@@ -667,3 +667,11 @@ export function getAccountByWalletById(
         }
     }
 }
+
+export type AccountsFolderStored = {
+    id: string;
+    type: 'folder';
+    accounts: AccountId[];
+    name: string;
+    lastIsOpened: boolean;
+};

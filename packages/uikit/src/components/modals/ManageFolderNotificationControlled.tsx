@@ -3,7 +3,7 @@ import { createModalControl } from './createModalControl';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from '../../hooks/translation';
 import { useAtom } from '../../libs/atom';
-import { AccountsFolder, useGlobalPreferences } from '../../state/global-preferences';
+import { useGlobalPreferences } from '../../state/global-preferences';
 import { useAccountsState } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../List';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
@@ -14,7 +14,13 @@ import { Checkbox } from '../fields/Checkbox';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
-import { useDeleteFolder, useNewFolderName, useUpdateFolder } from '../../state/folders';
+import {
+    AccountsFolder,
+    useDeleteFolder,
+    useFolders,
+    useNewFolderName,
+    useUpdateFolder
+} from '../../state/folders';
 
 const { hook, paramsControl } = createModalControl<{
     folderId?: string;
@@ -26,7 +32,7 @@ export const ManageFolderNotificationControlled = () => {
     const { isOpen, onClose } = useManageFolderNotification();
     const { t } = useTranslation();
     const [params] = useAtom(paramsControl);
-    const { folders } = useGlobalPreferences();
+    const folders = useFolders();
 
     const Content = useCallback(() => {
         const folder = folders.find(f => f.id === params?.folderId);
@@ -98,7 +104,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
     const { mutateAsync: updateFolder } = useUpdateFolder();
     const { mutateAsync: deleteFolder } = useDeleteFolder();
 
-    const [checkedAccounts, setChecked] = useState(folder?.accounts || []);
+    const [checkedAccounts, setChecked] = useState(folder?.accounts.map(a => a.id) || []);
     const [folderName, setFolderName] = useState(folder?.name || newFolderName);
 
     const { availableAccounts, unAvailableAccounts } = useMemo(() => {

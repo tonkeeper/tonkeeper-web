@@ -11,11 +11,7 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import {
-    useAccountsDNDDrop,
-    useActiveAccount,
-    useMutateActiveTonWallet, useSideBarItems
-} from "../../../state/wallet";
+import { useActiveAccount, useMutateActiveTonWallet } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -31,8 +27,9 @@ import {
     Droppable
 } from 'react-beautiful-dnd';
 import { AsideMenuAccount } from './AsideMenuAccount';
-import { AccountsFolder } from '../../../state/global-preferences';
 import { AsideMenuFolder } from './AsideMenuFolder';
+
+import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;

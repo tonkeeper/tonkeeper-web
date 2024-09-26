@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { AccountsFolder } from '../../../state/global-preferences';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { FolderIcon, GearIconEmpty } from '../../Icon';
@@ -10,9 +9,8 @@ import { useManageFolderNotification } from '../../modals/ManageFolderNotificati
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { Accordion } from '../../shared/Accordion';
 import { AsideMenuAccount } from './AsideMenuAccount';
-import { useAccountsState } from '../../../state/wallet';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useSetFolderLastIsOpened } from '../../../state/folders';
+import { AccountsFolder, useSetFolderLastIsOpened } from '../../../state/folders';
 
 const FolderIconStyled = styled(FolderIcon)`
     color: ${p => p.theme.iconSecondary};
@@ -40,7 +38,6 @@ export const AsideMenuFolder: FC<{
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const { onOpen: onManageFolder } = useManageFolderNotification();
     const { isOpen, onToggle } = useDisclosure(folder.lastIsOpened);
-    const accounts = useAccountsState();
     const { mutate, reset } = useSetFolderLastIsOpened();
 
     const onClickFolder = () => {
@@ -69,8 +66,8 @@ export const AsideMenuFolder: FC<{
                 <Accordion isOpened={isOpen} transitionMS={250}>
                     {folder.accounts.map(account => (
                         <AsideMenuAccount
-                            key={account}
-                            account={accounts.find(a => a.id === account)!}
+                            key={account.id}
+                            account={account}
                             isSelected={false}
                             onClickWallet={onClickWallet}
                         />

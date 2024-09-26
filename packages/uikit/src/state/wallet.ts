@@ -3,25 +3,25 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import {
     Account,
     AccountId,
-    AccountTonWatchOnly,
+    AccountMAM,
     AccountsState,
+    AccountTonMnemonic,
+    AccountTonMultisig,
+    AccountTonWatchOnly,
     getAccountByWalletById,
     getWalletById,
-    isAccountVersionEditable,
     isAccountTonWalletStandard,
-    AccountTonMultisig,
-    AccountTonMnemonic,
-    AccountMAM
+    isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
 import {
+    isStandardTonWallet,
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
     WalletVersion,
-    WalletVersions,
-    isStandardTonWallet
+    WalletVersions
 } from '@tonkeeper/core/dist/entries/wallet';
 import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
 import {
@@ -36,24 +36,22 @@ import {
     createStandardTonAccountByMnemonic,
     getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
-import { AccountsApi, Account as TonapiAccount } from '@tonkeeper/core/dist/tonApiV2';
+import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
 import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
-import { DropResult, ResponderProvided } from 'react-beautiful-dnd';
-import {
-    AccountsFolder,
-    applySideBarSorting,
-    useGlobalPreferences,
-    useMutateGlobalPreferences
-} from './global-preferences';
+import { useAccountsStateQuery, useAccountsState } from './accounts';
+import { useGlobalPreferences } from './global-preferences';
+import { useDeleteFolder } from './folders';
+
+export { useAccountsStateQuery, useAccountsState };
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -312,104 +310,6 @@ export const useControllableAccountAndWalletByWalletId = (
             account: getAccountByWalletById(accounts, id)
         };
     }, [accounts, id]);
-};
-
-export const useAccountsStateQuery = () => {
-    const storage = useAccountsStorage();
-    return useQuery<AccountsState, Error>(
-        [QueryKey.account, QueryKey.wallets],
-        () => storage.getAccounts(),
-        {
-            keepPreviousData: true
-        }
-    );
-};
-
-export const useSideBarItems = () => {
-    const accounts = useAccountsState();
-    const preferences = useGlobalPreferences();
-
-    const { folders, sideBarOrder } = preferences;
-    return useMemo(() => {
-        const accountsNotInFolder = accounts.filter(
-            a => !folders.some(f => f.accounts.includes(a.id))
-        );
-        return applySideBarSorting(
-            (accountsNotInFolder as (Account | AccountsFolder)[]).concat(folders),
-            sideBarOrder
-        );
-    }, [folders, sideBarOrder, accounts]);
-};
-
-export const useAccountsDNDDrop = (items: (Account | AccountsFolder)[]) => {
-    const { mutate } = useMutateGlobalPreferences();
-    const { folders } = useGlobalPreferences();
-
-    const [itemsOptimistic, setItemsOptimistic] = useState(items);
-
-    useEffect(() => {
-        setItemsOptimistic(items);
-    }, [items]);
-
-    const _handleDrop = useCallback<
-        (result: DropResult, provided: ResponderProvided) => (Account | AccountsFolder)[]
-    >(
-        droppedItem => {
-            const updatedList = [...items];
-            if (!droppedItem.destination) {
-                return updatedList;
-            }
-
-            const insideFolderId = droppedItem.source.droppableId.startsWith('folder_')
-                ? droppedItem.source.droppableId.split('folder_')[1]
-                : null;
-            if (insideFolderId) {
-                if (droppedItem.destination.droppableId !== droppedItem.source.droppableId) {
-                    throw new Error('Cannot move item from one folder to another');
-                }
-                const folder = folders.find(i => i.id === insideFolderId) as AccountsFolder;
-                if (!folder) {
-                    throw new Error(`Folder ${insideFolderId} not found`);
-                }
-                const newAccounts = folder.accounts.slice();
-
-                const [reorderedItem] = newAccounts.splice(droppedItem.source.index, 1);
-                newAccounts.splice(droppedItem.destination.index, 0, reorderedItem);
-
-                const folderIndex = folders.findIndex(i => i.id === insideFolderId);
-                const newFolders = folders.slice();
-                newFolders[folderIndex] = { ...folder, accounts: newAccounts };
-                mutate({ folders: newFolders });
-
-                updatedList[updatedList.findIndex(i => i.id === insideFolderId)] = {
-                    ...folder,
-                    accounts: newAccounts
-                };
-                return updatedList;
-            }
-
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate({ sideBarOrder: updatedList.map(i => i.id) });
-            return updatedList;
-        },
-        [items, mutate, folders, setItemsOptimistic]
-    );
-
-    const handleDrop = useCallback(
-        (droppedItem: DropResult, provided: ResponderProvided) => {
-            const result = _handleDrop(droppedItem, provided);
-            if (result) {
-                setItemsOptimistic(result);
-            }
-        },
-        [_handleDrop]
-    );
-
-    return {
-        handleDrop,
-        itemsOptimistic
-    };
 };
 
 export const useMutateAccountsState = () => {
@@ -690,10 +590,6 @@ export const useAddAccountToStateMutation = () => {
     });
 };
 
-export const useAccountsState = () => {
-    return useAccountsStateQuery().data!;
-};
-
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
     const storage = useAccountsStorage();
@@ -723,10 +619,22 @@ export const useIsPasswordSet = () => {
 export const useMutateLogOut = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
+    const { folders } = useGlobalPreferences();
+    const { mutateAsync } = useDeleteFolder();
+
     return useMutation<void, Error, AccountId>(async accountId => {
+        const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
+
+        if (folder) {
+            await mutateAsync(folder);
+        }
+
         await storage.removeAccountFromState(accountId);
         await client.invalidateQueries([QueryKey.account]);
         await client.invalidateQueries([QueryKey.pro]);
+        if (folder) {
+            await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
+        }
     });
 };
 

@@ -22,10 +22,12 @@ import { RenameWalletNotification } from '../../components/settings/wallet-name/
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useAccountsDNDDrop, useAccountsState, useSideBarItems } from '../../state/wallet';
+import { useAccountsState } from '../../state/wallet';
 import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
+
+import { useAccountsDNDDrop, useSideBarItems } from "../../state/folders";
 
 const Row = styled.div`
     display: flex;
@@ -171,7 +173,6 @@ export const Account = () => {
     const { t } = useTranslation();
 
     const items = useSideBarItems();
-    const accounts = useAccountsState();
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     const createItems = useMemo(() => {
@@ -211,13 +212,8 @@ export const Account = () => {
                                                                         key={account.id}
                                                                     >
                                                                         <WalletRow
-                                                                            key={a}
-                                                                            account={
-                                                                                accounts.find(
-                                                                                    ac =>
-                                                                                        ac.id === a
-                                                                                )!
-                                                                            }
+                                                                            key={a.id}
+                                                                            account={a}
                                                                             dragHandleProps={
                                                                                 p.dragHandleProps
                                                                             }
@@ -232,12 +228,8 @@ export const Account = () => {
                                                                     key={account.id}
                                                                 >
                                                                     <WalletRow
-                                                                        key={a}
-                                                                        account={
-                                                                            accounts.find(
-                                                                                ac => ac.id === a
-                                                                            )!
-                                                                        }
+                                                                        key={a.id}
+                                                                        account={a}
                                                                     />
                                                                 </ListItemElementInGroup>
                                                             );

@@ -12,12 +12,7 @@ import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import {
-    useAccountsState,
-    useAccountsDNDDrop,
-    useActiveTonNetwork,
-    useSideBarItems
-} from '../../state/wallet';
+import { useActiveTonNetwork } from '../../state/wallet';
 import {
     Account,
     AccountKeystone,
@@ -38,7 +33,6 @@ import {
     WalletIndexBadge,
     WalletVersionBadge
 } from '../../components/account/AccountBadge';
-import { AccountsFolder } from '../../state/global-preferences';
 import {
     sortDerivationsByIndex,
     sortWalletsByVersion,
@@ -53,7 +47,7 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { Button } from '../../components/fields/Button';
 import { useManageFolderNotification } from '../../components/modals/ManageFolderNotificationControlled';
-import { useDeleteFolder } from '../../state/folders';
+import { AccountsFolder, useAccountsDNDDrop, useDeleteFolder, useSideBarItems } from "../../state/folders";
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
@@ -658,7 +652,6 @@ const ItemRow: FC<{
     tabLevel?: number;
 }> = ({ item, dragHandleProps, tabLevel = 0 }) => {
     const { t } = useTranslation();
-    const accounts = useAccountsState();
     const { onOpen: onManageFolder } = useManageFolderNotification();
     const { mutate: deleteFolder } = useDeleteFolder();
 
@@ -691,7 +684,7 @@ const ItemRow: FC<{
                     />
                 </Row>
                 {item.accounts.length === 1 ? (
-                    <ItemRow item={accounts.find(a => a.id === item.accounts[0])!} tabLevel={1} />
+                    <ItemRow item={item.accounts[0]} tabLevel={1} />
                 ) : (
                     <Droppable droppableId={'folder_' + item.id} type="folder">
                         {provided => (
@@ -700,7 +693,7 @@ const ItemRow: FC<{
                                 ref={provided.innerRef}
                             >
                                 {item.accounts.map((acc, index) => (
-                                    <Draggable key={acc} draggableId={acc} index={index}>
+                                    <Draggable key={acc.id} draggableId={acc.id} index={index}>
                                         {(p, snapshot) => {
                                             const transform = p.draggableProps.style?.transform;
                                             if (transform) {
@@ -720,8 +713,8 @@ const ItemRow: FC<{
                                                     {...p.draggableProps}
                                                 >
                                                     <ItemRow
-                                                        key={acc}
-                                                        item={accounts.find(a => a.id === acc)!}
+                                                        key={acc.id}
+                                                        item={acc}
                                                         dragHandleProps={p.dragHandleProps}
                                                         tabLevel={tabLevel + 1}
                                                     />
