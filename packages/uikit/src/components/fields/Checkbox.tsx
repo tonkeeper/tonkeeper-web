@@ -11,12 +11,10 @@ export interface CheckboxProps {
     light?: boolean;
     className?: string;
     borderColor?: keyof DefaultTheme;
+    size?: 's' | 'm';
 }
 
 const Wrapper = styled.div`
-    width: 22px;
-    height: 22px;
-
     display: inline-flex;
     gap: 8px;
     align-items: center;
@@ -53,10 +51,19 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean; $borderColor
                   border-color: ${props.theme[props.$borderColor]};
               `}
 `;
-const CheckboxItem = styled(IconBase)`
+const CheckboxItem = styled(IconBase)<{ $size: 's' | 'm' }>`
     border-radius: 6px;
-    height: 100%;
-    width: 100%;
+
+    ${props =>
+        props.$size === 's'
+            ? css`
+                  width: 18px;
+                  height: 18px;
+              `
+            : css`
+                  width: 22px;
+                  height: 22px;
+              `}
 `;
 
 const RadioInput = styled.input`
@@ -122,7 +129,8 @@ export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
     children,
     light,
     className,
-    borderColor = 'backgroundContentTint'
+    borderColor = 'backgroundContentTint',
+    size = 'm'
 }) => {
     return (
         <Wrapper onClick={() => onChange(!checked)} className={className}>
@@ -130,6 +138,7 @@ export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
                 checked={checked}
                 disabled={disabled}
                 $borderColor={borderColor.toString()}
+                $size={size}
             >
                 {checked ? <CheckboxIcon /> : undefined}
             </CheckboxItem>

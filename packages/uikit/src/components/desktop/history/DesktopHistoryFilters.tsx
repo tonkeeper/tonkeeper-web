@@ -123,8 +123,6 @@ export const AssetHistoryFilter = () => {
 
 const CheckboxStyled = styled(Checkbox)`
     margin-right: 12px;
-    height: 18px;
-    width: 18px;
     pointer-events: none;
 `;
 
@@ -174,6 +172,7 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
                         $isDisabled={disableInitiatorFilter}
                     >
                         <CheckboxStyled
+                            size="s"
                             disabled={disableInitiatorFilter}
                             checked={onlyInitiatorChecked}
                             onChange={toggleOnlyInitiator}
@@ -184,6 +183,7 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
                     <DropDownItemsDivider />
                     <DropDownItemStyled onClick={toggleFilterSpam} isSelected={false}>
                         <CheckboxStyled
+                            size="s"
                             checked={filterSpam}
                             onChange={toggleFilterSpam}
                             borderColor="textTertiary"
