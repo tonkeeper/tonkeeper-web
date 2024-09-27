@@ -17,7 +17,7 @@ import nacl from 'tweetnacl';
 import { APIConfig } from '../../entries/apis';
 import { TonRecipient, TransferEstimationEventFee } from '../../entries/send';
 import { TonWalletStandard } from '../../entries/wallet';
-import { CellSigner, Signer } from '../../entries/signer';
+import { Signer } from '../../entries/signer';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import {
     Account,
@@ -182,6 +182,7 @@ export const createTransferMessage = async (
             seqno: wallet.seqno,
             timeout: getTTL(wallet.timestamp),
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            stateInit: transaction.init || undefined,
             payload: transaction.body
                 ? {
                       type: 'unsafe',
@@ -278,7 +279,7 @@ export const sendMultisigTransfer = async ({
     message: MessageRelaxed;
     fee: TransferEstimationEventFee;
     amount: BigNumber;
-    signer: CellSigner;
+    signer: Signer;
     ttlSeconds: number;
 }): Promise<void> => {
     const timestamp = await getServerTime(api);

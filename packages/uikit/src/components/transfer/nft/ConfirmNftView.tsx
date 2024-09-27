@@ -161,8 +161,8 @@ const useSendNft = (
                 const signer = await getSigner(sdk, signerAccount.id, checkTouchId, {
                     walletId: signerWallet.id
                 }).catch(() => null);
-                if (signer?.type !== 'cell') {
-                    throw new Error('Cant use this signer');
+                if (!signer) {
+                    throw new Error('Signer not found');
                 }
 
                 if (!options?.multisigTTL) {

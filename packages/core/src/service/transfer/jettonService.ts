@@ -247,7 +247,7 @@ export const sendMultisigJettonTransfer = async (params: {
     amount: AssetAmount<TonAsset>;
     jettonWalletAddress: string;
     fee: TransferEstimationEventFee;
-    signer: CellSigner;
+    signer: Signer;
     ttlSeconds: number;
 }): Promise<void> => {
     const internalParams = await createJettonTransferMsgParams({
