@@ -64,8 +64,8 @@ export const useNewFolderName = () => {
 export const useUpdateFolder = () => {
     const { folders } = useGlobalPreferences();
     const { mutateAsync } = useMutateGlobalPreferences();
-    return useMutation<void, Error, { id?: string; name: string; accounts: string[] }>(
-        ({ id, name, accounts }) => {
+    return useCallback(
+        ({ id, name, accounts }: { id?: string; name: string; accounts: string[] }) => {
             const newId =
                 id ??
                 (
@@ -74,11 +74,13 @@ export const useUpdateFolder = () => {
 
             const existingFolder = folders.find(folder => folder.id === newId);
 
+            const newFolders = [...folders];
+
             if (existingFolder) {
                 existingFolder.name = name;
                 existingFolder.accounts = accounts;
             } else {
-                folders.push({
+                newFolders.push({
                     id: newId,
                     type: 'folder',
                     accounts,
@@ -87,7 +89,7 @@ export const useUpdateFolder = () => {
                 });
             }
 
-            folders.forEach(f => {
+            newFolders.forEach(f => {
                 if (f.id === newId) {
                     return;
                 }
@@ -95,8 +97,9 @@ export const useUpdateFolder = () => {
                 f.accounts = f.accounts.filter(acc => !accounts.includes(acc));
             });
 
-            return mutateAsync({ folders: folders.slice() });
-        }
+            return mutateAsync({ folders: newFolders });
+        },
+        [folders, mutateAsync]
     );
 };
 
@@ -122,9 +125,12 @@ export const useSetFolderLastIsOpened = () => {
 export const useDeleteFolder = () => {
     const { folders } = useGlobalPreferences();
     const { mutateAsync } = useMutateGlobalPreferences();
-    return useMutation<void, Error, { id: string }>(({ id }) => {
-        return mutateAsync({ folders: folders.filter(f => f.id !== id) });
-    });
+    return useCallback(
+        ({ id }: { id: string }) => {
+            return mutateAsync({ folders: folders.filter(f => f.id !== id) });
+        },
+        [folders, mutateAsync]
+    );
 };
 
 function applySideBarSorting<T extends { id: string }>(items: T[], order: string[]): T[] {

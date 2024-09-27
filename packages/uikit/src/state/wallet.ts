@@ -620,13 +620,13 @@ export const useMutateLogOut = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     const { folders } = useGlobalPreferences();
-    const { mutateAsync } = useDeleteFolder();
+    const deleteFolder = useDeleteFolder();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
 
         if (folder) {
-            await mutateAsync(folder);
+            await deleteFolder(folder);
         }
 
         await storage.removeAccountFromState(accountId);

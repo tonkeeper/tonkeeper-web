@@ -16,21 +16,23 @@ const defaultGlobalPreferences: GlobalPreferences = {
 
 export const useGlobalPreferencesQuery = () => {
     const sdk = useAppSdk();
-    return useQuery(
-        [QueryKey.globalPreferencesConfig],
-        async () => {
-            const data = await sdk.storage.get<Partial<GlobalPreferences>>(
-                AppKey.GLOBAL_PREFERENCES_CONFIG
-            );
-            if (!data) {
-                return defaultGlobalPreferences;
-            }
-            return { ...defaultGlobalPreferences, ...data };
-        },
-        {
-            keepPreviousData: true
+    return useQuery([QueryKey.globalPreferencesConfig], async () => {
+        const data = await sdk.storage.get<Partial<GlobalPreferences>>(
+            AppKey.GLOBAL_PREFERENCES_CONFIG
+        );
+        if (!data) {
+            return defaultGlobalPreferences;
         }
-    );
+        const x = { ...defaultGlobalPreferences, ...data };
+
+        /**
+         * React query bug: no rerender otherwise
+         */
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        x.folders.ANY_PROP = Date.now();
+        return x;
+    });
 };
 
 export const useGlobalPreferences = () => {

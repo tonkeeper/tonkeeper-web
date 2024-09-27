@@ -47,7 +47,12 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { Button } from '../../components/fields/Button';
 import { useManageFolderNotification } from '../../components/modals/ManageFolderNotificationControlled';
-import { AccountsFolder, useAccountsDNDDrop, useDeleteFolder, useSideBarItems } from "../../state/folders";
+import {
+    AccountsFolder,
+    useAccountsDNDDrop,
+    useDeleteFolder,
+    useSideBarItems
+} from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
@@ -653,7 +658,7 @@ const ItemRow: FC<{
 }> = ({ item, dragHandleProps, tabLevel = 0 }) => {
     const { t } = useTranslation();
     const { onOpen: onManageFolder } = useManageFolderNotification();
-    const { mutate: deleteFolder } = useDeleteFolder();
+    const deleteFolder = useDeleteFolder();
 
     if (item.type === 'folder') {
         if (!item.accounts.length) {

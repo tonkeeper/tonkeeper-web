@@ -101,8 +101,8 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
     const accounts = useAccountsState().filter(a => a.type !== 'ton-multisig');
     const { folders } = useGlobalPreferences();
     const newFolderName = useNewFolderName();
-    const { mutateAsync: updateFolder } = useUpdateFolder();
-    const { mutateAsync: deleteFolder } = useDeleteFolder();
+    const updateFolder = useUpdateFolder();
+    const deleteFolder = useDeleteFolder();
 
     const [checkedAccounts, setChecked] = useState(folder?.accounts.map(a => a.id) || []);
     const [folderName, setFolderName] = useState(folder?.name || newFolderName);
