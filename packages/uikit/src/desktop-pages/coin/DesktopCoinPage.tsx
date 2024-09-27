@@ -281,7 +281,7 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
         <DesktopViewPageLayout ref={ref}>
             <DesktopViewHeaderStyled backButton borderBottom={true}>
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-                <OtherHistoryFilters disableInitiatorFilter />
+                <OtherHistoryFilters disableInitiatorFilter={token !== CryptoCurrency.TON} />
             </DesktopViewHeaderStyled>
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>

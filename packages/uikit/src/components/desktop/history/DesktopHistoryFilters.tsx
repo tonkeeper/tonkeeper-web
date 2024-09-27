@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components';
 import { useAssets } from '../../../state/home';
 import { ChevronDownIcon, SlidersIcon } from '../../Icon';
 import { Checkbox } from '../../fields/Checkbox';
-import { useHistoryFilters } from '../../../state/activity';
+import { isInitiatorFiltrationForAssetAvailable, useHistoryFilters } from '../../../state/activity';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useTranslation } from '../../../hooks/translation';
@@ -154,8 +154,13 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
     disableInitiatorFilter
 }) => {
     const { t } = useTranslation();
-    const { onlyInitiator, filterSpam, toggleFilterSpam, toggleOnlyInitiator } =
+    const { onlyInitiator, filterSpam, toggleFilterSpam, toggleOnlyInitiator, asset } =
         useHistoryFilters();
+
+    disableInitiatorFilter =
+        disableInitiatorFilter || !isInitiatorFiltrationForAssetAvailable(asset);
+
+    const onlyInitiatorChecked = onlyInitiator && !disableInitiatorFilter;
 
     return (
         <SelectDropDown
@@ -170,7 +175,7 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
                     >
                         <CheckboxStyled
                             disabled={disableInitiatorFilter}
-                            checked={onlyInitiator && !disableInitiatorFilter}
+                            checked={onlyInitiatorChecked}
                             onChange={toggleOnlyInitiator}
                             borderColor="textTertiary"
                         />
@@ -191,7 +196,7 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
                 </DropDownContent>
             )}
         >
-            <DropDownOtherFiltersButton $badge={filterSpam || onlyInitiator}>
+            <DropDownOtherFiltersButton $badge={filterSpam || onlyInitiatorChecked}>
                 <SlidersIcon />
             </DropDownOtherFiltersButton>
         </SelectDropDown>

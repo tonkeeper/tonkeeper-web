@@ -10,6 +10,7 @@ import { useActiveWallet } from './wallet';
 import { atom, useAtom } from '../libs/atom';
 import { useCallback, useEffect } from 'react';
 import {
+    isTon,
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -274,4 +275,11 @@ export const useHistoryFilters = () => {
         toggleFilterSpam,
         setAsset
     };
+};
+
+export const isInitiatorFiltrationForAssetAvailable = (asset: TonAsset | undefined): boolean => {
+    if (!asset) {
+        return true;
+    }
+    return isTon(asset.address);
 };
