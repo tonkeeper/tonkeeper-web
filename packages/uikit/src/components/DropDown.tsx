@@ -208,6 +208,7 @@ const DropDownListItemStyled = styled.div`
     padding: 10px 12px;
     cursor: pointer;
     display: flex;
+    align-items: center;
 
     transition: background 0.1s ease-in-out;
 

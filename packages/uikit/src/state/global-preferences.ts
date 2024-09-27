@@ -7,11 +7,13 @@ import { AccountsFolderStored } from '@tonkeeper/core/dist/entries/account';
 export interface GlobalPreferences {
     folders: AccountsFolderStored[];
     sideBarOrder: string[];
+    historyFilterSpam: boolean;
 }
 
 const defaultGlobalPreferences: GlobalPreferences = {
     folders: [],
-    sideBarOrder: []
+    sideBarOrder: [],
+    historyFilterSpam: false
 };
 
 export const useGlobalPreferencesQuery = () => {
