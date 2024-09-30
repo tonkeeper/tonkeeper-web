@@ -11,7 +11,7 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useActiveAccount, useMutateActiveTonWallet } from '../../../state/wallet';
+import { useMutateActiveTonWallet } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -97,6 +97,7 @@ const AsideMenuBottom = styled.div`
 const DraggingBlock = styled.div<{ $isDragging: boolean }>`
     cursor: pointer !important;
     border-radius: ${p => p.theme.corner2xSmall};
+    overflow: hidden;
     transition: background-color 0.15s ease-in-out;
     ${p =>
         p.$isDragging &&
@@ -119,10 +120,10 @@ export const AsideMenuDNDItem = forwardRef<
     HTMLDivElement,
     {
         item: Account | AccountsFolder;
-        isSelected: boolean;
+        mightBeHighlighted: boolean;
         isDragging: boolean;
     } & DraggableProvidedDraggableProps
->(({ item, isSelected, isDragging, ...rest }, fRef) => {
+>(({ item, mightBeHighlighted, isDragging, ...rest }, fRef) => {
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
     const location = useLocation();
@@ -148,11 +149,15 @@ export const AsideMenuDNDItem = forwardRef<
     return (
         <DraggingBlock ref={fRef} $isDragging={isDragging} {...rest}>
             {item.type === 'folder' ? (
-                <AsideMenuFolder folder={item} onClickWallet={onClickWallet} />
+                <AsideMenuFolder
+                    folder={item}
+                    onClickWallet={onClickWallet}
+                    accountMightBeHighlighted={mightBeHighlighted}
+                />
             ) : (
                 <AsideMenuAccount
                     account={item}
-                    isSelected={isSelected}
+                    mightBeHighlighted={mightBeHighlighted}
                     onClickWallet={onClickWallet}
                 />
             )}
@@ -162,9 +167,8 @@ export const AsideMenuDNDItem = forwardRef<
 
 const AccountDNDBlock: FC<{
     items: (Account | AccountsFolder)[];
-    activeAccount: Account;
     activeRoute: string | undefined;
-}> = ({ activeRoute, activeAccount, items }) => {
+}> = ({ activeRoute, items }) => {
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     return (
@@ -189,9 +193,7 @@ const AccountDNDBlock: FC<{
                                         <AsideMenuDNDItem
                                             ref={p.innerRef}
                                             item={account}
-                                            isSelected={
-                                                !activeRoute && activeAccount.id === account.id
-                                            }
+                                            mightBeHighlighted={!activeRoute}
                                             isDragging={snapshot.isDragging}
                                             {...p.draggableProps}
                                             {...p.dragHandleProps}
@@ -213,7 +215,6 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { onOpen: addWallet } = useAddWalletNotification();
     const { proFeatures } = useAppContext();
     const items = useSideBarItems();
-    const activeAccount = useActiveAccount();
     const navigate = useNavigate();
     const location = useLocation();
     const { ref, closeBottom } = useIsScrolled();
@@ -285,11 +286,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    <AccountDNDBlock
-                        items={items}
-                        activeAccount={activeAccount}
-                        activeRoute={activeRoute}
-                    />
+                    <AccountDNDBlock items={items} activeRoute={activeRoute} />
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
