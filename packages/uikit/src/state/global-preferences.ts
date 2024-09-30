@@ -2,11 +2,19 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
+import { AccountsFolderStored } from '@tonkeeper/core/dist/entries/account';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GlobalPreferences {}
+export interface GlobalPreferences {
+    folders: AccountsFolderStored[];
+    sideBarOrder: string[];
+    historyFilterSpam: boolean;
+}
 
-const defaultGlobalPreferences: GlobalPreferences = {};
+const defaultGlobalPreferences: GlobalPreferences = {
+    folders: [],
+    sideBarOrder: [],
+    historyFilterSpam: false
+};
 
 export const useGlobalPreferencesQuery = () => {
     const sdk = useAppSdk();
@@ -22,7 +30,8 @@ export const useGlobalPreferencesQuery = () => {
             return { ...defaultGlobalPreferences, ...data };
         },
         {
-            keepPreviousData: true
+            keepPreviousData: true,
+            structuralSharing: false
         }
     );
 };

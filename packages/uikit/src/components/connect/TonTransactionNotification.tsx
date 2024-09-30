@@ -88,9 +88,6 @@ const useSendMutation = (
             });
             const { signerWallet, signerAccount } = getMultisigSignerInfo(accounts, account);
             const signer = await getSigner(sdk, signerAccount.id, checkTouchId);
-            if (signer.type !== 'cell') {
-                throw new Error('Cant use this signer');
-            }
 
             if (!options.multisigTTL) {
                 throw new Error('TTL is required');

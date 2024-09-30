@@ -34,7 +34,7 @@ const DisclaimerLink = styled(Label1)`
     margin-left: 2.35rem;
 `;
 
-const DeleteContent: FC<{
+export const DeleteNotificationContent: FC<{
     onClose: () => void;
     accountId: AccountId;
     isKeystone: boolean;
@@ -103,7 +103,7 @@ export const DeleteAccountNotification: FC<{
         (afterClose: () => void) => {
             if (!account) return undefined;
             return (
-                <DeleteContent
+                <DeleteNotificationContent
                     accountId={account.id}
                     onClose={afterClose}
                     isKeystone={account.type === 'keystone'}

@@ -3,25 +3,25 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import {
     Account,
     AccountId,
-    AccountTonWatchOnly,
+    AccountMAM,
     AccountsState,
+    AccountTonMnemonic,
+    AccountTonMultisig,
+    AccountTonWatchOnly,
     getAccountByWalletById,
     getWalletById,
-    isAccountVersionEditable,
     isAccountTonWalletStandard,
-    AccountTonMultisig,
-    AccountTonMnemonic,
-    AccountMAM
+    isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
 import {
+    isStandardTonWallet,
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
     WalletVersion,
-    WalletVersions,
-    isStandardTonWallet
+    WalletVersions
 } from '@tonkeeper/core/dist/entries/wallet';
 import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
 import {
@@ -36,17 +36,22 @@ import {
     createStandardTonAccountByMnemonic,
     getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
-import { AccountsApi, Account as TonapiAccount } from '@tonkeeper/core/dist/tonApiV2';
+import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { QueryKey, anyOfKeysParts } from '../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useDevSettings } from './dev';
 import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { seeIfMnemonicValid } from "@tonkeeper/core/dist/service/mnemonicService";
+import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
+import { useAccountsStateQuery, useAccountsState } from './accounts';
+import { useGlobalPreferences } from './global-preferences';
+import { useDeleteFolder } from './folders';
+
+export { useAccountsStateQuery, useAccountsState };
 
 export const useActiveAccountQuery = () => {
     const storage = useAccountsStorage();
@@ -305,17 +310,6 @@ export const useControllableAccountAndWalletByWalletId = (
             account: getAccountByWalletById(accounts, id)
         };
     }, [accounts, id]);
-};
-
-export const useAccountsStateQuery = () => {
-    const storage = useAccountsStorage();
-    return useQuery<AccountsState, Error>(
-        [QueryKey.account, QueryKey.wallets],
-        () => storage.getAccounts(),
-        {
-            keepPreviousData: true
-        }
-    );
 };
 
 export const useMutateAccountsState = () => {
@@ -596,10 +590,6 @@ export const useAddAccountToStateMutation = () => {
     });
 };
 
-export const useAccountsState = () => {
-    return useAccountsStateQuery().data!;
-};
-
 export const useMutateDeleteAll = () => {
     const sdk = useAppSdk();
     const storage = useAccountsStorage();
@@ -629,10 +619,22 @@ export const useIsPasswordSet = () => {
 export const useMutateLogOut = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
+    const { folders } = useGlobalPreferences();
+    const deleteFolder = useDeleteFolder();
+
     return useMutation<void, Error, AccountId>(async accountId => {
+        const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
+
+        if (folder) {
+            await deleteFolder(folder);
+        }
+
         await storage.removeAccountFromState(accountId);
         await client.invalidateQueries([QueryKey.account]);
         await client.invalidateQueries([QueryKey.pro]);
+        if (folder) {
+            await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
+        }
     });
 };
 

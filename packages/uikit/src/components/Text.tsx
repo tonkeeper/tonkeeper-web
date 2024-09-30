@@ -116,3 +116,17 @@ export const Num3 = styled.span`
 export const Mono = styled.span`
     font-family: ${p => p.theme.fontMono};
 `;
+
+export const TextEllipsis = css`
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+`;
+
+export const NoSelectText = css`
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+`;

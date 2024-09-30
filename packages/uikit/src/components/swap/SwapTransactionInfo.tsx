@@ -1,7 +1,7 @@
 import { css, styled } from 'styled-components';
 import { Body2Class, Body3 } from '../Text';
 import { IconButton } from '../fields/IconButton';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
 import { Skeleton } from '../shared/Skeleton';
 import {
@@ -16,6 +16,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { useSwapOptions } from '../../state/swap/useSwapOptions';
 import { useTranslation } from '../../hooks/translation';
 import { BorderSmallResponsive } from '../shared/Styles';
+import { Accordion } from '../shared/Accordion';
 
 const TxInfoContainer = styled.div``;
 
@@ -135,8 +136,6 @@ const PriceImpact = styled(Body3)<{ status: ReturnType<typeof priceImpactStatus>
 export const SwapTransactionInfo = () => {
     const { t } = useTranslation();
     const [isOpened, setIsOpened] = useState(false);
-    const [isAnimationCompleted, setIsAnimationCompleted] = useState(false);
-    const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
     const { isFetching } = useCalculatedSwap();
     const [swap] = useSelectedSwap();
     const priceImpact = useSwapPriceImpact();
@@ -150,14 +149,7 @@ export const SwapTransactionInfo = () => {
     }
 
     const onToggleAccordion = () => {
-        clearTimeout(timeoutRef.current);
-        if (isOpened) {
-            setIsAnimationCompleted(false);
-            setIsOpened(false);
-        } else {
-            setIsOpened(true);
-            timeoutRef.current = setTimeout(() => setIsAnimationCompleted(true), 400);
-        }
+        setIsOpened(v => !v);
     };
 
     return (
@@ -168,106 +160,98 @@ export const SwapTransactionInfo = () => {
                     <ChevronDownIcon />
                 </AccordionButton>
             </TxInfoHeader>
-            <AccordionAnimation isOpened={isOpened} animationCompleted={isAnimationCompleted}>
-                <AccordionBody>
-                    <AccordionContent>
-                        <InfoRow>
-                            <InfoRowLabel>{t('swap_price_impact')}</InfoRowLabel>
-                            <TooltipHost>
-                                <InfoCircleIcon />
-                            </TooltipHost>
-                            <Tooltip placement="top">{t('swap_price_impact_tooltip')}</Tooltip>
-                            <InfoRowRight>
-                                {priceImpact === undefined || !trade ? (
-                                    <InfoSkeleton />
-                                ) : (
-                                    <PriceImpact status={priceImpactStatus(priceImpact)}>
-                                        {priceImpact ? (
-                                            <>
-                                                ≈&nbsp;
-                                                {`${priceImpact
-                                                    .multipliedBy(100)
-                                                    .decimalPlaces(2)
-                                                    .toString()
-                                                    .replace('.', getDecimalSeparator())
-                                                    .replace('-', '+')}%`}
-                                            </>
-                                        ) : (
-                                            t('swap_unknown_price_impact')
-                                        )}
-                                    </PriceImpact>
-                                )}
-                            </InfoRowRight>
-                        </InfoRow>
-                        <InfoRow>
-                            <InfoRowLabel>{t('swap_minimum_received')}</InfoRowLabel>
-                            <TooltipHost>
-                                <InfoCircleIcon />
-                            </TooltipHost>
-                            <Tooltip placement="top">
-                                {t('swap_minimum_received_tooltip')}
-                            </Tooltip>
-                            <InfoRowRight>
-                                {!trade || !swapOptions ? (
-                                    <InfoSkeleton />
-                                ) : (
-                                    <Body3>
+            <Accordion isOpened={isOpened}>
+                <InfoRow>
+                    <InfoRowLabel>{t('swap_price_impact')}</InfoRowLabel>
+                    <TooltipHost>
+                        <InfoCircleIcon />
+                    </TooltipHost>
+                    <Tooltip placement="top">{t('swap_price_impact_tooltip')}</Tooltip>
+                    <InfoRowRight>
+                        {priceImpact === undefined || !trade ? (
+                            <InfoSkeleton />
+                        ) : (
+                            <PriceImpact status={priceImpactStatus(priceImpact)}>
+                                {priceImpact ? (
+                                    <>
                                         ≈&nbsp;
-                                        {
-                                            new AssetAmount({
-                                                weiAmount: trade!.to.weiAmount
-                                                    .multipliedBy(100 - swapOptions.slippagePercent)
-                                                    .div(100),
-                                                asset: trade!.to.asset
-                                            }).stringAssetRelativeAmount
-                                        }
-                                    </Body3>
-                                )}
-                            </InfoRowRight>
-                        </InfoRow>
-                        <InfoRow>
-                            <InfoRowLabel>{t('swap_slippage')}</InfoRowLabel>
-                            <TooltipHost>
-                                <InfoCircleIcon />
-                            </TooltipHost>
-                            <Tooltip placement="top">{t('swap_slippage_tooltip')}</Tooltip>
-                            <InfoRowRight>
-                                {!trade || !swapOptions ? (
-                                    <InfoSkeleton />
+                                        {`${priceImpact
+                                            .multipliedBy(100)
+                                            .decimalPlaces(2)
+                                            .toString()
+                                            .replace('.', getDecimalSeparator())
+                                            .replace('-', '+')}%`}
+                                    </>
                                 ) : (
-                                    <Body3>{swapOptions.slippagePercent}%</Body3>
+                                    t('swap_unknown_price_impact')
                                 )}
-                            </InfoRowRight>
-                        </InfoRow>
-                        <InfoRow>
-                            <InfoRowLabel>{t('swap_blockchain_fee')}</InfoRowLabel>
-                            <TooltipHost>
-                                <InfoCircleIcon />
-                            </TooltipHost>
-                            <Tooltip placement="top">{t('swap_blockchain_fee_tooltip')}</Tooltip>
-                            <InfoRowRight>
-                                {!trade ? (
-                                    <InfoSkeleton />
-                                ) : (
-                                    <Body3>
-                                        ≈&nbsp;{trade!.blockchainFee.stringAssetRelativeAmount}
-                                    </Body3>
-                                )}
-                            </InfoRowRight>
-                        </InfoRow>
-                        <InfoRow>
-                            <InfoRowLabel>{t('swap_route')}</InfoRowLabel>
-                            <InfoRowRight>
-                                {!trade ? (
-                                    <InfoSkeleton />
-                                ) : (
-                                    <Body3>{trade!.path.map(ta => ta.symbol).join(' → ')}</Body3>
-                                )}
-                            </InfoRowRight>
-                        </InfoRow>
-                    </AccordionContent>
-                </AccordionBody>
-            </AccordionAnimation>
+                            </PriceImpact>
+                        )}
+                    </InfoRowRight>
+                </InfoRow>
+                <InfoRow>
+                    <InfoRowLabel>{t('swap_minimum_received')}</InfoRowLabel>
+                    <TooltipHost>
+                        <InfoCircleIcon />
+                    </TooltipHost>
+                    <Tooltip placement="top">{t('swap_minimum_received_tooltip')}</Tooltip>
+                    <InfoRowRight>
+                        {!trade || !swapOptions ? (
+                            <InfoSkeleton />
+                        ) : (
+                            <Body3>
+                                ≈&nbsp;
+                                {
+                                    new AssetAmount({
+                                        weiAmount: trade!.to.weiAmount
+                                            .multipliedBy(100 - swapOptions.slippagePercent)
+                                            .div(100),
+                                        asset: trade!.to.asset
+                                    }).stringAssetRelativeAmount
+                                }
+                            </Body3>
+                        )}
+                    </InfoRowRight>
+                </InfoRow>
+                <InfoRow>
+                    <InfoRowLabel>{t('swap_slippage')}</InfoRowLabel>
+                    <TooltipHost>
+                        <InfoCircleIcon />
+                    </TooltipHost>
+                    <Tooltip placement="top">{t('swap_slippage_tooltip')}</Tooltip>
+                    <InfoRowRight>
+                        {!trade || !swapOptions ? (
+                            <InfoSkeleton />
+                        ) : (
+                            <Body3>{swapOptions.slippagePercent}%</Body3>
+                        )}
+                    </InfoRowRight>
+                </InfoRow>
+                <InfoRow>
+                    <InfoRowLabel>{t('swap_blockchain_fee')}</InfoRowLabel>
+                    <TooltipHost>
+                        <InfoCircleIcon />
+                    </TooltipHost>
+                    <Tooltip placement="top">{t('swap_blockchain_fee_tooltip')}</Tooltip>
+                    <InfoRowRight>
+                        {!trade ? (
+                            <InfoSkeleton />
+                        ) : (
+                            <Body3>≈&nbsp;{trade!.blockchainFee.stringAssetRelativeAmount}</Body3>
+                        )}
+                    </InfoRowRight>
+                </InfoRow>
+                <InfoRow>
+                    <InfoRowLabel>{t('swap_route')}</InfoRowLabel>
+                    <InfoRowRight>
+                        {!trade ? (
+                            <InfoSkeleton />
+                        ) : (
+                            <Body3>{trade!.path.map(ta => ta.symbol).join(' → ')}</Body3>
+                        )}
+                    </InfoRowRight>
+                </InfoRow>
+            </Accordion>
         </TxInfoContainer>
     );
 };

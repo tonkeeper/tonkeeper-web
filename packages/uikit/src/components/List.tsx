@@ -1,7 +1,6 @@
 import React, {
     ComponentProps,
     createContext,
-    FC,
     forwardRef,
     PropsWithChildren,
     useContext,
@@ -16,9 +15,10 @@ import { mergeRefs } from '../libs/common';
 
 const ListBlockContext = createContext({ isDesktopAdaptive: false });
 
-export const ListBlockDesktopAdaptive: FC<
+export const ListBlockDesktopAdaptive = forwardRef<
+    HTMLDivElement,
     PropsWithChildren<{ className?: string } & ComponentProps<typeof ListBlock>>
-> = props => {
+>((props, ref) => {
     const value = useMemo(
         () => ({
             isDesktopAdaptive: true
@@ -28,10 +28,10 @@ export const ListBlockDesktopAdaptive: FC<
 
     return (
         <ListBlockContext.Provider value={value}>
-            <ListBlockDesktop {...props} />
+            <ListBlockDesktop ref={ref} {...props} />
         </ListBlockContext.Provider>
     );
-};
+});
 
 export const ListBlock = styled.div<{
     margin?: boolean;
