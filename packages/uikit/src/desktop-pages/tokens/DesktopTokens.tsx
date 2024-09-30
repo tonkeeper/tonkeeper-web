@@ -15,7 +15,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
-import { useAssetsDistribution } from "../../state/asset";
+import { useAssetsDistribution } from '../../state/asset';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -172,7 +172,7 @@ const DesktopTokensPayload = () => {
                                     position: 'absolute',
                                     top: 0,
                                     left: 0,
-                                    width: `100%`,
+                                    width: '100%',
                                     height: `${virtualRow.size}px`,
                                     transform: `translateY(${virtualRow.start}px)`
                                 }}

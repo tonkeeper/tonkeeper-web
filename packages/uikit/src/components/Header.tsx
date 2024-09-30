@@ -30,6 +30,9 @@ import { useAddWalletNotification } from './modals/AddWalletNotificationControll
 import { SkeletonText } from './shared/Skeleton';
 import { WalletEmoji } from './shared/emoji/WalletEmoji';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { notNullish } from '@tonkeeper/core/dist/utils/types';
+
+import { useSideBarItems } from '../state/folders';
 
 const Block = styled.div<{
     center?: boolean;
@@ -189,7 +192,10 @@ const DropDownPayload: FC<{ onClose: () => void; onCreate: () => void }> = ({
         wallet: TonContract;
         account: Account;
         derivation?: DerivationItemNamed;
-    }[] = useAccountsState()
+    }[] = useSideBarItems()
+        .map(i => (i.type === 'folder' ? i.accounts : [i]))
+        .flat()
+        .filter(notNullish)
         .filter(a => a.type !== 'ton-multisig')
         .flatMap(a => {
             if (a.type === 'ledger') {

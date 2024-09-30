@@ -614,11 +614,11 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'mnemonic':
         case 'ton-only':
         case 'mam':
+        case 'ledger':
             return true;
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
-        case 'ledger':
             return false;
     }
 
@@ -667,3 +667,11 @@ export function getAccountByWalletById(
         }
     }
 }
+
+export type AccountsFolderStored = {
+    id: string;
+    type: 'folder';
+    accounts: AccountId[];
+    name: string;
+    lastIsOpened: boolean;
+};

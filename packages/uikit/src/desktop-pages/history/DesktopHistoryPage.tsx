@@ -1,11 +1,8 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { FC, Suspense, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { QueryKey } from '../../libs/queryKey';
 import { getMixedActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
@@ -15,44 +12,71 @@ import {
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useIsScrolled } from '../../hooks/useIsScrolled';
-import { mergeRefs } from '../../libs/common';
 import { useActiveWallet } from '../../state/wallet';
-import { Body2, Label2 } from '../../components/Text';
+import { Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
+import { useFetchFilteredActivity } from '../../state/activity';
+import {
+    AssetHistoryFilter,
+    OtherHistoryFilters
+} from '../../components/desktop/history/DesktopHistoryFilters';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
+    min-height: 100%;
 `;
 
 const HistoryContainer = styled.div`
     overflow-x: auto;
     overflow-y: hidden;
+    min-height: calc(100% - 53px);
 `;
 
 const HistoryHeaderContainer = styled(DesktopViewHeader)`
     flex-shrink: 0;
-    justify-content: space-between;
-    border-bottom: 1px solid ${p => p.theme.separatorCommon};
+    justify-content: flex-start;
     padding-right: 0;
+    > *:last-child {
+        margin-left: auto;
+    }
 `;
 
 const ExplorerButton = styled.button`
     border: none;
     background-color: transparent;
-    padding: 0.5rem 1rem;
+    padding: 10px 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
 
-    color: ${p => p.theme.textAccent};
+    color: ${p => p.theme.iconTertiary};
+    transition: color 0.15s ease-in-out;
+    &:hover {
+        color: ${p => p.theme.textAccent};
+    }
+`;
+
+const FiltersWrapper = styled.div`
+    display: flex;
+`;
+
+const LoaderContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+
+    > * {
+        transform: scale(1.5);
+    }
 `;
 
 export const DesktopHistoryPage: FC = () => {
     const wallet = useActiveWallet();
     const sdk = useAppSdk();
-    const { api, standalone, config } = useAppContext();
+    const { config } = useAppContext();
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -63,30 +87,41 @@ export const DesktopHistoryPage: FC = () => {
         hasNextPage: hasTonNextPage,
         isFetchingNextPage: isTonFetchingNextPage,
         data: tonEvents
-    } = useInfiniteQuery({
-        queryKey: [wallet.rawAddress, QueryKey.activity, 'all'],
-        queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(api.tonApiV2).getAccountEvents({
-                accountId: wallet.rawAddress,
-                limit: 20,
-                beforeLt: pageParam,
-                subjectOnly: true
-            }),
-        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
-    });
+    } = useFetchFilteredActivity();
 
     const isFetchingNextPage = isTonFetchingNextPage;
 
-    useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
-
-    const { ref: scrollRef, closeTop } = useIsScrolled();
+    useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, true, ref);
 
     const activity = useMemo(() => {
         return getMixedActivity(tonEvents, undefined);
     }, [tonEvents]);
 
-    if (!isTonFetched) {
-        return null;
+    const onOpenExplorer = () =>
+        config.accountExplorer
+            ? sdk.openPage(config.accountExplorer.replace('%s', formatAddress(wallet.rawAddress)))
+            : undefined;
+
+    if (!isTonFetched!) {
+        return (
+            <HistoryPageWrapper>
+                <HistoryHeaderContainer borderBottom={false}>
+                    <Label2>{t('page_header_history')}</Label2>
+                    <ExplorerButton onClick={onOpenExplorer}>
+                        <LinkOutIcon color="currentColor" />
+                    </ExplorerButton>
+                    <FiltersWrapper>
+                        <AssetHistoryFilter />
+                        <OtherHistoryFilters />
+                    </FiltersWrapper>
+                </HistoryHeaderContainer>
+                <HistoryContainer>
+                    <LoaderContainer>
+                        <SpinnerRing />
+                    </LoaderContainer>
+                </HistoryContainer>
+            </HistoryPageWrapper>
+        );
     }
 
     if (activity.length === 0) {
@@ -98,23 +133,16 @@ export const DesktopHistoryPage: FC = () => {
     }
 
     return (
-        <HistoryPageWrapper ref={mergeRefs(ref, scrollRef)}>
-            <HistoryHeaderContainer borderBottom={!closeTop}>
+        <HistoryPageWrapper ref={ref}>
+            <HistoryHeaderContainer borderBottom={true}>
                 <Label2>{t('page_header_history')}</Label2>
-                <ExplorerButton
-                    onClick={() =>
-                        config.accountExplorer
-                            ? sdk.openPage(
-                                  config.accountExplorer.replace(
-                                      '%s',
-                                      formatAddress(wallet.rawAddress)
-                                  )
-                              )
-                            : undefined
-                    }
-                >
-                    <Body2>{t('nft_view_in_explorer')}</Body2>
+                <ExplorerButton onClick={onOpenExplorer}>
+                    <LinkOutIcon color="currentColor" />
                 </ExplorerButton>
+                <FiltersWrapper>
+                    <AssetHistoryFilter />
+                    <OtherHistoryFilters />
+                </FiltersWrapper>
             </HistoryHeaderContainer>
             <HistoryContainer>
                 <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />

@@ -1,10 +1,9 @@
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import {
     DragDropContext,
     Draggable,
     DraggableProvidedDragHandleProps,
-    Droppable,
-    OnDragEndResponder
+    Droppable
 } from 'react-beautiful-dnd';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -23,10 +22,12 @@ import { RenameWalletNotification } from '../../components/settings/wallet-name/
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useMutateAccountsState, useAccountsState } from '../../state/wallet';
+import { useAccountsState } from '../../state/wallet';
 import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
+
+import { useAccountsDNDDrop, useSideBarItems } from "../../state/folders";
 
 const Row = styled.div`
     display: flex;
@@ -41,9 +42,14 @@ const Icon = styled.span`
     color: ${props => props.theme.iconSecondary};
 `;
 
+const IconMock = styled.div`
+    height: 28px;
+    width: 28px;
+`;
+
 const WalletRow: FC<{
     account: AccountType;
-    dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
+    dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
 }> = ({ account, dragHandleProps }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -53,6 +59,10 @@ const WalletRow: FC<{
 
     const secondary = useAccountLabel(account);
 
+    if (account.type === 'ton-multisig') {
+        return null;
+    }
+
     if (!account) {
         return <SkeletonListPayloadWithImage />;
     }
@@ -61,9 +71,13 @@ const WalletRow: FC<{
         <>
             <ListItemPayload>
                 <Row>
-                    <Icon {...dragHandleProps}>
-                        <ReorderIcon />
-                    </Icon>
+                    {dragHandleProps ? (
+                        <Icon {...dragHandleProps}>
+                            <ReorderIcon />
+                        </Icon>
+                    ) : (
+                        <IconMock />
+                    )}
                     <WalletEmoji emoji={account.emoji} />
                     <ColumnText noWrap text={account.name} secondary={secondary} />
                     <DropDown
@@ -129,12 +143,37 @@ const WalletRow: FC<{
     );
 };
 
+const ListItemElementStyled = styled(ListItemElement)`
+    & > div {
+        border-top: 1px solid ${props => props.theme.separatorCommon};
+        padding-top: 15px;
+    }
+`;
+
+const ListItemElementInGroup = styled(ListItemElement)`
+    & > div {
+        border-top: none !important;
+        padding-top: 15px;
+    }
+`;
+
+const ListBlockStyled = styled(ListBlock)`
+    overflow: hidden;
+    & > *:nth-child(3) > div {
+        border-top: none !important;
+
+        > div {
+            border-top: none !important;
+        }
+    }
+`;
+
 export const Account = () => {
     const { onOpen: addWallet } = useAddWalletNotification();
     const { t } = useTranslation();
 
-    const accounts = useAccountsState();
-    const { mutate } = useMutateAccountsState();
+    const items = useSideBarItems();
+    const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     const createItems = useMemo(() => {
         return [
@@ -146,17 +185,6 @@ export const Account = () => {
         ];
     }, []);
 
-    const handleDrop: OnDragEndResponder = useCallback(
-        droppedItem => {
-            if (!droppedItem.destination) return;
-            const updatedList = [...accounts];
-            const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
-            updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
-            mutate(updatedList);
-        },
-        [accounts, mutate]
-    );
-
     return (
         <>
             <SubHeader title={t('Manage_wallets')} />
@@ -164,30 +192,78 @@ export const Account = () => {
                 <DragDropContext onDragEnd={handleDrop}>
                     <Droppable droppableId="wallets">
                         {provided => (
-                            <ListBlock {...provided.droppableProps} ref={provided.innerRef}>
-                                {accounts.map((account, index) => (
-                                    <Draggable
-                                        key={account.id}
-                                        draggableId={account.id}
-                                        index={index}
-                                    >
-                                        {p => (
-                                            <ListItemElement
-                                                ios={true}
-                                                hover={false}
-                                                ref={p.innerRef}
-                                                {...p.draggableProps}
+                            <ListBlockStyled {...provided.droppableProps} ref={provided.innerRef}>
+                                {itemsOptimistic.map((account, index) => {
+                                    if (account.type === 'folder') {
+                                        return (
+                                            <Draggable
+                                                key={account.id}
+                                                draggableId={account.id}
+                                                index={index}
                                             >
-                                                <WalletRow
-                                                    dragHandleProps={p.dragHandleProps}
-                                                    account={account}
-                                                />
-                                            </ListItemElement>
-                                        )}
-                                    </Draggable>
-                                ))}
+                                                {p => (
+                                                    <div ref={p.innerRef} {...p.draggableProps}>
+                                                        {account.accounts.map((a, i) => {
+                                                            if (i === 0) {
+                                                                return (
+                                                                    <ListItemElementStyled
+                                                                        ios={true}
+                                                                        hover={false}
+                                                                        key={account.id}
+                                                                    >
+                                                                        <WalletRow
+                                                                            key={a.id}
+                                                                            account={a}
+                                                                            dragHandleProps={
+                                                                                p.dragHandleProps
+                                                                            }
+                                                                        />
+                                                                    </ListItemElementStyled>
+                                                                );
+                                                            }
+                                                            return (
+                                                                <ListItemElementInGroup
+                                                                    ios={true}
+                                                                    hover={false}
+                                                                    key={account.id}
+                                                                >
+                                                                    <WalletRow
+                                                                        key={a.id}
+                                                                        account={a}
+                                                                    />
+                                                                </ListItemElementInGroup>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        );
+                                    }
+
+                                    return (
+                                        <Draggable
+                                            key={account.id}
+                                            draggableId={account.id}
+                                            index={index}
+                                        >
+                                            {p => (
+                                                <ListItemElementStyled
+                                                    ios={true}
+                                                    hover={false}
+                                                    ref={p.innerRef}
+                                                    {...p.draggableProps}
+                                                >
+                                                    <WalletRow
+                                                        dragHandleProps={p.dragHandleProps}
+                                                        account={account}
+                                                    />
+                                                </ListItemElementStyled>
+                                            )}
+                                        </Draggable>
+                                    );
+                                })}
                                 {provided.placeholder}
-                            </ListBlock>
+                            </ListBlockStyled>
                         )}
                     </Droppable>
                 </DragDropContext>

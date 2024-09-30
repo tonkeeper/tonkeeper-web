@@ -1,5 +1,5 @@
 import React, { FC, forwardRef, PropsWithChildren, useId } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, DefaultTheme } from 'styled-components';
 import { CheckboxIcon } from '../Icon';
 import { Body1 } from '../Text';
 import { ChangeHandler } from 'react-hook-form';
@@ -10,6 +10,8 @@ export interface CheckboxProps {
     disabled?: boolean;
     light?: boolean;
     className?: string;
+    borderColor?: keyof DefaultTheme;
+    size?: 's' | 'm';
 }
 
 const Wrapper = styled.div`
@@ -20,7 +22,7 @@ const Wrapper = styled.div`
     cursor: pointer;
 `;
 
-const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
+const IconBase = styled.div<{ checked: boolean; disabled?: boolean; $borderColor: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -46,14 +48,22 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean }>`
             : css`
                   color: transparent;
                   background: transparent;
-                  border-color: ${props.theme.backgroundContentTint};
+                  border-color: ${props.theme[props.$borderColor]};
               `}
 `;
-const CheckboxItem = styled(IconBase)`
-    width: 22px;
-    height: 22px;
-
+const CheckboxItem = styled(IconBase)<{ $size: 's' | 'm' }>`
     border-radius: 6px;
+
+    ${props =>
+        props.$size === 's'
+            ? css`
+                  width: 18px;
+                  height: 18px;
+              `
+            : css`
+                  width: 22px;
+                  height: 22px;
+              `}
 `;
 
 const RadioInput = styled.input`
@@ -118,11 +128,18 @@ export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
     disabled,
     children,
     light,
-    className
+    className,
+    borderColor = 'backgroundContentTint',
+    size = 'm'
 }) => {
     return (
         <Wrapper onClick={() => onChange(!checked)} className={className}>
-            <CheckboxItem checked={checked} disabled={disabled}>
+            <CheckboxItem
+                checked={checked}
+                disabled={disabled}
+                $borderColor={borderColor.toString()}
+                $size={size}
+            >
                 {checked ? <CheckboxIcon /> : undefined}
             </CheckboxItem>
             {children && <Text light={light}>{children}</Text>}

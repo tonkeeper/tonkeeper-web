@@ -68,10 +68,6 @@ export const useDeployMultisig = (
                 throw new Error('Signer not found');
             }
 
-            if (signer.type !== 'cell') {
-                throw new Error(`Cannot deploy using signer type: ${signer.type}`);
-            }
-
             const { address } = await deployMultisig({
                 api,
                 multisigConfig: params.multisigConfig,

@@ -340,7 +340,7 @@ export const sendMultisigTonTransfer = async ({
     weiAmount: BigNumber;
     isMax: boolean;
     fee: TransferEstimationEventFee;
-    signer: CellSigner;
+    signer: Signer;
     ttlSeconds: number;
 }): Promise<void> => {
     const timestamp = await getServerTime(api);
@@ -415,7 +415,7 @@ export const sendMultisigTonConnectTransfer = async ({
     hostWallet: TonWalletStandard;
     multisig: Pick<Multisig, 'address' | 'signers' | 'proposers'>;
     params: TonConnectTransactionPayload;
-    signer: CellSigner;
+    signer: Signer;
     ttlSeconds: number;
 }): Promise<string> => {
     const timestamp = await getServerTime(api);

@@ -32,7 +32,7 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
             const signer = await getSigner(sdk, signerAccount.id, checkTouchId, {
                 walletId: signerWallet.id
             }).catch(() => null);
-            if (signer === null || signer.type !== 'cell') {
+            if (signer === null) {
                 throw new Error('Signer not found');
             }
 
