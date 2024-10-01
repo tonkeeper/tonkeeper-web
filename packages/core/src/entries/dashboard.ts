@@ -95,7 +95,7 @@ export function toStringDashboardCell(cell: DashboardCell): string {
         case 'string':
             return cell.value;
         case 'address':
-            return Address.parse(cell.raw).toString();
+            return Address.parse(cell.raw).toString({ bounceable: false });
         case 'numeric':
             return cell.value;
         case 'numeric_crypto':
