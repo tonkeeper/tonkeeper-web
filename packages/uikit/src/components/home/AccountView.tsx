@@ -19,7 +19,7 @@ import {
 } from '../Notification';
 import { Body1, H3 } from '../Text';
 import { Button } from '../fields/Button';
-import { Wrapper, childFactoryCreator, duration } from '../transfer/common';
+import { childFactoryCreator, duration, Wrapper } from '../transfer/common';
 import { QrWrapper } from './qrCodeView';
 import {
     useActiveTonNetwork,
@@ -27,6 +27,9 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../state/wallet';
 import { AccountBadge } from '../account/AccountBadge';
+import { useAssetImage } from '../../state/asset';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { Address } from '@ton/core';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -154,6 +157,11 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
+    const assetImage = useAssetImage({
+        blockchain: BLOCKCHAIN_NAME.TON,
+        address: jetton ? Address.parse(jetton) : TON_ASSET.address
+    });
+
     const address = formatAddress(wallet.rawAddress, network);
     return (
         <NotificationBlock>
@@ -173,7 +181,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                             address,
                             jetton
                         })}
-                        logoImage="https://wallet.tonkeeper.com/img/toncoin.svg"
+                        logoImage={assetImage || 'https://wallet.tonkeeper.com/img/toncoin.svg'}
                         logoPadding={8}
                         qrStyle="dots"
                         eyeRadius={{
@@ -260,7 +268,18 @@ export const ReceiveContent: FC<{
                         }}
                     >
                         <div ref={nodeRef}>
-                            {isTon ? <ReceiveTon jetton={jetton} /> : <ReceiveTron tron={tron} />}
+                            {isTon ? (
+                                <ReceiveTon
+                                    jetton={
+                                        jetton?.toLowerCase() ===
+                                        TON_ASSET.address.toString().toLowerCase()
+                                            ? undefined
+                                            : jetton
+                                    }
+                                />
+                            ) : (
+                                <ReceiveTron tron={tron} />
+                            )}
                         </div>
                     </CSSTransition>
                 </TransitionGroup>

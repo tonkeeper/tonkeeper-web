@@ -115,7 +115,13 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     onClick={() => {
                         sdk.uiEvents.emit('receive', {
                             method: 'receive',
-                            params: {}
+                            params:
+                                token === CryptoCurrency.TON
+                                    ? {}
+                                    : {
+                                          chain: BLOCKCHAIN_NAME.TON,
+                                          jetton: token
+                                      }
                         });
                     }}
                 >
