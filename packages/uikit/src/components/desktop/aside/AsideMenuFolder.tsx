@@ -34,7 +34,8 @@ const AsideMenuSubItemContainer = styled.div`
 export const AsideMenuFolder: FC<{
     folder: AccountsFolder;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ folder, onClickWallet }) => {
+    accountMightBeHighlighted: boolean;
+}> = ({ folder, onClickWallet, accountMightBeHighlighted }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const { onOpen: onManageFolder } = useManageFolderNotification();
     const { isOpen, onToggle } = useDisclosure(folder.lastIsOpened);
@@ -68,7 +69,7 @@ export const AsideMenuFolder: FC<{
                         <AsideMenuAccount
                             key={account.id}
                             account={account}
-                            isSelected={false}
+                            mightBeHighlighted={accountMightBeHighlighted}
                             onClickWallet={onClickWallet}
                         />
                     ))}
