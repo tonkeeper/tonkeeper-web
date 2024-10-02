@@ -3,11 +3,8 @@ import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
 import { Label2 } from '../../components/Text';
 import { MultiSendTable } from '../../components/desktop/multi-send/MultiSendTable';
 import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useActiveWallet } from '../../state/wallet';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
-import { AppRoute } from '../../libs/routes';
 
 const PageWrapper = styled.div`
     overflow: auto;
