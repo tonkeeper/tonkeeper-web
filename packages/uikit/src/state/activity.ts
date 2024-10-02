@@ -1,20 +1,20 @@
-import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { QueryKey } from '../libs/queryKey';
-import { AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext } from '../hooks/appContext';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { seeIfTonTransfer } from './ton/tonActivity';
-import { MixedActivity } from './mixedActivity';
-import { useActiveWallet } from './wallet';
-import { atom, useAtom } from '../libs/atom';
-import { useCallback, useEffect } from 'react';
 import {
     isTon,
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { useCallback, useEffect } from 'react';
+import { useAppContext } from '../hooks/appContext';
+import { atom, useAtom } from '../libs/atom';
+import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
+import { MixedActivity } from './mixedActivity';
+import { seeIfTonTransfer } from './ton/tonActivity';
+import { useActiveWallet } from './wallet';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -187,9 +187,10 @@ export const useFetchFilteredActivity = (asset?: string) => {
                         initiator: onlyInitiator ? onlyInitiator : undefined
                     });
 
-                    activity.events = activity.events.filter(event =>
-                        event.actions.every(seeIfTonTransfer)
-                    );
+                    activity.events = activity.events.filter(event => {
+                        event.actions = event.actions.filter(seeIfTonTransfer);
+                        return event.actions.length > 0;
+                    });
                 } else {
                     activity = await new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
                         accountId: wallet.rawAddress,
