@@ -1,4 +1,4 @@
-import { FC, forwardRef, Fragment } from 'react';
+import { FC, forwardRef, Fragment, ReactNode } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -7,7 +7,16 @@ import {
 } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
 import { DropDownContent, DropDownItem } from '../../components/DropDown';
-import { EllipsisIcon, FolderIcon, PlusIcon, ReorderIcon } from '../../components/Icon';
+import {
+    EllipsisIcon,
+    FolderIcon,
+    KeyIcon,
+    ListIcon,
+    PencilIcon,
+    PlusIcon,
+    ReorderIcon,
+    TrashBinIcon
+} from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -240,11 +249,19 @@ const DropDownItemStyled = styled(DropDownItem)`
     }
 `;
 
-const AccountMenu: FC<{ options: { name: string; onClick: () => void }[] }> = ({ options }) => {
+const IconWrapper = styled.div`
+    margin-left: auto;
+    display: flex;
+    color: ${p => p.theme.accentBlue};
+`;
+
+const AccountMenu: FC<{ options: { name: string; onClick: () => void; icon: ReactNode }[] }> = ({
+    options
+}) => {
     return (
         <DropDownStyled
-            right="1rem"
-            top="0.5rem"
+            right="0"
+            top="0"
             payload={onClose => (
                 <DropDownContent>
                     {options.map(option => (
@@ -257,6 +274,7 @@ const AccountMenu: FC<{ options: { name: string; onClick: () => void }[] }> = ({
                             key={option.name}
                         >
                             <Label2>{option.name}</Label2>
+                            <IconWrapper>{option.icon}</IconWrapper>
                         </DropDownItemStyled>
                     ))}
                 </DropDownContent>
@@ -300,7 +318,11 @@ const MultisigItemRow = forwardRef<
             <AccountBadgeStyled accountType={account.type} size="s" />
             <AccountMenu
                 options={[
-                    { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) }
+                    {
+                        name: t('Rename'),
+                        onClick: () => onRename({ accountId: account.id }),
+                        icon: <PencilIcon />
+                    }
                 ]}
             />
         </Row>
@@ -332,14 +354,20 @@ const AccountMnemonicRow: FC<{
                 <Label2Styled>{account.name}</Label2Styled>
                 <AccountMenu
                     options={[
-                        { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) },
+                        {
+                            name: t('Rename'),
+                            onClick: () => onRename({ accountId: account.id }),
+                            icon: <PencilIcon />
+                        },
                         {
                             name: t('settings_backup_seed'),
-                            onClick: () => onRecovery({ accountId: account.id })
+                            onClick: () => onRecovery({ accountId: account.id }),
+                            icon: <KeyIcon color="accentBlue" />
                         },
                         {
                             name: t('settings_delete_account'),
-                            onClick: () => onDelete({ accountId: account.id })
+                            onClick: () => onDelete({ accountId: account.id }),
+                            icon: <TrashBinIcon />
                         }
                     ]}
                 />
@@ -389,10 +417,15 @@ const AccountLedgerRow: FC<{
                 <AccountBadgeStyled accountType={account.type} size="s" />
                 <AccountMenu
                     options={[
-                        { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) },
+                        {
+                            name: t('Rename'),
+                            onClick: () => onRename({ accountId: account.id }),
+                            icon: <PencilIcon />
+                        },
                         {
                             name: t('settings_delete_account'),
-                            onClick: () => onDelete({ accountId: account.id })
+                            onClick: () => onDelete({ accountId: account.id }),
+                            icon: <TrashBinIcon />
                         }
                     ]}
                 />
@@ -444,10 +477,15 @@ const AccountTonOnlyRow: FC<{
                 <AccountBadgeStyled accountType={account.type} size="s" />
                 <AccountMenu
                     options={[
-                        { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) },
+                        {
+                            name: t('Rename'),
+                            onClick: () => onRename({ accountId: account.id }),
+                            icon: <PencilIcon />
+                        },
                         {
                             name: t('settings_delete_account'),
-                            onClick: () => onDelete({ accountId: account.id })
+                            onClick: () => onDelete({ accountId: account.id }),
+                            icon: <TrashBinIcon />
                         }
                     ]}
                 />
@@ -493,10 +531,15 @@ const AccountKeystoneRow: FC<{
             <AccountBadgeStyled accountType={account.type} size="s" />
             <AccountMenu
                 options={[
-                    { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) },
+                    {
+                        name: t('Rename'),
+                        onClick: () => onRename({ accountId: account.id }),
+                        icon: <PencilIcon />
+                    },
                     {
                         name: t('settings_delete_account'),
-                        onClick: () => onDelete({ accountId: account.id })
+                        onClick: () => onDelete({ accountId: account.id }),
+                        icon: <TrashBinIcon />
                     }
                 ]}
             />
@@ -525,10 +568,15 @@ const AccountWatchOnlyRow: FC<{
             <AccountBadgeStyled accountType={account.type} size="s" />
             <AccountMenu
                 options={[
-                    { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) },
+                    {
+                        name: t('Rename'),
+                        onClick: () => onRename({ accountId: account.id }),
+                        icon: <PencilIcon />
+                    },
                     {
                         name: t('settings_delete_account'),
-                        onClick: () => onDelete({ accountId: account.id })
+                        onClick: () => onDelete({ accountId: account.id }),
+                        icon: <TrashBinIcon />
                     }
                 ]}
             />
@@ -559,14 +607,20 @@ const AccountMAMRow: FC<{
                 <AccountBadgeStyled accountType={account.type} size="s" />
                 <AccountMenu
                     options={[
-                        { name: t('Rename'), onClick: () => onRename({ accountId: account.id }) },
+                        {
+                            name: t('Rename'),
+                            onClick: () => onRename({ accountId: account.id }),
+                            icon: <PencilIcon />
+                        },
                         {
                             name: t('settings_backup_seed'),
-                            onClick: () => onRecovery({ accountId: account.id })
+                            onClick: () => onRecovery({ accountId: account.id }),
+                            icon: <KeyIcon color="accentBlue" />
                         },
                         {
                             name: t('settings_delete_account'),
-                            onClick: () => onDelete({ accountId: account.id })
+                            onClick: () => onDelete({ accountId: account.id }),
+                            icon: <TrashBinIcon />
                         }
                     ]}
                 />
@@ -593,7 +647,8 @@ const AccountMAMRow: FC<{
                                             onRename({
                                                 accountId: account.id,
                                                 derivationIndex: derivation.index
-                                            })
+                                            }),
+                                        icon: <PencilIcon />
                                     },
                                     {
                                         name: t('settings_backup_seed'),
@@ -601,7 +656,8 @@ const AccountMAMRow: FC<{
                                             onRecovery({
                                                 accountId: account.id,
                                                 walletId: derivation.activeTonWalletId
-                                            })
+                                            }),
+                                        icon: <KeyIcon color="accentBlue" />
                                     }
                                 ]}
                             />
@@ -679,11 +735,13 @@ const ItemRow: FC<{
                         options={[
                             {
                                 name: t('accounts_manage_folder'),
-                                onClick: () => onManageFolder({ folderId: item.id })
+                                onClick: () => onManageFolder({ folderId: item.id }),
+                                icon: <PencilIcon />
                             },
                             {
                                 name: t('accounts_delete_folder'),
-                                onClick: () => deleteFolder(item)
+                                onClick: () => deleteFolder(item),
+                                icon: <ListIcon />
                             }
                         ]}
                     />
