@@ -71,7 +71,7 @@ export const AssetHistoryFilter = () => {
     return (
         <SelectDropDown
             top="30px"
-            right="10px"
+            right="0"
             width="200px"
             payload={onClose => (
                 <DropDownContent>
