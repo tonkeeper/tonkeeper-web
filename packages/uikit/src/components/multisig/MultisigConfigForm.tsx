@@ -228,6 +228,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
     const [focus, setFocus] = useState(false);
 
     const participants = watch('participants');
+    const firstParticipant = watch('firstParticipant');
 
     return (
         <Controller
@@ -238,7 +239,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
                     }
 
                     if (
-                        participants.filter(p => {
+                        participants.concat({ address: firstParticipant }).filter(p => {
                             try {
                                 return Address.parse(p.address).equals(Address.parse(v));
                             } catch (e) {
