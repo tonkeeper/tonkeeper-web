@@ -44,11 +44,7 @@ import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
@@ -343,18 +339,12 @@ export const Loader: FC = () => {
 
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content activeAccount={activeAccount} lock={lock} />
-                        <CopyNotification hideSimpleCopyNotifications />
-                        <QrScanner />
-                        <ModalsRoot />
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
+            <AppContext.Provider value={context}>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification hideSimpleCopyNotifications />
+                <QrScanner />
+                <ModalsRoot />
+            </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 };
@@ -387,10 +377,7 @@ export const Content: FC<{
         return (
             <FullSizeWrapperBounded className="full-size-wrapper">
                 <InitializeContainer fullHeight={false}>
-                    <Routes>
-                        <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                        <Route path="*" element={<Initialize />} />
-                    </Routes>
+                    <Initialize />
                 </InitializeContainer>
             </FullSizeWrapperBounded>
         );

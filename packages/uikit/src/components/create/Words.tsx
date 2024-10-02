@@ -1,16 +1,13 @@
 import { wordlist } from '@ton/crypto/dist/mnemonic/wordlist';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute } from '../../libs/routes';
-import { BackButtonBlock } from '../BackButton';
 import { CenterContainer } from '../Layout';
-import { Body1, Body2, Body2Class, Body3, H2, Label2, Label2Class } from '../Text';
-import { Button } from '../fields/Button';
+import { Body1, Body2, Body2Class, Body3, H2Responsive, Label2 } from '../Text';
+import { ButtonResponsiveSize } from '../fields/Button';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -28,6 +25,10 @@ const Block = styled.div`
     }
 `;
 
+const BottomButtonBlock = styled(Block)`
+    margin-bottom: 0;
+`;
+
 const HeadingBlock = styled(Block)`
     ${p =>
         p.theme.displayType === 'full-width' &&
@@ -36,16 +37,6 @@ const HeadingBlock = styled(Block)`
         `}
 `;
 
-const Header = styled(H2)`
-    user-select: none;
-
-    ${p => p.theme.displayType === 'full-width' && Label2Class}
-    ${p =>
-        p.theme.displayType === 'full-width' &&
-        css`
-            margin-bottom: 0;
-        `}
-`;
 const Body = styled(Body1)`
     user-select: none;
 
@@ -130,9 +121,9 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
     return (
         <>
             <HeadingBlock>
-                <Header>
+                <H2Responsive>
                     {t(showMamInfo ? 'secret_words_account_title' : 'secret_words_title')}
-                </Header>
+                </H2Responsive>
                 <Body>
                     {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
                 </Body>
@@ -165,10 +156,9 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
 
 export const Words: FC<{
     mnemonic: string[];
-    onBack: () => void;
     onCheck: () => void;
     showMamInfo?: boolean;
-}> = ({ mnemonic, onBack, onCheck, showMamInfo }) => {
+}> = ({ mnemonic, onCheck, showMamInfo }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
@@ -180,12 +170,11 @@ export const Words: FC<{
 
     return (
         <CenterContainer>
-            <BackButtonBlock onClick={onBack} />
             <WordsGridAndHeaders mnemonic={mnemonic} showMamInfo={showMamInfo} />
 
-            <Button size="large" fullWidth primary marginTop onClick={onCheck}>
+            <ButtonResponsiveSize fullWidth primary marginTop onClick={onCheck}>
                 {t('continue')}
-            </Button>
+            </ButtonResponsiveSize>
         </CenterContainer>
     );
 };
@@ -330,10 +319,9 @@ const seeIfValid = (value: string, mnemonic: string) => {
 
 export const Check: FC<{
     mnemonic: string[];
-    onBack: () => void;
     onConfirm: () => void;
     isLoading?: boolean;
-}> = ({ onBack, onConfirm, mnemonic, isLoading }) => {
+}> = ({ onConfirm, mnemonic, isLoading }) => {
     const { t, i18n } = useTranslation();
 
     const [one, setOne] = useState('');
@@ -360,10 +348,9 @@ export const Check: FC<{
 
     return (
         <CenterContainer>
-            <BackButtonBlock onClick={onBack} />
             <Block>
                 <div>
-                    <Header>{t('check_words_title')}</Header>
+                    <H2Responsive>{t('check_words_title')}</H2Responsive>
                     <Body>{description}</Body>
                 </div>
             </Block>
@@ -394,10 +381,9 @@ export const Check: FC<{
                     focusNext={() => (isValid ? onConfirm() : undefined)}
                 />
             </Block>
-            <Block>
-                <Button
+            <BottomButtonBlock>
+                <ButtonResponsiveSize
                     tabIndex={4}
-                    size="large"
                     fullWidth
                     primary
                     loading={isLoading}
@@ -405,8 +391,8 @@ export const Check: FC<{
                     onClick={onConfirm}
                 >
                     {t('continue')}
-                </Button>
-            </Block>
+                </ButtonResponsiveSize>
+            </BottomButtonBlock>
         </CenterContainer>
     );
 };
@@ -426,7 +412,7 @@ const Inputs = styled.div<{ wordsNumber: 12 | 24 }>`
         css`
             grid-template-rows: ${p.wordsNumber === 24
                 ? 'repeat(8, minmax(0, 1fr))'
-                : 'repeat(6, minmax(0, 1fr))'};
+                : 'repeat(4, minmax(0, 1fr))'};
         `}
 `;
 
@@ -448,20 +434,26 @@ const ToggleButtonStyled = styled(ToggleButton)`
 export const ImportWords: FC<{
     isLoading?: boolean;
     onMnemonic: (mnemonic: string[]) => void;
-}> = ({ isLoading, onMnemonic }) => {
+    onIsDirtyChange?: (isDirty: boolean) => void;
+}> = ({ isLoading, onIsDirtyChange, onMnemonic }) => {
     const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const sdk = useAppSdk();
     const { standalone } = useAppContext();
     const ref = useRef<HTMLDivElement>(null);
 
     const { t } = useTranslation();
-    const navigate = useNavigate();
 
     const [_mnemonic, setMnemonic] = useState<string[]>(Array(24).fill(''));
 
     const mnemonic = useMemo(() => {
         return _mnemonic.slice(0, wordsNumber);
     }, [_mnemonic, wordsNumber]);
+
+    const isDirty = useMemo(() => mnemonic.some(Boolean), [mnemonic]);
+
+    useEffect(() => {
+        onIsDirtyChange?.(isDirty);
+    }, [isDirty]);
 
     const onChange = useCallback(
         (newValue: string, index: number) => {
@@ -529,10 +521,9 @@ export const ImportWords: FC<{
 
     return (
         <>
-            <BackButtonBlock onClick={() => navigate(AppRoute.home)} />
             <Block>
                 <div>
-                    <Header>{t('import_wallet_title')}</Header>
+                    <H2Responsive>{t('import_wallet_title')}</H2Responsive>
                     <Body>
                         {t(
                             wordsNumber === 12
@@ -565,9 +556,8 @@ export const ImportWords: FC<{
                     ))}
                 </Inputs>
             </Block>
-            <Block>
-                <Button
-                    size="large"
+            <BottomButtonBlock>
+                <ButtonResponsiveSize
                     fullWidth
                     primary
                     loading={isLoading}
@@ -575,8 +565,8 @@ export const ImportWords: FC<{
                     bottom={standalone}
                 >
                     {t('continue')}
-                </Button>
-            </Block>
+                </ButtonResponsiveSize>
+            </BottomButtonBlock>
         </>
     );
 };

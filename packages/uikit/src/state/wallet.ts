@@ -621,6 +621,7 @@ export const useMutateLogOut = () => {
     const client = useQueryClient();
     const { folders } = useGlobalPreferences();
     const deleteFolder = useDeleteFolder();
+    const accounts = useAccountsState();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
@@ -629,7 +630,20 @@ export const useMutateLogOut = () => {
             await deleteFolder(folder);
         }
 
-        await storage.removeAccountFromState(accountId);
+        const account = accounts.find(acc => acc.id === accountId)!;
+
+        const multisigs = accounts
+            .filter(
+                acc =>
+                    acc.type === 'ton-multisig' &&
+                    (acc.hostWallets.some(hw =>
+                        account.allTonWallets.some(w => w.rawAddress === hw.address)
+                    ) ||
+                        account.allTonWallets.some(w => w.id === acc.selectedHostWalletId))
+            )
+            .map(acc => acc.id);
+
+        await storage.removeAccountsFromState([accountId, ...multisigs]);
         await client.invalidateQueries([QueryKey.account]);
         await client.invalidateQueries([QueryKey.pro]);
         if (folder) {

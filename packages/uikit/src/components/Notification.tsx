@@ -448,7 +448,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
     });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
-type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
+export type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
 
 export const Notification: FC<{
     isOpen: boolean;

@@ -26,11 +26,7 @@ import {
     AppContext,
     IAppContext,
 } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
@@ -232,18 +228,14 @@ export const Loader: FC = React.memo(() => {
 
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={sdk.openExtensionInBrowser}>
-                <AfterImportAction.Provider value={sdk.closeExtensionInBrowser}>
-                    <AppContext.Provider value={context}>
-                        <Content activeAccount={activeAccount} lock={lock} />
-                        <CopyNotification />
-                        <Suspense fallback={<></>}>
-                            <QrScanner />
-                        </Suspense>
-                        <ModalsRoot />
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
+            <AppContext.Provider value={context}>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification />
+                <Suspense fallback={<></>}>
+                    <QrScanner />
+                </Suspense>
+                <ModalsRoot />
+            </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 });
@@ -285,24 +277,9 @@ export const Content: FC<{
         return (
             <PageWrapper>
                 <Suspense fallback={<Loading />}>
-                    <Routes>
-                        <Route
-                            path={any(AppRoute.import)}
-                            element={
-                                <InitializeContainer fullHeight={false}>
-                                    <ImportRouter />
-                                </InitializeContainer>
-                            }
-                        />
-                        <Route
-                            path="*"
-                            element={
-                                <InitializeContainer>
-                                    <Initialize />
-                                </InitializeContainer>
-                            }
-                        />
-                    </Routes>
+                    <InitializeContainer>
+                        <Initialize />
+                    </InitializeContainer>
                 </Suspense>
             </PageWrapper>
         );

@@ -1,19 +1,25 @@
 import { Notification } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AddWalletContent } from '../create/AddWallet';
+import { AddWalletContent, AddWalletMethod } from '../create/AddWallet';
 import styled, { css } from 'styled-components';
 import { Body1, Body2Class, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
-import { useOnImportAction } from '../../hooks/appSdk';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useAtom } from '../../libs/atom';
 import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 import { useProState } from '../../state/pro';
+import { CreateStandardWallet } from '../../pages/import/CreateStandardWallet';
+import { CreateMAMWallet } from '../../pages/import/CreateMAMWallet';
+import { ImportExistingWallet } from '../../pages/import/ImportExistingWallet';
+import { CreateWatchOnlyWallet } from '../../pages/import/CreateWatchOnlyWallet';
+import { CreateSignerWallet } from '../../pages/import/CreateSignerWallet';
+import { CreateKeystoneWallet } from '../../pages/import/CreateKeystoneWallet';
+import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 
-const { hook, paramsControl } = createModalControl<{ walletType?: MethodsInModal } | undefined>();
+const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
 export const useAddWalletNotification = hook;
 
@@ -50,22 +56,21 @@ const NotificationStyled = styled(Notification)<{ mWidth: string | undefined }>`
         `}
 `;
 
-const methodsInModal = ['multisig'] as const;
-type MethodsInModal = (typeof methodsInModal)[number];
-
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
     const { data: proState } = useProState();
     const { isOpen, onClose } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
-    const onImport = useOnImportAction();
-    const [selectedMethod, setSelectedMethod] = useState<MethodsInModal | undefined>(
+    const [selectedMethod, setSelectedMethod] = useState<AddWalletMethod | undefined>(
         params?.walletType
     );
 
     useEffect(() => {
-        if (isOpen && params?.walletType === 'multisig' && !proState?.subscription.valid) {
+        if (!isOpen) {
+            return;
+        }
+        if (params?.walletType === 'multisig' && !proState?.subscription.valid) {
             onClose();
             openBuyPro();
             return;
@@ -76,49 +81,60 @@ export const AddWalletNotificationControlled = () => {
 
     const onCloseCallback = useCallback(() => {
         onClose();
-        setTimeout(() => setSelectedMethod(undefined), 400);
+        setTimeout(() => setSelectedMethod(undefined), 600);
     }, [onClose, setSelectedMethod]);
 
-    const onSelect = useCallback(
-        (closed: (after: () => void) => void) => {
-            return (path: string) => {
-                if (methodsInModal.includes(path as MethodsInModal)) {
-                    if (path === 'multisig' && !proState?.subscription.valid) {
-                        openBuyPro();
-                        return;
-                    }
-                    setSelectedMethod(path as MethodsInModal);
-                } else {
-                    closed(() => onImport(path));
-                }
-            };
-        },
-        [proState?.subscription.valid, openBuyPro, setSelectedMethod, onImport]
-    );
-
-    const Content = useCallback(
-        (closed: (after: () => void) => void) => {
-            if (!selectedMethod) {
-                return (
-                    <NotificationContentWrapper>
-                        <Heading>{t('import_add_wallet')}</Heading>
-                        <SubHeading>{t('import_add_wallet_description')}</SubHeading>
-                        <AddWalletContent onSelect={onSelect(closed)} />
-                    </NotificationContentWrapper>
-                );
+    const onSelect = useCallback(() => {
+        return (path: AddWalletMethod) => {
+            if (path === 'multisig' && !proState?.subscription.valid) {
+                openBuyPro();
+                return;
             }
+            setSelectedMethod(path);
+        };
+    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod]);
 
-            switch (selectedMethod) {
-                case 'multisig': {
-                    return <CreateMultisig onClose={onCloseCallback} />;
-                }
-                default: {
-                    assertUnreachable(selectedMethod);
-                }
+    const Content = useCallback(() => {
+        if (!selectedMethod) {
+            return (
+                <NotificationContentWrapper>
+                    <Heading>{t('import_add_wallet')}</Heading>
+                    <SubHeading>{t('import_add_wallet_description')}</SubHeading>
+                    <AddWalletContent onSelect={onSelect()} />
+                </NotificationContentWrapper>
+            );
+        }
+
+        switch (selectedMethod) {
+            case 'multisig': {
+                return <CreateMultisig onClose={onCloseCallback} />;
             }
-        },
-        [onImport, t, selectedMethod, onCloseCallback, onSelect]
-    );
+            case 'create-standard': {
+                return <CreateStandardWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'create-mam': {
+                return <CreateMAMWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'import': {
+                return <ImportExistingWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'watch-only': {
+                return <CreateWatchOnlyWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'signer': {
+                return <CreateSignerWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'keystone': {
+                return <CreateKeystoneWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'ledger': {
+                return <CreateLedgerWallet afterCompleted={onCloseCallback} />;
+            }
+            default: {
+                assertUnreachable(selectedMethod);
+            }
+        }
+    }, [t, selectedMethod, onCloseCallback, onSelect]);
 
     const navigateHome = useMemo(
         () =>

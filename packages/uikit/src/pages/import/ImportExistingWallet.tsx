@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FC, useContext, useMemo, useState } from 'react';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportWords } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -23,8 +23,15 @@ import { useAppContext } from '../../hooks/appContext';
 import { WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { AccountIsAlreadyAdded } from '../../components/create/AccountIsAlreadyAdded';
+import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
+import {
+    OnCloseInterceptor,
+    useSetNotificationOnBack,
+    useSetNotificationOnCloseInterceptor
+} from '../../components/Notification';
 
-const Import = () => {
+export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const accounts = useAccountsState();
@@ -115,24 +122,84 @@ const Import = () => {
         setCreatedAccount(newAcc);
     };
 
+    const [isMnemonicFormDirty, setIsMnemonicFormDirty] = useState(false);
+
+    const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
+    const { navigateHome } = useContext(AddWalletContext);
+    const onBack = useMemo(() => {
+        if (!mnemonic) {
+            if (!isMnemonicFormDirty) {
+                return navigateHome;
+            }
+            return () =>
+                openConfirmDiscard({
+                    onClose: discard => {
+                        if (discard) {
+                            navigateHome?.();
+                        }
+                    }
+                });
+        }
+
+        if (existingAccountAndWallet) {
+            return () => {
+                setExistingAccountAndWallet(undefined);
+                setMnemonic(undefined);
+            };
+        }
+
+        if (!createdAccount) {
+            return () => {
+                setCreatedAccount(undefined);
+                setMnemonic(undefined);
+            };
+        }
+
+        return undefined;
+    }, [
+        mnemonic,
+        openConfirmDiscard,
+        navigateHome,
+        existingAccountAndWallet,
+        isMnemonicFormDirty,
+        createdAccount
+    ]);
+    useSetNotificationOnBack(onBack);
+
+    const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
+        if (!isMnemonicFormDirty) {
+            return undefined;
+        }
+
+        if (createdAccount || existingAccountAndWallet) {
+            return undefined;
+        }
+
+        return closeModal => {
+            openConfirmDiscard({
+                onClose: discard => {
+                    if (discard) {
+                        closeModal();
+                    }
+                }
+            });
+        };
+    }, [isMnemonicFormDirty, openConfirmDiscard, createdAccount, existingAccountAndWallet]);
+    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+
     if (!mnemonic) {
         return (
             <ImportWords
                 onMnemonic={onMnemonic}
                 isLoading={isCheckingIfMnemonicIsMAM || isCreatingAccountMam}
+                onIsDirtyChange={setIsMnemonicFormDirty}
             />
         );
     }
 
     if (existingAccountAndWallet) {
         return (
-            <AccountIsAlreadyAdded
-                {...existingAccountAndWallet}
-                onBack={() => {
-                    setExistingAccountAndWallet(undefined);
-                    setMnemonic(undefined);
-                }}
-            />
+            <AccountIsAlreadyAdded {...existingAccountAndWallet} onOpenAccount={afterCompleted} />
         );
     }
 
@@ -146,10 +213,6 @@ const Import = () => {
                         versions,
                         selectAccount: true
                     }).then(setCreatedAccount);
-                }}
-                onBack={() => {
-                    setCreatedAccount(undefined);
-                    setMnemonic(undefined);
                 }}
                 isLoading={isCreatingWallets}
             />
@@ -177,7 +240,5 @@ const Import = () => {
         );
     }
 
-    return <FinalView />;
+    return <FinalView afterCompleted={afterCompleted} />;
 };
-
-export default Import;

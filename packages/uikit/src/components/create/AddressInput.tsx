@@ -3,10 +3,9 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { LogoutButton } from '../BackButton';
 import { CenterContainer } from '../Layout';
-import { Body2, H2 } from '../Text';
-import { Button } from '../fields/Button';
+import { Body2, H2Responsive } from '../Text';
+import { ButtonResponsiveSize } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { useResolveDns } from '../../state/dns';
 import { seeIfInvalidDns } from '../transfer/RecipientView';
@@ -28,7 +27,8 @@ export const AddressInput: FC<{
     afterInput: (address: string) => void;
     isLoading?: boolean;
     className?: string;
-}> = ({ afterInput, isLoading, className }) => {
+    onIsDirtyChange?: (isDirty: boolean) => void;
+}> = ({ afterInput, isLoading, className, onIsDirtyChange }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
@@ -46,6 +46,14 @@ export const AddressInput: FC<{
     }, [value]);
 
     const { data: dnsWallet, isLoading: isDnsFetching } = useResolveDns(value);
+
+    const isDirty = !!value;
+
+    useEffect(() => {
+        if (onIsDirtyChange) {
+            onIsDirtyChange(isDirty);
+        }
+    }, [isDirty, onIsDirtyChange]);
 
     const onCreate: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
@@ -74,10 +82,9 @@ export const AddressInput: FC<{
 
     return (
         <CenterContainer className={className}>
-            <LogoutButton />
             <Block onSubmit={onCreate}>
                 <div>
-                    <H2>{t('add_watch_only_title')}</H2>
+                    <H2Responsive>{t('add_watch_only_title')}</H2Responsive>
                     <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
                 </div>
                 <ShowAddress value={showAddress}>
@@ -93,8 +100,7 @@ export const AddressInput: FC<{
                         isValid={error === undefined}
                     />
                 </ShowAddress>
-                <Button
-                    size="large"
+                <ButtonResponsiveSize
                     fullWidth
                     primary
                     marginTop
@@ -103,7 +109,7 @@ export const AddressInput: FC<{
                     type="submit"
                 >
                     {t('continue')}
-                </Button>
+                </ButtonResponsiveSize>
             </Block>
         </CenterContainer>
     );
