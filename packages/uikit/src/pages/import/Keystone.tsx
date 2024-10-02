@@ -2,11 +2,11 @@ import UR from '@ngraveio/bc-ur/dist/ur';
 import { useCallback } from 'react';
 import { styled } from 'styled-components';
 import { IconPage } from '../../components/Layout';
-import { KeystoneIcon } from '../../components/create/ImportIcons';
 import { Button } from '../../components/fields/Button';
 import { useKeystoneScanner } from '../../hooks/keystoneScanner';
 import { useTranslation } from '../../hooks/translation';
 import { usePairKeystoneMutation } from '../../state/keystone';
+import { WalletKeystoneIcon } from '../../components/create/WalletIcons';
 
 const IconBlock = styled.div`
     color: ${props => props.theme.accentBlue};
@@ -31,7 +31,7 @@ export const PairKeystone = () => {
             logOut
             icon={
                 <IconBlock>
-                    <KeystoneIcon size={144} />
+                    <WalletKeystoneIcon size={144} />
                 </IconBlock>
             }
             title={t('keystone_pair_title')}

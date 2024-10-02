@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 import { styled } from 'styled-components';
 import { IconPage } from '../../components/Layout';
-import { SignerIcon } from '../../components/create/ImportIcons';
 import { Button } from '../../components/fields/Button';
 import { useScanner } from '../../hooks/scanner';
 import { useTranslation } from '../../hooks/translation';
 import { usePairSignerMutation } from '../../state/signer';
+import { WalletSignerIcon } from '../../components/create/WalletIcons';
 
 const IconBlock = styled.div`
     color: ${props => props.theme.accentBlue};
@@ -30,7 +30,7 @@ export const PairSigner = () => {
             logOut
             icon={
                 <IconBlock>
-                    <SignerIcon size={144} />
+                    <WalletSignerIcon size={144} />
                 </IconBlock>
             }
             title={t('import_signer')}
