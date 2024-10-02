@@ -287,13 +287,13 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </AsideMenuItem>
                     )}
                     <AsideMenuItem
-                      onClick={() => handleNavigateClick(AppRoute.browser)}
-                      isSelected={activeRoute === AppRoute.browser}
+                        onClick={() => handleNavigateClick(AppRoute.browser)}
+                        isSelected={activeRoute === AppRoute.browser}
                     >
-                      <IconWrapper>
-                        <GlobeIcon />
-                      </IconWrapper>
-                      <Label2>{t('aside_discover')}</Label2>
+                        <IconWrapper>
+                            <GlobeIcon />
+                        </IconWrapper>
+                        <Label2>{t('aside_discover')}</Label2>
                     </AsideMenuItem>
                     <AccountDNDBlock items={items} activeRoute={activeRoute} />
                 </ScrollContainer>
