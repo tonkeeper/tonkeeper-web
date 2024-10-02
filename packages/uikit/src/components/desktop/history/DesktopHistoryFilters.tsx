@@ -4,7 +4,7 @@ import React, { FC } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
 import styled, { css } from 'styled-components';
 import { useAssets } from '../../../state/home';
-import { ChevronDownIcon, SlidersIcon } from '../../Icon';
+import { ChevronDownIcon, CoinsHorizontalIcon, SlidersIcon } from '../../Icon';
 import { Checkbox } from '../../fields/Checkbox';
 import { isInitiatorFiltrationForAssetAvailable, useHistoryFilters } from '../../../state/activity';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -18,6 +18,11 @@ const AssetIcon = styled.img`
     margin-right: 12px;
 
     pointer-events: none;
+`;
+
+const AllAssetsIcon = styled(CoinsHorizontalIcon)`
+    margin-right: 12px;
+    color: ${p => p.theme.iconSecondary};
 `;
 
 const DropDownButton = styled.button`
@@ -77,6 +82,7 @@ export const AssetHistoryFilter = () => {
                         }}
                         isSelected={selectedAsset === undefined}
                     >
+                        <AllAssetsIcon />
                         <Label2>{t('history_filters_all_assets')}</Label2>
                     </DropDownItem>
                     <DropDownItemsDivider />
