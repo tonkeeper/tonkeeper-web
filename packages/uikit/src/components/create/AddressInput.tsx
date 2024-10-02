@@ -8,6 +8,9 @@ import { CenterContainer } from '../Layout';
 import { Body2, H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
+import { useResolveDns } from '../../state/dns';
+import { seeIfInvalidDns } from '../transfer/RecipientView';
+import { ShowAddress, useShowAddress } from '../transfer/ShowAddress';
 
 const Block = styled.form`
     display: flex;
@@ -33,17 +36,28 @@ export const AddressInput: FC<{
 
     const [error, setError] = useState<string | undefined>(undefined);
 
-    const [address, setAddress] = useState('');
-    const valid = useMemo(() => {
-        return seeIfValidTonAddress(address);
-    }, [address]);
+    const [value, setValue] = useState('');
+    const validAddress = useMemo(() => {
+        return seeIfValidTonAddress(value);
+    }, [value]);
+
+    const validDns = useMemo(() => {
+        return !seeIfInvalidDns(value);
+    }, [value]);
+
+    const { data: dnsWallet, isLoading: isDnsFetching } = useResolveDns(value);
 
     const onCreate: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
 
-        if (valid) {
-            afterInput(address);
+        if (validDns && dnsWallet) {
+            afterInput(dnsWallet.address);
+            return;
+        }
+
+        if (validAddress) {
+            afterInput(value);
         } else {
             sdk.hapticNotification('error');
             setError('invalid');
@@ -56,6 +70,8 @@ export const AddressInput: FC<{
         }
     }, [ref]);
 
+    const showAddress = useShowAddress(ref, value, dnsWallet?.address);
+
     return (
         <CenterContainer className={className}>
             <LogoutButton />
@@ -64,22 +80,25 @@ export const AddressInput: FC<{
                     <H2>{t('add_watch_only_title')}</H2>
                     <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
                 </div>
-                <Input
-                    ref={ref}
-                    label={t('wallet_address')}
-                    value={address}
-                    onChange={value => {
-                        setAddress(value);
-                        setError(undefined);
-                    }}
-                    isValid={error === undefined || valid}
-                />
+                <ShowAddress value={showAddress}>
+                    <Input
+                        ref={ref}
+                        label={t('wallet_address')}
+                        value={value}
+                        onChange={v => {
+                            setValue(v);
+                            setError(undefined);
+                        }}
+                        clearButton
+                        isValid={error === undefined}
+                    />
+                </ShowAddress>
                 <Button
                     size="large"
                     fullWidth
                     primary
                     marginTop
-                    loading={isLoading}
+                    loading={isLoading || isDnsFetching}
                     disabled={!!error}
                     type="submit"
                 >
