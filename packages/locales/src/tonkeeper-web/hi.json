@@ -14,7 +14,7 @@
   "aside_add_wallet": "वॉलेट जोड़ें",
   "aside_dashboard": "डैशबोर्ड",
   "aside_discover": "खोजें",
-  "aside_expires_on": "{0, number}ate% को समाप्त होता है",
+  "aside_expires_on": "%date% को समाप्त होता है",
   "aside_header_number_wallets": "%'{'number'}' वॉलेट",
   "aside_pro_subscription_is_active": "प्रो सब्सक्रिप्शन सक्रिय है।",
   "aside_pro_trial_is_active": "प्रो ट्रायल सक्रिय है।",

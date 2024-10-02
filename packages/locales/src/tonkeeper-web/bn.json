@@ -13,7 +13,7 @@
   "aside_add_wallet": "ওয়ালেট যোগ করুন",
   "aside_dashboard": "ড্যাশবোর্ড",
   "aside_discover": "আবিষ্কার করুন",
-  "aside_expires_on": "এটি {0, number}ate% এ মেয়াদ শেষ হবে",
+  "aside_expires_on": "এটি %date% এ মেয়াদ শেষ হবে",
   "aside_header_number_wallets": "%'{'number'}' টি ওয়ালেট",
   "aside_pro_subscription_is_active": "প্রো সাবস্ক্রিপশন সক্রিয়।",
   "aside_pro_trial_is_active": "প্রো ট্রায়াল সক্রিয়।",
