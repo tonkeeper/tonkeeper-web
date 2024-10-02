@@ -116,11 +116,19 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
         const _availableAccounts = accounts.filter(acc =>
             folders.every(f => f.id === folder?.id || !f.accounts.includes(acc.id))
         );
+        const _availableCheckedAccounts = _availableAccounts.filter(i =>
+            folder?.accounts.some(a => a.id === i.id)
+        );
+
+        const _availableUncheckedAccounts = _availableAccounts.filter(
+            a => !_availableCheckedAccounts.includes(a)
+        );
+
         return {
-            availableAccounts: _availableAccounts,
+            availableAccounts: _availableCheckedAccounts.concat(_availableUncheckedAccounts),
             unAvailableAccounts: accounts.filter(acc => !_availableAccounts.includes(acc))
         };
-    }, [accounts, folders]);
+    }, [accounts, folders, folder]);
 
     const toggleCheckbox = (accId: AccountId) => {
         if (checkedAccounts.includes(accId)) {
