@@ -22,7 +22,7 @@ import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { useAccountsState, useActiveTonNetwork } from '../../../state/wallet';
+import { useAccountsState, useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import {
     useMultisigsOfAccountToDisplay,
     useMutateMultisigSelectedHostWallet
@@ -424,22 +424,26 @@ export const AsideMenuAccountMultisig = () => {
 
 export const AsideMenuAccount: FC<{
     account: Account;
-    isSelected: boolean;
+    mightBeHighlighted: boolean;
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, ...rest }) => {
+    const activeAccount = useActiveAccount();
+    const isSelected = rest.mightBeHighlighted && activeAccount.id === account.id;
     switch (account.type) {
         case 'mnemonic':
-            return <AsideMenuAccountMnemonic account={account} {...rest} />;
+            return <AsideMenuAccountMnemonic account={account} isSelected={isSelected} {...rest} />;
         case 'ledger':
-            return <AsideMenuAccountLedger account={account} {...rest} />;
+            return <AsideMenuAccountLedger account={account} isSelected={isSelected} {...rest} />;
         case 'ton-only':
-            return <AsideMenuAccountTonOnly account={account} {...rest} />;
+            return <AsideMenuAccountTonOnly account={account} isSelected={isSelected} {...rest} />;
         case 'keystone':
-            return <AsideMenuAccountKeystone account={account} {...rest} />;
+            return <AsideMenuAccountKeystone account={account} isSelected={isSelected} {...rest} />;
         case 'watch-only':
-            return <AsideMenuAccountWatchOnly account={account} {...rest} />;
+            return (
+                <AsideMenuAccountWatchOnly account={account} isSelected={isSelected} {...rest} />
+            );
         case 'mam':
-            return <AsideMenuAccountMAM account={account} {...rest} />;
+            return <AsideMenuAccountMAM account={account} isSelected={isSelected} {...rest} />;
         case 'ton-multisig':
             return <AsideMenuAccountMultisig />;
         default:

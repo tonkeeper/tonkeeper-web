@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/web",
-    "version": "3.24.0",
+    "version": "3.24.1",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Your web wallet on The Open Network",
     "dependencies": {
