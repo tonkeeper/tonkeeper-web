@@ -135,6 +135,7 @@ const NewFolderButton = styled.button`
     border: none;
     background-color: transparent;
     padding: 0.5rem 1rem;
+    margin-right: -1rem;
     display: flex;
     align-items: center;
     justify-content: center;
