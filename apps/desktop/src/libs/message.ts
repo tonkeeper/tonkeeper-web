@@ -45,6 +45,10 @@ export interface TonConnectMessage {
     king: 'reconnect';
 }
 
+export interface CleanCookieMessage {
+    king: 'clean-cookie';
+}
+
 export interface GetPreferredSystemLanguagesMessage {
     king: 'get-preferred-system-languages';
 }
@@ -76,4 +80,5 @@ export type Message =
     | CanPromptTouchIdMessage
     | PromptTouchIdMessage
     | GetPreferredSystemLanguagesMessage
-    | TonConnectSendDisconnectMessage;
+    | TonConnectSendDisconnectMessage
+    | CleanCookieMessage;
