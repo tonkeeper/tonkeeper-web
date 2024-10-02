@@ -5,6 +5,7 @@ import { useAtom } from '../../libs/atom';
 import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
+import { useTranslation } from '../../hooks/translation';
 
 const { hook, paramsControl } = createModalControl<{
     onClose(isDiscarded: boolean): void;
@@ -46,6 +47,7 @@ const NotificationStyled = styled(Notification)`
 `;
 
 export const ConfirmDiscardNotificationControlled = () => {
+    const { t } = useTranslation();
     const { isOpen, onClose } = useConfirmDiscardNotification();
     const [params] = useAtom(paramsControl);
 
@@ -63,16 +65,13 @@ export const ConfirmDiscardNotificationControlled = () => {
         <NotificationStyled isOpen={isOpen} handleClose={onContinue}>
             {() => (
                 <ContentContainer>
-                    <Label2>Are you sure you want to leave?</Label2>
-                    <Body2>
-                        You have unsaved changes. If you close this window, your progress will be
-                        lost. Do you want to continue?
-                    </Body2>
+                    <Label2>{t('confirm_discard_title')}</Label2>
+                    <Body2>{t('confirm_discard_description')}</Body2>
                     <ButtonsContainer>
                         <Button primary onClick={onContinue}>
-                            Continue Editing
+                            {t('confirm_discard_btn_continue_editing')}
                         </Button>
-                        <Button onClick={onDiscard}>Discard Changes</Button>
+                        <Button onClick={onDiscard}>{t('confirm_discard_btn_discard')}</Button>
                     </ButtonsContainer>
                 </ContentContainer>
             )}
