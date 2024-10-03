@@ -2,8 +2,8 @@ import { RefCallback, useCallback, useLayoutEffect, useRef, useState } from 'rea
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 
 export function useIsScrolled<T extends HTMLElement = HTMLDivElement>(options?: {
-    gapTop: number;
-    gapBottom: number;
+    gapTop?: number;
+    gapBottom?: number;
 }) {
     const gapTop = options?.gapTop ?? 10;
     const gapBottom = options?.gapBottom ?? 10;

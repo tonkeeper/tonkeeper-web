@@ -8,6 +8,7 @@ export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundContent)};
     border-radius: ${p => p.theme.corner2xSmall};
     box-sizing: border-box;
+    cursor: pointer;
 
     padding: 6px 10px;
     width: 100%;

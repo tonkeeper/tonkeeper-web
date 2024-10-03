@@ -94,6 +94,10 @@ const AsideMenuBottom = styled.div`
     padding-bottom: 0.5rem;
 `;
 
+const AsideMenuBottomContent = styled.div`
+    padding: 0.5rem 0;
+`;
+
 const DraggingBlock = styled.div<{ $isDragging: boolean }>`
     cursor: pointer !important;
     border-radius: ${p => p.theme.corner2xSmall};
@@ -299,21 +303,23 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
-                    <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
-                        <IconWrapper>
-                            <PlusIcon />
-                        </IconWrapper>
-                        <Label2>{t('aside_add_wallet')}</Label2>
-                    </AsideMenuItem>
-                    <AsideMenuItem
-                        onClick={() => handleNavigateClick(AppRoute.settings)}
-                        isSelected={activeRoute === AppRoute.settings}
-                    >
-                        <IconWrapper>
-                            <SlidersIcon />
-                        </IconWrapper>
-                        <Label2>{t('aside_settings')}</Label2>
-                    </AsideMenuItem>
+                    <AsideMenuBottomContent>
+                        <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
+                            <IconWrapper>
+                                <PlusIcon />
+                            </IconWrapper>
+                            <Label2>{t('aside_add_wallet')}</Label2>
+                        </AsideMenuItem>
+                        <AsideMenuItem
+                            onClick={() => handleNavigateClick(AppRoute.settings)}
+                            isSelected={activeRoute === AppRoute.settings}
+                        >
+                            <IconWrapper>
+                                <SlidersIcon />
+                            </IconWrapper>
+                            <Label2>{t('aside_settings')}</Label2>
+                        </AsideMenuItem>
+                    </AsideMenuBottomContent>
                     <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
                         <SubscriptionInfoBlock />
                     </ErrorBoundary>
