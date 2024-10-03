@@ -243,7 +243,7 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_delete_account')}</Label2>
                     </SettingsListItem>
                 )}
-                {account.type === 'mam' && (
+                {account.type === 'mam' && account.addedDerivationsIndexes.length > 1 && (
                     <SettingsListItem onClick={onHide}>
                         <ExitIcon />
                         <SettingsListText>
