@@ -69,6 +69,8 @@ export const AddressText = styled(Body1)<{ extension?: boolean }>`
     color: black;
     margin: 16px 4px 0;
     text-align: center;
+    font-family: ${p => p.theme.fontMono};
+
     ${props =>
         props.extension &&
         css`
