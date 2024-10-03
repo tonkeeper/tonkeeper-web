@@ -71,8 +71,13 @@ const ListItemPayloadStyled = styled(ListItemPayload)`
     }
 `;
 
+const ListItemPayloadPointer = styled(ListItemPayloadStyled)`
+    cursor: pointer;
+`;
+
 const CheckboxStyled = styled(Checkbox)`
     margin-left: auto;
+    pointer-events: none;
 `;
 
 const Body3Secondary = styled(Body3)`
@@ -111,11 +116,19 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
         const _availableAccounts = accounts.filter(acc =>
             folders.every(f => f.id === folder?.id || !f.accounts.includes(acc.id))
         );
+        const _availableCheckedAccounts = _availableAccounts.filter(i =>
+            folder?.accounts.some(a => a.id === i.id)
+        );
+
+        const _availableUncheckedAccounts = _availableAccounts.filter(
+            a => !_availableCheckedAccounts.includes(a)
+        );
+
         return {
-            availableAccounts: _availableAccounts,
+            availableAccounts: _availableCheckedAccounts.concat(_availableUncheckedAccounts),
             unAvailableAccounts: accounts.filter(acc => !_availableAccounts.includes(acc))
         };
-    }, [accounts, folders]);
+    }, [accounts, folders, folder]);
 
     const toggleCheckbox = (accId: AccountId) => {
         if (checkedAccounts.includes(accId)) {
@@ -155,15 +168,15 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
             <ListBlockDesktopAdaptiveStyled>
                 {availableAccounts.map(acc => (
                     <ListItem key={acc.id} hover={false}>
-                        <ListItemPayloadStyled>
+                        <ListItemPayloadPointer onClick={() => toggleCheckbox(acc.id)}>
                             <WalletEmoji emojiSize="16px" containerSize="16px" emoji={acc.emoji} />
                             <Label2Styled>{acc.name}</Label2Styled>
                             <AccountBadge accountType={acc.type} size="s" />
                             <CheckboxStyled
                                 checked={checkedAccounts.includes(acc.id)}
-                                onChange={() => toggleCheckbox(acc.id)}
+                                onChange={() => {}}
                             />
-                        </ListItemPayloadStyled>
+                        </ListItemPayloadPointer>
                     </ListItem>
                 ))}
                 {!!unAvailableAccounts.length && (
@@ -177,7 +190,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
                         </ListItem>
                         {unAvailableAccounts.map(acc => (
                             <ListItem key={acc.id} hover={false}>
-                                <ListItemPayloadStyled>
+                                <ListItemPayloadPointer onClick={() => toggleCheckbox(acc.id)}>
                                     <WalletEmoji
                                         emojiSize="16px"
                                         containerSize="16px"
@@ -187,9 +200,9 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
                                     <AccountBadge accountType={acc.type} size="s" />
                                     <CheckboxStyled
                                         checked={checkedAccounts.includes(acc.id)}
-                                        onChange={() => toggleCheckbox(acc.id)}
+                                        onChange={() => {}}
                                     />
-                                </ListItemPayloadStyled>
+                                </ListItemPayloadPointer>
                             </ListItem>
                         ))}
                     </>

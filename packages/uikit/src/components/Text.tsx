@@ -20,6 +20,17 @@ export const H2 = styled.h2`
     margin: 0 0 0.25rem;
 `;
 
+export const H2Responsive = styled(H2)`
+    user-select: none;
+
+    ${p => p.theme.displayType === 'full-width' && Label2Class}
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-bottom: 4px;
+        `}
+`;
+
 export const H3 = styled.h3`
     font-style: normal;
     font-weight: 700;

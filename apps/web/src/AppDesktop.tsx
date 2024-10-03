@@ -27,7 +27,6 @@ import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecom
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from 'react';
@@ -216,10 +215,7 @@ export const DesktopContent: FC<{
         return (
             <FullScreen>
                 <InitializeContainer>
-                    <Routes>
-                        <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                        <Route path="*" element={<Initialize />} />
-                    </Routes>
+                   <Initialize />
                 </InitializeContainer>
             </FullScreen>
         );

@@ -25,16 +25,6 @@ export enum SignerRoute {
     link = 'link'
 }
 
-export enum ImportRoute {
-    import = '/import',
-    create = '/create',
-    signer = '/signer',
-    ledger = '/ledger',
-    keystone = '/keystone',
-    readOnly = '/watch-only',
-    mam = '/mam'
-}
-
 export enum SettingsRoute {
     index = '/',
     localization = '/localization',

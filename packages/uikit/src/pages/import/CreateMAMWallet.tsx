@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Words } from '../../components/create/Words';
@@ -19,8 +19,15 @@ import {
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
 import { TonKeychainRoot } from '@ton-keychain/core';
+import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
+import {
+    OnCloseInterceptor,
+    useSetNotificationOnBack,
+    useSetNotificationOnCloseInterceptor
+} from '../../components/Notification';
 
-const Create = () => {
+export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
@@ -38,6 +45,14 @@ const Create = () => {
     const [wordsPagePassed, setWordsPagePassed] = useState(false);
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
     const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
+
+    const [wordsShown, setWordsShown] = useState(false);
+
+    useEffect(() => {
+        if (infoPagePassed) {
+            setWordsShown(true);
+        }
+    }, [infoPagePassed]);
 
     const onRename = async (form: { name: string; emoji: string }) => {
         const derivationIndexes = (createdAccount as AccountMAM).allAvailableDerivations.map(
@@ -71,6 +86,63 @@ const Create = () => {
         }
     }, [mnemonic]);
 
+    const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
+    const { navigateHome } = useContext(AddWalletContext);
+    const onBack = useMemo(() => {
+        if (!infoPagePassed) {
+            if (!wordsShown) {
+                return navigateHome;
+            }
+            return () =>
+                openConfirmDiscard({
+                    onClose: discard => {
+                        if (discard) {
+                            navigateHome?.();
+                        }
+                    }
+                });
+        }
+
+        if (!wordsPagePassed) {
+            return () => setInfoPagePassed(false);
+        }
+
+        if (!createdAccount) {
+            return () => setWordsPagePassed(false);
+        }
+
+        return undefined;
+    }, [
+        wordsShown,
+        openConfirmDiscard,
+        navigateHome,
+        infoPagePassed,
+        wordsPagePassed,
+        createdAccount
+    ]);
+    useSetNotificationOnBack(onBack);
+
+    const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
+        if (!wordsShown) {
+            return undefined;
+        }
+
+        if (createdAccount) {
+            return undefined;
+        }
+
+        return closeModal => {
+            openConfirmDiscard({
+                onClose: discard => {
+                    if (discard) {
+                        closeModal();
+                    }
+                }
+            });
+        };
+    }, [wordsShown, openConfirmDiscard, createdAccount]);
+    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+
     if (!mnemonic) {
         return <IconPage icon={<GearLottieIcon />} title={t('create_wallet_generating')} />;
     }
@@ -102,20 +174,13 @@ const Create = () => {
     }
 
     if (!wordsPagePassed) {
-        return (
-            <Words
-                mnemonic={mnemonic}
-                onBack={() => setInfoPagePassed(false)}
-                onCheck={() => setWordsPagePassed(true)}
-            />
-        );
+        return <Words mnemonic={mnemonic} onCheck={() => setWordsPagePassed(true)} />;
     }
 
     if (!createdAccount) {
         return (
             <Check
                 mnemonic={mnemonic}
-                onBack={() => setWordsPagePassed(false)}
                 onConfirm={() => {
                     createWalletsAsync({
                         mnemonic,
@@ -149,7 +214,5 @@ const Create = () => {
         );
     }
 
-    return <FinalView />;
+    return <FinalView afterCompleted={afterCompleted} />;
 };
-
-export default Create;

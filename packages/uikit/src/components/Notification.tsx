@@ -19,7 +19,7 @@ import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
 import { RoundedButton, ButtonMock } from './fields/RoundedButton';
-import { ArrowLeftIcon, CloseIcon } from './Icon';
+import { ArrowLeftIcon, ChevronLeftIcon, CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
 import { H2, H3, Label2 } from './Text';
@@ -288,13 +288,7 @@ export const NotificationTitleRow: FC<
     const isFullWidthMode = useIsFullWidthMode();
     return (
         <TitleRow className={className}>
-            {onBack ? (
-                <IconButtonTransparentBackground onClick={onBack}>
-                    <ArrowLeftIcon />
-                </IconButtonTransparentBackground>
-            ) : (
-                center && <ButtonMock />
-            )}
+            {onBack ? <NotificationBackButton onBack={onBack} /> : center && <ButtonMock />}
             {center && <ButtonMock />}
             {isFullWidthMode ? (
                 <RowTitleDesktop>{children}</RowTitleDesktop>
@@ -359,20 +353,46 @@ export const NotificationTitleBlock = styled.div`
     gap: 1rem;
 `;
 
+const DesktopCloseButtonStyled = styled(IconButtonTransparentBackground)`
+    margin-right: -10px;
+`;
+
+const DesktopBackButtonStyled = styled(IconButtonTransparentBackground)`
+    margin-left: -10px;
+`;
+
 export const NotificationCancelButton: FC<{ handleClose: () => void }> = ({ handleClose }) => {
     const isFullWidthMode = useIsFullWidthMode();
 
     if (isFullWidthMode) {
         return (
-            <IconButtonTransparentBackground onClick={handleClose}>
+            <DesktopCloseButtonStyled onClick={handleClose}>
                 <CloseIcon />
-            </IconButtonTransparentBackground>
+            </DesktopCloseButtonStyled>
         );
     }
 
     return (
         <RoundedButton onClick={handleClose}>
             <CloseIcon />
+        </RoundedButton>
+    );
+};
+
+export const NotificationBackButton: FC<{ onBack: () => void }> = ({ onBack }) => {
+    const isFullWidthMode = useIsFullWidthMode();
+
+    if (isFullWidthMode) {
+        return (
+            <DesktopBackButtonStyled onClick={onBack}>
+                <ArrowLeftIcon />
+            </DesktopBackButtonStyled>
+        );
+    }
+
+    return (
+        <RoundedButton onClick={onBack}>
+            <ChevronLeftIcon />
         </RoundedButton>
     );
 };
@@ -448,7 +468,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
     });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
-type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
+export type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
 
 export const Notification: FC<{
     isOpen: boolean;

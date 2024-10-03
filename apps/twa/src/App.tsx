@@ -19,11 +19,7 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
@@ -287,23 +283,17 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
 
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content
-                            activeAccount={activeAccount}
-                            lock={lock}
-                            showQrScan={showQrScan}
-                            sdk={sdk}
-                        />
-                        <CopyNotification />
-                        <ModalsRoot />
-                        {showQrScan && <TwaQrScanner />}
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
+            <AppContext.Provider value={context}>
+                <Content
+                    activeAccount={activeAccount}
+                    lock={lock}
+                    showQrScan={showQrScan}
+                    sdk={sdk}
+                />
+                <CopyNotification />
+                <ModalsRoot />
+                {showQrScan && <TwaQrScanner />}
+            </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 };
@@ -327,10 +317,7 @@ const InitPages: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
-                <Routes>
-                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                    <Route path="*" element={<Initialize />} />
-                </Routes>
+                <Initialize />
             </Suspense>
         </InitWrapper>
     );
