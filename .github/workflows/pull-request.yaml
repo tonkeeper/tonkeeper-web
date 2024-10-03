@@ -16,6 +16,10 @@ jobs:
                       command: make:intel
                       tag: x64
                       dist: /apps/desktop/out/make/deb/x64
+                    - os: ubuntu-latest
+                      command: make:arm
+                      tag: arm64
+                      dist: /apps/desktop/out/make/deb/arm64
                     - os: windows-latest
                       command: make:intel
                       tag: x64

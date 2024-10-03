@@ -106,7 +106,7 @@ const config: ForgeConfig = {
             ['linux']
         ),
         new MakerFlatpak({ options: { ...devAndRpmOptions, files: [], categories: ['Utility'] } }, [
-            'linux'
+            'linux/x64'
         ])
     ],
     plugins: [
