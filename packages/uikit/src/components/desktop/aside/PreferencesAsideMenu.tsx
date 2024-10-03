@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { Body2, Label2 } from '../../Text';
+import { Body2, Body3, Label2 } from "../../Text";
 import {
     AppearanceIcon,
     BankIcon,
@@ -67,7 +67,7 @@ const AsideMenuItemLargeBody = styled.div`
     flex-direction: column;
     text-align: start;
 
-    ${Body2} {
+    ${Body3} {
         color: ${p => p.theme.textSecondary};
     }
 `;
@@ -126,7 +126,7 @@ export const PreferencesAsideMenu = () => {
                                 <AppearanceIcon />
                                 <AsideMenuItemLargeBody>
                                     <Label2>{t('preferences_aside_theme')}</Label2>
-                                    <Body2>
+                                    <Body3>
                                         {!uiPreferences ? (
                                             <Skeleton width="60px" height="14px" margin="3px 0" />
                                         ) : (
@@ -135,7 +135,7 @@ export const PreferencesAsideMenu = () => {
                                                     Object.keys(availableThemes)[0]
                                             )
                                         )}
-                                    </Body2>
+                                    </Body3>
                                 </AsideMenuItemLargeBody>
                             </AsideMenuItemLarge>
                         )}
@@ -147,7 +147,7 @@ export const PreferencesAsideMenu = () => {
                             <GlobeIcon />
                             <AsideMenuItemLargeBody>
                                 <Label2>{t('Localization')}</Label2>
-                                <Body2>{getLanguageName(i18n.language)}</Body2>
+                                <Body3>{getLanguageName(i18n.language)}</Body3>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}
@@ -158,7 +158,7 @@ export const PreferencesAsideMenu = () => {
                             <BankIcon />
                             <AsideMenuItemLargeBody>
                                 <Label2>{t('settings_primary_currency')}</Label2>
-                                <Body2>{fiat}</Body2>
+                                <Body3>{fiat}</Body3>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}
@@ -169,13 +169,13 @@ export const PreferencesAsideMenu = () => {
                             <PlaceIcon />
                             <AsideMenuItemLargeBody>
                                 <Label2>{t('country')}</Label2>
-                                <Body2>
+                                <Body3>
                                     {!country ? (
                                         <Skeleton width="60px" height="14px" margin="3px 0" />
                                     ) : (
                                         getCountryName(i18n.language, country)
                                     )}
-                                </Body2>
+                                </Body3>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}
