@@ -1,4 +1,3 @@
-import { mnemonicToWalletKey } from '@ton/crypto';
 import {
     WalletVersion,
     WalletVersions,
@@ -19,6 +18,7 @@ import { ButtonResponsiveSize } from '../fields/Button';
 import { Body1, Body2, Body2Class, H2Responsive, Label1 } from '../Text';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -84,7 +84,7 @@ export const ChoseWalletVersions: FC<{
     }, []);
 
     useEffect(() => {
-        mnemonicToWalletKey(mnemonic).then(keypair =>
+        mnemonicToKeypair(mnemonic).then(keypair =>
             setPublicKey(keypair.publicKey.toString('hex'))
         );
     }, [mnemonic]);
