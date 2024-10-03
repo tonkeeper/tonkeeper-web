@@ -56,7 +56,6 @@ import { useDebuggingTools } from "@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
 import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 
-const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
