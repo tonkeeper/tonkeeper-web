@@ -141,7 +141,7 @@
   "logout_on_unlock_one": "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase.",
   "mam_account_explanation": "The account recovery phrase provides access to all wallets created with it and is only supported in Tonkeeper Pro. If you want to export a specific wallet, use wallet recovery phrase backup instead.",
   "Manage": "Manage",
-  "Manage_wallets": "Manage wallets",
+  "Manage_wallets": "Manage Wallets",
   "MinPassword": "Must be at least 6 characters.",
   "multi_send_about_w5": "About W5",
   "multi_send_add_more": "Add More",
