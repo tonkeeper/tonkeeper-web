@@ -78,7 +78,7 @@ const Row = styled.div<{ $tabLevel?: number }>`
     padding-top: 7px;
     padding-bottom: 8px;
     padding-right: 1rem;
-    ${p => `padding-left: ${16 + (p.$tabLevel ?? 0) * 28}px !important;`}
+    ${p => `padding-left: ${16 + (p.$tabLevel ?? 0) * 24}px !important;`}
     border-bottom: none !important;
 
     width: 100%;
