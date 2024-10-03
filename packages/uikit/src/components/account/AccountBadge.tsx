@@ -3,6 +3,7 @@ import { WalletId, WalletVersion, walletVersionText } from '@tonkeeper/core/dist
 import { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { Badge } from '../shared';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export const AccountBadge: FC<
     PropsWithChildren<{
@@ -173,5 +174,13 @@ export const AccountAndWalletBadgesGroup: FC<{
         );
     }
 
-    return null;
+    if (account.type === 'ton-multisig') {
+        return <AccountBadge className={className} size={size} accountType={account.type} />;
+    }
+
+    if (account.type === 'mnemonic') {
+        return null;
+    }
+
+    assertUnreachable(account);
 };
