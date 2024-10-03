@@ -18,6 +18,8 @@ import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -375,7 +377,7 @@ export interface InitTransferData {
     initAmountState?: Partial<AmountState>;
 }
 
-export const getInitData = (
+export const makeTransferInitData = (
     tonTransfer: TonTransferParams,
     toAccount: Account,
     jettons: JettonsBalances | undefined
@@ -383,14 +385,14 @@ export const getInitData = (
     const initRecipient: TonRecipientData = {
         address: {
             blockchain: BLOCKCHAIN_NAME.TON,
-            address: tonTransfer.address
+            address: formatAddress(toAccount.address)
         },
         toAccount,
         comment: tonTransfer.text ?? '',
         done: toAccount.memoRequired ? tonTransfer.text !== '' && tonTransfer.text !== null : true
     };
 
-    const { initAmountState } = getJetton(tonTransfer.jetton, jettons);
+    const initAmountState = makeTransferInitAmountState(tonTransfer, jettons);
 
     return {
         initRecipient,
@@ -398,18 +400,30 @@ export const getInitData = (
     };
 };
 
-export const getJetton = (
-    asset: string | undefined,
+export const makeTransferInitAmountState = (
+    transfer: Pick<TonTransferParams, 'amount' | 'jetton'>,
     jettons: JettonsBalances | undefined
-): InitTransferData => {
+): Partial<AmountState> => {
     try {
-        if (asset) {
-            const token = jettonToTonAsset(asset, jettons || { balances: [] });
+        const token = jettonToTonAsset(transfer.jetton || 'TON', jettons || { balances: [] });
 
+        if (!transfer.amount) {
             return {
-                initAmountState: { token: token }
+                token
             };
         }
+
+        const assetAmount = new AssetAmount({
+            asset: token,
+            weiAmount: transfer.amount || '0'
+        });
+
+        return {
+            coinValue: assetAmount.relativeAmount,
+            token,
+            inFiat: false,
+            isMax: false
+        };
     } catch {
         return {};
     }

@@ -6,7 +6,7 @@ import { jettonToTonAsset, TonAsset } from '@tonkeeper/core/dist/entries/crypto/
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
-    parseTonTransfer
+    parseTonTransferWithAddress
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -46,9 +46,9 @@ import {
     Wrapper,
     childFactoryCreator,
     duration,
-    getInitData,
-    getJetton,
-    TransferViewHeaderBlock
+    makeTransferInitData,
+    TransferViewHeaderBlock,
+    makeTransferInitAmountState
 } from './common';
 import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -143,7 +143,7 @@ const SendContent: FC<{
         setView('amount');
     };
 
-    const processRecipient = async ({ address, text }: TonTransferParams) => {
+    const processRecipient = async ({ address, text }: { address: string; text?: string }) => {
         const item = { address: address, blockchain: BLOCKCHAIN_NAME.TON } as const;
         const toAccount = await getAccountAsync(item);
 
@@ -200,7 +200,7 @@ const SendContent: FC<{
     );
 
     const onScan = async (signature: string) => {
-        const param = parseTonTransfer({ url: signature });
+        const param = parseTonTransferWithAddress({ url: signature });
 
         if (param) {
             const ok = await processJetton(param);
@@ -395,15 +395,15 @@ const SendActionNotification = () => {
         }) => {
             reset();
 
-            const { transfer, asset } = options.params;
+            const transfer = options.params;
             setChain(options.params.chain);
-            if (transfer) {
+            if (transfer.address) {
                 getAccountAsync({ address: transfer.address }).then(account => {
-                    setTonTransfer(getInitData(transfer, account, jettons));
+                    setTonTransfer(makeTransferInitData(transfer, account, jettons));
                     setOpen(true);
                 });
             } else {
-                setTonTransfer(getJetton(asset, jettons));
+                setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
                 setOpen(true);
             }
         };

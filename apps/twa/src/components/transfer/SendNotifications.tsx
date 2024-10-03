@@ -6,7 +6,7 @@ import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
-    parseTonTransfer
+    parseTonTransferWithAddress
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { ConfirmTransferView } from '@tonkeeper/uikit/dist/components/transfer/ConfirmTransferView';
@@ -26,8 +26,8 @@ import {
     Wrapper,
     childFactoryCreator,
     duration,
-    getInitData,
-    getJetton
+    makeTransferInitData,
+    makeTransferInitData
 } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -199,7 +199,7 @@ const SendContent: FC<{
     );
 
     const onScan = async (signature: string) => {
-        const param = parseTonTransfer({ url: signature });
+        const param = parseTonTransferWithAddress({ url: signature });
 
         if (param) {
             const ok = await processJetton(param);
@@ -321,11 +321,11 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
             setChain(chain);
             if (transfer) {
                 getAccountAsync({ address: transfer.address }).then(account => {
-                    setTonTransfer(getInitData(transfer, account, jettons));
+                    setTonTransfer(makeTransferInitData(transfer, account, jettons));
                     setOpen(true);
                 });
             } else {
-                setTonTransfer(getJetton(asset, jettons));
+                setTonTransfer(makeTransferInitData(asset, jettons));
                 setOpen(true);
             }
         };

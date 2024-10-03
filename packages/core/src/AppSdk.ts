@@ -5,17 +5,17 @@ import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { TonContract, TonWalletStandard } from './entries/wallet';
-import { TonTransferParams } from './service/deeplinkingService';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
+import { TonTransferParams } from './service/deeplinkingService';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
-export type TransferInitParams = {
-    transfer?: TonTransferParams;
-    asset?: string;
-    chain?: BLOCKCHAIN_NAME;
-};
+export type TransferInitParams =
+    | (TonTransferParams & {
+          chain: BLOCKCHAIN_NAME.TON;
+      })
+    | Record<string, never>;
 
 export type ReceiveInitParams = {
     chain?: BLOCKCHAIN_NAME;
