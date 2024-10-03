@@ -4,10 +4,10 @@ import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
+import { TonContract, TonWalletStandard } from './entries/wallet';
 import { TonTransferParams } from './service/deeplinkingService';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTransaction } from './service/ledger/connector';
-import { TonContract, TonWalletStandard } from './entries/wallet';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -68,6 +68,10 @@ export interface TouchId {
     prompt: (reason: (lang: string) => string) => Promise<void>;
 }
 
+export interface CookieService {
+    cleanUp: () => Promise<void>;
+}
+
 export interface NotificationService {
     subscribe: (
         api: APIConfig,
@@ -86,6 +90,7 @@ export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
     keychain?: KeychainPassword;
+    cookie?: CookieService;
     touchId?: TouchId;
 
     topMessage: (text: string) => void;

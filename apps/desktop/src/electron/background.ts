@@ -3,6 +3,7 @@ import keytar from 'keytar';
 import { Message } from '../libs/message';
 import { TonConnectSSE } from './sseEvetns';
 import { mainStorage } from './storageService';
+import { cookieJar } from './cookie';
 
 const service = 'tonkeeper.com';
 
@@ -43,6 +44,9 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             return systemPreferences.promptTouchID(message.reason);
         case 'get-preferred-system-languages':
             return app.getPreferredSystemLanguages();
+        case 'clean-cookie': {
+            return cookieJar.removeAllCookies();
+        }
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }
