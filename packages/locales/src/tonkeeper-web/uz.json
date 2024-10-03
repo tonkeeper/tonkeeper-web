@@ -19,7 +19,7 @@
   "aside_add_wallet": "Hamyon qo'shish",
   "aside_dashboard": "Boshqaruv paneli",
   "aside_discover": "Kashf qiling",
-  "aside_expires_on": "Uning muddati {0, number}ate% da tugaydi",
+  "aside_expires_on": "Uning muddati %date% da tugaydi",
   "aside_header_number_wallets": "%'{'number'}' hamyonlar",
   "aside_pro_subscription_is_active": "Pro obunasi faol.",
   "aside_pro_trial_is_active": "Pro sinovi faol.",

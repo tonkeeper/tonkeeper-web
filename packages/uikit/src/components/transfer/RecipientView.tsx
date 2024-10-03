@@ -2,9 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
-import { Account, AccountsApi, DNSApi } from '@tonkeeper/core/dist/tonApiV2';
+import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
-    debounce,
     formatAddress,
     seeIfValidTonAddress,
     seeIfValidTronAddress
@@ -33,6 +32,7 @@ import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
+import { useResolveDns } from '../../state/dns';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -67,41 +67,6 @@ export const seeIfInvalidDns = (value: string) => {
         value.length === 52 ||
         seeIfValidTonAddress(value) ||
         seeIfValidTronAddress(value)
-    );
-};
-
-const useDnsWallet = (value: string) => {
-    const { api } = useAppContext();
-
-    const [name, setName] = useState('');
-
-    const update = useMemo(() => {
-        return debounce<[string]>(v => setName(v), 400);
-    }, [setName]);
-
-    update(value);
-
-    return useQuery(
-        [QueryKey.dns, value, name],
-        async () => {
-            if (value !== name) {
-                return null;
-            }
-            let dns = name.trim();
-            if (seeIfInvalidDns(dns)) {
-                return null;
-            }
-            dns = dns.toString().toLowerCase();
-            const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: dns });
-            if (!result.wallet) {
-                return null;
-            }
-            return result.wallet;
-        },
-        {
-            retry: 0,
-            keepPreviousData: false
-        }
     );
 };
 
@@ -149,7 +114,7 @@ export const RecipientView: FC<{
         data?.address ?? defaultRecipient
     );
 
-    const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(recipient.address);
+    const { data: dnsWallet, isFetching: isDnsFetching } = useResolveDns(recipient.address);
 
     useEffect(() => {
         const timer = setTimeout(() => scrollToTop(), 300);
@@ -257,7 +222,7 @@ export const RecipientView: FC<{
         return recipient.address;
     }, [recipient, network]);
 
-    const showAddress = useShowAddress(ref, formatted, toAccount);
+    const showAddress = useShowAddress(ref, formatted, toAccount?.address);
 
     const handleSubmit = () => {
         setSubmit(true);

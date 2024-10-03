@@ -340,7 +340,7 @@ const MultiSendAddMore: FC<{
         );
     }
 
-    if (isW5Version(wallet.version)) {
+    if (!isW5Version(wallet.version)) {
         return (
             <MaximumReachedContainer>
                 <Body2>{t('multi_send_maximum_reached')}</Body2>

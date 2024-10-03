@@ -13,7 +13,7 @@
   "aside_add_wallet": "افزودن کیف‌پول",
   "aside_dashboard": "داشبورد",
   "aside_discover": "گشت و گذار",
-  "aside_expires_on": "تاریخ انقضاء {0, number}ate%",
+  "aside_expires_on": "تاریخ انقضاء %date%",
   "aside_header_number_wallets": "%'{'number'}' کیف‌پول",
   "aside_pro_subscription_is_active": "اشتراک پرو فعال است.",
   "aside_pro_trial_is_active": "دوره آزمایشی پرو فعال است.",

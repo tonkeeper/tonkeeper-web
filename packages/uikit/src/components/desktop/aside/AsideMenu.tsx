@@ -286,10 +286,6 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    <AccountDNDBlock items={items} activeRoute={activeRoute} />
-                </ScrollContainer>
-                <AsideMenuBottom>
-                    <DividerStyled isHidden={!closeBottom} />
                     <AsideMenuItem
                         onClick={() => handleNavigateClick(AppRoute.browser)}
                         isSelected={activeRoute === AppRoute.browser}
@@ -299,6 +295,10 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         </IconWrapper>
                         <Label2>{t('aside_discover')}</Label2>
                     </AsideMenuItem>
+                    <AccountDNDBlock items={items} activeRoute={activeRoute} />
+                </ScrollContainer>
+                <AsideMenuBottom>
+                    <DividerStyled isHidden={!closeBottom} />
                     <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
                         <IconWrapper>
                             <PlusIcon />

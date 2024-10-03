@@ -13,7 +13,7 @@
   "aside_add_wallet": "Agregar Billetera",
   "aside_dashboard": "Tablero",
   "aside_discover": "Descrubrir",
-  "aside_expires_on": "Expira en {0, number}ate%",
+  "aside_expires_on": "Expira en %date%",
   "aside_header_number_wallets": "%'{'number'}' billeteras",
   "aside_pro_subscription_is_active": "La suscripción Pro está activa.",
   "aside_pro_trial_is_active": "la prueba Pro está activa.",

@@ -272,7 +272,7 @@ const CreateMultisigFormPage: FC<{
                     >
                         <ConfirmViewTitleSlot />
                         <ConfirmViewHeadingSlot>
-                            <ConfirmViewHeading title="Deploy Multisig" />
+                            <ConfirmViewHeading title={t('multisig_deploy')} />
                         </ConfirmViewHeadingSlot>
                     </ConfirmView>
                 )}

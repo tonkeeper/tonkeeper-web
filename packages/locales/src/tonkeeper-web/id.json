@@ -13,7 +13,7 @@
   "aside_add_wallet": "Tambah Dompet",
   "aside_dashboard": "Dasbor",
   "aside_discover": "Temukan",
-  "aside_expires_on": "Berlaku hingga {0, number}ate%",
+  "aside_expires_on": "Berlaku hingga %date%",
   "aside_header_number_wallets": "%'{'number'}' dompet",
   "aside_pro_subscription_is_active": "Langganan Pro aktif.",
   "aside_pro_trial_is_active": "Uji coba Pro aktif.",
