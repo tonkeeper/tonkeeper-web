@@ -3,7 +3,11 @@ import { useMutation } from '@tanstack/react-query';
 import { useAccountsState } from './accounts';
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
-import { Account, AccountsFolderStored } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    AccountsFolderStored,
+    AccountTonMultisig
+} from '@tonkeeper/core/dist/entries/account';
 import { DropResult, ResponderProvided } from 'react-beautiful-dnd';
 
 export type AccountsFolder = Omit<AccountsFolderStored, 'accounts'> & {
@@ -44,6 +48,36 @@ export const useSideBarItems = (): (Account | AccountsFolder)[] => {
             sideBarOrder
         );
     }, [folders, sideBarOrder, accounts]);
+};
+
+export const useAccountsOrdered = () => {
+    const items = useSideBarItems();
+
+    return useMemo(() => {
+        const allAccounts = items.flatMap(i => (i.type === 'folder' ? i.accounts : [i]));
+
+        let multisigs = allAccounts.filter(a => a.type === 'ton-multisig') as AccountTonMultisig[];
+        const notMultisigs = allAccounts.filter(a => a.type !== 'ton-multisig');
+
+        const result: Account[] = [];
+
+        notMultisigs.forEach(account => {
+            result.push(account);
+
+            const multisigsToAdd = multisigs.filter(m =>
+                m.hostWallets
+                    .filter(w => w.isPinned)
+                    .map(w => w.address)
+                    .concat(m.selectedHostWalletId)
+                    .some(addr => account.allTonWallets.some(w => w.rawAddress === addr))
+            );
+
+            result.push(...multisigsToAdd);
+            multisigs = multisigs.filter(m => !multisigsToAdd.includes(m));
+        });
+
+        return result;
+    }, [items]);
 };
 
 export const useNewFolderName = () => {
