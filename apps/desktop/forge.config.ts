@@ -105,12 +105,16 @@ const config: ForgeConfig = {
             },
             ['linux']
         ),
-        new MakerAppImage(
-            {
-                options: devAndRpmOptions
-            },
-            ['linux']
-        )
+        ...(process.arch === 'x64'
+            ? [
+                  new MakerAppImage(
+                      {
+                          options: devAndRpmOptions
+                      },
+                      ['linux']
+                  )
+              ]
+            : [])
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),
