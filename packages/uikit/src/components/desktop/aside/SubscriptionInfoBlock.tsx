@@ -120,6 +120,13 @@ const DDContent = styled.div<{ width: number }>`
     box-sizing: border-box;
 `;
 
+const ProButtonPanel = styled(Button)`
+    cursor: default;
+    &:hover {
+        background-color: ${p => p.theme.buttonTertiaryBackground};
+    }
+`;
+
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { data } = useProState();
@@ -155,8 +162,9 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                             <SubscriptionStatus data={data} />
                         </DDContent>
                     )}
+                    trigger="hover"
                 >
-                    <Button>Pro</Button>
+                    <ProButtonPanel>Pro</ProButtonPanel>
                 </DropDown>
             );
         } else {
