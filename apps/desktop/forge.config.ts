@@ -1,6 +1,7 @@
 import { MakerDeb } from '@electron-forge/maker-deb';
 import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerRpm } from '@electron-forge/maker-rpm';
+import { MakerFlatpak, MakerFlatpakConfig } from '@electron-forge/maker-flatpak';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
@@ -103,7 +104,10 @@ const config: ForgeConfig = {
                 options: { ...devAndRpmOptions, compression: 'xz' } as MakerDebConfigOptions
             },
             ['linux']
-        )
+        ),
+        new MakerFlatpak({ options: { ...devAndRpmOptions, files: [], categories: ['Utility'] } }, [
+            'linux'
+        ])
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),
