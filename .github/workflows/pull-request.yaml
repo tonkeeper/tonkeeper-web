@@ -65,6 +65,14 @@ jobs:
               run: |
                   corepack enable
 
+            - name: Install flatpak
+              if: runner.os == 'Linux'
+              run: sudo apt-get install -y flatpak
+
+            - name: Install elfutils
+              if: runner.os == 'Linux'
+              run: sudo apt-get install -y elfutils
+
             - name: Decode service account into a file
               if: runner.os == 'macOS'
               env:
