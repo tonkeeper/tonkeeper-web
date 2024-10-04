@@ -20,8 +20,7 @@ import {
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
-    WalletVersion,
-    WalletVersions
+    WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
 import {
@@ -34,6 +33,7 @@ import {
     createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
     createStandardTonAccountByMnemonic,
+    getStandardTonWalletVersions,
     getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -450,17 +450,6 @@ export const useCreateAccountMnemonic = () => {
     });
 };
 
-export const useCheckIfMnemonicIsMAM = () => {
-    return useMutation(async (mnemonic: string[]) => {
-        try {
-            await TonKeychainRoot.fromMnemonic(mnemonic);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    });
-};
-
 export const useCreateAccountMAM = () => {
     const sdk = useAppSdk();
     const context = useAppContext();
@@ -793,29 +782,13 @@ export const useStandardTonWalletVersions = (publicKey?: string) => {
             if (!publicKey) {
                 return undefined;
             }
-            const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
 
-            const response = await new AccountsApi(api.tonApiV2).getAccounts({
-                getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }
+            return getStandardTonWalletVersions({
+                api,
+                publicKey,
+                network,
+                fiat
             });
-
-            const walletsJettonsBalances = await Promise.all(
-                versions.map(v =>
-                    new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                        accountId: v.address.toRawString(),
-                        currencies: [fiat],
-                        supportedExtensions: ['custom_payload']
-                    })
-                )
-            );
-
-            return versions.map((v, index) => ({
-                ...v,
-                tonBalance: response.accounts[index].balance,
-                hasJettons: walletsJettonsBalances[index].balances.some(
-                    b => b.price?.prices && Number(b.balance) > 0
-                )
-            }));
         },
         {
             keepPreviousData: true
