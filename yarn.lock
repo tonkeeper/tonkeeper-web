@@ -6987,13 +6987,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton-keychain/core@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "@ton-keychain/core@npm:0.0.2"
+"@ton-keychain/core@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@ton-keychain/core@npm:0.0.4"
   dependencies:
     "@scure/bip39": "npm:^1.2.2"
     "@ton/crypto": "npm:^3.2.0"
-  checksum: 10/92b04512ef5c53f252d47e2d9d45caeb9584f578b4cedb82efb3ef45b354885c13e311c51ca2beee82efe6fc410035d64f52796b10823262f4b9583d29cb9698
+  checksum: 10/fd94b8967b014105e514f0ef318efbc079148622ec097bb1be5ea35ddecdbb099d39d478a24d899f614440b7760813187f1154b2ec5b21dfaa99a4bfbfb98022
   languageName: node
   linkType: hard
 
@@ -7052,7 +7052,7 @@ __metadata:
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
-    "@ton-keychain/core": "npm:^0.0.2"
+    "@ton-keychain/core": "npm:^0.0.4"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"
@@ -7259,7 +7259,7 @@ __metadata:
     "@storybook/testing-library": "npm:^0.0.13"
     "@tanstack/react-query": "npm:4.3.4"
     "@tanstack/react-virtual": "npm:^3.8.3"
-    "@ton-keychain/core": "npm:^0.0.2"
+    "@ton-keychain/core": "npm:^0.0.4"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@tonkeeper/core": "npm:0.1.0"
