@@ -20,6 +20,7 @@ import { AmountState } from './amountView/amountState';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { useIsActiveAccountMultisig } from '../../state/multisig';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -231,6 +232,7 @@ export type ConfirmMainButtonProps = (props: {
 export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
     const { t } = useTranslation();
     const isLedger = useIsActiveWalletLedger();
+    const isMultisig = useIsActiveAccountMultisig();
     return (
         <Button
             fullWidth
@@ -241,7 +243,13 @@ export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisable
             loading={isLoading}
             onClick={onClick}
         >
-            {t(isLedger ? 'ledger_continue_with_ledger' : 'confirm_sending_submit')}
+            {t(
+                isLedger
+                    ? 'ledger_continue_with_ledger'
+                    : isMultisig
+                    ? 'confirm_sending_sign'
+                    : 'confirm_sending_submit'
+            )}
         </Button>
     );
 };
