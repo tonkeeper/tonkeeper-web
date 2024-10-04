@@ -105,7 +105,7 @@ const config: ForgeConfig = {
             },
             ['linux']
         ),
-        ...(process.arch === 'x64'
+        ...(process.argv[3] === 'x64'
             ? [
                   new MakerAppImage(
                       {
