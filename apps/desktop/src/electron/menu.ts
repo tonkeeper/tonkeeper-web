@@ -1,15 +1,24 @@
 import AppUpdate from './autoUpdate';
+import * as osLocale from 'os-locale';
+import resources from '@tonkeeper/locales/dist/i18n/resources.json';
+import { Dict } from 'styled-components/dist/types';
+
+const locale = osLocale.osLocaleSync();
+
+const fixed = locale.slice(0, 2);
+const all = resources as any as Dict<(typeof resources)['en']>;
+const dist = all[locale] ?? all[fixed] ?? resources['en'];
 
 const EditMenu: Electron.MenuItemConstructorOptions = {
-    label: 'Edit',
+    label: dist.translation.Edit,
     submenu: [
         {
-            label: 'Undo',
+            label: dist.translation.Undo,
             accelerator: 'CmdOrCtrl+Z',
             role: 'undo'
         },
         {
-            label: 'Redo',
+            label: dist.translation.Redo,
             accelerator: 'Shift+CmdOrCtrl+Z',
             role: 'redo'
         },
@@ -17,22 +26,22 @@ const EditMenu: Electron.MenuItemConstructorOptions = {
             type: 'separator'
         },
         {
-            label: 'Cut',
+            label: dist.translation.Cut,
             accelerator: 'CmdOrCtrl+X',
             role: 'cut'
         },
         {
-            label: 'Copy',
+            label: dist.translation.Copy,
             accelerator: 'CmdOrCtrl+C',
             role: 'copy'
         },
         {
-            label: 'Paste',
+            label: dist.translation.paste,
             accelerator: 'CmdOrCtrl+V',
             role: 'paste'
         },
         {
-            label: 'Select All',
+            label: dist.translation.select_all,
             accelerator: 'CmdOrCtrl+A',
             role: 'selectAll'
         }
@@ -40,16 +49,16 @@ const EditMenu: Electron.MenuItemConstructorOptions = {
 };
 
 const WindowMenu: Electron.MenuItemConstructorOptions = {
-    label: 'Window',
+    label: dist.translation.Window,
     role: 'window',
     submenu: [
         {
-            label: 'Minimize',
+            label: dist.translation.Minimize,
             accelerator: 'CmdOrCtrl+M',
             role: 'minimize'
         },
         {
-            label: 'Close',
+            label: dist.translation.close,
             accelerator: 'CmdOrCtrl+W',
             role: 'close'
         },
@@ -57,7 +66,7 @@ const WindowMenu: Electron.MenuItemConstructorOptions = {
             type: 'separator'
         },
         {
-            label: 'Bring All to Front',
+            label: dist.translation.bring_all_to_front,
             role: 'front'
         }
     ]
@@ -68,40 +77,40 @@ const getDarwinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions =
         label: 'Tonkeeper',
         submenu: [
             {
-                label: 'About Tonkeeper Pro',
+                label: dist.translation.about_tonkeeper_pro,
                 role: 'about'
             },
             {
                 type: 'separator'
             },
+            // {
+            //     label: dist.translaction.check_for_updates,
+            //     click: function () {
+            //         update.check();
+            //     }
+            // },
+            // {
+            //     type: 'separator'
+            // },
             {
-                label: 'Check for Updates',
-                click: function () {
-                    update.check();
-                }
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Hide Tonkeeper Pro',
+                label: dist.translation.hide_tonkeeper_pro,
                 accelerator: 'Command+H',
                 role: 'hide'
             },
             {
-                label: 'Hide Others',
+                label: dist.translation.hide_others,
                 accelerator: 'Command+Shift+H',
                 role: 'hideOthers'
             },
             {
-                label: 'Show All',
+                label: dist.translation.show_all,
                 role: 'unhide'
             },
             {
                 type: 'separator'
             },
             {
-                label: 'Quit Tonkeeper Pro',
+                label: dist.translation.quit_tonkeeper_pro,
                 accelerator: 'Command+Q',
                 role: 'quit'
             }
@@ -114,23 +123,23 @@ const getWinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions => {
         label: 'Tonkeeper',
         submenu: [
             {
-                label: 'About Tonkeeper Pro',
+                label: dist.translation.about_tonkeeper_pro,
                 role: 'about'
             },
+            // {
+            //     type: 'separator'
+            // },
+            // {
+            //     label: dist.translaction.check_for_updates,
+            //     click: function () {
+            //         update.check();
+            //     }
+            // },
             {
                 type: 'separator'
             },
             {
-                label: 'Check for Updates',
-                click: function () {
-                    update.check();
-                }
-            },
-            {
-                type: 'separator'
-            },
-            {
-                label: 'Quit Tonkeeper Pro',
+                label: dist.translation.quit_tonkeeper_pro,
                 accelerator: 'Command+Q',
                 role: 'quit'
             }
@@ -139,47 +148,53 @@ const getWinMenu = (update: AppUpdate): Electron.MenuItemConstructorOptions => {
 };
 
 const ViewMenu: Electron.MenuItemConstructorOptions = {
-    label: 'View',
+    label: dist.translation.View,
     submenu: [
         {
-            label: 'Reload',
+            label: dist.translation.Reload,
             accelerator: 'CmdOrCtrl+R',
             click: function (item, focusedWindow) {
-                if (focusedWindow) focusedWindow.reload();
+                if (focusedWindow) {
+                    focusedWindow.reload();
+                }
             }
         },
         {
-            label: 'Force Reload',
+            label: dist.translation.force_reload,
             accelerator: 'Shift+CmdOrCtrl+R',
             role: 'forceReload'
         },
         {
-            label: 'Toggle Full Screen',
+            label: dist.translation.toggle_full_screen,
             accelerator: (function () {
                 if (process.platform === 'darwin') return 'Ctrl+Command+F';
                 else return 'F11';
             })(),
             click: function (item, focusedWindow) {
-                if (focusedWindow) focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+                if (focusedWindow) {
+                    focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+                }
+            }
+        },
+        {
+            type: 'separator'
+        },
+        {
+            label: dist.translation.toggle_developer_tools,
+            accelerator: (function () {
+                if (process.platform === 'darwin') return 'Alt+Command+I';
+                else return 'Ctrl+Shift+I';
+            })(),
+            click: function (item, focusedWindow) {
+                if (focusedWindow) {
+                    focusedWindow.webContents.toggleDevTools();
+                }
             }
         }
-        //   {
-        //     label: 'Toggle Developer Tools',
-        //     accelerator: (function() {
-        //       if (process.platform === 'darwin')
-        //         return 'Alt+Command+I';
-        //       else
-        //         return 'Ctrl+Shift+I';
-        //     })(),
-        //     click: function(item, focusedWindow) {
-        //       if (focusedWindow)
-        //         focusedWindow.toggleDevTools();
-        //     }
-        //   },
     ]
 };
 
-export const AppMenu = (
+export const createAppMenu = (
     update: AppUpdate
 ): (Electron.MenuItemConstructorOptions | Electron.MenuItem)[] => {
     return [

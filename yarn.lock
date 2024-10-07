@@ -7114,6 +7114,7 @@ __metadata:
     i18next: "npm:^23.7.7"
     keytar: "npm:^7.9.0"
     node-loader: "npm:^2.0.0"
+    os-locale: "npm:^6.0.2"
     process: "npm:^0.11.10"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
@@ -17245,6 +17246,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"invert-kv@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "invert-kv@npm:3.0.1"
+  checksum: 10/9801e7876b80ee70df8bcd029a928a35a1252c9c8a92e5d7779fdcd7771ab73e834744bf1f868d6a4b849b275e5ed976ca4f2bfd86814140f863c449196484f5
+  languageName: node
+  linkType: hard
+
 "ip@npm:^2.0.0":
   version: 2.0.0
   resolution: "ip@npm:2.0.0"
@@ -19223,6 +19231,15 @@ __metadata:
   version: 1.0.5
   resolution: "lazy-val@npm:1.0.5"
   checksum: 10/31e12e0b118826dfae74f8f3ff8ebcddfe4200ff88d0d448db175c7265ee537e0ba55488d411728246337f3ed3c9ec68416f10889f632a2ce28fb7a970909fb5
+  languageName: node
+  linkType: hard
+
+"lcid@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "lcid@npm:3.1.1"
+  dependencies:
+    invert-kv: "npm:^3.0.0"
+  checksum: 10/ac2fc533882a4a62ba2ccd522e1400618c8e2e417a488fcc31c5474bb8bd62a618216d3e39f6838d15ab0f6f4536b4f60435f491f1b93c9eef6d9d6506c5c9f1
   languageName: node
   linkType: hard
 
@@ -21225,6 +21242,15 @@ __metadata:
   version: 1.0.2
   resolution: "os-homedir@npm:1.0.2"
   checksum: 10/af609f5a7ab72de2f6ca9be6d6b91a599777afc122ac5cad47e126c1f67c176fe9b52516b9eeca1ff6ca0ab8587fe66208bc85e40a3940125f03cdb91408e9d2
+  languageName: node
+  linkType: hard
+
+"os-locale@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "os-locale@npm:6.0.2"
+  dependencies:
+    lcid: "npm:^3.1.1"
+  checksum: 10/812d73334c8773b971bf7fd257b84d2ce7b85d5d2184370f2875fe0e51451f530d6f7c272de1faa0b9ff02d0d10dafd665b6425ed85489271705ab5738691a43
   languageName: node
   linkType: hard
 

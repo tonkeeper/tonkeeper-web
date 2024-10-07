@@ -94,6 +94,7 @@
   "import_multisend_table_heading_amount": "Miqdori",
   "import_multisend_table_heading_asset": "Fiat ticker / TON / hex, EQ yoki token-masterning UQ manzili",
   "import_multisend_table_heading_comment": "Ixtiyoriy izoh",
+  "import_wallet_title_web": "Qayta tiklash ifodangizni kiriting",
   "IncorrectCurrentPassword": "Noto'g'ri joriy parol.",
   "keystone_pair_subtitle": "AIR-GAP apparat hamyoni bilan yuqori darajadagi xavfsizlik",
   "keystone_pair_title": "Keystone bilan bog'lang",

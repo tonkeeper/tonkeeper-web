@@ -77,6 +77,7 @@
   "import_multisend_table_heading_amount": "राशि",
   "import_multisend_table_heading_asset": "फ़ियट टिकर / टीओएन / हेक्स, ईक्यू या यूक्यू पता टोकन-मास्टर",
   "import_multisend_table_heading_comment": "वैकल्पिक टिप्पणी",
+  "import_wallet_title_web": "अपना पुनर्प्राप्ति वाक्यांश दर्ज करें",
   "IncorrectCurrentPassword": "वर्तमान पासवर्ड गलत है।",
   "keystone_pair_subtitle": "एयर-गैप हार्डवेयर वॉलेट के साथ उच्च स्तर की सुरक्षा",
   "keystone_pair_title": "कीस्टोन के साथ जोड़ें",

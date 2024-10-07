@@ -115,6 +115,7 @@
   "import_wallet_12_words": "12个单词",
   "import_wallet_24_words": "24个单词",
   "import_wallet_caption_12": "为了恢复到您的钱包，请输入创建钱包时给您的12个助记词。",
+  "import_wallet_title_web": "输入您的 助记词",
   "IncorrectCurrentPassword": "当前密码不正确。",
   "keystone_pair_subtitle": "AIR-GAP 硬件钱包提供更高级别的安全性",
   "keystone_pair_title": "与 Keystone 配对",
