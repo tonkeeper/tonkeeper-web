@@ -3,6 +3,7 @@ export enum AppRoute {
     import = '/import',
     settings = '/settings',
     walletSettings = '/wallet-settings',
+    accountSettings = '/account-settings',
     browser = '/browser',
     activity = '/activity',
     purchases = '/purchases',

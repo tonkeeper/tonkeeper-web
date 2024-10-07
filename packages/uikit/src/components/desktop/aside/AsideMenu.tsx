@@ -137,7 +137,12 @@ export const AsideMenuDNDItem = forwardRef<
     const location = useLocation();
 
     const handleNavigateHome = useCallback(() => {
-        const navigateHomeFromRoutes = [AppProRoute.dashboard, AppRoute.settings, AppRoute.browser];
+        const navigateHomeFromRoutes = [
+            AppProRoute.dashboard,
+            AppRoute.settings,
+            AppRoute.browser,
+            AppRoute.accountSettings
+        ];
         if (navigateHomeFromRoutes.some(path => location.pathname.startsWith(path))) {
             return navigate(AppRoute.home);
         } else {

@@ -38,6 +38,10 @@ import {
 } from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
 import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
 
+const DesktopAccountSettingsPage = React.lazy(
+  () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
+);
+
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
 );
@@ -230,6 +234,10 @@ export const DesktopContent: FC<{
                     <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                     <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
                     <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
+                    <Route
+                      path={any(AppRoute.accountSettings)}
+                      element={<DesktopAccountSettingsPage />}
+                    />
                     <Route path="*" element={<WalletContent />} />
                 </Routes>
             </WideContent>
