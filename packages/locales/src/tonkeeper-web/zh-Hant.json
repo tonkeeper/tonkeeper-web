@@ -116,6 +116,7 @@
   "import_wallet_12_words": "12 個字",
   "import_wallet_24_words": "24 個字",
   "import_wallet_caption_12": "要恢復錢包的訪問權限，請輸入在創建錢包時給您的12個助記詞。",
+  "import_wallet_title_web": "輸入您的 助記詞",
   "IncorrectCurrentPassword": "當前密碼不正確。",
   "keystone_pair_subtitle": "使用 AIR-GAP 硬體錢包提升安全等級",
   "keystone_pair_title": "與 Keystone 配對",

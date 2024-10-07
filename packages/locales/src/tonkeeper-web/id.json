@@ -77,6 +77,7 @@
   "import_multisend_table_heading_amount": "Jumlah",
   "import_multisend_table_heading_asset": "Ticker fiat / TON / hex, alamat EQ atau UQ dari token-master",
   "import_multisend_table_heading_comment": "Komentar opsional",
+  "import_wallet_title_web": "Masukkan frase pemulihan diri Anda",
   "IncorrectCurrentPassword": "Kata sandi saat ini tidak benar.",
   "keystone_pair_subtitle": "Tingkat keamanan yang lebih tinggi dengan dompet perangkat keras AIR-GAP",
   "keystone_pair_title": "Pasangkan dengan Keystone",

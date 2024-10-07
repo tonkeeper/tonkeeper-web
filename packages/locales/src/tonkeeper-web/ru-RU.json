@@ -118,6 +118,7 @@
   "import_wallet_12_words": "12 слов",
   "import_wallet_24_words": "24 слова",
   "import_wallet_caption_12": "Чтобы восстановить доступ, введите 12 секретных слов, которые вы получили при создании кошелька.",
+  "import_wallet_title_web": "Введите секретный ключ",
   "IncorrectCurrentPassword": "Неверный текущий пароль.",
   "learn_more": "Подробнее",
   "ledger_choose_wallets": "Выберите кошельки",

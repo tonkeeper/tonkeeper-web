@@ -120,6 +120,7 @@
   "import_wallet_12_words": "12 words",
   "import_wallet_24_words": "24 words",
   "import_wallet_caption_12": "To restore access to your wallet, enter the 12 secret recovery words given to you when you created your wallet.",
+  "import_wallet_title_web": "Enter your recovery phrase",
   "IncorrectCurrentPassword": "Incorrect current password.",
   "keystone_pair_subtitle": "A higher level of security with AIR-GAP hardware wallet",
   "keystone_pair_title": "Pair with Keystone",

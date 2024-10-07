@@ -76,6 +76,7 @@
   "import_multisend_table_heading_amount": "Сума",
   "import_multisend_table_heading_asset": "Фіатний тікер / TON / hex, EQ або UQ адреса жетон майстра",
   "import_multisend_table_heading_comment": "Коментар (необов'язково)",
+  "import_wallet_title_web": "Введіть секретну фразу для відновлення",
   "IncorrectCurrentPassword": "Неправильний поточний пароль.",
   "learn_more": "Детальніше",
   "ledger_choose_wallets": "Оберіть гаманці",

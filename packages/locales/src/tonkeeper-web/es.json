@@ -77,6 +77,7 @@
   "import_multisend_table_heading_amount": "Cantidad",
   "import_multisend_table_heading_asset": "Símbolo de la divisa / TON / hexadecimal, dirección EQ o UQ del token-maestro",
   "import_multisend_table_heading_comment": "Comentario opcional",
+  "import_wallet_title_web": "Introduzca su\\nfrase de recuperación",
   "IncorrectCurrentPassword": "Contraseña actual incorrecta.",
   "keystone_pair_subtitle": "Un nivel de seguridad mayor con la billetera en hardware AIR-GAP",
   "keystone_pair_title": "Emparejar con Keystone",

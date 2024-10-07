@@ -106,6 +106,7 @@
   "import_wallet_12_words": "12 Wörter",
   "import_wallet_24_words": "24 Wörter",
   "import_wallet_caption_12": "Um den Zugriff auf Ihr Wallet wiederherzustellen, geben Sie die 12 geheimen Wiederherstellungswörter ein, die Sie beim Erstellen Ihres Wallets erhalten haben.",
+  "import_wallet_title_web": "Geben Sie Ihre Wiederherstellungsphrase ein",
   "IncorrectCurrentPassword": "Falsches aktuelles Passwort.",
   "keystone_pair_subtitle": "Ein höheres Maß an Sicherheit mit AIR-GAP-Hardware-Wallet",
   "keystone_pair_title": "Mit Keystone koppeln",

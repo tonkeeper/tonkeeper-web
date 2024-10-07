@@ -96,6 +96,7 @@
   "import_multisend_table_heading_amount": "Сума",
   "import_multisend_table_heading_asset": "Фиатен тикер / TON / хекс, EQ или UQ адрес на токен-майстор",
   "import_multisend_table_heading_comment": "Незадължителен коментар",
+  "import_wallet_title_web": "Въведете вашата възстановителна фраза",
   "IncorrectCurrentPassword": "Неправилна текуща парола.",
   "keystone_pair_subtitle": "По-високо ниво на сигурност с AIR-GAP хардуерен портфейл",
   "keystone_pair_title": "Свържете се с Keystone",

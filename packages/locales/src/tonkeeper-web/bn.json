@@ -77,6 +77,7 @@
   "import_multisend_table_heading_amount": "পরিমাণ",
   "import_multisend_table_heading_asset": "ফিয়াট টিকার / TON / হেক্স, EQ বা টোকেন-মাস্টার ঠিকানা",
   "import_multisend_table_heading_comment": "ঐচ্ছিক মন্তব্য",
+  "import_wallet_title_web": "আপনার পুনরুদ্ধার বাক্যাংশ লিখুন",
   "IncorrectCurrentPassword": "বর্তমান পাসওয়ার্ড সঠিক নয়।",
   "keystone_pair_subtitle": "AIR-GAP হার্ডওয়্যার ওয়ালেট সহ উচ্চতর নিরাপত্তা",
   "keystone_pair_title": "Keystone এর সাথে জোড়া করুন",

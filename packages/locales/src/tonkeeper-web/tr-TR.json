@@ -66,6 +66,7 @@
   "import_multisend_error_line": "satır",
   "import_multisend_error_list_empty": "CSV tablosu boştur",
   "import_multisend_error_too_many_crypto_assets": "Listede aktarılamayacak kadar çok farklı kripto varlığı var. Bir kripto varlığının belirtildiği tüm satırların aynı kripto varlığını kullandığından emin olun.",
+  "import_wallet_title_web": "Gizli kurtarma ifadenizi girin",
   "IncorrectCurrentPassword": "Geçerli şifre hatalı.",
   "Localization": "Dil",
   "Lock_screen": "Ekran kilidi",
