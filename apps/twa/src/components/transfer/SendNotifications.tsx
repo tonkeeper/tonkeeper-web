@@ -69,6 +69,7 @@ const SendContent: FC<{
     const { ios } = useAppContext();
     const { t } = useTranslation();
     const { data: filter } = useJettonList();
+    const track = useAnalyticsTrack();
 
     const recipientRef = useRef<HTMLDivElement>(null);
     const amountRef = useRef<HTMLDivElement>(null);
@@ -81,6 +82,15 @@ const SendContent: FC<{
     const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
         initAmountState
     );
+
+    useEffect(() => {
+        if (initRecipient) {
+            track('send_click', {
+                from: 'send_amount',
+                token: amountViewState?.token?.symbol ?? 'ton'
+            });
+        }
+    }, []);
 
     const { data: tronBalances } = useTronBalances();
 
@@ -112,12 +122,20 @@ const SendContent: FC<{
         setRight(true);
         setRecipient(data);
         setView('amount');
+        track('send_click', {
+            from: 'send_recipient',
+            token: amountViewState?.token?.symbol ?? 'ton'
+        });
     };
 
     const onConfirmAmount = (data: AmountState) => {
         setRight(true);
         setAmountViewState(data);
         setView('confirm');
+        track('send_confirm', {
+            from: 'send_amount',
+            token: amountViewState?.token?.symbol ?? 'ton'
+        });
     };
 
     const backToRecipient = (data?: AmountState) => {
