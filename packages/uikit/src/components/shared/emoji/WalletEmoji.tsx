@@ -11,6 +11,7 @@ const EmojiWrapper = styled.div<{ emojiSize?: string; containerSize?: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: visible;
 
     > svg {
         height: ${p => p.emojiSize || '24px'};
