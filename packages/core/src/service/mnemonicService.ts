@@ -30,6 +30,14 @@ export const seeIfMnemonicValid = async (mnemonic: string[]) => {
 };
 
 export const validateMnemonicTonOrMAM = async (mnemonic: string[]) => {
+    if (await validateMnemonicStandardOrBip39Ton(mnemonic)) {
+        return true;
+    }
+
+    return TonKeychainRoot.isValidMnemonic(mnemonic);
+};
+
+export const validateMnemonicStandardOrBip39Ton = async (mnemonic: string[]) => {
     if (await validateStandardTonMnemonic(mnemonic)) {
         return true;
     }
@@ -38,26 +46,12 @@ export const validateMnemonicTonOrMAM = async (mnemonic: string[]) => {
         return true;
     }
 
-    try {
-        await TonKeychainRoot.fromMnemonic(mnemonic);
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-
-const isMamMnemonic = async (mnemonic: string[]) => {
-    try {
-        await TonKeychainRoot.fromMnemonic(mnemonic);
-        return true;
-    } catch (e) {
-        return false;
-    }
+    return false;
 };
 
 const TON_DERIVATION_PATH = "m/44'/607'/0'";
 export const mnemonicToKeypair = async (mnemonic: string[]) => {
-    if (await isMamMnemonic(mnemonic)) {
+    if (await TonKeychainRoot.isValidMnemonic(mnemonic)) {
         throw new Error('Cannot convert MAM mnemonic to keypair');
     }
 

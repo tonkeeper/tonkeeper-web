@@ -6,7 +6,7 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
-    useCheckIfMnemonicIsMAM,
+    useActiveTonNetwork,
     useCreateAccountMAM,
     useCreateAccountMnemonic,
     useMutateRenameAccount,
@@ -18,7 +18,10 @@ import {
     AccountTonMnemonic,
     getAccountByWalletById
 } from '@tonkeeper/core/dist/entries/account';
-import { createStandardTonAccountByMnemonic } from '@tonkeeper/core/dist/service/walletService';
+import {
+    createStandardTonAccountByMnemonic,
+    getStandardTonWalletVersions
+} from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../../hooks/appContext';
 import { WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
@@ -30,11 +33,90 @@ import {
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
+import { TonKeychainRoot } from '@ton-keychain/core';
+import {
+    mnemonicToKeypair,
+    validateMnemonicStandardOrBip39Ton
+} from '@tonkeeper/core/dist/service/mnemonicService';
+import { useMutation } from '@tanstack/react-query';
+import { useUserFiat } from '../../state/fiat';
+
+const useProcessMnemonic = () => {
+    const { mutateAsync: createAccountMam } = useCreateAccountMAM();
+
+    const context = useAppContext();
+    const network = useActiveTonNetwork();
+    const fiat = useUserFiat();
+    const sdk = useAppSdk();
+    const accounts = useAccountsState();
+
+    return useMutation<
+        | { type: 'exisiting'; account: Account; walletId: WalletId }
+        | { type: 'created'; account: AccountMAM }
+        | undefined,
+        Error,
+        string[]
+    >(async mnemonic => {
+        let isLegacyMAM = false;
+
+        const mightBeLegacyMAM = await TonKeychainRoot.isValidMnemonicLegacy(mnemonic);
+        const isValidForUsualWallet = await validateMnemonicStandardOrBip39Ton(mnemonic);
+        if (mightBeLegacyMAM && isValidForUsualWallet) {
+            const keyPair = await mnemonicToKeypair(mnemonic);
+            const publicKey = keyPair.publicKey.toString('hex');
+            const versions = await getStandardTonWalletVersions({
+                publicKey,
+                network,
+                api: context.api,
+                fiat
+            });
+
+            const walletWasInitialised = versions.some(v => v.tonBalance > 0 || v.hasJettons);
+            isLegacyMAM = !walletWasInitialised;
+        }
+
+        const isMam = await TonKeychainRoot.isValidMnemonic(mnemonic);
+        if (isMam || isLegacyMAM) {
+            const newAccountMam = await createAccountMam({ mnemonic, selectAccount: true });
+            const existingAcc = accounts.find(a => a.id === newAccountMam.id);
+            if (existingAcc) {
+                return {
+                    type: 'exisiting',
+                    account: existingAcc,
+                    walletId: existingAcc.activeTonWallet.id
+                } as const;
+            }
+            return {
+                type: 'created',
+                account: newAccountMam
+            } as const;
+        }
+
+        const _account = await createStandardTonAccountByMnemonic(context, sdk.storage, mnemonic, {
+            auth: {
+                kind: 'keychain'
+            },
+            versions: [
+                WalletVersion.V5R1,
+                WalletVersion.V5_BETA,
+                WalletVersion.V4R2,
+                WalletVersion.V3R2,
+                WalletVersion.V3R1
+            ]
+        });
+
+        for (const w of _account.allTonWallets) {
+            const existingAcc = getAccountByWalletById(accounts, w.id);
+            if (existingAcc) {
+                return { type: 'exisiting', account: existingAcc, walletId: w.id };
+                break;
+            }
+        }
+    });
+};
 
 export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
-    const context = useAppContext();
-    const accounts = useAccountsState();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [createdAccount, setCreatedAccount] = useState<
@@ -57,45 +139,17 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
-    const { mutateAsync: createAccountMam, isLoading: isCreatingAccountMam } =
-        useCreateAccountMAM();
-    const { mutateAsync: checkIfMnemonicIsMAM, isLoading: isCheckingIfMnemonicIsMAM } =
-        useCheckIfMnemonicIsMAM();
+
+    const { mutateAsync: processMnemonic, isLoading: isProcessMnemonic } = useProcessMnemonic();
 
     const onMnemonic = async (m: string[]) => {
-        const _isMam = await checkIfMnemonicIsMAM(m);
-        if (_isMam) {
-            const newAccountMam = await createAccountMam({ mnemonic: m, selectAccount: true });
-            const existingAcc = accounts.find(a => a.id === newAccountMam.id);
-            if (existingAcc) {
-                setExistingAccountAndWallet({
-                    account: existingAcc,
-                    walletId: existingAcc.activeTonWallet.id
-                });
-            } else {
-                setCreatedAccount(newAccountMam);
-            }
-        } else {
-            const _account = await createStandardTonAccountByMnemonic(context, sdk.storage, m, {
-                auth: {
-                    kind: 'keychain'
-                },
-                versions: [
-                    WalletVersion.V5R1,
-                    WalletVersion.V5_BETA,
-                    WalletVersion.V4R2,
-                    WalletVersion.V3R2,
-                    WalletVersion.V3R1
-                ]
-            });
+        const result = await processMnemonic(m);
+        if (result?.type === 'exisiting') {
+            setExistingAccountAndWallet(result);
+        }
 
-            for (const w of _account.allTonWallets) {
-                const existingAcc = getAccountByWalletById(accounts, w.id);
-                if (existingAcc) {
-                    setExistingAccountAndWallet({ account: existingAcc, walletId: w.id });
-                    break;
-                }
-            }
+        if (result?.type === 'created') {
+            setCreatedAccount(result.account);
         }
 
         setMnemonic(m);
@@ -191,7 +245,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         return (
             <ImportWords
                 onMnemonic={onMnemonic}
-                isLoading={isCheckingIfMnemonicIsMAM || isCreatingAccountMam}
+                isLoading={isProcessMnemonic}
                 onIsDirtyChange={setIsMnemonicFormDirty}
             />
         );

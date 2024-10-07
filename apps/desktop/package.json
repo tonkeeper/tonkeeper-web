@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
-    "version": "3.24.2",
+    "version": "3.24.3",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
@@ -40,6 +40,7 @@
         "@electron-forge/plugin-webpack": "7.4.0",
         "@electron-forge/publisher-github": "7.4.0",
         "@electron-forge/shared-types": "7.4.0",
+        "@pengx17/electron-forge-maker-appimage": "^1.2.1",
         "@types/eventsource": "^1.1.15",
         "@types/node": "^20.10.3",
         "@types/react": "^18.0.26",
@@ -52,6 +53,7 @@
         "css-loader": "^6.0.0",
         "dotenv": "^16.3.1",
         "electron": "31.0.1",
+        "electron-forge-maker-appimage": "25.0.5",
         "eslint": "^8.0.1",
         "eslint-plugin-import": "^2.25.0",
         "fork-ts-checker-webpack-plugin": "^7.2.13",

@@ -15,11 +15,11 @@ jobs:
                     - os: ubuntu-latest
                       command: make:intel
                       tag: x64
-                      dist: /apps/desktop/out/make/deb/x64
+                      dist: /apps/desktop/out/make
                     - os: ubuntu-latest
                       command: make:arm
                       tag: arm64
-                      dist: /apps/desktop/out/make/deb/arm64
+                      dist: /apps/desktop/out/make
                     - os: windows-latest
                       command: make:intel
                       tag: x64
