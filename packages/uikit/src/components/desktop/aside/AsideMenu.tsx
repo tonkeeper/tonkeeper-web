@@ -62,7 +62,11 @@ const AsideContentContainer = styled.div`
     background: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
-    padding: 0.5rem 0.5rem 0;
+    padding: 0 0.5rem 0;
+
+    > *:first-child {
+        padding-top: 0.5rem;
+    }
 `;
 
 const DividerStyled = styled.div<{ isHidden?: boolean }>`
