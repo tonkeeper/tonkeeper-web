@@ -10,6 +10,7 @@ import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
+import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
 
 const NotificationBlock = styled.div`
     display: flex;
@@ -44,6 +45,7 @@ export const DeleteNotificationContent: FC<{
     const { t } = useTranslation();
     const [checked, setChecked] = useState(isKeystone || isReadOnly);
     const { mutateAsync, isLoading } = useMutateLogOut();
+    const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
         await mutateAsync(accountId);
@@ -72,7 +74,7 @@ export const DeleteNotificationContent: FC<{
                     </DisclaimerText>
                     <DisclaimerLink
                         onClick={() => {
-                            navigate(AppRoute.settings + SettingsRoute.recovery + '/' + accountId);
+                            onRecovery({ accountId });
                             onClose();
                         }}
                     >

@@ -25,6 +25,14 @@ const Block = styled.div`
     }
 `;
 
+const BlockSmallGap = styled(Block)`
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            gap: 8px;
+        `}
+`;
+
 const BottomButtonBlock = styled(Block)`
     margin-bottom: 0;
 `;
@@ -43,7 +51,16 @@ const Body = styled(Body1)`
     text-align: center;
     color: ${props => props.theme.textSecondary};
 
-    ${p => p.theme.displayType === 'full-width' && Body2Class}
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            ${Body2Class};
+            max-width: 450px;
+            display: block;
+            margin: 0 auto;
+        `}
+
+    text-wrap: balance;
 `;
 
 export const WorldsGrid = styled.div<{ wordsNumber: 12 | 24 }>`
@@ -197,7 +214,7 @@ const InputBlock = styled.label<{
 }>`
     width: 100%;
     line-height: 54px;
-    border-radius: ${props => props.theme.cornerSmall};
+    ${BorderSmallResponsive};
     padding: 0 1rem;
     box-sizing: border-box;
     text-align: left;
@@ -240,6 +257,15 @@ const InputBlock = styled.label<{
         display: inline-block;
         line-height: 54px;
         padding-right: 0.35rem;
+
+        ${p =>
+            p.theme.displayType === 'full-width' &&
+            css`
+                height: fit-content;
+                line-height: normal;
+                width: unset;
+                ${Body2Class};
+            `}
     }
     ${Input} {
         display: inline-block;
@@ -247,7 +273,25 @@ const InputBlock = styled.label<{
         height: 54px;
         line-height: 54px;
         box-sizing: border-box;
+
+        ${p =>
+            p.theme.displayType === 'full-width' &&
+            css`
+                height: fit-content;
+                line-height: normal;
+                ${Body2Class};
+            `}
     }
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            height: 36px;
+            line-height: normal;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+        `}
 `;
 
 const WordInput: FC<{
@@ -355,7 +399,7 @@ export const Check: FC<{
                 </div>
             </Block>
 
-            <Block ref={ref}>
+            <BlockSmallGap ref={ref}>
                 <WordInput
                     tabIndex={1}
                     test={test1}
@@ -380,7 +424,7 @@ export const Check: FC<{
                     isValid={seeIfValid(three, mnemonic[test3 - 1])}
                     focusNext={() => (isValid ? onConfirm() : undefined)}
                 />
-            </Block>
+            </BlockSmallGap>
             <BottomButtonBlock>
                 <ButtonResponsiveSize
                     tabIndex={4}
@@ -523,7 +567,7 @@ export const ImportWords: FC<{
         <>
             <Block>
                 <div>
-                    <H2Responsive>{t('import_wallet_title')}</H2Responsive>
+                    <H2Responsive>{t('import_wallet_title_web')}</H2Responsive>
                     <Body>
                         {t(
                             wordsNumber === 12

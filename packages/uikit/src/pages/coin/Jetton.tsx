@@ -1,6 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AccountsApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -99,9 +98,7 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
             <InnerBody ref={ref}>
                 <JettonHeader balance={balance} info={info} />
                 <ActionsRow>
-                    {!isReadOnly && (
-                        <SendAction asset={info.metadata.address} chain={BLOCKCHAIN_NAME.TON} />
-                    )}
+                    {!isReadOnly && <SendAction asset={info.metadata.address} />}
                     <ReceiveAction jetton={info.metadata.address} />
                     {swapAsset && <SwapAction fromAsset={swapAsset} />}
                 </ActionsRow>

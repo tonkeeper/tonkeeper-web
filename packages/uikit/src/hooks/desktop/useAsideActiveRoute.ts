@@ -18,6 +18,10 @@ export function useAsideActiveRoute() {
             return AppRoute.browser;
         }
 
+        if (location.pathname.startsWith(AppRoute.accountSettings)) {
+            return AppRoute.accountSettings;
+        }
+
         return undefined;
     }, [location.pathname]);
 }

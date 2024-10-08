@@ -115,6 +115,7 @@ export interface DropDownProps extends PropsWithChildren {
     disabled?: boolean;
     className?: string;
     containerClassName?: string;
+    trigger?: 'click' | 'hover';
 }
 
 const ContainerStyled = styled(Container)<{ status: TransitionStatus }>`
@@ -128,7 +129,8 @@ export const DropDown = ({
     center,
     disabled,
     className,
-    containerClassName
+    containerClassName,
+    trigger = 'click'
 }: DropDownProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -167,9 +169,26 @@ export const DropDown = ({
         };
     }, [ref]);
 
+    const onClickHost = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (trigger === 'click') {
+            onOpen(e);
+        }
+    };
+
+    const onMouseHoverHost = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (trigger === 'hover') {
+            onOpen(e);
+        }
+    };
+
     return (
         <DropDownContainer ref={ref} className={className}>
-            <DropDownHeader ref={hostRef} onClick={onOpen}>
+            <DropDownHeader
+                ref={hostRef}
+                onClick={onClickHost}
+                onMouseOver={onMouseHoverHost}
+                onMouseOut={onMouseHoverHost}
+            >
                 {children}
             </DropDownHeader>
             <Transition in={isOpen} timeout={150} nodeRef={containerRef} unmountOnExit mountOnEnter>

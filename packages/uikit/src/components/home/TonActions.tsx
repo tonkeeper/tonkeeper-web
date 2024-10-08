@@ -8,12 +8,12 @@ import { BuyAction } from './BuyAction';
 import { ReceiveAction } from './ReceiveAction';
 import { SwapAction } from './SwapAction';
 
-export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = ({ chain }) => {
+export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
     return (
         <ActionsRow>
             <BuyAction />
-            {!isReadOnly && <SendAction asset="TON" chain={chain} />}
+            {!isReadOnly && <SendAction asset="TON" />}
             <ReceiveAction />
             {!isReadOnly && <SwapAction fromAsset={TON_ASSET} />}
             {/* <SellAction sell={sell} /> */}

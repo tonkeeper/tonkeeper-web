@@ -1,10 +1,10 @@
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import React, { FC } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
-export const SendAction: FC<{ asset?: string; chain?: BLOCKCHAIN_NAME }> = ({ asset, chain }) => {
+export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
     const sdk = useAppSdk();
 
     return (
@@ -15,7 +15,7 @@ export const SendAction: FC<{ asset?: string; chain?: BLOCKCHAIN_NAME }> = ({ as
                 sdk.uiEvents.emit('transfer', {
                     method: 'transfer',
                     id: Date.now(),
-                    params: { asset, chain }
+                    params: { jetton: asset, chain: BLOCKCHAIN_NAME.TON }
                 })
             }
         />

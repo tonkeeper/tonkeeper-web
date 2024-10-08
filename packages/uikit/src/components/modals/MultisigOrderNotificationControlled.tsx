@@ -227,7 +227,7 @@ const NotificationContent: FC<{
                         disabled={isLoading}
                         onClick={onSubmit}
                     >
-                        {t('confirm')}
+                        {t('confirm_sending_sign')}
                     </Button>
                 </ButtonRowStyled>
             );

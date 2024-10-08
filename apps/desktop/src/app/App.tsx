@@ -40,6 +40,7 @@ import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/Des
 import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -392,6 +393,10 @@ export const Content: FC<{
                     <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                     <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
                     <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
+                    <Route
+                        path={any(AppRoute.accountSettings)}
+                        element={<DesktopAccountSettingsPage />}
+                    />
                     <Route path="*" element={<WalletContent />} />
                 </Routes>
             </WideContent>

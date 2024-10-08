@@ -198,7 +198,7 @@
   "multisig_order_details_explore": "Request details",
   "multisig_order_details_pending_signatures": "Pending Signatures",
   "multisig_order_details_signed_wallets": "Signed Wallets",
-  "multisig_order_notification_title": "Multisig Signature Request",
+  "multisig_order_notification_title": "Multi Signature Request",
   "multisig_order_select_time_description": "Select time for quorum to sign your transaction.",
   "multisig_orders_th_created": "Created",
   "multisig_orders_th_send": "Send",

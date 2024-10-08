@@ -77,8 +77,11 @@ const useProcessMnemonic = () => {
 
         const isMam = await TonKeychainRoot.isValidMnemonic(mnemonic);
         if (isMam || isLegacyMAM) {
-            const newAccountMam = await createAccountMam({ mnemonic, selectAccount: true });
-            const existingAcc = accounts.find(a => a.id === newAccountMam.id);
+            const possibleNewAccount = await TonKeychainRoot.fromMnemonic(mnemonic, {
+                allowLegacyMnemonic: true
+            });
+
+            const existingAcc = accounts.find(a => a.id === possibleNewAccount.id);
             if (existingAcc) {
                 return {
                     type: 'exisiting',
@@ -86,6 +89,8 @@ const useProcessMnemonic = () => {
                     walletId: existingAcc.activeTonWallet.id
                 } as const;
             }
+
+            const newAccountMam = await createAccountMam({ mnemonic, selectAccount: true });
             return {
                 type: 'created',
                 account: newAccountMam

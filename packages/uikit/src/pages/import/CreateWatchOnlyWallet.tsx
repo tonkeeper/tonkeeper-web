@@ -1,8 +1,12 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { FC, useContext, useMemo, useState } from 'react';
+import React, { FC, useContext, useMemo, useState } from 'react';
 import { AddressInput } from '../../components/create/AddressInput';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { useCreateAccountReadOnly, useMutateRenameAccount } from '../../state/wallet';
+import {
+    useAccountsState,
+    useCreateAccountReadOnly,
+    useMutateRenameAccount
+} from '../../state/wallet';
 import { FinalView } from './Password';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
@@ -11,6 +15,9 @@ import {
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
+import { AccountIsAlreadyAdded } from '../../components/create/AccountIsAlreadyAdded';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { Address } from '@ton/core';
 
 export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
@@ -65,10 +72,38 @@ export const CreateWatchOnlyWallet: FC<{ afterCompleted: () => void }> = ({ afte
     }, [createdAccount, openConfirmDiscard, isDirty]);
     useSetNotificationOnCloseInterceptor(onCloseInterceptor);
 
+    const [existingAccountAndWallet, setExistingAccountAndWallet] = useState<
+        | {
+              account: Account;
+              walletId: WalletId;
+          }
+        | undefined
+    >();
+    const accounts = useAccountsState().flatMap(a => ({ account: a, wallets: a.allTonWallets }));
+
+    const onAddressSubmit = (address: string) => {
+        address = Address.parse(address).toRawString();
+        const existingWallet = accounts.find(a => a.wallets.some(w => w.rawAddress === address));
+        if (existingWallet) {
+            setExistingAccountAndWallet({
+                account: existingWallet.account,
+                walletId: existingWallet.wallets.find(w => w.rawAddress === address)!.id
+            });
+            return;
+        }
+        createWalletsAsync({ address }).then(setCreatedAccount);
+    };
+
+    if (existingAccountAndWallet) {
+        return (
+            <AccountIsAlreadyAdded {...existingAccountAndWallet} onOpenAccount={afterCompleted} />
+        );
+    }
+
     if (!createdAccount) {
         return (
             <AddressInput
-                afterInput={address => createWalletsAsync({ address }).then(setCreatedAccount)}
+                afterInput={onAddressSubmit}
                 isLoading={isCreateWalletLoading}
                 onIsDirtyChange={setIsDirty}
             />

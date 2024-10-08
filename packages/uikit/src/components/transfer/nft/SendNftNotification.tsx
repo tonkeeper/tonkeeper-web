@@ -1,10 +1,7 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import {
-    TonTransferParams,
-    parseTonTransfer
-} from '@tonkeeper/core/dist/service/deeplinkingService';
+import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -68,7 +65,7 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
     );
 
     const processRecipient = useCallback(
-        async ({ address }: TonTransferParams) => {
+        async ({ address }: { address: string }) => {
             const item = { address: address };
             const toAccount = await getAccountAsync(item);
 
@@ -83,7 +80,7 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
     );
 
     const onScan = async (signature: string) => {
-        const param = parseTonTransfer({ url: signature });
+        const param = parseTonTransferWithAddress({ url: signature });
         if (param === null) {
             return sdk.uiEvents.emit('copy', {
                 method: 'copy',
