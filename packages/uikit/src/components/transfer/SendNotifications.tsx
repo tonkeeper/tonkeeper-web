@@ -405,6 +405,7 @@ const SendActionNotification = () => {
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
     const sdk = useAppSdk();
+    const track = useAnalyticsTrack();
 
     useEffect(() => {
         const handler = (options: {
@@ -425,13 +426,15 @@ const SendActionNotification = () => {
                 setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
                 setOpen(true);
             }
+
+            track('send_open', { from: transfer.from });
         };
 
         sdk.uiEvents.on('transfer', handler);
         return () => {
             sdk.uiEvents.off('transfer', handler);
         };
-    }, [jettons]);
+    }, [jettons, track]);
 
     const onClose = useCallback(() => {
         setTonTransfer(undefined);

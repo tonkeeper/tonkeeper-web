@@ -40,7 +40,7 @@ export const useGetConnectInfo = () => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
-                params: { chain: BLOCKCHAIN_NAME.TON, ...transfer }
+                params: { chain: BLOCKCHAIN_NAME.TON, ...transfer, from: 'qr-code' }
             });
             return null;
         }

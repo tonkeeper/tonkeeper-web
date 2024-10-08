@@ -102,7 +102,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                             sdk.uiEvents.emit('transfer', {
                                 method: 'transfer',
                                 id: Date.now(),
-                                params: { jetton: token, chain: BLOCKCHAIN_NAME.TON }
+                                params: { jetton: token, chain: BLOCKCHAIN_NAME.TON, from: 'token' }
                             })
                         }
                     >
