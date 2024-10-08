@@ -11,7 +11,7 @@ export const useSendTransferNotification = () => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
-                params: { chain: BLOCKCHAIN_NAME.TON, ...params }
+                params: { chain: BLOCKCHAIN_NAME.TON, ...params, from: 'wallet' }
             });
         },
         [sdk]

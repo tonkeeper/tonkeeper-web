@@ -15,7 +15,11 @@ export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
                 sdk.uiEvents.emit('transfer', {
                     method: 'transfer',
                     id: Date.now(),
-                    params: { jetton: asset, chain: BLOCKCHAIN_NAME.TON }
+                    params: {
+                        jetton: asset,
+                        chain: BLOCKCHAIN_NAME.TON,
+                        from: asset === 'TON' ? 'wallet' : 'token'
+                    }
                 })
             }
         />

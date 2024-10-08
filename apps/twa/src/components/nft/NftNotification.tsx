@@ -95,7 +95,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     }, []);
 
     const processRecipient = useCallback(
-        async ({ address }: TonTransferParams) => {
+        async ({ address }: { address: string }) => {
             const item = { address: address };
             const toAccount = await getAccountAsync(item);
 
