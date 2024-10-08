@@ -1,6 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { KeystonePathInfo } from '../service/keystone/types';
-import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
+import {
+    AuthKeychain,
+    AuthPassword,
+    AuthSigner,
+    AuthSignerDeepLink,
+    MnemonicType
+} from './password';
 import {
     DerivationItem,
     TonContract,
@@ -73,7 +79,8 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         public emoji: string,
         public auth: AuthPassword | AuthKeychain,
         public activeTonWalletId: WalletId,
-        public tonWallets: TonWalletStandard[]
+        public tonWallets: TonWalletStandard[],
+        public mnemonicType?: MnemonicType
     ) {
         super();
     }
