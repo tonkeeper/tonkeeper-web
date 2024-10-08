@@ -20,7 +20,7 @@ import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpB
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveAccountQuery, useActiveWallet } from '../../state/wallet';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 export const useGetConnectInfo = () => {
@@ -72,15 +72,15 @@ export interface AppConnectionProps {
 
 export const useResponseConnectionMutation = () => {
     const sdk = useAppSdk();
-    const wallet = useActiveWallet();
+    const { data } = useActiveAccountQuery();
     const client = useQueryClient();
 
     return useMutation<undefined, Error, AppConnectionProps>(
         async ({ params, replyItems, manifest }) => {
-            if (replyItems && manifest) {
+            if (replyItems && manifest && data) {
                 const response = await saveWalletTonConnect({
                     storage: sdk.storage,
-                    wallet,
+                    wallet: data.activeTonWallet,
                     manifest,
                     params,
                     replyItems,
