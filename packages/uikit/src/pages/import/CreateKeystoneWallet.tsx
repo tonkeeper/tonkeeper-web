@@ -17,14 +17,14 @@ const IconBlock = styled.div`
 export const CreateKeystoneWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
 
-    const { mutate, reset, isLoading } = usePairKeystoneMutation();
+    const { mutateAsync, reset, isLoading } = usePairKeystoneMutation();
     const onSubmit = useCallback(
-        (result: UR) => {
+        async (result: UR) => {
             reset();
-            mutate(result);
+            await mutateAsync(result);
             afterCompleted();
         },
-        [reset, mutate, afterCompleted]
+        [reset, mutateAsync, afterCompleted]
     );
 
     const openScanner = useKeystoneScanner(Date.now(), onSubmit);
