@@ -14,6 +14,7 @@ export type GetPasswordType = 'confirm' | 'unlock';
 export type TransferInitParams =
     | (TonTransferParams & {
           chain: BLOCKCHAIN_NAME.TON;
+          from: string;
       })
     | Record<string, never>;
 

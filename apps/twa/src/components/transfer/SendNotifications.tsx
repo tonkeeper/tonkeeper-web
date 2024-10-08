@@ -26,7 +26,7 @@ import {
     Wrapper,
     childFactoryCreator,
     duration,
-    makeTransferInitData,
+    makeTransferInitAmountState,
     makeTransferInitData
 } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
@@ -51,6 +51,7 @@ import {
     HideTwaBackButton,
     RecipientTwaHeaderBlock
 } from './SendNotificationHeader';
+import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/amplitude';
 
 const Body = styled.div`
     padding: 0 16px 16px;
@@ -69,6 +70,7 @@ const SendContent: FC<{
     const { ios } = useAppContext();
     const { t } = useTranslation();
     const { data: filter } = useJettonList();
+    const track = useAnalyticsTrack();
 
     const recipientRef = useRef<HTMLDivElement>(null);
     const amountRef = useRef<HTMLDivElement>(null);
@@ -81,6 +83,15 @@ const SendContent: FC<{
     const [amountViewState, setAmountViewState] = useState<Partial<AmountState> | undefined>(
         initAmountState
     );
+
+    useEffect(() => {
+        if (initRecipient) {
+            track('send_click', {
+                from: 'send_amount',
+                token: amountViewState?.token?.symbol ?? 'ton'
+            });
+        }
+    }, []);
 
     const { data: tronBalances } = useTronBalances();
 
@@ -112,12 +123,20 @@ const SendContent: FC<{
         setRight(true);
         setRecipient(data);
         setView('amount');
+        track('send_click', {
+            from: 'send_recipient',
+            token: amountViewState?.token?.symbol ?? 'ton'
+        });
     };
 
     const onConfirmAmount = (data: AmountState) => {
         setRight(true);
         setAmountViewState(data);
         setView('confirm');
+        track('send_confirm', {
+            from: 'send_amount',
+            token: amountViewState?.token?.symbol ?? 'ton'
+        });
     };
 
     const backToRecipient = (data?: AmountState) => {
@@ -142,7 +161,7 @@ const SendContent: FC<{
         setView('amount');
     };
 
-    const processRecipient = async ({ address, text }: TonTransferParams) => {
+    const processRecipient = async ({ address, text }: { address: string; text?: string }) => {
         const item = { address: address, blockchain: BLOCKCHAIN_NAME.TON } as const;
         const toAccount = await getAccountAsync(item);
 
@@ -306,6 +325,7 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
 
     const sdk = useAppSdk();
+    const track = useAnalyticsTrack();
 
     useEffect(() => {
         const handler = (options: {
@@ -317,17 +337,18 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
                 sdk.twaExpand();
             }
             reset();
-            const { transfer, asset, chain } = options.params;
+            const transfer = options.params;
             setChain(chain);
-            if (transfer) {
+            if (transfer.address) {
                 getAccountAsync({ address: transfer.address }).then(account => {
                     setTonTransfer(makeTransferInitData(transfer, account, jettons));
                     setOpen(true);
                 });
             } else {
-                setTonTransfer(makeTransferInitData(asset, jettons));
+                setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
                 setOpen(true);
             }
+            track('send_open', { from: transfer.from });
         };
 
         sdk.uiEvents.on('transfer', handler);
