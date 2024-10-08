@@ -23,7 +23,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
-import { AccountBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
+import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
@@ -226,28 +226,6 @@ export const MAMIndexesPageContent: FC<{
     return (
         <ContentWrapper className={className} ref={ref}>
             <ListBlockStyled>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <WalletEmoji containerSize="24px" emoji={account.emoji} />
-                        <FirstLineContainer>
-                            <Label2>{account.name}</Label2>
-                            <AccountBadge accountType="mam" />
-                        </FirstLineContainer>
-                        <ButtonsContainer>
-                            <IconButtonTransparentBackgroundStyled
-                                onClick={() => rename({ accountId: account.id })}
-                            >
-                                <PencilIcon />
-                            </IconButtonTransparentBackgroundStyled>
-                            <Button
-                                onClick={() => recovery({ accountId: account.id })}
-                                loading={isLoading}
-                            >
-                                {t('backup_screen_title')}
-                            </Button>
-                        </ButtonsContainer>
-                    </ListItemPayload>
-                </ListItem>
                 {balances.map((balance, cycleIndex) => {
                     const derivationIndex = account.allAvailableDerivations[cycleIndex].index;
                     const derivation = account.allAvailableDerivations.find(

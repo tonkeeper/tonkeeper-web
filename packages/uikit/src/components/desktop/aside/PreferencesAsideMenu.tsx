@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { Body2, Body3, Label2 } from "../../Text";
+import { Body3, Label2 } from '../../Text';
 import {
     AppearanceIcon,
     BankIcon,
@@ -29,6 +29,7 @@ import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState } from '../../../state/wallet';
+import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -92,6 +93,8 @@ export const PreferencesAsideMenu = () => {
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
+    const showSecurityPage = useShouldShowSecurityPage();
+
     return (
         <PreferencesAsideContainer>
             <AsideMenuItemsBlock>
@@ -103,14 +106,16 @@ export const PreferencesAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NavLink to={AppRoute.settings + SettingsRoute.security}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
-                            <LockIcon />
-                            <Label2>{t('settings_security')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
+                {showSecurityPage && (
+                    <NavLink to={AppRoute.settings + SettingsRoute.security}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                                <LockIcon />
+                                <Label2>{t('settings_security')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                )}
                 <NavLink to={AppRoute.settings + SettingsRoute.pro}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>

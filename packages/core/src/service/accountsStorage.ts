@@ -108,6 +108,10 @@ export class AccountsStorage {
         accounts.forEach(account => {
             const existingAccIndex = state.findIndex(a => a.id === account.id);
             if (existingAccIndex !== -1) {
+                const existingAcc = state[existingAccIndex];
+                if (existingAcc.type !== account.type) {
+                    throw new Error('Cannot rewrite account with account ofv different type');
+                }
                 state[existingAccIndex] = account;
                 return;
             }

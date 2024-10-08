@@ -31,7 +31,7 @@ import {
     useRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
-import { useAccountsState, useWalletAccountInfo } from './wallet';
+import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -174,6 +174,32 @@ export const useAllWalletsTotalBalance = () => {
     const allWalletsAddresses = useMemo(
         () => allAccounts.flatMap(acc => acc.allTonWallets).map(w => w.rawAddress),
         [allAccounts]
+    );
+
+    return useQuery<BigNumber>(
+        [QueryKey.allWalletsTotalBalance, fiat, allWalletsAddresses],
+        async () => {
+            const queryToFetch = {
+                accounts: allWalletsAddresses,
+                columns: ['total_balance']
+            };
+            const result = await getDashboardData(queryToFetch, {
+                currency: fiat
+            });
+
+            return result
+                .map(row => new BigNumber((row.cells[0] as DashboardCellNumeric).value))
+                .reduce((v, acc) => acc.plus(v), new BigNumber(0));
+        }
+    );
+};
+
+export const useAccountTotalBalance = () => {
+    const fiat = useUserFiat();
+    const account = useActiveAccount();
+    const allWalletsAddresses = useMemo(
+        () => account.allTonWallets.map(w => w.rawAddress),
+        [account]
     );
 
     return useQuery<BigNumber>(

@@ -2,13 +2,13 @@ import queryString from 'query-string';
 import { seeIfValidTonAddress } from '../utils/common';
 
 export interface TonTransferParams {
-    address: string;
+    address?: string;
     amount?: string;
     text?: string;
     jetton?: string;
 }
 
-export function parseTonTransfer(options: { url: string }) {
+export function parseTonTransferWithAddress(options: { url: string }) {
     try {
         const data = queryString.parseUrl(options.url);
 
@@ -28,7 +28,7 @@ export function parseTonTransfer(options: { url: string }) {
             }
         }
 
-        const result: TonTransferParams = {
+        const result: Omit<TonTransferParams, 'address'> & { address: string } = {
             address: linkAddress,
             ...data.query
         };

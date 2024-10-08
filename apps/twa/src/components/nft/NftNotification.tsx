@@ -4,7 +4,7 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
-    parseTonTransfer
+    parseTonTransferWithAddress
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { ConfirmViewButtons } from '@tonkeeper/uikit/dist/components/transfer/ConfirmView';
 import {
@@ -110,7 +110,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     );
 
     const onScan = async (signature: string) => {
-        const param = parseTonTransfer({ url: signature });
+        const param = parseTonTransferWithAddress({ url: signature });
         if (param === null) {
             return sdk.uiEvents.emit('copy', {
                 method: 'copy',

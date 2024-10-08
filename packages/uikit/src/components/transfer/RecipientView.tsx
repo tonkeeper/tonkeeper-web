@@ -114,6 +114,12 @@ export const RecipientView: FC<{
         data?.address ?? defaultRecipient
     );
 
+    useEffect(() => {
+        if (data) {
+            setAddress(data?.address);
+        }
+    }, [data]);
+
     const { data: dnsWallet, isFetching: isDnsFetching } = useResolveDns(recipient.address);
 
     useEffect(() => {

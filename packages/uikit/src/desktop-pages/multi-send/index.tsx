@@ -124,7 +124,7 @@ export const DesktopMultiSendPage: FC = () => {
     }
 
     const onCreateList = () => {
-        const id = Math.max(1, ...lists!.map(l => l.id)) + 1;
+        const id = Math.max(0, ...lists!.map(l => l.id)) + 1;
         navigate('./list/' + id);
     };
 

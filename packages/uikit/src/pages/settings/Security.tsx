@@ -53,8 +53,6 @@ const TouchIdSwitch = () => {
     const { data: touchIdEnabled } = useTouchIdEnabled();
     const { mutate } = useMutateTouchId();
 
-    console.log(touchIdEnabled);
-
     if (!canPrompt) {
         return null;
     }
@@ -139,4 +137,17 @@ export const SecuritySettings = () => {
             </InnerBody>
         </>
     );
+};
+
+export const useShouldShowSecurityPage = () => {
+    const { data: canPromptTouchId } = useCanPromptTouchId();
+    const isPasswordSet = useIsPasswordSet();
+
+    const isLedger = useIsActiveWalletLedger();
+    const isKeystone = useIsActiveWalletKeystone();
+    const isReadOnly = useIsActiveWalletWatchOnly();
+    const isFullWidthMode = useIsFullWidthMode();
+    const hidePhrasePage = isLedger || isKeystone || isReadOnly || isFullWidthMode;
+
+    return canPromptTouchId || isPasswordSet || !hidePhrasePage;
 };

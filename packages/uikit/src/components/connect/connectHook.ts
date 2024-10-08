@@ -4,7 +4,7 @@ import {
     DAppManifest,
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
     connectRejectResponse,
     parseTonConnect,
@@ -21,13 +21,14 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveWallet } from '../../state/wallet';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 export const useGetConnectInfo = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
     return useMutation<null | TonConnectParams, Error, string>(async url => {
-        const transfer = parseTonTransfer({ url });
+        const transfer = parseTonTransferWithAddress({ url });
 
         if (transfer) {
             sdk.uiEvents.emit('copy', {
@@ -39,7 +40,7 @@ export const useGetConnectInfo = () => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
-                params: { transfer }
+                params: { chain: BLOCKCHAIN_NAME.TON, ...transfer }
             });
             return null;
         }

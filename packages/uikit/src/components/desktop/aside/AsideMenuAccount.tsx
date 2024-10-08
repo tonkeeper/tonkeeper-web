@@ -22,7 +22,12 @@ import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { useAccountsState, useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useActiveTonNetwork,
+    useMutateActiveAccount
+} from '../../../state/wallet';
 import {
     useMultisigsOfAccountToDisplay,
     useMutateMultisigSelectedHostWallet
@@ -32,6 +37,9 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute } from '../../../libs/routes';
+import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;
@@ -362,11 +370,24 @@ export const AsideMenuAccountMAM: FC<{
 
     const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
+
+    const location = useAsideActiveRoute();
+    const activeAccount = useActiveAccount();
+    const navigate = useNavigate();
+    const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
+
+    const onClickAccount = async () => {
+        await setActiveAccount(account.id);
+        navigate(AppRoute.accountSettings);
+    };
+
     return (
         <>
             <AsideMenuItem
-                isSelected={false}
-                onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
+                isSelected={
+                    location === AppRoute.accountSettings && activeAccount.id === account.id
+                }
+                onClick={onClickAccount}
                 ref={ref}
             >
                 {shouldShowIcon && (
