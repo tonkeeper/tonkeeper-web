@@ -16,14 +16,14 @@ const IconBlock = styled.div`
 export const CreateSignerWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
 
-    const { mutate, reset, isLoading } = usePairSignerMutation();
+    const { mutateAsync, reset, isLoading } = usePairSignerMutation();
     const onSubmit = useCallback(
-        (result: string) => {
+        async (result: string) => {
             reset();
-            mutate(result);
+            await mutateAsync(result);
             afterCompleted();
         },
-        [reset, mutate, afterCompleted]
+        [reset, mutateAsync, afterCompleted]
     );
 
     const openScanner = useScanner(Date.now(), onSubmit);
