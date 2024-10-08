@@ -54,6 +54,7 @@ import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
+import { useAnalyticsTrack } from '../../hooks/amplitude';
 
 const SendContent: FC<{
     onClose: () => void;
