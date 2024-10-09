@@ -1,4 +1,4 @@
-import { autoUpdater, BrowserWindow, webContents } from 'electron';
+import { app, autoUpdater, BrowserWindow, webContents } from 'electron';
 
 export default class AppUpdate {
     constructor() {
@@ -14,6 +14,11 @@ export default class AppUpdate {
                 );
             }
         );
+
+        const appVersion = app.getVersion();  // Get the app version dynamically
+        const platform = process.platform;    // Get the platform dynamically (e.g., 'darwin', 'win32')
+        const arch = process.arch;            // Get the architecture dynamically (e.g., 'arm64', 'x64')
+
         autoUpdater.addListener('error', function (error) {
             console.log(error);
         });
@@ -22,10 +27,11 @@ export default class AppUpdate {
         });
 
         autoUpdater.addListener('update-not-available', function (event: any) {
-            notify('Tonkeeper Pro is up to date', `Version 123`); //${releaseName}`);
+            notify('Tonkeeper Pro is up to date', `Version ${releaseName}`);
         });
 
-        const feedURL = 'https://update.electronjs.org/tonkeeper/tonkeeper-web/darwin-arm64/3.17.2';
+        // Build the feed URL
+        const feedURL = `https://update.electronjs.org/tonkeeper/tonkeeper-web/${platform}-${arch}/${appVersion}`;
 
         autoUpdater.setFeedURL({ url: feedURL });
     }
