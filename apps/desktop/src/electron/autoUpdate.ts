@@ -1,4 +1,4 @@
-import { autoUpdater, BrowserWindow, webContents } from 'electron';
+import { app, autoUpdater, BrowserWindow, webContents } from 'electron';
 
 export default class AppUpdate {
     constructor() {
@@ -25,7 +25,8 @@ export default class AppUpdate {
             notify('Tonkeeper Pro is up to date', `Version 123`); //${releaseName}`);
         });
 
-        const feedURL = 'https://update.electronjs.org/tonkeeper/tonkeeper-web/darwin-arm64/3.17.2';
+        const appVersion = app.getVersion();  // Get the app version dynamically
+        const feedURL = `https://update.electronjs.org/tonkeeper/tonkeeper-web/darwin-arm64/${appVersion}`;
 
         autoUpdater.setFeedURL({ url: feedURL });
     }
