@@ -16,7 +16,7 @@ import { notifyError } from '../../components/transfer/common';
 import { useJettonList } from '../../state/jetton';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
-import { useTransactionAnalytics } from '../amplitude';
+import { useAnalyticsTrack, useTransactionAnalytics } from '../amplitude';
 import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
@@ -34,7 +34,7 @@ export function useSendTransfer<T extends Asset>(
     const { api } = useAppContext();
     const account = useActiveAccount();
     const client = useQueryClient();
-    const track2 = useTransactionAnalytics();
+    const track = useAnalyticsTrack();
     const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
@@ -48,7 +48,6 @@ export function useSendTransfer<T extends Asset>(
             }
             if (isTonAsset(amount.asset)) {
                 if (amount.asset.id === TON_ASSET.id) {
-                    track2('send-ton');
                     await sendTonTransfer(
                         api,
                         account,
@@ -58,8 +57,8 @@ export function useSendTransfer<T extends Asset>(
                         estimation.payload as TransferEstimationEvent,
                         signer
                     );
+                    track('send_success', { from: 'send_confirm', token: 'ton' });
                 } else {
-                    track2('send-jetton');
                     const jettonInfo = jettons!.balances.find(
                         jetton =>
                             (amount.asset.address as Address).toRawString() ===
@@ -74,6 +73,10 @@ export function useSendTransfer<T extends Asset>(
                         estimation.payload as TransferEstimationEvent,
                         signer
                     );
+                    track('send_success', {
+                        from: 'send_confirm',
+                        token: jettonInfo.jetton.symbol
+                    });
                 }
             } else {
                 throw new Error('Disable trc 20 transactions');

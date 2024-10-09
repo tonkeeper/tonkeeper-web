@@ -2,7 +2,7 @@
     "editor.codeActionsOnSave": {
         "source.fixAll": "explicit",
         "source.fixAll.eslint": "explicit",
-        "source.organizeImports": false,
+        "source.organizeImports": "never"
     },
     "javascript.format.enable": true,
     "editor.formatOnSave": true,

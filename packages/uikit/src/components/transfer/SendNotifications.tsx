@@ -54,6 +54,7 @@ import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
+import { useAnalyticsTrack } from '../../hooks/amplitude';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -67,6 +68,7 @@ const SendContent: FC<{
     const { data: filter } = useJettonList();
     const isFullWidth = useIsFullWidthMode();
     const isActiveAccountMultisig = useIsActiveAccountMultisig();
+    const track = useAnalyticsTrack();
 
     const [view, _setView] = useState<'multisig-settings' | 'recipient' | 'amount' | 'confirm'>(
         isActiveAccountMultisig ? 'multisig-settings' : 'recipient'
@@ -91,6 +93,15 @@ const SendContent: FC<{
         initAmountState
     );
 
+    useEffect(() => {
+        if (initRecipient) {
+            track('send_click', {
+                from: 'send_amount',
+                token: amountViewState?.token?.symbol ?? 'ton'
+            });
+        }
+    }, []);
+
     const { data: tronBalances } = useTronBalances();
 
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
@@ -113,12 +124,20 @@ const SendContent: FC<{
         setRight(true);
         setRecipient(data);
         setView('amount');
+        track('send_click', {
+            from: 'send_recipient',
+            token: amountViewState?.token?.symbol ?? 'ton'
+        });
     };
 
     const onConfirmAmount = (data: AmountState) => {
         setRight(true);
         setAmountViewState(data);
         setView('confirm');
+        track('send_confirm', {
+            from: 'send_amount',
+            token: amountViewState?.token?.symbol ?? 'ton'
+        });
     };
 
     const backToRecipient = (data?: AmountState) => {
@@ -386,6 +405,7 @@ const SendActionNotification = () => {
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
     const sdk = useAppSdk();
+    const track = useAnalyticsTrack();
 
     useEffect(() => {
         const handler = (options: {
@@ -406,13 +426,15 @@ const SendActionNotification = () => {
                 setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
                 setOpen(true);
             }
+
+            track('send_open', { from: transfer.from });
         };
 
         sdk.uiEvents.on('transfer', handler);
         return () => {
             sdk.uiEvents.off('transfer', handler);
         };
-    }, [jettons]);
+    }, [jettons, track]);
 
     const onClose = useCallback(() => {
         setTonTransfer(undefined);

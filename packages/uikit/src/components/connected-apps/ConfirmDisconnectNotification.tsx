@@ -1,11 +1,10 @@
 import { FC } from 'react';
-import { Notification } from '../Notification';
 import { styled } from 'styled-components';
+import { useTranslation } from '../../hooks/translation';
+import { usePrevious } from '../../hooks/usePrevious';
+import { Notification } from '../Notification';
 import { Button } from '../fields/Button';
 import { formatDappUrl } from './utils';
-import { usePrevious } from '../../hooks/usePrevious';
-import { useTranslation } from '../../hooks/translation';
-import { Label1 } from '../Text';
 
 const NotificationText = styled.div`
     text-align: center;
@@ -27,37 +26,37 @@ const ButtonsBlock = styled.div`
 export const ConfirmDisconnectNotification: FC<{
     isOpen: boolean;
     onClose: (confirmed?: boolean) => void;
+    isLoading?: boolean;
     app?: { url: string } | 'all';
-}> = ({ isOpen, onClose, app }) => {
+}> = ({ isOpen, onClose, app, isLoading }) => {
     const { t } = useTranslation();
     const prev = usePrevious(app);
 
     const appWithFallback = app || prev;
 
     return (
-        <Notification isOpen={isOpen} handleClose={() => onClose(false)}>
+        <Notification
+            isOpen={isOpen}
+            handleClose={() => onClose(false)}
+            title={
+                appWithFallback === 'all' ? (
+                    t('disconnect_all_apps_confirm')
+                ) : (
+                    <>
+                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.url)}?
+                    </>
+                )
+            }
+        >
             {() => (
-                <>
-                    <NotificationText>
-                        <Label1>
-                            {appWithFallback === 'all' ? (
-                                t('disconnect_all_apps_confirm')
-                            ) : (
-                                <>
-                                    {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.url)}?
-                                </>
-                            )}
-                        </Label1>
-                    </NotificationText>
-                    <ButtonsBlock>
-                        <Button secondary onClick={() => onClose(false)}>
-                            {t('cancel')}
-                        </Button>
-                        <Button primary onClick={() => onClose(true)}>
-                            {t('disconnect')}
-                        </Button>
-                    </ButtonsBlock>
-                </>
+                <ButtonsBlock>
+                    <Button secondary loading={isLoading} onClick={() => onClose(false)}>
+                        {t('cancel')}
+                    </Button>
+                    <Button primary loading={isLoading} onClick={() => onClose(true)}>
+                        {t('disconnect')}
+                    </Button>
+                </ButtonsBlock>
             )}
         </Notification>
     );

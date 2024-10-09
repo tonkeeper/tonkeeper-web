@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
-    "version": "3.24.3",
+    "version": "3.24.5",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
@@ -80,6 +80,7 @@
         "eventsource": "^2.0.2",
         "i18next": "^23.7.7",
         "keytar": "^7.9.0",
+        "os-locale": "^6.0.2",
         "process": "^0.11.10",
         "react": "18.2.0",
         "react-dom": "18.2.0",

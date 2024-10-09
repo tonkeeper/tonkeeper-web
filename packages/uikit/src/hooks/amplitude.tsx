@@ -26,6 +26,19 @@ export type AmplitudeTransactionType =
     | 'multi-send-ton'
     | 'multi-send-jetton';
 
+export const useAnalyticsTrack = () => {
+    const tracker = useContext(AmplitudeAnalyticsContext);
+
+    return useCallback(
+        (name: string, params: Record<string, any>) => {
+            if (tracker) {
+                tracker.track(name, params);
+            }
+        },
+        [tracker]
+    );
+};
+
 export const useTransactionAnalytics = () => {
     const tracker = useContext(AmplitudeAnalyticsContext);
 
