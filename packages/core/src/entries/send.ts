@@ -61,3 +61,4 @@ export type TransferEstimation<T extends Asset = Asset> = {
 };
 
 export type TransferEstimationEvent = { event: AccountEvent };
+export type TransferEstimationEventFee = { event: Pick<AccountEvent, 'extra'> };

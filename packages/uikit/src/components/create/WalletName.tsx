@@ -2,8 +2,8 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
-import { Body2, H2 } from '../Text';
-import { Button } from '../fields/Button';
+import { Body1, Body2Class, H2Responsive } from '../Text';
+import { ButtonResponsiveSize } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { EmojisList } from '../shared/emoji/EmojisList';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
@@ -15,9 +15,14 @@ const Block = styled.form`
     flex-direction: column;
 `;
 
-const Body = styled(Body2)`
+const Body = styled(Body1)`
+    user-select: none;
+    margin-bottom: 1rem;
+
     text-align: center;
     color: ${props => props.theme.textSecondary};
+
+    ${p => p.theme.displayType === 'full-width' && Body2Class}
 `;
 
 export const UpdateWalletName: FC<{
@@ -54,7 +59,7 @@ export const UpdateWalletName: FC<{
         <CenterContainer>
             <Block onSubmit={onSubmit}>
                 <div>
-                    <H2>{t('Name_your_wallet')}</H2>
+                    <H2Responsive>{t('Name_your_wallet')}</H2Responsive>
                     <Body>{t('Name_your_wallet_description')}</Body>
                 </div>
 
@@ -68,8 +73,7 @@ export const UpdateWalletName: FC<{
                 />
                 <EmojisList keepShortListForMS={500} onClick={setEmoji} />
 
-                <Button
-                    size="large"
+                <ButtonResponsiveSize
                     fullWidth
                     marginTop
                     primary
@@ -78,7 +82,7 @@ export const UpdateWalletName: FC<{
                     loading={isLoading}
                 >
                     {t('add_edit_favorite_save')}
-                </Button>
+                </ButtonResponsiveSize>
             </Block>
         </CenterContainer>
     );

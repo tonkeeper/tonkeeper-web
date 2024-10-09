@@ -1,10 +1,9 @@
-import { Account } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useTextWidth from '../../hooks/textWidth';
 import { Body1 } from '../Text';
-import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import { useActiveTonNetwork } from '../../state/wallet';
 
 interface ShowAddressProps {
     inputTextWidth: number;
@@ -12,17 +11,16 @@ interface ShowAddressProps {
     value: string;
 }
 export const useShowAddress = (
-    ref: React.MutableRefObject<HTMLTextAreaElement | null>,
-    value: string,
-    toAccount?: Account
+    ref: React.MutableRefObject<HTMLTextAreaElement | HTMLInputElement | null>,
+    dns: string,
+    address: string | undefined
 ) => {
     const network = useActiveTonNetwork();
-    const address = toAccount?.address ?? undefined;
 
     const [showAddress, setShowAddress] = useState<ShowAddressProps | undefined>(undefined);
 
     const inputTextWidth = useTextWidth({
-        text: value,
+        text: dns,
         font: '16px sans-serif'
     });
     const addressTextWidth = useTextWidth({
@@ -33,7 +31,7 @@ export const useShowAddress = (
     useEffect(() => {
         if (
             ref.current &&
-            toAccount &&
+            address &&
             !isNaN(inputTextWidth) &&
             !isNaN(addressTextWidth) &&
             ref.current.clientWidth - 16 * 3 - inputTextWidth - addressTextWidth > 0
@@ -41,12 +39,12 @@ export const useShowAddress = (
             setShowAddress({
                 inputTextWidth,
                 addressTextWidth,
-                value: toShortValue(formatAddress(toAccount.address, network))
+                value: toShortValue(formatAddress(address, network))
             });
         } else {
             setShowAddress(undefined);
         }
-    }, [ref.current, toAccount, inputTextWidth, addressTextWidth, network]);
+    }, [ref.current, address, inputTextWidth, addressTextWidth, network]);
 
     return showAddress;
 };

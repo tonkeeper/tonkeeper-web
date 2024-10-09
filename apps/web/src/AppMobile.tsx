@@ -27,7 +27,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 
-const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
@@ -165,10 +164,7 @@ export const MobileContent: FC<{
             <FullSizeWrapper standalone={false}>
                 <Suspense fallback={<Loading />}>
                     <InitializeContainer fullHeight={false}>
-                        <Routes>
-                            <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                            <Route path="*" element={<Initialize />} />
-                        </Routes>
+                        <Initialize />
                     </InitializeContainer>
                 </Suspense>
             </FullSizeWrapper>

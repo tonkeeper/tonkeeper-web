@@ -75,6 +75,18 @@ export interface MultisigOrder {
      * @memberof MultisigOrder
      */
     risk: Risk;
+    /**
+     * 
+     * @type {number}
+     * @memberof MultisigOrder
+     */
+    creationDate: number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof MultisigOrder
+     */
+    signedBy: Array<string>;
 }
 
 /**
@@ -89,6 +101,8 @@ export function instanceOfMultisigOrder(value: object): value is MultisigOrder {
     if (!('approvalsNum' in value) || value['approvalsNum'] === undefined) return false;
     if (!('expirationDate' in value) || value['expirationDate'] === undefined) return false;
     if (!('risk' in value) || value['risk'] === undefined) return false;
+    if (!('creationDate' in value) || value['creationDate'] === undefined) return false;
+    if (!('signedBy' in value) || value['signedBy'] === undefined) return false;
     return true;
 }
 
@@ -110,6 +124,8 @@ export function MultisigOrderFromJSONTyped(json: any, ignoreDiscriminator: boole
         'approvalsNum': json['approvals_num'],
         'expirationDate': json['expiration_date'],
         'risk': RiskFromJSON(json['risk']),
+        'creationDate': json['creation_date'],
+        'signedBy': json['signed_by'],
     };
 }
 
@@ -132,6 +148,8 @@ export function MultisigOrderFromJSONTyped(json: any, ignoreDiscriminator: boole
         'approvals_num': value['approvalsNum'],
         'expiration_date': value['expirationDate'],
         'risk': RiskToJSON(value['risk']),
+        'creation_date': value['creationDate'],
+        'signed_by': value['signedBy'],
     };
 }
 

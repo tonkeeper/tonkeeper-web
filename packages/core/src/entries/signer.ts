@@ -5,7 +5,7 @@ export type BaseSigner = (message: Cell) => Promise<Buffer>;
 
 export type CellSigner = BaseSigner & { type: 'cell' };
 
-export type LedgerSigner = ((path: number[], message: LedgerTransaction) => Promise<Cell>) & {
+export type LedgerSigner = ((message: LedgerTransaction) => Promise<Cell>) & {
     type: 'ledger';
 };
 

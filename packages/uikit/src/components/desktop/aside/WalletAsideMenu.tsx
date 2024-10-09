@@ -3,10 +3,12 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute } from '../../../libs/routes';
-import { useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import {
     ClockSmoothIcon,
     CoinsIcon,
+    InboxIcon,
+    ListIcon,
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
@@ -14,6 +16,12 @@ import {
 } from '../../Icon';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
+import {
+    useIsActiveAccountMultisig,
+    useUnviewedAccountOrdersNumber
+} from '../../../state/multisig';
+import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
+import { RoundedBadge } from '../../shared/Badge';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -34,6 +42,10 @@ const WalletAsideContainer = styled.div`
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
     padding-right: 50px;
+
+    > svg {
+        color: ${p => p.theme.iconSecondary};
+    }
 `;
 
 const SwapIconStyled = styled(SwapIcon)`
@@ -44,6 +56,9 @@ export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
     const isReadOnly = useIsActiveWalletWatchOnly();
+    const isMultisig = useIsActiveAccountMultisig();
+    const account = useActiveAccount();
+    const showMultisigs = isAccountCanManageMultisigs(account);
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -91,6 +106,17 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             )}
+            {isMultisig && <MultisigOrdersMenuItem />}
+            {showMultisigs && (
+                <NavLink to={AppRoute.multisigWallets}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <ListIcon />
+                            <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            )}
             <NavLink to={AppRoute.walletSettings}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
@@ -100,5 +126,27 @@ export const WalletAsideMenu = () => {
                 )}
             </NavLink>
         </WalletAsideContainer>
+    );
+};
+
+const BadgeStyled = styled(RoundedBadge)`
+    margin-left: auto;
+    margin-right: -40px;
+`;
+
+const MultisigOrdersMenuItem = () => {
+    const ordersNumber = useUnviewedAccountOrdersNumber();
+    const { t } = useTranslation();
+
+    return (
+        <NavLink to={AppRoute.multisigOrders}>
+            {({ isActive }) => (
+                <AsideMenuItemStyled isSelected={isActive}>
+                    <InboxIcon />
+                    <Label2>{t('wallet_aside_orders')}</Label2>
+                    {!!ordersNumber && <BadgeStyled>{ordersNumber}</BadgeStyled>}
+                </AsideMenuItemStyled>
+            )}
+        </NavLink>
     );
 };

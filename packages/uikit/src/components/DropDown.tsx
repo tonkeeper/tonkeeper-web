@@ -1,4 +1,6 @@
 import React, {
+    ComponentProps,
+    FC,
     forwardRef,
     PropsWithChildren,
     useCallback,
@@ -9,6 +11,8 @@ import React, {
 import styled, { css } from 'styled-components';
 import { Transition, TransitionStatus } from 'react-transition-group';
 import { mergeRefs } from '../libs/common';
+import { BorderSmallResponsive } from './shared/Styles';
+import { DoneIcon } from './Icon';
 
 const DropDownContainer = styled.div`
     position: relative;
@@ -56,15 +60,6 @@ const DropDownListContainer = styled.div<{ center?: boolean }>`
 
 export const DropDownListPayload = styled.div`
     white-space: nowrap;
-`;
-
-const ListItem = styled.div`
-    cursor: pointer;
-    padding: 10px 20px;
-
-    &:hover {
-        background: ${props => props.theme.backgroundHighlighted};
-    }
 `;
 
 function useOutsideAlerter(ref: React.RefObject<Node>, onClick: (e: MouseEvent) => void) {
@@ -120,6 +115,7 @@ export interface DropDownProps extends PropsWithChildren {
     disabled?: boolean;
     className?: string;
     containerClassName?: string;
+    trigger?: 'click' | 'hover';
 }
 
 const ContainerStyled = styled(Container)<{ status: TransitionStatus }>`
@@ -133,7 +129,8 @@ export const DropDown = ({
     center,
     disabled,
     className,
-    containerClassName
+    containerClassName,
+    trigger = 'click'
 }: DropDownProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -172,9 +169,26 @@ export const DropDown = ({
         };
     }, [ref]);
 
+    const onClickHost = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (trigger === 'click') {
+            onOpen(e);
+        }
+    };
+
+    const onMouseHoverHost = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (trigger === 'hover') {
+            onOpen(e);
+        }
+    };
+
     return (
         <DropDownContainer ref={ref} className={className}>
-            <DropDownHeader ref={hostRef} onClick={onOpen}>
+            <DropDownHeader
+                ref={hostRef}
+                onClick={onClickHost}
+                onMouseOver={onMouseHoverHost}
+                onMouseOut={onMouseHoverHost}
+            >
                 {children}
             </DropDownHeader>
             <Transition in={isOpen} timeout={150} nodeRef={containerRef} unmountOnExit mountOnEnter>
@@ -195,44 +209,46 @@ export const DropDown = ({
     );
 };
 
-export interface DropDownListProps<T> extends PropsWithChildren {
-    options: T[];
-    renderOption: (option: T) => React.ReactNode;
-    onSelect: (option: T) => void;
-    center?: boolean;
-    disabled?: boolean;
-}
+export const DropDownItemsDivider = styled.div`
+    height: 1px;
+    background: ${p => p.theme.separatorCommon};
+`;
 
-// eslint-disable-next-line @typescript-eslint/comma-dangle
-export const DropDownList = <T,>({
-    children,
-    options,
-    renderOption,
-    onSelect,
-    center,
-    disabled
-}: DropDownListProps<T>) => {
+export const DropDownContent = styled.div`
+    background: ${p => p.theme.backgroundContentTint};
+    ${BorderSmallResponsive};
+
+    ${DropDownItemsDivider}:last-child {
+        display: none;
+    }
+`;
+
+const DropDownListItemStyled = styled.div`
+    padding: 10px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+
+    transition: background 0.1s ease-in-out;
+
+    &:hover {
+        background: ${props => props.theme.backgroundHighlighted};
+    }
+`;
+
+const DoneIconStyled = styled(DoneIcon)`
+    flex-shrink: 0;
+    margin-left: auto;
+    color: ${p => p.theme.accentBlue};
+`;
+
+export const DropDownItem: FC<
+    PropsWithChildren<{ isSelected: boolean } & ComponentProps<'div'>>
+> = ({ isSelected, children, ...rest }) => {
     return (
-        <DropDown
-            disabled={disabled}
-            center={center}
-            payload={onClose => (
-                <DropDownListPayload>
-                    {options.map((option, index) => (
-                        <ListItem
-                            key={index}
-                            onClick={() => {
-                                onClose();
-                                onSelect(option);
-                            }}
-                        >
-                            {renderOption(option)}
-                        </ListItem>
-                    ))}
-                </DropDownListPayload>
-            )}
-        >
+        <DropDownListItemStyled {...rest}>
             {children}
-        </DropDown>
+            {isSelected && <DoneIconStyled />}
+        </DropDownListItemStyled>
     );
 };

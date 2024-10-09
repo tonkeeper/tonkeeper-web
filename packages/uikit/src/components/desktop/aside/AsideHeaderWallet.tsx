@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { FC, useRef, useState } from 'react';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body3, Label2 } from '../../Text';
-import { useActiveAccount } from '../../../state/wallet';
+import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { useTranslation } from '../../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useAppSdk } from '../../../hooks/appSdk';
@@ -63,7 +63,9 @@ export const AsideHeaderWallet: FC<{ width: number }> = ({ width }) => {
     const sdk = useAppSdk();
     const [hovered, setHovered] = useState(false);
 
-    const address = formatAddress(activeWallet.rawAddress);
+    const network = useActiveTonNetwork();
+
+    const address = formatAddress(activeWallet.rawAddress, network);
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 

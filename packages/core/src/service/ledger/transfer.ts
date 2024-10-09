@@ -18,7 +18,6 @@ import { getJettonCustomPayload } from '../transfer/jettonPayloadService';
 import { jettonTransferAmount, jettonTransferForwardAmount } from '../transfer/jettonService';
 import { nftTransferForwardAmount } from '../transfer/nftService';
 import { walletContractFromState } from '../wallet/contractService';
-import { getLedgerAccountPathByIndex } from './utils';
 
 export const createLedgerTonTransfer = async (
     timestamp: number,
@@ -29,11 +28,10 @@ export const createLedgerTonTransfer = async (
     isMax: boolean,
     signer: LedgerSigner
 ) => {
-    const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
     const walletState = account.activeTonWallet;
     const contract = walletContractFromState(walletState);
 
-    const transfer = await signer(path, {
+    const transfer = await signer({
         to: Address.parse(recipient.toAccount.address),
         bounce: seeIfTransferBounceable(recipient.toAccount, recipient.address),
         amount: BigInt(weiAmount.toFixed(0)),
@@ -61,7 +59,6 @@ export const createLedgerJettonTransfer = async (
     const timestamp = await getServerTime(api);
 
     const jettonAmount = BigInt(amount.stringWeiAmount);
-    const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
     const wallet = account.activeTonWallet;
 
     const { customPayload, stateInit } = await getJettonCustomPayload(
@@ -72,7 +69,7 @@ export const createLedgerJettonTransfer = async (
 
     const contract = walletContractFromState(wallet);
 
-    const transfer = await signer(path, {
+    const transfer = await signer({
         to: Address.parse(jettonWalletAddress),
         bounce: true,
         amount: jettonTransferAmount,
@@ -106,11 +103,10 @@ export const createLedgerNftTransfer = async (
     forwardPayload: Cell | null,
     signer: LedgerSigner
 ) => {
-    const path = getLedgerAccountPathByIndex(account.activeDerivationIndex);
     const walletState = account.activeTonWallet;
     const contract = walletContractFromState(walletState);
 
-    const transfer = await signer(path, {
+    const transfer = await signer({
         to: Address.parse(nftAddress),
         bounce: true,
         amount: nftTransferAmount,

@@ -1,4 +1,10 @@
-import { BaseApp, IAppSdk, KeychainPassword, TouchId } from '@tonkeeper/core/dist/AppSdk';
+import {
+    BaseApp,
+    IAppSdk,
+    KeychainPassword,
+    TouchId,
+    CookieService
+} from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
@@ -10,6 +16,12 @@ export class KeychainDesktop implements KeychainPassword {
     };
     getPassword = async (publicKey: string) => {
         return sendBackground<string>({ king: 'get-keychain', publicKey });
+    };
+}
+
+export class CookieDesktop implements CookieService {
+    cleanUp = async () => {
+        return sendBackground<void>({ king: 'clean-cookie' });
     };
 }
 
@@ -33,6 +45,7 @@ export class TouchIdDesktop implements TouchId {
 
 export class DesktopAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainDesktop();
+    cookie = new CookieDesktop();
 
     constructor() {
         super(new DesktopStorage());

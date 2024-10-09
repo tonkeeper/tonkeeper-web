@@ -30,6 +30,7 @@ import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -101,7 +102,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                             sdk.uiEvents.emit('transfer', {
                                 method: 'transfer',
                                 id: Date.now(),
-                                params: { asset: token, chain: BLOCKCHAIN_NAME.TON }
+                                params: { jetton: token, chain: BLOCKCHAIN_NAME.TON, from: 'token' }
                             })
                         }
                     >
@@ -114,7 +115,13 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     onClick={() => {
                         sdk.uiEvents.emit('receive', {
                             method: 'receive',
-                            params: {}
+                            params:
+                                token === CryptoCurrency.TON
+                                    ? {}
+                                    : {
+                                          chain: BLOCKCHAIN_NAME.TON,
+                                          jetton: token
+                                      }
                         });
                     }}
                 >
@@ -238,18 +245,26 @@ const HistorySubheader = styled(Label2)`
 
 const HistoryContainer = styled.div`
     overflow-x: auto;
+    overflow-y: hidden;
+`;
+
+const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
+    > *:last-child {
+        margin-left: auto;
+        width: fit-content;
+    }
+
+    padding-right: 0;
 `;
 
 export const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
-    const { standalone } = useAppContext();
-
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data } =
         useFetchFilteredActivity(token);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
+    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
     const activity = useMemo(() => {
         return getMixedActivity(data, undefined);
@@ -270,9 +285,10 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeader backButton borderBottom={true}>
+            <DesktopViewHeaderStyled backButton borderBottom={true}>
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-            </DesktopViewHeader>
+                <OtherHistoryFilters disableInitiatorFilter={token !== CryptoCurrency.TON} />
+            </DesktopViewHeaderStyled>
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>

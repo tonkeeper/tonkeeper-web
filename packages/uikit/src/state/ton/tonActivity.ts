@@ -7,12 +7,15 @@ const TonActivities: ActionTypeEnum[] = [
     'WithdrawStake',
     'WithdrawStakeRequest',
     'SmartContractExec',
-    'DomainRenew'
+    'DomainRenew',
+    'AuctionBid'
 ];
 
 export const seeIfTonTransfer = (action: Action) => {
     if (TonActivities.includes(action.type)) {
         return true;
+    } else if (action.type === 'JettonSwap') {
+        return action.jettonSwap?.tonIn != null || action.jettonSwap?.tonOut != null;
     } else if (action.type === 'ContractDeploy') {
         if (action.contractDeploy?.interfaces?.includes('wallet')) {
             return true;
@@ -27,7 +30,7 @@ export const groupAndFilterTonActivityItems = (
     return {
         pages: data.pages.reduce((acc, item) => {
             const events = item.events.reduce((e, event) => {
-                if (event.actions.every(seeIfTonTransfer)) {
+                if (event.actions.some(seeIfTonTransfer)) {
                     e.push(event);
                 }
                 return e;

@@ -1,37 +1,42 @@
 import UR from '@ngraveio/bc-ur/dist/ur';
-import { useCallback } from 'react';
+import { FC, useCallback, useContext } from 'react';
 import { styled } from 'styled-components';
 import { IconPage } from '../../components/Layout';
-import { KeystoneIcon } from '../../components/create/ImportIcons';
 import { Button } from '../../components/fields/Button';
 import { useKeystoneScanner } from '../../hooks/keystoneScanner';
 import { useTranslation } from '../../hooks/translation';
 import { usePairKeystoneMutation } from '../../state/keystone';
+import { WalletKeystoneIcon } from '../../components/create/WalletIcons';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
+import { useSetNotificationOnBack } from '../../components/Notification';
 
 const IconBlock = styled.div`
     color: ${props => props.theme.accentBlue};
 `;
 
-export const PairKeystone = () => {
+export const CreateKeystoneWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
 
-    const { mutate, reset, isLoading } = usePairKeystoneMutation();
+    const { mutateAsync, reset, isLoading } = usePairKeystoneMutation();
     const onSubmit = useCallback(
-        (result: UR) => {
+        async (result: UR) => {
             reset();
-            mutate(result);
+            await mutateAsync(result);
+            afterCompleted();
         },
-        [reset, mutate]
+        [reset, mutateAsync, afterCompleted]
     );
 
     const openScanner = useKeystoneScanner(Date.now(), onSubmit);
 
+    const { navigateHome } = useContext(AddWalletContext);
+    useSetNotificationOnBack(navigateHome);
+
     return (
         <IconPage
-            logOut
             icon={
                 <IconBlock>
-                    <KeystoneIcon size={144} />
+                    <WalletKeystoneIcon size={144} />
                 </IconBlock>
             }
             title={t('keystone_pair_title')}

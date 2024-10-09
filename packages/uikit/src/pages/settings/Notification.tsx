@@ -47,7 +47,7 @@ const useToggleSubscribe = () => {
                 await notifications.subscribe(
                     api,
                     wallet,
-                    signTonConnectOver(sdk, account.id, undefined, t, checkTouchId)
+                    signTonConnectOver({ sdk, accountId: account.id, t, checkTouchId })
                 );
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);

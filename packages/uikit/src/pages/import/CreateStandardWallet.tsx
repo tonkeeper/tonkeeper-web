@@ -1,9 +1,9 @@
 import { mnemonicNew } from '@ton/crypto';
-import { useEffect, useState } from 'react';
+import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Words } from '../../components/create/Words';
-import { Button } from '../../components/fields/Button';
+import { ButtonResponsiveSize } from '../../components/fields/Button';
 import {
     CheckLottieIcon,
     GearLottieIcon,
@@ -16,8 +16,15 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
+import {
+    OnCloseInterceptor,
+    useSetNotificationOnBack,
+    useSetNotificationOnCloseInterceptor
+} from '../../components/Notification';
+import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
 
-const Create = () => {
+export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { defaultWalletVersion } = useAppContext();
@@ -34,6 +41,14 @@ const Create = () => {
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
     const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
 
+    const [wordsShown, setWordsShown] = useState(false);
+
+    useEffect(() => {
+        if (infoPagePassed) {
+            setWordsShown(true);
+        }
+    }, [infoPagePassed]);
+
     useEffect(() => {
         setTimeout(() => {
             mnemonicNew(24).then(value => setMnemonic(value));
@@ -48,6 +63,63 @@ const Create = () => {
         }
     }, [mnemonic]);
 
+    const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
+    const { navigateHome } = useContext(AddWalletContext);
+    const onBack = useMemo(() => {
+        if (!infoPagePassed) {
+            if (!wordsShown) {
+                return navigateHome;
+            }
+            return () =>
+                openConfirmDiscard({
+                    onClose: discard => {
+                        if (discard) {
+                            navigateHome?.();
+                        }
+                    }
+                });
+        }
+
+        if (!wordsPagePassed) {
+            return () => setInfoPagePassed(false);
+        }
+
+        if (!createdAccount) {
+            return () => setWordsPagePassed(false);
+        }
+
+        return undefined;
+    }, [
+        wordsShown,
+        openConfirmDiscard,
+        navigateHome,
+        infoPagePassed,
+        wordsPagePassed,
+        createdAccount
+    ]);
+    useSetNotificationOnBack(onBack);
+
+    const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
+        if (!wordsShown) {
+            return undefined;
+        }
+
+        if (createdAccount) {
+            return undefined;
+        }
+
+        return closeModal => {
+            openConfirmDiscard({
+                onClose: discard => {
+                    if (discard) {
+                        closeModal();
+                    }
+                }
+            });
+        };
+    }, [wordsShown, openConfirmDiscard, createdAccount]);
+    useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+
     if (!mnemonic) {
         return <IconPage icon={<GearLottieIcon />} title={t('create_wallet_generating')} />;
     }
@@ -59,40 +131,31 @@ const Create = () => {
     if (!infoPagePassed) {
         return (
             <IconPage
-                logOut
                 icon={<WriteLottieIcon />}
                 title={t('create_wallet_title')}
                 description={t('create_wallet_caption')}
                 button={
-                    <Button
-                        size="large"
+                    <ButtonResponsiveSize
                         fullWidth
                         primary
                         marginTop
                         onClick={() => setInfoPagePassed(true)}
                     >
                         {t('continue')}
-                    </Button>
+                    </ButtonResponsiveSize>
                 }
             />
         );
     }
 
     if (!wordsPagePassed) {
-        return (
-            <Words
-                mnemonic={mnemonic}
-                onBack={() => setInfoPagePassed(false)}
-                onCheck={() => setWordsPagePassed(true)}
-            />
-        );
+        return <Words mnemonic={mnemonic} onCheck={() => setWordsPagePassed(true)} />;
     }
 
     if (!createdAccount) {
         return (
             <Check
                 mnemonic={mnemonic}
-                onBack={() => setWordsPagePassed(false)}
                 onConfirm={() => {
                     createWalletsAsync({
                         mnemonic,
@@ -134,7 +197,5 @@ const Create = () => {
         );
     }
 
-    return <FinalView />;
+    return <FinalView afterCompleted={afterCompleted} />;
 };
-
-export default Create;

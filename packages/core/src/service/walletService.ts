@@ -1,7 +1,6 @@
 import { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
 import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
-import { mnemonicToPrivateKey } from '@ton/crypto';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import queryString from 'query-string';
 import { IStorage } from '../Storage';
@@ -10,6 +9,7 @@ import {
     AccountLedger,
     AccountMAM,
     AccountTonMnemonic,
+    AccountTonMultisig,
     AccountTonOnly,
     AccountTonWatchOnly
 } from '../entries/account';
@@ -21,13 +21,48 @@ import {
     WalletVersions,
     sortWalletsByVersion,
     TonWalletStandard,
-    DerivationItemNamed
+    DerivationItemNamed,
+    WalletId
 } from '../entries/wallet';
 import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
 import { accountsStorage } from './accountsStorage';
 import { walletContract } from './wallet/contractService';
 import { TonKeychainRoot, KeychainTonAccount } from '@ton-keychain/core';
+import { mnemonicToKeypair } from './mnemonicService';
+import { FiatCurrencies } from '../entries/fiat';
+
+export const createMultisigTonAccount = async (
+    storage: IStorage,
+    address: string,
+    hostWallets: WalletId[],
+    selectedHostWalletId: WalletId,
+    options: {
+        name?: string;
+        emoji?: string;
+        pinToWallet?: string;
+    }
+) => {
+    const rawAddress = Address.parse(address).toRawString();
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+        rawAddress.split(':')[1]
+    );
+
+    return new AccountTonMultisig(
+        rawAddress,
+        options.name ?? name,
+        options.emoji ?? emoji,
+        {
+            id: rawAddress,
+            rawAddress: rawAddress
+        },
+        hostWallets.map(a => ({
+            address: a,
+            isPinned: a === options.pinToWallet
+        })),
+        selectedHostWalletId
+    );
+};
 
 export const createReadOnlyTonAccountByAddress = async (
     storage: IStorage,
@@ -57,7 +92,7 @@ export const createStandardTonAccountByMnemonic = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = await mnemonicToPrivateKey(mnemonic);
+    const keyPair = await mnemonicToKeypair(mnemonic);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
@@ -329,7 +364,9 @@ export const createMAMAccountByMnemonic = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const rootAccount = await TonKeychainRoot.fromMnemonic(rootMnemonic);
+    const rootAccount = await TonKeychainRoot.fromMnemonic(rootMnemonic, {
+        allowLegacyMnemonic: true
+    });
 
     let childTonWallets: {
         tonAccount: KeychainTonAccount;
@@ -503,4 +540,40 @@ async function gePreselectedMAMTonAccountsToImport(
             shouldAdd: selectedDerivations.includes(index)
         }))
     );
+}
+
+export async function getStandardTonWalletVersions({
+    publicKey,
+    network,
+    fiat,
+    api
+}: {
+    publicKey: string;
+    network: Network;
+    api: APIConfig;
+    fiat: FiatCurrencies;
+}) {
+    const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
+
+    const response = await new AccountsApi(api.tonApiV2).getAccounts({
+        getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }
+    });
+
+    const walletsJettonsBalances = await Promise.all(
+        versions.map(v =>
+            new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: v.address.toRawString(),
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
+            })
+        )
+    );
+
+    return versions.map((v, index) => ({
+        ...v,
+        tonBalance: response.accounts[index].balance,
+        hasJettons: walletsJettonsBalances[index].balances.some(
+            b => b.price?.prices && Number(b.balance) > 0
+        )
+    }));
 }

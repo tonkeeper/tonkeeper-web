@@ -16,12 +16,12 @@ import { toDaysLeft, useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
 import { useNotification } from '../../hooks/useNotification';
 import { useQueryChangeWait } from '../../hooks/useQueryChangeWait';
+import { useNftDNSExpirationDate } from '../../state/nft';
 import { Notification } from '../Notification';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmView, ConfirmViewButtons, ConfirmViewButtonsSlot } from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
-import { useNftDNSExpirationDate } from "../../state/nft";
 
 const RenewDNSBlock = styled.div`
     width: 100%;

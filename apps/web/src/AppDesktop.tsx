@@ -27,13 +27,20 @@ import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecom
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useLayoutEffect, useMemo } from 'react';
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, createGlobalStyle, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
+import {
+  DesktopManageMultisigsPage
+} from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
+import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
+
+const DesktopAccountSettingsPage = React.lazy(
+  () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
+);
 
 const TonConnectSubscription = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
@@ -212,10 +219,7 @@ export const DesktopContent: FC<{
         return (
             <FullScreen>
                 <InitializeContainer>
-                    <Routes>
-                        <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                        <Route path="*" element={<Initialize />} />
-                    </Routes>
+                   <Initialize />
                 </InitializeContainer>
             </FullScreen>
         );
@@ -230,6 +234,10 @@ export const DesktopContent: FC<{
                     <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                     <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
                     <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
+                    <Route
+                      path={any(AppRoute.accountSettings)}
+                      element={<DesktopAccountSettingsPage />}
+                    />
                     <Route path="*" element={<WalletContent />} />
                 </Routes>
             </WideContent>
@@ -257,6 +265,14 @@ const WalletContent = () => {
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
+                            <Route
+                              path={AppRoute.multisigWallets}
+                              element={<DesktopManageMultisigsPage />}
+                            />
+                            <Route
+                              path={AppRoute.multisigOrders}
+                              element={<DesktopMultisigOrdersPage />}
+                            />
                             <Route
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}

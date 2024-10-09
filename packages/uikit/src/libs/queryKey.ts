@@ -25,6 +25,9 @@ export enum QueryKey {
     language = 'language',
     walletVersions = 'walletVersions',
     globalPreferencesConfig = 'globalPreferencesConfig',
+    multisigWallets = 'multisigWallets',
+    multisigSigners = 'multisigSigners',
+    viewedMultisigOrders = 'viewedMultisigOrders',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',
@@ -51,7 +54,10 @@ export enum QueryKey {
     swapMaxValue = 'swapMaxValue',
     swapAllAssets = 'swapAllAssets',
     swapWalletAssets = 'swapWalletAssets',
-    swapCustomToken = 'swapCustomToken'
+    swapCustomToken = 'swapCustomToken',
+
+    multisigWallet = 'multisigWallet',
+    multisigOrder = 'multisigOrder'
 }
 
 export enum JettonKey {
@@ -67,8 +73,9 @@ export enum TonkeeperApiKey {
     fiat
 }
 
-export function anyOfKeysParts(...keys: string[]): InvalidateQueryFilters {
+export function anyOfKeysParts(...keys: (string | undefined)[]): InvalidateQueryFilters {
+    const notEmptyKeys = keys.filter(Boolean);
     return {
-        predicate: q => q.queryKey.some(element => keys.includes(element as string))
+        predicate: q => q.queryKey.some(element => notEmptyKeys.includes(element as string))
     };
 }

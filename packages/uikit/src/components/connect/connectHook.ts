@@ -4,7 +4,7 @@ import {
     DAppManifest,
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { parseTonTransfer } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
     connectRejectResponse,
     parseTonConnect,
@@ -20,15 +20,15 @@ import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpB
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { useActiveWallet } from '../../state/wallet';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { useActiveAccountQuery, useActiveWallet } from '../../state/wallet';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 export const useGetConnectInfo = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
     return useMutation<null | TonConnectParams, Error, string>(async url => {
-        const transfer = parseTonTransfer({ url });
+        const transfer = parseTonTransferWithAddress({ url });
 
         if (transfer) {
             sdk.uiEvents.emit('copy', {
@@ -40,7 +40,7 @@ export const useGetConnectInfo = () => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
-                params: { transfer }
+                params: { chain: BLOCKCHAIN_NAME.TON, ...transfer, from: 'qr-code' }
             });
             return null;
         }
@@ -72,20 +72,15 @@ export interface AppConnectionProps {
 
 export const useResponseConnectionMutation = () => {
     const sdk = useAppSdk();
-    const wallet = useActiveWallet();
+    const { data } = useActiveAccountQuery();
     const client = useQueryClient();
 
     return useMutation<undefined, Error, AppConnectionProps>(
         async ({ params, replyItems, manifest }) => {
-            if (!isStandardTonWallet(wallet)) {
-                console.error('Attempt to connect to non standard ton wallet');
-                return;
-            }
-
-            if (replyItems && manifest) {
+            if (replyItems && manifest && data) {
                 const response = await saveWalletTonConnect({
                     storage: sdk.storage,
-                    wallet,
+                    wallet: data.activeTonWallet,
                     manifest,
                     params,
                     replyItems,

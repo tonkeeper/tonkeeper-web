@@ -1,7 +1,3 @@
-import {
-    isAccountControllable,
-    isAccountVersionEditable
-} from '@tonkeeper/core/dist/entries/account';
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -25,6 +21,10 @@ import {
     WalletsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
+import {
+    isAccountTonWalletStandard,
+    isAccountVersionEditable
+} from '@tonkeeper/core/dist/entries/account';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -124,7 +124,7 @@ const SingleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        if (isAccountControllable(account)) {
+        if (isAccountTonWalletStandard(account)) {
             items.push({
                 name: t('settings_connected_apps'),
                 icon: <AppsIcon />,
@@ -268,7 +268,7 @@ const MultipleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        if (isAccountControllable(account)) {
+        if (isAccountTonWalletStandard(account)) {
             items.push({
                 name: t('settings_connected_apps'),
                 icon: <AppsIcon />,

@@ -13,15 +13,10 @@ import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import { AmplitudeAnalyticsContext } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
@@ -30,17 +25,22 @@ import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
+    useAccountsState,
     useAccountsStateQuery,
     useActiveAccountQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
+    useActiveTonNetwork, useMutateActiveAccount
+} from "@tonkeeper/uikit/dist/state/wallet";
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RouterProvider, createBrowserRouter, useNavigate } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
+import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
+import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
+import { useIsActiveAccountMultisig } from "@tonkeeper/uikit/dist/state/multisig";
+import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -62,7 +62,9 @@ export const App: FC = () => {
 };
 
 const Providers: FC<PropsWithChildren> = () => {
-    const { t, i18n } = useTranslation();
+  const { t: tSimple, i18n } = useTranslation();
+
+  const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
         const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
@@ -125,6 +127,8 @@ const Loader: FC = () => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    useGlobalSetup();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -141,7 +145,6 @@ const Loader: FC = () => {
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const navigate = useNavigate();
     useAppHeight();
 
     const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, sdk.version);
@@ -154,6 +157,8 @@ const Loader: FC = () => {
         }
     }, [activeAccount, i18n]);
 
+    const isMobile = useLayout();
+
     if (
         isWalletsLoading ||
         activeWalletLoading ||
@@ -161,7 +166,8 @@ const Loader: FC = () => {
         config === undefined ||
         lock === undefined ||
         fiat === undefined ||
-        !devSettings
+        !devSettings ||
+      globalPreferencesLoading
     ) {
         return <Loading />;
     }
@@ -176,6 +182,7 @@ const Loader: FC = () => {
         proFeatures: true,
         ios,
         defaultWalletVersion: WalletVersion.V5R1,
+        hideMultisig: isMobile,
         env: {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
@@ -184,24 +191,19 @@ const Loader: FC = () => {
 
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content
-                            activeAccount={activeAccount}
-                            lock={lock}
-                            standalone={standalone}
-                        />
-                        <CopyNotification hideSimpleCopyNotifications={!standalone} />
-                        <Suspense>
-                            <QrScanner />
-                        </Suspense>
-                        <ModalsRoot />
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
+            <AppContext.Provider value={context}>
+                <Content
+                    activeAccount={activeAccount}
+                    lock={lock}
+                    standalone={standalone}
+                />
+                <CopyNotification hideSimpleCopyNotifications={!standalone} />
+                <Suspense>
+                    <QrScanner />
+                </Suspense>
+                <ModalsRoot />
+                <UrlTonConnectSubscription />
+            </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 };
@@ -212,6 +214,18 @@ const Content: FC<{
     standalone: boolean;
 }> = ({ activeAccount, lock, standalone }) => {
     const isMobile = useLayout();
+    const accounts = useAccountsState();
+    const isActiveMultisig = useIsActiveAccountMultisig();
+    const { mutate: setActiveAccount } = useMutateActiveAccount();
+
+    useEffect(() => {
+        if (isMobile && isActiveMultisig) {
+            const firstNotMultisig = accounts.filter(a => a.type !== 'ton-multisig')[0];
+            if (firstNotMultisig) {
+                setActiveAccount(firstNotMultisig.id)
+            }
+        }
+    }, [isMobile, isActiveMultisig, setActiveAccount]);
 
     if (isMobile) {
         return <MobileView activeAccount={activeAccount} lock={lock} standalone={standalone} />;

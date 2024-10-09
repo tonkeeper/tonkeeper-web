@@ -11,7 +11,8 @@ const namespaces = ['tonkeeper', 'tonkeeper-web'];
 const localeMap = {
     'ru-RU': 'ru',
     'tr-TR': 'tr',
-    'zh-Hans-CN': 'zh_CN'
+    'zh-Hans-CN': 'zh_CN',
+    'zh-Hant': 'zh_TW'
 };
 
 const dist = './dist';
@@ -181,7 +182,7 @@ const checkForDuplicates = (resources: Record<string, { translation: Record<stri
         const checked = new Map<string, Record<string, string>>();
         keys.forEach(key => {
             if (checked.has(key.toLowerCase())) {
-              return;
+                return;
             }
 
             const duplicates = keys.filter(k => k.toLowerCase() === key.toLowerCase());
@@ -190,14 +191,13 @@ const checkForDuplicates = (resources: Record<string, { translation: Record<stri
                     return {
                         ...acc,
                         [d]: translation[d]
-                    }
+                    };
                 }, {});
                 console.error('⚠️ ERR: Find duplicating keys in', `"${locale}"`, 'locale ', values);
                 checked.set(key.toLowerCase(), values);
             }
-        })
-    })
-
-}
+        });
+    });
+};
 
 main().catch(() => process.exit(1));

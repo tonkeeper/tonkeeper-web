@@ -25,7 +25,8 @@ import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SkeletonListWithImages } from '../Skeleton';
 import { Label1 } from '../Text';
 import { useSuggestionAddress } from './SuggestionAddress';
-import { useActiveStandardTonWallet } from '../../state/wallet';
+import { useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 const Label = styled(Label1)`
     user-select: none;
@@ -37,11 +38,14 @@ const Label = styled(Label1)`
 const useLatestSuggestion = (acceptBlockchains?: BLOCKCHAIN_NAME[]) => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
+    const wallet = useActiveWallet();
 
     return useQuery(
         [wallet.rawAddress, QueryKey.activity, 'suggestions', acceptBlockchains],
-        () => getSuggestionsList(sdk, api, wallet, acceptBlockchains),
+        () =>
+            isStandardTonWallet(wallet)
+                ? getSuggestionsList(sdk, api, wallet, acceptBlockchains)
+                : [],
         { keepPreviousData: true }
     );
 };

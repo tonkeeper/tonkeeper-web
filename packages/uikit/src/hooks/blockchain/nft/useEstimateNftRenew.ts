@@ -1,6 +1,6 @@
 import { estimateNftRenew } from '@tonkeeper/core/dist/service/transfer/nftService';
-import { useEstimateTonFee } from '../useEstimateTonFee';
 import BigNumber from 'bignumber.js';
+import { useEstimateTonFee } from '../useEstimateTonFee';
 
 export const useEstimateNftRenew = (args: { nftAddress: string; amount: BigNumber }) => {
     return useEstimateTonFee(

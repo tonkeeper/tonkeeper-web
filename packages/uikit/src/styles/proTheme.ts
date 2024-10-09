@@ -12,7 +12,7 @@ export const proTheme: DefaultTheme = {
     backgroundContent: '#17171A',
     backgroundContentTint: '#222224',
     backgroundContentAttention: '#2F2F33',
-    backgroundOverlayStrong: 'rgba(20, 20, 20, 0.72)',
+    backgroundOverlayStrong: 'rgba(31, 31, 31, 0.72)',
     backgroundOverlayLight: 'rgba(20, 20, 20, 0.48)',
     backgroundOverlayExtraLight: 'rgba(20, 20, 20, 0.24)',
     backgroundHighlighted: 'rgb(255 255 255 / 4%)',

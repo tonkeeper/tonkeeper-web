@@ -1,6 +1,7 @@
 import { FC, PropsWithChildren } from 'react';
 import styled, { css } from 'styled-components';
 import { hexToRGBA } from '../../libs/css';
+import { Label3Class } from '../Text';
 
 const BadgeStyled = styled.div<{
     color: string;
@@ -57,3 +58,17 @@ export const Badge: FC<
         </BadgeStyled>
     );
 };
+
+export const RoundedBadge = styled.div`
+    background-color: ${p => p.theme.accentRed};
+    color: ${p => p.theme.textPrimary};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: ${p => p.theme.cornerFull};
+    padding: 0 4px;
+    aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+
+    ${Label3Class};
+`;

@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
+import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
 
 const NotificationBlock = styled.div`
     display: flex;
@@ -35,7 +35,7 @@ const DisclaimerLink = styled(Label1)`
     margin-left: 2.35rem;
 `;
 
-const DeleteContent: FC<{
+export const DeleteNotificationContent: FC<{
     onClose: () => void;
     accountId: AccountId;
     isKeystone: boolean;
@@ -45,6 +45,7 @@ const DeleteContent: FC<{
     const { t } = useTranslation();
     const [checked, setChecked] = useState(isKeystone || isReadOnly);
     const { mutateAsync, isLoading } = useMutateLogOut();
+    const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
         await mutateAsync(accountId);
@@ -73,7 +74,7 @@ const DeleteContent: FC<{
                     </DisclaimerText>
                     <DisclaimerLink
                         onClick={() => {
-                            navigate(AppRoute.settings + SettingsRoute.recovery + '/' + accountId);
+                            onRecovery({ accountId });
                             onClose();
                         }}
                     >
@@ -104,7 +105,7 @@ export const DeleteAccountNotification: FC<{
         (afterClose: () => void) => {
             if (!account) return undefined;
             return (
-                <DeleteContent
+                <DeleteNotificationContent
                     accountId={account.id}
                     onClose={afterClose}
                     isKeystone={account.type === 'keystone'}
@@ -127,11 +128,10 @@ const DeleteAllContent: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
     const { mutateAsync, isLoading } = useMutateDeleteAll();
-    const client = useQueryClient();
 
     const onDelete = async () => {
         await mutateAsync();
-        window.location.href = window.location.origin;
+        window.location.href = window.location.href;
     };
 
     return (

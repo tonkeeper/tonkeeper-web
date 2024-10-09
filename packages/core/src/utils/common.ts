@@ -129,3 +129,7 @@ export const seeIfValidTronAddress = (address: string): boolean => {
         return false;
     }
 };
+
+export function bufferToBigInt(buffer: Buffer) {
+    return BigInt(`0x${buffer.toString('hex')}`);
+}

@@ -16,7 +16,9 @@ const AsyncValidatorContext = createContext<null | {
     setFieldValidationState: (fieldName: string, state: AsyncValidationState) => void;
 }>(null);
 
-export const AsyncValidatorsStateProvider: FC<PropsWithChildren> = ({ children }) => {
+export const AsyncValidatorsStateProvider: FC<
+    PropsWithChildren & { onStateChange?: (state: AsyncValidationState) => void }
+> = ({ children, onStateChange }) => {
     const [fieldValidationState, _setFieldValidationState] = useState<
         Record<string, AsyncValidationState>
     >({});
@@ -24,8 +26,9 @@ export const AsyncValidatorsStateProvider: FC<PropsWithChildren> = ({ children }
     const setFieldValidationState = useCallback(
         (fieldName: string, state: AsyncValidationState) => {
             _setFieldValidationState(s => ({ ...s, [fieldName]: state }));
+            onStateChange?.(state);
         },
-        []
+        [onStateChange]
     );
 
     return (

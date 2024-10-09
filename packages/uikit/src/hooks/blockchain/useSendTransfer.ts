@@ -16,12 +16,12 @@ import { notifyError } from '../../components/transfer/common';
 import { useJettonList } from '../../state/jetton';
 import { getSigner } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
-import { useTransactionAnalytics } from '../amplitude';
+import { useAnalyticsTrack, useTransactionAnalytics } from '../amplitude';
 import { useAppContext } from '../appContext';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
 export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
@@ -34,7 +34,7 @@ export function useSendTransfer<T extends Asset>(
     const { api } = useAppContext();
     const account = useActiveAccount();
     const client = useQueryClient();
-    const track2 = useTransactionAnalytics();
+    const track = useAnalyticsTrack();
     const { data: jettons } = useJettonList();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
@@ -43,12 +43,11 @@ export function useSendTransfer<T extends Asset>(
         const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         if (signer === null) return false;
         try {
-            if (!isAccountControllable(account)) {
+            if (!isAccountTonWalletStandard(account)) {
                 throw new Error("Can't send a transfer using this account");
             }
             if (isTonAsset(amount.asset)) {
                 if (amount.asset.id === TON_ASSET.id) {
-                    track2('send-ton');
                     await sendTonTransfer(
                         api,
                         account,
@@ -58,8 +57,8 @@ export function useSendTransfer<T extends Asset>(
                         estimation.payload as TransferEstimationEvent,
                         signer
                     );
+                    track('send_success', { from: 'send_confirm', token: 'ton' });
                 } else {
-                    track2('send-jetton');
                     const jettonInfo = jettons!.balances.find(
                         jetton =>
                             (amount.asset.address as Address).toRawString() ===
@@ -74,6 +73,10 @@ export function useSendTransfer<T extends Asset>(
                         estimation.payload as TransferEstimationEvent,
                         signer
                     );
+                    track('send_success', {
+                        from: 'send_confirm',
+                        token: jettonInfo.jetton.symbol
+                    });
                 }
             } else {
                 throw new Error('Disable trc 20 transactions');

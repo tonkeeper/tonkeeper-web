@@ -5,6 +5,10 @@ import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotif
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
 import { AddWalletNotificationControlled } from './modals/AddWalletNotificationControlled';
+import { ConfirmDiscardNotificationControlled } from './modals/ConfirmDiscardNotificationControlled';
+import { MultisigOrderNotificationControlled } from './modals/MultisigOrderNotificationControlled';
+import { DeleteAccountNotificationControlled } from './modals/DeleteAccountNotificationControlled';
+import { ManageFolderNotificationControlled } from './modals/ManageFolderNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -16,6 +20,10 @@ export const ModalsRoot = () => {
             <RenameNotificationControlled />
             <RecoveryNotificationControlled />
             <AddWalletNotificationControlled />
+            <ConfirmDiscardNotificationControlled />
+            <MultisigOrderNotificationControlled />
+            <DeleteAccountNotificationControlled />
+            <ManageFolderNotificationControlled />
         </>
     );
 };
