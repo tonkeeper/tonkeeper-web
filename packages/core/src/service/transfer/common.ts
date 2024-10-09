@@ -90,6 +90,11 @@ export const checkWalletBalanceOrDie = (total: BigNumber, wallet: Account) => {
     }
 };
 
+export const assertBalanceEnough = async (api: APIConfig, total: BigNumber, wallet: string) => {
+    const [acc] = await getWalletBalance(api, { rawAddress: wallet });
+    checkWalletBalanceOrDie(total, acc);
+};
+
 export const checkWalletPositiveBalanceOrDie = (wallet: Account) => {
     if (new BigNumber(wallet.balance).isLessThan(toNano('0.01').toString())) {
         throw new Error(`Not enough account "${wallet.address}" amount: "${wallet.balance}"`);
@@ -262,6 +267,18 @@ export const seeIfTransferBounceable = (account: Account, recipient: TonRecipien
 
     return account.status === 'active';
 };
+
+export async function getIsBlockchainAccountBounceable(api: APIConfig, address: string) {
+    const account = await new AccountsApi(api.tonApiV2).getAccount({ accountId: address });
+    if ('dns' in account) {
+        return false;
+    }
+    if (!seeIfAddressBounceable(address)) {
+        return false;
+    }
+
+    return account.status === 'active';
+}
 
 export const sendMultisigTransfer = async ({
     api,

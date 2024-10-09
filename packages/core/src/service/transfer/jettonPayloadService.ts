@@ -1,7 +1,5 @@
-import { Address, Cell } from '@ton/core';
+import { Cell } from '@ton/core';
 import { APIConfig } from '../../entries/apis';
-import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { AccountsApi, JettonBalance, JettonsApi } from '../../tonApiV2';
 import { StateInit, toStateInit } from './common';
 
@@ -17,16 +15,20 @@ const seeIfCompressed = (jetton: JettonBalance) => {
 export const getJettonCustomPayload = async (
     api: APIConfig,
     walletAddress: string,
-    amount: AssetAmount<TonAsset>
-): Promise<{ customPayload: Cell | null; stateInit: StateInit }> => {
+    jettonAddress: string
+): Promise<{ customPayload: Cell | null; stateInit: StateInit; jettonWalletAddress: string }> => {
     const jetton = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
         accountId: walletAddress,
-        jettonId: (amount.asset.address as Address).toRawString(),
+        jettonId: jettonAddress,
         supportedExtensions: ['custom_payload']
     });
 
     if (!seeIfCompressed(jetton)) {
-        return { customPayload: null, stateInit: undefined };
+        return {
+            customPayload: null,
+            stateInit: undefined,
+            jettonWalletAddress: jetton.walletAddress.address
+        };
     }
 
     const { customPayload, stateInit } = await new JettonsApi(
@@ -37,13 +39,18 @@ export const getJettonCustomPayload = async (
     });
 
     if (!customPayload) {
-        return { customPayload: null, stateInit: undefined };
+        return {
+            customPayload: null,
+            stateInit: undefined,
+            jettonWalletAddress: jetton.walletAddress.address
+        };
     }
 
     return {
         customPayload: Cell.fromBase64(Buffer.from(customPayload, 'hex').toString('base64')),
         stateInit: stateInit
             ? toStateInit(Buffer.from(stateInit, 'hex').toString('base64'))
-            : undefined
+            : undefined,
+        jettonWalletAddress: jetton.walletAddress.address
     };
 };

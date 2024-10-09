@@ -38,7 +38,7 @@ export const MAX_ALLOWED_WALLET_MSGS = {
     [WalletVersion.V3R2]: 4,
     [WalletVersion.V3R1]: 4
 };
-const checkMaxAllowedMessagesInMultiTransferOrDie = (
+export const checkMaxAllowedMessagesInMultiTransferOrDie = (
     messagesNumber: number,
     walletVersion: WalletVersion
 ) => {
