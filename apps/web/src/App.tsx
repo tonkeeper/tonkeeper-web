@@ -40,7 +40,6 @@ import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
 import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
 import { useIsActiveAccountMultisig } from "@tonkeeper/uikit/dist/state/multisig";
-import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -202,7 +201,6 @@ const Loader: FC = () => {
                     <QrScanner />
                 </Suspense>
                 <ModalsRoot />
-                <UrlTonConnectSubscription />
             </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
