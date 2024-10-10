@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
+    BatteryIcon,
     CoinsIcon,
     ExitIcon,
     KeyIcon,
@@ -108,6 +109,8 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
+    const canUseBattery = account.type === 'mnemonic';
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
@@ -191,6 +194,14 @@ export const DesktopWalletSettingsPage = () => {
                         <SettingsListItem>
                             <AppsIcon />
                             <Label2>{t('settings_connected_apps')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
+                {canUseBattery && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+                        <SettingsListItem>
+                            <BatteryIcon />
+                            <Label2>{t('battery_title')}</Label2>
                         </SettingsListItem>
                     </LinkStyled>
                 )}

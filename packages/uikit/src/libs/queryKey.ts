@@ -57,7 +57,10 @@ export enum QueryKey {
     swapCustomToken = 'swapCustomToken',
 
     multisigWallet = 'multisigWallet',
-    multisigOrder = 'multisigOrder'
+    multisigOrder = 'multisigOrder',
+
+    batteryOnchainRechargeMethods = 'batteryOnchainRechargeMethods',
+    batteryAuthToken = 'batteryAuthToken'
 }
 
 export enum JettonKey {
