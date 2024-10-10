@@ -26,7 +26,7 @@ type TransferParams =
           comment?: string;
       }[];
 
-export class TonAssetTransferService {
+export class TonAssetTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonWalletStandard) {}
 
     async estimate(sender: Sender, params: TransferParams): Promise<TransferEstimation<TonAsset>> {

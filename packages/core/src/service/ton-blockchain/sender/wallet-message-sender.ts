@@ -1,11 +1,11 @@
 import { APIConfig } from '../../../entries/apis';
 import { walletContractFromState } from '../../wallet/contractService';
 import { externalMessage, getServerTime, getTTL, getWalletSeqNo } from '../../transfer/common';
-import { WalletContractV5R1 } from '@ton/ton';
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import { TonWalletStandard } from '../../../entries/wallet';
+import { WalletContractV5R1 } from '@ton/ton';
 
 export class WalletMessageSender {
     constructor(

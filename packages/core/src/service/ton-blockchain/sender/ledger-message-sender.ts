@@ -11,7 +11,9 @@ import {
     getTonkeeperQueryId,
     getTTL,
     getWalletSeqNo,
-    SendMode
+    seeIfAddressBounceable,
+    SendMode,
+    toStateInit
 } from '../../transfer/common';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
@@ -19,6 +21,8 @@ import { getJettonCustomPayload } from '../../transfer/jettonPayloadService';
 import { TonWalletStandard } from '../../../entries/wallet';
 import { JettonEncoder } from '../encoder/jetton-encoder';
 import { NFTEncoder } from '../encoder/nft-encoder';
+import { TonConnectTransactionPayload } from '../../../entries/tonConnect';
+import { LedgerError } from '../../../errors/LedgerError';
 
 export class LedgerMessageSender {
     constructor(
@@ -166,6 +170,45 @@ export class LedgerMessageSender {
         });
 
         return this.toSenderObject(externalMessage(contract, seqno, transfer));
+    };
+
+    tonConnectTransfer = async (transfer: TonConnectTransactionPayload) => {
+        if (transfer.messages.length !== 1) {
+            throw new LedgerError('Ledger signer does not support multiple messages');
+        }
+
+        const { timestamp, seqno, contract } = await this.getTransferParameters();
+        const message = transfer.messages[0];
+
+        let transferCell: Cell;
+        try {
+            transferCell = await this.signer({
+                to: Address.parse(message.address),
+                bounce: seeIfAddressBounceable(message.address),
+                amount: BigInt(message.amount),
+                seqno,
+                timeout: getTTL(timestamp),
+                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                payload: message.payload
+                    ? {
+                          type: 'unsafe',
+                          message: Cell.fromBase64(message.payload)
+                      }
+                    : undefined,
+                stateInit: toStateInit(message.stateInit)
+            });
+        } catch (e) {
+            console.error(e);
+            throw new LedgerError(
+                typeof e === 'string'
+                    ? e
+                    : typeof e === 'object' && e && 'message' in e
+                    ? (e.message as string)
+                    : 'Unknown error'
+            );
+        }
+
+        return this.toSenderObject(externalMessage(contract, seqno, transferCell));
     };
 
     private async getTransferParameters() {

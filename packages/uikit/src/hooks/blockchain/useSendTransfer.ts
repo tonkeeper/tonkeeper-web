@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { isTonAsset, Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import {
@@ -16,13 +16,13 @@ import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { TonAssetTransferService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transfer-service';
+import { TonAssetTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transaction.service';
 import {
     WalletMessageSender,
     LedgerMessageSender
 } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 
-export function useSendTransfer<T extends TonAsset>(
+export function useSendTransfer<T extends Asset>(
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
     amount: AssetAmount<T>,
     isMax: boolean,
@@ -46,13 +46,16 @@ export function useSendTransfer<T extends TonAsset>(
             }
 
             if (isTonAsset(amount.asset)) {
-                const transferService = new TonAssetTransferService(api, account.activeTonWallet);
+                const transferService = new TonAssetTransactionService(
+                    api,
+                    account.activeTonWallet
+                );
                 const sender =
                     signer.type === 'ledger'
                         ? new LedgerMessageSender(api, account.activeTonWallet, signer)
                         : new WalletMessageSender(api, account.activeTonWallet, signer);
-                transferService.send(sender, estimation, {
-                    to: recipient.address.address,
+                await transferService.send(sender, estimation as TransferEstimation<TonAsset>, {
+                    to: (recipient as TonRecipientData).toAccount.address,
                     amount: amount as AssetAmount<TonAsset>,
                     isMax,
                     comment: (recipient as TonRecipientData).comment
