@@ -160,7 +160,8 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
                     createWalletsAsync({
                         mnemonic,
                         versions: [defaultWalletVersion],
-                        selectAccount: true
+                        selectAccount: true,
+                        mnemonicType: 'ton'
                     }).then(setCreatedAccount);
                 }}
                 isLoading={isCreateWalletLoading}
@@ -190,6 +191,7 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
     if (sdk.notifications && !notificationsSubscribePagePassed) {
         return (
             <Subscribe
+                mnemonicType="ton"
                 wallet={createdAccount.activeTonWallet}
                 mnemonic={mnemonic}
                 onDone={() => setPassNotification(true)}

@@ -15,7 +15,7 @@ import {
 } from '../entries/account';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
-import { AuthKeychain, AuthPassword } from '../entries/password';
+import { AuthKeychain, AuthPassword, MnemonicType } from '../entries/password';
 import {
     WalletVersion,
     WalletVersions,
@@ -86,13 +86,14 @@ export const createStandardTonAccountByMnemonic = async (
     appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
     storage: IStorage,
     mnemonic: string[],
+    mnemonicType: MnemonicType,
     options: {
         versions?: WalletVersion[];
         network?: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = await mnemonicToKeypair(mnemonic);
+    const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
@@ -133,7 +134,8 @@ export const createStandardTonAccountByMnemonic = async (
             publicKey,
             version: w.version,
             rawAddress: w.rawAddress
-        }))
+        })),
+        mnemonicType
     );
 };
 
@@ -554,6 +556,50 @@ export async function getStandardTonWalletVersions({
     fiat: FiatCurrencies;
 }) {
     const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
+
+    const response = await new AccountsApi(api.tonApiV2).getAccounts({
+        getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }
+    });
+
+    const walletsJettonsBalances = await Promise.all(
+        versions.map(v =>
+            new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+                accountId: v.address.toRawString(),
+                currencies: [fiat],
+                supportedExtensions: ['custom_payload']
+            })
+        )
+    );
+
+    return versions.map((v, index) => ({
+        ...v,
+        tonBalance: response.accounts[index].balance,
+        hasJettons: walletsJettonsBalances[index].balances.some(
+            b => b.price?.prices && Number(b.balance) > 0
+        )
+    }));
+}
+
+export async function getMAMAccountWalletsInfo({
+    account,
+    network,
+    fiat,
+    api,
+    walletVersion
+}: {
+    account: TonKeychainRoot;
+    network: Network;
+    api: APIConfig;
+    fiat: FiatCurrencies;
+    walletVersion: WalletVersion;
+}) {
+    const possibleWallets = await Promise.all(
+        [...Array(5)].map((_, i) => account.getTonAccount(i))
+    );
+
+    const versions = possibleWallets.map(w =>
+        getWalletAddress(w.publicKey, walletVersion, network)
+    );
 
     const response = await new AccountsApi(api.tonApiV2).getAccounts({
         getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }

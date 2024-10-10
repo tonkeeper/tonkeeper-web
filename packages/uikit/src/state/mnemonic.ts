@@ -3,7 +3,7 @@ import { Cell } from '@ton/core';
 import { sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
-import { AuthPassword } from '@tonkeeper/core/dist/entries/password';
+import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
@@ -63,7 +63,7 @@ export const signTonConnectOver = ({
             }
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
-                const keyPair = await mnemonicToKeypair(mnemonic);
+                const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -72,7 +72,7 @@ export const signTonConnectOver = ({
             case 'mam': {
                 const w = wallet ?? account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id, checkTouchId);
-                const keyPair = await mnemonicToKeypair(mnemonic);
+                const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -91,9 +91,9 @@ export const signTonConnectOver = ({
     };
 };
 
-export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
+export const signTonConnectMnemonicOver = (mnemonic: string[], mnemonicType: MnemonicType) => {
     return async (bufferToSign: Buffer) => {
-        const keyPair = await mnemonicToKeypair(mnemonic);
+        const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
         const signature = nacl.sign.detached(
             Buffer.from(sha256_sync(bufferToSign)),
             keyPair.secretKey
@@ -189,7 +189,7 @@ export const getSigner = async (
                     checkTouchId
                 );
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToKeypair(mnemonic);
+                    const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
@@ -198,7 +198,7 @@ export const getSigner = async (
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToKeypair(mnemonic);
+                    const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
@@ -245,7 +245,7 @@ export const getMAMWalletMnemonic = async (
     }
 
     const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
-    const root = await TonKeychainRoot.fromMnemonic(mnemonic);
+    const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
     const tonAccount = await root.getTonAccount(derivation.index);
     return tonAccount.mnemonics;
 };
