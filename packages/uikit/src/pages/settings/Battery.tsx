@@ -12,13 +12,16 @@ import {
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
 import { BatteryInfoHeading } from '../../components/settings/battery/BatteryInfoHeading';
+import { useBatteryBalance, useProvideBatteryAuth } from '../../state/battery';
+import { SpinnerRing } from '../../components/Icon';
+import { BuyBatteryMethods } from '../../components/settings/battery/BuyBatteryMethods';
 
 export const BatteryPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
     const isFullWidth = useIsFullWidthMode();
 
-    if (account.type !== 'mnemonic') {
+    if (account.type !== 'mnemonic' && account.type !== 'mam') {
         return <Navigate to="../" />;
     }
 
@@ -48,16 +51,35 @@ const ContentWrapper = styled.div`
     margin: 0 auto;
 `;
 
+const SpinnerWrapper = styled.div`
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
 const HeadingBlock = styled.div`
     padding: 32px 0;
 `;
 
 export const BatteryPageContent: FC = () => {
+    useProvideBatteryAuth();
+    const { data } = useBatteryBalance();
+
+    if (!data) {
+        return (
+            <SpinnerWrapper>
+                <SpinnerRing />
+            </SpinnerWrapper>
+        );
+    }
+
     return (
         <ContentWrapper>
             <HeadingBlock>
                 <BatteryInfoHeading />
             </HeadingBlock>
+            <BuyBatteryMethods />
         </ContentWrapper>
     );
 };

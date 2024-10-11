@@ -109,7 +109,7 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
-    const canUseBattery = account.type === 'mnemonic';
+    const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
 
     return (
         <DesktopViewPageLayout>

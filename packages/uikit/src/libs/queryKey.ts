@@ -60,7 +60,8 @@ export enum QueryKey {
     multisigOrder = 'multisigOrder',
 
     batteryOnchainRechargeMethods = 'batteryOnchainRechargeMethods',
-    batteryAuthToken = 'batteryAuthToken'
+    batteryAuthToken = 'batteryAuthToken',
+    batteryBalance = 'batteryBalance'
 }
 
 export enum JettonKey {

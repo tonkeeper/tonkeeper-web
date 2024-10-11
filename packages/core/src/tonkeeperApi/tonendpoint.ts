@@ -69,6 +69,9 @@ export interface TonendpointConfig {
     multisig_help_url?: string;
 
     multisig_about_url?: string;
+
+    batteryHost?: string;
+    batteryMeanFees?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

@@ -1,6 +1,9 @@
 import styled, { useTheme } from 'styled-components';
 import { Body2, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
+import { BatteryBalance, useBatteryBalance, useBatteryPacks } from '../../../state/battery';
+import { FC } from 'react';
+import { Dot } from '../../Dot';
 
 const BatteryIconCharging = () => {
     const theme = useTheme();
@@ -106,6 +109,24 @@ const BatteryIconQuarter = () => {
     );
 };
 
+const BatteryIcon: FC<{ balance: BatteryBalance }> = ({ balance }) => {
+    const packs = useBatteryPacks();
+
+    if (balance.tonUnitsBalance.weiAmount.isZero()) {
+        return <BatteryIconCharging />;
+    }
+
+    if (balance.tonUnitsReserved.isLTE(packs.find(p => p.type === 'small')!.price)) {
+        return <BatteryIconQuarter />;
+    }
+
+    if (balance.tonUnitsReserved.isLTE(packs.find(p => p.type === 'medium')!.price)) {
+        return <BatteryIconHalf />;
+    }
+
+    return <BatteryIconFull />;
+};
+
 const Container = styled.div`
     display: flex;
     align-items: center;
@@ -124,13 +145,33 @@ const TextBlock = styled.div`
     }
 `;
 
+const DotStyled = styled(Dot)`
+    color: ${p => p.theme.textSecondary};
+`;
+
 export const BatteryInfoHeading = () => {
     const { t } = useTranslation();
+    const { data: balance } = useBatteryBalance();
+
+    if (!balance) {
+        return null;
+    }
+
     return (
         <Container>
-            <BatteryIconCharging />
+            <BatteryIcon balance={balance} />
             <TextBlock>
-                <Label2>{t('battery_title')}</Label2>
+                <Label2>
+                    {t('battery_title')}
+                    {!balance.batteryUnitsBalance.isZero() && (
+                        <>
+                            <DotStyled />
+                            {t('battery_charges', {
+                                charges: balance.batteryUnitsBalance.toString()
+                            })}
+                        </>
+                    )}
+                </Label2>
                 <Body2>{t('battery_capabilities_description')}</Body2>
             </TextBlock>
         </Container>

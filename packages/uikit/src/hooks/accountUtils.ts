@@ -34,8 +34,8 @@ export const useSignTonProof = () => {
     return useMutation<
         ReturnType<typeof createTonProofItem>,
         Error,
-        { payload: string; domain: string }
-    >(async ({ domain, payload }) => {
+        { payload: string; origin: string }
+    >(async ({ origin, payload }) => {
         if (!isAccountTonWalletStandard(account)) {
             throw new Error('Invalid account type');
         }
@@ -43,7 +43,7 @@ export const useSignTonProof = () => {
         const timestamp = await getServerTime(api);
         const proofPayload = tonConnectProofPayload(
             timestamp,
-            domain,
+            origin,
             account.activeTonWallet.rawAddress,
             payload
         );

@@ -108,6 +108,25 @@ export const SkeletonListDesktopAdaptive: FC<{
     );
 });
 
+export const SkeletonList: FC<{
+    size?: number;
+    margin?: boolean;
+    fullWidth?: boolean;
+    className?: string;
+}> = React.memo(({ size = 1, margin, fullWidth, className }) => {
+    return (
+        <ListBlock margin={margin} fullWidth={fullWidth} className={className}>
+            {Array(size)
+                .fill(null)
+                .map((_, index) => (
+                    <ListItem key={index} hover={false}>
+                        <SkeletonListPayload />
+                    </ListItem>
+                ))}
+        </ListBlock>
+    );
+});
+
 const SkeletonSettingsList: FC<{ size?: number }> = React.memo(({ size = 1 }) => {
     return (
         <ListBlock>
