@@ -202,6 +202,30 @@ const useProcessMnemonic = () => {
     });
 };
 
+const getMnemonicTypeFallback = async (mnemonic: string[]) => {
+    if (await mnemonicValidate(mnemonic)) {
+        return 'tonMnemonic';
+    }
+
+    if (mnemonic.length === 12) {
+        if (validateBip39Mnemonic(mnemonic)) {
+            return 'bip39';
+        }
+
+        throw new Error('Wallet mnemonic not valid');
+    }
+
+    if (await TonKeychainRoot.isValidMnemonic(mnemonic)) {
+        return 'tonKeychain';
+    }
+
+    if (validateBip39Mnemonic(mnemonic)) {
+        return 'bip39';
+    }
+
+    throw new Error('Wallet mnemonic not valid');
+};
+
 export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
 
@@ -244,7 +268,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
         const availableOptions = Object.entries(result).filter(([_, v]) => v !== undefined);
         if (availableOptions.length === 0) {
-            setSelectedMnemonicType('tonMnemonic');
+            setSelectedMnemonicType(await getMnemonicTypeFallback(m));
         } else if (availableOptions.length === 1) {
             await onSelectMnemonicTypePure(availableOptions[0][0] as ImportMnemonicType, m, result);
         }
