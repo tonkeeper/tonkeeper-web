@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
-import { Body2, H2Responsive } from '../Text';
+import { Body2, H2Label2Responsive } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { useResolveDns } from '../../state/dns';
@@ -84,7 +84,7 @@ export const AddressInput: FC<{
         <CenterContainer className={className}>
             <Block onSubmit={onCreate}>
                 <div>
-                    <H2Responsive>{t('add_watch_only_title')}</H2Responsive>
+                    <H2Label2Responsive>{t('add_watch_only_title')}</H2Label2Responsive>
                     <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
                 </div>
                 <ShowAddress value={showAddress}>

@@ -6,7 +6,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
-import { Body1, Body2, Body2Class, Body3, H2Responsive, Label2 } from '../Text';
+import { Body1, Body2, Body2Class, Body3, H2Label2Responsive, Label2 } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
@@ -138,9 +138,9 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
     return (
         <>
             <HeadingBlock>
-                <H2Responsive>
+                <H2Label2Responsive>
                     {t(showMamInfo ? 'secret_words_account_title' : 'secret_words_title')}
-                </H2Responsive>
+                </H2Label2Responsive>
                 <Body>
                     {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
                 </Body>
@@ -394,7 +394,7 @@ export const Check: FC<{
         <CenterContainer>
             <Block>
                 <div>
-                    <H2Responsive>{t('check_words_title')}</H2Responsive>
+                    <H2Label2Responsive>{t('check_words_title')}</H2Label2Responsive>
                     <Body>{description}</Body>
                 </div>
             </Block>
@@ -567,7 +567,7 @@ export const ImportWords: FC<{
         <>
             <Block>
                 <div>
-                    <H2Responsive>{t('import_wallet_title_web')}</H2Responsive>
+                    <H2Label2Responsive>{t('import_wallet_title_web')}</H2Label2Responsive>
                     <Body>
                         {t(
                             wordsNumber === 12

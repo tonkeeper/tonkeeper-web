@@ -15,7 +15,7 @@ import { useAccountState, useStandardTonWalletVersions } from '../../state/walle
 import { SkeletonListDesktopAdaptive } from '../Skeleton';
 import { Checkbox } from '../fields/Checkbox';
 import { ButtonResponsiveSize } from '../fields/Button';
-import { Body1, Body2, Body2Class, H2Responsive, Label1 } from '../Text';
+import { Body1, Body2, Body2Class, H2Label2Responsive, Label1 } from '../Text';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -120,7 +120,7 @@ export const ChoseWalletVersions: FC<{
 
     return (
         <Wrapper>
-            <H2Responsive>{t('choose_wallets_title')}</H2Responsive>
+            <H2Label2Responsive>{t('choose_wallets_title')}</H2Label2Responsive>
             <Body>{t('choose_wallets_subtitle')}</Body>
             {!wallets ? (
                 <SkeletonListStyled size={WalletVersions.length} />

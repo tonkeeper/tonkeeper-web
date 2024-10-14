@@ -4,6 +4,10 @@ import { useTranslation } from '../../../hooks/translation';
 import { BatteryBalance, useBatteryBalance, useBatteryPacks } from '../../../state/battery';
 import { FC } from 'react';
 import { Dot } from '../../Dot';
+import { BatterySettingsNotification } from './BatterySettingsNotification';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { useActiveTonWalletConfig } from '../../../state/wallet';
+import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 
 const BatteryIconCharging = () => {
     const theme = useTheme();
@@ -140,7 +144,7 @@ const TextBlock = styled.div`
     flex-direction: column;
     gap: 4px;
 
-    ${Body2} {
+    > ${Body2} {
         color: ${p => p.theme.textSecondary};
     }
 `;
@@ -149,12 +153,34 @@ const DotStyled = styled(Dot)`
     color: ${p => p.theme.textSecondary};
 `;
 
+const Body2Highlighted = styled(Body2)`
+    color: ${p => p.theme.accentBlue};
+    cursor: pointer;
+`;
+
 export const BatteryInfoHeading = () => {
     const { t } = useTranslation();
     const { data: balance } = useBatteryBalance();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { data: config } = useActiveTonWalletConfig();
 
-    if (!balance) {
+    if (!balance || !config) {
         return null;
+    }
+
+    let willBePaidText;
+    if (Object.values(config.batterySettings).some(Boolean)) {
+        const translationsMap = {
+            enabledForSwaps: 'battery_transactions_type_swap',
+            enabledForTokens: 'battery_transactions_type_transfer',
+            enabledForNfts: 'battery_transactions_types_nft'
+        };
+        const willBePaidItems = Object.entries(config.batterySettings)
+            .filter(([_, v]) => v)
+            .map(([k]) => t(translationsMap[k as keyof TonWalletConfig['batterySettings']]))
+            .join(', ');
+
+        willBePaidText = t('battery_info_will_be_paid', { items: willBePaidItems });
     }
 
     return (
@@ -172,8 +198,18 @@ export const BatteryInfoHeading = () => {
                         </>
                     )}
                 </Label2>
-                <Body2>{t('battery_capabilities_description')}</Body2>
+                {balance.batteryUnitsBalance.isZero() ? (
+                    <div>
+                        <Body2>{t('battery_capabilities_description')}</Body2>{' '}
+                        <Body2Highlighted onClick={onOpen}>
+                            {t('battery_capabilities_supported_transactions_label')}
+                        </Body2Highlighted>
+                    </div>
+                ) : (
+                    !!willBePaidText && <Body2>{willBePaidText}</Body2>
+                )}
             </TextBlock>
+            <BatterySettingsNotification isOpen={isOpen} onClose={onClose} hideSelection />
         </Container>
     );
 };
