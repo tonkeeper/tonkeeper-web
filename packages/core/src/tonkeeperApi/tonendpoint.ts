@@ -75,6 +75,7 @@ export interface TonendpointConfig {
     batteryMeanPrice_swap?: string;
     batteryMeanPrice_jetton?: string;
     batteryMeanPrice_nft?: string;
+    batteryRefundEndpoint?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

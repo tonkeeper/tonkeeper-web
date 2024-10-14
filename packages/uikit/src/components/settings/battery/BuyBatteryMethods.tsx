@@ -49,13 +49,13 @@ const TextContainer = styled.div`
     }
 `;
 
-export const BuyBatteryMethods: FC = () => {
+export const BuyBatteryMethods: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const methods = useBatteryAvailableRechargeMethods();
 
     if (!methods) {
         return (
-            <ListBlock>
+            <ListBlock className={className} margin={false}>
                 {[...new Array(4)].map((_, index) => (
                     <ListItemStyled key={index}>
                         <ListItemPayloadStyled>
@@ -72,7 +72,7 @@ export const BuyBatteryMethods: FC = () => {
     }
 
     return (
-        <ListBlock>
+        <ListBlock className={className} margin={false}>
             {methods.map(m => (
                 <ListItemStyled key={m.key}>
                     <ListItemPayloadStyled>

@@ -37,6 +37,7 @@
   "battery_capabilities_supported_transactions_label": "Supported Transactions",
   "battery_charges": "{charges} charges",
   "battery_info_will_be_paid": "Will be paid: {items}",
+  "battery_refunds_link": "Recharges and Refunds",
   "battery_settings_nft_price": "≈ {charges} charges per transfer",
   "battery_settings_nft_title": "NFT transfers",
   "battery_settings_swap_price": "≈ {charges} charges per swap",

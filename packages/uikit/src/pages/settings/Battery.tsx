@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
-import { Label2 } from '../../components/Text';
+import { Body2, Label2 } from '../../components/Text';
 import { useActiveAccount } from '../../state/wallet';
 import { Navigate } from 'react-router-dom';
 import {
@@ -20,6 +20,8 @@ import { useTranslation } from '../../hooks/translation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
+import { useAppSdk } from '../../hooks/appSdk';
+import { useAppContext } from '../../hooks/appContext';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
@@ -91,8 +93,23 @@ export const BatteryPageLayout: FC = () => {
     );
 };
 
+const RefundsBlock = styled.div`
+    padding: 24px 0;
+    color: ${p => p.theme.textSecondary};
+`;
+
+const RefundsLink = styled(Body2)`
+    color: ${p => p.theme.accentBlueConstant};
+    cursor: pointer;
+`;
+
 export const BatteryPageContent: FC = () => {
     const { data } = useBatteryBalance();
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+    const {
+        config: { batteryRefundEndpoint }
+    } = useAppContext();
 
     if (!data) {
         return (
@@ -108,6 +125,14 @@ export const BatteryPageContent: FC = () => {
                 <BatteryInfoHeading />
             </HeadingBlock>
             <BuyBatteryMethods />
+            <RefundsBlock>
+                <Body2>{t('battery_packages_disclaimer')}</Body2>{' '}
+                {!!batteryRefundEndpoint && (
+                    <RefundsLink onClick={() => sdk.openPage(batteryRefundEndpoint)}>
+                        {t('battery_refunds_link')}
+                    </RefundsLink>
+                )}
+            </RefundsBlock>
         </ContentWrapper>
     );
 };

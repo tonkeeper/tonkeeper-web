@@ -36,6 +36,7 @@
   "battery_capabilities_supported_transactions_label": "Поддерживаемые транзакции",
   "battery_charges": "{charges} зарядов",
   "battery_info_will_be_paid": "Будет оплачено: {items}",
+  "battery_refunds_link": "История пополнений и возврат",
   "battery_settings_nft_price": "≈ {charges} зарядов за перевод",
   "battery_settings_nft_title": "Отправка NFT",
   "battery_settings_swap_price": "≈ {charges} зарядов за своп",
