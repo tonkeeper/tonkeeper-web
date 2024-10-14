@@ -37,6 +37,7 @@ import {
   DesktopManageMultisigsPage
 } from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
 import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
+import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
 
 const DesktopAccountSettingsPage = React.lazy(
   () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
@@ -323,6 +324,7 @@ const BackgroundElements = () => {
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
+            <UrlTonConnectSubscription />
         </Suspense>
     );
 };

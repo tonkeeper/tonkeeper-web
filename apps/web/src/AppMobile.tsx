@@ -26,6 +26,7 @@ import React, { FC, Suspense, useMemo } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
+import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -233,6 +234,7 @@ export const MobileContent: FC<{
             <Footer standalone={standalone} />
             <MemoryScroll />
             <Notifications />
+            <UrlTonConnectSubscription />
         </Wrapper>
     );
 };
