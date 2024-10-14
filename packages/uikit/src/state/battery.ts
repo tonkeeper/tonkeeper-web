@@ -141,6 +141,14 @@ export const useProvideBatteryAuth = () => {
     return tokenQuery;
 };
 
+export const useBatteryUnitTonRate = () => {
+    const {
+        config: { batteryMeanFees }
+    } = useAppContext();
+
+    return useMemo(() => new BigNumber(batteryMeanFees || '0.0026'), [batteryMeanFees]);
+};
+
 export type BatteryBalance = {
     tonUnitsBalance: AssetAmount<typeof TON_ASSET>;
     tonUnitsReserved: AssetAmount<typeof TON_ASSET>;
@@ -152,7 +160,7 @@ export const useBatteryBalance = () => {
     const { data: token } = useBatteryAuthToken();
     const batteryApi = useBatteryApi();
 
-    const rate = '0.0026'; // TODO
+    const rate = useBatteryUnitTonRate();
 
     return useQuery<BatteryBalance | null>([QueryKey.batteryBalance, token, rate], async () => {
         if (!token) {
@@ -176,11 +184,7 @@ export const useBatteryBalance = () => {
 };
 
 export const useBatteryPacks = () => {
-    const { config } = useAppContext();
-    const batteryMeanFees = useMemo(
-        () => new BigNumber(config.batteryMeanFees || '0.03'),
-        [config.batteryMeanFees]
-    );
+    const rate = useBatteryUnitTonRate();
 
     return useMemo(
         () =>
@@ -189,24 +193,24 @@ export const useBatteryPacks = () => {
                     type: 'large',
                     price: AssetAmount.fromRelativeAmount({
                         asset: TON_ASSET,
-                        amount: batteryMeanFees.multipliedBy(400)
+                        amount: rate.multipliedBy(400)
                     })
                 },
                 {
                     type: 'medium',
                     price: AssetAmount.fromRelativeAmount({
                         asset: TON_ASSET,
-                        amount: batteryMeanFees.multipliedBy(250)
+                        amount: rate.multipliedBy(250)
                     })
                 },
                 {
                     type: 'small',
                     price: AssetAmount.fromRelativeAmount({
                         asset: TON_ASSET,
-                        amount: batteryMeanFees.multipliedBy(150)
+                        amount: rate.multipliedBy(150)
                     })
                 }
             ] as const,
-        [batteryMeanFees]
+        [rate]
     );
 };

@@ -9,6 +9,8 @@ import { Checkbox } from '../../fields/Checkbox';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { Button } from '../../fields/Button';
 import { useAppContext } from '../../../hooks/appContext';
+import { useBatteryUnitTonRate } from '../../../state/battery';
+import BigNumber from 'bignumber.js';
 
 const NotificationStyled = styled(Notification)<{ $hideSelection?: boolean }>`
     max-width: 400px;
@@ -124,8 +126,10 @@ const BatterySettingsNotificationContent: FC<{
 }> = ({ batterySettings, onClose, hideSelection }) => {
     const { t } = useTranslation();
 
+    const rate = useBatteryUnitTonRate();
+
     const {
-        config: { batteryMeanPrice_swaps, batteryMeanPrice_jetton, batteryMeanPrice_nft }
+        config: { batteryMeanPrice_swap, batteryMeanPrice_jetton, batteryMeanPrice_nft }
     } = useAppContext();
 
     const [batterySettingsOptimistic, setBatterySettingsOptimistic] = useState(batterySettings);
@@ -146,6 +150,19 @@ const BatterySettingsNotificationContent: FC<{
         onClose();
     };
 
+    const batterySwapCharges = new BigNumber(batteryMeanPrice_swap || '0.13')
+        .div(rate)
+        .integerValue(BigNumber.ROUND_UP)
+        .toNumber();
+    const batteryJettonCharges = new BigNumber(batteryMeanPrice_jetton || '0.025')
+        .div(rate)
+        .integerValue(BigNumber.ROUND_UP)
+        .toNumber();
+    const batteryNFTCharges = new BigNumber(batteryMeanPrice_nft || '0.01')
+        .div(rate)
+        .integerValue(BigNumber.ROUND_UP)
+        .toNumber();
+
     return (
         <>
             {!hideSelection && (
@@ -161,7 +178,9 @@ const BatterySettingsNotificationContent: FC<{
                     <ListItemPayload>
                         <ListItemText>
                             <Label2>{t('battery_settings_swap_title')}</Label2>
-                            <Body3>{t('battery_settings_swap_price', { charges: 5000 })}</Body3>
+                            <Body3>
+                                {t('battery_settings_swap_price', { charges: batterySwapCharges })}
+                            </Body3>
                         </ListItemText>
                         {!hideSelection && (
                             <CheckboxStyled checked={batterySettingsOptimistic.enabledForSwaps} />
@@ -172,7 +191,9 @@ const BatterySettingsNotificationContent: FC<{
                     <ListItemPayload>
                         <ListItemText>
                             <Label2>{t('battery_settings_nft_title')}</Label2>
-                            <Body3>{t('battery_settings_nft_price', { charges: 5000 })}</Body3>
+                            <Body3>
+                                {t('battery_settings_nft_price', { charges: batteryNFTCharges })}
+                            </Body3>
                         </ListItemText>
                         {!hideSelection && (
                             <CheckboxStyled checked={batterySettingsOptimistic.enabledForNfts} />
@@ -184,7 +205,9 @@ const BatterySettingsNotificationContent: FC<{
                         <ListItemText>
                             <Label2>{t('battery_settings_token_transfer_title')}</Label2>
                             <Body3>
-                                {t('battery_settings_token_transfer_price', { charges: 5000 })}
+                                {t('battery_settings_token_transfer_price', {
+                                    charges: batteryJettonCharges
+                                })}
                             </Body3>
                         </ListItemText>
                         {!hideSelection && (

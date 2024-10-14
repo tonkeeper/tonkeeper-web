@@ -72,7 +72,7 @@ export interface TonendpointConfig {
 
     batteryHost?: string;
     batteryMeanFees?: string;
-    batteryMeanPrice_swaps?: string;
+    batteryMeanPrice_swap?: string;
     batteryMeanPrice_jetton?: string;
     batteryMeanPrice_nft?: string;
 }
