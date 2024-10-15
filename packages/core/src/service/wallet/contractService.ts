@@ -42,7 +42,13 @@ export const walletContract = (
                 publicKey
             });
         case WalletVersion.V5R1:
-            return WalletContractV5R1.create({ workChain: workchain, publicKey });
+            return WalletContractV5R1.create({
+                workChain: workchain,
+                publicKey,
+                walletId: {
+                    networkGlobalId: network
+                }
+            });
     }
 };
 
