@@ -22,6 +22,7 @@ import { fallbackRenderOver } from '../../components/Error';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAppContext } from '../../hooks/appContext';
+import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
@@ -133,6 +134,7 @@ export const BatteryPageContent: FC = () => {
                     </RefundsLink>
                 )}
             </RefundsBlock>
+            <BatteryRechargeNotification isOpen={true} onClose={() => {}} />
         </ContentWrapper>
     );
 };

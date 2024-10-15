@@ -173,14 +173,60 @@ export const useBatteryBalance = () => {
         }
 
         return {
-            tonUnitsBalance: new AssetAmount({ asset: TON_ASSET, weiAmount: res.balance }),
-            tonUnitsReserved: new AssetAmount({ asset: TON_ASSET, weiAmount: res.reserved }),
+            tonUnitsBalance: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: res.balance
+            }),
+            tonUnitsReserved: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: res.reserved
+            }),
             batteryUnitsBalance: new BigNumber(res.balance)
                 .div(rate)
                 .integerValue(BigNumber.ROUND_FLOOR),
             batteryUnitsReserved: new BigNumber(res.reserved).div(rate)
         };
     });
+};
+
+export const useBatteryShouldBeReservedAmount = () => {
+    const { data: balance } = useBatteryBalance();
+    const { config } = useAppContext();
+    const rate = useBatteryUnitTonRate();
+
+    return useMemo(() => {
+        if (!balance) {
+            return undefined;
+        }
+
+        const configReservedAmount = new BigNumber(config.batteryReservedAmount || 0.065);
+
+        const tonUnitsToReserve = configReservedAmount.minus(
+            balance.tonUnitsReserved.relativeAmount
+        );
+
+        return {
+            tonUnits: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: tonUnitsToReserve
+            }),
+            batteryUnits: tonUnitsToReserve.div(rate)
+        };
+    }, [balance, config, rate]);
+};
+
+export const useBatteryPurchaseAssetCoefficient = (assetAddress: string) => {
+    const methods = useBatteryAvailableRechargeMethods();
+
+    if (!methods) {
+        return undefined;
+    }
+
+    if (assetAddress.toUpperCase() === TON_ASSET.address) {
+        return methods.find(m => m.type === 'ton')!.rate;
+    }
+
+    return methods.find(m => m.jetton_master === assetAddress)!.rate;
 };
 
 export const useBatteryPacks = () => {
@@ -194,11 +240,19 @@ export const useBatteryPacks = () => {
                     price: AssetAmount.fromRelativeAmount({
                         asset: TON_ASSET,
                         amount: rate.multipliedBy(400)
+                    }),
+                    value: AssetAmount.fromRelativeAmount({
+                        asset: TON_ASSET,
+                        amount: rate.multipliedBy(400)
                     })
                 },
                 {
                     type: 'medium',
                     price: AssetAmount.fromRelativeAmount({
+                        asset: TON_ASSET,
+                        amount: rate.multipliedBy(250)
+                    }),
+                    value: AssetAmount.fromRelativeAmount({
                         asset: TON_ASSET,
                         amount: rate.multipliedBy(250)
                     })
@@ -208,9 +262,37 @@ export const useBatteryPacks = () => {
                     price: AssetAmount.fromRelativeAmount({
                         asset: TON_ASSET,
                         amount: rate.multipliedBy(150)
+                    }),
+                    value: AssetAmount.fromRelativeAmount({
+                        asset: TON_ASSET,
+                        amount: rate.multipliedBy(150)
                     })
                 }
             ] as const,
         [rate]
     );
+};
+
+export const useBatteryPacksFeesApplied = (assetAddress: string) => {
+    const packs = useBatteryPacks();
+    const reserveAmount = useBatteryShouldBeReservedAmount();
+    const assetCoefficient = useBatteryPurchaseAssetCoefficient(assetAddress);
+
+    return useMemo(() => {
+        if (!reserveAmount || !assetCoefficient) {
+            return undefined;
+        }
+
+        return packs.map(p => ({
+            ...p,
+            value: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: p.value.relativeAmount.minus(reserveAmount.tonUnits.relativeAmount)
+            }),
+            price: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: p.price.relativeAmount.div(assetCoefficient)
+            })
+        }));
+    }, [packs, reserveAmount, assetCoefficient]);
 };

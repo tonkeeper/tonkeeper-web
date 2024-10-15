@@ -1,48 +1,66 @@
 import { Notification } from '../../Notification';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
-import { ListItem, ListItemElement } from '../../List';
+import { AssetSelect } from '../../fields/AssetSelect';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { BatteryPacksSelect } from './BatteryPacksSelect';
+import { useAsset } from '../../../state/home';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useBatteryAvailableRechargeMethods } from '../../../state/battery';
 
-export const BatteryRechargeNotification: FC<{ isOpen: boolean; onClose: () => void }> = ({
-    isOpen,
-    onClose
-}) => {
+const NotificationStyled = styled(Notification)`
+    max-width: 400px;
+`;
+
+export const BatteryRechargeNotification: FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    preselectAssetId?: string;
+}> = ({ isOpen, onClose, preselectAssetId = TON_ASSET.id }) => {
     const { t } = useTranslation();
+    const preselectedAsset = useAsset(preselectAssetId);
 
     return (
-        <Notification
+        <NotificationStyled
             isOpen={isOpen}
             handleClose={onClose}
             title={t('battery_recharge_by_crypto_title')}
         >
-            {() => <BatteryRechargeNotificationContent />}
-        </Notification>
+            {() =>
+                !!preselectedAsset && (
+                    <BatteryRechargeNotificationContent preselectedAsset={preselectedAsset} />
+                )
+            }
+        </NotificationStyled>
     );
 };
 
 const ContentWrapper = styled.div``;
 
-const BatteryRechargeNotificationContent = () => {
-    return (
-        <ContentWrapper>
-            <AssetSelect />
-        </ContentWrapper>
-    );
-};
-
-const AssetImage = styled.img`
-    border-radius: ${p => p.theme.cornerFull};
-    width: 24px;
-    height: 24px;
+const AssetSelectStyled = styled(AssetSelect)`
+    margin-bottom: 1rem;
 `;
 
-const AssetSelect = () => {
+const BatteryRechargeNotificationContent: FC<{ preselectedAsset: TonAsset }> = ({
+    preselectedAsset
+}) => {
+    const [asset, setAsset] = useState(preselectedAsset);
+    const [selectedPackType, setSelectedPackType] = useState<string | undefined>();
+    const methods = useBatteryAvailableRechargeMethods();
+
     return (
-        <ListItem hover={false}>
-            <ListItemElement>
-                <AssetImage />
-            </ListItemElement>
-        </ListItem>
+        <ContentWrapper>
+            <AssetSelectStyled
+                selectedAssetId={asset.id}
+                onAssetChange={setAsset}
+                allowedAssetsAddresses={methods?.map(m => m.jetton_master || 'TON')}
+            />
+            <BatteryPacksSelect
+                asset={asset}
+                selectedPackType={selectedPackType}
+                onPackTypeChange={setSelectedPackType}
+            />
+        </ContentWrapper>
     );
 };

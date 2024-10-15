@@ -39,7 +39,7 @@ import { IconButton } from '../../fields/IconButton';
 import { SkeletonText } from '../../shared/Skeleton';
 import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 import { AmountInput } from './AmountInput';
-import { AssetSelect } from './AssetSelect';
+import { MultisendAssetSelect } from './MultisendAssetSelect';
 import { CommentInput } from './CommentInput';
 import { DeleteListNotification } from './DeleteListNotification';
 import { EditListNotification } from './EditListNotification';
@@ -222,7 +222,7 @@ export const MultiSendTable: FC<{
         <>
             <ImportListNotification isOpen={isImportOpen} onClose={onImportList} />
             <FormHeadingWrapper>
-                <AssetSelect asset={asset} onAssetChange={setAsset} />
+                <MultisendAssetSelect asset={asset} onAssetChange={setAsset} />
                 <Button
                     secondary
                     as="a"

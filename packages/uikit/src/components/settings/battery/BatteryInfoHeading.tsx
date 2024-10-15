@@ -120,11 +120,11 @@ const BatteryIcon: FC<{ balance: BatteryBalance }> = ({ balance }) => {
         return <BatteryIconCharging />;
     }
 
-    if (balance.tonUnitsReserved.isLTE(packs.find(p => p.type === 'small')!.price)) {
+    if (balance.tonUnitsReserved.isLTE(packs.find(p => p.type === 'small')!.value)) {
         return <BatteryIconQuarter />;
     }
 
-    if (balance.tonUnitsReserved.isLTE(packs.find(p => p.type === 'medium')!.price)) {
+    if (balance.tonUnitsReserved.isLTE(packs.find(p => p.type === 'medium')!.value)) {
         return <BatteryIconHalf />;
     }
 

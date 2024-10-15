@@ -1,8 +1,9 @@
 import { Address } from '@ton/core';
-import { JettonsBalances } from '../../../tonApiV2';
+import { JettonBalance, JettonsBalances } from '../../../tonApiV2';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
+import { AssetAmount } from './asset-amount';
 
 export type TonAssetAddress = Address | 'TON';
 export function isTon(address: TonAssetAddress): address is 'TON' {
@@ -45,6 +46,20 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         address: Address.parseRaw(address),
         id: packAssetId(BLOCKCHAIN_NAME.TON, address)
     };
+}
+
+export function jettonToTonAssetAmount(jetton: JettonBalance): AssetAmount<TonAsset> {
+    const asset: TonAsset = {
+        symbol: jetton.jetton.symbol,
+        decimals: jetton.jetton.decimals,
+        name: jetton.jetton.name,
+        blockchain: BLOCKCHAIN_NAME.TON,
+        address: Address.parseRaw(jetton.jetton.address),
+        id: packAssetId(BLOCKCHAIN_NAME.TON, jetton.jetton.address),
+        image: jetton.jetton.image
+    };
+
+    return new AssetAmount({ weiAmount: jetton.balance, asset, image: jetton.jetton.image });
 }
 
 export function legacyTonAssetId(
