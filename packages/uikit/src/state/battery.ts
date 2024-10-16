@@ -215,18 +215,21 @@ export const useBatteryShouldBeReservedAmount = () => {
     }, [balance, config, rate]);
 };
 
-export const useBatteryPurchaseAssetCoefficient = (assetAddress: string) => {
+export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
+    const unitTonRate = useBatteryUnitTonRate();
     const methods = useBatteryAvailableRechargeMethods();
 
-    if (!methods) {
-        return undefined;
-    }
+    return useMemo(() => {
+        if (!methods) {
+            return undefined;
+        }
 
-    if (assetAddress.toUpperCase() === TON_ASSET.address) {
-        return methods.find(m => m.type === 'ton')!.rate;
-    }
+        if (assetAddress.toUpperCase() === TON_ASSET.address) {
+            return unitTonRate.div(methods.find(m => m.type === 'ton')!.rate);
+        }
 
-    return methods.find(m => m.jetton_master === assetAddress)!.rate;
+        return unitTonRate.div(methods.find(m => m.jetton_master === assetAddress)!.rate);
+    }, [unitTonRate, methods, assetAddress]);
 };
 
 export const useBatteryPacks = () => {
@@ -273,13 +276,12 @@ export const useBatteryPacks = () => {
     );
 };
 
-export const useBatteryPacksFeesApplied = (assetAddress: string) => {
+export const useBatteryPacksReservedApplied = () => {
     const packs = useBatteryPacks();
     const reserveAmount = useBatteryShouldBeReservedAmount();
-    const assetCoefficient = useBatteryPurchaseAssetCoefficient(assetAddress);
 
     return useMemo(() => {
-        if (!reserveAmount || !assetCoefficient) {
+        if (!reserveAmount) {
             return undefined;
         }
 
@@ -288,11 +290,7 @@ export const useBatteryPacksFeesApplied = (assetAddress: string) => {
             value: AssetAmount.fromRelativeAmount({
                 asset: TON_ASSET,
                 amount: p.value.relativeAmount.minus(reserveAmount.tonUnits.relativeAmount)
-            }),
-            price: AssetAmount.fromRelativeAmount({
-                asset: TON_ASSET,
-                amount: p.price.relativeAmount.div(assetCoefficient)
             })
         }));
-    }, [packs, reserveAmount, assetCoefficient]);
+    }, [packs, reserveAmount]);
 };

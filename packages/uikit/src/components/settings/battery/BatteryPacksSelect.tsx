@@ -1,19 +1,18 @@
 import { FC } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
-import { useBatteryPacksFeesApplied, useBatteryUnitTonRate } from '../../../state/battery';
+import {
+    useBatteryPacksReservedApplied,
+    useBatteryUnitTonRate,
+    usePurchaseBatteryUnitTokenRate
+} from '../../../state/battery';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { useTranslation } from '../../../hooks/translation';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { ColumnText } from '../../Layout';
-import {
-    legacyTonAssetId,
-    TonAsset,
-    tonAssetAddressToString
-} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { legacyTonAssetId, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useRate } from '../../../state/rates';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useUserFiat } from '../../../state/fiat';
 import { Radio } from '../../fields/Checkbox';
@@ -47,14 +46,15 @@ export const BatteryPacksSelect: FC<{
     selectedPackType?: string;
     onPackTypeChange: (packType: string) => void;
 }> = ({ className, asset, selectedPackType, onPackTypeChange }) => {
-    const packs = useBatteryPacksFeesApplied(tonAssetAddressToString(asset.address));
+    const packs = useBatteryPacksReservedApplied();
     const { t } = useTranslation();
-    const unitRate = useBatteryUnitTonRate();
+    const unitToTonRate = useBatteryUnitTonRate();
+    const unitToTokenRate = usePurchaseBatteryUnitTokenRate(legacyTonAssetId(asset));
+
     const { data: tokenRate } = useRate(legacyTonAssetId(asset));
-    const { data: tonRate } = useRate(legacyTonAssetId(TON_ASSET));
     const fiat = useUserFiat();
 
-    if (!tokenRate || !tonRate || !packs) {
+    if (!unitToTokenRate || !packs || !tokenRate) {
         return (
             <ListBlock className={className} margin={false}>
                 {[...new Array(4)].map((_, index) => (
@@ -69,19 +69,20 @@ export const BatteryPacksSelect: FC<{
         );
     }
 
-    const tokenToTonRate = new BigNumber(tokenRate.prices).div(tonRate.prices);
-
     const packCharges = (packValue: AssetAmount) =>
-        packValue.relativeAmount.div(unitRate).integerValue(BigNumber.ROUND_DOWN).toNumber();
+        packValue.relativeAmount.div(unitToTonRate).integerValue(BigNumber.ROUND_DOWN).toNumber();
 
     const packPriceInToken = (packPrice: AssetAmount) =>
         AssetAmount.fromRelativeAmount({
-            amount: packPrice.relativeAmount.div(tokenToTonRate),
+            amount: packPrice.relativeAmount.div(unitToTonRate).multipliedBy(unitToTokenRate),
             asset: asset
-        }).stringAssetRelativeAmount;
+        });
 
     const packPriceInFiat = (packPrice: AssetAmount) =>
-        formatFiatCurrency(fiat, packPrice.relativeAmount.multipliedBy(tonRate.prices));
+        formatFiatCurrency(
+            fiat,
+            packPriceInToken(packPrice).relativeAmount.multipliedBy(tokenRate.prices)
+        );
 
     return (
         <ListBlock className={className} margin={false}>
@@ -101,9 +102,9 @@ export const BatteryPacksSelect: FC<{
                             text={t('battery_charges', {
                                 charges: packCharges(pack.value)
                             })}
-                            secondary={`${packPriceInToken(pack.price)} · ${packPriceInFiat(
-                                pack.price
-                            )}`}
+                            secondary={`${
+                                packPriceInToken(pack.price).stringAssetRelativeAmount
+                            } · ${packPriceInFiat(pack.price)}`}
                         />
                         <RadioStyled checked={pack.type === selectedPackType} />
                     </ListItemPayloadStyled>

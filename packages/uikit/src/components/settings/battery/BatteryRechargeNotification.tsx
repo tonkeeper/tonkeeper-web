@@ -8,6 +8,8 @@ import { BatteryPacksSelect } from './BatteryPacksSelect';
 import { useAsset } from '../../../state/home';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useBatteryAvailableRechargeMethods } from '../../../state/battery';
+import { AmountDoubleInput } from '../../fields/AmountDoubleInput';
+import { BatteryCustomAmountInput } from './BatteryCustomAmountInput';
 
 const NotificationStyled = styled(Notification)`
     max-width: 400px;
@@ -42,6 +44,10 @@ const AssetSelectStyled = styled(AssetSelect)`
     margin-bottom: 1rem;
 `;
 
+const AmountDoubleInputStyled = styled(AmountDoubleInput)`
+    margin-top: 1rem;
+`;
+
 const BatteryRechargeNotificationContent: FC<{ preselectedAsset: TonAsset }> = ({
     preselectedAsset
 }) => {
@@ -61,6 +67,7 @@ const BatteryRechargeNotificationContent: FC<{ preselectedAsset: TonAsset }> = (
                 selectedPackType={selectedPackType}
                 onPackTypeChange={setSelectedPackType}
             />
+            <BatteryCustomAmountInput asset={asset} />
         </ContentWrapper>
     );
 };
