@@ -113,6 +113,7 @@ const StyledDiv = styled.div<{ windowWidth: number }>`
 
     video {
         z-index: 1;
+        position: relative;
         display: inline-block;
         height: 100%;
         transform: matrix(-1, 0, 0, 1, 0, 0);
