@@ -268,7 +268,15 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
         const availableOptions = Object.entries(result).filter(([_, v]) => v !== undefined);
         if (availableOptions.length === 0) {
-            setSelectedMnemonicType(await getMnemonicTypeFallback(m));
+            const typeToSet = await getMnemonicTypeFallback(m);
+            if (typeToSet === 'tonKeychain') {
+                const newAccountMam = await createAccountMam({
+                    mnemonic: m,
+                    selectAccount: true
+                });
+                setCreatedAccount(newAccountMam);
+            }
+            setSelectedMnemonicType(typeToSet);
         } else if (availableOptions.length === 1) {
             await onSelectMnemonicTypePure(availableOptions[0][0] as ImportMnemonicType, m, result);
         }
