@@ -14,7 +14,7 @@ import {
     isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { AuthKeychain } from '@tonkeeper/core/dist/entries/password';
+import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import {
     isStandardTonWallet,
     TonWalletConfig,
@@ -211,7 +211,7 @@ export const useCreateMAMAccountDerivation = () => {
 
         const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
 
-        const root = await TonKeychainRoot.fromMnemonic(mnemonic);
+        const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
         const tonAccount = await root.getTonAccount(newDerivationIndex);
 
         const tonWallet = walletContract(
@@ -394,11 +394,12 @@ export const useCreateAccountMnemonic = () => {
         Error,
         {
             mnemonic: string[];
+            mnemonicType: MnemonicType;
             password?: string;
             versions: WalletVersion[];
             selectAccount?: boolean;
         }
-    >(async ({ mnemonic, password, versions, selectAccount }) => {
+    >(async ({ mnemonic, password, versions, selectAccount, mnemonicType }) => {
         const valid = await seeIfMnemonicValid(mnemonic);
         if (!valid) {
             throw new Error('Mnemonic is not valid.');
@@ -409,6 +410,7 @@ export const useCreateAccountMnemonic = () => {
                 context,
                 sdk.storage,
                 mnemonic,
+                mnemonicType,
                 {
                     auth: {
                         kind: 'keychain'
@@ -434,13 +436,19 @@ export const useCreateAccountMnemonic = () => {
         }
 
         const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
-        const account = await createStandardTonAccountByMnemonic(context, sdk.storage, mnemonic, {
-            auth: {
-                kind: 'password',
-                encryptedMnemonic
-            },
-            versions
-        });
+        const account = await createStandardTonAccountByMnemonic(
+            context,
+            sdk.storage,
+            mnemonic,
+            mnemonicType,
+            {
+                auth: {
+                    kind: 'password',
+                    encryptedMnemonic
+                },
+                versions
+            }
+        );
 
         await addAccountToState(account);
         if (selectAccount) {

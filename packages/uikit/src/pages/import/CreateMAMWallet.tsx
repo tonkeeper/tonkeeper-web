@@ -8,10 +8,8 @@ import {
     GearLottieIcon,
     WriteLottieIcon
 } from '../../components/lottie/LottieIcons';
-import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { FinalView } from './Password';
-import { Subscribe } from './Subscribe';
 import { Account, AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import {
     useCreateAccountMAM,
@@ -28,7 +26,6 @@ import {
 } from '../../components/Notification';
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
-    const sdk = useAppSdk();
     const { t } = useTranslation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
         useCreateAccountMAM();
@@ -44,7 +41,6 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     const [infoPagePassed, setInfoPagePassed] = useState(false);
     const [wordsPagePassed, setWordsPagePassed] = useState(false);
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
-    const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
 
     const [wordsShown, setWordsShown] = useState(false);
 
@@ -200,16 +196,6 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
-            />
-        );
-    }
-
-    if (sdk.notifications && !notificationsSubscribePagePassed) {
-        return (
-            <Subscribe
-                wallet={createdAccount.activeTonWallet}
-                mnemonic={mnemonic}
-                onDone={() => setPassNotification(true)}
             />
         );
     }
