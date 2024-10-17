@@ -232,7 +232,7 @@ const CreateMultisigFormPage: FC<{
                 .concat(data.firstParticipant)
                 .map(v => Address.parse(v)),
             threshold: data.quorum,
-            allowArbitrarySeqno: false
+            allowArbitrarySeqno: true
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
         setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.fee.weiAmount });
