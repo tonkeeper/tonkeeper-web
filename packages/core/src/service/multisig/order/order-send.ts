@@ -36,14 +36,19 @@ export const getOrderSeqno = async (options: {
         throw new Error("Can't get next seqno");
     }
 
-    if (nextSeqno.startsWith('-')) {
-        if (Number(nextSeqno.slice(1)) !== 1) {
-            throw new Error('Invalid next seqno');
-        }
+    let nextSeqnoParsed = parseInt(nextSeqno);
 
-        return BigInt(Date.now());
-    } else {
+    if (nextSeqnoParsed < -1) {
+        throw new Error('Invalid next seqno');
+    }
+
+    /**
+     * if ~ allow_arbitrary_order_seqno
+     */
+    if (nextSeqnoParsed !== -1) {
         return MAX_ORDER_SEQNO;
+    } else {
+        return BigInt(Date.now());
     }
 };
 
