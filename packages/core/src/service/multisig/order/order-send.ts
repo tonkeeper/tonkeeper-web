@@ -11,13 +11,41 @@ import {
 } from '../../transfer/common';
 import BigNumber from 'bignumber.js';
 import { Signer } from '../../../entries/signer';
-import { createNewOrderMessage, MAX_ORDER_SEQNO, NewOrder } from './order-utils';
+import { createNewOrderMessage, NewOrder } from './order-utils';
 
 const createOrderAmount = toNano(0.05);
 const signOrderAmount = toNano(0.05);
 export const orderActionMinAmount = new BigNumber(
     createOrderAmount > signOrderAmount ? createOrderAmount.toString() : signOrderAmount.toString()
 );
+
+const MAX_ORDER_SEQNO =
+    115792089237316195423570985008687907853269984665640564039457584007913129639935n;
+
+export const getOrderSeqno = async (options: {
+    api: APIConfig;
+    multisig: Pick<Multisig, 'address'>;
+}) => {
+    const result = await new BlockchainApi(options.api.tonApiV2).execGetMethodForBlockchainAccount({
+        accountId: options.multisig.address,
+        methodName: 'get_multisig_data'
+    });
+
+    const nextSeqno = result.stack[0]?.num;
+    if (nextSeqno === undefined) {
+        throw new Error("Can't get next seqno");
+    }
+
+    if (nextSeqno.startsWith('-')) {
+        if (Number(nextSeqno.slice(1)) !== 1) {
+            throw new Error('Invalid next seqno');
+        }
+
+        return MAX_ORDER_SEQNO;
+    } else {
+        return BigInt(Date.now());
+    }
+};
 
 export async function sendCreateOrder(options: {
     api: APIConfig;
@@ -37,6 +65,8 @@ export async function sendCreateOrder(options: {
         }
     }
 
+    const newOrderSeqno = await getOrderSeqno({ api: options.api, multisig: options.multisig });
+
     const queryId = getTonkeeperQueryId();
 
     const body = createNewOrderMessage(
@@ -44,7 +74,7 @@ export async function sendCreateOrder(options: {
         options.order.validUntilSeconds,
         isSigner,
         addrIdx,
-        MAX_ORDER_SEQNO,
+        newOrderSeqno,
         queryId
     );
 

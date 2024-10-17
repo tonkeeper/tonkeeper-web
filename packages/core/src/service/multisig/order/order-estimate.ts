@@ -6,11 +6,12 @@ import {
     Multisig,
     MultisigOrder
 } from '../../../tonApiV2';
-import { MAX_ORDER_SEQNO, NewOrder, packOrderBody } from './order-utils';
+import { NewOrder, packOrderBody } from './order-utils';
 import { Address, beginCell, Cell, toNano, storeMessage, Dictionary } from '@ton/core';
 import { arrayToCell, MultisigOp, MultisigParams } from '../utils';
 import { bufferToBigInt } from '../../../utils/common';
 import { MultisigConfig } from '../deploy';
+import { getOrderSeqno } from './order-send';
 
 export type OrderEstimation =
     | { type: 'transfer'; event: AccountEvent }
@@ -128,27 +129,7 @@ async function estimateOrderByBodyCell(options: {
 }) {
     let orderSeqno: number | bigint | undefined = options.orderSeqno;
     if (orderSeqno === undefined) {
-        const result = await new BlockchainApi(
-            options.api.tonApiV2
-        ).execGetMethodForBlockchainAccount({
-            accountId: options.multisig.address,
-            methodName: 'get_multisig_data'
-        });
-
-        const nextSeqno = result.stack[0]?.num;
-        if (nextSeqno === undefined) {
-            throw new Error("Can't get next seqno");
-        }
-
-        if (nextSeqno.startsWith('-')) {
-            if (Number(nextSeqno.slice(1)) !== 1) {
-                throw new Error('Invalid next seqno');
-            }
-
-            orderSeqno = MAX_ORDER_SEQNO;
-        } else {
-            orderSeqno = Number(nextSeqno);
-        }
+        orderSeqno = await getOrderSeqno({ api: options.api, multisig: options.multisig });
     }
 
     const execRes = await new BlockchainApi(options.api.tonApiV2).execGetMethodForBlockchainAccount(
