@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { replaceTypedDecimalSeparator, seeIfValueValid } from '../transfer/amountView/AmountViewUI';
 import { getTextWidth } from '../../hooks/textWidth';
@@ -74,9 +74,18 @@ const getInputSize = (
     const max = parent.clientWidth - label.clientWidth - 1;
     let fontSize = originalFontSize;
     let width = getTextWidth(value, `600 ${fontSize}px 'Montserrat'`);
+
+    let iteration = 0;
     while (Math.round(width) > max - 115) {
         fontSize = Math.max(1, fontSize - 1);
         width = getTextWidth(value, `600 ${fontSize}px 'Montserrat'`);
+        iteration = iteration + 1;
+        if (iteration > 100) {
+            return {
+                width: Math.max(Math.round(width) + 5, value.length * 6, 30),
+                fontSize
+            };
+        }
     }
 
     return {
@@ -117,6 +126,8 @@ const Symbol = styled.span<{ $fontSize: number }>`
 `;
 
 const SecondCurrencyBlock = styled(Body1)`
+    display: flex;
+    align-items: center;
     cursor: pointer;
     z-index: 2;
 
@@ -140,13 +151,16 @@ export interface InputCurrency {
     decimals: number;
 }
 
-export const AmountDoubleInput: FC<{
-    className?: string;
-    fontSize?: number;
-    currencies: InputCurrency[];
-    rate: number | BigNumber | ((val: { currencyId: string; value: BigNumber }) => BigNumber);
-    onChange?: (val: { currencyId: string; input: string }) => void;
-}> = ({ onChange, currencies, className, fontSize = 28, rate }) => {
+export const AmountDoubleInput = forwardRef<
+    HTMLInputElement,
+    {
+        className?: string;
+        fontSize?: number;
+        currencies: InputCurrency[];
+        rate: number | BigNumber | ((val: { currencyId: string; value: BigNumber }) => BigNumber);
+        onChange?: (val: { currencyId: string; input: BigNumber }) => void;
+    }
+>(({ onChange, currencies, className, fontSize = 28, rate }, ref) => {
     const containerRef = useRef<HTMLLabelElement | null>(null);
     const labelRef = useRef<HTMLSpanElement | null>(null);
     const [size, setSize] = useState({
@@ -162,7 +176,7 @@ export const AmountDoubleInput: FC<{
     });
 
     useLayoutEffect(() => {
-        if (containerRef.current && labelRef.current) {
+        if (containerRef.current && labelRef.current && containerRef.current.clientWidth) {
             setSize(
                 getInputSize(
                     currencyAmount.inputValue,
@@ -173,6 +187,9 @@ export const AmountDoubleInput: FC<{
             );
         }
     }, [currencyAmount.inputValue, fontSize]);
+
+    const inputValueToBN = (v: string) =>
+        new BigNumber(removeGroupSeparator(v).replace(getDecimalSeparator(), '.'));
 
     const onInput = (newValue: string) => {
         const decimals = currencies.find(c => c.id === currencyAmount.activeCurrencyId)!.decimals;
@@ -188,7 +205,7 @@ export const AmountDoubleInput: FC<{
             }));
             onChange?.({
                 currencyId: currencyAmount.activeCurrencyId,
-                input: ''
+                input: new BigNumber(0)
             });
             return;
         }
@@ -196,7 +213,7 @@ export const AmountDoubleInput: FC<{
         if (!seeIfValueValid(inputValue, decimals)) {
             onChange?.({
                 currencyId: currencyAmount.activeCurrencyId,
-                input: ''
+                input: new BigNumber(0)
             });
             return;
         }
@@ -206,9 +223,7 @@ export const AmountDoubleInput: FC<{
 
         if (isNumeric(inputValue) && !inputValue.endsWith(getDecimalSeparator())) {
             const formattedInput = formatSendValue(inputValue);
-            const bnInput = new BigNumber(
-                removeGroupSeparator(inputValue).replace(getDecimalSeparator(), '.')
-            );
+            const bnInput = inputValueToBN(inputValue);
 
             if (currencyAmount.activeCurrencyId === currencies[1].id) {
                 const bnValue1 =
@@ -239,7 +254,9 @@ export const AmountDoubleInput: FC<{
 
         onChange?.({
             currencyId: currencyAmount.activeCurrencyId,
-            input: currencyAmount.activeCurrencyId === currencies[0].id ? value1 : value2
+            input: inputValueToBN(
+                currencyAmount.activeCurrencyId === currencies[0].id ? value1 : value2
+            )
         });
 
         setCurrencyAmount({
@@ -263,12 +280,17 @@ export const AmountDoubleInput: FC<{
                 currencyAmount.activeCurrencyId === currencies[0].id
                     ? currencies[1].id
                     : currencies[0].id,
-            input:
+            input: inputValueToBN(
                 currencyAmount.activeCurrencyId === currencies[0].id
                     ? currencyAmount.value2
                     : currencyAmount.value1
+            )
         });
     };
+
+    useEffect(() => {
+        onInput(currencyAmount.inputValue);
+    }, [currencies]);
 
     const activeCurrency = currencies.find(c => c.id === currencyAmount.activeCurrencyId)!;
     const notActiveCurrency = currencies.find(c => c.id !== currencyAmount.activeCurrencyId)!;
@@ -276,7 +298,12 @@ export const AmountDoubleInput: FC<{
     return (
         <AmountBlock ref={containerRef} className={className}>
             <InputBlock>
-                <Sentence value={currencyAmount.inputValue} setValue={onInput} inputSize={size} />
+                <Sentence
+                    ref={ref}
+                    value={currencyAmount.inputValue}
+                    setValue={onInput}
+                    inputSize={size}
+                />
                 <Symbol ref={labelRef} $fontSize={size.fontSize}>
                     {activeCurrency.label}
                 </Symbol>
@@ -289,4 +316,4 @@ export const AmountDoubleInput: FC<{
             </SecondCurrencyBlock>
         </AmountBlock>
     );
-};
+});

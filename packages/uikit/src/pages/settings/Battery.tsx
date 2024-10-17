@@ -134,7 +134,7 @@ export const BatteryPageContent: FC = () => {
                     </RefundsLink>
                 )}
             </RefundsBlock>
-            <BatteryRechargeNotification isOpen={false} onClose={() => {}} />
+            <BatteryRechargeNotification isOpen={true} onClose={() => {}} />
         </ContentWrapper>
     );
 };

@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import styled, { useTheme } from 'styled-components';
+import { FC, useCallback, useEffect } from 'react';
+import styled, { css, useTheme } from 'styled-components';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
 import {
     useBatteryPacksReservedApplied,
@@ -17,10 +17,18 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useUserFiat } from '../../../state/fiat';
 import { Radio } from '../../fields/Checkbox';
 import { SkeletonImage, SkeletonText } from '../../shared/Skeleton';
+import { useAssetWeiBalance } from '../../../state/home';
 
-const ListItemStyled = styled(ListItem)`
+const ListItemStyled = styled(ListItem)<{ $disabled?: boolean }>`
     padding: 0;
     cursor: pointer;
+
+    ${p =>
+        p.$disabled &&
+        css`
+            opacity: 0.6;
+            cursor: not-allowed;
+        `}
 
     & + & > div {
         padding-top: 11px;
@@ -54,7 +62,50 @@ export const BatteryPacksSelect: FC<{
     const { data: tokenRate } = useRate(legacyTonAssetId(asset));
     const fiat = useUserFiat();
 
-    if (!unitToTokenRate || !packs || !tokenRate) {
+    const assetWeiBalance = useAssetWeiBalance(asset);
+
+    const packPriceInToken = useCallback(
+        (packPrice: AssetAmount) =>
+            AssetAmount.fromRelativeAmount({
+                amount: packPrice.relativeAmount
+                    .div(unitToTonRate)
+                    .multipliedBy(unitToTokenRate || 1),
+                asset: asset
+            }),
+        [asset, unitToTonRate, unitToTokenRate]
+    );
+
+    const isPackAvailable = useCallback(
+        (packPrice: AssetAmount) =>
+            assetWeiBalance && packPriceInToken(packPrice).weiAmount.lt(assetWeiBalance),
+        [assetWeiBalance, packPriceInToken]
+    );
+
+    const allDataFetched = unitToTokenRate && packs && tokenRate && assetWeiBalance;
+
+    useEffect(() => {
+        if (!allDataFetched) {
+            return;
+        }
+
+        if (selectedPackType === 'custom') {
+            return;
+        }
+
+        const selectedPack = packs!.find(p => p.type === selectedPackType);
+        if (selectedPack && isPackAvailable(selectedPack.price)) {
+            return;
+        }
+
+        const firstAvailablePack = packs!.find(p => isPackAvailable(p.price));
+        if (firstAvailablePack) {
+            onPackTypeChange(firstAvailablePack.type);
+        } else {
+            onPackTypeChange('custom');
+        }
+    }, [isPackAvailable, packs, allDataFetched, selectedPackType, onPackTypeChange]);
+
+    if (!allDataFetched) {
         return (
             <ListBlock className={className} margin={false}>
                 {[...new Array(4)].map((_, index) => (
@@ -72,12 +123,6 @@ export const BatteryPacksSelect: FC<{
     const packCharges = (packValue: AssetAmount) =>
         packValue.relativeAmount.div(unitToTonRate).integerValue(BigNumber.ROUND_DOWN).toNumber();
 
-    const packPriceInToken = (packPrice: AssetAmount) =>
-        AssetAmount.fromRelativeAmount({
-            amount: packPrice.relativeAmount.div(unitToTonRate).multipliedBy(unitToTokenRate),
-            asset: asset
-        });
-
     const packPriceInFiat = (packPrice: AssetAmount) =>
         formatFiatCurrency(
             fiat,
@@ -90,8 +135,9 @@ export const BatteryPacksSelect: FC<{
                 <ListItemStyled
                     key={pack.type}
                     hover={false}
+                    $disabled={!isPackAvailable(pack.price)}
                     onClick={() => {
-                        if (pack.type !== selectedPackType) {
+                        if (pack.type !== selectedPackType && isPackAvailable(pack.price)) {
                             onPackTypeChange(pack.type);
                         }
                     }}

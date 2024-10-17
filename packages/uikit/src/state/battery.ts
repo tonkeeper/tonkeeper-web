@@ -16,6 +16,8 @@ import { TON_ASSET, TON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/a
 import { useJettonList } from './jetton';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
+import { jettonTransferAmount } from '@tonkeeper/core/dist/service/transfer/jettonService';
+import { toNano } from '@ton/core';
 
 const useBatteryApi = () => {
     const { config } = useAppContext();
@@ -147,6 +149,36 @@ export const useBatteryUnitTonRate = () => {
     } = useAppContext();
 
     return useMemo(() => new BigNumber(batteryMeanFees || '0.0026'), [batteryMeanFees]);
+};
+
+export const useBatteryMinBootstrapValue = (assetAddress: string) => {
+    const methods = useBatteryAvailableRechargeMethods();
+    const { data: balance } = useBatteryBalance();
+
+    return useMemo(() => {
+        if (!methods || !balance) {
+            return undefined;
+        }
+
+        if (assetAddress.toUpperCase() === TON_ASSET.address) {
+            return new BigNumber(0);
+        }
+
+        if (
+            balance.tonUnitsBalance.weiAmount.gt(
+                new BigNumber((jettonTransferAmount + toNano(0.03)).toString())
+            )
+        ) {
+            return new BigNumber(0);
+        }
+        const method = methods.find(m => m.jetton_master === assetAddress)!;
+
+        if (!method.min_bootstrap_value) {
+            return new BigNumber(0);
+        }
+
+        return new BigNumber(method.min_bootstrap_value);
+    }, [methods, balance, assetAddress]);
 };
 
 export type BatteryBalance = {
