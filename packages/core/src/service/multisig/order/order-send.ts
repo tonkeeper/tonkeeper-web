@@ -41,9 +41,9 @@ export const getOrderSeqno = async (options: {
             throw new Error('Invalid next seqno');
         }
 
-        return MAX_ORDER_SEQNO;
-    } else {
         return BigInt(Date.now());
+    } else {
+        return MAX_ORDER_SEQNO;
     }
 };
 
