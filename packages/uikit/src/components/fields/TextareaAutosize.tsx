@@ -1,7 +1,7 @@
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 const useEnhancedEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
 
@@ -110,6 +110,13 @@ const Textarea = styled.textarea`
     resize: none;
 
     word-break: break-all;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            font-size: 14px;
+            padding-top: 24px;
+        `}
 `;
 
 function isEmpty(obj: State) {

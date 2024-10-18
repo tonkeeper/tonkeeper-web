@@ -1,5 +1,5 @@
 import { Notification } from '../../Notification';
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
 import { AssetSelect } from '../../fields/AssetSelect';
@@ -19,6 +19,8 @@ import { ButtonResponsiveSize } from '../../fields/Button';
 import { BuyBatteryConfirmNotification } from './BuyBatteryConfirmNotification';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useToast } from '../../../hooks/useNotification';
+import { TonRecipientInput } from '../../fields/TonRecipientInput';
+import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 const NotificationStyled = styled(Notification)`
     max-width: 400px;
@@ -28,7 +30,8 @@ export const BatteryRechargeNotification: FC<{
     isOpen: boolean;
     onClose: () => void;
     preselectAssetId?: string;
-}> = ({ isOpen, onClose, preselectAssetId = TON_ASSET.id }) => {
+    asGift: boolean;
+}> = ({ isOpen, onClose, asGift, preselectAssetId = TON_ASSET.id }) => {
     const { t } = useTranslation();
     const preselectedAsset = useAsset(preselectAssetId);
 
@@ -43,6 +46,7 @@ export const BatteryRechargeNotification: FC<{
                     <BatteryRechargeNotificationContent
                         preselectedAsset={preselectedAsset}
                         onClose={onClose}
+                        asGift={asGift}
                     />
                 )
             }
@@ -54,6 +58,14 @@ const ContentWrapper = styled.div``;
 
 const AssetSelectStyled = styled(AssetSelect)`
     margin-bottom: 1rem;
+
+    min-height: 52px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    > * {
+        flex: 1;
+    }
 `;
 
 const BatteryCustomAmountInputStyled = styled(BatteryCustomAmountInput)`
@@ -65,10 +77,15 @@ const ButtonResponsiveSizeStyled = styled(ButtonResponsiveSize)`
     margin-top: 16px;
 `;
 
+const TonRecipientInputStyled = styled(TonRecipientInput)`
+    margin-bottom: 16px;
+`;
+
 const BatteryRechargeNotificationContent: FC<{
     preselectedAsset: TonAsset;
+    asGift: boolean;
     onClose: () => void;
-}> = ({ preselectedAsset, onClose }) => {
+}> = ({ preselectedAsset, onClose, asGift }) => {
     const [asset, setAsset] = useState(preselectedAsset);
     useEffect(() => {
         setAsset(preselectedAsset);
@@ -98,7 +115,35 @@ const BatteryRechargeNotificationContent: FC<{
         }
     };
 
+    const [customReceiver, setCustomReceiver] = useState<{
+        isLoading: boolean;
+        isErrored: boolean;
+        value: TonRecipient | undefined;
+    }>({
+        isLoading: false,
+        isErrored: false,
+        value: undefined
+    });
+    const [formSubmitted, setFormSubmitted] = useState(false);
+    const giftInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (asGift && giftInputRef.current) {
+            giftInputRef.current.focus();
+        }
+    }, [asGift]);
+
     const onOpenNotification = () => {
+        if (asGift) {
+            if (!customReceiver.value) {
+                return setFormSubmitted(true);
+            }
+
+            if (customReceiver.isErrored || customReceiver.isLoading) {
+                return;
+            }
+        }
+
         if (!selectedPackType) {
             throw new Error('No pack type selected');
         }
@@ -133,6 +178,13 @@ const BatteryRechargeNotificationContent: FC<{
 
     return (
         <ContentWrapper>
+            {asGift && (
+                <TonRecipientInputStyled
+                    ref={giftInputRef}
+                    onStateChange={setCustomReceiver}
+                    isFormSubmitted={formSubmitted}
+                />
+            )}
             <AssetSelectStyled
                 selectedAssetId={asset.id}
                 onAssetChange={setAsset}

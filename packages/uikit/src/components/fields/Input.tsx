@@ -50,6 +50,10 @@ export const InputBlock = styled.div<{
                 ? css`
                       display: none;
                   `
+                : p.theme.displayType === 'full-width'
+                ? css`
+                      transform: translate(0, 10px) scale(0.7);
+                  `
                 : css`
                       transform: translate(0, 12px) scale(0.7);
                   `}
@@ -79,6 +83,13 @@ export const InputBlock = styled.div<{
         props.isSuccess &&
         css`
             border: 1px solid ${props.theme.accentGreen};
+        `}
+
+    ${props =>
+        props.size !== 'small' &&
+        props.theme.displayType === 'full-width' &&
+        css`
+            min-height: 52px;
         `}
 `;
 
@@ -123,10 +134,20 @@ export const Label = styled.label<{ active?: boolean }>`
     left: 1rem;
 
     ${props =>
-        props.active &&
+        props.theme.displayType === 'full-width' &&
         css`
-            transform: translate(0, 12px) scale(0.7);
+            transform: translate(0, 18px) scale(1);
         `}
+
+    ${props =>
+        props.active &&
+        (props.theme.displayType === 'full-width'
+            ? css`
+                  transform: translate(0, 10px) scale(0.7);
+              `
+            : css`
+                  transform: translate(0, 12px) scale(0.7);
+              `)}
 `;
 
 export const OuterBlock = styled.div`

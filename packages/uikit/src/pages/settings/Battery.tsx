@@ -23,6 +23,7 @@ import { IconButtonTransparentBackground } from '../../components/fields/IconBut
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAppContext } from '../../hooks/appContext';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
@@ -112,12 +113,15 @@ export const BatteryPageContent: FC = () => {
         config: { batteryRefundEndpoint }
     } = useAppContext();
     const [preselectedRechargeAsset, setPreselectedRechargeAsset] = useState<string | undefined>();
+    const [asGift, setAsGift] = useState(false);
 
     const onMethodSelected = (value: { type: 'asset'; assetId: string } | { type: 'gift' }) => {
         if (value.type === 'asset') {
+            setAsGift(false);
             setPreselectedRechargeAsset(value.assetId);
         } else {
-            // TODO
+            setAsGift(true);
+            setPreselectedRechargeAsset(TON_ASSET.id);
         }
     };
 
@@ -146,7 +150,11 @@ export const BatteryPageContent: FC = () => {
             <BatteryRechargeNotification
                 isOpen={preselectedRechargeAsset !== undefined}
                 preselectAssetId={preselectedRechargeAsset}
-                onClose={() => setPreselectedRechargeAsset(undefined)}
+                onClose={() => {
+                    setPreselectedRechargeAsset(undefined);
+                    setTimeout(() => setAsGift(false), 300);
+                }}
+                asGift={asGift}
             />
         </ContentWrapper>
     );

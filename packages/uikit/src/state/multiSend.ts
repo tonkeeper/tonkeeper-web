@@ -13,15 +13,13 @@ import {
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { csvStringToArray } from '@tonkeeper/core/dist/service/parserService';
-import { DNSApi, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
-import { useCallback } from 'react';
 import { ErrorOption } from 'react-hook-form';
-import { seeIfInvalidDns } from '../components/transfer/RecipientView';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
+import { useTonRecipientValidator } from "../components/fields/TonRecipientInput";
 
 export type MultiSendRow = {
     receiver: TonRecipient | null;
@@ -41,72 +39,6 @@ export interface MultiSendList {
 }
 
 export type MultiSendListTemplate = Omit<MultiSendList, 'id'> & { id?: number };
-
-export const useMultiSendReceiverValidator = () => {
-    const { api } = useAppContext();
-    return useCallback<
-        (
-            val: string
-        ) => Promise<ErrorOption | undefined | null | { success: true; result: TonRecipient }>
-    >(
-        async (value: string) => {
-            value = value.trim();
-
-            if (!value) {
-                return {
-                    message: 'Empty receiver'
-                };
-            }
-
-            if (seeIfValidTonAddress(value)) {
-                let bounce = false;
-                if (Address.isFriendly(value)) {
-                    bounce = Address.parseFriendly(value).isBounceable;
-                }
-
-                return {
-                    success: true,
-                    result: {
-                        address: value,
-                        bounce,
-                        blockchain: BLOCKCHAIN_NAME.TON
-                    }
-                };
-            }
-
-            if (seeIfInvalidDns(value)) {
-                return {
-                    message: 'Wrong address format'
-                };
-            }
-            value = value.toLowerCase();
-
-            try {
-                const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: value });
-                if (result.wallet) {
-                    return {
-                        success: true,
-                        result: {
-                            address: result.wallet.address,
-                            dns: result.wallet,
-                            blockchain: BLOCKCHAIN_NAME.TON
-                        }
-                    };
-                } else {
-                    return {
-                        message: 'Wrong DNS wallet'
-                    };
-                }
-            } catch (e) {
-                console.error(e);
-                return {
-                    message: 'Wrong DNS wallet'
-                };
-            }
-        },
-        [api]
-    );
-};
 
 export const useUserMultiSendLists = () => {
     const sdk = useAppSdk();
@@ -191,7 +123,7 @@ export class ListImportError extends Error {
 export const useParseCsvListMutation = () => {
     const { api } = useAppContext();
     const { data: lists } = useUserMultiSendLists();
-    const receiverValidator = useMultiSendReceiverValidator();
+    const receiverValidator = useTonRecipientValidator();
 
     return useMutation<{ list: MultiSendList; selectedFiat: FiatCurrencies | null }, Error, File>(
         async (csv: File) => {
@@ -449,7 +381,7 @@ export const getPastedTable = async (
           }
     >
 ): Promise<MultiSendRow[] | null> => {
-    if (clipText.trim() == '') return null;
+    if (clipText.trim() === '') return null;
 
     const clipRows = clipText.split('\n');
 
