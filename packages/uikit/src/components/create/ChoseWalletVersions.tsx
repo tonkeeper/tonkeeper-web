@@ -19,6 +19,7 @@ import { Body1, Body2, Body2Class, H2Label2Responsive, Label1 } from '../Text';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
+import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -65,9 +66,10 @@ const SubmitBlock = styled.div`
 
 export const ChoseWalletVersions: FC<{
     mnemonic: string[];
+    mnemonicType: MnemonicType;
     onSubmit: (versions: WalletVersion[]) => void;
     isLoading?: boolean;
-}> = ({ mnemonic, onSubmit, isLoading }) => {
+}> = ({ mnemonic, onSubmit, isLoading, mnemonicType }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { defaultWalletVersion } = useAppContext();
@@ -84,7 +86,7 @@ export const ChoseWalletVersions: FC<{
     }, []);
 
     useEffect(() => {
-        mnemonicToKeypair(mnemonic).then(keypair =>
+        mnemonicToKeypair(mnemonic, mnemonicType).then(keypair =>
             setPublicKey(keypair.publicKey.toString('hex'))
         );
     }, [mnemonic]);

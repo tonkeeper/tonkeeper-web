@@ -1,6 +1,6 @@
 import React, { FC, useContext, useMemo, useState } from 'react';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { ImportWords } from '../../components/create/Words';
+import { ImportMnemonicType, ImportWords, SelectMnemonicType } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
@@ -20,6 +20,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import {
     createStandardTonAccountByMnemonic,
+    getMAMAccountWalletsInfo,
     getStandardTonWalletVersions
 } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../../hooks/appContext';
@@ -34,16 +35,16 @@ import {
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
 import { TonKeychainRoot } from '@ton-keychain/core';
-import {
-    mnemonicToKeypair,
-    validateMnemonicStandardOrBip39Ton
-} from '@tonkeeper/core/dist/service/mnemonicService';
 import { useMutation } from '@tanstack/react-query';
 import { useUserFiat } from '../../state/fiat';
+import { mnemonicValidate } from '@ton/crypto';
+import {
+    mnemonicToKeypair,
+    validateBip39Mnemonic
+} from '@tonkeeper/core/dist/service/mnemonicService';
+import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 
 const useProcessMnemonic = () => {
-    const { mutateAsync: createAccountMam } = useCreateAccountMAM();
-
     const context = useAppContext();
     const network = useActiveTonNetwork();
     const fiat = useUserFiat();
@@ -51,73 +52,178 @@ const useProcessMnemonic = () => {
     const accounts = useAccountsState();
 
     return useMutation<
-        | { type: 'exisiting'; account: Account; walletId: WalletId }
-        | { type: 'created'; account: AccountMAM }
-        | undefined,
+        {
+            tonKeychain:
+                | { type: 'create' }
+                | { type: 'exisiting'; account: Account; walletId: WalletId }
+                | undefined;
+            tonMnemonic:
+                | {
+                      type: 'select-versions';
+                  }
+                | { type: 'exisiting'; account: Account; walletId: WalletId }
+                | undefined;
+            bip39:
+                | { type: 'select-versions' }
+                | { type: 'exisiting'; account: Account; walletId: WalletId }
+                | undefined;
+        },
         Error,
         string[]
     >(async mnemonic => {
-        let isLegacyMAM = false;
+        let tonKeychain = undefined;
+        let tonMnemonic = undefined;
+        let bip39 = undefined;
 
-        const mightBeLegacyMAM = await TonKeychainRoot.isValidMnemonicLegacy(mnemonic);
-        const isValidForUsualWallet = await validateMnemonicStandardOrBip39Ton(mnemonic);
-        if (mightBeLegacyMAM && isValidForUsualWallet) {
-            const keyPair = await mnemonicToKeypair(mnemonic);
-            const publicKey = keyPair.publicKey.toString('hex');
-            const versions = await getStandardTonWalletVersions({
-                publicKey,
-                network,
-                api: context.api,
-                fiat
-            });
-
-            const walletWasInitialised = versions.some(v => v.tonBalance > 0 || v.hasJettons);
-            isLegacyMAM = !walletWasInitialised;
-        }
-
-        const isMam = await TonKeychainRoot.isValidMnemonic(mnemonic);
-        if (isMam || isLegacyMAM) {
-            const possibleNewAccount = await TonKeychainRoot.fromMnemonic(mnemonic, {
+        const mightBeMAM = await TonKeychainRoot.isValidMnemonicLegacy(mnemonic);
+        if (mightBeMAM) {
+            const possibleMAMAccount = await TonKeychainRoot.fromMnemonic(mnemonic, {
                 allowLegacyMnemonic: true
             });
 
-            const existingAcc = accounts.find(a => a.id === possibleNewAccount.id);
+            const existingAcc = accounts.find(a => a.id === possibleMAMAccount.id);
             if (existingAcc) {
-                return {
+                tonKeychain = {
                     type: 'exisiting',
                     account: existingAcc,
                     walletId: existingAcc.activeTonWallet.id
                 } as const;
-            }
+            } else {
+                const wallets = await getMAMAccountWalletsInfo({
+                    account: possibleMAMAccount,
+                    network,
+                    api: context.api,
+                    fiat,
+                    walletVersion: context.defaultWalletVersion
+                });
 
-            const newAccountMam = await createAccountMam({ mnemonic, selectAccount: true });
-            return {
-                type: 'created',
-                account: newAccountMam
-            } as const;
-        }
-
-        const _account = await createStandardTonAccountByMnemonic(context, sdk.storage, mnemonic, {
-            auth: {
-                kind: 'keychain'
-            },
-            versions: [
-                WalletVersion.V5R1,
-                WalletVersion.V5_BETA,
-                WalletVersion.V4R2,
-                WalletVersion.V3R2,
-                WalletVersion.V3R1
-            ]
-        });
-
-        for (const w of _account.allTonWallets) {
-            const existingAcc = getAccountByWalletById(accounts, w.id);
-            if (existingAcc) {
-                return { type: 'exisiting', account: existingAcc, walletId: w.id };
-                break;
+                const shouldCreateMam = wallets.some(v => v.tonBalance > 0 || v.hasJettons);
+                if (shouldCreateMam) {
+                    tonKeychain = {
+                        type: 'create'
+                    } as const;
+                }
             }
         }
+
+        const isValidForStandardWallet = await mnemonicValidate(mnemonic);
+        if (isValidForStandardWallet) {
+            const possibleStadnardAccount = await createStandardTonAccountByMnemonic(
+                context,
+                sdk.storage,
+                mnemonic,
+                'ton',
+                {
+                    auth: {
+                        kind: 'keychain'
+                    },
+                    versions: [
+                        WalletVersion.V5R1,
+                        WalletVersion.V5_BETA,
+                        WalletVersion.V4R2,
+                        WalletVersion.V3R2,
+                        WalletVersion.V3R1
+                    ]
+                }
+            );
+
+            for (const w of possibleStadnardAccount.allTonWallets) {
+                const existingAcc = getAccountByWalletById(accounts, w.id);
+                if (existingAcc) {
+                    tonMnemonic = {
+                        type: 'exisiting',
+                        account: existingAcc,
+                        walletId: w.id
+                    } as const;
+                    break;
+                }
+            }
+
+            if (tonMnemonic === undefined) {
+                const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
+                const publicKey = keyPair.publicKey.toString('hex');
+                const versions = await getStandardTonWalletVersions({
+                    publicKey,
+                    network,
+                    api: context.api,
+                    fiat
+                });
+                if (versions.some(v => v.tonBalance || v.hasJettons)) {
+                    tonMnemonic = { type: 'select-versions' } as const;
+                }
+            }
+        }
+
+        const isValidBip39 = validateBip39Mnemonic(mnemonic);
+        if (isValidBip39) {
+            const possibleStadnardAccount = await createStandardTonAccountByMnemonic(
+                context,
+                sdk.storage,
+                mnemonic,
+                'bip39',
+                {
+                    auth: {
+                        kind: 'keychain'
+                    },
+                    versions: [
+                        WalletVersion.V5R1,
+                        WalletVersion.V5_BETA,
+                        WalletVersion.V4R2,
+                        WalletVersion.V3R2,
+                        WalletVersion.V3R1
+                    ]
+                }
+            );
+
+            for (const w of possibleStadnardAccount.allTonWallets) {
+                const existingAcc = getAccountByWalletById(accounts, w.id);
+                if (existingAcc) {
+                    bip39 = { type: 'exisiting', account: existingAcc, walletId: w.id } as const;
+                    break;
+                }
+            }
+
+            if (bip39 === undefined) {
+                const keyPair = await mnemonicToKeypair(mnemonic, 'bip39');
+                const publicKey = keyPair.publicKey.toString('hex');
+                const versions = await getStandardTonWalletVersions({
+                    publicKey,
+                    network,
+                    api: context.api,
+                    fiat
+                });
+                if (versions.some(v => v.tonBalance || v.hasJettons)) {
+                    bip39 = { type: 'select-versions' } as const;
+                }
+            }
+        }
+
+        return { tonKeychain, tonMnemonic, bip39 };
     });
+};
+
+const getMnemonicTypeFallback = async (mnemonic: string[]) => {
+    if (await mnemonicValidate(mnemonic)) {
+        return 'tonMnemonic';
+    }
+
+    if (mnemonic.length === 12) {
+        if (validateBip39Mnemonic(mnemonic)) {
+            return 'bip39';
+        }
+
+        throw new Error('Wallet mnemonic not valid');
+    }
+
+    if (await TonKeychainRoot.isValidMnemonic(mnemonic)) {
+        return 'tonKeychain';
+    }
+
+    if (validateBip39Mnemonic(mnemonic)) {
+        return 'bip39';
+    }
+
+    throw new Error('Wallet mnemonic not valid');
 };
 
 export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
@@ -144,20 +250,64 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
+    const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
 
-    const { mutateAsync: processMnemonic, isLoading: isProcessMnemonic } = useProcessMnemonic();
+    const {
+        mutateAsync: processMnemonic,
+        isLoading: isProcessMnemonic,
+        data: processedMnemonicResult
+    } = useProcessMnemonic();
+    const availableMnemonicTypes = Object.entries(processedMnemonicResult || {})
+        .filter(([_, v]) => v !== undefined)
+        .map(v => v[0] as ImportMnemonicType);
+
+    const [selectedMnemonicType, setSelectedMnemonicType] = useState<ImportMnemonicType>();
 
     const onMnemonic = async (m: string[]) => {
         const result = await processMnemonic(m);
-        if (result?.type === 'exisiting') {
-            setExistingAccountAndWallet(result);
-        }
 
-        if (result?.type === 'created') {
-            setCreatedAccount(result.account);
+        const availableOptions = Object.entries(result).filter(([_, v]) => v !== undefined);
+        if (availableOptions.length === 0) {
+            const typeToSet = await getMnemonicTypeFallback(m);
+            if (typeToSet === 'tonKeychain') {
+                const newAccountMam = await createAccountMam({
+                    mnemonic: m,
+                    selectAccount: true
+                });
+                setCreatedAccount(newAccountMam);
+            }
+            setSelectedMnemonicType(typeToSet);
+        } else if (availableOptions.length === 1) {
+            await onSelectMnemonicTypePure(availableOptions[0][0] as ImportMnemonicType, m, result);
         }
 
         setMnemonic(m);
+    };
+
+    const onSelectMnemonicTypePure = async (
+        mnemonicType: ImportMnemonicType,
+        m: string[],
+        precessingRes: typeof processedMnemonicResult
+    ) => {
+        const acc = precessingRes![mnemonicType]!;
+
+        if (acc.type === 'exisiting') {
+            setExistingAccountAndWallet(acc);
+        }
+
+        if (acc.type === 'create') {
+            const newAccountMam = await createAccountMam({
+                mnemonic: m,
+                selectAccount: true
+            });
+            setCreatedAccount(newAccountMam);
+        }
+
+        setSelectedMnemonicType(mnemonicType);
+    };
+
+    const onSelectMnemonicType = (mnemonicType: ImportMnemonicType) => {
+        return onSelectMnemonicTypePure(mnemonicType, mnemonic!, processedMnemonicResult!);
     };
 
     const onRename = async (form: { name: string; emoji: string }) => {
@@ -200,16 +350,17 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 });
         }
 
+        if (!selectedMnemonicType) {
+            if (isCreatingMam) {
+                return undefined;
+            }
+            return () => setMnemonic(undefined);
+        }
+
         if (existingAccountAndWallet) {
             return () => {
                 setExistingAccountAndWallet(undefined);
-                setMnemonic(undefined);
-            };
-        }
-
-        if (!createdAccount) {
-            return () => {
-                setCreatedAccount(undefined);
+                setSelectedMnemonicType(undefined);
                 setMnemonic(undefined);
             };
         }
@@ -221,7 +372,8 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         navigateHome,
         existingAccountAndWallet,
         isMnemonicFormDirty,
-        createdAccount
+        selectedMnemonicType,
+        isCreatingMam
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -250,8 +402,18 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         return (
             <ImportWords
                 onMnemonic={onMnemonic}
-                isLoading={isProcessMnemonic}
+                isLoading={isProcessMnemonic || processedMnemonicResult !== undefined}
                 onIsDirtyChange={setIsMnemonicFormDirty}
+            />
+        );
+    }
+
+    if (!selectedMnemonicType) {
+        return (
+            <SelectMnemonicType
+                availableTypes={availableMnemonicTypes}
+                onSelect={onSelectMnemonicType}
+                isLoading={isCreatingMam}
             />
         );
     }
@@ -266,11 +428,24 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         return (
             <ChoseWalletVersions
                 mnemonic={mnemonic}
+                mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 onSubmit={versions => {
+                    let mnemonicType: MnemonicType | undefined = undefined;
+                    if (selectedMnemonicType === 'tonMnemonic') {
+                        mnemonicType = 'ton';
+                    } else if (selectedMnemonicType === 'bip39') {
+                        mnemonicType = 'bip39';
+                    }
+
+                    if (!mnemonicType) {
+                        throw new Error(`Unexpected mnemonic type ${selectedMnemonicType}`);
+                    }
+
                     createWalletsAsync({
                         mnemonic,
                         versions,
-                        selectAccount: true
+                        selectAccount: true,
+                        mnemonicType
                     }).then(setCreatedAccount);
                 }}
                 isLoading={isCreatingWallets}
@@ -289,9 +464,14 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         );
     }
 
-    if (sdk.notifications && !notificationsSubscribePagePassed) {
+    if (
+        sdk.notifications &&
+        !notificationsSubscribePagePassed &&
+        selectedMnemonicType !== 'tonKeychain'
+    ) {
         return (
             <Subscribe
+                mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 wallet={createdAccount.activeTonWallet}
                 mnemonic={mnemonic}
                 onDone={() => setNotificationsSubscribePagePassed(true)}

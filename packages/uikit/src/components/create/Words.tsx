@@ -614,3 +614,38 @@ export const ImportWords: FC<{
         </>
     );
 };
+
+export type ImportMnemonicType = 'tonKeychain' | 'tonMnemonic' | 'bip39';
+
+export const SelectMnemonicType: FC<{
+    availableTypes: ImportMnemonicType[];
+    onSelect: (type: ImportMnemonicType) => void;
+    isLoading?: boolean;
+}> = ({ availableTypes, onSelect, isLoading }) => {
+    const { t } = useTranslation();
+
+    return (
+        <>
+            <Block>
+                <H2Responsive>{t('import_chose_mnemonic_type_title')}</H2Responsive>
+                <Body>{t('import_chose_mnemonic_type_description')}</Body>
+            </Block>
+            <BottomButtonBlock>
+                {isLoading ? (
+                    <ButtonResponsiveSize fullWidth secondary loading />
+                ) : (
+                    availableTypes.map(type => (
+                        <ButtonResponsiveSize
+                            key={type}
+                            fullWidth
+                            secondary
+                            onClick={() => onSelect(type)}
+                        >
+                            {t(`import_chose_mnemonic_option_${type}`)}
+                        </ButtonResponsiveSize>
+                    ))
+                )}
+            </BottomButtonBlock>
+        </>
+    );
+};

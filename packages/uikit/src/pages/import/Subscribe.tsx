@@ -1,4 +1,4 @@
-import { TonContract, TonWalletStandard } from "@tonkeeper/core/dist/entries/wallet";
+import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import React, { FC } from 'react';
 import { IconPage } from '../../components/Layout';
 import { Button } from '../../components/fields/Button';
@@ -6,16 +6,18 @@ import { NotificationIcon } from '../../components/lottie/LottieIcons';
 import { useTranslation } from '../../hooks/translation';
 import { signTonConnectMnemonicOver } from '../../state/mnemonic';
 import { useSubscribeMutation } from '../../state/subscribe';
+import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 
 export const Subscribe: FC<{
     wallet: TonContract;
     mnemonic: string[];
     onDone: () => void;
-}> = ({ wallet, mnemonic, onDone }) => {
+    mnemonicType: MnemonicType;
+}> = ({ wallet, mnemonic, onDone, mnemonicType }) => {
     const { t } = useTranslation();
     const { mutate, reset, isLoading } = useSubscribeMutation(
         wallet,
-        signTonConnectMnemonicOver(mnemonic),
+        signTonConnectMnemonicOver(mnemonic, mnemonicType),
         onDone
     );
     return (
