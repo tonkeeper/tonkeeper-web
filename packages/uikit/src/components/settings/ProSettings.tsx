@@ -11,7 +11,6 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useNotifyError } from '../../hooks/appSdk';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
@@ -44,6 +43,7 @@ import { Radio } from '../fields/Checkbox';
 import { Input } from '../fields/Input';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ConfirmView } from '../transfer/ConfirmView';
+import { useNotifyError } from '../../hooks/useNotification';
 
 const Block = styled.div`
     display: flex;
@@ -124,7 +124,7 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     ) as (AccountTonMnemonic | AccountMAM)[];
 
     const accountsWallets: AccountWallet[] = accounts.flatMap(a => {
-        if (a.type == 'mam') {
+        if (a.type === 'mam') {
             return a.derivations.map<AccountWallet>(derivation => ({
                 wallet: derivation.tonWallets[0],
                 account: a,

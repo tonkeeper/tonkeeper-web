@@ -1,16 +1,24 @@
 import { Notification } from '../../Notification';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
 import { AssetSelect } from '../../fields/AssetSelect';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { BatteryPacksSelect } from './BatteryPacksSelect';
-import { useAsset, useAssetWeiBalance } from "../../../state/home";
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { useBatteryAvailableRechargeMethods } from '../../../state/battery';
+import { useAsset } from '../../../state/home';
+import { legacyTonAssetId, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    useBatteryAvailableRechargeMethods,
+    useBatteryPacksReservedApplied,
+    useBatteryUnitTonRate,
+    usePurchaseBatteryUnitTokenRate
+} from '../../../state/battery';
 import { BatteryCustomAmountInput } from './BatteryCustomAmountInput';
 import BigNumber from 'bignumber.js';
 import { ButtonResponsiveSize } from '../../fields/Button';
+import { BuyBatteryConfirmNotification } from './BuyBatteryConfirmNotification';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useToast } from '../../../hooks/useNotification';
 
 const NotificationStyled = styled(Notification)`
     max-width: 400px;
@@ -32,7 +40,10 @@ export const BatteryRechargeNotification: FC<{
         >
             {() =>
                 !!preselectedAsset && (
-                    <BatteryRechargeNotificationContent preselectedAsset={preselectedAsset} />
+                    <BatteryRechargeNotificationContent
+                        preselectedAsset={preselectedAsset}
+                        onClose={onClose}
+                    />
                 )
             }
         </NotificationStyled>
@@ -54,12 +65,18 @@ const ButtonResponsiveSizeStyled = styled(ButtonResponsiveSize)`
     margin-top: 16px;
 `;
 
-const BatteryRechargeNotificationContent: FC<{ preselectedAsset: TonAsset }> = ({
-    preselectedAsset
-}) => {
+const BatteryRechargeNotificationContent: FC<{
+    preselectedAsset: TonAsset;
+    onClose: () => void;
+}> = ({ preselectedAsset, onClose }) => {
     const [asset, setAsset] = useState(preselectedAsset);
+    useEffect(() => {
+        setAsset(preselectedAsset);
+    }, [preselectedAsset]);
+
     const [selectedPackType, setSelectedPackType] = useState<string | undefined>();
     const methods = useBatteryAvailableRechargeMethods();
+    const packs = useBatteryPacksReservedApplied();
     const [selectedCustomAmount, setSelectedCustomAmount] = useState<{
         tokenValue: BigNumber;
         error: boolean;
@@ -68,7 +85,51 @@ const BatteryRechargeNotificationContent: FC<{ preselectedAsset: TonAsset }> = (
         error: true
     });
     const { t } = useTranslation();
-    const assetWeiBalance = useAssetWeiBalance(asset);
+    const [assetAmountToPay, setAssetAmountToPay] = useState<AssetAmount<TonAsset> | undefined>();
+    const unitToTonRate = useBatteryUnitTonRate();
+    const unitToTokenRate = usePurchaseBatteryUnitTokenRate(legacyTonAssetId(asset));
+    const toast = useToast();
+
+    const onCloseNotification = (confirmed?: boolean) => {
+        setAssetAmountToPay(undefined);
+        if (confirmed) {
+            onClose();
+            toast(t('battery_please_wait'));
+        }
+    };
+
+    const onOpenNotification = () => {
+        if (!selectedPackType) {
+            throw new Error('No pack type selected');
+        }
+        if (selectedPackType !== 'custom') {
+            const packPrice = packs?.find(p => p.type === selectedPackType)?.price;
+
+            if (!unitToTokenRate || !packPrice) {
+                throw new Error('Invalid packs data');
+            }
+
+            setAssetAmountToPay(
+                AssetAmount.fromRelativeAmount({
+                    amount: packPrice.relativeAmount
+                        .div(unitToTonRate)
+                        .multipliedBy(unitToTokenRate),
+                    asset: asset
+                })
+            );
+        } else {
+            if (selectedCustomAmount.error || selectedCustomAmount.tokenValue.eq(0)) {
+                throw new Error('Invalid custom amount');
+            }
+
+            setAssetAmountToPay(
+                AssetAmount.fromRelativeAmount({ amount: selectedCustomAmount.tokenValue, asset })
+            );
+        }
+    };
+
+    const isContinueDisabled =
+        !selectedPackType || (selectedPackType === 'custom' && selectedCustomAmount.error);
 
     return (
         <ContentWrapper>
@@ -87,9 +148,19 @@ const BatteryRechargeNotificationContent: FC<{ preselectedAsset: TonAsset }> = (
                 hidden={selectedPackType !== 'custom'}
                 onChange={setSelectedCustomAmount}
             />
-            <ButtonResponsiveSizeStyled primary fullWidth disabled={selectedCustomAmount.error}>
+            <ButtonResponsiveSizeStyled
+                primary
+                fullWidth
+                disabled={isContinueDisabled}
+                onClick={onOpenNotification}
+            >
                 {t('continue')}
             </ButtonResponsiveSizeStyled>
+            <BuyBatteryConfirmNotification
+                isOpen={!!assetAmountToPay}
+                onClose={onCloseNotification}
+                assetAmount={assetAmountToPay}
+            />
         </ContentWrapper>
     );
 };

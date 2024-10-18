@@ -1,12 +1,31 @@
-import { notifyError } from '../components/transfer/common';
-import { useTranslation } from './translation';
-import { useAppSdk } from './appSdk';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from './translation';
+import { useCallback, useEffect } from 'react';
+import { notifyError } from '../components/transfer/common';
+import { useAppSdk } from './appSdk';
 
-export function useNotification() {
-    const { t } = useTranslation();
+export function useToast() {
+    const sdk = useAppSdk();
+    return useCallback(
+        (content: string) => {
+            sdk.topMessage(content);
+        },
+        [sdk]
+    );
+}
+
+export function useNotifyError(error: unknown) {
+    const sdk = useAppSdk();
+    useEffect(() => {
+        if (error instanceof Error) {
+            sdk.topMessage(error.message);
+        }
+    }, [error]);
+}
+
+export const useNotifyErrorHandle = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-
-    return (e: Error) => notifyError(client, sdk, t, e);
-}
+    const { t } = useTranslation();
+    return useCallback((e: unknown) => notifyError(client, sdk, t, e), []);
+};

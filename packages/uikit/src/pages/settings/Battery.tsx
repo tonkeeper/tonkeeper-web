@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label2 } from '../../components/Text';
@@ -111,6 +111,15 @@ export const BatteryPageContent: FC = () => {
     const {
         config: { batteryRefundEndpoint }
     } = useAppContext();
+    const [preselectedRechargeAsset, setPreselectedRechargeAsset] = useState<string | undefined>();
+
+    const onMethodSelected = (value: { type: 'asset'; assetId: string } | { type: 'gift' }) => {
+        if (value.type === 'asset') {
+            setPreselectedRechargeAsset(value.assetId);
+        } else {
+            // TODO
+        }
+    };
 
     if (!data) {
         return (
@@ -125,7 +134,7 @@ export const BatteryPageContent: FC = () => {
             <HeadingBlock>
                 <BatteryInfoHeading />
             </HeadingBlock>
-            <BuyBatteryMethods />
+            <BuyBatteryMethods onMethodSelected={onMethodSelected} />
             <RefundsBlock>
                 <Body2>{t('battery_packages_disclaimer')}</Body2>{' '}
                 {!!batteryRefundEndpoint && (
@@ -134,7 +143,11 @@ export const BatteryPageContent: FC = () => {
                     </RefundsLink>
                 )}
             </RefundsBlock>
-            <BatteryRechargeNotification isOpen={true} onClose={() => {}} />
+            <BatteryRechargeNotification
+                isOpen={preselectedRechargeAsset !== undefined}
+                preselectAssetId={preselectedRechargeAsset}
+                onClose={() => setPreselectedRechargeAsset(undefined)}
+            />
         </ContentWrapper>
     );
 };

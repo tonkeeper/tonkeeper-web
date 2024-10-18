@@ -7,6 +7,9 @@ import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { ChevronRightIcon } from '../../Icon';
 import { SkeletonImage, SkeletonText } from '../../shared/Skeleton';
 import { Body3, Label2 } from '../../Text';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 export const MethodImageRounded = styled.img`
     width: 40px;
@@ -49,7 +52,10 @@ const TextContainer = styled.div`
     }
 `;
 
-export const BuyBatteryMethods: FC<{ className?: string }> = ({ className }) => {
+export const BuyBatteryMethods: FC<{
+    className?: string;
+    onMethodSelected: (value: { type: 'asset'; assetId: string } | { type: 'gift' }) => void;
+}> = ({ className, onMethodSelected }) => {
     const { t } = useTranslation();
     const methods = useBatteryAvailableRechargeMethods();
 
@@ -74,7 +80,18 @@ export const BuyBatteryMethods: FC<{ className?: string }> = ({ className }) => 
     return (
         <ListBlock className={className} margin={false}>
             {methods.map(m => (
-                <ListItemStyled key={m.key}>
+                <ListItemStyled
+                    key={m.key}
+                    onClick={() =>
+                        onMethodSelected({
+                            type: 'asset',
+                            assetId:
+                                m.type === 'ton'
+                                    ? TON_ASSET.id
+                                    : packAssetId(BLOCKCHAIN_NAME.TON, m.jetton_master!)
+                        })
+                    }
+                >
                     <ListItemPayloadStyled>
                         <MethodImageRounded src={m.image} />
                         <Label2>
@@ -86,7 +103,7 @@ export const BuyBatteryMethods: FC<{ className?: string }> = ({ className }) => 
                     </ListItemPayloadStyled>
                 </ListItemStyled>
             ))}
-            <ListItemStyled>
+            <ListItemStyled onClick={() => onMethodSelected({ type: 'gift' })}>
                 <ListItemPayloadStyled>
                     <GiftIcon />
                     <TextContainer>

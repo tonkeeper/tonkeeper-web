@@ -7,14 +7,12 @@ import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useToast } from '../../hooks/appSdk';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
 import { useEstimateNftRenew } from '../../hooks/blockchain/nft/useEstimateNftRenew';
 import { useRenewNft } from '../../hooks/blockchain/nft/useRenewNft';
 import { useTonRecipient } from '../../hooks/blockchain/useTonRecipient';
 import { toDaysLeft, useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
-import { useNotification } from '../../hooks/useNotification';
 import { useQueryChangeWait } from '../../hooks/useQueryChangeWait';
 import { useNftDNSExpirationDate } from '../../state/nft';
 import { Notification } from '../Notification';
@@ -22,6 +20,7 @@ import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmView, ConfirmViewButtons, ConfirmViewButtonsSlot } from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
+import { useNotifyErrorHandle, useToast } from '../../hooks/useNotification';
 
 const RenewDNSBlock = styled.div`
     width: 100%;
@@ -51,7 +50,7 @@ export const RenewNft: FC<{
 }> = ({ nft }) => {
     const toast = useToast();
     const isDisabled = useAreNftActionsDisabled(nft);
-    const notifyError = useNotification();
+    const notifyError = useNotifyErrorHandle();
     const {
         t,
         i18n: { language }

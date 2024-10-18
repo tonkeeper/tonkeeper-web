@@ -61,7 +61,8 @@ export enum QueryKey {
 
     batteryOnchainRechargeMethods = 'batteryOnchainRechargeMethods',
     batteryAuthToken = 'batteryAuthToken',
-    batteryBalance = 'batteryBalance'
+    batteryBalance = 'batteryBalance',
+    estimateBatteryPurchase = 'estimateBatteryPurchase'
 }
 
 export enum JettonKey {

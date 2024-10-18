@@ -19,7 +19,7 @@ import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { jettonTransferAmount } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { toNano } from '@ton/core';
 
-const useBatteryApi = () => {
+export const useBatteryApi = () => {
     const { config } = useAppContext();
     return useMemo(
         () => new Battery({ BASE: config.batteryHost || 'https://battery.tonkeeper.com' }),
