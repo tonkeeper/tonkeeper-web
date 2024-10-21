@@ -47,6 +47,7 @@ export const BatteryCustomAmountInput: FC<{
     const shouldReserveAmount = useBatteryShouldBeReservedAmount();
     const weiBalance = useAssetWeiBalance(asset);
     const [selectedAssetAmount, setSelectedAssetAmount] = useState<BigNumber>(new BigNumber(0));
+    const isDirty = useRef(false);
 
     const minValue = useBatteryMinBootstrapValue(tonAssetAddressToString(asset.address));
 
@@ -79,6 +80,10 @@ export const BatteryCustomAmountInput: FC<{
     );
 
     const error = useMemo(() => {
+        if (!isDirty.current) {
+            return undefined;
+        }
+
         if (remainingAssetAmount?.weiAmount.lt(0)) {
             return t('battery_buy_error_not_enough_balance');
         }
@@ -125,6 +130,10 @@ export const BatteryCustomAmountInput: FC<{
     const onInputChange = ({ currencyId, input }: { currencyId: string; input: BigNumber }) => {
         if (!input) {
             return setSelectedAssetAmount(new BigNumber(0));
+        }
+
+        if (!input.isZero()) {
+            isDirty.current = true;
         }
 
         if (currencyId === 'token') {

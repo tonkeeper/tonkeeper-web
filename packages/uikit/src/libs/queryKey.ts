@@ -59,6 +59,7 @@ export enum QueryKey {
     multisigWallet = 'multisigWallet',
     multisigOrder = 'multisigOrder',
 
+    batteryServiceConfig = 'batteryServiceConfig',
     batteryOnchainRechargeMethods = 'batteryOnchainRechargeMethods',
     batteryAuthToken = 'batteryAuthToken',
     batteryBalance = 'batteryBalance',

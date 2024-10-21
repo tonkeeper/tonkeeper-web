@@ -272,8 +272,19 @@ const ConfirmBuyProService: FC<
         } & ConfirmState
     >
 > = ({ ...rest }) => {
-    const estimation = useEstimateTransfer(rest.recipient, rest.assetAmount, false);
-    const mutation = useSendTransfer(rest.recipient, rest.assetAmount, false, estimation.data!);
+    const estimation = useEstimateTransfer({
+        recipient: rest.recipient,
+        amount: rest.assetAmount,
+        isMax: false,
+        senderType: 'external'
+    });
+    const mutation = useSendTransfer({
+        recipient: rest.recipient,
+        amount: rest.assetAmount,
+        isMax: false,
+        estimation: estimation.data!,
+        senderType: 'external'
+    });
 
     return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
 };

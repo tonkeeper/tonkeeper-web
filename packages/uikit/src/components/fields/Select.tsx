@@ -7,6 +7,7 @@ const DropDownStyled = styled(DropDown)<{
     width?: string;
     maxHeight?: string;
     right?: string;
+    left?: string;
     top?: string;
     bottom?: string;
 }>`
@@ -17,8 +18,13 @@ const DropDownStyled = styled(DropDown)<{
             ${p.width && `width: ${p.width};`}
             ${p.maxHeight && `max-height: ${p.maxHeight};`}
             ${p.right && `right: ${p.right};`}
+            ${p.left && `left: ${p.left};`}
             ${p.top && `top: ${p.top};`}
-            ${p.bottom && `bottom: ${p.bottom};`}
+            ${p.bottom &&
+            css`
+                bottom: ${p.bottom};
+                ${!p.top && 'top: unset;'}
+            `}
         `}
     }
 `;
@@ -28,6 +34,7 @@ export const SelectDropDown: FC<
         width?: string;
         maxHeight?: string;
         right?: string;
+        left?: string;
         top?: string;
         bottom?: string;
     } & ComponentProps<typeof DropDown>

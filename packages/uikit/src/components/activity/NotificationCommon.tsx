@@ -11,21 +11,28 @@ import {
 import { TronEvent, TronFee } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, PropsWithChildren, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { FC, PropsWithChildren, useMemo } from 'react';
+import styled, { useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent } from '../../state/asset';
 import { useFormatFiat, useRate } from '../../state/rates';
-import { SpinnerIcon } from '../Icon';
+import { ChevronRightIcon, SpinnerIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import { Body1, H2, Label1 } from '../Text';
+import { Body1, Body2Class, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveTonNetwork } from '../../state/wallet';
+import { SenderType } from '../../hooks/blockchain/useSender';
+import { SelectDropDown } from '../fields/Select';
+import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useBatteryBalance, useBatteryUnitTonRate } from '../../state/battery';
+import BigNumber from 'bignumber.js';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -379,22 +386,124 @@ export const ActionTronFeeDetails: FC<{
     );
 };
 
+const FeeLabelColumn = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const TransparentButton = styled.button`
+    ${Body2Class};
+    color: ${p => p.theme.accentBlue};
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+`;
+
+const TokenImage = styled.img`
+    width: 24px;
+    height: 24px;
+    border-radius: ${p => p.theme.cornerFull};
+    margin-right: 12px;
+`;
+
+const BatteryIcon = () => {
+    const theme = useTheme();
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            style={{ marginRight: '12px' }}
+        >
+            <path
+                d="M6.35428 9.51938L11.4006 3.57258C12.9788 1.71282 13.7678 0.782938 14.3453 1.04296C14.9227 1.30299 14.7201 2.49695 14.3148 4.88488L13.8679 7.51798C13.7699 8.09565 13.7209 8.38449 13.869 8.60008C14.0171 8.81568 14.3081 8.8792 14.8903 9.00624L15.8145 9.20792C18.195 9.72741 19.3852 9.98716 19.6863 10.8541C19.9874 11.7211 19.2068 12.6409 17.6457 14.4806L12.5994 20.4274C11.0212 22.2872 10.2322 23.2171 9.65472 22.957C9.0773 22.697 9.27993 21.503 9.6852 19.1151L10.1321 16.482C10.2301 15.9043 10.2791 15.6155 10.131 15.3999C9.98293 15.1843 9.69186 15.1208 9.10971 14.9938L8.18552 14.7921C5.80504 14.2726 4.61481 14.0128 4.3137 13.1459C4.0126 12.2789 4.79316 11.3591 6.35428 9.51938Z"
+                fill={theme.accentGreen}
+            />
+        </svg>
+    );
+};
+
 export const ActionFeeDetailsUniversal: FC<{
     fee: AssetAmount | undefined;
-}> = ({ fee }) => {
+    onSenderTypeChange?: (type: SenderType) => void;
+    selectedSenderType?: SenderType;
+    availableSenders?: SenderType[];
+}> = ({ fee, availableSenders, onSenderTypeChange, selectedSenderType }) => {
     const { t } = useTranslation();
 
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label>{fee?.weiAmount.lt(0) ? t('txActions_refund') : t('transaction_fee')}</Label>
-                {fee ? <ActionFeeDetailsUniversalValue fee={fee} /> : <SpinnerIcon />}
+                <FeeLabelColumn>
+                    <Label>
+                        {fee?.weiAmount.lt(0) ? t('txActions_refund') : t('transaction_fee')}
+                    </Label>
+                    {!!availableSenders?.length && availableSenders.length > 1 && (
+                        <SelectDropDown
+                            left="0"
+                            bottom="0"
+                            payload={onClose => (
+                                <DropDownContent>
+                                    {availableSenders.map(s => (
+                                        <>
+                                            <DropDownItem
+                                                onClick={() => {
+                                                    onClose();
+                                                    onSenderTypeChange?.(s);
+                                                }}
+                                                key={s}
+                                                isSelected={selectedSenderType === s}
+                                            >
+                                                {s === 'battery' ? (
+                                                    <>
+                                                        <BatteryIcon />
+                                                        <Label2>{t('battery_title')}</Label2>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <TokenImage src={TON_ASSET.image} />
+                                                        <Label2>{TON_ASSET.symbol}</Label2>
+                                                    </>
+                                                )}
+                                            </DropDownItem>
+                                            <DropDownItemsDivider />
+                                        </>
+                                    ))}
+                                </DropDownContent>
+                            )}
+                        >
+                            <TransparentButton>
+                                {t('send_change_fee_payment_method')}
+                                <ChevronRightIcon />
+                            </TransparentButton>
+                        </SelectDropDown>
+                    )}
+                </FeeLabelColumn>
+                {fee ? (
+                    <ActionFeeDetailsUniversalValue fee={fee} senderType={selectedSenderType} />
+                ) : (
+                    <SpinnerIcon />
+                )}
             </ListItemPayload>
         </ListItem>
     );
 };
 
-const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount }> = ({ fee }) => {
+const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount; senderType?: SenderType }> = ({
+    fee,
+    senderType
+}) => {
+    if (senderType === 'battery') {
+        return <ActionFeeDetailsUniversalBatteryValue fee={fee as AssetAmount<TonAsset>} />;
+    } else {
+        return <ActionFeeDetailsUniversalTokenValue fee={fee} />;
+    }
+};
+
+const ActionFeeDetailsUniversalTokenValue: FC<{ fee: AssetAmount }> = ({ fee }) => {
     const { fiat } = useAppContext();
     const { data: fiatAmountBN, isLoading } = useAssetAmountFiatEquivalent(fee);
 
@@ -407,6 +516,30 @@ const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount }> = ({ fee }) => {
             right
             text={fee.stringAssetAbsoluteRelativeAmount}
             secondary={fiatAmountBN ? `≈ ${fiatAmount}` : undefined}
+        />
+    );
+};
+
+const ActionFeeDetailsUniversalBatteryValue: FC<{ fee: AssetAmount<TonAsset> }> = ({ fee }) => {
+    const { t } = useTranslation();
+    const unitRate = useBatteryUnitTonRate();
+    const { data: balance } = useBatteryBalance();
+    const unitsToSpeed = fee.relativeAmount
+        .div(unitRate)
+        .integerValue(BigNumber.ROUND_UP)
+        .toNumber();
+
+    if (!balance) {
+        return <SpinnerIcon />;
+    }
+
+    return (
+        <ColumnText
+            right
+            text={unitsToSpeed}
+            secondary={t('battery_out_of_num_available', {
+                number: balance.batteryUnitsBalance.toNumber()
+            })}
         />
     );
 };

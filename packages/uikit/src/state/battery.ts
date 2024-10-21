@@ -18,6 +18,7 @@ import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/ass
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { jettonTransferAmount } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { toNano } from '@ton/core';
+import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
 
 export const useBatteryApi = () => {
     const { config } = useAppContext();
@@ -27,11 +28,42 @@ export const useBatteryApi = () => {
     );
 };
 
+export const useBatteryServiceConfigQuery = () => {
+    const batteryApi = useBatteryApi();
+
+    return useQuery<Config>(
+        [QueryKey.batteryServiceConfig],
+        async () => {
+            const res = await batteryApi.default.getConfig();
+            if ('error' in res) {
+                throw new Error(res.error);
+            }
+
+            return res;
+        },
+        {
+            keepPreviousData: true
+        }
+    );
+};
+
+export const useBatteryServiceConfig = () => {
+    const { data } = useBatteryServiceConfigQuery();
+
+    if (!data) {
+        throw new Error('Battery service config not found');
+    }
+
+    return data;
+};
+
 export const useBatteryOnChainRechargeMethods = () => {
+    const batteryApi = useBatteryApi();
+
     return useQuery<RechargeMethods['methods']>(
         [QueryKey.batteryOnchainRechargeMethods],
         async () => {
-            const res = await new Battery().default.getRechargeMethods(false);
+            const res = await batteryApi.default.getRechargeMethods(false);
             if ('error' in res) {
                 throw new Error(res.error);
             }
@@ -123,6 +155,7 @@ export const useRequestBatteryAuthToken = () => {
             token: res.token
         });
         await client.invalidateQueries([QueryKey.batteryAuthToken]);
+        return res.token;
     });
 };
 
@@ -154,14 +187,15 @@ export const useBatteryUnitTonRate = () => {
 export const useBatteryMinBootstrapValue = (assetAddress: string) => {
     const methods = useBatteryAvailableRechargeMethods();
     const { data: balance } = useBatteryBalance();
+    const shouldReserve = useBatteryShouldBeReservedAmount();
 
     return useMemo(() => {
-        if (!methods || !balance) {
+        if (!methods || !balance || !shouldReserve) {
             return undefined;
         }
 
         if (assetAddress.toUpperCase() === TON_ASSET.address) {
-            return new BigNumber(0);
+            return new BigNumber(shouldReserve.tonUnits.relativeAmount);
         }
 
         if (
@@ -169,16 +203,19 @@ export const useBatteryMinBootstrapValue = (assetAddress: string) => {
                 new BigNumber((jettonTransferAmount + toNano(0.03)).toString())
             )
         ) {
-            return new BigNumber(0);
+            return new BigNumber(shouldReserve.tonUnits.relativeAmount);
         }
         const method = methods.find(m => m.jetton_master === assetAddress)!;
 
         if (!method.min_bootstrap_value) {
-            return new BigNumber(0);
+            return new BigNumber(shouldReserve.tonUnits.relativeAmount);
         }
 
-        return new BigNumber(method.min_bootstrap_value);
-    }, [methods, balance, assetAddress]);
+        const bootstrapValue = new BigNumber(method.min_bootstrap_value);
+        return bootstrapValue.gt(shouldReserve.tonUnits.relativeAmount)
+            ? bootstrapValue
+            : new BigNumber(shouldReserve.tonUnits.relativeAmount);
+    }, [methods, balance, assetAddress, shouldReserve]);
 };
 
 export type BatteryBalance = {

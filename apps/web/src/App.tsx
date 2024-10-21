@@ -127,7 +127,7 @@ const Loader: FC = () => {
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
-    useGlobalSetup();
+    const { isLoading: globalSetupLoading } = useGlobalSetup();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -166,7 +166,8 @@ const Loader: FC = () => {
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
-      globalPreferencesLoading
+        globalPreferencesLoading ||
+        globalSetupLoading
     ) {
         return <Loading />;
     }

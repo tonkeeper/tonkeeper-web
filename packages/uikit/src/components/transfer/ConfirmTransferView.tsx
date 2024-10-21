@@ -1,9 +1,11 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import React, { FC, PropsWithChildren } from 'react';
+import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from './ConfirmView';
+import { useAvailableSendersTypes } from '../../hooks/blockchain/useSender';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const ConfirmTransferView: FC<
     PropsWithChildren<{
@@ -15,8 +17,39 @@ export const ConfirmTransferView: FC<
         fitContent?: boolean;
     }>
 > = ({ isMax, ...rest }) => {
-    const estimation = useEstimateTransfer(rest.recipient, rest.assetAmount, isMax);
-    const mutation = useSendTransfer(rest.recipient, rest.assetAmount, isMax, estimation.data!);
+    const availableSenders = useAvailableSendersTypes({
+        type: 'transfer',
+        asset: rest.assetAmount.asset as TonAsset
+    });
 
-    return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
+    useEffect(() => {
+        onSenderTypeChange(availableSenders[0]);
+    }, [availableSenders]);
+
+    const [selectedSenderType, onSenderTypeChange] = useState(availableSenders[0]);
+
+    const estimation = useEstimateTransfer({
+        recipient: rest.recipient,
+        amount: rest.assetAmount,
+        isMax,
+        senderType: selectedSenderType
+    });
+    const mutation = useSendTransfer({
+        recipient: rest.recipient,
+        amount: rest.assetAmount,
+        isMax,
+        estimation: estimation.data!,
+        senderType: selectedSenderType
+    });
+
+    return (
+        <ConfirmView
+            estimation={estimation}
+            {...mutation}
+            {...rest}
+            selectedSenderType={selectedSenderType}
+            onSenderTypeChange={onSenderTypeChange}
+            availableSenders={availableSenders}
+        />
+    );
 };

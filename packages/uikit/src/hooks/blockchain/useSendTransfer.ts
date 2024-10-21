@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { isTonAsset, Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -7,59 +7,46 @@ import {
     TransferEstimation,
     TronRecipientData
 } from '@tonkeeper/core/dist/entries/send';
-import { notifyError } from '../../components/transfer/common';
-import { getSigner } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import { useAnalyticsTrack } from '../amplitude';
-import { useAppContext } from '../appContext';
-import { useAppSdk } from '../appSdk';
-import { useTranslation } from '../translation';
-import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { TonAssetTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transaction.service';
-import {
-    WalletMessageSender,
-    LedgerMessageSender
-} from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
-export function useSendTransfer<T extends Asset>(
-    recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
-    amount: AssetAmount<T>,
-    isMax: boolean,
-    estimation: TransferEstimation<T>
-) {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
-    const account = useActiveAccount();
-    const client = useQueryClient();
+import { SenderType, useGetSender } from './useSender';
+import { useTransferService } from './useTransferService';
+import { useNotifyErrorHandle } from '../useNotification';
+
+export function useSendTransfer<T extends Asset>({
+    recipient,
+    amount,
+    isMax,
+    estimation,
+    senderType
+}: {
+    recipient: T extends TonAsset ? TonRecipientData : TronRecipientData;
+    amount: AssetAmount<T>;
+    isMax: boolean;
+    estimation: TransferEstimation<T>;
+    senderType: SenderType;
+}) {
     const track = useAnalyticsTrack();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
+    const notifyError = useNotifyErrorHandle();
+    const getSender = useGetSender(senderType);
+    const transferService = useTransferService();
 
     return useMutation<boolean, Error>(async () => {
-        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
-        if (signer === null) return false;
         try {
-            if (!isAccountTonWalletStandard(account)) {
-                throw new Error("Can't send a transfer using this account");
-            }
-
             if (isTonAsset(amount.asset)) {
-                const transferService = new TonAssetTransactionService(
-                    api,
-                    account.activeTonWallet
+                const comment = (recipient as TonRecipientData).comment;
+                await transferService.send(
+                    await getSender(),
+                    estimation as TransferEstimation<TonAsset>,
+                    {
+                        to: (recipient as TonRecipientData).toAccount.address,
+                        amount: amount as AssetAmount<TonAsset>,
+                        isMax,
+                        payload: comment ? { type: 'comment', value: comment } : undefined
+                    }
                 );
-                const sender =
-                    signer.type === 'ledger'
-                        ? new LedgerMessageSender(api, account.activeTonWallet, signer)
-                        : new WalletMessageSender(api, account.activeTonWallet, signer);
-                await transferService.send(sender, estimation as TransferEstimation<TonAsset>, {
-                    to: (recipient as TonRecipientData).toAccount.address,
-                    amount: amount as AssetAmount<TonAsset>,
-                    isMax,
-                    comment: (recipient as TonRecipientData).comment
-                });
                 track('send_success', {
                     from: 'send_confirm',
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
@@ -68,7 +55,7 @@ export function useSendTransfer<T extends Asset>(
                 throw new Error('Disable trc 20 transactions');
             }
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
         }
 
         await invalidateAccountQueries();
