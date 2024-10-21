@@ -23,6 +23,8 @@ import { JettonEncoder } from '../encoder/jetton-encoder';
 import { NFTEncoder } from '../encoder/nft-encoder';
 import { TonConnectTransactionPayload } from '../../../entries/tonConnect';
 import { LedgerError } from '../../../errors/LedgerError';
+import { MessagePayloadParam, serializePayload } from '../encoder/types';
+import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
 
 export class LedgerMessageSender {
     constructor(
@@ -59,13 +61,13 @@ export class LedgerMessageSender {
     tonTransfer = async ({
         to,
         weiAmount,
-        comment,
+        payload,
         isMax
     }: {
         to: string;
         weiAmount: BigNumber;
-        comment?: string;
-        isMax: boolean;
+        payload?: MessagePayloadParam;
+        isMax?: boolean;
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
@@ -78,7 +80,7 @@ export class LedgerMessageSender {
             sendMode: isMax
                 ? SendMode.CARRY_ALL_REMAINING_BALANCE + SendMode.IGNORE_ERRORS
                 : SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-            payload: comment ? { type: 'comment', text: comment } : undefined
+            payload: this.serializeLedgerMessagePayload(payload)
         });
 
         return this.toSenderObject(externalMessage(contract, seqno, transfer));
@@ -100,11 +102,11 @@ export class LedgerMessageSender {
     jettonTransfer = async ({
         amount,
         to,
-        comment
+        payload
     }: {
         to: string;
         amount: AssetAmount<TonAsset>;
-        comment?: string;
+        payload?: MessagePayloadParam;
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
@@ -129,7 +131,7 @@ export class LedgerMessageSender {
                 destination: Address.parse(to),
                 responseDestination: Address.parse(this.wallet.rawAddress),
                 forwardAmount: JettonEncoder.jettonTransferForwardAmount,
-                forwardPayload: comment ? encodeComment(comment) : null,
+                forwardPayload: serializePayload(payload) ?? null,
                 customPayload
             },
             stateInit
@@ -219,6 +221,23 @@ export class LedgerMessageSender {
             timestamp,
             seqno,
             contract
+        };
+    }
+
+    private serializeLedgerMessagePayload(
+        payload?: MessagePayloadParam
+    ): TonPayloadFormat | undefined {
+        if (!payload) {
+            return undefined;
+        }
+
+        if (payload.type === 'comment') {
+            return { type: 'comment', text: payload.value };
+        }
+
+        return {
+            type: 'unsafe',
+            message: payload.value
         };
     }
 }

@@ -11,19 +11,20 @@ import { assertBalanceEnough } from '../transfer/common';
 import { TransferEstimation } from '../../entries/send';
 import { TonWalletStandard } from '../../entries/wallet';
 import { checkMaxAllowedMessagesInMultiTransferOrDie } from '../transfer/multiSendService';
+import { MessagePayloadParam } from './encoder/types';
 
 type TransferParams =
     | {
           to: string;
           amount: AssetAmount<TonAsset>;
-          isMax: boolean;
-          comment?: string;
+          isMax?: boolean;
+          payload?: MessagePayloadParam;
       }
     | {
           to: string;
           amount: AssetAmount<TonAsset>;
           bounce: boolean;
-          comment?: string;
+          payload?: MessagePayloadParam;
       }[];
 
 export class TonAssetTransactionService {
@@ -85,7 +86,10 @@ export class TonAssetTransactionService {
                 throw new Error('Ledger multisend is not supported.');
             } else {
                 return sender.estimate(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(params)
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                        responseAddress: sender.jettonResponseAddress,
+                        ...params
+                    })
                 );
             }
         } else {
@@ -93,7 +97,10 @@ export class TonAssetTransactionService {
                 return (await sender.jettonTransfer(params)).estimate();
             } else {
                 return sender.estimate(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(params)
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                        responseAddress: sender.jettonResponseAddress,
+                        ...params
+                    })
                 );
             }
         }
@@ -152,7 +159,10 @@ export class TonAssetTransactionService {
                 throw new Error('Ledger multisend is not supported.');
             } else {
                 return sender.send(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(params)
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                        responseAddress: sender.jettonResponseAddress,
+                        ...params
+                    })
                 );
             }
         } else {
@@ -160,7 +170,10 @@ export class TonAssetTransactionService {
                 return (await sender.jettonTransfer(params)).send();
             } else {
                 return sender.send(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(params)
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                        responseAddress: sender.jettonResponseAddress,
+                        ...params
+                    })
                 );
             }
         }
@@ -176,13 +189,24 @@ export class TonAssetTransactionService {
         params: TransferParams,
         estimation?: TransferEstimation<TonAsset>
     ) {
+        const isJettonTransfer = this.isJettonTransfer(params);
+
         let requiredBalance = Array.isArray(params)
-            ? params.reduce((acc, p) => acc.plus(p.amount.weiAmount), new BigNumber(0))
+            ? params.reduce(
+                  (acc, p) =>
+                      acc.plus(
+                          isJettonTransfer
+                              ? new BigNumber(JettonEncoder.jettonTransferAmount.toString())
+                              : p.amount.weiAmount
+                      ),
+                  new BigNumber(0)
+              )
+            : isJettonTransfer
+            ? new BigNumber(JettonEncoder.jettonTransferAmount.toString())
             : params.amount.weiAmount;
 
         if (estimation) {
             requiredBalance = requiredBalance.plus(estimation.fee.weiAmount);
-            const isJettonTransfer = this.isJettonTransfer(params);
 
             if (
                 isJettonTransfer &&

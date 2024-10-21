@@ -12,11 +12,18 @@ export const BuyBatteryConfirmNotification: FC<{
     assetAmount: AssetAmount<TonAsset> | undefined;
     isOpen: boolean;
     onClose: (confirmed?: boolean) => void;
-}> = ({ assetAmount, isOpen, onClose }) => {
+    giftRecipient?: string;
+}> = ({ assetAmount, isOpen, onClose, giftRecipient }) => {
     return (
         <Notification isOpen={isOpen} handleClose={() => onClose(false)}>
             {() =>
-                !!assetAmount && <NotificationContent assetAmount={assetAmount} onClose={onClose} />
+                !!assetAmount && (
+                    <NotificationContent
+                        assetAmount={assetAmount}
+                        onClose={onClose}
+                        giftRecipient={giftRecipient}
+                    />
+                )
             }
         </Notification>
     );
@@ -25,9 +32,15 @@ export const BuyBatteryConfirmNotification: FC<{
 const NotificationContent: FC<{
     assetAmount: AssetAmount<TonAsset>;
     onClose: (confirmed?: boolean) => void;
-}> = ({ assetAmount, onClose }) => {
-    const estimation = useEstimatePurchaseBattery(assetAmount);
-    const mutation = usePurchaseBattery({ assetAmount, estimation: estimation.data! });
+    giftRecipient?: string;
+}> = ({ assetAmount, onClose, giftRecipient }) => {
+    const estimation = useEstimatePurchaseBattery({ assetAmount, giftRecipient });
+
+    const mutation = usePurchaseBattery({
+        assetAmount,
+        estimation: estimation.data!,
+        giftRecipient
+    });
 
     return (
         <ConfirmView

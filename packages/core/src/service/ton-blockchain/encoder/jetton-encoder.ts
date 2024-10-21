@@ -1,10 +1,10 @@
-import { Address, beginCell, Cell, toNano, comment as encodeComment, internal } from '@ton/core';
+import { Address, beginCell, Cell, toNano, internal } from '@ton/core';
 import { getTonkeeperQueryId, SendMode } from '../../transfer/common';
 import { APIConfig } from '../../../entries/apis';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
 import { getJettonCustomPayload } from '../../transfer/jettonPayloadService';
-import { WalletOutgoingMessage } from './types';
+import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
 
 export class JettonEncoder {
     static jettonTransferAmount = toNano(0.1);
@@ -39,12 +39,14 @@ export class JettonEncoder {
             | {
                   to: string;
                   amount: AssetAmount<TonAsset>;
-                  comment?: string;
+                  payload?: MessagePayloadParam;
+                  responseAddress?: string;
               }
             | {
                   to: string;
                   amount: AssetAmount<TonAsset>;
-                  comment?: string;
+                  payload?: MessagePayloadParam;
+                  responseAddress?: string;
               }[]
     ): Promise<WalletOutgoingMessage> => {
         if (Array.isArray(transfer)) {
@@ -57,11 +59,13 @@ export class JettonEncoder {
     private encodeSingleTransfer = async ({
         to,
         amount,
-        comment
+        payload,
+        responseAddress
     }: {
         to: string;
         amount: AssetAmount<TonAsset>;
-        comment?: string;
+        payload?: MessagePayloadParam;
+        responseAddress?: string;
     }): Promise<WalletOutgoingMessage> => {
         const { customPayload, stateInit, jettonWalletAddress } = await getJettonCustomPayload(
             this.api,
@@ -75,9 +79,11 @@ export class JettonEncoder {
             queryId: getTonkeeperQueryId(),
             jettonAmount,
             toAddress: Address.parse(to),
-            responseAddress: Address.parse(this.walletAddress),
+            responseAddress: responseAddress
+                ? Address.parse(responseAddress)
+                : Address.parse(this.walletAddress),
             forwardAmount: JettonEncoder.jettonTransferForwardAmount,
-            forwardPayload: comment ? encodeComment(comment) : null,
+            forwardPayload: serializePayload(payload) ?? null,
             customPayload
         });
 
@@ -99,7 +105,8 @@ export class JettonEncoder {
         transfers: {
             to: string;
             amount: AssetAmount<TonAsset>;
-            comment?: string;
+            payload?: MessagePayloadParam;
+            responseAddress?: string;
         }[]
     ): Promise<WalletOutgoingMessage> => {
         const { customPayload, stateInit, jettonWalletAddress } = await getJettonCustomPayload(
@@ -117,9 +124,11 @@ export class JettonEncoder {
                 queryId: getTonkeeperQueryId(),
                 jettonAmount: BigInt(transfer.amount.stringWeiAmount),
                 toAddress: Address.parse(transfer.to),
-                responseAddress: Address.parse(this.walletAddress),
+                responseAddress: transfer.responseAddress
+                    ? Address.parse(transfer.responseAddress)
+                    : Address.parse(this.walletAddress),
                 forwardAmount: JettonEncoder.jettonTransferForwardAmount,
-                forwardPayload: transfer.comment ? encodeComment(transfer.comment) : null,
+                forwardPayload: serializePayload(transfer.payload) ?? null,
                 customPayload: null
             })
         );

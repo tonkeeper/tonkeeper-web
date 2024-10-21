@@ -2,7 +2,7 @@ import { Address, internal } from '@ton/core';
 import { getIsBlockchainAccountBounceable, SendMode } from '../../transfer/common';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../../entries/apis';
-import { WalletOutgoingMessage } from './types';
+import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
 
 export class TonEncoder {
     constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
@@ -12,14 +12,14 @@ export class TonEncoder {
             | {
                   to: string;
                   weiAmount: BigNumber;
-                  comment?: string;
-                  isMax: boolean;
+                  isMax?: boolean;
+                  payload?: MessagePayloadParam;
               }
             | {
                   to: string;
                   weiAmount: BigNumber;
                   bounce: boolean;
-                  comment?: string;
+                  payload?: MessagePayloadParam;
               }[]
     ): Promise<WalletOutgoingMessage> => {
         if (Array.isArray(transfer)) {
@@ -32,19 +32,19 @@ export class TonEncoder {
     private encodeSingleTransfer = async ({
         to,
         weiAmount,
-        comment,
+        payload,
         isMax
     }: {
         to: string;
         weiAmount: BigNumber;
-        comment?: string;
-        isMax: boolean;
+        isMax?: boolean;
+        payload?: MessagePayloadParam;
     }): Promise<WalletOutgoingMessage> => {
         const message = internal({
             to: Address.parse(to),
             bounce: await getIsBlockchainAccountBounceable(this.api, to),
             value: BigInt(weiAmount.toFixed(0)),
-            body: comment || undefined
+            body: serializePayload(payload)
         });
 
         return {
@@ -60,7 +60,7 @@ export class TonEncoder {
             to: string;
             weiAmount: BigNumber;
             bounce: boolean;
-            comment?: string;
+            payload?: MessagePayloadParam;
         }[]
     ): Promise<WalletOutgoingMessage> => {
         return {
@@ -69,7 +69,7 @@ export class TonEncoder {
                     to: Address.parse(transfer.to),
                     bounce: transfer.bounce,
                     value: BigInt(transfer.weiAmount.toFixed(0)),
-                    body: transfer.comment || undefined
+                    body: serializePayload(transfer.payload)
                 })
             ),
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS

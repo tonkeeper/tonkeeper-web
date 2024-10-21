@@ -212,6 +212,7 @@ const BatteryRechargeNotificationContent: FC<{
                 isOpen={!!assetAmountToPay}
                 onClose={onCloseNotification}
                 assetAmount={assetAmountToPay}
+                giftRecipient={asGift ? customReceiver.value?.address : undefined}
             />
         </ContentWrapper>
     );
