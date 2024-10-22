@@ -31,7 +31,6 @@ import {
 } from '../fields/Select';
 import { useAppContext } from '../../hooks/appContext';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { deployMultisigAssetAmount } from '@tonkeeper/core/dist/service/multisig/deploy';
 import {
     Account,
     isAccountCanManageMultisigs,
@@ -40,6 +39,10 @@ import {
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Dot } from '../Dot';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import BigNumber from 'bignumber.js';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 
 const FormWrapper = styled.form`
     display: flex;
@@ -283,6 +286,11 @@ const AccountAndWalletInfoStyled = styled(AccountAndWalletInfo)`
 const SelectDropDownHostStyled = styled(SelectDropDownHost)`
     background-color: ${p => p.theme.fieldBackground};
 `;
+
+const deployMultisigAssetAmount = new AssetAmount({
+    weiAmount: new BigNumber(MultisigEncoder.deployMultisigValue.toString()),
+    asset: TON_ASSET
+});
 
 const FirstParticipantCard: FC<{ skipBalanceCheck?: boolean }> = ({ skipBalanceCheck }) => {
     const methods = useFormContext<MultisigUseForm>();

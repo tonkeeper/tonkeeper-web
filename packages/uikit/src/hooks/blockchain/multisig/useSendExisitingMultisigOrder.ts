@@ -1,26 +1,27 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAppContext } from '../../appContext';
+import { useMutation } from '@tanstack/react-query';
 import { useActiveMultisigAccountHost, useActiveMultisigWalletInfo } from '../../../state/multisig';
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
-import { getSigner } from '../../../state/mnemonic';
 import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
-import { useAppSdk } from '../../appSdk';
-import { useCheckTouchId } from '../../../state/password';
-import { signOrder } from '@tonkeeper/core/dist/service/multisig/multisigService';
-import { notifyError } from '../../../components/transfer/common';
-import { useTranslation } from '../../translation';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useTonRawTransactionService } from '../useBlockchainService';
+import { useGetSender } from '../useSender';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+
+import { useAppContext } from '../../appContext';
+import { useNotifyErrorHandle } from '../../useNotification';
+import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
 
 export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
-    const { api } = useAppContext();
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
-    const sdk = useAppSdk();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
-    const client = useQueryClient();
-    const { t } = useTranslation();
-    const { signerAccount, signerWallet } = useActiveMultisigAccountHost();
+    const { signerWallet } = useActiveMultisigAccountHost();
+    const { api } = useAppContext();
+
+    const rawTransactionService = useTonRawTransactionService();
+    const getSender = useGetSender('external');
+    const notifyError = useNotifyErrorHandle();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -29,25 +30,23 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
                 throw new Error('Multisig not found');
             }
 
-            const signer = await getSigner(sdk, signerAccount.id, checkTouchId, {
-                walletId: signerWallet.id
-            }).catch(() => null);
-            if (signer === null) {
-                throw new Error('Signer not found');
-            }
-
-            await signOrder({
-                api,
+            const message = new MultisigEncoder(api, signerWallet.rawAddress).encodeSignOrder(
                 multisig,
-                hostWallet: signerWallet,
-                signer,
-                orderAddress: orderAddress
-            });
+                orderAddress
+            );
+
+            await rawTransactionService.send(
+                await getSender(),
+                {
+                    fee: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 })
+                },
+                message
+            );
 
             await invalidateAccountQueries();
             return true;
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
             throw e;
         }
     });

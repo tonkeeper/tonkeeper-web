@@ -2,10 +2,8 @@ import { Address } from '@ton/core';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService';
-import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { areEqAddresses, formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
@@ -121,7 +119,6 @@ const LinkNftUnlinked: FC<{
 
     const { refetch: refetchEstimateFee, ...estimation } = useEstimateNftLink({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
         linkToAddress
     });
 
@@ -136,9 +133,7 @@ const LinkNftUnlinked: FC<{
 
     const mutation = useLinkNft({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
-        linkToAddress,
-        fee: estimation.data?.payload as TransferEstimationEvent
+        linkToAddress
     });
 
     const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.rawAddress);
@@ -326,15 +321,12 @@ const LinkNftLinked: FC<{
 
     const estimation = useEstimateNftLink({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
         linkToAddress
     });
 
     const mutation = useLinkNft({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
-        linkToAddress,
-        fee: estimation.data?.payload as TransferEstimationEvent
+        linkToAddress
     });
 
     const child = () => (

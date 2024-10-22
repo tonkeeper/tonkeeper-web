@@ -16,9 +16,9 @@ import { TON_ASSET, TON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/a
 import { useJettonList } from './jetton';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
-import { jettonTransferAmount } from '@tonkeeper/core/dist/service/transfer/jettonService';
 import { toNano } from '@ton/core';
 import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
+import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 
 export const useBatteryApi = () => {
     const { config } = useAppContext();
@@ -200,7 +200,7 @@ export const useBatteryMinBootstrapValue = (assetAddress: string) => {
 
         if (
             balance.tonUnitsBalance.weiAmount.gt(
-                new BigNumber((jettonTransferAmount + toNano(0.03)).toString())
+                new BigNumber((JettonEncoder.jettonTransferAmount + toNano(0.03)).toString())
             )
         ) {
             return new BigNumber(shouldReserve.tonUnits.relativeAmount);

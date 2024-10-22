@@ -11,8 +11,9 @@ import { useAnalyticsTrack } from '../amplitude';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
 import { SenderType, useGetSender } from './useSender';
-import { useTransferService } from './useTransferService';
+import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useSendTransfer<T extends Asset>({
     recipient,
@@ -31,17 +32,22 @@ export function useSendTransfer<T extends Asset>({
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender(senderType);
-    const transferService = useTransferService();
+    const transferService = useTonAssetTransferService();
 
     return useMutation<boolean, Error>(async () => {
         try {
             if (isTonAsset(amount.asset)) {
+                if (!('toAccount' in recipient)) {
+                    throw new Error('Invalid recipient');
+                }
                 const comment = (recipient as TonRecipientData).comment;
                 await transferService.send(
                     await getSender(),
                     estimation as TransferEstimation<TonAsset>,
                     {
-                        to: (recipient as TonRecipientData).toAccount.address,
+                        to: seeIfValidTonAddress(recipient.address.address)
+                            ? recipient.address.address
+                            : recipient.toAccount.address,
                         amount: amount as AssetAmount<TonAsset>,
                         isMax,
                         payload: comment ? { type: 'comment', value: comment } : undefined

@@ -2,8 +2,6 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
-import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -37,7 +35,6 @@ const RenewDNSValidUntil = styled(Body2)<{ danger: boolean }>`
     color: ${props => (props.danger ? props.theme.accentRed : props.theme.textSecondary)};
 `;
 
-const dnsRenewAmount = new BigNumber(0.02);
 const dnsRenewAssetAmount = AssetAmount.fromRelativeAmount({
     asset: TON_ASSET,
     amount: new BigNumber(0.02)
@@ -88,14 +85,11 @@ export const RenewNft: FC<{
     const { recipient, isLoading: isRecipientLoading } = useTonRecipient(nft.address);
 
     const estimation = useEstimateNftRenew({
-        nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsRenewAmount)
+        nftAddress: nft.address
     });
 
     const mutation = useRenewNft({
-        nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsRenewAmount),
-        fee: estimation.data?.payload as TransferEstimationEvent
+        nftAddress: nft.address
     });
 
     const onOpen = () => {

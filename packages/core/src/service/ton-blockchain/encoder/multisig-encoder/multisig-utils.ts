@@ -1,21 +1,88 @@
-import { APIConfig } from '../../../entries/apis';
+import { APIConfig } from '../../../../entries/apis';
 import {
     AccountEvent,
     BlockchainApi,
     EmulationApi,
     Multisig,
     MultisigOrder
-} from '../../../tonApiV2';
-import { NewOrder, packOrderBody } from './order-utils';
+} from '../../../../tonApiV2';
 import { Address, beginCell, Cell, toNano, storeMessage, Dictionary } from '@ton/core';
-import { arrayToCell, MultisigOp, MultisigParams } from '../utils';
-import { bufferToBigInt } from '../../../utils/common';
-import { MultisigConfig } from '../deploy';
-import { getOrderSeqno } from './order-send';
+import { bufferToBigInt } from '../../../../utils/common';
+import { MultisigConfig, MultisigOrderStatus } from './types';
 
 export type OrderEstimation =
     | { type: 'transfer'; event: AccountEvent }
     | { type: 'update'; config: Omit<MultisigConfig, 'allowArbitrarySeqno'> };
+
+export const MultisigOp = {
+    multisig: {
+        new_order: 0xf718510f,
+        execute: 0x75097f5d,
+        execute_internal: 0xa32c59bf
+    },
+
+    order: {
+        approve: 0xa762230f,
+        expired: 0x6,
+        approve_rejected: 0xafaf283e,
+        approved: 0x82609bf6,
+        init: 0x9c73fba2
+    },
+
+    actions: {
+        send_message: 0xf1381e5b,
+        update_multisig_params: 0x1d0cfbd3
+    }
+};
+
+export const MultisigParams = {
+    bitsize: {
+        op: 32,
+        queryId: 64,
+        orderSeqno: 256,
+        signerIndex: 8,
+        actionIndex: 8,
+        time: 48
+    }
+};
+
+export function arrayToCell(arr: Array<Address>): Dictionary<number, Address> {
+    const dict = Dictionary.empty(Dictionary.Keys.Uint(8), Dictionary.Values.Address());
+    for (let i = 0; i < arr.length; i++) {
+        dict.set(i, arr[i]);
+    }
+    return dict;
+}
+
+export const MAX_ORDER_SEQNO =
+    115792089237316195423570985008687907853269984665640564039457584007913129639935n;
+
+export const getOrderSeqno = async (api: APIConfig, multisigAddress: string) => {
+    const result = await new BlockchainApi(api.tonApiV2).execGetMethodForBlockchainAccount({
+        accountId: multisigAddress,
+        methodName: 'get_multisig_data'
+    });
+
+    const nextSeqno = result.stack[0]?.num;
+    if (nextSeqno === undefined) {
+        throw new Error("Can't get next seqno");
+    }
+
+    const nextSeqnoParsed = parseInt(nextSeqno);
+
+    if (nextSeqnoParsed < -1) {
+        throw new Error('Invalid next seqno');
+    }
+
+    /**
+     * if ~ allow_arbitrary_order_seqno
+     */
+    if (nextSeqnoParsed !== -1) {
+        return MAX_ORDER_SEQNO;
+    } else {
+        return BigInt(Date.now());
+    }
+};
 
 export async function estimateExistingOrder({
     api,
@@ -104,20 +171,16 @@ export async function estimateExistingOrder({
     };
 }
 
-export async function estimateNewOrder(options: {
-    api: APIConfig;
-    multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
-    order: NewOrder;
-}) {
-    const orderBodyCell = packOrderBody(options.order.actions);
+export function orderStatus(order: MultisigOrder): MultisigOrderStatus {
+    if (order.sentForExecution) {
+        return 'completed';
+    }
 
-    const estimation = await estimateOrderByBodyCell({
-        ...options,
-        orderBodyCell,
-        orderValidUntilSeconds: options.order.validUntilSeconds
-    });
+    if (order.expirationDate * 1000 > Date.now()) {
+        return 'progress';
+    }
 
-    return hideMultisigCallFromEstimation(options.multisig.address, estimation);
+    return 'expired';
 }
 
 async function estimateOrderByBodyCell(options: {
@@ -129,7 +192,7 @@ async function estimateOrderByBodyCell(options: {
 }) {
     let orderSeqno: number | bigint | undefined = options.orderSeqno;
     if (orderSeqno === undefined) {
-        orderSeqno = await getOrderSeqno({ api: options.api, multisig: options.multisig });
+        orderSeqno = await getOrderSeqno(options.api, options.multisig.address);
     }
 
     const execRes = await new BlockchainApi(options.api.tonApiV2).execGetMethodForBlockchainAccount(
@@ -209,7 +272,7 @@ async function estimateOrderByBodyCell(options: {
     return { event };
 }
 
-export function hideMultisigCallFromEstimation(
+function hideMultisigCallFromEstimation(
     multisigAddress: string,
     estimation: { event: AccountEvent }
 ) {

@@ -25,7 +25,6 @@ export function useNotifyError(error: unknown) {
 
 export const useNotifyErrorHandle = () => {
     const sdk = useAppSdk();
-    const client = useQueryClient();
     const { t } = useTranslation();
-    return useCallback((e: unknown) => notifyError(client, sdk, t, e), []);
+    return useCallback((e: unknown) => notifyError(sdk, t, e), []);
 };

@@ -11,7 +11,7 @@ import { DefaultRefetchInterval } from '../../state/tonendpoint';
 import { useNotifyErrorHandle } from '../useNotification';
 import { Address, beginCell } from '@ton/core';
 import { useEstimationSender, useGetSender } from './useSender';
-import { useTransferService } from './useTransferService';
+import { useTonAssetTransferService } from './useBlockchainService';
 
 export function useEstimatePurchaseBattery({
     assetAmount,
@@ -24,7 +24,7 @@ export function useEstimatePurchaseBattery({
 }) {
     const notifyError = useNotifyErrorHandle();
     const batteryConfig = useBatteryServiceConfig();
-    const transferService = useTransferService();
+    const transferService = useTonAssetTransferService();
 
     const payWithTon = isTon(assetAmount.asset.address);
 
@@ -82,7 +82,7 @@ export const usePurchaseBattery = ({
     const notifyError = useNotifyErrorHandle();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const batteryConfig = useBatteryServiceConfig();
-    const transferService = useTransferService();
+    const transferService = useTonAssetTransferService();
 
     return useMutation<boolean, Error>(async () => {
         try {

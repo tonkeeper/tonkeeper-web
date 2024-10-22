@@ -7,13 +7,13 @@ import { LedgerMessageSender } from './sender/ledger-message-sender';
 import { TonEncoder } from './encoder/ton-encoder';
 import { JettonEncoder } from './encoder/jetton-encoder';
 import BigNumber from 'bignumber.js';
-import { assertBalanceEnough } from '../transfer/common';
-import { TransferEstimation } from '../../entries/send';
-import { TonWalletStandard } from '../../entries/wallet';
-import { checkMaxAllowedMessagesInMultiTransferOrDie } from '../transfer/multiSendService';
+import { assertBalanceEnough } from './utils';
+import { Estimation, TransferEstimation } from '../../entries/send';
+import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import { MessagePayloadParam } from './encoder/types';
+import { assertMessagesNumberSupported } from './utils';
 
-type TransferParams =
+export type TransferParams =
     | {
           to: string;
           amount: AssetAmount<TonAsset>;
@@ -28,7 +28,7 @@ type TransferParams =
       }[];
 
 export class TonAssetTransactionService {
-    constructor(private readonly api: APIConfig, private readonly wallet: TonWalletStandard) {}
+    constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
 
     async estimate(sender: Sender, params: TransferParams): Promise<TransferEstimation<TonAsset>> {
         let estimation;
@@ -106,7 +106,7 @@ export class TonAssetTransactionService {
         }
     }
 
-    async send(sender: Sender, estimation: TransferEstimation<TonAsset>, params: TransferParams) {
+    async send(sender: Sender, estimation: Estimation<TonAsset>, params: TransferParams) {
         if (this.isJettonTransfer(params)) {
             await this.sendJetton(sender, estimation, params);
         } else {
@@ -116,7 +116,7 @@ export class TonAssetTransactionService {
 
     private async sendTon(
         sender: Sender,
-        estimation: TransferEstimation<TonAsset>,
+        estimation: Estimation<TonAsset>,
         params: TransferParams
     ) {
         await this.checkTransferPossibility(params, estimation);
@@ -149,7 +149,7 @@ export class TonAssetTransactionService {
 
     private async sendJetton(
         sender: Sender,
-        estimation: TransferEstimation<TonAsset>,
+        estimation: Estimation<TonAsset>,
         params: TransferParams
     ) {
         await this.checkTransferPossibility(params, estimation);
@@ -187,7 +187,7 @@ export class TonAssetTransactionService {
 
     private async checkTransferPossibility(
         params: TransferParams,
-        estimation?: TransferEstimation<TonAsset>
+        estimation?: Estimation<TonAsset>
     ) {
         const isJettonTransfer = this.isJettonTransfer(params);
 
@@ -210,7 +210,7 @@ export class TonAssetTransactionService {
 
             if (
                 isJettonTransfer &&
-                estimation.payload.event.actions
+                estimation.payload?.event.actions
                     .filter(action => action.type === 'JettonTransfer')
                     .some(action => action.status !== 'ok')
             ) {
@@ -219,8 +219,8 @@ export class TonAssetTransactionService {
         }
 
         await assertBalanceEnough(this.api, requiredBalance, this.wallet.rawAddress);
-        if (Array.isArray(params)) {
-            checkMaxAllowedMessagesInMultiTransferOrDie(params.length, this.wallet.version);
+        if (Array.isArray(params) && isStandardTonWallet(this.wallet)) {
+            assertMessagesNumberSupported(params.length, this.wallet.version);
         }
     }
 }

@@ -1,6 +1,6 @@
 import { APIConfig } from '../../../entries/apis';
 import { walletContractFromState } from '../../wallet/contractService';
-import { externalMessage, getServerTime, getTTL, getWalletSeqNo } from '../../transfer/common';
+import { externalMessage, getServerTime, getTTL, getWalletSeqNo } from '../utils';
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
@@ -22,9 +22,11 @@ export class WalletMessageSender implements ISender {
     public async send(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        return new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
+        await new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
             sendBlockchainMessageRequest: { boc: external.toBoc().toString('base64') }
         });
+
+        return external;
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {

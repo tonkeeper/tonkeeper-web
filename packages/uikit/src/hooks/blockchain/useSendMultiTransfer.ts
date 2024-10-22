@@ -1,25 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
-import {
-    TransferMessage,
-    sendJettonMultiTransfer,
-    sendTonMultiTransfer
-} from '@tonkeeper/core/dist/service/transfer/multiSendService';
+
 import BigNumber from 'bignumber.js';
-import { notifyError } from '../../components/transfer/common';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import { useJettonList } from '../../state/jetton';
-import { getSigner } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import { useTransactionAnalytics } from '../amplitude';
-import { useAppContext } from '../appContext';
-import { useAppSdk } from '../appSdk';
-import { useTranslation } from '../translation';
 import { useActiveAccount } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useNotifyErrorHandle } from '../useNotification';
+import { useGetSender } from './useSender';
+import { useTonAssetTransferService } from './useBlockchainService';
+import { TransferParams } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transaction.service';
 
 export type MultiSendFormTokenized = {
     rows: {
@@ -29,71 +21,59 @@ export type MultiSendFormTokenized = {
     }[];
 };
 
-export function multiSendFormToTransferMessages(form: MultiSendFormTokenized): TransferMessage[] {
+export function multiSendFormToTransferMessages(
+    asset: TonAsset,
+    form: MultiSendFormTokenized
+): TransferParams {
     return form.rows.map(row => {
         return {
             to: row.receiver!.address,
-            weiAmount: row.weiAmount,
-            bounce: (row.receiver as { bounce?: boolean }).bounce ?? false,
-            comment: row.comment
+            amount: new AssetAmount({ asset, weiAmount: row.weiAmount }),
+            bounce:
+                (row.receiver as { bounce?: boolean }).bounce ??
+                !(row.receiver && 'dns' in row.receiver),
+            payload: row.comment ? { type: 'comment', value: row.comment } : undefined
         };
     });
 }
 
 export function useSendMultiTransfer() {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
     const account = useActiveAccount();
     const client = useQueryClient();
     const track2 = useTransactionAnalytics();
-    const { data: jettons } = useJettonList();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
+    const notifyError = useNotifyErrorHandle();
+    const getSender = useGetSender('external');
+    const transferService = useTonAssetTransferService();
 
     return useMutation<
         boolean,
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
     >(async ({ form, asset, feeEstimation }) => {
-        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
         const walletId = account.activeTonWallet.id;
-        if (signer === null) return false;
         try {
             if (!isAccountTonWalletStandard(account)) {
                 throw new Error("Can't send a transfer using this account");
             }
 
-            const wallet = account.activeTonWallet;
-
-            if (signer.type !== 'cell') {
-                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+            if (account.type === 'ledger') {
+                throw new Error("Can't estimate fee using ledger account");
             }
+
+            await transferService.send(
+                await getSender(),
+                { fee: new AssetAmount({ asset: TON_ASSET, weiAmount: feeEstimation }) },
+                multiSendFormToTransferMessages(asset, form)
+            );
 
             if (asset.id === TON_ASSET.id) {
                 track2('multi-send-ton');
-                await sendTonMultiTransfer(
-                    api,
-                    wallet,
-                    multiSendFormToTransferMessages(form),
-                    feeEstimation,
-                    signer
-                );
             } else {
                 track2('multi-send-jetton');
-                const jettonInfo = jettons!.balances.find(
-                    jetton => (asset.address as Address).toRawString() === jetton.jetton.address
-                )!;
-                await sendJettonMultiTransfer(
-                    api,
-                    wallet,
-                    jettonInfo.walletAddress.address,
-                    multiSendFormToTransferMessages(form),
-                    feeEstimation,
-                    signer
-                );
             }
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
         }
 
         await client.invalidateQueries({

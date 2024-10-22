@@ -6,7 +6,7 @@ import { AccountEvent, AccountsApi, MultisigOrder } from '@tonkeeper/core/dist/t
 import {
     estimateExistingOrder,
     OrderEstimation
-} from '@tonkeeper/core/dist/service/multisig/order/order-estimate';
+} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 
 export function useEstimateExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
     const { api } = useAppContext();

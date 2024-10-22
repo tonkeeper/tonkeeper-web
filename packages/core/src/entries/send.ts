@@ -62,3 +62,12 @@ export type TransferEstimation<T extends Asset = Asset> = {
 
 export type TransferEstimationEvent = { event: AccountEvent };
 export type TransferEstimationEventFee = { event: Pick<AccountEvent, 'extra'> };
+
+export type Estimation<T extends Asset = Asset> = {
+    fee: AssetAmount<T>;
+    payload?: T extends TonAsset
+        ? TransferEstimationEvent
+        : T extends TronAsset
+        ? EstimatePayload
+        : never;
+};

@@ -1,5 +1,5 @@
-import { Address, internal } from '@ton/core';
-import { getIsBlockchainAccountBounceable, SendMode } from '../../transfer/common';
+import { Address, internal, SendMode } from '@ton/core';
+import { userInputAddressIsBounceable } from '../utils';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../../entries/apis';
 import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
@@ -42,7 +42,7 @@ export class TonEncoder {
     }): Promise<WalletOutgoingMessage> => {
         const message = internal({
             to: Address.parse(to),
-            bounce: await getIsBlockchainAccountBounceable(this.api, to),
+            bounce: await userInputAddressIsBounceable(this.api, to),
             value: BigInt(weiAmount.toFixed(0)),
             body: serializePayload(payload)
         });

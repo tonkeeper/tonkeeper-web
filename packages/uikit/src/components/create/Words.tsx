@@ -627,7 +627,7 @@ export const SelectMnemonicType: FC<{
     return (
         <>
             <Block>
-                <H2Responsive>{t('import_chose_mnemonic_type_title')}</H2Responsive>
+                <H2Label2Responsive>{t('import_chose_mnemonic_type_title')}</H2Label2Responsive>
                 <Body>{t('import_chose_mnemonic_type_description')}</Body>
             </Block>
             <BottomButtonBlock>

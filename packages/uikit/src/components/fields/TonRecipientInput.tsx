@@ -14,12 +14,12 @@ import { useAsyncValidator } from '../../hooks/useAsyncValidator';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { IconButton } from './IconButton';
 import { useAppContext } from '../../hooks/appContext';
-import { Address } from '@ton/core';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { seeIfInvalidDns } from '../transfer/RecipientView';
 import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TextareaAutosize } from './TextareaAutosize';
 import { InputBlock, Label } from './Input';
+import { userInputAddressIsBounceable } from '@tonkeeper/core/dist/service/transfer/common';
 
 const SpinnerRingStyled = styled(SpinnerRing)`
     transform: scale(1.2);
@@ -211,16 +211,11 @@ export const useTonRecipientValidator = () => {
             }
 
             if (seeIfValidTonAddress(value)) {
-                let bounce = false;
-                if (Address.isFriendly(value)) {
-                    bounce = Address.parseFriendly(value).isBounceable;
-                }
-
                 return {
                     success: true,
                     result: {
                         address: value,
-                        bounce,
+                        bounce: await userInputAddressIsBounceable(api, value),
                         blockchain: BLOCKCHAIN_NAME.TON
                     }
                 };

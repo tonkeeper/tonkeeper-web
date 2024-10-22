@@ -3,21 +3,19 @@ import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import BigNumber from 'bignumber.js';
 import { LedgerSigner } from '../../../entries/signer';
 import { walletContractFromState } from '../../wallet/contractService';
-import { Address, Cell, comment as encodeComment } from '@ton/core';
+import { Address, Cell, comment as encodeComment, SendMode } from '@ton/core';
 import {
     externalMessage,
-    getIsBlockchainAccountBounceable,
+    userInputAddressIsBounceable,
     getServerTime,
     getTonkeeperQueryId,
     getTTL,
     getWalletSeqNo,
-    seeIfAddressBounceable,
-    SendMode,
+    tonConnectAddressIsBounceable,
     toStateInit
-} from '../../transfer/common';
+} from '../utils';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
-import { getJettonCustomPayload } from '../../transfer/jettonPayloadService';
 import { TonWalletStandard } from '../../../entries/wallet';
 import { JettonEncoder } from '../encoder/jetton-encoder';
 import { NFTEncoder } from '../encoder/nft-encoder';
@@ -33,30 +31,38 @@ export class LedgerMessageSender {
         private readonly signer: LedgerSigner
     ) {}
 
-    blindSignSender() {
-        /*const signer = (cell: Cell) => {
-            await this.signer({
-                to: Address.parse(transaction.to),
-                bounce: true,
-                amount: BigInt(value),
-                seqno: wallet.seqno,
-                timeout: getTTL(wallet.timestamp),
-                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-                stateInit: transaction.init || undefined,
-                payload: transaction.body
-                    ? {
-                          type: 'unsafe',
-                          message:
-                              typeof transaction.body == 'string'
-                                  ? Cell.fromBase64(transaction.body)
-                                  : transaction.body
-                      }
-                    : undefined
-            });
-        };
+    tonRawTransfer = async ({
+        to,
+        value,
+        body,
+        bounce,
+        sendMode
+    }: {
+        to: Address;
+        value: bigint;
+        body?: Cell;
+        sendMode: SendMode;
+        bounce: boolean;
+    }) => {
+        const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        return new WalletMessageSender(this.api, this.wallet);*/
-    }
+        const transfer = await this.signer({
+            to,
+            bounce,
+            amount: value,
+            seqno,
+            timeout: getTTL(timestamp),
+            sendMode: sendMode,
+            payload: body
+                ? {
+                      type: 'unsafe',
+                      message: body
+                  }
+                : undefined
+        });
+
+        return this.toSenderObject(externalMessage(contract, seqno, transfer));
+    };
 
     tonTransfer = async ({
         to,
@@ -73,7 +79,7 @@ export class LedgerMessageSender {
 
         const transfer = await this.signer({
             to: Address.parse(to),
-            bounce: await getIsBlockchainAccountBounceable(this.api, to),
+            bounce: await userInputAddressIsBounceable(this.api, to),
             amount: BigInt(weiAmount.toFixed(0)),
             seqno,
             timeout: getTTL(timestamp),
@@ -88,10 +94,12 @@ export class LedgerMessageSender {
 
     private toSenderObject(external: Cell) {
         return {
-            send: () =>
-                new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
+            send: async () => {
+                await new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
                     sendBlockchainMessageRequest: { boc: external.toBoc().toString('base64') }
-                }),
+                });
+                return external;
+            },
             estimate: () =>
                 new EmulationApi(this.api.tonApiV2).emulateMessageToWallet({
                     emulateMessageToWalletRequest: { boc: external.toBoc().toString('base64') }
@@ -110,11 +118,10 @@ export class LedgerMessageSender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const { customPayload, stateInit, jettonWalletAddress } = await getJettonCustomPayload(
-            this.api,
-            this.wallet.rawAddress,
-            tonAssetAddressToString(amount.asset.address)
-        );
+        const jettonEncoder = new JettonEncoder(this.api, this.wallet.rawAddress);
+
+        const { customPayload, stateInit, jettonWalletAddress } =
+            await jettonEncoder.jettonCustomPayload(tonAssetAddressToString(amount.asset.address));
 
         const transfer = await this.signer({
             to: Address.parse(jettonWalletAddress),
@@ -186,7 +193,7 @@ export class LedgerMessageSender {
         try {
             transferCell = await this.signer({
                 to: Address.parse(message.address),
-                bounce: seeIfAddressBounceable(message.address),
+                bounce: await tonConnectAddressIsBounceable(this.api, message.address),
                 amount: BigInt(message.amount),
                 seqno,
                 timeout: getTTL(timestamp),

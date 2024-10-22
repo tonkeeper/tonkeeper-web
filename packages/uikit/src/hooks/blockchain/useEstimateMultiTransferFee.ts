@@ -1,60 +1,47 @@
 import { useMutation } from '@tanstack/react-query';
-import { Address } from '@ton/core';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    estimateJettonMultiTransfer,
-    estimateTonMultiTransfer
-} from '@tonkeeper/core/dist/service/transfer/multiSendService';
+
 import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
-import BigNumber from 'bignumber.js';
-import { useJettonList } from '../../state/jetton';
-import { useAppContext } from '../appContext';
 import { MultiSendFormTokenized, multiSendFormToTransferMessages } from './useSendMultiTransfer';
-import { useActiveStandardTonWallet } from '../../state/wallet';
+import { useNotifyErrorHandle } from '../useNotification';
+import { useGetSender } from './useSender';
+import { useTonAssetTransferService } from './useBlockchainService';
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { useActiveAccount } from '../../state/wallet';
 
 export function useEstimateMultiTransfer() {
-    const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
-    const { data: jettons } = useJettonList();
+    const notifyError = useNotifyErrorHandle();
+    const getSender = useGetSender('external');
+    const transferService = useTonAssetTransferService();
+    const account = useActiveAccount();
 
     return useMutation<
         { fee: AssetAmount<TonAsset>; estimation: AccountEvent },
         Error,
         { form: MultiSendFormTokenized; asset: TonAsset }
     >(async ({ form, asset }) => {
-        if (asset.id === TON_ASSET.id) {
-            const estimation = await estimateTonMultiTransfer(
-                api,
-                wallet,
-                multiSendFormToTransferMessages(form)
+        try {
+            if (!isAccountTonWalletStandard(account)) {
+                throw new Error("Can't send a transfer using this account");
+            }
+
+            if (account.type === 'ledger') {
+                throw new Error("Can't estimate fee using ledger account");
+            }
+
+            const result = await transferService.estimate(
+                await getSender(),
+                multiSendFormToTransferMessages(asset, form)
             );
-            const total = new BigNumber(estimation.extra);
 
-            const fee = new AssetAmount({
-                asset: TON_ASSET,
-                weiAmount: total.multipliedBy(-1)
-            });
-            return { fee, estimation };
-        } else {
-            const jettonInfo = jettons!.balances.find(
-                jetton => (asset.address as Address).toRawString() === jetton.jetton.address
-            )!;
-
-            const estimation = await estimateJettonMultiTransfer(
-                api,
-                wallet,
-                jettonInfo.walletAddress.address,
-                multiSendFormToTransferMessages(form)
-            );
-            const total = new BigNumber(estimation.extra);
-
-            const fee = new AssetAmount({
-                asset: TON_ASSET,
-                weiAmount: total.multipliedBy(-1)
-            });
-            return { fee, estimation };
+            return {
+                fee: result.fee,
+                estimation: result.payload.event
+            };
+        } catch (e) {
+            await notifyError(e);
+            throw e;
         }
     });
 }

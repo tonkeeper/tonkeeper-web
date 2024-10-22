@@ -1,5 +1,4 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { EstimateData } from '@tonkeeper/core/dist/service/transfer/tonService';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, useMemo } from 'react';
 import styled from 'styled-components';
@@ -10,6 +9,7 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock } from '../List';
 import { Body2, Label1 } from '../Text';
 import { TonActivityEvents } from '../activity/ton/TonActivityEvents';
+import { EstimateData } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 const Fee = styled.div`
     width: 100%;
@@ -61,10 +61,10 @@ export const EmulationList: FC<{ isError: boolean; estimate: EstimateData | unde
     const { t, i18n } = useTranslation();
 
     const [date, timestamp] = useMemo(() => {
-        const timestamp = estimate?.accountEvent.event.timestamp
+        const _timestamp = estimate?.accountEvent.event.timestamp
             ? estimate?.accountEvent.event.timestamp * 1000
             : Date.now();
-        return [formatActivityDate(i18n.language, 'now', timestamp), timestamp] as const;
+        return [formatActivityDate(i18n.language, 'now', _timestamp), _timestamp] as const;
     }, [estimate]);
 
     if (isError) {

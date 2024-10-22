@@ -1,5 +1,4 @@
 import { walletContractFromState } from '../../wallet/contractService';
-import { externalMessage, getServerTime, getWalletSeqNo } from '../../transfer/common';
 import { WalletContractV5R1 } from '@ton/ton';
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
@@ -7,6 +6,7 @@ import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
 import { Battery } from '../../../batteryApi';
 import { APIConfig } from '../../../entries/apis';
 import { ISender } from './ISender';
+import { externalMessage, getServerTime, getWalletSeqNo } from '../utils';
 
 export class BatteryMessageSender implements ISender {
     constructor(
@@ -31,9 +31,11 @@ export class BatteryMessageSender implements ISender {
     public async send(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        return this.api.batteryApi.default.sendMessage(this.batteryConfig.authToken, {
+        await this.api.batteryApi.default.sendMessage(this.batteryConfig.authToken, {
             boc: external.toBoc().toString('base64')
         });
+
+        return external;
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {

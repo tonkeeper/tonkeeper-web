@@ -1,10 +1,10 @@
-import { Address, beginCell, Cell, toNano, internal } from '@ton/core';
-import { getTonkeeperQueryId, SendMode } from '../../transfer/common';
+import { Address, beginCell, Cell, toNano, internal, SendMode } from '@ton/core';
+import { getTonkeeperQueryId, StateInit, toStateInit } from '../utils';
 import { APIConfig } from '../../../entries/apis';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
-import { getJettonCustomPayload } from '../../transfer/jettonPayloadService';
 import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
+import { AccountsApi, JettonBalance, JettonsApi } from '../../../tonApiV2';
 
 export class JettonEncoder {
     static jettonTransferAmount = toNano(0.1);
@@ -56,6 +56,51 @@ export class JettonEncoder {
         }
     };
 
+    public jettonCustomPayload = async (
+        jettonAddress: string
+    ): Promise<{
+        customPayload: Cell | null;
+        stateInit: StateInit;
+        jettonWalletAddress: string;
+    }> => {
+        const jetton = await new AccountsApi(this.api.tonApiV2).getAccountJettonBalance({
+            accountId: this.walletAddress,
+            jettonId: jettonAddress,
+            supportedExtensions: ['custom_payload']
+        });
+
+        if (!this.isCompressed(jetton)) {
+            return {
+                customPayload: null,
+                stateInit: undefined,
+                jettonWalletAddress: jetton.walletAddress.address
+            };
+        }
+
+        const { customPayload, stateInit } = await new JettonsApi(
+            this.api.tonApiV2
+        ).getJettonTransferPayload({
+            accountId: this.walletAddress,
+            jettonId: jetton.jetton.address
+        });
+
+        if (!customPayload) {
+            return {
+                customPayload: null,
+                stateInit: undefined,
+                jettonWalletAddress: jetton.walletAddress.address
+            };
+        }
+
+        return {
+            customPayload: Cell.fromBase64(Buffer.from(customPayload, 'hex').toString('base64')),
+            stateInit: stateInit
+                ? toStateInit(Buffer.from(stateInit, 'hex').toString('base64'))
+                : undefined,
+            jettonWalletAddress: jetton.walletAddress.address
+        };
+    };
+
     private encodeSingleTransfer = async ({
         to,
         amount,
@@ -67,9 +112,7 @@ export class JettonEncoder {
         payload?: MessagePayloadParam;
         responseAddress?: string;
     }): Promise<WalletOutgoingMessage> => {
-        const { customPayload, stateInit, jettonWalletAddress } = await getJettonCustomPayload(
-            this.api,
-            this.walletAddress,
+        const { customPayload, stateInit, jettonWalletAddress } = await this.jettonCustomPayload(
             tonAssetAddressToString(amount.asset.address)
         );
 
@@ -109,9 +152,7 @@ export class JettonEncoder {
             responseAddress?: string;
         }[]
     ): Promise<WalletOutgoingMessage> => {
-        const { customPayload, stateInit, jettonWalletAddress } = await getJettonCustomPayload(
-            this.api,
-            this.walletAddress,
+        const { customPayload, stateInit, jettonWalletAddress } = await this.jettonCustomPayload(
             (transfers[0].amount.asset.address as Address).toRawString()
         );
 
@@ -144,5 +185,9 @@ export class JettonEncoder {
             ),
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
         };
+    };
+
+    private isCompressed = (jetton: JettonBalance) => {
+        return !!jetton.extensions && jetton.extensions.includes('custom_payload');
     };
 }

@@ -10,8 +10,9 @@ import {
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
 import { SenderType, useEstimationSender } from './useSender';
-import { useTransferService } from './useTransferService';
+import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useEstimateTransfer({
     recipient,
@@ -25,7 +26,7 @@ export function useEstimateTransfer({
     senderType: SenderType;
 }) {
     const sender = useEstimationSender(senderType);
-    const transferService = useTransferService();
+    const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
 
     return useQuery<TransferEstimation<Asset>, Error>(
@@ -34,8 +35,13 @@ export function useEstimateTransfer({
             const comment = (recipient as TonRecipientData).comment;
             try {
                 if (isTonAsset(amount.asset)) {
+                    if (!('toAccount' in recipient)) {
+                        throw new Error('Invalid recipient');
+                    }
                     return await transferService.estimate(sender!, {
-                        to: (recipient as TonRecipientData).toAccount.address,
+                        to: seeIfValidTonAddress(recipient.address.address)
+                            ? recipient.address.address
+                            : recipient.toAccount.address,
                         amount: amount as AssetAmount<TonAsset>,
                         isMax,
                         payload: comment ? { type: 'comment', value: comment } : undefined

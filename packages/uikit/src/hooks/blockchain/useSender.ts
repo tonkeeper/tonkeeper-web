@@ -6,6 +6,7 @@ import {
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useAppContext } from '../appContext';
 import {
+    useAccountsState,
     useActiveAccount,
     useActiveStandardTonWallet,
     useActiveTonWalletConfig
@@ -21,8 +22,16 @@ import {
 import { useGetActiveAccountSigner } from '../../state/mnemonic';
 import { useCallback, useMemo } from 'react';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountTonMultisig,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { getMultisigSignerInfo, useActiveMultisigAccountHost } from '../../state/multisig';
+import { MultisigCreateOrderSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/multisig-create-order-sender';
+import { Signer } from '@tonkeeper/core/dist/entries/signer';
+import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 export type SenderType = 'external' | 'battery';
 
@@ -120,6 +129,62 @@ export const useEstimationSender = (type: SenderType) => {
     }, [type, api, batteryApi, batteryConfig, wallet, authToken, activeAccount, mutate]);
 };
 
+export const useGetEstimationSender = (type: SenderType) => {
+    const { api } = useAppContext();
+    const batteryApi = useBatteryApi();
+    const batteryConfig = useBatteryServiceConfig();
+    const wallet = useActiveStandardTonWallet();
+    const { data: authToken } = useBatteryAuthToken();
+    const activeAccount = useActiveAccount();
+    const { mutateAsync } = useRequestBatteryAuthToken();
+
+    return useMemo(() => {
+        if (type === 'battery' && authToken === undefined) {
+            return undefined;
+        }
+
+        return async () => {
+            if (!isAccountTonWalletStandard(activeAccount)) {
+                throw new Error("Can't send a transfer using this account");
+            }
+
+            if (activeAccount.type === 'ledger') {
+                if (type !== 'external') {
+                    throw new Error("Can't send a transfer using this account");
+                }
+                return new WalletMessageSender(api, wallet, estimationSigner);
+            }
+
+            if (type === 'external') {
+                return new WalletMessageSender(api, wallet, estimationSigner);
+            }
+
+            if (type === 'battery') {
+                let _authToken = authToken;
+                if (_authToken === null) {
+                    _authToken = await mutateAsync();
+                }
+
+                return new BatteryMessageSender(
+                    {
+                        jettonResponseAddress: batteryConfig.excess_account,
+                        messageTtl: batteryConfig.message_ttl,
+                        authToken: _authToken!
+                    },
+                    {
+                        tonApi: api,
+                        batteryApi
+                    },
+                    wallet,
+                    estimationSigner
+                );
+            }
+
+            assertUnreachable(type);
+        };
+    }, [type, api, batteryApi, batteryConfig, wallet, authToken, activeAccount, mutateAsync]);
+};
+
 export const useGetSender = (presetType?: SenderType) => {
     const { api } = useAppContext();
     const batteryApi = useBatteryApi();
@@ -192,5 +257,82 @@ export const useGetSender = (presetType?: SenderType) => {
             activeAccount,
             mutateAsync
         ]
+    );
+};
+
+export const useGetMultisigSender = (type: 'send' | 'estimate') => {
+    const { api } = useAppContext();
+    const getSigner = useGetActiveAccountSigner();
+    const activeAccount = useActiveAccount();
+    const accounts = useAccountsState();
+
+    return useCallback(
+        async (ttlSeconds: number) => {
+            const { signerWallet } = getMultisigSignerInfo(
+                accounts,
+                activeAccount as AccountTonMultisig
+            );
+            let signer: Signer;
+            if (type === 'estimate') {
+                signer = estimationSigner;
+            } else {
+                const _signer = await getSigner(signerWallet.id).catch(() => null);
+                if (_signer === null) {
+                    throw new Error('Signer not found');
+                }
+
+                signer = _signer;
+            }
+
+            const multisigApi = new MultisigApi(api.tonApiV2);
+            const multisig = await multisigApi.getMultisigAccount({
+                accountId: activeAccount.activeTonWallet.rawAddress
+            });
+            if (!multisig) {
+                throw new Error('Multisig not found');
+            }
+
+            return new MultisigCreateOrderSender(api, multisig, ttlSeconds, signerWallet, signer);
+        },
+        [api, accounts, getSigner, activeAccount]
+    );
+};
+
+export const useGetTonConnectSender = (type: 'send' | 'estimate') => {
+    const { api } = useAppContext();
+    const { signerWallet } = useActiveMultisigAccountHost();
+    const getSigner = useGetActiveAccountSigner();
+    const activeAccount = useActiveAccount();
+    const getMultisigSender = useGetMultisigSender(type);
+
+    return useCallback(
+        async (ttlSeconds?: number) => {
+            if (activeAccount.type === 'ton-multisig') {
+                if (ttlSeconds === undefined) {
+                    throw new Error('TTL is required');
+                }
+                return getMultisigSender(ttlSeconds);
+            }
+
+            const signer = type === 'send' ? await getSigner() : estimationSigner;
+
+            if (activeAccount.type === 'ledger') {
+                if (signer.type !== 'ledger') {
+                    throw new Error("Account and signer types don't match");
+                }
+                return new LedgerMessageSender(api, activeAccount.activeTonWallet, signer);
+            }
+
+            if (!isStandardTonWallet(activeAccount.activeTonWallet)) {
+                throw new Error("Can't send a transfer using this wallet");
+            }
+
+            if (signer.type !== 'cell') {
+                throw new Error("Account and signer types don't match");
+            }
+
+            return new WalletMessageSender(api, activeAccount.activeTonWallet, signer);
+        },
+        [type, api, signerWallet, getSigner, activeAccount, getMultisigSender]
     );
 };
