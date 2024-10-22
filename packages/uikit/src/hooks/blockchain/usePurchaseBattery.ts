@@ -10,7 +10,7 @@ import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
 import { useNotifyErrorHandle } from '../useNotification';
 import { Address, beginCell } from '@ton/core';
-import { useEstimationSender, useGetSender } from './useSender';
+import { useGetEstimationSender, useGetSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 
 export function useEstimatePurchaseBattery({
@@ -28,14 +28,14 @@ export function useEstimatePurchaseBattery({
 
     const payWithTon = isTon(assetAmount.asset.address);
 
-    const sender = useEstimationSender(payWithTon ? 'external' : 'battery');
+    const getSender = useGetEstimationSender(payWithTon ? 'external' : 'battery');
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
         [
             QueryKey.estimateBatteryPurchase,
             assetAmount,
             payWithTon,
-            sender,
+            getSender,
             transferService,
             giftRecipient,
             promoCode,
@@ -44,7 +44,7 @@ export function useEstimatePurchaseBattery({
         async () => {
             try {
                 const needPayload = giftRecipient || promoCode || !payWithTon;
-                return await transferService.estimate(sender!, {
+                return await transferService.estimate(await getSender!(), {
                     to: batteryConfig.fund_receiver,
                     amount: assetAmount,
                     payload: needPayload
@@ -61,7 +61,8 @@ export function useEstimatePurchaseBattery({
         },
         {
             refetchInterval: DefaultRefetchInterval,
-            refetchOnMount: 'always'
+            refetchOnMount: 'always',
+            enabled: !!getSender
         }
     );
 }
@@ -92,7 +93,7 @@ export const usePurchaseBattery = ({
 
             const payWithTon = isTon(assetAmount.asset.address);
 
-            const sender = await getSender(payWithTon ? 'external' : 'battery');
+            const sender = await getSender({ type: payWithTon ? 'external' : 'battery' });
 
             const needPayload = giftRecipient || promoCode || !payWithTon;
             await transferService.send(sender, estimation, {

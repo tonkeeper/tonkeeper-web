@@ -20,7 +20,7 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
     const { api } = useAppContext();
 
     const rawTransactionService = useTonRawTransactionService();
-    const getSender = useGetSender('external');
+    const getSender = useGetSender();
     const notifyError = useNotifyErrorHandle();
 
     return useMutation<boolean, Error>(async () => {
@@ -36,7 +36,7 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
             );
 
             await rawTransactionService.send(
-                await getSender(),
+                await getSender({ type: 'external' }),
                 {
                     fee: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 })
                 },

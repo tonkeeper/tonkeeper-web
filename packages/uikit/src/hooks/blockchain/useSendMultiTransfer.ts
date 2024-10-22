@@ -43,7 +43,7 @@ export function useSendMultiTransfer() {
     const track2 = useTransactionAnalytics();
 
     const notifyError = useNotifyErrorHandle();
-    const getSender = useGetSender('external');
+    const getSender = useGetSender();
     const transferService = useTonAssetTransferService();
 
     return useMutation<
@@ -62,7 +62,7 @@ export function useSendMultiTransfer() {
             }
 
             await transferService.send(
-                await getSender(),
+                await getSender({ type: 'external' }),
                 { fee: new AssetAmount({ asset: TON_ASSET, weiAmount: feeEstimation }) },
                 multiSendFormToTransferMessages(asset, form)
             );

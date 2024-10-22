@@ -28,12 +28,12 @@ import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
 import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
-import { useGetTonConnectSender } from '../../hooks/blockchain/useSender';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { EstimateData } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { useGetEstimationSender, useGetSender } from '../../hooks/blockchain/useSender';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -66,7 +66,7 @@ const useSendMutation = (
 ) => {
     const account = useActiveAccount();
     const client = useQueryClient();
-    const getSender = useGetTonConnectSender('send');
+    const getSender = useGetSender();
     const tonConenctService = useTonConnectTransactionService();
 
     return useMutation<string, Error>(async () => {
@@ -74,8 +74,10 @@ const useSendMutation = (
             throw new Error('Cant use this account');
         }
 
-        const ttl = options.multisigTTL ? 60 * Number(options.multisigTTL) : undefined;
-        const sender = await getSender(ttl);
+        const sender = await getSender({
+            multisigTtlSeconds: options.multisigTTL ? 60 * Number(options.multisigTTL) : undefined,
+            type: 'external'
+        });
 
         const boc = await tonConenctService.send(
             sender,
@@ -268,23 +270,22 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
-    const getSender = useGetTonConnectSender('estimate');
+    const getSender = useGetEstimationSender('external');
     const tonConenctService = useTonConnectTransactionService();
 
     return useQuery<EstimateData, Error>(
-        [QueryKey.estimate, params, account, accounts],
+        [QueryKey.estimate, params, account, accounts, getSender],
         async () => {
             if (account.type === 'watch-only') {
                 throw new Error('Cant use this account');
             }
 
-            const ttl = 5 * 60;
-            const sender = await getSender(ttl);
+            const sender = await getSender!();
 
             const result = await tonConenctService.estimate(sender, params);
             return { accountEvent: result.payload };
         },
-        { enabled: errorFetched }
+        { enabled: errorFetched && !!getSender }
     );
 };
 

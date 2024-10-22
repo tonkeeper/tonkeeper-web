@@ -9,7 +9,7 @@ import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useTonAssetTransferService } from '../useBlockchainService';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useNotifyErrorHandle } from '../../useNotification';
-import { useGetMultisigSender } from '../useSender';
+import { useGetSender } from '../useSender';
 
 export function useSendNewMultisigTransfer(
     recipient: TonRecipientData,
@@ -20,7 +20,7 @@ export function useSendNewMultisigTransfer(
 ) {
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
-    const getSender = useGetMultisigSender('send');
+    const getSender = useGetSender();
     const track2 = useTransactionAnalytics();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
@@ -28,7 +28,7 @@ export function useSendNewMultisigTransfer(
         try {
             const ttlSeconds = Number(ttl) * 60;
 
-            const sender = await getSender(ttlSeconds);
+            const sender = await getSender({ multisigTtlSeconds: ttlSeconds });
 
             const comment = (recipient as TonRecipientData).comment;
             await transferService.send(sender, estimation, {

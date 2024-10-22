@@ -45,7 +45,6 @@ import {
     SenderType,
     useAvailableSendersTypes,
     useGetEstimationSender,
-    useGetMultisigSender,
     useGetSender
 } from '../../../hooks/blockchain/useSender';
 import { useTonRawTransactionService } from '../../../hooks/blockchain/useBlockchainService';
@@ -75,23 +74,15 @@ const useNftTransferEstimation = (
         signerWallet = getMultisigSignerInfo(accounts, account).signerWallet;
     }
 
-    const getMultisigSender = useGetMultisigSender('estimate');
     const getSender = useGetEstimationSender(selectedSenderType);
     const rawTransactionService = useTonRawTransactionService();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
-        [QueryKey.estimate, data?.address, accounts, signerWallet],
+        [QueryKey.estimate, data?.address, accounts, signerWallet, getSender],
         async () => {
             try {
                 if (account.type === 'watch-only') {
                     throw new Error('account not controllable');
-                }
-
-                let sender: Sender;
-                if (account.type === 'ton-multisig') {
-                    sender = await getMultisigSender(60 * 5);
-                } else {
-                    sender = await getSender!();
                 }
 
                 const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
@@ -103,7 +94,7 @@ const useNftTransferEstimation = (
                     nftTransferAmountWei
                 });
 
-                return await rawTransactionService.estimate(sender, nftTransferMsg);
+                return await rawTransactionService.estimate(await getSender!(), nftTransferMsg);
             } catch (e) {
                 await notifyError(e);
                 throw e;
@@ -126,8 +117,7 @@ const useSendNft = (
     const track2 = useTransactionAnalytics();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
-    const getMultisigSender = useGetMultisigSender('send');
-    const getSender = useGetSender(options.selectedSenderType);
+    const getSender = useGetSender();
     const rawTransactionService = useTonRawTransactionService();
     const notifyError = useNotifyErrorHandle();
 
@@ -140,16 +130,10 @@ const useSendNft = (
         if (!fee) return false;
 
         try {
-            let sender: Sender;
-            if (account.type === 'ton-multisig') {
-                if (!options?.multisigTTL) {
-                    throw new Error('TTL is required');
-                }
-
-                sender = await getMultisigSender(60 * Number(options.multisigTTL));
-            } else {
-                sender = await getSender();
-            }
+            const sender = await getSender({
+                multisigTtlSeconds: 60 * Number(options.multisigTTL),
+                type: options.selectedSenderType
+            });
 
             const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
             const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(

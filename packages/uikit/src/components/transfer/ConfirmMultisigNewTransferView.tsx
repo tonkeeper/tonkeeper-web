@@ -1,6 +1,6 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import React, { FC, PropsWithChildren, useEffect } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import { ConfirmView, ConfirmViewAdditionalBottomSlot } from './ConfirmView';
 import { useEstimateNewMultisigTransfer } from '../../hooks/blockchain/multisig/useEstimateNewMultisigTransfer';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -35,10 +35,6 @@ export const ConfirmMultisigNewTransferView: FC<
         ttl,
         estimation.data!
     );
-
-    useEffect(() => {
-        estimation.mutate();
-    }, [estimation.mutate]);
 
     return (
         <ConfirmView estimation={estimation} {...mutation} {...rest}>

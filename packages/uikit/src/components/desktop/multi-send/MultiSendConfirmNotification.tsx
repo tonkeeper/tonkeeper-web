@@ -1,5 +1,5 @@
 import { Notification } from '../../Notification';
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useMemo } from 'react';
 import { Image, ImageMock } from '../../transfer/Confirm';
 import { MultiSendForm } from '../../../state/multiSend';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -159,19 +159,10 @@ const MultiSendConfirmContent: FC<{
     );
 
     const {
-        mutateAsync: estimate,
         isLoading: estimateLoading,
         data: estimateData,
         error: estimateError
-    } = useEstimateMultiTransfer();
-
-    useEffect(() => {
-        estimate({ form: formTokenized, asset }).catch(e => {
-            if (!(e instanceof NotEnoughBalanceError)) {
-                setTimeout(onClose, 5000);
-            }
-        });
-    }, [asset, formTokenized]);
+    } = useEstimateMultiTransfer(formTokenized, asset);
 
     const tonFee = estimateData?.fee.stringAssetRelativeAmount;
     const fiatFee = formatFiatCurrency(

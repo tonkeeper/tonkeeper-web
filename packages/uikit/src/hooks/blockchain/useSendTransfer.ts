@@ -31,7 +31,7 @@ export function useSendTransfer<T extends Asset>({
     const track = useAnalyticsTrack();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const notifyError = useNotifyErrorHandle();
-    const getSender = useGetSender(senderType);
+    const getSender = useGetSender();
     const transferService = useTonAssetTransferService();
 
     return useMutation<boolean, Error>(async () => {
@@ -42,7 +42,7 @@ export function useSendTransfer<T extends Asset>({
                 }
                 const comment = (recipient as TonRecipientData).comment;
                 await transferService.send(
-                    await getSender(),
+                    await getSender({ type: senderType }),
                     estimation as TransferEstimation<TonAsset>,
                     {
                         to: seeIfValidTonAddress(recipient.address.address)

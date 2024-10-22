@@ -7,7 +7,7 @@ import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useTransactionAnalytics } from '../../amplitude';
 
 export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) => {
-    const getSender = useGetSender('external');
+    const getSender = useGetSender();
     const rawTransactionService = useTonRawTransactionService();
     const activeAccount = useActiveAccount();
     const track2 = useTransactionAnalytics();
@@ -17,7 +17,7 @@ export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) 
     return useMutation<boolean, Error>(async () => {
         const nftEncoder = new NFTEncoder(walletAddress);
         await rawTransactionService.send(
-            await getSender(),
+            await getSender({ type: 'external' }),
             zeroFee,
             nftEncoder.encodeNftLink(args)
         );
