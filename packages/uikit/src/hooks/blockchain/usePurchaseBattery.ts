@@ -12,6 +12,7 @@ import { useNotifyErrorHandle } from '../useNotification';
 import { Address, beginCell } from '@ton/core';
 import { useGetEstimationSender, useGetSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
+import { useToQueryKeyPart } from '../useToQueryKeyPart';
 
 export function useEstimatePurchaseBattery({
     assetAmount,
@@ -29,13 +30,14 @@ export function useEstimatePurchaseBattery({
     const payWithTon = isTon(assetAmount.asset.address);
 
     const getSender = useGetEstimationSender(payWithTon ? 'external' : 'battery');
+    const getSenderKey = useToQueryKeyPart(getSender);
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
         [
             QueryKey.estimateBatteryPurchase,
             assetAmount,
             payWithTon,
-            getSender,
+            getSenderKey,
             transferService,
             giftRecipient,
             promoCode,

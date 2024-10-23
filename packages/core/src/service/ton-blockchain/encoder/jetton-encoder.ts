@@ -7,7 +7,7 @@ import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './
 import { AccountsApi, JettonBalance, JettonsApi } from '../../../tonApiV2';
 
 export class JettonEncoder {
-    static jettonTransferAmount = toNano(0.1);
+    static jettonTransferAmount = toNano(0.02);
 
     static jettonTransferForwardAmount = BigInt(1);
 

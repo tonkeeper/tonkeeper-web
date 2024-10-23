@@ -1,5 +1,5 @@
 import { APIConfig } from '../../entries/apis';
-import { Sender } from './sender';
+import { BatteryMessageSender, Sender } from './sender';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
@@ -50,7 +50,7 @@ export class TonAssetTransactionService {
     }
 
     private async estimateTon(sender: Sender, params: TransferParams) {
-        await this.checkTransferPossibility(params);
+        await this.checkTransferPossibility(sender, params);
 
         if (Array.isArray(params)) {
             if (sender instanceof LedgerMessageSender) {
@@ -79,7 +79,7 @@ export class TonAssetTransactionService {
     }
 
     private async estimateJetton(sender: Sender, params: TransferParams) {
-        await this.checkTransferPossibility(params);
+        await this.checkTransferPossibility(sender, params);
 
         if (Array.isArray(params)) {
             if (sender instanceof LedgerMessageSender) {
@@ -119,7 +119,7 @@ export class TonAssetTransactionService {
         estimation: Estimation<TonAsset>,
         params: TransferParams
     ) {
-        await this.checkTransferPossibility(params, estimation);
+        await this.checkTransferPossibility(sender, params, estimation);
 
         if (Array.isArray(params)) {
             if (sender instanceof LedgerMessageSender) {
@@ -152,7 +152,7 @@ export class TonAssetTransactionService {
         estimation: Estimation<TonAsset>,
         params: TransferParams
     ) {
-        await this.checkTransferPossibility(params, estimation);
+        await this.checkTransferPossibility(sender, params, estimation);
 
         if (Array.isArray(params)) {
             if (sender instanceof LedgerMessageSender) {
@@ -186,9 +186,14 @@ export class TonAssetTransactionService {
     }
 
     private async checkTransferPossibility(
+        sender: Sender,
         params: TransferParams,
         estimation?: Estimation<TonAsset>
     ) {
+        if (sender instanceof BatteryMessageSender) {
+            return;
+        }
+
         const isJettonTransfer = this.isJettonTransfer(params);
 
         let requiredBalance = Array.isArray(params)

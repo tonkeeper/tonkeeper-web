@@ -54,6 +54,7 @@ import BigNumber from 'bignumber.js';
 import { comment } from '@ton/core';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { useToQueryKeyPart } from "../../../hooks/useToQueryKeyPart";
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -75,10 +76,11 @@ const useNftTransferEstimation = (
     }
 
     const getSender = useGetEstimationSender(selectedSenderType);
+    const getSenderKey = useToQueryKeyPart(getSender);
     const rawTransactionService = useTonRawTransactionService();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
-        [QueryKey.estimate, data?.address, accounts, signerWallet, getSender],
+        [QueryKey.estimate, data?.address, accounts, signerWallet, getSenderKey],
         async () => {
             try {
                 if (account.type === 'watch-only') {

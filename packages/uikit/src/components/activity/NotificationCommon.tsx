@@ -497,7 +497,7 @@ const ActionFeeDetailsUniversalValue: FC<{ fee: AssetAmount; senderType?: Sender
     senderType
 }) => {
     if (senderType === 'battery') {
-        return <ActionFeeDetailsUniversalBatteryValue fee={fee as AssetAmount<TonAsset>} />;
+        return <ActionFeeDetailsUniversalTokenValue fee={fee as AssetAmount<TonAsset>} />;
     } else {
         return <ActionFeeDetailsUniversalTokenValue fee={fee} />;
     }

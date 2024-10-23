@@ -13,6 +13,7 @@ import { SenderType, useGetEstimationSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { useToQueryKeyPart } from '../useToQueryKeyPart';
 
 export function useEstimateTransfer({
     recipient,
@@ -28,9 +29,10 @@ export function useEstimateTransfer({
     const getSender = useGetEstimationSender(senderType);
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
+    const getSenderKey = useToQueryKeyPart(getSender);
 
     return useQuery<TransferEstimation<Asset>, Error>(
-        [QueryKey.estimate, recipient, amount, isMax, getSender, transferService, notifyError],
+        [QueryKey.estimate, recipient, amount, isMax, getSenderKey, transferService, notifyError],
         async () => {
             const comment = (recipient as TonRecipientData).comment;
             try {

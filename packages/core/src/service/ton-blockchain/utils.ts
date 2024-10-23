@@ -132,8 +132,8 @@ const isFriendlyNotBounceableAddress = (address: string) => {
 };
 
 /**
- * EQ -> not bounceable
- * UQ, raw -> bounceable <=> account is active
+ * UQ -> not bounceable
+ * EQ, raw -> bounceable <=> account is active
  */
 export async function userInputAddressIsBounceable(api: APIConfig, address: string) {
     const account = await new AccountsApi(api.tonApiV2).getAccount({
@@ -148,8 +148,8 @@ export async function userInputAddressIsBounceable(api: APIConfig, address: stri
 }
 
 /**
- * EQ -> not bounceable
- * UQ -> bounceable
+ * UQ -> not bounceable
+ * EQ -> bounceable
  * raw -> bounceable <=> account is active
  */
 export async function tonConnectAddressIsBounceable(api: APIConfig, address: string) {

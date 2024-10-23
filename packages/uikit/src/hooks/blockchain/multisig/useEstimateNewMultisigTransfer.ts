@@ -6,6 +6,7 @@ import { TonRecipientData, TransferEstimation } from '@tonkeeper/core/dist/entri
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useTonAssetTransferService } from '../useBlockchainService';
 import { useGetEstimationSender } from '../useSender';
+import { useToQueryKeyPart } from '../../useToQueryKeyPart';
 
 export function useEstimateNewMultisigTransfer(
     recipient: TonRecipientData,
@@ -13,10 +14,11 @@ export function useEstimateNewMultisigTransfer(
     isMax: boolean
 ) {
     const getSender = useGetEstimationSender();
+    const getSenderKey = useToQueryKeyPart(getSender);
     const transferService = useTonAssetTransferService();
 
     return useQuery<TransferEstimation<TonAsset>, Error>(
-        ['multisig-transfer-estimation', recipient, amount, isMax, getSender],
+        ['multisig-transfer-estimation', recipient, amount, isMax, getSenderKey],
         async () => {
             const sender = await getSender!();
 

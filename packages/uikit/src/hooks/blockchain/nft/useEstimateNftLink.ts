@@ -5,9 +5,11 @@ import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/
 import { useActiveAccount } from '../../../state/wallet';
 import { TransferEstimation } from '@tonkeeper/core/dist/entries/send';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useToQueryKeyPart } from '../../useToQueryKeyPart';
 
 export const useEstimateNftLink = (args: { nftAddress: string; linkToAddress: string }) => {
     const getSender = useGetEstimationSender('external');
+    const getSenderKey = useToQueryKeyPart(getSender);
     const rawTransactionService = useTonRawTransactionService();
     const activeAccount = useActiveAccount();
 
@@ -19,7 +21,7 @@ export const useEstimateNftLink = (args: { nftAddress: string; linkToAddress: st
             args.nftAddress,
             args.linkToAddress,
             rawTransactionService,
-            getSender,
+            getSenderKey,
             walletAddress
         ],
         async () => {

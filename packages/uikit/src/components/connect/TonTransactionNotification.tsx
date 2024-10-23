@@ -34,6 +34,7 @@ import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import { EstimateData } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useGetEstimationSender, useGetSender } from '../../hooks/blockchain/useSender';
+import { useToQueryKeyPart } from "../../hooks/useToQueryKeyPart";
 
 const ButtonGap = styled.div`
     ${props =>
@@ -271,10 +272,11 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
     const accounts = useAccountsState();
 
     const getSender = useGetEstimationSender('external');
+    const getSenderKey = useToQueryKeyPart(getSender);
     const tonConenctService = useTonConnectTransactionService();
 
     return useQuery<EstimateData, Error>(
-        [QueryKey.estimate, params, account, accounts, getSender],
+        [QueryKey.estimate, params, account, accounts, getSenderKey],
         async () => {
             if (account.type === 'watch-only') {
                 throw new Error('Cant use this account');
