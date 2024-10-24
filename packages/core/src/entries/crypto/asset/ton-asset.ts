@@ -44,7 +44,8 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         name: jetton.jetton.name,
         blockchain: BLOCKCHAIN_NAME.TON,
         address: Address.parseRaw(address),
-        id: packAssetId(BLOCKCHAIN_NAME.TON, address)
+        id: packAssetId(BLOCKCHAIN_NAME.TON, address),
+        image: jetton.jetton.image
     };
 }
 

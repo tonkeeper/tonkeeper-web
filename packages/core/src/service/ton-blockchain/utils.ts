@@ -10,11 +10,6 @@ import BigNumber from 'bignumber.js';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import { AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import nacl from 'tweetnacl';
-import { TransferEstimationEvent } from '../../entries/send';
-
-export type EstimateData = {
-    accountEvent: TransferEstimationEvent;
-};
 
 export const estimationSigner = async (message: Cell): Promise<Buffer> => {
     return sign(message.hash(), Buffer.alloc(64));

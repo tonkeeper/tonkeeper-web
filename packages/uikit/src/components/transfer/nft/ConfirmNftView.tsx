@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, ReactNode, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { Gap } from '../../Layout';
@@ -10,12 +10,7 @@ import { FullHeightBlock } from '../../Notification';
 
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    TonRecipientData,
-    TransferEstimation,
-    TransferEstimationEvent
-} from '@tonkeeper/core/dist/entries/send';
+import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../../hooks/amplitude';
 import { QueryKey } from '../../../libs/queryKey';
 import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
@@ -32,29 +27,29 @@ import {
     useInvalidateActiveWalletQueries
 } from '../../../state/wallet';
 import {
-    getMultisigSignerInfo,
     useActiveMultisigAccountHost,
     useActiveMultisigWalletInfo,
     useIsActiveAccountMultisig
 } from '../../../state/multisig';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { MultisigTransferDetails } from '../multisig/MultisigTransferDetails';
 import { styled } from 'styled-components';
 import {
-    SenderType,
-    useAvailableSendersTypes,
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    SenderTypeUserAvailable,
+    useAvailableSendersChoices,
     useGetEstimationSender,
     useGetSender
 } from '../../../hooks/blockchain/useSender';
 import { useTonRawTransactionService } from '../../../hooks/blockchain/useBlockchainService';
-import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import BigNumber from 'bignumber.js';
 import { comment } from '@ton/core';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { useToQueryKeyPart } from "../../../hooks/useToQueryKeyPart";
+import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -64,23 +59,33 @@ const assetAmount = new AssetAmount({
 const useNftTransferEstimation = (
     nftItem: NftItem,
     data: TonRecipientData,
-    selectedSenderType: SenderType
+    selectedSenderType: SenderTypeUserAvailable
 ) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
     const notifyError = useNotifyErrorHandle();
 
-    let signerWallet: TonWalletStandard | null = null;
-    if (account.type === 'ton-multisig') {
-        signerWallet = getMultisigSignerInfo(accounts, account).signerWallet;
-    }
+    const senderChoice = useMemo(() => {
+        if (account.type === 'ton-multisig') {
+            return { type: 'multisig', ttlSeconds: 5 * 60 } as const;
+        }
+        if (selectedSenderType === 'external') {
+            return EXTERNAL_SENDER_CHOICE;
+        }
 
-    const getSender = useGetEstimationSender(selectedSenderType);
+        if (selectedSenderType === 'battery') {
+            return BATTERY_SENDER_CHOICE;
+        }
+
+        throw new Error(`Unsupported sender type for nft transfer ${selectedSenderType}`);
+    }, [selectedSenderType, account]);
+
+    const getSender = useGetEstimationSender(senderChoice);
     const getSenderKey = useToQueryKeyPart(getSender);
     const rawTransactionService = useTonRawTransactionService();
 
-    return useQuery<TransferEstimation<TonAsset>, Error>(
-        [QueryKey.estimate, data?.address, accounts, signerWallet, getSenderKey],
+    return useQuery<TonEstimation, Error>(
+        [QueryKey.estimate, data?.address, accounts, getSenderKey],
         async () => {
             try {
                 if (account.type === 'watch-only') {
@@ -109,10 +114,10 @@ const useNftTransferEstimation = (
 const useSendNft = (
     recipient: TonRecipientData,
     nftItem: NftItem,
-    fee: TransferEstimationEvent | undefined,
+    fee: AssetAmount<TonAsset> | undefined,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
-        selectedSenderType: SenderType;
+        selectedSenderType: SenderTypeUserAvailable;
     }
 ) => {
     const account = useActiveAccount();
@@ -131,15 +136,32 @@ const useSendNft = (
 
         if (!fee) return false;
 
+        if (fee.asset.id !== TON_ASSET.id) {
+            throw new Error(`Unexpected fee asset ${fee.asset.symbol}`);
+        }
+
         try {
-            const sender = await getSender({
-                multisigTtlSeconds: 60 * Number(options.multisigTTL),
-                type: options.selectedSenderType
-            });
+            let senderChoice;
+            if (account.type === 'ton-multisig') {
+                if (options.multisigTTL === undefined) {
+                    throw new Error('TTL must be specified for multisig sending');
+                }
+                senderChoice = { type: 'multisig', ttlSeconds: 5 * 60 } as const;
+            } else if (options.selectedSenderType === 'external') {
+                senderChoice = EXTERNAL_SENDER_CHOICE;
+            } else if (options.selectedSenderType === 'battery') {
+                senderChoice = BATTERY_SENDER_CHOICE;
+            } else {
+                throw new Error(
+                    `Unsupported sender type for nft transfer ${options.selectedSenderType}`
+                );
+            }
+
+            const sender = await getSender(senderChoice);
 
             const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
             const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(
-                Math.abs(fee.event.extra)
+                fee.weiAmount
             );
             const nftTransferMsg = nftEncoder.encodeNftTransfer({
                 nftAddress: nftItem.address,
@@ -172,17 +194,19 @@ export const ConfirmNftView: FC<{
     const { t } = useTranslation();
     const isActiveMultisig = useIsActiveAccountMultisig();
 
-    const availableSenders = useAvailableSendersTypes({ type: 'nfr_transfer' });
-    const [selectedSenderType, onSenderTypeChange] = useState<SenderType>(availableSenders[0]);
+    const availableSendersChoices = useAvailableSendersChoices({ type: 'nfr_transfer' });
+    const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>(
+        availableSendersChoices[0].type
+    );
     useEffect(() => {
-        onSenderTypeChange(availableSenders[0]);
-    }, [availableSenders]);
+        onSenderTypeChange(availableSendersChoices[0].type);
+    }, [availableSendersChoices]);
 
     const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
     const { mutateAsync, isLoading, error, reset } = useSendNft(
         recipient,
         nftItem,
-        estimation.data?.payload,
+        estimation.data?.fee,
         { multisigTTL, selectedSenderType }
     );
 
@@ -232,7 +256,7 @@ export const ConfirmNftView: FC<{
                 <ListBlock margin={false} fullWidth>
                     <ConfirmViewDetailsRecipient />
                     <ConfirmViewDetailsFee
-                        availableSenders={availableSenders}
+                        availableSendersChoices={availableSendersChoices}
                         selectedSenderType={selectedSenderType}
                         onSenderTypeChange={onSenderTypeChange}
                     />

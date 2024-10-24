@@ -1,11 +1,11 @@
 import { WalletOutgoingMessage } from '../encoder/types';
-import { MessageConsequences } from '../../../tonApiV2';
 import { Cell } from '@ton/core';
+import { Estimation } from '../../../entries/send';
 
 export interface ISender {
     jettonResponseAddress: string;
 
     send(outgoing: WalletOutgoingMessage): Promise<Cell>;
 
-    estimate(outgoing: WalletOutgoingMessage): Promise<Pick<MessageConsequences, 'event'>>;
+    estimate(outgoing: WalletOutgoingMessage): Promise<Estimation>;
 }

@@ -2,15 +2,16 @@ import { useMutation } from '@tanstack/react-query';
 import { isTonAsset, Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    TonRecipientData,
-    TransferEstimation,
-    TronRecipientData
-} from '@tonkeeper/core/dist/entries/send';
+import { Estimation, TonRecipientData, TronRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useAnalyticsTrack } from '../amplitude';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
-import { SenderType, useGetSender } from './useSender';
+import {
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    SenderTypeUserAvailable,
+    useGetSender
+} from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -25,8 +26,8 @@ export function useSendTransfer<T extends Asset>({
     recipient: T extends TonAsset ? TonRecipientData : TronRecipientData;
     amount: AssetAmount<T>;
     isMax: boolean;
-    estimation: TransferEstimation<T>;
-    senderType: SenderType;
+    estimation: Estimation<T>;
+    senderType: SenderTypeUserAvailable;
 }) {
     const track = useAnalyticsTrack();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
@@ -41,9 +42,29 @@ export function useSendTransfer<T extends Asset>({
                     throw new Error('Invalid recipient');
                 }
                 const comment = (recipient as TonRecipientData).comment;
+
+                let senderChoice;
+                if (senderType === 'external') {
+                    senderChoice = EXTERNAL_SENDER_CHOICE;
+                } else if (senderType === 'battery') {
+                    senderChoice = BATTERY_SENDER_CHOICE;
+                } else if (senderType === 'gasless') {
+                    if (!isTonAsset(amount.asset)) {
+                        throw new Error('Unexpected asset');
+                    }
+
+                    senderChoice = {
+                        type: 'gasless',
+                        asset: amount.asset
+                    } as const;
+                }
+                if (!senderChoice) {
+                    throw new Error('Unexpected sender choice');
+                }
+
                 await transferService.send(
-                    await getSender({ type: senderType }),
-                    estimation as TransferEstimation<TonAsset>,
+                    await getSender(senderChoice),
+                    estimation as Estimation<TonAsset>,
                     {
                         to: seeIfValidTonAddress(recipient.address.address)
                             ? recipient.address.address

@@ -3,14 +3,13 @@ import { useActiveMultisigAccountHost, useActiveMultisigWalletInfo } from '../..
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
 import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useTonRawTransactionService } from '../useBlockchainService';
-import { useGetSender } from '../useSender';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 
 import { useAppContext } from '../../appContext';
 import { useNotifyErrorHandle } from '../../useNotification';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
+import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
@@ -36,10 +35,8 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
             );
 
             await rawTransactionService.send(
-                await getSender({ type: 'external' }),
-                {
-                    fee: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 })
-                },
+                await getSender(EXTERNAL_SENDER_CHOICE),
+                zeroFee,
                 message
             );
 

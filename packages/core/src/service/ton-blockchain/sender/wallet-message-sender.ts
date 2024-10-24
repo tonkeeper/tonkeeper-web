@@ -7,6 +7,8 @@ import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import { TonWalletStandard } from '../../../entries/wallet';
 import { WalletContractV5R1 } from '@ton/ton';
 import { ISender } from './ISender';
+import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class WalletMessageSender implements ISender {
     constructor(
@@ -32,9 +34,14 @@ export class WalletMessageSender implements ISender {
     public async estimate(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        return new EmulationApi(this.api.tonApiV2).emulateMessageToWallet({
+        const result = await new EmulationApi(this.api.tonApiV2).emulateMessageToWallet({
             emulateMessageToWalletRequest: { boc: external.toBoc().toString('base64') }
         });
+
+        return {
+            fee: new AssetAmount({ asset: TON_ASSET, weiAmount: Math.abs(result.event.extra) }),
+            payload: result
+        };
     }
 
     private async toExternal({ messages, sendMode }: WalletOutgoingMessage) {

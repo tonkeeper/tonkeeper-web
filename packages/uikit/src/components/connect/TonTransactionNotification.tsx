@@ -28,13 +28,16 @@ import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
 import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
-import { EstimateData } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { useGetEstimationSender, useGetSender } from '../../hooks/blockchain/useSender';
-import { useToQueryKeyPart } from "../../hooks/useToQueryKeyPart";
+import {
+    EXTERNAL_SENDER_CHOICE,
+    useGetEstimationSender,
+    useGetSender
+} from '../../hooks/blockchain/useSender';
+import { useToQueryKeyPart } from '../../hooks/useToQueryKeyPart';
+import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -59,7 +62,7 @@ const ButtonRowStyled = styled.div`
 
 const useSendMutation = (
     params: TonConnectTransactionPayload,
-    estimate: EstimateData,
+    estimate: TonEstimationDetailed,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
         waitInvalidation?: boolean;
@@ -75,21 +78,21 @@ const useSendMutation = (
             throw new Error('Cant use this account');
         }
 
-        const sender = await getSender({
-            multisigTtlSeconds: options.multisigTTL ? 60 * Number(options.multisigTTL) : undefined,
-            type: 'external'
-        });
+        let sender: Sender;
+        if (account.type === 'ton-multisig') {
+            if (!options.multisigTTL) {
+                throw new Error('TTL must be specified for multisig sending');
+            }
 
-        const boc = await tonConenctService.send(
-            sender,
-            {
-                fee: new AssetAmount({
-                    asset: TON_ASSET,
-                    weiAmount: Math.abs(estimate.accountEvent.event.extra)
-                })
-            },
-            params
-        );
+            sender = await getSender({
+                type: 'multisig',
+                ttlSeconds: 60 * Number(options.multisigTTL)
+            });
+        } else {
+            sender = await getSender(EXTERNAL_SENDER_CHOICE);
+        }
+
+        const boc = await tonConenctService.send(sender, estimate, params);
 
         const invalidationPromise = client.invalidateQueries(
             anyOfKeysParts(account.id, account.activeTonWallet.id)
@@ -223,7 +226,7 @@ const ConnectContent: FC<{
 
     return (
         <NotificationBlock>
-            <EmulationList isError={isError} estimate={estimate} />
+            <EmulationList isError={isError} event={estimate?.event} />
             <ButtonGap />
             <NotificationFooterPortal>
                 <NotificationFooter>
@@ -271,11 +274,11 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
-    const getSender = useGetEstimationSender('external');
+    const getSender = useGetEstimationSender(EXTERNAL_SENDER_CHOICE);
     const getSenderKey = useToQueryKeyPart(getSender);
     const tonConenctService = useTonConnectTransactionService();
 
-    return useQuery<EstimateData, Error>(
+    return useQuery<TonEstimationDetailed, Error>(
         [QueryKey.estimate, params, account, accounts, getSenderKey],
         async () => {
             if (account.type === 'watch-only') {
@@ -285,7 +288,12 @@ const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boole
             const sender = await getSender!();
 
             const result = await tonConenctService.estimate(sender, params);
-            return { accountEvent: result.payload };
+
+            if (!isTonEstimationDetailed(result)) {
+                throw new Error("Can't get estimation details");
+            }
+
+            return result;
         },
         { enabled: errorFetched && !!getSender }
     );

@@ -1,21 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
-import { useGetEstimationSender } from '../useSender';
+import { EXTERNAL_SENDER_CHOICE, useGetEstimationSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import { useActiveAccount } from '../../../state/wallet';
-import { TransferEstimation } from '@tonkeeper/core/dist/entries/send';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useToQueryKeyPart } from '../../useToQueryKeyPart';
+import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
 
 export const useEstimateNftLink = (args: { nftAddress: string; linkToAddress: string }) => {
-    const getSender = useGetEstimationSender('external');
+    const getSender = useGetEstimationSender(EXTERNAL_SENDER_CHOICE);
     const getSenderKey = useToQueryKeyPart(getSender);
     const rawTransactionService = useTonRawTransactionService();
     const activeAccount = useActiveAccount();
 
     const walletAddress = activeAccount.activeTonWallet.rawAddress;
 
-    return useQuery<TransferEstimation<TonAsset>, Error>(
+    return useQuery<TonEstimation, Error>(
         [
             'estimate-link-nft',
             args.nftAddress,

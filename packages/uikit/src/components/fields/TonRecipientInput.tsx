@@ -19,7 +19,7 @@ import { seeIfInvalidDns } from '../transfer/RecipientView';
 import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TextareaAutosize } from './TextareaAutosize';
 import { InputBlock, Label } from './Input';
-import { userInputAddressIsBounceable } from '@tonkeeper/core/dist/service/transfer/common';
+import { userInputAddressIsBounceable } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 const SpinnerRingStyled = styled(SpinnerRing)`
     transform: scale(1.2);

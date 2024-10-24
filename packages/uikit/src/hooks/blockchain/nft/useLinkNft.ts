@@ -1,4 +1,4 @@
-import { useGetSender } from '../useSender';
+import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { useActiveAccount } from '../../../state/wallet';
 import { useMutation } from '@tanstack/react-query';
@@ -17,7 +17,7 @@ export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) 
     return useMutation<boolean, Error>(async () => {
         const nftEncoder = new NFTEncoder(walletAddress);
         await rawTransactionService.send(
-            await getSender({ type: 'external' }),
+            await getSender(EXTERNAL_SENDER_CHOICE),
             zeroFee,
             nftEncoder.encodeNftLink(args)
         );

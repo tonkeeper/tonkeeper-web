@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Estimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useTransactionAnalytics } from '../../amplitude';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
@@ -16,7 +16,7 @@ export function useSendNewMultisigTransfer(
     amount: AssetAmount<TonAsset>,
     isMax: boolean,
     ttl: MultisigOrderLifetimeMinutes,
-    estimation: Estimation<TonAsset>
+    estimation: TonEstimation
 ) {
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
@@ -28,7 +28,7 @@ export function useSendNewMultisigTransfer(
         try {
             const ttlSeconds = Number(ttl) * 60;
 
-            const sender = await getSender({ multisigTtlSeconds: ttlSeconds });
+            const sender = await getSender({ type: 'multisig', ttlSeconds });
 
             const comment = (recipient as TonRecipientData).comment;
             await transferService.send(sender, estimation, {

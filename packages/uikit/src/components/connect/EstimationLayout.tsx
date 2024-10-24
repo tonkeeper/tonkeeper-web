@@ -9,7 +9,7 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock } from '../List';
 import { Body2, Label1 } from '../Text';
 import { TonActivityEvents } from '../activity/ton/TonActivityEvents';
-import { EstimateData } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { AccountEvent } from '@tonkeeper/core/dist/tonApiV2';
 
 const Fee = styled.div`
     width: 100%;
@@ -54,18 +54,16 @@ const Block = styled.div`
     user-select: none;
 `;
 
-export const EmulationList: FC<{ isError: boolean; estimate: EstimateData | undefined }> = ({
-    isError,
-    estimate
-}) => {
+export const EmulationList: FC<{
+    isError: boolean;
+    event: AccountEvent | undefined;
+}> = ({ isError, event }) => {
     const { t, i18n } = useTranslation();
 
     const [date, timestamp] = useMemo(() => {
-        const _timestamp = estimate?.accountEvent.event.timestamp
-            ? estimate?.accountEvent.event.timestamp * 1000
-            : Date.now();
+        const _timestamp = event?.timestamp ? event?.timestamp * 1000 : Date.now();
         return [formatActivityDate(i18n.language, 'now', _timestamp), _timestamp] as const;
-    }, [estimate]);
+    }, [event]);
 
     if (isError) {
         return (
@@ -75,19 +73,19 @@ export const EmulationList: FC<{ isError: boolean; estimate: EstimateData | unde
         );
     }
 
-    if (estimate) {
+    if (event) {
         return (
             <>
                 <ListBlock noUserSelect fullWidth margin={false}>
                     <TonActivityEvents
                         hover={false}
-                        event={estimate.accountEvent.event}
+                        event={event}
                         date={date}
                         timestamp={timestamp}
                         setActivity={() => null}
                     />
                 </ListBlock>
-                <ExtraDetails extra={estimate.accountEvent.event.extra} />
+                <ExtraDetails extra={event.extra} />
             </>
         );
     }

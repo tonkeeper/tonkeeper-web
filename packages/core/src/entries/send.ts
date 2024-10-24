@@ -1,11 +1,10 @@
 import { Account, AccountEvent, WalletDNS } from '../tonApiV2';
-import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
-import { Asset } from './crypto/asset/asset';
 import { AssetAmount } from './crypto/asset/asset-amount';
 import { TonAsset } from './crypto/asset/ton-asset';
 import { TronAsset } from './crypto/asset/tron-asset';
 import { Suggestion } from './suggestion';
+import { Asset } from './crypto/asset/asset';
 
 export type BaseRecipient = Suggestion | { address: string; bounce?: boolean };
 
@@ -51,23 +50,25 @@ export function isTronRecipientData(
     return isTronRecipient(recipientData.address);
 }
 
-export type TransferEstimation<T extends Asset = Asset> = {
-    fee: AssetAmount<T>;
-    payload: T extends TonAsset
-        ? TransferEstimationEvent
-        : T extends TronAsset
-        ? EstimatePayload
-        : never;
+export type TonEstimation = {
+    fee: AssetAmount<TonAsset>;
+    event?: AccountEvent;
 };
 
-export type TransferEstimationEvent = { event: AccountEvent };
-export type TransferEstimationEventFee = { event: Pick<AccountEvent, 'extra'> };
+export type TonEstimationDetailed = Required<TonEstimation>;
 
-export type Estimation<T extends Asset = Asset> = {
-    fee: AssetAmount<T>;
-    payload?: T extends TonAsset
-        ? TransferEstimationEvent
-        : T extends TronAsset
-        ? EstimatePayload
-        : never;
+export const isTonEstimationDetailed = (
+    estimation: TonEstimation
+): estimation is TonEstimationDetailed => {
+    return estimation.event !== undefined;
 };
+
+export type TronEstimation = {
+    fee: AssetAmount<TronAsset>;
+};
+
+export type Estimation<T extends Asset = Asset> = T extends TonAsset
+    ? TonEstimation
+    : T extends TronAsset
+    ? TronEstimation
+    : TonAsset | TronAsset;

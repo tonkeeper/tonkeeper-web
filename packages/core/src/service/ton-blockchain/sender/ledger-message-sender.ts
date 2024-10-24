@@ -23,6 +23,7 @@ import { TonConnectTransactionPayload } from '../../../entries/tonConnect';
 import { LedgerError } from '../../../errors/LedgerError';
 import { MessagePayloadParam, serializePayload } from '../encoder/types';
 import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
+import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class LedgerMessageSender {
     constructor(
@@ -100,10 +101,19 @@ export class LedgerMessageSender {
                 });
                 return external;
             },
-            estimate: () =>
-                new EmulationApi(this.api.tonApiV2).emulateMessageToWallet({
+            estimate: async () => {
+                const result = await new EmulationApi(this.api.tonApiV2).emulateMessageToWallet({
                     emulateMessageToWalletRequest: { boc: external.toBoc().toString('base64') }
-                })
+                });
+
+                return {
+                    fee: new AssetAmount({
+                        asset: TON_ASSET,
+                        weiAmount: Math.abs(result.event.extra)
+                    }),
+                    payload: result
+                };
+            }
         };
     }
 

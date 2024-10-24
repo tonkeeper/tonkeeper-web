@@ -2,18 +2,21 @@ import { useQuery } from '@tanstack/react-query';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    RecipientData,
-    TonRecipientData,
-    TransferEstimation
-} from '@tonkeeper/core/dist/entries/send';
+import { Estimation, RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
-import { SenderType, useGetEstimationSender } from './useSender';
+import {
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    SenderTypeUserAvailable,
+    useGetEstimationSender
+} from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useToQueryKeyPart } from '../useToQueryKeyPart';
+import { useMemo } from 'react';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export function useEstimateTransfer({
     recipient,
@@ -24,14 +27,36 @@ export function useEstimateTransfer({
     recipient: RecipientData;
     amount: AssetAmount<Asset>;
     isMax: boolean;
-    senderType: SenderType;
+    senderType: SenderTypeUserAvailable;
 }) {
-    const getSender = useGetEstimationSender(senderType);
+    const senderChoice = useMemo(() => {
+        if (senderType === 'external') {
+            return EXTERNAL_SENDER_CHOICE;
+        }
+
+        if (senderType === 'battery') {
+            return BATTERY_SENDER_CHOICE;
+        }
+
+        if (senderType === 'gasless') {
+            if (!isTonAsset(amount.asset)) {
+                throw new Error('Unexpected asset');
+            }
+
+            return {
+                type: 'gasless',
+                asset: amount.asset
+            } as const;
+        }
+
+        assertUnreachable(senderType);
+    }, [senderType, amount]);
+    const getSender = useGetEstimationSender(senderChoice);
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
     const getSenderKey = useToQueryKeyPart(getSender);
 
-    return useQuery<TransferEstimation<Asset>, Error>(
+    return useQuery<Estimation, Error>(
         [QueryKey.estimate, recipient, amount, isMax, getSenderKey, transferService, notifyError],
         async () => {
             const comment = (recipient as TonRecipientData).comment;

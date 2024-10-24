@@ -10,9 +10,9 @@ import {
     createTonProofItem,
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { signTonConnectOver } from '../state/mnemonic';
+import { getServerTime } from "@tonkeeper/core/dist/service/ton-blockchain/utils";
 
 export function useAccountLabel(account: Account) {
     const tonWallets = account.allTonWallets;

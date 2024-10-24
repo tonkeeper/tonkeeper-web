@@ -36,7 +36,7 @@ import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import { SenderType } from '../../hooks/blockchain/useSender';
+import { SenderChoiceUserAvailable, SenderTypeUserAvailable } from '../../hooks/blockchain/useSender';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -79,9 +79,9 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
-        onSenderTypeChange?: (type: SenderType) => void;
-        availableSenders?: SenderType[];
-        selectedSenderType?: SenderType;
+        onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
+        availableSendersChoices?: SenderChoiceUserAvailable[];
+        selectedSenderType?: SenderTypeUserAvailable;
         estimation: {
             data:
                 | {
@@ -105,7 +105,7 @@ export function ConfirmView<T extends Asset = Asset>({
     className,
     onSenderTypeChange,
     selectedSenderType,
-    availableSenders,
+    availableSendersChoices,
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, reset } = mutation;
@@ -130,7 +130,7 @@ export function ConfirmView<T extends Asset = Asset>({
             <ConfirmViewDetailsFee
                 onSenderTypeChange={onSenderTypeChange}
                 selectedSenderType={selectedSenderType}
-                availableSenders={availableSenders}
+                availableSendersChoices={availableSendersChoices}
             />
             <ConfirmViewDetailsComment />
         </ConfirmViewDetailsSlot>
@@ -308,17 +308,17 @@ export const ConfirmViewDetailsAmount: FC = () => {
 };
 
 export const ConfirmViewDetailsFee: FC<{
-    onSenderTypeChange?: (type: SenderType) => void;
-    availableSenders?: SenderType[];
-    selectedSenderType?: SenderType;
-}> = ({ onSenderTypeChange, availableSenders, selectedSenderType }) => {
+    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
+    availableSendersChoices?: SenderChoiceUserAvailable[];
+    selectedSenderType?: SenderTypeUserAvailable;
+}> = ({ onSenderTypeChange, availableSendersChoices, selectedSenderType }) => {
     const { estimation } = useConfirmViewContext();
 
     return (
         <ActionFeeDetailsUniversal
             fee={estimation.isLoading ? undefined : estimation.data?.fee}
             onSenderTypeChange={onSenderTypeChange}
-            availableSenders={availableSenders}
+            availableSendersChoices={availableSendersChoices}
             selectedSenderType={selectedSenderType}
         />
     );

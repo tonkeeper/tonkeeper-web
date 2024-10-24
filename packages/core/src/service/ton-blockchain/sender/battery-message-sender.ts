@@ -7,6 +7,8 @@ import { Battery } from '../../../batteryApi';
 import { APIConfig } from '../../../entries/apis';
 import { ISender } from './ISender';
 import { externalMessage, getServerTime, getWalletSeqNo } from '../utils';
+import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class BatteryMessageSender implements ISender {
     constructor(
@@ -41,9 +43,17 @@ export class BatteryMessageSender implements ISender {
     public async estimate(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        return this.api.batteryApi.emulation.emulateMessageToWallet(this.batteryConfig.authToken, {
-            boc: external.toBoc().toString('base64')
-        });
+        const result = await this.api.batteryApi.emulation.emulateMessageToWallet(
+            this.batteryConfig.authToken,
+            {
+                boc: external.toBoc().toString('base64')
+            }
+        );
+
+        return {
+            fee: new AssetAmount({ asset: TON_ASSET, weiAmount: Math.abs(result.event.extra) }),
+            payload: result
+        };
     }
 
     private async toWalletV4External({ messages, sendMode }: WalletOutgoingMessage) {

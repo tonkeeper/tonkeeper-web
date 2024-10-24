@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 
-import { TransferEstimation } from '@tonkeeper/core/dist/entries/send';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useBatteryServiceConfig } from '../../state/battery';
@@ -10,9 +9,15 @@ import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../../state/tonendpoint';
 import { useNotifyErrorHandle } from '../useNotification';
 import { Address, beginCell } from '@ton/core';
-import { useGetEstimationSender, useGetSender } from './useSender';
+import {
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    useGetEstimationSender,
+    useGetSender
+} from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useToQueryKeyPart } from '../useToQueryKeyPart';
+import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
 
 export function useEstimatePurchaseBattery({
     assetAmount,
@@ -29,10 +34,12 @@ export function useEstimatePurchaseBattery({
 
     const payWithTon = isTon(assetAmount.asset.address);
 
-    const getSender = useGetEstimationSender(payWithTon ? 'external' : 'battery');
+    const getSender = useGetEstimationSender(
+        payWithTon ? EXTERNAL_SENDER_CHOICE : BATTERY_SENDER_CHOICE
+    );
     const getSenderKey = useToQueryKeyPart(getSender);
 
-    return useQuery<TransferEstimation<TonAsset>, Error>(
+    return useQuery<TonEstimation, Error>(
         [
             QueryKey.estimateBatteryPurchase,
             assetAmount,
@@ -75,7 +82,7 @@ export const usePurchaseBattery = ({
     giftRecipient,
     promoCode
 }: {
-    estimation: TransferEstimation<TonAsset>;
+    estimation: TonEstimation;
     assetAmount: AssetAmount<TonAsset>;
     giftRecipient?: string;
     promoCode?: string;
@@ -95,7 +102,9 @@ export const usePurchaseBattery = ({
 
             const payWithTon = isTon(assetAmount.asset.address);
 
-            const sender = await getSender({ type: payWithTon ? 'external' : 'battery' });
+            const sender = await getSender(
+                payWithTon ? EXTERNAL_SENDER_CHOICE : BATTERY_SENDER_CHOICE
+            );
 
             const needPayload = giftRecipient || promoCode || !payWithTon;
             await transferService.send(sender, estimation, {
