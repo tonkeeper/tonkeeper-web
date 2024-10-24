@@ -1,12 +1,12 @@
 import React, { FC } from 'react';
 import { styled } from 'styled-components';
 import { Body2, Mono } from '../../Text';
-import { MultisigOrderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { toTimeLeft } from '@tonkeeper/core/dist/utils/date';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { MultisigOrderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 
 const MultisigDetailsBlock = styled.div`
     width: 100%;

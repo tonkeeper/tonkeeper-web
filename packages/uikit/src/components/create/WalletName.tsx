@@ -2,7 +2,7 @@ import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
-import { Body1, Body2Class, H2Responsive } from '../Text';
+import { Body1, Body2Class, H2Label2Responsive } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { EmojisList } from '../shared/emoji/EmojisList';
@@ -59,7 +59,7 @@ export const UpdateWalletName: FC<{
         <CenterContainer>
             <Block onSubmit={onSubmit}>
                 <div>
-                    <H2Responsive>{t('Name_your_wallet')}</H2Responsive>
+                    <H2Label2Responsive>{t('Name_your_wallet')}</H2Label2Responsive>
                     <Body>{t('Name_your_wallet_description')}</Body>
                 </div>
 

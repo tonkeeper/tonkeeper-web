@@ -184,7 +184,7 @@ export const Loader: FC = React.memo(() => {
     const { data: devSettings } = useDevSettings();
     const network = useActiveTonNetwork();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
-    useGlobalSetup();
+    const { isLoading: globalSetupLoading } = useGlobalSetup();
 
     useEffect(() => {
         setLang(localizationFrom(browser.i18n.getUILanguage()))
@@ -201,7 +201,7 @@ export const Loader: FC = React.memo(() => {
 
     const { data: tracker } = useAnalytics(sdk.storage, activeAccount || undefined, accounts, sdk.version);
 
-    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings || globalPreferencesLoading) {
+    if (activeWalletLoading || isWalletsLoading || !config || lock === undefined || fiat === undefined || !devSettings || globalPreferencesLoading || globalSetupLoading) {
         return (
             <FullSizeWrapper standalone={false}>
                 <Loading />

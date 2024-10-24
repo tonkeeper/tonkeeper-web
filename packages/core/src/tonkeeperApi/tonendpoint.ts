@@ -69,6 +69,14 @@ export interface TonendpointConfig {
     multisig_help_url?: string;
 
     multisig_about_url?: string;
+
+    batteryHost?: string;
+    batteryMeanFees?: string;
+    batteryMeanPrice_swap?: string;
+    batteryMeanPrice_jetton?: string;
+    batteryMeanPrice_nft?: string;
+    batteryRefundEndpoint?: string;
+    batteryReservedAmount?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

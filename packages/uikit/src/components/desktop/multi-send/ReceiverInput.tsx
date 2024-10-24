@@ -7,15 +7,12 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { useAsyncValidator } from '../../../hooks/useAsyncValidator';
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
-import {
-    MultiSendForm,
-    getPastedTable,
-    useMultiSendReceiverValidator
-} from '../../../state/multiSend';
+import { MultiSendForm, getPastedTable } from '../../../state/multiSend';
 import { SpinnerRing, XMarkCircleIcon } from '../../Icon';
 import { Body2 } from '../../Text';
 import { IconButton } from '../../fields/IconButton';
 import { InputBlockStyled, InputFieldStyled } from './InputStyled';
+import { useTonRecipientValidator } from '../../fields/TonRecipientInput';
 
 const SpinnerRingStyled = styled(SpinnerRing)`
     transform: scale(1.2);
@@ -53,7 +50,7 @@ export const ReceiverInput: FC<{
     const [inputValue, setInputValue] = useState('');
     const inputTouched = useRef(false);
 
-    const validator = useMultiSendReceiverValidator();
+    const validator = useTonRecipientValidator();
 
     const [validationState, validationProduct] = useAsyncValidator<string, string, TonRecipient>(
         methods,
@@ -84,14 +81,13 @@ export const ReceiverInput: FC<{
 
     const { onCopy, copied } = useCopyToClipboard(validationProduct?.address ?? '');
 
-    const validate = useMultiSendReceiverValidator();
     const onPaste = useCallback(
         async (e: React.ClipboardEvent<HTMLInputElement>) => {
             console.log('paste');
 
             const clipText = e.clipboardData.getData('Text');
 
-            const values = await getPastedTable(clipText, validate);
+            const values = await getPastedTable(clipText, validator);
 
             if (values == null) return;
 
@@ -99,7 +95,7 @@ export const ReceiverInput: FC<{
             form.rows.splice(index, values.length, ...values);
             methods.reset(form);
         },
-        [methods, validate]
+        [methods, validator]
     );
 
     return (

@@ -1,22 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import {
-    ConnectTransferError,
-    EstimateData,
-    estimateMultisigTonConnectTransfer,
-    estimateTonConnectTransfer,
-    sendMultisigTonConnectTransfer,
-    sendTonConnectTransfer,
-    tonConnectTransferError
-} from '@tonkeeper/core/dist/service/transfer/tonService';
 import { FC, useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
-import { getSigner } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import { CheckmarkCircleIcon, ErrorIcon, ExclamationMarkCircleIcon } from '../Icon';
 import {
     Notification,
@@ -35,11 +24,20 @@ import { EmulationList } from './EstimationLayout';
 import { useAccountsState, useActiveAccount, useActiveWallet } from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
-import { getMultisigSignerInfo, useIsActiveAccountMultisig } from '../../state/multisig';
+import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
+import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
+import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import BigNumber from 'bignumber.js';
+import {
+    EXTERNAL_SENDER_CHOICE,
+    useGetEstimationSender,
+    useGetSender
+} from '../../hooks/blockchain/useSender';
+import { useToQueryKeyPart } from '../../hooks/useToQueryKeyPart';
+import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -64,48 +62,38 @@ const ButtonRowStyled = styled.div`
 
 const useSendMutation = (
     params: TonConnectTransactionPayload,
+    estimate: TonEstimationDetailed,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
         waitInvalidation?: boolean;
     }
 ) => {
     const account = useActiveAccount();
-    const accounts = useAccountsState();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
     const client = useQueryClient();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const getSender = useGetSender();
+    const tonConenctService = useTonConnectTransactionService();
 
     return useMutation<string, Error>(async () => {
         if (account.type === 'watch-only') {
             throw new Error('Cant use this account');
         }
 
-        let boc: string;
+        let sender: Sender;
         if (account.type === 'ton-multisig') {
-            const multisig = await new MultisigApi(api.tonApiV2).getMultisigAccount({
-                accountId: account.activeTonWallet.rawAddress
-            });
-            const { signerWallet, signerAccount } = getMultisigSignerInfo(accounts, account);
-            const signer = await getSigner(sdk, signerAccount.id, checkTouchId);
-
             if (!options.multisigTTL) {
-                throw new Error('TTL is required');
+                throw new Error('TTL must be specified for multisig sending');
             }
 
-            boc = await sendMultisigTonConnectTransfer({
-                api,
-                multisig,
-                hostWallet: signerWallet,
-                params,
-                signer,
+            sender = await getSender({
+                type: 'multisig',
                 ttlSeconds: 60 * Number(options.multisigTTL)
             });
         } else {
-            const signer = await getSigner(sdk, account.id, checkTouchId);
-
-            boc = await sendTonConnectTransfer(api, account, params, signer);
+            sender = await getSender(EXTERNAL_SENDER_CHOICE);
         }
+
+        const boc = await tonConenctService.send(sender, estimate, params);
+
         const invalidationPromise = client.invalidateQueries(
             anyOfKeysParts(account.id, account.activeTonWallet.id)
         );
@@ -205,7 +193,7 @@ const ConnectContent: FC<{
         isLoading,
         error: sendError,
         data: sendResult
-    } = useSendMutation(params, { multisigTTL, waitInvalidation });
+    } = useSendMutation(params, estimate!, { multisigTTL, waitInvalidation });
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -238,7 +226,7 @@ const ConnectContent: FC<{
 
     return (
         <NotificationBlock>
-            <EmulationList isError={isError} estimate={estimate} />
+            <EmulationList isError={isError} event={estimate?.event} />
             <ButtonGap />
             <NotificationFooterPortal>
                 <NotificationFooter>
@@ -283,45 +271,55 @@ const ConnectContent: FC<{
 };
 
 const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
-    const { api } = useAppContext();
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
-    return useQuery<EstimateData, Error>(
-        [QueryKey.estimate, params, account, accounts],
+    const getSender = useGetEstimationSender(EXTERNAL_SENDER_CHOICE);
+    const getSenderKey = useToQueryKeyPart(getSender);
+    const tonConenctService = useTonConnectTransactionService();
+
+    return useQuery<TonEstimationDetailed, Error>(
+        [QueryKey.estimate, params, account, accounts, getSenderKey],
         async () => {
-            if (isAccountTonWalletStandard(account)) {
-                const accountEvent = await estimateTonConnectTransfer(api, account, params);
-                return { accountEvent };
+            if (account.type === 'watch-only') {
+                throw new Error('Cant use this account');
             }
 
-            if (account.type === 'ton-multisig') {
-                const multisig = await new MultisigApi(api.tonApiV2).getMultisigAccount({
-                    accountId: account.activeTonWallet.rawAddress
-                });
-                const { signerWallet } = getMultisigSignerInfo(accounts, account);
-                const accountEvent = await estimateMultisigTonConnectTransfer(
-                    api,
-                    signerWallet,
-                    multisig,
-                    params
-                );
+            const sender = await getSender!();
 
-                return { accountEvent };
+            const result = await tonConenctService.estimate(sender, params);
+
+            if (!isTonEstimationDetailed(result)) {
+                throw new Error("Can't get estimation details");
             }
 
-            throw new Error(`Ton Connect does not support this account type: ${account.type}`);
+            return result;
         },
-        { enabled: errorFetched }
+        { enabled: errorFetched && !!getSender }
     );
 };
+
+type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: undefined };
 
 const useTransactionError = (params: TonConnectTransactionPayload) => {
     const { api } = useAppContext();
     const wallet = useActiveWallet();
 
     return useQuery<ConnectTransferError, Error>([QueryKey.estimate, 'error', params], async () => {
-        return tonConnectTransferError(api, wallet, params);
+        const walletData = await new AccountsApi(api.tonApiV2).getAccount({
+            accountId: wallet.rawAddress
+        });
+
+        const total = params.messages.reduce(
+            (acc, message) => acc.plus(message.amount),
+            new BigNumber(0)
+        );
+
+        if (total.isGreaterThanOrEqualTo(walletData.balance)) {
+            return { kind: 'not-enough-balance' } as const;
+        }
+
+        return { kind: undefined };
     });
 };
 

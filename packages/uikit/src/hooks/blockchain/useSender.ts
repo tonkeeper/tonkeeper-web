@@ -1,0 +1,381 @@
+import {
+    BatteryMessageSender,
+    LedgerMessageSender,
+    WalletMessageSender,
+    MultisigCreateOrderSender,
+    GaslessMessageSender,
+    Sender
+} from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { useAppContext } from '../appContext';
+import { useAccountsState, useActiveAccount, useActiveTonWalletConfig } from '../../state/wallet';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import {
+    useBatteryApi,
+    useBatteryAuthToken,
+    useBatteryBalance,
+    useBatteryServiceConfig,
+    useRequestBatteryAuthToken
+} from '../../state/battery';
+import { useGetActiveAccountSigner } from '../../state/mnemonic';
+import { useCallback, useMemo } from 'react';
+import {
+    TonAsset,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { Account, AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { getMultisigSignerInfo } from '../../state/multisig';
+import { GaslessConfig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { useGaslessConfig } from '../../state/gasless';
+
+export type SenderChoice =
+    | { type: 'multisig'; ttlSeconds: number }
+    | { type: 'external' }
+    | { type: 'battery' }
+    | { type: 'gasless'; asset: TonAsset };
+
+export type SenderChoiceUserAvailable = Exclude<
+    SenderChoice,
+    { type: 'multisig'; ttlSeconds: number }
+>;
+
+export type SenderTypeUserAvailable = SenderChoiceUserAvailable['type'];
+
+export const useAvailableSendersChoices = (
+    operation: { type: 'transfer'; asset: TonAsset } | { type: 'swap' } | { type: 'nfr_transfer' }
+) => {
+    const { data: config } = useActiveTonWalletConfig();
+    const { data: batteryBalance } = useBatteryBalance();
+    const account = useActiveAccount();
+    const {
+        config: { batteryReservedAmount }
+    } = useAppContext();
+    const gaslessConfig = useGaslessConfig();
+
+    const asset = 'asset' in operation ? operation.asset : undefined;
+
+    return useMemo<SenderChoiceUserAvailable[]>(() => {
+        if (account.type === 'ledger') {
+            return [EXTERNAL_SENDER_CHOICE];
+        }
+        let batteryAvailable = false;
+
+        if (operation.type === 'transfer') {
+            batteryAvailable =
+                !!config?.batterySettings.enabledForTokens && asset?.id !== TON_ASSET.id;
+        } else if (operation.type === 'swap') {
+            batteryAvailable = !!config?.batterySettings.enabledForSwaps;
+        } else if (operation.type === 'nfr_transfer') {
+            batteryAvailable = !!config?.batterySettings.enabledForNfts;
+        }
+
+        let availableSenders: SenderChoiceUserAvailable[];
+
+        if (!batteryBalance) {
+            availableSenders = batteryAvailable
+                ? [EXTERNAL_SENDER_CHOICE, BATTERY_SENDER_CHOICE]
+                : [EXTERNAL_SENDER_CHOICE];
+        } else if (
+            batteryReservedAmount &&
+            batteryBalance.tonUnitsReserved.relativeAmount.lt(batteryReservedAmount)
+        ) {
+            availableSenders = [EXTERNAL_SENDER_CHOICE];
+        } else {
+            availableSenders = batteryAvailable
+                ? [BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE]
+                : [EXTERNAL_SENDER_CHOICE];
+        }
+
+        if (isGaslessAvailable({ asset, account, gaslessConfig })) {
+            availableSenders.push({ type: 'gasless', asset: asset! });
+        }
+
+        return availableSenders;
+    }, [
+        operation.type,
+        asset,
+        config,
+        batteryBalance,
+        account.type,
+        batteryReservedAmount,
+        gaslessConfig
+    ]);
+};
+
+export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies SenderChoice;
+export const BATTERY_SENDER_CHOICE = { type: 'battery' } as const satisfies SenderChoice;
+
+export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'external' }) => {
+    const { api } = useAppContext();
+    const batteryApi = useBatteryApi();
+    const batteryConfig = useBatteryServiceConfig();
+    const { data: authToken } = useBatteryAuthToken();
+    const activeAccount = useActiveAccount();
+    const { mutateAsync } = useRequestBatteryAuthToken();
+    const accounts = useAccountsState();
+    const gaslessConfig = useGaslessConfig();
+
+    const wallet = activeAccount.activeTonWallet;
+
+    return useMemo(() => {
+        if (senderChoice.type === 'battery' && authToken === undefined) {
+            return undefined;
+        }
+
+        return async () => {
+            if (activeAccount.type === 'watch-only') {
+                throw new Error("Can't send a transfer using this account");
+            }
+
+            if (senderChoice.type === 'multisig') {
+                if (activeAccount.type !== 'ton-multisig') {
+                    throw new Error('Multisig sender available only for multisig accounts');
+                }
+                const { signerWallet } = getMultisigSignerInfo(
+                    accounts,
+                    activeAccount as AccountTonMultisig
+                );
+
+                const signer = estimationSigner;
+
+                const multisigApi = new MultisigApi(api.tonApiV2);
+                const multisig = await multisigApi.getMultisigAccount({
+                    accountId: activeAccount.activeTonWallet.rawAddress
+                });
+                if (!multisig) {
+                    throw new Error('Multisig not found');
+                }
+
+                return new MultisigCreateOrderSender(
+                    api,
+                    multisig,
+                    senderChoice.ttlSeconds,
+                    signerWallet,
+                    signer
+                );
+            }
+
+            if (!isStandardTonWallet(wallet)) {
+                throw new Error("Can't send a transfer using this wallet type");
+            }
+
+            if (activeAccount.type === 'ledger') {
+                if (senderChoice.type !== 'external') {
+                    throw new Error("Can't send a transfer using this account");
+                }
+                return new WalletMessageSender(api, wallet, estimationSigner);
+            }
+
+            if (senderChoice.type === 'external') {
+                return new WalletMessageSender(api, wallet, estimationSigner);
+            }
+
+            if (senderChoice.type === 'gasless') {
+                if (
+                    !isGaslessAvailable({
+                        asset: senderChoice.asset,
+                        account: activeAccount,
+                        gaslessConfig
+                    })
+                ) {
+                    throw new Error(
+                        `Jetton ${senderChoice.asset.symbol} not configured for gasless`
+                    );
+                }
+                return new GaslessMessageSender(
+                    {
+                        payWithAsset: senderChoice.asset,
+                        relayerAddress: gaslessConfig.relayAddress
+                    },
+                    api,
+                    wallet,
+                    estimationSigner
+                );
+            }
+
+            if (senderChoice.type === 'battery') {
+                let _authToken = authToken;
+                if (_authToken === null) {
+                    _authToken = await mutateAsync();
+                }
+
+                return new BatteryMessageSender(
+                    {
+                        jettonResponseAddress: batteryConfig.excess_account,
+                        messageTtl: batteryConfig.message_ttl,
+                        authToken: _authToken!
+                    },
+                    {
+                        tonApi: api,
+                        batteryApi
+                    },
+                    wallet,
+                    estimationSigner
+                );
+            }
+
+            assertUnreachable(senderChoice);
+        };
+    }, [
+        senderChoice,
+        authToken,
+        activeAccount,
+        accounts,
+        api,
+        wallet,
+        batteryApi,
+        batteryConfig,
+        mutateAsync,
+        gaslessConfig
+    ]);
+};
+
+export const useGetSender = () => {
+    const { api } = useAppContext();
+    const batteryApi = useBatteryApi();
+    const batteryConfig = useBatteryServiceConfig();
+    const { data: authToken } = useBatteryAuthToken();
+    const getSigner = useGetActiveAccountSigner();
+    const activeAccount = useActiveAccount();
+    const { mutateAsync } = useRequestBatteryAuthToken();
+    const accounts = useAccountsState();
+    const gaslessConfig = useGaslessConfig();
+
+    const wallet = activeAccount.activeTonWallet;
+
+    return useCallback(
+        async (senderChoice: SenderChoice = { type: 'external' }): Promise<Sender> => {
+            if (activeAccount.type === 'watch-only') {
+                throw new Error("Can't send a transfer using this account");
+            }
+
+            if (senderChoice.type === 'multisig') {
+                if (activeAccount.type !== 'ton-multisig') {
+                    throw new Error('Multisig sender available only for multisig accounts');
+                }
+
+                const { signerWallet } = getMultisigSignerInfo(
+                    accounts,
+                    activeAccount as AccountTonMultisig
+                );
+                const signer = await getSigner(signerWallet.id);
+
+                const multisigApi = new MultisigApi(api.tonApiV2);
+                const multisig = await multisigApi.getMultisigAccount({
+                    accountId: activeAccount.activeTonWallet.rawAddress
+                });
+                if (!multisig) {
+                    throw new Error('Multisig not found');
+                }
+
+                return new MultisigCreateOrderSender(
+                    api,
+                    multisig,
+                    senderChoice.ttlSeconds,
+                    signerWallet,
+                    signer
+                );
+            }
+
+            if (!isStandardTonWallet(wallet)) {
+                throw new Error("Can't send a transfer using this wallet type");
+            }
+
+            const signer = await getSigner();
+
+            if (!signer) {
+                throw new Error("Can't send a transfer using this account");
+            }
+
+            if (signer.type === 'ledger') {
+                if (senderChoice.type !== 'external') {
+                    throw new Error("Can't send a transfer using this account");
+                }
+                return new LedgerMessageSender(api, wallet, signer);
+            }
+
+            if (senderChoice.type === 'external') {
+                return new WalletMessageSender(api, wallet, signer);
+            }
+
+            if (senderChoice.type === 'gasless') {
+                if (
+                    !isGaslessAvailable({
+                        asset: senderChoice.asset,
+                        account: activeAccount,
+                        gaslessConfig
+                    })
+                ) {
+                    throw new Error(
+                        `Jetton ${senderChoice.asset.symbol} not configured for gasless`
+                    );
+                }
+                return new GaslessMessageSender(
+                    {
+                        payWithAsset: senderChoice.asset,
+                        relayerAddress: gaslessConfig.relayAddress
+                    },
+                    api,
+                    wallet,
+                    signer
+                );
+            }
+
+            if (senderChoice.type === 'battery') {
+                let batteryToken = authToken;
+                if (authToken === null) {
+                    batteryToken = await mutateAsync();
+                }
+                if (!batteryToken) {
+                    throw new Error('Auth token not found');
+                }
+                return new BatteryMessageSender(
+                    {
+                        jettonResponseAddress: batteryConfig.excess_account,
+                        messageTtl: batteryConfig.message_ttl,
+                        authToken: batteryToken
+                    },
+                    {
+                        tonApi: api,
+                        batteryApi
+                    },
+                    wallet,
+                    signer
+                );
+            }
+
+            assertUnreachable(senderChoice);
+        },
+        [
+            accounts,
+            api,
+            batteryApi,
+            batteryConfig,
+            wallet,
+            authToken,
+            getSigner,
+            activeAccount,
+            mutateAsync,
+            gaslessConfig
+        ]
+    );
+};
+
+const isGaslessAvailable = ({
+    gaslessConfig,
+    account,
+    asset
+}: {
+    gaslessConfig: GaslessConfig;
+    asset: TonAsset | undefined;
+    account: Account;
+}) => {
+    return (
+        asset &&
+        gaslessConfig.gasJettons.some(j => j.masterId === tonAssetAddressToString(asset.address)) &&
+        isStandardTonWallet(account.activeTonWallet) &&
+        account.activeTonWallet.version === WalletVersion.V5R1
+    );
+};

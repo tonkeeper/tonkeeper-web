@@ -1,10 +1,8 @@
-import { QueryClient } from '@tanstack/react-query';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
-import { seeIfBalanceError, seeIfTimeError } from '@tonkeeper/core/dist/service/transfer/common';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
@@ -360,12 +358,15 @@ export const childFactoryCreator = (right: boolean) => (child: React.ReactElemen
         isAnimating: true
     });
 
-export const notifyError = async (
-    client: QueryClient,
-    sdk: IAppSdk,
-    t: (value: string) => string,
-    error: unknown
-) => {
+const seeIfTimeError = (e: unknown): e is Error => {
+    return e instanceof Error && e.message.startsWith('Time and date are incorrect');
+};
+
+const seeIfBalanceError = (e: unknown): e is Error => {
+    return e instanceof Error && e.message.startsWith('Not enough account');
+};
+
+export const notifyError = async (sdk: IAppSdk, t: (value: string) => string, error: unknown) => {
     if (seeIfBalanceError(error)) {
         sdk.uiEvents.emit('copy', {
             method: 'copy',

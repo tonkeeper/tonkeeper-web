@@ -20,7 +20,7 @@ export const H2 = styled.h2`
     margin: 0 0 0.25rem;
 `;
 
-export const H2Responsive = styled(H2)`
+export const H2Label2Responsive = styled(H2)`
     user-select: none;
 
     ${p => p.theme.displayType === 'full-width' && Label2Class}
@@ -82,6 +82,24 @@ export const Body1 = styled.span`
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
+`;
+
+export const Body1Body2Responsive = styled(Body1)<{ secondary?: boolean }>`
+    user-select: none;
+
+    ${p =>
+        p.secondary &&
+        css`
+            color: ${p => p.theme.textSecondary};
+        `}
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            ${Body2Class};
+        `}
+
+    text-wrap: balance;
 `;
 
 export const Body2Class = css`

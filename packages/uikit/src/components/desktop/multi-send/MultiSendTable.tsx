@@ -4,7 +4,6 @@ import { TonAsset, isTon } from '@tonkeeper/core/dist/entries/crypto/asset/ton-a
 import { DnsRecipient, TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { isW5Version } from '@tonkeeper/core/dist/entries/wallet';
 import { arrayToCsvString } from '@tonkeeper/core/dist/service/parserService';
-import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/transfer/multiSendService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
@@ -39,7 +38,7 @@ import { IconButton } from '../../fields/IconButton';
 import { SkeletonText } from '../../shared/Skeleton';
 import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 import { AmountInput } from './AmountInput';
-import { AssetSelect } from './AssetSelect';
+import { MultisendAssetSelect } from './MultisendAssetSelect';
 import { CommentInput } from './CommentInput';
 import { DeleteListNotification } from './DeleteListNotification';
 import { EditListNotification } from './EditListNotification';
@@ -52,6 +51,7 @@ import { getWillBeMultiSendValue } from './utils';
 import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
+import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -222,7 +222,7 @@ export const MultiSendTable: FC<{
         <>
             <ImportListNotification isOpen={isImportOpen} onClose={onImportList} />
             <FormHeadingWrapper>
-                <AssetSelect asset={asset} onAssetChange={setAsset} />
+                <MultisendAssetSelect asset={asset} onAssetChange={setAsset} />
                 <Button
                     secondary
                     as="a"

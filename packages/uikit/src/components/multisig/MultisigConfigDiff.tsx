@@ -1,11 +1,11 @@
 import { FC } from 'react';
-import { MultisigConfig } from '@tonkeeper/core/dist/service/multisig/deploy';
 import { styled } from 'styled-components';
 import { Body2 } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAppContext } from '../../hooks/appContext';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../hooks/translation';
+import { MultisigConfig } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 
 const DiffContainer = styled.div``;
 

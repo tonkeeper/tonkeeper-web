@@ -276,7 +276,7 @@ export const Loader: FC = () => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
-    useGlobalSetup();
+    const { isLoading: globalSetupLoading } = useGlobalSetup();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -316,7 +316,8 @@ export const Loader: FC = () => {
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
-        globalPreferencesLoading
+        globalPreferencesLoading ||
+        globalSetupLoading
     ) {
         return <Loading />;
     }

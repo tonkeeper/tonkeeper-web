@@ -8,7 +8,7 @@ import {
 } from '../../state/ledger';
 import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { LedgerTonTransport } from '@tonkeeper/core/dist/service/ledger/connector';
-import { Body2, H2Responsive } from '../../components/Text';
+import { Body2, H2Label2Responsive } from '../../components/Text';
 import { useNavigate } from 'react-router-dom';
 import { useAppSdk } from '../../hooks/appSdk';
 import { AppRoute } from '../../libs/routes';
@@ -34,7 +34,7 @@ const ConnectLedgerWrapper = styled.div`
     flex-direction: column;
 `;
 
-const H2Styled = styled(H2Responsive)`
+const H2Styled = styled(H2Label2Responsive)`
     margin-bottom: 1rem;
 `;
 

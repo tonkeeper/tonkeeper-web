@@ -6,7 +6,7 @@ import { ChangeHandler } from 'react-hook-form';
 
 export interface CheckboxProps {
     checked: boolean;
-    onChange: (checked: boolean) => void;
+    onChange?: (checked: boolean) => void;
     disabled?: boolean;
     light?: boolean;
     className?: string;
@@ -133,7 +133,7 @@ export const Checkbox: FC<PropsWithChildren<CheckboxProps>> = ({
     size = 'm'
 }) => {
     return (
-        <Wrapper onClick={() => onChange(!checked)} className={className}>
+        <Wrapper onClick={() => onChange?.(!checked)} className={className}>
             <CheckboxItem
                 checked={checked}
                 disabled={disabled}

@@ -43,5 +43,7 @@ export enum AppKey {
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
-    SWAP_OPTIONS = 'swap_options'
+    SWAP_OPTIONS = 'swap_options',
+
+    BATTERY_AUTH_TOKEN = 'battery_auth_token'
 }

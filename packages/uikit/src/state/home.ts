@@ -5,6 +5,10 @@ import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useJettonList } from './jetton';
 import { useActiveWallet, useWalletAccountInfo } from './wallet';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { jettonToTonAssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 
 export const useAssets = () => {
     const wallet = useActiveWallet();
@@ -45,4 +49,43 @@ export const useAssetWeiBalance = (asset: AssetIdentification) => {
             assets.tron.balances.find(i => i.token.address === asset.address)?.weiAmount || '0'
         );
     }, [assets, asset]);
+};
+
+export const useTonAssetsBalances = () => {
+    const [assets] = useAssets();
+
+    return useMemo(() => {
+        if (!assets) {
+            return undefined;
+        }
+
+        const tonAssetAmount = new AssetAmount({
+            asset: TON_ASSET,
+            weiAmount: assets.ton.info.balance,
+            image: TON_ASSET.image
+        });
+
+        const jettonsAmounts = assets?.ton.jettons.balances.map(jettonToTonAssetAmount);
+
+        return [tonAssetAmount, ...jettonsAmounts];
+    }, [assets]);
+};
+
+export const useAsset = (assetId: string) => {
+    const [assets] = useAssets();
+    return useMemo(() => {
+        if (!assets) {
+            return undefined;
+        }
+
+        if (assetId === TON_ASSET.id) {
+            return TON_ASSET;
+        }
+
+        const jetton = assets.ton.jettons.balances.find(
+            i => packAssetId(BLOCKCHAIN_NAME.TON, i.jetton.address) === assetId
+        );
+
+        return jettonToTonAssetAmount(jetton!).asset;
+    }, [assetId, assets]);
 };

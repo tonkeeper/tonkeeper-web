@@ -30,7 +30,7 @@ import { Flatten } from '../utils/types';
 import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
-import { getServerTime } from './transfer/common';
+import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {

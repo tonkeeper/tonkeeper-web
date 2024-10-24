@@ -226,7 +226,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
-    useGlobalSetup();
+    const { isLoading: globalSetupLoading } = useGlobalSetup();
 
     const lock = useLock(sdk);
     const network = useActiveTonNetwork();
@@ -255,7 +255,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
-        globalPreferencesLoading
+        globalPreferencesLoading ||
+        globalSetupLoading
     ) {
         return <Loading />;
     }

@@ -9,6 +9,7 @@ import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
 import { DesktopNftSettings } from './DesktopNftSettings';
 import { MAMIndexesPage } from '../../pages/settings/MamIndexes';
 import { LedgerIndexesPage } from '../../pages/settings/LedgerIndexes';
+import { BatteryPage } from '../../pages/settings/Battery';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
@@ -39,6 +40,7 @@ export const DesktopWalletSettingsRouting = () => {
             />
             <Route path={WalletSettingsRoute.nft} element={<DesktopNftSettings />} />
             <Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />
+            <Route path={WalletSettingsRoute.battery} element={<BatteryPage />} />
             <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
             <Route path={WalletSettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
             <Route path="*" element={<DesktopWalletSettingsPage />} />

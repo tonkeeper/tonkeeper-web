@@ -11,7 +11,12 @@ const defaultConfig: TonWalletConfig = {
     pinnedTokens: [],
     hiddenTokens: [],
     trustedNfts: [],
-    spamNfts: []
+    spamNfts: [],
+    batterySettings: {
+        enabledForSwaps: true,
+        enabledForTokens: true,
+        enabledForNfts: true
+    }
 };
 
 const migration = async (storage: IStorage, address: string, network: Network | undefined) => {
