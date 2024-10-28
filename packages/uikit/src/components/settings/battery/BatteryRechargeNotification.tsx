@@ -1,7 +1,7 @@
 import { Notification } from '../../Notification';
 import { FC, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { AssetSelect } from '../../fields/AssetSelect';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { BatteryPacksSelect } from './BatteryPacksSelect';
@@ -23,7 +23,11 @@ import { TonRecipientInput } from '../../fields/TonRecipientInput';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 const NotificationStyled = styled(Notification)`
-    max-width: 400px;
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            max-width: 400px;
+        `}
 `;
 
 export const BatteryRechargeNotification: FC<{

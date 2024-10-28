@@ -11,7 +11,11 @@ import {
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
 import { BatteryInfoHeading } from '../../components/settings/battery/BatteryInfoHeading';
-import { useBatteryBalance, useProvideBatteryAuth } from '../../state/battery';
+import {
+    useBatteryBalance,
+    useBatteryEnabledConfig,
+    useProvideBatteryAuth
+} from '../../state/battery';
 import { GearIconEmpty, SpinnerRing } from '../../components/Icon';
 import { BuyBatteryMethods } from '../../components/settings/battery/BuyBatteryMethods';
 import { BatterySettingsNotification } from '../../components/settings/battery/BatterySettingsNotification';
@@ -27,8 +31,9 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
+    const { disableWhole } = useBatteryEnabledConfig();
 
-    if (account.type !== 'mnemonic' && account.type !== 'mam') {
+    if ((account.type !== 'mnemonic' && account.type !== 'mam') || disableWhole) {
         return <Navigate to="../" />;
     }
 

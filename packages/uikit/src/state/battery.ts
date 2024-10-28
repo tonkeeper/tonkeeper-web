@@ -184,6 +184,21 @@ export const useBatteryUnitTonRate = () => {
     return useMemo(() => new BigNumber(batteryMeanFees || '0.0026'), [batteryMeanFees]);
 };
 
+export const useBatteryEnabledConfig = () => {
+    const {
+        config: { battery_beta, disable_battery, disable_battery_send }
+    } = useAppContext();
+
+    return useMemo(
+        () => ({
+            isBeta: battery_beta ?? false,
+            disableWhole: disable_battery ?? false,
+            disableOperations: disable_battery ? true : disable_battery_send ?? false
+        }),
+        [battery_beta, disable_battery, disable_battery_send]
+    );
+};
+
 export const useBatteryMinBootstrapValue = (assetAddress: string) => {
     const methods = useBatteryAvailableRechargeMethods();
     const { data: balance } = useBatteryBalance();

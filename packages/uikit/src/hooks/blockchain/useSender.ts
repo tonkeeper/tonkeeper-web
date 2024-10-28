@@ -13,6 +13,7 @@ import {
     useBatteryApi,
     useBatteryAuthToken,
     useBatteryBalance,
+    useBatteryEnabledConfig,
     useBatteryServiceConfig,
     useRequestBatteryAuthToken
 } from '../../state/battery';
@@ -53,6 +54,7 @@ export const useAvailableSendersChoices = (
         config: { batteryReservedAmount }
     } = useAppContext();
     const gaslessConfig = useGaslessConfig();
+    const batteryEnableConfig = useBatteryEnabledConfig();
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
@@ -69,6 +71,10 @@ export const useAvailableSendersChoices = (
             batteryAvailable = !!config?.batterySettings.enabledForSwaps;
         } else if (operation.type === 'nfr_transfer') {
             batteryAvailable = !!config?.batterySettings.enabledForNfts;
+        }
+
+        if (batteryEnableConfig.disableOperations) {
+            batteryAvailable = false;
         }
 
         let availableSenders: SenderChoiceUserAvailable[];
@@ -100,7 +106,8 @@ export const useAvailableSendersChoices = (
         batteryBalance,
         account.type,
         batteryReservedAmount,
-        gaslessConfig
+        gaslessConfig,
+        batteryEnableConfig.disableOperations
     ]);
 };
 

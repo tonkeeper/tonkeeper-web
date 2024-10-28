@@ -40,6 +40,7 @@ import {
     useMultisigTogglePinForWallet
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
+import { useBatteryEnabledConfig } from '../../state/battery';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -101,6 +102,7 @@ export const DesktopWalletSettingsPage = () => {
 
     const activeDerivation = account.type === 'mam' ? account.activeDerivation : undefined;
     const navigate = useNavigate();
+    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
 
     const onHide = () => {
         hideDerivation({
@@ -109,7 +111,8 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
-    const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
+    const canUseBattery =
+        (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
 
     return (
         <DesktopViewPageLayout>
