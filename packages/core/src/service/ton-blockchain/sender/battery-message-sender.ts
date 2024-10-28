@@ -51,7 +51,7 @@ export class BatteryMessageSender implements ISender {
         );
 
         return {
-            fee: new AssetAmount({ asset: TON_ASSET, weiAmount: Math.abs(result.event.extra) }),
+            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.event.extra * -1 }),
             payload: result
         };
     }

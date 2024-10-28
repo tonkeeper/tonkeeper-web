@@ -206,7 +206,7 @@ export const ConfirmNftView: FC<{
     const { mutateAsync, isLoading, error, reset } = useSendNft(
         recipient,
         nftItem,
-        estimation.data?.fee,
+        estimation.data?.extra,
         { multisigTTL, selectedSenderType }
     );
 

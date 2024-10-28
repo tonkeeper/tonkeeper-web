@@ -1,7 +1,7 @@
 import { APIConfig } from '../../entries/apis';
 import { LedgerMessageSender, Sender } from './sender';
 import BigNumber from 'bignumber.js';
-import { TonEstimation } from '../../entries/send';
+import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import { TonConnectTransactionPayload } from '../../entries/tonConnect';
 import { TonConnectEncoder } from './encoder/ton-connect-encoder';
@@ -65,9 +65,7 @@ export class TonConnectTransactionService {
             new BigNumber(0)
         );
 
-        if (estimation) {
-            requiredBalance = requiredBalance.plus(estimation.fee.weiAmount);
-        }
+        requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));
 
         await assertBalanceEnough(this.api, requiredBalance, this.wallet.rawAddress);
     }

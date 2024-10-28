@@ -36,7 +36,10 @@ import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import { SenderChoiceUserAvailable, SenderTypeUserAvailable } from '../../hooks/blockchain/useSender';
+import {
+    SenderChoiceUserAvailable,
+    SenderTypeUserAvailable
+} from '../../hooks/blockchain/useSender';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -49,7 +52,7 @@ type ConfirmViewContextValue = {
     estimation: {
         data:
             | {
-                  fee: AssetAmount;
+                  extra: AssetAmount;
               }
             | undefined;
         isLoading: boolean;
@@ -85,7 +88,7 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         estimation: {
             data:
                 | {
-                      fee: AssetAmount<T>;
+                      extra: AssetAmount<T>;
                   }
                 | undefined;
             isLoading: boolean;
@@ -316,7 +319,7 @@ export const ConfirmViewDetailsFee: FC<{
 
     return (
         <ActionFeeDetailsUniversal
-            fee={estimation.isLoading ? undefined : estimation.data?.fee}
+            extra={estimation.isLoading ? undefined : estimation.data?.extra}
             onSenderTypeChange={onSenderTypeChange}
             availableSendersChoices={availableSendersChoices}
             selectedSenderType={selectedSenderType}

@@ -164,10 +164,10 @@ const MultiSendConfirmContent: FC<{
         error: estimateError
     } = useEstimateMultiTransfer(formTokenized, asset);
 
-    const tonFee = estimateData?.fee.stringAssetRelativeAmount;
+    const tonFee = estimateData?.extra.stringAssetRelativeAmount;
     const fiatFee = formatFiatCurrency(
         fiat,
-        estimateData?.fee.relativeAmount.multipliedBy(tonRate?.prices || 0) || new BigNumber(0)
+        estimateData?.extra.relativeAmount.multipliedBy(tonRate?.prices || 0) || new BigNumber(0)
     );
 
     const navigate = useNavigate();
@@ -200,7 +200,11 @@ const MultiSendConfirmContent: FC<{
                         <Label2>{listName}</Label2>
                     </ListItemStyled>
                     <ListItemStyled hover={false}>
-                        <Body2>{t('confirm_sending_fee')}</Body2>
+                        <Body2>
+                            {estimateData?.extra.weiAmount.lt(0)
+                                ? t('txActions_refund')
+                                : t('confirm_sending_fee')}
+                        </Body2>
                         <FeeContainer>
                             {estimateError ? null : estimateLoading || !tonRate ? (
                                 <>
@@ -219,7 +223,7 @@ const MultiSendConfirmContent: FC<{
                 <ButtonBlock
                     form={formTokenized}
                     asset={asset}
-                    feeEstimation={estimateData?.fee.weiAmount}
+                    feeEstimation={estimateData?.extra.weiAmount}
                     onSuccess={() => {
                         setTimeout(() => {
                             onClose();

@@ -20,7 +20,7 @@ export const useEstimateDeployMultisig = () => {
     const rawTransactionService = useTonRawTransactionService();
 
     return useMutation<
-        { fee: AssetAmount; address: Address },
+        { extra: AssetAmount; address: Address },
         Error,
         { multisigConfig: MultisigConfig; fromWallet: WalletId }
     >(async ({ multisigConfig, fromWallet }) => {
@@ -41,7 +41,7 @@ export const useEstimateDeployMultisig = () => {
         );
 
         return {
-            fee: estimation.fee,
+            extra: estimation.extra,
             address
         };
     });

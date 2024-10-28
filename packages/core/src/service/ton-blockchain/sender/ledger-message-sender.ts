@@ -107,9 +107,9 @@ export class LedgerMessageSender {
                 });
 
                 return {
-                    fee: new AssetAmount({
+                    extra: new AssetAmount({
                         asset: TON_ASSET,
-                        weiAmount: Math.abs(result.event.extra)
+                        weiAmount: result.event.extra * -1
                     }),
                     payload: result
                 };

@@ -63,7 +63,7 @@ export function useSendMultiTransfer() {
 
             await transferService.send(
                 await getSender(EXTERNAL_SENDER_CHOICE),
-                { fee: new AssetAmount({ asset: TON_ASSET, weiAmount: feeEstimation }) },
+                { extra: new AssetAmount({ asset: TON_ASSET, weiAmount: feeEstimation }) },
                 multiSendFormToTransferMessages(asset, form)
             );
 

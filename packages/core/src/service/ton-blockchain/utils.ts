@@ -35,7 +35,7 @@ export const assertMessagesNumberSupported = (
     }
 };
 
-export const zeroFee = { fee: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 }) };
+export const zeroFee = { extra: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 }) };
 
 export type StateInit = ReturnType<typeof toStateInit>;
 

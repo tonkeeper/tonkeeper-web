@@ -5,6 +5,8 @@ import { TonAsset } from './crypto/asset/ton-asset';
 import { TronAsset } from './crypto/asset/tron-asset';
 import { Suggestion } from './suggestion';
 import { Asset } from './crypto/asset/asset';
+import BigNumber from 'bignumber.js';
+import { TON_ASSET } from './crypto/asset/constants';
 
 export type BaseRecipient = Suggestion | { address: string; bounce?: boolean };
 
@@ -51,9 +53,25 @@ export function isTronRecipientData(
 }
 
 export type TonEstimation = {
-    fee: AssetAmount<TonAsset>;
+    /**
+     * positive if fee
+     * negative if there will be a refund
+     */
+    extra: AssetAmount<TonAsset>;
     event?: AccountEvent;
 };
+
+export function getTonEstimationTonFee(estimation: TonEstimation | undefined): BigNumber {
+    if (
+        estimation &&
+        estimation.extra.asset.id === TON_ASSET.id &&
+        estimation.extra.weiAmount.gte(0)
+    ) {
+        return estimation.extra.weiAmount;
+    }
+
+    return new BigNumber(0);
+}
 
 export type TonEstimationDetailed = Required<TonEstimation>;
 
@@ -64,7 +82,7 @@ export const isTonEstimationDetailed = (
 };
 
 export type TronEstimation = {
-    fee: AssetAmount<TronAsset>;
+    extra: AssetAmount<TronAsset>;
 };
 
 export type Estimation<T extends Asset = Asset> = T extends TonAsset

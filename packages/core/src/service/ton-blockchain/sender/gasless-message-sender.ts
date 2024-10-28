@@ -61,7 +61,7 @@ export class GaslessMessageSender implements ISender {
         const params = await this.getGaslessParams(outgoing);
 
         return {
-            fee: new AssetAmount({
+            extra: new AssetAmount({
                 asset: this.gaslessConfig.payWithAsset,
                 weiAmount: params.commission
             })

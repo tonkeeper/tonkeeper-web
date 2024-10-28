@@ -94,7 +94,7 @@ export const useDeployMultisig = (
             await rawTransactionService.send(
                 sender,
                 {
-                    fee: new AssetAmount({ asset: TON_ASSET, weiAmount: params.feeWei })
+                    extra: new AssetAmount({ asset: TON_ASSET, weiAmount: params.feeWei })
                 },
                 message
             );
