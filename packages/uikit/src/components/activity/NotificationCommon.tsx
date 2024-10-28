@@ -376,6 +376,7 @@ const TransparentButton = styled.button`
     background: transparent;
     display: flex;
     align-items: center;
+    padding: 0;
 `;
 
 const TokenImage = styled.img`
