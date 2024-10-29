@@ -40,7 +40,7 @@ export class WalletMessageSender implements ISender {
 
         return {
             extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.event.extra * -1 }),
-            payload: result
+            event: result.event
         };
     }
 
