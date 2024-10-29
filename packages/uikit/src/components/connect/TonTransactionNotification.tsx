@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { FC, useCallback, useEffect, useState } from 'react';
+import {
+    TON_CONNECT_MSG_VARIANTS_ID,
+    TonConnectTransactionPayload,
+    TonConnectTransactionPayloadVariantSelected
+} from '@tonkeeper/core/dist/entries/tonConnect';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -31,13 +35,17 @@ import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlock
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import BigNumber from 'bignumber.js';
 import {
+    BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
+    SenderChoiceUserAvailable,
     useGetEstimationSender,
-    useGetSender
+    useGetSender,
+    useTonConnectAvailableSendersChoices
 } from '../../hooks/blockchain/useSender';
 import { useToQueryKeyPart } from '../../hooks/useToQueryKeyPart';
 import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
+import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -61,7 +69,7 @@ const ButtonRowStyled = styled.div`
 `;
 
 const useSendMutation = (
-    params: TonConnectTransactionPayload,
+    params: TonConnectTransactionPayloadVariantSelected,
     estimate: TonEstimationDetailed,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
@@ -89,7 +97,9 @@ const useSendMutation = (
                 ttlSeconds: 60 * Number(options.multisigTTL)
             });
         } else {
-            sender = await getSender(EXTERNAL_SENDER_CHOICE);
+            sender = await getSender(
+                params.variant === 'battery' ? BATTERY_SENDER_CHOICE : EXTERNAL_SENDER_CHOICE
+            );
         }
 
         const boc = await tonConenctService.send(sender, estimate, params);
@@ -176,6 +186,12 @@ const NotificationIssue: FC<{
     );
 };
 
+const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
+    background-color: transparent;
+    width: 100%;
+    margin-top: -24px;
+`;
+
 const ConnectContent: FC<{
     params: TonConnectTransactionPayload;
     handleClose: (result?: string) => void;
@@ -186,14 +202,40 @@ const ConnectContent: FC<{
 
     const { t } = useTranslation();
 
+    const { data: availableSendersChoices } = useTonConnectAvailableSendersChoices(params);
+    const [selectedSenderType, onSenderTypeChange] = useState<SenderChoiceUserAvailable['type']>(
+        EXTERNAL_SENDER_CHOICE.type
+    );
+    useEffect(() => {
+        if (availableSendersChoices && availableSendersChoices[0]) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [availableSendersChoices]);
+
+    const paramsVariantSelected: TonConnectTransactionPayloadVariantSelected = useMemo(() => {
+        return {
+            ...params,
+            variant:
+                selectedSenderType === 'external'
+                    ? 'standard'
+                    : selectedSenderType === 'battery'
+                    ? TON_CONNECT_MSG_VARIANTS_ID.BATTERY
+                    : TON_CONNECT_MSG_VARIANTS_ID.GASLESS
+        };
+    }, [params, selectedSenderType]);
+
     const { data: issues, isFetched } = useTransactionError(params);
-    const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params, isFetched);
+    const {
+        data: estimate,
+        isLoading: isEstimating,
+        isError
+    } = useEstimation(paramsVariantSelected, isFetched);
     const {
         mutateAsync,
         isLoading,
         error: sendError,
         data: sendResult
-    } = useSendMutation(params, estimate!, { multisigTTL, waitInvalidation });
+    } = useSendMutation(paramsVariantSelected, estimate!, { multisigTTL, waitInvalidation });
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -226,7 +268,15 @@ const ConnectContent: FC<{
 
     return (
         <NotificationBlock>
-            <EmulationList isError={isError} event={estimate?.event} />
+            <EmulationList isError={isError} event={estimate?.event} hideExtraDetails />
+            {!!estimate?.extra && (
+                <ActionFeeDetailsUniversalStyled
+                    availableSendersChoices={availableSendersChoices}
+                    selectedSenderType={selectedSenderType}
+                    onSenderTypeChange={onSenderTypeChange}
+                    extra={estimate.extra}
+                />
+            )}
             <ButtonGap />
             <NotificationFooterPortal>
                 <NotificationFooter>
@@ -270,11 +320,16 @@ const ConnectContent: FC<{
     );
 };
 
-const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
+const useEstimation = (
+    params: TonConnectTransactionPayloadVariantSelected,
+    errorFetched: boolean
+) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
-    const getSender = useGetEstimationSender(EXTERNAL_SENDER_CHOICE);
+    const getSender = useGetEstimationSender(
+        params.variant === 'battery' ? BATTERY_SENDER_CHOICE : EXTERNAL_SENDER_CHOICE
+    );
     const getSenderKey = useToQueryKeyPart(getSender);
     const tonConenctService = useTonConnectTransactionService();
 

@@ -2,18 +2,23 @@ import { Address, Cell, internal, SendMode } from '@ton/core';
 import { tonConnectAddressIsBounceable, toStateInit } from '../utils';
 import { APIConfig } from '../../../entries/apis';
 import { WalletOutgoingMessage } from './types';
-import { TonConnectTransactionPayload } from '../../../entries/tonConnect';
+import { TonConnectTransactionPayloadVariantSelected } from '../../../entries/tonConnect';
 
 export class TonConnectEncoder {
     constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
 
     encodeTransfer = async (
-        transfer: TonConnectTransactionPayload
+        transfer: TonConnectTransactionPayloadVariantSelected
     ): Promise<WalletOutgoingMessage> => {
+        let messages = transfer.messages;
+        if (transfer.variant !== 'standard' && transfer.messagesVariants?.[transfer.variant]) {
+            messages = transfer.messagesVariants[transfer.variant]!;
+        }
+
         return {
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             messages: await Promise.all(
-                transfer.messages.map(async item =>
+                messages.map(async item =>
                     internal({
                         to: Address.parse(item.address),
                         bounce: await tonConnectAddressIsBounceable(this.api, item.address),

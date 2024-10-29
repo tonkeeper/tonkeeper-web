@@ -30,6 +30,12 @@ import { GaslessConfig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useGaslessConfig } from '../../state/gasless';
+import {
+    TON_CONNECT_MSG_VARIANTS_ID,
+    TonConnectTransactionPayload
+} from '@tonkeeper/core/dist/entries/tonConnect';
+import { useQuery } from '@tanstack/react-query';
+import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -109,6 +115,71 @@ export const useAvailableSendersChoices = (
         gaslessConfig,
         batteryEnableConfig.disableOperations
     ]);
+};
+
+export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransactionPayload) => {
+    const { api } = useAppContext();
+    const batteryApi = useBatteryApi();
+    const { data: batteryAuthToken } = useBatteryAuthToken();
+    const account = useActiveAccount();
+    const batteryConfig = useBatteryServiceConfig();
+    const batteryEnableConfig = useBatteryEnabledConfig();
+
+    return useQuery<SenderChoiceUserAvailable[]>(
+        [
+            'ton-connect-sender-choices',
+            payload,
+            account,
+            batteryAuthToken,
+            batteryEnableConfig.disableOperations,
+            batteryConfig
+        ],
+        async () => {
+            if (account.type === 'ledger') {
+                return [EXTERNAL_SENDER_CHOICE];
+            }
+
+            const choices: SenderChoiceUserAvailable[] = [EXTERNAL_SENDER_CHOICE];
+
+            const tonConnectService = new TonConnectTransactionService(
+                api,
+                account.activeTonWallet
+            );
+
+            if (
+                !batteryEnableConfig.disableOperations &&
+                batteryAuthToken &&
+                isStandardTonWallet(account.activeTonWallet)
+            ) {
+                const batterySender = new BatteryMessageSender(
+                    {
+                        messageTtl: batteryConfig.messageTtl,
+                        jettonResponseAddress: batteryConfig.excessAccount,
+                        authToken: batteryAuthToken
+                    },
+                    { batteryApi, tonApi: api },
+                    account.activeTonWallet,
+                    estimationSigner
+                );
+
+                try {
+                    await tonConnectService.estimate(batterySender, {
+                        ...payload,
+                        variant: TON_CONNECT_MSG_VARIANTS_ID.BATTERY
+                    });
+
+                    choices.push(BATTERY_SENDER_CHOICE);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            return choices;
+        },
+        {
+            enabled: batteryAuthToken !== undefined
+        }
+    );
 };
 
 export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies SenderChoice;
@@ -210,8 +281,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
 
                 return new BatteryMessageSender(
                     {
-                        jettonResponseAddress: batteryConfig.excess_account,
-                        messageTtl: batteryConfig.message_ttl,
+                        jettonResponseAddress: batteryConfig.excessAccount,
+                        messageTtl: batteryConfig.messageTtl,
                         authToken: _authToken!
                     },
                     {
@@ -340,8 +411,8 @@ export const useGetSender = () => {
                 }
                 return new BatteryMessageSender(
                     {
-                        jettonResponseAddress: batteryConfig.excess_account,
-                        messageTtl: batteryConfig.message_ttl,
+                        jettonResponseAddress: batteryConfig.excessAccount,
+                        messageTtl: batteryConfig.messageTtl,
                         authToken: batteryToken
                     },
                     {

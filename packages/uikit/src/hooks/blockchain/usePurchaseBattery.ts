@@ -54,7 +54,7 @@ export function useEstimatePurchaseBattery({
             try {
                 const needPayload = giftRecipient || promoCode || !payWithTon;
                 return await transferService.estimate(await getSender!(), {
-                    to: batteryConfig.fund_receiver,
+                    to: batteryConfig.fundReceiver,
                     amount: assetAmount,
                     payload: needPayload
                         ? {
@@ -108,7 +108,7 @@ export const usePurchaseBattery = ({
 
             const needPayload = giftRecipient || promoCode || !payWithTon;
             await transferService.send(sender, estimation, {
-                to: batteryConfig.fund_receiver,
+                to: batteryConfig.fundReceiver,
                 amount: assetAmount,
                 payload: needPayload
                     ? {

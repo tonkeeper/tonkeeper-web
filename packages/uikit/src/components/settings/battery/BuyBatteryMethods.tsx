@@ -88,7 +88,7 @@ export const BuyBatteryMethods: FC<{
                             assetId:
                                 m.type === 'ton'
                                     ? TON_ASSET.id
-                                    : packAssetId(BLOCKCHAIN_NAME.TON, m.jetton_master!)
+                                    : packAssetId(BLOCKCHAIN_NAME.TON, m.jettonMaster!)
                         })
                     }
                 >

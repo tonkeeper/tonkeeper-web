@@ -57,7 +57,8 @@ const Block = styled.div`
 export const EmulationList: FC<{
     isError: boolean;
     event: AccountEvent | undefined;
-}> = ({ isError, event }) => {
+    hideExtraDetails?: boolean;
+}> = ({ isError, event, hideExtraDetails }) => {
     const { t, i18n } = useTranslation();
 
     const [date, timestamp] = useMemo(() => {
@@ -85,7 +86,7 @@ export const EmulationList: FC<{
                         setActivity={() => null}
                     />
                 </ListBlock>
-                <ExtraDetails extra={event.extra} />
+                {!hideExtraDetails && <ExtraDetails extra={event.extra} />}
             </>
         );
     }

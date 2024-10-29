@@ -3,12 +3,12 @@ import { WalletContractV5R1 } from '@ton/ton';
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
-import { Battery } from '../../../batteryApi';
 import { APIConfig } from '../../../entries/apis';
 import { ISender } from './ISender';
 import { externalMessage, getServerTime, getWalletSeqNo } from '../utils';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
+import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
 
 export class BatteryMessageSender implements ISender {
     constructor(
@@ -19,7 +19,7 @@ export class BatteryMessageSender implements ISender {
         },
         private api: {
             tonApi: APIConfig;
-            batteryApi: Battery;
+            batteryApi: Configuration;
         },
         private readonly wallet: TonWalletStandard,
 
@@ -33,8 +33,11 @@ export class BatteryMessageSender implements ISender {
     public async send(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        await this.api.batteryApi.default.sendMessage(this.batteryConfig.authToken, {
-            boc: external.toBoc().toString('base64')
+        await new DefaultApi(this.api.batteryApi).sendMessage({
+            xTonConnectAuth: this.batteryConfig.authToken,
+            emulateMessageToWalletRequest: {
+                boc: external.toBoc().toString('base64')
+            }
         });
 
         return external;
@@ -43,12 +46,12 @@ export class BatteryMessageSender implements ISender {
     public async estimate(outgoing: WalletOutgoingMessage) {
         const external = await this.toExternal(outgoing);
 
-        const result = await this.api.batteryApi.emulation.emulateMessageToWallet(
-            this.batteryConfig.authToken,
-            {
+        const result = await new EmulationApi(this.api.batteryApi).emulateMessageToWallet({
+            xTonConnectAuth: this.batteryConfig.authToken,
+            emulateMessageToWalletRequest: {
                 boc: external.toBoc().toString('base64')
             }
-        );
+        });
 
         return {
             extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.event.extra * -1 }),

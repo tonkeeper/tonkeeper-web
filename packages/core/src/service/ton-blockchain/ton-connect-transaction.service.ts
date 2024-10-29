@@ -3,7 +3,10 @@ import { LedgerMessageSender, Sender } from './sender';
 import BigNumber from 'bignumber.js';
 import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { isStandardTonWallet, TonContract } from '../../entries/wallet';
-import { TonConnectTransactionPayload } from '../../entries/tonConnect';
+import {
+    TonConnectTransactionPayload,
+    TonConnectTransactionPayloadVariantSelected
+} from '../../entries/tonConnect';
 import { TonConnectEncoder } from './encoder/ton-connect-encoder';
 import { assertMessagesNumberSupported, assertBalanceEnough } from './utils';
 import { Cell } from '@ton/core';
@@ -13,7 +16,7 @@ export class TonConnectTransactionService {
 
     async estimate(
         sender: Sender,
-        transaction: TonConnectTransactionPayload
+        transaction: TonConnectTransactionPayloadVariantSelected
     ): Promise<TonEstimation> {
         await this.checkTransactionPossibility(transaction);
 
@@ -31,7 +34,7 @@ export class TonConnectTransactionService {
     async send(
         sender: Sender,
         estimation: TonEstimation,
-        transaction: TonConnectTransactionPayload
+        transaction: TonConnectTransactionPayloadVariantSelected
     ): Promise<string> {
         await this.checkTransactionPossibility(transaction, estimation);
 

@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Battery } from '@tonkeeper/core/dist/batteryApi';
 import { QueryKey } from '../libs/queryKey';
 import type { RechargeMethods } from '@tonkeeper/core/dist/batteryApi/models/RechargeMethods';
 
@@ -19,13 +18,15 @@ import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { toNano } from '@ton/core';
 import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
+import { Configuration, ConnectApi, DefaultApi, WalletApi } from '@tonkeeper/core/dist/batteryApi';
 
 export const useBatteryApi = () => {
     const { config } = useAppContext();
-    return useMemo(
-        () => new Battery({ BASE: config.batteryHost || 'https://battery.tonkeeper.com' }),
-        []
-    );
+    return useMemo(() => {
+        return new Configuration({
+            basePath: config.batteryHost || 'https://battery.tonkeeper.com'
+        });
+    }, []);
 };
 
 export const useBatteryServiceConfigQuery = () => {
@@ -34,12 +35,7 @@ export const useBatteryServiceConfigQuery = () => {
     return useQuery<Config>(
         [QueryKey.batteryServiceConfig],
         async () => {
-            const res = await batteryApi.default.getConfig();
-            if ('error' in res) {
-                throw new Error(res.error);
-            }
-
-            return res;
+            return new DefaultApi(batteryApi).getConfig();
         },
         {
             keepPreviousData: true
@@ -63,11 +59,9 @@ export const useBatteryOnChainRechargeMethods = () => {
     return useQuery<RechargeMethods['methods']>(
         [QueryKey.batteryOnchainRechargeMethods],
         async () => {
-            const res = await batteryApi.default.getRechargeMethods(false);
-            if ('error' in res) {
-                throw new Error(res.error);
-            }
-
+            const res = await new DefaultApi(batteryApi).getRechargeMethods({
+                includeRechargeOnly: false
+            });
             return res.methods;
         }
     );
@@ -92,12 +86,12 @@ export const useBatteryAvailableRechargeMethods = () => {
                     };
                 }
 
-                if (m.jetton_master === tonAssetAddressToString(TON_USDT_ASSET.address)) {
-                    return { ...m, key: m.jetton_master! };
+                if (m.jettonMaster === tonAssetAddressToString(TON_USDT_ASSET.address)) {
+                    return { ...m, key: m.jettonMaster! };
                 }
 
-                if (jettons.balances.some(b => b.jetton.address === m.jetton_master)) {
-                    return { ...m, key: m.jetton_master! };
+                if (jettons.balances.some(b => b.jetton.address === m.jettonMaster)) {
+                    return { ...m, key: m.jettonMaster! };
                 }
 
                 return null;
@@ -133,21 +127,23 @@ export const useRequestBatteryAuthToken = () => {
         if (account.type !== 'mnemonic' && account.type !== 'mam') {
             throw new Error('Invalid account type');
         }
-        const { payload } = await batteryApi.connect.getTonConnectPayload();
-        const origin = batteryApi.request.config.BASE;
+        const { payload } = await new ConnectApi(batteryApi).getTonConnectPayload();
+        const origin = batteryApi.basePath;
 
         const proof = await signTonProof({ payload, origin });
-        const res = await batteryApi.wallet.tonConnectProof({
-            address: account.activeTonWallet.rawAddress,
-            proof: {
-                timestamp: proof.timestamp,
-                domain: {
-                    value: proof.domain.value,
-                    length_bytes: proof.domain.lengthBytes
-                },
-                signature: proof.signature,
-                payload,
-                state_init: proof.stateInit
+        const res = await new WalletApi(batteryApi).tonConnectProof({
+            tonConnectProofRequest: {
+                address: account.activeTonWallet.rawAddress,
+                proof: {
+                    timestamp: proof.timestamp,
+                    domain: {
+                        value: proof.domain.value,
+                        lengthBytes: proof.domain.lengthBytes
+                    },
+                    signature: proof.signature,
+                    payload,
+                    stateInit: proof.stateInit
+                }
             }
         });
 
@@ -220,13 +216,13 @@ export const useBatteryMinBootstrapValue = (assetAddress: string) => {
         ) {
             return new BigNumber(shouldReserve.tonUnits.relativeAmount);
         }
-        const method = methods.find(m => m.jetton_master === assetAddress)!;
+        const method = methods.find(m => m.jettonMaster === assetAddress)!;
 
-        if (!method.min_bootstrap_value) {
+        if (!method.minBootstrapValue) {
             return new BigNumber(shouldReserve.tonUnits.relativeAmount);
         }
 
-        const bootstrapValue = new BigNumber(method.min_bootstrap_value);
+        const bootstrapValue = new BigNumber(method.minBootstrapValue);
         return bootstrapValue.gt(shouldReserve.tonUnits.relativeAmount)
             ? bootstrapValue
             : new BigNumber(shouldReserve.tonUnits.relativeAmount);
@@ -251,10 +247,10 @@ export const useBatteryBalance = () => {
             return null;
         }
 
-        const res = await batteryApi.default.getBalance(token, 'ton');
-        if ('error' in res) {
-            throw new Error(res.error);
-        }
+        const res = await new DefaultApi(batteryApi).getBalance({
+            xTonConnectAuth: token,
+            units: 'ton'
+        });
 
         return {
             tonUnitsBalance: AssetAmount.fromRelativeAmount({
@@ -312,7 +308,7 @@ export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
             return unitTonRate.div(methods.find(m => m.type === 'ton')!.rate);
         }
 
-        return unitTonRate.div(methods.find(m => m.jetton_master === assetAddress)!.rate);
+        return unitTonRate.div(methods.find(m => m.jettonMaster === assetAddress)!.rate);
     }, [unitTonRate, methods, assetAddress]);
 };
 

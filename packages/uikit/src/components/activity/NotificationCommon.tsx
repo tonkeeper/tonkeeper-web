@@ -410,61 +410,22 @@ export const ActionFeeDetailsUniversal: FC<{
     onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
     selectedSenderType?: SenderTypeUserAvailable;
     availableSendersChoices?: SenderChoiceUserAvailable[];
-}> = ({ extra, availableSendersChoices, onSenderTypeChange, selectedSenderType }) => {
+    className?: string;
+}> = ({ extra, availableSendersChoices, onSenderTypeChange, selectedSenderType, className }) => {
     const { t } = useTranslation();
 
     return (
-        <ListItem hover={false}>
+        <ListItem hover={false} className={className}>
             <ListItemPayload>
                 <FeeLabelColumn>
                     <Label>
                         {extra?.weiAmount.lt(0) ? t('txActions_refund') : t('transaction_fee')}
                     </Label>
-                    {!!availableSendersChoices?.length && availableSendersChoices.length > 1 && (
-                        <SelectDropDown
-                            left="0"
-                            bottom="0"
-                            payload={onClose => (
-                                <DropDownContent>
-                                    {availableSendersChoices.map(s => (
-                                        <>
-                                            <DropDownItem
-                                                onClick={() => {
-                                                    onClose();
-                                                    onSenderTypeChange?.(s.type);
-                                                }}
-                                                key={s.type}
-                                                isSelected={selectedSenderType === s.type}
-                                            >
-                                                {s.type === 'battery' ? (
-                                                    <>
-                                                        <BatteryIcon />
-                                                        <Label2>{t('battery_title')}</Label2>
-                                                    </>
-                                                ) : s.type === 'gasless' ? (
-                                                    <>
-                                                        <TokenImage src={s.asset.image} />
-                                                        <Label2>{s.asset.symbol}</Label2>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <TokenImage src={TON_ASSET.image} />
-                                                        <Label2>{TON_ASSET.symbol}</Label2>
-                                                    </>
-                                                )}
-                                            </DropDownItem>
-                                            <DropDownItemsDivider />
-                                        </>
-                                    ))}
-                                </DropDownContent>
-                            )}
-                        >
-                            <TransparentButton>
-                                {t('send_change_fee_payment_method')}
-                                <ChevronRightIcon />
-                            </TransparentButton>
-                        </SelectDropDown>
-                    )}
+                    <SelectSenderDropdown
+                        availableSendersChoices={availableSendersChoices}
+                        onSenderTypeChange={onSenderTypeChange}
+                        selectedSenderType={selectedSenderType}
+                    />
                 </FeeLabelColumn>
                 {extra ? (
                     <ActionFeeDetailsUniversalValue extra={extra} senderType={selectedSenderType} />
@@ -473,6 +434,65 @@ export const ActionFeeDetailsUniversal: FC<{
                 )}
             </ListItemPayload>
         </ListItem>
+    );
+};
+
+export const SelectSenderDropdown: FC<{
+    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
+    selectedSenderType?: SenderTypeUserAvailable;
+    availableSendersChoices?: SenderChoiceUserAvailable[];
+    className?: string;
+}> = ({ onSenderTypeChange, selectedSenderType, availableSendersChoices, className }) => {
+    const { t } = useTranslation();
+    if (!availableSendersChoices?.length || availableSendersChoices.length <= 1) {
+        return null;
+    }
+
+    return (
+        <SelectDropDown
+            left="0"
+            bottom="0"
+            className={className}
+            payload={onClose => (
+                <DropDownContent>
+                    {availableSendersChoices.map(s => (
+                        <>
+                            <DropDownItem
+                                onClick={() => {
+                                    onClose();
+                                    onSenderTypeChange?.(s.type);
+                                }}
+                                key={s.type}
+                                isSelected={selectedSenderType === s.type}
+                            >
+                                {s.type === 'battery' ? (
+                                    <>
+                                        <BatteryIcon />
+                                        <Label2>{t('battery_title')}</Label2>
+                                    </>
+                                ) : s.type === 'gasless' ? (
+                                    <>
+                                        <TokenImage src={s.asset.image} />
+                                        <Label2>{s.asset.symbol}</Label2>
+                                    </>
+                                ) : (
+                                    <>
+                                        <TokenImage src={TON_ASSET.image} />
+                                        <Label2>{TON_ASSET.symbol}</Label2>
+                                    </>
+                                )}
+                            </DropDownItem>
+                            <DropDownItemsDivider />
+                        </>
+                    ))}
+                </DropDownContent>
+            )}
+        >
+            <TransparentButton>
+                {t('send_change_fee_payment_method')}
+                <ChevronRightIcon />
+            </TransparentButton>
+        </SelectDropDown>
     );
 };
 

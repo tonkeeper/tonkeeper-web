@@ -192,7 +192,7 @@ const BatteryRechargeNotificationContent: FC<{
             <AssetSelectStyled
                 selectedAssetId={asset.id}
                 onAssetChange={setAsset}
-                allowedAssetsAddresses={methods?.map(m => m.jetton_master || 'TON')}
+                allowedAssetsAddresses={methods?.map(m => m.jettonMaster || 'TON')}
             />
             <BatteryPacksSelect
                 asset={asset}
