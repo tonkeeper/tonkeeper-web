@@ -161,7 +161,7 @@ jobs:
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command: pages deploy apps/web/dist --project-name=tonkeeper-web
 
-   twa-build:
+    twa-build:
         name: twa-build
         runs-on: ubuntu-latest
         timeout-minutes: 10
