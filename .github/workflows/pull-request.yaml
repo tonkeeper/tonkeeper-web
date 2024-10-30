@@ -172,12 +172,6 @@ jobs:
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
                   echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
-            - name: Delete a comment
-              uses: thollander/actions-comment-pull-request@v3
-              with:
-                  comment-tag: web_deploy
-                  mode: delete
-
             - name: Comment PR
               uses: thollander/actions-comment-pull-request@v3
               with:
