@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,9 +30,11 @@ export interface ResetUserBalanceRequest {
 /**
  * Check if a given object implements the ResetUserBalanceRequest interface.
  */
-export function instanceOfResetUserBalanceRequest(value: object): value is ResetUserBalanceRequest {
-    if (!('reason' in value) || value['reason'] === undefined) return false;
-    return true;
+export function instanceOfResetUserBalanceRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "reason" in value;
+
+    return isInstance;
 }
 
 export function ResetUserBalanceRequestFromJSON(json: any): ResetUserBalanceRequest {
@@ -40,7 +42,7 @@ export function ResetUserBalanceRequestFromJSON(json: any): ResetUserBalanceRequ
 }
 
 export function ResetUserBalanceRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResetUserBalanceRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -49,18 +51,16 @@ export function ResetUserBalanceRequestFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function ResetUserBalanceRequestToJSON(json: any): ResetUserBalanceRequest {
-      return ResetUserBalanceRequestToJSONTyped(json, false);
-  }
-
-  export function ResetUserBalanceRequestToJSONTyped(value?: ResetUserBalanceRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function ResetUserBalanceRequestToJSON(value?: ResetUserBalanceRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'reason': value['reason'],
+        'reason': value.reason,
     };
 }
 

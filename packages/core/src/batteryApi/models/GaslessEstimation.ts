@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,9 +30,11 @@ export interface GaslessEstimation {
 /**
  * Check if a given object implements the GaslessEstimation interface.
  */
-export function instanceOfGaslessEstimation(value: object): value is GaslessEstimation {
-    if (!('commission' in value) || value['commission'] === undefined) return false;
-    return true;
+export function instanceOfGaslessEstimation(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "commission" in value;
+
+    return isInstance;
 }
 
 export function GaslessEstimationFromJSON(json: any): GaslessEstimation {
@@ -40,7 +42,7 @@ export function GaslessEstimationFromJSON(json: any): GaslessEstimation {
 }
 
 export function GaslessEstimationFromJSONTyped(json: any, ignoreDiscriminator: boolean): GaslessEstimation {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -49,18 +51,16 @@ export function GaslessEstimationFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function GaslessEstimationToJSON(json: any): GaslessEstimation {
-      return GaslessEstimationToJSONTyped(json, false);
-  }
-
-  export function GaslessEstimationToJSONTyped(value?: GaslessEstimation | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function GaslessEstimationToJSON(value?: GaslessEstimation | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'commission': value['commission'],
+        'commission': value.commission,
     };
 }
 

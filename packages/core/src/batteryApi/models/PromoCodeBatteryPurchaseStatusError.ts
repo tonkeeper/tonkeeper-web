@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -48,10 +48,12 @@ export type PromoCodeBatteryPurchaseStatusErrorCodeEnum = typeof PromoCodeBatter
 /**
  * Check if a given object implements the PromoCodeBatteryPurchaseStatusError interface.
  */
-export function instanceOfPromoCodeBatteryPurchaseStatusError(value: object): value is PromoCodeBatteryPurchaseStatusError {
-    if (!('msg' in value) || value['msg'] === undefined) return false;
-    if (!('code' in value) || value['code'] === undefined) return false;
-    return true;
+export function instanceOfPromoCodeBatteryPurchaseStatusError(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "msg" in value;
+    isInstance = isInstance && "code" in value;
+
+    return isInstance;
 }
 
 export function PromoCodeBatteryPurchaseStatusErrorFromJSON(json: any): PromoCodeBatteryPurchaseStatusError {
@@ -59,7 +61,7 @@ export function PromoCodeBatteryPurchaseStatusErrorFromJSON(json: any): PromoCod
 }
 
 export function PromoCodeBatteryPurchaseStatusErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean): PromoCodeBatteryPurchaseStatusError {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -69,19 +71,17 @@ export function PromoCodeBatteryPurchaseStatusErrorFromJSONTyped(json: any, igno
     };
 }
 
-  export function PromoCodeBatteryPurchaseStatusErrorToJSON(json: any): PromoCodeBatteryPurchaseStatusError {
-      return PromoCodeBatteryPurchaseStatusErrorToJSONTyped(json, false);
-  }
-
-  export function PromoCodeBatteryPurchaseStatusErrorToJSONTyped(value?: PromoCodeBatteryPurchaseStatusError | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function PromoCodeBatteryPurchaseStatusErrorToJSON(value?: PromoCodeBatteryPurchaseStatusError | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'msg': value['msg'],
-        'code': value['code'],
+        'msg': value.msg,
+        'code': value.code,
     };
 }
 

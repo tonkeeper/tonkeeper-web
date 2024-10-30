@@ -64,11 +64,8 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
      * Account verification and token issuance
      */
     async tonConnectProofRaw(requestParameters: TonConnectProofOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TonConnectProof200Response>> {
-        if (requestParameters['tonConnectProofRequest'] == null) {
-            throw new runtime.RequiredError(
-                'tonConnectProofRequest',
-                'Required parameter "tonConnectProofRequest" was null or undefined when calling tonConnectProof().'
-            );
+        if (requestParameters.tonConnectProofRequest === null || requestParameters.tonConnectProofRequest === undefined) {
+            throw new runtime.RequiredError('tonConnectProofRequest','Required parameter requestParameters.tonConnectProofRequest was null or undefined when calling tonConnectProof.');
         }
 
         const queryParameters: any = {};
@@ -82,7 +79,7 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: TonConnectProofRequestToJSON(requestParameters['tonConnectProofRequest']),
+            body: TonConnectProofRequestToJSON(requestParameters.tonConnectProofRequest),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TonConnectProof200ResponseFromJSON(jsonValue));

@@ -12,13 +12,12 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 import type { IOSBatteryPurchaseStatusTransactionsInnerError } from './IOSBatteryPurchaseStatusTransactionsInnerError';
 import {
     IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSON,
     IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSONTyped,
     IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON,
-    IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped,
 } from './IOSBatteryPurchaseStatusTransactionsInnerError';
 
 /**
@@ -50,10 +49,12 @@ export interface IOSBatteryPurchaseStatusTransactionsInner {
 /**
  * Check if a given object implements the IOSBatteryPurchaseStatusTransactionsInner interface.
  */
-export function instanceOfIOSBatteryPurchaseStatusTransactionsInner(value: object): value is IOSBatteryPurchaseStatusTransactionsInner {
-    if (!('transactionId' in value) || value['transactionId'] === undefined) return false;
-    if (!('success' in value) || value['success'] === undefined) return false;
-    return true;
+export function instanceOfIOSBatteryPurchaseStatusTransactionsInner(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "transactionId" in value;
+    isInstance = isInstance && "success" in value;
+
+    return isInstance;
 }
 
 export function IOSBatteryPurchaseStatusTransactionsInnerFromJSON(json: any): IOSBatteryPurchaseStatusTransactionsInner {
@@ -61,31 +62,29 @@ export function IOSBatteryPurchaseStatusTransactionsInnerFromJSON(json: any): IO
 }
 
 export function IOSBatteryPurchaseStatusTransactionsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): IOSBatteryPurchaseStatusTransactionsInner {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'transactionId': json['transaction_id'],
         'success': json['success'],
-        'error': json['error'] == null ? undefined : IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSON(json['error']),
+        'error': !exists(json, 'error') ? undefined : IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSON(json['error']),
     };
 }
 
-  export function IOSBatteryPurchaseStatusTransactionsInnerToJSON(json: any): IOSBatteryPurchaseStatusTransactionsInner {
-      return IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped(json, false);
-  }
-
-  export function IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped(value?: IOSBatteryPurchaseStatusTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function IOSBatteryPurchaseStatusTransactionsInnerToJSON(value?: IOSBatteryPurchaseStatusTransactionsInner | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'transaction_id': value['transactionId'],
-        'success': value['success'],
-        'error': IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON(value['error']),
+        'transaction_id': value.transactionId,
+        'success': value.success,
+        'error': IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON(value.error),
     };
 }
 

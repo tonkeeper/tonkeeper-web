@@ -12,13 +12,12 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 import type { TransactionsTransactionsInner } from './TransactionsTransactionsInner';
 import {
     TransactionsTransactionsInnerFromJSON,
     TransactionsTransactionsInnerFromJSONTyped,
     TransactionsTransactionsInnerToJSON,
-    TransactionsTransactionsInnerToJSONTyped,
 } from './TransactionsTransactionsInner';
 
 /**
@@ -50,10 +49,12 @@ export interface Transactions {
 /**
  * Check if a given object implements the Transactions interface.
  */
-export function instanceOfTransactions(value: object): value is Transactions {
-    if (!('totalTransactions' in value) || value['totalTransactions'] === undefined) return false;
-    if (!('transactions' in value) || value['transactions'] === undefined) return false;
-    return true;
+export function instanceOfTransactions(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "totalTransactions" in value;
+    isInstance = isInstance && "transactions" in value;
+
+    return isInstance;
 }
 
 export function TransactionsFromJSON(json: any): Transactions {
@@ -61,31 +62,29 @@ export function TransactionsFromJSON(json: any): Transactions {
 }
 
 export function TransactionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): Transactions {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'totalTransactions': json['total_transactions'],
-        'nextOffset': json['next_offset'] == null ? undefined : json['next_offset'],
+        'nextOffset': !exists(json, 'next_offset') ? undefined : json['next_offset'],
         'transactions': ((json['transactions'] as Array<any>).map(TransactionsTransactionsInnerFromJSON)),
     };
 }
 
-  export function TransactionsToJSON(json: any): Transactions {
-      return TransactionsToJSONTyped(json, false);
-  }
-
-  export function TransactionsToJSONTyped(value?: Transactions | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function TransactionsToJSON(value?: Transactions | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'total_transactions': value['totalTransactions'],
-        'next_offset': value['nextOffset'],
-        'transactions': ((value['transactions'] as Array<any>).map(TransactionsTransactionsInnerToJSON)),
+        'total_transactions': value.totalTransactions,
+        'next_offset': value.nextOffset,
+        'transactions': ((value.transactions as Array<any>).map(TransactionsTransactionsInnerToJSON)),
     };
 }
 

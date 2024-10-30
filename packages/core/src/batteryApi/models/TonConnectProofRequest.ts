@@ -12,13 +12,12 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 import type { TonConnectProofRequestProof } from './TonConnectProofRequestProof';
 import {
     TonConnectProofRequestProofFromJSON,
     TonConnectProofRequestProofFromJSONTyped,
     TonConnectProofRequestProofToJSON,
-    TonConnectProofRequestProofToJSONTyped,
 } from './TonConnectProofRequestProof';
 
 /**
@@ -44,10 +43,12 @@ export interface TonConnectProofRequest {
 /**
  * Check if a given object implements the TonConnectProofRequest interface.
  */
-export function instanceOfTonConnectProofRequest(value: object): value is TonConnectProofRequest {
-    if (!('address' in value) || value['address'] === undefined) return false;
-    if (!('proof' in value) || value['proof'] === undefined) return false;
-    return true;
+export function instanceOfTonConnectProofRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "address" in value;
+    isInstance = isInstance && "proof" in value;
+
+    return isInstance;
 }
 
 export function TonConnectProofRequestFromJSON(json: any): TonConnectProofRequest {
@@ -55,7 +56,7 @@ export function TonConnectProofRequestFromJSON(json: any): TonConnectProofReques
 }
 
 export function TonConnectProofRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProofRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -65,19 +66,17 @@ export function TonConnectProofRequestFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-  export function TonConnectProofRequestToJSON(json: any): TonConnectProofRequest {
-      return TonConnectProofRequestToJSONTyped(json, false);
-  }
-
-  export function TonConnectProofRequestToJSONTyped(value?: TonConnectProofRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function TonConnectProofRequestToJSON(value?: TonConnectProofRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'address': value['address'],
-        'proof': TonConnectProofRequestProofToJSON(value['proof']),
+        'address': value.address,
+        'proof': TonConnectProofRequestProofToJSON(value.proof),
     };
 }
 

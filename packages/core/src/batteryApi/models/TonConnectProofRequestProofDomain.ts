@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -36,9 +36,11 @@ export interface TonConnectProofRequestProofDomain {
 /**
  * Check if a given object implements the TonConnectProofRequestProofDomain interface.
  */
-export function instanceOfTonConnectProofRequestProofDomain(value: object): value is TonConnectProofRequestProofDomain {
-    if (!('value' in value) || value['value'] === undefined) return false;
-    return true;
+export function instanceOfTonConnectProofRequestProofDomain(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "value" in value;
+
+    return isInstance;
 }
 
 export function TonConnectProofRequestProofDomainFromJSON(json: any): TonConnectProofRequestProofDomain {
@@ -46,29 +48,27 @@ export function TonConnectProofRequestProofDomainFromJSON(json: any): TonConnect
 }
 
 export function TonConnectProofRequestProofDomainFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProofRequestProofDomain {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'lengthBytes': json['length_bytes'] == null ? undefined : json['length_bytes'],
+        'lengthBytes': !exists(json, 'length_bytes') ? undefined : json['length_bytes'],
         'value': json['value'],
     };
 }
 
-  export function TonConnectProofRequestProofDomainToJSON(json: any): TonConnectProofRequestProofDomain {
-      return TonConnectProofRequestProofDomainToJSONTyped(json, false);
-  }
-
-  export function TonConnectProofRequestProofDomainToJSONTyped(value?: TonConnectProofRequestProofDomain | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function TonConnectProofRequestProofDomainToJSON(value?: TonConnectProofRequestProofDomain | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'length_bytes': value['lengthBytes'],
-        'value': value['value'],
+        'length_bytes': value.lengthBytes,
+        'value': value.value,
     };
 }
 

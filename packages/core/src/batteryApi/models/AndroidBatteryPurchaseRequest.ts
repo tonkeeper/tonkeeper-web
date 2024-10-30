@@ -12,13 +12,12 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 import type { AndroidBatteryPurchaseRequestPurchasesInner } from './AndroidBatteryPurchaseRequestPurchasesInner';
 import {
     AndroidBatteryPurchaseRequestPurchasesInnerFromJSON,
     AndroidBatteryPurchaseRequestPurchasesInnerFromJSONTyped,
     AndroidBatteryPurchaseRequestPurchasesInnerToJSON,
-    AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped,
 } from './AndroidBatteryPurchaseRequestPurchasesInner';
 
 /**
@@ -38,9 +37,11 @@ export interface AndroidBatteryPurchaseRequest {
 /**
  * Check if a given object implements the AndroidBatteryPurchaseRequest interface.
  */
-export function instanceOfAndroidBatteryPurchaseRequest(value: object): value is AndroidBatteryPurchaseRequest {
-    if (!('purchases' in value) || value['purchases'] === undefined) return false;
-    return true;
+export function instanceOfAndroidBatteryPurchaseRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "purchases" in value;
+
+    return isInstance;
 }
 
 export function AndroidBatteryPurchaseRequestFromJSON(json: any): AndroidBatteryPurchaseRequest {
@@ -48,7 +49,7 @@ export function AndroidBatteryPurchaseRequestFromJSON(json: any): AndroidBattery
 }
 
 export function AndroidBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): AndroidBatteryPurchaseRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -57,18 +58,16 @@ export function AndroidBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function AndroidBatteryPurchaseRequestToJSON(json: any): AndroidBatteryPurchaseRequest {
-      return AndroidBatteryPurchaseRequestToJSONTyped(json, false);
-  }
-
-  export function AndroidBatteryPurchaseRequestToJSONTyped(value?: AndroidBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function AndroidBatteryPurchaseRequestToJSON(value?: AndroidBatteryPurchaseRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'purchases': ((value['purchases'] as Array<any>).map(AndroidBatteryPurchaseRequestPurchasesInnerToJSON)),
+        'purchases': ((value.purchases as Array<any>).map(AndroidBatteryPurchaseRequestPurchasesInnerToJSON)),
     };
 }
 

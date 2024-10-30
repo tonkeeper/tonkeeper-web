@@ -82,18 +82,12 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling emulateMessageToWallet().'
-            );
+        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
+            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling emulateMessageToWallet.');
         }
 
-        if (requestParameters['emulateMessageToWalletRequest'] == null) {
-            throw new runtime.RequiredError(
-                'emulateMessageToWalletRequest',
-                'Required parameter "emulateMessageToWalletRequest" was null or undefined when calling emulateMessageToWallet().'
-            );
+        if (requestParameters.emulateMessageToWalletRequest === null || requestParameters.emulateMessageToWalletRequest === undefined) {
+            throw new runtime.RequiredError('emulateMessageToWalletRequest','Required parameter requestParameters.emulateMessageToWalletRequest was null or undefined when calling emulateMessageToWallet.');
         }
 
         const queryParameters: any = {};
@@ -102,12 +96,12 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters['acceptLanguage'] != null) {
-            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
+        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
+            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
         }
 
-        if (requestParameters['xTonConnectAuth'] != null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
+        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
         }
 
         const response = await this.request({
@@ -115,7 +109,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
+            body: EmulateMessageToWalletRequestToJSON(requestParameters.emulateMessageToWalletRequest),
         }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -132,11 +126,8 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     /**
      */
     async getJettonMetadataRaw(requestParameters: GetJettonMetadataRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
-        if (requestParameters['name'] == null) {
-            throw new runtime.RequiredError(
-                'name',
-                'Required parameter "name" was null or undefined when calling getJettonMetadata().'
-            );
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling getJettonMetadata.');
         }
 
         const queryParameters: any = {};
@@ -144,7 +135,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/jetton-metadata/{name}.json`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters['name']))),
+            path: `/jetton-metadata/{name}.json`.replace(`{${"name"}}`, encodeURIComponent(String(requestParameters.name))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

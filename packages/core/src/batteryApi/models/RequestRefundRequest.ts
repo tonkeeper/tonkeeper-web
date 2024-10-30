@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -37,8 +37,10 @@ export interface RequestRefundRequest {
 /**
  * Check if a given object implements the RequestRefundRequest interface.
  */
-export function instanceOfRequestRefundRequest(value: object): value is RequestRefundRequest {
-    return true;
+export function instanceOfRequestRefundRequest(value: object): boolean {
+    let isInstance = true;
+
+    return isInstance;
 }
 
 export function RequestRefundRequestFromJSON(json: any): RequestRefundRequest {
@@ -46,29 +48,27 @@ export function RequestRefundRequestFromJSON(json: any): RequestRefundRequest {
 }
 
 export function RequestRefundRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): RequestRefundRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'userPurchaseId': json['user_purchase_id'] == null ? undefined : json['user_purchase_id'],
-        'purchaseId': json['purchase_id'] == null ? undefined : json['purchase_id'],
+        'userPurchaseId': !exists(json, 'user_purchase_id') ? undefined : json['user_purchase_id'],
+        'purchaseId': !exists(json, 'purchase_id') ? undefined : json['purchase_id'],
     };
 }
 
-  export function RequestRefundRequestToJSON(json: any): RequestRefundRequest {
-      return RequestRefundRequestToJSONTyped(json, false);
-  }
-
-  export function RequestRefundRequestToJSONTyped(value?: RequestRefundRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function RequestRefundRequestToJSON(value?: RequestRefundRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'user_purchase_id': value['userPurchaseId'],
-        'purchase_id': value['purchaseId'],
+        'user_purchase_id': value.userPurchaseId,
+        'purchase_id': value.purchaseId,
     };
 }
 

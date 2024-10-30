@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,9 +30,11 @@ export interface StatusPendingTransactionsInner {
 /**
  * Check if a given object implements the StatusPendingTransactionsInner interface.
  */
-export function instanceOfStatusPendingTransactionsInner(value: object): value is StatusPendingTransactionsInner {
-    if (!('id' in value) || value['id'] === undefined) return false;
-    return true;
+export function instanceOfStatusPendingTransactionsInner(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+
+    return isInstance;
 }
 
 export function StatusPendingTransactionsInnerFromJSON(json: any): StatusPendingTransactionsInner {
@@ -40,7 +42,7 @@ export function StatusPendingTransactionsInnerFromJSON(json: any): StatusPending
 }
 
 export function StatusPendingTransactionsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): StatusPendingTransactionsInner {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -49,18 +51,16 @@ export function StatusPendingTransactionsInnerFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function StatusPendingTransactionsInnerToJSON(json: any): StatusPendingTransactionsInner {
-      return StatusPendingTransactionsInnerToJSONTyped(json, false);
-  }
-
-  export function StatusPendingTransactionsInnerToJSONTyped(value?: StatusPendingTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function StatusPendingTransactionsInnerToJSON(value?: StatusPendingTransactionsInner | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'id': value['id'],
+        'id': value.id,
     };
 }
 

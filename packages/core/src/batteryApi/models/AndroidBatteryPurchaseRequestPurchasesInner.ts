@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -42,10 +42,12 @@ export interface AndroidBatteryPurchaseRequestPurchasesInner {
 /**
  * Check if a given object implements the AndroidBatteryPurchaseRequestPurchasesInner interface.
  */
-export function instanceOfAndroidBatteryPurchaseRequestPurchasesInner(value: object): value is AndroidBatteryPurchaseRequestPurchasesInner {
-    if (!('token' in value) || value['token'] === undefined) return false;
-    if (!('productId' in value) || value['productId'] === undefined) return false;
-    return true;
+export function instanceOfAndroidBatteryPurchaseRequestPurchasesInner(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "token" in value;
+    isInstance = isInstance && "productId" in value;
+
+    return isInstance;
 }
 
 export function AndroidBatteryPurchaseRequestPurchasesInnerFromJSON(json: any): AndroidBatteryPurchaseRequestPurchasesInner {
@@ -53,31 +55,29 @@ export function AndroidBatteryPurchaseRequestPurchasesInnerFromJSON(json: any): 
 }
 
 export function AndroidBatteryPurchaseRequestPurchasesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): AndroidBatteryPurchaseRequestPurchasesInner {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'token': json['token'],
         'productId': json['product_id'],
-        'promo': json['promo'] == null ? undefined : json['promo'],
+        'promo': !exists(json, 'promo') ? undefined : json['promo'],
     };
 }
 
-  export function AndroidBatteryPurchaseRequestPurchasesInnerToJSON(json: any): AndroidBatteryPurchaseRequestPurchasesInner {
-      return AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped(json, false);
-  }
-
-  export function AndroidBatteryPurchaseRequestPurchasesInnerToJSONTyped(value?: AndroidBatteryPurchaseRequestPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function AndroidBatteryPurchaseRequestPurchasesInnerToJSON(value?: AndroidBatteryPurchaseRequestPurchasesInner | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'token': value['token'],
-        'product_id': value['productId'],
-        'promo': value['promo'],
+        'token': value.token,
+        'product_id': value.productId,
+        'promo': value.promo,
     };
 }
 

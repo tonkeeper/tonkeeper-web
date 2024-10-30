@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,9 +30,11 @@ export interface EmulateMessageToWalletRequest {
 /**
  * Check if a given object implements the EmulateMessageToWalletRequest interface.
  */
-export function instanceOfEmulateMessageToWalletRequest(value: object): value is EmulateMessageToWalletRequest {
-    if (!('boc' in value) || value['boc'] === undefined) return false;
-    return true;
+export function instanceOfEmulateMessageToWalletRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "boc" in value;
+
+    return isInstance;
 }
 
 export function EmulateMessageToWalletRequestFromJSON(json: any): EmulateMessageToWalletRequest {
@@ -40,7 +42,7 @@ export function EmulateMessageToWalletRequestFromJSON(json: any): EmulateMessage
 }
 
 export function EmulateMessageToWalletRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): EmulateMessageToWalletRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -49,18 +51,16 @@ export function EmulateMessageToWalletRequestFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function EmulateMessageToWalletRequestToJSON(json: any): EmulateMessageToWalletRequest {
-      return EmulateMessageToWalletRequestToJSONTyped(json, false);
-  }
-
-  export function EmulateMessageToWalletRequestToJSONTyped(value?: EmulateMessageToWalletRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function EmulateMessageToWalletRequestToJSON(value?: EmulateMessageToWalletRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'boc': value['boc'],
+        'boc': value.boc,
     };
 }
 

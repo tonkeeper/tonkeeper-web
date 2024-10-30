@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,9 +30,11 @@ export interface AppStoreNotificationRequest {
 /**
  * Check if a given object implements the AppStoreNotificationRequest interface.
  */
-export function instanceOfAppStoreNotificationRequest(value: object): value is AppStoreNotificationRequest {
-    if (!('signedPayload' in value) || value['signedPayload'] === undefined) return false;
-    return true;
+export function instanceOfAppStoreNotificationRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "signedPayload" in value;
+
+    return isInstance;
 }
 
 export function AppStoreNotificationRequestFromJSON(json: any): AppStoreNotificationRequest {
@@ -40,7 +42,7 @@ export function AppStoreNotificationRequestFromJSON(json: any): AppStoreNotifica
 }
 
 export function AppStoreNotificationRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): AppStoreNotificationRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -49,18 +51,16 @@ export function AppStoreNotificationRequestFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function AppStoreNotificationRequestToJSON(json: any): AppStoreNotificationRequest {
-      return AppStoreNotificationRequestToJSONTyped(json, false);
-  }
-
-  export function AppStoreNotificationRequestToJSONTyped(value?: AppStoreNotificationRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function AppStoreNotificationRequestToJSON(value?: AppStoreNotificationRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'signedPayload': value['signedPayload'],
+        'signedPayload': value.signedPayload,
     };
 }
 

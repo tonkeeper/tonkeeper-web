@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -36,10 +36,12 @@ export interface PurchasesPurchasesInnerRefundInformationRefunded {
 /**
  * Check if a given object implements the PurchasesPurchasesInnerRefundInformationRefunded interface.
  */
-export function instanceOfPurchasesPurchasesInnerRefundInformationRefunded(value: object): value is PurchasesPurchasesInnerRefundInformationRefunded {
-    if (!('amount' in value) || value['amount'] === undefined) return false;
-    if (!('charges' in value) || value['charges'] === undefined) return false;
-    return true;
+export function instanceOfPurchasesPurchasesInnerRefundInformationRefunded(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "amount" in value;
+    isInstance = isInstance && "charges" in value;
+
+    return isInstance;
 }
 
 export function PurchasesPurchasesInnerRefundInformationRefundedFromJSON(json: any): PurchasesPurchasesInnerRefundInformationRefunded {
@@ -47,7 +49,7 @@ export function PurchasesPurchasesInnerRefundInformationRefundedFromJSON(json: a
 }
 
 export function PurchasesPurchasesInnerRefundInformationRefundedFromJSONTyped(json: any, ignoreDiscriminator: boolean): PurchasesPurchasesInnerRefundInformationRefunded {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -57,19 +59,17 @@ export function PurchasesPurchasesInnerRefundInformationRefundedFromJSONTyped(js
     };
 }
 
-  export function PurchasesPurchasesInnerRefundInformationRefundedToJSON(json: any): PurchasesPurchasesInnerRefundInformationRefunded {
-      return PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped(json, false);
-  }
-
-  export function PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped(value?: PurchasesPurchasesInnerRefundInformationRefunded | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function PurchasesPurchasesInnerRefundInformationRefundedToJSON(value?: PurchasesPurchasesInnerRefundInformationRefunded | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'amount': value['amount'],
-        'charges': value['charges'],
+        'amount': value.amount,
+        'charges': value.charges,
     };
 }
 

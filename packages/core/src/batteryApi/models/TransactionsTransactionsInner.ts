@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -60,12 +60,14 @@ export type TransactionsTransactionsInnerStatusEnum = typeof TransactionsTransac
 /**
  * Check if a given object implements the TransactionsTransactionsInner interface.
  */
-export function instanceOfTransactionsTransactionsInner(value: object): value is TransactionsTransactionsInner {
-    if (!('id' in value) || value['id'] === undefined) return false;
-    if (!('paidAmount' in value) || value['paidAmount'] === undefined) return false;
-    if (!('status' in value) || value['status'] === undefined) return false;
-    if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
-    return true;
+export function instanceOfTransactionsTransactionsInner(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "paidAmount" in value;
+    isInstance = isInstance && "status" in value;
+    isInstance = isInstance && "createdAt" in value;
+
+    return isInstance;
 }
 
 export function TransactionsTransactionsInnerFromJSON(json: any): TransactionsTransactionsInner {
@@ -73,7 +75,7 @@ export function TransactionsTransactionsInnerFromJSON(json: any): TransactionsTr
 }
 
 export function TransactionsTransactionsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): TransactionsTransactionsInner {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -85,21 +87,19 @@ export function TransactionsTransactionsInnerFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function TransactionsTransactionsInnerToJSON(json: any): TransactionsTransactionsInner {
-      return TransactionsTransactionsInnerToJSONTyped(json, false);
-  }
-
-  export function TransactionsTransactionsInnerToJSONTyped(value?: TransactionsTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function TransactionsTransactionsInnerToJSON(value?: TransactionsTransactionsInner | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'id': value['id'],
-        'paid_amount': value['paidAmount'],
-        'status': value['status'],
-        'created_at': value['createdAt'],
+        'id': value.id,
+        'paid_amount': value.paidAmount,
+        'status': value.status,
+        'created_at': value.createdAt,
     };
 }
 

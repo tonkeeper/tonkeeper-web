@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -36,10 +36,12 @@ export interface ApplyPromoRequest {
 /**
  * Check if a given object implements the ApplyPromoRequest interface.
  */
-export function instanceOfApplyPromoRequest(value: object): value is ApplyPromoRequest {
-    if (!('publicKey' in value) || value['publicKey'] === undefined) return false;
-    if (!('promoCode' in value) || value['promoCode'] === undefined) return false;
-    return true;
+export function instanceOfApplyPromoRequest(value: object): boolean {
+    let isInstance = true;
+    isInstance = isInstance && "publicKey" in value;
+    isInstance = isInstance && "promoCode" in value;
+
+    return isInstance;
 }
 
 export function ApplyPromoRequestFromJSON(json: any): ApplyPromoRequest {
@@ -47,7 +49,7 @@ export function ApplyPromoRequestFromJSON(json: any): ApplyPromoRequest {
 }
 
 export function ApplyPromoRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): ApplyPromoRequest {
-    if (json == null) {
+    if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
@@ -57,19 +59,17 @@ export function ApplyPromoRequestFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function ApplyPromoRequestToJSON(json: any): ApplyPromoRequest {
-      return ApplyPromoRequestToJSONTyped(json, false);
-  }
-
-  export function ApplyPromoRequestToJSONTyped(value?: ApplyPromoRequest | null, ignoreDiscriminator: boolean = false): any {
-    if (value == null) {
-        return value;
+export function ApplyPromoRequestToJSON(value?: ApplyPromoRequest | null): any {
+    if (value === undefined) {
+        return undefined;
     }
-
+    if (value === null) {
+        return null;
+    }
     return {
         
-        'public_key': value['publicKey'],
-        'promo_code': value['promoCode'],
+        'public_key': value.publicKey,
+        'promo_code': value.promoCode,
     };
 }
 
