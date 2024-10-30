@@ -7,7 +7,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
-import { useActiveWallet } from '../wallet';
+import { useActiveTonWalletConfig, useActiveWallet } from '../wallet';
 import {
     TON_CONNECT_MSG_VARIANTS_ID,
     TonConnectTransactionPayload
@@ -48,12 +48,16 @@ export function useEncodeSwapToTonConnectParams() {
     const { mutateAsync: encode } = useEncodeSwap();
     const { data: batteryBalance } = useBatteryBalance();
     const { excessAccount: batteryExcess } = useBatteryServiceConfig();
+    const { data: activeWalletConfig } = useActiveTonWalletConfig();
 
     return useMutation<TonConnectTransactionPayload, Error, NonNullableFields<CalculatedSwap>>(
         async swap => {
             const resultsPromises = [encode(swap)];
 
-            if (batteryBalance) {
+            const batterySwapsEnabled = activeWalletConfig
+                ? activeWalletConfig.batterySettings.enabledForSwaps
+                : true;
+            if (batteryBalance && batterySwapsEnabled) {
                 resultsPromises.push(
                     encode({ ...swap, excessAddress: Address.parse(batteryExcess).toRawString() })
                 );

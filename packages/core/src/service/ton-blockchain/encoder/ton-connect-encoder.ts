@@ -16,7 +16,13 @@ export class TonConnectEncoder {
         }
     ): Promise<WalletOutgoingMessage> => {
         let messages = transfer.messages;
-        if (transfer.variant !== 'standard' && transfer.messagesVariants?.[transfer.variant]) {
+        if (transfer.variant !== 'standard') {
+            if (!transfer.messagesVariants?.[transfer.variant]) {
+                throw new Error(
+                    `TonConnect message payload for selected variant ${transfer.variant} is not provided`
+                );
+            }
+
             messages = transfer.messagesVariants[transfer.variant]!;
         }
 
