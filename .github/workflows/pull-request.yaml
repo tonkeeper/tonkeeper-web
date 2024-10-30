@@ -195,6 +195,15 @@ jobs:
               with:
                   cmd: build:twa
 
+            - name: Publish TWA to Cloudflare Pages
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command:
+                      pages deploy apps/twa/dist --project-name=tonkeeper-telegram
+                      --branch=feature/twa
+
     extension-build:
         name: extension-build
         runs-on: macos-14
