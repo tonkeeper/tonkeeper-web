@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -42,11 +42,9 @@ export interface GetTonConnectPayloadDefaultResponse {
 /**
  * Check if a given object implements the GetTonConnectPayloadDefaultResponse interface.
  */
-export function instanceOfGetTonConnectPayloadDefaultResponse(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "error" in value;
-
-    return isInstance;
+export function instanceOfGetTonConnectPayloadDefaultResponse(value: object): value is GetTonConnectPayloadDefaultResponse {
+    if (!('error' in value) || value['error'] === undefined) return false;
+    return true;
 }
 
 export function GetTonConnectPayloadDefaultResponseFromJSON(json: any): GetTonConnectPayloadDefaultResponse {
@@ -54,29 +52,31 @@ export function GetTonConnectPayloadDefaultResponseFromJSON(json: any): GetTonCo
 }
 
 export function GetTonConnectPayloadDefaultResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetTonConnectPayloadDefaultResponse {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'error': json['error'],
-        'errorKey': !exists(json, 'error-key') ? undefined : json['error-key'],
-        'errorDetails': !exists(json, 'error-details') ? undefined : json['error-details'],
+        'errorKey': json['error-key'] == null ? undefined : json['error-key'],
+        'errorDetails': json['error-details'] == null ? undefined : json['error-details'],
     };
 }
 
-export function GetTonConnectPayloadDefaultResponseToJSON(value?: GetTonConnectPayloadDefaultResponse | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function GetTonConnectPayloadDefaultResponseToJSON(json: any): GetTonConnectPayloadDefaultResponse {
+      return GetTonConnectPayloadDefaultResponseToJSONTyped(json, false);
+  }
+
+  export function GetTonConnectPayloadDefaultResponseToJSONTyped(value?: GetTonConnectPayloadDefaultResponse | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'error': value.error,
-        'error-key': value.errorKey,
-        'error-details': value.errorDetails,
+        'error': value['error'],
+        'error-key': value['errorKey'],
+        'error-details': value['errorDetails'],
     };
 }
 

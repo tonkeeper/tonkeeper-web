@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,11 +30,9 @@ export interface GetTonConnectPayload200Response {
 /**
  * Check if a given object implements the GetTonConnectPayload200Response interface.
  */
-export function instanceOfGetTonConnectPayload200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "payload" in value;
-
-    return isInstance;
+export function instanceOfGetTonConnectPayload200Response(value: object): value is GetTonConnectPayload200Response {
+    if (!('payload' in value) || value['payload'] === undefined) return false;
+    return true;
 }
 
 export function GetTonConnectPayload200ResponseFromJSON(json: any): GetTonConnectPayload200Response {
@@ -42,7 +40,7 @@ export function GetTonConnectPayload200ResponseFromJSON(json: any): GetTonConnec
 }
 
 export function GetTonConnectPayload200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetTonConnectPayload200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -51,16 +49,18 @@ export function GetTonConnectPayload200ResponseFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function GetTonConnectPayload200ResponseToJSON(value?: GetTonConnectPayload200Response | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function GetTonConnectPayload200ResponseToJSON(json: any): GetTonConnectPayload200Response {
+      return GetTonConnectPayload200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetTonConnectPayload200ResponseToJSONTyped(value?: GetTonConnectPayload200Response | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'payload': value.payload,
+        'payload': value['payload'],
     };
 }
 

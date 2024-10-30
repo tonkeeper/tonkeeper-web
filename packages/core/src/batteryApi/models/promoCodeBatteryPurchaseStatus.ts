@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PromoCodeBatteryPurchaseStatusError } from './PromoCodeBatteryPurchaseStatusError';
 import {
     PromoCodeBatteryPurchaseStatusErrorFromJSON,
     PromoCodeBatteryPurchaseStatusErrorFromJSONTyped,
     PromoCodeBatteryPurchaseStatusErrorToJSON,
+    PromoCodeBatteryPurchaseStatusErrorToJSONTyped,
 } from './PromoCodeBatteryPurchaseStatusError';
 
 /**
@@ -49,12 +50,10 @@ export interface PromoCodeBatteryPurchaseStatus {
 /**
  * Check if a given object implements the PromoCodeBatteryPurchaseStatus interface.
  */
-export function instanceOfPromoCodeBatteryPurchaseStatus(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "balanceChange" in value;
-    isInstance = isInstance && "success" in value;
-
-    return isInstance;
+export function instanceOfPromoCodeBatteryPurchaseStatus(value: object): value is PromoCodeBatteryPurchaseStatus {
+    if (!('balanceChange' in value) || value['balanceChange'] === undefined) return false;
+    if (!('success' in value) || value['success'] === undefined) return false;
+    return true;
 }
 
 export function PromoCodeBatteryPurchaseStatusFromJSON(json: any): PromoCodeBatteryPurchaseStatus {
@@ -62,29 +61,31 @@ export function PromoCodeBatteryPurchaseStatusFromJSON(json: any): PromoCodeBatt
 }
 
 export function PromoCodeBatteryPurchaseStatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): PromoCodeBatteryPurchaseStatus {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'balanceChange': json['balance_change'],
         'success': json['success'],
-        'error': !exists(json, 'error') ? undefined : PromoCodeBatteryPurchaseStatusErrorFromJSON(json['error']),
+        'error': json['error'] == null ? undefined : PromoCodeBatteryPurchaseStatusErrorFromJSON(json['error']),
     };
 }
 
-export function PromoCodeBatteryPurchaseStatusToJSON(value?: PromoCodeBatteryPurchaseStatus | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function PromoCodeBatteryPurchaseStatusToJSON(json: any): PromoCodeBatteryPurchaseStatus {
+      return PromoCodeBatteryPurchaseStatusToJSONTyped(json, false);
+  }
+
+  export function PromoCodeBatteryPurchaseStatusToJSONTyped(value?: PromoCodeBatteryPurchaseStatus | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'balance_change': value.balanceChange,
-        'success': value.success,
-        'error': PromoCodeBatteryPurchaseStatusErrorToJSON(value.error),
+        'balance_change': value['balanceChange'],
+        'success': value['success'],
+        'error': PromoCodeBatteryPurchaseStatusErrorToJSON(value['error']),
     };
 }
 

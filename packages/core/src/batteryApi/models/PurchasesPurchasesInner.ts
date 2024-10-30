@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PurchasesPurchasesInnerRefundInformation } from './PurchasesPurchasesInnerRefundInformation';
 import {
     PurchasesPurchasesInnerRefundInformationFromJSON,
     PurchasesPurchasesInnerRefundInformationFromJSONTyped,
     PurchasesPurchasesInnerRefundInformationToJSON,
+    PurchasesPurchasesInnerRefundInformationToJSONTyped,
 } from './PurchasesPurchasesInnerRefundInformation';
 
 /**
@@ -107,15 +108,13 @@ export type PurchasesPurchasesInnerTypeEnum = typeof PurchasesPurchasesInnerType
 /**
  * Check if a given object implements the PurchasesPurchasesInner interface.
  */
-export function instanceOfPurchasesPurchasesInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "userPurchaseId" in value;
-    isInstance = isInstance && "purchaseId" in value;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "charges" in value;
-    isInstance = isInstance && "datetime" in value;
-
-    return isInstance;
+export function instanceOfPurchasesPurchasesInner(value: object): value is PurchasesPurchasesInner {
+    if (!('userPurchaseId' in value) || value['userPurchaseId'] === undefined) return false;
+    if (!('purchaseId' in value) || value['purchaseId'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('charges' in value) || value['charges'] === undefined) return false;
+    if (!('datetime' in value) || value['datetime'] === undefined) return false;
+    return true;
 }
 
 export function PurchasesPurchasesInnerFromJSON(json: any): PurchasesPurchasesInner {
@@ -123,43 +122,45 @@ export function PurchasesPurchasesInnerFromJSON(json: any): PurchasesPurchasesIn
 }
 
 export function PurchasesPurchasesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): PurchasesPurchasesInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'promo': !exists(json, 'promo') ? undefined : json['promo'],
-        'forAccountId': !exists(json, 'for_account_id') ? undefined : json['for_account_id'],
+        'promo': json['promo'] == null ? undefined : json['promo'],
+        'forAccountId': json['for_account_id'] == null ? undefined : json['for_account_id'],
         'userPurchaseId': json['user_purchase_id'],
         'purchaseId': json['purchase_id'],
         'type': json['type'],
-        'amount': !exists(json, 'amount') ? undefined : json['amount'],
+        'amount': json['amount'] == null ? undefined : json['amount'],
         'charges': json['charges'],
-        'currency': !exists(json, 'currency') ? undefined : json['currency'],
+        'currency': json['currency'] == null ? undefined : json['currency'],
         'datetime': json['datetime'],
-        'refundInformation': !exists(json, 'refund_information') ? undefined : PurchasesPurchasesInnerRefundInformationFromJSON(json['refund_information']),
+        'refundInformation': json['refund_information'] == null ? undefined : PurchasesPurchasesInnerRefundInformationFromJSON(json['refund_information']),
     };
 }
 
-export function PurchasesPurchasesInnerToJSON(value?: PurchasesPurchasesInner | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function PurchasesPurchasesInnerToJSON(json: any): PurchasesPurchasesInner {
+      return PurchasesPurchasesInnerToJSONTyped(json, false);
+  }
+
+  export function PurchasesPurchasesInnerToJSONTyped(value?: PurchasesPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'promo': value.promo,
-        'for_account_id': value.forAccountId,
-        'user_purchase_id': value.userPurchaseId,
-        'purchase_id': value.purchaseId,
-        'type': value.type,
-        'amount': value.amount,
-        'charges': value.charges,
-        'currency': value.currency,
-        'datetime': value.datetime,
-        'refund_information': PurchasesPurchasesInnerRefundInformationToJSON(value.refundInformation),
+        'promo': value['promo'],
+        'for_account_id': value['forAccountId'],
+        'user_purchase_id': value['userPurchaseId'],
+        'purchase_id': value['purchaseId'],
+        'type': value['type'],
+        'amount': value['amount'],
+        'charges': value['charges'],
+        'currency': value['currency'],
+        'datetime': value['datetime'],
+        'refund_information': PurchasesPurchasesInnerRefundInformationToJSON(value['refundInformation']),
     };
 }
 

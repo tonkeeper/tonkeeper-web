@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { IosBatteryPurchaseRequestTransactionsInner } from './IosBatteryPurchaseRequestTransactionsInner';
 import {
     IosBatteryPurchaseRequestTransactionsInnerFromJSON,
     IosBatteryPurchaseRequestTransactionsInnerFromJSONTyped,
     IosBatteryPurchaseRequestTransactionsInnerToJSON,
+    IosBatteryPurchaseRequestTransactionsInnerToJSONTyped,
 } from './IosBatteryPurchaseRequestTransactionsInner';
 
 /**
@@ -37,11 +38,9 @@ export interface IosBatteryPurchaseRequest {
 /**
  * Check if a given object implements the IosBatteryPurchaseRequest interface.
  */
-export function instanceOfIosBatteryPurchaseRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "transactions" in value;
-
-    return isInstance;
+export function instanceOfIosBatteryPurchaseRequest(value: object): value is IosBatteryPurchaseRequest {
+    if (!('transactions' in value) || value['transactions'] === undefined) return false;
+    return true;
 }
 
 export function IosBatteryPurchaseRequestFromJSON(json: any): IosBatteryPurchaseRequest {
@@ -49,7 +48,7 @@ export function IosBatteryPurchaseRequestFromJSON(json: any): IosBatteryPurchase
 }
 
 export function IosBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): IosBatteryPurchaseRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -58,16 +57,18 @@ export function IosBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function IosBatteryPurchaseRequestToJSON(value?: IosBatteryPurchaseRequest | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function IosBatteryPurchaseRequestToJSON(json: any): IosBatteryPurchaseRequest {
+      return IosBatteryPurchaseRequestToJSONTyped(json, false);
+  }
+
+  export function IosBatteryPurchaseRequestToJSONTyped(value?: IosBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'transactions': ((value.transactions as Array<any>).map(IosBatteryPurchaseRequestTransactionsInnerToJSON)),
+        'transactions': ((value['transactions'] as Array<any>).map(IosBatteryPurchaseRequestTransactionsInnerToJSON)),
     };
 }
 

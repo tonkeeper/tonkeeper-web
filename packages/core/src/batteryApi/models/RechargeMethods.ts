@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { RechargeMethodsMethodsInner } from './RechargeMethodsMethodsInner';
 import {
     RechargeMethodsMethodsInnerFromJSON,
     RechargeMethodsMethodsInnerFromJSONTyped,
     RechargeMethodsMethodsInnerToJSON,
+    RechargeMethodsMethodsInnerToJSONTyped,
 } from './RechargeMethodsMethodsInner';
 
 /**
@@ -37,11 +38,9 @@ export interface RechargeMethods {
 /**
  * Check if a given object implements the RechargeMethods interface.
  */
-export function instanceOfRechargeMethods(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "methods" in value;
-
-    return isInstance;
+export function instanceOfRechargeMethods(value: object): value is RechargeMethods {
+    if (!('methods' in value) || value['methods'] === undefined) return false;
+    return true;
 }
 
 export function RechargeMethodsFromJSON(json: any): RechargeMethods {
@@ -49,7 +48,7 @@ export function RechargeMethodsFromJSON(json: any): RechargeMethods {
 }
 
 export function RechargeMethodsFromJSONTyped(json: any, ignoreDiscriminator: boolean): RechargeMethods {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -58,16 +57,18 @@ export function RechargeMethodsFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function RechargeMethodsToJSON(value?: RechargeMethods | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function RechargeMethodsToJSON(json: any): RechargeMethods {
+      return RechargeMethodsToJSONTyped(json, false);
+  }
+
+  export function RechargeMethodsToJSONTyped(value?: RechargeMethods | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'methods': ((value.methods as Array<any>).map(RechargeMethodsMethodsInnerToJSON)),
+        'methods': ((value['methods'] as Array<any>).map(RechargeMethodsMethodsInnerToJSON)),
     };
 }
 

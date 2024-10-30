@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -50,12 +50,10 @@ export type AndroidBatteryPurchaseStatusPurchasesInnerErrorCodeEnum = typeof And
 /**
  * Check if a given object implements the AndroidBatteryPurchaseStatusPurchasesInnerError interface.
  */
-export function instanceOfAndroidBatteryPurchaseStatusPurchasesInnerError(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "msg" in value;
-    isInstance = isInstance && "code" in value;
-
-    return isInstance;
+export function instanceOfAndroidBatteryPurchaseStatusPurchasesInnerError(value: object): value is AndroidBatteryPurchaseStatusPurchasesInnerError {
+    if (!('msg' in value) || value['msg'] === undefined) return false;
+    if (!('code' in value) || value['code'] === undefined) return false;
+    return true;
 }
 
 export function AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInnerError {
@@ -63,7 +61,7 @@ export function AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSON(json: an
 }
 
 export function AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean): AndroidBatteryPurchaseStatusPurchasesInnerError {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -73,17 +71,19 @@ export function AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSONTyped(jso
     };
 }
 
-export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON(value?: AndroidBatteryPurchaseStatusPurchasesInnerError | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInnerError {
+      return AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped(json, false);
+  }
+
+  export function AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped(value?: AndroidBatteryPurchaseStatusPurchasesInnerError | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'msg': value.msg,
-        'code': value.code,
+        'msg': value['msg'],
+        'code': value['code'],
     };
 }
 

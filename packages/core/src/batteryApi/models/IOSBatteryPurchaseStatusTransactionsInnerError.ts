@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -51,12 +51,10 @@ export type IOSBatteryPurchaseStatusTransactionsInnerErrorCodeEnum = typeof IOSB
 /**
  * Check if a given object implements the IOSBatteryPurchaseStatusTransactionsInnerError interface.
  */
-export function instanceOfIOSBatteryPurchaseStatusTransactionsInnerError(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "msg" in value;
-    isInstance = isInstance && "code" in value;
-
-    return isInstance;
+export function instanceOfIOSBatteryPurchaseStatusTransactionsInnerError(value: object): value is IOSBatteryPurchaseStatusTransactionsInnerError {
+    if (!('msg' in value) || value['msg'] === undefined) return false;
+    if (!('code' in value) || value['code'] === undefined) return false;
+    return true;
 }
 
 export function IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSON(json: any): IOSBatteryPurchaseStatusTransactionsInnerError {
@@ -64,7 +62,7 @@ export function IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSON(json: any
 }
 
 export function IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSONTyped(json: any, ignoreDiscriminator: boolean): IOSBatteryPurchaseStatusTransactionsInnerError {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -74,17 +72,19 @@ export function IOSBatteryPurchaseStatusTransactionsInnerErrorFromJSONTyped(json
     };
 }
 
-export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON(value?: IOSBatteryPurchaseStatusTransactionsInnerError | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSON(json: any): IOSBatteryPurchaseStatusTransactionsInnerError {
+      return IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped(json, false);
+  }
+
+  export function IOSBatteryPurchaseStatusTransactionsInnerErrorToJSONTyped(value?: IOSBatteryPurchaseStatusTransactionsInnerError | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'msg': value.msg,
-        'code': value.code,
+        'msg': value['msg'],
+        'code': value['code'],
     };
 }
 

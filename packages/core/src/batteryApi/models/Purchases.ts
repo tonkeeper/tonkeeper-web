@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PurchasesPurchasesInner } from './PurchasesPurchasesInner';
 import {
     PurchasesPurchasesInnerFromJSON,
     PurchasesPurchasesInnerFromJSONTyped,
     PurchasesPurchasesInnerToJSON,
+    PurchasesPurchasesInnerToJSONTyped,
 } from './PurchasesPurchasesInner';
 
 /**
@@ -43,12 +44,10 @@ export interface Purchases {
 /**
  * Check if a given object implements the Purchases interface.
  */
-export function instanceOfPurchases(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "totalPurchases" in value;
-    isInstance = isInstance && "purchases" in value;
-
-    return isInstance;
+export function instanceOfPurchases(value: object): value is Purchases {
+    if (!('totalPurchases' in value) || value['totalPurchases'] === undefined) return false;
+    if (!('purchases' in value) || value['purchases'] === undefined) return false;
+    return true;
 }
 
 export function PurchasesFromJSON(json: any): Purchases {
@@ -56,7 +55,7 @@ export function PurchasesFromJSON(json: any): Purchases {
 }
 
 export function PurchasesFromJSONTyped(json: any, ignoreDiscriminator: boolean): Purchases {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -66,17 +65,19 @@ export function PurchasesFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function PurchasesToJSON(value?: Purchases | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function PurchasesToJSON(json: any): Purchases {
+      return PurchasesToJSONTyped(json, false);
+  }
+
+  export function PurchasesToJSONTyped(value?: Purchases | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'total_purchases': value.totalPurchases,
-        'purchases': ((value.purchases as Array<any>).map(PurchasesPurchasesInnerToJSON)),
+        'total_purchases': value['totalPurchases'],
+        'purchases': ((value['purchases'] as Array<any>).map(PurchasesPurchasesInnerToJSON)),
     };
 }
 

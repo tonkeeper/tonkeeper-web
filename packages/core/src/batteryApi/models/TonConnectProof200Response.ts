@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,11 +30,9 @@ export interface TonConnectProof200Response {
 /**
  * Check if a given object implements the TonConnectProof200Response interface.
  */
-export function instanceOfTonConnectProof200Response(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "token" in value;
-
-    return isInstance;
+export function instanceOfTonConnectProof200Response(value: object): value is TonConnectProof200Response {
+    if (!('token' in value) || value['token'] === undefined) return false;
+    return true;
 }
 
 export function TonConnectProof200ResponseFromJSON(json: any): TonConnectProof200Response {
@@ -42,7 +40,7 @@ export function TonConnectProof200ResponseFromJSON(json: any): TonConnectProof20
 }
 
 export function TonConnectProof200ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): TonConnectProof200Response {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -51,16 +49,18 @@ export function TonConnectProof200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function TonConnectProof200ResponseToJSON(value?: TonConnectProof200Response | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function TonConnectProof200ResponseToJSON(json: any): TonConnectProof200Response {
+      return TonConnectProof200ResponseToJSONTyped(json, false);
+  }
+
+  export function TonConnectProof200ResponseToJSONTyped(value?: TonConnectProof200Response | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'token': value.token,
+        'token': value['token'],
     };
 }
 

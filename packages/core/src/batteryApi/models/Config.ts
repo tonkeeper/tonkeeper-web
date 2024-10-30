@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -48,14 +48,12 @@ export interface Config {
 /**
  * Check if a given object implements the Config interface.
  */
-export function instanceOfConfig(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "chargeCost" in value;
-    isInstance = isInstance && "fundReceiver" in value;
-    isInstance = isInstance && "excessAccount" in value;
-    isInstance = isInstance && "messageTtl" in value;
-
-    return isInstance;
+export function instanceOfConfig(value: object): value is Config {
+    if (!('chargeCost' in value) || value['chargeCost'] === undefined) return false;
+    if (!('fundReceiver' in value) || value['fundReceiver'] === undefined) return false;
+    if (!('excessAccount' in value) || value['excessAccount'] === undefined) return false;
+    if (!('messageTtl' in value) || value['messageTtl'] === undefined) return false;
+    return true;
 }
 
 export function ConfigFromJSON(json: any): Config {
@@ -63,7 +61,7 @@ export function ConfigFromJSON(json: any): Config {
 }
 
 export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Config {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -75,19 +73,21 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
     };
 }
 
-export function ConfigToJSON(value?: Config | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function ConfigToJSON(json: any): Config {
+      return ConfigToJSONTyped(json, false);
+  }
+
+  export function ConfigToJSONTyped(value?: Config | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'charge_cost': value.chargeCost,
-        'fund_receiver': value.fundReceiver,
-        'excess_account': value.excessAccount,
-        'message_ttl': value.messageTtl,
+        'charge_cost': value['chargeCost'],
+        'fund_receiver': value['fundReceiver'],
+        'excess_account': value['excessAccount'],
+        'message_ttl': value['messageTtl'],
     };
 }
 

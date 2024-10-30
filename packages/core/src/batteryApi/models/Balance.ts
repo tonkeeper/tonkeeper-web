@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -53,13 +53,11 @@ export type BalanceUnitsEnum = typeof BalanceUnitsEnum[keyof typeof BalanceUnits
 /**
  * Check if a given object implements the Balance interface.
  */
-export function instanceOfBalance(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "balance" in value;
-    isInstance = isInstance && "reserved" in value;
-    isInstance = isInstance && "units" in value;
-
-    return isInstance;
+export function instanceOfBalance(value: object): value is Balance {
+    if (!('balance' in value) || value['balance'] === undefined) return false;
+    if (!('reserved' in value) || value['reserved'] === undefined) return false;
+    if (!('units' in value) || value['units'] === undefined) return false;
+    return true;
 }
 
 export function BalanceFromJSON(json: any): Balance {
@@ -67,7 +65,7 @@ export function BalanceFromJSON(json: any): Balance {
 }
 
 export function BalanceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Balance {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -78,18 +76,20 @@ export function BalanceFromJSONTyped(json: any, ignoreDiscriminator: boolean): B
     };
 }
 
-export function BalanceToJSON(value?: Balance | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function BalanceToJSON(json: any): Balance {
+      return BalanceToJSONTyped(json, false);
+  }
+
+  export function BalanceToJSONTyped(value?: Balance | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'balance': value.balance,
-        'reserved': value.reserved,
-        'units': value.units,
+        'balance': value['balance'],
+        'reserved': value['reserved'],
+        'units': value['units'],
     };
 }
 

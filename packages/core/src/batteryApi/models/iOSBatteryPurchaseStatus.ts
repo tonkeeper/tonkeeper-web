@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { IOSBatteryPurchaseStatusTransactionsInner } from './IOSBatteryPurchaseStatusTransactionsInner';
 import {
     IOSBatteryPurchaseStatusTransactionsInnerFromJSON,
     IOSBatteryPurchaseStatusTransactionsInnerFromJSONTyped,
     IOSBatteryPurchaseStatusTransactionsInnerToJSON,
+    IOSBatteryPurchaseStatusTransactionsInnerToJSONTyped,
 } from './IOSBatteryPurchaseStatusTransactionsInner';
 
 /**
@@ -37,11 +38,9 @@ export interface IOSBatteryPurchaseStatus {
 /**
  * Check if a given object implements the IOSBatteryPurchaseStatus interface.
  */
-export function instanceOfIOSBatteryPurchaseStatus(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "transactions" in value;
-
-    return isInstance;
+export function instanceOfIOSBatteryPurchaseStatus(value: object): value is IOSBatteryPurchaseStatus {
+    if (!('transactions' in value) || value['transactions'] === undefined) return false;
+    return true;
 }
 
 export function IOSBatteryPurchaseStatusFromJSON(json: any): IOSBatteryPurchaseStatus {
@@ -49,7 +48,7 @@ export function IOSBatteryPurchaseStatusFromJSON(json: any): IOSBatteryPurchaseS
 }
 
 export function IOSBatteryPurchaseStatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): IOSBatteryPurchaseStatus {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -58,16 +57,18 @@ export function IOSBatteryPurchaseStatusFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function IOSBatteryPurchaseStatusToJSON(value?: IOSBatteryPurchaseStatus | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function IOSBatteryPurchaseStatusToJSON(json: any): IOSBatteryPurchaseStatus {
+      return IOSBatteryPurchaseStatusToJSONTyped(json, false);
+  }
+
+  export function IOSBatteryPurchaseStatusToJSONTyped(value?: IOSBatteryPurchaseStatus | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'transactions': ((value.transactions as Array<any>).map(IOSBatteryPurchaseStatusTransactionsInnerToJSON)),
+        'transactions': ((value['transactions'] as Array<any>).map(IOSBatteryPurchaseStatusTransactionsInnerToJSON)),
     };
 }
 

@@ -453,12 +453,18 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * verify an in-app purchase
      */
     async androidBatteryPurchaseRaw(requestParameters: AndroidBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AndroidBatteryPurchaseStatus>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling androidBatteryPurchase.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling androidBatteryPurchase().'
+            );
         }
 
-        if (requestParameters.androidBatteryPurchaseRequest === null || requestParameters.androidBatteryPurchaseRequest === undefined) {
-            throw new runtime.RequiredError('androidBatteryPurchaseRequest','Required parameter requestParameters.androidBatteryPurchaseRequest was null or undefined when calling androidBatteryPurchase.');
+        if (requestParameters['androidBatteryPurchaseRequest'] == null) {
+            throw new runtime.RequiredError(
+                'androidBatteryPurchaseRequest',
+                'Required parameter "androidBatteryPurchaseRequest" was null or undefined when calling androidBatteryPurchase().'
+            );
         }
 
         const queryParameters: any = {};
@@ -467,8 +473,8 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -476,7 +482,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AndroidBatteryPurchaseRequestToJSON(requestParameters.androidBatteryPurchaseRequest),
+            body: AndroidBatteryPurchaseRequestToJSON(requestParameters['androidBatteryPurchaseRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AndroidBatteryPurchaseStatusFromJSON(jsonValue));
@@ -493,8 +499,11 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async appStoreNotificationRaw(requestParameters: AppStoreNotificationOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
-        if (requestParameters.appStoreNotificationRequest === null || requestParameters.appStoreNotificationRequest === undefined) {
-            throw new runtime.RequiredError('appStoreNotificationRequest','Required parameter requestParameters.appStoreNotificationRequest was null or undefined when calling appStoreNotification.');
+        if (requestParameters['appStoreNotificationRequest'] == null) {
+            throw new runtime.RequiredError(
+                'appStoreNotificationRequest',
+                'Required parameter "appStoreNotificationRequest" was null or undefined when calling appStoreNotification().'
+            );
         }
 
         const queryParameters: any = {};
@@ -508,7 +517,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AppStoreNotificationRequestToJSON(requestParameters.appStoreNotificationRequest),
+            body: AppStoreNotificationRequestToJSON(requestParameters['appStoreNotificationRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -524,18 +533,24 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async applyPromoRaw(requestParameters: ApplyPromoOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoCodeBatteryPurchaseStatus>> {
-        if (requestParameters.token === null || requestParameters.token === undefined) {
-            throw new runtime.RequiredError('token','Required parameter requestParameters.token was null or undefined when calling applyPromo.');
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling applyPromo().'
+            );
         }
 
-        if (requestParameters.applyPromoRequest === null || requestParameters.applyPromoRequest === undefined) {
-            throw new runtime.RequiredError('applyPromoRequest','Required parameter requestParameters.applyPromoRequest was null or undefined when calling applyPromo.');
+        if (requestParameters['applyPromoRequest'] == null) {
+            throw new runtime.RequiredError(
+                'applyPromoRequest',
+                'Required parameter "applyPromoRequest" was null or undefined when calling applyPromo().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.token !== undefined) {
-            queryParameters['token'] = requestParameters.token;
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -547,7 +562,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ApplyPromoRequestToJSON(requestParameters.applyPromoRequest),
+            body: ApplyPromoRequestToJSON(requestParameters['applyPromoRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PromoCodeBatteryPurchaseStatusFromJSON(jsonValue));
@@ -563,18 +578,24 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async createCustomRefundRaw(requestParameters: CreateCustomRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
-        if (requestParameters.token === null || requestParameters.token === undefined) {
-            throw new runtime.RequiredError('token','Required parameter requestParameters.token was null or undefined when calling createCustomRefund.');
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling createCustomRefund().'
+            );
         }
 
-        if (requestParameters.createCustomRefundRequest === null || requestParameters.createCustomRefundRequest === undefined) {
-            throw new runtime.RequiredError('createCustomRefundRequest','Required parameter requestParameters.createCustomRefundRequest was null or undefined when calling createCustomRefund.');
+        if (requestParameters['createCustomRefundRequest'] == null) {
+            throw new runtime.RequiredError(
+                'createCustomRefundRequest',
+                'Required parameter "createCustomRefundRequest" was null or undefined when calling createCustomRefund().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.token !== undefined) {
-            queryParameters['token'] = requestParameters.token;
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -586,7 +607,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: CreateCustomRefundRequestToJSON(requestParameters.createCustomRefundRequest),
+            body: CreateCustomRefundRequestToJSON(requestParameters['createCustomRefundRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -602,38 +623,44 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async estimateGaslessCostRaw(requestParameters: EstimateGaslessCostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessEstimation>> {
-        if (requestParameters.jettonMaster === null || requestParameters.jettonMaster === undefined) {
-            throw new runtime.RequiredError('jettonMaster','Required parameter requestParameters.jettonMaster was null or undefined when calling estimateGaslessCost.');
+        if (requestParameters['jettonMaster'] == null) {
+            throw new runtime.RequiredError(
+                'jettonMaster',
+                'Required parameter "jettonMaster" was null or undefined when calling estimateGaslessCost().'
+            );
         }
 
-        if (requestParameters.estimateGaslessCostRequest === null || requestParameters.estimateGaslessCostRequest === undefined) {
-            throw new runtime.RequiredError('estimateGaslessCostRequest','Required parameter requestParameters.estimateGaslessCostRequest was null or undefined when calling estimateGaslessCost.');
+        if (requestParameters['estimateGaslessCostRequest'] == null) {
+            throw new runtime.RequiredError(
+                'estimateGaslessCostRequest',
+                'Required parameter "estimateGaslessCostRequest" was null or undefined when calling estimateGaslessCost().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.walletAddress !== undefined) {
-            queryParameters['wallet_address'] = requestParameters.walletAddress;
+        if (requestParameters['walletAddress'] != null) {
+            queryParameters['wallet_address'] = requestParameters['walletAddress'];
         }
 
-        if (requestParameters.walletPublicKey !== undefined) {
-            queryParameters['wallet_public_key'] = requestParameters.walletPublicKey;
+        if (requestParameters['walletPublicKey'] != null) {
+            queryParameters['wallet_public_key'] = requestParameters['walletPublicKey'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
-            path: `/gasless/estimate-cost/{jetton_master}`.replace(`{${"jetton_master"}}`, encodeURIComponent(String(requestParameters.jettonMaster))),
+            path: `/gasless/estimate-cost/{jetton_master}`.replace(`{${"jetton_master"}}`, encodeURIComponent(String(requestParameters['jettonMaster']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EstimateGaslessCostRequestToJSON(requestParameters.estimateGaslessCostRequest),
+            body: EstimateGaslessCostRequestToJSON(requestParameters['estimateGaslessCostRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => GaslessEstimationFromJSON(jsonValue));
@@ -649,24 +676,30 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async extendRefundPeriodRaw(requestParameters: ExtendRefundPeriodRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
-        if (requestParameters.token === null || requestParameters.token === undefined) {
-            throw new runtime.RequiredError('token','Required parameter requestParameters.token was null or undefined when calling extendRefundPeriod.');
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling extendRefundPeriod().'
+            );
         }
 
-        if (requestParameters.purchaseId === null || requestParameters.purchaseId === undefined) {
-            throw new runtime.RequiredError('purchaseId','Required parameter requestParameters.purchaseId was null or undefined when calling extendRefundPeriod.');
+        if (requestParameters['purchaseId'] == null) {
+            throw new runtime.RequiredError(
+                'purchaseId',
+                'Required parameter "purchaseId" was null or undefined when calling extendRefundPeriod().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.token !== undefined) {
-            queryParameters['token'] = requestParameters.token;
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/restricted/purchases/{purchase_id}/extend-refund-period`.replace(`{${"purchase_id"}}`, encodeURIComponent(String(requestParameters.purchaseId))),
+            path: `/restricted/purchases/{purchase_id}/extend-refund-period`.replace(`{${"purchase_id"}}`, encodeURIComponent(String(requestParameters['purchaseId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -686,20 +719,23 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * This method returns information about a user\'s balance.
      */
     async getBalanceRaw(requestParameters: GetBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Balance>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling getBalance.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getBalance().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.units !== undefined) {
-            queryParameters['units'] = requestParameters.units;
+        if (requestParameters['units'] != null) {
+            queryParameters['units'] = requestParameters['units'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -750,28 +786,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * This method returns a list of purchases made by a specific user.
      */
     async getPurchasesRaw(requestParameters: GetPurchasesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Purchases>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling getPurchases.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getPurchases().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
-        if (requestParameters.includeGiftsOnTheWay !== undefined) {
-            queryParameters['include_gifts_on_the_way'] = requestParameters.includeGiftsOnTheWay;
+        if (requestParameters['includeGiftsOnTheWay'] != null) {
+            queryParameters['include_gifts_on_the_way'] = requestParameters['includeGiftsOnTheWay'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -798,8 +837,8 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     async getRechargeMethodsRaw(requestParameters: GetRechargeMethodsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<RechargeMethods>> {
         const queryParameters: any = {};
 
-        if (requestParameters.includeRechargeOnly !== undefined) {
-            queryParameters['include_recharge_only'] = requestParameters.includeRechargeOnly;
+        if (requestParameters['includeRechargeOnly'] != null) {
+            queryParameters['include_recharge_only'] = requestParameters['includeRechargeOnly'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -826,16 +865,19 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * This method returns information about the current status of Battery Service.
      */
     async getStatusRaw(requestParameters: GetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Status>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling getStatus.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getStatus().'
+            );
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -860,24 +902,27 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * This method returns a list of transactions made by a specific user.
      */
     async getTransactionsRaw(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Transactions>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling getTransactions.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getTransactions().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.limit !== undefined) {
-            queryParameters['limit'] = requestParameters.limit;
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters.offset !== undefined) {
-            queryParameters['offset'] = requestParameters.offset;
+        if (requestParameters['offset'] != null) {
+            queryParameters['offset'] = requestParameters['offset'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -902,12 +947,18 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * verify an in-app purchase
      */
     async iosBatteryPurchaseRaw(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IOSBatteryPurchaseStatus>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling iosBatteryPurchase.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling iosBatteryPurchase().'
+            );
         }
 
-        if (requestParameters.iosBatteryPurchaseRequest === null || requestParameters.iosBatteryPurchaseRequest === undefined) {
-            throw new runtime.RequiredError('iosBatteryPurchaseRequest','Required parameter requestParameters.iosBatteryPurchaseRequest was null or undefined when calling iosBatteryPurchase.');
+        if (requestParameters['iosBatteryPurchaseRequest'] == null) {
+            throw new runtime.RequiredError(
+                'iosBatteryPurchaseRequest',
+                'Required parameter "iosBatteryPurchaseRequest" was null or undefined when calling iosBatteryPurchase().'
+            );
         }
 
         const queryParameters: any = {};
@@ -916,8 +967,8 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -925,7 +976,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: IosBatteryPurchaseRequestToJSON(requestParameters.iosBatteryPurchaseRequest),
+            body: IosBatteryPurchaseRequestToJSON(requestParameters['iosBatteryPurchaseRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => IOSBatteryPurchaseStatusFromJSON(jsonValue));
@@ -943,12 +994,18 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * charge battery with promo code
      */
     async promoCodeBatteryPurchaseRaw(requestParameters: PromoCodeBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoCodeBatteryPurchaseStatus>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling promoCodeBatteryPurchase.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling promoCodeBatteryPurchase().'
+            );
         }
 
-        if (requestParameters.promoCodeBatteryPurchaseRequest === null || requestParameters.promoCodeBatteryPurchaseRequest === undefined) {
-            throw new runtime.RequiredError('promoCodeBatteryPurchaseRequest','Required parameter requestParameters.promoCodeBatteryPurchaseRequest was null or undefined when calling promoCodeBatteryPurchase.');
+        if (requestParameters['promoCodeBatteryPurchaseRequest'] == null) {
+            throw new runtime.RequiredError(
+                'promoCodeBatteryPurchaseRequest',
+                'Required parameter "promoCodeBatteryPurchaseRequest" was null or undefined when calling promoCodeBatteryPurchase().'
+            );
         }
 
         const queryParameters: any = {};
@@ -957,12 +1014,12 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.acceptLanguage !== undefined && requestParameters.acceptLanguage !== null) {
-            headerParameters['Accept-Language'] = String(requestParameters.acceptLanguage);
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -970,7 +1027,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: PromoCodeBatteryPurchaseRequestToJSON(requestParameters.promoCodeBatteryPurchaseRequest),
+            body: PromoCodeBatteryPurchaseRequestToJSON(requestParameters['promoCodeBatteryPurchaseRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => PromoCodeBatteryPurchaseStatusFromJSON(jsonValue));
@@ -987,12 +1044,18 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async requestRefundRaw(requestParameters: RequestRefundOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling requestRefund.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling requestRefund().'
+            );
         }
 
-        if (requestParameters.requestRefundRequest === null || requestParameters.requestRefundRequest === undefined) {
-            throw new runtime.RequiredError('requestRefundRequest','Required parameter requestParameters.requestRefundRequest was null or undefined when calling requestRefund.');
+        if (requestParameters['requestRefundRequest'] == null) {
+            throw new runtime.RequiredError(
+                'requestRefundRequest',
+                'Required parameter "requestRefundRequest" was null or undefined when calling requestRefund().'
+            );
         }
 
         const queryParameters: any = {};
@@ -1001,8 +1064,8 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -1010,7 +1073,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: RequestRefundRequestToJSON(requestParameters.requestRefundRequest),
+            body: RequestRefundRequestToJSON(requestParameters['requestRefundRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -1025,22 +1088,31 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     /**
      */
     async resetUserBalanceRaw(requestParameters: ResetUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
-        if (requestParameters.token === null || requestParameters.token === undefined) {
-            throw new runtime.RequiredError('token','Required parameter requestParameters.token was null or undefined when calling resetUserBalance.');
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling resetUserBalance().'
+            );
         }
 
-        if (requestParameters.userId === null || requestParameters.userId === undefined) {
-            throw new runtime.RequiredError('userId','Required parameter requestParameters.userId was null or undefined when calling resetUserBalance.');
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling resetUserBalance().'
+            );
         }
 
-        if (requestParameters.resetUserBalanceRequest === null || requestParameters.resetUserBalanceRequest === undefined) {
-            throw new runtime.RequiredError('resetUserBalanceRequest','Required parameter requestParameters.resetUserBalanceRequest was null or undefined when calling resetUserBalance.');
+        if (requestParameters['resetUserBalanceRequest'] == null) {
+            throw new runtime.RequiredError(
+                'resetUserBalanceRequest',
+                'Required parameter "resetUserBalanceRequest" was null or undefined when calling resetUserBalance().'
+            );
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.token !== undefined) {
-            queryParameters['token'] = requestParameters.token;
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -1048,11 +1120,11 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/restricted/users/{user_id}/reset-balance`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters.userId))),
+            path: `/restricted/users/{user_id}/reset-balance`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: ResetUserBalanceRequestToJSON(requestParameters.resetUserBalanceRequest),
+            body: ResetUserBalanceRequestToJSON(requestParameters['resetUserBalanceRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse<any>(response);
@@ -1069,12 +1141,18 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * Send message to blockchain
      */
     async sendMessageRaw(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.xTonConnectAuth === null || requestParameters.xTonConnectAuth === undefined) {
-            throw new runtime.RequiredError('xTonConnectAuth','Required parameter requestParameters.xTonConnectAuth was null or undefined when calling sendMessage.');
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling sendMessage().'
+            );
         }
 
-        if (requestParameters.emulateMessageToWalletRequest === null || requestParameters.emulateMessageToWalletRequest === undefined) {
-            throw new runtime.RequiredError('emulateMessageToWalletRequest','Required parameter requestParameters.emulateMessageToWalletRequest was null or undefined when calling sendMessage.');
+        if (requestParameters['emulateMessageToWalletRequest'] == null) {
+            throw new runtime.RequiredError(
+                'emulateMessageToWalletRequest',
+                'Required parameter "emulateMessageToWalletRequest" was null or undefined when calling sendMessage().'
+            );
         }
 
         const queryParameters: any = {};
@@ -1083,8 +1161,8 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
-        if (requestParameters.xTonConnectAuth !== undefined && requestParameters.xTonConnectAuth !== null) {
-            headerParameters['X-TonConnect-Auth'] = String(requestParameters.xTonConnectAuth);
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
         }
 
         const response = await this.request({
@@ -1092,7 +1170,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: EmulateMessageToWalletRequestToJSON(requestParameters.emulateMessageToWalletRequest),
+            body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -1110,8 +1188,8 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     async verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
         const queryParameters: any = {};
 
-        if (requestParameters.promo !== undefined) {
-            queryParameters['promo'] = requestParameters.promo;
+        if (requestParameters['promo'] != null) {
+            queryParameters['promo'] = requestParameters['promo'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

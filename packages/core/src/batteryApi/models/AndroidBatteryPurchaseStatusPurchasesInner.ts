@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { AndroidBatteryPurchaseStatusPurchasesInnerError } from './AndroidBatteryPurchaseStatusPurchasesInnerError';
 import {
     AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSON,
     AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSONTyped,
     AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON,
+    AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSONTyped,
 } from './AndroidBatteryPurchaseStatusPurchasesInnerError';
 
 /**
@@ -55,13 +56,11 @@ export interface AndroidBatteryPurchaseStatusPurchasesInner {
 /**
  * Check if a given object implements the AndroidBatteryPurchaseStatusPurchasesInner interface.
  */
-export function instanceOfAndroidBatteryPurchaseStatusPurchasesInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "productId" in value;
-    isInstance = isInstance && "token" in value;
-    isInstance = isInstance && "success" in value;
-
-    return isInstance;
+export function instanceOfAndroidBatteryPurchaseStatusPurchasesInner(value: object): value is AndroidBatteryPurchaseStatusPurchasesInner {
+    if (!('productId' in value) || value['productId'] === undefined) return false;
+    if (!('token' in value) || value['token'] === undefined) return false;
+    if (!('success' in value) || value['success'] === undefined) return false;
+    return true;
 }
 
 export function AndroidBatteryPurchaseStatusPurchasesInnerFromJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInner {
@@ -69,7 +68,7 @@ export function AndroidBatteryPurchaseStatusPurchasesInnerFromJSON(json: any): A
 }
 
 export function AndroidBatteryPurchaseStatusPurchasesInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): AndroidBatteryPurchaseStatusPurchasesInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -77,23 +76,25 @@ export function AndroidBatteryPurchaseStatusPurchasesInnerFromJSONTyped(json: an
         'productId': json['product_id'],
         'token': json['token'],
         'success': json['success'],
-        'error': !exists(json, 'error') ? undefined : AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSON(json['error']),
+        'error': json['error'] == null ? undefined : AndroidBatteryPurchaseStatusPurchasesInnerErrorFromJSON(json['error']),
     };
 }
 
-export function AndroidBatteryPurchaseStatusPurchasesInnerToJSON(value?: AndroidBatteryPurchaseStatusPurchasesInner | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function AndroidBatteryPurchaseStatusPurchasesInnerToJSON(json: any): AndroidBatteryPurchaseStatusPurchasesInner {
+      return AndroidBatteryPurchaseStatusPurchasesInnerToJSONTyped(json, false);
+  }
+
+  export function AndroidBatteryPurchaseStatusPurchasesInnerToJSONTyped(value?: AndroidBatteryPurchaseStatusPurchasesInner | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'product_id': value.productId,
-        'token': value.token,
-        'success': value.success,
-        'error': AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON(value.error),
+        'product_id': value['productId'],
+        'token': value['token'],
+        'success': value['success'],
+        'error': AndroidBatteryPurchaseStatusPurchasesInnerErrorToJSON(value['error']),
     };
 }
 

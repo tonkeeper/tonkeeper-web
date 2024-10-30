@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -30,11 +30,9 @@ export interface PromoCodeBatteryPurchaseRequest {
 /**
  * Check if a given object implements the PromoCodeBatteryPurchaseRequest interface.
  */
-export function instanceOfPromoCodeBatteryPurchaseRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "promoCode" in value;
-
-    return isInstance;
+export function instanceOfPromoCodeBatteryPurchaseRequest(value: object): value is PromoCodeBatteryPurchaseRequest {
+    if (!('promoCode' in value) || value['promoCode'] === undefined) return false;
+    return true;
 }
 
 export function PromoCodeBatteryPurchaseRequestFromJSON(json: any): PromoCodeBatteryPurchaseRequest {
@@ -42,7 +40,7 @@ export function PromoCodeBatteryPurchaseRequestFromJSON(json: any): PromoCodeBat
 }
 
 export function PromoCodeBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PromoCodeBatteryPurchaseRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -51,16 +49,18 @@ export function PromoCodeBatteryPurchaseRequestFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function PromoCodeBatteryPurchaseRequestToJSON(value?: PromoCodeBatteryPurchaseRequest | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function PromoCodeBatteryPurchaseRequestToJSON(json: any): PromoCodeBatteryPurchaseRequest {
+      return PromoCodeBatteryPurchaseRequestToJSONTyped(json, false);
+  }
+
+  export function PromoCodeBatteryPurchaseRequestToJSONTyped(value?: PromoCodeBatteryPurchaseRequest | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'promo_code': value.promoCode,
+        'promo_code': value['promoCode'],
     };
 }
 

@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { StatusPendingTransactionsInner } from './StatusPendingTransactionsInner';
 import {
     StatusPendingTransactionsInnerFromJSON,
     StatusPendingTransactionsInnerFromJSONTyped,
     StatusPendingTransactionsInnerToJSON,
+    StatusPendingTransactionsInnerToJSONTyped,
 } from './StatusPendingTransactionsInner';
 
 /**
@@ -37,11 +38,9 @@ export interface Status {
 /**
  * Check if a given object implements the Status interface.
  */
-export function instanceOfStatus(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "pendingTransactions" in value;
-
-    return isInstance;
+export function instanceOfStatus(value: object): value is Status {
+    if (!('pendingTransactions' in value) || value['pendingTransactions'] === undefined) return false;
+    return true;
 }
 
 export function StatusFromJSON(json: any): Status {
@@ -49,7 +48,7 @@ export function StatusFromJSON(json: any): Status {
 }
 
 export function StatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): Status {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -58,16 +57,18 @@ export function StatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): St
     };
 }
 
-export function StatusToJSON(value?: Status | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function StatusToJSON(json: any): Status {
+      return StatusToJSONTyped(json, false);
+  }
+
+  export function StatusToJSONTyped(value?: Status | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'pending_transactions': ((value.pendingTransactions as Array<any>).map(StatusPendingTransactionsInnerToJSON)),
+        'pending_transactions': ((value['pendingTransactions'] as Array<any>).map(StatusPendingTransactionsInnerToJSON)),
     };
 }
 

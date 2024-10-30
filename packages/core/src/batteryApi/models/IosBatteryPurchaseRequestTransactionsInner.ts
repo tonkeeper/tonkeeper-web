@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -36,11 +36,9 @@ export interface IosBatteryPurchaseRequestTransactionsInner {
 /**
  * Check if a given object implements the IosBatteryPurchaseRequestTransactionsInner interface.
  */
-export function instanceOfIosBatteryPurchaseRequestTransactionsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "id" in value;
-
-    return isInstance;
+export function instanceOfIosBatteryPurchaseRequestTransactionsInner(value: object): value is IosBatteryPurchaseRequestTransactionsInner {
+    if (!('id' in value) || value['id'] === undefined) return false;
+    return true;
 }
 
 export function IosBatteryPurchaseRequestTransactionsInnerFromJSON(json: any): IosBatteryPurchaseRequestTransactionsInner {
@@ -48,27 +46,29 @@ export function IosBatteryPurchaseRequestTransactionsInnerFromJSON(json: any): I
 }
 
 export function IosBatteryPurchaseRequestTransactionsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): IosBatteryPurchaseRequestTransactionsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
         'id': json['id'],
-        'promo': !exists(json, 'promo') ? undefined : json['promo'],
+        'promo': json['promo'] == null ? undefined : json['promo'],
     };
 }
 
-export function IosBatteryPurchaseRequestTransactionsInnerToJSON(value?: IosBatteryPurchaseRequestTransactionsInner | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function IosBatteryPurchaseRequestTransactionsInnerToJSON(json: any): IosBatteryPurchaseRequestTransactionsInner {
+      return IosBatteryPurchaseRequestTransactionsInnerToJSONTyped(json, false);
+  }
+
+  export function IosBatteryPurchaseRequestTransactionsInnerToJSONTyped(value?: IosBatteryPurchaseRequestTransactionsInner | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'id': value.id,
-        'promo': value.promo,
+        'id': value['id'],
+        'promo': value['promo'],
     };
 }
 

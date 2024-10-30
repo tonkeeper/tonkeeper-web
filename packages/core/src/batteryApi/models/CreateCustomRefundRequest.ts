@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -60,15 +60,13 @@ export interface CreateCustomRefundRequest {
 /**
  * Check if a given object implements the CreateCustomRefundRequest interface.
  */
-export function instanceOfCreateCustomRefundRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "amount" in value;
-    isInstance = isInstance && "currency" in value;
-    isInstance = isInstance && "comment" in value;
-    isInstance = isInstance && "reason" in value;
-    isInstance = isInstance && "destination" in value;
-
-    return isInstance;
+export function instanceOfCreateCustomRefundRequest(value: object): value is CreateCustomRefundRequest {
+    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('currency' in value) || value['currency'] === undefined) return false;
+    if (!('comment' in value) || value['comment'] === undefined) return false;
+    if (!('reason' in value) || value['reason'] === undefined) return false;
+    if (!('destination' in value) || value['destination'] === undefined) return false;
+    return true;
 }
 
 export function CreateCustomRefundRequestFromJSON(json: any): CreateCustomRefundRequest {
@@ -76,12 +74,12 @@ export function CreateCustomRefundRequestFromJSON(json: any): CreateCustomRefund
 }
 
 export function CreateCustomRefundRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateCustomRefundRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'relayerEventId': !exists(json, 'relayer_event_id') ? undefined : json['relayer_event_id'],
+        'relayerEventId': json['relayer_event_id'] == null ? undefined : json['relayer_event_id'],
         'amount': json['amount'],
         'currency': json['currency'],
         'comment': json['comment'],
@@ -90,21 +88,23 @@ export function CreateCustomRefundRequestFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function CreateCustomRefundRequestToJSON(value?: CreateCustomRefundRequest | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function CreateCustomRefundRequestToJSON(json: any): CreateCustomRefundRequest {
+      return CreateCustomRefundRequestToJSONTyped(json, false);
+  }
+
+  export function CreateCustomRefundRequestToJSONTyped(value?: CreateCustomRefundRequest | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'relayer_event_id': value.relayerEventId,
-        'amount': value.amount,
-        'currency': value.currency,
-        'comment': value.comment,
-        'reason': value.reason,
-        'destination': value.destination,
+        'relayer_event_id': value['relayerEventId'],
+        'amount': value['amount'],
+        'currency': value['currency'],
+        'comment': value['comment'],
+        'reason': value['reason'],
+        'destination': value['destination'],
     };
 }
 

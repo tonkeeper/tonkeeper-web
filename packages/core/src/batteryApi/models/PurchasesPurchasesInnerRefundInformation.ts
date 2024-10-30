@@ -12,12 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 import type { PurchasesPurchasesInnerRefundInformationRefunded } from './PurchasesPurchasesInnerRefundInformationRefunded';
 import {
     PurchasesPurchasesInnerRefundInformationRefundedFromJSON,
     PurchasesPurchasesInnerRefundInformationRefundedFromJSONTyped,
     PurchasesPurchasesInnerRefundInformationRefundedToJSON,
+    PurchasesPurchasesInnerRefundInformationRefundedToJSONTyped,
 } from './PurchasesPurchasesInnerRefundInformationRefunded';
 
 /**
@@ -61,13 +62,11 @@ export interface PurchasesPurchasesInnerRefundInformation {
 /**
  * Check if a given object implements the PurchasesPurchasesInnerRefundInformation interface.
  */
-export function instanceOfPurchasesPurchasesInnerRefundInformation(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "fullyRefunded" in value;
-    isInstance = isInstance && "partiallyRefunded" in value;
-    isInstance = isInstance && "pendingRefund" in value;
-
-    return isInstance;
+export function instanceOfPurchasesPurchasesInnerRefundInformation(value: object): value is PurchasesPurchasesInnerRefundInformation {
+    if (!('fullyRefunded' in value) || value['fullyRefunded'] === undefined) return false;
+    if (!('partiallyRefunded' in value) || value['partiallyRefunded'] === undefined) return false;
+    if (!('pendingRefund' in value) || value['pendingRefund'] === undefined) return false;
+    return true;
 }
 
 export function PurchasesPurchasesInnerRefundInformationFromJSON(json: any): PurchasesPurchasesInnerRefundInformation {
@@ -75,7 +74,7 @@ export function PurchasesPurchasesInnerRefundInformationFromJSON(json: any): Pur
 }
 
 export function PurchasesPurchasesInnerRefundInformationFromJSONTyped(json: any, ignoreDiscriminator: boolean): PurchasesPurchasesInnerRefundInformation {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
@@ -83,25 +82,27 @@ export function PurchasesPurchasesInnerRefundInformationFromJSONTyped(json: any,
         'fullyRefunded': json['fully_refunded'],
         'partiallyRefunded': json['partially_refunded'],
         'pendingRefund': json['pending_refund'],
-        'refunded': !exists(json, 'refunded') ? undefined : PurchasesPurchasesInnerRefundInformationRefundedFromJSON(json['refunded']),
-        'refundable': !exists(json, 'refundable') ? undefined : PurchasesPurchasesInnerRefundInformationRefundedFromJSON(json['refundable']),
+        'refunded': json['refunded'] == null ? undefined : PurchasesPurchasesInnerRefundInformationRefundedFromJSON(json['refunded']),
+        'refundable': json['refundable'] == null ? undefined : PurchasesPurchasesInnerRefundInformationRefundedFromJSON(json['refundable']),
     };
 }
 
-export function PurchasesPurchasesInnerRefundInformationToJSON(value?: PurchasesPurchasesInnerRefundInformation | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function PurchasesPurchasesInnerRefundInformationToJSON(json: any): PurchasesPurchasesInnerRefundInformation {
+      return PurchasesPurchasesInnerRefundInformationToJSONTyped(json, false);
+  }
+
+  export function PurchasesPurchasesInnerRefundInformationToJSONTyped(value?: PurchasesPurchasesInnerRefundInformation | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'fully_refunded': value.fullyRefunded,
-        'partially_refunded': value.partiallyRefunded,
-        'pending_refund': value.pendingRefund,
-        'refunded': PurchasesPurchasesInnerRefundInformationRefundedToJSON(value.refunded),
-        'refundable': PurchasesPurchasesInnerRefundInformationRefundedToJSON(value.refundable),
+        'fully_refunded': value['fullyRefunded'],
+        'partially_refunded': value['partiallyRefunded'],
+        'pending_refund': value['pendingRefund'],
+        'refunded': PurchasesPurchasesInnerRefundInformationRefundedToJSON(value['refunded']),
+        'refundable': PurchasesPurchasesInnerRefundInformationRefundedToJSON(value['refundable']),
     };
 }
 

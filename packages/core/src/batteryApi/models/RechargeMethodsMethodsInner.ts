@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -89,16 +89,14 @@ export type RechargeMethodsMethodsInnerTypeEnum = typeof RechargeMethodsMethodsI
 /**
  * Check if a given object implements the RechargeMethodsMethodsInner interface.
  */
-export function instanceOfRechargeMethodsMethodsInner(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "type" in value;
-    isInstance = isInstance && "rate" in value;
-    isInstance = isInstance && "symbol" in value;
-    isInstance = isInstance && "decimals" in value;
-    isInstance = isInstance && "supportGasless" in value;
-    isInstance = isInstance && "supportRecharge" in value;
-
-    return isInstance;
+export function instanceOfRechargeMethodsMethodsInner(value: object): value is RechargeMethodsMethodsInner {
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('rate' in value) || value['rate'] === undefined) return false;
+    if (!('symbol' in value) || value['symbol'] === undefined) return false;
+    if (!('decimals' in value) || value['decimals'] === undefined) return false;
+    if (!('supportGasless' in value) || value['supportGasless'] === undefined) return false;
+    if (!('supportRecharge' in value) || value['supportRecharge'] === undefined) return false;
+    return true;
 }
 
 export function RechargeMethodsMethodsInnerFromJSON(json: any): RechargeMethodsMethodsInner {
@@ -106,14 +104,14 @@ export function RechargeMethodsMethodsInnerFromJSON(json: any): RechargeMethodsM
 }
 
 export function RechargeMethodsMethodsInnerFromJSONTyped(json: any, ignoreDiscriminator: boolean): RechargeMethodsMethodsInner {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'image': !exists(json, 'image') ? undefined : json['image'],
-        'jettonMaster': !exists(json, 'jetton_master') ? undefined : json['jetton_master'],
-        'minBootstrapValue': !exists(json, 'min_bootstrap_value') ? undefined : json['min_bootstrap_value'],
+        'image': json['image'] == null ? undefined : json['image'],
+        'jettonMaster': json['jetton_master'] == null ? undefined : json['jetton_master'],
+        'minBootstrapValue': json['min_bootstrap_value'] == null ? undefined : json['min_bootstrap_value'],
         'type': json['type'],
         'rate': json['rate'],
         'symbol': json['symbol'],
@@ -123,24 +121,26 @@ export function RechargeMethodsMethodsInnerFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function RechargeMethodsMethodsInnerToJSON(value?: RechargeMethodsMethodsInner | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function RechargeMethodsMethodsInnerToJSON(json: any): RechargeMethodsMethodsInner {
+      return RechargeMethodsMethodsInnerToJSONTyped(json, false);
+  }
+
+  export function RechargeMethodsMethodsInnerToJSONTyped(value?: RechargeMethodsMethodsInner | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'image': value.image,
-        'jetton_master': value.jettonMaster,
-        'min_bootstrap_value': value.minBootstrapValue,
-        'type': value.type,
-        'rate': value.rate,
-        'symbol': value.symbol,
-        'decimals': value.decimals,
-        'support_gasless': value.supportGasless,
-        'support_recharge': value.supportRecharge,
+        'image': value['image'],
+        'jetton_master': value['jettonMaster'],
+        'min_bootstrap_value': value['minBootstrapValue'],
+        'type': value['type'],
+        'rate': value['rate'],
+        'symbol': value['symbol'],
+        'decimals': value['decimals'],
+        'support_gasless': value['supportGasless'],
+        'support_recharge': value['supportRecharge'],
     };
 }
 

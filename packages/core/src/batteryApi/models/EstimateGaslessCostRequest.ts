@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
+import { mapValues } from '../runtime';
 /**
  * 
  * @export
@@ -36,11 +36,9 @@ export interface EstimateGaslessCostRequest {
 /**
  * Check if a given object implements the EstimateGaslessCostRequest interface.
  */
-export function instanceOfEstimateGaslessCostRequest(value: object): boolean {
-    let isInstance = true;
-    isInstance = isInstance && "payload" in value;
-
-    return isInstance;
+export function instanceOfEstimateGaslessCostRequest(value: object): value is EstimateGaslessCostRequest {
+    if (!('payload' in value) || value['payload'] === undefined) return false;
+    return true;
 }
 
 export function EstimateGaslessCostRequestFromJSON(json: any): EstimateGaslessCostRequest {
@@ -48,27 +46,29 @@ export function EstimateGaslessCostRequestFromJSON(json: any): EstimateGaslessCo
 }
 
 export function EstimateGaslessCostRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): EstimateGaslessCostRequest {
-    if ((json === undefined) || (json === null)) {
+    if (json == null) {
         return json;
     }
     return {
         
-        'battery': !exists(json, 'battery') ? undefined : json['battery'],
+        'battery': json['battery'] == null ? undefined : json['battery'],
         'payload': json['payload'],
     };
 }
 
-export function EstimateGaslessCostRequestToJSON(value?: EstimateGaslessCostRequest | null): any {
-    if (value === undefined) {
-        return undefined;
+  export function EstimateGaslessCostRequestToJSON(json: any): EstimateGaslessCostRequest {
+      return EstimateGaslessCostRequestToJSONTyped(json, false);
+  }
+
+  export function EstimateGaslessCostRequestToJSONTyped(value?: EstimateGaslessCostRequest | null, ignoreDiscriminator: boolean = false): any {
+    if (value == null) {
+        return value;
     }
-    if (value === null) {
-        return null;
-    }
+
     return {
         
-        'battery': value.battery,
-        'payload': value.payload,
+        'battery': value['battery'],
+        'payload': value['payload'],
     };
 }
 
