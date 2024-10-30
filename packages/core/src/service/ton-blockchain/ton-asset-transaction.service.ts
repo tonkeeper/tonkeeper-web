@@ -1,7 +1,7 @@
 import { APIConfig } from '../../entries/apis';
 import { BatteryMessageSender, GaslessMessageSender, Sender } from './sender';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
-import { TonAsset } from '../../entries/crypto/asset/ton-asset';
+import { isTon, TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
 import { LedgerMessageSender } from './sender/ledger-message-sender';
 import { TonEncoder } from './encoder/ton-encoder';
@@ -172,6 +172,10 @@ export class TonAssetTransactionService {
         estimation?: TonEstimation
     ) {
         if (sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender) {
+            return;
+        }
+
+        if (!Array.isArray(params) && params.isMax && isTon(params.amount.asset.address)) {
             return;
         }
 
