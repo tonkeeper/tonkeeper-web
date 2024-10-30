@@ -532,7 +532,7 @@ const ActionFeeDetailsUniversalBatteryValue: FC<{ extra: AssetAmount<TonAsset> }
     const { t } = useTranslation();
     const unitRate = useBatteryUnitTonRate();
     const { data: balance } = useBatteryBalance();
-    let unitsToSpeed = extra.relativeAmount
+    const unitsToSpeed = extra.relativeAmount
         .div(unitRate)
         .integerValue(BigNumber.ROUND_UP)
         .toNumber();
@@ -542,17 +542,18 @@ const ActionFeeDetailsUniversalBatteryValue: FC<{ extra: AssetAmount<TonAsset> }
     }
 
     const balanceNumber = balance.batteryUnitsBalance.toNumber();
-    if (unitsToSpeed > balanceNumber) {
-        unitsToSpeed = balanceNumber;
-    }
 
     return (
         <ColumnText
             right
-            text={unitsToSpeed}
-            secondary={t('battery_out_of_num_available', {
-                number: balanceNumber
-            })}
+            text={t('battery_n_battery_charges', { charges: unitsToSpeed })}
+            secondary={
+                balanceNumber !== 0
+                    ? t('battery_out_of_num_available', {
+                          number: balanceNumber
+                      })
+                    : ''
+            }
         />
     );
 };
