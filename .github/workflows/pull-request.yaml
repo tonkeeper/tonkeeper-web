@@ -164,7 +164,7 @@ jobs:
 
             - name: Summary
               run: |
-                  echo '### Success Deploy of WEB! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo '### Successful WEB deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
                   echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
@@ -214,7 +214,7 @@ jobs:
 
             - name: Summary
               run: |
-                  echo '### Success Deploy on TWA! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo '### Successful TWA deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
                   echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
 
