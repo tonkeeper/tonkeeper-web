@@ -168,6 +168,18 @@ jobs:
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
                   echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
+            - name: Comment
+              uses: actions/github-script@v3
+              with:
+                  github-token: ${{secrets.GITHUB_TOKEN}}
+                  script: |
+                      github.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: $GITHUB_STEP_SUMMARY
+                      })
+
     twa-build:
         name: twa-build
         runs-on: ubuntu-latest
