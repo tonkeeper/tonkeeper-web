@@ -1,9 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-    TON_CONNECT_MSG_VARIANTS_ID,
-    TonConnectTransactionPayload,
-    TonConnectTransactionPayloadVariantSelected
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -37,6 +33,7 @@ import BigNumber from 'bignumber.js';
 import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
+    SenderChoice,
     SenderChoiceUserAvailable,
     useGetEstimationSender,
     useGetSender,
@@ -69,9 +66,10 @@ const ButtonRowStyled = styled.div`
 `;
 
 const useSendMutation = (
-    params: TonConnectTransactionPayloadVariantSelected,
+    params: TonConnectTransactionPayload,
     estimate: TonEstimationDetailed,
     options: {
+        senderChoice: SenderChoice;
         multisigTTL?: MultisigOrderLifetimeMinutes;
         waitInvalidation?: boolean;
     }
@@ -97,9 +95,7 @@ const useSendMutation = (
                 ttlSeconds: 60 * Number(options.multisigTTL)
             });
         } else {
-            sender = await getSender(
-                params.variant === 'battery' ? BATTERY_SENDER_CHOICE : EXTERNAL_SENDER_CHOICE
-            );
+            sender = await getSender(options.senderChoice);
         }
 
         const boc = await tonConenctService.send(sender, estimate, params);
@@ -212,30 +208,30 @@ const ConnectContent: FC<{
         }
     }, [availableSendersChoices]);
 
-    const paramsVariantSelected: TonConnectTransactionPayloadVariantSelected = useMemo(() => {
-        return {
-            ...params,
-            variant:
-                selectedSenderType === 'external'
-                    ? 'standard'
-                    : selectedSenderType === 'battery'
-                    ? TON_CONNECT_MSG_VARIANTS_ID.BATTERY
-                    : TON_CONNECT_MSG_VARIANTS_ID.GASLESS
-        };
-    }, [params, selectedSenderType]);
+    const senderChoice: SenderChoice = useMemo(() => {
+        if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
+            return BATTERY_SENDER_CHOICE;
+        }
+
+        if (selectedSenderType === EXTERNAL_SENDER_CHOICE.type) {
+            return EXTERNAL_SENDER_CHOICE;
+        }
+
+        throw new Error('Unexpected sender choice');
+    }, [selectedSenderType]);
 
     const { data: issues, isFetched } = useTransactionError(params);
     const {
         data: estimate,
         isLoading: isEstimating,
         isError
-    } = useEstimation(paramsVariantSelected, isFetched);
+    } = useEstimation(params, isFetched, senderChoice);
     const {
         mutateAsync,
         isLoading,
         error: sendError,
         data: sendResult
-    } = useSendMutation(paramsVariantSelected, estimate!, { multisigTTL, waitInvalidation });
+    } = useSendMutation(params, estimate!, { multisigTTL, waitInvalidation, senderChoice });
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -321,15 +317,14 @@ const ConnectContent: FC<{
 };
 
 const useEstimation = (
-    params: TonConnectTransactionPayloadVariantSelected,
-    errorFetched: boolean
+    params: TonConnectTransactionPayload,
+    errorFetched: boolean,
+    senderChoice: SenderChoice
 ) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
-    const getSender = useGetEstimationSender(
-        params.variant === 'battery' ? BATTERY_SENDER_CHOICE : EXTERNAL_SENDER_CHOICE
-    );
+    const getSender = useGetEstimationSender(senderChoice);
     const getSenderKey = useToQueryKeyPart(getSender);
     const tonConenctService = useTonConnectTransactionService();
 

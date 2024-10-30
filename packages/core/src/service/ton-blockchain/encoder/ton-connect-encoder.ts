@@ -2,13 +2,18 @@ import { Address, Cell, internal, SendMode } from '@ton/core';
 import { tonConnectAddressIsBounceable, toStateInit } from '../utils';
 import { APIConfig } from '../../../entries/apis';
 import { WalletOutgoingMessage } from './types';
-import { TonConnectTransactionPayloadVariantSelected } from '../../../entries/tonConnect';
+import {
+    TON_CONNECT_MSG_VARIANTS_ID,
+    TonConnectTransactionPayload
+} from '../../../entries/tonConnect';
 
 export class TonConnectEncoder {
     constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
 
     encodeTransfer = async (
-        transfer: TonConnectTransactionPayloadVariantSelected
+        transfer: TonConnectTransactionPayload & {
+            variant: TON_CONNECT_MSG_VARIANTS_ID | 'standard';
+        }
     ): Promise<WalletOutgoingMessage> => {
         let messages = transfer.messages;
         if (transfer.variant !== 'standard' && transfer.messagesVariants?.[transfer.variant]) {

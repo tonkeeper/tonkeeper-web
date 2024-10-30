@@ -1,22 +1,30 @@
 import { APIConfig } from '../../entries/apis';
-import { LedgerMessageSender, Sender } from './sender';
+import {
+    BatteryMessageSender,
+    GaslessMessageSender,
+    LedgerMessageSender,
+    MultisigCreateOrderSender,
+    Sender,
+    WalletMessageSender
+} from './sender';
 import BigNumber from 'bignumber.js';
 import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import {
-    TonConnectTransactionPayload,
-    TonConnectTransactionPayloadVariantSelected
+    TON_CONNECT_MSG_VARIANTS_ID,
+    TonConnectTransactionPayload
 } from '../../entries/tonConnect';
 import { TonConnectEncoder } from './encoder/ton-connect-encoder';
-import { assertMessagesNumberSupported, assertBalanceEnough } from './utils';
+import { assertBalanceEnough, assertMessagesNumberSupported } from './utils';
 import { Cell } from '@ton/core';
+import { assertUnreachable } from '../../utils/types';
 
 export class TonConnectTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
 
     async estimate(
         sender: Sender,
-        transaction: TonConnectTransactionPayloadVariantSelected
+        transaction: TonConnectTransactionPayload
     ): Promise<TonEstimation> {
         await this.checkTransactionPossibility(transaction);
 
@@ -24,9 +32,10 @@ export class TonConnectTransactionService {
             return (await sender.tonConnectTransfer(transaction)).estimate();
         } else {
             return sender.estimate(
-                await new TonConnectEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
-                    transaction
-                )
+                await new TonConnectEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                    ...transaction,
+                    variant: this.getVariantBySender(sender)
+                })
             );
         }
     }
@@ -34,7 +43,7 @@ export class TonConnectTransactionService {
     async send(
         sender: Sender,
         estimation: TonEstimation,
-        transaction: TonConnectTransactionPayloadVariantSelected
+        transaction: TonConnectTransactionPayload
     ): Promise<string> {
         await this.checkTransactionPossibility(transaction, estimation);
 
@@ -43,13 +52,34 @@ export class TonConnectTransactionService {
             cell = await (await sender.tonConnectTransfer(transaction)).send();
         } else {
             cell = await sender.send(
-                await new TonConnectEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
-                    transaction
-                )
+                await new TonConnectEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                    ...transaction,
+                    variant: this.getVariantBySender(sender)
+                })
             );
         }
 
         return cell.toBoc().toString('base64');
+    }
+
+    private getVariantBySender(sender: Sender): TON_CONNECT_MSG_VARIANTS_ID | 'standard' {
+        if (sender instanceof BatteryMessageSender) {
+            return TON_CONNECT_MSG_VARIANTS_ID.BATTERY;
+        }
+
+        if (sender instanceof GaslessMessageSender) {
+            return TON_CONNECT_MSG_VARIANTS_ID.GASLESS;
+        }
+
+        if (
+            sender instanceof LedgerMessageSender ||
+            sender instanceof MultisigCreateOrderSender ||
+            sender instanceof WalletMessageSender
+        ) {
+            return 'standard';
+        }
+
+        assertUnreachable(sender);
     }
 
     private async checkTransactionPossibility(

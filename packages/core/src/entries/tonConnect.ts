@@ -21,10 +21,6 @@ export interface TonConnectTransactionPayload {
     >;
 }
 
-export interface TonConnectTransactionPayloadVariantSelected extends TonConnectTransactionPayload {
-    variant: TON_CONNECT_MSG_VARIANTS_ID | 'standard';
-}
-
 export interface TonConnectTransactionPayloadMessage {
     address: string; // address
     amount: string | number;

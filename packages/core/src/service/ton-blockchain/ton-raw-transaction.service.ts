@@ -1,5 +1,5 @@
 import { APIConfig } from '../../entries/apis';
-import { LedgerMessageSender, Sender } from './sender';
+import { BatteryMessageSender, GaslessMessageSender, LedgerMessageSender, Sender } from './sender';
 import BigNumber from 'bignumber.js';
 import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { TonContract } from '../../entries/wallet';
@@ -22,7 +22,7 @@ export class TonRawTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
 
     async estimate(sender: Sender, transaction: TonRawTransaction): Promise<TonEstimation> {
-        await this.checkTransactionPossibility(transaction);
+        await this.checkTransactionPossibility(sender, transaction);
 
         if (sender instanceof LedgerMessageSender) {
             return (
@@ -41,7 +41,7 @@ export class TonRawTransactionService {
     }
 
     async send(sender: Sender, estimation: TonEstimation, transaction: TonRawTransaction) {
-        await this.checkTransactionPossibility(transaction, estimation);
+        await this.checkTransactionPossibility(sender, transaction, estimation);
 
         if (sender instanceof LedgerMessageSender) {
             await (
@@ -60,9 +60,14 @@ export class TonRawTransactionService {
     }
 
     private async checkTransactionPossibility(
+        sender: Sender,
         transaction: TonRawTransaction,
         estimation?: TonEstimation
     ) {
+        if (sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender) {
+            return;
+        }
+
         let requiredBalance = new BigNumber(transaction.value.toString());
 
         requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));

@@ -30,12 +30,12 @@ import { GaslessConfig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useGaslessConfig } from '../../state/gasless';
-import {
-    TON_CONNECT_MSG_VARIANTS_ID,
-    TonConnectTransactionPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { useQuery } from '@tanstack/react-query';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
+import { useAssets } from '../../state/home';
+import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
+import { toNano } from '@ton/core';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -61,6 +61,7 @@ export const useAvailableSendersChoices = (
     } = useAppContext();
     const gaslessConfig = useGaslessConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
+    const [walletInfo] = useAssets();
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
@@ -101,7 +102,14 @@ export const useAvailableSendersChoices = (
         }
 
         if (isGaslessAvailable({ asset, account, gaslessConfig })) {
-            availableSenders.push({ type: 'gasless', asset: asset! });
+            if (
+                walletInfo?.ton.info.balance !== undefined &&
+                walletInfo?.ton.info.balance < JettonEncoder.jettonTransferAmount + toNano(0.005)
+            ) {
+                availableSenders.unshift({ type: 'gasless', asset: asset! });
+            } else {
+                availableSenders.push({ type: 'gasless', asset: asset! });
+            }
         }
 
         return availableSenders;
@@ -113,7 +121,8 @@ export const useAvailableSendersChoices = (
         account.type,
         batteryReservedAmount,
         gaslessConfig,
-        batteryEnableConfig.disableOperations
+        batteryEnableConfig.disableOperations,
+        walletInfo
     ]);
 };
 
@@ -163,10 +172,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 );
 
                 try {
-                    await tonConnectService.estimate(batterySender, {
-                        ...payload,
-                        variant: TON_CONNECT_MSG_VARIANTS_ID.BATTERY
-                    });
+                    await tonConnectService.estimate(batterySender, payload);
 
                     choices.push(BATTERY_SENDER_CHOICE);
                 } catch (e) {

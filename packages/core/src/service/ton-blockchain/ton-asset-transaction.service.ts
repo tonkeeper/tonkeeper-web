@@ -1,5 +1,5 @@
 import { APIConfig } from '../../entries/apis';
-import { BatteryMessageSender, Sender } from './sender';
+import { BatteryMessageSender, GaslessMessageSender, Sender } from './sender';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TonAsset } from '../../entries/crypto/asset/ton-asset';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
@@ -171,7 +171,7 @@ export class TonAssetTransactionService {
         params: TransferParams,
         estimation?: TonEstimation
     ) {
-        if (sender instanceof BatteryMessageSender) {
+        if (sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender) {
             return;
         }
 
