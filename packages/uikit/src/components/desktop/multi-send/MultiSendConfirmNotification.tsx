@@ -1,18 +1,17 @@
 import { Notification } from '../../Notification';
-import React, { FC, useMemo } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Image, ImageMock } from '../../transfer/Confirm';
 import { MultiSendForm } from '../../../state/multiSend';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import styled from 'styled-components';
 import { useAssetImage } from '../../../state/asset';
-import { Body2, Body3, Label2, Num2 } from '../../Text';
+import { Body1, Body2, Body2Class, Body3, Body3Class, Label2, Num2 } from '../../Text';
 import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatFiatCurrency, useFormatCoinValue } from '../../../hooks/balance';
 import { ListBlock, ListItem } from '../../List';
 import { useTranslation } from '../../../hooks/translation';
 import { useEstimateMultiTransfer } from '../../../hooks/blockchain/useEstimateMultiTransferFee';
-import { Skeleton } from '../../shared/Skeleton';
 import BigNumber from 'bignumber.js';
 import { getWillBeMultiSendValue } from './utils';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -30,6 +29,12 @@ import { MultiSendReceiversNotification } from './MultiSendReceiversNotification
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AccountAndWalletInfo } from '../../account/AccountAndWalletInfo';
+import { ActionFeeDetailsUniversal } from '../../activity/NotificationCommon';
+import {
+    SenderChoiceUserAvailable,
+    SenderTypeUserAvailable,
+    useAvailableSendersChoices
+} from '../../../hooks/blockchain/useSender';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -73,6 +78,22 @@ const ListBlockStyled = styled(ListBlock)`
     margin-bottom: 1rem;
 `;
 
+const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
+    padding: 0;
+
+    > * {
+        padding: 7px 12px 8px !important;
+    }
+
+    ${Body1} {
+        ${Body2Class}
+    }
+
+    ${Body2} {
+        ${Body3Class}
+    }
+`;
+
 const ListItemStyled = styled(ListItem)`
     box-sizing: border-box;
     padding: 8px 12px;
@@ -106,17 +127,6 @@ const ShowAllButton = styled(Body3)`
     cursor: pointer;
 `;
 
-const FeeContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    text-align: right;
-
-    > ${Body3} {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
-
 const MultiSendConfirmContent: FC<{
     form: MultiSendForm;
     asset: TonAsset;
@@ -133,8 +143,6 @@ const MultiSendConfirmContent: FC<{
     const { data: rate, isFetched: isRateFetched } = useRate(
         typeof asset.address === 'string' ? asset.address : asset.address.toRawString()
     );
-    const { data: tonRate } = useRate('TON');
-
     const { willBeSent, willBeSentBN, bnAmounts } = useMemo(
         () => getWillBeMultiSendValue(form.rows, asset, rate || { prices: 0 }),
         [form.rows, asset, rate?.prices]
@@ -158,17 +166,34 @@ const MultiSendConfirmContent: FC<{
         willBeSentBN?.multipliedBy(rate?.prices || 0)
     );
 
+    const operationType = useMemo(() => {
+        return {
+            type: 'multisend-transfer',
+            asset
+        } as const;
+    }, [asset]);
+    const { data: availableSendersChoices } = useAvailableSendersChoices(operationType);
+    useEffect(() => {
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [availableSendersChoices]);
+
+    const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>();
+
+    const selectedSenderChoice = useMemo(() => {
+        if (!availableSendersChoices) {
+            return undefined;
+        }
+
+        return availableSendersChoices.find(c => c.type === selectedSenderType);
+    }, [availableSendersChoices, selectedSenderType]);
+
     const {
         isLoading: estimateLoading,
         data: estimateData,
         error: estimateError
     } = useEstimateMultiTransfer(formTokenized, asset);
-
-    const tonFee = estimateData?.extra.stringAssetRelativeAmount;
-    const fiatFee = formatFiatCurrency(
-        fiat,
-        estimateData?.extra.relativeAmount.multipliedBy(tonRate?.prices || 0) || new BigNumber(0)
-    );
 
     const navigate = useNavigate();
 
@@ -199,26 +224,12 @@ const MultiSendConfirmContent: FC<{
                         <Body2>{t('multi_send_list')}</Body2>
                         <Label2>{listName}</Label2>
                     </ListItemStyled>
-                    <ListItemStyled hover={false}>
-                        <Body2>
-                            {estimateData?.extra.weiAmount.lt(0)
-                                ? t('txActions_refund')
-                                : t('confirm_sending_fee')}
-                        </Body2>
-                        <FeeContainer>
-                            {estimateError ? null : estimateLoading || !tonRate ? (
-                                <>
-                                    <Skeleton margin="3px 0" width="100px" height="14px" />
-                                    <Skeleton margin="2px 0" width="80px" height="12px" />
-                                </>
-                            ) : (
-                                <>
-                                    <Label2>≈ {tonFee}</Label2>
-                                    <Body3>{fiatFee}</Body3>
-                                </>
-                            )}
-                        </FeeContainer>
-                    </ListItemStyled>
+                    <ActionFeeDetailsUniversalStyled
+                        extra={estimateData?.extra}
+                        availableSendersChoices={availableSendersChoices}
+                        selectedSenderType={selectedSenderType}
+                        onSenderTypeChange={onSenderTypeChange}
+                    />
                 </ListBlockStyled>
                 <ButtonBlock
                     form={formTokenized}
@@ -232,6 +243,7 @@ const MultiSendConfirmContent: FC<{
                     }}
                     isLoading={estimateLoading || !isRateFetched}
                     estimationError={estimateError}
+                    selectedSenderChoice={selectedSenderChoice!}
                 />
             </ConfirmWrapper>
             <MultiSendReceiversNotification
@@ -263,7 +275,16 @@ const ButtonBlock: FC<{
     asset: TonAsset;
     feeEstimation: BigNumber | undefined;
     estimationError: Error | null;
-}> = ({ onSuccess, form, asset, feeEstimation, isLoading, estimationError }) => {
+    selectedSenderChoice: SenderChoiceUserAvailable | undefined;
+}> = ({
+    onSuccess,
+    form,
+    asset,
+    feeEstimation,
+    isLoading,
+    estimationError,
+    selectedSenderChoice
+}) => {
     const { t } = useTranslation();
     const {
         mutateAsync: send,
@@ -275,7 +296,12 @@ const ButtonBlock: FC<{
     const format = useFormatCoinValue();
 
     const onClick = async () => {
-        const confirmed = await send({ form, asset, feeEstimation: feeEstimation! });
+        const confirmed = await send({
+            form,
+            asset,
+            feeEstimation: feeEstimation!,
+            senderChoice: selectedSenderChoice!
+        });
         if (confirmed) {
             onSuccess();
         }

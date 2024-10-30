@@ -1,6 +1,6 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
+import React, { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from './ConfirmView';
@@ -20,10 +20,14 @@ export const ConfirmTransferView: FC<
         fitContent?: boolean;
     }>
 > = ({ isMax, ...rest }) => {
-    const { data: availableSendersChoices } = useAvailableSendersChoices({
-        type: 'transfer',
-        asset: rest.assetAmount.asset as TonAsset
-    });
+    const operationType = useMemo(() => {
+        return {
+            type: 'transfer',
+            asset: rest.assetAmount.asset as TonAsset
+        } as const;
+    }, [rest.assetAmount.asset]);
+
+    const { data: availableSendersChoices } = useAvailableSendersChoices(operationType);
 
     useEffect(() => {
         if (availableSendersChoices) {

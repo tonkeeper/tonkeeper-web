@@ -9,7 +9,7 @@ import { useActiveAccount } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useNotifyErrorHandle } from '../useNotification';
-import { EXTERNAL_SENDER_CHOICE, useGetSender } from './useSender';
+import { SenderChoiceUserAvailable, useGetSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { TransferParams } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transaction.service';
 
@@ -49,8 +49,13 @@ export function useSendMultiTransfer() {
     return useMutation<
         boolean,
         Error,
-        { form: MultiSendFormTokenized; asset: TonAsset; feeEstimation: BigNumber }
-    >(async ({ form, asset, feeEstimation }) => {
+        {
+            form: MultiSendFormTokenized;
+            asset: TonAsset;
+            feeEstimation: BigNumber;
+            senderChoice: SenderChoiceUserAvailable;
+        }
+    >(async ({ form, asset, feeEstimation, senderChoice }) => {
         const walletId = account.activeTonWallet.id;
         try {
             if (!isAccountTonWalletStandard(account)) {
@@ -62,7 +67,7 @@ export function useSendMultiTransfer() {
             }
 
             await transferService.send(
-                await getSender(EXTERNAL_SENDER_CHOICE),
+                await getSender(senderChoice),
                 { extra: new AssetAmount({ asset: TON_ASSET, weiAmount: feeEstimation }) },
                 multiSendFormToTransferMessages(asset, form)
             );

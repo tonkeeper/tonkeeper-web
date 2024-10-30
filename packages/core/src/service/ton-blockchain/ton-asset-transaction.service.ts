@@ -75,10 +75,9 @@ export class TonAssetTransactionService {
                 throw new Error('Ledger multisend is not supported.');
             } else {
                 return sender.estimate(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
-                        responseAddress: sender.jettonResponseAddress,
-                        ...params
-                    })
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        this.patchResponseAddress(sender, params)
+                    )
                 );
             }
         } else {
@@ -86,10 +85,9 @@ export class TonAssetTransactionService {
                 return (await sender.jettonTransfer(params)).estimate();
             } else {
                 return sender.estimate(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
-                        responseAddress: sender.jettonResponseAddress,
-                        ...params
-                    })
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        this.patchResponseAddress(sender, params)
+                    )
                 );
             }
         }
@@ -140,10 +138,9 @@ export class TonAssetTransactionService {
                 throw new Error('Ledger multisend is not supported.');
             } else {
                 return sender.send(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
-                        responseAddress: sender.jettonResponseAddress,
-                        ...params
-                    })
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        this.patchResponseAddress(sender, params)
+                    )
                 );
             }
         } else {
@@ -151,13 +148,38 @@ export class TonAssetTransactionService {
                 return (await sender.jettonTransfer(params)).send();
             } else {
                 return sender.send(
-                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
-                        responseAddress: sender.jettonResponseAddress,
-                        ...params
-                    })
+                    await new JettonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        this.patchResponseAddress(sender, params)
+                    )
                 );
             }
         }
+    }
+
+    private patchResponseAddress(
+        sender: Exclude<Sender, LedgerMessageSender>,
+        params: TransferParams
+    ):
+        | {
+              to: string;
+              amount: AssetAmount<TonAsset>;
+              payload?: MessagePayloadParam;
+              responseAddress?: string;
+          }
+        | {
+              to: string;
+              amount: AssetAmount<TonAsset>;
+              payload?: MessagePayloadParam;
+              responseAddress?: string;
+          }[] {
+        if (Array.isArray(params)) {
+            return params.map(p => ({ ...p, responseAddress: sender.jettonResponseAddress }));
+        }
+
+        return {
+            ...params,
+            responseAddress: sender.jettonResponseAddress
+        };
     }
 
     private isJettonTransfer(params: TransferParams) {

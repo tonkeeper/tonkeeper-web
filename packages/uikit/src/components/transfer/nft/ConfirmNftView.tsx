@@ -183,6 +183,8 @@ const useSendNft = (
     });
 };
 
+const operationTypeSendNFT = { type: 'nfr_transfer' };
+
 export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
     nftItem: NftItem;
@@ -196,7 +198,7 @@ export const ConfirmNftView: FC<{
     const { t } = useTranslation();
     const isActiveMultisig = useIsActiveAccountMultisig();
 
-    const { data: availableSendersChoices } = useAvailableSendersChoices({ type: 'nfr_transfer' });
+    const { data: availableSendersChoices } = useAvailableSendersChoices(operationTypeSendNFT);
     const [selectedSenderType, onSenderTypeChange] = useState<
         SenderTypeUserAvailable | undefined
     >();

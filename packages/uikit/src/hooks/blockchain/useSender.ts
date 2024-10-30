@@ -51,7 +51,10 @@ export type SenderChoiceUserAvailable = Exclude<
 export type SenderTypeUserAvailable = SenderChoiceUserAvailable['type'];
 
 export const useAvailableSendersChoices = (
-    operation: { type: 'transfer'; asset: TonAsset } | { type: 'nfr_transfer' }
+    operation:
+        | { type: 'transfer'; asset: TonAsset }
+        | { type: 'multisend-transfer'; asset: TonAsset }
+        | { type: 'nfr_transfer' }
 ) => {
     const { data: config } = useActiveTonWalletConfig();
     const { data: batteryBalance } = useBatteryBalance();
@@ -82,6 +85,10 @@ export const useAvailableSendersChoices = (
             if (account.type === 'ledger') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
+            if (operation.type === 'multisend-transfer') {
+                return [EXTERNAL_SENDER_CHOICE];
+            }
+
             let batteryAvailable = false;
 
             if (operation.type === 'transfer') {
