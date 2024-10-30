@@ -8,6 +8,8 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Notification } from '../../Notification';
 import { BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE } from '../../../hooks/blockchain/useSender';
+import { useTonRecipient } from '../../../hooks/blockchain/useTonRecipient';
+import { useBatteryServiceConfig } from '../../../state/battery';
 
 export const BuyBatteryConfirmNotification: FC<{
     assetAmount: AssetAmount<TonAsset> | undefined;
@@ -36,6 +38,8 @@ const NotificationContent: FC<{
     giftRecipient?: string;
 }> = ({ assetAmount, onClose, giftRecipient }) => {
     const estimation = useEstimatePurchaseBattery({ assetAmount, giftRecipient });
+    const batteryConfig = useBatteryServiceConfig();
+    const { recipient, isLoading } = useTonRecipient(batteryConfig.fundReceiver);
 
     const mutation = usePurchaseBattery({
         assetAmount,
@@ -50,6 +54,7 @@ const NotificationContent: FC<{
     return (
         <ConfirmView
             assetAmount={assetAmount}
+            recipient={isLoading ? undefined : recipient}
             onClose={onClose}
             estimation={estimation}
             selectedSenderType={selectedSenderType}
