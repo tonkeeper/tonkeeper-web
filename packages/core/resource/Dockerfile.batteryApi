@@ -1,3 +1,3 @@
 FROM openapitools/openapi-generator-cli
 
-CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/custodial-battery/refs/heads/master/api/battery-api.yml?token=GHSAT0AAAAAACKHFPNIKAOV4T77QFJJLNJAZZCIELQ", "-g", "typescript-fetch", "-o", "/local/src/batteryApi", "-p", "supportsES6=true,withInterfaces=true", "--openapi-normalizer", "KEEP_ONLY_FIRST_TAG_IN_OPERATION=true"]
+CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/custodial-battery/refs/heads/master/api/battery-api.yml?token=GHSAT0AAAAAACKHFPNJXTMZ2WDM4CGP7STWZZCKAXQ", "-g", "typescript-fetch", "-o", "/local/src/batteryApi", "-p", "supportsES6=true,withInterfaces=true", "--openapi-normalizer", "KEEP_ONLY_FIRST_TAG_IN_OPERATION=true", "--name-mappings", "iOSBatteryPurchaseStatus=IOSBatteryPurchaseStatus"]
