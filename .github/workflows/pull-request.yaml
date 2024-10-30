@@ -155,11 +155,18 @@ jobs:
                   cmd: build:web
 
             - name: Publish to Cloudflare Pages
+              id: deploy
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
                   command: pages deploy apps/web/dist --project-name=tonkeeper-web
+
+            - name: Summary
+              run: |
+                  echo '### Success Deploy of WEB! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
 
     twa-build:
         name: twa-build
@@ -196,6 +203,7 @@ jobs:
                   cmd: build:twa
 
             - name: Publish TWA to Cloudflare Pages
+              id: deploy
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -203,6 +211,12 @@ jobs:
                   command:
                       pages deploy apps/twa/dist --project-name=tonkeeper-telegram
                       --branch=feature/twa
+
+            - name: Summary
+              run: |
+                  echo '### Success Deploy on TWA! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
 
     extension-build:
         name: extension-build
