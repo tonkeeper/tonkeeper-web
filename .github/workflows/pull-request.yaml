@@ -180,7 +180,7 @@ jobs:
                       Well done!
                       Link to test environment:
                       ${{ steps.deploy.outputs.deployment-url }}
-                  comment_tag: integration
+                  comment-tag: web-deploy
 
     twa-build:
         name: twa-build
