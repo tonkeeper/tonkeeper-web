@@ -6,6 +6,9 @@ on:
 env:
     node-version: 20.11.1
 
+permissions:
+    pull-requests: write
+
 jobs:
     desktop-build:
         name: desktop-build
@@ -177,6 +180,7 @@ jobs:
                       Well done!
                       Link to test environment:
                       ${{ steps.deploy.outputs.deployment-url }}
+                  comment_tag: integration
 
     twa-build:
         name: twa-build
