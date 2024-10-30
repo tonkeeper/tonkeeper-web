@@ -11,9 +11,8 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppContext } from '../hooks/appContext';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET, TON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useJettonList } from './jetton';
-import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { toNano } from '@ton/core';
 import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
@@ -84,10 +83,6 @@ export const useBatteryAvailableRechargeMethods = () => {
                         image: TON_ASSET.image,
                         key: 'ton'
                     };
-                }
-
-                if (m.jettonMaster === tonAssetAddressToString(TON_USDT_ASSET.address)) {
-                    return { ...m, key: m.jettonMaster! };
                 }
 
                 if (jettons.balances.some(b => b.jetton.address === m.jettonMaster)) {

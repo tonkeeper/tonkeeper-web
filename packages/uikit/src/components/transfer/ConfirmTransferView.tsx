@@ -4,7 +4,10 @@ import React, { FC, PropsWithChildren, useEffect, useState } from 'react';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from './ConfirmView';
-import { useAvailableSendersChoices } from '../../hooks/blockchain/useSender';
+import {
+    SenderTypeUserAvailable,
+    useAvailableSendersChoices
+} from '../../hooks/blockchain/useSender';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const ConfirmTransferView: FC<
@@ -17,16 +20,18 @@ export const ConfirmTransferView: FC<
         fitContent?: boolean;
     }>
 > = ({ isMax, ...rest }) => {
-    const availableSendersChoices = useAvailableSendersChoices({
+    const { data: availableSendersChoices } = useAvailableSendersChoices({
         type: 'transfer',
         asset: rest.assetAmount.asset as TonAsset
     });
 
     useEffect(() => {
-        onSenderTypeChange(availableSendersChoices[0].type);
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
     }, [availableSendersChoices]);
 
-    const [selectedSenderType, onSenderTypeChange] = useState(availableSendersChoices[0].type);
+    const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>();
 
     const estimation = useEstimateTransfer({
         recipient: rest.recipient,
@@ -39,7 +44,7 @@ export const ConfirmTransferView: FC<
         amount: rest.assetAmount,
         isMax,
         estimation: estimation.data!,
-        senderType: selectedSenderType
+        senderType: selectedSenderType!
     });
 
     return (

@@ -21,7 +21,7 @@ export class NFTEncoder {
     }: {
         recipientAddress: string;
         nftAddress: string;
-        nftTransferAmountWei: BigNumber;
+        nftTransferAmountWei?: BigNumber;
         forwardPayload?: Cell | null;
     }) => {
         const body = this.nftTransferBody({
@@ -34,7 +34,10 @@ export class NFTEncoder {
 
         return {
             to: Address.parse(nftAddress),
-            value: BigInt(nftTransferAmountWei.toFixed(0)),
+            value:
+                nftTransferAmountWei !== undefined
+                    ? BigInt(nftTransferAmountWei.toFixed(0))
+                    : NFTEncoder.nftTransferBase,
             body,
             bounce: true
         };

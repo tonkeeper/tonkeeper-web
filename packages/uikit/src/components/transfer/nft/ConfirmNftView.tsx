@@ -59,13 +59,17 @@ const assetAmount = new AssetAmount({
 const useNftTransferEstimation = (
     nftItem: NftItem,
     data: TonRecipientData,
-    selectedSenderType: SenderTypeUserAvailable
+    selectedSenderType: SenderTypeUserAvailable | undefined
 ) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
     const notifyError = useNotifyErrorHandle();
 
     const senderChoice = useMemo(() => {
+        if (!selectedSenderType) {
+            return undefined;
+        }
+
         if (account.type === 'ton-multisig') {
             return { type: 'multisig', ttlSeconds: 5 * 60 } as const;
         }
@@ -93,12 +97,10 @@ const useNftTransferEstimation = (
                 }
 
                 const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
-                const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString());
                 const nftTransferMsg = nftEncoder.encodeNftTransfer({
                     nftAddress: nftItem.address,
                     recipientAddress: data!.address.address,
-                    forwardPayload: data!.comment ? comment(data.comment) : null,
-                    nftTransferAmountWei
+                    forwardPayload: data!.comment ? comment(data.comment) : null
                 });
 
                 return await rawTransactionService.estimate(await getSender!(), nftTransferMsg);
@@ -107,7 +109,7 @@ const useNftTransferEstimation = (
                 throw e;
             }
         },
-        { enabled: data != null && !!getSender }
+        { enabled: data != null && !!getSender && senderChoice !== undefined }
     );
 };
 
@@ -194,12 +196,14 @@ export const ConfirmNftView: FC<{
     const { t } = useTranslation();
     const isActiveMultisig = useIsActiveAccountMultisig();
 
-    const availableSendersChoices = useAvailableSendersChoices({ type: 'nfr_transfer' });
-    const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>(
-        availableSendersChoices[0].type
-    );
+    const { data: availableSendersChoices } = useAvailableSendersChoices({ type: 'nfr_transfer' });
+    const [selectedSenderType, onSenderTypeChange] = useState<
+        SenderTypeUserAvailable | undefined
+    >();
     useEffect(() => {
-        onSenderTypeChange(availableSendersChoices[0].type);
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
     }, [availableSendersChoices]);
 
     const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
@@ -207,7 +211,7 @@ export const ConfirmNftView: FC<{
         recipient,
         nftItem,
         estimation.data?.extra,
-        { multisigTTL, selectedSenderType }
+        { multisigTTL, selectedSenderType: selectedSenderType! }
     );
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');

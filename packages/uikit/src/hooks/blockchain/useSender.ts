@@ -51,7 +51,7 @@ export type SenderChoiceUserAvailable = Exclude<
 export type SenderTypeUserAvailable = SenderChoiceUserAvailable['type'];
 
 export const useAvailableSendersChoices = (
-    operation: { type: 'transfer'; asset: TonAsset } | { type: 'swap' } | { type: 'nfr_transfer' }
+    operation: { type: 'transfer'; asset: TonAsset } | { type: 'nfr_transfer' }
 ) => {
     const { data: config } = useActiveTonWalletConfig();
     const { data: batteryBalance } = useBatteryBalance();
@@ -65,65 +65,71 @@ export const useAvailableSendersChoices = (
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
-    return useMemo<SenderChoiceUserAvailable[]>(() => {
-        if (account.type === 'ledger') {
-            return [EXTERNAL_SENDER_CHOICE];
-        }
-        let batteryAvailable = false;
-
-        if (operation.type === 'transfer') {
-            batteryAvailable =
-                !!config?.batterySettings.enabledForTokens && asset?.id !== TON_ASSET.id;
-        } else if (operation.type === 'swap') {
-            batteryAvailable = !!config?.batterySettings.enabledForSwaps;
-        } else if (operation.type === 'nfr_transfer') {
-            batteryAvailable = !!config?.batterySettings.enabledForNfts;
-        }
-
-        if (batteryEnableConfig.disableOperations) {
-            batteryAvailable = false;
-        }
-
-        let availableSenders: SenderChoiceUserAvailable[];
-
-        if (!batteryBalance) {
-            availableSenders = batteryAvailable
-                ? [EXTERNAL_SENDER_CHOICE, BATTERY_SENDER_CHOICE]
-                : [EXTERNAL_SENDER_CHOICE];
-        } else if (
-            batteryReservedAmount &&
-            batteryBalance.tonUnitsReserved.relativeAmount.lt(batteryReservedAmount)
-        ) {
-            availableSenders = [EXTERNAL_SENDER_CHOICE];
-        } else {
-            availableSenders = batteryAvailable
-                ? [BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE]
-                : [EXTERNAL_SENDER_CHOICE];
-        }
-
-        if (isGaslessAvailable({ asset, account, gaslessConfig })) {
-            if (
-                walletInfo?.ton.info.balance !== undefined &&
-                walletInfo?.ton.info.balance < JettonEncoder.jettonTransferAmount + toNano(0.005)
-            ) {
-                availableSenders.unshift({ type: 'gasless', asset: asset! });
-            } else {
-                availableSenders.push({ type: 'gasless', asset: asset! });
+    return useQuery<SenderChoiceUserAvailable[]>(
+        [
+            'available-sender-choices',
+            operation.type,
+            asset,
+            config,
+            batteryBalance,
+            account.type,
+            batteryReservedAmount,
+            gaslessConfig,
+            batteryEnableConfig.disableOperations,
+            walletInfo
+        ],
+        () => {
+            if (account.type === 'ledger') {
+                return [EXTERNAL_SENDER_CHOICE];
             }
-        }
+            let batteryAvailable = false;
 
-        return availableSenders;
-    }, [
-        operation.type,
-        asset,
-        config,
-        batteryBalance,
-        account.type,
-        batteryReservedAmount,
-        gaslessConfig,
-        batteryEnableConfig.disableOperations,
-        walletInfo
-    ]);
+            if (operation.type === 'transfer') {
+                batteryAvailable =
+                    !!config?.batterySettings.enabledForTokens && asset?.id !== TON_ASSET.id;
+            } else if (operation.type === 'nfr_transfer') {
+                batteryAvailable = !!config?.batterySettings.enabledForNfts;
+            }
+
+            if (batteryEnableConfig.disableOperations) {
+                batteryAvailable = false;
+            }
+
+            let availableSenders: SenderChoiceUserAvailable[];
+
+            if (!batteryBalance) {
+                availableSenders = batteryAvailable
+                    ? [EXTERNAL_SENDER_CHOICE, BATTERY_SENDER_CHOICE]
+                    : [EXTERNAL_SENDER_CHOICE];
+            } else if (
+                batteryReservedAmount &&
+                batteryBalance.tonUnitsReserved.relativeAmount.lt(batteryReservedAmount)
+            ) {
+                availableSenders = [EXTERNAL_SENDER_CHOICE];
+            } else {
+                availableSenders = batteryAvailable
+                    ? [BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE]
+                    : [EXTERNAL_SENDER_CHOICE];
+            }
+
+            if (isGaslessAvailable({ asset, account, gaslessConfig })) {
+                if (
+                    walletInfo!.ton.info.balance <
+                    JettonEncoder.jettonTransferAmount + toNano(0.005)
+                ) {
+                    availableSenders.unshift({ type: 'gasless', asset: asset! });
+                } else {
+                    availableSenders.push({ type: 'gasless', asset: asset! });
+                }
+            }
+
+            return availableSenders;
+        },
+        {
+            enabled:
+                batteryBalance !== undefined && walletInfo !== undefined && config !== undefined
+        }
+    );
 };
 
 export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransactionPayload) => {
@@ -204,6 +210,9 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
     const wallet = activeAccount.activeTonWallet;
 
     return useMemo(() => {
+        if (!senderChoice) {
+            return undefined;
+        }
         if (senderChoice.type === 'battery' && authToken === undefined) {
             return undefined;
         }

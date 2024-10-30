@@ -27,9 +27,13 @@ export function useEstimateTransfer({
     recipient: RecipientData;
     amount: AssetAmount<Asset>;
     isMax: boolean;
-    senderType: SenderTypeUserAvailable;
+    senderType: SenderTypeUserAvailable | undefined;
 }) {
     const senderChoice = useMemo(() => {
+        if (senderType === undefined) {
+            return undefined;
+        }
+
         if (senderType === 'external') {
             return EXTERNAL_SENDER_CHOICE;
         }
@@ -84,7 +88,7 @@ export function useEstimateTransfer({
         {
             refetchInterval: DefaultRefetchInterval,
             refetchOnMount: 'always',
-            enabled: !!getSender
+            enabled: !!getSender && senderChoice !== undefined
         }
     );
 }
