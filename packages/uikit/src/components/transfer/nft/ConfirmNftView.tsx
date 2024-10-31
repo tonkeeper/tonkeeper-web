@@ -183,7 +183,7 @@ const useSendNft = (
     });
 };
 
-const operationTypeSendNFT = { type: 'nfr_transfer' };
+const operationTypeSendNFT = { type: 'nfr_transfer' } as const;
 
 export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
