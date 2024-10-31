@@ -23,7 +23,11 @@ import {
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Account, AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    AccountTonMultisig,
+    getNetworkByAccount
+} from '@tonkeeper/core/dist/entries/account';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { getMultisigSignerInfo } from '../../state/multisig';
 import { GaslessConfig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -36,6 +40,7 @@ import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-b
 import { useAssets } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import { toNano } from '@ton/core';
+import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -150,7 +155,7 @@ export const useAvailableSendersChoices = (
 };
 
 export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransactionPayload) => {
-    const { api } = useAppContext();
+    const appContext = useAppContext();
     const batteryApi = useBatteryApi();
     const { data: batteryAuthToken } = useBatteryAuthToken();
     const account = useActiveAccount();
@@ -171,6 +176,8 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 return [EXTERNAL_SENDER_CHOICE];
             }
 
+            const network = getNetworkByAccount(account);
+            const [api] = getContextApiByNetwork(appContext, network);
             const choices: SenderChoiceUserAvailable[] = [EXTERNAL_SENDER_CHOICE];
 
             const tonConnectService = new TonConnectTransactionService(
@@ -191,7 +198,8 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                     },
                     { batteryApi, tonApi: api },
                     account.activeTonWallet,
-                    estimationSigner
+                    estimationSigner,
+                    network
                 );
 
                 try {
@@ -215,7 +223,7 @@ export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies Se
 export const BATTERY_SENDER_CHOICE = { type: 'battery' } as const satisfies SenderChoice;
 
 export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'external' }) => {
-    const { api } = useAppContext();
+    const appContext = useAppContext();
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
     const { data: authToken } = useBatteryAuthToken();
@@ -239,10 +247,14 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                 throw new Error("Can't send a transfer using this account");
             }
 
+            const network = getNetworkByAccount(activeAccount);
+            const [api] = getContextApiByNetwork(appContext, network);
+
             if (senderChoice.type === 'multisig') {
                 if (activeAccount.type !== 'ton-multisig') {
                     throw new Error('Multisig sender available only for multisig accounts');
                 }
+
                 const { signerWallet } = getMultisigSignerInfo(
                     accounts,
                     activeAccount as AccountTonMultisig
@@ -263,7 +275,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     multisig,
                     senderChoice.ttlSeconds,
                     signerWallet,
-                    signer
+                    signer,
+                    network
                 );
             }
 
@@ -275,11 +288,11 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                 if (senderChoice.type !== 'external') {
                     throw new Error("Can't send a transfer using this account");
                 }
-                return new WalletMessageSender(api, wallet, estimationSigner);
+                return new WalletMessageSender(api, wallet, estimationSigner, network);
             }
 
             if (senderChoice.type === 'external') {
-                return new WalletMessageSender(api, wallet, estimationSigner);
+                return new WalletMessageSender(api, wallet, estimationSigner, network);
             }
 
             if (senderChoice.type === 'gasless') {
@@ -301,7 +314,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     },
                     api,
                     wallet,
-                    estimationSigner
+                    estimationSigner,
+                    network
                 );
             }
 
@@ -322,7 +336,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                         batteryApi
                     },
                     wallet,
-                    estimationSigner
+                    estimationSigner,
+                    network
                 );
             }
 
@@ -333,7 +348,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
         authToken,
         activeAccount,
         accounts,
-        api,
+        appContext,
         wallet,
         batteryApi,
         batteryConfig,
@@ -343,7 +358,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
 };
 
 export const useGetSender = () => {
-    const { api } = useAppContext();
+    const appContext = useAppContext();
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
     const { data: authToken } = useBatteryAuthToken();
@@ -360,6 +375,9 @@ export const useGetSender = () => {
             if (activeAccount.type === 'watch-only') {
                 throw new Error("Can't send a transfer using this account");
             }
+
+            const network = getNetworkByAccount(activeAccount);
+            const [api] = getContextApiByNetwork(appContext, network);
 
             if (senderChoice.type === 'multisig') {
                 if (activeAccount.type !== 'ton-multisig') {
@@ -385,7 +403,8 @@ export const useGetSender = () => {
                     multisig,
                     senderChoice.ttlSeconds,
                     signerWallet,
-                    signer
+                    signer,
+                    network
                 );
             }
 
@@ -403,11 +422,11 @@ export const useGetSender = () => {
                 if (senderChoice.type !== 'external') {
                     throw new Error("Can't send a transfer using this account");
                 }
-                return new LedgerMessageSender(api, wallet, signer);
+                return new LedgerMessageSender(api, wallet, signer, network);
             }
 
             if (senderChoice.type === 'external') {
-                return new WalletMessageSender(api, wallet, signer);
+                return new WalletMessageSender(api, wallet, signer, network);
             }
 
             if (senderChoice.type === 'gasless') {
@@ -429,7 +448,8 @@ export const useGetSender = () => {
                     },
                     api,
                     wallet,
-                    signer
+                    signer,
+                    network
                 );
             }
 
@@ -452,7 +472,8 @@ export const useGetSender = () => {
                         batteryApi
                     },
                     wallet,
-                    signer
+                    signer,
+                    network
                 );
             }
 
@@ -460,7 +481,7 @@ export const useGetSender = () => {
         },
         [
             accounts,
-            api,
+            appContext,
             batteryApi,
             batteryConfig,
             wallet,

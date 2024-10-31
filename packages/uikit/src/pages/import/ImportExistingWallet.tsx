@@ -43,10 +43,10 @@ import {
     validateBip39Mnemonic
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
-const useProcessMnemonic = () => {
+const useProcessMnemonic = (network: Network) => {
     const context = useAppContext();
-    const network = useActiveTonNetwork();
     const fiat = useUserFiat();
     const sdk = useAppSdk();
     const accounts = useAccountsState();
@@ -92,7 +92,7 @@ const useProcessMnemonic = () => {
                 const wallets = await getMAMAccountWalletsInfo({
                     account: possibleMAMAccount,
                     network,
-                    api: context.api,
+                    appContext: context,
                     fiat,
                     walletVersion: context.defaultWalletVersion
                 });
@@ -114,6 +114,7 @@ const useProcessMnemonic = () => {
                 mnemonic,
                 'ton',
                 {
+                    network,
                     auth: {
                         kind: 'keychain'
                     },
@@ -145,7 +146,7 @@ const useProcessMnemonic = () => {
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
                     network,
-                    api: context.api,
+                    appContext: context,
                     fiat
                 });
                 if (versions.some(v => v.tonBalance || v.hasJettons)) {
@@ -162,6 +163,7 @@ const useProcessMnemonic = () => {
                 mnemonic,
                 'bip39',
                 {
+                    network,
                     auth: {
                         kind: 'keychain'
                     },
@@ -189,7 +191,7 @@ const useProcessMnemonic = () => {
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
                     network,
-                    api: context.api,
+                    appContext: context,
                     fiat
                 });
                 if (versions.some(v => v.tonBalance || v.hasJettons)) {
@@ -226,7 +228,10 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
     throw new Error('Wallet mnemonic not valid');
 };
 
-export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
+export const ImportExistingWallet: FC<{ afterCompleted: () => void; network: Network }> = ({
+    afterCompleted,
+    network
+}) => {
     const sdk = useAppSdk();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
@@ -249,14 +254,16 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         useMutateRenameAccountDerivations();
 
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
-        useCreateAccountMnemonic();
-    const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
+        useCreateAccountMnemonic(network);
+    const { mutateAsync: createAccountMam, isLoading: isCreatingMam } =
+        useCreateAccountMAM(network);
 
     const {
         mutateAsync: processMnemonic,
         isLoading: isProcessMnemonic,
         data: processedMnemonicResult
-    } = useProcessMnemonic();
+    } = useProcessMnemonic(network);
+
     const availableMnemonicTypes = Object.entries(processedMnemonicResult || {})
         .filter(([_, v]) => v !== undefined)
         .map(v => v[0] as ImportMnemonicType);
@@ -427,6 +434,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     if (!createdAccount) {
         return (
             <ChoseWalletVersions
+                network={network}
                 mnemonic={mnemonic}
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 onSubmit={versions => {

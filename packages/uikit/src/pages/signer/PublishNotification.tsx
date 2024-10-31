@@ -11,13 +11,14 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { useActiveStandardTonWallet } from '../../state/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const usePublishMessage = (signatureHex: string) => {
     const sdk = useAppSdk();
     const { api } = useAppContext();
     const wallet = useActiveStandardTonWallet();
     return useQuery([signatureHex], async () => {
-        return publishSignerMessage(sdk, api, wallet, signatureHex);
+        return publishSignerMessage(sdk, api, wallet, signatureHex, Network.MAINNET);
     });
 };
 

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
@@ -67,11 +67,7 @@ import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import {
-    useAccountsStateQuery,
-    useActiveAccountQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
+import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -270,7 +266,6 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
 `;
 
 export const Loader: FC = () => {
-    const network = useActiveTonNetwork();
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
@@ -285,13 +280,11 @@ export const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        network,
         lang,
         platform: 'desktop'
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
-    const navigate = useNavigate();
     useAppHeight();
 
     const { data: tracker } = useAnalytics(sdk.version, activeAccount, accounts);
@@ -323,7 +316,8 @@ export const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
+        api: getApiConfig(config, Network.MAINNET, REACT_APP_TONCONSOLE_API),
+        testnetApi: getApiConfig(config, Network.TESTNET),
         fiat,
         config,
         tonendpoint,

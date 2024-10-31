@@ -12,6 +12,8 @@ import React, { useContext } from 'react';
 
 export interface IAppContext {
     api: APIConfig;
+    testnetApi: APIConfig;
+
     fiat: FiatCurrencies;
     config: TonendpointConfig;
     tonendpoint: Tonendpoint;
@@ -37,6 +39,10 @@ export interface IAppContext {
 
 export const AppContext = React.createContext<IAppContext>({
     api: {
+        tonApiV2: new ConfigurationV2(),
+        tronApi: new TronConfiguration()
+    },
+    testnetApi: {
         tonApiV2: new ConfigurationV2(),
         tronApi: new TronConfiguration()
     },

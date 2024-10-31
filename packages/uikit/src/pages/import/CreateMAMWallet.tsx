@@ -24,11 +24,15 @@ import {
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
-export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
+export const CreateMAMWallet: FC<{ afterCompleted: () => void; network?: Network }> = ({
+    afterCompleted,
+    network = Network.MAINNET
+}) => {
     const { t } = useTranslation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
-        useCreateAccountMAM();
+        useCreateAccountMAM(network);
     const { mutateAsync: renameAccount, isLoading: renameAccountLoading } =
         useMutateRenameAccount();
     const { mutateAsync: renameDerivations, isLoading: renameDerivationsLoading } =

@@ -4,6 +4,7 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState } from '../../../state/wallet';
 import {
     getAccountByWalletById,
+    getNetworkByAccount,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
 import { getSigner } from '../../../state/mnemonic';
@@ -30,6 +31,7 @@ import {
     MultisigEncoder,
     MultisigConfig
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 
 export const useDeployMultisig = (
     params:
@@ -40,7 +42,7 @@ export const useDeployMultisig = (
           }
         | undefined
 ) => {
-    const { api } = useAppContext();
+    const appContext = useAppContext();
     const wallets = useAccountsState()
         .filter(isAccountTonWalletStandard)
         .flatMap(a => a.allTonWallets.map(w => ({ wallet: w, account: a })));
@@ -63,6 +65,8 @@ export const useDeployMultisig = (
                 throw new Error('Wallet not found');
             }
 
+            const network = getNetworkByAccount(accountAndWallet.account);
+            const [api] = getContextApiByNetwork(appContext, network);
             const multisigEncoder = new MultisigEncoder(api, accountAndWallet.wallet.rawAddress);
             const address = multisigEncoder.multisigAddress(params.multisigConfig);
 
@@ -86,9 +90,9 @@ export const useDeployMultisig = (
 
             let sender: Sender;
             if (signer.type === 'ledger') {
-                sender = new LedgerMessageSender(api, accountAndWallet.wallet, signer);
+                sender = new LedgerMessageSender(api, accountAndWallet.wallet, signer, network);
             } else {
-                sender = new WalletMessageSender(api, accountAndWallet.wallet, signer);
+                sender = new WalletMessageSender(api, accountAndWallet.wallet, signer, network);
             }
 
             await rawTransactionService.send(

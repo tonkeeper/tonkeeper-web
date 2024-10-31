@@ -5,7 +5,11 @@ import {
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { AccountId, AccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountId,
+    AccountVersionEditable,
+    getNetworkByAccount
+} from '@tonkeeper/core/dist/entries/account';
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
@@ -114,14 +118,16 @@ export const WalletVersionPageContentInternal: FC<{
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const appActiveWallet = activeAccount.activeTonWallet;
+
     const selectedWallet = account.activeTonWallet;
     const currentAccountWalletsVersions = account.allTonWallets;
+    const network = getNetworkByAccount(account);
 
     const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } =
         useMutateActiveTonWallet();
     const navigate = useNavigate();
 
-    const { data: wallets } = useStandardTonWalletVersions(selectedWallet.publicKey);
+    const { data: wallets } = useStandardTonWalletVersions(network, selectedWallet.publicKey);
 
     const { mutate: createWallet, isLoading: isCreateWalletLoading } =
         useAddTonWalletVersionToAccount();

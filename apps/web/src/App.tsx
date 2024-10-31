@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -16,7 +16,11 @@ import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext'
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext, useTWithReplaces } from "@tonkeeper/uikit/dist/hooks/translation";
+import {
+    I18nContext,
+    TranslationContext,
+    useTWithReplaces
+} from '@tonkeeper/uikit/dist/hooks/translation';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
@@ -28,8 +32,9 @@ import {
     useAccountsState,
     useAccountsStateQuery,
     useActiveAccountQuery,
-    useActiveTonNetwork, useMutateActiveAccount
-} from "@tonkeeper/uikit/dist/state/wallet";
+    useActiveTonNetwork,
+    useMutateActiveAccount
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,9 +42,9 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
-import { useGlobalPreferencesQuery } from "@tonkeeper/uikit/dist/state/global-preferences";
-import { useGlobalSetup } from "@tonkeeper/uikit/dist/state/globalSetup";
-import { useIsActiveAccountMultisig } from "@tonkeeper/uikit/dist/state/multisig";
+import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
+import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -61,9 +66,9 @@ export const App: FC = () => {
 };
 
 const Providers: FC<PropsWithChildren> = () => {
-  const { t: tSimple, i18n } = useTranslation();
+    const { t: tSimple, i18n } = useTranslation();
 
-  const t = useTWithReplaces(tSimple);
+    const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
         const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
@@ -120,7 +125,6 @@ const router = createBrowserRouter([
 ]);
 
 const Loader: FC = () => {
-    const network = useActiveTonNetwork();
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
@@ -139,7 +143,6 @@ const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        network,
         lang
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
@@ -173,7 +176,8 @@ const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        api: getApiConfig(config, network, import.meta.env.VITE_APP_TONCONSOLE_HOST),
+        api: getApiConfig(config, Network.MAINNET, import.meta.env.VITE_APP_TONCONSOLE_HOST),
+        testnetApi: getApiConfig(config, Network.TESTNET),
         fiat,
         config,
         tonendpoint,
@@ -192,11 +196,7 @@ const Loader: FC = () => {
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
             <AppContext.Provider value={context}>
-                <Content
-                    activeAccount={activeAccount}
-                    lock={lock}
-                    standalone={standalone}
-                />
+                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
                 <CopyNotification hideSimpleCopyNotifications={!standalone} />
                 <Suspense>
                     <QrScanner />
@@ -221,7 +221,7 @@ const Content: FC<{
         if (isMobile && isActiveMultisig) {
             const firstNotMultisig = accounts.filter(a => a.type !== 'ton-multisig')[0];
             if (firstNotMultisig) {
-                setActiveAccount(firstNotMultisig.id)
+                setActiveAccount(firstNotMultisig.id);
             }
         }
     }, [isMobile, isActiveMultisig, setActiveAccount]);

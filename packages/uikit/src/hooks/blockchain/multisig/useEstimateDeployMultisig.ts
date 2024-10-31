@@ -2,7 +2,10 @@ import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState } from '../../../state/wallet';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import {
+    getNetworkByAccount,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { Address } from '@ton/core';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
@@ -10,13 +13,11 @@ import { useTonRawTransactionService } from '../useBlockchainService';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { MultisigConfig } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/types';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
+import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 
 export const useEstimateDeployMultisig = () => {
-    const { api } = useAppContext();
-    const wallets = useAccountsState()
-        .filter(isAccountTonWalletStandard)
-        .flatMap(a => a.allTonWallets);
-
+    const appContext = useAppContext();
+    const accounts = useAccountsState();
     const rawTransactionService = useTonRawTransactionService();
 
     return useMutation<
@@ -24,13 +25,22 @@ export const useEstimateDeployMultisig = () => {
         Error,
         { multisigConfig: MultisigConfig; fromWallet: WalletId }
     >(async ({ multisigConfig, fromWallet }) => {
-        const walletState = wallets.find(w => w.id === fromWallet);
+        const account = accounts
+            .filter(isAccountTonWalletStandard)
+            .find(account => account.allTonWallets.some(w => w.id === fromWallet));
+        if (!account) {
+            throw new Error('Wallet not found');
+        }
+        const walletState = account.allTonWallets.find(w => w.id === fromWallet);
         if (!walletState) {
             throw new Error('Wallet not found');
         }
 
+        const network = getNetworkByAccount(account);
+        const [api] = getContextApiByNetwork(appContext, network);
+
         const multisigEncoder = new MultisigEncoder(api, walletState.rawAddress);
-        const sender = new WalletMessageSender(api, walletState, estimationSigner);
+        const sender = new WalletMessageSender(api, walletState, estimationSigner, network);
 
         const message = await multisigEncoder.encodeCreateMultisig(multisigConfig);
 

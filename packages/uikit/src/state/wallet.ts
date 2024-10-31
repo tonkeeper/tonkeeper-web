@@ -9,6 +9,7 @@ import {
     AccountTonMultisig,
     AccountTonWatchOnly,
     getAccountByWalletById,
+    getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard,
     isAccountVersionEditable
@@ -34,6 +35,7 @@ import {
     createReadOnlyTonAccountByAddress,
     createStandardTonAccountByMnemonic,
     getStandardTonWalletVersions,
+    getTonWalletStandard,
     getWalletAddress
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -383,7 +385,7 @@ export const useCreateAccountReadOnly = () => {
         return account;
     });
 };
-export const useCreateAccountMnemonic = () => {
+export const useCreateAccountMnemonic = (network: Network) => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
@@ -412,6 +414,7 @@ export const useCreateAccountMnemonic = () => {
                 mnemonic,
                 mnemonicType,
                 {
+                    network,
                     auth: {
                         kind: 'keychain'
                     },
@@ -442,6 +445,7 @@ export const useCreateAccountMnemonic = () => {
             mnemonic,
             mnemonicType,
             {
+                network,
                 auth: {
                     kind: 'password',
                     encryptedMnemonic
@@ -458,7 +462,7 @@ export const useCreateAccountMnemonic = () => {
     });
 };
 
-export const useCreateAccountMAM = () => {
+export const useCreateAccountMAM = (network: Network) => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
@@ -476,6 +480,7 @@ export const useCreateAccountMAM = () => {
     >(async ({ selectedDerivations, mnemonic, password, selectAccount }) => {
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+                network,
                 selectedDerivations,
                 auth: {
                     kind: 'keychain'
@@ -500,6 +505,7 @@ export const useCreateAccountMAM = () => {
 
         const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
         const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+            network,
             selectedDerivations,
             auth: {
                 kind: 'password',
@@ -532,13 +538,14 @@ export const useAddTonWalletVersionToAccount = () => {
             throw new Error('Cannot add wallet to this account');
         }
         const publicKey = account.activeTonWallet.publicKey;
-        const w = getWalletAddress(publicKey, version);
-        const wallet: TonWalletStandard = {
-            id: w.address.toRawString(),
-            rawAddress: w.address.toRawString(),
-            version,
-            publicKey
-        };
+
+        const network = getNetworkByAccount(account);
+        const w = getWalletAddress(publicKey, version, network);
+        const wallet = getTonWalletStandard(
+            { rawAddress: w.address.toRawString(), version },
+            publicKey,
+            network
+        );
 
         account.addTonWalletToActiveDerivation(wallet);
         await accountsStore.updateAccountInState(account);
@@ -748,7 +755,8 @@ export const useWalletAccountInfo = () => {
 };
 
 export const useActiveTonNetwork = () => {
-    return useDevSettings().data?.tonNetwork || Network.MAINNET;
+    const { data } = useActiveAccountQuery();
+    return data ? getNetworkByAccount(data) : Network.MAINNET;
 };
 
 export const useActiveTonWalletConfig = () => {
@@ -783,9 +791,8 @@ export const useMutateActiveTonWalletConfig = () => {
     });
 };
 
-export const useStandardTonWalletVersions = (publicKey?: string) => {
-    const { api, fiat } = useAppContext();
-    const network = useActiveTonNetwork();
+export const useStandardTonWalletVersions = (network: Network, publicKey?: string) => {
+    const appContext = useAppContext();
 
     return useQuery(
         [QueryKey.walletVersions, publicKey, network],
@@ -795,10 +802,10 @@ export const useStandardTonWalletVersions = (publicKey?: string) => {
             }
 
             return getStandardTonWalletVersions({
-                api,
+                appContext,
                 publicKey,
                 network,
-                fiat
+                fiat: appContext.fiat
             });
         },
         {
