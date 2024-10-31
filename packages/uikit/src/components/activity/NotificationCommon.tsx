@@ -406,7 +406,7 @@ const BatteryIcon = () => {
 };
 
 export const ActionFeeDetailsUniversal: FC<{
-    extra: AssetAmount | undefined;
+    extra: AssetAmount | undefined | null;
     onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
     selectedSenderType?: SenderTypeUserAvailable;
     availableSendersChoices?: SenderChoiceUserAvailable[];
@@ -429,6 +429,8 @@ export const ActionFeeDetailsUniversal: FC<{
                 </FeeLabelColumn>
                 {extra ? (
                     <ActionFeeDetailsUniversalValue extra={extra} senderType={selectedSenderType} />
+                ) : extra === null ? (
+                    <></>
                 ) : (
                     <SpinnerIcon />
                 )}

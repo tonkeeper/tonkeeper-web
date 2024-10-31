@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
@@ -21,15 +20,13 @@ import { H2, Label2, Label3 } from '../Text';
 import { Button } from '../fields/Button';
 import { MainButton, ResultButton, TransferViewHeaderBlock } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { useAccountsState, useActiveAccount, useActiveWallet } from '../../state/wallet';
+import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
 import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import BigNumber from 'bignumber.js';
 import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
@@ -42,7 +39,8 @@ import {
 import { useToQueryKeyPart } from '../../hooks/useToQueryKeyPart';
 import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
-import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
+import { ActionFeeDetailsUniversal, SelectSenderDropdown } from '../activity/NotificationCommon';
+import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -155,33 +153,6 @@ const ResultButtonErrored = styled(ResultButton)`
     height: fit-content;
 `;
 
-const NotificationIssue: FC<{
-    kind: 'not-enough-balance';
-    handleClose: (result?: string) => void;
-}> = ({ handleClose }) => {
-    const { t } = useTranslation();
-
-    return (
-        <NotificationBlock>
-            <ErrorStyled>
-                <ErrorIcon />
-                <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
-            </ErrorStyled>
-
-            <ButtonGap />
-            <NotificationFooterPortal>
-                <NotificationFooter>
-                    <ButtonRowStyled>
-                        <Button size="large" type="button" onClick={() => handleClose()}>
-                            {t('notifications_alert_cancel')}
-                        </Button>
-                    </ButtonRowStyled>
-                </NotificationFooter>
-            </NotificationFooterPortal>
-        </NotificationBlock>
-    );
-};
-
 const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
     background-color: transparent;
     width: 100%;
@@ -220,12 +191,12 @@ const ConnectContent: FC<{
         throw new Error('Unexpected sender choice');
     }, [selectedSenderType]);
 
-    const { data: issues, isFetched } = useTransactionError(params);
     const {
         data: estimate,
         isLoading: isEstimating,
-        isError
-    } = useEstimation(params, isFetched, senderChoice);
+        isError,
+        error
+    } = useEstimation(params, senderChoice);
     const {
         mutateAsync,
         isLoading,
@@ -251,10 +222,6 @@ const ConnectContent: FC<{
         }
     };
 
-    if (issues?.kind !== undefined) {
-        return <NotificationIssue kind={issues?.kind} handleClose={handleClose} />;
-    }
-
     if (isEstimating) {
         return <NotificationSkeleton handleClose={handleClose} />;
     }
@@ -264,7 +231,21 @@ const ConnectContent: FC<{
 
     return (
         <NotificationBlock>
-            <EmulationList isError={isError} event={estimate?.event} hideExtraDetails />
+            {error && error instanceof NotEnoughBalanceError ? (
+                <>
+                    <ErrorStyled>
+                        <ErrorIcon />
+                        <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
+                    </ErrorStyled>
+                    <SelectSenderDropdown
+                        availableSendersChoices={availableSendersChoices}
+                        onSenderTypeChange={onSenderTypeChange}
+                        selectedSenderType={selectedSenderType}
+                    />
+                </>
+            ) : (
+                <EmulationList isError={isError} event={estimate?.event} hideExtraDetails />
+            )}
             {!!estimate?.extra && (
                 <ActionFeeDetailsUniversalStyled
                     availableSendersChoices={availableSendersChoices}
@@ -303,7 +284,7 @@ const ConnectContent: FC<{
                                 type="button"
                                 primary
                                 loading={isLoading}
-                                disabled={isLoading}
+                                disabled={isLoading || isError}
                                 onClick={onSubmit}
                             >
                                 {t('confirm')}
@@ -316,11 +297,7 @@ const ConnectContent: FC<{
     );
 };
 
-const useEstimation = (
-    params: TonConnectTransactionPayload,
-    errorFetched: boolean,
-    senderChoice: SenderChoice
-) => {
+const useEstimation = (params: TonConnectTransactionPayload, senderChoice: SenderChoice) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
@@ -345,32 +322,8 @@ const useEstimation = (
 
             return result;
         },
-        { enabled: errorFetched && !!getSender }
+        { enabled: !!getSender }
     );
-};
-
-type ConnectTransferError = { kind: 'not-enough-balance' } | { kind: undefined };
-
-const useTransactionError = (params: TonConnectTransactionPayload) => {
-    const { api } = useAppContext();
-    const wallet = useActiveWallet();
-
-    return useQuery<ConnectTransferError, Error>([QueryKey.estimate, 'error', params], async () => {
-        const walletData = await new AccountsApi(api.tonApiV2).getAccount({
-            accountId: wallet.rawAddress
-        });
-
-        const total = params.messages.reduce(
-            (acc, message) => acc.plus(message.amount),
-            new BigNumber(0)
-        );
-
-        if (total.isGreaterThanOrEqualTo(walletData.balance)) {
-            return { kind: 'not-enough-balance' } as const;
-        }
-
-        return { kind: undefined };
-    });
 };
 
 const NotificationTitleRowStyled = styled(NotificationTitleRow)`

@@ -187,7 +187,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 try {
                     await tonConnectService.estimate(batterySender, payload);
 
-                    choices.push(BATTERY_SENDER_CHOICE);
+                    choices.unshift(BATTERY_SENDER_CHOICE);
                 } catch (e) {
                     console.error(e);
                 }

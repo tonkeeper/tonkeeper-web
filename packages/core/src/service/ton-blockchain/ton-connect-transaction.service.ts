@@ -26,7 +26,7 @@ export class TonConnectTransactionService {
         sender: Sender,
         transaction: TonConnectTransactionPayload
     ): Promise<TonEstimation> {
-        await this.checkTransactionPossibility(transaction);
+        await this.checkTransactionPossibility(sender, transaction);
 
         if (sender instanceof LedgerMessageSender) {
             return (await sender.tonConnectTransfer(transaction)).estimate();
@@ -45,7 +45,7 @@ export class TonConnectTransactionService {
         estimation: TonEstimation,
         transaction: TonConnectTransactionPayload
     ): Promise<string> {
-        await this.checkTransactionPossibility(transaction, estimation);
+        await this.checkTransactionPossibility(sender, transaction, estimation);
 
         let cell: Cell;
         if (sender instanceof LedgerMessageSender) {
@@ -83,6 +83,7 @@ export class TonConnectTransactionService {
     }
 
     private async checkTransactionPossibility(
+        sender: Sender,
         transaction: TonConnectTransactionPayload,
         estimation?: TonEstimation
     ) {
@@ -91,6 +92,10 @@ export class TonConnectTransactionService {
         }
         if (transaction.valid_until * 1000 < Date.now()) {
             throw new Error('Transaction expired');
+        }
+
+        if (sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender) {
+            return;
         }
 
         let requiredBalance = transaction.messages.reduce(
