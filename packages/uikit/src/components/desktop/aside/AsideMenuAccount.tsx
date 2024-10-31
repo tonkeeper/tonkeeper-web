@@ -16,23 +16,24 @@ import {
     AccountTonMultisig,
     AccountTonOnly,
     AccountTonWatchOnly,
-    Account
+    Account,
+    getNetworkByAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import {
-    useAccountsState,
-    useActiveAccount,
-    useActiveTonNetwork,
-    useMutateActiveAccount
-} from '../../../state/wallet';
+import { useAccountsState, useActiveAccount, useMutateActiveAccount } from '../../../state/wallet';
 import {
     useMultisigsOfAccountToDisplay,
     useMutateMultisigSelectedHostWallet
 } from '../../../state/multisig';
-import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
+import {
+    AccountBadge,
+    NetworkBadge,
+    WalletIndexBadge,
+    WalletVersionBadge
+} from '../../account/AccountBadge';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
@@ -53,6 +54,10 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
 
 const AsideMenuSubItemContainer = styled.div`
     padding-left: 16px;
+`;
+
+const NetworkBadgeStyled = styled(NetworkBadge)`
+    margin-left: -4px;
 `;
 
 const AccountBadgeStyled = styled(AccountBadge)`
@@ -125,7 +130,7 @@ export const AsideMenuAccountMnemonic: FC<{
 }> = ({ account, isSelected, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
@@ -141,6 +146,8 @@ export const AsideMenuAccountMnemonic: FC<{
                     <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 )}
                 <Label2>{account.name}</Label2>
+                <NetworkBadgeStyled network={network} size="s" />
+
                 <GearIconButtonStyled
                     onClick={e => {
                         e.preventDefault();
@@ -187,7 +194,7 @@ export const AsideMenuAccountLedger: FC<{
 }> = ({ account, isSelected, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
@@ -263,7 +270,7 @@ export const AsideMenuAccountTonOnly: FC<{
 }> = ({ account, isSelected, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
@@ -368,6 +375,7 @@ export const AsideMenuAccountMAM: FC<{
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
 
+    const network = getNetworkByAccount(account);
     const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
 
@@ -394,6 +402,7 @@ export const AsideMenuAccountMAM: FC<{
                     <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 )}
                 <Label2>{account.name}</Label2>
+                <NetworkBadgeStyled network={network} size="s" />
                 <AccountBadgeStyled accountType={account.type} size="s" />
 
                 <GearIconButtonStyled
