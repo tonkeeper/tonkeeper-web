@@ -9,6 +9,7 @@ import { externalMessage, getServerTime, getWalletSeqNo } from '../utils';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
+import { Network } from '../../../entries/network';
 
 export class BatteryMessageSender implements ISender {
     constructor(
@@ -22,8 +23,8 @@ export class BatteryMessageSender implements ISender {
             batteryApi: Configuration;
         },
         private readonly wallet: TonWalletStandard,
-
-        private readonly signer: CellSigner
+        private readonly signer: CellSigner,
+        private readonly network: Network
     ) {}
 
     public get jettonResponseAddress() {
@@ -63,7 +64,7 @@ export class BatteryMessageSender implements ISender {
         const timestamp = await getServerTime(this.api.tonApi);
         const seqno = await getWalletSeqNo(this.api.tonApi, this.wallet.rawAddress);
 
-        const contract = walletContractFromState(this.wallet) as WalletContractV5R1;
+        const contract = walletContractFromState(this.wallet, this.network) as WalletContractV5R1;
         const transfer = await contract.createTransfer({
             seqno,
             signer: this.signer,
@@ -85,7 +86,7 @@ export class BatteryMessageSender implements ISender {
             throw new Error(`Unsupported wallet version: ${this.wallet.version}`);
         }
 
-        const contract = walletContractFromState(this.wallet) as WalletContractV5R1;
+        const contract = walletContractFromState(this.wallet, this.network) as WalletContractV5R1;
         const transfer = await contract.createTransfer({
             authType: 'internal',
             seqno,

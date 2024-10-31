@@ -10,6 +10,7 @@ import { WalletMessageSender } from './wallet-message-sender';
 import BigNumber from 'bignumber.js';
 import { LedgerMessageSender } from './ledger-message-sender';
 import { internal, SendMode } from '@ton/core';
+import { Network } from '../../../entries/network';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class MultisigCreateOrderSender implements ISender {
@@ -18,7 +19,7 @@ export class MultisigCreateOrderSender implements ISender {
         private readonly multisig: Multisig,
         private readonly ttlSeconds: number,
         private readonly hostWallet: TonWalletStandard,
-        private readonly signer: Signer
+        private readonly network: Network
     ) {}
 
     public get jettonResponseAddress() {
@@ -29,7 +30,12 @@ export class MultisigCreateOrderSender implements ISender {
         const wrappedMessage = await this.wrapMessage(outgoing);
 
         if (this.signer.type === 'ledger') {
-            const sender = new LedgerMessageSender(this.api, this.hostWallet, this.signer);
+            const sender = new LedgerMessageSender(
+                this.api,
+                this.hostWallet,
+                this.signer,
+                this.network
+            );
             return (
                 await sender.tonRawTransfer({
                     ...wrappedMessage,
@@ -38,7 +44,12 @@ export class MultisigCreateOrderSender implements ISender {
             ).send();
         }
 
-        const sender = new WalletMessageSender(this.api, this.hostWallet, this.signer);
+        const sender = new WalletMessageSender(
+            this.api,
+            this.hostWallet,
+            this.signer,
+            this.network
+        );
         return sender.send({
             sendMode: SendMode.IGNORE_ERRORS,
             messages: [internal(wrappedMessage)]
@@ -49,7 +60,12 @@ export class MultisigCreateOrderSender implements ISender {
         const wrappedMessage = await this.wrapMessage(outgoing);
 
         if (this.signer.type === 'ledger') {
-            const sender = new LedgerMessageSender(this.api, this.hostWallet, this.signer);
+            const sender = new LedgerMessageSender(
+                this.api,
+                this.hostWallet,
+                this.signer,
+                this.network
+            );
             return (
                 await sender.tonRawTransfer({
                     ...wrappedMessage,
@@ -58,7 +74,12 @@ export class MultisigCreateOrderSender implements ISender {
             ).estimate();
         }
 
-        const sender = new WalletMessageSender(this.api, this.hostWallet, this.signer);
+        const sender = new WalletMessageSender(
+            this.api,
+            this.hostWallet,
+            this.signer,
+            this.network
+        );
         return sender.estimate({
             sendMode: SendMode.IGNORE_ERRORS,
             messages: [internal(wrappedMessage)]

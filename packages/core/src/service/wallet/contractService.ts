@@ -9,9 +9,9 @@ import {
     WalletContractV5R1
 } from '@ton/ton';
 
-export const walletContractFromState = (wallet: TonWalletStandard) => {
+export const walletContractFromState = (wallet: TonWalletStandard, network: Network) => {
     const publicKey = Buffer.from(wallet.publicKey, 'hex');
-    return walletContract(publicKey, wallet.version);
+    return walletContract(publicKey, wallet.version, network);
 };
 
 const workchain = 0;
@@ -21,7 +21,7 @@ export type WalletContract = ReturnType<typeof walletContract>;
 export const walletContract = (
     publicKey: Buffer | string,
     version: WalletVersion,
-    network = Network.MAINNET
+    network: Network
 ) => {
     if (typeof publicKey === 'string') {
         publicKey = Buffer.from(publicKey, 'hex');
@@ -44,12 +44,18 @@ export const walletContract = (
                 publicKey
             });
         case WalletVersion.V5R1:
-            return WalletContractV5R1.create({ workchain: workchain, publicKey });
+            return WalletContractV5R1.create({
+                workchain: workchain,
+                walletId: {
+                    networkGlobalId: network
+                },
+                publicKey
+            });
     }
 };
 
 export const walletStateInitFromState = (wallet: TonWalletStandard) => {
-    const contract = walletContractFromState(wallet);
+    const contract = walletContractFromState(wallet, Network.MAINNET);
 
     return beginCell()
         .store(storeStateInit(contract.init))

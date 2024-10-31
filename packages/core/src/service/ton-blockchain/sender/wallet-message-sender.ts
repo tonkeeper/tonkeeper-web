@@ -9,12 +9,14 @@ import { WalletContractV5R1 } from '@ton/ton';
 import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
+import { Network } from '../../../entries/network';
 
 export class WalletMessageSender implements ISender {
     constructor(
         private readonly api: APIConfig,
         private readonly wallet: TonWalletStandard,
-        private readonly signer: CellSigner
+        private readonly signer: CellSigner,
+        private readonly network: Network
     ) {}
 
     public get jettonResponseAddress() {
@@ -48,7 +50,7 @@ export class WalletMessageSender implements ISender {
         const timestamp = await getServerTime(this.api);
         const seqno = await getWalletSeqNo(this.api, this.wallet.rawAddress);
 
-        const contract = walletContractFromState(this.wallet) as WalletContractV5R1;
+        const contract = walletContractFromState(this.wallet, this.network) as WalletContractV5R1;
         const transfer = await contract.createTransfer({
             seqno,
             signer: this.signer,

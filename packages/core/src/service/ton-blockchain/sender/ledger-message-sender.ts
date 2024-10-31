@@ -25,12 +25,14 @@ import { MessagePayloadParam, serializePayload } from '../encoder/types';
 import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { TonEstimation } from '../../../entries/send';
+import { Network } from '../../../entries/network';
 
 export class LedgerMessageSender {
     constructor(
         private readonly api: APIConfig,
         private readonly wallet: TonWalletStandard,
-        private readonly signer: LedgerSigner
+        private readonly signer: LedgerSigner,
+        private readonly network: Network
     ) {}
 
     tonRawTransfer = async ({
@@ -234,7 +236,7 @@ export class LedgerMessageSender {
     private async getTransferParameters() {
         const timestamp = await getServerTime(this.api);
         const seqno = await getWalletSeqNo(this.api, this.wallet.rawAddress);
-        const contract = walletContractFromState(this.wallet);
+        const contract = walletContractFromState(this.wallet, this.network);
         return {
             timestamp,
             seqno,

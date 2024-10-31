@@ -7,6 +7,7 @@ import { isW5Version, TonWalletStandard, WalletVersion } from '../entries/wallet
 import { BlockchainApi } from '../tonApiV2';
 import { externalMessage, getWalletSeqNo } from './ton-blockchain/utils';
 import { walletContractFromState } from './wallet/contractService';
+import { Network } from '../entries/network';
 
 export const parseSignerSignature = (payload: string): Buffer => {
     console.log('signer', payload);
@@ -67,13 +68,14 @@ export const publishSignerMessage = async (
     sdk: IAppSdk,
     api: APIConfig,
     walletState: TonWalletStandard,
-    signatureHex: string
+    signatureHex: string,
+    network: Network
 ) => {
     const messageBase64 = await sdk.storage.get<string>(AppKey.SIGNER_MESSAGE);
     if (!messageBase64) {
         throw new Error('missing message');
     }
-    const contract = walletContractFromState(walletState);
+    const contract = walletContractFromState(walletState, network);
     const seqno = await getWalletSeqNo(api, walletState.rawAddress);
     const signature = Buffer.from(signatureHex, 'hex');
     const message = Cell.fromBase64(messageBase64).asSlice();

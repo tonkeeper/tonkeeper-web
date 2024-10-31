@@ -265,7 +265,7 @@ export const toTonAddressItemReply = (
             walletStateInit: ''
         };
     }
-    const contract = walletContractFromState(wallet);
+    const contract = walletContractFromState(wallet, network);
     return {
         name: 'ton_addr',
         address: contract.address.toRawString(),

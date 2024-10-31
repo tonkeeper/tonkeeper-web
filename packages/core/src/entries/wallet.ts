@@ -95,6 +95,9 @@ export interface DeprecatedWalletState {
 
     revision: number;
 
+    /**
+     * @deprecated
+     */
     network?: Network;
 
     hiddenJettons?: string[];

@@ -15,6 +15,7 @@ import {
     DerivationItemNamed
 } from './wallet';
 import { assertUnreachable } from '../utils/types';
+import { Network } from './network';
 
 /**
  * @deprecated
@@ -80,9 +81,14 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         public auth: AuthPassword | AuthKeychain,
         public activeTonWalletId: WalletId,
         public tonWallets: TonWalletStandard[],
-        public mnemonicType?: MnemonicType
+        public mnemonicType?: MnemonicType,
+        public network?: Network // It's undefined for old wallets
     ) {
         super();
+
+        if (this.network === undefined) {
+            this.network = Network.MAINNET;
+        }
     }
 
     getTonWallet(id: WalletId) {
@@ -393,7 +399,8 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         public auth: AuthPassword | AuthKeychain,
         public activeDerivationIndex: number,
         public addedDerivationsIndexes: number[],
-        public allAvailableDerivations: DerivationItemNamed[]
+        public allAvailableDerivations: DerivationItemNamed[],
+        public network: Network // it's undefined for old wallets
     ) {
         super();
 
@@ -410,6 +417,10 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         }
 
         this.addedDerivationsIndexes = [...new Set(addedDerivationsIndexes)];
+
+        if (this.network === undefined) {
+            this.network = Network.MAINNET;
+        }
     }
 
     getTonWallet(id: WalletId) {
@@ -595,9 +606,9 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'mam':
         case 'ton-multisig':
             return false;
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }
 
 export function isAccountTonWalletStandard(account: Account): account is AccountTonWalletStandard {
@@ -611,9 +622,9 @@ export function isAccountTonWalletStandard(account: Account): account is Account
         case 'watch-only':
         case 'ton-multisig':
             return false;
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }
 
 export function isAccountCanManageMultisigs(account: Account): boolean {
@@ -627,9 +638,25 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'ton-multisig':
         case 'keystone':
             return false;
+        default:
+            return assertUnreachable(account);
     }
+}
 
-    assertUnreachable(account);
+export function getNetworkByAccount(account: Account): Network {
+    switch (account.type) {
+        case 'mam':
+        case 'mnemonic':
+            return account.network ?? Network.MAINNET;
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return Network.MAINNET;
+        default:
+            assertUnreachable(account);
+    }
 }
 
 export type AccountsState = Account[];
