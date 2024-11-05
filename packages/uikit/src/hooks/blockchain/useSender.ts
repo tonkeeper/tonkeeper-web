@@ -82,7 +82,7 @@ export const useAvailableSendersChoices = (
             walletInfo
         ],
         () => {
-            if (account.type === 'ledger') {
+            if (account.type !== 'mnemonic' && account.type !== 'mam') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
             if (operation.type === 'multisend-transfer') {
