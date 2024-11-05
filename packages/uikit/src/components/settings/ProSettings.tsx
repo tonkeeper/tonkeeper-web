@@ -150,7 +150,7 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     });
 
     if (accountsWallets.length === 0) {
-        return <Label1>{t('tonkeeper_pro_authorization')}</Label1>;
+        return <SelectLabel>{t('tonkeeper_pro_authorization')}</SelectLabel>;
     }
 
     return (
