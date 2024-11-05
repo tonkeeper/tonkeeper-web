@@ -11,7 +11,12 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { signTonConnectOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
-import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveApi,
+    useActiveTonNetwork,
+    useActiveWallet
+} from '../../state/wallet';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -33,7 +38,7 @@ const useToggleSubscribe = () => {
     const account = useActiveAccount();
     const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const network = useActiveTonNetwork();
 
     return useMutation<void, Error, boolean>(async checked => {

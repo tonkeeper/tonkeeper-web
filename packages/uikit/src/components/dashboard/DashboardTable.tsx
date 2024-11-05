@@ -7,6 +7,7 @@ import { DashboardColumnType } from '@tonkeeper/core/dist/entries/dashboard';
 import { Skeleton } from '../shared/Skeleton';
 import { DashboardCell } from './columns/DashboardCell';
 import { useAccountsState } from '../../state/wallet';
+import { seeIfMainnnetAccount } from '@tonkeeper/core/dist/entries/account';
 
 const TableStyled = styled.table`
     width: 100%;
@@ -101,7 +102,7 @@ export const DashboardTable: FC<{ className?: string }> = ({ className }) => {
     const { data: columns } = useDashboardColumnsAsForm();
     const { data: dashboardData } = useDashboardData();
     const wallets = useAccountsState();
-    const mainnetIds = wallets?.map(w => w!.id);
+    const mainnetIds = wallets.filter(seeIfMainnnetAccount)?.map(w => w!.id);
 
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [hoverOnColumn, setHoverOnColumn] = useState<number | undefined>(undefined);

@@ -109,13 +109,13 @@ export const getTonWalletStandard = (
 };
 
 interface CreateWalletContext {
-    api: APIConfig;
+    mainnetApi: APIConfig;
     testnetApi: APIConfig;
     defaultWalletVersion: WalletVersion;
 }
 
 export const getContextApiByNetwork = (context: CreateWalletContext, network: Network) => {
-    const api = network === Network.TESTNET ? context.testnetApi : context.api;
+    const api = network === Network.TESTNET ? context.testnetApi : context.mainnetApi;
     return [api, context.defaultWalletVersion] as const;
 };
 

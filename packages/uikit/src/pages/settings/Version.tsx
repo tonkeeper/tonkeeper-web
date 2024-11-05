@@ -184,7 +184,7 @@ export const WalletVersionPageContentInternal: FC<{
                             <TextContainer>
                                 <Label1>{walletVersionText(wallet.version)}</Label1>
                                 <Body2Secondary>
-                                    {toShortValue(formatAddress(wallet.address)) + ' '}·
+                                    {toShortValue(formatAddress(wallet.address, network)) + ' '}·
                                     {' ' + toFormattedTonBalance(wallet.tonBalance)}
                                     &nbsp;TON
                                     {wallet.hasJettons && t('wallet_version_and_tokens')}

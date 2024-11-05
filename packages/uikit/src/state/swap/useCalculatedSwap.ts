@@ -26,6 +26,7 @@ import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { atom, useAtom } from '../../libs/atom';
 import { useSwapsConfig } from './useSwapsConfig';
+import { useActiveApi } from '../wallet';
 
 export type BasicCalculatedTrade = {
     from: AssetAmount<TonAsset>;
@@ -70,7 +71,7 @@ const fetchedSwaps$ = atom<CalculatedSwap[]>([]);
 let calculationId = 0;
 
 export function useCalculatedSwap() {
-    const { api } = useAppContext();
+    const api = useActiveApi();
 
     const [fetchedSwaps, setFetchedSwaps] = useAtom(fetchedSwaps$);
     const [fromAsset] = useSwapFromAsset();

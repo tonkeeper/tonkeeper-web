@@ -10,13 +10,15 @@ import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { getMixedActivityGroups } from '../../state/mixedActivity';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveApi, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
 const Activity: FC = () => {
     const wallet = useActiveWallet();
-    const { api, standalone } = useAppContext();
+    const network = useActiveTonNetwork();
+    const api = useActiveApi();
+    const { standalone } = useAppContext();
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -27,7 +29,7 @@ const Activity: FC = () => {
         isFetchingNextPage: isTonFetchingNextPage,
         data: tonEvents
     } = useInfiniteQuery({
-        queryKey: [wallet.rawAddress, QueryKey.activity, 'all'],
+        queryKey: [wallet.rawAddress, QueryKey.activity, 'all', network],
         queryFn: ({ pageParam = undefined }) =>
             new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.rawAddress,

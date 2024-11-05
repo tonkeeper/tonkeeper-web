@@ -102,6 +102,8 @@ export function toStringDashboardCell(cell: DashboardCell): string {
             return cell.value.div(10 ** cell.decimals).toString() + ' ' + cell.symbol;
         case 'numeric_fiat':
             return cell.value.toString() + ' ' + cell.fiat;
+        default:
+            return assertUnreachable(cell);
     }
 }
 
@@ -152,7 +154,7 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             return baseInfo;
         case 'ton-multisig':
             return baseInfo + ' ' + 'multisig';
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }

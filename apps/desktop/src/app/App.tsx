@@ -316,7 +316,7 @@ export const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        api: getApiConfig(config, Network.MAINNET, REACT_APP_TONCONSOLE_API),
+        mainnetApi: getApiConfig(config, Network.MAINNET, REACT_APP_TONCONSOLE_API),
         testnetApi: getApiConfig(config, Network.TESTNET),
         fiat,
         config,

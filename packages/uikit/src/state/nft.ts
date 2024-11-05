@@ -19,6 +19,7 @@ import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
 import { useTonenpointConfig } from './tonendpoint';
 import {
+    useActiveApi,
     useActiveTonNetwork,
     useActiveTonWalletConfig,
     useActiveWallet,
@@ -182,9 +183,7 @@ export const isUnverifiedNft = (
 };
 export const useWalletNftList = () => {
     const wallet = useActiveWallet();
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const { tonApiV2 } = useActiveApi();
 
     return useQuery<NFT[], Error>([wallet.rawAddress, QueryKey.nft], async () => {
         const { nftItems } = await new AccountsApi(tonApiV2).getAccountNftItems({
@@ -220,9 +219,7 @@ export const useWalletFilteredNftList = () => {
     };
 };
 export const useNftDNSLinkData = (nft: NFT) => {
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const api = useActiveApi();
 
     return useQuery<DnsRecord | null, Error>(
         ['dns_link', nft?.address],
@@ -231,7 +228,7 @@ export const useNftDNSLinkData = (nft: NFT) => {
             if (!domainName) return null;
 
             try {
-                return await new DNSApi(tonApiV2).dnsResolve({ domainName });
+                return await new DNSApi(api.tonApiV2).dnsResolve({ domainName });
             } catch (e) {
                 return null;
             }
@@ -241,9 +238,7 @@ export const useNftDNSLinkData = (nft: NFT) => {
 };
 const MINUTES_IN_YEAR = 60 * 60 * 24 * 366;
 export const useNftDNSExpirationDate = (nft: NFT) => {
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const { tonApiV2 } = useActiveApi();
 
     return useQuery<Date | null, Error>(['dns_expiring', nft.address], async () => {
         if (!nft.owner?.address || !nft.dns || !isTONDNSDomain(nft.dns)) {
@@ -268,9 +263,7 @@ export const useNftDNSExpirationDate = (nft: NFT) => {
     });
 };
 export const useNftCollectionData = (nftOrCollection: NftItem | string) => {
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const { tonApiV2 } = useActiveApi();
 
     const collectionAddress =
         typeof nftOrCollection === 'string' ? nftOrCollection : nftOrCollection.collection?.address;
@@ -288,9 +281,7 @@ export const useNftCollectionData = (nftOrCollection: NftItem | string) => {
     );
 };
 export const useNftItemData = (address?: string) => {
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const { tonApiV2 } = useActiveApi();
 
     return useQuery<NftItem, Error>(
         [address, QueryKey.nft],

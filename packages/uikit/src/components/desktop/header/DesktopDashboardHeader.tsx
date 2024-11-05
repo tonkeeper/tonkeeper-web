@@ -16,6 +16,8 @@ import {
     useDashboardColumns,
     useDashboardColumnsForm
 } from '../../../state/dashboard/useDashboardColumns';
+import { useActiveTonNetwork } from '../../../state/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -53,7 +55,11 @@ const DesktopDashboardHeaderPayload = () => {
 
     return (
         <DesktopHeaderContainer>
-            <DesktopHeaderBalance isLoading={isLoading} balance={balance} />
+            <DesktopHeaderBalance
+                isLoading={isLoading}
+                balance={balance}
+                network={Network.MAINNET}
+            />
             <DesktopRightPart>
                 <ButtonsContainer>
                     <Button

@@ -1,13 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from '../../../hooks/appContext';
-import { useActiveWallet } from '../../../state/wallet';
+import { useActiveApi, useActiveWallet } from '../../../state/wallet';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { toNano } from '@ton/core';
 import { assertBalanceEnough } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useMinimalBalance = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const walletState = useActiveWallet();
     const notifyError = useNotifyErrorHandle();
 

@@ -14,7 +14,7 @@ import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
 import { MixedActivity } from './mixedActivity';
 import { seeIfTonTransfer } from './ton/tonActivity';
-import { useActiveWallet } from './wallet';
+import { useActiveApi, useActiveWallet } from './wallet';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -146,7 +146,7 @@ export const groupActivityGeneric = <T>(
 
 export const useFetchFilteredActivity = (asset?: string) => {
     const wallet = useActiveWallet();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const { asset: selectedAsset, filterSpam, onlyInitiator } = useHistoryFilters();
 
     return useInfiniteQuery({

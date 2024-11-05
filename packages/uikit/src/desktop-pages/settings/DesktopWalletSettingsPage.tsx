@@ -29,7 +29,8 @@ import {
 import {
     AccountMAM,
     isAccountVersionEditable,
-    AccountTonMultisig
+    AccountTonMultisig,
+    getNetworkByAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
@@ -41,6 +42,7 @@ import {
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../state/battery';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -111,8 +113,12 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
+    const network = getNetworkByAccount(account);
+
     const canUseBattery =
-        (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+        (account.type === 'mnemonic' || account.type === 'mam') &&
+        !disableWholeBattery &&
+        network === Network.MAINNET;
 
     return (
         <DesktopViewPageLayout>

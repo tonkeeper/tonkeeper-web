@@ -19,7 +19,8 @@ import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { ErrorOption } from 'react-hook-form';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
-import { useTonRecipientValidator } from "../components/fields/TonRecipientInput";
+import { useTonRecipientValidator } from '../components/fields/TonRecipientInput';
+import { useActiveApi } from './wallet';
 
 export type MultiSendRow = {
     receiver: TonRecipient | null;
@@ -121,7 +122,7 @@ export class ListImportError extends Error {
 }
 
 export const useParseCsvListMutation = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const { data: lists } = useUserMultiSendLists();
     const receiverValidator = useTonRecipientValidator();
 

@@ -17,17 +17,17 @@ import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { useActiveTonNetwork, useActiveWallet } from './wallet';
+import { useActiveApi, useActiveTonNetwork, useActiveWallet } from './wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useActiveWallet();
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const api = useActiveApi();
+
     return useQuery<JettonInfo, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.info, jettonAddress],
         async () => {
-            const result = await new JettonsApi(tonApiV2).getJettonInfo({
+            const result = await new JettonsApi(api.tonApiV2).getJettonInfo({
                 accountId: jettonAddress
             });
             return result;
@@ -59,7 +59,8 @@ const compareTokensOver = (fiat: FiatCurrencies) => {
 export const useJettonRawList = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
-    const { api, fiat } = useAppContext();
+    const { fiat } = useAppContext();
+    const api = useActiveApi();
 
     return useQuery<JettonsBalances, Error>(
         [wallet.id, JettonKey.raw, QueryKey.jettons, fiat, network],
@@ -78,7 +79,9 @@ export const useJettonRawList = () => {
 export const useJettonList = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
-    const { api, fiat } = useAppContext();
+    const { fiat } = useAppContext();
+    const api = useActiveApi();
+
     const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
@@ -114,7 +117,7 @@ export const useJettonList = () => {
 
 export const useJettonBalance = (jettonAddress: string) => {
     const wallet = useActiveWallet();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useQuery<JettonBalance, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {

@@ -744,10 +744,18 @@ export const useMutateRenameAccountDerivations = <T extends AccountMAM>() => {
     });
 };
 
+export const useActiveApi = () => {
+    const { mainnetApi, testnetApi } = useAppContext();
+    const network = useActiveTonNetwork();
+    return network === Network.TESTNET ? testnetApi : mainnetApi;
+};
+
 export const useWalletAccountInfo = () => {
     const wallet = useActiveWallet();
-    const { api } = useAppContext();
-    return useQuery<TonapiAccount, Error>([wallet.rawAddress, QueryKey.info], async () => {
+    const network = useActiveTonNetwork();
+    const api = useActiveApi();
+
+    return useQuery<TonapiAccount, Error>([wallet.rawAddress, QueryKey.info, network], async () => {
         return new AccountsApi(api.tonApiV2).getAccount({
             accountId: wallet.rawAddress
         });
@@ -815,8 +823,9 @@ export const useStandardTonWalletVersions = (network: Network, publicKey?: strin
 };
 
 export const useTonWalletsBalances = (addresses: string[]) => {
-    const { api, fiat } = useAppContext();
+    const { fiat } = useAppContext();
     const network = useActiveTonNetwork();
+    const api = useActiveApi();
 
     return useQuery(
         [QueryKey.walletVersions, addresses, network, fiat],

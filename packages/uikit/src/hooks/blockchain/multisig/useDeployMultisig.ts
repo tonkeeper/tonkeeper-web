@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useAccountsState } from '../../../state/wallet';
+import { useAccountsState, useActiveApi } from '../../../state/wallet';
 import {
     getAccountByWalletById,
     getNetworkByAccount,
@@ -127,7 +127,7 @@ const checkIfMultisigExists = async (options: { api: APIConfig; address: Address
 };
 
 export const useAwaitMultisigIsDeployed = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const client = useQueryClient();
     const accounts = useAccountsStorage();
     return useMutation<void, Error, { multisigAddress: string; deployerWalletId: WalletId }>(

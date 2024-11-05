@@ -11,7 +11,7 @@ import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi
 import React, { useContext } from 'react';
 
 export interface IAppContext {
-    api: APIConfig;
+    mainnetApi: APIConfig;
     testnetApi: APIConfig;
 
     fiat: FiatCurrencies;
@@ -38,7 +38,7 @@ export interface IAppContext {
 }
 
 export const AppContext = React.createContext<IAppContext>({
-    api: {
+    mainnetApi: {
         tonApiV2: new ConfigurationV2(),
         tronApi: new TronConfiguration()
     },

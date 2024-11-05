@@ -659,6 +659,11 @@ export function getNetworkByAccount(account: Account): Network {
     }
 }
 
+export function seeIfMainnnetAccount(account: Account): boolean {
+    const network = getNetworkByAccount(account);
+    return network === Network.MAINNET;
+}
+
 export type AccountsState = Account[];
 
 export const defaultAccountState: AccountsState = [];
