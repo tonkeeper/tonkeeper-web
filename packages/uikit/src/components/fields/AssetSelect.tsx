@@ -144,7 +144,7 @@ export const AssetSelectDropdownContent: FC<{
                         <AssetIcon src={item.asset.image} />
                         <ColumnText
                             text={item.asset.symbol}
-                            secondary={item.stringRelativeAmount}
+                            secondary={item.stringAssetRelativeAmount}
                         />
                     </DropDownItemStyled>
                     <DropDownItemsDivider />
