@@ -91,6 +91,7 @@ const BatteryRechargeNotificationContent: FC<{
     onClose: () => void;
 }> = ({ preselectedAsset, onClose, asGift }) => {
     const [asset, setAsset] = useState(preselectedAsset);
+    const unitToTonRate = useBatteryUnitTonRate();
     useEffect(() => {
         setAsset(preselectedAsset);
     }, [preselectedAsset]);
@@ -159,7 +160,9 @@ const BatteryRechargeNotificationContent: FC<{
 
             setAssetAmountToPay(
                 AssetAmount.fromRelativeAmount({
-                    amount: packPrice.relativeAmount.multipliedBy(unitToTokenRate),
+                    amount: packPrice.relativeAmount
+                        .div(unitToTonRate)
+                        .multipliedBy(unitToTokenRate),
                     asset: asset
                 })
             );
