@@ -550,7 +550,7 @@ const ActionFeeDetailsUniversalBatteryValue: FC<{ extra: AssetAmount<TonAsset> }
             right
             text={t('battery_n_battery_charges', { charges: unitsToSpeed })}
             secondary={
-                balanceNumber !== 0
+                balanceNumber !== 0 && balanceNumber >= unitsToSpeed
                     ? t('battery_out_of_num_available', {
                           number: balanceNumber
                       })

@@ -231,7 +231,7 @@ export class TonAssetTransactionService {
         }
 
         if (estimation) {
-            if (isTon(estimation.extra.asset.address)) {
+            if (isTon(estimation.extra.asset.address) && !isNoGasSender) {
                 requiredTonBalance = (requiredTonBalance || new BigNumber(0)).plus(
                     getTonEstimationTonFee(estimation)
                 );
