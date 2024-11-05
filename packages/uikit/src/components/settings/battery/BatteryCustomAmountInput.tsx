@@ -86,7 +86,7 @@ export const BatteryCustomAmountInput: FC<{
 
         if (minValue && selectedAssetAmount.lt(minValue.relativeAmount)) {
             return t('battery_buy_error_min', {
-                amount: minValue.stringRelativeAmount
+                amount: minValue.stringAssetRelativeAmount
             });
         }
     }, [t, remainingAssetAmount, asset, minValue, selectedAssetAmount]);
