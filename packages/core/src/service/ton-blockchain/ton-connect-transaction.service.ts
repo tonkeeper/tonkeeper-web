@@ -19,6 +19,7 @@ import { assertBalanceEnough, assertMessagesNumberSupported } from './utils';
 import { Cell } from '@ton/core';
 import { assertUnreachable } from '../../utils/types';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
+import { maxBigNumber } from '../../utils/common';
 
 export class TonConnectTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
@@ -104,7 +105,7 @@ export class TonConnectTransactionService {
             new BigNumber(0)
         );
 
-        requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));
+        requiredBalance = maxBigNumber(requiredBalance, getTonEstimationTonFee(estimation));
 
         await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.wallet.rawAddress);
     }

@@ -6,6 +6,7 @@ import { TonContract } from '../../entries/wallet';
 import { Address, Cell, internal, SendMode } from '@ton/core';
 import { assertBalanceEnough } from './utils';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
+import { maxBigNumber } from '../../utils/common';
 
 export type TonRawTransaction = {
     to: Address;
@@ -71,7 +72,7 @@ export class TonRawTransactionService {
 
         let requiredBalance = new BigNumber(transaction.value.toString());
 
-        requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));
+        requiredBalance = maxBigNumber(requiredBalance, getTonEstimationTonFee(estimation));
 
         await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.wallet.rawAddress);
     }
