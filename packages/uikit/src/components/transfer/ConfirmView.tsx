@@ -40,6 +40,7 @@ import {
     SenderChoiceUserAvailable,
     SenderTypeUserAvailable
 } from '../../hooks/blockchain/useSender';
+import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -387,14 +388,19 @@ export const ConfirmViewButtons: FC<{
     }
 
     if (error && !(error instanceof UserCancelledError)) {
+        let errorText =
+            error instanceof TxConfirmationCustomError ? error.message : t('send_publish_tx_error');
+        if (error instanceof NotEnoughBalanceError) {
+            errorText = t('confirm_error_insufficient_balance', {
+                balance: error.balance.stringAssetRelativeAmount,
+                required: error.requiredBalance.stringAssetRelativeAmount
+            });
+        }
+
         return (
             <ResultErrorButtonStyled>
                 <ExclamationMarkCircleIconStyled />
-                <ErrorLabelStyled>
-                    {error instanceof TxConfirmationCustomError
-                        ? error.message
-                        : t('send_publish_tx_error')}
-                </ErrorLabelStyled>
+                <ErrorLabelStyled>{errorText}</ErrorLabelStyled>
             </ResultErrorButtonStyled>
         );
     }

@@ -188,14 +188,21 @@ export class TonAssetTransactionService {
             : params.amount.asset.id !== TON_ASSET.id;
     }
 
+    private getTransferAsset(params: TransferParams) {
+        return Array.isArray(params) ? params[0].amount.asset : params.amount.asset;
+    }
+
     private async checkTransferPossibility(
         sender: Sender,
         params: TransferParams,
         estimation?: TonEstimation
     ) {
-        if (sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender) {
-            return;
+        if (Array.isArray(params) && new Set(params.map(p => p.amount.asset.id)).size > 1) {
+            throw new Error('Different assets transfers are not supported at the moment.');
         }
+
+        const isNoGasSender =
+            sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender;
 
         if (!Array.isArray(params) && params.isMax && isTon(params.amount.asset.address)) {
             return;
@@ -203,22 +210,36 @@ export class TonAssetTransactionService {
 
         const isJettonTransfer = this.isJettonTransfer(params);
 
-        let requiredBalance = Array.isArray(params)
-            ? params.reduce(
-                  (acc, p) =>
-                      acc.plus(
-                          isJettonTransfer
-                              ? new BigNumber(JettonEncoder.jettonTransferAmount.toString())
-                              : p.amount.weiAmount
-                      ),
-                  new BigNumber(0)
-              )
-            : isJettonTransfer
-            ? new BigNumber(JettonEncoder.jettonTransferAmount.toString())
-            : params.amount.weiAmount;
+        let requiredTonBalance;
+        let requiredJettonBalance;
+        if (isJettonTransfer) {
+            if (!isNoGasSender) {
+                requiredTonBalance = Array.isArray(params)
+                    ? new BigNumber(JettonEncoder.jettonTransferAmount.toString()).multipliedBy(
+                          params.length
+                      )
+                    : new BigNumber(JettonEncoder.jettonTransferAmount.toString());
+            }
+
+            requiredJettonBalance = Array.isArray(params)
+                ? params.reduce((acc, p) => acc.plus(p.amount.weiAmount), new BigNumber(0))
+                : params.amount.weiAmount;
+        } else {
+            requiredTonBalance = Array.isArray(params)
+                ? params.reduce((acc, p) => acc.plus(p.amount.weiAmount), new BigNumber(0))
+                : params.amount.weiAmount;
+        }
 
         if (estimation) {
-            requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));
+            if (isTon(estimation.extra.asset.address)) {
+                requiredTonBalance = (requiredTonBalance || new BigNumber(0)).plus(
+                    getTonEstimationTonFee(estimation)
+                );
+            } else if (estimation.extra.asset.id === this.getTransferAsset(params).id) {
+                requiredJettonBalance = (requiredJettonBalance || new BigNumber(0)).plus(
+                    estimation.extra.weiAmount
+                );
+            }
 
             if (
                 isJettonTransfer &&
@@ -230,7 +251,24 @@ export class TonAssetTransactionService {
             }
         }
 
-        await assertBalanceEnough(this.api, requiredBalance, this.wallet.rawAddress);
+        if (requiredTonBalance) {
+            await assertBalanceEnough(
+                this.api,
+                requiredTonBalance,
+                TON_ASSET,
+                this.wallet.rawAddress
+            );
+        }
+
+        if (requiredJettonBalance) {
+            await assertBalanceEnough(
+                this.api,
+                requiredJettonBalance,
+                this.getTransferAsset(params),
+                this.wallet.rawAddress
+            );
+        }
+
         if (Array.isArray(params) && isStandardTonWallet(this.wallet)) {
             assertMessagesNumberSupported(params.length, this.wallet.version);
         }

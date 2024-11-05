@@ -27,7 +27,6 @@ import { AppRoute } from '../../../libs/routes';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { MultiSendReceiversNotification } from './MultiSendReceiversNotification';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AccountAndWalletInfo } from '../../account/AccountAndWalletInfo';
 import { ActionFeeDetailsUniversal } from '../../activity/NotificationCommon';
 import {
@@ -308,17 +307,16 @@ const ButtonBlock: FC<{
     };
 
     if (estimationError instanceof NotEnoughBalanceError) {
-        const balance = format(estimationError.balanceWei, TON_ASSET.decimals) + ' TON';
-        const requiredBalance =
-            format(estimationError.requiredBalanceWei, TON_ASSET.decimals) + ' TON';
-
         return (
             <ResultButtonStyled>
                 <ExclamationMarkCircleIconStyled />
                 <Label2>
                     {t('multisend_confirm_error_insufficient_ton_for_fee')
-                        .replace('%balance%', balance)
-                        .replace('%required%', requiredBalance)}
+                        .replace('%balance%', estimationError.balance.stringAssetRelativeAmount)
+                        .replace(
+                            '%required%',
+                            estimationError.requiredBalance.stringAssetRelativeAmount
+                        )}
                 </Label2>
             </ResultButtonStyled>
         );

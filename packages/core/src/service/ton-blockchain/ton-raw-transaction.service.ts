@@ -5,6 +5,7 @@ import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { TonContract } from '../../entries/wallet';
 import { Address, Cell, internal, SendMode } from '@ton/core';
 import { assertBalanceEnough } from './utils';
+import { TON_ASSET } from '../../entries/crypto/asset/constants';
 
 export type TonRawTransaction = {
     to: Address;
@@ -72,6 +73,6 @@ export class TonRawTransactionService {
 
         requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));
 
-        await assertBalanceEnough(this.api, requiredBalance, this.wallet.rawAddress);
+        await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.wallet.rawAddress);
     }
 }

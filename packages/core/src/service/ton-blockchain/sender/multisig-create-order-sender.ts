@@ -10,6 +10,7 @@ import { WalletMessageSender } from './wallet-message-sender';
 import BigNumber from 'bignumber.js';
 import { LedgerMessageSender } from './ledger-message-sender';
 import { internal, SendMode } from '@ton/core';
+import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(
@@ -70,6 +71,7 @@ export class MultisigCreateOrderSender implements ISender {
         await assertBalanceEnough(
             this.api,
             new BigNumber(MultisigEncoder.createOrderAmount.toString()),
+            TON_ASSET,
             this.hostWallet.rawAddress
         );
 

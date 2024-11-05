@@ -18,6 +18,7 @@ import { TonConnectEncoder } from './encoder/ton-connect-encoder';
 import { assertBalanceEnough, assertMessagesNumberSupported } from './utils';
 import { Cell } from '@ton/core';
 import { assertUnreachable } from '../../utils/types';
+import { TON_ASSET } from '../../entries/crypto/asset/constants';
 
 export class TonConnectTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
@@ -105,6 +106,6 @@ export class TonConnectTransactionService {
 
         requiredBalance = requiredBalance.plus(getTonEstimationTonFee(estimation));
 
-        await assertBalanceEnough(this.api, requiredBalance, this.wallet.rawAddress);
+        await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.wallet.rawAddress);
     }
 }

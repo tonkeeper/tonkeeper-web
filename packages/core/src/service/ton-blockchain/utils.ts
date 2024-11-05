@@ -10,6 +10,14 @@ import BigNumber from 'bignumber.js';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
 import { AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import nacl from 'tweetnacl';
+import { AssetIdentification } from '../../entries/crypto/asset/asset-identification';
+import { BLOCKCHAIN_NAME } from '../../entries/crypto';
+import {
+    isTon,
+    jettonToTonAssetAmount,
+    tonAssetAddressToString
+} from '../../entries/crypto/asset/ton-asset';
+import { formatAddress } from '../../utils/common';
 
 export const estimationSigner = async (message: Cell): Promise<Buffer> => {
     return sign(message.hash(), Buffer.alloc(64));
@@ -68,21 +76,24 @@ export const externalMessage = (contract: WalletContract, seqno: number, body: C
 
 export const assertBalanceEnough = async (
     api: APIConfig,
-    total: BigNumber | bigint,
-    wallet: string
+    totalWei: BigNumber | bigint,
+    asset: AssetIdentification,
+    walletAddress: string
 ) => {
-    const [acc] = await getWalletBalance(api, { rawAddress: wallet });
+    const balance = await getWalletBalance(api, walletAddress, asset);
 
-    if (!(total instanceof BigNumber)) {
-        total = new BigNumber(total.toString());
+    if (!(totalWei instanceof BigNumber)) {
+        totalWei = new BigNumber(totalWei.toString());
     }
 
-    if (total.isGreaterThanOrEqualTo(acc.balance)) {
+    const total = new AssetAmount({ asset: balance.asset, weiAmount: totalWei });
+
+    if (totalWei.isGreaterThan(balance.weiAmount)) {
         throw new NotEnoughBalanceError(
-            `Not enough account "${acc.address}" amount: "${
-                acc.balance
-            }", transaction total: ${total.toString()}`,
-            new BigNumber(acc.balance),
+            `Not enough account "${formatAddress(walletAddress)}" amount: "${
+                balance.stringAssetRelativeAmount
+            }", transaction total: ${total.stringAssetRelativeAmount}`,
+            balance,
             total
         );
     }
@@ -95,13 +106,28 @@ export const getWalletSeqNo = async (api: APIConfig, accountId: string) => {
     return seqno;
 };
 
-export const getWalletBalance = async (api: APIConfig, walletState: { rawAddress: string }) => {
-    const wallet = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: walletState.rawAddress
-    });
-    const seqno = await getWalletSeqNo(api, walletState.rawAddress);
+export const getWalletBalance = async (
+    api: APIConfig,
+    walletAddress: string,
+    asset: AssetIdentification
+) => {
+    if (asset.blockchain !== BLOCKCHAIN_NAME.TON) {
+        throw new Error('Tron assets are not supported');
+    }
 
-    return [wallet, seqno] as const;
+    if (isTon(asset.address)) {
+        const wallet = await new AccountsApi(api.tonApiV2).getAccount({
+            accountId: walletAddress
+        });
+        return new AssetAmount({ asset: TON_ASSET, weiAmount: BigNumber(wallet.balance) });
+    }
+
+    const jettonBalance = await new AccountsApi(api.tonApiV2).getAccountJettonBalance({
+        accountId: walletAddress,
+        jettonId: tonAssetAddressToString(asset.address)
+    });
+
+    return jettonToTonAssetAmount(jettonBalance);
 };
 
 export const getServerTime = async (api: APIConfig) => {
