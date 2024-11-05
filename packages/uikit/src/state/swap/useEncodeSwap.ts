@@ -57,7 +57,7 @@ export function useEncodeSwapToTonConnectParams() {
             const batterySwapsEnabled = activeWalletConfig
                 ? activeWalletConfig.batterySettings.enabledForSwaps
                 : true;
-            if (batteryBalance && batterySwapsEnabled) {
+            if (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled) {
                 resultsPromises.push(
                     encode({ ...swap, excessAddress: Address.parse(batteryExcess).toRawString() })
                 );
