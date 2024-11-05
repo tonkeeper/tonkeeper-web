@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
 import {
+    useBatteryMinBootstrapValue,
     useBatteryPacksReservedApplied,
     useBatteryUnitTonRate,
     usePurchaseBatteryUnitTokenRate
@@ -58,6 +59,7 @@ export const BatteryPacksSelect: FC<{
     const { t } = useTranslation();
     const unitToTonRate = useBatteryUnitTonRate();
     const unitToTokenRate = usePurchaseBatteryUnitTokenRate(legacyTonAssetId(asset));
+    const minValue = useBatteryMinBootstrapValue(asset);
 
     const { data: tokenRate } = useRate(legacyTonAssetId(asset));
     const fiat = useUserFiat();
@@ -72,16 +74,18 @@ export const BatteryPacksSelect: FC<{
                     .multipliedBy(unitToTokenRate || 1),
                 asset: asset
             }),
-        [asset, unitToTonRate, unitToTokenRate]
+        [asset, unitToTokenRate]
     );
 
     const isPackAvailable = useCallback(
         (packPrice: AssetAmount) =>
-            assetWeiBalance && packPriceInToken(packPrice).weiAmount.lt(assetWeiBalance),
+            assetWeiBalance &&
+            packPriceInToken(packPrice).weiAmount.lt(assetWeiBalance) &&
+            packPriceInToken(packPrice).isGT(minValue!),
         [assetWeiBalance, packPriceInToken]
     );
 
-    const allDataFetched = unitToTokenRate && packs && tokenRate && assetWeiBalance;
+    const allDataFetched = unitToTokenRate && packs && tokenRate && assetWeiBalance && minValue;
 
     useEffect(() => {
         if (!allDataFetched) {

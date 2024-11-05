@@ -3,11 +3,7 @@ import {
     useBatteryShouldBeReservedAmount,
     usePurchaseBatteryUnitTokenRate
 } from '../../../state/battery';
-import {
-    legacyTonAssetId,
-    TonAsset,
-    tonAssetAddressToString
-} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { legacyTonAssetId, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import { AmountDoubleInput } from '../../fields/AmountDoubleInput';
@@ -49,7 +45,7 @@ export const BatteryCustomAmountInput: FC<{
     const [selectedAssetAmount, setSelectedAssetAmount] = useState<BigNumber>(new BigNumber(0));
     const isDirty = useRef(false);
 
-    const minValue = useBatteryMinBootstrapValue(tonAssetAddressToString(asset.address));
+    const minValue = useBatteryMinBootstrapValue(asset);
 
     const remainingAssetAmount = useMemo(() => {
         if (!weiBalance) {
@@ -88,10 +84,9 @@ export const BatteryCustomAmountInput: FC<{
             return t('battery_buy_error_not_enough_balance');
         }
 
-        if (minValue && selectedAssetAmount.lt(minValue)) {
+        if (minValue && selectedAssetAmount.lt(minValue.relativeAmount)) {
             return t('battery_buy_error_min', {
-                amount: AssetAmount.fromRelativeAmount({ asset, amount: minValue })
-                    .stringRelativeAmount
+                amount: minValue.stringRelativeAmount
             });
         }
     }, [t, remainingAssetAmount, asset, minValue, selectedAssetAmount]);

@@ -107,7 +107,6 @@ const BatteryRechargeNotificationContent: FC<{
     });
     const { t } = useTranslation();
     const [assetAmountToPay, setAssetAmountToPay] = useState<AssetAmount<TonAsset> | undefined>();
-    const unitToTonRate = useBatteryUnitTonRate();
     const unitToTokenRate = usePurchaseBatteryUnitTokenRate(legacyTonAssetId(asset));
     const toast = useToast();
 
@@ -160,9 +159,7 @@ const BatteryRechargeNotificationContent: FC<{
 
             setAssetAmountToPay(
                 AssetAmount.fromRelativeAmount({
-                    amount: packPrice.relativeAmount
-                        .div(unitToTonRate)
-                        .multipliedBy(unitToTokenRate),
+                    amount: packPrice.relativeAmount.multipliedBy(unitToTokenRate),
                     asset: asset
                 })
             );

@@ -18,6 +18,11 @@ import { toNano } from '@ton/core';
 import type { Config } from '@tonkeeper/core/dist/batteryApi/models/Config';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import { Configuration, ConnectApi, DefaultApi, WalletApi } from '@tonkeeper/core/dist/batteryApi';
+import {
+    isTon,
+    TonAsset,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const useBatteryApi = () => {
     const { config } = useAppContext();
@@ -167,6 +172,9 @@ export const useProvideBatteryAuth = () => {
     return tokenQuery;
 };
 
+/**
+ * ton relative / unit
+ */
 export const useBatteryUnitTonRate = () => {
     const {
         config: { batteryMeanFees }
@@ -190,38 +198,62 @@ export const useBatteryEnabledConfig = () => {
     );
 };
 
-export const useBatteryMinBootstrapValue = (assetAddress: string) => {
+export const useBatteryMinBootstrapValue = (asset: TonAsset) => {
     const methods = useBatteryAvailableRechargeMethods();
     const { data: balance } = useBatteryBalance();
     const shouldReserve = useBatteryShouldBeReservedAmount();
+    const tokenRate = usePurchaseBatteryUnitTokenRate(tonAssetAddressToString(asset.address));
 
     return useMemo(() => {
-        if (!methods || !balance || !shouldReserve) {
+        if (!methods || !balance || !shouldReserve || !tokenRate) {
             return undefined;
         }
 
-        if (assetAddress.toUpperCase() === TON_ASSET.address) {
-            return new BigNumber(shouldReserve.tonUnits.relativeAmount);
+        if (isTon(asset.address)) {
+            return new AssetAmount({
+                asset: TON_ASSET,
+                weiAmount: shouldReserve.tonUnits.weiAmount
+            });
         }
 
+        const shouldReserveInTokenWei = shouldReserve.batteryUnits.multipliedBy(tokenRate);
+        /**
+         * if can cover jetton fees with own balance
+         */
         if (
             balance.tonUnitsBalance.weiAmount.gt(
                 new BigNumber((JettonEncoder.jettonTransferAmount + toNano(0.03)).toString())
             )
         ) {
-            return new BigNumber(shouldReserve.tonUnits.relativeAmount);
+            return new AssetAmount({
+                asset,
+                weiAmount: shouldReserveInTokenWei
+            });
         }
-        const method = methods.find(m => m.jettonMaster === assetAddress)!;
+        const method = methods.find(
+            m => m.jettonMaster === tonAssetAddressToString(asset.address)
+        )!;
 
         if (!method.minBootstrapValue) {
-            return new BigNumber(shouldReserve.tonUnits.relativeAmount);
+            return new AssetAmount({
+                asset,
+                weiAmount: shouldReserveInTokenWei
+            });
         }
 
-        const bootstrapValue = new BigNumber(method.minBootstrapValue);
-        return bootstrapValue.gt(shouldReserve.tonUnits.relativeAmount)
+        const bootstrapValue = AssetAmount.fromRelativeAmount({
+            asset,
+            amount: method.minBootstrapValue
+        }).weiAmount;
+        const min = bootstrapValue.gt(shouldReserveInTokenWei)
             ? bootstrapValue
-            : new BigNumber(shouldReserve.tonUnits.relativeAmount);
-    }, [methods, balance, assetAddress, shouldReserve]);
+            : shouldReserveInTokenWei;
+
+        return new AssetAmount({
+            asset,
+            weiAmount: min
+        });
+    }, [methods, balance, asset, shouldReserve]);
 };
 
 export type BatteryBalance = {
@@ -290,9 +322,13 @@ export const useBatteryShouldBeReservedAmount = () => {
     }, [balance, config, rate]);
 };
 
+/**
+ * token relative/unit
+ * @param assetAddress
+ */
 export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
-    const unitTonRate = useBatteryUnitTonRate();
     const methods = useBatteryAvailableRechargeMethods();
+    const unitTonRate = useBatteryUnitTonRate();
 
     return useMemo(() => {
         if (!methods) {
@@ -303,8 +339,11 @@ export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
             return unitTonRate.div(methods.find(m => m.type === 'ton')!.rate);
         }
 
+        /**
+         * api rate is ton / jetton
+         */
         return unitTonRate.div(methods.find(m => m.jettonMaster === assetAddress)!.rate);
-    }, [unitTonRate, methods, assetAddress]);
+    }, [methods, assetAddress]);
 };
 
 export const useBatteryPacks = () => {
