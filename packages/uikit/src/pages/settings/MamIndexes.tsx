@@ -14,7 +14,8 @@ import {
     useActiveAccount,
     useCreateMAMAccountDerivation,
     useHideMAMAccountDerivation,
-    useEnableMAMAccountDerivation
+    useEnableMAMAccountDerivation,
+    useActiveConfig
 } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
@@ -138,7 +139,7 @@ export const MAMIndexesPageContent: FC<{
     buttonWrapperClassName?: string;
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { data: proState } = useProState();
     const { onOpen: recovery } = useRecoveryNotification();
     const { onOpen: buyPro } = useProFeaturesNotification();

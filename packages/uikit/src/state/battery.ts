@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import type { RechargeMethods } from '@tonkeeper/core/dist/batteryApi/models/RechargeMethods';
 
-import { useActiveAccount } from './wallet';
+import { useActiveAccount, useActiveConfig } from './wallet';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
@@ -25,7 +25,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const useBatteryApi = () => {
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     return useMemo(() => {
         return new Configuration({
             basePath: config.batteryHost || 'https://battery.tonkeeper.com'
@@ -176,17 +176,13 @@ export const useProvideBatteryAuth = () => {
  * ton relative / unit
  */
 export const useBatteryUnitTonRate = () => {
-    const {
-        config: { batteryMeanFees }
-    } = useAppContext();
+    const { batteryMeanFees } = useActiveConfig();
 
     return useMemo(() => new BigNumber(batteryMeanFees || '0.0026'), [batteryMeanFees]);
 };
 
 export const useBatteryEnabledConfig = () => {
-    const {
-        config: { battery_beta, disable_battery, disable_battery_send }
-    } = useAppContext();
+    const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
 
     return useMemo(
         () => ({
@@ -298,7 +294,7 @@ export const useBatteryBalance = () => {
 
 export const useBatteryShouldBeReservedAmount = () => {
     const { data: balance } = useBatteryBalance();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const rate = useBatteryUnitTonRate();
 
     return useMemo(() => {

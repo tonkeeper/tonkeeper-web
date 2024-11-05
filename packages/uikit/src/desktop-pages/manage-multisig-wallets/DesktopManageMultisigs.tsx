@@ -22,6 +22,7 @@ import { Button } from '../../components/fields/Button';
 import {
     useAccountsState,
     useActiveAccount,
+    useActiveConfig,
     useCreateAccountTonMultisig,
     useMutateActiveAccount
 } from '../../state/wallet';
@@ -252,7 +253,7 @@ const Buttons = styled.div`
 
 const EmptyMultisigsPage = () => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
     const { onOpen: addWallet } = useAddWalletNotification();
 

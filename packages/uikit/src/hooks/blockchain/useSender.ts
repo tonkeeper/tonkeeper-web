@@ -7,7 +7,12 @@ import {
     Sender
 } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { useAppContext } from '../appContext';
-import { useAccountsState, useActiveAccount, useActiveTonWalletConfig } from '../../state/wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useActiveConfig,
+    useActiveTonWalletConfig
+} from '../../state/wallet';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import {
     useBatteryApi,
@@ -64,9 +69,7 @@ export const useAvailableSendersChoices = (
     const { data: config } = useActiveTonWalletConfig();
     const { data: batteryBalance } = useBatteryBalance();
     const account = useActiveAccount();
-    const {
-        config: { batteryReservedAmount }
-    } = useAppContext();
+    const { batteryReservedAmount } = useActiveConfig();
     const gaslessConfig = useGaslessConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const [walletInfo] = useAssets();

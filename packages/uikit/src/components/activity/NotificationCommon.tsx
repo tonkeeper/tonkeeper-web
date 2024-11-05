@@ -24,7 +24,7 @@ import { ListItem, ListItemPayload } from '../List';
 import { Body1, Body2Class, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
-import { useActiveTonNetwork } from '../../state/wallet';
+import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
 import {
     SenderChoiceUserAvailable,
     SenderTypeUserAvailable
@@ -572,7 +572,7 @@ export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> 
     event,
     children
 }) => {
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const url = config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
     return (
         <CommonActionDetailsBlock url={url} eventId={event.eventId}>

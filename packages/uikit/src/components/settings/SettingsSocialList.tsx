@@ -6,11 +6,12 @@ import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative } from '../../libs/routes';
 import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
+import { useActiveConfig } from '../../state/wallet';
 
 export const SettingsSocialList: FC = React.memo(() => {
     const navigate = useNavigate();
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
 
     const { t } = useTranslation();
     const items = useMemo(() => {

@@ -200,7 +200,7 @@ export const Loader: FC = React.memo(() => {
         build: sdk.version,
         lang: localizationFrom(browser.i18n.getUILanguage())
     });
-    const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     const { data: tracker } = useAnalytics(
         sdk.storage,
@@ -212,7 +212,7 @@ export const Loader: FC = React.memo(() => {
     if (
         activeWalletLoading ||
         isWalletsLoading ||
-        !config ||
+        !serverConfig ||
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
@@ -227,10 +227,11 @@ export const Loader: FC = React.memo(() => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(config, Network.MAINNET),
-        testnetApi: getApiConfig(config, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
+        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: serverConfig.mainnetConfig,
+        testnetConfig: serverConfig.testnetConfig,
         tonendpoint,
         ios: false,
         standalone: true,

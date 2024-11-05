@@ -12,6 +12,7 @@ import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
 import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
+import { useActiveConfig } from '../../state/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -132,7 +133,7 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
     showMamInfo
 }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
 
     return (

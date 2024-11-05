@@ -36,11 +36,19 @@ export const useTonendpoint = (options: {
     }, [options.targetEnv, options.build, options.network, options.lang, options.platform]);
 };
 
+export interface ServerConfig {
+    mainnetConfig: TonendpointConfig;
+    testnetConfig: TonendpointConfig;
+}
+
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
-    return useQuery<TonendpointConfig, Error>(
+    return useQuery<ServerConfig, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpoint],
         async () => {
-            return getServerConfig(tonendpoint);
+            return {
+                mainnetConfig: await getServerConfig(tonendpoint, Network.MAINNET),
+                testnetConfig: await getServerConfig(tonendpoint, Network.TESTNET)
+            };
         }
     );
 };
@@ -78,9 +86,10 @@ export const useTonendpointBuyMethods = () => {
 
 export const useCreateMercuryoProUrl = () => {
     const { tonendpoint } = useAppContext();
-    const { data } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     return useMutation<string, Error, string>(async baseUrl => {
+        const data = serverConfig?.mainnetConfig;
         try {
             if (!data?.mercuryo_otc_id) {
                 throw new Error('Missing mercuryo get otc url');

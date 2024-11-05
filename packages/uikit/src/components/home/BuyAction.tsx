@@ -24,6 +24,7 @@ import { CommonCountryButton } from '../fields/RoundedButton';
 import { Action } from './Actions';
 import { BuyItemNotification } from './BuyItemNotification';
 import { BuyIcon, SellIcon } from './HomeIcons';
+import { useActiveConfig } from '../../state/wallet';
 
 const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ items, kind }) => {
     return (
@@ -53,7 +54,7 @@ const ActionNotification: FC<{
     const { data: country } = useUserCountry();
 
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     return (
         <Block>
             <NotificationHeaderPortal>

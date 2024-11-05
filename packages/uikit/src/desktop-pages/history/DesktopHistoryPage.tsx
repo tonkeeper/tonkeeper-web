@@ -12,7 +12,7 @@ import {
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveConfig, useActiveWallet } from '../../state/wallet';
 import { Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
@@ -76,7 +76,7 @@ const LoaderContainer = styled.div`
 export const DesktopHistoryPage: FC = () => {
     const wallet = useActiveWallet();
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);

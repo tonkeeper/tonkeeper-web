@@ -241,9 +241,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         network,
         lang
     });
-    const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const navigate = useNavigate();
     const { data: tracker } = useAnalytics(
         activeAccount || undefined,
         accounts,
@@ -255,7 +254,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         isWalletsLoading ||
         activeWalletLoading ||
         isLangLoading ||
-        config === undefined ||
+        serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
@@ -268,10 +267,11 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(config, Network.MAINNET),
-        testnetApi: getApiConfig(config, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
+        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: serverConfig.mainnetConfig,
+        testnetConfig: serverConfig.testnetConfig,
         tonendpoint,
         standalone: true,
         extension: false,

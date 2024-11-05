@@ -32,7 +32,6 @@ import {
     useAccountsState,
     useAccountsStateQuery,
     useActiveAccountQuery,
-    useActiveTonNetwork,
     useMutateActiveAccount
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -145,7 +144,7 @@ const Loader: FC = () => {
         build: sdk.version,
         lang
     });
-    const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     useAppHeight();
 
@@ -165,7 +164,7 @@ const Loader: FC = () => {
         isWalletsLoading ||
         activeWalletLoading ||
         isLangLoading ||
-        config === undefined ||
+        serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
@@ -176,10 +175,15 @@ const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(config, Network.MAINNET, import.meta.env.VITE_APP_TONCONSOLE_HOST),
-        testnetApi: getApiConfig(config, Network.TESTNET),
+        mainnetApi: getApiConfig(
+            serverConfig.mainnetConfig,
+            Network.MAINNET,
+            import.meta.env.VITE_APP_TONCONSOLE_HOST
+        ),
+        testnetApi: getApiConfig(serverConfig.mainnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: serverConfig.mainnetConfig,
+        testnetConfig: serverConfig.testnetConfig,
         tonendpoint,
         standalone,
         extension: false,

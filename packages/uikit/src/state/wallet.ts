@@ -744,6 +744,12 @@ export const useMutateRenameAccountDerivations = <T extends AccountMAM>() => {
     });
 };
 
+export const useActiveConfig = () => {
+    const { mainnetConfig, testnetConfig } = useAppContext();
+    const network = useActiveTonNetwork();
+    return network === Network.TESTNET ? testnetConfig : mainnetConfig;
+};
+
 export const useActiveApi = () => {
     const { mainnetApi, testnetApi } = useAppContext();
     const network = useActiveTonNetwork();

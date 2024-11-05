@@ -15,7 +15,8 @@ export interface IAppContext {
     testnetApi: APIConfig;
 
     fiat: FiatCurrencies;
-    config: TonendpointConfig;
+    mainnetConfig: TonendpointConfig;
+    testnetConfig: TonendpointConfig;
     tonendpoint: Tonendpoint;
     standalone: boolean;
     extension: boolean;
@@ -47,7 +48,8 @@ export const AppContext = React.createContext<IAppContext>({
         tronApi: new TronConfiguration()
     },
     fiat: FiatCurrencies.USD,
-    config: defaultTonendpointConfig,
+    mainnetConfig: defaultTonendpointConfig,
+    testnetConfig: defaultTonendpointConfig,
     tonendpoint: new Tonendpoint({ targetEnv: 'web' }, {}),
     standalone: false,
     extension: false,

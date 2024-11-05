@@ -35,13 +35,14 @@ export const useMarkNftAsSpam = () => {
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveTonWalletConfig();
     const { tonendpoint } = useAppContext();
-    const { data: tonendpointConfig } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, NftWithCollectionId>(async nft => {
         let config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         const address = nft.collection?.address || nft.address;
+        const tonendpointConfig = serverConfig?.mainnetConfig;
 
         if (!config.spamNfts.includes(address) && tonendpointConfig?.scam_api_url) {
             let baseUrl = tonendpointConfig?.scam_api_url;

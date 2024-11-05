@@ -283,7 +283,7 @@ export const Loader: FC = () => {
         lang,
         platform: 'desktop'
     });
-    const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     useAppHeight();
 
@@ -305,7 +305,7 @@ export const Loader: FC = () => {
         activeWalletLoading ||
         isLangLoading ||
         isWalletsLoading ||
-        config === undefined ||
+        serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
         !devSettings ||
@@ -316,10 +316,15 @@ export const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(config, Network.MAINNET, REACT_APP_TONCONSOLE_API),
-        testnetApi: getApiConfig(config, Network.TESTNET),
+        mainnetApi: getApiConfig(
+            serverConfig.mainnetConfig,
+            Network.MAINNET,
+            REACT_APP_TONCONSOLE_API
+        ),
+        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: serverConfig.mainnetConfig,
+        testnetConfig: serverConfig.testnetConfig,
         tonendpoint,
         standalone: true,
         extension: false,
