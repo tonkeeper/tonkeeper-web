@@ -107,14 +107,24 @@ export const signTonConnectMnemonicOver = (mnemonic: string[], mnemonicType: Mne
 };
 
 export const useGetActiveAccountSigner = () => {
-    const sdk = useAppSdk();
     const account = useActiveAccount();
+    const _getSigner = useGetAccountSigner();
+    return useCallback(
+        (walletId?: WalletId) => {
+            return _getSigner(account.id, walletId);
+        },
+        [account, _getSigner]
+    );
+};
+
+export const useGetAccountSigner = () => {
+    const sdk = useAppSdk();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useCallback(
-        (walletId?: WalletId) =>
-            getSigner(sdk, account.id, checkTouchId, walletId ? { walletId } : undefined),
-        [sdk, account.id, checkTouchId]
+        (accountId: AccountId, walletId?: WalletId) =>
+            getSigner(sdk, accountId, checkTouchId, walletId ? { walletId } : undefined),
+        [sdk, checkTouchId]
     );
 };
 

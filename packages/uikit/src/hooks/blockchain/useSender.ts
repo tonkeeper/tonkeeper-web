@@ -17,7 +17,7 @@ import {
     useBatteryServiceConfig,
     useRequestBatteryAuthToken
 } from '../../state/battery';
-import { useGetActiveAccountSigner } from '../../state/mnemonic';
+import { useGetAccountSigner } from '../../state/mnemonic';
 import { useCallback, useMemo } from 'react';
 import {
     TonAsset,
@@ -347,7 +347,7 @@ export const useGetSender = () => {
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
     const { data: authToken } = useBatteryAuthToken();
-    const getSigner = useGetActiveAccountSigner();
+    const getSigner = useGetAccountSigner();
     const activeAccount = useActiveAccount();
     const { mutateAsync } = useRequestBatteryAuthToken();
     const accounts = useAccountsState();
@@ -366,11 +366,11 @@ export const useGetSender = () => {
                     throw new Error('Multisig sender available only for multisig accounts');
                 }
 
-                const { signerWallet } = getMultisigSignerInfo(
+                const { signerAccount, signerWallet } = getMultisigSignerInfo(
                     accounts,
                     activeAccount as AccountTonMultisig
                 );
-                const signer = await getSigner(signerWallet.id);
+                const signer = await getSigner(signerAccount.id, signerWallet.id);
 
                 const multisigApi = new MultisigApi(api.tonApiV2);
                 const multisig = await multisigApi.getMultisigAccount({
@@ -393,7 +393,7 @@ export const useGetSender = () => {
                 throw new Error("Can't send a transfer using this wallet type");
             }
 
-            const signer = await getSigner();
+            const signer = await getSigner(activeAccount.id);
 
             if (!signer) {
                 throw new Error("Can't send a transfer using this account");
