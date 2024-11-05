@@ -90,7 +90,6 @@ export const useAvailableSendersChoices = (
             }
 
             let batteryAvailable = false;
-
             if (operation.type === 'transfer') {
                 batteryAvailable =
                     !!config?.batterySettings.enabledForTokens && asset?.id !== TON_ASSET.id;
@@ -102,21 +101,25 @@ export const useAvailableSendersChoices = (
                 batteryAvailable = false;
             }
 
-            let availableSenders: SenderChoiceUserAvailable[];
+            const potentialSenders: {
+                choice: SenderChoiceUserAvailable;
+                priority: number;
+            }[] = [{ choice: EXTERNAL_SENDER_CHOICE, priority: 2 }];
 
-            if (!batteryBalance) {
-                availableSenders = batteryAvailable
-                    ? [EXTERNAL_SENDER_CHOICE, BATTERY_SENDER_CHOICE]
-                    : [EXTERNAL_SENDER_CHOICE];
-            } else if (
-                batteryReservedAmount &&
-                batteryBalance.tonUnitsReserved.relativeAmount.lt(batteryReservedAmount)
-            ) {
-                availableSenders = [EXTERNAL_SENDER_CHOICE];
-            } else {
-                availableSenders = batteryAvailable
-                    ? [BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE]
-                    : [EXTERNAL_SENDER_CHOICE];
+            if (batteryAvailable) {
+                if (!batteryBalance || !batteryReservedAmount) {
+                    potentialSenders.push({
+                        choice: BATTERY_SENDER_CHOICE,
+                        priority: 0
+                    });
+                } else if (
+                    batteryBalance.tonUnitsReserved.relativeAmount.gte(batteryReservedAmount)
+                ) {
+                    potentialSenders.push({
+                        choice: BATTERY_SENDER_CHOICE,
+                        priority: 4
+                    });
+                }
             }
 
             if (isGaslessAvailable({ asset, account, gaslessConfig })) {
@@ -124,13 +127,20 @@ export const useAvailableSendersChoices = (
                     walletInfo!.ton.info.balance <
                     JettonEncoder.jettonTransferAmount + toNano(0.005)
                 ) {
-                    availableSenders.unshift({ type: 'gasless', asset: asset! });
+                    potentialSenders.push({
+                        choice: { type: 'gasless', asset: asset! },
+                        priority: 3
+                    });
                 } else {
-                    availableSenders.push({ type: 'gasless', asset: asset! });
+                    potentialSenders.push({
+                        choice: { type: 'gasless', asset: asset! },
+                        priority: 1
+                    });
                 }
             }
+            potentialSenders.sort((s1, s2) => s2.priority - s1.priority);
 
-            return availableSenders;
+            return potentialSenders.map(s => s.choice);
         },
         {
             enabled:
