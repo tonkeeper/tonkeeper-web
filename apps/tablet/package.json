@@ -1,0 +1,53 @@
+{
+  "name": "@tonkeeper/tablet",
+  "version": "3.0.0",
+  "license": "Apache-2.0",
+  "description": "Your tablet wallet on The Open Network",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tonkeeper/tonkeeper-web.git"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Ton APPS UK Limited",
+    "email": "support@tonkeeper.com"
+  },
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build && cap sync",
+    "preview": "vite preview",
+    "sync": "cap sync"
+  },
+  "dependencies": {
+    "@capacitor/camera": "latest",
+    "@capacitor/clipboard": "^6.0.1",
+    "@capacitor/core": "latest",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/preferences": "^6.0.2",
+    "@capacitor/splash-screen": "latest",
+    "@tanstack/react-query": "4.3.4",
+    "@tonkeeper/core": "0.1.0",
+    "@tonkeeper/locales": "0.1.0",
+    "@tonkeeper/uikit": "0.1.0",
+    "buffer": "^6.0.3",
+    "copy-to-clipboard": "^3.3.3",
+    "crypto-browserify": "^3.12.0",
+    "eventsource": "^2.0.2",
+    "i18next": "^23.7.7",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-i18next": "^13.5.0",
+    "react-router-dom": "^6.20.1",
+    "stream-browserify": "^3.0.0",
+    "styled-components": "^6.1.1",
+    "uuid": "^11.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "latest",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.2",
+    "vite-plugin-node-polyfills": "0.17.0"
+  },
+  "packageManager": "yarn@4.3.0"
+}
