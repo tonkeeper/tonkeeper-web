@@ -229,8 +229,19 @@ jobs:
             - name: Summary
               run: |
                   echo '### Successful TWA deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
                   echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
                   echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              with:
+                  message: |
+                      ### Successful TWA deployment 🚀🚀🚀
+                      Well done!
+                      Link to test environment:
+                      https://t.me/tonkeeperdevbot
+                  comment-tag: twa_deploy
 
     extension-build:
         name: extension-build
