@@ -23,6 +23,7 @@ export class BatteryMessageSender implements ISender {
             batteryApi: Configuration;
         },
         private readonly wallet: TonWalletStandard,
+
         private readonly signer: CellSigner,
         private readonly network: Network
     ) {}

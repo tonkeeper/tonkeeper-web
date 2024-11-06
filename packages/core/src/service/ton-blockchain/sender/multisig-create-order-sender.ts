@@ -10,8 +10,8 @@ import { WalletMessageSender } from './wallet-message-sender';
 import BigNumber from 'bignumber.js';
 import { LedgerMessageSender } from './ledger-message-sender';
 import { internal, SendMode } from '@ton/core';
-import { Network } from '../../../entries/network';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
+import { Network } from '../../../entries/network';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(
@@ -19,6 +19,7 @@ export class MultisigCreateOrderSender implements ISender {
         private readonly multisig: Multisig,
         private readonly ttlSeconds: number,
         private readonly hostWallet: TonWalletStandard,
+        private readonly signer: Signer,
         private readonly network: Network
     ) {}
 
