@@ -361,6 +361,9 @@ export const useGetSender = () => {
                 throw new Error("Can't send a transfer using this account");
             }
 
+            /**
+             * create multisig order
+             */
             if (senderChoice.type === 'multisig') {
                 if (activeAccount.type !== 'ton-multisig') {
                     throw new Error('Multisig sender available only for multisig accounts');
@@ -387,6 +390,27 @@ export const useGetSender = () => {
                     signerWallet,
                     signer
                 );
+            }
+
+            /**
+             * sign existing multisig order
+             */
+            if (activeAccount.type === 'ton-multisig') {
+                if (senderChoice.type !== 'external') {
+                    throw new Error('Multisig signes existing orders only via external sender');
+                }
+
+                const { signerAccount, signerWallet } = getMultisigSignerInfo(
+                    accounts,
+                    activeAccount as AccountTonMultisig
+                );
+                const signer = await getSigner(signerAccount.id, signerWallet.id);
+
+                if (signer.type !== 'cell') {
+                    throw new Error('Unexpected signer type');
+                }
+
+                return new WalletMessageSender(api, signerWallet, signer);
             }
 
             if (!isStandardTonWallet(wallet)) {
