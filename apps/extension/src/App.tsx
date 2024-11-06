@@ -38,11 +38,7 @@ import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/imp
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import {
-    useActiveAccountQuery,
-    useAccountsStateQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveAccountQuery, useAccountsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
