@@ -186,7 +186,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 const batterySender = new BatteryMessageSender(
                     {
                         messageTtl: batteryConfig.messageTtl,
-                        jettonResponseAddress: batteryConfig.excessAccount,
+                        excessAddress: batteryConfig.excessAccount,
                         authToken: batteryAuthToken
                     },
                     { batteryApi, tonApi: api },
@@ -313,7 +313,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
 
                 return new BatteryMessageSender(
                     {
-                        jettonResponseAddress: batteryConfig.excessAccount,
+                        excessAddress: batteryConfig.excessAccount,
                         messageTtl: batteryConfig.messageTtl,
                         authToken: _authToken!
                     },
@@ -467,7 +467,7 @@ export const useGetSender = () => {
                 }
                 return new BatteryMessageSender(
                     {
-                        jettonResponseAddress: batteryConfig.excessAccount,
+                        excessAddress: batteryConfig.excessAccount,
                         messageTtl: batteryConfig.messageTtl,
                         authToken: batteryToken
                     },
