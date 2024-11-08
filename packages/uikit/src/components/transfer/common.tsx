@@ -17,7 +17,7 @@ import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
 import { useIsActiveWalletLedger } from '../../state/ledger';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 
 export const duration = 300;
@@ -391,10 +391,14 @@ export const makeTransferInitData = (
     toAccount: Account,
     jettons: JettonsBalances | undefined
 ): InitTransferData => {
+    const address =
+        tonTransfer.address && seeIfValidTonAddress(tonTransfer.address)
+            ? tonTransfer.address
+            : formatAddress(toAccount.address);
     const initRecipient: TonRecipientData = {
         address: {
             blockchain: BLOCKCHAIN_NAME.TON,
-            address: formatAddress(toAccount.address)
+            address
         },
         toAccount,
         comment: tonTransfer.text ?? '',
