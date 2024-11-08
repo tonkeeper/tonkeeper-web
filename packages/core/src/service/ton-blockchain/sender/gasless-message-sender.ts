@@ -28,7 +28,7 @@ export class GaslessMessageSender implements ISender {
         this.gaslessApi = new GaslessApi(this.api.tonApiV2);
     }
 
-    public get jettonResponseAddress() {
+    public get excessAddress() {
         return this.gaslessConfig.relayerAddress;
     }
 

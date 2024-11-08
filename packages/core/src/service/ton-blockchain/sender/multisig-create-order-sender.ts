@@ -23,7 +23,7 @@ export class MultisigCreateOrderSender implements ISender {
         private readonly network: Network
     ) {}
 
-    public get jettonResponseAddress() {
+    public get excessAddress() {
         return this.multisig.address;
     }
 

@@ -89,7 +89,7 @@ export const useOpenBrowser = () => {
 
     return useCallback(() => {
         if (tracker) {
-            tracker.track('open_browser', {});
+            tracker.track('browser_open', {});
         }
     }, [tracker]);
 };

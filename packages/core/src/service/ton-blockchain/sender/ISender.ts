@@ -3,7 +3,7 @@ import { Cell } from '@ton/core';
 import { Estimation } from '../../../entries/send';
 
 export interface ISender {
-    jettonResponseAddress: string;
+    excessAddress: string;
 
     send(outgoing: WalletOutgoingMessage): Promise<Cell>;
 

@@ -2,7 +2,7 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Body2, Body3, Label2 } from '../../components/Text';
+import { Body2, Body2Class, Body3, Label2 } from '../../components/Text';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -47,11 +47,23 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
 `;
 
+const NewMultisigButton = styled.button`
+    ${Body2Class};
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+
+    color: ${p => p.theme.textAccent};
+    margin-right: -8px;
+    margin-left: auto;
+`;
+
 export const DesktopManageMultisigsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const isActiveAccountMultisigManagable = isAccountCanManageMultisigs(activeAccount);
+    const { onOpen: addWallet } = useAddWalletNotification();
 
     if (!isActiveAccountMultisigManagable) {
         return <Navigate to={AppRoute.home} />;
@@ -61,6 +73,9 @@ export const DesktopManageMultisigsPage = () => {
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
                 <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                <NewMultisigButton onClick={() => addWallet({ walletType: 'multisig' })}>
+                    {t('add_wallet_new_multisig_title')}
+                </NewMultisigButton>
             </DesktopViewHeader>
             <DesktopManageMultisigsPageBody />
         </DesktopViewPageLayoutStyled>

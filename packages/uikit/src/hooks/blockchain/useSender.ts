@@ -196,7 +196,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 const batterySender = new BatteryMessageSender(
                     {
                         messageTtl: batteryConfig.messageTtl,
-                        jettonResponseAddress: batteryConfig.excessAccount,
+                        excessAddress: batteryConfig.excessAccount,
                         authToken: batteryAuthToken
                     },
                     { batteryApi, tonApi: api },
@@ -330,7 +330,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
 
                 return new BatteryMessageSender(
                     {
-                        jettonResponseAddress: batteryConfig.excessAccount,
+                        excessAddress: batteryConfig.excessAccount,
                         messageTtl: batteryConfig.messageTtl,
                         authToken: _authToken!
                     },
@@ -382,6 +382,9 @@ export const useGetSender = () => {
             const network = getNetworkByAccount(activeAccount);
             const [api] = getContextApiByNetwork(appContext, network);
 
+            /**
+             * create multisig order
+             */
             if (senderChoice.type === 'multisig') {
                 if (activeAccount.type !== 'ton-multisig') {
                     throw new Error('Multisig sender available only for multisig accounts');
@@ -409,6 +412,27 @@ export const useGetSender = () => {
                     signer,
                     network
                 );
+            }
+
+            /**
+             * sign existing multisig order
+             */
+            if (activeAccount.type === 'ton-multisig') {
+                if (senderChoice.type !== 'external') {
+                    throw new Error('Multisig signes existing orders only via external sender');
+                }
+
+                const { signerAccount, signerWallet } = getMultisigSignerInfo(
+                    accounts,
+                    activeAccount as AccountTonMultisig
+                );
+                const signer = await getSigner(signerAccount.id, signerWallet.id);
+
+                if (signer.type !== 'cell') {
+                    throw new Error('Unexpected signer type');
+                }
+
+                return new WalletMessageSender(api, signerWallet, signer);
             }
 
             if (!isStandardTonWallet(wallet)) {
@@ -466,7 +490,7 @@ export const useGetSender = () => {
                 }
                 return new BatteryMessageSender(
                     {
-                        jettonResponseAddress: batteryConfig.excessAccount,
+                        excessAddress: batteryConfig.excessAccount,
                         messageTtl: batteryConfig.messageTtl,
                         authToken: batteryToken
                     },

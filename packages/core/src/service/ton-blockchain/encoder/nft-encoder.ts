@@ -17,17 +17,19 @@ export class NFTEncoder {
         nftTransferAmountWei,
         nftAddress,
         recipientAddress,
-        forwardPayload
+        forwardPayload,
+        responseAddress
     }: {
         recipientAddress: string;
         nftAddress: string;
         nftTransferAmountWei?: BigNumber;
         forwardPayload?: Cell | null;
+        responseAddress?: string;
     }) => {
         const body = this.nftTransferBody({
             queryId: getTonkeeperQueryId(),
             newOwnerAddress: Address.parse(recipientAddress),
-            responseAddress: Address.parse(this.walletAddress),
+            responseAddress: Address.parse(responseAddress ?? this.walletAddress),
             forwardAmount: NFTEncoder.nftTransferForwardAmount,
             forwardPayload
         });

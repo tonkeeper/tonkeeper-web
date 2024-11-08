@@ -19,7 +19,7 @@ export class WalletMessageSender implements ISender {
         private readonly network: Network
     ) {}
 
-    public get jettonResponseAddress() {
+    public get excessAddress() {
         return this.wallet.rawAddress;
     }
 
