@@ -757,7 +757,10 @@ export const useActiveTonWalletConfig = () => {
     const network = useActiveTonNetwork();
     return useQuery<TonWalletConfig, Error>(
         [wallet.rawAddress, network, QueryKey.walletConfig],
-        async () => getActiveWalletConfig(sdk, wallet.rawAddress, network)
+        async () => getActiveWalletConfig(sdk, wallet.rawAddress, network),
+        {
+            keepPreviousData: true
+        }
     );
 };
 

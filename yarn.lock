@@ -6799,9 +6799,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@https://github.com/tonkeeper/tonkeeper-ton#build10":
-  version: 13.11.1
-  resolution: "@ton/ton@https://github.com/tonkeeper/tonkeeper-ton.git#commit=0b82d8f6dd324296b1290578f89d0cf1c21e5302"
+"@ton/ton@npm:^15.1.0":
+  version: 15.1.0
+  resolution: "@ton/ton@npm:15.1.0"
   dependencies:
     axios: "npm:^1.6.7"
     dataloader: "npm:^2.0.0"
@@ -6809,9 +6809,9 @@ __metadata:
     teslabot: "npm:^1.3.0"
     zod: "npm:^3.21.4"
   peerDependencies:
-    "@ton/core": ">=0.56.0"
+    "@ton/core": ">=0.59.0"
     "@ton/crypto": ">=3.2.0"
-  checksum: 10/ee56a1391ee844dd169abba21de44112d87e1ae984a1769de655ea6b70918ab2ffe52ea525470ba6f7b4760d2e2050a15208a4679601ffe84b8fba006a6a3f47
+  checksum: 10/8adde2c60858af8fd33835dbb0b1ca77fdc039de1a9ee5f8216d4b3366590301f56bd160a47a5d2cd9ef18674416e13dd3e0d91e63e90b2f55bdeefbd9b9badf
   languageName: node
   linkType: hard
 
@@ -6826,7 +6826,7 @@ __metadata:
     "@ton-keychain/core": "npm:^0.0.4"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "https://github.com/tonkeeper/tonkeeper-ton#build10"
+    "@ton/ton": "npm:^15.1.0"
     bignumber.js: "npm:^9.1.1"
     bip39: "npm:^3.1.0"
     ethers: "npm:^6.6.5"

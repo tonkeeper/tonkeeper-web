@@ -36,6 +36,11 @@ import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
+import {
+    SenderChoiceUserAvailable,
+    SenderTypeUserAvailable
+} from '../../hooks/blockchain/useSender';
+import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -48,7 +53,7 @@ type ConfirmViewContextValue = {
     estimation: {
         data:
             | {
-                  fee: AssetAmount;
+                  extra: AssetAmount;
               }
             | undefined;
         isLoading: boolean;
@@ -78,10 +83,13 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
+        onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
+        availableSendersChoices?: SenderChoiceUserAvailable[];
+        selectedSenderType?: SenderTypeUserAvailable;
         estimation: {
             data:
                 | {
-                      fee: AssetAmount<T>;
+                      extra: AssetAmount<T>;
                   }
                 | undefined;
             isLoading: boolean;
@@ -99,6 +107,9 @@ export function ConfirmView<T extends Asset = Asset>({
     assetAmount,
     fitContent,
     className,
+    onSenderTypeChange,
+    selectedSenderType,
+    availableSendersChoices,
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, reset } = mutation;
@@ -120,7 +131,11 @@ export function ConfirmView<T extends Asset = Asset>({
         <ConfirmViewDetailsSlot>
             <ConfirmViewDetailsRecipient />
             <ConfirmViewDetailsAmount />
-            <ConfirmViewDetailsFee />
+            <ConfirmViewDetailsFee
+                onSenderTypeChange={onSenderTypeChange}
+                selectedSenderType={selectedSenderType}
+                availableSendersChoices={availableSendersChoices}
+            />
             <ConfirmViewDetailsComment />
         </ConfirmViewDetailsSlot>
     );
@@ -296,11 +311,20 @@ export const ConfirmViewDetailsAmount: FC = () => {
     );
 };
 
-export const ConfirmViewDetailsFee: FC = () => {
+export const ConfirmViewDetailsFee: FC<{
+    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
+    availableSendersChoices?: SenderChoiceUserAvailable[];
+    selectedSenderType?: SenderTypeUserAvailable;
+}> = ({ onSenderTypeChange, availableSendersChoices, selectedSenderType }) => {
     const { estimation } = useConfirmViewContext();
 
     return (
-        <ActionFeeDetailsUniversal fee={estimation.isLoading ? undefined : estimation.data?.fee} />
+        <ActionFeeDetailsUniversal
+            extra={estimation.isLoading ? undefined : estimation.data?.extra}
+            onSenderTypeChange={onSenderTypeChange}
+            availableSendersChoices={availableSendersChoices}
+            selectedSenderType={selectedSenderType}
+        />
     );
 };
 export const ConfirmViewDetailsComment: FC = () => {
@@ -364,14 +388,19 @@ export const ConfirmViewButtons: FC<{
     }
 
     if (error && !(error instanceof UserCancelledError)) {
+        let errorText =
+            error instanceof TxConfirmationCustomError ? error.message : t('send_publish_tx_error');
+        if (error instanceof NotEnoughBalanceError) {
+            errorText = t('confirm_error_insufficient_balance', {
+                balance: error.balance.stringAssetRelativeAmount,
+                required: error.requiredBalance.stringAssetRelativeAmount
+            });
+        }
+
         return (
             <ResultErrorButtonStyled>
                 <ExclamationMarkCircleIconStyled />
-                <ErrorLabelStyled>
-                    {error instanceof TxConfirmationCustomError
-                        ? error.message
-                        : t('send_publish_tx_error')}
-                </ErrorLabelStyled>
+                <ErrorLabelStyled>{errorText}</ErrorLabelStyled>
             </ResultErrorButtonStyled>
         );
     }

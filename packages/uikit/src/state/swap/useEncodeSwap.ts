@@ -7,7 +7,12 @@ import { useAppContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
-import { useActiveWallet } from '../wallet';
+import { useActiveTonWalletConfig, useActiveWallet } from '../wallet';
+import {
+    TON_CONNECT_MSG_VARIANTS_ID,
+    TonConnectTransactionPayload
+} from '@tonkeeper/core/dist/entries/tonConnect';
+import { useBatteryBalance, useBatteryServiceConfig } from '../battery';
 
 export function useEncodeSwap() {
     const wallet = useActiveWallet();
@@ -19,7 +24,7 @@ export function useEncodeSwap() {
     return useMutation<
         { value: string; to: string; body: string },
         Error,
-        NonNullableFields<CalculatedSwap>
+        NonNullableFields<CalculatedSwap> & { excessAddress?: string }
     >(swap => {
         if (!swapOpaitons) {
             throw new Error('SwapOptions query was not resolved yet');
@@ -32,10 +37,64 @@ export function useEncodeSwap() {
                     .div(100)
                     .decimalPlaces(5)
                     .toString(),
-                ...(referral && { referralAddress: Address.parse(referral).toRawString() })
+                ...(referral && { referralAddress: Address.parse(referral).toRawString() }),
+                ...(swap.excessAddress && { excessAddress: swap.excessAddress })
             }
         });
     });
+}
+
+export function useEncodeSwapToTonConnectParams() {
+    const { mutateAsync: encode } = useEncodeSwap();
+    const { data: batteryBalance } = useBatteryBalance();
+    const { excessAccount: batteryExcess } = useBatteryServiceConfig();
+    const { data: activeWalletConfig } = useActiveTonWalletConfig();
+
+    return useMutation<TonConnectTransactionPayload, Error, NonNullableFields<CalculatedSwap>>(
+        async swap => {
+            const resultsPromises = [encode(swap)];
+
+            const batterySwapsEnabled = activeWalletConfig
+                ? activeWalletConfig.batterySettings.enabledForSwaps
+                : true;
+            if (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled) {
+                resultsPromises.push(
+                    encode({ ...swap, excessAddress: Address.parse(batteryExcess).toRawString() })
+                );
+            }
+
+            const results = await Promise.all(resultsPromises);
+            const gasMessage = results[0];
+
+            const tonConnectPayload: TonConnectTransactionPayload = {
+                valid_until: (Date.now() + 10 * 60 * 1000) / 1000,
+                messages: [
+                    {
+                        address: Address.parse(gasMessage.to).toString({ bounceable: true }),
+                        amount: gasMessage.value,
+                        payload: gasMessage.body
+                    }
+                ]
+            };
+
+            const batteryMessage = results[1];
+            if (batteryMessage) {
+                tonConnectPayload.messagesVariants = {
+                    [TON_CONNECT_MSG_VARIANTS_ID.BATTERY]: [
+                        {
+                            address: Address.parse(batteryMessage.to).toString({
+                                bounceable: true
+                            }),
+                            amount: batteryMessage.value,
+                            payload: batteryMessage.body
+                        }
+                    ]
+                };
+            }
+
+            return tonConnectPayload;
+        }
+    );
 }
 
 const swapToProviderSwap = (
@@ -49,6 +108,7 @@ const swapToProviderSwap = (
                 toAsset: string;
                 fromAmount: string;
                 toAmount: string;
+                routerAddress: string;
             }
         };
     }

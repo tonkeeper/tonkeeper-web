@@ -11,7 +11,6 @@ export class SwapService {
      * @param toAsset
      * @param fromAmount
      * @param provider
-     * @param referral
      * @returns any Default Response
      * @throws ApiError
      */
@@ -20,7 +19,6 @@ export class SwapService {
         toAsset: string,
         fromAmount: string,
         provider: ('dedust' | 'stonfi'),
-        referral?: string,
     ): CancelablePromise<({
         provider: 'stonfi';
         trades: Array<({
@@ -31,12 +29,18 @@ export class SwapService {
             blockchainFee: string;
             path: Array<string>;
         } & {
-            stonfiRawTrade: {
+            routerAddress: string;
+            /**
+             * Value that should be passed to stonfiTrade property in encode api method
+             */
+            stonfiRawTrade: ({
                 fromAsset: string;
                 toAsset: string;
                 fromAmount: string;
                 toAmount: string;
-            };
+            } & {
+                routerAddress: string;
+            });
         })>;
     } | {
         provider: 'dedust';
@@ -48,6 +52,9 @@ export class SwapService {
             blockchainFee: string;
             path: Array<string>;
         } & {
+            /**
+             * Value that should be passed to dedustTrade property in encode api method
+             */
             dedustRawTrade: Array<{
                 fromAsset: string;
                 toAsset: string;
@@ -64,7 +71,6 @@ export class SwapService {
                 'fromAsset': fromAsset,
                 'toAsset': toAsset,
                 'fromAmount': fromAmount,
-                'referral': referral,
                 'provider': provider,
             },
             errors: {
@@ -90,17 +96,19 @@ export class SwapService {
                 }>;
             } | {
                 provider: 'stonfi';
-                stonfiTrade: {
+                stonfiTrade: ({
                     fromAsset: string;
                     toAsset: string;
                     fromAmount: string;
                     toAmount: string;
-                };
+                } & {
+                    routerAddress: string;
+                });
             });
             options: {
                 senderAddress: string;
-                referralAddress?: string;
                 slippage: string;
+                excessesAddress?: string;
             };
         },
     ): CancelablePromise<{

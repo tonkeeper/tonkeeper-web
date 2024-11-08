@@ -22,6 +22,10 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
+import { useAppSdk } from '../hooks/appSdk';
+import { useCallback } from 'react';
+import { useActiveAccount } from './wallet';
+import { useCheckTouchId } from './password';
 
 export const signTonConnectOver = ({
     sdk,
@@ -100,6 +104,28 @@ export const signTonConnectMnemonicOver = (mnemonic: string[], mnemonicType: Mne
         );
         return signature;
     };
+};
+
+export const useGetActiveAccountSigner = () => {
+    const account = useActiveAccount();
+    const _getSigner = useGetAccountSigner();
+    return useCallback(
+        (walletId?: WalletId) => {
+            return _getSigner(account.id, walletId);
+        },
+        [account, _getSigner]
+    );
+};
+
+export const useGetAccountSigner = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
+    return useCallback(
+        (accountId: AccountId, walletId?: WalletId) =>
+            getSigner(sdk, accountId, checkTouchId, walletId ? { walletId } : undefined),
+        [sdk, checkTouchId]
+    );
 };
 
 export const getSigner = async (

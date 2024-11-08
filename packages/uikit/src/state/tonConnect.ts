@@ -18,7 +18,6 @@ import {
     setAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -37,6 +36,7 @@ import {
     useActiveWallet
 } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { getServerTime } from "@tonkeeper/core/dist/service/ton-blockchain/utils";
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();

@@ -1,4 +1,3 @@
-import { Address } from '@ton/core';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { FC, useState } from 'react';
@@ -6,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { styled, useTheme } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { CalculatedSwap } from '../../state/swap/useCalculatedSwap';
-import { useEncodeSwap } from '../../state/swap/useEncodeSwap';
+import { useEncodeSwapToTonConnectParams } from '../../state/swap/useEncodeSwap';
 import {
     useSelectedSwap,
     useSwapFromAmount,
@@ -53,7 +52,7 @@ const ChangeIconStyled = styled(IconButton)`
 
 export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     const theme = useTheme();
-    const { isLoading, mutateAsync: encode } = useEncodeSwap();
+    const { isLoading, mutateAsync: encode } = useEncodeSwapToTonConnectParams();
     const [modalParams, setModalParams] = useState<TonConnectTransactionPayload | null>(null);
     const [selectedSwap] = useSelectedSwap();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
@@ -61,19 +60,11 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     const [_, setFromAmount] = useSwapFromAmount();
     const navigate = useNavigate();
     const [__, setIsMobileSwapOpen] = useSwapMobileNotification();
-    const onConfirm = async () => {
-        const result = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
 
-        setModalParams({
-            valid_until: (Date.now() + 10 * 60 * 1000) / 1000,
-            messages: [
-                {
-                    address: Address.parse(result.to).toString({ bounceable: true }),
-                    amount: result.value,
-                    payload: result.body
-                }
-            ]
-        });
+    const onConfirm = async () => {
+        const params = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
+
+        setModalParams(params);
     };
 
     const onChangeFields = () => {

@@ -19,6 +19,7 @@ import { ActiveRecovery, Recovery } from './Recovery';
 import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
 import { WalletVersionPage } from './Version';
+import { BatteryPage } from './Battery';
 
 const SettingsRouter = () => {
     return (
@@ -42,6 +43,7 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.pro} element={<ProSettings />} />
             <Route path={WalletSettingsRoute.connectedApps} element={<ConnectedAppsSettings />} />
             <Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />
+            <Route path={WalletSettingsRoute.battery} element={<BatteryPage />} />
             <Route
                 path="*"
                 element={

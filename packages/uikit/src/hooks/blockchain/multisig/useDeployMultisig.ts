@@ -1,9 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-    checkIfMultisigExists,
-    deployMultisig,
-    MultisigConfig
-} from '@tonkeeper/core/dist/service/multisig/multisigService';
 import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState } from '../../../state/wallet';
@@ -14,13 +9,27 @@ import {
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { useCheckTouchId } from '../../../state/password';
-import { notifyError } from '../../../components/transfer/common';
 import { useTranslation } from '../../translation';
 import { anyOfKeysParts } from '../../../libs/queryKey';
 import BigNumber from 'bignumber.js';
-import { MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountsApi, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsStorage } from '../../useStorage';
 import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
+import {
+    LedgerMessageSender,
+    WalletMessageSender,
+    Sender
+} from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { useNotifyErrorHandle } from '../../useNotification';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+import { Address } from '@ton/core';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useTonRawTransactionService } from '../useBlockchainService';
+import {
+    MultisigEncoder,
+    MultisigConfig
+} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 
 export const useDeployMultisig = (
     params:
@@ -40,6 +49,9 @@ export const useDeployMultisig = (
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const notifyError = useNotifyErrorHandle();
+    const rawTransactionService = useTonRawTransactionService();
+
     return useMutation<string | undefined, Error>(async () => {
         try {
             if (!params) {
@@ -51,10 +63,12 @@ export const useDeployMultisig = (
                 throw new Error('Wallet not found');
             }
 
+            const multisigEncoder = new MultisigEncoder(api, accountAndWallet.wallet.rawAddress);
+            const address = multisigEncoder.multisigAddress(params.multisigConfig);
+
             const alreadyDeployed = await checkIfMultisigExists({
                 api,
-                multisigConfig: params.multisigConfig,
-                walletState: accountAndWallet.wallet
+                address
             });
 
             if (alreadyDeployed) {
@@ -68,13 +82,22 @@ export const useDeployMultisig = (
                 throw new Error('Signer not found');
             }
 
-            const { address } = await deployMultisig({
-                api,
-                multisigConfig: params.multisigConfig,
-                walletState: accountAndWallet.wallet,
-                signer,
-                feeWei: params.feeWei
-            });
+            const message = await multisigEncoder.encodeCreateMultisig(params.multisigConfig);
+
+            let sender: Sender;
+            if (signer.type === 'ledger') {
+                sender = new LedgerMessageSender(api, accountAndWallet.wallet, signer);
+            } else {
+                sender = new WalletMessageSender(api, accountAndWallet.wallet, signer);
+            }
+
+            await rawTransactionService.send(
+                sender,
+                {
+                    extra: new AssetAmount({ asset: TON_ASSET, weiAmount: params.feeWei })
+                },
+                message
+            );
 
             await client.invalidateQueries(
                 anyOfKeysParts(
@@ -85,10 +108,18 @@ export const useDeployMultisig = (
             );
             return address.toRawString();
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
             return undefined;
         }
     });
+};
+
+const checkIfMultisigExists = async (options: { api: APIConfig; address: Address }) => {
+    const account = await new AccountsApi(options.api.tonApiV2).getAccount({
+        accountId: options.address.toRawString()
+    });
+
+    return !(account.status === 'nonexist' || account.status === 'uninit');
 };
 
 export const useAwaitMultisigIsDeployed = () => {

@@ -1,11 +1,12 @@
 import { Account, AccountEvent, WalletDNS } from '../tonApiV2';
-import { EstimatePayload } from '../tronApi';
 import { BLOCKCHAIN_NAME } from './crypto';
-import { Asset } from './crypto/asset/asset';
 import { AssetAmount } from './crypto/asset/asset-amount';
 import { TonAsset } from './crypto/asset/ton-asset';
 import { TronAsset } from './crypto/asset/tron-asset';
 import { Suggestion } from './suggestion';
+import { Asset } from './crypto/asset/asset';
+import BigNumber from 'bignumber.js';
+import { TON_ASSET } from './crypto/asset/constants';
 
 export type BaseRecipient = Suggestion | { address: string; bounce?: boolean };
 
@@ -51,14 +52,41 @@ export function isTronRecipientData(
     return isTronRecipient(recipientData.address);
 }
 
-export type TransferEstimation<T extends Asset = Asset> = {
-    fee: AssetAmount<T>;
-    payload: T extends TonAsset
-        ? TransferEstimationEvent
-        : T extends TronAsset
-        ? EstimatePayload
-        : never;
+export type TonEstimation = {
+    /**
+     * positive if fee
+     * negative if there will be a refund
+     */
+    extra: AssetAmount<TonAsset>;
+    event?: AccountEvent;
 };
 
-export type TransferEstimationEvent = { event: AccountEvent };
-export type TransferEstimationEventFee = { event: Pick<AccountEvent, 'extra'> };
+export function getTonEstimationTonFee(estimation: TonEstimation | undefined): BigNumber {
+    if (
+        estimation &&
+        estimation.extra.asset.id === TON_ASSET.id &&
+        estimation.extra.weiAmount.gte(0)
+    ) {
+        return estimation.extra.weiAmount;
+    }
+
+    return new BigNumber(0);
+}
+
+export type TonEstimationDetailed = Required<TonEstimation>;
+
+export const isTonEstimationDetailed = (
+    estimation: TonEstimation
+): estimation is TonEstimationDetailed => {
+    return estimation.event !== undefined;
+};
+
+export type TronEstimation = {
+    extra: AssetAmount<TronAsset>;
+};
+
+export type Estimation<T extends Asset = Asset> = T extends TonAsset
+    ? TonEstimation
+    : T extends TronAsset
+    ? TronEstimation
+    : TonAsset | TronAsset;

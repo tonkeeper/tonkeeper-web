@@ -18,13 +18,15 @@ import {
     SaleBadgeIcon,
     SecurityIcon,
     SettingsProIcon,
-    WalletsIcon
+    WalletsIcon,
+    BatteryIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import {
     isAccountTonWalletStandard,
     isAccountVersionEditable
 } from '@tonkeeper/core/dist/entries/account';
+import { useBatteryEnabledConfig } from '../../state/battery';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -34,6 +36,7 @@ const SingleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
     const { onOpen: rename } = useRenameNotification();
+    const batteryEnableConfig = useBatteryEnabledConfig();
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -132,6 +135,15 @@ const SingleAccountSettings = () => {
             });
         }
 
+        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
+        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+            items.push({
+                name: t('battery_title'),
+                icon: <BatteryIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.battery))
+            });
+        }
+
         return items;
     }, [t, navigate, account, jettons, nft]);
 
@@ -151,6 +163,7 @@ const MultipleAccountSettings = () => {
     const { proFeatures } = useAppContext();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
+    const batteryEnableConfig = useBatteryEnabledConfig();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
 
@@ -275,6 +288,16 @@ const MultipleAccountSettings = () => {
                 action: () => navigate(relative(WalletSettingsRoute.connectedApps))
             });
         }
+
+        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
+        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+            items.push({
+                name: t('battery_title'),
+                icon: <BatteryIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.battery))
+            });
+        }
+
         items.push({
             name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,

@@ -22,7 +22,6 @@ import {
 } from '../common';
 import { ConfirmHeaderBlock } from './Common';
 import { ConfirmNftView } from './ConfirmNftView';
-import { useMinimalBalance } from './hooks';
 import { MultisigOrderFormView } from '../MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../../state/multisig';
@@ -41,10 +40,7 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
 
     const { mutateAsync: getAccountAsync } = useGetToAccount();
 
-    const { mutateAsync: checkBalanceAsync, isLoading: isChecking } = useMinimalBalance();
-
     const onRecipient = async (data: RecipientData) => {
-        await checkBalanceAsync();
         setRight(true);
         setRecipient(data as TonRecipientData);
         setView('confirm');
@@ -132,7 +128,6 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
                                     data={recipient}
                                     setRecipient={onRecipient}
                                     onScan={onScan}
-                                    isExternalLoading={isChecking}
                                     acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
                                     MainButton={MainButton}
                                     HeaderBlock={() => (

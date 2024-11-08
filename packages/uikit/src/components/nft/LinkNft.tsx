@@ -2,22 +2,18 @@ import { Address } from '@ton/core';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
-import { TransferEstimationEvent } from '@tonkeeper/core/dist/entries/send';
 import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { getWalletsAddresses } from '@tonkeeper/core/dist/service/walletService';
-import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { areEqAddresses, formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { isTMEDomain } from '@tonkeeper/core/dist/utils/nft';
 import BigNumber from 'bignumber.js';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import { useToast } from '../../hooks/appSdk';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
 import { useEstimateNftLink } from '../../hooks/blockchain/nft/useEstimateNftLink';
 import { useLinkNft } from '../../hooks/blockchain/nft/useLinkNft';
 import { useTonRecipient } from '../../hooks/blockchain/useTonRecipient';
 import { useTranslation } from '../../hooks/translation';
-import { useNotification } from '../../hooks/useNotification';
 import { useQueryChangeWait } from '../../hooks/useQueryChangeWait';
 import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { ColumnText, Gap } from '../Layout';
@@ -39,6 +35,7 @@ import {
 } from '../transfer/ConfirmView';
 import { ConfirmAndCancelMainButton } from '../transfer/common';
 import { useNftDNSLinkData } from '../../state/nft';
+import { useNotifyErrorHandle, useToast } from '../../hooks/useNotification';
 
 export const LinkNft: FC<{ nft: NFTDNS }> = ({ nft }) => {
     const toast = useToast();
@@ -100,7 +97,7 @@ const LinkNftUnlinked: FC<{
     isLoading: boolean;
     refetch: () => void;
 }> = ({ nft, isLoading, refetch }) => {
-    const notifyError = useNotification();
+    const notifyError = useNotifyErrorHandle();
     const { t } = useTranslation();
     const [openedView, setOpenedView] = useState<'confirm' | 'wallet' | undefined>();
     const walletState = useActiveWallet();
@@ -122,7 +119,6 @@ const LinkNftUnlinked: FC<{
 
     const { refetch: refetchEstimateFee, ...estimation } = useEstimateNftLink({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
         linkToAddress
     });
 
@@ -137,9 +133,7 @@ const LinkNftUnlinked: FC<{
 
     const mutation = useLinkNft({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
-        linkToAddress,
-        fee: estimation.data?.payload as TransferEstimationEvent
+        linkToAddress
     });
 
     const isSelectedCurrentAddress = areEqAddresses(linkToAddress, walletState.rawAddress);
@@ -312,7 +306,7 @@ const LinkNftLinked: FC<{
     isLoading: boolean;
     refetch: () => void;
 }> = ({ nft, linkedAddress, isLoading, refetch }) => {
-    const notifyError = useNotification();
+    const notifyError = useNotifyErrorHandle();
     const { t } = useTranslation();
     const walletState = useActiveWallet();
     const [isOpen, setIsOpen] = useState(false);
@@ -327,15 +321,12 @@ const LinkNftLinked: FC<{
 
     const estimation = useEstimateNftLink({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
         linkToAddress
     });
 
     const mutation = useLinkNft({
         nftAddress: nft.address,
-        amount: unShiftedDecimals(dnsLinkAmount),
-        linkToAddress,
-        fee: estimation.data?.payload as TransferEstimationEvent
+        linkToAddress
     });
 
     const child = () => (

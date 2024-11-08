@@ -30,7 +30,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useMultisigOrderNotification } from '../../components/modals/MultisigOrderNotificationControlled';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
-import { orderStatus } from '@tonkeeper/core/dist/service/multisig/multisigService';
+import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;

@@ -49,7 +49,6 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
 
     const mainButton = useMainButton();
     const { mutateAsync: getAccountAsync } = useGetToAccount();
-    const { mutateAsync: checkBalanceAsync, isLoading: isChecking } = useMinimalBalance();
 
     const indexRef = useRef<HTMLDivElement>(null);
     const recipientRef = useRef<HTMLDivElement>(null);
@@ -71,7 +70,6 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     const favoriteState = useFavoriteNotification(onFavorite);
 
     const onRecipient = async (data: RecipientData) => {
-        await checkBalanceAsync();
         setRight(true);
         setRecipient(data as TonRecipientData);
         setView('confirm');
@@ -150,7 +148,6 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
                                 data={recipient}
                                 setRecipient={onRecipient}
                                 onScan={onScan}
-                                isExternalLoading={isChecking}
                                 acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
                                 MainButton={RecipientTwaMainButton}
                                 HeaderBlock={() => (

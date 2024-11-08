@@ -1,27 +1,21 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { checkWalletPositiveBalanceOrDie } from '@tonkeeper/core/dist/service/transfer/common';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from '../../../hooks/appContext';
-import { useAppSdk } from '../../../hooks/appSdk';
-import { useTranslation } from '../../../hooks/translation';
-import { notifyError } from '../common';
 import { useActiveWallet } from '../../../state/wallet';
+import { useNotifyErrorHandle } from '../../../hooks/useNotification';
+import { toNano } from '@ton/core';
+import { assertBalanceEnough } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useMinimalBalance = () => {
-    const sdk = useAppSdk();
     const { api } = useAppContext();
     const walletState = useActiveWallet();
-    const { t } = useTranslation();
-    const client = useQueryClient();
+    const notifyError = useNotifyErrorHandle();
 
     return useMutation(async () => {
-        const wallet = await new AccountsApi(api.tonApiV2).getAccount({
-            accountId: walletState.rawAddress
-        });
         try {
-            checkWalletPositiveBalanceOrDie(wallet);
+            await assertBalanceEnough(api, toNano('0.01'), TON_ASSET, walletState.rawAddress);
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
         }
     });
 };

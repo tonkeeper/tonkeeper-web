@@ -1,99 +1,88 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
-import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { useMutation } from '@tanstack/react-query';
+import { isTonAsset, Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    TonRecipientData,
-    TransferEstimation,
-    TransferEstimationEvent,
-    TronRecipientData
-} from '@tonkeeper/core/dist/entries/send';
-import { sendJettonTransfer } from '@tonkeeper/core/dist/service/transfer/jettonService';
-import { sendTonTransfer } from '@tonkeeper/core/dist/service/transfer/tonService';
-import { notifyError } from '../../components/transfer/common';
-import { useJettonList } from '../../state/jetton';
-import { getSigner } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
-import { useAnalyticsTrack, useTransactionAnalytics } from '../amplitude';
-import { useAppContext } from '../appContext';
-import { useAppSdk } from '../appSdk';
-import { useTranslation } from '../translation';
-import { useActiveAccount, useInvalidateActiveWalletQueries } from '../../state/wallet';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { Estimation, TonRecipientData, TronRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { useAnalyticsTrack } from '../amplitude';
+import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
-export function useSendTransfer<T extends Asset>(
-    recipient: T extends TonAsset ? TonRecipientData : TronRecipientData,
-    amount: AssetAmount<T>,
-    isMax: boolean,
-    estimation: TransferEstimation<T>
-) {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
-    const account = useActiveAccount();
-    const client = useQueryClient();
+import {
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    SenderTypeUserAvailable,
+    useGetSender
+} from './useSender';
+import { useTonAssetTransferService } from './useBlockchainService';
+import { useNotifyErrorHandle } from '../useNotification';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+
+export function useSendTransfer<T extends Asset>({
+    recipient,
+    amount,
+    isMax,
+    estimation,
+    senderType
+}: {
+    recipient: T extends TonAsset ? TonRecipientData : TronRecipientData;
+    amount: AssetAmount<T>;
+    isMax: boolean;
+    estimation: Estimation<T>;
+    senderType: SenderTypeUserAvailable;
+}) {
     const track = useAnalyticsTrack();
-    const { data: jettons } = useJettonList();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
+    const notifyError = useNotifyErrorHandle();
+    const getSender = useGetSender();
+    const transferService = useTonAssetTransferService();
 
     return useMutation<boolean, Error>(async () => {
-        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
-        if (signer === null) return false;
         try {
-            if (!isAccountTonWalletStandard(account)) {
-                throw new Error("Can't send a transfer using this account");
-            }
             if (isTonAsset(amount.asset)) {
-                if (amount.asset.id === TON_ASSET.id) {
-                    await sendTonTransfer(
-                        api,
-                        account,
-                        recipient as TonRecipientData,
-                        amount,
-                        isMax,
-                        estimation.payload as TransferEstimationEvent,
-                        signer
-                    );
-                    track('send_success', { from: 'send_confirm', token: 'ton' });
-                } else {
-                    const jettonInfo = jettons!.balances.find(
-                        jetton =>
-                            (amount.asset.address as Address).toRawString() ===
-                            jetton.jetton.address
-                    )!;
-                    await sendJettonTransfer(
-                        api,
-                        account,
-                        recipient as TonRecipientData,
-                        amount as AssetAmount<TonAsset>,
-                        jettonInfo!.walletAddress.address,
-                        estimation.payload as TransferEstimationEvent,
-                        signer
-                    );
-                    track('send_success', {
-                        from: 'send_confirm',
-                        token: jettonInfo.jetton.symbol
-                    });
+                if (!('toAccount' in recipient)) {
+                    throw new Error('Invalid recipient');
                 }
+                const comment = (recipient as TonRecipientData).comment;
+
+                let senderChoice;
+                if (senderType === 'external') {
+                    senderChoice = EXTERNAL_SENDER_CHOICE;
+                } else if (senderType === 'battery') {
+                    senderChoice = BATTERY_SENDER_CHOICE;
+                } else if (senderType === 'gasless') {
+                    if (!isTonAsset(amount.asset)) {
+                        throw new Error('Unexpected asset');
+                    }
+
+                    senderChoice = {
+                        type: 'gasless',
+                        asset: amount.asset
+                    } as const;
+                }
+                if (!senderChoice) {
+                    throw new Error('Unexpected sender choice');
+                }
+
+                await transferService.send(
+                    await getSender(senderChoice),
+                    estimation as Estimation<TonAsset>,
+                    {
+                        to: seeIfValidTonAddress(recipient.address.address)
+                            ? recipient.address.address
+                            : recipient.toAccount.address,
+                        amount: amount as AssetAmount<TonAsset>,
+                        isMax,
+                        payload: comment ? { type: 'comment', value: comment } : undefined
+                    }
+                );
+                track('send_success', {
+                    from: 'send_confirm',
+                    token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
+                });
             } else {
                 throw new Error('Disable trc 20 transactions');
-                // track2('send-trc20');
-                // await sendTronTransfer(
-                //     {
-                //         tronApi: api.tronApi,
-                //         tron: wallet.tron!,
-                //         request: (estimation.payload as EstimatePayload).request
-                //     },
-                //     {
-                //         mnemonic
-                //     }
-                // );
             }
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
         }
 
         await invalidateAccountQueries();

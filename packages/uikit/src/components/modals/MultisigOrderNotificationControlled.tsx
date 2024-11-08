@@ -236,7 +236,7 @@ const NotificationContent: FC<{
     return (
         <NotificationBlock>
             {estimation.type === 'transfer' && (
-                <EmulationList isError={isError} estimate={{ accountEvent: estimation }} />
+                <EmulationList isError={isError} event={estimation?.event} />
             )}
             {estimation?.type === 'update' && (
                 <MultisigConfigDiffStyled

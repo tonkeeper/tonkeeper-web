@@ -24,10 +24,7 @@ import {
     ConfirmViewTitleSlot
 } from '../transfer/ConfirmView';
 import { useDisclosure } from '../../hooks/useDisclosure';
-import {
-    deployMultisigAssetAmount,
-    MultisigConfig
-} from '@tonkeeper/core/dist/service/multisig/multisigService';
+
 import { Address } from '@ton/core';
 
 import { useAppContext } from '../../hooks/appContext';
@@ -38,6 +35,13 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { MultisigConfigForm, MultisigUseForm } from '../multisig/MultisigConfigForm';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
+import {
+    MultisigConfig,
+    MultisigEncoder
+} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import BigNumber from 'bignumber.js';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -205,6 +209,11 @@ const CreateMultisigAwaitDeployPage: FC<{
     );
 };
 
+const deployMultisigAssetAmount = new AssetAmount({
+    weiAmount: new BigNumber(MultisigEncoder.deployMultisigValue.toString()),
+    asset: TON_ASSET
+});
+
 const CreateMultisigFormPage: FC<{
     onSentDeploy: (info: {
         multisigAddress: string;
@@ -235,7 +244,7 @@ const CreateMultisigFormPage: FC<{
             allowArbitrarySeqno: false
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
-        setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.fee.weiAmount });
+        setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.extra.weiAmount });
     };
 
     const mutateAsync = useCallback(async () => {

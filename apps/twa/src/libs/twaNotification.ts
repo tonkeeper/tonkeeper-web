@@ -10,9 +10,9 @@ import {
     toTonProofItem,
     tonConnectProofPayload
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
 import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { Configuration, DefaultApi } from '../twaApi';
+import { getServerTime } from "@tonkeeper/core/dist/service/ton-blockchain/utils";
 
 const seeIfProduction = () => {
     return window.location.hostname.includes('twa.tonkeeper.com');

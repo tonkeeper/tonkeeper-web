@@ -6,6 +6,9 @@ on:
 env:
     node-version: 20.11.1
 
+permissions:
+    pull-requests: write
+
 jobs:
     desktop-build:
         name: desktop-build
@@ -155,13 +158,90 @@ jobs:
                   cmd: build:web
 
             - name: Publish to Cloudflare Pages
-              uses: cloudflare/pages-action@v1
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  projectName: tonkeeper-web
-                  directory: apps/web/dist
-                  wranglerVersion: '3'
+                  command: pages deploy apps/web/dist --project-name=tonkeeper-web
+
+            - name: Summary
+              run: |
+                  echo '### Successful WEB deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              with:
+                  message: |
+                      ### Successful WEB deployment 🚀🚀🚀
+                      Well done!
+                      Link to test environment:
+                      ${{ steps.deploy.outputs.deployment-url }}
+                  comment-tag: web_deploy
+
+    twa-build:
+        name: twa-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v5
+              env:
+                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
+                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
+              with:
+                  cmd: build:twa
+
+            - name: Publish TWA to Cloudflare Pages
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command:
+                      pages deploy apps/twa/dist --project-name=tonkeeper-telegram
+                      --branch=feature/twa
+
+            - name: Summary
+              run: |
+                  echo '### Successful TWA deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              with:
+                  message: |
+                      ### Successful TWA deployment 🚀🚀🚀
+                      Well done!
+                      Link to test environment:
+                      https://t.me/tonkeeperdevbot
+                  comment-tag: twa_deploy
 
     extension-build:
         name: extension-build
