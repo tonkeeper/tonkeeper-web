@@ -84,6 +84,7 @@ export const DesktopHistoryPage: FC = () => {
     const ref = useRef<HTMLDivElement>(null);
 
     const {
+        refetch,
         isFetched: isTonFetched,
         fetchNextPage: fetchTonNextPage,
         hasNextPage: hasTonNextPage,
@@ -91,12 +92,7 @@ export const DesktopHistoryPage: FC = () => {
         data: tonEvents
     } = useFetchFilteredActivity();
 
-    const client = useQueryClient();
-    const invalidate = useCallback(() => {
-        return client.invalidateQueries([wallet.rawAddress, QueryKey.activity]);
-    }, []);
-
-    useScrollMonitor(ref, 5000, invalidate);
+    useScrollMonitor(ref, 5000, refetch);
 
     const isFetchingNextPage = isTonFetchingNextPage;
 

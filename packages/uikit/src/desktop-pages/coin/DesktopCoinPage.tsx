@@ -3,7 +3,7 @@ import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/a
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, useEffect, useMemo, useRef } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
@@ -22,15 +22,17 @@ import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
-import { useFetchFilteredActivity } from '../../state/activity';
+import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { getMixedActivity } from '../../state/mixedActivity';
 import { toTokenRate, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryKey } from '../../libs/queryKey';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -261,8 +263,10 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
-    const { fetchNextPage, hasNextPage, isFetchingNextPage, data } =
+    const { fetchNextPage, hasNextPage, isFetchingNextPage, data, refetch } =
         useFetchFilteredActivity(token);
+
+    useScrollMonitor(ref, 5000, refetch);
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
