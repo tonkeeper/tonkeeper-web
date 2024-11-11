@@ -7,7 +7,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { atom, useAtom } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
@@ -15,6 +15,7 @@ import { useGlobalPreferences, useMutateGlobalPreferences } from './global-prefe
 import { MixedActivity } from './mixedActivity';
 import { seeIfTonTransfer } from './ton/tonActivity';
 import { useActiveWallet } from './wallet';
+import { debounce } from '@tonkeeper/core/dist/utils/common';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -206,7 +207,8 @@ export const useFetchFilteredActivity = (asset?: string) => {
             }
             return activity;
         },
-        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
+        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined),
+        keepPreviousData: true
     });
 };
 
@@ -283,4 +285,39 @@ export const isInitiatorFiltrationForAssetAvailable = (asset: TonAsset | undefin
         return true;
     }
     return isTon(asset.address);
+};
+
+export const useScrollMonitor = (
+    elementRef: React.RefObject<HTMLDivElement>,
+    timeout: number,
+    callback: () => void
+) => {
+    const [isAtTop, setIsAtTop] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = debounce(() => {
+            if (elementRef.current && elementRef.current.scrollTop < 5) {
+                setIsAtTop(true);
+            } else {
+                setIsAtTop(false);
+            }
+        }, 20);
+
+        handleScroll();
+        elementRef.current?.addEventListener('scroll', handleScroll);
+        return () => {
+            elementRef.current?.removeEventListener('scroll', handleScroll);
+        };
+    }, [elementRef.current]);
+
+    useLayoutEffect(() => {
+        const timer = setInterval(() => {
+            if (isAtTop) {
+                callback();
+            }
+        }, timeout);
+        return () => {
+            clearInterval(timer);
+        };
+    }, [isAtTop, callback]);
 };
