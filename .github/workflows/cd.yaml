@@ -132,7 +132,7 @@ jobs:
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command: pages deploy apps/web/dist --project-name=tonkeeper-web
+                  command: pages deploy apps/web/dist --project-name=tonkeeper-web --branch=main
 
     extension-build:
         name: extension-build
