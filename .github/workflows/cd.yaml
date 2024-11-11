@@ -127,14 +127,12 @@ jobs:
                   cmd: build:web
 
             - name: Publish to Cloudflare Pages
-              uses: cloudflare/pages-action@v1
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  projectName: tonkeeper-web
-                  directory: apps/web/dist
-                  branch: main
-                  wranglerVersion: '3'
+                  command: pages deploy apps/web/dist --project-name=tonkeeper-web
 
     extension-build:
         name: extension-build
