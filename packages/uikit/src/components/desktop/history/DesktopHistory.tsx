@@ -79,13 +79,18 @@ export const DesktopHistory: FC<{
     const [selectedActivity, setSelectedActivity] = useState<ActionData | undefined>();
 
     const aggregatedActivity: GroupedActivity = useMemo(() => {
+        const double = new Set();
+
         const groupped = (activity ?? []).reduce((acc, item) => {
             if (item.event.kind === 'tron' || !item.event.event.isScam) {
-                acc.push({
-                    type: 'single',
-                    item,
-                    key: item.key
-                });
+                if (!double.has(item.key)) {
+                    double.add(item.key);
+                    acc.push({
+                        type: 'single',
+                        item,
+                        key: item.key
+                    });
+                }
                 return acc;
             }
 
