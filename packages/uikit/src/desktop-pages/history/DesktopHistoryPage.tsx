@@ -96,7 +96,7 @@ export const DesktopHistoryPage: FC = () => {
         return client.invalidateQueries([wallet.rawAddress, QueryKey.activity]);
     }, []);
 
-    useScrollMonitor(ref, 3000, invalidate);
+    useScrollMonitor(ref, 5000, invalidate);
 
     const isFetchingNextPage = isTonFetchingNextPage;
 
