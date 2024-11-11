@@ -1,4 +1,4 @@
-import { FC, Suspense, useMemo, useRef } from 'react';
+import { FC, Suspense, useCallback, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useAppContext } from '../../hooks/appContext';
@@ -16,11 +16,13 @@ import { useActiveWallet } from '../../state/wallet';
 import { Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
-import { useFetchFilteredActivity } from '../../state/activity';
+import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import {
     AssetHistoryFilter,
     OtherHistoryFilters
 } from '../../components/desktop/history/DesktopHistoryFilters';
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryKey } from '../../libs/queryKey';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -82,12 +84,15 @@ export const DesktopHistoryPage: FC = () => {
     const ref = useRef<HTMLDivElement>(null);
 
     const {
+        refetch,
         isFetched: isTonFetched,
         fetchNextPage: fetchTonNextPage,
         hasNextPage: hasTonNextPage,
         isFetchingNextPage: isTonFetchingNextPage,
         data: tonEvents
     } = useFetchFilteredActivity();
+
+    useScrollMonitor(ref, 5000, refetch);
 
     const isFetchingNextPage = isTonFetchingNextPage;
 

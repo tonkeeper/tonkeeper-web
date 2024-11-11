@@ -1,6 +1,6 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, Suspense, useMemo, useRef } from 'react';
+import React, { FC, Suspense, useCallback, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonListWithImages } from '../../components/Skeleton';
@@ -11,6 +11,7 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { getMixedActivityGroups } from '../../state/mixedActivity';
 import { useActiveWallet } from '../../state/wallet';
+import { useScrollMonitor } from '../../state/activity';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
@@ -37,6 +38,13 @@ const Activity: FC = () => {
             }),
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
     });
+
+    const client = useQueryClient();
+    const invalidate = useCallback(() => {
+        return client.invalidateQueries([wallet.rawAddress, QueryKey.activity, 'all']);
+    }, []);
+
+    useScrollMonitor(ref, 5000, invalidate);
 
     // const {
     //     isFetched: isTronFetched,
