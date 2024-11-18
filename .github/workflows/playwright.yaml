@@ -1,10 +1,9 @@
 name: Tonkeeper Playwright
 on:
     workflow_dispatch:
-
 jobs:
-    playwright:
-        name: playwright
+    playwright-tests:
+        name: playwright-tests
         runs-on: windows-latest
         timeout-minutes: 20
 
