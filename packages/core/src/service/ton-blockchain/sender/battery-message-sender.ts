@@ -14,7 +14,7 @@ export class BatteryMessageSender implements ISender {
     constructor(
         private batteryConfig: {
             messageTtl: number;
-            jettonResponseAddress: string;
+            excessAddress: string;
             authToken: string;
         },
         private api: {
@@ -26,8 +26,8 @@ export class BatteryMessageSender implements ISender {
         private readonly signer: CellSigner
     ) {}
 
-    public get jettonResponseAddress() {
-        return this.batteryConfig.jettonResponseAddress;
+    public get excessAddress() {
+        return this.batteryConfig.excessAddress;
     }
 
     public async send(outgoing: WalletOutgoingMessage) {

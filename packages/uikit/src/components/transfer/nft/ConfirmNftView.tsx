@@ -97,13 +97,18 @@ const useNftTransferEstimation = (
                 }
 
                 const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
+                const sender = await getSender!();
                 const nftTransferMsg = nftEncoder.encodeNftTransfer({
                     nftAddress: nftItem.address,
                     recipientAddress: data!.address.address,
-                    forwardPayload: data!.comment ? comment(data.comment) : null
+                    forwardPayload: data!.comment ? comment(data.comment) : null,
+                    responseAddress:
+                        'excessAddress' in sender && sender.excessAddress
+                            ? sender.excessAddress
+                            : undefined
                 });
 
-                return await rawTransactionService.estimate(await getSender!(), nftTransferMsg);
+                return await rawTransactionService.estimate(sender, nftTransferMsg);
             } catch (e) {
                 await notifyError(e);
                 throw e;
@@ -148,7 +153,10 @@ const useSendNft = (
                 if (options.multisigTTL === undefined) {
                     throw new Error('TTL must be specified for multisig sending');
                 }
-                senderChoice = { type: 'multisig', ttlSeconds: 5 * 60 } as const;
+                senderChoice = {
+                    type: 'multisig',
+                    ttlSeconds: 60 * Number(options.multisigTTL)
+                } as const;
             } else if (options.selectedSenderType === 'external') {
                 senderChoice = EXTERNAL_SENDER_CHOICE;
             } else if (options.selectedSenderType === 'battery') {
@@ -169,7 +177,11 @@ const useSendNft = (
                 nftAddress: nftItem.address,
                 recipientAddress: recipient.address.address,
                 forwardPayload: recipient.comment ? comment(recipient.comment) : null,
-                nftTransferAmountWei
+                nftTransferAmountWei,
+                responseAddress:
+                    'excessAddress' in sender && sender.excessAddress
+                        ? sender.excessAddress
+                        : undefined
             });
 
             await rawTransactionService.send(sender, zeroFee, nftTransferMsg);

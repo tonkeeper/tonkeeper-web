@@ -21,7 +21,7 @@ export class MultisigCreateOrderSender implements ISender {
         private readonly signer: Signer
     ) {}
 
-    public get jettonResponseAddress() {
+    public get excessAddress() {
         return this.multisig.address;
     }
 

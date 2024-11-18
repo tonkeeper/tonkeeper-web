@@ -49,12 +49,11 @@ jobs:
                   cmd: build:web
 
             - name: Publish to Cloudflare Pages
-              uses: cloudflare/pages-action@v1
-              if: contains(github.ref, 'main') || inputs.environment == 'dev'
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  projectName: tonkeeper-web
-                  directory: apps/web/dist
-                  wranglerVersion: '3'
-                  branch: ${{ inputs.environment }}
+                  command:
+                      pages deploy apps/web/dist --project-name=tonkeeper-web --branch=${{
+                      inputs.environment }}

@@ -173,12 +173,12 @@ export class TonAssetTransactionService {
               responseAddress?: string;
           }[] {
         if (Array.isArray(params)) {
-            return params.map(p => ({ ...p, responseAddress: sender.jettonResponseAddress }));
+            return params.map(p => ({ ...p, responseAddress: sender.excessAddress }));
         }
 
         return {
             ...params,
-            responseAddress: sender.jettonResponseAddress
+            responseAddress: sender.excessAddress
         };
     }
 
@@ -192,6 +192,7 @@ export class TonAssetTransactionService {
         return Array.isArray(params) ? params[0].amount.asset : params.amount.asset;
     }
 
+    // eslint-disable-next-line complexity
     private async checkTransferPossibility(
         sender: Sender,
         params: TransferParams,
