@@ -34,7 +34,7 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
             setValue(message);
         } else {
             let count = 0;
-            setInterval(() => {
+            const timer = setInterval(() => {
                 let current = items[count];
                 setValue(current.join(''));
 
@@ -46,6 +46,8 @@ export const AnimatedQrCode: FC<{ message: string }> = React.memo(({ message }) 
                     count = 0;
                 }
             }, 100);
+
+            return () => clearInterval(timer);
         }
     }, [message]);
 
