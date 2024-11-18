@@ -28,7 +28,10 @@ test('test', async ({ page }) => {
     await page.goto(
         'https://app.tonkeeper.com/ton-connect?v=2&id=29f2d58c1c8f4069ae394c99f62ab4ae7affd04a9fa1f3676e3cd13cd1ffe011&r=%7B%22manifestUrl%22%3A%22https%3A%2F%2Fgetgems.io%2Ftcm.json%22%2C%22items%22%3A%5B%7B%22name%22%3A%22ton_addr%22%7D%2C%7B%22name%22%3A%22ton_proof%22%2C%22payload%22%3A%22gems%22%7D%5D%7D&ret=none'
     );
+
+    // TODO: this test is not working as soon as follow link will navigate to production wallet.tonkeeper.com, instead of testing version
     await page.getByRole('link', { name: 'Sign in with Tonkeeper Web' }).click();
+
     await expect(
         page.locator('#react-portal-modal-container').getByText('UQAG…gyIO')
     ).toBeVisible();

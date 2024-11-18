@@ -30,6 +30,7 @@ test('ton connect + elements', async ({ page }) => {
     await page.goto(
         'https://app.tonkeeper.com/ton-connect?v=2&id=9c251162746584e1160d0c827e5ca9b182e3db0c901ae980e1cda70f18666a3b&r=%7B%22manifestUrl%22%3A%22https%3A%2F%2Fapp.ston.fi%2Ftonconnect-manifest.json%22%2C%22items%22%3A%5B%7B%22name%22%3A%22ton_addr%22%7D%5D%7D&ret=none'
     );
+    // TODO: this test is not working as soon as follow link will navigate to production wallet.tonkeeper.com, instead of testing version
     await page.getByRole('link', { name: 'Sign in with Tonkeeper Web' }).click();
     await expect(
         page.locator('#react-portal-modal-container').getByText('UQAG…gyIO')
