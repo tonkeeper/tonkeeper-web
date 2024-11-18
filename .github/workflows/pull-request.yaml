@@ -335,7 +335,8 @@ jobs:
                   TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
               run: npx playwright test
 
-            - uses: daun/playwright-report-summary@v3
+            - name: Comment Playwright report
+              uses: daun/playwright-report-summary@v3
               if: always()
               with:
                   report-file: results.json
