@@ -333,6 +333,7 @@ jobs:
                   TON_MNEMONIC_ANANAS: ${{ secrets.TON_MNEMONIC_ANANAS }}
                   TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
                   TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
+                  FAKE_MNEMONIC: ${{ secrets.FAKE_MNEMONIC }}
               run: npx playwright test
 
             - name: Comment Playwright report
