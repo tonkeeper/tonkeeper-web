@@ -296,7 +296,7 @@ jobs:
     playwright-tests:
         name: playwright-tests
         timeout-minutes: 60
-        runs-on: ubuntu-latest
+        runs-on: windows-latest
         needs: web-build
 
         steps:
