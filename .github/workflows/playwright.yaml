@@ -30,9 +30,9 @@ jobs:
               uses: borales/actions-yarn@v5
               with:
                   dir: 'tests/playwright'
-                  cmd: playwright install
+                  cmd: playwright
 
-            - name: Run install
+            - name: Run tests
               uses: borales/actions-yarn@v5
               env:
                   BASE_APP_URL: https://wallet.tonkeeper.com
