@@ -37,20 +37,20 @@ jobs:
               env:
                   BASE_APP_URL: https://wallet.tonkeeper.com
                   TON_MNEMONIC_24: ${{ secrets.TON_MNEMONIC_24 }}
-                  TON_MNEMONIC_24_2: ${{ secrets.TON_MNEMONIC_24_2 }} 
-                  TON_MNEMONIC_24_3: ${{ secrets.TON_MNEMONIC_24_3 }} 
-                  TON_MNEMONIC_24_4: ${{ secrets.TON_MNEMONIC_24_4 }} 
-                  TON_MNEMONIC_24_5: ${{ secrets.TON_MNEMONIC_24_5 }} 
-                  TON_MNEMONIC_ANANAS: ${{ secrets.TON_MNEMONIC_ANANAS }} 
-                  TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }} 
-                  TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }} 
+                  TON_MNEMONIC_24_2: ${{ secrets.TON_MNEMONIC_24_2 }}
+                  TON_MNEMONIC_24_3: ${{ secrets.TON_MNEMONIC_24_3 }}
+                  TON_MNEMONIC_24_4: ${{ secrets.TON_MNEMONIC_24_4 }}
+                  TON_MNEMONIC_24_5: ${{ secrets.TON_MNEMONIC_24_5 }}
+                  TON_MNEMONIC_ANANAS: ${{ secrets.TON_MNEMONIC_ANANAS }}
+                  TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
+                  TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
               with:
                   dir: 'tests/playwright'
                   cmd: test
 
-          - uses: actions/upload-artifact@v4
-            if: ${{ !cancelled() }}
-            with:
-              name: playwright-report
-              path: tests/playwright/playwright-report/
-              retention-days: 10
+            - uses: actions/upload-artifact@v4
+              if: ${{ !cancelled() }}
+              with:
+                  name: playwright-report
+                  path: tests/playwright/playwright-report/
+                  retention-days: 10
