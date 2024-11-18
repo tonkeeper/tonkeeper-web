@@ -60,7 +60,7 @@ test('Incorrect password', async ({ page }) => {
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Save' }).click();
     await page.getByRole('link', { name: 'Settings' }).click();
-    await page.goto('https://wallet.tonkeeper.com/wallet-settings');
+    await page.goto('/wallet-settings');
     await page
         .locator('div')
         .filter({ hasText: /^Delete Account$/ })
