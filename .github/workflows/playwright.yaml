@@ -26,6 +26,7 @@ jobs:
                   cmd: install
 
             - name: Install Playwright Browsers
+              working-directory: ./tests/playwright
               run: npx playwright install --with-deps
 
             - name: Run Playwright tests
