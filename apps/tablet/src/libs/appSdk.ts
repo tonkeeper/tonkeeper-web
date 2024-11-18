@@ -9,7 +9,8 @@ import packageJson from '../../package.json';
 import { TabletStorage } from './storage';
 import { Preferences } from '@capacitor/preferences';
 import { Clipboard } from '@capacitor/clipboard';
-import { getWindow } from "./utils";
+import { getWindow } from './utils';
+import { Biometric } from "./plugins";
 
 export class KeychainTablet implements KeychainPassword { // TODO use secure storage
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -35,12 +36,17 @@ export class CookieTablet implements CookieService {
 
 export class TouchIdTablet implements TouchId {
     canPrompt = async () => {
-        return false; // TODO
+        try {
+            const result = await Biometric.canPrompt();
+            return result.isAvailable;
+        } catch (e) {
+            console.error('TOUCH ID rejected, cause', e);
+            return  false;
+        }
     };
 
-    // @ts-ignore
     prompt = async (reason: (lang: string) => string) => {
-        // TODO
+        return Biometric.prompt(reason('en')); // TODO lang
     };
 }
 
