@@ -9,6 +9,7 @@ import packageJson from '../../package.json';
 import { TabletStorage } from './storage';
 import { Preferences } from '@capacitor/preferences';
 import { Clipboard } from '@capacitor/clipboard';
+import { getWindow } from "./utils";
 
 export class KeychainTablet implements KeychainPassword { // TODO use secure storage
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -58,10 +59,8 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
         this.topMessage(notification);
     };
 
-
-    // @ts-ignore
     openPage = async (url: string) => {
-        // TODO
+        getWindow()?.open(url, '_blank');
     };
 
     version = packageJson.version ?? 'Unknown';
