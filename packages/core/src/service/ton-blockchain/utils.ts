@@ -8,7 +8,7 @@ import { WalletContract } from '../wallet/contractService';
 import { APIConfig } from '../../entries/apis';
 import BigNumber from 'bignumber.js';
 import { NotEnoughBalanceError } from '../../errors/NotEnoughBalanceError';
-import { AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
+import { Account, AccountsApi, LiteServerApi, WalletApi } from '../../tonApiV2';
 import nacl from 'tweetnacl';
 import { AssetIdentification } from '../../entries/crypto/asset/asset-identification';
 import { BLOCKCHAIN_NAME } from '../../entries/crypto';
@@ -156,10 +156,27 @@ const isFriendlyNotBounceableAddress = (address: string) => {
  * UQ -> not bounceable
  * EQ, raw -> bounceable <=> account is active
  */
-export async function userInputAddressIsBounceable(api: APIConfig, address: string) {
-    const account = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: Address.parse(address).toRawString()
-    });
+export async function userInputAddressIsBounceable(
+    api: APIConfig,
+    address: string,
+    retryAmount = 10
+) {
+    const fetchAccount = async (retries = retryAmount): Promise<Account> => {
+        try {
+            return await new AccountsApi(api.tonApiV2).getAccount({
+                accountId: Address.parse(address).toRawString()
+            });
+        } catch (error) {
+            if (retries > 0) {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                return fetchAccount(retries - 1);
+            } else {
+                throw error;
+            }
+        }
+    };
+
+    const account = await fetchAccount();
 
     if (isFriendlyNotBounceableAddress(address)) {
         return false;
