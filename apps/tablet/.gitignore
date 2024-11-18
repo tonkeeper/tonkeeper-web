@@ -5,3 +5,4 @@ node_modules/
 .DS_Store
 .sourcemaps
 dist/
+/capacitor.live-reload-config.ts

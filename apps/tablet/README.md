@@ -1,12 +1,7 @@
-## Created with Capacitor Create App
+# Tonkeeper tablet
 
-This app was created using [`@capacitor/create-app`](https://github.com/ionic-team/create-capacitor-app),
-and comes with a very minimal shell for building an app.
+### Start development server
 
-### Running this example
-
-To run the provided example, you can use `npm start` command.
-
-```bash
-npm start
-```
+1. `chmod +x live-reload.sh`
+2. `yarn start`
+3. Open xcode and run the app in ./ios directory
