@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "./live-reload.sh",
-    "build": "tsc && vite build && cap sync",
+    "build": "./build.sh",
     "preview": "vite preview",
     "sync": "cap sync"
   },
