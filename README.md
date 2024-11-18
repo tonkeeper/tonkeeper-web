@@ -25,7 +25,7 @@ yarn
 yarn build:web
 ```
 
-Compressed build could be found in `/apps/web/build` once they're built.
+Compressed build could be found in `/apps/web/dist` once they're built.
 
 ### Build extension script
 
