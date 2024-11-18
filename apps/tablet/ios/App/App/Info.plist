@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>Tonkeeper Pro</string>
+	<string>Tonkeeper Pro</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -45,5 +45,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>UIStatusBarHidden</key>
+    <true/>
+    <key>WKAppBoundDomains</key>
+    <array>
+      <string>dev-pro.tonconsole.com</string>
+      <string>pro.tonconsole.com</string>
+    </array>
 </dict>
 </plist>

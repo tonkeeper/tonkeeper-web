@@ -10,6 +10,7 @@ import { TabletStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
 import { getWindow } from './utils';
 import { Biometric, SecureStorage } from "./plugins";
+import { CapacitorCookies } from "@capacitor/core";
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -29,7 +30,7 @@ export class KeychainTablet implements KeychainPassword {
 
 export class CookieTablet implements CookieService {
     cleanUp = async () => {
-        // TODO
+        await CapacitorCookies.clearAllCookies();
     };
 }
 
