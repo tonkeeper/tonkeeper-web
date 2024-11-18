@@ -339,4 +339,4 @@ jobs:
               uses: daun/playwright-report-summary@v3
               if: always()
               with:
-                  report-file: results.json
+                  report-file: ./tests/playwright/results.json
