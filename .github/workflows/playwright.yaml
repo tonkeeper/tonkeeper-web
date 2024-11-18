@@ -26,11 +26,8 @@ jobs:
                   dir: 'tests/playwright'
                   cmd: install
 
-            - name: Run playwright install
-              uses: borales/actions-yarn@v5
-              with:
-                  dir: 'tests/playwright'
-                  cmd: playwright
+            - name: Install Playwright Browsers
+              run: npx playwright install --with-deps
 
             - name: Run tests
               uses: borales/actions-yarn@v5
