@@ -18,6 +18,7 @@ class CustomViewController: CAPBridgeViewController {
     
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(BiometricPlugin())
+        bridge?.registerPluginInstance(SecureStoragePlugin())
     }
 
     /*

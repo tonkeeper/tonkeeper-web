@@ -8,3 +8,11 @@ export interface BiometricPlugin {
 
 export const Biometric = registerPlugin<BiometricPlugin>('Biometric');
 
+
+export interface SecureStoragePlugin {
+  storeData(params:{ id: string, data: string }): Promise<void>
+
+  getData(params:{ id: string }): Promise<{ data: string }>
+}
+
+export const SecureStorage = registerPlugin<SecureStoragePlugin>('SecureStorage');

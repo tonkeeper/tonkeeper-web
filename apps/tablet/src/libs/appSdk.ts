@@ -7,24 +7,23 @@ import {
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
 import { TabletStorage } from './storage';
-import { Preferences } from '@capacitor/preferences';
 import { Clipboard } from '@capacitor/clipboard';
 import { getWindow } from './utils';
-import { Biometric } from "./plugins";
+import { Biometric, SecureStorage } from "./plugins";
 
-export class KeychainTablet implements KeychainPassword { // TODO use secure storage
+export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
-        await Preferences.set({
-            key: `keychain-${publicKey}`,
-            value: mnemonic
+        await SecureStorage.storeData({
+            id: `Wallet-${publicKey}`,
+            data: mnemonic
         });
     };
 
     getPassword = async (publicKey: string) => {
-        const { value } = await Preferences.get({
-            key: `keychain-${publicKey}`
+        const { data } = await SecureStorage.getData({
+            id: `Wallet-${publicKey}`
         });
-        return value!; // TODO
+        return data!;
     };
 }
 

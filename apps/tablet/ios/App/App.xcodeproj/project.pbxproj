@@ -17,6 +17,7 @@
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
 		B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */; };
 		B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */; };
+		B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewController.swift; sourceTree = "<group>"; };
 		B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricPlugin.swift; sourceTree = "<group>"; };
+		B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoragePlugin.swift; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -87,6 +89,7 @@
 				50B271D01FEDC1A000F3C39B /* public */,
 				B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */,
 				B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */,
+				B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */,
 				B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
