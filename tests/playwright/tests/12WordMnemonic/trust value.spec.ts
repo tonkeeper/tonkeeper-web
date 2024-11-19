@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-//add trust wallet (12 words) + утверждаю, что токены TON & USDT присутствуют (видимы) + элемент мультисенд
-// видим и называется Multi Send
+//add trust wallet (12 words) and confirm that TON & USDT are visible + 
+//multisend element is visible and is called Multisend
 
 test('trust + assert visibility and value', async ({ page }) => {
     await page.goto('/');

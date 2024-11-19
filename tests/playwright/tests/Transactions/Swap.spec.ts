@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// swap ton-usdt
+// swap ton => usdt
 
 test.setTimeout(4 * 60 * 1000);
 
@@ -62,6 +62,8 @@ test.describe('Swap Test', () => {
         // Wait pending transaction transaction
         await expect(page.getByText('Pending')).toBeVisible({ timeout: 40 * 1000 });
     });
+
+//swap usdt => ton
 
     test('Should send swap usdt to ton and wait pending transaction', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Swap' })).toBeVisible();

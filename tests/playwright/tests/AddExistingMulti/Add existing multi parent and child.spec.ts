@@ -28,7 +28,7 @@ test('Add existing multi wallet', async ({ page }) => {
     await page.getByRole('button', { name: 'Delete wallet data' }).click();
 });
 
-//Add child wallet only from multiaccount
+//Add child wallet only (separately) from multiaccount
 
 test('Child wallet', async ({ page }) => {
     await page.goto('/');

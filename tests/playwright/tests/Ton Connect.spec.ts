@@ -30,7 +30,7 @@ test.afterEach(async ({ page }) => {
     await page.getByRole('button', { name: 'Delete wallet data' }).click();
 });
 
-//TON Connect + заходим сеттинги Connected Apps + проверка ассертов и элементов
+//TON Connect + go to the settings => Connected Apps + check asserts and elements
 
 test.describe('ton connect', () => {
     test('elements', async ({ page }) => {

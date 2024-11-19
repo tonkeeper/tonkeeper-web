@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-//отправка usdt с экрана токена + подтверждаем успех транзакции появлением Done
+//send usdt from token screen + confirm successful transaction as soon as Done is visibleS
 
 test('test', async ({ page }) => {
     await page.goto('/');
