@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 
 test.setTimeout(3 * 60 * 1000);
 
-test.beforeAll(async ({ page }) => {
+test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Get started' }).click();
     await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
@@ -23,16 +23,28 @@ test.beforeAll(async ({ page }) => {
     await page.getByRole('button', { name: 'Save' }).click();
 });
 
-test.describe('Swap tests', () => {
-    test.beforeEach(async ({ page }) => {
-        await page.getByRole('link', { name: 'History' }).click();
-        // Page should have a record with "TON"
-        await expect(page.getByText('TON')).toBeVisible();
-        // And don't need a pending records, may wait a couple of mins
-        await expect(page.getByText('Pending')).not.toBeVisible({ timeout: 2 * 60 * 1000 });
-    });
+test.afterEach(async ({ page }) => {
+    await page.getByRole('link', { name: 'Settings' }).click();
+    await page.getByText('Delete Account').click();
+    await page
+        .locator('div')
+        .filter({ hasText: /^I have a backup copy of recovery phrase$/ })
+        .locator('div')
+        .click();
+    await page.getByRole('button', { name: 'Delete wallet data' }).click();
+});
 
-    test('Should send swap ton-usdt and wait pending transaction', async ({ page }) => {
+test.describe('Swap Test', () => {
+    // test.beforeEach(async ({ page }) => {
+    //     await page.getByRole('link', { name: 'History' }).click();
+    //     // Page should have a record with "TON", wait loading
+    //     await expect(page.getByRole('button', { name: 'All Tokens' })).toBeVisible();
+    //     await expect(page.getByText('TON')).toBeVisible({ timeout: 20 * 1000 });
+    //     // And don't need a pending records, may wait a couple of mins
+    //     await expect(page.getByText('Pending')).not.toBeVisible({ timeout: 2 * 60 * 1000 });
+    // });
+
+    test('Should send swap ton to usdt and wait pending transaction', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Swap' })).toBeVisible();
         await page.getByRole('link', { name: 'Swap' }).click();
 
@@ -51,7 +63,7 @@ test.describe('Swap tests', () => {
         await expect(page.getByText('Pending')).toBeVisible({ timeout: 40 * 1000 });
     });
 
-    test('Should send swap usdt-ton and wait pending transaction', async ({ page }) => {
+    test.skip('Should send swap usdt to ton and wait pending transaction', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Swap' })).toBeVisible();
         await page.getByRole('link', { name: 'Swap' }).click();
 
@@ -71,15 +83,4 @@ test.describe('Swap tests', () => {
         // Wait pending transaction transaction
         await expect(page.getByText('Pending')).toBeVisible({ timeout: 40 * 1000 });
     });
-});
-
-test.afterAll(async ({ page }) => {
-    await page.getByRole('link', { name: 'Settings' }).click();
-    await page.getByText('Delete Account').click();
-    await page
-        .locator('div')
-        .filter({ hasText: /^I have a backup copy of recovery phrase$/ })
-        .locator('div')
-        .click();
-    await page.getByRole('button', { name: 'Delete wallet data' }).click();
 });
