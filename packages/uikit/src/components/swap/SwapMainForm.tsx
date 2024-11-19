@@ -86,7 +86,7 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
     return (
         <MainFormWrapper className={className}>
             <SwapFromField>
-                <ChangeIconStyled onClick={onChangeFields}>
+                <ChangeIconStyled data-testid="change-swap" onClick={onChangeFields}>
                     <SwapIcon />
                 </ChangeIconStyled>
             </SwapFromField>
