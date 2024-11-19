@@ -159,6 +159,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
     return (
         <ModalContentWrapper>
             <InputStyled
+                id="folder-name"
                 value={folderName}
                 onChange={setFolderName}
                 label={t('accounts_manage_folder_name')}

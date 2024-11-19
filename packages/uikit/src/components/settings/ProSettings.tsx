@@ -343,6 +343,7 @@ const BuyProService: FC<{
             />
             <Line>
                 <Input
+                    id="battery-promocode"
                     isSuccess={promoCode !== undefined}
                     disabled={isLoading}
                     value={promo}

@@ -71,6 +71,7 @@ export const CountrySettings = () => {
             <InnerBody>
                 <Block>
                     <Input
+                        id="country-search"
                         value={search}
                         onChange={setSearch}
                         label={t('settings_search_engine')}

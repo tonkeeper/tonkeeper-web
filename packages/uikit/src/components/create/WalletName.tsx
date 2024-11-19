@@ -64,6 +64,7 @@ export const UpdateWalletName: FC<{
                 </div>
 
                 <Input
+                    id="wallet-name"
                     ref={ref}
                     value={name}
                     onChange={onChange}

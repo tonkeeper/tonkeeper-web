@@ -55,6 +55,7 @@ export const RenameWalletContent: FC<{
     return (
         <NotificationBlock onSubmit={onSubmit}>
             <Input
+                id="wallet-name"
                 value={name}
                 onChange={setName}
                 isValid={!isError}

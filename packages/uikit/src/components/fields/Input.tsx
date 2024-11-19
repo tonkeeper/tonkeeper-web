@@ -205,11 +205,13 @@ export interface InputProps {
     marginRight?: string;
     className?: string;
     size?: 'small' | 'medium';
+    id: string;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     (
         {
+            id,
             type,
             value,
             onChange,
@@ -246,6 +248,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     size={size}
                 >
                     <InputField
+                        id={id}
                         ref={ref}
                         disabled={disabled}
                         type={type}
@@ -259,7 +262,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         size={size}
                         placeholder={size === 'small' ? label : undefined}
                     />
-                    {label && size !== 'small' && <Label active={value !== ''}>{label}</Label>}
+                    {label && size !== 'small' && (
+                        <Label active={value !== ''} htmlFor={id}>
+                            {label}
+                        </Label>
+                    )}
                     {rightElement && <RightBlock>{rightElement}</RightBlock>}
                     {!!value && clearButton && !rightElement && (
                         <ClearBlock onClick={onClear}>
