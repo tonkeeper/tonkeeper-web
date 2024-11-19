@@ -23,7 +23,7 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import { useTranslation } from '../../hooks/translation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
-import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
+import { IconButton, IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAppContext } from '../../hooks/appContext';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
@@ -66,6 +66,13 @@ const SettingsButton = styled(IconButtonTransparentBackground)`
     margin-left: auto;
 `;
 
+const SettingsButtonMobile = styled(IconButton)`
+    position: absolute;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+`;
+
 export const BatteryPageLayout: FC = () => {
     useProvideBatteryAuth();
     const { data } = useBatteryBalance();
@@ -92,10 +99,17 @@ export const BatteryPageLayout: FC = () => {
 
     return (
         <>
-            <SubHeader title={t('battery_title')} />
+            <SubHeader title={t('battery_title')}>
+                {data?.batteryUnitsBalance.gt(0) && (
+                    <SettingsButtonMobile onClick={onOpen}>
+                        <GearIconEmpty />
+                    </SettingsButtonMobile>
+                )}
+            </SubHeader>
             <InnerBody>
                 <BatteryPageContent />
             </InnerBody>
+            <BatterySettingsNotification isOpen={isOpen} onClose={onClose} />
         </>
     );
 };

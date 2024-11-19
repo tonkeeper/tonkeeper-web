@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import React, { FC, PropsWithChildren, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
@@ -96,7 +96,10 @@ const SubHeaderBackButton = () => {
     }
 };
 
-export const SubHeader: FC<SubHeaderProps & { hideBackButton?: boolean }> = ({ title }) => {
+export const SubHeader: FC<PropsWithChildren<SubHeaderProps & { hideBackButton?: boolean }>> = ({
+    title,
+    children
+}) => {
     const theme = useTheme();
 
     if (theme.displayType === 'full-width') {
@@ -112,6 +115,7 @@ export const SubHeader: FC<SubHeaderProps & { hideBackButton?: boolean }> = ({ t
         <Block>
             <SubHeaderBackButton />
             <Title>{title}</Title>
+            {children}
         </Block>
     );
 };
