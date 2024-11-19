@@ -127,7 +127,7 @@ const GiftIcon = () => {
             height="40"
             viewBox="0 0 40 40"
             fill="none"
-            style={{ borderRadius: '10px' }}
+            style={{ borderRadius: '10px', marginRight: '12px' }}
         >
             <g clipPath="url(#clip0_45119_78795)">
                 <rect width="40" height="40" fill="url(#paint0_linear_45119_78795)" />
