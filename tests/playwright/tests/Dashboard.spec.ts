@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-//Дэшборд для одного кошелька и элементы на нём
+//Dashboard for a single wallet + its elements` visibility
 
 test('Dashboard + elements', async ({ page }) => {
     await page.goto('/');

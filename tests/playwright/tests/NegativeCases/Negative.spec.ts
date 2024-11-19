@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-//добавить кошелёк с неверной сидкой + попап Incorrect phrase +
-//тексты и кнопки в модалке закрытия окошка видимы и называются корректно
+//Add wallet with incorrect seed phrase + pop up Incorrect phrase +
+//texts and buttons in a closing modal window are visible and correct
 
 test('Incorrect seed phrase ', async ({ page }) => {
     await page.goto('/');
@@ -26,7 +26,8 @@ test('Incorrect seed phrase ', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });
 
-//неверный пароль ввести 2 раза, ошибка Passwords do not match + ввод верного пароля +удаление кошелька
+//incorrect password to enter 2 times, error Passwords do not match + 
+//correct password to enter + delete wallet
 
 test('Incorrect password', async ({ page }) => {
     await page.goto('/');
