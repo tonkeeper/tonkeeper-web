@@ -8,7 +8,7 @@ test('Incorrect seed phrase ', async ({ page }) => {
     await page.getByRole('button', { name: 'Get started' }).click();
     await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
     await page.getByLabel('1:', { exact: true }).click();
-    await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_ANANAS);
+    await page.getByLabel('1:', { exact: true }).fill(process.env.FAKE_MNEMONIC);
     await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -60,7 +60,7 @@ test('Incorrect password', async ({ page }) => {
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Save' }).click();
     await page.getByRole('link', { name: 'Settings' }).click();
-    await page.goto('https://wallet.tonkeeper.com/wallet-settings');
+    await page.goto('/wallet-settings');
     await page
         .locator('div')
         .filter({ hasText: /^Delete Account$/ })

@@ -66,6 +66,7 @@ const EditFavoriteContent: FC<{
     return (
         <Block>
             <Input
+                id="favorite-name"
                 ref={ref}
                 value={name}
                 onChange={onName}
@@ -113,6 +114,7 @@ const AddFavoriteContent: FC<{
     return (
         <Block>
             <Input
+                id="favorite-name"
                 ref={ref}
                 value={name}
                 onChange={onName}

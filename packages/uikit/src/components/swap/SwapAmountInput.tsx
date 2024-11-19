@@ -90,6 +90,7 @@ export const SwapAmountInput: FC<{
     const decimalSeparator = getDecimalSeparator();
     return (
         <AmountInputWrapper
+            id="swap-amount"
             value={input}
             onChange={e => onInput(e.target.value)}
             placeholder={`0${decimalSeparator}00`}

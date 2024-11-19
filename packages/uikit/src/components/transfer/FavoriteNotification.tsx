@@ -47,6 +47,7 @@ const AddFavoriteContent: FC<{
     return (
         <Block onSubmit={handleSubmit}>
             <Input
+                id="favorite-name"
                 ref={ref}
                 value={name}
                 onChange={onName}
@@ -141,6 +142,7 @@ const EditFavoriteContent: FC<{
     return (
         <Block onSubmit={handleSubmit}>
             <Input
+                id="favorite-name"
                 ref={ref}
                 value={name}
                 onChange={onName}
