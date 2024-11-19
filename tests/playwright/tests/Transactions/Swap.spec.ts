@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 // swap ton-usdt
 
-test.setTimeout(3 * 60 * 1000);
+test.setTimeout(4 * 60 * 1000);
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/');
@@ -35,14 +35,14 @@ test.afterEach(async ({ page }) => {
 });
 
 test.describe('Swap Test', () => {
-    // test.beforeEach(async ({ page }) => {
-    //     await page.getByRole('link', { name: 'History' }).click();
-    //     // Page should have a record with "TON", wait loading
-    //     await expect(page.getByRole('button', { name: 'All Tokens' })).toBeVisible();
-    //     await expect(page.getByText('TON')).toBeVisible({ timeout: 20 * 1000 });
-    //     // And don't need a pending records, may wait a couple of mins
-    //     await expect(page.getByText('Pending')).not.toBeVisible({ timeout: 2 * 60 * 1000 });
-    // });
+    test.beforeEach(async ({ page }) => {
+        await page.getByRole('link', { name: 'History' }).click();
+        // Page should have a record with "TON", wait loading
+        await expect(page.getByRole('button', { name: 'All Tokens' })).toBeVisible();
+        await expect(page.getByText('TON').nth(0)).toBeVisible({ timeout: 20 * 1000 });
+        // And don't need a pending records, may wait a couple of mins
+        await expect(page.getByText('Pending')).not.toBeVisible({ timeout: 2 * 60 * 1000 });
+    });
 
     test('Should send swap ton to usdt and wait pending transaction', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Swap' })).toBeVisible();
@@ -63,7 +63,7 @@ test.describe('Swap Test', () => {
         await expect(page.getByText('Pending')).toBeVisible({ timeout: 40 * 1000 });
     });
 
-    test.skip('Should send swap usdt to ton and wait pending transaction', async ({ page }) => {
+    test('Should send swap usdt to ton and wait pending transaction', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Swap' })).toBeVisible();
         await page.getByRole('link', { name: 'Swap' }).click();
 
