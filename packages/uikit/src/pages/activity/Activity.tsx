@@ -89,7 +89,7 @@ const Activity: FC = () => {
         <>
             <ActivityHeader />
             <InnerBody ref={ref}>
-                <MixedActivityGroup items={activity} />
+                <MixedActivityGroup key={activity[0][0]} items={activity} />
                 {isFetchingNextPage && <SkeletonListWithImages size={3} />}
             </InnerBody>
         </>
