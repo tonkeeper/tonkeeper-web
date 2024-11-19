@@ -28,13 +28,14 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useAppContext } from '../../hooks/appContext';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { AppRoute } from "../../libs/routes";
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
     const { disableWhole } = useBatteryEnabledConfig();
 
     if ((account.type !== 'mnemonic' && account.type !== 'mam') || disableWhole) {
-        return <Navigate to="../" />;
+        return <Navigate to={AppRoute.home} />;
     }
 
     return (
@@ -83,7 +84,7 @@ export const BatteryPageLayout: FC = () => {
     if (isFullWidth) {
         return (
             <DesktopViewPageLayout>
-                <DesktopViewHeaderStyled backButton borderBottom>
+                <DesktopViewHeaderStyled borderBottom>
                     <Label2>{t('battery_title')}</Label2>
                     {data?.batteryUnitsBalance.gt(0) && (
                         <SettingsButton onClick={onOpen}>
