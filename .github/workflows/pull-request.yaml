@@ -319,7 +319,7 @@ jobs:
 
             - name: Install Playwright Browsers
               working-directory: ./tests/playwright
-              run: npx playwright install --with-deps
+              run: npx playwright install --with-deps chromium
 
             - name: Run Playwright tests
               working-directory: ./tests/playwright
@@ -334,7 +334,7 @@ jobs:
                   TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
                   TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
                   FAKE_MNEMONIC: ${{ secrets.FAKE_MNEMONIC }}
-              run: npx playwright test
+              run: npx playwright test --project='chromium'
 
             - name: Comment Playwright report
               uses: daun/playwright-report-summary@v3
