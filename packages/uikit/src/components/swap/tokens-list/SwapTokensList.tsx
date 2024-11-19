@@ -168,6 +168,10 @@ const TokenInfoLine = styled.div`
         text-overflow: ellipsis;
     }
 
+    > ${Label2} {
+        color: ${p => p.theme.textPrimary};
+    }
+
     > *:nth-child(3) {
         margin-left: auto;
     }
