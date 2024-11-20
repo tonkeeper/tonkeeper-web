@@ -2,11 +2,14 @@ name: build-web
 description: Build Tonkeeper Web Wallet
 inputs:
     environment:
+        description: 'Environment main or feature'
+        required: false
     node_version:
+        description: 'Version of node js'
         required: true
-            outputs:
 outputs:
     deployment-url:
+        description: 'URL of deployment'
 runs:
     using: composite
     steps:
