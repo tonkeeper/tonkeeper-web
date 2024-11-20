@@ -53,6 +53,24 @@ type GroupedActivityItemGroup = {
 
 type GroupedActivity = (GroupedActivityItemSingle | GroupedActivityItemGroup)[];
 
+const HistoryEvents: FC<{
+    className?: string;
+    aggregatedActivity: GroupedActivity;
+    setSelectedActivity: React.Dispatch<React.SetStateAction<ActionData | undefined>>;
+}> = ({ className, aggregatedActivity, setSelectedActivity }) => {
+    return (
+        <HistoryEventsGrid className={className}>
+            <GridSizer />
+            <GridSizer2 />
+            <GridSizer3 />
+            <GridSizer />
+            {aggregatedActivity.map(group => (
+                <HistoryEvent group={group} key={group.key} onActionClick={setSelectedActivity} />
+            ))}
+        </HistoryEventsGrid>
+    );
+};
+
 export const DesktopHistory: FC<{
     activity: GenericActivity<MixedActivity>[] | undefined;
     isFetchingNextPage: boolean;
@@ -60,14 +78,19 @@ export const DesktopHistory: FC<{
 }> = ({ activity, isFetchingNextPage, className }) => {
     const [selectedActivity, setSelectedActivity] = useState<ActionData | undefined>();
 
-    const aggregatedActivity: GroupedActivity | undefined = useMemo(() => {
-        const groupped = activity?.reduce((acc, item) => {
+    const aggregatedActivity: GroupedActivity = useMemo(() => {
+        const double = new Set();
+
+        const groupped = (activity ?? []).reduce((acc, item) => {
             if (item.event.kind === 'tron' || !item.event.event.isScam) {
-                acc.push({
-                    type: 'single',
-                    item,
-                    key: item.key
-                });
+                if (!double.has(item.key)) {
+                    double.add(item.key);
+                    acc.push({
+                        type: 'single',
+                        item,
+                        key: item.key
+                    });
+                }
                 return acc;
             }
 
@@ -88,7 +111,7 @@ export const DesktopHistory: FC<{
             return acc;
         }, [] as GroupedActivity);
 
-        return groupped?.map(i => {
+        return groupped.map(i => {
             if (i.type === 'group' && i.items.length === 1) {
                 return {
                     type: 'single',
@@ -101,27 +124,19 @@ export const DesktopHistory: FC<{
         });
     }, [activity]);
 
+    const key = aggregatedActivity.length ? aggregatedActivity[0].key : undefined;
     return (
         <>
             <ActivityNotification
                 value={selectedActivity}
                 handleClose={() => setSelectedActivity(undefined)}
             />
-            {aggregatedActivity && (
-                <HistoryEventsGrid className={className}>
-                    <GridSizer />
-                    <GridSizer2 />
-                    <GridSizer3 />
-                    <GridSizer />
-                    {aggregatedActivity.map(group => (
-                        <HistoryEvent
-                            group={group}
-                            key={group.key}
-                            onActionClick={setSelectedActivity}
-                        />
-                    ))}
-                </HistoryEventsGrid>
-            )}
+            <HistoryEvents
+                key={key}
+                className={className}
+                aggregatedActivity={aggregatedActivity}
+                setSelectedActivity={setSelectedActivity}
+            />
             {(isFetchingNextPage || !activity) && (
                 <FetchingRows>
                     <SpinnerRing />

@@ -44,6 +44,7 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps>(
             <SentenceInput
                 autoComplete="off"
                 id="sentence"
+                data-testid="amount-input"
                 ref={ref}
                 style={{
                     fontSize: `${inputSize.size}px`,

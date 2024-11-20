@@ -153,7 +153,10 @@ const useSendNft = (
                 if (options.multisigTTL === undefined) {
                     throw new Error('TTL must be specified for multisig sending');
                 }
-                senderChoice = { type: 'multisig', ttlSeconds: 5 * 60 } as const;
+                senderChoice = {
+                    type: 'multisig',
+                    ttlSeconds: 60 * Number(options.multisigTTL)
+                } as const;
             } else if (options.selectedSenderType === 'external') {
                 senderChoice = EXTERNAL_SENDER_CHOICE;
             } else if (options.selectedSenderType === 'battery') {

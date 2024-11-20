@@ -112,6 +112,7 @@ export const PasswordUnlock: FC<{
     return (
         <Block onSubmit={handleSubmit} padding={padding}>
             <Input
+                id="unlock-password"
                 ref={ref}
                 value={password}
                 onChange={setPassword}

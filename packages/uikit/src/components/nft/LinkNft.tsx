@@ -279,6 +279,7 @@ const LinkNFTWalletView: FC<{
         <ChangeWalletContainerStyled onSubmit={onSubmit}>
             <WalletLabelStyled>{t('add_dns_address').replace('%1%', domain)}</WalletLabelStyled>
             <Input
+                id="dns-address"
                 disabled={isLoading}
                 isValid={isInputValid}
                 value={inputValue}
