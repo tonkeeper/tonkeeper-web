@@ -19,8 +19,7 @@ export class MultisigCreateOrderSender implements ISender {
         private readonly multisig: Multisig,
         private readonly ttlSeconds: number,
         private readonly hostWallet: TonWalletStandard,
-        private readonly signer: Signer,
-        private readonly network: Network
+        private readonly signer: Signer
     ) {}
 
     public get excessAddress() {
@@ -31,12 +30,7 @@ export class MultisigCreateOrderSender implements ISender {
         const wrappedMessage = await this.wrapMessage(outgoing);
 
         if (this.signer.type === 'ledger') {
-            const sender = new LedgerMessageSender(
-                this.api,
-                this.hostWallet,
-                this.signer,
-                this.network
-            );
+            const sender = new LedgerMessageSender(this.api, this.hostWallet, this.signer);
             return (
                 await sender.tonRawTransfer({
                     ...wrappedMessage,
@@ -45,12 +39,7 @@ export class MultisigCreateOrderSender implements ISender {
             ).send();
         }
 
-        const sender = new WalletMessageSender(
-            this.api,
-            this.hostWallet,
-            this.signer,
-            this.network
-        );
+        const sender = new WalletMessageSender(this.api, this.hostWallet, this.signer);
         return sender.send({
             sendMode: SendMode.IGNORE_ERRORS,
             messages: [internal(wrappedMessage)]
@@ -61,12 +50,7 @@ export class MultisigCreateOrderSender implements ISender {
         const wrappedMessage = await this.wrapMessage(outgoing);
 
         if (this.signer.type === 'ledger') {
-            const sender = new LedgerMessageSender(
-                this.api,
-                this.hostWallet,
-                this.signer,
-                this.network
-            );
+            const sender = new LedgerMessageSender(this.api, this.hostWallet, this.signer);
             return (
                 await sender.tonRawTransfer({
                     ...wrappedMessage,
@@ -75,12 +59,7 @@ export class MultisigCreateOrderSender implements ISender {
             ).estimate();
         }
 
-        const sender = new WalletMessageSender(
-            this.api,
-            this.hostWallet,
-            this.signer,
-            this.network
-        );
+        const sender = new WalletMessageSender(this.api, this.hostWallet, this.signer);
         return sender.estimate({
             sendMode: SendMode.IGNORE_ERRORS,
             messages: [internal(wrappedMessage)]

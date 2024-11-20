@@ -17,7 +17,8 @@ import {
     AccountTonOnly,
     AccountTonWatchOnly,
     Account,
-    getNetworkByAccount
+    getNetworkByAccount,
+    AccountTonTestnet
 } from '@tonkeeper/core/dist/entries/account';
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
@@ -124,7 +125,7 @@ const AsideMultisigItem = forwardRef<
 });
 
 export const AsideMenuAccountMnemonic: FC<{
-    account: AccountTonMnemonic;
+    account: AccountTonMnemonic | AccountTonTestnet;
     isSelected: boolean;
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, isSelected, onClickWallet }) => {
@@ -461,6 +462,7 @@ export const AsideMenuAccount: FC<{
     const isSelected = rest.mightBeHighlighted && activeAccount.id === account.id;
     switch (account.type) {
         case 'mnemonic':
+        case 'testnet':
             return <AsideMenuAccountMnemonic account={account} isSelected={isSelected} {...rest} />;
         case 'ledger':
             return <AsideMenuAccountLedger account={account} isSelected={isSelected} {...rest} />;

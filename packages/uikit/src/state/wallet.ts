@@ -7,6 +7,7 @@ import {
     AccountsState,
     AccountTonMnemonic,
     AccountTonMultisig,
+    AccountTonTestnet,
     AccountTonWatchOnly,
     getAccountByWalletById,
     getNetworkByAccount,
@@ -33,6 +34,7 @@ import {
     createMAMAccountByMnemonic,
     createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
+    createStandardTestnetAccountByMnemonic,
     createStandardTonAccountByMnemonic,
     getStandardTonWalletVersions,
     getTonWalletStandard,
@@ -385,7 +387,83 @@ export const useCreateAccountReadOnly = () => {
         return account;
     });
 };
-export const useCreateAccountMnemonic = (network: Network) => {
+
+export const useCreateAccountTestnet = () => {
+    const sdk = useAppSdk();
+    const context = useAppContext();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+
+    return useMutation<
+        AccountTonTestnet,
+        Error,
+        {
+            mnemonic: string[];
+            mnemonicType: MnemonicType;
+            password?: string;
+            versions: WalletVersion[];
+            selectAccount?: boolean;
+        }
+    >(async ({ mnemonic, password, versions, selectAccount, mnemonicType }) => {
+        const valid = await seeIfMnemonicValid(mnemonic);
+        if (!valid) {
+            throw new Error('Mnemonic is not valid.');
+        }
+
+        if (sdk.keychain) {
+            const account = await createStandardTestnetAccountByMnemonic(
+                context,
+                sdk.storage,
+                mnemonic,
+                mnemonicType,
+                {
+                    auth: {
+                        kind: 'keychain'
+                    },
+                    versions
+                }
+            );
+
+            await sdk.keychain.setPassword(
+                (account.auth as AuthKeychain).keychainStoreKey,
+                mnemonic.join(' ')
+            );
+
+            await addAccountToState(account);
+            if (selectAccount) {
+                await selectAccountMutation(account.id);
+            }
+            return account;
+        }
+
+        if (!password) {
+            password = await getPasswordByNotification(sdk);
+        }
+
+        const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
+        const account = await createStandardTestnetAccountByMnemonic(
+            context,
+            sdk.storage,
+            mnemonic,
+            mnemonicType,
+            {
+                auth: {
+                    kind: 'password',
+                    encryptedMnemonic
+                },
+                versions
+            }
+        );
+
+        await addAccountToState(account);
+        if (selectAccount) {
+            await selectAccountMutation(account.id);
+        }
+        return account;
+    });
+};
+
+export const useCreateAccountMnemonic = () => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
@@ -414,7 +492,6 @@ export const useCreateAccountMnemonic = (network: Network) => {
                 mnemonic,
                 mnemonicType,
                 {
-                    network,
                     auth: {
                         kind: 'keychain'
                     },
@@ -445,7 +522,6 @@ export const useCreateAccountMnemonic = (network: Network) => {
             mnemonic,
             mnemonicType,
             {
-                network,
                 auth: {
                     kind: 'password',
                     encryptedMnemonic
@@ -462,7 +538,7 @@ export const useCreateAccountMnemonic = (network: Network) => {
     });
 };
 
-export const useCreateAccountMAM = (network: Network) => {
+export const useCreateAccountMAM = () => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
@@ -480,7 +556,6 @@ export const useCreateAccountMAM = (network: Network) => {
     >(async ({ selectedDerivations, mnemonic, password, selectAccount }) => {
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
-                network,
                 selectedDerivations,
                 auth: {
                     kind: 'keychain'
@@ -505,7 +580,6 @@ export const useCreateAccountMAM = (network: Network) => {
 
         const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
         const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
-            network,
             selectedDerivations,
             auth: {
                 kind: 'password',

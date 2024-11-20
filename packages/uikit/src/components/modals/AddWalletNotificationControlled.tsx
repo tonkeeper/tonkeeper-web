@@ -21,6 +21,7 @@ import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -166,20 +167,10 @@ export const AddWalletNotificationControlled = () => {
                 return <CreateMAMWallet afterCompleted={onCloseCallback} />;
             }
             case 'testnet': {
-                return (
-                    <ImportExistingWallet
-                        afterCompleted={onCloseCallback}
-                        network={Network.TESTNET}
-                    />
-                );
+                return <ImportTestnetWallet afterCompleted={onCloseCallback} />;
             }
             case 'import': {
-                return (
-                    <ImportExistingWallet
-                        afterCompleted={onCloseCallback}
-                        network={Network.MAINNET}
-                    />
-                );
+                return <ImportExistingWallet afterCompleted={onCloseCallback} />;
             }
             case 'watch-only': {
                 return <CreateWatchOnlyWallet afterCompleted={onCloseCallback} />;

@@ -60,9 +60,7 @@ export class Clonable {
     }
 }
 
-export class AccountTonMnemonic extends Clonable implements IAccountVersionsEditable {
-    public readonly type = 'mnemonic';
-
+abstract class TonMnemonic extends Clonable implements IAccountVersionsEditable {
     get allTonWallets() {
         return this.tonWallets;
     }
@@ -81,14 +79,9 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         public auth: AuthPassword | AuthKeychain,
         public activeTonWalletId: WalletId,
         public tonWallets: TonWalletStandard[],
-        public mnemonicType?: MnemonicType,
-        public network?: Network // It's undefined for old wallets
+        public mnemonicType?: MnemonicType
     ) {
         super();
-
-        if (this.network === undefined) {
-            this.network = Network.MAINNET;
-        }
     }
 
     getTonWallet(id: WalletId) {
@@ -121,6 +114,13 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         }
         this.activeTonWalletId = walletId;
     }
+}
+export class AccountTonMnemonic extends TonMnemonic {
+    public readonly type = 'mnemonic';
+}
+
+export class AccountTonTestnet extends TonMnemonic {
+    public readonly type = 'testnet';
 }
 
 export class AccountTonWatchOnly extends Clonable implements IAccount {
@@ -399,8 +399,7 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         public auth: AuthPassword | AuthKeychain,
         public activeDerivationIndex: number,
         public addedDerivationsIndexes: number[],
-        public allAvailableDerivations: DerivationItemNamed[],
-        public network: Network // it's undefined for old wallets
+        public allAvailableDerivations: DerivationItemNamed[]
     ) {
         super();
 
@@ -417,10 +416,6 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         }
 
         this.addedDerivationsIndexes = [...new Set(addedDerivationsIndexes)];
-
-        if (this.network === undefined) {
-            this.network = Network.MAINNET;
-        }
     }
 
     getTonWallet(id: WalletId) {
@@ -585,7 +580,7 @@ export class AccountTonMultisig extends Clonable implements IAccount {
     }
 }
 
-export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly;
+export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly | AccountTonTestnet;
 
 export type AccountTonWalletStandard =
     | AccountVersionEditable
@@ -599,6 +594,7 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
     switch (account.type) {
         case 'mnemonic':
         case 'ton-only':
+        case 'testnet':
             return true;
         case 'ledger':
         case 'keystone':
@@ -618,6 +614,7 @@ export function isAccountTonWalletStandard(account: Account): account is Account
         case 'ledger':
         case 'ton-only':
         case 'mam':
+        case 'testnet':
             return true;
         case 'watch-only':
         case 'ton-multisig':
@@ -637,6 +634,7 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
+        case 'testnet':
             return false;
         default:
             return assertUnreachable(account);
@@ -645,9 +643,10 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
 
 export function getNetworkByAccount(account: Account): Network {
     switch (account.type) {
+        case 'testnet':
+            return Network.TESTNET;
         case 'mam':
         case 'mnemonic':
-            return account.network ?? Network.MAINNET;
         case 'ton-only':
         case 'ledger':
         case 'watch-only':
@@ -674,6 +673,7 @@ export function serializeAccount(account: Account): string {
 
 const prototypes = {
     mnemonic: AccountTonMnemonic.prototype,
+    testnet: AccountTonTestnet.prototype,
     ledger: AccountLedger.prototype,
     keystone: AccountKeystone.prototype,
     'ton-only': AccountTonOnly.prototype,

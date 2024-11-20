@@ -36,11 +36,10 @@ export const useEstimateDeployMultisig = () => {
             throw new Error('Wallet not found');
         }
 
-        const network = getNetworkByAccount(account);
-        const [api] = getContextApiByNetwork(appContext, network);
+        const [api] = getContextApiByNetwork(appContext, getNetworkByAccount(account));
 
         const multisigEncoder = new MultisigEncoder(api, walletState.rawAddress);
-        const sender = new WalletMessageSender(api, walletState, estimationSigner, network);
+        const sender = new WalletMessageSender(api, walletState, estimationSigner);
 
         const message = await multisigEncoder.encodeCreateMultisig(multisigConfig);
 

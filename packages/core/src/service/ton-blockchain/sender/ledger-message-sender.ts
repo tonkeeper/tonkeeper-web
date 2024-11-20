@@ -31,8 +31,7 @@ export class LedgerMessageSender {
     constructor(
         private readonly api: APIConfig,
         private readonly wallet: TonWalletStandard,
-        private readonly signer: LedgerSigner,
-        private readonly network: Network
+        private readonly signer: LedgerSigner
     ) {}
 
     tonRawTransfer = async ({
@@ -236,7 +235,7 @@ export class LedgerMessageSender {
     private async getTransferParameters() {
         const timestamp = await getServerTime(this.api);
         const seqno = await getWalletSeqNo(this.api, this.wallet.rawAddress);
-        const contract = walletContractFromState(this.wallet, this.network);
+        const contract = walletContractFromState(this.wallet);
         return {
             timestamp,
             seqno,

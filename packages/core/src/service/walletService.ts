@@ -11,6 +11,7 @@ import {
     AccountTonMnemonic,
     AccountTonMultisig,
     AccountTonOnly,
+    AccountTonTestnet,
     AccountTonWatchOnly
 } from '../entries/account';
 import { APIConfig } from '../entries/apis';
@@ -96,14 +97,16 @@ export const getTonWalletStandard = (
             }),
             publicKey,
             version: item.version,
-            rawAddress: item.rawAddress
+            rawAddress: item.rawAddress,
+            network
         };
     } else {
         return {
             id: item.rawAddress,
             publicKey,
             version: item.version,
-            rawAddress: item.rawAddress
+            rawAddress: item.rawAddress,
+            network
         };
     }
 };
@@ -126,7 +129,6 @@ export const createStandardTonAccountByMnemonic = async (
     mnemonicType: MnemonicType,
     options: {
         versions?: WalletVersion[];
-        network: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
@@ -137,13 +139,13 @@ export const createStandardTonAccountByMnemonic = async (
     let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
     if (options.versions) {
         tonWallets = options.versions
-            .map(v => getWalletAddress(publicKey, v, options.network))
+            .map(v => getWalletAddress(publicKey, v, Network.MAINNET))
             .map(i => ({
                 rawAddress: i.address.toRawString(),
                 version: i.version
             }));
     } else {
-        tonWallets = [await findWalletAddress(appContext, options.network, publicKey)];
+        tonWallets = [await findWalletAddress(appContext, Network.MAINNET, publicKey)];
     }
 
     let walletAuth: AuthPassword | AuthKeychain;
@@ -160,18 +162,71 @@ export const createStandardTonAccountByMnemonic = async (
 
     const wallets = tonWallets
         .slice()
-        .map(item => getTonWalletStandard(item, publicKey, options.network));
+        .map(item => getTonWalletStandard(item, publicKey, Network.MAINNET));
     const walletIdToActivate = wallets[0].id;
 
     return new AccountTonMnemonic(
-        options.network === Network.TESTNET ? `testnet-${publicKey}` : publicKey,
+        publicKey,
         name,
         emoji,
         walletAuth,
         walletIdToActivate,
         wallets,
-        mnemonicType,
-        options.network
+        mnemonicType
+    );
+};
+
+export const createStandardTestnetAccountByMnemonic = async (
+    appContext: CreateWalletContext,
+    storage: IStorage,
+    mnemonic: string[],
+    mnemonicType: MnemonicType,
+    options: {
+        versions?: WalletVersion[];
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+    }
+) => {
+    const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
+
+    const publicKey = keyPair.publicKey.toString('hex');
+
+    let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
+    if (options.versions) {
+        tonWallets = options.versions
+            .map(v => getWalletAddress(publicKey, v, Network.TESTNET))
+            .map(i => ({
+                rawAddress: i.address.toRawString(),
+                version: i.version
+            }));
+    } else {
+        tonWallets = [await findWalletAddress(appContext, Network.TESTNET, publicKey)];
+    }
+
+    let walletAuth: AuthPassword | AuthKeychain;
+    if (options.auth.kind === 'keychain') {
+        walletAuth = {
+            kind: 'keychain',
+            keychainStoreKey: publicKey
+        };
+    } else {
+        walletAuth = options.auth;
+    }
+
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
+
+    const wallets = tonWallets
+        .slice()
+        .map(item => getTonWalletStandard(item, publicKey, Network.TESTNET));
+    const walletIdToActivate = wallets[0].id;
+
+    return new AccountTonTestnet(
+        `testnet-${publicKey}`,
+        name,
+        emoji,
+        walletAuth,
+        walletIdToActivate,
+        wallets,
+        mnemonicType
     );
 };
 
@@ -408,7 +463,6 @@ export const createMAMAccountByMnemonic = async (
     rootMnemonic: string[],
     options: {
         selectedDerivations?: number[];
-        network: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
@@ -430,7 +484,7 @@ export const createMAMAccountByMnemonic = async (
         childTonWallets = await getRelevantMAMTonAccountsToImport(
             rootAccount,
             appContext,
-            options.network
+            Network.MAINNET
         );
 
         if (!childTonWallets.length) {
@@ -457,7 +511,7 @@ export const createMAMAccountByMnemonic = async (
             const tonWallet = walletContract(
                 w.tonAccount.publicKey,
                 appContext.defaultWalletVersion,
-                options.network
+                Network.MAINNET
             );
 
             const tonWallets: TonWalletStandard[] = [
@@ -467,7 +521,7 @@ export const createMAMAccountByMnemonic = async (
                         rawAddress: tonWallet.address.toRawString()
                     },
                     w.tonAccount.publicKey,
-                    options.network
+                    Network.MAINNET
                 )
             ];
 
@@ -495,8 +549,7 @@ export const createMAMAccountByMnemonic = async (
         auth,
         addedDerivationIndexes[0],
         addedDerivationIndexes,
-        namedDerivations.map(d => d.item),
-        options.network
+        namedDerivations.map(d => d.item)
     );
 };
 

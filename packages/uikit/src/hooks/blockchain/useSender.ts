@@ -178,9 +178,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             if (account.type === 'ledger') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
-
-            const network = getNetworkByAccount(account);
-            const [api] = getContextApiByNetwork(appContext, network);
+            const [api] = getContextApiByNetwork(appContext, getNetworkByAccount(account));
             const choices: SenderChoiceUserAvailable[] = [EXTERNAL_SENDER_CHOICE];
 
             const tonConnectService = new TonConnectTransactionService(
@@ -201,8 +199,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                     },
                     { batteryApi, tonApi: api },
                     account.activeTonWallet,
-                    estimationSigner,
-                    network
+                    estimationSigner
                 );
 
                 try {
@@ -250,8 +247,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                 throw new Error("Can't send a transfer using this account");
             }
 
-            const network = getNetworkByAccount(activeAccount);
-            const [api] = getContextApiByNetwork(appContext, network);
+            const [api] = getContextApiByNetwork(appContext, getNetworkByAccount(activeAccount));
 
             if (senderChoice.type === 'multisig') {
                 if (activeAccount.type !== 'ton-multisig') {
@@ -278,8 +274,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     multisig,
                     senderChoice.ttlSeconds,
                     signerWallet,
-                    signer,
-                    network
+                    signer
                 );
             }
 
@@ -291,11 +286,11 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                 if (senderChoice.type !== 'external') {
                     throw new Error("Can't send a transfer using this account");
                 }
-                return new WalletMessageSender(api, wallet, estimationSigner, network);
+                return new WalletMessageSender(api, wallet, estimationSigner);
             }
 
             if (senderChoice.type === 'external') {
-                return new WalletMessageSender(api, wallet, estimationSigner, network);
+                return new WalletMessageSender(api, wallet, estimationSigner);
             }
 
             if (senderChoice.type === 'gasless') {
@@ -317,8 +312,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     },
                     api,
                     wallet,
-                    estimationSigner,
-                    network
+                    estimationSigner
                 );
             }
 
@@ -339,8 +333,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                         batteryApi
                     },
                     wallet,
-                    estimationSigner,
-                    network
+                    estimationSigner
                 );
             }
 
@@ -379,8 +372,7 @@ export const useGetSender = () => {
                 throw new Error("Can't send a transfer using this account");
             }
 
-            const network = getNetworkByAccount(activeAccount);
-            const [api] = getContextApiByNetwork(appContext, network);
+            const [api] = getContextApiByNetwork(appContext, getNetworkByAccount(activeAccount));
 
             /**
              * create multisig order
@@ -409,8 +401,7 @@ export const useGetSender = () => {
                     multisig,
                     senderChoice.ttlSeconds,
                     signerWallet,
-                    signer,
-                    network
+                    signer
                 );
             }
 
@@ -449,11 +440,11 @@ export const useGetSender = () => {
                 if (senderChoice.type !== 'external') {
                     throw new Error("Can't send a transfer using this account");
                 }
-                return new LedgerMessageSender(api, wallet, signer, network);
+                return new LedgerMessageSender(api, wallet, signer);
             }
 
             if (senderChoice.type === 'external') {
-                return new WalletMessageSender(api, wallet, signer, network);
+                return new WalletMessageSender(api, wallet, signer);
             }
 
             if (senderChoice.type === 'gasless') {
@@ -475,8 +466,7 @@ export const useGetSender = () => {
                     },
                     api,
                     wallet,
-                    signer,
-                    network
+                    signer
                 );
             }
 
@@ -499,8 +489,7 @@ export const useGetSender = () => {
                         batteryApi
                     },
                     wallet,
-                    signer,
-                    network
+                    signer
                 );
             }
 

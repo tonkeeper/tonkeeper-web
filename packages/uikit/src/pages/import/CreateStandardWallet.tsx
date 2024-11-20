@@ -23,17 +23,13 @@ import {
 } from '../../components/Notification';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 
-export const CreateStandardWallet: FC<{ afterCompleted: () => void; network?: Network }> = ({
-    afterCompleted,
-    network = Network.MAINNET
-}) => {
+export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { defaultWalletVersion } = useAppContext();
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
-        useCreateAccountMnemonic(network);
+        useCreateAccountMnemonic();
     const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();

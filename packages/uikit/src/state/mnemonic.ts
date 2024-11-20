@@ -65,6 +65,7 @@ export const signTonConnectOver = ({
                 );
                 return Buffer.from(result, 'hex');
             }
+            case 'testnet':
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
                 const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
@@ -221,6 +222,7 @@ export const getSigner = async (
                 callback.type = 'cell' as const;
                 return callback;
             }
+            case 'testnet':
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {

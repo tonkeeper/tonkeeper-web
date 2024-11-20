@@ -197,7 +197,7 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
-    if (account.type === 'mnemonic') {
+    if (account.type === 'mnemonic' || account.type === 'testnet') {
         return null;
     }
 

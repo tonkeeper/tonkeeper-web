@@ -140,6 +140,7 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             );
         case 'ton-only':
         case 'mnemonic':
+        case 'testnet':
             if (account.allTonWallets.length === 1) {
                 return baseInfo;
             }

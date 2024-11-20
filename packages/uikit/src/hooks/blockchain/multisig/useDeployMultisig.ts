@@ -65,8 +65,10 @@ export const useDeployMultisig = (
                 throw new Error('Wallet not found');
             }
 
-            const network = getNetworkByAccount(accountAndWallet.account);
-            const [api] = getContextApiByNetwork(appContext, network);
+            const [api] = getContextApiByNetwork(
+                appContext,
+                getNetworkByAccount(accountAndWallet.account)
+            );
             const multisigEncoder = new MultisigEncoder(api, accountAndWallet.wallet.rawAddress);
             const address = multisigEncoder.multisigAddress(params.multisigConfig);
 
@@ -90,9 +92,9 @@ export const useDeployMultisig = (
 
             let sender: Sender;
             if (signer.type === 'ledger') {
-                sender = new LedgerMessageSender(api, accountAndWallet.wallet, signer, network);
+                sender = new LedgerMessageSender(api, accountAndWallet.wallet, signer);
             } else {
-                sender = new WalletMessageSender(api, accountAndWallet.wallet, signer, network);
+                sender = new WalletMessageSender(api, accountAndWallet.wallet, signer);
             }
 
             await rawTransactionService.send(
