@@ -133,7 +133,7 @@ jobs:
 
             - name: Build and deploy web
               id: deploy
-              uses: .github/workflows/web-build
+              uses: ./.github/workflows/web-build
               with:
                   node_version: ${{ env.node-version }}
 
