@@ -128,6 +128,9 @@ jobs:
         outputs:
             deployment-url: ${{ steps.deploy.outputs.deployment-url }}
         steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
             - name: Build and deploy web
               id: deploy
               uses: ./.github/workflows/web-build
