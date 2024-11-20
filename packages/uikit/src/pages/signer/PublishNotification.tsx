@@ -18,7 +18,7 @@ const usePublishMessage = (signatureHex: string) => {
     const api = useActiveApi();
     const wallet = useActiveStandardTonWallet();
     return useQuery([signatureHex], async () => {
-        return publishSignerMessage(sdk, api, wallet, signatureHex, Network.MAINNET);
+        return publishSignerMessage(sdk, api, wallet, signatureHex);
     });
 };
 

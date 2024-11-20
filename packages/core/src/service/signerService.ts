@@ -68,14 +68,13 @@ export const publishSignerMessage = async (
     sdk: IAppSdk,
     api: APIConfig,
     walletState: TonWalletStandard,
-    signatureHex: string,
-    network: Network
+    signatureHex: string
 ) => {
     const messageBase64 = await sdk.storage.get<string>(AppKey.SIGNER_MESSAGE);
     if (!messageBase64) {
         throw new Error('missing message');
     }
-    const contract = walletContractFromState(walletState, network);
+    const contract = walletContractFromState(walletState);
     const seqno = await getWalletSeqNo(api, walletState.rawAddress);
     const signature = Buffer.from(signatureHex, 'hex');
     const message = Cell.fromBase64(messageBase64).asSlice();
