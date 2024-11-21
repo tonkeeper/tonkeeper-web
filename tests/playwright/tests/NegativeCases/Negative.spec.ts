@@ -47,12 +47,14 @@ test('Incorrect password', async ({ page }) => {
         .getByText('Create passwordPasswordPasswords do not match.Re-enter passwordContinue')
         .click();
     await page.locator('div:nth-child(2) > .sc-gGmKOd').click();
-    await page.getByRole('textbox').nth(1).click();
-    await page.getByRole('textbox').nth(1).fill('1234');
+
+    await page.locator('#create-password-confirm').fill('1234');
+
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page.getByText('Passwords do not match.')).toBeVisible();
-    await page.getByRole('textbox').nth(1).click();
-    await page.getByRole('textbox').nth(1).fill('123456');
+
+    await page.locator('#create-password-confirm').fill('123456');
+
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Save' }).click();
     await page.getByRole('link', { name: 'Settings' }).click();
