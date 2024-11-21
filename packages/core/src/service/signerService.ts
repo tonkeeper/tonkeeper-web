@@ -7,7 +7,6 @@ import { isW5Version, TonWalletStandard, WalletVersion } from '../entries/wallet
 import { BlockchainApi } from '../tonApiV2';
 import { externalMessage, getWalletSeqNo } from './ton-blockchain/utils';
 import { walletContractFromState } from './wallet/contractService';
-import { Network } from '../entries/network';
 
 export const parseSignerSignature = (payload: string): Buffer => {
     console.log('signer', payload);
