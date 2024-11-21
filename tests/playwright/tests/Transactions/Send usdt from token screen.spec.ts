@@ -24,7 +24,6 @@ test.beforeEach(async ({ page }) => {
 
 test.afterEach(async ({ page }) => {
     await page.getByRole('link', { name: 'Settings' }).click();
-    await page.goto(`/wallet-settings`);
     await page.getByText('Delete Account').click();
     await page
         .locator('div')
