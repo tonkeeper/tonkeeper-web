@@ -121,68 +121,10 @@ jobs:
                   rm ${{ github.workspace }}/AuthKey.p8
 
     web-build:
-        name: web-build
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        outputs:
-            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build
-              uses: borales/actions-yarn@v5
-              env:
-                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
-                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
-                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
-                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
-                  VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
-                  VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
-              with:
-                  cmd: build:web
-
-            - name: Publish to Cloudflare Pages
-              id: deploy
-              uses: cloudflare/wrangler-action@v3
-              with:
-                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command: pages deploy apps/web/dist --project-name=tonkeeper-web
-
-            - name: Summary
-              run: |
-                  echo '### Successful WEB deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
-                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
-                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
-
-            - name: Comment PR
-              uses: thollander/actions-comment-pull-request@v3
-              with:
-                  message: |
-                      ### Successful WEB deployment 🚀🚀🚀
-                      Well done!
-                      Link to test environment:
-                      ${{ steps.deploy.outputs.deployment-url }}
-                  comment-tag: web_deploy
+        uses: ./.github/workflows/web-build.yaml
+        with:
+            environment: ${{ github.head_ref }}
+        secrets: inherit
 
     twa-build:
         name: twa-build
@@ -293,51 +235,9 @@ jobs:
                   path: |
                       ${{ github.workspace }}/apps/extension/dist/firefox
 
-    playwright-tests:
-        name: playwright-tests
-        runs-on: ubuntu-latest
-        timeout-minutes: 20
+    web-tests:
         needs: web-build
-
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: lts/*
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Install Playwright Browsers
-              working-directory: ./tests/playwright
-              run: npx playwright install --with-deps chromium
-
-            - name: Run Playwright tests
-              working-directory: ./tests/playwright
-              env:
-                  BASE_APP_URL: ${{ needs.web-build.outputs.deployment-url }}
-                  TON_MNEMONIC_24: ${{ secrets.TON_MNEMONIC_24 }}
-                  TON_MNEMONIC_24_2: ${{ secrets.TON_MNEMONIC_24_2 }}
-                  TON_MNEMONIC_24_3: ${{ secrets.TON_MNEMONIC_24_3 }}
-                  TON_MNEMONIC_24_4: ${{ secrets.TON_MNEMONIC_24_4 }}
-                  TON_MNEMONIC_24_5: ${{ secrets.TON_MNEMONIC_24_5 }}
-                  TON_MNEMONIC_ANANAS: ${{ secrets.TON_MNEMONIC_ANANAS }}
-                  TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
-                  TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
-                  FAKE_MNEMONIC: ${{ secrets.FAKE_MNEMONIC }}
-              run: npx playwright test --project='chromium'
-
-            - name: Comment Playwright report
-              uses: daun/playwright-report-summary@v3
-              if: always()
-              with:
-                  report-file: ./tests/playwright/results.json
+        uses: ./.github/workflows/web-tests.yaml
+        with:
+            base-url: ${{ needs.web-build.outputs.deployment-url }}
+        secrets: inherit
