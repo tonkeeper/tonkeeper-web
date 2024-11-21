@@ -65,7 +65,9 @@ export enum QueryKey {
     batteryBalance = 'batteryBalance',
     estimateBatteryPurchase = 'estimateBatteryPurchase',
 
-    gaslessConfig = 'gaslessConfig'
+    gaslessConfig = 'gaslessConfig',
+
+    twoFAWalletConfig = 'twoFAWalletConfig'
 }
 
 export enum JettonKey {

@@ -45,5 +45,7 @@ export enum AppKey {
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
     SWAP_OPTIONS = 'swap_options',
 
-    BATTERY_AUTH_TOKEN = 'battery_auth_token'
+    BATTERY_AUTH_TOKEN = 'battery_auth_token',
+
+    TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config'
 }
