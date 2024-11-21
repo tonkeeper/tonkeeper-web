@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useAccountsState } from '../../../state/wallet';
+import { useAccountsState, useActiveApi } from '../../../state/wallet';
 import {
     getNetworkByAccount,
     isAccountTonWalletStandard
@@ -13,12 +13,11 @@ import { useTonRawTransactionService } from '../useBlockchainService';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { MultisigConfig } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/types';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
-import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 
 export const useEstimateDeployMultisig = () => {
-    const appContext = useAppContext();
     const accounts = useAccountsState();
     const rawTransactionService = useTonRawTransactionService();
+    const api = useActiveApi();
 
     return useMutation<
         { extra: AssetAmount; address: Address },
@@ -35,8 +34,6 @@ export const useEstimateDeployMultisig = () => {
         if (!walletState) {
             throw new Error('Wallet not found');
         }
-
-        const [api] = getContextApiByNetwork(appContext, getNetworkByAccount(account));
 
         const multisigEncoder = new MultisigEncoder(api, walletState.rawAddress);
         const sender = new WalletMessageSender(api, walletState, estimationSigner);

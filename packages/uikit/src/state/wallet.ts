@@ -36,6 +36,7 @@ import {
     createReadOnlyTonAccountByAddress,
     createStandardTestnetAccountByMnemonic,
     createStandardTonAccountByMnemonic,
+    getContextApiByNetwork,
     getStandardTonWalletVersions,
     getTonWalletStandard,
     getWalletAddress
@@ -825,9 +826,12 @@ export const useActiveConfig = () => {
 };
 
 export const useActiveApi = () => {
-    const { mainnetApi, testnetApi } = useAppContext();
+    const appContext = useAppContext();
     const network = useActiveTonNetwork();
-    return network === Network.TESTNET ? testnetApi : mainnetApi;
+    return useMemo(() => {
+        const [api] = getContextApiByNetwork(appContext, network);
+        return api;
+    }, [appContext, network]);
 };
 
 export const useWalletAccountInfo = () => {

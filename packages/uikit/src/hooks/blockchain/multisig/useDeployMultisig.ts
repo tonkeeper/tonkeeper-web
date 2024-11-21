@@ -1,10 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAppContext } from '../../appContext';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState, useActiveApi } from '../../../state/wallet';
 import {
     getAccountByWalletById,
-    getNetworkByAccount,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
 import { getSigner } from '../../../state/mnemonic';
@@ -31,7 +29,6 @@ import {
     MultisigEncoder,
     MultisigConfig
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
-import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 
 export const useDeployMultisig = (
     params:
@@ -42,7 +39,7 @@ export const useDeployMultisig = (
           }
         | undefined
 ) => {
-    const appContext = useAppContext();
+    const api = useActiveApi();
     const wallets = useAccountsState()
         .filter(isAccountTonWalletStandard)
         .flatMap(a => a.allTonWallets.map(w => ({ wallet: w, account: a })));
@@ -65,10 +62,6 @@ export const useDeployMultisig = (
                 throw new Error('Wallet not found');
             }
 
-            const [api] = getContextApiByNetwork(
-                appContext,
-                getNetworkByAccount(accountAndWallet.account)
-            );
             const multisigEncoder = new MultisigEncoder(api, accountAndWallet.wallet.rawAddress);
             const address = multisigEncoder.multisigAddress(params.multisigConfig);
 
