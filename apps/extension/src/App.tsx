@@ -89,6 +89,7 @@ const PairKeystoneNotification = React.lazy(
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
+            staleTime: 30000,
             refetchOnWindowFocus: false
         }
     }

@@ -36,7 +36,7 @@ import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useJettonList } from '@tonkeeper/uikit/dist/state/jetton';
 import { useTronBalances } from '@tonkeeper/uikit/dist/state/tron/tron';
 import BigNumber from 'bignumber.js';
-import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { FavoriteView, useFavoriteNotification } from './FavoriteNotification';
@@ -246,6 +246,18 @@ const SendContent: FC<{
         confirm: confirmRef
     }[view];
 
+
+    const assetAmount = useMemo(() => {
+        if (!amountViewState?.token || !amountViewState?.coinValue) {
+            return null;
+        }
+
+        return AssetAmount.fromRelativeAmount({
+            asset: amountViewState!.token!,
+            amount: amountViewState!.coinValue!
+        });
+    }, [amountViewState?.token, amountViewState?.coinValue]);
+
     return (
         <Wrapper standalone={false} extension={true}>
             <HideTwaMainButton />
@@ -295,10 +307,7 @@ const SendContent: FC<{
                                 onBack={backToAmount}
                                 recipient={recipient!}
                                 fitContent
-                                assetAmount={AssetAmount.fromRelativeAmount({
-                                    asset: amountViewState!.token!,
-                                    amount: amountViewState!.coinValue!
-                                })}
+                                assetAmount={assetAmount!}
                                 isMax={amountViewState!.isMax!}
                             >
                                 <ConfirmViewTitleSlot>

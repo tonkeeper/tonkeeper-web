@@ -370,6 +370,7 @@ const FeeLabelColumn = styled.div`
 `;
 
 const TransparentButton = styled.button`
+    text-align: start;
     ${Body2Class};
     color: ${p => p.theme.accentBlue};
     border: none;

@@ -127,7 +127,7 @@ export const ConfirmTransferView: FC<
                 weiAmount: assetWeiBalance.minus(fee.weiAmount)
             })
         );
-    }, [isMax, assetAmount, selectedSenderType, assetWeiBalance]);
+    }, [isMax, assetAmount, selectedSenderType, assetWeiBalance?.toFixed(0)]);
 
     return (
         <ConfirmView

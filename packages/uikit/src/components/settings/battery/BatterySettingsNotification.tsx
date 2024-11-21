@@ -83,7 +83,11 @@ const ListItemText = styled.div`
 `;
 
 const ListBlockStyled = styled(ListBlockDesktopAdaptive)<{ $hideSelection?: boolean }>`
-    margin: 0 -1rem;
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin: 0 -1rem;
+        `}
 
     > * {
         cursor: ${p => (p.$hideSelection ? 'auto' : 'pointer')};
