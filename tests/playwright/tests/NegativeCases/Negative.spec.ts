@@ -26,7 +26,7 @@ test('Incorrect seed phrase ', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });
 
-//incorrect password to enter 2 times, error Passwords do not match + 
+//incorrect password to enter 2 times, error Passwords do not match +
 //correct password to enter + delete wallet
 
 test('Incorrect password', async ({ page }) => {
@@ -37,13 +37,8 @@ test('Incorrect password', async ({ page }) => {
     await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_12);
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page
-        .locator('div')
-        .filter({ hasText: /^Password$/ })
-        .getByRole('textbox')
-        .fill('123456');
-    await page.getByRole('textbox').nth(1).click();
-    await page.getByRole('textbox').nth(1).fill('123457');
+    await page.locator('#create-password').fill('123456');
+    await page.locator('#create-password-confirm').fill('123457');
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page.getByText('Passwords do not match.')).toBeVisible();
     await expect(page.locator('form')).toContainText('Passwords do not match.');
