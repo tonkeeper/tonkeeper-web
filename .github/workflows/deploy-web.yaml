@@ -50,6 +50,7 @@ jobs:
 
             - name: Publish to Cloudflare Pages
               id: deploy
+              if: contains(github.ref, 'main') || inputs.environment == 'dev'
               uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
