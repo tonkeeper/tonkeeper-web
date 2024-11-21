@@ -5,10 +5,6 @@ on:
             base-url:
                 required: true
                 type: string
-                default: https://wallet.tonkeeper.com
-            node-version:
-                type: string
-                default: lts/*
             transaction:
                 type: boolean
                 default: false
@@ -31,6 +27,9 @@ on:
                 required: true
             FAKE_MNEMONIC:
                 required: true
+
+env:
+    node-version: lts/*
 jobs:
     playwright-tests:
         name: playwright-tests
@@ -44,7 +43,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: ${{ inputs.node-version }}
+                  node-version: ${{ env.node-version }}
 
             - name: Enable Corepack
               run: |

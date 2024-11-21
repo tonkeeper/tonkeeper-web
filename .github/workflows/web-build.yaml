@@ -1,0 +1,96 @@
+name: Tonkeeper Web Build
+on:
+    workflow_call:
+        inputs:
+            environment:
+                required: true
+                type: string
+        secrets:
+            REACT_APP_AMPLITUDE_EXTENSION:
+                required: true
+            REACT_APP_MEASUREMENT_ID:
+                required: true
+            VITE_APP_APTABASE:
+                required: true
+            REACT_APP_TG_BOT_ID:
+                required: true
+            REACT_APP_STONFI_REFERRAL_ADDRESS:
+                required: true
+            CLOUDFLARE_API_TOKEN:
+                required: true
+            CLOUDFLARE_ACCOUNT_ID:
+                required: true
+        outputs:
+            deployment-url:
+                description: 'The app deployment url'
+                value: ${{ jobs.web-build.outputs.deployment-url }}
+env:
+    node-version: 20.11.1
+
+jobs:
+    web-build:
+        name: web-build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        outputs:
+            deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v5
+              env:
+                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
+                  VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
+                  VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
+                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
+              with:
+                  cmd: build:web
+
+            - name: Publish to Cloudflare Pages
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
+              with:
+                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+                  command:
+                      pages deploy apps/web/dist --project-name=tonkeeper-web --branch=${{
+                      inputs.environment }}
+
+            - name: Summary
+              run: |
+                  echo '### Successful WEB deployment 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo '${{ steps.deploy.outputs.deployment-url }}' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              if: github.event_name == 'pull_request'
+              with:
+                  message: |
+                      ### Successful WEB deployment 🚀🚀🚀
+                      Well done!
+                      Link to test environment:
+                      ${{ steps.deploy.outputs.deployment-url }}
+                  comment-tag: web_deploy
