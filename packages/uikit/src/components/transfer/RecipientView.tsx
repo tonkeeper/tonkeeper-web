@@ -320,6 +320,7 @@ export const RecipientView: FC<{
 
             {isValidForBlockchain !== BLOCKCHAIN_NAME.TRON && (
                 <TextArea
+                    id="transaction-comment"
                     onSubmit={handleSubmit}
                     value={comment}
                     onChange={setComment}

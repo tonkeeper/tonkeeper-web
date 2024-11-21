@@ -4,8 +4,8 @@ on:
 jobs:
     playwright-tests:
         name: playwright-tests
-        runs-on: windows-latest
-        timeout-minutes: 20
+        timeout-minutes: 60
+        runs-on: ubuntu-latest
 
         steps:
             - name: Checkout to git repository
@@ -14,7 +14,7 @@ jobs:
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
-                  node-version: 20.11.1
+                  node-version: lts/*
 
             - name: Enable Corepack
               run: |
@@ -23,17 +23,14 @@ jobs:
             - name: Run install
               uses: borales/actions-yarn@v5
               with:
-                  dir: 'tests/playwright'
                   cmd: install
 
-            - name: Run playwright install
-              uses: borales/actions-yarn@v5
-              with:
-                  dir: 'tests/playwright'
-                  cmd: playwright install
+            - name: Install Playwright Browsers
+              working-directory: ./tests/playwright
+              run: npx playwright install --with-deps chromium
 
-            - name: Run install
-              uses: borales/actions-yarn@v5
+            - name: Run Playwright tests
+              working-directory: ./tests/playwright
               env:
                   BASE_APP_URL: https://wallet.tonkeeper.com
                   TON_MNEMONIC_24: ${{ secrets.TON_MNEMONIC_24 }}
@@ -44,13 +41,5 @@ jobs:
                   TON_MNEMONIC_ANANAS: ${{ secrets.TON_MNEMONIC_ANANAS }}
                   TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
                   TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
-              with:
-                  dir: 'tests/playwright'
-                  cmd: test
-
-            - uses: actions/upload-artifact@v4
-              if: ${{ !cancelled() }}
-              with:
-                  name: playwright-report
-                  path: tests/playwright/playwright-report/
-                  retention-days: 10
+                  FAKE_MNEMONIC: ${{ secrets.FAKE_MNEMONIC }}
+              run: npx playwright test --project='chromium'

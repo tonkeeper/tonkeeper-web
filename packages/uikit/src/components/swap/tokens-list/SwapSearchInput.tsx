@@ -12,6 +12,7 @@ export const SwapSearchInput = forwardRef<
 
     return (
         <Input
+            id="swap-search"
             value={value}
             onChange={e => setValue(e)}
             ref={ref}
