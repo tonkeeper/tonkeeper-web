@@ -1,6 +1,6 @@
 name: Tonkeeper Web Tests
 on:
-    workflow_dispatch:
+    workflow_call:
         inputs:
             base-url:
                 required: true
