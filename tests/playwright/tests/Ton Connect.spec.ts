@@ -44,7 +44,7 @@ test.describe('ton connect', () => {
 
         const page1Promise = page.waitForEvent('popup');
 
-        await page.getByText('STON.fi').nth(0).click();
+        await page.getByText('STON.fi').nth(2).click();
 
         // wait new page
         const page1 = await page1Promise;
