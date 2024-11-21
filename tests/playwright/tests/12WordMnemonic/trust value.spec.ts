@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-//add trust wallet (12 words) and confirm that TON & USDT are visible + 
+//add trust wallet (12 words) and confirm that TON & USDT are visible +
 //multisend element is visible and is called Multisend
 
 test('trust + assert visibility and value', async ({ page }) => {
@@ -26,7 +26,7 @@ test('trust + assert visibility and value', async ({ page }) => {
         .fill('trust wallet - 12 words mnemonic');
     await page.getByText('🤖').click();
     await page.getByRole('button', { name: 'Save' }).click();
-    await expect(page.getByText('TON')).toBeVisible();
+    await expect(page.getByText('TON').first()).toBeVisible();
     await expect(page.getByText('USD₮')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Multi Send' })).toBeVisible();
     await expect(page.locator('#root')).toContainText('Multi Send');
