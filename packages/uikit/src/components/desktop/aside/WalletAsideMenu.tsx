@@ -30,7 +30,6 @@ import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 
-
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
     width: fit-content;

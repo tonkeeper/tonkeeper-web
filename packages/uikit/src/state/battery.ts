@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import type { RechargeMethods } from '@tonkeeper/core/dist/batteryApi/models/RechargeMethods';
 
-import { useActiveAccount, useActiveConfig } from './wallet';
+import { useActiveAccount, useActiveConfig, useActiveTonNetwork } from './wallet';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
@@ -23,6 +23,7 @@ import {
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useBatteryApi = () => {
     const config = useActiveConfig();
@@ -182,16 +183,23 @@ export const useBatteryUnitTonRate = () => {
 };
 
 export const useBatteryEnabledConfig = () => {
+    const network = useActiveTonNetwork();
     const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
 
-    return useMemo(
-        () => ({
+    return useMemo(() => {
+        if (network === Network.TESTNET) {
+            return {
+                isBeta: false,
+                disableWhole: false,
+                disableOperations: false
+            };
+        }
+        return {
             isBeta: battery_beta ?? false,
             disableWhole: disable_battery ?? false,
             disableOperations: disable_battery ? true : disable_battery_send ?? false
-        }),
-        [battery_beta, disable_battery, disable_battery_send]
-    );
+        };
+    }, [battery_beta, disable_battery, disable_battery_send, network]);
 };
 
 /**

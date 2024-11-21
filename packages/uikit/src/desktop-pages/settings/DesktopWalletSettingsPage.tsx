@@ -111,13 +111,6 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
-    const network = getNetworkByAccount(account);
-
-    const canUseBattery =
-        (account.type === 'mnemonic' || account.type === 'mam') &&
-        !disableWholeBattery &&
-        network === Network.MAINNET;
-
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
