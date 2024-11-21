@@ -198,6 +198,20 @@ export const useBatteryEnabledConfig = () => {
     );
 };
 
+/**
+ * Calculated as follows:
+ *
+ * `shouldReserveTon = configReservedAmountTon - accountReservedTon`
+ *
+ * If the purchase is in TON, then:
+ *     `min = shouldReserveTon`
+ * Otherwise:
+ *     `shouldReserveInJetton = shouldReserveTon * batteryUnitToTonPrice / batteryUnitToJettonPrice`
+ *     If the BATTERY balance is sufficient to cover the gas fee for the purchase, then:
+ *         `min = shouldReserveInJetton`
+ *     Otherwise:
+ *         `min = Math.MAX(shouldReserveInJetton, minJettonBootstrapValue)`
+ */
 export const useBatteryMinBootstrapValue = (asset: TonAsset) => {
     const methods = useBatteryAvailableRechargeMethods();
     const { data: balance } = useBatteryBalance();

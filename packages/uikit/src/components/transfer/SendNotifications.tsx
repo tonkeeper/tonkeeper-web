@@ -10,7 +10,7 @@ import {
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -252,6 +252,17 @@ const SendContent: FC<{
         confirm: confirmRef
     }[view];
 
+    const assetAmount = useMemo(() => {
+        if (!amountViewState?.token || !amountViewState?.coinValue) {
+            return null;
+        }
+
+        return AssetAmount.fromRelativeAmount({
+            asset: amountViewState!.token!,
+            amount: amountViewState!.coinValue!
+        });
+    }, [amountViewState?.token?.id, amountViewState?.coinValue]);
+
     return (
         <Wrapper standalone={standalone} extension={extension}>
             <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -361,10 +372,7 @@ const SendContent: FC<{
                                         onClose={onClose}
                                         onBack={backToAmount}
                                         recipient={recipient!}
-                                        assetAmount={AssetAmount.fromRelativeAmount({
-                                            asset: amountViewState!.token!,
-                                            amount: amountViewState!.coinValue!
-                                        })}
+                                        assetAmount={assetAmount!}
                                         isMax={amountViewState!.isMax!}
                                     >
                                         {status !== 'exiting' && isFullWidth && (

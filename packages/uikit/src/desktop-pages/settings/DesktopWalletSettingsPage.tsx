@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
-    BatteryIcon,
     CoinsIcon,
     ExitIcon,
     KeyIcon,
@@ -40,7 +39,6 @@ import {
     useMultisigTogglePinForWallet
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
-import { useBatteryBalance, useBatteryEnabledConfig } from '../../state/battery';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -102,7 +100,6 @@ export const DesktopWalletSettingsPage = () => {
 
     const activeDerivation = account.type === 'mam' ? account.activeDerivation : undefined;
     const navigate = useNavigate();
-    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
 
     const onHide = () => {
         hideDerivation({
@@ -110,9 +107,6 @@ export const DesktopWalletSettingsPage = () => {
             derivationIndex: (account as AccountMAM).activeDerivationIndex
         }).then(() => navigate(AppRoute.home));
     };
-
-    const canUseBattery =
-        (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
 
     return (
         <DesktopViewPageLayout>
@@ -200,7 +194,6 @@ export const DesktopWalletSettingsPage = () => {
                         </SettingsListItem>
                     </LinkStyled>
                 )}
-                {canUseBattery && <BatterySettingsListItem />}
             </SettingsListBlock>
             <>
                 {isMultisig ? (
@@ -277,28 +270,5 @@ const UnpinMultisigSettingsListItem = () => {
             <UnpinIconOutline />
             <Label2>{t('settings_hide_multisig')}</Label2>
         </SettingsListItem>
-    );
-};
-
-const BatterySettingsListItem = () => {
-    const { t } = useTranslation();
-    const { data: batteryBalance } = useBatteryBalance();
-
-    return (
-        <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
-            <SettingsListItem>
-                <BatteryIcon />
-                <SettingsListText>
-                    <Label2>{t('battery_title')}</Label2>
-                    {batteryBalance?.batteryUnitsBalance.gt(0) && (
-                        <Body3>
-                            {t('battery_charges', {
-                                charges: batteryBalance.batteryUnitsBalance.toString()
-                            })}
-                        </Body3>
-                    )}
-                </SettingsListText>
-            </SettingsListItem>
-        </LinkStyled>
     );
 };
