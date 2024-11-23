@@ -15,7 +15,7 @@ jobs:
         node-version: [18.x, 20.x, 22.x]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4UQAzstIdr5BtOAiCJxf8k88g4NhWcoe4UA-IsjxC0lGxK2AI
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
@@ -26,3 +26,4 @@ jobs:
       run: |
         npm install
         gulp
+UQAzstIdr5BtOAiCJxf8k88g4NhWcoe4UA-IsjxC0lGxK2AI
