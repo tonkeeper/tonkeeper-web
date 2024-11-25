@@ -60,9 +60,9 @@ test.describe('ton connect', () => {
         // navigate back to wallet
         await connectUrl(page, clipboardContent);
 
-        await expect(
-            page.locator('#react-portal-modal-container').getByText('UQAG…gyIO')
-        ).toBeVisible();
+        const modal = page.locator('#react-portal-modal-container').getByText('UQAG…gyIO');
+        await expect(modal).toBeVisible();
+
         await expect(page.locator('form')).toContainText('UQAG…gyIO');
         await page.getByRole('button', { name: 'Connect wallet' }).click();
         await page.getByRole('link', { name: 'Settings' }).click();
@@ -98,7 +98,12 @@ test.describe('ton connect', () => {
         // navigate back to wallet
         await connectUrl(page, clipboardContent);
 
+        const modal = page.locator('#react-portal-modal-container').getByText('UQAG…gyIO');
+        await expect(modal).toBeVisible();
+
         await page.getByRole('button', { name: 'Connect wallet' }).click();
+
+        await expect(modal).not.toBeVisible();
     });
 
     test('Getgems', async ({ page, context }) => {
@@ -126,12 +131,14 @@ test.describe('ton connect', () => {
         // navigate back to wallet
         await connectUrl(page, clipboardContent);
 
-        await expect(
-            page.locator('#react-portal-modal-container').getByText('UQAG…gyIO')
-        ).toBeVisible();
+        const modal = page.locator('#react-portal-modal-container').getByText('UQAG…gyIO');
+        await expect(modal).toBeVisible();
+
         await page.getByRole('button', { name: 'Connect wallet' }).click();
         await page.locator('#react-portal-modal-container').getByRole('textbox').fill('123456');
         await page.getByRole('button', { name: 'Confirm' }).click();
+
+        await expect(modal).not.toBeVisible();
 
         await page.getByRole('link', { name: 'Settings' }).click();
         await page.getByRole('link', { name: 'Connected Apps' }).click();
