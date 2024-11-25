@@ -136,9 +136,9 @@ export const WalletVersionPageContentInternal: FC<{
     const { mutate: hideWallet, isLoading: isHideWalletLoading } =
         useRemoveTonWalletVersionFromAccount();
 
-    const onOpenWallet = async (address: Address) => {
-        if (address.toRawString() !== appActiveWallet.rawAddress) {
-            await selectWallet(address.toRawString());
+    const onOpenWallet = async (w: { id: WalletId; address: Address }) => {
+        if (w.id !== appActiveWallet.id) {
+            await selectWallet(w.id);
         }
         navigate(AppRoute.home);
         afterWalletOpened?.();
@@ -194,7 +194,7 @@ export const WalletVersionPageContentInternal: FC<{
                             {isWalletAdded ? (
                                 <ButtonsContainer>
                                     <Button
-                                        onClick={() => onOpenWallet(wallet.address)}
+                                        onClick={() => onOpenWallet(wallet)}
                                         loading={isLoading}
                                     >
                                         {t('open')}
