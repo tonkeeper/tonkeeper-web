@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/extension",
-    "version": "3.25.3",
+    "version": "3.25.4",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Your extension wallet on The Open Network",
     "dependencies": {
