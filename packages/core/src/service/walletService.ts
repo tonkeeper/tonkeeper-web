@@ -22,7 +22,8 @@ import {
     WalletVersions,
     TonWalletStandard,
     DerivationItemNamed,
-    WalletId
+    WalletId,
+    sortWalletsByVersion
 } from '../entries/wallet';
 import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
@@ -160,7 +161,7 @@ export const createStandardTonAccountByMnemonic = async (
     const wallets = tonWallets
         .slice()
         .map(item => getTonWalletStandard(item, publicKey, Network.MAINNET));
-    const walletIdToActivate = wallets[0].id;
+    const walletIdToActivate = wallets.slice().sort(sortWalletsByVersion)[0].id;
 
     return new AccountTonMnemonic(
         publicKey,
