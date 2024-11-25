@@ -120,7 +120,7 @@ export const getContextApiByNetwork = (context: CreateWalletContext, network: Ne
     return [api, context.defaultWalletVersion] as const;
 };
 
-export const createStandardTonAccountByMnemonic = async (
+const createPayloadOfStandardTonAccount = async (
     appContext: CreateWalletContext,
     storage: IStorage,
     mnemonic: string[],
@@ -128,7 +128,8 @@ export const createStandardTonAccountByMnemonic = async (
     options: {
         versions?: WalletVersion[];
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
-    }
+    },
+    network: Network
 ) => {
     const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
 
@@ -137,13 +138,13 @@ export const createStandardTonAccountByMnemonic = async (
     let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
     if (options.versions) {
         tonWallets = options.versions
-            .map(v => getWalletAddress(publicKey, v, Network.MAINNET))
+            .map(v => getWalletAddress(publicKey, v, network))
             .map(i => ({
                 rawAddress: i.address.toRawString(),
                 version: i.version
             }));
     } else {
-        tonWallets = [await findWalletAddress(appContext, Network.MAINNET, publicKey)];
+        tonWallets = [await findWalletAddress(appContext, network, publicKey)];
     }
 
     let walletAuth: AuthPassword | AuthKeychain;
@@ -158,10 +159,32 @@ export const createStandardTonAccountByMnemonic = async (
 
     const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
 
-    const wallets = tonWallets
-        .slice()
-        .map(item => getTonWalletStandard(item, publicKey, Network.MAINNET));
+    const wallets = tonWallets.slice().map(item => getTonWalletStandard(item, publicKey, network));
+
     const walletIdToActivate = wallets.slice().sort(sortWalletsByVersion)[0].id;
+
+    return { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets };
+};
+
+export const createStandardTonAccountByMnemonic = async (
+    appContext: CreateWalletContext,
+    storage: IStorage,
+    mnemonic: string[],
+    mnemonicType: MnemonicType,
+    options: {
+        versions?: WalletVersion[];
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+    }
+) => {
+    const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets } =
+        await createPayloadOfStandardTonAccount(
+            appContext,
+            storage,
+            mnemonic,
+            mnemonicType,
+            options,
+            Network.MAINNET
+        );
 
     return new AccountTonMnemonic(
         publicKey,
@@ -184,38 +207,15 @@ export const createStandardTestnetAccountByMnemonic = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
-
-    const publicKey = keyPair.publicKey.toString('hex');
-
-    let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
-    if (options.versions) {
-        tonWallets = options.versions
-            .map(v => getWalletAddress(publicKey, v, Network.TESTNET))
-            .map(i => ({
-                rawAddress: i.address.toRawString(),
-                version: i.version
-            }));
-    } else {
-        tonWallets = [await findWalletAddress(appContext, Network.TESTNET, publicKey)];
-    }
-
-    let walletAuth: AuthPassword | AuthKeychain;
-    if (options.auth.kind === 'keychain') {
-        walletAuth = {
-            kind: 'keychain',
-            keychainStoreKey: publicKey
-        };
-    } else {
-        walletAuth = options.auth;
-    }
-
-    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
-
-    const wallets = tonWallets
-        .slice()
-        .map(item => getTonWalletStandard(item, publicKey, Network.TESTNET));
-    const walletIdToActivate = wallets[0].id;
+    const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets } =
+        await createPayloadOfStandardTonAccount(
+            appContext,
+            storage,
+            mnemonic,
+            mnemonicType,
+            options,
+            Network.TESTNET
+        );
 
     return new AccountTonTestnet(
         `testnet-${publicKey}`,
