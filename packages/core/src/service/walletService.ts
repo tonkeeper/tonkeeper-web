@@ -20,7 +20,6 @@ import { AuthKeychain, AuthPassword, MnemonicType } from '../entries/password';
 import {
     WalletVersion,
     WalletVersions,
-    sortWalletsByVersion,
     TonWalletStandard,
     DerivationItemNamed,
     WalletId
@@ -83,32 +82,30 @@ export const createReadOnlyTonAccountByAddress = async (
     });
 };
 
+const getWalletId = (rawAddress: string, network: Network): WalletId => {
+    if (network === Network.TESTNET) {
+        return Address.parseRaw(rawAddress).toString({
+            urlSafe: true,
+            bounceable: false,
+            testOnly: true
+        });
+    } else {
+        return rawAddress;
+    }
+};
+
 export const getTonWalletStandard = (
     item: { rawAddress: string; version: WalletVersion },
     publicKey: string,
     network: Network
 ): TonWalletStandard => {
-    if (network === Network.TESTNET) {
-        return {
-            id: Address.parseRaw(item.rawAddress).toString({
-                urlSafe: true,
-                bounceable: false,
-                testOnly: true
-            }),
-            publicKey,
-            version: item.version,
-            rawAddress: item.rawAddress,
-            network
-        };
-    } else {
-        return {
-            id: item.rawAddress,
-            publicKey,
-            version: item.version,
-            rawAddress: item.rawAddress,
-            network
-        };
-    }
+    return {
+        id: getWalletId(item.rawAddress, network),
+        publicKey,
+        version: item.version,
+        rawAddress: item.rawAddress,
+        network
+    };
 };
 
 interface CreateWalletContext {
@@ -677,6 +674,7 @@ export async function getStandardTonWalletVersions({
 
     return versions.map((v, index) => ({
         ...v,
+        id: getWalletId(v.address.toRawString(), network),
         tonBalance: response.accounts[index].balance,
         hasJettons: walletsJettonsBalances[index].balances.some(
             b => b.price?.prices && Number(b.balance) > 0

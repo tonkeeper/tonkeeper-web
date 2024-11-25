@@ -2,7 +2,8 @@ import {
     backwardCompatibilityOnlyWalletVersions,
     WalletVersion as WalletVersionType,
     WalletVersions,
-    walletVersionText
+    walletVersionText,
+    WalletId
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import {
@@ -10,7 +11,7 @@ import {
     AccountVersionEditable,
     getNetworkByAccount
 } from '@tonkeeper/core/dist/entries/account';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
@@ -150,10 +151,10 @@ export const WalletVersionPageContentInternal: FC<{
         });
     };
 
-    const onHideWallet = async (w: { address: Address }) => {
+    const onHideWallet = async (w: { id: WalletId; address: Address }) => {
         hideWallet({
             accountId: account.id,
-            walletId: w.address.toRawString()
+            walletId: w.id
         });
     };
     if (!wallets) {
