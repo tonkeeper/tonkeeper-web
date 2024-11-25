@@ -137,7 +137,7 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                {account.type === 'mnemonic' && (
+                {(account.type === 'mnemonic' || account.type === 'testnet') && (
                     <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
                         <KeyIcon />
                         <Label2>{t('settings_backup_seed')}</Label2>
