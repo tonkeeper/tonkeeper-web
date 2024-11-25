@@ -18,7 +18,6 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { useActiveApi, useActiveTonNetwork, useActiveWallet } from './wallet';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useActiveWallet();

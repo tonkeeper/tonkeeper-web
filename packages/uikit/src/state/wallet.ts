@@ -856,7 +856,7 @@ export const useActiveTonWalletConfig = () => {
     const sdk = useAppSdk();
     const network = useActiveTonNetwork();
     return useQuery<TonWalletConfig, Error>(
-        [wallet.rawAddress, network, QueryKey.walletConfig],
+        [wallet.id, network, QueryKey.walletConfig],
         async () => getActiveWalletConfig(sdk, wallet.rawAddress, network),
         {
             keepPreviousData: true
