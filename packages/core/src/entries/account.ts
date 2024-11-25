@@ -641,6 +641,23 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
     }
 }
 
+export function isMnemonicAndPassword(account: Account): boolean {
+    switch (account.type) {
+        case 'mam':
+        case 'mnemonic':
+        case 'testnet':
+            return true;
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
 export function getNetworkByAccount(account: Account): Network {
     switch (account.type) {
         case 'testnet':
