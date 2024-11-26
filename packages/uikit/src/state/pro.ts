@@ -29,10 +29,12 @@ import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
 import {
     getAccountByWalletById,
+    getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();

@@ -641,7 +641,9 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
     }
 }
 
-export function isMnemonicAndPassword(account: Account): boolean {
+export function isMnemonicAndPassword(
+    account: Account
+): account is AccountTonMnemonic | AccountTonTestnet | AccountMAM {
     switch (account.type) {
         case 'mam':
         case 'mnemonic':
