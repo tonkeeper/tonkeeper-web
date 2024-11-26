@@ -1,7 +1,22 @@
-import { Address, beginCell, Cell, contractAddress, Dictionary, toNano } from '@ton/core';
+import {
+    Address,
+    beginCell,
+    Cell,
+    contractAddress,
+    Dictionary,
+    internal,
+    OutActionSendMsg,
+    SendMode,
+    toNano
+} from '@ton/core';
+import { APIConfig } from '../../../entries/apis';
+import { BlockchainApi } from '../../../tonApiV2';
+import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
 
 export class TwoFAEncoder {
     public static readonly deployPluginValue = toNano(0.05); // TODO сколько надо?
+
+    public static readonly removePluginValue = toNano(0.05); // TODO сколько надо?
 
     /**
      * install#43563174 service_pubkey:uint256 seed_pubkey:uint256 device_pubkeys:(Dict uint32 uint256) = InternalMessage;
@@ -21,34 +36,60 @@ export class TwoFAEncoder {
 
     private readonly walletAddress: Address;
 
-    constructor(walletAddressRaw: string) {
+    constructor(private readonly api: APIConfig, walletAddressRaw: string) {
         this.walletAddress = Address.parse(walletAddressRaw);
     }
 
-    public encodeCreatePlugin = async (params: {
+    public encodeInstallForDevice = async (params: {
         servicePubKey: bigint;
         seedPubKey: bigint;
         devicePubKey: bigint;
-    }) => {
+    }): Promise<OutActionWalletV5[]> => {
         const stateInit = this.pluginStateInit();
         const address = contractAddress(this.walletAddress.workChain, stateInit);
 
-        const devicePubKeys = Dictionary.empty(
-            Dictionary.Keys.Uint(32),
-            Dictionary.Values.BigUint(256)
-        );
-        devicePubKeys.set(0, params.devicePubKey);
+        const seqno = await this.getPluginSeqno(address.toRawString());
 
-        return {
-            to: address,
-            bounce: false,
-            value: TwoFAEncoder.deployPluginValue,
-            init: stateInit,
-            body: TwoFAEncoder.encodeInstallBody({
-                ...params,
-                devicePubKeys
+        let devicePubKeys: Dictionary<number, bigint>;
+        if (seqno === 0) {
+            devicePubKeys = Dictionary.empty(
+                Dictionary.Keys.Uint(32),
+                Dictionary.Values.BigUint(256)
+            );
+            devicePubKeys.set(0, params.devicePubKey);
+        } else {
+            devicePubKeys = await this.getPluginDeviceKeysDict(address.toRawString());
+            if (devicePubKeys.values().every(v => v !== params.devicePubKey)) {
+                const newKey = Math.max(...devicePubKeys.keys()) + 1;
+                devicePubKeys.set(newKey, params.devicePubKey);
+            }
+        }
+
+        const msgInstall: OutActionSendMsg = {
+            type: 'sendMsg',
+            mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+            outMsg: internal({
+                to: address,
+                bounce: false,
+                value: TwoFAEncoder.deployPluginValue,
+                init: seqno === 0 ? stateInit : undefined,
+                body: TwoFAEncoder.encodeInstallBody({
+                    ...params,
+                    devicePubKeys
+                })
             })
         };
+
+        const outActions: OutActionWalletV5[] = [msgInstall];
+
+        if (!(await this.getIsPluginAlreadyInstalled(address))) {
+            outActions.push({
+                type: 'addExtension',
+                address
+            });
+        }
+
+        return outActions;
     };
 
     pluginAddress() {
@@ -106,5 +147,78 @@ export class TwoFAEncoder {
             .storeUint(0, 64)
             .storeUint(findShardCounter, 32) // TODO size
             .endCell();
+    }
+
+    private async getPluginDeviceKeysDict(pluginAddress: string) {
+        const res = await new BlockchainApi(this.api.tonApiV2).execGetMethodForBlockchainAccount({
+            accountId: pluginAddress,
+            methodName: 'get_device_pubkeys',
+            args: []
+        });
+
+        if (res.stack[0].type !== 'cell' || !res.stack[0].cell) {
+            throw new Error(`Unexpected result ${res.stack[0].type}`);
+        }
+
+        const cell = Cell.fromBase64(res.stack[0].cell!);
+        return cell
+            .beginParse()
+            .loadDictDirect(Dictionary.Keys.Uint(32), Dictionary.Values.BigUint(256));
+    }
+
+    public async getPluginSeqno(pluginAddress: string) {
+        try {
+            const res = await new BlockchainApi(
+                this.api.tonApiV2
+            ).execGetMethodForBlockchainAccount({
+                accountId: pluginAddress,
+                methodName: 'get_seqno',
+                args: []
+            });
+
+            const seqno = res.stack[0].num;
+
+            if (!seqno || !isFinite(Number(seqno))) {
+                throw new Error("Can't get seqno");
+            }
+
+            return Number(seqno);
+        } catch (e) {
+            console.error(e);
+            return 0;
+        }
+    }
+
+    public async getIsPluginAlreadyInstalled(address: Address) {
+        try {
+            const res = await new BlockchainApi(
+                this.api.tonApiV2
+            ).execGetMethodForBlockchainAccount({
+                accountId: this.walletAddress.toRawString(),
+                methodName: 'get_extensions'
+            });
+
+            if (res.stack[0].type !== 'cell' || !res.stack[0].cell) {
+                throw new Error(`Unexpected result ${res.stack[0].type}`);
+            }
+
+            const extensions = Cell.fromBase64(res.stack[0].cell);
+
+            const dict: Dictionary<bigint, bigint> = Dictionary.loadDirect(
+                Dictionary.Keys.BigUint(256),
+                Dictionary.Values.BigInt(1),
+                extensions
+            );
+
+            const extensionsAddresses = dict.keys().map(addressHex => {
+                const wc = this.walletAddress.workChain;
+                return Address.parseRaw(`${wc}:${addressHex.toString(16).padStart(64, '0')}`);
+            });
+
+            return extensionsAddresses.some(ext => ext.equals(address));
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
     }
 }
