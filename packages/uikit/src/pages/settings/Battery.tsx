@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label2 } from '../../components/Text';
-import { useActiveAccount } from '../../state/wallet';
+import { useActiveAccount, useActiveConfig } from '../../state/wallet';
 import { Navigate } from 'react-router-dom';
 import {
     DesktopViewHeader,
@@ -129,9 +129,7 @@ export const BatteryPageContent: FC = () => {
     const { data } = useBatteryBalance();
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const {
-        config: { batteryRefundEndpoint }
-    } = useAppContext();
+    const { batteryRefundEndpoint } = useActiveConfig();
     const [preselectedRechargeAsset, setPreselectedRechargeAsset] = useState<string | undefined>();
     const [asGift, setAsGift] = useState(false);
 

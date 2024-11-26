@@ -4,6 +4,25 @@ import { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { Badge } from '../shared';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+
+export const NetworkBadge: FC<
+    PropsWithChildren<{
+        network: Network;
+        size?: 's' | 'm';
+        className?: string;
+    }>
+> = ({ network, size = 'm', className, children }) => {
+    if (network === Network.TESTNET) {
+        return (
+            <Badge size={size} color="accentRed" className={className}>
+                {children || 'Testnet'}
+            </Badge>
+        );
+    }
+
+    return null;
+};
 
 export const AccountBadge: FC<
     PropsWithChildren<{
@@ -178,7 +197,7 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
-    if (account.type === 'mnemonic') {
+    if (account.type === 'mnemonic' || account.type === 'testnet') {
         return null;
     }
 

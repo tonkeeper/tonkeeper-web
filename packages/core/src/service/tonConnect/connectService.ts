@@ -247,7 +247,7 @@ export const tonReConnectRequest = async (
             CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
         );
     }
-    return [toTonAddressItemReply(connection.wallet, (await getDevSettings(storage)).tonNetwork)];
+    return [toTonAddressItemReply(connection.wallet, connection.wallet.network ?? Network.MAINNET)];
 };
 
 export const toTonAddressItemReply = (

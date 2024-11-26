@@ -3,9 +3,10 @@ import { QueryKey } from '../libs/queryKey';
 import { useAppContext } from '../hooks/appContext';
 import { GaslessApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useMemo } from 'react';
+import { useActiveApi } from './wallet';
 
 export const useGaslessApi = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useMemo(() => new GaslessApi(api.tonApiV2), [api]);
 };
 

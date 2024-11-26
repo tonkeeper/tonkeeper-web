@@ -7,9 +7,10 @@ import {
     estimateExistingOrder,
     OrderEstimation
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useActiveApi } from '../../../state/wallet';
 
 export function useEstimateExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
 

@@ -5,12 +5,14 @@ import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import queryString from 'query-string';
 import { IStorage } from '../Storage';
 import {
+    AccountId,
     AccountKeystone,
     AccountLedger,
     AccountMAM,
     AccountTonMnemonic,
     AccountTonMultisig,
     AccountTonOnly,
+    AccountTonTestnet,
     AccountTonWatchOnly
 } from '../entries/account';
 import { APIConfig } from '../entries/apis';
@@ -19,10 +21,10 @@ import { AuthKeychain, AuthPassword, MnemonicType } from '../entries/password';
 import {
     WalletVersion,
     WalletVersions,
-    sortWalletsByVersion,
     TonWalletStandard,
     DerivationItemNamed,
-    WalletId
+    WalletId,
+    sortWalletsByVersion
 } from '../entries/wallet';
 import { AccountsApi, WalletApi } from '../tonApiV2';
 import { emojis } from '../utils/emojis';
@@ -82,16 +84,53 @@ export const createReadOnlyTonAccountByAddress = async (
     });
 };
 
-export const createStandardTonAccountByMnemonic = async (
-    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+const getWalletId = (rawAddress: string, network: Network): WalletId => {
+    if (network === Network.TESTNET) {
+        return Address.parseRaw(rawAddress).toString({
+            urlSafe: true,
+            bounceable: false,
+            testOnly: true
+        });
+    } else {
+        return rawAddress;
+    }
+};
+
+export const getTonWalletStandard = (
+    item: { rawAddress: string; version: WalletVersion },
+    publicKey: string,
+    network: Network
+): TonWalletStandard => {
+    return {
+        id: getWalletId(item.rawAddress, network),
+        publicKey,
+        version: item.version,
+        rawAddress: item.rawAddress,
+        network
+    };
+};
+
+interface CreateWalletContext {
+    mainnetApi: APIConfig;
+    testnetApi: APIConfig;
+    defaultWalletVersion: WalletVersion;
+}
+
+export const getContextApiByNetwork = (context: CreateWalletContext, network: Network) => {
+    const api = network === Network.TESTNET ? context.testnetApi : context.mainnetApi;
+    return api;
+};
+
+const createPayloadOfStandardTonAccount = async (
+    appContext: CreateWalletContext,
     storage: IStorage,
     mnemonic: string[],
     mnemonicType: MnemonicType,
     options: {
         versions?: WalletVersion[];
-        network?: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
-    }
+    },
+    network: Network
 ) => {
     const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
 
@@ -100,13 +139,13 @@ export const createStandardTonAccountByMnemonic = async (
     let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
     if (options.versions) {
         tonWallets = options.versions
-            .map(v => getWalletAddress(publicKey, v))
+            .map(v => getWalletAddress(publicKey, v, network))
             .map(i => ({
                 rawAddress: i.address.toRawString(),
                 version: i.version
             }));
     } else {
-        tonWallets = [await findWalletAddress(appContext, publicKey)];
+        tonWallets = [await findWalletAddress(appContext, network, publicKey)];
     }
 
     let walletAuth: AuthPassword | AuthKeychain;
@@ -121,20 +160,89 @@ export const createStandardTonAccountByMnemonic = async (
 
     const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
 
-    const walletIdToActivate = tonWallets.slice().sort(sortWalletsByVersion)[0].rawAddress;
+    const wallets = tonWallets.slice().map(item => getTonWalletStandard(item, publicKey, network));
+
+    const walletIdToActivate = wallets.slice().sort(sortWalletsByVersion)[0].id;
+
+    return { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets };
+};
+
+export const mayBeCreateAccountId = (
+    network: Network,
+    publicKey: string | undefined
+): AccountId | undefined => {
+    if (!publicKey) {
+        return undefined;
+    }
+    return createAccountId(network, publicKey);
+};
+
+const createAccountId = (network: Network, publicKey: string): AccountId => {
+    if (network === Network.TESTNET) {
+        return `testnet-${publicKey}`;
+    } else {
+        return publicKey;
+    }
+};
+
+export const createStandardTonAccountByMnemonic = async (
+    appContext: CreateWalletContext,
+    storage: IStorage,
+    mnemonic: string[],
+    mnemonicType: MnemonicType,
+    options: {
+        versions?: WalletVersion[];
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+    }
+) => {
+    const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets } =
+        await createPayloadOfStandardTonAccount(
+            appContext,
+            storage,
+            mnemonic,
+            mnemonicType,
+            options,
+            Network.MAINNET
+        );
 
     return new AccountTonMnemonic(
-        publicKey,
+        createAccountId(Network.MAINNET, publicKey),
         name,
         emoji,
         walletAuth,
         walletIdToActivate,
-        tonWallets.map(w => ({
-            id: w.rawAddress,
-            publicKey,
-            version: w.version,
-            rawAddress: w.rawAddress
-        })),
+        wallets,
+        mnemonicType
+    );
+};
+
+export const createStandardTestnetAccountByMnemonic = async (
+    appContext: CreateWalletContext,
+    storage: IStorage,
+    mnemonic: string[],
+    mnemonicType: MnemonicType,
+    options: {
+        versions?: WalletVersion[];
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+    }
+) => {
+    const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets } =
+        await createPayloadOfStandardTonAccount(
+            appContext,
+            storage,
+            mnemonic,
+            mnemonicType,
+            options,
+            Network.TESTNET
+        );
+
+    return new AccountTonTestnet(
+        createAccountId(Network.TESTNET, publicKey),
+        name,
+        emoji,
+        walletAuth,
+        walletIdToActivate,
+        wallets,
         mnemonicType
     );
 };
@@ -160,11 +268,13 @@ const findWalletVersion = (interfaces?: string[]): WalletVersion => {
 };
 
 const findWalletAddress = async (
-    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    appContext: CreateWalletContext,
+    network: Network,
     publicKey: string
 ): Promise<{ rawAddress: string; version: WalletVersion }> => {
     try {
-        const result = await new WalletApi(appContext.api.tonApiV2).getWalletsByPublicKey({
+        const api = getContextApiByNetwork(appContext, network);
+        const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
             publicKey: publicKey
         });
 
@@ -188,7 +298,11 @@ const findWalletAddress = async (
         console.warn(e);
     }
 
-    const contact = walletContract(Buffer.from(publicKey, 'hex'), appContext.defaultWalletVersion);
+    const contact = walletContract(
+        Buffer.from(publicKey, 'hex'),
+        appContext.defaultWalletVersion,
+        network
+    );
     return {
         rawAddress: contact.address.toRawString(),
         version: appContext.defaultWalletVersion
@@ -198,7 +312,7 @@ const findWalletAddress = async (
 export const getWalletAddress = (
     publicKey: Buffer | string,
     version: WalletVersion,
-    network?: Network
+    network: Network
 ): { address: Address; version: WalletVersion } => {
     if (typeof publicKey === 'string') {
         publicKey = Buffer.from(publicKey, 'hex');
@@ -212,7 +326,7 @@ export const getWalletAddress = (
 
 export const getWalletsAddresses = (
     publicKey: Buffer | string,
-    network?: Network
+    network: Network
 ): Record<(typeof WalletVersions)[number], { address: Address; version: WalletVersion }> => {
     if (typeof publicKey === 'string') {
         publicKey = Buffer.from(publicKey, 'hex');
@@ -227,7 +341,7 @@ export const getWalletsAddresses = (
 };
 
 export const accountBySignerQr = async (
-    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    appContext: CreateWalletContext,
     storage: IStorage,
     qrCode: string
 ): Promise<AccountTonOnly> => {
@@ -246,10 +360,13 @@ export const accountBySignerQr = async (
         throw new Error('Unexpected QR code');
     }
 
+    // TODO parse network from QR?
+    const network = Network.MAINNET;
+
     const publicKey = pk;
 
     // TODO support multiple wallets versions configuration
-    const active = await findWalletAddress(appContext, publicKey);
+    const active = await findWalletAddress(appContext, network, publicKey);
 
     const { name: fallbackName, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
         publicKey
@@ -273,12 +390,13 @@ export const accountBySignerQr = async (
 };
 
 export const accountBySignerDeepLink = async (
-    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    appContext: CreateWalletContext,
+    network: Network,
     storage: IStorage,
     publicKey: string,
     name: string | null
 ): Promise<AccountTonOnly> => {
-    const active = await findWalletAddress(appContext, publicKey);
+    const active = await findWalletAddress(appContext, network, publicKey);
 
     const { name: fallbackName, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
         publicKey
@@ -357,12 +475,11 @@ export const accountByKeystone = async (ur: UR, storage: IStorage): Promise<Acco
 };
 
 export const createMAMAccountByMnemonic = async (
-    appContext: { api: APIConfig; defaultWalletVersion: WalletVersion },
+    appContext: CreateWalletContext,
     storage: IStorage,
     rootMnemonic: string[],
     options: {
         selectedDerivations?: number[];
-        network?: Network;
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
@@ -383,9 +500,8 @@ export const createMAMAccountByMnemonic = async (
     } else {
         childTonWallets = await getRelevantMAMTonAccountsToImport(
             rootAccount,
-            appContext.api,
-            appContext.defaultWalletVersion,
-            options.network
+            appContext,
+            Network.MAINNET
         );
 
         if (!childTonWallets.length) {
@@ -412,15 +528,18 @@ export const createMAMAccountByMnemonic = async (
             const tonWallet = walletContract(
                 w.tonAccount.publicKey,
                 appContext.defaultWalletVersion,
-                options.network
+                Network.MAINNET
             );
+
             const tonWallets: TonWalletStandard[] = [
-                {
-                    id: tonWallet.address.toRawString(),
-                    publicKey: w.tonAccount.publicKey,
-                    version: appContext.defaultWalletVersion,
-                    rawAddress: tonWallet.address.toRawString()
-                }
+                getTonWalletStandard(
+                    {
+                        version: appContext.defaultWalletVersion,
+                        rawAddress: tonWallet.address.toRawString()
+                    },
+                    w.tonAccount.publicKey,
+                    Network.MAINNET
+                )
             ];
 
             return {
@@ -468,15 +587,15 @@ export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
 
 async function getRelevantMAMTonAccountsToImport(
     root: TonKeychainRoot,
-    api: APIConfig,
-    defaultWalletVersion: WalletVersion,
-    network?: Network
+    appContext: CreateWalletContext,
+    network: Network
 ): Promise<{ tonAccount: KeychainTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
+    const api = getContextApiByNetwork(appContext, network);
     const getAccountsBalances = async (tonAccounts: KeychainTonAccount[]) => {
         const addresses = tonAccounts.map(tonAccount =>
             walletContract(
                 tonAccount.publicKey,
-                defaultWalletVersion,
+                appContext.defaultWalletVersion,
                 network
             ).address.toRawString()
         );
@@ -546,16 +665,18 @@ async function gePreselectedMAMTonAccountsToImport(
 
 export async function getStandardTonWalletVersions({
     publicKey,
+    appContext,
     network,
-    fiat,
-    api
+    fiat
 }: {
     publicKey: string;
+    appContext: CreateWalletContext;
     network: Network;
-    api: APIConfig;
     fiat: FiatCurrencies;
 }) {
     const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
+
+    const api = getContextApiByNetwork(appContext, network);
 
     const response = await new AccountsApi(api.tonApiV2).getAccounts({
         getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }
@@ -573,6 +694,7 @@ export async function getStandardTonWalletVersions({
 
     return versions.map((v, index) => ({
         ...v,
+        id: getWalletId(v.address.toRawString(), network),
         tonBalance: response.accounts[index].balance,
         hasJettons: walletsJettonsBalances[index].balances.some(
             b => b.price?.prices && Number(b.balance) > 0
@@ -584,12 +706,12 @@ export async function getMAMAccountWalletsInfo({
     account,
     network,
     fiat,
-    api,
+    appContext,
     walletVersion
 }: {
     account: TonKeychainRoot;
     network: Network;
-    api: APIConfig;
+    appContext: CreateWalletContext;
     fiat: FiatCurrencies;
     walletVersion: WalletVersion;
 }) {
@@ -600,6 +722,8 @@ export async function getMAMAccountWalletsInfo({
     const versions = possibleWallets.map(w =>
         getWalletAddress(w.publicKey, walletVersion, network)
     );
+
+    const api = getContextApiByNetwork(appContext, network);
 
     const response = await new AccountsApi(api.tonApiV2).getAccounts({
         getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }

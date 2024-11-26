@@ -1,4 +1,4 @@
-import { Account } from '@tonkeeper/core/dist/entries/account';
+import { Account, getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
 import {
     DerivationItemNamed,
     TonContract,
@@ -24,7 +24,7 @@ import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1, Label2 } from './Text';
-import { AccountAndWalletBadgesGroup } from './account/AccountBadge';
+import { AccountAndWalletBadgesGroup, NetworkBadge } from './account/AccountBadge';
 import { ScanButton } from './connect/ScanButton';
 import { useAddWalletNotification } from './modals/AddWalletNotificationControlled';
 import { SkeletonText } from './shared/Skeleton';
@@ -146,13 +146,20 @@ const DropDownContainerStyle = createGlobalStyle`
   }
 `;
 
+const Column = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+`;
+
 const WalletRow: FC<{
     account: Account;
     wallet: TonContract;
     derivation?: DerivationItemNamed;
     onClose: () => void;
 }> = ({ account, wallet, onClose, derivation }) => {
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
     const { mutate } = useMutateActiveTonWallet();
     const address = toShortValue(formatAddress(wallet.rawAddress, network));
     const activeWallet = useActiveWallet();
@@ -171,7 +178,10 @@ const WalletRow: FC<{
                     text={derivation?.name ?? account.name}
                     secondary={address}
                 />
-                <AccountAndWalletBadgesGroup account={account} walletId={wallet.id} />
+                <Column>
+                    <AccountAndWalletBadgesGroup account={account} walletId={wallet.id} />
+                    <NetworkBadge size="s" network={network} />
+                </Column>
                 {activeWallet?.id === wallet.id ? (
                     <Icon>
                         <DoneIcon />
@@ -294,6 +304,8 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
 
     const accounts = useAccountsState();
     const shouldShowIcon = accounts.length > 1;
+
+    const network = getNetworkByAccount(account);
 
     return (
         <Block center>

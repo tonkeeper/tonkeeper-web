@@ -20,6 +20,7 @@ import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TextareaAutosize } from './TextareaAutosize';
 import { InputBlock, Label } from './Input';
 import { userInputAddressIsBounceable } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { useActiveApi } from '../../state/wallet';
 
 const SpinnerRingStyled = styled(SpinnerRing)`
     transform: scale(1.2);
@@ -195,7 +196,7 @@ export const TonRecipientInput = forwardRef<
 );
 
 export const useTonRecipientValidator = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useCallback<
         (
             val: string

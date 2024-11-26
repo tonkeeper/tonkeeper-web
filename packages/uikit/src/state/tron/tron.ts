@@ -5,6 +5,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../tonendpoint';
+import { useActiveApi } from '../wallet';
 
 enum TronKeys {
     state,
@@ -12,10 +13,7 @@ enum TronKeys {
 }
 
 export const useTronWalletState = (enabled = true) => {
-    const sdk = useAppSdk();
-    const {
-        api: { tronApi }
-    } = useAppContext();
+    const { tronApi } = useActiveApi();
     /*    const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();*/
 
@@ -40,9 +38,7 @@ export const useTronWalletState = (enabled = true) => {
 };
 
 export const useTronTokens = () => {
-    const {
-        api: { tronApi }
-    } = useAppContext();
+    const { tronApi } = useActiveApi();
     // const wallet = useWalletContext();
     return useQuery<TronToken[], Error>(
         [QueryKey.tron, /*wallet.network,*/ TronKeys.balance],
@@ -55,9 +51,7 @@ export const useTronTokens = () => {
 };
 
 export const useTronBalances = () => {
-    const {
-        api: { tronApi }
-    } = useAppContext();
+    const { tronApi } = useActiveApi();
     /*const wallet = useWalletContext();*/
 
     return useQuery<TronBalances, Error>(
@@ -88,9 +82,7 @@ export const useTronBalances = () => {
 };
 
 export const useTronBalance = (tron: TronWalletState, address: string | undefined) => {
-    const {
-        api: { tronApi }
-    } = useAppContext();
+    const { tronApi } = useActiveApi();
     // const wallet = useWalletContext();
 
     return useQuery<TronBalance, Error>([QueryKey.tron, address], async () => {

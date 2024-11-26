@@ -151,9 +151,9 @@ export class Tonendpoint {
         return params.toString();
     };
 
-    boot = async (): Promise<TonendpointConfig> => {
+    boot = async (network: Network): Promise<TonendpointConfig> => {
         const response = await this.fetchApi(
-            `https://boot.tonkeeper.com/keys?${this.toSearchParams()}`,
+            `https://boot.tonkeeper.com/keys?${this.toSearchParams({ network })}`,
             {
                 method: 'GET'
             }
@@ -204,8 +204,11 @@ export class Tonendpoint {
     };
 }
 
-export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<TonendpointConfig> => {
-    const result = await tonendpoint.boot();
+export const getServerConfig = async (
+    tonendpoint: Tonendpoint,
+    network: Network
+): Promise<TonendpointConfig> => {
+    const result = await tonendpoint.boot(network);
 
     return {
         flags: {},

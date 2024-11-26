@@ -1,8 +1,9 @@
 import { useAppContext } from '../../hooks/appContext';
 import { OpenAPI, SwapService } from '@tonkeeper/core/dist/swapsApi';
+import { useActiveConfig } from '../wallet';
 
 export const useSwapsConfig = () => {
-    const { config } = useAppContext();
+    const config = useActiveConfig();
 
     OpenAPI.BASE = config.web_swaps_url!;
     return {
