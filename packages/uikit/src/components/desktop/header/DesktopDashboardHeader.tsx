@@ -16,7 +16,6 @@ import {
     useDashboardColumns,
     useDashboardColumnsForm
 } from '../../../state/dashboard/useDashboardColumns';
-import { useActiveTonNetwork } from '../../../state/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const ButtonsContainer = styled.div`
@@ -34,7 +33,7 @@ const DesktopRightPart = styled.div`
 `;
 
 const DesktopDashboardHeaderPayload = () => {
-    const { data: balance, isLoading } = useAllWalletsTotalBalance();
+    const { data: balance, isLoading } = useAllWalletsTotalBalance(Network.MAINNET);
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data } = useDashboardData();

@@ -828,10 +828,7 @@ export const useActiveConfig = () => {
 export const useActiveApi = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
-    return useMemo(() => {
-        const [api] = getContextApiByNetwork(appContext, network);
-        return api;
-    }, [appContext, network]);
+    return useMemo(() => getContextApiByNetwork(appContext, network), [appContext, network]);
 };
 
 export const useWalletAccountInfo = () => {

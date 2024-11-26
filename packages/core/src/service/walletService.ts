@@ -117,7 +117,7 @@ interface CreateWalletContext {
 
 export const getContextApiByNetwork = (context: CreateWalletContext, network: Network) => {
     const api = network === Network.TESTNET ? context.testnetApi : context.mainnetApi;
-    return [api, context.defaultWalletVersion] as const;
+    return api;
 };
 
 const createPayloadOfStandardTonAccount = async (
@@ -254,7 +254,7 @@ const findWalletAddress = async (
     publicKey: string
 ): Promise<{ rawAddress: string; version: WalletVersion }> => {
     try {
-        const [api] = getContextApiByNetwork(appContext, network);
+        const api = getContextApiByNetwork(appContext, network);
         const result = await new WalletApi(api.tonApiV2).getWalletsByPublicKey({
             publicKey: publicKey
         });
@@ -571,12 +571,12 @@ async function getRelevantMAMTonAccountsToImport(
     appContext: CreateWalletContext,
     network: Network
 ): Promise<{ tonAccount: KeychainTonAccount; derivationIndex: number; shouldAdd: boolean }[]> {
-    const [api, defaultWalletVersion] = getContextApiByNetwork(appContext, network);
+    const api = getContextApiByNetwork(appContext, network);
     const getAccountsBalances = async (tonAccounts: KeychainTonAccount[]) => {
         const addresses = tonAccounts.map(tonAccount =>
             walletContract(
                 tonAccount.publicKey,
-                defaultWalletVersion,
+                appContext.defaultWalletVersion,
                 network
             ).address.toRawString()
         );
@@ -657,7 +657,7 @@ export async function getStandardTonWalletVersions({
 }) {
     const versions = WalletVersions.map(v => getWalletAddress(publicKey, v, network));
 
-    const [api] = getContextApiByNetwork(appContext, network);
+    const api = getContextApiByNetwork(appContext, network);
 
     const response = await new AccountsApi(api.tonApiV2).getAccounts({
         getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }
@@ -704,7 +704,7 @@ export async function getMAMAccountWalletsInfo({
         getWalletAddress(w.publicKey, walletVersion, network)
     );
 
-    const [api] = getContextApiByNetwork(appContext, network);
+    const api = getContextApiByNetwork(appContext, network);
 
     const response = await new AccountsApi(api.tonApiV2).getAccounts({
         getAccountsRequest: { accountIds: versions.map(v => v.address.toRawString()) }
