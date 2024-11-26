@@ -6,24 +6,13 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
-    useActiveTonNetwork,
-    useCreateAccountMAM,
-    useCreateAccountMnemonic,
     useCreateAccountTestnet,
-    useMutateRenameAccount,
-    useMutateRenameAccountDerivations
+    useMutateRenameAccount
 } from '../../state/wallet';
 import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
-import {
-    AccountMAM,
-    AccountTonMnemonic,
-    AccountTonTestnet,
-    getAccountByWalletById
-} from '@tonkeeper/core/dist/entries/account';
+import { AccountTonTestnet, getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
 import {
     createStandardTestnetAccountByMnemonic,
-    createStandardTonAccountByMnemonic,
-    getMAMAccountWalletsInfo,
     getStandardTonWalletVersions
 } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../../hooks/appContext';
@@ -41,11 +30,7 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import { useMutation } from '@tanstack/react-query';
 import { useUserFiat } from '../../state/fiat';
 import { mnemonicValidate } from '@ton/crypto';
-import {
-    mnemonicToKeypair,
-    validateBip39Mnemonic
-} from '@tonkeeper/core/dist/service/mnemonicService';
-import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const useProcessMnemonic = () => {
@@ -254,12 +239,11 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
                 mnemonic={mnemonic}
                 mnemonicType={'ton'}
                 onSubmit={versions => {
-                    let mnemonicType: MnemonicType | undefined = 'ton';
                     createWalletsAsync({
                         mnemonic,
                         versions,
                         selectAccount: true,
-                        mnemonicType
+                        mnemonicType: 'ton'
                     }).then(setCreatedAccount);
                 }}
                 isLoading={isCreatingWallets}

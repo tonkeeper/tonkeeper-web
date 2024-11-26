@@ -5,6 +5,7 @@ import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import queryString from 'query-string';
 import { IStorage } from '../Storage';
 import {
+    AccountId,
     AccountKeystone,
     AccountLedger,
     AccountMAM,
@@ -166,6 +167,20 @@ const createPayloadOfStandardTonAccount = async (
     return { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets };
 };
 
+export const createAccountId = (
+    network: Network,
+    publicKey: string | undefined
+): AccountId | undefined => {
+    if (!publicKey) {
+        return undefined;
+    }
+    if (network === Network.TESTNET) {
+        return `testnet-${publicKey}`;
+    } else {
+        return publicKey;
+    }
+};
+
 export const createStandardTonAccountByMnemonic = async (
     appContext: CreateWalletContext,
     storage: IStorage,
@@ -187,7 +202,7 @@ export const createStandardTonAccountByMnemonic = async (
         );
 
     return new AccountTonMnemonic(
-        publicKey,
+        createAccountId(Network.MAINNET, publicKey),
         name,
         emoji,
         walletAuth,
@@ -218,7 +233,7 @@ export const createStandardTestnetAccountByMnemonic = async (
         );
 
     return new AccountTonTestnet(
-        `testnet-${publicKey}`,
+        createAccountId(Network.TESTNET, publicKey),
         name,
         emoji,
         walletAuth,
