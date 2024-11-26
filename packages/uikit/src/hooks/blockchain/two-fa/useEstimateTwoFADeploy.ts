@@ -26,7 +26,7 @@ export function useEstimateTwoFADeploy() {
                     throw new Error('Cant deploy two fa plugin using this wallet');
                 }
 
-                const tx = await new TwoFAEncoder(wallet.rawAddress).encodeCreatePlugin({
+                const tx = await new TwoFAEncoder(wallet.rawAddress).encodeInstallForDevice({
                     seedPubKey: BigInt('0x' + wallet.publicKey),
                     servicePubKey,
                     devicePubKey: BigInt(twoFAWalletConfig!.deviceKey!.publicKey)
