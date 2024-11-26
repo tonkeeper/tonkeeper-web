@@ -167,13 +167,17 @@ const createPayloadOfStandardTonAccount = async (
     return { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets };
 };
 
-export const createAccountId = (
+export const mayBeCreateAccountId = (
     network: Network,
     publicKey: string | undefined
 ): AccountId | undefined => {
     if (!publicKey) {
         return undefined;
     }
+    return createAccountId(network, publicKey);
+};
+
+const createAccountId = (network: Network, publicKey: string): AccountId => {
     if (network === Network.TESTNET) {
         return `testnet-${publicKey}`;
     } else {

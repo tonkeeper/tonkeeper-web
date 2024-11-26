@@ -21,7 +21,7 @@ import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { createAccountId } from '@tonkeeper/core/dist/service/walletService';
+import { mayBeCreateAccountId } from '@tonkeeper/core/dist/service/walletService';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -80,7 +80,7 @@ export const ChoseWalletVersions: FC<{
     const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
     const { data: wallets } = useStandardTonWalletVersions(network, publicKey);
     const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
-    const accountState = useAccountState(createAccountId(network, publicKey));
+    const accountState = useAccountState(mayBeCreateAccountId(network, publicKey));
 
     useEffect(() => {
         if (sdk.isIOs()) {
