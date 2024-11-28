@@ -24,7 +24,8 @@ import {
 import { SettingsItem, SettingsList } from './SettingsList';
 import {
     isAccountTonWalletStandard,
-    isAccountVersionEditable
+    isAccountVersionEditable,
+    isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
 import { useBatteryEnabledConfig } from '../../state/battery';
 
@@ -81,7 +82,11 @@ const SingleAccountSettings = () => {
             });
         }
 
-        if (account.type === 'mnemonic' || account.type === 'ton-only') {
+        if (
+            account.type === 'mnemonic' ||
+            account.type === 'testnet' ||
+            account.type === 'ton-only'
+        ) {
             items.push({
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(account.activeTonWallet.version),
@@ -197,7 +202,7 @@ const MultipleAccountSettings = () => {
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        if (account.type === 'mnemonic' || account.type === 'mam') {
+        if (isMnemonicAndPassword(account)) {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,

@@ -13,7 +13,8 @@ import {
     getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard,
-    isAccountVersionEditable
+    isAccountVersionEditable,
+    isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
@@ -690,9 +691,7 @@ export const useMutateDeleteAll = () => {
 
 export const useIsPasswordSet = () => {
     const wallets = useAccountsState();
-    return (wallets || []).some(
-        acc => (acc.type === 'mnemonic' || acc.type === 'mam') && acc.auth.kind === 'password'
-    );
+    return (wallets || []).some(acc => isMnemonicAndPassword(acc) && acc.auth.kind === 'password');
 };
 
 export const useMutateLogOut = () => {

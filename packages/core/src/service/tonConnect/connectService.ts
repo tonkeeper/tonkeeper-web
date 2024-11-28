@@ -385,21 +385,36 @@ export const tonDisconnectRequest = async (options: { storage: IStorage; webView
     await disconnectAccountConnection({ ...options, wallet: connection.wallet });
 };
 
+const getMaxMessages = (account: Account) => {
+    if (account.type === 'ledger') {
+        return 1;
+    }
+
+    const wallet = account.activeTonWallet;
+
+    return isStandardTonWallet(wallet) && wallet.version === WalletVersion.V5R1 ? 255 : 4;
+};
+
 export const saveWalletTonConnect = async (options: {
     storage: IStorage;
-    wallet: TonContract;
+    account: Account;
     manifest: DAppManifest;
     params: TonConnectParams;
     replyItems: ConnectItemReply[];
     appVersion: string;
     webViewUrl?: string;
 }): Promise<ConnectEvent> => {
-    await saveAccountConnection(options);
+    const wallet = options.account.activeTonWallet;
+    await saveAccountConnection({
+        storage: options.storage,
+        wallet,
+        manifest: options.manifest,
+        params: options.params,
+        webViewUrl: options.webViewUrl
+    });
 
-    const maxMessages =
-        isStandardTonWallet(options.wallet) && options.wallet.version === WalletVersion.V5R1
-            ? 255
-            : 4;
+    const maxMessages = getMaxMessages(options.account);
+
     return {
         id: Date.now(),
         event: 'connect',

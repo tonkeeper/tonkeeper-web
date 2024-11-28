@@ -192,12 +192,12 @@ export const AddWalletNotificationControlled = () => {
 
     const navigateHome = useMemo(
         () =>
-            !params?.walletType
+            selectedMethod
                 ? () => {
                       setSelectedMethod(undefined);
                   }
                 : undefined,
-        [params?.walletType]
+        [selectedMethod]
     );
 
     return (

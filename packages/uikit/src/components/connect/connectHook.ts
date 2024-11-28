@@ -87,7 +87,7 @@ export const useResponseConnectionMutation = () => {
             if (replyItems && manifest && data) {
                 const response = await saveWalletTonConnect({
                     storage: sdk.storage,
-                    wallet: data.activeTonWallet,
+                    account: data,
                     manifest,
                     params,
                     replyItems,
