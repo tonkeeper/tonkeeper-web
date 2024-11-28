@@ -82,7 +82,11 @@ const SingleAccountSettings = () => {
             });
         }
 
-        if (account.type === 'mnemonic' || account.type === 'ton-only') {
+        if (
+            account.type === 'mnemonic' ||
+            account.type === 'testnet' ||
+            account.type === 'ton-only'
+        ) {
             items.push({
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(account.activeTonWallet.version),
