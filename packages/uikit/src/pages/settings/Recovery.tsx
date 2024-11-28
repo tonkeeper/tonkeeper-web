@@ -1,4 +1,4 @@
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { AccountId, isMnemonicAndPassword } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { useAccountState, useActiveAccount } from '../../state/wallet';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
-    if (account.type === 'mnemonic' || account.type === 'mam') {
+    if (isMnemonicAndPassword(account)) {
         return <RecoveryContent accountId={account.id} />;
     } else {
         return <Navigate to="../" replace={true} />;
