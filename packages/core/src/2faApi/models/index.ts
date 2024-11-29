@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AuthCheckRequest';
 export * from './AuthRequest';
 export * from './Message';
 export * from './MessageID';

@@ -18,6 +18,7 @@ import { AppRoute } from '../../libs/routes';
 import { useIsTwoFAEnabledGlobally, useTwoFAWalletConfig } from '../../state/two-fa';
 import { hexToRGBA } from '../../libs/css';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
+import { TwoFASetUp } from '../../components/settings/two-fa/TwoFASetUp';
 
 export const TwoFAPage = () => {
     const account = useActiveAccount();
@@ -107,6 +108,10 @@ const WarningBlockText = styled.ul`
     margin: 0;
 `;
 
+const TwoFASetUpStyled = styled(TwoFASetUp)`
+    margin: 0 auto 84px;
+`;
+
 export const TwoFAPageContent: FC = () => {
     const { data: config } = useTwoFAWalletConfig();
     const { t } = useTranslation();
@@ -127,6 +132,7 @@ export const TwoFAPageContent: FC = () => {
                     <Body2>{t('two_fa_settings_heading_description')}</Body2>
                 </TextHeadingBlock>
             </ContentWrapper>
+            <TwoFASetUpStyled />
             <WarningBlock>
                 <WarningBlockText>
                     <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>

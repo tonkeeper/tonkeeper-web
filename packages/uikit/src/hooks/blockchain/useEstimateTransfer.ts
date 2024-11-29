@@ -9,6 +9,7 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
+    TWO_FA_SENDER_CHOICE,
     useGetEstimationSender
 } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
@@ -40,6 +41,10 @@ export function useEstimateTransfer({
 
         if (senderType === 'battery') {
             return BATTERY_SENDER_CHOICE;
+        }
+
+        if (senderType === 'two_fa') {
+            return TWO_FA_SENDER_CHOICE;
         }
 
         if (senderType === 'gasless') {

@@ -3,13 +3,15 @@ import { BatteryMessageSender } from './battery-message-sender';
 import { WalletMessageSender } from './wallet-message-sender';
 import { MultisigCreateOrderSender } from './multisig-create-order-sender';
 import { GaslessMessageSender } from './gasless-message-sender';
+import { TwoFAMessageSender } from './two-fa-message-sender';
 
 export type Sender =
     | WalletMessageSender
     | BatteryMessageSender
     | LedgerMessageSender
     | MultisigCreateOrderSender
-    | GaslessMessageSender;
+    | GaslessMessageSender
+    | TwoFAMessageSender;
 
 export {
     WalletMessageSender,

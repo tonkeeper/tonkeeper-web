@@ -80,6 +80,9 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
+
+    '2fa_public_key'?: string;
+    '2fa_api_url'?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

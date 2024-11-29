@@ -10,11 +10,12 @@ import { useTonRawTransactionService } from '../useBlockchainService';
 import {
     useIsTwoFAEnabledGlobally,
     useMarkTwoFAWalletAsActive,
-    useTwoFAServiceKey,
+    useTwoFAServiceConfig,
     useTwoFAWalletConfig
 } from '../../../state/two-fa';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { useAppContext } from '../../appContext';
 
 export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const track = useAnalyticsTrack();
@@ -25,8 +26,9 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
     const wallet = useActiveWallet();
-    const servicePubKey = useTwoFAServiceKey();
+    const { servicePubKey } = useTwoFAServiceConfig();
     const { mutateAsync: markTwoFAWalletAsActive } = useMarkTwoFAWalletAsActive();
+    const { api } = useAppContext();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -42,7 +44,8 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
                 throw new Error('Cant deploy two fa plugin using this wallet');
             }
 
-            const tx = await new TwoFAEncoder(wallet.rawAddress).encodeInstallForDevice({
+            const encoder = new TwoFAEncoder(api, wallet.rawAddress);
+            const tx = await encoder.encodeInstallForDevice({
                 seedPubKey: BigInt('0x' + wallet.publicKey),
                 servicePubKey,
                 devicePubKey: BigInt(twoFAWalletConfig!.deviceKey!.publicKey)
@@ -54,7 +57,7 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
                 tx
             );
 
-            await markTwoFAWalletAsActive();
+            await markTwoFAWalletAsActive({ pluginAddress: encoder.pluginAddress.toRawString() });
 
             track('deploy_2fa', {
                 wallet: wallet.rawAddress

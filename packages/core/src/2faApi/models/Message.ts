@@ -44,7 +44,7 @@ export interface Message {
      * @type {string}
      * @memberof Message
      */
-    boc: string;
+    extMsg?: string;
     /**
      * 
      * @type {number}
@@ -61,7 +61,6 @@ export interface Message {
 export function instanceOfMessage(value: object): value is Message {
     if (!('id' in value) || value['id'] === undefined) return false;
     if (!('state' in value) || value['state'] === undefined) return false;
-    if (!('boc' in value) || value['boc'] === undefined) return false;
     if (!('dateCreate' in value) || value['dateCreate'] === undefined) return false;
     return true;
 }
@@ -78,7 +77,7 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         
         'id': json['id'],
         'state': MessageStateFromJSON(json['state']),
-        'boc': json['boc'],
+        'extMsg': json['ext_msg'] == null ? undefined : json['ext_msg'],
         'dateCreate': json['date_create'],
     };
 }
@@ -96,7 +95,7 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         
         'id': value['id'],
         'state': MessageStateToJSON(value['state']),
-        'boc': value['boc'],
+        'ext_msg': value['extMsg'],
         'date_create': value['dateCreate'],
     };
 }

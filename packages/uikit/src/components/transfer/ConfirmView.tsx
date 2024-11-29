@@ -193,7 +193,6 @@ export function ConfirmView<T extends Asset = Asset>({
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-        handleSubmit();
     };
 
     return (

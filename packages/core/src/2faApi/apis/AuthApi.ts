@@ -15,14 +15,20 @@
 
 import * as runtime from '../runtime';
 import type {
+  AuthCheckRequest,
   AuthRequest,
+  Ok,
   Payload,
   PingReadyGet500Response,
   Url,
 } from '../models/index';
 import {
+    AuthCheckRequestFromJSON,
+    AuthCheckRequestToJSON,
     AuthRequestFromJSON,
     AuthRequestToJSON,
+    OkFromJSON,
+    OkToJSON,
     PayloadFromJSON,
     PayloadToJSON,
     PingReadyGet500ResponseFromJSON,
@@ -33,6 +39,10 @@ import {
 
 export interface AuthOperationRequest {
     authRequest?: AuthRequest;
+}
+
+export interface AuthCheckOperationRequest {
+    authCheckRequest?: AuthCheckRequest;
 }
 
 /**
@@ -56,6 +66,21 @@ export interface AuthApiInterface {
      * Receive a deep link for the Telegram bot
      */
     auth(requestParameters: AuthOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url>;
+
+    /**
+     * 
+     * @summary Verify if a device public key is linked to a Telegram bot
+     * @param {AuthCheckRequest} [authCheckRequest] Data that is expected
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    authCheckRaw(requestParameters: AuthCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>>;
+
+    /**
+     * Verify if a device public key is linked to a Telegram bot
+     */
+    authCheck(requestParameters: AuthCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok>;
 
     /**
      * 
@@ -104,6 +129,35 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
      */
     async auth(requestParameters: AuthOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url> {
         const response = await this.authRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Verify if a device public key is linked to a Telegram bot
+     */
+    async authCheckRaw(requestParameters: AuthCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/auth/check`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: AuthCheckRequestToJSON(requestParameters['authCheckRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OkFromJSON(jsonValue));
+    }
+
+    /**
+     * Verify if a device public key is linked to a Telegram bot
+     */
+    async authCheck(requestParameters: AuthCheckOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok> {
+        const response = await this.authCheckRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

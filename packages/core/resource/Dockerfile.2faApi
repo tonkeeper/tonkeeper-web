@@ -1,3 +1,3 @@
 FROM openapitools/openapi-generator-cli
 
-CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/tonkeeper_2fa_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUOCZGDBLJA4RR53F2LWZZ5YTWA", "-g", "typescript-fetch", "-o", "/local/src/2faApi", "-p", "supportsES6=true,withInterfaces=true", "--openapi-normalizer", "KEEP_ONLY_FIRST_TAG_IN_OPERATION=true"]
+CMD ["generate", "-i", "https://raw.githubusercontent.com/tonkeeper/tonkeeper_2fa_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUOD6C7WOGR7W25WCEZCZ2HC7PQ", "-g", "typescript-fetch", "-o", "/local/src/2faApi", "-p", "supportsES6=true,withInterfaces=true", "--openapi-normalizer", "KEEP_ONLY_FIRST_TAG_IN_OPERATION=true"]

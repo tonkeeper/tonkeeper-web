@@ -9,7 +9,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { TonContract } from '../../entries/wallet';
-import { Address, Cell, internal, SendMode } from '@ton/core';
+import { Address, Cell, internal, OutActionSendMsg, SendMode } from '@ton/core';
 import { assertBalanceEnough } from './utils';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
 import { maxBigNumber } from '../../utils/common';
@@ -34,9 +34,9 @@ export class TonRawTransactionService {
         sender: Sender,
         transaction: TonRawTransaction | OutActionWalletV5[]
     ): Promise<TonEstimation> {
-        if (!Array.isArray(transaction)) {
-            await this.checkTransactionPossibility(sender, transaction);
+        await this.checkTransactionPossibility(sender, transaction);
 
+        if (!Array.isArray(transaction)) {
             if (sender instanceof LedgerMessageSender) {
                 return (
                     await sender.tonRawTransfer({
@@ -67,9 +67,9 @@ export class TonRawTransactionService {
         estimation: TonEstimation,
         transaction: TonRawTransaction | OutActionWalletV5[]
     ) {
-        if (!Array.isArray(transaction)) {
-            await this.checkTransactionPossibility(sender, transaction, estimation);
+        await this.checkTransactionPossibility(sender, transaction, estimation);
 
+        if (!Array.isArray(transaction)) {
             if (sender instanceof LedgerMessageSender) {
                 await (
                     await sender.tonRawTransfer({
@@ -99,14 +99,28 @@ export class TonRawTransactionService {
 
     private async checkTransactionPossibility(
         sender: Sender,
-        transaction: TonRawTransaction,
+        transaction: TonRawTransaction | OutActionWalletV5[],
         estimation?: TonEstimation
     ) {
         if (sender instanceof BatteryMessageSender || sender instanceof GaslessMessageSender) {
             return;
         }
 
-        let requiredBalance = new BigNumber(transaction.value.toString());
+        let requiredBalance: BigNumber;
+        if (Array.isArray(transaction)) {
+            requiredBalance = transaction
+                .filter(t => t.type === 'sendMsg')
+                .reduce((acc, t) => {
+                    const info = (t as OutActionSendMsg).outMsg.info;
+                    if (info.type === 'internal') {
+                        return acc.plus(info.value.coins.toString());
+                    }
+
+                    return acc;
+                }, new BigNumber(0));
+        } else {
+            requiredBalance = new BigNumber(transaction.value.toString());
+        }
 
         requiredBalance = maxBigNumber(requiredBalance, getTonEstimationTonFee(estimation));
 

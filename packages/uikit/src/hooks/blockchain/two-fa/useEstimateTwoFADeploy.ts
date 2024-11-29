@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { Estimation } from '@tonkeeper/core/dist/entries/send';
+import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
 import { EXTERNAL_SENDER_CHOICE, useGetEstimationSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { useNotifyErrorHandle } from '../../useNotification';
 import { DefaultRefetchInterval } from '../../../state/tonendpoint';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
 import { useActiveAccount } from '../../../state/wallet';
-import { useTwoFAServiceKey, useTwoFAWalletConfig } from '../../../state/two-fa';
+import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { useAppContext } from '../../appContext';
 
 export function useEstimateTwoFADeploy() {
     const getSender = useGetEstimationSender(EXTERNAL_SENDER_CHOICE);
@@ -16,9 +17,10 @@ export function useEstimateTwoFADeploy() {
     const account = useActiveAccount();
     const wallet = account.activeTonWallet;
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
-    const servicePubKey = useTwoFAServiceKey();
+    const { servicePubKey } = useTwoFAServiceConfig();
+    const { api } = useAppContext();
 
-    return useQuery<Estimation, Error>(
+    return useQuery<TonEstimation, Error>(
         ['estimate-deploy-2fa-plugin', wallet],
         async () => {
             try {
@@ -26,7 +28,7 @@ export function useEstimateTwoFADeploy() {
                     throw new Error('Cant deploy two fa plugin using this wallet');
                 }
 
-                const tx = await new TwoFAEncoder(wallet.rawAddress).encodeInstallForDevice({
+                const tx = await new TwoFAEncoder(api, wallet.rawAddress).encodeInstallForDevice({
                     seedPubKey: BigInt('0x' + wallet.publicKey),
                     servicePubKey,
                     devicePubKey: BigInt(twoFAWalletConfig!.deviceKey!.publicKey)

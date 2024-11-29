@@ -10,6 +10,7 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
+    TWO_FA_SENDER_CHOICE,
     useGetSender
 } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
@@ -57,7 +58,10 @@ export function useSendTransfer<T extends Asset>({
                         type: 'gasless',
                         asset: amount.asset
                     } as const;
+                } else if (senderType === 'two_fa') {
+                    senderChoice = TWO_FA_SENDER_CHOICE;
                 }
+
                 if (!senderChoice) {
                     throw new Error('Unexpected sender choice');
                 }

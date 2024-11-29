@@ -4,44 +4,49 @@ import { useAppSdk } from '../hooks/appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAccountsState, useActiveAccount, useActiveWallet } from './wallet';
 import nacl from 'tweetnacl';
-import { HexStringPrefixed } from '@tonkeeper/core/dist/utils/types';
 import { useDevSettings } from './dev';
 import { useAppContext } from '../hooks/appContext';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { AuthApi, Configuration } from '@tonkeeper/core/dist/2faApi';
 import { useMemo } from 'react';
-
-export type TwoFADeviceKey = {
-    publicKey: HexStringPrefixed;
-    secretKey: HexStringPrefixed;
-};
+import { TwoFADeviceKey } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 
 export type TwoFAReadyForActivationWalletConfig = {
-    status: 'ready-for-activation';
+    status: 'initial';
     deviceKey: TwoFADeviceKey;
 };
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
-    token: string;
+    authUrl: string;
     expiresAtUnixSeconds: number;
+    deviceKey: TwoFADeviceKey;
+};
+
+export type TwoFATgBotBoundedWalletConfig = {
+    status: 'ready-for-deployment';
+    botUrl: string;
     deviceKey: TwoFADeviceKey;
 };
 
 export type TwoFAActiveWalletConfig = {
     status: 'active';
+    botUrl: string;
     deviceKey: TwoFADeviceKey;
+    pluginAddress: string;
 };
 
 export type TwoFADisablingWalletConfig = {
     status: 'disabling';
     deviceKey: TwoFADeviceKey;
+    pluginAddress: string;
     willBeDisabledAtUnixSeconds: number;
 };
 
 export type TwoFAWalletConfig =
     | TwoFAReadyForActivationWalletConfig
     | TwoFATgBotBoundingWalletConfig
+    | TwoFATgBotBoundedWalletConfig
     | TwoFAActiveWalletConfig
     | TwoFADisablingWalletConfig;
 
@@ -68,16 +73,29 @@ export const useTwoFAApi = () => {
     const { config } = useAppContext();
     return useMemo(() => {
         return new Configuration({
-            basePath: '2fa.tonapi.io' // TODO endpoint form config
+            basePath: config['2fa_api_url'] || 'https://2fa.tonapi.io'
         });
     }, []);
 };
 
-export const useTwoFAServiceKey = () => {
+export const useTwoFAServiceConfig = () => {
     const { config } = useAppContext();
 
-    // TODO
-    return 0n;
+    return useMemo(() => {
+        if (!config['2fa_public_key']) {
+            throw new Error('2fa_public_key not found');
+        }
+
+        const servicePubKey = BigInt(
+            '0x' + Buffer.from(config['2fa_public_key'], 'base64').toString('hex')
+        );
+
+        return {
+            servicePubKey,
+            confirmMessageTGTtlSeconds: 60 * 3, // TODO
+            confirmConnectionTGTtlSeconds: 60 * 3 // TODO
+        };
+    }, [config]);
 };
 
 export const useTwoFAWalletConfig = () => {
@@ -86,37 +104,74 @@ export const useTwoFAWalletConfig = () => {
     const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
 
     const wallet = account.activeTonWallet;
+    const api = useTwoFAApi();
 
     const isSuitableAccount = account.type === 'mnemonic' || account.type === 'mam';
 
     return useQuery<TwoFAWalletConfig>(
         [QueryKey.twoFAWalletConfig, wallet.id, isTwoFAEnabledGlobally],
         async () => {
-            const config = await sdk.storage.get<TwoFAWalletConfig>(
+            let config = await sdk.storage.get<TwoFAWalletConfig>(
                 twoFaWalletConfigStorageKey(wallet.id)
             );
-            if (config) {
-                return config;
+            const originalConfigStatus = config?.status;
+            if (!config) {
+                config = {
+                    status: 'initial',
+                    deviceKey: createNewDeviceKey()
+                };
             }
 
-            const newConfig = {
-                status: 'ready-for-activation',
-                deviceKey: createNewDeviceKey()
-            } as const;
+            if (
+                config.status === 'tg-bot-bounding' &&
+                config.expiresAtUnixSeconds < Date.now() / 1000
+            ) {
+                config = {
+                    status: 'initial',
+                    deviceKey: createNewDeviceKey()
+                };
+            }
 
-            await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), newConfig);
+            if (config.status === 'tg-bot-bounding') {
+                try {
+                    const result = await new AuthApi(api).authCheck({
+                        authCheckRequest: { devicePublicKey: config.deviceKey.publicKey.slice(2) }
+                    });
 
-            return newConfig;
+                    if (result.ok) {
+                        config = {
+                            status: 'ready-for-deployment',
+                            botUrl: authUrlToBotUrl(config.authUrl),
+                            deviceKey: config.deviceKey
+                        };
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            if (config.status !== originalConfigStatus) {
+                await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), config);
+            }
+
+            return config;
         },
         {
             keepPreviousData: true,
-            enabled: isSuitableAccount
+            enabled: isSuitableAccount,
+            refetchInterval: d =>
+                d?.status === 'tg-bot-bounding' || d?.status === 'disabling' ? 1000 : false
         }
     );
 };
 
+const authUrlToBotUrl = (authUrl: string) => {
+    const u = new URL(authUrl);
+    return u.origin + u.pathname;
+};
+
 function createNewDeviceKey(): TwoFADeviceKey {
-    const keypair = nacl.box.keyPair();
+    const keypair = nacl.sign.keyPair();
 
     return {
         publicKey: `0x${uint8ArrayToHexString(keypair.publicKey)}`,
@@ -136,14 +191,15 @@ export const useMarkTwoFAWalletAsActive = () => {
     const { mutateAsync } = useMutateTwoFAWalletConfig();
     const config = useTwoFAWalletConfig().data;
 
-    return useMutation(async () => {
+    return useMutation<void, Error, { pluginAddress: string }>(async ({ pluginAddress }) => {
         if (!config) {
             throw new Error('Config not found');
         }
 
         await mutateAsync({
             status: 'active',
-            deviceKey: config.deviceKey
+            deviceKey: config.deviceKey,
+            pluginAddress
         });
     });
 };
@@ -183,7 +239,7 @@ export const useBoundTwoFABot = () => {
     const twoFaConfig = useTwoFAWalletConfig().data?.deviceKey;
     const { mutateAsync } = useMutateTwoFAWalletConfig();
 
-    return useMutation(async () => {
+    return useMutation<string>(async () => {
         if (!twoFaConfig) {
             throw new Error('Unexpected two fa config');
         }
@@ -191,7 +247,7 @@ export const useBoundTwoFABot = () => {
 
         const signature = nacl.sign.detached(
             Buffer.from(`two_fa_auth${payload}`, 'utf8'),
-            Buffer.from(twoFaConfig.secretKey, 'hex')
+            Buffer.from(twoFaConfig.secretKey.slice(2), 'hex')
         );
 
         const res = await new AuthApi(twoFAApi).auth({
@@ -204,9 +260,39 @@ export const useBoundTwoFABot = () => {
 
         await mutateAsync({
             status: 'tg-bot-bounding',
-            token: res.url,
+            authUrl: res.url,
             expiresAtUnixSeconds: Math.round(Date.now() / 1000) + 60 * 30
         });
+        await client.invalidateQueries([QueryKey.twoFAWalletConfig]);
+
+        return res.url;
+    });
+};
+
+export const useDisconnectTwoFABot = () => {
+    const client = useQueryClient();
+    const twoFaConfig = useTwoFAWalletConfig().data;
+    const sdk = useAppSdk();
+    const wallet = useActiveWallet();
+
+    return useMutation(async () => {
+        if (!twoFaConfig) {
+            throw new Error('Unexpected two fa config');
+        }
+
+        if (
+            twoFaConfig.status !== 'tg-bot-bounding' &&
+            twoFaConfig.status !== 'ready-for-deployment'
+        ) {
+            throw new Error(`Cannot disconnect bot for status ${twoFaConfig.status}`);
+        }
+
+        const newConfig = {
+            status: 'initial',
+            deviceKey: createNewDeviceKey()
+        } as const;
+
+        await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), newConfig);
         await client.invalidateQueries([QueryKey.twoFAWalletConfig]);
     });
 };

@@ -4,6 +4,7 @@ apis/MessageApi.ts
 apis/SystemApi.ts
 apis/index.ts
 index.ts
+models/AuthCheckRequest.ts
 models/AuthRequest.ts
 models/Message.ts
 models/MessageID.ts
