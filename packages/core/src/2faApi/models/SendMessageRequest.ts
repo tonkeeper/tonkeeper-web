@@ -24,7 +24,13 @@ export interface SendMessageRequest {
      * @type {string}
      * @memberof SendMessageRequest
      */
-    boc: string;
+    address: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendMessageRequest
+     */
+    dataToSign: string;
     /**
      * 
      * @type {string}
@@ -43,7 +49,8 @@ export interface SendMessageRequest {
  * Check if a given object implements the SendMessageRequest interface.
  */
 export function instanceOfSendMessageRequest(value: object): value is SendMessageRequest {
-    if (!('boc' in value) || value['boc'] === undefined) return false;
+    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('dataToSign' in value) || value['dataToSign'] === undefined) return false;
     if (!('devicePublicKey' in value) || value['devicePublicKey'] === undefined) return false;
     if (!('signature' in value) || value['signature'] === undefined) return false;
     return true;
@@ -59,7 +66,8 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'boc': json['boc'],
+        'address': json['address'],
+        'dataToSign': json['data_to_sign'],
         'devicePublicKey': json['device_public_key'],
         'signature': json['signature'],
     };
@@ -76,7 +84,8 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
 
     return {
         
-        'boc': value['boc'],
+        'address': value['address'],
+        'data_to_sign': value['dataToSign'],
         'device_public_key': value['devicePublicKey'],
         'signature': value['signature'],
     };

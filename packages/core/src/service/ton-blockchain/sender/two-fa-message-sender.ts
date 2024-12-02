@@ -51,7 +51,8 @@ export class TwoFAMessageSender implements ISender {
 
         const res = await new MessageApi(this.api.twoFaApi).sendMessage({
             sendMessageRequest: {
-                boc: params.dataToSign.toBoc().toString('hex'),
+                address: this.pluginConfig.address,
+                dataToSign: params.dataToSign.toBoc().toString('hex'),
                 signature: params.signatureAndDeviceId.toBoc().toString('hex'),
                 devicePublicKey: this.pluginConfig.deviceKey.publicKey.slice(2)
             }
@@ -167,7 +168,7 @@ export class TwoFAMessageSender implements ISender {
         const opCode = 0xb15f2c8c;
         const payload = beginCell()
             .storeRef(msgToTheWallet)
-            .storeUint(0, SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS);
+            .storeUint(SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS, 8);
         return this.encodeAndSignTwoFARequest(opCode, payload);
     }
 
