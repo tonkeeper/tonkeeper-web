@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
@@ -298,7 +298,7 @@ export const Loader: FC = () => {
     }, [lang, i18n]);
 
     useEffect(() => {
-     //   window.backgroundApi.onRefresh(() => queryClient.invalidateQueries()); TODO
+        //   window.backgroundApi.onRefresh(() => queryClient.invalidateQueries()); TODO
     }, []);
 
     if (
@@ -316,9 +316,15 @@ export const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        api: getApiConfig(config, network, import.meta.env.VITE_APP_TONCONSOLE_HOST),
+        mainnetApi: getApiConfig(
+            config.mainnetConfig,
+            Network.MAINNET,
+            import.meta.env.VITE_APP_TONCONSOLE_HOST
+        ),
+        testnetApi: getApiConfig(config.mainnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: config.mainnetConfig,
+        testnetConfig: config.testnetConfig,
         tonendpoint,
         standalone: true,
         extension: false,
