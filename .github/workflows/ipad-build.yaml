@@ -23,13 +23,13 @@ on:
             REACT_APP_STONFI_REFERRAL_ADDRESS:
                 required: true
 env:
-    node-version: 20.11.1
-    ruby-version: 3.3.0
+    node-version: 20.18.1
+    ruby-version: 3.3.6
 
 jobs:
     ipad-build:
         name: ipad-build
-        runs-on: macos-13
+        runs-on: macos-15
         timeout-minutes: 20
 
         steps:
@@ -56,6 +56,13 @@ jobs:
                   bundler-cache: true
                   working-directory: './apps/tablet'
 
+            - name: UploadGemfile to artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/tablet/Gemfile.lock
+
             - name: Decode service account into a file
               env:
                   CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
@@ -71,7 +78,7 @@ jobs:
               with:
                   cmd: install
 
-            - name: Run build
+            - name: Run build js and capacitor
               uses: borales/actions-yarn@v5
               env:
                   VITE_APP_AMPLITUDE: ''
