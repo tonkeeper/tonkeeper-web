@@ -1,0 +1,140 @@
+platform :ios do
+    desc 'Export ipa and submit to TestFlight'
+    lane :beta do
+      keychain_info = { keychain_name: "ios-build-#{Time.now.to_i}.keychain", keychain_password: SecureRandom.uuid }
+  
+      begin
+        setup_signing(keychain_info)
+        bump_build_number
+        build_app_with_signing(keychain_info)
+        submit_to_testflight
+      ensure
+        cleanup_keychain(keychain_info)
+      end
+    end
+  
+    private_lane :setup_signing do |options|
+      create_keychain(
+        name: options[:keychain_name],
+        password: options[:keychain_password],
+        unlock: true,
+        timeout: 0,
+        lock_when_sleeps: false,
+        add_to_search_list: true
+      )
+      import_cert(options)
+      install_profile
+      update_project_settings
+    end
+  
+    lane :bump_build_number do
+      file = File.read('../package.json')
+      data_hash = JSON.parse(file)
+      api_key = app_store_connect_api_key(
+        key_id: ENV['APPLE_KEY_ID'],
+        issuer_id: ENV['APPLE_ISSUER_ID'],
+        key_content: Base64.decode64(ENV['APPLE_KEY_CONTENT']),
+        duration: 1200,
+        in_house: false
+      )
+      build_num = app_store_build_number(
+        api_key: api_key,
+        app_identifier: ENV['BUNDLE_IDENTIFIER'],
+        live: false
+      )
+      build_num = build_num + 1
+      UI.message("Bumped build number to #{build_num}")
+      increment_build_number(
+        build_number: build_num,
+        xcodeproj: "./ios/App/App.xcodeproj",
+        skip_info_plist: true
+      )
+    end
+  
+    private_lane :import_cert do |options|
+      cert_path = "#{Dir.tmpdir}/build_certificate.p12"
+      File.write(cert_path, Base64.decode64(ENV['BUILD_CERTIFICATE_BASE64']))
+      import_certificate(
+        certificate_path: cert_path,
+        certificate_password: ENV['P12_PASSWORD'] || "",
+        keychain_name: options[:keychain_name],
+        keychain_password: options[:keychain_password],
+        log_output: true
+      )
+      File.delete(cert_path)
+    end
+  
+    private_lane :cleanup_keychain do |options|
+      delete_keychain(
+        name: options[:keychain_name]
+      )
+    end
+  
+    private_lane :install_profile do
+      profile_path = "#{Dir.tmpdir}/build_pp.mobileprovision"
+      File.write(profile_path, Base64.decode64(ENV['BUILD_PROVISION_PROFILE_BASE64']))
+      UI.user_error!("Failed to create provisioning profile at #{profile_path}") unless File.exist?(profile_path)
+      ENV['PROVISIONING_PROFILE_PATH'] = profile_path
+      install_provisioning_profile(path: profile_path)
+      File.delete(profile_path)
+    end
+  
+    private_lane :update_project_settings do
+      update_code_signing_settings(
+        path: "./ios/App/App.xcodeproj",
+        use_automatic_signing: false,
+        code_sign_identity: "iPhone Distribution",
+        team_id: ENV['APP_STORE_CONNECT_TEAM_ID'],
+        app_identifier: ENV['BUNDLE_IDENTIFIER']
+      )
+
+      ##  profile_name: ENV['APPLE_PROFILE_NAME'],
+      ##   bundle_identifier: ENV['BUNDLE_IDENTIFIER'],
+
+      update_project_team(
+        path: "./ios/App/App.xcodeproj",
+        teamid: ENV['APP_STORE_CONNECT_TEAM_ID']
+      )
+    end
+  
+    private_lane :build_app_with_signing do |options|
+      unlock_keychain(
+        path: options[:keychain_name],
+        password: options[:keychain_password],
+        set_default: false
+      )
+      build_app(
+        workspace: "./ios/App/App.xcworkspace",
+        scheme: "App",
+        configuration: "Release",
+        export_method: "app-store",
+        output_name: "App.ipa",
+        export_options: {
+          provisioningProfiles: {
+            ENV['BUNDLE_IDENTIFIER'] => ENV['APPLE_PROFILE_NAME']
+          }
+        },
+        xcargs: "-verbose",
+        buildlog_path: "./build_logs",
+        export_xcargs: "-allowProvisioningUpdates",
+      )
+    end
+  
+    private_lane :submit_to_testflight do
+      api_key = app_store_connect_api_key(
+        key_id: ENV['APPLE_KEY_ID'],
+        issuer_id: ENV['APPLE_ISSUER_ID'],
+        key_content: Base64.decode64(ENV['APPLE_KEY_CONTENT']),
+        duration: 1200,
+        in_house: false
+      )
+      pilot(
+        api_key: api_key,
+        skip_waiting_for_build_processing: true,
+        skip_submission: true,
+        distribute_external: false,
+        notify_external_testers: false,
+        ipa: "./App.ipa"
+      )
+    end
+  end

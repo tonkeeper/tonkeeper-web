@@ -235,6 +235,10 @@ jobs:
                   path: |
                       ${{ github.workspace }}/apps/extension/dist/firefox
 
+    ipad-build:
+        uses: ./.github/workflows/ipad-build.yaml
+        secrets: inherit
+
     web-tests:
         needs: web-build
         uses: ./.github/workflows/web-tests.yaml

@@ -1,0 +1,99 @@
+name: Tonkeeper iPad Build
+on:
+    workflow_call:
+        secrets:
+            APP_STORE_CONNECT_TEAM_ID:
+                required: true
+            APPLE_API_ISSUER:
+                required: true
+            APPLE_API_KEY:
+                required: true
+            APPLE_API_KEY_ID:
+                required: true
+            IDENTITY_P12_B64:
+                required: true
+            IDENTITY_PASSPHRASE:
+                required: true
+            REACT_APP_MEASUREMENT_ID:
+                required: true
+            VITE_APP_APTABASE:
+                required: true
+            REACT_APP_TG_BOT_ID:
+                required: true
+            REACT_APP_STONFI_REFERRAL_ADDRESS:
+                required: true
+env:
+    node-version: 20.11.1
+    ruby-version: 3.3.0
+
+jobs:
+    ipad-build:
+        name: ipad-build
+        runs-on: macos-13
+        timeout-minutes: 20
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Pods cache
+              uses: actions/cache@v3
+                with:
+                  path: ./apps/tablet/ios/App/Pods
+                  key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+                  restore-keys: |
+                    ${{ runner.os }}-pods-
+
+            - name: Set up Ruby and Gemfile dependencies
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: ${{ env.ruby-version }}
+                  bundler-cache: true
+                  working-directory: './apps/tablet'
+
+            - name: Decode service account into a file
+              env:
+                  CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
+              run: |
+                  echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Run build
+              uses: borales/actions-yarn@v5
+              env:
+                  VITE_APP_AMPLITUDE: ""
+                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
+                  VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
+                  VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
+                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
+              with:
+                  cmd: build:ipad
+
+            - name: Run build ios and upload test flight
+              uses: maierj/fastlane-action@v3.1.0
+              env:
+                APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+                BUNDLE_IDENTIFIER: com.tonapps.tonkeeperpro
+                BUILD_CERTIFICATE_BASE64: ${{ secrets.IDENTITY_P12_B64 }}
+                P12_PASSWORD: ${{ secrets.IDENTITY_PASSPHRASE }}
+                APPLE_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                APPLE_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER }}
+                APPLE_KEY_CONTENT: ${{ github.workspace }}/AuthKey.p8
+              with:
+                lane: ios beta
