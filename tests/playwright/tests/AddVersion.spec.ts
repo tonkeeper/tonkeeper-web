@@ -61,3 +61,39 @@ test('test', async ({ page }) => {
   await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
 });
+
+//Can add versions via settings tab in a regular wallet 
+
+test('Versions via settings', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
+  await page.getByLabel('1:', { exact: true }).click();
+  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page
+    .locator('div')
+    .filter({ hasText: /^Password$/ })
+    .getByRole('textbox')
+    .fill('W123*4567');
+  await page.getByRole('textbox').nth(1).click();
+  await page.getByRole('textbox').nth(1).fill('W123*4567');
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('link', { name: 'Settings' }).click();
+  await page.getByRole('link', { name: 'Active address v4R2' }).click();
+  await page.getByRole('button', { name: 'Add' }).first().click();
+  await expect(page.locator('#root')).toContainText('UQCk…yXNw');
+  await expect(page.locator('#root')).toContainText('v3R2');
+  await expect(page.locator('#root')).toContainText('UQC0…6y4I · 0 TON');
+  await page.getByRole('button', { name: 'Add' }).click();
+  await expect(page.locator('#root')).toContainText('UQBP…Hy5i');
+  await expect(page.locator('#root')).toContainText('W5');
+  await page.getByRole('button', { name: 'Hide' }).nth(1).click();
+  await page.getByRole('button', { name: 'Hide' }).nth(2).click();
+  await page.getByText('Preferences').click();
+  await page.locator('div').filter({ hasText: /^Sign Out$/ }).nth(1).click();
+  await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).click();
+  await page.getByRole('button', { name: 'Delete wallet data' }).click();
+});
