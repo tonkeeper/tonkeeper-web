@@ -7347,15 +7347,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tonkeeper-capacitor/biometric@file:../../../tonkeeper-capacitor/packages/biometric::locator=%40tonkeeper%2Ftablet%40workspace%3Aapps%2Ftablet":
-  version: 0.0.1
-  resolution: "@tonkeeper-capacitor/biometric@file:../../../tonkeeper-capacitor/packages/biometric#../../../tonkeeper-capacitor/packages/biometric::hash=875989&locator=%40tonkeeper%2Ftablet%40workspace%3Aapps%2Ftablet"
-  peerDependencies:
-    "@capacitor/core": ^6.0.0
-  checksum: 10/970e68ddf710baaa7e58331a641984278a1a184be89ef06ed96993a7c8d7bed67e579a72775d8af5aa26e331771fd4d017179e1fe0a2bc67870c19d74b99b012
-  languageName: node
-  linkType: hard
-
 "@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
@@ -7519,10 +7510,10 @@ __metadata:
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/splash-screen": "npm:latest"
     "@tanstack/react-query": "npm:4.3.4"
-    "@tonkeeper-capacitor/biometric": ../../../tonkeeper-capacitor/packages/biometric
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
+    "@types/eventsource": "npm:^1.1.15"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
     "@types/styled-components": "npm:^5.1.26"

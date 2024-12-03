@@ -52,5 +52,26 @@
       <string>dev-pro.tonconsole.com</string>
       <string>pro.tonconsole.com</string>
     </array>
+    <key>NSFaceIDUsageDescription</key>
+    <string>We use Face ID to securely authenticate your access to mnemonic key.</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>tonkeeper</string>
+                <string>tonkeeper-tc</string>
+                <string>tc</string>
+                <string>ton</string>
+            </array>
+        </dict>
+    </array>
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to your camera to read QR codes.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>
