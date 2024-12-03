@@ -29,10 +29,15 @@ import { toTokenRate, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import {
+    useActiveTonNetwork,
+    useActiveWallet,
+    useIsActiveWalletWatchOnly
+} from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../../libs/queryKey';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -74,15 +79,18 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const network = useActiveTonNetwork();
+
     const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: buy } = useTonendpointBuyMethods();
-    const canBuy = token === CryptoCurrency.TON;
+    const canBuy = token === CryptoCurrency.TON && network !== Network.TESTNET;
     const { data: swapAssets } = useAllSwapAssets();
 
     const currentAssetAddress = tonAssetAddressFromString(token);
-    const swapAsset = isReadOnly
-        ? undefined
-        : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
+    const swapAsset =
+        isReadOnly || network === Network.TESTNET
+            ? undefined
+            : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
 
     const [_, setSwapFromAsset] = useSwapFromAsset();
     const navigate = useNavigate();

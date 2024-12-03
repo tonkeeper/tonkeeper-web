@@ -6,6 +6,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../hooks/translation';
 import { MultisigConfig } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useActiveConfig } from '../../state/wallet';
 
 const DiffContainer = styled.div``;
 
@@ -35,7 +36,7 @@ export const MultisigConfigDiff: FC<{
     );
 
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
 
     const onOpenTonviewer = (address: string) => {
         const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';

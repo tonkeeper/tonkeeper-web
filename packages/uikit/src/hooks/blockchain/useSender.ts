@@ -7,7 +7,13 @@ import {
     Sender
 } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { useAppContext } from '../appContext';
-import { useAccountsState, useActiveAccount, useActiveTonWalletConfig } from '../../state/wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useActiveApi,
+    useActiveConfig,
+    useActiveTonWalletConfig
+} from '../../state/wallet';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import {
     useBatteryApi,
@@ -59,9 +65,7 @@ export const useAvailableSendersChoices = (
     const { data: config } = useActiveTonWalletConfig();
     const { data: batteryBalance } = useBatteryBalance();
     const account = useActiveAccount();
-    const {
-        config: { batteryReservedAmount }
-    } = useAppContext();
+    const { batteryReservedAmount } = useActiveConfig();
     const gaslessConfig = useGaslessConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const [walletInfo] = useAssets();
@@ -150,7 +154,7 @@ export const useAvailableSendersChoices = (
 };
 
 export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransactionPayload) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const batteryApi = useBatteryApi();
     const { data: batteryAuthToken } = useBatteryAuthToken();
     const account = useActiveAccount();
@@ -170,7 +174,6 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             if (account.type === 'ledger') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
-
             const choices: SenderChoiceUserAvailable[] = [EXTERNAL_SENDER_CHOICE];
 
             const tonConnectService = new TonConnectTransactionService(
@@ -215,7 +218,8 @@ export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies Se
 export const BATTERY_SENDER_CHOICE = { type: 'battery' } as const satisfies SenderChoice;
 
 export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'external' }) => {
-    const { api } = useAppContext();
+    const appContext = useAppContext();
+    const api = useActiveApi();
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
     const { data: authToken } = useBatteryAuthToken();
@@ -243,6 +247,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                 if (activeAccount.type !== 'ton-multisig') {
                     throw new Error('Multisig sender available only for multisig accounts');
                 }
+
                 const { signerWallet } = getMultisigSignerInfo(
                     accounts,
                     activeAccount as AccountTonMultisig
@@ -333,7 +338,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
         authToken,
         activeAccount,
         accounts,
-        api,
+        appContext,
         wallet,
         batteryApi,
         batteryConfig,
@@ -343,7 +348,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
 };
 
 export const useGetSender = () => {
-    const { api } = useAppContext();
+    const appContext = useAppContext();
+    const api = useActiveApi();
     const batteryApi = useBatteryApi();
     const batteryConfig = useBatteryServiceConfig();
     const { data: authToken } = useBatteryAuthToken();
@@ -484,7 +490,7 @@ export const useGetSender = () => {
         },
         [
             accounts,
-            api,
+            appContext,
             batteryApi,
             batteryConfig,
             wallet,

@@ -7,6 +7,7 @@ import { Dot } from '../Dot';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useActiveConfig } from '../../state/wallet';
 
 const CardStyled = styled.div`
     box-sizing: border-box;
@@ -68,7 +69,7 @@ export const LedgerConnectionSteps: FC<{
     currentStep: 'connect' | 'open-ton' | 'confirm-tx' | 'all-completed';
     className?: string;
 }> = ({ currentStep, showConfirmTxStep, className }) => {
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { t } = useTranslation();
 
     const sdk = useAppSdk();

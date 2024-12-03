@@ -9,6 +9,7 @@ import { AssetData } from '../components/home/Jettons';
 import { useAppContext } from '../hooks/appContext';
 import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
+import { useActiveApi } from './wallet';
 
 export interface TokenRate {
     diff7d: string;
@@ -25,9 +26,7 @@ export const toTokenRate = (rate: TokenRates, fiat: FiatCurrencies): TokenRate =
 };
 
 export const usePreFetchRates = () => {
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const { tonApiV2 } = useActiveApi();
     const { fiat } = useAppContext();
     const client = useQueryClient();
 
@@ -63,9 +62,7 @@ export const usePreFetchRates = () => {
 export const getRateKey = (fiat: FiatCurrencies, token: string) => [QueryKey.rate, fiat, token];
 
 export const useRate = (token: string) => {
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const { tonApiV2 } = useActiveApi();
     const { fiat } = useAppContext();
     const client = useQueryClient();
     return useQuery<TokenRate, Error>(

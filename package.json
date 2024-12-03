@@ -39,7 +39,8 @@
     "workspaces": {
         "packages": [
             "packages/*",
-            "apps/*"
+            "apps/*",
+            "tests/*"
         ]
     },
     "packageManager": "yarn@4.3.0",

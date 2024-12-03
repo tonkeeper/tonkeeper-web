@@ -7,7 +7,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useDateFormat } from '../../hooks/dateFormat';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import { useActiveConfig, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
 import { SpinnerIcon } from '../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { Body1, H3, Label1 } from '../Text';
@@ -48,7 +48,7 @@ export const NftDetails: FC<{ nftItem: NftItem; kind: NFTKind }> = React.memo(({
     const item = data ?? nftItem;
 
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const owner = item.owner?.address;
     const address = Address.parse(item.address).toString();
 

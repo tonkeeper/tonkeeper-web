@@ -8,7 +8,7 @@ import { TonRecipientInput } from '../fields/TonRecipientInput';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { Address } from '@ton/core';
 
-const Block = styled.form`
+const Block = styled.div`
     display: flex;
     text-align: center;
     gap: 1rem;
@@ -46,7 +46,7 @@ export const AddressInput: FC<{
 
     return (
         <CenterContainer className={className}>
-            <Block onSubmit={() => afterInput(Address.parse(recipient!.address).toRawString())}>
+            <Block>
                 <div>
                     <H2Label2Responsive>{t('add_watch_only_title')}</H2Label2Responsive>
                     <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
@@ -64,7 +64,7 @@ export const AddressInput: FC<{
                     marginTop
                     loading={isLoading || isDataLoading}
                     disabled={error || !recipient}
-                    type="submit"
+                    onClick={() => afterInput(Address.parse(recipient!.address).toRawString())}
                 >
                     {t('continue')}
                 </ButtonResponsiveSize>

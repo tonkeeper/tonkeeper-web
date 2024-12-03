@@ -89,7 +89,7 @@ export const useOpenBrowser = () => {
 
     return useCallback(() => {
         if (tracker) {
-            tracker.track('browser_open', {});
+            tracker.track('browser_open', { from: 'wallet' });
         }
     }, [tracker]);
 };
@@ -98,9 +98,9 @@ export const useClickBrowser = () => {
     const tracker = useContext(AmplitudeAnalyticsContext);
 
     return useCallback(
-        (dapp: string, source: string) => {
+        (url: string, source: string) => {
             if (tracker) {
-                tracker.track('click_dapp', { dapp, source });
+                tracker.track('click_dapp', { url, source });
             }
         },
         [tracker]

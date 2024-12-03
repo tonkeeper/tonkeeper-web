@@ -2,11 +2,16 @@ import {
     backwardCompatibilityOnlyWalletVersions,
     WalletVersion as WalletVersionType,
     WalletVersions,
-    walletVersionText
+    walletVersionText,
+    WalletId
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { AccountId, AccountVersionEditable } from '@tonkeeper/core/dist/entries/account';
-import React, { FC } from 'react';
+import {
+    AccountId,
+    AccountVersionEditable,
+    getNetworkByAccount
+} from '@tonkeeper/core/dist/entries/account';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
@@ -114,14 +119,16 @@ export const WalletVersionPageContentInternal: FC<{
     const { t } = useTranslation();
     const activeAccount = useActiveAccount();
     const appActiveWallet = activeAccount.activeTonWallet;
+
     const selectedWallet = account.activeTonWallet;
     const currentAccountWalletsVersions = account.allTonWallets;
+    const network = getNetworkByAccount(account);
 
     const { mutateAsync: selectWallet, isLoading: isSelectWalletLoading } =
         useMutateActiveTonWallet();
     const navigate = useNavigate();
 
-    const { data: wallets } = useStandardTonWalletVersions(selectedWallet.publicKey);
+    const { data: wallets } = useStandardTonWalletVersions(network, selectedWallet.publicKey);
 
     const { mutate: createWallet, isLoading: isCreateWalletLoading } =
         useAddTonWalletVersionToAccount();
@@ -129,9 +136,9 @@ export const WalletVersionPageContentInternal: FC<{
     const { mutate: hideWallet, isLoading: isHideWalletLoading } =
         useRemoveTonWalletVersionFromAccount();
 
-    const onOpenWallet = async (address: Address) => {
-        if (address.toRawString() !== appActiveWallet.rawAddress) {
-            await selectWallet(address.toRawString());
+    const onOpenWallet = async (w: { id: WalletId; address: Address }) => {
+        if (w.id !== appActiveWallet.id) {
+            await selectWallet(w.id);
         }
         navigate(AppRoute.home);
         afterWalletOpened?.();
@@ -144,10 +151,10 @@ export const WalletVersionPageContentInternal: FC<{
         });
     };
 
-    const onHideWallet = async (w: { address: Address }) => {
+    const onHideWallet = async (w: { id: WalletId; address: Address }) => {
         hideWallet({
             accountId: account.id,
-            walletId: w.address.toRawString()
+            walletId: w.id
         });
     };
     if (!wallets) {
@@ -178,7 +185,7 @@ export const WalletVersionPageContentInternal: FC<{
                             <TextContainer>
                                 <Label1>{walletVersionText(wallet.version)}</Label1>
                                 <Body2Secondary>
-                                    {toShortValue(formatAddress(wallet.address)) + ' '}·
+                                    {toShortValue(formatAddress(wallet.address, network)) + ' '}·
                                     {' ' + toFormattedTonBalance(wallet.tonBalance)}
                                     &nbsp;TON
                                     {wallet.hasJettons && t('wallet_version_and_tokens')}
@@ -187,7 +194,7 @@ export const WalletVersionPageContentInternal: FC<{
                             {isWalletAdded ? (
                                 <ButtonsContainer>
                                     <Button
-                                        onClick={() => onOpenWallet(wallet.address)}
+                                        onClick={() => onOpenWallet(wallet)}
                                         loading={isLoading}
                                     >
                                         {t('open')}

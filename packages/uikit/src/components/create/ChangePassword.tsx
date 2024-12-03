@@ -77,6 +77,7 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({ handleClose })
         <NotificationBlock onSubmit={onUpdate}>
             <Block>
                 <Input
+                    id="change-password"
                     type="password"
                     label={t('Old_password')}
                     value={old}
@@ -91,6 +92,7 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({ handleClose })
 
             <Block>
                 <Input
+                    id="new-password"
                     type="password"
                     label={t('Password')}
                     value={password}
@@ -105,6 +107,7 @@ const ChangePasswordContent: FC<{ handleClose: () => void }> = ({ handleClose })
                 />
 
                 <Input
+                    id="new-password-confirm"
                     type="password"
                     label={t('ConfirmPassword')}
                     value={confirm}

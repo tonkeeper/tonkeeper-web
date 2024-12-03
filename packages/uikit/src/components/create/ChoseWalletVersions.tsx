@@ -20,6 +20,8 @@ import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { mayBeCreateAccountId } from '@tonkeeper/core/dist/service/walletService';
 
 const Wrapper = styled.div`
     flex: 1;
@@ -67,17 +69,18 @@ const SubmitBlock = styled.div`
 export const ChoseWalletVersions: FC<{
     mnemonic: string[];
     mnemonicType: MnemonicType;
+    network: Network;
     onSubmit: (versions: WalletVersion[]) => void;
     isLoading?: boolean;
-}> = ({ mnemonic, onSubmit, isLoading, mnemonicType }) => {
+}> = ({ mnemonic, onSubmit, network, isLoading, mnemonicType }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { defaultWalletVersion } = useAppContext();
 
     const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
-    const { data: wallets } = useStandardTonWalletVersions(publicKey);
+    const { data: wallets } = useStandardTonWalletVersions(network, publicKey);
     const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
-    const accountState = useAccountState(publicKey);
+    const accountState = useAccountState(mayBeCreateAccountId(network, publicKey));
 
     useEffect(() => {
         if (sdk.isIOs()) {
@@ -135,7 +138,7 @@ export const ChoseWalletVersions: FC<{
                                     <TextContainer>
                                         <Label1>{walletVersionText(wallet.version)}</Label1>
                                         <Body2Secondary>
-                                            {toShortValue(formatAddress(wallet.address))}
+                                            {toShortValue(formatAddress(wallet.address, network))}
                                             &nbsp;·&nbsp;
                                             {toFormattedTonBalance(wallet.tonBalance)}&nbsp;TON
                                             {wallet.hasJettons && t('wallet_version_and_tokens')}

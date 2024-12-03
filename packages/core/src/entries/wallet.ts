@@ -95,6 +95,9 @@ export interface DeprecatedWalletState {
 
     revision: number;
 
+    /**
+     * @deprecated
+     */
     network?: Network;
 
     hiddenJettons?: string[];
@@ -119,6 +122,7 @@ export type TonContract = {
 export type TonWalletStandard = TonContract & {
     publicKey: string;
     version: WalletVersion;
+    network?: Network;
 };
 
 export type DerivationItem = {

@@ -50,3 +50,6 @@ Thumbs.db
 
 **/public/locales/*
 **/src/wallet-translation/*
+
+
+package-lock.json

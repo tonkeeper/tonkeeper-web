@@ -18,7 +18,7 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
-import { useActiveTonNetwork } from '../../state/wallet';
+import { useActiveApi, useActiveTonNetwork } from '../../state/wallet';
 import { Gap } from '../Layout';
 import {
     FullHeightBlock,
@@ -43,7 +43,7 @@ const Warning = styled(Body2)`
 `;
 
 export const useGetToAccount = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useMutation<Account, Error, BaseRecipient | DnsRecipient>(recipient => {
         const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
         return new AccountsApi(api.tonApiV2).getAccount({ accountId });
@@ -51,7 +51,7 @@ export const useGetToAccount = () => {
 };
 
 const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
     return useQuery<Account, Error>(
         [QueryKey.account, accountId],
@@ -320,6 +320,7 @@ export const RecipientView: FC<{
 
             {isValidForBlockchain !== BLOCKCHAIN_NAME.TRON && (
                 <TextArea
+                    id="transaction-comment"
                     onSubmit={handleSubmit}
                     value={comment}
                     onChange={setComment}

@@ -2,7 +2,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { usePreFetchRates } from '../../../state/rates';
-import { useActiveAccount } from '../../../state/wallet';
+import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
@@ -40,10 +40,11 @@ const DesktopAccountHeaderPayload = () => {
     const account = useActiveAccount();
 
     const { onOpen: manageMAMIndexes } = useMAMIndexesSettingsNotification();
+    const network = useActiveTonNetwork();
 
     return (
         <DesktopHeaderContainer>
-            <DesktopHeaderBalance isLoading={isLoading} balance={balance} />
+            <DesktopHeaderBalance isLoading={isLoading} balance={balance} network={network} />
             <DesktopRightPart>
                 <ButtonsContainer>
                     <ButtonStyled

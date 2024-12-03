@@ -29,9 +29,12 @@ import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
 import {
     getAccountByWalletById,
+    getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
+import { useActiveApi } from './wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -56,7 +59,7 @@ export const useProState = () => {
 export const useSelectWalletForProMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const accountsStorage = useAccountsStorage();
@@ -128,7 +131,7 @@ export interface ConfirmState {
 
 export const useCreateInvoiceMutation = () => {
     const ws = useAccountsStorage();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useMutation<
         ConfirmState,
         Error,

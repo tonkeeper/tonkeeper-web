@@ -18,7 +18,6 @@ import {
     setAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { subject } from '../libs/atom';
@@ -32,11 +31,12 @@ import {
     useAccountsState,
     useAccountsStateQuery,
     useActiveAccount,
+    useActiveApi,
     useActiveTonNetwork,
     useActiveWallet
 } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
-import { getServerTime } from "@tonkeeper/core/dist/service/ton-blockchain/utils";
+import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -92,7 +92,7 @@ export const useConnectTonConnectAppMutation = () => {
     const account = useActiveAccount();
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const network = useActiveTonNetwork();

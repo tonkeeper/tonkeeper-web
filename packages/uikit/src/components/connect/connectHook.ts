@@ -19,45 +19,52 @@ import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { useActiveAccountQuery } from '../../state/wallet';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { useToast } from '../../hooks/useNotification';
 
 export const useGetConnectInfo = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
+    const notifyError = useToast();
 
     return useMutation<null | TonConnectParams, Error, string>(async url => {
-        const transfer = parseTonTransferWithAddress({ url });
+        try {
+            const transfer = parseTonTransferWithAddress({ url });
 
-        if (transfer) {
+            if (transfer) {
+                sdk.uiEvents.emit('copy', {
+                    method: 'copy',
+                    id: Date.now(),
+                    params: t('loading')
+                });
+
+                sdk.uiEvents.emit('transfer', {
+                    method: 'transfer',
+                    id: Date.now(),
+                    params: { chain: BLOCKCHAIN_NAME.TON, ...transfer, from: 'qr-code' }
+                });
+                return null;
+            }
+
+            const params = parseTonConnect({ url });
+
+            if (typeof params === 'string') {
+                console.error(params);
+                throw new Error('Unsupported link');
+            }
+
+            // TODO: handle auto connect
+
             sdk.uiEvents.emit('copy', {
                 method: 'copy',
                 id: Date.now(),
                 params: t('loading')
             });
 
-            sdk.uiEvents.emit('transfer', {
-                method: 'transfer',
-                id: Date.now(),
-                params: { chain: BLOCKCHAIN_NAME.TON, ...transfer, from: 'qr-code' }
-            });
-            return null;
+            return params;
+        } catch (e) {
+            notifyError(String(e));
+            throw e;
         }
-
-        const params = parseTonConnect({ url });
-
-        if (typeof params === 'string') {
-            console.error(params);
-            return null;
-        }
-
-        // TODO: handle auto connect
-
-        sdk.uiEvents.emit('copy', {
-            method: 'copy',
-            id: Date.now(),
-            params: t('loading')
-        });
-
-        return params;
     });
 };
 
@@ -77,7 +84,7 @@ export const useResponseConnectionMutation = () => {
             if (replyItems && manifest && data) {
                 const response = await saveWalletTonConnect({
                     storage: sdk.storage,
-                    wallet: data.activeTonWallet,
+                    account: data,
                     manifest,
                     params,
                     replyItems,
