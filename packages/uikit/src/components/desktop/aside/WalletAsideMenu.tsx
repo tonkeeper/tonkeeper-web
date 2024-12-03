@@ -3,7 +3,11 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveTonNetwork,
+    useIsActiveWalletWatchOnly
+} from '../../../state/wallet';
 import {
     BatteryIcon,
     ClockSmoothIcon,
@@ -23,6 +27,7 @@ import {
 } from '../../../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 
 const WalletAsideContainer = styled.div`
@@ -62,6 +67,9 @@ export const WalletAsideMenu = () => {
     const isMultisig = useIsActiveAccountMultisig();
     const account = useActiveAccount();
     const showMultisigs = isAccountCanManageMultisigs(account);
+    const network = useActiveTonNetwork();
+
+    const isTestnet = network === Network.TESTNET;
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -103,7 +111,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            {!isReadOnly && (
+            {!isReadOnly && !isTestnet && (
                 <NavLink to={AppRoute.swap}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
@@ -113,8 +121,8 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             )}
-            {isMultisig && <MultisigOrdersMenuItem />}
-            {showMultisigs && (
+            {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+            {showMultisigs && !isTestnet && (
                 <NavLink to={AppRoute.multisigWallets}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>

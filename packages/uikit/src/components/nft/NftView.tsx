@@ -12,7 +12,7 @@ import {
     useMarkNftAsTrusted,
     useNftCollectionData
 } from '../../state/nft';
-import { useActiveTonWalletConfig } from '../../state/wallet';
+import { useActiveConfig, useActiveTonWalletConfig } from '../../state/wallet';
 import { DropDown } from '../DropDown';
 import {
     BlockIcon,
@@ -178,7 +178,7 @@ export const NftPreview: FC<{
         onCloseSpamModal();
     };
 
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
 
     const explorerUrl = config.NFTOnExplorerUrl ?? 'https://tonviewer.com/nft/%s';

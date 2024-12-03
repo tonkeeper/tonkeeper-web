@@ -7,7 +7,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
-import { useActiveTonWalletConfig, useActiveWallet } from '../wallet';
+import { useActiveConfig, useActiveTonWalletConfig, useActiveWallet } from '../wallet';
 import {
     TON_CONNECT_MSG_VARIANTS_ID,
     TonConnectTransactionPayload
@@ -17,7 +17,7 @@ import { useBatteryBalance, useBatteryServiceConfig } from '../battery';
 export function useEncodeSwap() {
     const wallet = useActiveWallet();
     const { swapService } = useSwapsConfig();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { data: swapOpaitons } = useSwapOptions();
     const referral = config.web_swaps_referral_address;
 

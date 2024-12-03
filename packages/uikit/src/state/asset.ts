@@ -32,6 +32,8 @@ import {
 } from './rates';
 import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -168,11 +170,15 @@ export const useWalletTotalBalance = () => {
     );
 };
 
-export const useAllWalletsTotalBalance = () => {
+export const useAllWalletsTotalBalance = (network: Network) => {
     const fiat = useUserFiat();
     const allAccounts = useAccountsState();
     const allWalletsAddresses = useMemo(
-        () => allAccounts.flatMap(acc => acc.allTonWallets).map(w => w.rawAddress),
+        () =>
+            allAccounts
+                .filter(acc => getNetworkByAccount(acc) === network)
+                .flatMap(acc => acc.allTonWallets)
+                .map(w => w.rawAddress),
         [allAccounts]
     );
 

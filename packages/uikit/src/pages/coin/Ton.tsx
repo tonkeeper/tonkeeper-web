@@ -17,7 +17,7 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { QueryKey } from '../../libs/queryKey';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { groupAndFilterTonActivityItems } from '../../state/ton/tonActivity';
-import { useActiveWallet, useWalletAccountInfo } from '../../state/wallet';
+import { useActiveApi, useActiveWallet, useWalletAccountInfo } from '../../state/wallet';
 
 const TonHeader: FC<{ info: Account }> = ({ info: { balance } }) => {
     const { t } = useTranslation();
@@ -44,8 +44,9 @@ export const TonPage = () => {
     const ref = useRef<HTMLDivElement>(null);
 
     const { data: info } = useWalletAccountInfo();
+    const api = useActiveApi();
 
-    const { api, standalone } = useAppContext();
+    const { standalone } = useAppContext();
     const wallet = useActiveWallet();
 
     const { fetchNextPage, hasNextPage, isFetchingNextPage, data, isFetched } = useInfiniteQuery({

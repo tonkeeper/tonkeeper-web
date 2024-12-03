@@ -23,6 +23,7 @@ import { useAssets } from '../home';
 import { useJettonList } from '../jetton';
 import { useRate } from '../rates';
 import { useSwapsConfig } from './useSwapsConfig';
+import { useActiveApi } from '../wallet';
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();
@@ -160,7 +161,8 @@ export const useSwapCustomTokenSearch = () => {
     const [filter] = useSwapTokensFilter();
 
     const isAddress = seeIfValidTonAddress(filter);
-    const { api, fiat } = useAppContext();
+    const { fiat } = useAppContext();
+    const api = useActiveApi();
     const { data: jettons } = useJettonList();
 
     return useQuery<WalletSwapAsset | null>({

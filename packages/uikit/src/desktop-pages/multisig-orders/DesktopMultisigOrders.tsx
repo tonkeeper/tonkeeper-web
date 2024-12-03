@@ -31,6 +31,7 @@ import { useMultisigOrderNotification } from '../../components/modals/MultisigOr
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
 import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useActiveConfig } from '../../state/wallet';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -140,7 +141,7 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
     const { onOpen: onView } = useMultisigOrderNotification();
 
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
 
     const onOpenTonviewer = (address: string) => {
         const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
@@ -319,7 +320,7 @@ const Buttons = styled.div`
 
 const EmptyOrdersPage = () => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
     const { onOpen: sendTransfer } = useSendTransferNotification();
 

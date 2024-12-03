@@ -28,7 +28,7 @@ import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
-import { useAccountsState } from '../../../state/wallet';
+import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 
 const PreferencesAsideContainer = styled.div`
@@ -84,7 +84,7 @@ export const PreferencesAsideMenu = () => {
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: countryData } = useCountrySetting();
     const country = countryData === null ? t('auto') : countryData;

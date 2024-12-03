@@ -1,6 +1,10 @@
 import { FC, useEffect, useState } from 'react';
 import { Notification, NotificationFooterPortal } from '../../Notification';
-import { useActiveTonWalletConfig, useMutateActiveTonWalletConfig } from '../../../state/wallet';
+import {
+    useActiveConfig,
+    useActiveTonWalletConfig,
+    useMutateActiveTonWalletConfig
+} from '../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body1Body2Responsive, Body3, H2Label2Responsive, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
@@ -132,10 +136,8 @@ const BatterySettingsNotificationContent: FC<{
 
     const rate = useBatteryUnitTonRate();
 
-    const {
-        config: { batteryMeanPrice_swap, batteryMeanPrice_jetton, batteryMeanPrice_nft }
-    } = useAppContext();
-
+    const { batteryMeanPrice_swap, batteryMeanPrice_jetton, batteryMeanPrice_nft } =
+        useActiveConfig();
     const [batterySettingsOptimistic, setBatterySettingsOptimistic] = useState(batterySettings);
     const { mutateAsync } = useMutateActiveTonWalletConfig();
 

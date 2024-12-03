@@ -5,7 +5,11 @@ import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import {
+    useActiveTonNetwork,
+    useActiveWallet,
+    useIsActiveWalletWatchOnly
+} from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
@@ -16,6 +20,7 @@ import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -54,10 +59,11 @@ const DesktopWalletHeaderPayload = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
     const activeWallet = useActiveWallet();
     const { onOpen: sendTransfer } = useSendTransferNotification();
+    const network = useActiveTonNetwork();
 
     return (
         <DesktopHeaderContainer>
-            <DesktopHeaderBalance isLoading={isLoading} balance={balance} />
+            <DesktopHeaderBalance isLoading={isLoading} balance={balance} network={network} />
             <DesktopRightPart>
                 <ButtonsContainer>
                     {!isReadOnly && (
@@ -86,12 +92,15 @@ const DesktopWalletHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                    <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIconSmall />
-                        {t('wallet_buy')}
-                    </ButtonStyled>
+                    {network !== Network.TESTNET && (
+                        <ButtonStyled size="small" onClick={onOpen}>
+                            <PlusIconSmall />
+                            {t('wallet_buy')}
+                        </ButtonStyled>
+                    )}
                 </ButtonsContainer>
             </DesktopRightPart>
+
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </DesktopHeaderContainer>
     );

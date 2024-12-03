@@ -32,6 +32,8 @@ import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
+import { getNetworkByAccount } from '../entries/account';
+import { Network } from '../entries/network';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -84,9 +86,10 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
 
     let authorizedWallet: ProStateWallet | null = null;
     if (user.pub_key && user.version) {
-        const wallets = (await accountsStorage(storage).getAccounts()).flatMap(
-            a => a.allTonWallets
-        );
+        const wallets = (await accountsStorage(storage).getAccounts())
+            .filter(a => getNetworkByAccount(a) === Network.MAINNET)
+            .flatMap(a => a.allTonWallets);
+
         const actualWallet = wallets
             .filter(isStandardTonWallet)
             .find(

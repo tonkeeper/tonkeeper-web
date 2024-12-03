@@ -1,5 +1,5 @@
 import { IStorage } from '../Storage';
-import { AccountTonMnemonic } from '../entries/account';
+import { AccountTonMnemonic, isMnemonicAndPassword } from '../entries/account';
 import { AuthPassword } from '../entries/password';
 import { AccountsStorage } from './accountsStorage';
 import { decrypt, encrypt } from './cryptoService';
@@ -64,7 +64,7 @@ export class PasswordStorage {
     private async getPasswordAuthAccounts(): Promise<AccountTonMnemonic[]> {
         const accounts = await this.accountsStorage.getAccounts();
         return accounts.filter(
-            a => (a.type === 'mnemonic' || a.type === 'mam') && a.auth.kind === 'password'
+            a => isMnemonicAndPassword(a) && a.auth.kind === 'password'
         ) as AccountTonMnemonic[];
     }
 }

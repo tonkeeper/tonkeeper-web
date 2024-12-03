@@ -20,7 +20,12 @@ import { H2, Label2, Label3 } from '../Text';
 import { Button } from '../fields/Button';
 import { MainButton, ResultButton, TransferViewHeaderBlock } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useActiveApi,
+    useActiveWallet
+} from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
