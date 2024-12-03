@@ -15,10 +15,11 @@ import {
     useTonConnectLastEventId
 } from '../../state/tonConnect';
 import { TonTransactionNotification } from './TonTransactionNotification';
-import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
+import { useResponseSendMutation } from './connectHook';
 
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
 import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
+import { SendTransactionAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
 
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
