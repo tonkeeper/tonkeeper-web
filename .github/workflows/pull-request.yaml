@@ -82,6 +82,14 @@ jobs:
                   p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
                   p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
 
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
             - name: Run install
               uses: borales/actions-yarn@v5
               with:
@@ -144,6 +152,14 @@ jobs:
               run: |
                   corepack enable
 
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
             - name: Run install
               uses: borales/actions-yarn@v5
               with:
@@ -204,6 +220,14 @@ jobs:
             - name: Enable Corepack
               run: |
                   corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
 
             - name: Run install
               uses: borales/actions-yarn@v5

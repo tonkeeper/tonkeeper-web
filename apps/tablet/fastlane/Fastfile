@@ -30,18 +30,22 @@ platform :ios do
     lane :bump_build_number do
       file = File.read('../package.json')
       data_hash = JSON.parse(file)
-      api_key = app_store_connect_api_key(
+      connect_api_key = app_store_connect_api_key(
         key_id: ENV['APPLE_KEY_ID'],
         issuer_id: ENV['APPLE_ISSUER_ID'],
         key_content: Base64.decode64(ENV['APPLE_KEY_CONTENT']),
         duration: 1200,
         in_house: false
       )
-      build_num = app_store_build_number(
-        api_key: api_key,
-        app_identifier: ENV['BUNDLE_IDENTIFIER'],
-        live: false
-      )
+
+      build_num = 0
+      
+      #   build_num = app_store_build_number(
+      #     api_key: connect_api_key,
+      #     app_identifier: ENV['BUNDLE_IDENTIFIER'],
+      #     live: false
+      #   )
+
       build_num = build_num + 1
       UI.message("Bumped build number to #{build_num}")
       increment_build_number(
@@ -85,11 +89,11 @@ platform :ios do
         use_automatic_signing: false,
         code_sign_identity: "iPhone Distribution",
         team_id: ENV['APP_STORE_CONNECT_TEAM_ID'],
-        app_identifier: ENV['BUNDLE_IDENTIFIER']
+        bundle_identifier: ENV['BUNDLE_IDENTIFIER'],
+        profile_name: ENV['APPLE_PROFILE_NAME'],
       )
 
-      ##  profile_name: ENV['APPLE_PROFILE_NAME'],
-      ##   bundle_identifier: ENV['BUNDLE_IDENTIFIER'],
+
 
       update_project_team(
         path: "./ios/App/App.xcodeproj",

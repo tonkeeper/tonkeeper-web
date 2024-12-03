@@ -48,6 +48,14 @@ jobs:
               run: |
                   corepack enable
 
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
             - name: Run install
               uses: borales/actions-yarn@v5
               with:

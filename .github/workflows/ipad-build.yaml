@@ -14,6 +14,8 @@ on:
                 required: true
             IDENTITY_PASSPHRASE:
                 required: true
+            BUILD_PROVISION_PROFILE_BASE64:
+                required: true
             REACT_APP_MEASUREMENT_ID:
                 required: true
             VITE_APP_APTABASE:
@@ -42,7 +44,7 @@ jobs:
                   node-version: ${{ env.node-version }}
 
             - name: Pods cache
-              uses: actions/cache@v3
+              uses: actions/cache@v4
               with:
                   path: ./apps/tablet/ios/App/Pods
                   key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
@@ -63,20 +65,26 @@ jobs:
                   path: |
                       ${{ github.workspace }}/apps/tablet/Gemfile.lock
 
-            - name: Decode service account into a file
-              env:
-                  CREDENTIALS: ${{ secrets.APPLE_API_KEY }}
-              run: |
-                  echo $CREDENTIALS | base64 -d > ${{ github.workspace }}/AuthKey.p8
-
             - name: Enable Corepack
               run: |
                   corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
 
             - name: Run install
               uses: borales/actions-yarn@v5
               with:
                   cmd: install
+
+            - name: Install pods dependencies
+              working-directory: ./apps/tablet/ios/App
+              run: bundle exec pod install
 
             - name: Run build js and capacitor
               uses: borales/actions-yarn@v5
@@ -92,8 +100,9 @@ jobs:
               with:
                   cmd: build:ipad
 
-            - name: Run build ios and upload test flight
-              uses: maierj/fastlane-action@v3.1.0
+            - name: Build & upload iOS binary
+              working-directory: ./apps/tablet
+              run: bundle exec fastlane ios beta
               env:
                   APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
                   BUNDLE_IDENTIFIER: com.tonapps.tonkeeperpro
@@ -101,6 +110,13 @@ jobs:
                   P12_PASSWORD: ${{ secrets.IDENTITY_PASSPHRASE }}
                   APPLE_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
                   APPLE_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER }}
-                  APPLE_KEY_CONTENT: ${{ github.workspace }}/AuthKey.p8
+                  APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
+                  APPLE_PROFILE_NAME: GitHub CI/Cd iPad
+                  BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+
+            - name: Upload logs to artifacts
+              uses: actions/upload-artifact@v3
+              if: failure()
               with:
-                  lane: ios beta
+                  name: gum-logs
+                  path: /Users/runner/Library/Logs/gym/*.log
