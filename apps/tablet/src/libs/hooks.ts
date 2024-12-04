@@ -1,14 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
-import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { getTabletOS, TABLET_APPLICATION_ID } from "./appSdk";
+import { AptabaseWeb } from "@tonkeeper/uikit/dist/hooks/analytics/aptabase-web";
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -46,36 +44,27 @@ export const useAppWidth = () => {
 };
 
 export const useAnalytics = (version: string, activeAccount?: Account, accounts?: Account[]) => {
-    const sdk = useAppSdk();
     const network = useActiveTonNetwork();
 
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const userId = await sdk.storage
-                .get<string>(AppKey.USER_ID)
-                .then(async (userId: string | null) => {
-                    if (userId) {
-                        return userId;
-                    } else {
-                        const newUserId = uuidv4();
-                        await sdk.storage.set(AppKey.USER_ID, newUserId);
-                        return newUserId;
-                    }
-                });
-
             const tracker = new AnalyticsGroup(
-                new Amplitude(import.meta.env.VITE_APP_AMPLITUDE, userId)
+                  new AptabaseWeb(
+                    import.meta.env.VITE_APP_APTABASE_HOST,
+                    import.meta.env.VITE_APP_APTABASE,
+                    version
+                  )
             );
 
             tracker.init({
-                application: 'Desktop',
+                application: 'Tablet',
                 walletType: toWalletType(activeAccount?.activeTonWallet),
                 activeAccount: activeAccount!,
                 accounts: accounts!,
                 network,
                 version,
-                platform: `tablet`  // TODO
+                platform: `${TABLET_APPLICATION_ID}-${await getTabletOS()}`
             });
 
             return tracker;

@@ -13,6 +13,7 @@ import { fallbackRenderOver } from '../../components/Error';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { useTranslation } from '../../hooks/translation';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
@@ -73,8 +74,10 @@ const DesktopSwapPageContent = () => {
 
 export const DesktopSwapPage = () => {
     return (
-        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
-            <DesktopSwapPageContent />
-        </ErrorBoundary>
+        <HideOnReview>
+            <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
+                <DesktopSwapPageContent />
+            </ErrorBoundary>
+        </HideOnReview>
     );
 };

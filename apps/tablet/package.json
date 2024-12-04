@@ -25,6 +25,7 @@
         "@capacitor/camera": "latest",
         "@capacitor/clipboard": "^6.0.1",
         "@capacitor/core": "latest",
+        "@capacitor/device": "^6.0.2",
         "@capacitor/ios": "^6.1.2",
         "@capacitor/preferences": "^6.0.2",
         "@capacitor/splash-screen": "latest",

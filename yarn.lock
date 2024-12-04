@@ -2331,6 +2331,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/device@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "@capacitor/device@npm:6.0.2"
+  peerDependencies:
+    "@capacitor/core": ^6.0.0
+  checksum: 10/4856c42956cfb44551f953bda2cf4003d124ba476ec418edc04be34d6f8a6ca92fcbec6f1738236d8bc65d5bb5592ac03664a278acb6cf460be4ee7a52ae7242
+  languageName: node
+  linkType: hard
+
 "@capacitor/ios@npm:^6.1.2":
   version: 6.2.0
   resolution: "@capacitor/ios@npm:6.2.0"
@@ -7502,6 +7511,7 @@ __metadata:
     "@capacitor/cli": "npm:latest"
     "@capacitor/clipboard": "npm:^6.0.1"
     "@capacitor/core": "npm:latest"
+    "@capacitor/device": "npm:^6.0.2"
     "@capacitor/ios": "npm:^6.1.2"
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/splash-screen": "npm:latest"

@@ -11,6 +11,7 @@ import { Clipboard } from '@capacitor/clipboard';
 import { getWindow } from './utils';
 import { Biometric, SecureStorage } from "./plugins";
 import { CapacitorCookies } from "@capacitor/core";
+import { Device } from '@capacitor/device';
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -50,6 +51,8 @@ export class TouchIdTablet implements TouchId {
     };
 }
 
+export const TABLET_APPLICATION_ID = 'tablet' as const;
+
 export class TabletAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainTablet();
     cookie = new CookieTablet();
@@ -71,5 +74,10 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
 
     version = packageJson.version ?? 'Unknown';
 
-    targetEnv = 'desktop' as const;
+    targetEnv = TABLET_APPLICATION_ID;
+}
+
+export const getTabletOS = async ()=> {
+    const info = await Device.getInfo();
+    return info.platform;
 }

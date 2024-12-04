@@ -83,7 +83,7 @@ import {
     useLocation
 } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
-import { TabletAppSdk } from '../libs/appSdk';
+import { TABLET_APPLICATION_ID, TabletAppSdk } from "../libs/appSdk";
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
@@ -129,7 +129,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new TabletAppSdk();
-const TARGET_ENV = 'desktop';
 
 const langs = import.meta.env.VITE_APP_LOCALES;
 
@@ -154,7 +153,7 @@ export const Providers = () => {
     }, [t, i18n]);
 
     useEffect(() => {
-        // document.body.classList.add(window.backgroundApi.platform()); TODO
+        document.body.classList.add(TABLET_APPLICATION_ID);
     }, []);
 
     return (
@@ -277,11 +276,11 @@ export const Loader: FC = () => {
     const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
+        targetEnv: TABLET_APPLICATION_ID,
         build: sdk.version,
         network,
         lang,
-        platform: 'desktop'
+        platform: 'desktop' // TODO TABLET_APPLICATION_ID
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
