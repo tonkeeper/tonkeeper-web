@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-test('test', async ({ page }) => {
+//Buy TON flow on main screen
+
+test('Buy TON on main screen', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
