@@ -10,9 +10,9 @@ on:
                 required: true
             APPLE_API_KEY_ID:
                 required: true
-            IDENTITY_P12_B64:
+            BUILD_CERTIFICATE_BASE64:
                 required: true
-            IDENTITY_PASSPHRASE:
+            BUILD_CERTIFICATE_PASSPHRASE:
                 required: true
             BUILD_PROVISION_PROFILE_BASE64:
                 required: true
@@ -106,8 +106,8 @@ jobs:
               env:
                   APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
                   BUNDLE_IDENTIFIER: com.tonapps.tonkeeperpro
-                  BUILD_CERTIFICATE_BASE64: ${{ secrets.IDENTITY_P12_B64 }}
-                  P12_PASSWORD: ${{ secrets.IDENTITY_PASSPHRASE }}
+                  BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+                  P12_PASSWORD: ${{ secrets.BUILD_CERTIFICATE_PASSPHRASE }}
                   APPLE_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
                   APPLE_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER }}
                   APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
