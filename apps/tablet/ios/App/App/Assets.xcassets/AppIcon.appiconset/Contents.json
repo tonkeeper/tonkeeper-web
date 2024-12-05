@@ -2,57 +2,9 @@
   "images": [
     {
       "filename": "icon-appstore@1024.png",
-      "idiom": "ios-marketing",
-      "scale": "1x",
+      "idiom": "universal",
+      "platform" : "ios",
       "size": "1024x1024"
-    },
-    {
-      "filename": "icon-app@2x.png",
-      "idiom": "iphone",
-      "scale": "2x",
-      "size": "60x60"
-    },
-    {
-      "filename": "icon-app@3x.png",
-      "idiom": "iphone",
-      "scale": "3x",
-      "size": "60x60"
-    },
-    {
-      "filename": "icon-settings@2x.png",
-      "idiom": "iphone",
-      "scale": "2x",
-      "size": "29x29"
-    },
-    {
-      "filename": "icon-settings@3x.png",
-      "idiom": "iphone",
-      "scale": "3x",
-      "size": "29x29"
-    },
-    {
-      "filename": "icon-spotlight@2x.png",
-      "idiom": "iphone",
-      "scale": "2x",
-      "size": "40x40"
-    },
-    {
-      "filename": "icon-spotlight@3x.png",
-      "idiom": "iphone",
-      "scale": "3x",
-      "size": "40x40"
-    },
-    {
-      "filename": "icon-notification@2x.png",
-      "idiom": "iphone",
-      "scale": "2x",
-      "size": "20x20"
-    },
-    {
-      "filename": "icon-notification@3x.png",
-      "idiom": "iphone",
-      "scale": "3x",
-      "size": "20x20"
     }
   ],
   "info": {
