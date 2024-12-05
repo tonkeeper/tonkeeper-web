@@ -1,23 +1,25 @@
 import { getWindow } from '@tonkeeper/core/dist/service/telegramOauth';
 
 type UserFriendlyAddress = string;
+type TimestampMS = number;
 
-export type TonkeeperInjectionContext = {
+export type TonkeeperInjection = {
     address: UserFriendlyAddress;
+    close: () => void;
     sendTransaction: (params: {
         source: UserFriendlyAddress;
-        valid_until: 1733389156144;
+        valid_until: TimestampMS;
         messages: {
             address: UserFriendlyAddress;
             amount: string;
-            payload: string;
+            payload?: string;
         }[];
     }) => Promise<string>;
 };
 
 declare global {
     interface Window {
-        tonkeeperStonfi?: TonkeeperInjectionContext;
+        tonkeeperStonfi?: TonkeeperInjection;
     }
 }
 

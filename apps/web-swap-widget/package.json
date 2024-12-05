@@ -7,6 +7,7 @@
         "@amplitude/analytics-browser": "^2.1.0",
         "@aptabase/web": "^0.4.2",
         "@tanstack/react-query": "4.3.4",
+        "@ton/core": "^0.56.0",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",
         "@tonkeeper/uikit": "0.1.0",

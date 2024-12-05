@@ -1,4 +1,4 @@
-import { styled, useTheme } from 'styled-components';
+import { styled } from 'styled-components';
 import { useEncodeSwapToTonConnectParams } from '@tonkeeper/uikit/dist/state/swap/useEncodeSwap';
 import { useState } from 'react';
 import {
@@ -11,17 +11,23 @@ import { CalculatedSwap } from '@tonkeeper/uikit/dist/state/swap/useCalculatedSw
 import { SwapFromField } from '@tonkeeper/uikit/dist/components/swap/SwapFromField';
 import { SwapIcon } from '@tonkeeper/uikit/dist/components/Icon';
 import { SwapToField } from '@tonkeeper/uikit/dist/components/swap/SwapToField';
-import { SwapProviders } from '@tonkeeper/uikit/dist/components/swap/SwapProviders';
 import { SwapButton } from '@tonkeeper/uikit/dist/components/swap/SwapButton';
 import { SwapTokensListNotification } from '@tonkeeper/uikit/dist/components/swap/tokens-list/SwapTokensListNotification';
 import { IconButton } from '@tonkeeper/uikit/dist/components/fields/IconButton';
-import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
+import { SwapWidgetHeader } from './SwapWidgetHeader';
+import { getTonkeeperInjectionContext } from '../libs/tonkeeper-injection-context';
+import { SwapWidgetFooter } from './SwapWidgetFooter';
 
 const MainFormWrapper = styled.div`
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+`;
+
+const Spacer = styled.div`
+    flex: 1;
 `;
 
 const ChangeIconStyled = styled(IconButton)`
@@ -47,9 +53,10 @@ const ChangeIconStyled = styled(IconButton)`
 `;
 
 export const SwapWidgetPage = () => {
-    const theme = useTheme();
-    const { isLoading, mutateAsync: encode } = useEncodeSwapToTonConnectParams();
-    const [modalParams, setModalParams] = useState<TonConnectTransactionPayload | null>(null);
+    const { isLoading, mutateAsync: encode } = useEncodeSwapToTonConnectParams({
+        ignoreBattery: true
+    });
+    const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
     const [selectedSwap] = useSelectedSwap();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const [toAsset, setToAsset] = useSwapToAsset();
@@ -57,9 +64,20 @@ export const SwapWidgetPage = () => {
 
     const onConfirm = async () => {
         const params = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
-        // Ton Connect send
 
-        setModalParams(params);
+        const ctx = getTonkeeperInjectionContext()!;
+
+        ctx.sendTransaction({
+            source: ctx.address,
+            // legacy tonkeeper api, timestamp in ms
+            valid_until: params.valid_until * 1000,
+            messages: params.messages.map(m => ({
+                address: m.address,
+                amount: m.amount.toString(),
+                payload: m.payload
+            }))
+        });
+        setHasBeenSent(true);
     };
 
     const onChangeFields = () => {
@@ -72,14 +90,16 @@ export const SwapWidgetPage = () => {
 
     return (
         <MainFormWrapper>
+            <SwapWidgetHeader />
             <SwapFromField>
                 <ChangeIconStyled data-testid="change-swap" onClick={onChangeFields}>
                     <SwapIcon />
                 </ChangeIconStyled>
             </SwapFromField>
-            <SwapToField />
-            {theme.displayType === 'compact' && <SwapProviders />}
-            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || !!modalParams} />
+            <SwapToField separateInfo />
+            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || hasBeenSent} />
+            <Spacer />
+            <SwapWidgetFooter />
             <SwapTokensListNotification />
         </MainFormWrapper>
     );

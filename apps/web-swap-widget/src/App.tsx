@@ -3,12 +3,8 @@ import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
-import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
-import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
-import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
-import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -26,7 +22,7 @@ import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { FC, Suspense, useEffect, useMemo } from 'react';
+import { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
@@ -35,10 +31,12 @@ import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { SwapWidgetPage } from './components/SwapWidgetPage';
-import { Container } from '@tonkeeper/uikit';
+import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
+import { AccountTonWatchOnly } from '@tonkeeper/core/dist/entries/account';
+import { getTonkeeperInjectionContext } from './libs/tonkeeper-injection-context';
+import { Address } from '@ton/core';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -52,6 +50,18 @@ const queryClient = new QueryClient({
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
+// TODO remove
+window.tonkeeperStonfi = {
+    address: 'UQDHd3ZKCW3h7OH7F9tTQcWuxpR9s71lW7mv7n2RKl8STkZ5',
+    sendTransaction: async params => {
+        console.log(params);
+        return 'boc';
+    },
+    close: () => {
+        console.log('close');
+    }
+};
+
 export const App: FC = () => {
     const { t: tSimple, i18n } = useTranslation();
 
@@ -64,7 +74,7 @@ export const App: FC = () => {
             i18n: {
                 enable: true,
                 reloadResources: i18n.reloadResources,
-                changeLanguage: i18n.changeLanguage as (lang: string) => Promise<void>,
+                changeLanguage: i18n.changeLanguage as unknown as (lang: string) => Promise<void>,
                 language: i18n.language,
                 languages: languages
             }
@@ -87,20 +97,63 @@ export const App: FC = () => {
     );
 };
 
+const WidgetGlobalStyle = createGlobalStyle`
+    html, body, #root {
+        height: 100%;
+    }
+    
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
+`;
+
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
     return (
-        <UserThemeProvider isPro={false} isProSupported={false} displayType="compact">
+        <UserThemeProvider
+            isPro={false}
+            isProSupported={false}
+            displayType="compact"
+            isInsideTonkeeper
+        >
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
-                <HeaderGlobalStyle />
-                <FooterGlobalStyle />
-                <SybHeaderGlobalStyle />
-                <GlobalListStyle />
-                <Loader />
+                <WidgetGlobalStyle />
+                <ProvideActiveAccount>
+                    <Loader />
+                </ProvideActiveAccount>
             </DarkThemeContext.Provider>
         </UserThemeProvider>
     );
+};
+
+const ProvideActiveAccount: FC<PropsWithChildren> = ({ children }) => {
+    const storage = useAccountsStorage();
+    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        const addressFriendly = getTonkeeperInjectionContext()?.address;
+
+        if (!addressFriendly) {
+            return;
+        }
+
+        const addressRaw = Address.parse(addressFriendly).toRawString();
+
+        storage
+            .setAccounts([
+                new AccountTonWatchOnly(addressRaw, 'Wallet', '🙂', {
+                    rawAddress: addressRaw,
+                    id: addressRaw
+                })
+            ])
+            .then(() => setIsLoading(false));
+    }, []);
+
+    if (isLoading) {
+        return null;
+    }
+
+    return <>{children}</>;
 };
 
 const Loader: FC = () => {
@@ -183,38 +236,10 @@ const Loader: FC = () => {
     );
 };
 
-const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
-    ${props =>
-        props.standalone
-            ? css`
-                  position: fixed;
-                  top: 0;
-                  height: calc(var(--app-height) - 2px);
-                  -webkit-overflow-scrolling: touch;
-              `
-            : css`
-                  @media (min-width: 600px) {
-                      border-left: 1px solid ${props.theme.separatorCommon};
-                      border-right: 1px solid ${props.theme.separatorCommon};
-                  }
-              `};
-
-    > * {
-        ${props =>
-            props.standalone &&
-            css`
-                overflow: auto;
-                width: var(--app-width);
-                max-width: 548px;
-                box-sizing: border-box;
-            `}
-    }
-`;
-
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
+const Wrapper = styled.div`
     box-sizing: border-box;
-    padding-top: 64px;
-    padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
+    padding: 0 16px 34px;
+    height: 100%;
 `;
 
 const Content: FC<{
@@ -227,7 +252,7 @@ const Content: FC<{
     useDebuggingTools();
 
     return (
-        <Wrapper standalone={standalone}>
+        <Wrapper>
             <SwapWidgetPage />
         </Wrapper>
     );

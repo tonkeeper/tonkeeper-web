@@ -7306,6 +7306,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ton/core@npm:^0.56.0":
+  version: 0.56.3
+  resolution: "@ton/core@npm:0.56.3"
+  dependencies:
+    symbol.inspect: "npm:1.0.1"
+  peerDependencies:
+    "@ton/crypto": ">=3.2.0"
+  checksum: 10/5fe0284bc66789e4b408cce7d459d30d0f8477ce981337ef7bfe7beeee93eda575e8178338fb3d73d47cd8f78065ed84988b82db839b463a39e576be39831243
+  languageName: node
+  linkType: hard
+
 "@ton/crypto-primitives@npm:2.0.0":
   version: 2.0.0
   resolution: "@ton/crypto-primitives@npm:2.0.0"
@@ -7666,6 +7677,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:^5.16.5"
     "@testing-library/react": "npm:^13.4.0"
     "@testing-library/user-event": "npm:^13.5.0"
+    "@ton/core": "npm:^0.56.0"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
