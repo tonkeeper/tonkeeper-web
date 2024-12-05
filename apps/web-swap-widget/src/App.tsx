@@ -50,18 +50,6 @@ const queryClient = new QueryClient({
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
-// TODO remove
-window.tonkeeperStonfi = {
-    address: 'UQDHd3ZKCW3h7OH7F9tTQcWuxpR9s71lW7mv7n2RKl8STkZ5',
-    sendTransaction: async params => {
-        console.log(params);
-        return 'boc';
-    },
-    close: () => {
-        console.log('close');
-    }
-};
-
 export const App: FC = () => {
     const { t: tSimple, i18n } = useTranslation();
 
