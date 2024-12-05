@@ -1,9 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-//Review elements on token screet, clickable buttons + send ton but cancel
-
-test('TON screen', async ({ page }) => {
-
+test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
@@ -28,6 +25,11 @@ test('TON screen', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.locator('#root')).toContainText('TON');
   await expect(page.locator('#root')).toContainText('USD₮');
+});
+//Review elements on token screet, clickable buttons + send ton but cancel
+
+test('TON screen', async ({ page }) => {
+
   await page.getByText('TON').nth(2).click();
   await expect(page.getByText('Toncoin')).toBeVisible();
   await expect(page.locator('div').filter({ hasText: /^Toncoin$/ }).getByRole('button').first()).toBeVisible();
@@ -71,30 +73,6 @@ test('TON screen', async ({ page }) => {
 
 test('Jetton screen', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('dsbFbват^%*(&(');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('dsbFbват^%*(&(');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByText('USD₮').nth(1).click();
   await expect(page.getByText('USD₮', { exact: true })).toBeVisible();
   await expect(page.getByRole('img', { name: 'USD₮' })).toBeVisible();

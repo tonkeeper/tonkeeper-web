@@ -1,10 +1,7 @@
 import { test, expect } from '@playwright/test';
 test.setTimeout(4 * 60 * 1000);
 
-//Send TON flow - TON is preselected + Filter USDT in drop-down list of modal window to send
-
-test('Filter usdt', async ({ page }) => {
-
+test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
@@ -16,9 +13,9 @@ test('Filter usdt', async ({ page }) => {
     .locator('div')
     .filter({ hasText: /^Password$/ })
     .getByRole('textbox')
-    .fill('123456');
+    .fill('#$%^&^*^%*(&(');
   await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
+  await page.getByRole('textbox').nth(1).fill('#$%^&^*^%*(&(');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Wallet name').fill('Account ');
   await page.getByLabel('Wallet name').click();
@@ -29,6 +26,12 @@ test('Filter usdt', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.locator('#root')).toContainText('TON');
   await expect(page.locator('#root')).toContainText('USD₮');
+});
+
+//Send TON flow - TON is preselected + Filter USDT in drop-down list of modal window to send
+
+test('Filter usdt', async ({ page }) => {
+
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Recipient' })).toBeVisible();
   await expect(page.locator('#react-portal-modal-container').getByRole('button').first()).toBeVisible();
@@ -65,30 +68,6 @@ test('Filter usdt', async ({ page }) => {
 
 test('Send Ton but cancel', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Recipient' })).toBeVisible();
   await expect(page.locator('#react-portal-modal-container').getByRole('button').first()).toBeVisible();
@@ -132,30 +111,6 @@ test('Send Ton but cancel', async ({ page }) => {
 
 test('Wrong password when sending TON', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('UQDj5NvQK1Hh6cct5PAX8Xcb6IKo1Hmjoc2LM1Nag_1fpOuv');
@@ -180,30 +135,6 @@ test('Wrong password when sending TON', async ({ page }) => {
 //Input dns as a recipient address
 test('Recipient by dns', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('oleganza.ton');
@@ -228,30 +159,6 @@ test('Recipient by dns', async ({ page }) => {
 //Input t.me username as a recipient address
 test('Recipient by username', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('maincrypt0.t.me');
@@ -275,30 +182,6 @@ test('Recipient by username', async ({ page }) => {
 //Input up to 9 decimals as amount
 test('9 decimals amount', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('oleganza.ton');
@@ -322,30 +205,6 @@ test('9 decimals amount', async ({ page }) => {
 //Input MAX amount
 test('Max amount', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('oleganza.ton');
@@ -371,30 +230,6 @@ test('Max amount', async ({ page }) => {
 //Input fiat amount
 test('Fiat amount', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('123456');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('123456');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('oleganza.ton');
@@ -425,30 +260,6 @@ test('Fiat amount', async ({ page }) => {
 
 test('Insufficient balance', async ({ page }) => {
 
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('#$%^&^*^%*(&(');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('#$%^&^*^%*(&(');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Account ');
-  await page.getByLabel('Wallet name').click();
-  await page.getByLabel('Wallet name').fill('Тестовый кошелёк');
-  await page.getByLabel('Wallet name').click();
-  await page.locator('div:nth-child(1664)').click();
-  await page.getByText('❣️').click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.locator('#root')).toContainText('TON');
-  await expect(page.locator('#root')).toContainText('USD₮');
   await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.getByRole('textbox').first().click();
   await page.getByRole('textbox').first().fill('oleganza.ton');
