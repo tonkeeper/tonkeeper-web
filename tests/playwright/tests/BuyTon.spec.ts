@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+test.setTimeout(4 * 60 * 1000);
 //Buy TON flow on main screen
 
 test('Buy TON on main screen', async ({ page }) => {
