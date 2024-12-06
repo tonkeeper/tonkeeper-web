@@ -77,16 +77,9 @@ test('Receive for multiwallet', async ({ page }) => {
   await page.getByLabel('1:', { exact: true }).click();
   await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24_3);
   await page.getByRole('button', { name: 'Continue' }).click();
+  await page.locator('#create-password').fill('tmY6V +# > ');
+  await page.locator('#create-password-confirm').fill('tmY6V +# > ');
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Password$/ })
-    .getByRole('textbox')
-    .fill('j9USgKk%b');
-  await page.getByRole('textbox').nth(1).click();
-  await page.getByRole('textbox').nth(1).fill('j9USgKk%b');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Тестовый wallet!008');
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByRole('heading', { name: 'Congratulations! You’ve set' })).toBeVisible();
   await page.getByRole('button', { name: 'Receive' }).click();
