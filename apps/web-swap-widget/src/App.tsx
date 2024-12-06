@@ -48,7 +48,7 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
-const TARGET_ENV = 'web';
+const TARGET_ENV = 'web'; // 'web-swap-widget' TODO
 
 export const App: FC = () => {
     const { t: tSimple, i18n } = useTranslation();
