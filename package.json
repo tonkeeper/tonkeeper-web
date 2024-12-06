@@ -12,6 +12,7 @@
         "deploy:twa": "npx turbo build:twa && npx wrangler pages deploy apps/twa/build",
         "build:extension": "npx turbo build:extension",
         "build:desktop": "npx turbo build:desktop",
+        "build:ipad": "npx turbo build:ipad",
         "build:pkg": "npx turbo build:pkg"
     },
     "private": true,

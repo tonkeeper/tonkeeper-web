@@ -8,8 +8,9 @@ export const UserThemeProvider: FC<
         displayType?: 'compact' | 'full-width';
         isPro?: boolean;
         isProSupported?: boolean;
+        isInsideTonkeeper?: boolean;
     }>
-> = ({ children, displayType, isPro, isProSupported }) => {
+> = ({ children, displayType, isPro, isProSupported, isInsideTonkeeper }) => {
     const { data: uiPreferences, isFetched: isUIPreferencesLoaded } = useUserUIPreferences();
     const { mutateAsync } = useMutateUserUIPreferences();
     const isProPrev = usePrevious(isPro);
@@ -31,7 +32,7 @@ export const UserThemeProvider: FC<
 
         themeName = themeName || 'dark';
 
-        const theme = availableThemes[themeName];
+        let theme = availableThemes[themeName];
 
         if (displayType) {
             theme.displayType = displayType;
@@ -41,8 +42,21 @@ export const UserThemeProvider: FC<
 
         window.document.body.style.background = theme.backgroundPage;
 
+        if (isInsideTonkeeper) {
+            theme = {
+                ...theme,
+                corner3xSmall: '2px',
+                corner2xSmall: '4px',
+                cornerExtraSmall: '6px',
+                cornerSmall: '8px',
+                cornerMedium: '12px',
+                cornerLarge: '16px',
+                cornerFull: '100%'
+            };
+        }
+
         return [theme, themeName];
-    }, [uiPreferences?.theme, displayType, isPro, isProPrev]);
+    }, [uiPreferences?.theme, displayType, isPro, isProPrev, isInsideTonkeeper]);
 
     useEffect(() => {
         if (currentTheme && uiPreferences && currentThemeName !== uiPreferences.theme) {

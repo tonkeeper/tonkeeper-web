@@ -1,10 +1,10 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
-import { SendTransactionAppRequest } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { contextBridge, ipcRenderer } from 'electron';
 import { Message } from './libs/message';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { SendTransactionAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
 
 contextBridge.exposeInMainWorld('backgroundApi', {
     platform: () => process.platform,
