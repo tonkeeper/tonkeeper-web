@@ -2358,6 +2358,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/push-notifications@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "@capacitor/push-notifications@npm:6.0.3"
+  peerDependencies:
+    "@capacitor/core": ^6.0.0
+  checksum: 10/86ada486405b966dfb4b8fc8c11527fe12376007a437c642f6a19dd6592e1bf1f960ae4d9f83f711a6206fdd2448efe58536fa8efb3646152b9b201f52aaf566
+  languageName: node
+  linkType: hard
+
 "@capacitor/splash-screen@npm:latest":
   version: 6.0.3
   resolution: "@capacitor/splash-screen@npm:6.0.3"
@@ -7514,6 +7523,7 @@ __metadata:
     "@capacitor/device": "npm:^6.0.2"
     "@capacitor/ios": "npm:^6.1.2"
     "@capacitor/preferences": "npm:^6.0.2"
+    "@capacitor/push-notifications": "npm:^6.0.3"
     "@capacitor/splash-screen": "npm:latest"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
