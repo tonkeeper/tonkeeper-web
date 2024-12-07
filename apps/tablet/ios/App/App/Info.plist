@@ -74,5 +74,7 @@
 		<string>dev-pro.tonconsole.com</string>
 		<string>pro.tonconsole.com</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>
