@@ -5,6 +5,7 @@ platform :ios do
   
       begin
         setup_signing(keychain_info)
+        load_asc_api_key
         bump_build_number
         build_app_with_signing(keychain_info)
         submit_to_testflight
@@ -26,33 +27,38 @@ platform :ios do
       install_profile
       update_project_settings
     end
-  
-    lane :bump_build_number do
-      file = File.read('../package.json')
-      data_hash = JSON.parse(file)
-      connect_api_key = app_store_connect_api_key(
+    
+    desc "Load ASC API Key information to use in subsequent lanes"
+    private_lane :load_asc_api_key do
+      app_store_connect_api_key(
         key_id: ENV['APPLE_KEY_ID'],
         issuer_id: ENV['APPLE_ISSUER_ID'],
         key_content: Base64.decode64(ENV['APPLE_KEY_CONTENT']),
         duration: 1200,
         in_house: false
       )
+    end
+    
+    lane :bump_build_number do
+      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
 
-      build_num = 0
-      
-      #   build_num = app_store_build_number(
-      #     api_key: connect_api_key,
-      #     app_identifier: ENV['BUNDLE_IDENTIFIER'],
-      #     live: false
-      #   )
-
-      build_num = build_num + 1
-      UI.message("Bumped build number to #{build_num}")
-      increment_build_number(
-        build_number: build_num,
-        xcodeproj: "./ios/App/App.xcodeproj",
-        skip_info_plist: true
+      xcodeproj = "./ios/App/App.xcodeproj";
+      current_version = get_version_number(xcodeproj: xcodeproj)
+      latest_build_number = app_store_build_number(
+        api_key: api_key,
+        version: current_version,
+        app_identifier: ENV['BUNDLE_IDENTIFIER']
       )
+
+      build_number = latest_build_number + 1
+      
+      increment_build_number(
+        xcodeproj: xcodeproj,
+        build_number: build_number
+      )
+      
+      UI.message("Bumped build number to #{build_number}")
+      sh("echo VERSION_CODE=#{build_number} >> $GITHUB_ENV")
     end
   
     private_lane :import_cert do |options|
@@ -93,8 +99,6 @@ platform :ios do
         profile_name: ENV['APPLE_PROFILE_NAME'],
       )
 
-
-
       update_project_team(
         path: "./ios/App/App.xcodeproj",
         teamid: ENV['APP_STORE_CONNECT_TEAM_ID']
@@ -125,20 +129,15 @@ platform :ios do
     end
   
     private_lane :submit_to_testflight do
-      api_key = app_store_connect_api_key(
-        key_id: ENV['APPLE_KEY_ID'],
-        issuer_id: ENV['APPLE_ISSUER_ID'],
-        key_content: Base64.decode64(ENV['APPLE_KEY_CONTENT']),
-        duration: 1200,
-        in_house: false
-      )
-      pilot(
+      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+
+      deliver(
         api_key: api_key,
-        skip_waiting_for_build_processing: true,
-        skip_submission: true,
-        distribute_external: false,
-        notify_external_testers: false,
-        ipa: "./App.ipa"
+        skip_screenshots: false,
+        skip_metadata: false,
+        skip_app_version_update: true,
+        force: true, # skips verification of HTML preview file (since this will be run from a CI machine)
+        run_precheck_before_submit: false # not supported through ASC API yet
       )
     end
   end
