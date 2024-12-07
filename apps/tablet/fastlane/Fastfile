@@ -46,8 +46,8 @@ platform :ios do
       current_version = get_version_number(xcodeproj: xcodeproj)
       latest_build_number = app_store_build_number(
         api_key: api_key,
-        version: current_version,
-        app_identifier: ENV['BUNDLE_IDENTIFIER']
+        app_identifier: ENV['BUNDLE_IDENTIFIER'],
+        live: false
       )
 
       build_number = latest_build_number + 1
