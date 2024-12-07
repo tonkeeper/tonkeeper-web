@@ -39,10 +39,16 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Tonkeeper uses bluetooth to connect your hardware Ledger Nano X</string>
 	<key>NSCameraUsageDescription</key>
-	<string>We need access to your camera to read QR codes.</string>
+	<string>Tonkeeper uses camera to scan QR codes</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>We use Face ID to securely authenticate your access to mnemonic key.</string>
+	<string>Tonkeeper uses biometric authentication to authorize transactions</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone is used for identity verification with 3rd party services</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
