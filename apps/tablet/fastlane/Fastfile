@@ -1,14 +1,18 @@
+
 platform :ios do
+    xcodeproj = "./ios/App/App.xcodeproj"
+    workspace = "./ios/App/App.xcworkspace"
+
     desc 'Export ipa and submit to TestFlight'
     lane :beta do
       keychain_info = { keychain_name: "ios-build-#{Time.now.to_i}.keychain", keychain_password: SecureRandom.uuid }
-  
+      
+
       begin
         setup_signing(keychain_info)
         load_asc_api_key
         bump_build_number
         build_app_with_signing(keychain_info)
-        create_changelog
         submit_to_testflight
       ensure
         cleanup_keychain(keychain_info)
@@ -41,26 +45,34 @@ platform :ios do
     end
     
     lane :bump_build_number do
-      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      package = read_json(json_path: "./package.json")
+      increment_version_number(
+        xcodeproj: xcodeproj,
+        version_number: package[:version]
+      )
 
-      xcodeproj = "./ios/App/App.xcodeproj";
+      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+
       current_version = get_version_number(xcodeproj: xcodeproj)
       latest_build_number = app_store_build_number(
-        initial_build_number: 5,
+        initial_build_number: 0,
         api_key: api_key,
-        app_identifier: ENV['BUNDLE_IDENTIFIER'],
+        app_identifier: app_identifier,
+        version: package[:version],
         live: false
       )
 
       build_number = latest_build_number + 1
-      
+
       increment_build_number(
         xcodeproj: xcodeproj,
         build_number: build_number
       )
       
       UI.message("Bumped build number to #{build_number}")
-      sh("echo VERSION_CODE=#{build_number} >> $GITHUB_ENV")
+      sh("echo VERSION_CODE=#{package[:version]} >> $GITHUB_ENV")
+      sh("echo BUILD_CODE=#{build_number} >> $GITHUB_ENV")
     end
   
     private_lane :import_cert do |options|
@@ -92,18 +104,21 @@ platform :ios do
     end
   
     private_lane :update_project_settings do
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+
       update_code_signing_settings(
-        path: "./ios/App/App.xcodeproj",
+        path: xcodeproj,
         use_automatic_signing: false,
         code_sign_identity: "iPhone Distribution",
-        team_id: ENV['APP_STORE_CONNECT_TEAM_ID'],
-        bundle_identifier: ENV['BUNDLE_IDENTIFIER'],
+        team_id: team_id,
+        bundle_identifier: app_identifier,
         profile_name: ENV['APPLE_PROFILE_NAME'],
       )
 
       update_project_team(
-        path: "./ios/App/App.xcodeproj",
-        teamid: ENV['APP_STORE_CONNECT_TEAM_ID']
+        path: xcodeproj,
+        teamid: team_id
       )
     end
   
@@ -113,15 +128,16 @@ platform :ios do
         password: options[:keychain_password],
         set_default: false
       )
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       build_app(
-        workspace: "./ios/App/App.xcworkspace",
+        workspace: workspace,
         scheme: "App",
         configuration: "Release",
         export_method: "app-store",
-        output_name: "App.ipa",
+        output_name: "TonkeeperPro.ipa",
         export_options: {
           provisioningProfiles: {
-            ENV['BUNDLE_IDENTIFIER'] => ENV['APPLE_PROFILE_NAME']
+            app_identifier => ENV['APPLE_PROFILE_NAME']
           }
         },
         xcargs: "-verbose",
@@ -130,22 +146,22 @@ platform :ios do
       )
     end
 
-    private_lane :create_changelog do
-      release_notes = "./metadata/default/release_notes.txt"
-      changes = changelog_from_git_commits(commits_count: 10, merge_commit_filtering: "exclude_merges")
-      File.write(release_notes, changes)
-    end
-
     private_lane :submit_to_testflight do
       api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      ipa = lane_context[SharedValues::IPA_OUTPUT_PATH]
+      changelog = changelog_from_git_commits(
+        merge_commit_filtering: "exclude_merges",
+        between: ["origin/main", "HEAD"]
+      )
 
-      deliver(
+      pilot(
         api_key: api_key,
-        skip_screenshots: false,
-        skip_metadata: false,
-        skip_app_version_update: true,
-        force: true, # skips verification of HTML preview file (since this will be run from a CI machine)
-        run_precheck_before_submit: false # not supported through ASC API yet
+        ipa: ipa,
+        changelog: changelog,
+        skip_waiting_for_build_processing: true,
+        skip_submission: true,
+        distribute_external: false,
+        notify_external_testers: false
       )
     end
   end

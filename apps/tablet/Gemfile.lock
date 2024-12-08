@@ -170,6 +170,7 @@ GEM
       xcodeproj (>= 1.13.0, < 2.0.0)
       xcpretty (~> 0.3.0)
       xcpretty-travis-formatter (>= 0.0.3, < 2.0.0)
+    fastlane-plugin-json (1.1.7)
     fastlane-sirp (1.0.0)
       sysrandom (~> 1.0)
     ffi (1.17.0)
@@ -313,6 +314,7 @@ PLATFORMS
 DEPENDENCIES
   cocoapods (~> 1.13)
   fastlane
+  fastlane-plugin-json
 
 RUBY VERSION
    ruby 3.3.6p108
