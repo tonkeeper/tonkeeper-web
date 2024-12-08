@@ -60,13 +60,6 @@ jobs:
                   bundler-cache: true
                   working-directory: './apps/tablet'
 
-            - name: UploadGemfile to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/tablet/Gemfile.lock
-
             - name: Enable Corepack
               run: |
                   corepack enable
