@@ -52,6 +52,7 @@ import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -543,9 +544,11 @@ const MultiSendFooter: FC<{
                         {t('continue')}
                     </Button>
                 ) : (
-                    <Button type="button" primary onClick={onBuyPro}>
-                        {t('multi_send_continue_with_pro')}
-                    </Button>
+                    <HideOnReview>
+                        <Button type="button" primary onClick={onBuyPro}>
+                            {t('multi_send_continue_with_pro')}
+                        </Button>
+                    </HideOnReview>
                 )}
             </MultiSendFooterWrapper>
             <SaveListNotification

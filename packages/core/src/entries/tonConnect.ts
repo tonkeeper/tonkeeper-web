@@ -306,3 +306,9 @@ export interface TonConnectMessageRequest {
     from: string;
     connection: AccountConnection;
 }
+
+export interface SendTransactionAppRequest {
+    id: string;
+    connection: AccountConnection;
+    payload: TonConnectTransactionPayload;
+}

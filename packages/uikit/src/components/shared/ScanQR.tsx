@@ -50,7 +50,15 @@ function Scan({
         const startScanning = async () => {
             try {
                 const videoInputDevices = await BrowserQRCodeReader.listVideoInputDevices();
-                const selectedDeviceId = videoInputDevices[0].deviceId;
+
+                // Prefer the back camera
+                const backCamera = videoInputDevices.find(
+                    device =>
+                        device?.label?.toLowerCase().includes('back') ||
+                        device?.deviceId?.includes('camera')
+                );
+
+                const selectedDeviceId = backCamera?.deviceId ?? videoInputDevices[0].deviceId;
 
                 controlsRef.current = await codeReader.decodeFromVideoDevice(
                     selectedDeviceId,
