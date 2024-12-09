@@ -1,4 +1,4 @@
-name: Tonkeeper Pull-Request
+name: PR
 on:
     workflow_dispatch:
     pull_request:
