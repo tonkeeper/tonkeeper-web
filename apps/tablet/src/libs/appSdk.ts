@@ -3,8 +3,8 @@ import {
     IAppSdk,
     KeychainPassword,
     TouchId,
-    CookieService
-} from '@tonkeeper/core/dist/AppSdk';
+    CookieService, NotificationService
+} from "@tonkeeper/core/dist/AppSdk";
 import packageJson from '../../package.json';
 import { TabletStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
@@ -47,7 +47,7 @@ export class TouchIdTablet implements TouchId {
     };
 
     prompt = async (reason: (lang: string) => string) => {
-        return Biometric.prompt(reason('en')); // TODO lang
+        return Biometric.prompt(reason('en'));
     };
 }
 
@@ -56,6 +56,10 @@ export const TABLET_APPLICATION_ID = 'tablet' as const;
 export class TabletAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainTablet();
     cookie = new CookieTablet();
+    /**
+     * initialises in the App component when config is fetched
+     */
+    notifications: NotificationService | undefined = undefined;
 
     touchId = new TouchIdTablet();
 
