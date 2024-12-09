@@ -28,8 +28,8 @@ env:
     node-version: 20.11.1
 
 jobs:
-    web-build:
-        name: web-build
+    swap-widget:
+        name: Swap Widget
         runs-on: ubuntu-latest
         timeout-minutes: 10
 
