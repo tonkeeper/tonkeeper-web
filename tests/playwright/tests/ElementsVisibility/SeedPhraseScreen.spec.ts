@@ -1,0 +1,51 @@
+import { test, expect } from '@playwright/test';
+
+//Elements visibility at seed phrase screen
+
+test('Seed phrase screen', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
+  await expect(page.locator('#react-portal-modal-container').getByRole('button').nth(1)).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container').getByRole('button').first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Enter your recovery phrase' })).toBeVisible();
+  await expect(page.locator('h2')).toContainText('Enter your recovery phrase');
+  await expect(page.getByText('To restore access to your')).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('To restore access to your wallet, enter the 24 secret recovery words given to you when you created your wallet.');
+  await expect(page.getByRole('button', { name: '24 words' })).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('24 words');
+  await expect(page.getByRole('button', { name: '12 words' })).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('12 words');
+  await expect(page.locator('label').filter({ hasText: /^1:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^2:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^3:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^4:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^5:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^6:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^7:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^8:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: /^9:$/ })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '10:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '11:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '12:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '13:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '14:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '15:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '16:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '17:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '18:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '19:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '20:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '21:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '22:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '23:' })).toBeVisible();
+  await expect(page.locator('label').filter({ hasText: '24:' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Continue' })).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('Continue');
+  await page.locator('#react-portal-modal-container').getByRole('button').first().click();
+  await expect(page.getByRole('heading', { name: 'Add Wallet' })).toBeVisible();
+  await expect(page.locator('h2')).toContainText('Add Wallet');
+  await expect(page.getByText('Create a new wallet or add an')).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('Create a new wallet or add an existing one.');
+  await page.locator('.sc-laRQQM').click();
+});
