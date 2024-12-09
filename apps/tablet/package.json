@@ -28,6 +28,7 @@
         "@capacitor/device": "^6.0.2",
         "@capacitor/ios": "^6.1.2",
         "@capacitor/preferences": "^6.0.2",
+        "@capacitor/push-notifications": "^6.0.3",
         "@capacitor/splash-screen": "latest",
         "@tanstack/react-query": "4.3.4",
         "@tonkeeper/core": "0.1.0",

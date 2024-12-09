@@ -37,6 +37,8 @@ jobs:
         steps:
             - name: Checkout to git repository
               uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
 
             - name: Set up Node
               uses: actions/setup-node@v4
@@ -57,13 +59,6 @@ jobs:
                   ruby-version: ${{ env.ruby-version }}
                   bundler-cache: true
                   working-directory: './apps/tablet'
-
-            - name: UploadGemfile to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/tablet/Gemfile.lock
 
             - name: Enable Corepack
               run: |
@@ -111,7 +106,7 @@ jobs:
                   APPLE_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
                   APPLE_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER }}
                   APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
-                  APPLE_PROFILE_NAME: GitHub CI/Cd iPad
+                  APPLE_PROFILE_NAME: GitHub CI/CD iPad
                   BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
 
             - name: Upload logs to artifacts
@@ -120,3 +115,21 @@ jobs:
               with:
                   name: gum-logs
                   path: /Users/runner/Library/Logs/gym/*.log
+
+            - name: Summary
+              run: |
+                  echo '### Successful iPad build 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
+                  echo 'The app with build version: ${{ env.VERSION_CODE }}(${{ env.BUILD_CODE }})' >> $GITHUB_STEP_SUMMARY
+                  echo 'Uploaded to TestFlight' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              if: github.event_name == 'pull_request'
+              with:
+                  message: |
+                      ### Successful iPad build 🚀🚀🚀
+                      Well done!
+                      The app with build version: ${{ env.VERSION_CODE }}(${{ env.BUILD_CODE }})
+                      Uploaded to TestFlight
+                  comment-tag: ipad_build

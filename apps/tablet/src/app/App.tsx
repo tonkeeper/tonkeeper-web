@@ -72,7 +72,7 @@ import {
     useActiveTonNetwork
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { FC, Suspense, useEffect, useMemo } from 'react';
+import { FC, Suspense, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from 'react-i18next';
 import {
     Outlet,
@@ -91,6 +91,8 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
+import { ActionPerformed, PushNotifications, PushNotificationSchema, Token } from '@capacitor/push-notifications';
+import { PullToRefresh } from "./components/PullToRefresh";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -155,6 +157,43 @@ export const Providers = () => {
     useEffect(() => {
         document.body.classList.add(TABLET_APPLICATION_ID);
     }, []);
+
+    /**
+     * TODO remove
+     */
+    useEffect(() => {
+        PushNotifications.requestPermissions().then((result) => {
+            if (result.receive === 'granted') {
+                // Register with Apple / Google to receive push via APNS/FCM
+                PushNotifications.register();
+            } else {
+                // Show some error
+            }
+        });
+
+        // On success, we should be able to receive notifications
+        PushNotifications.addListener('registration', (token: Token) => {
+            alert('Push registration success, token: ' + token.value);
+        });
+
+        // Some issue with our setup and push will not work
+        PushNotifications.addListener('registrationError', (error: any) => {
+            alert('Error on registration: ' + JSON.stringify(error));
+        });
+
+        // Show us the notification payload if the app is open on our device
+        PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+            alert('Push received: ' + JSON.stringify(notification));
+        });
+
+        // Method called when tapping on a notification
+        PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
+            alert('Push action performed: ' + JSON.stringify(notification));
+        });
+    }, []);
+    /**
+     * TODO remove
+     */
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -295,10 +334,6 @@ export const Loader: FC = () => {
             );
         }
     }, [lang, i18n]);
-
-    useEffect(() => {
-        //   window.backgroundApi.onRefresh(() => queryClient.invalidateQueries()); TODO
-    }, []);
 
     if (
         activeWalletLoading ||
@@ -469,6 +504,13 @@ const OldAppRouting = () => {
 };
 
 const BackgroundElements = () => {
+    const onRefresh = useCallback(async () => {
+        const promise1 = queryClient.invalidateQueries();
+        const promise2 = new Promise(r => setTimeout(r, 1000));
+
+        await Promise.all([promise1, promise2]);
+    }, []);
+
     return (
         <>
             <SendActionNotification />
@@ -482,6 +524,7 @@ const BackgroundElements = () => {
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
+            <PullToRefresh onRefresh={onRefresh} />
         </>
     );
 };
