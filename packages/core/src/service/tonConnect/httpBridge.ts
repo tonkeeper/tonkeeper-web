@@ -91,6 +91,7 @@ export const subscribeTonConnect = ({
     const eventSource = new EventSourceClass(url);
 
     const onMessage = (params: MessageEvent<string>) => {
+        console.log('sse message received', params.data);
         setLastEventId(storage, params.lastEventId);
 
         const { from, message }: TonConnectRequest = JSON.parse(params.data);
@@ -98,6 +99,7 @@ export const subscribeTonConnect = ({
         const connection = connections.find(item => item.clientSessionId === from);
         if (!connection) return;
 
+        console.log('sse message processed', params.data);
         handleMessage(decryptTonConnectMessage({ message, from, connection }));
     };
 

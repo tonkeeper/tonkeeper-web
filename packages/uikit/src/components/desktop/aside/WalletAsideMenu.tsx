@@ -29,6 +29,7 @@ import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/accoun
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -111,16 +112,18 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            {!isReadOnly && !isTestnet && (
-                <NavLink to={AppRoute.swap}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <SwapIconStyled />
-                            <Label2>{t('wallet_swap')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
+            <HideOnReview>
+                {!isReadOnly && !isTestnet && (
+                    <NavLink to={AppRoute.swap}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <SwapIconStyled />
+                                <Label2>{t('wallet_swap')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                )}
+            </HideOnReview>
             {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
             {showMultisigs && !isTestnet && (
                 <NavLink to={AppRoute.multisigWallets}>

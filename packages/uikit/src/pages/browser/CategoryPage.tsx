@@ -6,6 +6,7 @@ import { CategoryGroupItem } from './CategoryBlock';
 import { ListBlock } from '../../components/List';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { RecommendationPageListItemSkeleton } from '../../components/skeletons/BrowserSkeletons';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 export const CategoryPage = () => {
     const { id } = useParams();
@@ -14,7 +15,7 @@ export const CategoryPage = () => {
     const group = data?.categories.find(item => item.id === id);
 
     return (
-        <>
+        <HideOnReview>
             <SubHeader title={group?.title} />
             <InnerBody>
                 {group ? (
@@ -33,6 +34,6 @@ export const CategoryPage = () => {
                     </ListBlock>
                 )}
             </InnerBody>
-        </>
+        </HideOnReview>
     );
 };

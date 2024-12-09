@@ -4,6 +4,7 @@ import { useOpenBrowser } from '../../hooks/amplitude';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 import { DesktopCategoryBlock } from './DesktopCategoryBlock';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -38,15 +39,17 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     }
 
     return (
-        <CategoriesWrapper>
-            <PromotionsCarouselStyled apps={data.apps} slidesToShow={2} />
-            {data.categories.map((category, index) => (
-                <CategoryBlockStyled
-                    key={category.id}
-                    category={category}
-                    hideDivider={index === 0}
-                />
-            ))}
-        </CategoriesWrapper>
+        <HideOnReview>
+            <CategoriesWrapper>
+                <PromotionsCarouselStyled apps={data.apps} slidesToShow={2} />
+                {data.categories.map((category, index) => (
+                    <CategoryBlockStyled
+                        key={category.id}
+                        category={category}
+                        hideDivider={index === 0}
+                    />
+                ))}
+            </CategoriesWrapper>
+        </HideOnReview>
     );
 };

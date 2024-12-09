@@ -1,4 +1,3 @@
-import { useAppContext } from '../../hooks/appContext';
 import { OpenAPI, SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { useActiveConfig } from '../wallet';
 

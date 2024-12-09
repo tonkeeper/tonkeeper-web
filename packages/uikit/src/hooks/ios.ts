@@ -1,3 +1,5 @@
+import { useAppContext } from './appContext';
+
 export function openIosKeyboard(keyboard: string, type = 'text', timerSeconds = 30) {
     const input = document.createElement('input');
     input.setAttribute('type', type);
@@ -18,3 +20,8 @@ export function hideIosKeyboard() {
         activeElement.blur();
     }
 }
+
+export const useIsOnIosReview = () => {
+    const { mainnetConfig } = useAppContext();
+    return Boolean(mainnetConfig.isOnReview);
+};
