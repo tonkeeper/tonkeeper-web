@@ -1,12 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { throttle } from '@tonkeeper/core/dist/utils/common';
+import { seeIfValidTonAddress, throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useSwapFromAsset, useSwapToAsset } from '@tonkeeper/uikit/dist/state/swap/useSwapForm';
+import { useAllSwapAssets } from '@tonkeeper/uikit/dist/state/swap/useSwapAssets';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { Address } from '@ton/core';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -74,4 +78,47 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[], vers
         },
         { enabled: accounts != null && activeAccount !== undefined }
     );
+};
+
+export const useApplyQueryParams = () => {
+    const [_, setFromAsset] = useSwapFromAsset();
+    const [__, setToAsset] = useSwapToAsset();
+    const { data: allAssets } = useAllSwapAssets();
+    const [isApplied, setIsApplied] = useState(false);
+
+    useEffect(() => {
+        if (!allAssets || isApplied) {
+            return;
+        }
+        setIsApplied(true);
+        const searchParams = new URLSearchParams(window.location.search);
+        const fromAssetParam = searchParams.get('ft');
+        const toAssetParam = searchParams.get('tt');
+
+        const fromAssetToSet =
+            fromAssetParam && seeIfValidTonAddress(fromAssetParam)
+                ? allAssets.find(
+                      asset =>
+                          tonAssetAddressToString(asset.address).toLowerCase() ===
+                          Address.parse(fromAssetParam).toRawString()
+                  )
+                : undefined;
+        if (fromAssetToSet) {
+            setFromAsset(fromAssetToSet);
+        }
+
+        const toAssetToSet =
+            toAssetParam && seeIfValidTonAddress(toAssetParam)
+                ? allAssets.find(
+                      asset =>
+                          tonAssetAddressToString(asset.address).toLowerCase() ===
+                          Address.parse(toAssetParam).toRawString()
+                  )
+                : undefined;
+        if (toAssetToSet) {
+            setToAsset(toAssetToSet);
+        }
+    }, [allAssets, isApplied]);
+
+    return isApplied;
 };

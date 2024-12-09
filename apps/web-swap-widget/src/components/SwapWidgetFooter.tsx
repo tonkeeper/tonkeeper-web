@@ -3,20 +3,20 @@ import { useTranslation } from 'react-i18next';
 import { Dot } from '@tonkeeper/uikit/dist/components/Dot';
 import { Body3Class } from '@tonkeeper/uikit';
 
-const Wrapper = styled.div`
-    text-align: center;
-`;
+const Wrapper = styled.div``;
 
 const Row = styled.div`
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     color: ${p => p.theme.textTertiary};
     ${Body3Class}
 `;
 
 const Link = styled.a`
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     text-decoration: unset;
     color: ${p => p.theme.textSecondary};
 
@@ -31,11 +31,11 @@ export const SwapWidgetFooter = () => {
         <Wrapper>
             <Row>
                 {t('legal_powered_by')}
-                <Link href="https://dedust.io/" target="_blank">
+                {/* <Link href="https://dedust.io/" target="_blank">
                     <DedustIcon />
                     Dedust
                 </Link>
-                ,
+                ,*/}
                 <Link href="https://ston.fi/" target="_blank">
                     <StonfiIcon />
                     STON.fi
@@ -55,7 +55,7 @@ export const SwapWidgetFooter = () => {
     );
 };
 
-const DedustIcon = () => {
+/*const DedustIcon = () => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -70,7 +70,7 @@ const DedustIcon = () => {
             <path d="M6.5 0L0.5 3.5L6.5 7L12.5 3.5L6.5 0Z" fill="currentColor" />
         </svg>
     );
-};
+};*/
 
 const StonfiIcon = () => {
     return (

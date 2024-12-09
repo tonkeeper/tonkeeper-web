@@ -76,7 +76,7 @@ export const SwapWidgetPage = () => {
                 amount: m.amount.toString(),
                 payload: m.payload
             }))
-        });
+        }).finally(() => setHasBeenSent(false));
         setHasBeenSent(true);
     };
 

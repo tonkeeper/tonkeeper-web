@@ -4,7 +4,6 @@ import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
-import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -25,7 +24,7 @@ import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserAppSdk } from './libs/appSdk';
-import { useAnalytics, useAppHeight, useAppWidth } from './libs/hooks';
+import { useAnalytics, useAppHeight, useApplyQueryParams, useAppWidth } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -188,7 +187,7 @@ const Loader: FC = () => {
         globalPreferencesLoading ||
         globalSetupLoading
     ) {
-        return <Loading />;
+        return null;
     }
 
     const context: IAppContext = {
@@ -238,6 +237,11 @@ const Content: FC<{
     useKeyboardHeight();
     useTrackLocation();
     useDebuggingTools();
+    const isApplied = useApplyQueryParams();
+
+    if (!isApplied) {
+        return null;
+    }
 
     return (
         <Wrapper>
