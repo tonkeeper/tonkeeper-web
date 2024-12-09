@@ -263,6 +263,12 @@ jobs:
         uses: ./.github/workflows/ipad-build.yaml
         secrets: inherit
 
+    swap-widget-build:
+        uses: ./.github/workflows/swap-widget-build.yaml
+        with:
+            environment: ${{ github.head_ref }}
+        secrets: inherit
+
     web-tests:
         needs: web-build
         uses: ./.github/workflows/web-tests.yaml
