@@ -9,6 +9,7 @@ import { Button } from '../../fields/Button';
 import { ProNotification } from '../../pro/ProNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { ProDashboardIcon, ProMultisendIcon } from './Icons';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const NotificationStyled = styled(Notification)`
     max-width: 768px;
@@ -19,11 +20,11 @@ export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void 
     onClose
 }) => {
     return (
-        <>
+        <HideOnReview>
             <NotificationStyled isOpen={isOpen} handleClose={onClose}>
                 {() => <ProFeaturesNotificationContent onClose={onClose} />}
             </NotificationStyled>
-        </>
+        </HideOnReview>
     );
 };
 

@@ -10,6 +10,7 @@ import {
     ExitIcon,
     GlobeIcon,
     LockIcon,
+    NotificationOutlineIcon,
     PlaceIcon,
     SlidersIcon,
     TonkeeperSkeletIcon
@@ -146,6 +147,14 @@ export const PreferencesAsideMenu = () => {
                         )}
                     </NavLink>
                 )}
+                <NavLink to={AppRoute.settings + SettingsRoute.notification}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <NotificationOutlineIcon />
+                            <Label2>{t('settings_notifications')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 <NavLink to={AppRoute.settings + SettingsRoute.localization}>
                     {({ isActive }) => (
                         <AsideMenuItemLarge isSelected={isActive}>

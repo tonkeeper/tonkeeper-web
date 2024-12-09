@@ -7,6 +7,7 @@ import { scrollToTop } from '../libs/common';
 import { AppRoute } from '../libs/routes';
 import { ActivityIcon, BrowserIcon, SettingsIcon, WalletIcon } from './NavigationIcons';
 import { Label3 } from './Text';
+import { HideOnReview } from './ios/HideOnReview';
 
 const Button = styled.div<{ active: boolean }>`
     user-select: none;
@@ -113,15 +114,17 @@ export const Footer: FC<{ standalone?: boolean; sticky?: boolean }> = ({ standal
                 <ActivityIcon />
                 <Label3>{t('activity_screen_title')}</Label3>
             </Button>
-            {hideBrowser === true ? null : (
-                <Button
-                    active={active === AppRoute.browser}
-                    onClick={() => handleClick(AppRoute.browser)}
-                >
-                    <BrowserIcon />
-                    <Label3>{t('browser_title')}</Label3>
-                </Button>
-            )}
+            <HideOnReview>
+                {hideBrowser === true ? null : (
+                    <Button
+                        active={active === AppRoute.browser}
+                        onClick={() => handleClick(AppRoute.browser)}
+                    >
+                        <BrowserIcon />
+                        <Label3>{t('browser_title')}</Label3>
+                    </Button>
+                )}
+            </HideOnReview>
             <Button
                 active={active === AppRoute.settings}
                 onClick={() => handleClick(AppRoute.settings)}
