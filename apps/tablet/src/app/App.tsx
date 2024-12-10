@@ -128,6 +128,12 @@ const GlobalStyle = createGlobalStyle`
       cursor: pointer;
       outline: inherit;
     }
+    
+    * {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none; 
+    }
 `;
 
 const sdk = new TabletAppSdk();
