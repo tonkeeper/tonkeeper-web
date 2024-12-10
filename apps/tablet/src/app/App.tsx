@@ -130,9 +130,15 @@ const GlobalStyle = createGlobalStyle`
     }
     
     * {
-      -webkit-touch-callout: none;
+      -webkit-touch-callout: none !important;
       -webkit-user-select: none;
-      user-select: none; 
+      user-select: none;
+
+      overscroll-behavior: none;
+    }
+
+    a {
+        -webkit-user-drag: none;
     }
 `;
 
