@@ -1,4 +1,4 @@
-import { HistoryEvent } from './HistoryEvent';
+import { HistoryEvent, HistoryGridTimeCell } from './HistoryEvent';
 import { SpinnerRing } from '../../Icon';
 import React, { FC, useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -6,14 +6,11 @@ import { GenericActivity } from '../../../state/activity';
 import { MixedActivity } from '../../../state/mixedActivity';
 import { ActionData, ActivityNotification } from '../../activity/ton/ActivityNotification';
 
-const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
-    display: grid;
-    grid-template-columns: 152px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
-    column-gap: 8px;
-    padding: 0 1rem;
+const ContainerQuery = styled.div`
+    container-type: inline-size;
 `;
 
-const GridSizer = styled.div`
+const GridSizer1 = styled.div`
     height: 0;
 `;
 
@@ -25,6 +22,33 @@ const GridSizer2 = styled.div`
 const GridSizer3 = styled.div`
     height: 0;
     min-width: 120px;
+`;
+
+const GridSizer4 = styled.div`
+    height: 0;
+`;
+
+const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
+    display: grid;
+    grid-template-columns: 152px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
+    column-gap: 8px;
+    padding: 0 1rem;
+
+    @container (max-width: 800px) {
+        grid-template-columns: fit-content(256px) fit-content(256px) minmax(40px, 1fr);
+
+        ${HistoryGridTimeCell} {
+            grid-column: 1 / -1;
+
+            &:empty {
+                display: none;
+            }
+        }
+
+        ${GridSizer1} {
+            grid-column: 1 / -1;
+        }
+    }
 `;
 
 const FetchingRows = styled.div`
@@ -59,15 +83,21 @@ const HistoryEvents: FC<{
     setSelectedActivity: React.Dispatch<React.SetStateAction<ActionData | undefined>>;
 }> = ({ className, aggregatedActivity, setSelectedActivity }) => {
     return (
-        <HistoryEventsGrid className={className}>
-            <GridSizer />
-            <GridSizer2 />
-            <GridSizer3 />
-            <GridSizer />
-            {aggregatedActivity.map(group => (
-                <HistoryEvent group={group} key={group.key} onActionClick={setSelectedActivity} />
-            ))}
-        </HistoryEventsGrid>
+        <ContainerQuery>
+            <HistoryEventsGrid className={className}>
+                <GridSizer1 />
+                <GridSizer2 />
+                <GridSizer3 />
+                <GridSizer4 />
+                {aggregatedActivity.map(group => (
+                    <HistoryEvent
+                        group={group}
+                        key={group.key}
+                        onActionClick={setSelectedActivity}
+                    />
+                ))}
+            </HistoryEventsGrid>
+        </ContainerQuery>
     );
 };
 

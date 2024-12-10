@@ -17,7 +17,7 @@ import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
-    min-width: 640px;
+    min-width: 580px;
 `;
 
 const HeaderButtons = styled.div`
