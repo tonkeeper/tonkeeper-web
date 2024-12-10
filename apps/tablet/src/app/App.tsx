@@ -92,7 +92,7 @@ import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { PullToRefresh } from "./components/PullToRefresh";
-import { TabletNotifications } from "../libs/tablet-notifications";
+import { TabletNotifications } from "../libs/tabletNotifications";
 
 const queryClient = new QueryClient({
     defaultOptions: {

@@ -52,10 +52,9 @@ export class TabletNotifications implements NotificationService {
         const token = await requestPushPermission();
 
         const endpoint = `${this.baseUrl}/v1/internal/pushes/plain/subscribe`;
-        const accounts = { address: wallet.rawAddress }
         const deviceId = await Device.getId();
 
-        await (await fetch(endpoint, {
+        const result = await (await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -63,10 +62,14 @@ export class TabletNotifications implements NotificationService {
             body: JSON.stringify({
                 locale:  (await Device.getLanguageCode()).value,
                 device: deviceId.identifier,
-                accounts,
+                accounts: [{ address: wallet.rawAddress }],
                 token
             }),
         })).json();
+
+        if (!result.ok) {
+            throw new Error('Subscribe failed due to API error');
+        }
 
         const records = await this.getRecords();
         records[wallet.rawAddress] = true;
@@ -76,7 +79,7 @@ export class TabletNotifications implements NotificationService {
         const deviceId = await Device.getId();
         const endpoint = `${this.baseUrl}/v1/internal/pushes/plain/unsubscribe`;
 
-        await (await fetch(endpoint, {
+        const result = await (await fetch(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -86,6 +89,10 @@ export class TabletNotifications implements NotificationService {
                 accounts: address ? [{ address }] : undefined
             }),
         })).json();
+
+        if (!result.ok) {
+            throw new Error('Unsubscribe failed due to API error');
+        }
 
         let records = await this.getRecords();
         if (address) {
