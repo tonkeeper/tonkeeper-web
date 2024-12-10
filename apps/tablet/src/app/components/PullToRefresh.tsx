@@ -2,7 +2,10 @@ import styled from "styled-components";
 import { useState, useCallback, useEffect, FC } from "react";
 import { RefreshIcon } from "@tonkeeper/uikit/dist/components/Icon";
 
-export const THRESHOLD = 64;
+const THRESHOLD = 300;
+const INITIAL_SHIFT = 4;
+const SHIFT_LIMIT = 16;
+const PULL_RESISTANCE_KOEF = 0.2;
 
 export function usePullToRefresh(onRefresh:() => Promise<void> ) {
   const [startY, setStartY] = useState(0);
@@ -19,13 +22,20 @@ export function usePullToRefresh(onRefresh:() => Promise<void> ) {
     if (startY === 0 || isRefreshing) return;
 
     const y = e.touches[0].clientY;
-    const pull = Math.max(0, Math.min(y - startY, THRESHOLD));
-    setPullProgress(pull / THRESHOLD);
+    let pull = Math.max(0, y - startY);
+
+    if (pull < THRESHOLD) {
+      pull = 0;
+    } else {
+      pull = Math.min(INITIAL_SHIFT + pull * PULL_RESISTANCE_KOEF, SHIFT_LIMIT);
+    }
 
     // Prevent default scrolling while pulling
     if (pull > 0) {
       e.preventDefault();
     }
+
+    setPullProgress(pull);
   }, [startY, isRefreshing]);
 
   const handleTouchEnd = useCallback(async () => {
@@ -64,7 +74,7 @@ export const RefreshContainer = styled.div<{ $pullProgress: number }>`
   position: fixed;
   top: 0;
   left: 50%;
-  transform: translateX(-50%) translateY(${props => props.$pullProgress > 0 ? '16px' : '-100%'});
+  transform: translateX(-50%) translateY(${props => props.$pullProgress > 0 ? props.$pullProgress + 'px' : '-100%'});
   height: 36px;
   width: 36px;
   display: flex;
@@ -78,23 +88,23 @@ export const RefreshContainer = styled.div<{ $pullProgress: number }>`
 `;
 
 export const IconWrapper = styled.div<{ $rotation: number; $isRefreshing: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  transform: rotate(${props => props.$rotation}deg);
-  transition: transform 0.2s;
-  animation: ${props => props.$isRefreshing ? 'spin 1s linear infinite' : 'none'};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    transform: rotate(${props => props.$rotation}deg);
+    transition: transform 0.2s;
+    animation: ${props => props.$isRefreshing ? 'spin 1s linear infinite' : 'none'};
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
     }
-    to {
-      transform: rotate(360deg);
-    }
-  }
 `;
 
 export const PullToRefresh: FC<{ onRefresh: () => Promise<void>}> = ({ onRefresh }) => {
