@@ -67,7 +67,7 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[], vers
             );
 
             tracker.init({
-                application: 'Web-swap-widget',
+                application: 'Swap-widget-web',
                 walletType: toWalletType(activeAccount?.activeTonWallet),
                 activeAccount: activeAccount!,
                 accounts: accounts!,
