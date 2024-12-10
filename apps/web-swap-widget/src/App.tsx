@@ -46,6 +46,17 @@ const queryClient = new QueryClient({
     }
 });
 
+window.tonkeeperStonfi = {
+    address: 'UQDHd3ZKCW3h7OH7F9tTQcWuxpR9s71lW7mv7n2RKl8STkZ5',
+    sendTransaction: async params => {
+        console.log(params);
+        return 'boc';
+    },
+    close: () => {
+        console.log('close');
+    }
+};
+
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web'; // 'web-swap-widget' TODO
 
