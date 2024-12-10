@@ -7,7 +7,7 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { Body1, Body2, Body2Class, Body3, H2Label2Responsive, Label2 } from '../Text';
-import { ButtonResponsiveSize } from '../fields/Button';
+import { Button, ButtonResponsiveSize } from '../fields/Button';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -128,10 +128,11 @@ const LinkStyled = styled(Body3)`
     cursor: pointer;
 `;
 
-export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean }> = ({
-    mnemonic,
-    showMamInfo
-}) => {
+export const WordsGridAndHeaders: FC<{
+    mnemonic: string[];
+    showMamInfo?: boolean;
+    allowCopy?: boolean;
+}> = ({ mnemonic, showMamInfo, allowCopy }) => {
     const { t } = useTranslation();
     const config = useActiveConfig();
     const sdk = useAppSdk();
@@ -168,6 +169,15 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                     </Body1>
                 ))}
             </WorldsGridStyled>
+
+            {allowCopy && (
+                <Button
+                    onClick={() => sdk.copyToClipboard(mnemonic.join(' '), t('copied'))}
+                    marginTop
+                >
+                    {t('recovery_phrase_copy_button')}
+                </Button>
+            )}
         </>
     );
 };

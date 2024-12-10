@@ -99,6 +99,7 @@ export const RecoveryContent: FC<{
             <WordsGridAndHeaders
                 mnemonic={mnemonic}
                 showMamInfo={account?.type === 'mam' && walletId === undefined}
+                allowCopy
             />
         </Wrapper>
     );
