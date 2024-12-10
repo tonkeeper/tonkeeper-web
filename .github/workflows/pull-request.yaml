@@ -27,6 +27,10 @@ jobs:
                       command: make:intel
                       tag: x64
                       dist: /apps/desktop/out/make/squirrel.windows/x64/*Setup.exe
+                    - os: windows-latest
+                      command: make:x86
+                      tag: x86
+                      dist: /apps/desktop/out/make/squirrel.windows/ia32/*Setup.exe
                     - os: macos-13
                       command: make:intel
                       tag: x64
@@ -100,7 +104,7 @@ jobs:
 
             - name: Upload zip distributives to artifacts
               uses: actions/upload-artifact@v4
-              if: runner.os == 'Windows'
+              if: runner.os == 'Windows' && matrix.tag == 'x64'
               with:
                   name: Tonkeeper Desktop ${{ runner.os }} x64 archive
                   retention-days: 10
