@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 //send usdt from token screen + confirm successful transaction as soon as Done is visibleS
+test.setTimeout(4 * 60 * 1000);
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/');

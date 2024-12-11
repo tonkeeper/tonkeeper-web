@@ -27,6 +27,10 @@ on:
                 required: true
             FAKE_MNEMONIC:
                 required: true
+            OKX_MNEMONIC_12:
+                required: true
+            BITGET_MNEMONIC_24:
+                required: true
 
 env:
     node-version: lts/*
@@ -80,6 +84,8 @@ jobs:
                   TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
                   TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
                   FAKE_MNEMONIC: ${{ secrets.FAKE_MNEMONIC }}
+                  OKX_MNEMONIC_12: ${{ secrets.OKX_MNEMONIC_12 }}
+                  BITGET_MNEMONIC_24: ${{ secrets.BITGET_MNEMONIC_24 }}
               run: npx playwright test --project='chromium'
 
             - name: Comment Playwright report
