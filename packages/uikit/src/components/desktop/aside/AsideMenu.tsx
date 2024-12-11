@@ -11,7 +11,7 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useMutateActiveTonWallet } from '../../../state/wallet';
+import { useActiveWallet, useMutateActiveTonWallet } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -125,26 +125,41 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
         `}
 `;
 
+const shouldNavigateHome = (pathname: string) => {
+    const navigateHomeFromRoutes = [
+        AppProRoute.dashboard,
+        AppRoute.settings,
+        AppRoute.browser,
+        AppRoute.accountSettings
+    ];
+    return navigateHomeFromRoutes.some(path => pathname.startsWith(path));
+};
+
 export const AsideMenuDNDItem = forwardRef<
     HTMLDivElement,
     {
         item: Account | AccountsFolder;
-        mightBeHighlighted: boolean;
         isDragging: boolean;
     } & DraggableProvidedDraggableProps
->(({ item, mightBeHighlighted, isDragging, ...rest }, fRef) => {
+>(({ item, isDragging, ...rest }, fRef) => {
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
     const location = useLocation();
 
+    const activeRoute = useAsideActiveRoute();
+    const [optimisticActiveRoute, setOptimisticActiveRoute] = useState(activeRoute);
+    useEffect(() => {
+        setOptimisticActiveRoute(activeRoute);
+    }, [activeRoute]);
+
+    const activeWalletId = useActiveWallet().id;
+    const [optimisticWalletId, setOptimisticWalletId] = useState(activeWalletId);
+    useEffect(() => {
+        setOptimisticWalletId(activeWalletId);
+    }, [activeWalletId]);
+
     const handleNavigateHome = useCallback(() => {
-        const navigateHomeFromRoutes = [
-            AppProRoute.dashboard,
-            AppRoute.settings,
-            AppRoute.browser,
-            AppRoute.accountSettings
-        ];
-        if (navigateHomeFromRoutes.some(path => location.pathname.startsWith(path))) {
+        if (shouldNavigateHome(location.pathname)) {
             return navigate(AppRoute.home);
         } else {
             scrollToTop();
@@ -152,8 +167,14 @@ export const AsideMenuDNDItem = forwardRef<
     }, [location.pathname]);
 
     const onClickWallet = useCallback(
-        (walletId: WalletId) => setActiveWallet(walletId).then(handleNavigateHome),
-        [setActiveWallet, handleNavigateHome]
+        (walletId: WalletId) => {
+            if (shouldNavigateHome(location.pathname)) {
+                setOptimisticActiveRoute(undefined);
+            }
+            setOptimisticWalletId(walletId);
+            setActiveWallet(walletId).then(handleNavigateHome);
+        },
+        [setActiveWallet, handleNavigateHome, location.pathname]
     );
 
     if (!item) {
@@ -166,13 +187,15 @@ export const AsideMenuDNDItem = forwardRef<
                 <AsideMenuFolder
                     folder={item}
                     onClickWallet={onClickWallet}
-                    accountMightBeHighlighted={!isDragging && mightBeHighlighted}
+                    accountMightBeHighlighted={!isDragging && !optimisticActiveRoute}
+                    selectedWalletId={optimisticWalletId}
                 />
             ) : (
                 <AsideMenuAccount
                     account={item}
-                    mightBeHighlighted={!isDragging && mightBeHighlighted}
+                    mightBeHighlighted={!isDragging && !optimisticActiveRoute}
                     onClickWallet={onClickWallet}
+                    selectedWalletId={optimisticWalletId}
                 />
             )}
         </DraggingBlock>
@@ -181,8 +204,7 @@ export const AsideMenuDNDItem = forwardRef<
 
 const AccountDNDBlock: FC<{
     items: (Account | AccountsFolder)[];
-    activeRoute: string | undefined;
-}> = ({ activeRoute, items }) => {
+}> = ({ items }) => {
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     return (
@@ -207,7 +229,6 @@ const AccountDNDBlock: FC<{
                                         <AsideMenuDNDItem
                                             ref={p.innerRef}
                                             item={account}
-                                            mightBeHighlighted={!activeRoute}
                                             isDragging={snapshot.isDragging}
                                             {...p.draggableProps}
                                             {...p.dragHandleProps}
@@ -311,7 +332,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_discover')}</Label2>
                         </AsideMenuItem>
                     </HideOnReview>
-                    <AccountDNDBlock items={items} activeRoute={activeRoute} />
+                    <AccountDNDBlock items={items} />
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
