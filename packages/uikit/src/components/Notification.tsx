@@ -402,8 +402,12 @@ export const NotificationScrollContext = React.createContext<HTMLDivElement | nu
 const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; entered: boolean }>> =
     React.memo(({ children, handleClose, entered }) => {
         const scrollRef = useRef<HTMLDivElement>(null);
+        const isFullWidthMode = useIsFullWidthMode();
 
         useEffect(() => {
+            if (isFullWidthMode) {
+                return;
+            }
             const element = scrollRef.current;
 
             if (!element) return;
@@ -456,7 +460,7 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
                 window.removeEventListener('touchend', handleClose);
                 window.removeEventListener('touchcancel', handleClose);
             };
-        }, [scrollRef, handleClose]);
+        }, [scrollRef, handleClose, isFullWidthMode]);
 
         return (
             <OverlayWrapper ref={scrollRef} entered={entered}>

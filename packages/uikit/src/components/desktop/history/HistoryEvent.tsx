@@ -18,13 +18,15 @@ const EventDivider = styled.div`
     margin: 0 -1rem;
 `;
 
-const HistoryDateCell = styled(HistoryGridCell)`
+export const HistoryGridTimeCell = styled(HistoryGridCell)``;
+
+const HistoryDateCell = styled(HistoryGridTimeCell)`
     display: flex;
     align-items: center;
     color: ${p => p.theme.textSecondary};
 `;
 
-const PendingEventCell = styled(HistoryGridCell)`
+const PendingEventCell = styled(HistoryGridTimeCell)`
     display: flex;
     align-items: center;
     gap: 6px;

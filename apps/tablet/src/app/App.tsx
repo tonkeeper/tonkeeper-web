@@ -91,8 +91,8 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
-import { ActionPerformed, PushNotifications, PushNotificationSchema, Token } from '@capacitor/push-notifications';
 import { PullToRefresh } from "./components/PullToRefresh";
+import { TabletNotifications } from "../libs/tabletNotifications";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -128,6 +128,18 @@ const GlobalStyle = createGlobalStyle`
       cursor: pointer;
       outline: inherit;
     }
+    
+    * {
+      -webkit-touch-callout: none !important;
+      -webkit-user-select: none;
+      user-select: none;
+
+      overscroll-behavior: none;
+    }
+
+    a {
+        -webkit-user-drag: none;
+    }
 `;
 
 const sdk = new TabletAppSdk();
@@ -157,43 +169,6 @@ export const Providers = () => {
     useEffect(() => {
         document.body.classList.add(TABLET_APPLICATION_ID);
     }, []);
-
-    /**
-     * TODO remove
-     */
-    useEffect(() => {
-        PushNotifications.requestPermissions().then((result) => {
-            if (result.receive === 'granted') {
-                // Register with Apple / Google to receive push via APNS/FCM
-                PushNotifications.register();
-            } else {
-                // Show some error
-            }
-        });
-
-        // On success, we should be able to receive notifications
-        PushNotifications.addListener('registration', (token: Token) => {
-            alert('Push registration success, token: ' + token.value);
-        });
-
-        // Some issue with our setup and push will not work
-        PushNotifications.addListener('registrationError', (error: any) => {
-            alert('Error on registration: ' + JSON.stringify(error));
-        });
-
-        // Show us the notification payload if the app is open on our device
-        PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-            alert('Push received: ' + JSON.stringify(notification));
-        });
-
-        // Method called when tapping on a notification
-        PushNotifications.addListener('pushNotificationActionPerformed', (notification: ActionPerformed) => {
-            alert('Push action performed: ' + JSON.stringify(notification));
-        });
-    }, []);
-    /**
-     * TODO remove
-     */
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -319,7 +294,7 @@ export const Loader: FC = () => {
         build: sdk.version,
         network,
         lang,
-        platform: 'desktop' // TODO TABLET_APPLICATION_ID
+        platform: TABLET_APPLICATION_ID
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
@@ -334,6 +309,12 @@ export const Loader: FC = () => {
             );
         }
     }, [lang, i18n]);
+
+    useEffect(() => {
+        if (config && config.mainnetConfig.tonapiIOEndpoint) {
+            sdk.notifications = new TabletNotifications(config.mainnetConfig, sdk.storage);
+        }
+    }, [config]);
 
     if (
         activeWalletLoading ||
