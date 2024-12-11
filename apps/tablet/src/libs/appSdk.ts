@@ -1,17 +1,19 @@
 import {
     BaseApp,
+    CookieService,
     IAppSdk,
     KeychainPassword,
-    TouchId,
-    CookieService, NotificationService
+    NotificationService,
+    TouchId
 } from "@tonkeeper/core/dist/AppSdk";
-import packageJson from '../../package.json';
-import { TabletStorage } from './storage';
-import { Clipboard } from '@capacitor/clipboard';
-import { getWindow } from './utils';
+import packageJson from "../../package.json";
+import { TabletStorage } from "./storage";
+import { Clipboard } from "@capacitor/clipboard";
+import { getWindow } from "./utils";
 import { Biometric, SecureStorage } from "./plugins";
 import { CapacitorCookies } from "@capacitor/core";
-import { Device } from '@capacitor/device';
+import { Device } from "@capacitor/device";
+import { Haptics, NotificationType } from "@capacitor/haptics";
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -79,6 +81,10 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
     version = packageJson.version ?? 'Unknown';
 
     targetEnv = TABLET_APPLICATION_ID;
+
+    hapticNotification = (type: 'success' | 'error') => {
+        return Haptics.notification({type: type === 'success' ? NotificationType.Success : NotificationType.Error});
+    };
 }
 
 export const getTabletOS = async ()=> {
