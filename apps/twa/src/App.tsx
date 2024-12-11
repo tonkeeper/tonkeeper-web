@@ -53,7 +53,7 @@ import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'reac
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
-import StandardErrorBoundary from './components/ErrorBoundary';
+import StandardErrorBoundary from '@tonkeeper/uikit/dist/components/ErrorBoundary';
 import { InitDataLogger } from './components/InitData';
 import { TwaReceiveNotification } from './components/ReceiveNotifications';
 import { TwaQrScanner } from './components/TwaQrScanner';

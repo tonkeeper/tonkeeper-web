@@ -36,6 +36,7 @@ import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
 import { AccountTonWatchOnly } from '@tonkeeper/core/dist/entries/account';
 import { getTonkeeperInjectionContext } from './libs/tonkeeper-injection-context';
 import { Address } from '@ton/core';
+import StandardErrorBoundary from '@tonkeeper/uikit/src/components/ErrorBoundary';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -49,7 +50,15 @@ const queryClient = new QueryClient({
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'swap-widget-web';
 
-export const App: FC = () => {
+export const App = () => {
+    return (
+        <StandardErrorBoundary>
+            <SwapWidget />
+        </StandardErrorBoundary>
+    );
+};
+
+const SwapWidget: FC = () => {
     const { t: tSimple, i18n } = useTranslation();
 
     const t = useTWithReplaces(tSimple);
