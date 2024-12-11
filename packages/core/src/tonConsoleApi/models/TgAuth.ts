@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -10,5 +10,6 @@ export type TgAuth = {
     username?: string;
     hash: string;
     auth_date: number;
+    referral_id?: string;
 };
 

@@ -17,13 +17,13 @@ import {
     FiatCurrencies as FiatCurrenciesGenerated,
     InvoiceStatus,
     InvoicesInvoice,
-    Lang,
     ProServiceDashboardCellAddress,
     ProServiceDashboardCellNumericCrypto,
     ProServiceDashboardCellNumericFiat,
     ProServiceDashboardCellString,
     ProServiceDashboardColumnType,
-    ProServiceService
+    ProServiceService,
+    OpenAPI
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
@@ -81,7 +81,18 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
+const attachProAuthToken = async (storage: IStorage) => {
+    const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
+    OpenAPI.TOKEN = token ?? undefined;
+};
+
+const updateProAuthToken = async (storage: IStorage, token: string | null) => {
+    await storage.set(AppKey.PRO_AUTH_TOKEN, token);
+    return attachProAuthToken(storage);
+};
+
 export const loadProState = async (storage: IStorage): Promise<ProState> => {
+    await attachProAuthToken(storage);
     const user = await ProServiceService.proServiceGetUserInfo();
 
     let authorizedWallet: ProStateWallet | null = null;
@@ -147,16 +158,8 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
     };
 };
 
-export const checkAuthCookie = async () => {
-    try {
-        await ProServiceService.proServiceVerify();
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-
 export const authViaTonConnect = async (
+    storage: IStorage,
     api: APIConfig,
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
@@ -187,13 +190,17 @@ export const authViaTonConnect = async (
     if (!result.ok) {
         throw new Error('Unable to authorize');
     }
+
+    await updateProAuthToken(storage, result.auth_token);
 };
 
-export const logoutTonConsole = async () => {
+export const logoutTonConsole = async (storage: IStorage) => {
     const result = await ProServiceService.proServiceLogout();
     if (!result.ok) {
         throw new Error('Unable to logout');
     }
+
+    await updateProAuthToken(storage, null);
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
@@ -260,12 +267,16 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export async function startProServiceTrial(botId: string, lang?: string) {
+export async function startProServiceTrial(storage: IStorage, botId: string, lang?: string) {
     const tgData = await loginViaTG(botId, lang);
     if (!tgData) {
         return false;
     }
-    return (await ProServiceService.proServiceTrial(tgData)).ok;
+    const result = await ProServiceService.proServiceTrial(tgData);
+
+    await updateProAuthToken(storage, result.auth_token);
+
+    return result.ok;
 }
 
 export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {
@@ -281,6 +292,11 @@ export async function getDashboardColumns(lang?: string): Promise<DashboardColum
         defaultIsChecked: item.checked_default,
         onlyPro: item.only_pro
     }));
+}
+
+enum Lang {
+    EN = 'en',
+    RU = 'ru'
 }
 
 export async function getDashboardData(

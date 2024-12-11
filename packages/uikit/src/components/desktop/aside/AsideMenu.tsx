@@ -107,7 +107,7 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
     cursor: pointer !important;
     border-radius: ${p => p.theme.corner2xSmall};
     overflow: hidden;
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color 0.1s ease-in-out;
     ${p =>
         p.$isDragging &&
         css`
@@ -166,12 +166,12 @@ export const AsideMenuDNDItem = forwardRef<
                 <AsideMenuFolder
                     folder={item}
                     onClickWallet={onClickWallet}
-                    accountMightBeHighlighted={mightBeHighlighted}
+                    accountMightBeHighlighted={!isDragging && mightBeHighlighted}
                 />
             ) : (
                 <AsideMenuAccount
                     account={item}
-                    mightBeHighlighted={mightBeHighlighted}
+                    mightBeHighlighted={!isDragging && mightBeHighlighted}
                     onClickWallet={onClickWallet}
                 />
             )}
