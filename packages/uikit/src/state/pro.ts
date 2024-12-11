@@ -81,6 +81,7 @@ export const useSelectWalletForProMutation = () => {
         }
 
         await authViaTonConnect(
+            sdk.storage,
             api,
             wallet,
             signTonConnectOver({ sdk, accountId: account.id, wallet, t, checkTouchId })
@@ -92,8 +93,9 @@ export const useSelectWalletForProMutation = () => {
 
 export const useProLogout = () => {
     const client = useQueryClient();
+    const sdk = useAppSdk();
     return useMutation(async () => {
-        await logoutTonConsole();
+        await logoutTonConsole(sdk.storage);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
@@ -173,9 +175,11 @@ export const useActivateTrialMutation = () => {
     const {
         i18n: { language }
     } = useTranslation();
+    const sdk = useAppSdk();
 
     return useMutation<boolean, Error>(async () => {
         const result = await startProServiceTrial(
+            sdk.storage,
             (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
             language
         );
