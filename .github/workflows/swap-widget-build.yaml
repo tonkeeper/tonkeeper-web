@@ -70,7 +70,7 @@ jobs:
                   VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
                   VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
                   VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
+                  VITE_APP_STONFI_REFERRAL_ADDRESS: UQCV6ZyNxqQ4Um30lhk2_1EgnzB6KMN8bHgxDOFAq3irZfgx
               with:
                   cmd: build:swap-widget
 
