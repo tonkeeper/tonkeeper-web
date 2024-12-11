@@ -11,6 +11,7 @@ import { useSwapFromAsset, useSwapToAsset } from '@tonkeeper/uikit/dist/state/sw
 import { useAllSwapAssets } from '@tonkeeper/uikit/dist/state/swap/useSwapAssets';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Address } from '@ton/core';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -80,11 +81,17 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[], vers
     );
 };
 
-export const useApplyQueryParams = () => {
+export const useApplyQueryParams = (sdk: IAppSdk) => {
     const [_, setFromAsset] = useSwapFromAsset();
     const [__, setToAsset] = useSwapToAsset();
-    const { data: allAssets } = useAllSwapAssets();
+    const { data: allAssets, error } = useAllSwapAssets();
     const [isApplied, setIsApplied] = useState(false);
+
+    useEffect(() => {
+        if (error instanceof Error) {
+            sdk.topMessage(error.message);
+        }
+    }, [error]);
 
     useEffect(() => {
         if (!allAssets || isApplied) {

@@ -246,7 +246,7 @@ const Content: FC<{
     useKeyboardHeight();
     useTrackLocation();
     useDebuggingTools();
-    const isApplied = useApplyQueryParams();
+    const isApplied = useApplyQueryParams(sdk);
 
     if (!isApplied) {
         return null;
