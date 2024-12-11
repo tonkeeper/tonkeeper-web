@@ -1,4 +1,4 @@
-name: Tonkeeper Pull-Request
+name: PR
 on:
     workflow_dispatch:
     pull_request:
@@ -261,6 +261,12 @@ jobs:
 
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
+        secrets: inherit
+
+    swap-widget-build:
+        uses: ./.github/workflows/swap-widget-build.yaml
+        with:
+            environment: ${{ github.head_ref }}
         secrets: inherit
 
     web-tests:
