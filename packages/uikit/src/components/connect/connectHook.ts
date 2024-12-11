@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     ConnectItemReply,
     DAppManifest,
-    TonConnectTransactionPayload
+    SendTransactionAppRequest
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
@@ -12,10 +12,7 @@ import {
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import {
-    AccountConnection,
-    TonConnectParams
-} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -114,12 +111,6 @@ export const useResponseConnectionMutation = () => {
         }
     );
 };
-
-export interface SendTransactionAppRequest {
-    id: string;
-    connection: AccountConnection;
-    payload: TonConnectTransactionPayload;
-}
 
 export interface ResponseSendProps {
     request: SendTransactionAppRequest;

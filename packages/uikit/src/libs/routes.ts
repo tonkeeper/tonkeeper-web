@@ -56,7 +56,8 @@ export enum WalletSettingsRoute {
     nft = '/nft',
     connectedApps = '/connected-apps',
     derivations = '/derivations',
-    battery = '/battery'
+    battery = '/battery',
+    notification = '/notification'
 }
 
 export enum BrowserRoute {

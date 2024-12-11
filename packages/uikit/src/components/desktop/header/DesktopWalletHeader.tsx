@@ -21,6 +21,8 @@ import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderEle
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useIsOnIosReview } from '../../../hooks/ios';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -50,6 +52,7 @@ const LinkStyled = styled(Link)`
 `;
 
 const DesktopWalletHeaderPayload = () => {
+    const isOnReview = useIsOnIosReview();
     usePreFetchRates();
     const { data: balance, isLoading } = useWalletTotalBalance();
     const sdk = useAppSdk();
@@ -92,12 +95,14 @@ const DesktopWalletHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                    {network !== Network.TESTNET && (
-                        <ButtonStyled size="small" onClick={onOpen}>
-                            <PlusIconSmall />
-                            {t('wallet_buy')}
-                        </ButtonStyled>
-                    )}
+                    <HideOnReview>
+                        {network !== Network.TESTNET && (
+                            <ButtonStyled size="small" onClick={onOpen}>
+                                <PlusIconSmall />
+                                {t('wallet_buy')}
+                            </ButtonStyled>
+                        )}
+                    </HideOnReview>
                 </ButtonsContainer>
             </DesktopRightPart>
 

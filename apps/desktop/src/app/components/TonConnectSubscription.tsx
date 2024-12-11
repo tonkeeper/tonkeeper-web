@@ -1,7 +1,4 @@
-import {
-    useResponseSendMutation,
-    SendTransactionAppRequest
-} from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { useResponseSendMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
 import { useSendNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useCallback, useEffect, useState } from 'react';
@@ -10,6 +7,7 @@ import {
     useDisconnectTonConnectApp
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { sendBackground } from '../../libs/backgroudService';
+import { SendTransactionAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);

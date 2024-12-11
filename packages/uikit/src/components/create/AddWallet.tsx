@@ -17,6 +17,7 @@ import {
     WalletTestnetIcon
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const AddMethod = styled.button`
     display: flex;
@@ -172,7 +173,9 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                         <AddMethodText>
                             <AddMethodLabel>
                                 {t('add_wallet_new_multisig_title')}{' '}
-                                <Badge color="accentBlue">PRO</Badge>
+                                <HideOnReview>
+                                    <Badge color="accentBlue">PRO</Badge>
+                                </HideOnReview>
                             </AddMethodLabel>
                             <AddMethodDescription>
                                 {t('add_wallet_new_multisig_description')}

@@ -5,7 +5,7 @@ import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop';
+    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -80,6 +80,7 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
+    isOnReview?: boolean;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';
