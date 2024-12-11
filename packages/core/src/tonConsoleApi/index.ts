@@ -7,7 +7,7 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { account } from './models/Account';
+export type { Account, account } from './models/Account';
 export type { appID } from './models/appID';
 export type { AppTier } from './models/AppTier';
 export type { Balance } from './models/Balance';

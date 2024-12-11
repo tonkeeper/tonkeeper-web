@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { account } from '../models/Account';
+import type { Account } from '../models/Account';
 import type { URL } from '../models/URL';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -17,7 +17,7 @@ export class MinterJettonMediaService {
     public static getJettonsByOwner(
         address: string,
     ): CancelablePromise<{
-        items: Array<account>;
+        items: Array<Account>;
     }> {
         return __request(OpenAPI, {
             method: 'GET',

@@ -6,3 +6,4 @@
  * Account
  */
 export type account = string;
+export type Account = string;

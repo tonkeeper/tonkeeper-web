@@ -10,7 +10,7 @@
         "sdk": "npm-run-all -p generate:*",
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
         "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
-        "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUODH27UDR7JHB2VQH3UZ2YJY5A' --output ./src/tonConsoleApi",
+        "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUOCGQXJBM2BFNOB6XREZ2ZZZCA' --output ./src/tonConsoleApi",
         "generate:swapsApi": "rm -r ./src/swapsApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/swaps-backend/master/swagger.yaml?token=GHSAT0AAAAAACJYQUODBKR67AB7WULZBFWEZSUUGFQ' --output ./src/swapsApi",
         "generate:batteryApi": "rm -fr ./src/batteryApi && docker build -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
         "build:pkg": "yarn build"
