@@ -44,9 +44,9 @@ export const Accordion: FC<PropsWithChildren<{ isOpened: boolean; transitionMS?:
     useEffect(() => {
         clearTimeout(timeoutRef.current);
         if (isOpened) {
-            setIsAnimationCompleted(false);
-        } else {
             timeoutRef.current = setTimeout(() => setIsAnimationCompleted(true), 200);
+        } else {
+            setIsAnimationCompleted(false);
         }
     }, [isOpened]);
 
