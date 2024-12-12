@@ -38,6 +38,8 @@ export class CookieTablet implements CookieService {
 }
 
 export class TouchIdTablet implements TouchId {
+    constructor(private alert: (text: string) => void) { }
+
     canPrompt = async () => {
         try {
             const result = await Biometric.canPrompt();
@@ -49,7 +51,14 @@ export class TouchIdTablet implements TouchId {
     };
 
     prompt = async (reason: (lang: string) => string) => {
-        return Biometric.prompt(reason('en'));
+        try {
+            return await Biometric.prompt(reason('en'));
+        } catch (e) {
+            if (e && typeof e === 'object' && 'message' in e && typeof e.message === 'string') {
+                this.alert(e.message);
+            }
+            throw e;
+        }
     };
 }
 
@@ -63,7 +72,7 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
      */
     notifications: NotificationService | undefined = undefined;
 
-    touchId = new TouchIdTablet();
+    touchId = new TouchIdTablet(this.topMessage.bind(this));
 
     constructor() {
         super(new TabletStorage());
