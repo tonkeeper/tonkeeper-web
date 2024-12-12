@@ -1,4 +1,8 @@
 import { getWindow } from '@tonkeeper/core/dist/service/telegramOauth';
+import {
+    TON_CONNECT_MSG_VARIANTS_ID,
+    TonConnectTransactionPayloadMessage
+} from '@tonkeeper/core/dist/entries/tonConnect';
 
 type UserFriendlyAddress = string;
 type TimestampMS = number;
@@ -14,6 +18,9 @@ export type TonkeeperInjection = {
             amount: string;
             payload?: string;
         }[];
+        messagesVariants?: Partial<
+            Record<TON_CONNECT_MSG_VARIANTS_ID, TonConnectTransactionPayloadMessage[]>
+        >;
     }) => Promise<string>;
 };
 

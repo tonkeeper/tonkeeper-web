@@ -43,7 +43,7 @@ export function useEncodeSwap() {
     });
 }
 
-export function useEncodeSwapToTonConnectParams(options: { ignoreBattery?: boolean } = {}) {
+export function useEncodeSwapToTonConnectParams(options: { forceCalculateBattery?: boolean } = {}) {
     const { mutateAsync: encode } = useEncodeSwap();
     const { data: batteryBalance } = useBatteryBalance();
     const { excessAccount: batteryExcess } = useBatteryServiceConfig();
@@ -53,10 +53,13 @@ export function useEncodeSwapToTonConnectParams(options: { ignoreBattery?: boole
         async swap => {
             const resultsPromises = [encode(swap)];
 
-            const batterySwapsEnabled =
-                (activeWalletConfig ? activeWalletConfig.batterySettings.enabledForSwaps : true) &&
-                !options.ignoreBattery;
-            if (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled) {
+            const batterySwapsEnabled = activeWalletConfig
+                ? activeWalletConfig.batterySettings.enabledForSwaps
+                : true;
+            if (
+                options.forceCalculateBattery ||
+                (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled)
+            ) {
                 resultsPromises.push(
                     encode({ ...swap, excessAddress: Address.parse(batteryExcess).toRawString() })
                 );

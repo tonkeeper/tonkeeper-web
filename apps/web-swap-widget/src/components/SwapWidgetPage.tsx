@@ -54,7 +54,7 @@ const ChangeIconStyled = styled(IconButton)`
 
 export const SwapWidgetPage = () => {
     const { isLoading, mutateAsync: encode } = useEncodeSwapToTonConnectParams({
-        ignoreBattery: true
+        forceCalculateBattery: true
     });
     const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
     const [selectedSwap] = useSelectedSwap();
@@ -75,7 +75,19 @@ export const SwapWidgetPage = () => {
                 address: m.address,
                 amount: m.amount.toString(),
                 payload: m.payload
-            }))
+            })),
+            messagesVariants: params.messagesVariants
+                ? Object.fromEntries(
+                      Object.entries(params.messagesVariants).map(([k, v]) => [
+                          k,
+                          v.map(m => ({
+                              address: m.address,
+                              amount: m.amount.toString(),
+                              payload: m.payload
+                          }))
+                      ])
+                  )
+                : undefined
         }).finally(() => setHasBeenSent(false));
         setHasBeenSent(true);
     };

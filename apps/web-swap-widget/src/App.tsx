@@ -53,7 +53,7 @@ const TARGET_ENV = 'swap-widget-web';
 window.tonkeeperStonfi = {
     address: 'UQD2NmD_lH5f5u1Kj3KfGyTvhZSX0Eg6qp2a5IQUKXxOGzCi',
     sendTransaction: async params => {
-        console.log(params);
+        console.log(JSON.stringify(params));
         return 'boc';
     },
     close: () => {
