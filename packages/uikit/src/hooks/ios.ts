@@ -23,5 +23,5 @@ export function hideIosKeyboard() {
 
 export const useIsOnIosReview = () => {
     const { mainnetConfig } = useAppContext();
-    return Boolean(mainnetConfig.isOnReview);
+    return Boolean(mainnetConfig.tablet_enable_additional_security);
 };

@@ -80,7 +80,11 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
-    isOnReview?: boolean;
+
+    /**
+     * "secret" flag name to determine if the app is on ios review
+     */
+    tablet_enable_additional_security?: boolean;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

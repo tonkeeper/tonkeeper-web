@@ -49,6 +49,7 @@ import { Input } from '../fields/Input';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ConfirmView } from '../transfer/ConfirmView';
 import { useNotifyError } from '../../hooks/useNotification';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const Block = styled.div`
     display: flex;
@@ -451,11 +452,11 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 
 export const ProSettings: FC = () => {
     return (
-        <>
+        <HideOnReview>
             <SubHeader />
             <InnerBody>
                 <ProSettingsContent />
             </InnerBody>
-        </>
+        </HideOnReview>
     );
 };

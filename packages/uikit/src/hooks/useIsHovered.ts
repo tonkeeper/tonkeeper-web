@@ -1,5 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { useEventListener } from './useEventListener';
+import { isTouchDevice } from '../libs/web';
+
+const isTouchScreen = isTouchDevice();
 
 export const useIsHovered = <T extends HTMLElement = HTMLElement>() => {
     const [isHovered, setIsHovered] = useState(false);
@@ -8,8 +11,16 @@ export const useIsHovered = <T extends HTMLElement = HTMLElement>() => {
     const handleMouseEnter = useCallback(() => setIsHovered(true), []);
     const handleMouseLeave = useCallback(() => setIsHovered(false), []);
 
-    useEventListener('mouseenter', handleMouseEnter, ref);
-    useEventListener('mouseleave', handleMouseLeave, ref);
+    useEventListener(
+        ...((isTouchScreen ? [] : ['mouseenter', handleMouseEnter, ref]) as Parameters<
+            typeof useEventListener
+        >)
+    );
+    useEventListener(
+        ...((isTouchScreen ? [] : ['mouseleave', handleMouseLeave, ref]) as Parameters<
+            typeof useEventListener
+        >)
+    );
 
     return { isHovered, ref };
 };

@@ -5,7 +5,7 @@ import { hexToRGBA } from '../../libs/css';
  * Need to be a 'div' instead of 'button' to provide correct dnd behavior
  */
 export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
-    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundContent)};
+    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'transparent')};
     border-radius: ${p => p.theme.corner2xSmall};
     box-sizing: border-box;
     cursor: pointer;
@@ -24,9 +24,9 @@ export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
         overflow: hidden;
     }
 
-    transition: background-color 0.15s ease-in-out;
-
-    &:hover {
-        background: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.56)};
+    @media (pointer: fine) {
+        &:hover {
+            background: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.56)};
+        }
     }
 `;
