@@ -15,7 +15,6 @@ import { useMemo } from 'react';
 import { SlidersIcon } from '../../components/Icon';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useWalletFilteredNftList } from '../../state/nft';
-import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -72,11 +71,7 @@ const SettingsButtonStyled = styled(IconButtonTransparentBackground)`
 `;
 
 export const DesktopCollectables = () => {
-    return (
-        <HideOnReview>
-            <DesktopCollectablesContent />
-        </HideOnReview>
-    );
+    return <DesktopCollectablesContent />;
 };
 
 export const DesktopCollectablesContent = () => {

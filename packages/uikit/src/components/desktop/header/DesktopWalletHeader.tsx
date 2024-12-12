@@ -73,14 +73,16 @@ const DesktopWalletHeaderPayload = () => {
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
-                        <LinkStyled to={AppProRoute.multiSend}>
-                            <ButtonStyled size="small">
-                                <ArrowUpIcon />
-                                {t('wallet_multi_send')}
-                            </ButtonStyled>
-                        </LinkStyled>
-                    )}
+                    <HideOnReview>
+                        {!isReadOnly && isStandardTonWallet(activeWallet) && (
+                            <LinkStyled to={AppProRoute.multiSend}>
+                                <ButtonStyled size="small">
+                                    <ArrowUpIcon />
+                                    {t('wallet_multi_send')}
+                                </ButtonStyled>
+                            </LinkStyled>
+                        )}
+                    </HideOnReview>
                     <ButtonStyled
                         size="small"
                         onClick={() => {
