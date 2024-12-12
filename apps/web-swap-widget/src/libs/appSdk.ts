@@ -2,7 +2,7 @@ import { BaseApp } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
-import { BrowserStorage } from './storage';
+import { SwapWidgetStorage } from './storage';
 
 function iOS() {
     return (
@@ -16,7 +16,7 @@ function iOS() {
 
 export class BrowserAppSdk extends BaseApp {
     constructor() {
-        super(new BrowserStorage());
+        super(new SwapWidgetStorage());
     }
 
     copyToClipboard = (value: string, notification?: string) => {
