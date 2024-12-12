@@ -96,23 +96,23 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.purchases}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
-            <NavLink to={AppRoute.dns}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
             <HideOnReview>
+                <NavLink to={AppRoute.purchases}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SaleBadgeIcon />
+                            <Label2>{t('wallet_aside_collectibles')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                <NavLink to={AppRoute.dns}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 {!isReadOnly && !isTestnet && (
                     <NavLink to={AppRoute.swap}>
                         {({ isActive }) => (
@@ -135,7 +135,7 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             )}
-            {canUseBattery && <BatterySettingsListItem />}
+            <HideOnReview>{canUseBattery && <BatterySettingsListItem />}</HideOnReview>
             <NavLink to={AppRoute.walletSettings} end>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
