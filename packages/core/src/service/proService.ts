@@ -22,8 +22,7 @@ import {
     ProServiceDashboardCellNumericFiat,
     ProServiceDashboardCellString,
     ProServiceDashboardColumnType,
-    ProServiceService,
-    OpenAPI
+    ProServiceService
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
@@ -44,9 +43,12 @@ export const getBackupState = async (storage: IStorage) => {
     return backup ?? toEmptySubscription();
 };
 
-export const getProState = async (storage: IStorage): Promise<ProState> => {
+export const getProState = async (
+    authTokenService: ProAuthTokenService,
+    storage: IStorage
+): Promise<ProState> => {
     try {
-        return await loadProState(storage);
+        return await loadProState(authTokenService, storage);
     } catch (e) {
         console.error(e);
         return {
@@ -81,18 +83,16 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-const attachProAuthToken = async (storage: IStorage) => {
-    const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
-    OpenAPI.TOKEN = token ?? undefined;
+export type ProAuthTokenService = {
+    attachToken: () => Promise<void>;
+    onTokenUpdated: (token: string | null) => Promise<void>;
 };
 
-const updateProAuthToken = async (storage: IStorage, token: string | null) => {
-    await storage.set(AppKey.PRO_AUTH_TOKEN, token);
-    return attachProAuthToken(storage);
-};
-
-export const loadProState = async (storage: IStorage): Promise<ProState> => {
-    await attachProAuthToken(storage);
+const loadProState = async (
+    authService: ProAuthTokenService,
+    storage: IStorage
+): Promise<ProState> => {
+    await authService.attachToken();
     const user = await ProServiceService.proServiceGetUserInfo();
 
     let authorizedWallet: ProStateWallet | null = null;
@@ -159,7 +159,7 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
 };
 
 export const authViaTonConnect = async (
-    storage: IStorage,
+    authService: ProAuthTokenService,
     api: APIConfig,
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
@@ -191,16 +191,16 @@ export const authViaTonConnect = async (
         throw new Error('Unable to authorize');
     }
 
-    await updateProAuthToken(storage, result.auth_token);
+    await authService.onTokenUpdated(result.auth_token);
 };
 
-export const logoutTonConsole = async (storage: IStorage) => {
+export const logoutTonConsole = async (authService: ProAuthTokenService) => {
     const result = await ProServiceService.proServiceLogout();
     if (!result.ok) {
         throw new Error('Unable to logout');
     }
 
-    await updateProAuthToken(storage, null);
+    await authService.onTokenUpdated(null);
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
@@ -244,9 +244,9 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const retryProService = async (storage: IStorage) => {
+export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
     for (let i = 0; i < 10; i++) {
-        const state = await getProState(storage);
+        const state = await getProState(authService, storage);
         if (state.subscription.valid) {
             return;
         }
@@ -267,14 +267,18 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export async function startProServiceTrial(storage: IStorage, botId: string, lang?: string) {
+export async function startProServiceTrial(
+    authService: ProAuthTokenService,
+    botId: string,
+    lang?: string
+) {
     const tgData = await loginViaTG(botId, lang);
     if (!tgData) {
         return false;
     }
     const result = await ProServiceService.proServiceTrial(tgData);
 
-    await updateProAuthToken(storage, result.auth_token);
+    await authService.onTokenUpdated(result.auth_token);
 
     return result.ok;
 }
