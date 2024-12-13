@@ -72,32 +72,44 @@ export const SwapWidgetPage = () => {
 
         const ctx = getTonkeeperInjectionContext()!;
 
-        ctx.sendTransaction({
-            source: ctx.address,
-            // legacy tonkeeper api, timestamp in ms
-            valid_until: params.valid_until * 1000,
-            messages: params.messages.map(m => ({
-                address: m.address,
-                amount: m.amount.toString(),
-                payload: m.payload
-            })),
-            messagesVariants: params.messagesVariants
-                ? Object.fromEntries(
-                      Object.entries(params.messagesVariants).map(([k, v]) => [
-                          k,
-                          v.map(m => ({
-                              address: m.address,
-                              amount: m.amount.toString(),
-                              payload: m.payload
-                          }))
-                      ])
-                  )
-                : undefined
-        })
-            .then(onOpen)
-            .catch(notifyError)
-            .finally(() => setHasBeenSent(false));
         setHasBeenSent(true);
+        try {
+            const result = await ctx.sendTransaction({
+                source: ctx.address,
+                // legacy tonkeeper api, timestamp in ms
+                valid_until: params.valid_until * 1000,
+                messages: params.messages.map(m => ({
+                    address: m.address,
+                    amount: m.amount.toString(),
+                    payload: m.payload
+                })),
+                messagesVariants: params.messagesVariants
+                    ? Object.fromEntries(
+                          Object.entries(params.messagesVariants).map(([k, v]) => [
+                              k,
+                              v.map(m => ({
+                                  address: m.address,
+                                  amount: m.amount.toString(),
+                                  payload: m.payload
+                              }))
+                          ])
+                      )
+                    : undefined
+            });
+
+            if (!result) {
+                throw new Error('Transaction was not confirmed');
+            }
+
+            onOpen();
+        } catch (e) {
+            if (e && typeof e === 'object' && 'message' in e && typeof e.message === 'string') {
+                notifyError(e.message);
+            } else if (e && typeof e === 'string') {
+                notifyError(e);
+            }
+        }
+        setHasBeenSent(false);
     };
 
     const onChangeFields = () => {

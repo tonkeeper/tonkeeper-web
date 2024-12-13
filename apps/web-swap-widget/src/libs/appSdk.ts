@@ -14,7 +14,9 @@ function iOS() {
     );
 }
 
-export class BrowserAppSdk extends BaseApp {
+export class WidgetAppSdk extends BaseApp {
+    static version = packageJson.version ?? 'Unknown';
+
     constructor() {
         super(new SwapWidgetStorage());
     }
@@ -42,7 +44,7 @@ export class BrowserAppSdk extends BaseApp {
     isStandalone = () =>
         iOS() && ((window.navigator as unknown as { standalone: boolean }).standalone as boolean);
 
-    version = packageJson.version ?? 'Unknown';
+    version = WidgetAppSdk.version;
 
     targetEnv = 'web' as const;
 }

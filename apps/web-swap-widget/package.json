@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/web-swap-widget",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Web swap widget for Tonkeeper",
     "dependencies": {

@@ -23,7 +23,7 @@ import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/d
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserAppSdk } from './libs/appSdk';
+import { WidgetAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useApplyQueryParams, useAppWidth } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
@@ -47,7 +47,7 @@ const queryClient = new QueryClient({
     }
 });
 
-const sdk = new BrowserAppSdk();
+const sdk = new WidgetAppSdk();
 const TARGET_ENV = 'swap-widget-web';
 
 const queryParams = new URLSearchParams(new URL(window.location.href).search);
