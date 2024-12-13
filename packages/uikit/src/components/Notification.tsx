@@ -406,76 +406,13 @@ export const NotificationBackButton: FC<{ onBack: () => void }> = ({ onBack }) =
     );
 };
 
-export const NotificationScrollContext = React.createContext<HTMLDivElement | null>(null);
-
 const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; entered: boolean }>> =
-    React.memo(({ children, handleClose, entered }) => {
+    React.memo(({ children, entered }) => {
         const scrollRef = useRef<HTMLDivElement>(null);
-        const isFullWidthMode = useIsFullWidthMode();
-
-        useEffect(() => {
-            if (isFullWidthMode) {
-                return;
-            }
-            const element = scrollRef.current;
-
-            if (!element) return;
-
-            let lastY = 0;
-            let startY = 0;
-            let maxScrollTop = 0;
-            let startScroll = 0;
-
-            const handlerTouchStart = function (event: TouchEvent) {
-                lastY = startY = event.touches[0].clientY;
-                const style = window.getComputedStyle(element);
-                const outerHeight = ['height', 'padding-top', 'padding-bottom']
-                    .map(key => parseInt(style.getPropertyValue(key)))
-                    .reduce((prev, cur) => prev + cur);
-
-                maxScrollTop = element.scrollHeight - outerHeight;
-                startScroll = element.scrollTop;
-            };
-
-            const handlerTouchMoveElement = function (event: TouchEvent) {
-                const top = event.touches[0].clientY;
-
-                const direction = lastY - top < 0 ? 'down' : 'up';
-                if (event.cancelable) {
-                    if (startScroll >= maxScrollTop && direction === 'up') {
-                        event.preventDefault();
-                    }
-                }
-                lastY = top;
-            };
-
-            const handlerTouchMoveWindow = function (event: TouchEvent) {
-                if (startY === 0) return;
-                const top = event.touches[0].clientY;
-                if (startScroll <= 0 && startY - top < -180) {
-                    window.addEventListener('touchend', handleClose);
-                    window.addEventListener('touchcancel', handleClose);
-                }
-            };
-
-            element.addEventListener('touchstart', handlerTouchStart);
-            element.addEventListener('touchmove', handlerTouchMoveElement);
-            window.addEventListener('touchmove', handlerTouchMoveWindow);
-
-            return () => {
-                element.removeEventListener('touchstart', handlerTouchStart);
-                element.removeEventListener('touchmove', handlerTouchMoveElement);
-                window.removeEventListener('touchmove', handlerTouchMoveWindow);
-                window.removeEventListener('touchend', handleClose);
-                window.removeEventListener('touchcancel', handleClose);
-            };
-        }, [scrollRef, handleClose, isFullWidthMode]);
 
         return (
             <OverlayWrapper ref={scrollRef} entered={entered}>
-                <NotificationScrollContext.Provider value={scrollRef.current}>
-                    {children}
-                </NotificationScrollContext.Provider>
+                {children}
             </OverlayWrapper>
         );
     });
