@@ -26,7 +26,6 @@ const Wrapper = styled.div`
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding-bottom: 46px;
 `;
 
 const CheckmarkCircleIcon = () => {

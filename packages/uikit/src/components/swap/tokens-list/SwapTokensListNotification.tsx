@@ -65,7 +65,7 @@ const SwapTokensListContentWrapper = styled.div`
                   height: 580px;
               `
             : css`
-                  height: calc(var(--app-height) - 6rem);
+                  height: calc(var(--app-height) - 8rem);
               `}
 `;
 

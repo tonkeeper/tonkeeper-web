@@ -27,6 +27,7 @@ import ReactPortal from './ReactPortal';
 import { H2, H3, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
+import { useAppPlatform } from '../hooks/appContext';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -170,7 +171,7 @@ const Splash = styled.div`
     }
 `;
 
-const Content = styled.div<{ standalone: boolean }>`
+const Content = styled.div<{ standalone: boolean; $isInWidget: boolean }>`
     width: 100%;
     background-color: ${props => props.theme.backgroundPage};
     border-top-right-radius: ${props => props.theme.cornerMedium};
@@ -183,6 +184,12 @@ const Content = styled.div<{ standalone: boolean }>`
         props.standalone &&
         css`
             padding-bottom: 2rem;
+        `}
+
+    ${props =>
+        props.$isInWidget &&
+        css`
+            padding-bottom: 46px;
         `}
 
     ${p =>
@@ -585,6 +592,8 @@ export const Notification: FC<{
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
+    const isInWidget = useAppPlatform() === 'swap-widget-web';
+
     return (
         <NotificationContext.Provider
             value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
@@ -607,6 +616,7 @@ export const Notification: FC<{
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                     <Content
+                                        $isInWidget={isInWidget}
                                         standalone={standalone}
                                         ref={containerRef}
                                         className="dialog-content"
