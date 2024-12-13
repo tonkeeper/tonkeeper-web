@@ -1,8 +1,10 @@
 import React, {
+    Children,
     createContext,
     FC,
     forwardRef,
     PropsWithChildren,
+    ReactElement,
     ReactNode,
     useCallback,
     useContext,
@@ -694,7 +696,20 @@ export const NotificationHeader: FC<{ children: ReactNode; className?: string }>
     const isFullWidth = useIsFullWidthMode();
 
     if (!isFullWidth) {
-        return <>{children}</>;
+        return (
+            <>
+                {Children.map(children, child =>
+                    React.isValidElement(child)
+                        ? React.cloneElement<{ className?: string }>(
+                              child as ReactElement<{ className?: string }>,
+                              {
+                                  className: `${child.props.className || ''} ${className}`.trim()
+                              }
+                          )
+                        : child
+                )}
+            </>
+        );
     }
 
     return (

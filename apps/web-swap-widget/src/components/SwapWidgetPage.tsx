@@ -18,6 +18,9 @@ import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { SwapWidgetHeader } from './SwapWidgetHeader';
 import { getTonkeeperInjectionContext } from '../libs/tonkeeper-injection-context';
 import { SwapWidgetFooter } from './SwapWidgetFooter';
+import { SwapWidgetTxSentNotification } from './SwapWidgetTxSent';
+import { useDisclosure } from '@tonkeeper/uikit/dist/hooks/useDisclosure';
+import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
 
 const MainFormWrapper = styled.div`
     height: 100%;
@@ -61,6 +64,8 @@ export const SwapWidgetPage = () => {
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const [toAsset, setToAsset] = useSwapToAsset();
     const [_, setFromAmount] = useSwapFromAmount();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const notifyError = useToast();
 
     const onConfirm = async () => {
         const params = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
@@ -88,7 +93,10 @@ export const SwapWidgetPage = () => {
                       ])
                   )
                 : undefined
-        }).finally(() => setHasBeenSent(false));
+        })
+            .then(onOpen)
+            .catch(notifyError)
+            .finally(() => setHasBeenSent(false));
         setHasBeenSent(true);
     };
 
@@ -113,6 +121,7 @@ export const SwapWidgetPage = () => {
             <Spacer />
             <SwapWidgetFooter />
             <SwapTokensListNotification />
+            <SwapWidgetTxSentNotification isOpen={isOpen} onClose={onClose} />
         </MainFormWrapper>
     );
 };

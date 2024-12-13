@@ -50,17 +50,6 @@ const queryClient = new QueryClient({
 const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'swap-widget-web';
 
-window.tonkeeperStonfi = {
-    address: 'UQD2NmD_lH5f5u1Kj3KfGyTvhZSX0Eg6qp2a5IQUKXxOGzCi',
-    sendTransaction: async params => {
-        console.log(JSON.stringify(params));
-        return 'boc';
-    },
-    close: () => {
-        console.log('close');
-    }
-};
-
 const queryParams = new URLSearchParams(new URL(window.location.href).search);
 
 const queryParamLangKey = (supportedLanguages: string[]) => {
@@ -265,7 +254,7 @@ const Loader: FC = () => {
 
 const Wrapper = styled.div`
     box-sizing: border-box;
-    padding: 0 16px 34px;
+    padding: 0 16px 46px;
     height: 100%;
 `;
 
