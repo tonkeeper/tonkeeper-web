@@ -7,7 +7,7 @@ import {
     WalletSwapAsset
 } from '../../../state/swap/useSwapAssets';
 import { formatFiatCurrency } from '../../../hooks/balance';
-import { useAppContext } from '../../../hooks/appContext';
+import { useAppContext, useAppPlatform } from '../../../hooks/appContext';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { LinkOutIcon, SpinnerIcon } from '../../Icon';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
@@ -203,6 +203,7 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
 }) => {
     const isZeroBalance = swapAsset.assetAmount.relativeAmount.isZero();
     const { fiat } = useAppContext();
+    const platform = useAppPlatform();
 
     let explorerUrl;
     if (isTon(swapAsset.assetAmount.asset.address)) {
@@ -223,9 +224,13 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
             <TokenInfo>
                 <TokenInfoLine>
                     <Label2>{swapAsset.assetAmount.asset.symbol}</Label2>
-                    <LinkOutIconWrapper href={explorerUrl} onClick={onClickExplorer}>
-                        <LinkOutIcon />
-                    </LinkOutIconWrapper>
+                    {platform === 'swap-widget-web' ? (
+                        <div />
+                    ) : (
+                        <LinkOutIconWrapper href={explorerUrl} onClick={onClickExplorer}>
+                            <LinkOutIcon />
+                        </LinkOutIconWrapper>
+                    )}
                     <BalanceLabel isZero={isZeroBalance}>
                         {swapAsset.assetAmount.stringRelativeAmount}
                     </BalanceLabel>
