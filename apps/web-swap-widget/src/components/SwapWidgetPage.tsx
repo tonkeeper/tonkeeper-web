@@ -108,8 +108,9 @@ export const SwapWidgetPage = () => {
             } else if (e && typeof e === 'string') {
                 notifyError(e);
             }
+        } finally {
+            setHasBeenSent(false);
         }
-        setHasBeenSent(false);
     };
 
     const onChangeFields = () => {
