@@ -1,6 +1,5 @@
 import { styled } from 'styled-components';
 import { useEncodeSwapToTonConnectParams } from '@tonkeeper/uikit/dist/state/swap/useEncodeSwap';
-import { useState } from 'react';
 import {
     useSelectedSwap,
     useSwapFromAmount,
@@ -60,7 +59,6 @@ export const SwapWidgetPage = () => {
     const { isLoading, mutateAsync: encode } = useEncodeSwapToTonConnectParams({
         forceCalculateBattery: true
     });
-    const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
     const [selectedSwap] = useSelectedSwap();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const [toAsset, setToAsset] = useSwapToAsset();
@@ -73,7 +71,6 @@ export const SwapWidgetPage = () => {
 
         const ctx = getTonkeeperInjectionContext()!;
 
-        setHasBeenSent(true);
         try {
             const result = await ctx.sendTransaction({
                 source: ctx.address,
@@ -105,8 +102,6 @@ export const SwapWidgetPage = () => {
             onOpen();
         } catch (e) {
             notifyError(toErrorMessage(e));
-        } finally {
-            setHasBeenSent(false);
         }
     };
 
@@ -127,7 +122,7 @@ export const SwapWidgetPage = () => {
                 </ChangeIconStyled>
             </SwapFromField>
             <SwapToField separateInfo />
-            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || hasBeenSent} />
+            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading} />
             <Spacer />
             <SwapWidgetFooter />
             <SwapTokensListNotification />

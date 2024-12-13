@@ -81,8 +81,8 @@ export const SwapButton: FC<{ onClick: () => void; isEncodingProcess: boolean }>
     }
 
     return (
-        <Button size="medium" primary onClick={onClick}>
-            isEncodingProcess: {isEncodingProcess}
+        <Button size="medium" primary onClick={onClick} loading={isEncodingProcess}>
+            {t('continue')}
         </Button>
     );
 };
