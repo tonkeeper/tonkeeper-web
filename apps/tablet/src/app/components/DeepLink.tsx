@@ -7,6 +7,8 @@ import {
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
 import { subscribeToTonOrTonConnectUrlOpened, tonConnectSSE } from "../../libs/tonConnect";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectParams | null>(null);
@@ -15,11 +17,18 @@ export const DeepLinkSubscription = () => {
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
       useResponseConnectionMutation();
 
-    const handlerClose = async (replyItems?: ConnectItemReply[], manifest?: DAppManifest) => {
+    const handlerClose = async (
+      result: {
+          replyItems: ConnectItemReply[];
+          manifest: DAppManifest;
+          account: Account;
+          walletId: WalletId;
+      } | null
+    ) => {
         if (!params) return;
         responseReset();
         try {
-            await responseConnectionAsync({ params, replyItems, manifest });
+            await responseConnectionAsync({ params, result });
         } finally {
             setParams(null);
             await tonConnectSSE.reconnect();
