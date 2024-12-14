@@ -72,7 +72,7 @@ export const SwapWidgetPage = () => {
         const ctx = getTonkeeperInjectionContext()!;
 
         try {
-            const result = await ctx.sendTransaction({
+            await ctx.sendTransaction({
                 source: ctx.address,
                 // legacy tonkeeper api, timestamp in ms
                 valid_until: params.valid_until * 1000,
@@ -94,10 +94,6 @@ export const SwapWidgetPage = () => {
                       )
                     : undefined
             });
-
-            if (!result) {
-                throw new Error('Transaction was not confirmed');
-            }
 
             onOpen();
         } catch (e) {
