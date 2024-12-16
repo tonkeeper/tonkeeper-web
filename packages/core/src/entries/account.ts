@@ -15,6 +15,7 @@ import {
     DerivationItemNamed
 } from './wallet';
 import { assertUnreachable } from '../utils/types';
+import { Network } from './network';
 
 /**
  * @deprecated
@@ -59,9 +60,7 @@ export class Clonable {
     }
 }
 
-export class AccountTonMnemonic extends Clonable implements IAccountVersionsEditable {
-    public readonly type = 'mnemonic';
-
+abstract class TonMnemonic extends Clonable implements IAccountVersionsEditable {
     get allTonWallets() {
         return this.tonWallets;
     }
@@ -115,6 +114,13 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         }
         this.activeTonWalletId = walletId;
     }
+}
+export class AccountTonMnemonic extends TonMnemonic {
+    public readonly type = 'mnemonic';
+}
+
+export class AccountTonTestnet extends TonMnemonic {
+    public readonly type = 'testnet';
 }
 
 export class AccountTonWatchOnly extends Clonable implements IAccount {
@@ -574,7 +580,7 @@ export class AccountTonMultisig extends Clonable implements IAccount {
     }
 }
 
-export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly;
+export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly | AccountTonTestnet;
 
 export type AccountTonWalletStandard =
     | AccountVersionEditable
@@ -588,6 +594,7 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
     switch (account.type) {
         case 'mnemonic':
         case 'ton-only':
+        case 'testnet':
             return true;
         case 'ledger':
         case 'keystone':
@@ -595,9 +602,9 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'mam':
         case 'ton-multisig':
             return false;
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }
 
 export function isAccountTonWalletStandard(account: Account): account is AccountTonWalletStandard {
@@ -607,13 +614,14 @@ export function isAccountTonWalletStandard(account: Account): account is Account
         case 'ledger':
         case 'ton-only':
         case 'mam':
+        case 'testnet':
             return true;
         case 'watch-only':
         case 'ton-multisig':
             return false;
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }
 
 export function isAccountCanManageMultisigs(account: Account): boolean {
@@ -626,10 +634,52 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
+        case 'testnet':
             return false;
+        default:
+            return assertUnreachable(account);
     }
+}
 
-    assertUnreachable(account);
+export function isMnemonicAndPassword(
+    account: Account
+): account is AccountTonMnemonic | AccountTonTestnet | AccountMAM {
+    switch (account.type) {
+        case 'mam':
+        case 'mnemonic':
+        case 'testnet':
+            return true;
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
+export function getNetworkByAccount(account: Account): Network {
+    switch (account.type) {
+        case 'testnet':
+            return Network.TESTNET;
+        case 'mam':
+        case 'mnemonic':
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return Network.MAINNET;
+        default:
+            assertUnreachable(account);
+    }
+}
+
+export function seeIfMainnnetAccount(account: Account): boolean {
+    const network = getNetworkByAccount(account);
+    return network === Network.MAINNET;
 }
 
 export type AccountsState = Account[];
@@ -642,6 +692,7 @@ export function serializeAccount(account: Account): string {
 
 const prototypes = {
     mnemonic: AccountTonMnemonic.prototype,
+    testnet: AccountTonTestnet.prototype,
     ledger: AccountLedger.prototype,
     keystone: AccountKeystone.prototype,
     'ton-only': AccountTonOnly.prototype,

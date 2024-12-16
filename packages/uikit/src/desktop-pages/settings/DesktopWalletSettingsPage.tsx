@@ -5,7 +5,9 @@ import {
     AppsIcon,
     CoinsIcon,
     ExitIcon,
-    KeyIcon, LockIcon,
+    KeyIcon,
+    LockIcon,
+    NotificationOutlineIcon,
     SaleBadgeIcon,
     SwitchIcon,
     UnpinIconOutline
@@ -39,6 +41,8 @@ import {
     useMultisigTogglePinForWallet
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
+import React from 'react';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
 
 const SettingsListBlock = styled.div`
@@ -111,6 +115,8 @@ export const DesktopWalletSettingsPage = () => {
 
     const canViewTwoFA = useCanViewTwoFA();
 
+    const notificationsAvailable = useAppSdk().notifications !== undefined;
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
@@ -137,7 +143,7 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                {account.type === 'mnemonic' && (
+                {(account.type === 'mnemonic' || account.type === 'testnet') && (
                     <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
                         <KeyIcon />
                         <Label2>{t('settings_backup_seed')}</Label2>
@@ -199,6 +205,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_collectibles_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
+                {notificationsAvailable && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.notification}>
+                        <SettingsListItem>
+                            <NotificationOutlineIcon />
+                            <Label2>{t('settings_notifications')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
                 {!isReadOnly && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
                         <SettingsListItem>

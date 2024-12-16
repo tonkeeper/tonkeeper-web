@@ -11,9 +11,12 @@ import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi
 import React, { useContext } from 'react';
 
 export interface IAppContext {
-    api: APIConfig;
+    mainnetApi: APIConfig;
+    testnetApi: APIConfig;
+
     fiat: FiatCurrencies;
-    config: TonendpointConfig;
+    mainnetConfig: TonendpointConfig;
+    testnetConfig: TonendpointConfig;
     tonendpoint: Tonendpoint;
     standalone: boolean;
     extension: boolean;
@@ -36,12 +39,17 @@ export interface IAppContext {
 }
 
 export const AppContext = React.createContext<IAppContext>({
-    api: {
+    mainnetApi: {
+        tonApiV2: new ConfigurationV2(),
+        tronApi: new TronConfiguration()
+    },
+    testnetApi: {
         tonApiV2: new ConfigurationV2(),
         tronApi: new TronConfiguration()
     },
     fiat: FiatCurrencies.USD,
-    config: defaultTonendpointConfig,
+    mainnetConfig: defaultTonendpointConfig,
+    testnetConfig: defaultTonendpointConfig,
     tonendpoint: new Tonendpoint({ targetEnv: 'web' }, {}),
     standalone: false,
     extension: false,

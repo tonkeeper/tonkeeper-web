@@ -6,7 +6,6 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { FC } from 'react';
 import BigNumber from 'bignumber.js';
-import { useActiveTonNetwork } from '../../../state/wallet';
 import { useUserFiat } from '../../../state/fiat';
 import { Link } from 'react-router-dom';
 import { hexToRGBA } from '../../../libs/css';
@@ -52,11 +51,11 @@ const TestnetBadge = styled(Link)`
     ${Body2Class};
 `;
 
-export const DesktopHeaderBalance: FC<{ isLoading: boolean; balance: BigNumber | undefined }> = ({
-    isLoading,
-    balance
-}) => {
-    const network = useActiveTonNetwork();
+export const DesktopHeaderBalance: FC<{
+    isLoading: boolean;
+    balance: BigNumber | undefined;
+    network: Network;
+}> = ({ isLoading, balance, network }) => {
     const fiat = useUserFiat();
 
     return (

@@ -32,6 +32,7 @@ export enum QueryKey {
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',
     subscribed = 'subscribed',
+    globalSubscribed = 'globalSubscribed',
     featuredRecommendations = 'recommendations',
     experimental = 'experimental',
 

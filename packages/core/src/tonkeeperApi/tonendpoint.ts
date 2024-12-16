@@ -5,7 +5,7 @@ import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop';
+    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -80,7 +80,7 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
-
+    isOnReview?: boolean;
     '2fa_public_key'?: string;
     '2fa_api_url'?: string;
 }
@@ -154,9 +154,9 @@ export class Tonendpoint {
         return params.toString();
     };
 
-    boot = async (): Promise<TonendpointConfig> => {
+    boot = async (network: Network): Promise<TonendpointConfig> => {
         const response = await this.fetchApi(
-            `https://boot.tonkeeper.com/keys?${this.toSearchParams()}`,
+            `https://boot.tonkeeper.com/keys?${this.toSearchParams({ network })}`,
             {
                 method: 'GET'
             }
@@ -207,8 +207,11 @@ export class Tonendpoint {
     };
 }
 
-export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<TonendpointConfig> => {
-    const result = await tonendpoint.boot();
+export const getServerConfig = async (
+    tonendpoint: Tonendpoint,
+    network: Network
+): Promise<TonendpointConfig> => {
+    const result = await tonendpoint.boot(network);
 
     return {
         flags: {},

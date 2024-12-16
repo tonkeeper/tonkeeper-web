@@ -1,0 +1,89 @@
+name: Tonkeeper Web Tests
+on:
+    workflow_call:
+        inputs:
+            base-url:
+                required: true
+                type: string
+            transaction:
+                type: boolean
+                default: false
+        secrets:
+            TON_MNEMONIC_24:
+                required: true
+            TON_MNEMONIC_24_2:
+                required: true
+            TON_MNEMONIC_24_3:
+                required: true
+            TON_MNEMONIC_24_4:
+                required: true
+            TON_MNEMONIC_24_5:
+                required: true
+            TON_MNEMONIC_ANANAS:
+                required: true
+            TON_MNEMONIC_12:
+                required: true
+            TON_MNEMONIC_12_2:
+                required: true
+            FAKE_MNEMONIC:
+                required: true
+
+env:
+    node-version: lts/*
+jobs:
+    playwright-tests:
+        name: playwright-tests
+        timeout-minutes: 20
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Install Playwright Browsers
+              working-directory: ./tests/playwright
+              run: npx playwright install --with-deps chromium
+
+            - name: Run Playwright tests
+              working-directory: ./tests/playwright
+              env:
+                  BASE_APP_URL: ${{ inputs.base-url }}
+                  TRANSACTION_TESTS: ${{ inputs.transaction }}
+                  TON_MNEMONIC_24: ${{ secrets.TON_MNEMONIC_24 }}
+                  TON_MNEMONIC_24_2: ${{ secrets.TON_MNEMONIC_24_2 }}
+                  TON_MNEMONIC_24_3: ${{ secrets.TON_MNEMONIC_24_3 }}
+                  TON_MNEMONIC_24_4: ${{ secrets.TON_MNEMONIC_24_4 }}
+                  TON_MNEMONIC_24_5: ${{ secrets.TON_MNEMONIC_24_5 }}
+                  TON_MNEMONIC_ANANAS: ${{ secrets.TON_MNEMONIC_ANANAS }}
+                  TON_MNEMONIC_12: ${{ secrets.TON_MNEMONIC_12 }}
+                  TON_MNEMONIC_12_2: ${{ secrets.TON_MNEMONIC_12_2 }}
+                  FAKE_MNEMONIC: ${{ secrets.FAKE_MNEMONIC }}
+              run: npx playwright test --project='chromium'
+
+            - name: Comment Playwright report
+              uses: daun/playwright-report-summary@v3
+              if: always() && github.event_name == 'pull_request'
+              with:
+                  report-file: ./tests/playwright/results.json

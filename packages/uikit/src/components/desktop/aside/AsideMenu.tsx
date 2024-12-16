@@ -30,6 +30,7 @@ import { AsideMenuAccount } from './AsideMenuAccount';
 import { AsideMenuFolder } from './AsideMenuFolder';
 
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -299,15 +300,17 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    <AsideMenuItem
-                        onClick={() => handleNavigateClick(AppRoute.browser)}
-                        isSelected={activeRoute === AppRoute.browser}
-                    >
-                        <IconWrapper>
-                            <GlobeIcon />
-                        </IconWrapper>
-                        <Label2>{t('aside_discover')}</Label2>
-                    </AsideMenuItem>
+                    <HideOnReview>
+                        <AsideMenuItem
+                            onClick={() => handleNavigateClick(AppRoute.browser)}
+                            isSelected={activeRoute === AppRoute.browser}
+                        >
+                            <IconWrapper>
+                                <GlobeIcon />
+                            </IconWrapper>
+                            <Label2>{t('aside_discover')}</Label2>
+                        </AsideMenuItem>
+                    </HideOnReview>
                     <AccountDNDBlock items={items} activeRoute={activeRoute} />
                 </ScrollContainer>
                 <AsideMenuBottom>
@@ -329,9 +332,13 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_settings')}</Label2>
                         </AsideMenuItem>
                     </AsideMenuBottomContent>
-                    <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
-                        <SubscriptionInfoBlock />
-                    </ErrorBoundary>
+                    <HideOnReview>
+                        <ErrorBoundary
+                            fallbackRender={fallbackRenderOver('Failed to load Pro State')}
+                        >
+                            <SubscriptionInfoBlock />
+                        </ErrorBoundary>
+                    </HideOnReview>
                 </AsideMenuBottom>
             </AsideContentContainer>
             <AsideResizeHandle

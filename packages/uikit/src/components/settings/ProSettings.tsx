@@ -1,4 +1,9 @@
-import { Account, AccountMAM, AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    AccountMAM,
+    AccountTonMnemonic,
+    seeIfMainnnetAccount
+} from '@tonkeeper/core/dist/entries/account';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { ProState, ProStateAuthorized, isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import {
@@ -119,9 +124,12 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const { mutateAsync, error } = useSelectWalletForProMutation();
     useNotifyError(error);
-    const accounts = useAccountsState().filter(
-        acc => acc.type === 'mnemonic' || acc.type === 'mam'
-    ) as (AccountTonMnemonic | AccountMAM)[];
+    const accounts = useAccountsState()
+        .filter(seeIfMainnnetAccount)
+        .filter(acc => acc.type === 'mnemonic' || acc.type === 'mam') as (
+        | AccountTonMnemonic
+        | AccountMAM
+    )[];
 
     const accountsWallets: AccountWallet[] = accounts.flatMap(a => {
         if (a.type === 'mam') {
@@ -140,6 +148,10 @@ const SelectWallet: FC<{ onClose: () => void }> = ({ onClose }) => {
                 account: a
             }));
     });
+
+    if (accountsWallets.length === 0) {
+        return <SelectLabel>{t('tonkeeper_pro_authorization')}</SelectLabel>;
+    }
 
     return (
         <>

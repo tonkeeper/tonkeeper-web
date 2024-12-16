@@ -3,15 +3,24 @@ import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label1 } from '../../components/Text';
+import { Body2, Label1, Label2 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { signTonConnectOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
-import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveApi,
+    useActiveTonNetwork,
+    useActiveWallet
+} from '../../state/wallet';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -33,7 +42,7 @@ const useToggleSubscribe = () => {
     const account = useActiveAccount();
     const client = useQueryClient();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const network = useActiveTonNetwork();
 
     return useMutation<void, Error, boolean>(async checked => {
@@ -95,8 +104,27 @@ const SwitchNotification = () => {
     );
 };
 
+const DesktopContentView = styled.div`
+    padding: 0 16px;
+`;
+
 export const Notifications = () => {
     const { t } = useTranslation();
+
+    const isFullWidthMode = useIsFullWidthMode();
+
+    if (isFullWidthMode) {
+        return (
+            <DesktopViewPageLayout>
+                <DesktopViewHeader backButton>
+                    <Label2>{t('settings_notifications')}</Label2>
+                </DesktopViewHeader>
+                <DesktopContentView>
+                    <SwitchNotification />
+                </DesktopContentView>
+            </DesktopViewPageLayout>
+        );
+    }
 
     return (
         <>

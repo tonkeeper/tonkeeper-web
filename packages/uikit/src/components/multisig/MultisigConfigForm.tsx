@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useContext, useEffect, useId, useMemo, useState } from 'react';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
-import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import {
     NotificationFooterPortal,
@@ -295,7 +295,7 @@ const deployMultisigAssetAmount = new AssetAmount({
 const FirstParticipantCard: FC<{ skipBalanceCheck?: boolean }> = ({ skipBalanceCheck }) => {
     const methods = useFormContext<MultisigUseForm>();
     const { watch, control } = methods;
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const selectedAddress = watch('firstParticipant');
 
     const asyncValidator = useCallback(

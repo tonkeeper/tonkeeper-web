@@ -90,49 +90,24 @@ jobs:
                   rm ${{ github.workspace }}/AuthKey.p8
 
     web-build:
-        name: web-build
-        runs-on: macos-13
-        timeout-minutes: 10
+        uses: ./.github/workflows/web-build.yaml
+        with:
+            environment: 'main'
+        secrets: inherit
 
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
+    swap-widget-build:
+        uses: ./.github/workflows/swap-widget-build.yaml
+        with:
+            environment: 'main'
+        secrets: inherit
 
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build
-              uses: borales/actions-yarn@v5
-              env:
-                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
-                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
-                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
-                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
-                  VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
-                  VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
-              with:
-                  cmd: build:web
-
-            - name: Publish to Cloudflare Pages
-              id: deploy
-              uses: cloudflare/wrangler-action@v3
-              with:
-                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command: pages deploy apps/web/dist --project-name=tonkeeper-web --branch=main
+    web-tests:
+        needs: web-build
+        uses: ./.github/workflows/web-tests.yaml
+        with:
+            base-url: 'https://wallet.tonkeeper.com'
+            transaction: true
+        secrets: inherit
 
     extension-build:
         name: extension-build

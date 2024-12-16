@@ -57,7 +57,8 @@ export enum WalletSettingsRoute {
     connectedApps = '/connected-apps',
     derivations = '/derivations',
     battery = '/battery',
-    twoFa = '/two-fa'
+    twoFa = '/two-fa',
+    notification = '/notification'
 }
 
 export enum BrowserRoute {

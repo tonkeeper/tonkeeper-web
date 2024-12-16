@@ -4,7 +4,7 @@ import { Body1, Body2, Body2Class, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { SpinnerRing } from '../Icon';
-import { useAccountsState, useCreateAccountTonMultisig } from '../../state/wallet';
+import { useAccountsState, useActiveConfig, useCreateAccountTonMultisig } from '../../state/wallet';
 import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -134,7 +134,7 @@ const CreateMultisigAwaitDeployPage: FC<{
     const [showHelpButton, setShowHelpButton] = useState(false);
     const { navigateHome } = useContext(AddWalletContext);
     const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
 
     const onNotificationBack = useMemo(

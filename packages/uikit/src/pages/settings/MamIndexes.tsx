@@ -14,7 +14,8 @@ import {
     useActiveAccount,
     useCreateMAMAccountDerivation,
     useHideMAMAccountDerivation,
-    useEnableMAMAccountDerivation
+    useEnableMAMAccountDerivation,
+    useActiveConfig
 } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
@@ -30,13 +31,12 @@ import {
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
-import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
-import { useAppContext } from '../../hooks/appContext';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
 import { scrollToContainersBottom } from '../../libs/web';
 import { useProState } from '../../state/pro';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -138,9 +138,8 @@ export const MAMIndexesPageContent: FC<{
     buttonWrapperClassName?: string;
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { data: proState } = useProState();
-    const { onOpen: recovery } = useRecoveryNotification();
     const { onOpen: buyPro } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -305,9 +304,11 @@ export const MAMIndexesPageContent: FC<{
             <NotificationFooterPortal>
                 <FooterButtonContainerStyled className={buttonWrapperClassName}>
                     {showByProButton ? (
-                        <Button primary fullWidth onClick={buyPro}>
-                            {t('settings_mam_add_wallet_with_pro')}
-                        </Button>
+                        <HideOnReview>
+                            <Button primary fullWidth onClick={buyPro}>
+                                {t('settings_mam_add_wallet_with_pro')}
+                            </Button>
+                        </HideOnReview>
                     ) : (
                         <Button fullWidth onClick={onCreateDerivation}>
                             {t('settings_mam_add_wallet')}

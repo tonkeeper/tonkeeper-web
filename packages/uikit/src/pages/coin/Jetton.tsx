@@ -20,13 +20,14 @@ import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useActiveApi, useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
     innerRef
 }) => {
-    const { api, standalone } = useAppContext();
+    const api = useActiveApi();
+    const { standalone } = useAppContext();
     const wallet = useActiveWallet();
 
     const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({

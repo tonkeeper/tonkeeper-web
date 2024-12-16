@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useActiveMultisigAccountHost, useActiveMultisigWalletInfo } from '../../../state/multisig';
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
-import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
+import { useActiveApi, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 
@@ -16,7 +16,7 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const { signerWallet } = useActiveMultisigAccountHost();
-    const { api } = useAppContext();
+    const api = useActiveApi();
 
     const rawTransactionService = useTonRawTransactionService();
     const getSender = useGetSender();

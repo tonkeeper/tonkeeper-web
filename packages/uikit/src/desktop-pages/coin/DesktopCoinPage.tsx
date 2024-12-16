@@ -3,7 +3,7 @@ import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/a
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import { FC, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
@@ -29,10 +29,11 @@ import { toTokenRate, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
-import { useQueryClient } from '@tanstack/react-query';
-import { QueryKey } from '../../libs/queryKey';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useIsOnIosReview } from '../../hooks/ios';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -74,15 +75,18 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const network = useActiveTonNetwork();
+
     const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: buy } = useTonendpointBuyMethods();
-    const canBuy = token === CryptoCurrency.TON;
+    const canBuy = token === CryptoCurrency.TON && network !== Network.TESTNET;
     const { data: swapAssets } = useAllSwapAssets();
 
     const currentAssetAddress = tonAssetAddressFromString(token);
-    const swapAsset = isReadOnly
-        ? undefined
-        : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
+    const swapAsset =
+        isReadOnly || network === Network.TESTNET
+            ? undefined
+            : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
 
     const [_, setSwapFromAsset] = useSwapFromAsset();
     const navigate = useNavigate();
@@ -130,18 +134,20 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                {swapAsset && (
-                    <ButtonStyled size="small" onClick={onSwap}>
-                        <SwapIcon />
-                        {t('wallet_swap')}
-                    </ButtonStyled>
-                )}
-                {canBuy && (
-                    <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIcon />
-                        {t('wallet_buy')}
-                    </ButtonStyled>
-                )}
+                <HideOnReview>
+                    {swapAsset && (
+                        <ButtonStyled size="small" onClick={onSwap}>
+                            <SwapIcon />
+                            {t('wallet_swap')}
+                        </ButtonStyled>
+                    )}
+                    {canBuy && (
+                        <ButtonStyled size="small" onClick={onOpen}>
+                            <PlusIcon />
+                            {t('wallet_buy')}
+                        </ButtonStyled>
+                    )}
+                </HideOnReview>
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </CoinHeaderStyled>

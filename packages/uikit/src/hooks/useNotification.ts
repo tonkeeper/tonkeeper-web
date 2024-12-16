@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from './translation';
 import { useCallback, useEffect } from 'react';
 import { notifyError } from '../components/transfer/common';

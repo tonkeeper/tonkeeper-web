@@ -24,7 +24,7 @@ import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
 import { hexToRGBA } from '../../libs/css';
-import { useActiveWallet } from '../../state/wallet';
+import { useActiveConfig, useActiveWallet } from '../../state/wallet';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -212,7 +212,8 @@ export const BuyItemNotification: FC<{
     const track = useBuyAnalytics();
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
-    const { config, fiat } = useAppContext();
+    const config = useActiveConfig();
+    const { fiat } = useAppContext();
     const { t } = useTranslation();
     const [open, setOpen] = useState(false);
 

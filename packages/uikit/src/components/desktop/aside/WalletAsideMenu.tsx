@@ -3,7 +3,11 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveTonNetwork,
+    useIsActiveWalletWatchOnly
+} from '../../../state/wallet';
 import {
     BatteryIcon,
     ClockSmoothIcon,
@@ -23,7 +27,9 @@ import {
 } from '../../../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -62,6 +68,9 @@ export const WalletAsideMenu = () => {
     const isMultisig = useIsActiveAccountMultisig();
     const account = useActiveAccount();
     const showMultisigs = isAccountCanManageMultisigs(account);
+    const network = useActiveTonNetwork();
+
+    const isTestnet = network === Network.TESTNET;
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -103,18 +112,20 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            {!isReadOnly && (
-                <NavLink to={AppRoute.swap}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <SwapIconStyled />
-                            <Label2>{t('wallet_swap')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
-            {isMultisig && <MultisigOrdersMenuItem />}
-            {showMultisigs && (
+            <HideOnReview>
+                {!isReadOnly && !isTestnet && (
+                    <NavLink to={AppRoute.swap}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <SwapIconStyled />
+                                <Label2>{t('wallet_swap')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                )}
+            </HideOnReview>
+            {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+            {showMultisigs && !isTestnet && (
                 <NavLink to={AppRoute.multisigWallets}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>

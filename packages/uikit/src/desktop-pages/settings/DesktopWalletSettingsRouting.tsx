@@ -10,6 +10,7 @@ import { DesktopNftSettings } from './DesktopNftSettings';
 import { MAMIndexesPage } from '../../pages/settings/MamIndexes';
 import { LedgerIndexesPage } from '../../pages/settings/LedgerIndexes';
 import { BatteryPage } from '../../pages/settings/Battery';
+import { Notifications } from '../../pages/settings/Notification';
 import { TwoFAPage } from '../../pages/settings/TwoFA';
 
 const OldSettingsLayoutWrapper = styled.div`
@@ -45,6 +46,7 @@ export const DesktopWalletSettingsRouting = () => {
             <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
             <Route path={WalletSettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
             <Route path={WalletSettingsRoute.twoFa} element={<TwoFAPage />} />
+            <Route path={WalletSettingsRoute.notification} element={<Notifications />} />
             <Route path="*" element={<DesktopWalletSettingsPage />} />
         </Routes>
     );

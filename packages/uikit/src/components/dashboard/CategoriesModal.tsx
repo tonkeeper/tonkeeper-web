@@ -18,6 +18,7 @@ import { ProNotification } from '../pro/ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
 import { useTranslation } from '../../hooks/translation';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const HeaderStyled = styled.div`
     width: 100%;
@@ -155,7 +156,11 @@ const CategoriesModalContent: FC<{
                                                             <ReorderIcon />
                                                         </Icon>
                                                         <Body1>{category?.name}</Body1>
-                                                        {category?.onlyPro && <Badge>PRO</Badge>}
+                                                        <HideOnReview>
+                                                            {category?.onlyPro && (
+                                                                <Badge>PRO</Badge>
+                                                            )}
+                                                        </HideOnReview>
                                                         <CheckboxStyled
                                                             checked={isEnabled}
                                                             disabled={isDisabled}

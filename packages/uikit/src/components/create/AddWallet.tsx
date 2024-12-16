@@ -13,9 +13,11 @@ import {
     WalletMagnifyingGlassIcon,
     WalletPencilIcon,
     WalletPlusIcon,
-    WalletSignerIcon
+    WalletSignerIcon,
+    WalletTestnetIcon
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const AddMethod = styled.button`
     display: flex;
@@ -90,7 +92,8 @@ export const addWalletMethod = [
     'watch-only',
     'signer',
     'keystone',
-    'ledger'
+    'ledger',
+    'testnet'
 ] as const;
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
@@ -170,7 +173,9 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                         <AddMethodText>
                             <AddMethodLabel>
                                 {t('add_wallet_new_multisig_title')}{' '}
-                                <Badge color="accentBlue">PRO</Badge>
+                                <HideOnReview>
+                                    <Badge color="accentBlue">PRO</Badge>
+                                </HideOnReview>
                             </AddMethodLabel>
                             <AddMethodDescription>
                                 {t('add_wallet_new_multisig_description')}
@@ -179,6 +184,18 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                         <RightIconStyled />
                     </AddMethod>
                 )}
+                <AddMethod onClick={() => onSelect('testnet')}>
+                    <ButtonIcon>
+                        <WalletTestnetIcon />
+                    </ButtonIcon>
+                    <AddMethodText>
+                        <AddMethodLabel>{t('add_wallet_modal_testnet_title')}</AddMethodLabel>
+                        <AddMethodDescription>
+                            {t('add_wallet_modal_testnet_subtitle')}
+                        </AddMethodDescription>
+                    </AddMethodText>
+                    <RightIconStyled />
+                </AddMethod>
             </AddMethodsGroup>
             {!hideAllHardwareWallets && (
                 <>

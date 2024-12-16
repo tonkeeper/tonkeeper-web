@@ -2,7 +2,7 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
 import { sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { AccountId, isMnemonicAndPassword } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
@@ -65,6 +65,7 @@ export const signTonConnectOver = ({
                 );
                 return Buffer.from(result, 'hex');
             }
+            case 'testnet':
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
                 const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
@@ -221,6 +222,7 @@ export const getSigner = async (
                 callback.type = 'cell' as const;
                 return callback;
             }
+            case 'testnet':
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
@@ -282,11 +284,7 @@ export const getMnemonicAndPassword = async (
     checkTouchId: () => Promise<void>
 ): Promise<{ mnemonic: string[]; password?: string }> => {
     const account = await accountsStorage(sdk.storage).getAccount(accountId);
-    if (
-        !account ||
-        (account.type !== 'mnemonic' && account.type !== 'mam') ||
-        !('auth' in account)
-    ) {
+    if (!account || !isMnemonicAndPassword(account) || !('auth' in account)) {
         throw new Error('Unexpected auth method for account');
     }
 

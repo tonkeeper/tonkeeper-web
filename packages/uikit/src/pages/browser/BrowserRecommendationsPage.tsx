@@ -7,6 +7,7 @@ import { RecommendationsPageBodySkeleton } from '../../components/skeletons/Brow
 import { useOpenBrowser } from '../../hooks/amplitude';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { CategoryBlock } from './CategoryBlock';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const InnerBodyStyled = styled(InnerBody)`
     padding: 0;
@@ -33,7 +34,7 @@ export const BrowserRecommendationsPage: FC = () => {
     }, [track, data]);
 
     return (
-        <>
+        <HideOnReview>
             <BrowserHeader />
             <InnerBodyStyled>
                 {data ? (
@@ -51,6 +52,6 @@ export const BrowserRecommendationsPage: FC = () => {
                     </SkeletonContainer>
                 )}
             </InnerBodyStyled>
-        </>
+        </HideOnReview>
     );
 };

@@ -9,6 +9,7 @@ import React from 'react';
 
 import { useAppContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
+import { useActiveConfig } from '../../../state/wallet';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -27,7 +28,7 @@ const ButtonsContainer = styled.div`
 
 const DesktopPreferencesHeaderPayload = () => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
 
     const newsUrl = config.tonkeeperNewsUrl;

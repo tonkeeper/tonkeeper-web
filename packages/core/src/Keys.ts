@@ -47,5 +47,7 @@ export enum AppKey {
 
     BATTERY_AUTH_TOKEN = 'battery_auth_token',
 
-    TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config'
+    TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config',
+
+    NOTIFICATIONS = 'notifications'
 }

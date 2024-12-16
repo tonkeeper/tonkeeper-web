@@ -1,0 +1,167 @@
+
+platform :ios do
+    xcodeproj = "./ios/App/App.xcodeproj"
+    workspace = "./ios/App/App.xcworkspace"
+
+    desc 'Export ipa and submit to TestFlight'
+    lane :beta do
+      keychain_info = { keychain_name: "ios-build-#{Time.now.to_i}.keychain", keychain_password: SecureRandom.uuid }
+      
+
+      begin
+        setup_signing(keychain_info)
+        load_asc_api_key
+        bump_build_number
+        build_app_with_signing(keychain_info)
+        submit_to_testflight
+      ensure
+        cleanup_keychain(keychain_info)
+      end
+    end
+  
+    private_lane :setup_signing do |options|
+      create_keychain(
+        name: options[:keychain_name],
+        password: options[:keychain_password],
+        unlock: true,
+        timeout: 0,
+        lock_when_sleeps: false,
+        add_to_search_list: true
+      )
+      import_cert(options)
+      install_profile
+      update_project_settings
+    end
+    
+    desc "Load ASC API Key information to use in subsequent lanes"
+    private_lane :load_asc_api_key do
+      app_store_connect_api_key(
+        key_id: ENV['APPLE_KEY_ID'],
+        issuer_id: ENV['APPLE_ISSUER_ID'],
+        key_content: Base64.decode64(ENV['APPLE_KEY_CONTENT']),
+        duration: 1200,
+        in_house: false
+      )
+    end
+    
+    lane :bump_build_number do
+      package = read_json(json_path: "./package.json")
+      increment_version_number(
+        xcodeproj: xcodeproj,
+        version_number: package[:version]
+      )
+
+      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+
+      current_version = get_version_number(xcodeproj: xcodeproj)
+      latest_build_number = app_store_build_number(
+        initial_build_number: 0,
+        api_key: api_key,
+        app_identifier: app_identifier,
+        version: package[:version],
+        live: false
+      )
+
+      build_number = latest_build_number + 1
+
+      increment_build_number(
+        xcodeproj: xcodeproj,
+        build_number: build_number
+      )
+      
+      UI.message("Bumped build number to #{build_number}")
+      sh("echo VERSION_CODE=#{package[:version]} >> $GITHUB_ENV")
+      sh("echo BUILD_CODE=#{build_number} >> $GITHUB_ENV")
+    end
+  
+    private_lane :import_cert do |options|
+      cert_path = "#{Dir.tmpdir}/build_certificate.p12"
+      File.write(cert_path, Base64.decode64(ENV['BUILD_CERTIFICATE_BASE64']))
+      import_certificate(
+        certificate_path: cert_path,
+        certificate_password: ENV['P12_PASSWORD'] || "",
+        keychain_name: options[:keychain_name],
+        keychain_password: options[:keychain_password],
+        log_output: true
+      )
+      File.delete(cert_path)
+    end
+  
+    private_lane :cleanup_keychain do |options|
+      delete_keychain(
+        name: options[:keychain_name]
+      )
+    end
+  
+    private_lane :install_profile do
+      profile_path = "#{Dir.tmpdir}/build_pp.mobileprovision"
+      File.write(profile_path, Base64.decode64(ENV['BUILD_PROVISION_PROFILE_BASE64']))
+      UI.user_error!("Failed to create provisioning profile at #{profile_path}") unless File.exist?(profile_path)
+      ENV['PROVISIONING_PROFILE_PATH'] = profile_path
+      install_provisioning_profile(path: profile_path)
+      File.delete(profile_path)
+    end
+  
+    private_lane :update_project_settings do
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
+
+      update_code_signing_settings(
+        path: xcodeproj,
+        use_automatic_signing: false,
+        code_sign_identity: "iPhone Distribution",
+        team_id: team_id,
+        bundle_identifier: app_identifier,
+        profile_name: ENV['APPLE_PROFILE_NAME'],
+      )
+
+      update_project_team(
+        path: xcodeproj,
+        teamid: team_id
+      )
+    end
+  
+    private_lane :build_app_with_signing do |options|
+      unlock_keychain(
+        path: options[:keychain_name],
+        password: options[:keychain_password],
+        set_default: false
+      )
+      app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      build_app(
+        workspace: workspace,
+        scheme: "App",
+        configuration: "Release",
+        export_method: "app-store",
+        output_name: "TonkeeperPro.ipa",
+        export_options: {
+          provisioningProfiles: {
+            app_identifier => ENV['APPLE_PROFILE_NAME']
+          }
+        },
+        xcargs: "-verbose",
+        buildlog_path: "./build_logs",
+        export_xcargs: "-allowProvisioningUpdates",
+      )
+    end
+
+    private_lane :submit_to_testflight do
+      api_key = lane_context[SharedValues::APP_STORE_CONNECT_API_KEY]
+      ipa = lane_context[SharedValues::IPA_OUTPUT_PATH]
+      changelog = changelog_from_git_commits(
+        merge_commit_filtering: "exclude_merges",
+        between: ["origin/main", "HEAD"]
+      )
+
+      pilot(
+        api_key: api_key,
+        ipa: ipa,
+        changelog: changelog,
+        skip_waiting_for_build_processing: true,
+        skip_submission: true,
+        distribute_external: false,
+        notify_external_testers: false
+      )
+    end
+  end

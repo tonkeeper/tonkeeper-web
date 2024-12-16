@@ -12,7 +12,8 @@ import { SkeletonText } from '../shared/Skeleton';
 import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
 import { useTranslation } from '../../hooks/translation';
-import { AccountAndWalletBadgesGroup } from '../account/AccountBadge';
+import { AccountAndWalletBadgesGroup, NetworkBadge } from '../account/AccountBadge';
+import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
 
 const Block = styled.div`
     display: flex;
@@ -36,6 +37,10 @@ const Body = styled(Label2)`
 const Amount = styled(Num2)`
     margin-bottom: 0.5rem;
     user-select: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
 `;
 
 const Error = styled.div`
@@ -91,7 +96,7 @@ export const Balance: FC<{
     const { fiat } = useAppContext();
     const wallet = useActiveWallet();
     const client = useQueryClient();
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const address = formatAddress(wallet.rawAddress, network);
 
@@ -112,7 +117,10 @@ export const Balance: FC<{
     return (
         <Block>
             <MessageBlock error={error} isFetching={isFetching} />
-            <Amount>{formatFiatCurrency(fiat, total || 0)}</Amount>
+            <Amount>
+                <span>{formatFiatCurrency(fiat, total || 0)}</span>
+                <NetworkBadge network={network} />
+            </Amount>
             <Body onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
                 {toShortValue(address)}
                 <AccountAndWalletBadgesGroupStyled

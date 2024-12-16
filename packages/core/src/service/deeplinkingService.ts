@@ -28,6 +28,10 @@ export function parseTonTransferWithAddress(options: { url: string }) {
             }
         }
 
+        if (data.query.bin) {
+            throw new Error('Unsupported link');
+        }
+
         const result: Omit<TonTransferParams, 'address'> & { address: string } = {
             address: linkAddress,
             ...data.query

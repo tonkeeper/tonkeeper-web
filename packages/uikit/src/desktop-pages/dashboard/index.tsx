@@ -6,6 +6,7 @@ import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopD
 import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
 import { ProBanner } from '../../components/pro/ProBanner';
 import { useProState } from '../../state/pro';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -36,11 +37,13 @@ const DashboardPage: FC = () => {
             <DesktopDashboardHeader />
             <PageWrapper>
                 <DashboardTableStyled />
-                {shouldShowProBanner && (
-                    <ProBannerWrapper>
-                        <ProBanner />
-                    </ProBannerWrapper>
-                )}
+                <HideOnReview>
+                    {shouldShowProBanner && (
+                        <ProBannerWrapper>
+                            <ProBanner />
+                        </ProBannerWrapper>
+                    )}
+                </HideOnReview>
             </PageWrapper>
         </>
     );

@@ -12,13 +12,8 @@ test.beforeEach(async ({ page }) => {
     await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_ANANAS);
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page
-        .locator('div')
-        .filter({ hasText: /^Password$/ })
-        .getByRole('textbox')
-        .fill('123456');
-    await page.getByRole('textbox').nth(1).click();
-    await page.getByRole('textbox').nth(1).fill('123456');
+    await page.locator('#create-password').fill('123456');
+    await page.locator('#create-password-confirm').fill('123456');
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Save' }).click();
 });
@@ -63,7 +58,7 @@ test.describe('Swap Test', () => {
         await expect(page.getByText('Pending')).toBeVisible({ timeout: 40 * 1000 });
     });
 
-//swap usdt => ton
+    //swap usdt => ton
 
     test('Should send swap usdt to ton and wait pending transaction', async ({ page }) => {
         await expect(page.getByRole('link', { name: 'Swap' })).toBeVisible();

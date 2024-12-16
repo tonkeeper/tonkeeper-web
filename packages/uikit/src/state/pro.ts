@@ -32,6 +32,7 @@ import {
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
+import { useActiveApi } from './wallet';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -56,7 +57,7 @@ export const useProState = () => {
 export const useSelectWalletForProMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const accountsStorage = useAccountsStorage();
@@ -128,7 +129,7 @@ export interface ConfirmState {
 
 export const useCreateInvoiceMutation = () => {
     const ws = useAccountsStorage();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useMutation<
         ConfirmState,
         Error,

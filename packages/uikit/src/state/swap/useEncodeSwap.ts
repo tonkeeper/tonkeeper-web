@@ -3,11 +3,10 @@ import { CalculatedSwap } from './useCalculatedSwap';
 import type { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { assertUnreachable, NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
-import { useAppContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
-import { useActiveTonWalletConfig, useActiveWallet } from '../wallet';
+import { useActiveConfig, useActiveTonWalletConfig, useActiveWallet } from '../wallet';
 import {
     TON_CONNECT_MSG_VARIANTS_ID,
     TonConnectTransactionPayload
@@ -17,7 +16,7 @@ import { useBatteryBalance, useBatteryServiceConfig } from '../battery';
 export function useEncodeSwap() {
     const wallet = useActiveWallet();
     const { swapService } = useSwapsConfig();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { data: swapOpaitons } = useSwapOptions();
     const referral = config.web_swaps_referral_address;
 
@@ -44,7 +43,7 @@ export function useEncodeSwap() {
     });
 }
 
-export function useEncodeSwapToTonConnectParams() {
+export function useEncodeSwapToTonConnectParams(options: { ignoreBattery?: boolean } = {}) {
     const { mutateAsync: encode } = useEncodeSwap();
     const { data: batteryBalance } = useBatteryBalance();
     const { excessAccount: batteryExcess } = useBatteryServiceConfig();
@@ -54,9 +53,9 @@ export function useEncodeSwapToTonConnectParams() {
         async swap => {
             const resultsPromises = [encode(swap)];
 
-            const batterySwapsEnabled = activeWalletConfig
-                ? activeWalletConfig.batterySettings.enabledForSwaps
-                : true;
+            const batterySwapsEnabled =
+                (activeWalletConfig ? activeWalletConfig.batterySettings.enabledForSwaps : true) &&
+                !options.ignoreBattery;
             if (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled) {
                 resultsPromises.push(
                     encode({ ...swap, excessAddress: Address.parse(batteryExcess).toRawString() })

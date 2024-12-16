@@ -7,11 +7,12 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { Body1, Body2, Body2Class, Body3, H2Label2Responsive, Label2 } from '../Text';
-import { ButtonResponsiveSize } from '../fields/Button';
+import { Button, ButtonResponsiveSize } from '../fields/Button';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
 import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
+import { useActiveConfig } from '../../state/wallet';
 
 const Block = styled.div`
     display: flex;
@@ -127,12 +128,13 @@ const LinkStyled = styled(Body3)`
     cursor: pointer;
 `;
 
-export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean }> = ({
-    mnemonic,
-    showMamInfo
-}) => {
+export const WordsGridAndHeaders: FC<{
+    mnemonic: string[];
+    showMamInfo?: boolean;
+    allowCopy?: boolean;
+}> = ({ mnemonic, showMamInfo, allowCopy }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
 
     return (
@@ -167,6 +169,15 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                     </Body1>
                 ))}
             </WorldsGridStyled>
+
+            {allowCopy && (
+                <Button
+                    onClick={() => sdk.copyToClipboard(mnemonic.join(' '), t('copied'))}
+                    marginTop
+                >
+                    {t('recovery_phrase_copy_button')}
+                </Button>
+            )}
         </>
     );
 };
@@ -479,7 +490,8 @@ export const ImportWords: FC<{
     isLoading?: boolean;
     onMnemonic: (mnemonic: string[]) => void;
     onIsDirtyChange?: (isDirty: boolean) => void;
-}> = ({ isLoading, onIsDirtyChange, onMnemonic }) => {
+    enableShortMnemonic?: boolean;
+}> = ({ isLoading, onIsDirtyChange, onMnemonic, enableShortMnemonic = true }) => {
     const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const sdk = useAppSdk();
     const { standalone } = useAppContext();
@@ -577,14 +589,22 @@ export const ImportWords: FC<{
                     </Body>
                 </div>
             </Block>
-            <ToggleButtonStyled>
-                <ToggleButtonItem active={wordsNumber === 24} onClick={() => setWordsNumber(24)}>
-                    <Label2>{t('import_wallet_24_words')}</Label2>
-                </ToggleButtonItem>
-                <ToggleButtonItem active={wordsNumber === 12} onClick={() => setWordsNumber(12)}>
-                    <Label2>{t('import_wallet_12_words')}</Label2>
-                </ToggleButtonItem>
-            </ToggleButtonStyled>
+            {enableShortMnemonic && (
+                <ToggleButtonStyled>
+                    <ToggleButtonItem
+                        active={wordsNumber === 24}
+                        onClick={() => setWordsNumber(24)}
+                    >
+                        <Label2>{t('import_wallet_24_words')}</Label2>
+                    </ToggleButtonItem>
+                    <ToggleButtonItem
+                        active={wordsNumber === 12}
+                        onClick={() => setWordsNumber(12)}
+                    >
+                        <Label2>{t('import_wallet_12_words')}</Label2>
+                    </ToggleButtonItem>
+                </ToggleButtonStyled>
+            )}
             <Block>
                 <Inputs ref={ref} wordsNumber={wordsNumber}>
                     {mnemonic.slice(0, wordsNumber).map((item, index) => (

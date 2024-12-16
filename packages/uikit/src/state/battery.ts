@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import type { RechargeMethods } from '@tonkeeper/core/dist/batteryApi/models/RechargeMethods';
 
-import { useActiveAccount } from './wallet';
+import { useActiveAccount, useActiveConfig, useActiveTonNetwork } from './wallet';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
@@ -23,9 +23,10 @@ import {
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useBatteryApi = () => {
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     return useMemo(() => {
         return new Configuration({
             basePath: config.batteryHost || 'https://battery.tonkeeper.com'
@@ -176,26 +177,29 @@ export const useProvideBatteryAuth = () => {
  * ton relative / unit
  */
 export const useBatteryUnitTonRate = () => {
-    const {
-        config: { batteryMeanFees }
-    } = useAppContext();
+    const { batteryMeanFees } = useActiveConfig();
 
     return useMemo(() => new BigNumber(batteryMeanFees || '0.0026'), [batteryMeanFees]);
 };
 
 export const useBatteryEnabledConfig = () => {
-    const {
-        config: { battery_beta, disable_battery, disable_battery_send }
-    } = useAppContext();
+    const network = useActiveTonNetwork();
+    const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
 
-    return useMemo(
-        () => ({
+    return useMemo(() => {
+        if (network === Network.TESTNET) {
+            return {
+                isBeta: false,
+                disableWhole: false,
+                disableOperations: false
+            };
+        }
+        return {
             isBeta: battery_beta ?? false,
             disableWhole: disable_battery ?? false,
             disableOperations: disable_battery ? true : disable_battery_send ?? false
-        }),
-        [battery_beta, disable_battery, disable_battery_send]
-    );
+        };
+    }, [battery_beta, disable_battery, disable_battery_send, network]);
 };
 
 /**
@@ -312,7 +316,7 @@ export const useBatteryBalance = () => {
 
 export const useBatteryShouldBeReservedAmount = () => {
     const { data: balance } = useBatteryBalance();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const rate = useBatteryUnitTonRate();
 
     return useMemo(() => {

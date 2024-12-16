@@ -43,10 +43,10 @@ import {
     validateBip39Mnemonic
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
-    const network = useActiveTonNetwork();
     const fiat = useUserFiat();
     const sdk = useAppSdk();
     const accounts = useAccountsState();
@@ -91,8 +91,8 @@ const useProcessMnemonic = () => {
             } else {
                 const wallets = await getMAMAccountWalletsInfo({
                     account: possibleMAMAccount,
-                    network,
-                    api: context.api,
+                    network: Network.MAINNET,
+                    appContext: context,
                     fiat,
                     walletVersion: context.defaultWalletVersion
                 });
@@ -144,8 +144,8 @@ const useProcessMnemonic = () => {
                 const publicKey = keyPair.publicKey.toString('hex');
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
-                    network,
-                    api: context.api,
+                    network: Network.MAINNET,
+                    appContext: context,
                     fiat
                 });
                 if (versions.some(v => v.tonBalance || v.hasJettons)) {
@@ -188,8 +188,8 @@ const useProcessMnemonic = () => {
                 const publicKey = keyPair.publicKey.toString('hex');
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
-                    network,
-                    api: context.api,
+                    network: Network.MAINNET,
+                    appContext: context,
                     fiat
                 });
                 if (versions.some(v => v.tonBalance || v.hasJettons)) {
@@ -257,6 +257,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         isLoading: isProcessMnemonic,
         data: processedMnemonicResult
     } = useProcessMnemonic();
+
     const availableMnemonicTypes = Object.entries(processedMnemonicResult || {})
         .filter(([_, v]) => v !== undefined)
         .map(v => v[0] as ImportMnemonicType);
@@ -427,6 +428,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     if (!createdAccount) {
         return (
             <ChoseWalletVersions
+                network={Network.MAINNET}
                 mnemonic={mnemonic}
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 onSubmit={versions => {

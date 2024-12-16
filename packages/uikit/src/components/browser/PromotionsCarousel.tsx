@@ -10,6 +10,7 @@ import {
     PromotedItemImage,
     PromotedItemText
 } from '../../pages/browser/PromotedItem';
+import { useActiveConfig } from '../../state/wallet';
 
 const CarouselCard = styled.div<{ img: string }>`
     width: 100%;
@@ -31,7 +32,7 @@ const CarouselCardFooter = styled(PromotedItem)`
 export const PromotionsCarousel: FC<
     { apps: CarouselApp[]; className?: string } & Partial<ComponentProps<typeof Carousel>>
 > = ({ apps, className, ...rest }) => {
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const speed = config.featured_play_interval || 1000 * 10;
 
     return (

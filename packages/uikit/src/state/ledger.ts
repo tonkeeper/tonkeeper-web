@@ -15,7 +15,7 @@ import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { useActiveAccount } from './wallet';
+import { useActiveAccount, useActiveApi } from './wallet';
 import { accountByLedger } from '@tonkeeper/core/dist/service/walletService';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 
@@ -79,7 +79,7 @@ export const useLedgerWallets = (
         LedgerTonTransport
     >
 > => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const accountsStorage = useAccountsStorage();
 
     return useMutation<
