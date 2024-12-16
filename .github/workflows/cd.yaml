@@ -3,6 +3,9 @@ on:
     push:
         tags:
             - v*
+permissions:
+    contents: write
+
 env:
     node-version: 20.11.1
 
@@ -38,7 +41,6 @@ jobs:
             REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
             REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
             REACT_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
-            GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
             DEBUG: electron*
 
         steps:
@@ -147,7 +149,6 @@ jobs:
                   name: 'Tonkeeper ${{ github.ref_name }}'
                   draft: true
                   generate_release_notes: true
-                  token: ${{ secrets.GH_TOKEN }}
                   files: |
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
                           github.ref_name }}.zip
