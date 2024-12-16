@@ -303,12 +303,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     throw new Error('2FA is not active');
                 }
 
-                return new TwoFAMessageSender({ tonApi: api, twoFaApi }, wallet, {
-                    address: twoFAConfig.pluginAddress,
-                    deviceKey: {
-                        publicKey: twoFAConfig.deviceKey.publicKey,
-                        secretKey: `0x${'00'.repeat(64)}` // doesn't provide real key during estiomation for additional safety
-                    }
+                return new TwoFAMessageSender({ tonApi: api, twoFaApi }, wallet, estimationSigner, {
+                    address: twoFAConfig.pluginAddress
                 });
             }
 
@@ -456,17 +452,6 @@ export const useGetSender = () => {
                 throw new Error("Can't send a transfer using this wallet type");
             }
 
-            if (senderChoice.type === 'two_fa') {
-                if (twoFAConfig?.status !== 'active') {
-                    throw new Error('2FA is not active');
-                }
-
-                return new TwoFAMessageSender({ tonApi: api, twoFaApi }, wallet, {
-                    address: twoFAConfig.pluginAddress,
-                    deviceKey: twoFAConfig.deviceKey
-                });
-            }
-
             const signer = await getSigner(activeAccount.id);
 
             if (!signer) {
@@ -478,6 +463,16 @@ export const useGetSender = () => {
                     throw new Error("Can't send a transfer using this account");
                 }
                 return new LedgerMessageSender(api, wallet, signer);
+            }
+
+            if (senderChoice.type === 'two_fa') {
+                if (twoFAConfig?.status !== 'active') {
+                    throw new Error('2FA is not active');
+                }
+
+                return new TwoFAMessageSender({ tonApi: api, twoFaApi }, wallet, signer, {
+                    address: twoFAConfig.pluginAddress
+                });
             }
 
             if (senderChoice.type === 'external') {

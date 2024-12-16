@@ -10,6 +10,7 @@ import { Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
 import { Badge } from '../../components/shared';
 import styled from 'styled-components';
+import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();

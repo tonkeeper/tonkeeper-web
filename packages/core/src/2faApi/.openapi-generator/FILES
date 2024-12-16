@@ -4,8 +4,8 @@ apis/MessageApi.ts
 apis/SystemApi.ts
 apis/index.ts
 index.ts
-models/AuthCheckRequest.ts
-models/AuthRequest.ts
+models/ConnectRequest.ts
+models/ExistsExtensionRequest.ts
 models/Message.ts
 models/MessageID.ts
 models/MessageState.ts
@@ -13,6 +13,7 @@ models/ModelError.ts
 models/Ok.ts
 models/Payload.ts
 models/PingReadyGet500Response.ts
+models/Proof.ts
 models/SendMessageRequest.ts
 models/Url.ts
 models/index.ts

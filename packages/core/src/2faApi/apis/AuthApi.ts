@@ -15,18 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  AuthCheckRequest,
-  AuthRequest,
+  ConnectRequest,
+  ExistsExtensionRequest,
   Ok,
   Payload,
   PingReadyGet500Response,
   Url,
 } from '../models/index';
 import {
-    AuthCheckRequestFromJSON,
-    AuthCheckRequestToJSON,
-    AuthRequestFromJSON,
-    AuthRequestToJSON,
+    ConnectRequestFromJSON,
+    ConnectRequestToJSON,
+    ExistsExtensionRequestFromJSON,
+    ExistsExtensionRequestToJSON,
     OkFromJSON,
     OkToJSON,
     PayloadFromJSON,
@@ -37,12 +37,16 @@ import {
     UrlToJSON,
 } from '../models/index';
 
-export interface AuthOperationRequest {
-    authRequest?: AuthRequest;
+export interface ConnectOperationRequest {
+    connectRequest?: ConnectRequest;
 }
 
-export interface AuthCheckOperationRequest {
-    authCheckRequest?: AuthCheckRequest;
+export interface DisconnectRequest {
+    connectRequest?: ConnectRequest;
+}
+
+export interface ExistsExtensionOperationRequest {
+    existsExtensionRequest?: ExistsExtensionRequest;
 }
 
 /**
@@ -55,46 +59,61 @@ export interface AuthApiInterface {
     /**
      * 
      * @summary Receive a deep link for the Telegram bot
-     * @param {AuthRequest} [authRequest] Data that is expected
+     * @param {ConnectRequest} [connectRequest] Data that is expected
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authRaw(requestParameters: AuthOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Url>>;
+    connectRaw(requestParameters: ConnectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Url>>;
 
     /**
      * Receive a deep link for the Telegram bot
      */
-    auth(requestParameters: AuthOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url>;
+    connect(requestParameters: ConnectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url>;
 
     /**
      * 
-     * @summary Verify if a device public key is linked to a Telegram bot
-     * @param {AuthCheckRequest} [authCheckRequest] Data that is expected
+     * @summary Disable 2FA for the wallet
+     * @param {ConnectRequest} [connectRequest] Data that is expected
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    authCheckRaw(requestParameters: AuthCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>>;
+    disconnectRaw(requestParameters: DisconnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>>;
 
     /**
-     * Verify if a device public key is linked to a Telegram bot
+     * Disable 2FA for the wallet
      */
-    authCheck(requestParameters: AuthCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok>;
+    disconnect(requestParameters: DisconnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok>;
 
     /**
      * 
-     * @summary Retrieve the authentication payload
+     * @summary Verify if a wallet is linked to a Telegram bot
+     * @param {ExistsExtensionRequest} [existsExtensionRequest] Data that is expected
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AuthApiInterface
      */
-    getAuthPayloadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Payload>>;
+    existsExtensionRaw(requestParameters: ExistsExtensionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>>;
 
     /**
-     * Retrieve the authentication payload
+     * Verify if a wallet is linked to a Telegram bot
      */
-    getAuthPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload>;
+    existsExtension(requestParameters: ExistsExtensionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok>;
+
+    /**
+     * 
+     * @summary Retrieve the payload
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    getPayloadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Payload>>;
+
+    /**
+     * Retrieve the payload
+     */
+    getPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload>;
 
 }
 
@@ -106,7 +125,7 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
     /**
      * Receive a deep link for the Telegram bot
      */
-    async authRaw(requestParameters: AuthOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Url>> {
+    async connectRaw(requestParameters: ConnectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Url>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -114,11 +133,11 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/api/v1/auth`,
+            path: `/api/v1/connect`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AuthRequestToJSON(requestParameters['authRequest']),
+            body: ConnectRequestToJSON(requestParameters['connectRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => UrlFromJSON(jsonValue));
@@ -127,15 +146,15 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
     /**
      * Receive a deep link for the Telegram bot
      */
-    async auth(requestParameters: AuthOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url> {
-        const response = await this.authRaw(requestParameters, initOverrides);
+    async connect(requestParameters: ConnectOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url> {
+        const response = await this.connectRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Verify if a device public key is linked to a Telegram bot
+     * Disable 2FA for the wallet
      */
-    async authCheckRaw(requestParameters: AuthCheckOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>> {
+    async disconnectRaw(requestParameters: DisconnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -143,34 +162,63 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/api/v1/auth/check`,
+            path: `/api/v1/disconnect`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AuthCheckRequestToJSON(requestParameters['authCheckRequest']),
+            body: ConnectRequestToJSON(requestParameters['connectRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => OkFromJSON(jsonValue));
     }
 
     /**
-     * Verify if a device public key is linked to a Telegram bot
+     * Disable 2FA for the wallet
      */
-    async authCheck(requestParameters: AuthCheckOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok> {
-        const response = await this.authCheckRaw(requestParameters, initOverrides);
+    async disconnect(requestParameters: DisconnectRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok> {
+        const response = await this.disconnectRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * Retrieve the authentication payload
+     * Verify if a wallet is linked to a Telegram bot
      */
-    async getAuthPayloadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Payload>> {
+    async existsExtensionRaw(requestParameters: ExistsExtensionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/exists`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ExistsExtensionRequestToJSON(requestParameters['existsExtensionRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => OkFromJSON(jsonValue));
+    }
+
+    /**
+     * Verify if a wallet is linked to a Telegram bot
+     */
+    async existsExtension(requestParameters: ExistsExtensionOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok> {
+        const response = await this.existsExtensionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Retrieve the payload
+     */
+    async getPayloadRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Payload>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/auth/payload`,
+            path: `/api/v1/payload`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -180,10 +228,10 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
     }
 
     /**
-     * Retrieve the authentication payload
+     * Retrieve the payload
      */
-    async getAuthPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload> {
-        const response = await this.getAuthPayloadRaw(initOverrides);
+    async getPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload> {
+        const response = await this.getPayloadRaw(initOverrides);
         return await response.value();
     }
 

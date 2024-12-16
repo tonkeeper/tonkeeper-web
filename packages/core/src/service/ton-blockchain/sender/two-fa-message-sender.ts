@@ -3,29 +3,15 @@ import { walletContractFromState } from '../../wallet/contractService';
 import { getServerTime, getTTL, getWalletSeqNo } from '../utils';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { isW5Version, TonWalletStandard } from '../../../entries/wallet';
-import { Builder, WalletContractV5R1 } from '@ton/ton';
+import { WalletContractV5R1 } from '@ton/ton';
 import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { Configuration as TwoFaConfiguration, MessageApi } from '../../../2faApi';
-import {
-    Address,
-    beginCell,
-    Cell,
-    internal,
-    SendMode,
-    storeMessageRelaxed,
-    toNano
-} from '@ton/core';
+import { Address, beginCell, Cell, internal, storeMessageRelaxed, toNano } from '@ton/core';
 import { TwoFAEncoder } from '../encoder/2fa-encoder';
-import { HexStringPrefixed } from '../../../utils/types';
-import nacl from 'tweetnacl';
 import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
-
-export type TwoFADeviceKey = {
-    publicKey: HexStringPrefixed;
-    secretKey: HexStringPrefixed;
-};
+import { CellSigner } from '../../../entries/signer';
 
 let lastSearchingMessageId: string | undefined = undefined;
 
@@ -36,9 +22,9 @@ export class TwoFAMessageSender implements ISender {
             twoFaApi: TwoFaConfiguration;
         },
         private readonly wallet: TonWalletStandard,
+        private readonly signer: CellSigner,
         private readonly pluginConfig: {
             address: string;
-            deviceKey: TwoFADeviceKey;
         }
     ) {}
 
@@ -51,10 +37,9 @@ export class TwoFAMessageSender implements ISender {
 
         const res = await new MessageApi(this.api.twoFaApi).sendMessage({
             sendMessageRequest: {
-                address: this.pluginConfig.address,
                 dataToSign: params.dataToSign.toBoc().toString('hex'),
-                signature: params.signatureAndDeviceId.toBoc().toString('hex'),
-                devicePublicKey: this.pluginConfig.deviceKey.publicKey.slice(2)
+                signature: params.signature.toString('hex'),
+                extensionAddress: this.pluginConfig.address
             }
         });
 
@@ -161,65 +146,18 @@ export class TwoFAMessageSender implements ISender {
         return cellByValue(realValue);
     }
 
-    /**
-     * send_actions#b15f2c8c msg:^Cell mode:uint8 = ExternalMessage;
-     */
-    private encodeSendAction(msgToTheWallet: Cell) {
-        const opCode = 0xb15f2c8c;
-        const payload = beginCell()
-            .storeRef(msgToTheWallet)
-            .storeUint(SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS, 8);
-        return this.encodeAndSignTwoFARequest(opCode, payload);
-    }
+    private async encodeSendAction(msgToTheWallet: Cell) {
+        const dataToSign = await new TwoFAEncoder(
+            this.api.tonApi,
+            this.wallet.rawAddress
+        ).encodeSendAction(this.pluginConfig.address, msgToTheWallet);
 
-    private async encodeAndSignTwoFARequest(opCode: number, payload: Builder) {
-        const timestamp = await getServerTime(this.api.tonApi);
-        const validUntil = getTTL(timestamp);
-
-        const dataToSign = beginCell()
-            .storeUint(opCode, 32) // op code of the method
-            .storeUint(await this.getPluginSeqno(), 32)
-            .storeUint(validUntil, 64)
-            .storeBuilder(payload) // payload of the method
-            .endCell();
-
-        const signature = Buffer.from(
-            nacl.sign.detached(
-                dataToSign.hash(),
-                Buffer.from(this.pluginConfig.deviceKey.secretKey.slice(2), 'hex')
-            )
-        );
-
-        const signatureAndDeviceId = beginCell()
-            .storeBuffer(signature)
-            .storeUint(await this.getKeyId(), 32)
-            .endCell();
+        const signature = await this.signer(dataToSign);
 
         return {
             dataToSign,
-            signatureAndDeviceId
+            signature
         };
-    }
-
-    private async getPluginSeqno() {
-        return new TwoFAEncoder(this.api.tonApi, this.wallet.rawAddress).getPluginSeqno(
-            this.pluginConfig.address
-        );
-    }
-
-    private async getKeyId() {
-        const keysDict = await new TwoFAEncoder(
-            this.api.tonApi,
-            this.wallet.rawAddress
-        ).getPluginDeviceKeysDict(this.pluginConfig.address);
-
-        for (const pair of keysDict) {
-            if (pair[1] === BigInt(this.pluginConfig.deviceKey.publicKey)) {
-                return pair[0];
-            }
-        }
-
-        throw new Error('Key not found');
     }
 
     private async estimatePluginOwnFee({
@@ -233,7 +171,7 @@ export class TwoFAMessageSender implements ISender {
             this.api.tonApi.tonApiV2
         ).execGetMethodForBlockchainAccount({
             accountId: this.pluginConfig.address, // TODO не работает нормально
-            methodName: 'get_gas_fee_for_processing_send_actions',
+            methodName: 'get_estimated_attached_value',
             args: [forwardMsg.toBoc().toString('base64'), '0x' + actionsNumber.toString(16), '0x0']
         });
 

@@ -83,6 +83,8 @@ export interface TonendpointConfig {
     isOnReview?: boolean;
     '2fa_public_key'?: string;
     '2fa_api_url'?: string;
+    '2fa_tg_confirm_send_message_ttl_seconds'?: number;
+    '2fa_tg_linked_ttl_seconds'?: number;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

@@ -3,7 +3,11 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Estimation } from '@tonkeeper/core/dist/entries/send';
 
 import { useAnalyticsTrack } from '../../amplitude';
-import { useActiveWallet, useInvalidateActiveWalletQueries } from '../../../state/wallet';
+import {
+    useActiveApi,
+    useActiveWallet,
+    useInvalidateActiveWalletQueries
+} from '../../../state/wallet';
 import { useNotifyErrorHandle } from '../../useNotification';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
@@ -15,7 +19,6 @@ import {
 } from '../../../state/two-fa';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
-import { useAppContext } from '../../appContext';
 
 export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const track = useAnalyticsTrack();
@@ -28,7 +31,7 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const wallet = useActiveWallet();
     const { servicePubKey } = useTwoFAServiceConfig();
     const { mutateAsync: markTwoFAWalletAsActive } = useMarkTwoFAWalletAsActive();
-    const { api } = useAppContext();
+    const api = useActiveApi();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -45,10 +48,9 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
             }
 
             const encoder = new TwoFAEncoder(api, wallet.rawAddress);
-            const tx = await encoder.encodeInstallForDevice({
+            const tx = await encoder.encodeInstall({
                 seedPubKey: BigInt('0x' + wallet.publicKey),
-                servicePubKey,
-                devicePubKey: BigInt(twoFAWalletConfig!.deviceKey!.publicKey)
+                servicePubKey
             });
 
             await rawTransactionService.send(

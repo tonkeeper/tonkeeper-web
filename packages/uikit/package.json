@@ -46,8 +46,8 @@
         "recharts": "^2.12.3",
         "slick-carousel": "^1.8.1",
         "styled-components": "^6.1.1",
-        "uuid": "^9.0.0",
-        "tweetnacl": "^1.0.3"
+        "tweetnacl": "^1.0.3",
+        "uuid": "^9.0.0"
     },
     "devDependencies": {
         "@babel/core": "^7.20.5",

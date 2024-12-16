@@ -72,13 +72,13 @@ const LinkTGStep = forwardRef<HTMLElement, { config: TwoFAWalletConfig }>(({ con
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
 
-    const isStepActive = config.status === 'initial' || config.status === 'tg-bot-bounding';
+    const isStepActive = config === null || config.status === 'tg-bot-bounding';
 
     const { mutateAsync: boundBot } = useBoundTwoFABot();
     const { mutate: disconnect } = useDisconnectTwoFABot();
 
     const onClickContinue = async () => {
-        if (config.status === 'initial') {
+        if (config === null) {
             await boundBot();
         }
 
@@ -114,7 +114,7 @@ const DeployPluginStep = forwardRef<HTMLElement, { config: TwoFAWalletConfig }>(
         const { t } = useTranslation();
         const { isOpen, onClose, onOpen } = useDisclosure();
 
-        const isStepActive = config.status === 'ready-for-deployment';
+        const isStepActive = config?.status === 'ready-for-deployment';
 
         return (
             <>

@@ -24,19 +24,13 @@ export interface SendMessageRequest {
      * @type {string}
      * @memberof SendMessageRequest
      */
-    address: string;
+    extensionAddress: string;
     /**
      * 
      * @type {string}
      * @memberof SendMessageRequest
      */
     dataToSign: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SendMessageRequest
-     */
-    devicePublicKey: string;
     /**
      * 
      * @type {string}
@@ -49,9 +43,8 @@ export interface SendMessageRequest {
  * Check if a given object implements the SendMessageRequest interface.
  */
 export function instanceOfSendMessageRequest(value: object): value is SendMessageRequest {
-    if (!('address' in value) || value['address'] === undefined) return false;
+    if (!('extensionAddress' in value) || value['extensionAddress'] === undefined) return false;
     if (!('dataToSign' in value) || value['dataToSign'] === undefined) return false;
-    if (!('devicePublicKey' in value) || value['devicePublicKey'] === undefined) return false;
     if (!('signature' in value) || value['signature'] === undefined) return false;
     return true;
 }
@@ -66,9 +59,8 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'address': json['address'],
+        'extensionAddress': json['extension_address'],
         'dataToSign': json['data_to_sign'],
-        'devicePublicKey': json['device_public_key'],
         'signature': json['signature'],
     };
 }
@@ -84,9 +76,8 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
 
     return {
         
-        'address': value['address'],
+        'extension_address': value['extensionAddress'],
         'data_to_sign': value['dataToSign'],
-        'device_public_key': value['devicePublicKey'],
         'signature': value['signature'],
     };
 }

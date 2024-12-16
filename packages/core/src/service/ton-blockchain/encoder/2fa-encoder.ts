@@ -3,7 +3,6 @@ import {
     beginCell,
     Cell,
     contractAddress,
-    Dictionary,
     internal,
     OutActionSendMsg,
     SendMode,
@@ -12,25 +11,22 @@ import {
 import { APIConfig } from '../../../entries/apis';
 import { BlockchainApi } from '../../../tonApiV2';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
+import { Builder } from '@ton/ton';
+import { getServerTime, getTTL } from '../utils';
 
 export class TwoFAEncoder {
-    public static readonly deployPluginValue = toNano(0.05); // TODO сколько надо?
+    public static readonly deployPluginValue = toNano(0.05); // TODO сколько надо? 0.5
 
-    public static readonly removePluginValue = toNano(0.05); // TODO сколько надо?
+    public static readonly removePluginValue = toNano(0.05); // TODO сколько надо? 0.5
 
     /**
-     * install#43563174 service_pubkey:uint256 seed_pubkey:uint256 device_pubkeys:(Dict uint32 uint256) = InternalMessage;
+     * install#43563174 service_pubkey:uint256 seed_pubkey:uint256 = InternalMessage;
      */
-    static encodeInstallBody(params: {
-        servicePubKey: bigint;
-        seedPubKey: bigint;
-        devicePubKeys: Dictionary<number, bigint>;
-    }) {
+    static encodeInstallBody(params: { servicePubKey: bigint; seedPubKey: bigint }) {
         return beginCell()
             .storeUint(0x43563174, 32)
             .storeUint(params.servicePubKey, 256)
             .storeUint(params.seedPubKey, 256)
-            .storeDict(params.devicePubKeys)
             .endCell();
     }
 
@@ -59,30 +55,14 @@ export class TwoFAEncoder {
         this.walletAddress = Address.parse(walletAddressRaw);
     }
 
-    public encodeInstallForDevice = async (params: {
+    public encodeInstall = async (params: {
         servicePubKey: bigint;
         seedPubKey: bigint;
-        devicePubKey: bigint;
     }): Promise<OutActionWalletV5[]> => {
         const stateInit = this.pluginStateInit;
         const address = contractAddress(this.walletAddress.workChain, stateInit);
 
         const seqno = await this.getPluginSeqno(address.toRawString());
-
-        let devicePubKeys: Dictionary<number, bigint>;
-        if (seqno === 0) {
-            devicePubKeys = Dictionary.empty(
-                Dictionary.Keys.Uint(32),
-                Dictionary.Values.BigUint(256)
-            );
-            devicePubKeys.set(0, params.devicePubKey);
-        } else {
-            devicePubKeys = await this.getPluginDeviceKeysDict(address.toRawString());
-            if (devicePubKeys.values().every(v => v !== params.devicePubKey)) {
-                const newKey = Math.max(...devicePubKeys.keys()) + 1;
-                devicePubKeys.set(newKey, params.devicePubKey);
-            }
-        }
 
         const msgInstall: OutActionSendMsg = {
             type: 'sendMsg',
@@ -92,24 +72,41 @@ export class TwoFAEncoder {
                 bounce: false,
                 value: TwoFAEncoder.deployPluginValue,
                 init: seqno === 0 ? stateInit : undefined,
-                body: TwoFAEncoder.encodeInstallBody({
-                    ...params,
-                    devicePubKeys
-                })
+                body: TwoFAEncoder.encodeInstallBody(params)
             })
         };
 
-        const outActions: OutActionWalletV5[] = [msgInstall];
-
-        if (!(await this.getIsPluginAlreadyInstalled(address))) {
-            outActions.push({
+        return [
+            msgInstall,
+            {
                 type: 'addExtension',
                 address
-            });
-        }
-
-        return outActions;
+            }
+        ];
     };
+
+    /**
+     * send_actions#b15f2c8c msg:^Cell mode:uint8 = ExternalMessage;
+     */
+    public encodeSendAction(pluginAddress: string, msgToTheWallet: Cell) {
+        const opCode = 0xb15f2c8c;
+        const payload = beginCell()
+            .storeRef(msgToTheWallet)
+            .storeUint(SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS, 8);
+        return this.encodeTwoFARequest(pluginAddress, opCode, payload);
+    }
+
+    private async encodeTwoFARequest(pluginAddress: string, opCode: number, payload: Builder) {
+        const timestamp = await getServerTime(this.api);
+        const validUntil = getTTL(timestamp);
+
+        return beginCell()
+            .storeUint(opCode, 32) // op code of the method
+            .storeUint(await this.getPluginSeqno(pluginAddress), 32)
+            .storeUint(validUntil, 64)
+            .storeBuilder(payload) // payload of the method
+            .endCell();
+    }
 
     private calculatePluginAddress() {
         return contractAddress(this.walletAddress.workChain, this.pluginStateInit);
@@ -161,27 +158,10 @@ export class TwoFAEncoder {
             .storeAddress(this.walletAddress)
             .storeUint(0, 256)
             .storeUint(0, 256)
-            .storeDict()
             .storeUint(0, 2)
             .storeUint(0, 64)
             .storeUint(findShardCounter, 32) // TODO size
             .endCell();
-    }
-
-    public async getPluginDeviceKeysDict(pluginAddress: string) {
-        const res = await new BlockchainApi(this.api.tonApiV2).execGetMethodForBlockchainAccount({
-            accountId: pluginAddress,
-            methodName: 'get_device_pubkeys'
-        });
-
-        if (!res.success || res.stack[0].type !== 'cell' || !res.stack[0].cell) {
-            throw new Error(`Unexpected result ${res.stack[0].type}`);
-        }
-
-        const cell = Cell.fromBase64(Buffer.from(res.stack[0].cell!, 'hex').toString('base64'));
-        return cell
-            .beginParse()
-            .loadDictDirect(Dictionary.Keys.Uint(32), Dictionary.Values.BigUint(256));
     }
 
     public async getPluginSeqno(pluginAddress: string) {
@@ -203,41 +183,6 @@ export class TwoFAEncoder {
         } catch (e) {
             console.error(e);
             return 0;
-        }
-    }
-
-    public async getIsPluginAlreadyInstalled(address: Address) {
-        try {
-            const res = await new BlockchainApi(
-                this.api.tonApiV2
-            ).execGetMethodForBlockchainAccount({
-                accountId: this.walletAddress.toRawString(),
-                methodName: 'get_extensions'
-            });
-
-            if (res.stack[0].type !== 'cell' || !res.stack[0].cell || !res.success) {
-                throw new Error(`Unexpected result ${res.stack[0].type}`);
-            }
-
-            const extensions = Cell.fromBase64(
-                Buffer.from(res.stack[0].cell, 'hex').toString('base64')
-            );
-
-            const dict: Dictionary<bigint, bigint> = Dictionary.loadDirect(
-                Dictionary.Keys.BigUint(256),
-                Dictionary.Values.BigInt(1),
-                extensions
-            );
-
-            const extensionsAddresses = dict.keys().map(addressHex => {
-                const wc = this.walletAddress.workChain;
-                return Address.parseRaw(`${wc}:${addressHex.toString(16).padStart(64, '0')}`);
-            });
-
-            return extensionsAddresses.some(ext => ext.equals(address));
-        } catch (e) {
-            console.error(e);
-            return false;
         }
     }
 }

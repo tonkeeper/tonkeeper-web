@@ -2,7 +2,6 @@ import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entrie
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useActiveAccount, useActiveApi, useActiveTonNetwork } from '../state/wallet';
 import { useTranslation } from './translation';
-import { useAppContext } from './appContext';
 import { useAppSdk } from './appSdk';
 import { useCheckTouchId } from '../state/password';
 import { useMutation } from '@tanstack/react-query';
@@ -32,7 +31,7 @@ export const useSignTonProof = () => {
     const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<
-        ReturnType<typeof createTonProofItem>,
+        Omit<ReturnType<typeof createTonProofItem>, 'stateInit'> & { stateInit: string },
         Error,
         { payload: string; origin: string }
     >(async ({ origin, payload }) => {
@@ -58,6 +57,6 @@ export const useSignTonProof = () => {
             })(proofPayload.bufferToSign),
             proofPayload,
             stateInit
-        );
+        ) as Omit<ReturnType<typeof createTonProofItem>, 'stateInit'> & { stateInit: string };
     });
 };
