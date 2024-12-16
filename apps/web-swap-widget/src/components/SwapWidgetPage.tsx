@@ -72,9 +72,11 @@ export const SwapWidgetPage = () => {
         const ctx = getTonkeeperInjectionContext()!;
 
         try {
-            await ctx.sendTransaction({
+            const result = await ctx.sendTransaction({
                 source: ctx.address,
-                // legacy tonkeeper api, timestamp in ms
+                /**
+                 * legacy tonkeeper api, timestamp in ms
+                 */
                 valid_until: params.valid_until * 1000,
                 messages: params.messages.map(m => ({
                     address: m.address,
@@ -95,8 +97,16 @@ export const SwapWidgetPage = () => {
                     : undefined
             });
 
+            /**
+              old tonkeeper android versions return empty result instead of throwing
+             */
+            if (!result) {
+                throw new Error('Operation failed');
+            }
+
             onOpen();
         } catch (e) {
+            console.error(e);
             notifyError(toErrorMessage(e));
         }
     };
