@@ -1,6 +1,16 @@
 import queryString from 'query-string';
 import { seeIfValidTonAddress } from '../utils/common';
 
+export function seeIfBringToFrontLink(options: { url: string }) {
+    const { query } = queryString.parseUrl(options.url);
+
+    if (typeof query.ret === 'string' && query.v == null) {
+        return { ret: query.ret };
+    } else {
+        return null;
+    }
+}
+
 export interface TonTransferParams {
     address?: string;
     amount?: string;

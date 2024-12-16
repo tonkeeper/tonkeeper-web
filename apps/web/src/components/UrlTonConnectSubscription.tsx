@@ -8,6 +8,8 @@ import {
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppRoute } from "@tonkeeper/uikit/dist/libs/routes";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
 
 const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 
@@ -19,11 +21,18 @@ export const UrlTonConnectSubscription = () => {
     useResponseConnectionMutation();
 
 
-  const handlerClose = async (replyItems?: ConnectItemReply[], manifest?: DAppManifest) => {
+  const handlerClose = async (
+    result: {
+      replyItems: ConnectItemReply[];
+      manifest: DAppManifest;
+      account: Account;
+      walletId: WalletId;
+    } | null
+  ) => {
     if (!params) return;
     responseReset();
     try {
-      await responseConnectionAsync({ params, replyItems, manifest });
+      await responseConnectionAsync({ params, result });
     } finally {
       setParams(null);
     }
