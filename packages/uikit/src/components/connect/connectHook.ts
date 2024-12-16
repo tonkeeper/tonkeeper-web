@@ -4,7 +4,10 @@ import {
     DAppManifest,
     SendTransactionAppRequest
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
+import {
+    parseTonTransferWithAddress,
+    seeIfBringToFrontLink
+} from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
     connectRejectResponse,
     parseTonConnect,
@@ -29,6 +32,12 @@ export const useGetConnectInfo = () => {
 
     return useMutation<null | TonConnectParams, Error, string>(async url => {
         try {
+            const bring = seeIfBringToFrontLink({ url });
+            if (bring != null) {
+                // TODO: save ret parameter and user after confirm transaction
+                return null;
+            }
+
             const transfer = parseTonTransferWithAddress({ url });
 
             if (transfer) {
