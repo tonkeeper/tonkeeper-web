@@ -37,6 +37,13 @@ export class TwoFAEncoder {
         return beginCell().storeUint(0x9d8084d6, 32).endCell();
     }
 
+    /**
+     * cancel_delegation#de82b501 = ExternalMessage;
+     */
+    static cancelRecoveryBody(builder: Builder) {
+        return builder.storeUint(0xde82b501, 32);
+    }
+
     private readonly walletAddress: Address;
 
     private pluginAddressCache: Address | undefined;
@@ -193,11 +200,15 @@ export class TwoFAEncoder {
         }
     }
 
-    public async getPluginState(): Promise<'not_exist' | 'active' | 'deactivating'> {
+    public async getPluginState(): Promise<
+        | { type: 'not_exist' }
+        | { type: 'active' }
+        | { type: 'deactivating'; willBeDisabledAtUnixSeconds: number }
+    > {
         const seqno = await this.getPluginSeqno();
 
         if (seqno === 0) {
-            return 'not_exist';
+            return { type: 'not_exist' };
         }
 
         const res = await new BlockchainApi(this.api.tonApiV2).execGetMethodForBlockchainAccount({
@@ -205,16 +216,23 @@ export class TwoFAEncoder {
             methodName: 'get_delegation_state'
         });
 
-        const state = res.stack[0].num;
+        const state = res.stack[0]?.num;
 
         if (!res.success || !state || !isFinite(Number(state))) {
             throw new Error("Can't get state");
         }
 
         if (Number(state) === 0) {
-            return 'active';
+            return { type: 'active' };
         } else if (Number(state) === 1) {
-            return 'deactivating';
+            if (!res.stack[1]?.num || !isFinite(Number(res.stack[1].num))) {
+                throw new Error("Can't get deactivating time");
+            }
+
+            return {
+                type: 'deactivating',
+                willBeDisabledAtUnixSeconds: Number(res.stack[1].num)
+            };
         } else {
             throw new Error(`Unknown state ${state}`);
         }

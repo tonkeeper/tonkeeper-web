@@ -25,7 +25,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { IconButton, IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useAppContext } from '../../hooks/appContext';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppRoute } from '../../libs/routes';

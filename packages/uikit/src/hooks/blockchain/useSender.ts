@@ -391,12 +391,14 @@ export const useGetSender = () => {
     const gaslessConfig = useGaslessConfig();
     const twoFaApi = useTwoFAApi();
     const { data: twoFAConfig } = useTwoFAWalletConfig();
-    const { onOpen: openTwoFaConfirmTelegram } = useConfirmTwoFANotification();
+    const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
+        useConfirmTwoFANotification();
     const twoFAServiceConfig = useTwoFAServiceConfig();
 
     const wallet = activeAccount.activeTonWallet;
 
     return useCallback(
+        // eslint-disable-next-line complexity
         async (senderChoice: SenderChoice = { type: 'external' }): Promise<Sender> => {
             if (activeAccount.type === 'watch-only') {
                 throw new Error("Can't send a transfer using this account");
@@ -472,7 +474,7 @@ export const useGetSender = () => {
             }
 
             if (senderChoice.type === 'two_fa') {
-                if (twoFAConfig?.status !== 'active') {
+                if (twoFAConfig?.status !== 'active' && twoFAConfig?.status !== 'disabling') {
                     throw new Error('2FA is not active');
                 }
 
@@ -482,7 +484,10 @@ export const useGetSender = () => {
                     signer,
                     twoFAConfig.pluginAddress,
                     {
-                        onBocSigned: openTwoFaConfirmTelegram,
+                        openConfirmModal: () => {
+                            openTwoFaConfirmTelegram();
+                            return closeTwoFaConfirmTelegram;
+                        },
                         confirmMessageTGTtlSeconds: twoFAServiceConfig.confirmMessageTGTtlSeconds
                     }
                 );
@@ -554,6 +559,7 @@ export const useGetSender = () => {
             twoFaApi,
             twoFAConfig,
             openTwoFaConfirmTelegram,
+            closeTwoFaConfirmTelegram,
             twoFAServiceConfig.confirmMessageTGTtlSeconds
         ]
     );

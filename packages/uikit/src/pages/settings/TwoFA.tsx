@@ -28,6 +28,10 @@ import { Button } from '../../components/fields/Button';
 import { DisableTwoFAConfirmNotification } from '../../components/settings/two-fa/DisableTwoFAConfirmNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { TwoFAReConnectBotNotification } from '../../components/settings/two-fa/TwoFAConnectBotNotification';
+import { useUserLanguage } from '../../state/language';
+import { localizationText } from '@tonkeeper/core/dist/entries/language';
+import { formattedDateTimeStamp } from '../../libs/dateTime';
+import { useSendTwoFACancelRecovery } from '../../hooks/blockchain/two-fa/useSendTwoFCancelRecovery';
 
 export const TwoFAPage = () => {
     const account = useActiveAccount();
@@ -154,7 +158,11 @@ const TwoFAPageContent: FC = () => {
         case 'active':
             return <TwoFAActiveContent />;
         case 'disabling':
-            return <TwoFADisablingContent />;
+            return (
+                <TwoFADisablingContent
+                    disablingDate={new Date(config.willBeDisabledAtUnixSeconds * 1000)}
+                />
+            );
         default:
             assertUnreachable(config);
     }
@@ -258,7 +266,30 @@ const TwoFAActiveContent = () => {
     );
 };
 
-const TwoFADisablingContent = () => {
+const TwoFADisablingContent: FC<{ disablingDate: Date }> = ({ disablingDate }) => {
     const { t } = useTranslation();
-    return null;
+    const { data } = useUserLanguage();
+    const locale = localizationText(data) as unknown as ILocale;
+    const { mutate, isLoading } = useSendTwoFACancelRecovery();
+
+    return (
+        <>
+            <ContentWrapper>
+                <TextHeadingBlock>
+                    <Label2>{t('two_fa_settings_heading_recovery_title')}</Label2>
+                    <Body2>
+                        {t('two_fa_settings_heading_recovery_description', {
+                            date: formattedDateTimeStamp(disablingDate, locale)
+                        })}
+                    </Body2>
+                </TextHeadingBlock>
+
+                <ActionButtonsContainer>
+                    <Button primary onClick={() => mutate()} loading={isLoading}>
+                        {t('two_fa_settings_cancel_recovery_button')}
+                    </Button>
+                </ActionButtonsContainer>
+            </ContentWrapper>
+        </>
+    );
 };

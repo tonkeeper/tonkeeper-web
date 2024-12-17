@@ -2,12 +2,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useAppSdk } from '../hooks/appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useAccountsState, useActiveAccount, useActiveConfig, useActiveWallet } from './wallet';
+import {
+    useAccountsState,
+    useActiveAccount,
+    useActiveApi,
+    useActiveConfig,
+    useActiveWallet
+} from './wallet';
 import { useDevSettings } from './dev';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { AuthApi, Configuration } from '@tonkeeper/core/dist/2faApi';
 import { useMemo } from 'react';
 import { useSignTonProof } from '../hooks/accountUtils';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
@@ -18,12 +26,6 @@ export type TwoFATgBotBoundingWalletConfig = {
 export type TwoFATgBotBoundedWalletConfig = {
     status: 'ready-for-deployment';
     botUrl: string;
-};
-
-export type TwoFAPendingDeploymentWalletConfig = {
-    status: 'active';
-    botUrl: string;
-    pluginAddress: string;
 };
 
 export type TwoFAActiveWalletConfig = {
@@ -89,7 +91,8 @@ export const useTwoFAServiceConfig = () => {
             baseUrl: config['2fa_api_url'],
             servicePubKey,
             confirmMessageTGTtlSeconds: config['2fa_tg_confirm_send_message_ttl_seconds'] ?? 600,
-            confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'] ?? 600
+            confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'] ?? 600,
+            botUrl: config['2fa_bot_url'] ?? 'https://t.me/tonkeeper_2fa_bot'
         };
     }, [config]);
 };
@@ -100,23 +103,54 @@ export const useTwoFAWalletConfig = () => {
     const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
 
     const wallet = account.activeTonWallet;
-    const api = useTwoFAApi();
+    const twoFAApi = useTwoFAApi();
+    const api = useActiveApi();
 
     const isSuitableAccount = account.type === 'mnemonic' || account.type === 'mam';
+    const serviceConfig = useTwoFAServiceConfig();
 
     return useQuery<TwoFAWalletConfig>(
         [QueryKey.twoFAWalletConfig, wallet.id, isTwoFAEnabledGlobally],
         async () => {
+            const twoFAEncoder = new TwoFAEncoder(api, wallet.rawAddress);
+            const twoFAState = await new TwoFAEncoder(api, wallet.rawAddress).getPluginState();
+
             let config = await sdk.storage.get<TwoFAWalletConfig>(
                 twoFaWalletConfigStorageKey(wallet.id)
             );
             const originalConfigStatus = config?.status;
-            if (!config) {
-                return null;
+
+            if (twoFAState.type === 'active') {
+                config = {
+                    status: 'active',
+                    pluginAddress: twoFAEncoder.pluginAddress.toRawString(),
+                    botUrl: serviceConfig.botUrl
+                };
+                await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), config);
+                return config;
+            }
+
+            if (twoFAState.type === 'deactivating') {
+                config = {
+                    status: 'disabling',
+                    pluginAddress: twoFAEncoder.pluginAddress.toRawString(),
+                    willBeDisabledAtUnixSeconds: twoFAState.willBeDisabledAtUnixSeconds
+                };
+
+                await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), config);
+                return config;
+            }
+
+            if (twoFAState.type !== 'not_exist') {
+                assertUnreachable(twoFAState);
+            }
+
+            if (config?.status === 'active' || config?.status === 'disabling') {
+                config = null;
             }
 
             if (
-                config.status === 'tg-bot-bounding' &&
+                config?.status === 'tg-bot-bounding' &&
                 config.expiresAtUnixSeconds < Date.now() / 1000
             ) {
                 config = null;
@@ -124,7 +158,7 @@ export const useTwoFAWalletConfig = () => {
 
             if (config?.status === 'tg-bot-bounding') {
                 try {
-                    const result = await new AuthApi(api).existsExtension({
+                    const result = await new AuthApi(twoFAApi).existsExtension({
                         existsExtensionRequest: {
                             wallet: wallet.rawAddress
                         }
@@ -151,7 +185,11 @@ export const useTwoFAWalletConfig = () => {
             keepPreviousData: true,
             enabled: isSuitableAccount,
             refetchInterval: d =>
-                d?.status === 'tg-bot-bounding' || d?.status === 'disabling' ? 1000 : false
+                d?.status === 'tg-bot-bounding'
+                    ? 1000
+                    : d?.status === 'disabling' || d?.status === 'active'
+                    ? 10000
+                    : false
         }
     );
 };

@@ -85,6 +85,7 @@ export interface TonendpointConfig {
     '2fa_api_url'?: string;
     '2fa_tg_confirm_send_message_ttl_seconds'?: number;
     '2fa_tg_linked_ttl_seconds'?: number;
+    '2fa_bot_url'?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

@@ -8,12 +8,23 @@ import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { Configuration as TwoFaConfiguration, MessageApi } from '../../../2faApi';
-import { Address, beginCell, Cell, internal, storeMessageRelaxed, toNano } from '@ton/core';
+import {
+    Address,
+    beginCell,
+    Cell,
+    internal,
+    storeMessage,
+    storeMessageRelaxed,
+    toNano,
+    external
+} from '@ton/core';
 import { TwoFAEncoder } from '../encoder/2fa-encoder';
 import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import { CellSigner } from '../../../entries/signer';
 
 let lastSearchingMessageId: string | undefined = undefined;
+
+type CloseConfirmModalCallback = () => void;
 
 export class TwoFAMessageSender implements ISender {
     constructor(
@@ -25,7 +36,7 @@ export class TwoFAMessageSender implements ISender {
         private readonly signer: CellSigner,
         private readonly pluginAddress: string,
         private readonly options: {
-            onBocSigned?: () => void;
+            openConfirmModal?: () => CloseConfirmModalCallback;
             confirmMessageTGTtlSeconds?: number;
         } = {}
     ) {}
@@ -46,10 +57,13 @@ export class TwoFAMessageSender implements ISender {
             }
         });
 
-        this.options.onBocSigned?.();
+        const closeConfirmModal = this.options.openConfirmModal?.();
 
         lastSearchingMessageId = res.messageId;
-        return Cell.fromBase64(await this.bocByMsgId(res.messageId));
+        const result = Cell.fromBase64(await this.bocByMsgId(res.messageId));
+
+        closeConfirmModal?.();
+        return result;
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {
@@ -118,10 +132,50 @@ export class TwoFAMessageSender implements ISender {
             }
         });
 
-        this.options.onBocSigned?.();
+        const closeConfirmModal = this.options.openConfirmModal?.();
 
         lastSearchingMessageId = res.messageId;
-        return Cell.fromBase64(await this.bocByMsgId(res.messageId));
+        const result = Cell.fromBase64(await this.bocByMsgId(res.messageId));
+        closeConfirmModal?.();
+
+        return result;
+    }
+
+    public async sendCancelRecovery() {
+        const timestamp = await getServerTime(this.api.tonApi);
+        const validUntil = getTTL(timestamp);
+        const seqno = await new TwoFAEncoder(
+            this.api.tonApi,
+            this.wallet.rawAddress
+        ).getPluginSeqno(this.pluginAddress);
+
+        const dataToSign = beginCell()
+            .store(TwoFAEncoder.cancelRecoveryBody)
+            .storeUint(seqno, 32)
+            .storeUint(validUntil, 64)
+            .endCell();
+
+        const signature = await this.signer(dataToSign);
+
+        const body = beginCell()
+            .storeBuffer(signature)
+            .storeSlice(dataToSign.beginParse())
+            .endCell();
+
+        const ext = beginCell()
+            .storeWritable(
+                storeMessage(
+                    external({
+                        to: this.pluginAddress,
+                        body
+                    })
+                )
+            )
+            .endCell();
+
+        await new BlockchainApi(this.api.tonApi.tonApiV2).sendBlockchainMessage({
+            sendBlockchainMessageRequest: { boc: ext.toBoc().toString('base64') }
+        });
     }
 
     private async toPluginExternalParams({ messages, sendMode }: WalletOutgoingMessage) {
