@@ -19,7 +19,6 @@ import { getTonkeeperInjectionContext } from '../libs/tonkeeper-injection-contex
 import { SwapWidgetFooter } from './SwapWidgetFooter';
 import { SwapWidgetTxSentNotification } from './SwapWidgetTxSent';
 import { useDisclosure } from '@tonkeeper/uikit/dist/hooks/useDisclosure';
-import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
 
 const MainFormWrapper = styled.div`
     height: 100%;
@@ -63,7 +62,6 @@ export const SwapWidgetPage = () => {
     const [toAsset, setToAsset] = useSwapToAsset();
     const [_, setFromAmount] = useSwapFromAmount();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const notifyError = useToast();
 
     const onConfirm = async () => {
         const params = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
