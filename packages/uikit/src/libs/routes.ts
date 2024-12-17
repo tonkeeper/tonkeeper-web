@@ -43,7 +43,8 @@ export enum SettingsRoute {
     security = '/security',
     subscriptions = '/subscriptions',
     country = '/country',
-    pro = '/pro'
+    pro = '/pro',
+    twoFa = '/two-fa'
 }
 
 export enum WalletSettingsRoute {

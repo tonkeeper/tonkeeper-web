@@ -145,7 +145,7 @@ export class TwoFAEncoder {
     }
 
     private isSameShardWithWallet(address: Address) {
-        const watchFirstBits = 9; // TODO мб меньше брать? Долго ли будет
+        const watchFirstBits = 9;
         return address.hash
             .subarray(0, watchFirstBits / 8)
             .equals(this.walletAddress.hash.subarray(0, watchFirstBits / 8));
@@ -174,7 +174,7 @@ export class TwoFAEncoder {
             .storeUint(0, 256)
             .storeUint(0, 2)
             .storeUint(0, 64)
-            .storeUint(findShardCounter, 32) // TODO size
+            .storeUint(findShardCounter, 32)
             .endCell();
     }
 

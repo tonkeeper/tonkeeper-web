@@ -1,5 +1,5 @@
 import { createModalControl } from './createModalControl';
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../state/two-fa';
 import styled from 'styled-components';
 import { Notification } from '../Notification';
@@ -17,6 +17,15 @@ const NotificationStyled = styled(Notification)`
 
 export const ConfirmTwoFANotificationControlled = () => {
     const { isOpen, onClose } = useConfirmTwoFANotification();
+
+    return (
+        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+            {() => <Content onClose={onClose} isOpen={isOpen} />}
+        </NotificationStyled>
+    );
+};
+
+const Content: FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const { confirmMessageTGTtlSeconds } = useTwoFAServiceConfig();
     const { data: walletConfig } = useTwoFAWalletConfig();
     const authLink = walletConfig && 'botUrl' in walletConfig ? walletConfig.botUrl : undefined;
@@ -32,18 +41,15 @@ export const ConfirmTwoFANotificationControlled = () => {
     }, [isOpen, confirmMessageTGTtlSeconds]);
 
     return (
-        <NotificationStyled isOpen={creationTimeSeconds !== undefined} handleClose={onClose}>
-            {() =>
-                !!authLink &&
-                creationTimeSeconds !== undefined && (
-                    <ConfirmView2FATelegramContent
-                        validUntilSeconds={creationTimeSeconds + confirmMessageTGTtlSeconds}
-                        onClose={onClose}
-                        openTgLink={authLink}
-                        creationTimeSeconds={creationTimeSeconds}
-                    />
-                )
-            }
-        </NotificationStyled>
+        <>
+            {!!authLink && creationTimeSeconds !== undefined && (
+                <ConfirmView2FATelegramContent
+                    validUntilSeconds={creationTimeSeconds + confirmMessageTGTtlSeconds}
+                    onClose={onClose}
+                    openTgLink={authLink}
+                    creationTimeSeconds={creationTimeSeconds}
+                />
+            )}
+        </>
     );
 };

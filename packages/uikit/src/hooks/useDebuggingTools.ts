@@ -1,13 +1,13 @@
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
-import { useActiveApi, useActiveWallet } from '../state/wallet';
+import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
 import { beginCell, external, storeMessage, storeStateInit } from '@ton/core';
-import { useGetActiveAccountSigner } from '../state/mnemonic';
+import { useGetAccountSigner } from '../state/mnemonic';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 
 export const useDebuggingTools = () => {
-    const wallet = useActiveWallet();
     const api = useActiveApi();
-    const getSigner = useGetActiveAccountSigner();
+    const getSigner = useGetAccountSigner();
+    const { data: activeAccount } = useActiveAccountQuery();
 
     if (typeof window !== 'undefined') {
         const activityKey =
@@ -24,6 +24,8 @@ export const useDebuggingTools = () => {
                     return;
                 }
 
+                const wallet = activeAccount!.activeTonWallet;
+
                 const twoFAEncoder = new TwoFAEncoder(api, wallet.rawAddress);
                 const stateInit = beginCell()
                     .store(storeStateInit(twoFAEncoder.pluginStateInit))
@@ -37,7 +39,7 @@ export const useDebuggingTools = () => {
                     .storeBuilder(payload)
                     .endCell();
 
-                const signer = await getSigner();
+                const signer = await getSigner(activeAccount!.id);
 
                 if (signer.type !== 'cell') {
                     throw new Error('Wrong signer type');
