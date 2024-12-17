@@ -1,4 +1,4 @@
-import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
 import { beginCell, external, storeMessage, storeStateInit } from '@ton/core';
 import { useGetAccountSigner } from '../state/mnemonic';

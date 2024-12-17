@@ -10,7 +10,7 @@ import { useSendTwoFADeploy } from '../../../hooks/blockchain/two-fa/useSendTwoF
 import { useEstimateTwoFADeploy } from '../../../hooks/blockchain/two-fa/useEstimateTwoFADeploy';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { useTranslation } from '../../../hooks/translation';
 
 export const DeployTwoFAConfirmNotification: FC<{

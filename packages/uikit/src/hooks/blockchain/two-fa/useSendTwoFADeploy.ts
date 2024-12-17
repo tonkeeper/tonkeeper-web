@@ -17,7 +17,7 @@ import {
     useTwoFAServiceConfig,
     useTwoFAWalletConfig
 } from '../../../state/two-fa';
-import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {

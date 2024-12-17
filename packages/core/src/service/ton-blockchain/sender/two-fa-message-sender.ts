@@ -16,10 +16,11 @@ import {
     storeMessage,
     storeMessageRelaxed,
     toNano,
-    external
+    external,
+    MessageRelaxed
 } from '@ton/core';
-import { TwoFAEncoder } from '../encoder/2fa-encoder';
-import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
+import { TwoFAEncoder } from '../encoder/two-fa-encoder';
+import { AccountsApi, BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import { CellSigner } from '../../../entries/signer';
 
 let lastSearchingMessageId: string | undefined = undefined;
@@ -67,7 +68,10 @@ export class TwoFAMessageSender implements ISender {
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {
-        const transferBody = await this.toTransferBody(outgoing);
+        const transferBody = await this.toTransferBody({
+            sendMode: outgoing.sendMode,
+            messages: await this.addRefillMessageIfNeeded(outgoing.messages)
+        });
 
         /**
          * Emulate internal message from the plugin to the wallet
@@ -178,8 +182,33 @@ export class TwoFAMessageSender implements ISender {
         });
     }
 
+    private async addRefillMessageIfNeeded(messages: MessageRelaxed[]): Promise<MessageRelaxed[]> {
+        const pluginBalance = BigInt(
+            (
+                await new AccountsApi(this.api.tonApi.tonApiV2).getAccount({
+                    accountId: this.pluginAddress
+                })
+            ).balance
+        );
+
+        if (pluginBalance > TwoFAEncoder.refillAtValue) {
+            return messages;
+        }
+
+        const refillMessage = internal({
+            to: this.pluginAddress,
+            value: TwoFAEncoder.refillValue,
+            bounce: false
+        });
+
+        return [...messages, refillMessage];
+    }
+
     private async toPluginExternalParams({ messages, sendMode }: WalletOutgoingMessage) {
-        const transferBody = await this.toTransferBody({ messages, sendMode });
+        const transferBody = await this.toTransferBody({
+            sendMode,
+            messages: await this.addRefillMessageIfNeeded(messages)
+        });
         const transferCell = await this.transferBodyToCell(transferBody, messages.length);
 
         return this.encodeSendAction(transferCell);

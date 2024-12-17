@@ -14,7 +14,7 @@ import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { AuthApi, Configuration } from '@tonkeeper/core/dist/2faApi';
 import { useMemo } from 'react';
 import { useSignTonProof } from '../hooks/accountUtils';
-import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/2fa-encoder';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export type TwoFATgBotBoundingWalletConfig = {
