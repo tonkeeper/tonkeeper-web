@@ -42,8 +42,9 @@ import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-b
 import { useAssets } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import { toNano } from '@ton/core';
-import { useTwoFAApi, useTwoFAWalletConfig } from '../../state/two-fa';
+import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../state/two-fa';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
+import { useConfirmTwoFANotification } from '../../components/modals/ConfirmTwoFANotificationControlled';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -303,9 +304,12 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     throw new Error('2FA is not active');
                 }
 
-                return new TwoFAMessageSender({ tonApi: api, twoFaApi }, wallet, estimationSigner, {
-                    address: twoFAConfig.pluginAddress
-                });
+                return new TwoFAMessageSender(
+                    { tonApi: api, twoFaApi },
+                    wallet,
+                    estimationSigner,
+                    twoFAConfig.pluginAddress
+                );
             }
 
             if (senderChoice.type === 'external') {
@@ -387,6 +391,8 @@ export const useGetSender = () => {
     const gaslessConfig = useGaslessConfig();
     const twoFaApi = useTwoFAApi();
     const { data: twoFAConfig } = useTwoFAWalletConfig();
+    const { onOpen: openTwoFaConfirmTelegram } = useConfirmTwoFANotification();
+    const twoFAServiceConfig = useTwoFAServiceConfig();
 
     const wallet = activeAccount.activeTonWallet;
 
@@ -470,9 +476,16 @@ export const useGetSender = () => {
                     throw new Error('2FA is not active');
                 }
 
-                return new TwoFAMessageSender({ tonApi: api, twoFaApi }, wallet, signer, {
-                    address: twoFAConfig.pluginAddress
-                });
+                return new TwoFAMessageSender(
+                    { tonApi: api, twoFaApi },
+                    wallet,
+                    signer,
+                    twoFAConfig.pluginAddress,
+                    {
+                        onBocSigned: openTwoFaConfirmTelegram,
+                        confirmMessageTGTtlSeconds: twoFAServiceConfig.confirmMessageTGTtlSeconds
+                    }
+                );
             }
 
             if (senderChoice.type === 'external') {
@@ -539,7 +552,9 @@ export const useGetSender = () => {
             mutateAsync,
             gaslessConfig,
             twoFaApi,
-            twoFAConfig
+            twoFAConfig,
+            openTwoFaConfirmTelegram,
+            twoFAServiceConfig.confirmMessageTGTtlSeconds
         ]
     );
 };

@@ -1,7 +1,7 @@
 import { Notification } from '../../Notification';
 import { FC } from 'react';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
-import { H2Label2Responsive } from '../../Text';
+import { Body2, H2Label2Responsive } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
 import { BorderSmallResponsive } from '../../shared/Styles';
@@ -31,10 +31,22 @@ export const TwoFAConnectBotNotification: FC<{ isOpen: boolean; onClose: () => v
     );
 };
 
+export const TwoFAReConnectBotNotification: FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    authLink?: string;
+}> = ({ isOpen, onClose, authLink }) => {
+    return (
+        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+            {() => authLink && <TwoFAConnectBotNotificationContent tgLink={authLink} reconnect />}
+        </NotificationStyled>
+    );
+};
+
 const Heading = styled(H2Label2Responsive)`
     text-align: center;
     max-width: 304px;
-    margin: 0 auto 1rem;
+    margin: 0 auto;
 `;
 
 const QRWrapper = styled.div`
@@ -45,6 +57,7 @@ const QRWrapper = styled.div`
     background-color: ${p => p.theme.backgroundContent};
     ${BorderSmallResponsive};
     margin-bottom: 1rem;
+    margin-top: 1rem;
 `;
 
 const QRBackground = styled.div`
@@ -64,13 +77,30 @@ const TelegramIconStyled = styled(TelegramIcon)`
     color: ${p => p.theme.buttonPrimaryForeground};
 `;
 
-const TwoFAConnectBotNotificationContent: FC<{ tgLink: string }> = ({ tgLink }) => {
+const Body2Styled = styled(Body2)`
+    margin-top: 4px;
+    color: ${p => p.theme.textSecondary};
+`;
+
+const TwoFAConnectBotNotificationContent: FC<{ tgLink: string; reconnect?: boolean }> = ({
+    tgLink,
+    reconnect
+}) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
     return (
         <div>
-            <Heading>{t('two_fa_settings_set_up_tg_connection_modal_heading')}</Heading>
+            <Heading>
+                {reconnect
+                    ? t('two_fa_settings_reconnect_tg_connection_modal_heading')
+                    : t('two_fa_settings_set_up_tg_connection_modal_heading')}
+            </Heading>
+            {reconnect && (
+                <Body2Styled>
+                    {t('two_fa_settings_reconnect_tg_connection_modal_description')}
+                </Body2Styled>
+            )}
             <QRWrapper>
                 <QRBackground>
                     <QRCode value={tgLink} bgColor="transparent" />

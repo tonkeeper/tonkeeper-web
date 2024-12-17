@@ -164,7 +164,7 @@ export const DesktopWalletSettingsPage = () => {
                         <SettingsListItem>
                             <LockIcon />
                             <SettingsListText>
-                                <Label2>{t('two_fa_short')}</Label2>
+                                <Label2>{t('two_fa_long')}</Label2>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>

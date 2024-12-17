@@ -22,12 +22,19 @@ export class TwoFAEncoder {
     /**
      * install#43563174 service_pubkey:uint256 seed_pubkey:uint256 = InternalMessage;
      */
-    static encodeInstallBody(params: { servicePubKey: bigint; seedPubKey: bigint }) {
+    static installBody(params: { servicePubKey: bigint; seedPubKey: bigint }) {
         return beginCell()
             .storeUint(0x43563174, 32)
             .storeUint(params.servicePubKey, 256)
             .storeUint(params.seedPubKey, 256)
             .endCell();
+    }
+
+    /**
+     * remove_extension#9d8084d6 = ExternalMessage;
+     */
+    static removeBody() {
+        return beginCell().storeUint(0x9d8084d6, 32).endCell();
     }
 
     private readonly walletAddress: Address;
@@ -72,7 +79,7 @@ export class TwoFAEncoder {
                 bounce: false,
                 value: TwoFAEncoder.deployPluginValue,
                 init: seqno === 0 ? stateInit : undefined,
-                body: TwoFAEncoder.encodeInstallBody(params)
+                body: TwoFAEncoder.installBody(params)
             })
         };
 
@@ -164,7 +171,7 @@ export class TwoFAEncoder {
             .endCell();
     }
 
-    public async getPluginSeqno(pluginAddress: string) {
+    public async getPluginSeqno(pluginAddress = this.pluginAddress.toRawString()) {
         try {
             const res = await new BlockchainApi(
                 this.api.tonApiV2
@@ -183,6 +190,33 @@ export class TwoFAEncoder {
         } catch (e) {
             console.error(e);
             return 0;
+        }
+    }
+
+    public async getPluginState(): Promise<'not_exist' | 'active' | 'deactivating'> {
+        const seqno = await this.getPluginSeqno();
+
+        if (seqno === 0) {
+            return 'not_exist';
+        }
+
+        const res = await new BlockchainApi(this.api.tonApiV2).execGetMethodForBlockchainAccount({
+            accountId: this.pluginAddress.toRawString(),
+            methodName: 'get_delegation_state'
+        });
+
+        const state = res.stack[0].num;
+
+        if (!res.success || !state || !isFinite(Number(state))) {
+            throw new Error("Can't get state");
+        }
+
+        if (Number(state) === 0) {
+            return 'active';
+        } else if (Number(state) === 1) {
+            return 'deactivating';
+        } else {
+            throw new Error(`Unknown state ${state}`);
         }
     }
 }

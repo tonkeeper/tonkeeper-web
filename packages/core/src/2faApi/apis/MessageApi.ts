@@ -39,6 +39,10 @@ export interface SendMessageOperationRequest {
     sendMessageRequest?: SendMessageRequest;
 }
 
+export interface SendMessageNewRequest {
+    sendMessageRequest?: SendMessageRequest;
+}
+
 /**
  * MessageApi - interface
  * 
@@ -63,7 +67,7 @@ export interface MessageApiInterface {
 
     /**
      * 
-     * @summary Send message to blockchain
+     * @summary Temporary method
      * @param {SendMessageRequest} [sendMessageRequest] Data that is expected
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -72,9 +76,24 @@ export interface MessageApiInterface {
     sendMessageRaw(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>>;
 
     /**
-     * Send message to blockchain
+     * Temporary method
      */
     sendMessage(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID>;
+
+    /**
+     * 
+     * @summary Send message to blockchain
+     * @param {SendMessageRequest} [sendMessageRequest] Data that is expected
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MessageApiInterface
+     */
+    sendMessageNewRaw(requestParameters: SendMessageNewRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>>;
+
+    /**
+     * Send message to blockchain
+     */
+    sendMessageNew(requestParameters: SendMessageNewRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID>;
 
 }
 
@@ -117,7 +136,7 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
     }
 
     /**
-     * Send message to blockchain
+     * Temporary method
      */
     async sendMessageRaw(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>> {
         const queryParameters: any = {};
@@ -127,7 +146,36 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/api/v1/message/send`,
+            path: `/api/v1/message/send/old`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SendMessageRequestToJSON(requestParameters['sendMessageRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageIDFromJSON(jsonValue));
+    }
+
+    /**
+     * Temporary method
+     */
+    async sendMessage(requestParameters: SendMessageOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID> {
+        const response = await this.sendMessageRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Send message to blockchain
+     */
+    async sendMessageNewRaw(requestParameters: SendMessageNewRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/message/send/new`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -140,8 +188,8 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
     /**
      * Send message to blockchain
      */
-    async sendMessage(requestParameters: SendMessageOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID> {
-        const response = await this.sendMessageRaw(requestParameters, initOverrides);
+    async sendMessageNew(requestParameters: SendMessageNewRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID> {
+        const response = await this.sendMessageNewRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

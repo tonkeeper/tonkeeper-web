@@ -18,7 +18,7 @@ export const TwoFASetUp: FC<{ className?: string }> = ({ className }) => {
     const { data: config } = useTwoFAWalletConfig();
     const { ref1, ref2, params } = useDrawConnector();
 
-    if (!config) {
+    if (config === undefined) {
         return null;
     }
 

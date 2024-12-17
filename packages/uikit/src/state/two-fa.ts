@@ -20,6 +20,12 @@ export type TwoFATgBotBoundedWalletConfig = {
     botUrl: string;
 };
 
+export type TwoFAPendingDeploymentWalletConfig = {
+    status: 'active';
+    botUrl: string;
+    pluginAddress: string;
+};
+
 export type TwoFAActiveWalletConfig = {
     status: 'active';
     botUrl: string;
@@ -59,19 +65,19 @@ export const useCanViewTwoFA = () => {
 };
 
 export const useTwoFAApi = () => {
-    const config = useActiveConfig();
+    const config = useTwoFAServiceConfig();
     return useMemo(() => {
         return new Configuration({
-            basePath: config['2fa_api_url'] || 'https://2fa.tonapi.io'
+            basePath: config.baseUrl
         });
-    }, []);
+    }, [config.baseUrl]);
 };
 
 export const useTwoFAServiceConfig = () => {
     const config = useActiveConfig();
 
     return useMemo(() => {
-        if (!config['2fa_public_key']) {
+        if (!config['2fa_public_key'] || !config['2fa_api_url']) {
             throw new Error('2fa_public_key not found');
         }
 
@@ -80,6 +86,7 @@ export const useTwoFAServiceConfig = () => {
         );
 
         return {
+            baseUrl: config['2fa_api_url'],
             servicePubKey,
             confirmMessageTGTtlSeconds: config['2fa_tg_confirm_send_message_ttl_seconds'] ?? 600,
             confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'] ?? 600
@@ -199,17 +206,15 @@ export const useRemoveAccountTwoFAData = () => {
     });
 };
 
-export const useBoundTwoFABot = () => {
+export const useGetBoundingTwoFABotLink = () => {
     const twoFAApi = useTwoFAApi();
-    const client = useQueryClient();
-    const { mutateAsync } = useMutateTwoFAWalletConfig();
     const { mutateAsync: signTonProof } = useSignTonProof();
     const address = useActiveWallet().rawAddress;
     const serviceConfig = useTwoFAServiceConfig();
 
     return useMutation<string>(async () => {
         const { payload } = await new AuthApi(twoFAApi).getPayload();
-        const origin = 'https://tonkeeper.com';
+        const origin = serviceConfig.baseUrl;
 
         const { timestamp, signature, stateInit, domain } = await signTonProof({
             origin,
@@ -229,15 +234,28 @@ export const useBoundTwoFABot = () => {
             }
         });
 
+        return res.url;
+    });
+};
+
+export const useBoundTwoFABot = () => {
+    const client = useQueryClient();
+    const { mutateAsync } = useMutateTwoFAWalletConfig();
+    const serviceConfig = useTwoFAServiceConfig();
+    const { mutateAsync: getLink } = useGetBoundingTwoFABotLink();
+
+    return useMutation<string>(async () => {
+        const authUrl = await getLink();
+
         await mutateAsync({
             status: 'tg-bot-bounding',
-            authUrl: res.url,
+            authUrl,
             expiresAtUnixSeconds:
                 Math.round(Date.now() / 1000) + serviceConfig.confirmConnectionTGTtlSeconds
         });
         await client.invalidateQueries([QueryKey.twoFAWalletConfig]);
 
-        return res.url;
+        return authUrl;
     });
 };
 

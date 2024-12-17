@@ -1,5 +1,5 @@
 import { APIConfig } from '../../../entries/apis';
-import { walletContractFromState } from '../../wallet/contractService';
+import { walletContractFromState, walletStateInitFromState } from '../../wallet/contractService';
 import { getServerTime, getTTL, getWalletSeqNo } from '../utils';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { isW5Version, TonWalletStandard } from '../../../entries/wallet';
@@ -23,9 +23,11 @@ export class TwoFAMessageSender implements ISender {
         },
         private readonly wallet: TonWalletStandard,
         private readonly signer: CellSigner,
-        private readonly pluginConfig: {
-            address: string;
-        }
+        private readonly pluginAddress: string,
+        private readonly options: {
+            onBocSigned?: () => void;
+            confirmMessageTGTtlSeconds?: number;
+        } = {}
     ) {}
 
     public get excessAddress() {
@@ -39,9 +41,12 @@ export class TwoFAMessageSender implements ISender {
             sendMessageRequest: {
                 dataToSign: params.dataToSign.toBoc().toString('hex'),
                 signature: params.signature.toString('hex'),
-                extensionAddress: this.pluginConfig.address
+                wallet: this.pluginAddress, // TODO временно для Захара, поменять на кошелек
+                stateInit: walletStateInitFromState(this.wallet)
             }
         });
+
+        this.options.onBocSigned?.();
 
         lastSearchingMessageId = res.messageId;
         return Cell.fromBase64(await this.bocByMsgId(res.messageId));
@@ -60,7 +65,7 @@ export class TwoFAMessageSender implements ISender {
                     storeMessageRelaxed({
                         info: {
                             type: 'internal',
-                            src: Address.parse(this.pluginConfig.address),
+                            src: Address.parse(this.pluginAddress),
                             dest: Address.parse(this.wallet.rawAddress),
                             value: { coins: value },
                             bounce: false,
@@ -96,6 +101,27 @@ export class TwoFAMessageSender implements ISender {
             extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.extra * -1 }),
             event: result
         };
+    }
+
+    public async sendRemoveExtension() {
+        const dataToSign = TwoFAEncoder.removeBody();
+
+        const signature = await this.signer(dataToSign);
+
+        const res = await new MessageApi(this.api.twoFaApi).sendMessage({
+            // TODO другой эндпоинт
+            sendMessageRequest: {
+                dataToSign: dataToSign.toBoc().toString('hex'),
+                signature: signature.toString('hex'),
+                wallet: this.pluginAddress, // TODO временно для Захара, поменять на кошелек
+                stateInit: walletStateInitFromState(this.wallet)
+            }
+        });
+
+        this.options.onBocSigned?.();
+
+        lastSearchingMessageId = res.messageId;
+        return Cell.fromBase64(await this.bocByMsgId(res.messageId));
     }
 
     private async toPluginExternalParams({ messages, sendMode }: WalletOutgoingMessage) {
@@ -150,7 +176,7 @@ export class TwoFAMessageSender implements ISender {
         const dataToSign = await new TwoFAEncoder(
             this.api.tonApi,
             this.wallet.rawAddress
-        ).encodeSendAction(this.pluginConfig.address, msgToTheWallet);
+        ).encodeSendAction(this.pluginAddress, msgToTheWallet);
 
         const signature = await this.signer(dataToSign);
 
@@ -170,9 +196,13 @@ export class TwoFAMessageSender implements ISender {
         const res = await new BlockchainApi(
             this.api.tonApi.tonApiV2
         ).execGetMethodForBlockchainAccount({
-            accountId: this.pluginConfig.address, // TODO не работает нормально
+            accountId: this.pluginAddress,
             methodName: 'get_estimated_attached_value',
-            args: [forwardMsg.toBoc().toString('base64'), '0x' + actionsNumber.toString(16), '0x0']
+            args: [
+                forwardMsg.toBoc().toString('base64'),
+                '0x' + actionsNumber.toString(16),
+                '0x0'
+            ].reverse() // TODO починить
         });
 
         if (res.stack[0].num === undefined || !res.success) {
@@ -186,8 +216,10 @@ export class TwoFAMessageSender implements ISender {
         if (lastSearchingMessageId !== msgId) {
             throw new Error('Message has been replaced with a new one. Stop searching for it');
         }
-        const maxAttempts = 200; // TODO взять из конфига
-        const timeout = 1000;
+        const timeoutMS = 1000;
+        const confirmMessageTGTtlMS = (this.options.confirmMessageTGTtlSeconds ?? 600) * 1000;
+
+        const maxAttempts = confirmMessageTGTtlMS / timeoutMS;
 
         try {
             const result = await new MessageApi(this.api.twoFaApi).getMessageInfo({ id: msgId });
@@ -200,7 +232,7 @@ export class TwoFAMessageSender implements ISender {
             console.error(e);
 
             if (attempt < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, timeout));
+                await new Promise(resolve => setTimeout(resolve, timeoutMS));
                 return this.bocByMsgId(msgId, attempt + 1);
             } else {
                 throw e;

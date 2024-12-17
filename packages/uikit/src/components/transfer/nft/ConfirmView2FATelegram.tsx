@@ -82,7 +82,7 @@ const CannotAccessTgText = styled(Body2)`
     }
 `;
 
-const ConfirmView2FATelegramContent: FC<{
+export const ConfirmView2FATelegramContent: FC<{
     validUntilSeconds: number;
     creationTimeSeconds: number;
     onClose: () => void;
@@ -168,7 +168,7 @@ const formatTime = (seconds: number): string => {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 };
 
-export const CircularTimer: FC<{
+const CircularTimer: FC<{
     totalSeconds: number;
     secondsLeft: number;
     className?: string;

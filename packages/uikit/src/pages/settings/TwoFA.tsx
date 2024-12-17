@@ -15,10 +15,19 @@ import { useTranslation } from '../../hooks/translation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { AppRoute } from '../../libs/routes';
-import { useIsTwoFAEnabledGlobally, useTwoFAWalletConfig } from '../../state/two-fa';
+import {
+    useGetBoundingTwoFABotLink,
+    useIsTwoFAEnabledGlobally,
+    useTwoFAWalletConfig
+} from '../../state/two-fa';
 import { hexToRGBA } from '../../libs/css';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { TwoFASetUp } from '../../components/settings/two-fa/TwoFASetUp';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { Button } from '../../components/fields/Button';
+import { DisableTwoFAConfirmNotification } from '../../components/settings/two-fa/DisableTwoFAConfirmNotification';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { TwoFAReConnectBotNotification } from '../../components/settings/two-fa/TwoFAConnectBotNotification';
 
 export const TwoFAPage = () => {
     const account = useActiveAccount();
@@ -36,7 +45,7 @@ export const TwoFAPage = () => {
 };
 
 const ContentWrapper = styled.div`
-    max-width: 368px;
+    max-width: 468px;
     margin: 0 auto;
 `;
 
@@ -47,25 +56,39 @@ const SpinnerWrapper = styled.div`
     justify-content: center;
 `;
 
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+`;
+
+const TwoFAPageContentWrapper = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+`;
+
 export const TwoFAPageLayout: FC = () => {
-    const config = useTwoFAWalletConfig();
     const isFullWidth = useIsFullWidthMode();
     const { t } = useTranslation();
 
     if (isFullWidth) {
         return (
-            <DesktopViewPageLayout>
+            <DesktopViewPageLayoutStyled>
                 <DesktopViewHeader borderBottom backButton>
-                    <Label2>{t('two_fa_short')}</Label2>
+                    <Label2>{t('two_fa_long')}</Label2>
                 </DesktopViewHeader>
-                <TwoFAPageContent />
-            </DesktopViewPageLayout>
+                <TwoFAPageContentWrapper>
+                    <TwoFAPageContent />
+                </TwoFAPageContentWrapper>
+            </DesktopViewPageLayoutStyled>
         );
     }
 
     return (
         <>
-            <SubHeader title={t('two_fa_short')} />
+            <SubHeader title={t('two_fa_long')} />
             <InnerBody>
                 <TwoFAPageContent />
             </InnerBody>
@@ -79,7 +102,7 @@ const TextHeadingBlock = styled.div`
     flex-direction: column;
     gap: 6px;
     align-items: center;
-    padding: 32px 0;
+    padding: 32px 0 16px;
 
     > ${Body2} {
         color: ${p => p.theme.textSecondary};
@@ -109,14 +132,13 @@ const WarningBlockText = styled.ul`
 `;
 
 const TwoFASetUpStyled = styled(TwoFASetUp)`
-    margin: 0 auto 84px;
+    margin: 16px auto 84px;
 `;
 
-export const TwoFAPageContent: FC = () => {
+const TwoFAPageContent: FC = () => {
     const { data: config } = useTwoFAWalletConfig();
-    const { t } = useTranslation();
 
-    if (!config) {
+    if (config === undefined) {
         return (
             <SpinnerWrapper>
                 <SpinnerRing />
@@ -124,6 +146,22 @@ export const TwoFAPageContent: FC = () => {
         );
     }
 
+    switch (config?.status) {
+        case undefined:
+        case 'tg-bot-bounding':
+        case 'ready-for-deployment':
+            return <TwoFANotSetContent />;
+        case 'active':
+            return <TwoFAActiveContent />;
+        case 'disabling':
+            return <TwoFADisablingContent />;
+        default:
+            assertUnreachable(config);
+    }
+};
+
+const TwoFANotSetContent = () => {
+    const { t } = useTranslation();
     return (
         <div>
             <ContentWrapper>
@@ -143,4 +181,84 @@ export const TwoFAPageContent: FC = () => {
             </WarningBlock>
         </div>
     );
+};
+
+const ActionButtonsContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    margin: 0 auto 84px;
+    gap: 8px;
+`;
+
+const TwoFAActiveContent = () => {
+    const { t } = useTranslation();
+    const {
+        isOpen: isOpenDisconnect,
+        onClose: onCloseDisconnect,
+        onOpen: onOpenDisconnect
+    } = useDisclosure();
+
+    const {
+        isOpen: isOpenReconnectTG,
+        onClose: onCloseReconnectTG,
+        onOpen: onOpenReconnectTG
+    } = useDisclosure();
+
+    const {
+        mutateAsync: getReconnectTGLink,
+        data: reconnectTGLink,
+        reset: resetReconnectTGLink
+    } = useGetBoundingTwoFABotLink();
+
+    const onClickReconnectTG = async () => {
+        await getReconnectTGLink();
+        onOpenReconnectTG();
+    };
+
+    const onClickCloseReconnectTG = () => {
+        onCloseReconnectTG();
+        setTimeout(resetReconnectTGLink, 300);
+    };
+
+    return (
+        <>
+            <ContentWrapper>
+                <TextHeadingBlock>
+                    <Label2>{t('two_fa_settings_heading_active_title')}</Label2>
+                    <Body2>{t('two_fa_settings_heading_active_description')}</Body2>
+                </TextHeadingBlock>
+
+                <ActionButtonsContainer>
+                    <Button secondary onClick={onOpenDisconnect}>
+                        {t('two_fa_settings_disable_button')}
+                    </Button>
+                    <Button secondary onClick={onClickReconnectTG}>
+                        {t('two_fa_settings_change_tg_button')}
+                    </Button>
+                </ActionButtonsContainer>
+            </ContentWrapper>
+            <WarningBlock>
+                <WarningBlockText>
+                    <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
+                    <li>{t('two_fa_settings_warning_balance_required')}</li>
+                    <li>{t('two_fa_settings_warning_battery_gasless')}</li>
+                </WarningBlockText>
+                <ExclamationMarkTriangleIconStyled />
+            </WarningBlock>
+            <DisableTwoFAConfirmNotification
+                isOpen={isOpenDisconnect}
+                onClose={onCloseDisconnect}
+            />
+            <TwoFAReConnectBotNotification
+                isOpen={isOpenReconnectTG}
+                onClose={onClickCloseReconnectTG}
+                authLink={reconnectTGLink}
+            />
+        </>
+    );
+};
+
+const TwoFADisablingContent = () => {
+    const { t } = useTranslation();
+    return null;
 };

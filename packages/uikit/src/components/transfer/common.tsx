@@ -4,7 +4,7 @@ import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, PropsWithChildren, useCallback, useState } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -19,9 +19,6 @@ import { useIsActiveWalletLedger } from '../../state/ledger';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { formatAddress, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
-import { ConfirmView2FATelegram } from './nft/ConfirmView2FATelegram';
-import { useTwoFAWalletConfig } from '../../state/two-fa';
-import { useDisclosure } from '../../hooks/useDisclosure';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -230,70 +227,28 @@ export type ConfirmMainButtonProps = (props: {
     onClose: () => void;
 }) => JSX.Element;
 
-const GoToTgButtonStyled = styled(Button)`
-    margin-top: 12px;
-`;
-
 export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
     const { t } = useTranslation();
     const isLedger = useIsActiveWalletLedger();
     const isMultisig = useIsActiveAccountMultisig();
-    const isTwoFAEnabled = useTwoFAWalletConfig().data?.status === 'active';
-    const [confirmationTimestamp, setConfirmationTimestamp] = useState<number>();
-
-    const {
-        isOpen: isConfirmTGOpen,
-        onClose: onConfirmTGClose,
-        onOpen: onConfirmTGOpen
-    } = useDisclosure();
-
-    const onConfirm = useCallback(() => {
-        onClick();
-        if (isTwoFAEnabled) {
-            setConfirmationTimestamp(Date.now());
-            onConfirmTGOpen();
-        }
-    }, [isTwoFAEnabled, onClick, onConfirmTGOpen]);
-
     return (
-        <>
-            <Button
-                fullWidth
-                size="large"
-                primary
-                type="submit"
-                disabled={isDisabled}
-                loading={isLoading}
-                onClick={onConfirm}
-            >
-                {t(
-                    isLedger
-                        ? 'ledger_continue_with_ledger'
-                        : isMultisig
-                        ? 'confirm_sending_sign'
-                        : 'confirm_sending_submit'
-                )}
-            </Button>
-            {!!confirmationTimestamp && (
-                <>
-                    <ConfirmView2FATelegram
-                        isOpen={isConfirmTGOpen}
-                        onClose={onConfirmTGClose}
-                        creationDateMS={confirmationTimestamp}
-                    />
-                    {isLoading && (
-                        <GoToTgButtonStyled
-                            secondary
-                            fullWidth
-                            size="large"
-                            onClick={onConfirmTGOpen}
-                        >
-                            {t('two_fa_send_continue_with_tg')}
-                        </GoToTgButtonStyled>
-                    )}
-                </>
+        <Button
+            fullWidth
+            size="large"
+            primary
+            type="submit"
+            disabled={isDisabled}
+            loading={isLoading}
+            onClick={onClick}
+        >
+            {t(
+                isLedger
+                    ? 'ledger_continue_with_ledger'
+                    : isMultisig
+                    ? 'confirm_sending_sign'
+                    : 'confirm_sending_submit'
             )}
-        </>
+        </Button>
     );
 };
 
@@ -309,8 +264,7 @@ const ConfirmViewButtonsContainerStyled = styled.div`
 export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
     isLoading,
     isDisabled,
-    onClose,
-    onClick
+    onClose
 }) => {
     const { t } = useTranslation();
     const isLedger = useIsActiveWalletLedger();
@@ -319,14 +273,7 @@ export const ConfirmAndCancelMainButton: ConfirmMainButtonProps = ({
             <Button size="large" secondary type="button" onClick={onClose}>
                 {t('cancel')}
             </Button>
-            <Button
-                size="large"
-                primary
-                type="button"
-                onClick={onClick}
-                disabled={isDisabled}
-                loading={isLoading}
-            >
+            <Button size="large" primary type="submit" disabled={isDisabled} loading={isLoading}>
                 {t(isLedger ? 'ledger_continue_with_ledger' : 'confirm')}
             </Button>
         </ConfirmViewButtonsContainerStyled>

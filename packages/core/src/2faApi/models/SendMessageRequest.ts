@@ -24,7 +24,13 @@ export interface SendMessageRequest {
      * @type {string}
      * @memberof SendMessageRequest
      */
-    extensionAddress: string;
+    wallet: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof SendMessageRequest
+     */
+    stateInit: string;
     /**
      * 
      * @type {string}
@@ -43,7 +49,8 @@ export interface SendMessageRequest {
  * Check if a given object implements the SendMessageRequest interface.
  */
 export function instanceOfSendMessageRequest(value: object): value is SendMessageRequest {
-    if (!('extensionAddress' in value) || value['extensionAddress'] === undefined) return false;
+    if (!('wallet' in value) || value['wallet'] === undefined) return false;
+    if (!('stateInit' in value) || value['stateInit'] === undefined) return false;
     if (!('dataToSign' in value) || value['dataToSign'] === undefined) return false;
     if (!('signature' in value) || value['signature'] === undefined) return false;
     return true;
@@ -59,7 +66,8 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'extensionAddress': json['extension_address'],
+        'wallet': json['wallet'],
+        'stateInit': json['state_init'],
         'dataToSign': json['data_to_sign'],
         'signature': json['signature'],
     };
@@ -76,7 +84,8 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
 
     return {
         
-        'extension_address': value['extensionAddress'],
+        'wallet': value['wallet'],
+        'state_init': value['stateInit'],
         'data_to_sign': value['dataToSign'],
         'signature': value['signature'],
     };
