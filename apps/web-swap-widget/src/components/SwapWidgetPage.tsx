@@ -20,7 +20,6 @@ import { SwapWidgetFooter } from './SwapWidgetFooter';
 import { SwapWidgetTxSentNotification } from './SwapWidgetTxSent';
 import { useDisclosure } from '@tonkeeper/uikit/dist/hooks/useDisclosure';
 import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
-import { toErrorMessage } from '@tonkeeper/uikit/dist/libs/common';
 
 const MainFormWrapper = styled.div`
     height: 100%;
@@ -107,7 +106,6 @@ export const SwapWidgetPage = () => {
             onOpen();
         } catch (e) {
             console.error(e);
-            notifyError(toErrorMessage(e));
         }
     };
 
