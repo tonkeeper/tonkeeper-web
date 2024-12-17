@@ -72,6 +72,7 @@ export const SwapWidgetPage = () => {
         const ctx = getTonkeeperInjectionContext()!;
 
         try {
+            console.log('Call sendTransaction');
             const result = await ctx.sendTransaction({
                 source: ctx.address,
                 /**
@@ -97,6 +98,8 @@ export const SwapWidgetPage = () => {
                     : undefined
             });
 
+            console.log('sendTransaction resolved, result: ', result);
+
             /**
               old tonkeeper android versions return empty result instead of throwing
              */
@@ -106,6 +109,7 @@ export const SwapWidgetPage = () => {
 
             onOpen();
         } catch (e) {
+            console.error('sendTransaction rejected');
             console.error(e);
             notifyError(toErrorMessage(e));
         }
