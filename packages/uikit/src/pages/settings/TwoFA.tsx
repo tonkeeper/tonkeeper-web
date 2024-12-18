@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Body3Class, Label2 } from '../../components/Text';
-import { useActiveAccount } from '../../state/wallet';
 import { Navigate } from 'react-router-dom';
 import {
     DesktopViewHeader,
@@ -16,10 +15,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { AppRoute } from '../../libs/routes';
 import {
+    useCanViewTwoFA,
     useGetBoundingTwoFABotLink,
     useIsTwoFAActivationProcess,
     useIsTwoFACancelRecoveryProcess,
-    useIsTwoFAEnabledGlobally,
     useIsTwoFARemovingProcess,
     useTwoFAWalletConfig
 } from '../../state/two-fa';
@@ -38,10 +37,9 @@ import { useSendTwoFACancelRecovery } from '../../hooks/blockchain/two-fa/useSen
 import { useSendTwoFARemove } from '../../hooks/blockchain/two-fa/useSendTwoFARemove';
 
 export const TwoFAPage = () => {
-    const account = useActiveAccount();
-    const isEnabled = useIsTwoFAEnabledGlobally();
+    const canViewTwoFA = useCanViewTwoFA();
 
-    if ((account.type !== 'mnemonic' && account.type !== 'mam') || !isEnabled) {
+    if (!canViewTwoFA) {
         return <Navigate to={AppRoute.home} />;
     }
 
