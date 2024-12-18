@@ -18,7 +18,7 @@ import type {
   Message,
   MessageID,
   PingReadyGet500Response,
-  SendMessageRequest,
+  RemoveExtensionRequest,
 } from '../models/index';
 import {
     MessageFromJSON,
@@ -27,20 +27,20 @@ import {
     MessageIDToJSON,
     PingReadyGet500ResponseFromJSON,
     PingReadyGet500ResponseToJSON,
-    SendMessageRequestFromJSON,
-    SendMessageRequestToJSON,
+    RemoveExtensionRequestFromJSON,
+    RemoveExtensionRequestToJSON,
 } from '../models/index';
 
 export interface GetMessageInfoRequest {
     id: string;
 }
 
-export interface SendMessageOperationRequest {
-    sendMessageRequest?: SendMessageRequest;
+export interface SendMessageRequest {
+    removeExtensionRequest?: RemoveExtensionRequest;
 }
 
 export interface SendMessageNewRequest {
-    sendMessageRequest?: SendMessageRequest;
+    removeExtensionRequest?: RemoveExtensionRequest;
 }
 
 /**
@@ -68,22 +68,22 @@ export interface MessageApiInterface {
     /**
      * 
      * @summary Temporary method
-     * @param {SendMessageRequest} [sendMessageRequest] Data that is expected
+     * @param {RemoveExtensionRequest} [removeExtensionRequest] Data that is expected
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MessageApiInterface
      */
-    sendMessageRaw(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>>;
+    sendMessageRaw(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>>;
 
     /**
      * Temporary method
      */
-    sendMessage(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID>;
+    sendMessage(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID>;
 
     /**
      * 
      * @summary Send message to blockchain
-     * @param {SendMessageRequest} [sendMessageRequest] Data that is expected
+     * @param {RemoveExtensionRequest} [removeExtensionRequest] Data that is expected
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof MessageApiInterface
@@ -138,7 +138,7 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
     /**
      * Temporary method
      */
-    async sendMessageRaw(requestParameters: SendMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>> {
+    async sendMessageRaw(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -150,7 +150,7 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SendMessageRequestToJSON(requestParameters['sendMessageRequest']),
+            body: RemoveExtensionRequestToJSON(requestParameters['removeExtensionRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageIDFromJSON(jsonValue));
@@ -159,7 +159,7 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
     /**
      * Temporary method
      */
-    async sendMessage(requestParameters: SendMessageOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID> {
+    async sendMessage(requestParameters: SendMessageRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID> {
         const response = await this.sendMessageRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -179,7 +179,7 @@ export class MessageApi extends runtime.BaseAPI implements MessageApiInterface {
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SendMessageRequestToJSON(requestParameters['sendMessageRequest']),
+            body: RemoveExtensionRequestToJSON(requestParameters['removeExtensionRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => MessageIDFromJSON(jsonValue));

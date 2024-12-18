@@ -10,5 +10,5 @@ export * from './Ok';
 export * from './Payload';
 export * from './PingReadyGet500Response';
 export * from './Proof';
-export * from './SendMessageRequest';
+export * from './RemoveExtensionRequest';
 export * from './Url';

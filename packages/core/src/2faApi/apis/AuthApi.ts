@@ -17,9 +17,11 @@ import * as runtime from '../runtime';
 import type {
   ConnectRequest,
   ExistsExtensionRequest,
+  MessageID,
   Ok,
   Payload,
   PingReadyGet500Response,
+  RemoveExtensionRequest,
   Url,
 } from '../models/index';
 import {
@@ -27,12 +29,16 @@ import {
     ConnectRequestToJSON,
     ExistsExtensionRequestFromJSON,
     ExistsExtensionRequestToJSON,
+    MessageIDFromJSON,
+    MessageIDToJSON,
     OkFromJSON,
     OkToJSON,
     PayloadFromJSON,
     PayloadToJSON,
     PingReadyGet500ResponseFromJSON,
     PingReadyGet500ResponseToJSON,
+    RemoveExtensionRequestFromJSON,
+    RemoveExtensionRequestToJSON,
     UrlFromJSON,
     UrlToJSON,
 } from '../models/index';
@@ -41,12 +47,12 @@ export interface ConnectOperationRequest {
     connectRequest?: ConnectRequest;
 }
 
-export interface DisconnectRequest {
-    connectRequest?: ConnectRequest;
-}
-
 export interface ExistsExtensionOperationRequest {
     existsExtensionRequest?: ExistsExtensionRequest;
+}
+
+export interface RemoveExtensionOperationRequest {
+    removeExtensionRequest?: RemoveExtensionRequest;
 }
 
 /**
@@ -70,21 +76,6 @@ export interface AuthApiInterface {
      * Receive a deep link for the Telegram bot
      */
     connect(requestParameters: ConnectOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url>;
-
-    /**
-     * 
-     * @summary Disable 2FA for the wallet
-     * @param {ConnectRequest} [connectRequest] Data that is expected
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AuthApiInterface
-     */
-    disconnectRaw(requestParameters: DisconnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>>;
-
-    /**
-     * Disable 2FA for the wallet
-     */
-    disconnect(requestParameters: DisconnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok>;
 
     /**
      * 
@@ -114,6 +105,21 @@ export interface AuthApiInterface {
      * Retrieve the payload
      */
     getPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload>;
+
+    /**
+     * 
+     * @summary Disable 2FA for the wallet
+     * @param {RemoveExtensionRequest} [removeExtensionRequest] Data that is expected
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    removeExtensionRaw(requestParameters: RemoveExtensionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>>;
+
+    /**
+     * Disable 2FA for the wallet
+     */
+    removeExtension(requestParameters: RemoveExtensionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID>;
 
 }
 
@@ -148,35 +154,6 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
      */
     async connect(requestParameters: ConnectOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url> {
         const response = await this.connectRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
-
-    /**
-     * Disable 2FA for the wallet
-     */
-    async disconnectRaw(requestParameters: DisconnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Ok>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/v1/disconnect`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: ConnectRequestToJSON(requestParameters['connectRequest']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => OkFromJSON(jsonValue));
-    }
-
-    /**
-     * Disable 2FA for the wallet
-     */
-    async disconnect(requestParameters: DisconnectRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Ok> {
-        const response = await this.disconnectRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -232,6 +209,35 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
      */
     async getPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload> {
         const response = await this.getPayloadRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Disable 2FA for the wallet
+     */
+    async removeExtensionRaw(requestParameters: RemoveExtensionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageID>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/remove`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: RemoveExtensionRequestToJSON(requestParameters['removeExtensionRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageIDFromJSON(jsonValue));
+    }
+
+    /**
+     * Disable 2FA for the wallet
+     */
+    async removeExtension(requestParameters: RemoveExtensionOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageID> {
+        const response = await this.removeExtensionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -16,39 +16,39 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface SendMessageRequest
+ * @interface RemoveExtensionRequest
  */
-export interface SendMessageRequest {
+export interface RemoveExtensionRequest {
     /**
      * 
      * @type {string}
-     * @memberof SendMessageRequest
+     * @memberof RemoveExtensionRequest
      */
     wallet: string;
     /**
      * 
      * @type {string}
-     * @memberof SendMessageRequest
+     * @memberof RemoveExtensionRequest
      */
     stateInit: string;
     /**
      * 
      * @type {string}
-     * @memberof SendMessageRequest
+     * @memberof RemoveExtensionRequest
      */
     dataToSign: string;
     /**
      * 
      * @type {string}
-     * @memberof SendMessageRequest
+     * @memberof RemoveExtensionRequest
      */
     signature: string;
 }
 
 /**
- * Check if a given object implements the SendMessageRequest interface.
+ * Check if a given object implements the RemoveExtensionRequest interface.
  */
-export function instanceOfSendMessageRequest(value: object): value is SendMessageRequest {
+export function instanceOfRemoveExtensionRequest(value: object): value is RemoveExtensionRequest {
     if (!('wallet' in value) || value['wallet'] === undefined) return false;
     if (!('stateInit' in value) || value['stateInit'] === undefined) return false;
     if (!('dataToSign' in value) || value['dataToSign'] === undefined) return false;
@@ -56,11 +56,11 @@ export function instanceOfSendMessageRequest(value: object): value is SendMessag
     return true;
 }
 
-export function SendMessageRequestFromJSON(json: any): SendMessageRequest {
-    return SendMessageRequestFromJSONTyped(json, false);
+export function RemoveExtensionRequestFromJSON(json: any): RemoveExtensionRequest {
+    return RemoveExtensionRequestFromJSONTyped(json, false);
 }
 
-export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): SendMessageRequest {
+export function RemoveExtensionRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): RemoveExtensionRequest {
     if (json == null) {
         return json;
     }
@@ -73,11 +73,11 @@ export function SendMessageRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function SendMessageRequestToJSON(json: any): SendMessageRequest {
-      return SendMessageRequestToJSONTyped(json, false);
+  export function RemoveExtensionRequestToJSON(json: any): RemoveExtensionRequest {
+      return RemoveExtensionRequestToJSONTyped(json, false);
   }
 
-  export function SendMessageRequestToJSONTyped(value?: SendMessageRequest | null, ignoreDiscriminator: boolean = false): any {
+  export function RemoveExtensionRequestToJSONTyped(value?: RemoveExtensionRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

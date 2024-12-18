@@ -21,7 +21,6 @@ import type {
   NftCollections,
   NftItem,
   NftItems,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     AccountEventsFromJSON,
@@ -36,8 +35,6 @@ import {
     NftItemToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountNftHistoryRequest {
@@ -57,6 +54,10 @@ export interface GetItemsFromCollectionRequest {
 
 export interface GetNftCollectionRequest {
     accountId: string;
+}
+
+export interface GetNftCollectionItemsByAddressesRequest {
+    getAccountsRequest?: GetAccountsRequest;
 }
 
 export interface GetNftCollectionsRequest {
@@ -136,6 +137,20 @@ export interface NFTApiInterface {
      * Get NFT collection by collection address
      */
     getNftCollection(requestParameters: GetNftCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NftCollection>;
+
+    /**
+     * Get NFT collection items by their addresses
+     * @param {GetAccountsRequest} [getAccountsRequest] a list of account ids
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof NFTApiInterface
+     */
+    getNftCollectionItemsByAddressesRaw(requestParameters: GetNftCollectionItemsByAddressesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NftCollections>>;
+
+    /**
+     * Get NFT collection items by their addresses
+     */
+    getNftCollectionItemsByAddresses(requestParameters: GetNftCollectionItemsByAddressesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NftCollections>;
 
     /**
      * Get NFT collections
@@ -337,6 +352,35 @@ export class NFTApi extends runtime.BaseAPI implements NFTApiInterface {
      */
     async getNftCollection(requestParameters: GetNftCollectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NftCollection> {
         const response = await this.getNftCollectionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get NFT collection items by their addresses
+     */
+    async getNftCollectionItemsByAddressesRaw(requestParameters: GetNftCollectionItemsByAddressesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<NftCollections>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v2/nfts/collections/_bulk`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: GetAccountsRequestToJSON(requestParameters['getAccountsRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => NftCollectionsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get NFT collection items by their addresses
+     */
+    async getNftCollectionItemsByAddresses(requestParameters: GetNftCollectionItemsByAddressesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<NftCollections> {
+        const response = await this.getNftCollectionItemsByAddressesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

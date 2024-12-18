@@ -14,7 +14,7 @@ models/Ok.ts
 models/Payload.ts
 models/PingReadyGet500Response.ts
 models/Proof.ts
-models/SendMessageRequest.ts
+models/RemoveExtensionRequest.ts
 models/Url.ts
 models/index.ts
 runtime.ts
