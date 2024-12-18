@@ -15,11 +15,11 @@ import { Builder } from '@ton/ton';
 import { getServerTime, getTTL } from '../utils';
 
 export class TwoFAEncoder {
-    public static readonly deployPluginValue = toNano(0.05); // TODO сколько надо? 0.5
+    public static readonly deployPluginValue = toNano(0.05); // TODO 0.5
 
-    public static readonly refillAtValue = toNano(0.04); // TODO сколько надо? 0.36
+    public static readonly refillAtValue = toNano(0.04); // TODO 0.4
 
-    public static readonly refillValue = toNano(0.01); // TODO сколько надо? 0.36
+    public static readonly refillValue = toNano(0.01); // TODO 0.1
 
     /**
      * install#43563174 service_pubkey:uint256 seed_pubkey:uint256 = InternalMessage;
