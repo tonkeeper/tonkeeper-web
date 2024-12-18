@@ -3,6 +3,7 @@ import {
     TwoFAWalletConfig,
     useBoundTwoFABot,
     useDisconnectTwoFABot,
+    useIsTwoFAActivationProcess,
     useTwoFAWalletConfig
 } from '../../../state/two-fa';
 import styled, { useTheme } from 'styled-components';
@@ -113,6 +114,7 @@ const DeployPluginStep = forwardRef<HTMLElement, { config: TwoFAWalletConfig }>(
     ({ config }, ref) => {
         const { t } = useTranslation();
         const { isOpen, onClose, onOpen } = useDisclosure();
+        const { data: isDeploying } = useIsTwoFAActivationProcess();
 
         const isStepActive = config?.status === 'ready-for-deployment';
 
@@ -121,7 +123,12 @@ const DeployPluginStep = forwardRef<HTMLElement, { config: TwoFAWalletConfig }>(
                 <StepContainer $active={isStepActive}>
                     <DoneIcon28 ref={ref} />
                     <Body2>{t('two_fa_settings_set_up_deploy_step_description')}</Body2>
-                    <Button primary={isStepActive} disabled={!isStepActive} onClick={onOpen}>
+                    <Button
+                        primary={isStepActive}
+                        disabled={!isStepActive}
+                        onClick={onOpen}
+                        loading={isDeploying}
+                    >
                         {t('two_fa_settings_set_up_deploy_step_button')}
                     </Button>
                 </StepContainer>

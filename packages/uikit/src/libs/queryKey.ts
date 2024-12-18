@@ -68,7 +68,10 @@ export enum QueryKey {
 
     gaslessConfig = 'gaslessConfig',
 
-    twoFAWalletConfig = 'twoFAWalletConfig'
+    twoFAWalletConfig = 'twoFAWalletConfig',
+    twoFAActivationProcess = 'twoFAActivationProcess',
+    twoFARemovingProcess = 'twoFARemovingProcess',
+    twoFACancellRecoveryProcess = 'twoFARemovingProcess'
 }
 
 export enum JettonKey {

@@ -1,12 +1,13 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAnalyticsTrack } from '../../amplitude';
 import { useActiveWallet, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useNotifyErrorHandle } from '../../useNotification';
 import { TWO_FA_SENDER_CHOICE, useGetSender } from '../useSender';
-import { useMutateTwoFAWalletConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
+import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
+import { QueryKey } from '../../../libs/queryKey';
 
 export function useSendTwoFARemove() {
     const track = useAnalyticsTrack();
@@ -15,7 +16,7 @@ export function useSendTwoFARemove() {
     const getSender = useGetSender();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const wallet = useActiveWallet();
-    const { mutateAsync: setTwoFAWalletConfig } = useMutateTwoFAWalletConfig();
+    const queryClient = useQueryClient();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -31,7 +32,7 @@ export function useSendTwoFARemove() {
 
             await sender.sendRemoveExtension();
 
-            await setTwoFAWalletConfig(null);
+            queryClient.setQueryData([QueryKey.twoFARemovingProcess, wallet.id], true);
 
             track('remove_2fa', {
                 wallet: wallet.rawAddress

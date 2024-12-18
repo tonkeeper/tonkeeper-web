@@ -12,7 +12,7 @@ import {
 import { useDevSettings } from './dev';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { AuthApi, Configuration } from '@tonkeeper/core/dist/2faApi';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
@@ -185,7 +185,7 @@ export const useTwoFAWalletConfig = () => {
             keepPreviousData: true,
             enabled: isSuitableAccount,
             refetchInterval: d =>
-                d?.status === 'tg-bot-bounding'
+                d?.status === 'tg-bot-bounding' || d?.status === 'ready-for-deployment'
                     ? 1000
                     : d?.status === 'disabling' || d?.status === 'active'
                     ? 10000
@@ -197,22 +197,6 @@ export const useTwoFAWalletConfig = () => {
 const authUrlToBotUrl = (authUrl: string) => {
     const u = new URL(authUrl);
     return u.origin + u.pathname;
-};
-
-export const useMarkTwoFAWalletAsActive = () => {
-    const { mutateAsync } = useMutateTwoFAWalletConfig();
-    const config = useTwoFAWalletConfig().data;
-
-    return useMutation<void, Error, { pluginAddress: string }>(async ({ pluginAddress }) => {
-        if (!config) {
-            throw new Error('Config not found');
-        }
-
-        await mutateAsync({
-            status: 'active',
-            pluginAddress
-        });
-    });
 };
 
 export const useMutateTwoFAWalletConfig = () => {
@@ -317,5 +301,48 @@ export const useDisconnectTwoFABot = () => {
 
         await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), null);
         await client.invalidateQueries([QueryKey.twoFAWalletConfig]);
+    });
+};
+
+export const useIsTwoFAActivationProcess = () => {
+    const wallet = useActiveWallet();
+    const { data: config } = useTwoFAWalletConfig();
+
+    return useQuery([QueryKey.twoFAActivationProcess, wallet.id], () => false, {
+        initialData: false,
+        enabled: config?.status === 'active'
+    });
+};
+
+export const useIsTwoFARemovingProcess = () => {
+    const wallet = useActiveWallet();
+    const { data: config } = useTwoFAWalletConfig();
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (
+            config === null &&
+            queryClient.getQueryData([QueryKey.twoFARemovingProcess, wallet.id])
+        ) {
+            queryClient.setQueryData([QueryKey.twoFARemovingProcess, wallet.id], false);
+        }
+    }, [config, wallet.id]);
+
+    return useQuery(
+        [QueryKey.twoFARemovingProcess, wallet.id],
+        ctx => queryClient.getQueryData(ctx.queryKey),
+        {
+            initialData: false
+        }
+    );
+};
+
+export const useIsTwoFACancelRecoveryProcess = () => {
+    const wallet = useActiveWallet();
+    const { data: config } = useTwoFAWalletConfig();
+
+    return useQuery([QueryKey.twoFACancellRecoveryProcess, wallet.id], () => false, {
+        initialData: false,
+        enabled: config?.status !== 'disabling'
     });
 };

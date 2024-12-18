@@ -17,7 +17,10 @@ import { fallbackRenderOver } from '../../components/Error';
 import { AppRoute } from '../../libs/routes';
 import {
     useGetBoundingTwoFABotLink,
+    useIsTwoFAActivationProcess,
+    useIsTwoFACancelRecoveryProcess,
     useIsTwoFAEnabledGlobally,
+    useIsTwoFARemovingProcess,
     useTwoFAWalletConfig
 } from '../../state/two-fa';
 import { hexToRGBA } from '../../libs/css';
@@ -32,6 +35,7 @@ import { useUserLanguage } from '../../state/language';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { formattedDateTimeStamp } from '../../libs/dateTime';
 import { useSendTwoFACancelRecovery } from '../../hooks/blockchain/two-fa/useSendTwoFCancelRecovery';
+import { useSendTwoFARemove } from '../../hooks/blockchain/two-fa/useSendTwoFARemove';
 
 export const TwoFAPage = () => {
     const account = useActiveAccount();
@@ -141,6 +145,9 @@ const TwoFASetUpStyled = styled(TwoFASetUp)`
 
 const TwoFAPageContent: FC = () => {
     const { data: config } = useTwoFAWalletConfig();
+    useIsTwoFACancelRecoveryProcess();
+    useIsTwoFARemovingProcess();
+    useIsTwoFAActivationProcess();
 
     if (config === undefined) {
         return (
@@ -228,6 +235,18 @@ const TwoFAActiveContent = () => {
         setTimeout(resetReconnectTGLink, 300);
     };
 
+    const { mutateAsync: removeTwoFA, isLoading: isRemovingLoading } = useSendTwoFARemove();
+    const { data: isRemovingProcess } = useIsTwoFARemovingProcess();
+
+    const onClickCloseDisconnect = async (confirmed?: boolean) => {
+        onCloseDisconnect();
+        if (!confirmed) {
+            return;
+        }
+
+        await removeTwoFA();
+    };
+
     return (
         <>
             <ContentWrapper>
@@ -237,7 +256,11 @@ const TwoFAActiveContent = () => {
                 </TextHeadingBlock>
 
                 <ActionButtonsContainer>
-                    <Button secondary onClick={onOpenDisconnect}>
+                    <Button
+                        secondary
+                        onClick={onOpenDisconnect}
+                        loading={isRemovingLoading || isRemovingProcess}
+                    >
                         {t('two_fa_settings_disable_button')}
                     </Button>
                     <Button secondary onClick={onClickReconnectTG}>
@@ -255,7 +278,7 @@ const TwoFAActiveContent = () => {
             </WarningBlock>
             <DisableTwoFAConfirmNotification
                 isOpen={isOpenDisconnect}
-                onClose={onCloseDisconnect}
+                onClose={onClickCloseDisconnect}
             />
             <TwoFAReConnectBotNotification
                 isOpen={isOpenReconnectTG}
@@ -272,6 +295,8 @@ const TwoFADisablingContent: FC<{ disablingDate: Date }> = ({ disablingDate }) =
     const locale = localizationText(data) as unknown as ILocale;
     const { mutate, isLoading } = useSendTwoFACancelRecovery();
 
+    const { data: isCancelRecoveryProcess } = useIsTwoFACancelRecoveryProcess();
+
     return (
         <>
             <ContentWrapper>
@@ -285,7 +310,11 @@ const TwoFADisablingContent: FC<{ disablingDate: Date }> = ({ disablingDate }) =
                 </TextHeadingBlock>
 
                 <ActionButtonsContainer>
-                    <Button primary onClick={() => mutate()} loading={isLoading}>
+                    <Button
+                        primary
+                        onClick={() => mutate()}
+                        loading={isLoading || isCancelRecoveryProcess}
+                    >
                         {t('two_fa_settings_cancel_recovery_button')}
                     </Button>
                 </ActionButtonsContainer>

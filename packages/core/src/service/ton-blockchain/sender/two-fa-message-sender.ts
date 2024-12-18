@@ -7,7 +7,7 @@ import { WalletContractV5R1 } from '@ton/ton';
 import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { Configuration as TwoFaConfiguration, MessageApi } from '../../../2faApi';
+import { AuthApi, Configuration as TwoFaConfiguration, MessageApi } from '../../../2faApi';
 import {
     Address,
     beginCell,
@@ -50,7 +50,7 @@ export class TwoFAMessageSender implements ISender {
         const params = await this.toPluginExternalParams(outgoing);
 
         const res = await new MessageApi(this.api.twoFaApi).sendMessage({
-            sendMessageRequest: {
+            removeExtensionRequest: {
                 dataToSign: params.dataToSign.toBoc().toString('hex'),
                 signature: params.signature.toString('hex'),
                 wallet: this.pluginAddress, // TODO временно для Захара, поменять на кошелек
@@ -122,13 +122,23 @@ export class TwoFAMessageSender implements ISender {
     }
 
     public async sendRemoveExtension() {
-        const dataToSign = TwoFAEncoder.removeBody();
+        const timestamp = await getServerTime(this.api.tonApi);
+        const validUntil = getTTL(timestamp);
+        const seqno = await new TwoFAEncoder(
+            this.api.tonApi,
+            this.wallet.rawAddress
+        ).getPluginSeqno(this.pluginAddress);
+
+        const dataToSign = beginCell()
+            .store(TwoFAEncoder.removeBody)
+            .storeUint(seqno, 32)
+            .storeUint(validUntil, 64)
+            .endCell();
 
         const signature = await this.signer(dataToSign);
 
-        const res = await new MessageApi(this.api.twoFaApi).sendMessage({
-            // TODO другой эндпоинт
-            sendMessageRequest: {
+        const res = await new AuthApi(this.api.twoFaApi).removeExtension({
+            removeExtensionRequest: {
                 dataToSign: dataToSign.toBoc().toString('hex'),
                 signature: signature.toString('hex'),
                 wallet: this.pluginAddress, // TODO временно для Захара, поменять на кошелек
@@ -281,11 +291,8 @@ export class TwoFAMessageSender implements ISender {
         ).execGetMethodForBlockchainAccount({
             accountId: this.pluginAddress,
             methodName: 'get_estimated_attached_value',
-            args: [
-                forwardMsg.toBoc().toString('base64'),
-                '0x' + actionsNumber.toString(16),
-                '0x0'
-            ].reverse() // TODO починить
+            fixOrder: false,
+            args: [forwardMsg.toBoc().toString('base64'), '0x' + actionsNumber.toString(16), '0x0']
         });
 
         if (res.stack[0].num === undefined || !res.success) {

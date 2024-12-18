@@ -35,8 +35,8 @@ export class TwoFAEncoder {
     /**
      * remove_extension#9d8084d6 = ExternalMessage;
      */
-    static removeBody() {
-        return beginCell().storeUint(0x9d8084d6, 32).endCell();
+    static removeBody(builder: Builder) {
+        return builder.storeUint(0x9d8084d6, 32);
     }
 
     /**

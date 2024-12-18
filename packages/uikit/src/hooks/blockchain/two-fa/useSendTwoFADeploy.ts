@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Estimation } from '@tonkeeper/core/dist/entries/send';
 
@@ -13,12 +13,12 @@ import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import {
     useIsTwoFAEnabledGlobally,
-    useMarkTwoFAWalletAsActive,
     useTwoFAServiceConfig,
     useTwoFAWalletConfig
 } from '../../../state/two-fa';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { QueryKey } from '../../../libs/queryKey';
 
 export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const track = useAnalyticsTrack();
@@ -30,8 +30,8 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
     const wallet = useActiveWallet();
     const { servicePubKey } = useTwoFAServiceConfig();
-    const { mutateAsync: markTwoFAWalletAsActive } = useMarkTwoFAWalletAsActive();
     const api = useActiveApi();
+    const queryClient = useQueryClient();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -59,7 +59,7 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
                 tx
             );
 
-            await markTwoFAWalletAsActive({ pluginAddress: encoder.pluginAddress.toRawString() });
+            queryClient.setQueryData([QueryKey.twoFAActivationProcess, wallet.id], true);
 
             track('deploy_2fa', {
                 wallet: wallet.rawAddress
