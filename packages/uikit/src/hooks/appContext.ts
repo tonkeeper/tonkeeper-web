@@ -67,5 +67,5 @@ export const AppSelectionContext = React.createContext<EventTarget | null>(null)
 
 export const useAppPlatform = () => {
     const { tonendpoint } = useAppContext();
-    return tonendpoint.params.platform;
+    return tonendpoint.targetEnv;
 };

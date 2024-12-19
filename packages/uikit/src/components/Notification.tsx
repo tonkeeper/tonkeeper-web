@@ -1,8 +1,10 @@
 import React, {
+    Children,
     createContext,
     FC,
     forwardRef,
     PropsWithChildren,
+    ReactElement,
     ReactNode,
     useCallback,
     useContext,
@@ -25,6 +27,7 @@ import ReactPortal from './ReactPortal';
 import { H2, H3, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
+import { useAppPlatform } from '../hooks/appContext';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -168,7 +171,7 @@ const Splash = styled.div`
     }
 `;
 
-const Content = styled.div<{ standalone: boolean }>`
+const Content = styled.div<{ standalone: boolean; $isInWidget: boolean }>`
     width: 100%;
     background-color: ${props => props.theme.backgroundPage};
     border-top-right-radius: ${props => props.theme.cornerMedium};
@@ -181,6 +184,12 @@ const Content = styled.div<{ standalone: boolean }>`
         props.standalone &&
         css`
             padding-bottom: 2rem;
+        `}
+
+    ${props =>
+        props.$isInWidget &&
+        css`
+            padding-bottom: 46px;
         `}
 
     ${p =>
@@ -397,76 +406,13 @@ export const NotificationBackButton: FC<{ onBack: () => void }> = ({ onBack }) =
     );
 };
 
-export const NotificationScrollContext = React.createContext<HTMLDivElement | null>(null);
-
 const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; entered: boolean }>> =
-    React.memo(({ children, handleClose, entered }) => {
+    React.memo(({ children, entered }) => {
         const scrollRef = useRef<HTMLDivElement>(null);
-        const isFullWidthMode = useIsFullWidthMode();
-
-        useEffect(() => {
-            if (isFullWidthMode) {
-                return;
-            }
-            const element = scrollRef.current;
-
-            if (!element) return;
-
-            let lastY = 0;
-            let startY = 0;
-            let maxScrollTop = 0;
-            let startScroll = 0;
-
-            const handlerTouchStart = function (event: TouchEvent) {
-                lastY = startY = event.touches[0].clientY;
-                const style = window.getComputedStyle(element);
-                const outerHeight = ['height', 'padding-top', 'padding-bottom']
-                    .map(key => parseInt(style.getPropertyValue(key)))
-                    .reduce((prev, cur) => prev + cur);
-
-                maxScrollTop = element.scrollHeight - outerHeight;
-                startScroll = element.scrollTop;
-            };
-
-            const handlerTouchMoveElement = function (event: TouchEvent) {
-                const top = event.touches[0].clientY;
-
-                const direction = lastY - top < 0 ? 'down' : 'up';
-                if (event.cancelable) {
-                    if (startScroll >= maxScrollTop && direction === 'up') {
-                        event.preventDefault();
-                    }
-                }
-                lastY = top;
-            };
-
-            const handlerTouchMoveWindow = function (event: TouchEvent) {
-                if (startY === 0) return;
-                const top = event.touches[0].clientY;
-                if (startScroll <= 0 && startY - top < -180) {
-                    window.addEventListener('touchend', handleClose);
-                    window.addEventListener('touchcancel', handleClose);
-                }
-            };
-
-            element.addEventListener('touchstart', handlerTouchStart);
-            element.addEventListener('touchmove', handlerTouchMoveElement);
-            window.addEventListener('touchmove', handlerTouchMoveWindow);
-
-            return () => {
-                element.removeEventListener('touchstart', handlerTouchStart);
-                element.removeEventListener('touchmove', handlerTouchMoveElement);
-                window.removeEventListener('touchmove', handlerTouchMoveWindow);
-                window.removeEventListener('touchend', handleClose);
-                window.removeEventListener('touchcancel', handleClose);
-            };
-        }, [scrollRef, handleClose, isFullWidthMode]);
 
         return (
             <OverlayWrapper ref={scrollRef} entered={entered}>
-                <NotificationScrollContext.Provider value={scrollRef.current}>
-                    {children}
-                </NotificationScrollContext.Provider>
+                {children}
             </OverlayWrapper>
         );
     });
@@ -583,6 +529,8 @@ export const Notification: FC<{
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
+    const isInWidget = useAppPlatform() === 'swap-widget-web';
+
     return (
         <NotificationContext.Provider
             value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
@@ -605,6 +553,7 @@ export const Notification: FC<{
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                     <Content
+                                        $isInWidget={isInWidget}
                                         standalone={standalone}
                                         ref={containerRef}
                                         className="dialog-content"
@@ -694,7 +643,20 @@ export const NotificationHeader: FC<{ children: ReactNode; className?: string }>
     const isFullWidth = useIsFullWidthMode();
 
     if (!isFullWidth) {
-        return <>{children}</>;
+        return (
+            <>
+                {Children.map(children, child =>
+                    React.isValidElement(child)
+                        ? React.cloneElement<{ className?: string }>(
+                              child as ReactElement<{ className?: string }>,
+                              {
+                                  className: `${child.props.className || ''} ${className}`.trim()
+                              }
+                          )
+                        : child
+                )}
+            </>
+        );
     }
 
     return (

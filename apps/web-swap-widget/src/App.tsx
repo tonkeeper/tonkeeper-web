@@ -23,7 +23,7 @@ import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/d
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, PropsWithChildren, Suspense, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserAppSdk } from './libs/appSdk';
+import { WidgetAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useApplyQueryParams, useAppWidth } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
@@ -36,6 +36,7 @@ import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
 import { AccountTonWatchOnly } from '@tonkeeper/core/dist/entries/account';
 import { getTonkeeperInjectionContext } from './libs/tonkeeper-injection-context';
 import { Address } from '@ton/core';
+import { defaultLanguage } from './i18n';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -46,16 +47,44 @@ const queryClient = new QueryClient({
     }
 });
 
-const sdk = new BrowserAppSdk();
+const sdk = new WidgetAppSdk();
 const TARGET_ENV = 'swap-widget-web';
 
+const queryParams = new URLSearchParams(new URL(window.location.href).search);
+
+const queryParamLangKey = (supportedLanguages: string[]) => {
+    let key = queryParams.get('lang');
+
+    if (!key) {
+        return undefined;
+    }
+
+    if (supportedLanguages.includes(key)) {
+        return key;
+    }
+
+    if (key.includes('_')) {
+        key = key.split('_')[0].toLowerCase();
+
+        return supportedLanguages.includes(key) ? key : undefined;
+    }
+};
+
 export const App: FC = () => {
+    const languages = (import.meta.env.VITE_APP_LOCALES ?? defaultLanguage).split(',');
+    const queryParamsLang = queryParamLangKey(languages);
+
     const { t: tSimple, i18n } = useTranslation();
+
+    useEffect(() => {
+        if (queryParamsLang && queryParamsLang !== defaultLanguage) {
+            i18n.reloadResources(queryParamsLang).then(() => i18n.changeLanguage(queryParamsLang));
+        }
+    }, []);
 
     const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -225,7 +254,7 @@ const Loader: FC = () => {
 
 const Wrapper = styled.div`
     box-sizing: border-box;
-    padding: 0 16px 34px;
+    padding: 0 16px 46px;
     height: 100%;
 `;
 
