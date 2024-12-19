@@ -32,7 +32,6 @@ import type {
   GetRawTransactions200Response,
   SendRawMessage200Response,
   SendRawMessageRequest,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     GetAllRawShardsInfo200ResponseFromJSON,
@@ -69,8 +68,6 @@ import {
     SendRawMessage200ResponseToJSON,
     SendRawMessageRequestFromJSON,
     SendRawMessageRequestToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAllRawShardsInfoRequest {

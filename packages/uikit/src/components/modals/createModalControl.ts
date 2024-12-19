@@ -18,7 +18,7 @@ export const createModalControl = <T = object>() => {
                         setParams(p);
                         setIsOpen(true);
                     },
-                    [setParams, setParams]
+                    [setParams, setIsOpen]
                 ),
                 onClose: useCallback(() => setIsOpen(false), [setIsOpen])
             };

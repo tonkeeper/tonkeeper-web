@@ -6,11 +6,12 @@ import {
     CoinsIcon,
     ExitIcon,
     KeyIcon,
+    LockIcon,
     NotificationOutlineIcon,
     SaleBadgeIcon,
     SwitchIcon,
     UnpinIconOutline
-} from '../../components/Icon';
+} from "../../components/Icon";
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
@@ -42,6 +43,7 @@ import {
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useCanViewTwoFA } from '../../state/two-fa';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -111,6 +113,8 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
+    const canViewTwoFA = useCanViewTwoFA();
+
     const notificationsAvailable = useAppSdk().notifications !== undefined;
 
     return (
@@ -154,6 +158,16 @@ export const DesktopWalletSettingsPage = () => {
                         <KeyIcon />
                         <Label2>{t('settings_backup_wallet')}</Label2>
                     </SettingsListItem>
+                )}
+                {canViewTwoFA && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}>
+                        <SettingsListItem>
+                            <LockIcon />
+                            <SettingsListText>
+                                <Label2>{t('two_fa_long')}</Label2>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
                 )}
                 {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>

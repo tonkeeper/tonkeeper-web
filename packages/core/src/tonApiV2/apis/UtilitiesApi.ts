@@ -17,15 +17,12 @@ import * as runtime from '../runtime';
 import type {
   AddressParse200Response,
   ServiceStatus,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     AddressParse200ResponseFromJSON,
     AddressParse200ResponseToJSON,
     ServiceStatusFromJSON,
     ServiceStatusToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface AddressParseRequest {
@@ -52,6 +49,32 @@ export interface UtilitiesApiInterface {
      * parse address and display in all formats
      */
     addressParse(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddressParse200Response>;
+
+    /**
+     * Get the openapi.json file
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilitiesApiInterface
+     */
+    getOpenapiJsonRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>>;
+
+    /**
+     * Get the openapi.json file
+     */
+    getOpenapiJson(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any>;
+
+    /**
+     * Get the openapi.yml file
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UtilitiesApiInterface
+     */
+    getOpenapiYmlRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>>;
+
+    /**
+     * Get the openapi.yml file
+     */
+    getOpenapiYml(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob>;
 
     /**
      * Status
@@ -103,6 +126,62 @@ export class UtilitiesApi extends runtime.BaseAPI implements UtilitiesApiInterfa
      */
     async addressParse(requestParameters: AddressParseRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AddressParse200Response> {
         const response = await this.addressParseRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the openapi.json file
+     */
+    async getOpenapiJsonRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/openapi.json`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<any>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
+    }
+
+    /**
+     * Get the openapi.json file
+     */
+    async getOpenapiJson(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.getOpenapiJsonRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the openapi.yml file
+     */
+    async getOpenapiYmlRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/openapi.yml`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Get the openapi.yml file
+     */
+    async getOpenapiYml(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.getOpenapiYmlRaw(initOverrides);
         return await response.value();
     }
 

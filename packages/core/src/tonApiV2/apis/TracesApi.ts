@@ -15,12 +15,9 @@
 
 import * as runtime from '../runtime';
 import type {
-  StatusDefaultResponse,
   Trace,
 } from '../models/index';
 import {
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';

@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ExtraCurrency } from './ExtraCurrency';
+import {
+    ExtraCurrencyFromJSON,
+    ExtraCurrencyFromJSONTyped,
+    ExtraCurrencyToJSON,
+    ExtraCurrencyToJSONTyped,
+} from './ExtraCurrency';
 import type { StateInit } from './StateInit';
 import {
     StateInitFromJSON,
@@ -70,6 +77,12 @@ export interface Message {
      * @memberof Message
      */
     value: number;
+    /**
+     * 
+     * @type {Array<ExtraCurrency>}
+     * @memberof Message
+     */
+    valueExtra?: Array<ExtraCurrency>;
     /**
      * 
      * @type {number}
@@ -190,6 +203,7 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         'bounce': json['bounce'],
         'bounced': json['bounced'],
         'value': json['value'],
+        'valueExtra': json['value_extra'] == null ? undefined : ((json['value_extra'] as Array<any>).map(ExtraCurrencyFromJSON)),
         'fwdFee': json['fwd_fee'],
         'ihrFee': json['ihr_fee'],
         'destination': json['destination'] == null ? undefined : AccountAddressFromJSON(json['destination']),
@@ -222,6 +236,7 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
         'bounce': value['bounce'],
         'bounced': value['bounced'],
         'value': value['value'],
+        'value_extra': value['valueExtra'] == null ? undefined : ((value['valueExtra'] as Array<any>).map(ExtraCurrencyToJSON)),
         'fwd_fee': value['fwdFee'],
         'ihr_fee': value['ihrFee'],
         'destination': AccountAddressToJSON(value['destination']),
