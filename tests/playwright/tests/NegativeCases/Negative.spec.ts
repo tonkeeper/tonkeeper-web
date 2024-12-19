@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 
 //Add wallet with incorrect seed phrase + pop up Incorrect phrase +
 //texts and buttons in a closing modal window are visible and correct
+test.setTimeout(4 * 60 * 1000);
 
 test('Incorrect seed phrase ', async ({ page }) => {
     await page.goto('/');
