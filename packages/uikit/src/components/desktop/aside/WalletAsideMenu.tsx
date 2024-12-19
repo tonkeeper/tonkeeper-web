@@ -29,6 +29,7 @@ import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/accoun
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -95,6 +96,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
+
             <NavLink to={AppRoute.purchases}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
@@ -103,36 +105,38 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.dns}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                    </AsideMenuItemStyled>
+            <HideOnReview>
+                <NavLink to={AppRoute.dns}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                {!isReadOnly && !isTestnet && (
+                    <NavLink to={AppRoute.swap}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <SwapIconStyled />
+                                <Label2>{t('wallet_swap')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
                 )}
-            </NavLink>
-            {!isReadOnly && !isTestnet && (
-                <NavLink to={AppRoute.swap}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <SwapIconStyled />
-                            <Label2>{t('wallet_swap')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
-            {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
-            {showMultisigs && !isTestnet && (
-                <NavLink to={AppRoute.multisigWallets}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <ListIcon />
-                            <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
-            {canUseBattery && <BatterySettingsListItem />}
+                {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+                {showMultisigs && !isTestnet && (
+                    <NavLink to={AppRoute.multisigWallets}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <ListIcon />
+                                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                )}
+                {canUseBattery && <BatterySettingsListItem />}
+            </HideOnReview>
             <NavLink to={AppRoute.walletSettings} end>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>

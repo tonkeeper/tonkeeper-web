@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import React, { FC, Fragment, useEffect, useRef, useState } from 'react';
+import React, { FC, Fragment, MouseEventHandler, useEffect, useRef, useState } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
 import {
     useAddUserCustomSwapAsset,
@@ -7,13 +7,13 @@ import {
     WalletSwapAsset
 } from '../../../state/swap/useSwapAssets';
 import { formatFiatCurrency } from '../../../hooks/balance';
-import { useAppContext } from '../../../hooks/appContext';
+import { useAppContext, useAppPlatform } from '../../../hooks/appContext';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { LinkOutIcon, SpinnerIcon } from '../../Icon';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
-import { useAppSdk } from '../../../hooks/appSdk';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../../hooks/translation';
+import { ExternalLink } from '../../shared/ExternalLink';
 
 const SwapTokensListWrapper = styled.div`
     overflow-y: auto;
@@ -177,8 +177,7 @@ const TokenInfoLine = styled.div`
     }
 `;
 
-const LinkOutIconWrapper = styled.div`
-    cursor: pointer;
+const LinkOutIconWrapper = styled(ExternalLink)`
     &:hover {
         > svg {
             color: ${p => p.theme.iconSecondary};
@@ -204,22 +203,19 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
 }) => {
     const isZeroBalance = swapAsset.assetAmount.relativeAmount.isZero();
     const { fiat } = useAppContext();
-    const sdk = useAppSdk();
+    const platform = useAppPlatform();
 
-    const onOpenExplorer = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
+    let explorerUrl;
+    if (isTon(swapAsset.assetAmount.asset.address)) {
+        explorerUrl = 'https://tonviewer.com/price';
+    } else {
+        explorerUrl = `https://tonviewer.com/${swapAsset.assetAmount.asset.address.toString({
+            urlSafe: true
+        })}`;
+    }
+
+    const onClickExplorer: MouseEventHandler = e => {
         e.stopPropagation();
-
-        let explorerUrl;
-        if (isTon(swapAsset.assetAmount.asset.address)) {
-            explorerUrl = 'https://tonviewer.com/price';
-        } else {
-            explorerUrl = `https://tonviewer.com/${swapAsset.assetAmount.asset.address.toString({
-                urlSafe: true
-            })}`;
-        }
-
-        sdk.openPage(explorerUrl);
     };
 
     return (
@@ -228,9 +224,13 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
             <TokenInfo>
                 <TokenInfoLine>
                     <Label2>{swapAsset.assetAmount.asset.symbol}</Label2>
-                    <LinkOutIconWrapper onClick={onOpenExplorer}>
-                        <LinkOutIcon />
-                    </LinkOutIconWrapper>
+                    {platform === 'swap-widget-web' ? (
+                        <div />
+                    ) : (
+                        <LinkOutIconWrapper href={explorerUrl} onClick={onClickExplorer}>
+                            <LinkOutIcon />
+                        </LinkOutIconWrapper>
+                    )}
                     <BalanceLabel isZero={isZeroBalance}>
                         {swapAsset.assetAmount.stringRelativeAmount}
                     </BalanceLabel>

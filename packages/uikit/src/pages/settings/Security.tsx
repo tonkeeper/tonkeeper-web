@@ -21,6 +21,7 @@ import {
     useTouchIdEnabled
 } from '../../state/password';
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
+import styled from 'styled-components';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -46,6 +47,10 @@ const LockSwitch = () => {
     }
 };
 
+const Label1Capitalised = styled(Label1)`
+    text-transform: capitalize;
+`;
+
 const TouchIdSwitch = () => {
     const { t } = useTranslation();
     const { data: canPrompt } = useCanPromptTouchId();
@@ -61,7 +66,7 @@ const TouchIdSwitch = () => {
         <ListBlock>
             <ListItem hover={false}>
                 <ListItemPayload>
-                    <Label1>{t('biometry_ios_fingerprint')}</Label1>
+                    <Label1Capitalised>{t('biometry_default')}</Label1Capitalised>
                     <Switch checked={!!touchIdEnabled} onChange={mutate} />
                 </ListItemPayload>
             </ListItem>

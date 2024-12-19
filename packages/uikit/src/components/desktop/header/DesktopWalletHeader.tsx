@@ -21,6 +21,7 @@ import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderEle
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -72,14 +73,16 @@ const DesktopWalletHeaderPayload = () => {
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
-                        <LinkStyled to={AppProRoute.multiSend}>
-                            <ButtonStyled size="small">
-                                <ArrowUpIcon />
-                                {t('wallet_multi_send')}
-                            </ButtonStyled>
-                        </LinkStyled>
-                    )}
+                    <HideOnReview>
+                        {!isReadOnly && isStandardTonWallet(activeWallet) && (
+                            <LinkStyled to={AppProRoute.multiSend}>
+                                <ButtonStyled size="small">
+                                    <ArrowUpIcon />
+                                    {t('wallet_multi_send')}
+                                </ButtonStyled>
+                            </LinkStyled>
+                        )}
+                    </HideOnReview>
                     <ButtonStyled
                         size="small"
                         onClick={() => {
@@ -92,12 +95,14 @@ const DesktopWalletHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                    {network !== Network.TESTNET && (
-                        <ButtonStyled size="small" onClick={onOpen}>
-                            <PlusIconSmall />
-                            {t('wallet_buy')}
-                        </ButtonStyled>
-                    )}
+                    <HideOnReview>
+                        {network !== Network.TESTNET && (
+                            <ButtonStyled size="small" onClick={onOpen}>
+                                <PlusIconSmall />
+                                {t('wallet_buy')}
+                            </ButtonStyled>
+                        )}
+                    </HideOnReview>
                 </ButtonsContainer>
             </DesktopRightPart>
 

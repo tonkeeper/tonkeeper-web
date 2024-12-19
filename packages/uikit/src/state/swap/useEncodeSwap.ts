@@ -3,7 +3,6 @@ import { CalculatedSwap } from './useCalculatedSwap';
 import type { SwapService } from '@tonkeeper/core/dist/swapsApi';
 import { assertUnreachable, NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
-import { useAppContext } from '../../hooks/appContext';
 import { useSwapsConfig } from './useSwapsConfig';
 import BigNumber from 'bignumber.js';
 import { useSwapOptions } from './useSwapOptions';
@@ -44,7 +43,7 @@ export function useEncodeSwap() {
     });
 }
 
-export function useEncodeSwapToTonConnectParams() {
+export function useEncodeSwapToTonConnectParams(options: { forceCalculateBattery?: boolean } = {}) {
     const { mutateAsync: encode } = useEncodeSwap();
     const { data: batteryBalance } = useBatteryBalance();
     const { excessAccount: batteryExcess } = useBatteryServiceConfig();
@@ -57,7 +56,10 @@ export function useEncodeSwapToTonConnectParams() {
             const batterySwapsEnabled = activeWalletConfig
                 ? activeWalletConfig.batterySettings.enabledForSwaps
                 : true;
-            if (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled) {
+            if (
+                options.forceCalculateBattery ||
+                (batteryBalance?.batteryUnitsBalance.gt(0) && batterySwapsEnabled)
+            ) {
                 resultsPromises.push(
                     encode({ ...swap, excessAddress: Address.parse(batteryExcess).toRawString() })
                 );

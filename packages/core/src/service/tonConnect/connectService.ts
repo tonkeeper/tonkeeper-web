@@ -20,10 +20,9 @@ import {
     TonConnectAccount,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
-import { isStandardTonWallet, TonContract } from '../../entries/wallet';
+import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
 import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
 import { accountsStorage } from '../accountsStorage';
-import { getDevSettings } from '../devStorage';
 import { walletContractFromState } from '../wallet/contractService';
 import {
     AccountConnection,
@@ -403,8 +402,17 @@ export const saveWalletTonConnect = async (options: {
     replyItems: ConnectItemReply[];
     appVersion: string;
     webViewUrl?: string;
+    walletId?: WalletId;
 }): Promise<ConnectEvent> => {
-    const wallet = options.account.activeTonWallet;
+    const wallet =
+        options.walletId !== undefined
+            ? options.account.getTonWallet(options.walletId)
+            : options.account.activeTonWallet;
+
+    if (!wallet) {
+        throw new Error('Missing wallet');
+    }
+
     await saveAccountConnection({
         storage: options.storage,
         wallet,

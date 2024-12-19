@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -9,4 +9,6 @@ export enum ServiceName {
     TESTNET = 'testnet',
     PRO = 'pro',
     CNFT = 'cnft',
+    LITEPROXY = 'liteproxy',
+    STREAMING = 'streaming',
 }

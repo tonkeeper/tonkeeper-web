@@ -1,7 +1,8 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CryptoCurrency } from '../models/CryptoCurrency';
 import type { InvoiceFieldOrder } from '../models/InvoiceFieldOrder';
 import type { InvoicesApp } from '../models/InvoicesApp';
 import type { InvoicesInvoice } from '../models/InvoicesInvoice';
@@ -279,6 +280,7 @@ export class InvoicesServiceService {
              */
             life_time: number;
             description?: string;
+            currency?: CryptoCurrency;
         },
     ): CancelablePromise<InvoicesInvoice> {
         return __request(OpenAPI, {
@@ -305,6 +307,7 @@ export class InvoicesServiceService {
      * @param typeOrder Type order
      * @param searchId Search ID
      * @param filterStatus Filter status
+     * @param currency Currency
      * @param overpayment Overpayment
      * @param start Start date
      * @param end End date
@@ -319,6 +322,7 @@ export class InvoicesServiceService {
         typeOrder?: 'asc' | 'desc',
         searchId?: string,
         filterStatus?: Array<InvoiceStatus>,
+        currency?: CryptoCurrency,
         overpayment: boolean = false,
         start?: number,
         end?: number,
@@ -337,6 +341,7 @@ export class InvoicesServiceService {
                 'type_order': typeOrder,
                 'search_id': searchId,
                 'filter_status': filterStatus,
+                'currency': currency,
                 'overpayment': overpayment,
                 'start': start,
                 'end': end,
@@ -439,11 +444,13 @@ export class InvoicesServiceService {
     /**
      * Get invoices stats
      * @param appId App ID
+     * @param currency Currency
      * @returns any Invoices stats
      * @throws ApiError
      */
     public static getInvoicesStats(
         appId: number,
+        currency?: CryptoCurrency,
     ): CancelablePromise<{
         stats: {
             total: number;
@@ -451,6 +458,7 @@ export class InvoicesServiceService {
             success_in_week: number;
             invoices_in_progress: number;
             total_amount_pending: number;
+            currency: CryptoCurrency;
         };
     }> {
         return __request(OpenAPI, {
@@ -458,6 +466,7 @@ export class InvoicesServiceService {
             url: '/api/v1/services/invoices/stats',
             query: {
                 'app_id': appId,
+                'currency': currency,
             },
             errors: {
                 400: `Something went wrong on client side`,
@@ -476,6 +485,7 @@ export class InvoicesServiceService {
      * @param overpayment Overpayment
      * @param start Start date
      * @param end End date
+     * @param currency Currency
      * @returns binary Invoices CSV
      * @throws ApiError
      */
@@ -488,6 +498,7 @@ export class InvoicesServiceService {
         overpayment: boolean = false,
         start?: number,
         end?: number,
+        currency?: CryptoCurrency,
     ): CancelablePromise<Blob> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -501,6 +512,7 @@ export class InvoicesServiceService {
                 'overpayment': overpayment,
                 'start': start,
                 'end': end,
+                'currency': currency,
             },
             errors: {
                 400: `Something went wrong on client side`,

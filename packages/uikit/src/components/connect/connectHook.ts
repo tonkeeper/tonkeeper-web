@@ -2,9 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     ConnectItemReply,
     DAppManifest,
-    TonConnectTransactionPayload
+    SendTransactionAppRequest
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
+import {
+    parseTonTransferWithAddress,
+    seeIfBringToFrontLink
+} from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
     connectRejectResponse,
     parseTonConnect,
@@ -12,17 +15,15 @@ import {
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import {
-    AccountConnection,
-    TonConnectParams
-} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { useActiveAccountQuery } from '../../state/wallet';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { useToast } from '../../hooks/useNotification';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 export const useGetConnectInfo = () => {
     const sdk = useAppSdk();
@@ -31,6 +32,12 @@ export const useGetConnectInfo = () => {
 
     return useMutation<null | TonConnectParams, Error, string>(async url => {
         try {
+            const bring = seeIfBringToFrontLink({ url });
+            if (bring != null) {
+                // TODO: save ret parameter and user after confirm transaction
+                return null;
+            }
+
             const transfer = parseTonTransferWithAddress({ url });
 
             if (transfer) {
@@ -73,53 +80,49 @@ export const useGetConnectInfo = () => {
 
 export interface AppConnectionProps {
     params: TonConnectParams;
-    replyItems?: ConnectItemReply[];
-    manifest?: DAppManifest;
+    result: {
+        replyItems: ConnectItemReply[];
+        manifest: DAppManifest;
+        account: Account;
+        walletId: WalletId;
+    } | null;
 }
 
 export const useResponseConnectionMutation = () => {
     const sdk = useAppSdk();
-    const { data } = useActiveAccountQuery();
     const client = useQueryClient();
 
-    return useMutation<undefined, Error, AppConnectionProps>(
-        async ({ params, replyItems, manifest }) => {
-            if (replyItems && manifest && data) {
-                const response = await saveWalletTonConnect({
-                    storage: sdk.storage,
-                    account: data,
-                    manifest,
-                    params,
-                    replyItems,
-                    appVersion: sdk.version
-                });
+    return useMutation<undefined, Error, AppConnectionProps>(async ({ params, result }) => {
+        if (result) {
+            const response = await saveWalletTonConnect({
+                storage: sdk.storage,
+                account: result.account,
+                walletId: result.walletId,
+                manifest: result.manifest,
+                params,
+                replyItems: result.replyItems,
+                appVersion: sdk.version
+            });
 
-                await sendEventToBridge({
-                    response,
-                    sessionKeyPair: params.sessionKeyPair,
-                    clientSessionId: params.clientSessionId
-                });
+            await sendEventToBridge({
+                response,
+                sessionKeyPair: params.sessionKeyPair,
+                clientSessionId: params.clientSessionId
+            });
 
-                await client.invalidateQueries([QueryKey.tonConnectConnection]);
-                await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
-            } else {
-                await sendEventToBridge({
-                    response: connectRejectResponse(),
-                    sessionKeyPair: params.sessionKeyPair,
-                    clientSessionId: params.clientSessionId
-                });
-            }
-
-            return undefined;
+            await client.invalidateQueries([QueryKey.tonConnectConnection]);
+            await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
+        } else {
+            await sendEventToBridge({
+                response: connectRejectResponse(),
+                sessionKeyPair: params.sessionKeyPair,
+                clientSessionId: params.clientSessionId
+            });
         }
-    );
-};
 
-export interface SendTransactionAppRequest {
-    id: string;
-    connection: AccountConnection;
-    payload: TonConnectTransactionPayload;
-}
+        return undefined;
+    });
+};
 
 export interface ResponseSendProps {
     request: SendTransactionAppRequest;

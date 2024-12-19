@@ -11,15 +11,16 @@ import {
     getProServiceTiers,
     getProState,
     logoutTonConsole,
+    ProAuthTokenService,
     retryProService,
     setBackupState,
     startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
-import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
+import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext } from '../hooks/appContext';
+import { useAppContext, useAppPlatform } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
@@ -29,12 +30,11 @@ import { signTonConnectOver } from './mnemonic';
 import { useCheckTouchId } from './password';
 import {
     getAccountByWalletById,
-    getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
-import { Network } from '@tonkeeper/core/dist/entries/network';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -45,11 +45,42 @@ export const useProBackupState = () => {
     );
 };
 
+export const useProAuthTokenService = (): ProAuthTokenService => {
+    const appPlatform = useAppPlatform();
+    const storage = useAppSdk().storage;
+
+    return useMemo(() => {
+        if (appPlatform === 'tablet') {
+            return {
+                async attachToken() {
+                    const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
+                    OpenAPI.TOKEN = token ?? undefined;
+                },
+                async onTokenUpdated(token: string | null) {
+                    await storage.set(AppKey.PRO_AUTH_TOKEN, token);
+                    return this.attachToken();
+                }
+            };
+        } else {
+            return {
+                async attachToken() {
+                    /* */
+                },
+                async onTokenUpdated() {
+                    /* */
+                }
+            };
+        }
+    }, [appPlatform]);
+};
+
 export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const authService = useProAuthTokenService();
+
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(sdk.storage);
+        const state = await getProState(authService, sdk.storage);
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
@@ -63,6 +94,7 @@ export const useSelectWalletForProMutation = () => {
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const accountsStorage = useAccountsStorage();
+    const authService = useProAuthTokenService();
 
     return useMutation<void, Error, string>(async walletId => {
         const accounts = (await accountsStorage.getAccounts()).filter(isAccountTonWalletStandard);
@@ -83,6 +115,7 @@ export const useSelectWalletForProMutation = () => {
         }
 
         await authViaTonConnect(
+            authService,
             api,
             wallet,
             signTonConnectOver({ sdk, accountId: account.id, wallet, t, checkTouchId })
@@ -94,8 +127,10 @@ export const useSelectWalletForProMutation = () => {
 
 export const useProLogout = () => {
     const client = useQueryClient();
+    const authService = useProAuthTokenService();
+
     return useMutation(async () => {
-        await logoutTonConsole();
+        await logoutTonConsole(authService);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
@@ -162,9 +197,11 @@ export const useCreateInvoiceMutation = () => {
 export const useWaitInvoiceMutation = () => {
     const client = useQueryClient();
     const sdk = useAppSdk();
+    const authService = useProAuthTokenService();
+
     return useMutation<void, Error, ConfirmState>(async data => {
         await waitProServiceInvoice(data.invoice);
-        await retryProService(sdk.storage);
+        await retryProService(authService, sdk.storage);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
@@ -175,9 +212,11 @@ export const useActivateTrialMutation = () => {
     const {
         i18n: { language }
     } = useTranslation();
+    const authService = useProAuthTokenService();
 
     return useMutation<boolean, Error>(async () => {
         const result = await startProServiceTrial(
+            authService,
             (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
             language
         );
