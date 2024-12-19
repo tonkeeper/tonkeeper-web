@@ -76,7 +76,10 @@ export const useDeployMultisig = (
 
             const signer = await getSigner(sdk, accountAndWallet.account.id, checkTouchId, {
                 walletId: accountAndWallet.wallet.id
-            }).catch(() => null);
+            }).catch(e => {
+                console.error(e);
+                return null;
+            });
             if (signer === null) {
                 throw new Error('Signer not found');
             }

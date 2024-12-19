@@ -17,6 +17,7 @@ import {
     useDashboardColumnsForm
 } from '../../../state/dashboard/useDashboardColumns';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useAppPlatform } from '../../../hooks/appContext';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -52,6 +53,8 @@ const DesktopDashboardHeaderPayload = () => {
         return arrayToCsvString([columnsRow, ...dataRows]);
     }, [data, columns, selectedColumns]);
 
+    const platform = useAppPlatform();
+
     return (
         <DesktopHeaderContainer>
             <DesktopHeaderBalance
@@ -61,16 +64,18 @@ const DesktopDashboardHeaderPayload = () => {
             />
             <DesktopRightPart>
                 <ButtonsContainer>
-                    <Button
-                        size="small"
-                        as="a"
-                        href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent || '')}
-                        download={'tonkeeper-wallets' + '.csv'}
-                        loading={!downloadContent}
-                    >
-                        <ExportIcon />
-                        {t('export_dot_csv')}
-                    </Button>
+                    {platform !== 'tablet' && (
+                        <Button
+                            size="small"
+                            as="a"
+                            href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent || '')}
+                            download={'tonkeeper-wallets' + '.csv'}
+                            loading={!downloadContent}
+                        >
+                            <ExportIcon />
+                            {t('export_dot_csv')}
+                        </Button>
+                    )}
                     <Button size="small" onClick={onOpen}>
                         <SlidersIcon />
                         {t('Manage')}

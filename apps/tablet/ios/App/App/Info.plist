@@ -81,5 +81,9 @@
 		<string>dev-pro.tonconsole.com</string>
 		<string>pro.tonconsole.com</string>
 	</array>
+	<key>NSUserActivityTypes</key>
+    <array>
+        <string>NSUserActivityTypeBrowsingWeb</string>
+    </array>
 </dict>
 </plist>

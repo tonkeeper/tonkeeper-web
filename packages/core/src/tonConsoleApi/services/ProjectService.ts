@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -6,6 +6,7 @@ import type { Balance } from '../models/Balance';
 import type { Charge } from '../models/Charge';
 import type { Deposit } from '../models/Deposit';
 import type { Ok } from '../models/Ok';
+import type { Participant } from '../models/Participant';
 import type { Project } from '../models/Project';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -216,6 +217,88 @@ export class ProjectService {
             query: {
                 'offset': offset,
                 'limit': limit,
+            },
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
+     * Get project participants
+     * @param id Project ID
+     * @returns any List of project participants
+     * @throws ApiError
+     */
+    public static getProjectParticipants(
+        id: number,
+    ): CancelablePromise<{
+        items: Array<Participant>;
+    }> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/project/{id}/participants',
+            path: {
+                'id': id,
+            },
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
+     * Add a participant to the project
+     * @param id Project ID
+     * @param requestBody Data that is expected
+     * @returns any Participant
+     * @throws ApiError
+     */
+    public static addProjectParticipant(
+        id: number,
+        requestBody?: {
+            user_id: number;
+        },
+    ): CancelablePromise<{
+        participant: Participant;
+    }> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/project/{id}/participants',
+            path: {
+                'id': id,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
+     * Delete a participant from the project
+     * @param id Project ID
+     * @param userId User ID
+     * @returns Ok Ok
+     * @throws ApiError
+     */
+    public static deleteProjectParticipant(
+        id: number,
+        userId: number,
+    ): CancelablePromise<Ok> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/project/{id}/participant/{user_id}',
+            path: {
+                'id': id,
+                'user_id': userId,
             },
             errors: {
                 400: `Something went wrong on client side`,

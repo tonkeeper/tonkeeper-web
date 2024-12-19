@@ -30,6 +30,7 @@ import { availableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -116,14 +117,16 @@ export const PreferencesAsideMenu = () => {
                         )}
                     </NavLink>
                 )}
-                <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <TonkeeperSkeletIcon />
-                            <Label2>{t('tonkeeper_pro')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
+                <HideOnReview>
+                    <NavLink to={AppRoute.settings + SettingsRoute.pro}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <TonkeeperSkeletIcon />
+                                <Label2>{t('tonkeeper_pro')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                </HideOnReview>
                 {proState?.subscription.valid && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (

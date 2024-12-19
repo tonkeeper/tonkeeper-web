@@ -5,6 +5,7 @@ import { SettingsItem, SettingsList } from '../../components/settings/SettingsLi
 import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
@@ -18,6 +19,7 @@ const CookieSettings = () => {
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
+        await sdk.storage.set(AppKey.PRO_AUTH_TOKEN, null);
         await client.invalidateQueries();
     });
 

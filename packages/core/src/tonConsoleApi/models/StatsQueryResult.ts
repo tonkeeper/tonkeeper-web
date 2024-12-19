@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -8,6 +8,7 @@ import type { StatsQueryStatus } from './StatsQueryStatus';
 import type { StatsQueryType } from './StatsQueryType';
 export type StatsQueryResult = {
     id: string;
+    name?: string;
     status: StatsQueryStatus;
     query?: StatsQuery;
     type?: StatsQueryType;

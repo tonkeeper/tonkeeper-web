@@ -96,6 +96,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
+
             <NavLink to={AppRoute.purchases}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
@@ -104,15 +105,15 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.dns}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
             <HideOnReview>
+                <NavLink to={AppRoute.dns}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 {!isReadOnly && !isTestnet && (
                     <NavLink to={AppRoute.swap}>
                         {({ isActive }) => (
@@ -123,19 +124,19 @@ export const WalletAsideMenu = () => {
                         )}
                     </NavLink>
                 )}
+                {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+                {showMultisigs && !isTestnet && (
+                    <NavLink to={AppRoute.multisigWallets}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <ListIcon />
+                                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                )}
+                {canUseBattery && <BatterySettingsListItem />}
             </HideOnReview>
-            {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
-            {showMultisigs && !isTestnet && (
-                <NavLink to={AppRoute.multisigWallets}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <ListIcon />
-                            <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
-            {canUseBattery && <BatterySettingsListItem />}
             <NavLink to={AppRoute.walletSettings} end>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>

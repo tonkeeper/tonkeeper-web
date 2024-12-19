@@ -105,10 +105,10 @@ export class TabletNotifications implements NotificationService {
         await this.storage.set(AppKey.NOTIFICATIONS, records);
     }
     async subscribeTonConnect() {
-        throw new Error('Method not supported.');
+        // TODO
     }
     async unsubscribeTonConnect() {
-        throw new Error('Method not supported.');
+        // TODO
     }
     async subscribed(address: string) {
         const records = await this.getRecords();

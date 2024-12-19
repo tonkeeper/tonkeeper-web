@@ -2,7 +2,7 @@ import { BaseApp } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
-import { BrowserStorage } from './storage';
+import { SwapWidgetStorage } from './storage';
 
 function iOS() {
     return (
@@ -14,9 +14,11 @@ function iOS() {
     );
 }
 
-export class BrowserAppSdk extends BaseApp {
+export class WidgetAppSdk extends BaseApp {
+    static version = packageJson.version ?? 'Unknown';
+
     constructor() {
-        super(new BrowserStorage());
+        super(new SwapWidgetStorage());
     }
 
     copyToClipboard = (value: string, notification?: string) => {
@@ -42,7 +44,7 @@ export class BrowserAppSdk extends BaseApp {
     isStandalone = () =>
         iOS() && ((window.navigator as unknown as { standalone: boolean }).standalone as boolean);
 
-    version = packageJson.version ?? 'Unknown';
+    version = WidgetAppSdk.version;
 
     targetEnv = 'web' as const;
 }

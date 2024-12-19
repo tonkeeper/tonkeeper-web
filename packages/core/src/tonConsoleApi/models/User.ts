@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -16,10 +16,9 @@ export type User = {
     last_name?: string;
     avatar?: string;
     is_ban: boolean;
-    /**
-     * Authorization token
-     */
-    token?: string;
+    invited_by?: number;
+    referral_id: string;
+    referrals_count: number;
     date_create: number;
 };
 

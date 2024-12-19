@@ -32,7 +32,6 @@ import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useIsOnIosReview } from '../../hooks/ios';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 
 export const DesktopCoinPage = () => {

@@ -5,7 +5,7 @@ import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet';
+    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet' | 'swap-widget-web';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -80,6 +80,11 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
+
+    /**
+     * "secret" flag name to determine if the app is on ios review
+     */
+    tablet_enable_additional_security?: boolean;
     isOnReview?: boolean;
     '2fa_public_key'?: string;
     '2fa_api_url'?: string;
