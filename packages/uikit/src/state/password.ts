@@ -43,7 +43,8 @@ const isTouchIdEnabled = async (sdk: IAppSdk): Promise<boolean> => {
         return touchId;
     }
 
-    const canPrompt = await sdk.touchId?.canPrompt();
+    const canPrompt = Boolean(await sdk.touchId?.canPrompt());
+    await sdk.storage.set(AppKey.TOUCH_ID, canPrompt);
     return Boolean(canPrompt);
 };
 
