@@ -484,6 +484,7 @@ export const Notification: FC<{
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
 }> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
+    const animationTime = 200;
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
     const onClose = useCallback(() => {
         if (!onCloseInterceptor) {
@@ -513,7 +514,7 @@ export const Notification: FC<{
 
     const Child = useMemo(() => {
         return children((afterClose?: () => void) => {
-            setTimeout(() => afterClose && afterClose(), 300);
+            setTimeout(() => afterClose && afterClose(), animationTime);
             onClose();
         });
     }, [open, children, onClose]);
@@ -531,8 +532,8 @@ export const Notification: FC<{
             }
         };
         handler();
-        const timer = setTimeout(handler, 301);
-        const timer2 = setTimeout(handler, 400);
+        const timer = setTimeout(handler, animationTime + 1);
+        const timer2 = setTimeout(handler, animationTime + 100);
 
         return () => {
             clearTimeout(timer);
@@ -589,12 +590,12 @@ export const Notification: FC<{
             <ReactPortal wrapperId="react-portal-modal-container">
                 <CSSTransition
                     in={open}
-                    timeout={300}
+                    timeout={animationTime}
                     unmountOnExit
                     nodeRef={nodeRef}
                     onEntering={() => setIsEntering(true)}
                     onExited={() => setIsEntering(false)}
-                    onEntered={() => setTimeout(() => setEntered(true), 300)}
+                    onEntered={() => setTimeout(() => setEntered(true), animationTime)}
                     onExit={() => setEntered(false)}
                 >
                     <Splash ref={nodeRef} className="scrollable">

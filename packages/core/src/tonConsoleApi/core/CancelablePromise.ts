@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -85,9 +85,9 @@ export class CancelablePromise<T> implements Promise<T> {
         });
     }
 
-     get [Symbol.toStringTag]() {
-            return "Cancellable Promise";
-     }
+    get [Symbol.toStringTag]() {
+        return "Cancellable Promise";
+    }
 
     public then<TResult1 = T, TResult2 = never>(
         onFulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,

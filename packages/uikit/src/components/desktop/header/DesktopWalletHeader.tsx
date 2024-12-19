@@ -21,7 +21,6 @@ import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderEle
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useIsOnIosReview } from '../../../hooks/ios';
 import { HideOnReview } from '../../ios/HideOnReview';
 
 const ButtonsContainer = styled.div`
@@ -52,7 +51,6 @@ const LinkStyled = styled(Link)`
 `;
 
 const DesktopWalletHeaderPayload = () => {
-    const isOnReview = useIsOnIosReview();
     usePreFetchRates();
     const { data: balance, isLoading } = useWalletTotalBalance();
     const sdk = useAppSdk();
@@ -75,14 +73,16 @@ const DesktopWalletHeaderPayload = () => {
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
-                        <LinkStyled to={AppProRoute.multiSend}>
-                            <ButtonStyled size="small">
-                                <ArrowUpIcon />
-                                {t('wallet_multi_send')}
-                            </ButtonStyled>
-                        </LinkStyled>
-                    )}
+                    <HideOnReview>
+                        {!isReadOnly && isStandardTonWallet(activeWallet) && (
+                            <LinkStyled to={AppProRoute.multiSend}>
+                                <ButtonStyled size="small">
+                                    <ArrowUpIcon />
+                                    {t('wallet_multi_send')}
+                                </ButtonStyled>
+                            </LinkStyled>
+                        )}
+                    </HideOnReview>
                     <ButtonStyled
                         size="small"
                         onClick={() => {

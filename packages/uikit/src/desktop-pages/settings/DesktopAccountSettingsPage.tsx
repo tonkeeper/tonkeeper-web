@@ -13,7 +13,7 @@ import { useActiveAccount } from '../../state/wallet';
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import React, { FC } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useMAMIndexesSettingsNotification } from '../../components/modals/MAMIndexesSettingsNotification';
 import { DesktopAccountHeader } from '../../components/desktop/header/DesktopAccountHeader';
@@ -50,9 +50,14 @@ const SettingsListText = styled.div`
 
 const DesktopAccountSettingsPage: FC = () => {
     const account = useActiveAccount();
+    const [waiting, setWaiting] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => setWaiting(false), 200);
+    }, []);
 
     if (account.type !== 'mam') {
-        return <Navigate to="../" />;
+        return waiting ? <></> : <Navigate to="../" />;
     }
 
     return <DesktopAccountSettingsPageContent account={account} />;

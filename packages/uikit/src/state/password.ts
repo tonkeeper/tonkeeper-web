@@ -37,20 +37,26 @@ export const useTouchIdEnabled = () => {
 };
 
 const isTouchIdEnabled = async (sdk: IAppSdk): Promise<boolean> => {
-    const canPrompt = await sdk.touchId?.canPrompt();
-    if (!canPrompt) {
-        return false;
-    }
-
     const touchId = await sdk.storage.get<boolean>(AppKey.TOUCH_ID);
 
-    return touchId ?? true;
+    if (touchId !== null) {
+        return touchId;
+    }
+
+    const canPrompt = Boolean(await sdk.touchId?.canPrompt());
+    await sdk.storage.set(AppKey.TOUCH_ID, canPrompt);
+    return Boolean(canPrompt);
 };
 
 export const useMutateTouchId = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { t } = useTranslation();
+
     return useMutation<void, Error, boolean>(async value => {
+        if (!value) {
+            await sdk.touchId?.prompt(lng => t('touch_id_unlock_wallet', { lng }));
+        }
         await sdk.storage.set(AppKey.TOUCH_ID, value);
         await client.invalidateQueries([QueryKey.touchId]);
     });

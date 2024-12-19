@@ -25,10 +25,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { IconButton, IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useAppContext } from '../../hooks/appContext';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { AppRoute } from "../../libs/routes";
+import { AppRoute } from '../../libs/routes';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
@@ -40,7 +40,9 @@ export const BatteryPage = () => {
 
     return (
         <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Battery page')}>
-            <BatteryPageLayout />
+            <HideOnReview>
+                <BatteryPageLayout />
+            </HideOnReview>
         </ErrorBoundary>
     );
 };
