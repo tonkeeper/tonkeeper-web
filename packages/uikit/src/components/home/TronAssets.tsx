@@ -1,21 +1,15 @@
-import { TronBalances, TronToken } from '@tonkeeper/core/dist/tronApi';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import React, { FC, useMemo } from 'react';
+import { TronBalances } from '@tonkeeper/core/dist/tronApi';
+import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFormatBalance } from '../../hooks/balance';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 
-const TronAsset: FC<{
-    token: TronToken;
-    weiAmount: string;
-}> = ({ token, weiAmount }) => {
+const TronAsset: FC<{ assetAmount: AssetAmount<TronAsset> }> = ({ assetAmount }) => {
     const navigate = useNavigate();
-
-    const amount = useMemo(() => formatDecimals(weiAmount, token.decimals), [weiAmount, token]);
-    const balance = useFormatBalance(amount, token.decimals);
 
     const { data } = useRate(token.symbol);
     const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
@@ -23,11 +17,11 @@ const TronAsset: FC<{
     return (
         <ListItem onClick={() => navigate(AppRoute.coins + '/tron/' + token.address)}>
             <ListItemPayload>
-                <TokenLogo src={token.image} />
+                <TokenLogo src={assetAmount.image} />
                 <TokenLayout
-                    name={token.name}
-                    symbol={token.symbol}
-                    balance={balance}
+                    name={assetAmount.asset.name!}
+                    symbol={assetAmount.asset.symbol}
+                    balance={assetAmount.stringAssetRelativeAmount}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}
                     label="TRC20"

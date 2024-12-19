@@ -1,4 +1,3 @@
-import { TronBalance } from '../../../tronApi';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { packAssetId } from './basic-asset';
 import { TonAsset } from './ton-asset';
@@ -11,18 +10,18 @@ export const TRON_USDT_ASSET: TronAsset = {
     name: 'Tether USDT',
     decimals: 6,
     address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
-    blockchain: BLOCKCHAIN_NAME.TRON
+    blockchain: BLOCKCHAIN_NAME.TRON,
+    image: 'https://wallet.tonkeeper.com/img/usdt.svg'
 };
 
-export const toTronAsset = (balance: TronBalance): TronAsset => {
-    return {
-        id: packAssetId(BLOCKCHAIN_NAME.TRON, balance.token.address),
-        symbol: balance.token.symbol,
-        name: balance.token.name,
-        decimals: balance.token.decimals,
-        address: balance.token.address,
-        blockchain: BLOCKCHAIN_NAME.TRON
-    };
+export const TRON_TRX_ASSET: TronAsset = {
+    id: packAssetId(BLOCKCHAIN_NAME.TRON, 'TRX'),
+    symbol: 'TRX',
+    name: 'TRX',
+    decimals: 6,
+    address: 'TRX',
+    blockchain: BLOCKCHAIN_NAME.TRON,
+    image: 'https://wallet.tonkeeper.com/img/trx.svg'
 };
 
 export const TON_ASSET: TonAsset = {

@@ -7,7 +7,6 @@ import {
     Tonendpoint,
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useContext } from 'react';
 
 export interface IAppContext {
@@ -32,20 +31,19 @@ export interface IAppContext {
     hideBrowser?: boolean;
     browserLength?: number;
     env?: {
-        tgAuthBotId: string;
-        stonfiReferralAddress: string;
+        tgAuthBotId?: string;
+        stonfiReferralAddress?: string;
+        tronApiKey?: string;
     };
     defaultWalletVersion: WalletVersion;
 }
 
 export const AppContext = React.createContext<IAppContext>({
     mainnetApi: {
-        tonApiV2: new ConfigurationV2(),
-        tronApi: new TronConfiguration()
+        tonApiV2: new ConfigurationV2()
     },
     testnetApi: {
-        tonApiV2: new ConfigurationV2(),
-        tronApi: new TronConfiguration()
+        tonApiV2: new ConfigurationV2()
     },
     fiat: FiatCurrencies.USD,
     mainnetConfig: defaultTonendpointConfig,

@@ -2,6 +2,7 @@ import { Language } from './language';
 import { Network } from './network';
 import { DeprecatedAuthState } from './password';
 import { WalletProxy } from './proxy';
+import { TronWallet } from './tron/tron-wallet';
 
 export enum WalletVersion {
     V3R1 = 0,
@@ -129,7 +130,10 @@ export type DerivationItem = {
     index: number;
     activeTonWalletId: WalletId;
     tonWallets: TonWalletStandard[];
-    //  tronWallets: never;
+    /**
+     * undefined for old wallets
+     */
+    tronWallet?: TronWallet;
 };
 
 export type DerivationItemNamed = DerivationItem & {
@@ -168,14 +172,3 @@ export const defaultPreferencesConfig: TonWalletConfig = {
         enabledForNfts: true
     }
 };
-
-export interface TronWalletStorage {
-    ownerWalletAddress: string;
-    walletByChain: Record<string, string>;
-}
-
-export interface TronWalletState {
-    ownerWalletAddress: string;
-    chainId: string;
-    walletAddress: string;
-}

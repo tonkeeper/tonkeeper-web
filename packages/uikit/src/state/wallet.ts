@@ -13,6 +13,7 @@ import {
     getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard,
+    isAccountTronCompatible,
     isAccountVersionEditable,
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
@@ -40,7 +41,9 @@ import {
     getContextApiByNetwork,
     getStandardTonWalletVersions,
     getTonWalletStandard,
-    getWalletAddress
+    getWalletAddress,
+    mamAccountToMamAccountWithTron,
+    standardTonAccountToAccountWithTron
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -49,13 +52,18 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
+import {
+    getAccountMnemonic,
+    getPasswordByNotification,
+    useGetActiveAccountMnemonic
+} from './mnemonic';
 import { useCheckTouchId } from './password';
 import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
 import { useAccountsStateQuery, useAccountsState } from './accounts';
 import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -462,6 +470,34 @@ export const useCreateAccountTestnet = () => {
             await selectAccountMutation(account.id);
         }
         return account;
+    });
+};
+
+export const useAddTronToAccount = () => {
+    const getMnemonic = useGetActiveAccountMnemonic();
+    const activeAccount = useActiveAccount();
+    const accountsStorage = useAccountsStorage();
+    const client = useQueryClient();
+
+    return useMutation(async () => {
+        if (!isAccountTronCompatible(activeAccount)) {
+            throw new Error('Account is not tron compatible');
+        }
+
+        let updatedAccount: Account;
+        switch (activeAccount.type) {
+            case 'mnemonic':
+                updatedAccount = standardTonAccountToAccountWithTron(activeAccount, getMnemonic);
+                break;
+            case 'mam':
+                updatedAccount = mamAccountToMamAccountWithTron(activeAccount);
+                break;
+            default:
+                assertUnreachable(activeAccount);
+        }
+
+        await accountsStorage.updateAccountInState(updatedAccount);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, updatedAccount.id));
     });
 };
 

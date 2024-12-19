@@ -454,3 +454,14 @@ const pairLedgerByNotification = async (
         sdk.uiEvents.on('response', onCallback);
     });
 };
+
+export const useGetActiveAccountMnemonic = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const activeAccount = useActiveAccount();
+    const accountId = activeAccount.id;
+
+    return useCallback(async () => {
+        return getAccountMnemonic(sdk, accountId, checkTouchId);
+    }, [sdk, checkTouchId, accountId]);
+};
