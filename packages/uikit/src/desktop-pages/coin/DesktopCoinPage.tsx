@@ -1,10 +1,9 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Label2, Num3 } from '../../components/Text';
@@ -33,6 +32,10 @@ import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wal
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -44,9 +47,18 @@ export const DesktopCoinPage = () => {
         }
     }, [name]);
 
+    const canUseTron = useActiveTronWallet();
+
     if (!name) return <></>;
 
     const token = name === 'ton' ? CryptoCurrency.TON : name;
+
+    if (token === TRON_USDT_ASSET.id) {
+        if (!canUseTron) {
+            return <Navigate to={AppRoute.home} />;
+        }
+        return <TronUSDTPage />;
+    }
 
     return <CoinPage token={token} />;
 };
@@ -264,7 +276,7 @@ const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
     padding-right: 0;
 `;
 
-export const CoinPage: FC<{ token: string }> = ({ token }) => {
+const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
@@ -303,6 +315,60 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
+        </DesktopViewPageLayout>
+    );
+};
+
+export const TronUSDTPage = () => {
+    const { t } = useTranslation();
+
+    const asset = TRON_USDT_ASSET;
+    const { fiat } = useAppContext();
+    const { data: balances } = useTronBalances();
+
+    const usdtBalance = useMemo(() => {
+        if (balances === undefined) {
+            return undefined;
+        }
+
+        if (balances === null) {
+            return new AssetAmount({ weiAmount: 0, asset: TRON_USDT_ASSET });
+        }
+
+        return balances.usdt;
+    }, [balances]);
+
+    return (
+        <DesktopViewPageLayout>
+            <DesktopViewHeader backButton borderBottom={true}>
+                <Label2>{asset.symbol}</Label2>
+            </DesktopViewHeader>
+            <CoinHeaderStyled>
+                <CoinInfoWrapper>
+                    <img src={asset.image} alt={asset.symbol} />
+                    {usdtBalance !== undefined && (
+                        <CoinInfoAmounts>
+                            <Num3>{usdtBalance.stringAssetRelativeAmount}</Num3>
+                            <Body2>{formatFiatCurrency(fiat, usdtBalance.relativeAmount)}</Body2>
+                        </CoinInfoAmounts>
+                    )}
+                </CoinInfoWrapper>
+                <HeaderButtonsContainer>
+                    <ButtonStyled
+                        size="small"
+                        onClick={() => {}}
+                        disabled={usdtBalance?.weiAmount.isZero()}
+                    >
+                        <ArrowUpIcon />
+                        {t('wallet_send')}
+                    </ButtonStyled>
+                    <ButtonStyled size="small" onClick={() => {}}>
+                        <ArrowDownIcon />
+                        {t('wallet_receive')}
+                    </ButtonStyled>
+                </HeaderButtonsContainer>
+            </CoinHeaderStyled>
+            <HistorySubheader>{t('page_header_history')}</HistorySubheader>
         </DesktopViewPageLayout>
     );
 };

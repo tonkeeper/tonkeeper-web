@@ -1,7 +1,5 @@
-import { Address } from '@ton/core';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Account, JettonBalance, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
-import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, forwardRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +10,7 @@ import { AppRoute } from '../../libs/routes';
 import { toTokenRate, useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
+import { TronBalances } from '../../state/tron/tron';
 
 export interface TonAssetData {
     info: Account;
@@ -70,13 +69,7 @@ export const JettonAsset = forwardRef<
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { fiat } = useAppContext();
-    const [amount, address] = useMemo(
-        () => [
-            formatDecimals(jetton.balance, jetton.jetton.decimals),
-            Address.parse(jetton.jetton.address).toString()
-        ],
-        [jetton]
-    );
+    const amount = useMemo(() => formatDecimals(jetton.balance, jetton.jetton.decimals), [jetton]);
     const balance = useFormatBalance(amount, jetton.jetton.decimals);
 
     const data = useMemo(
@@ -111,8 +104,7 @@ export const JettonAsset = forwardRef<
 
 export const JettonList: FC<AssetProps> = ({
     assets: {
-        ton: { info, jettons },
-        tron: _tron
+        ton: { info, jettons }
     }
 }) => {
     return (

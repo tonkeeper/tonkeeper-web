@@ -16,6 +16,8 @@ import { useAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
+import { TronAssets } from '../../components/home/TronAssets';
+import { useCanUseTronForActiveWallet, useTronBalances } from '../../state/tron/tron';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -28,6 +30,12 @@ const DesktopAssetStylesOverride = css`
 `;
 
 const TonAssetStyled = styled(TonAsset)`
+    margin: 0 -16px;
+
+    ${DesktopAssetStylesOverride}
+`;
+
+const TronAssetsStyled = styled(TronAssets)`
     margin: 0 -16px;
 
     ${DesktopAssetStylesOverride}
@@ -82,6 +90,9 @@ const DesktopTokensPayload = () => {
     const tonRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
+    const { data: tronBalances } = useTronBalances();
+    const canUseTron = useCanUseTronForActiveWallet();
+
     useLayoutEffect(() => {
         if (uiPreferences?.showTokensChart !== undefined) {
             setShowChart(uiPreferences.showTokensChart);
@@ -99,12 +110,15 @@ const DesktopTokensPayload = () => {
         return assets?.ton?.jettons?.balances ?? [];
     }, [assets]);
 
+    const virtualScrollPaddingBase = canUseTron ? 2 * itemSize : itemSize;
+
     const rowVirtualizer = useVirtualizer({
         count: sortedAssets.length,
         getScrollElement: () => containerRef.current,
         estimateSize: () => itemSize,
         getItemKey: index => sortedAssets[index].jetton.address,
-        paddingStart: canShowChart && showChart ? 192 + itemSize : itemSize
+        paddingStart:
+            canShowChart && showChart ? 192 + virtualScrollPaddingBase : virtualScrollPaddingBase
     });
 
     const onTokenClick = useCallback(
@@ -150,45 +164,59 @@ const DesktopTokensPayload = () => {
                     overflow: 'hidden'
                 }}
             >
-                {sortedAssets && assets && distribution && uiPreferences && (
-                    <>
-                        {canShowChart && showChart && (
-                            <ErrorBoundary
-                                fallbackRender={fallbackRenderOver('Failed to display pie chart')}
-                            >
-                                <TokensPieChart
-                                    distribution={distribution}
-                                    onTokenClick={onTokenClick}
-                                />
-                                <Divider />
-                            </ErrorBoundary>
-                        )}
-                        <TonAssetStyled ref={tonRef} info={assets.ton.info} />
-                        <Divider />
-                        {rowVirtualizer.getVirtualItems().map(virtualRow => (
-                            <div
-                                key={virtualRow.index}
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: `${virtualRow.size}px`,
-                                    transform: `translateY(${virtualRow.start}px)`
-                                }}
-                            >
+                {sortedAssets &&
+                    assets &&
+                    distribution &&
+                    uiPreferences &&
+                    tronBalances !== undefined && (
+                        <>
+                            {canShowChart && showChart && (
                                 <ErrorBoundary
                                     fallbackRender={fallbackRenderOver(
-                                        'Failed to display tokens list'
+                                        'Failed to display pie chart'
                                     )}
                                 >
-                                    <JettonAssetStyled jetton={sortedAssets[virtualRow.index]} />
+                                    <TokensPieChart
+                                        distribution={distribution}
+                                        onTokenClick={onTokenClick}
+                                    />
                                     <Divider />
                                 </ErrorBoundary>
-                            </div>
-                        ))}
-                    </>
-                )}
+                            )}
+                            <TonAssetStyled ref={tonRef} info={assets.ton.info} />
+                            <Divider />
+                            {canUseTron && (
+                                <>
+                                    <TronAssetsStyled balances={tronBalances} />
+                                    <Divider />
+                                </>
+                            )}
+                            {rowVirtualizer.getVirtualItems().map(virtualRow => (
+                                <div
+                                    key={virtualRow.index}
+                                    style={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: `${virtualRow.size}px`,
+                                        transform: `translateY(${virtualRow.start}px)`
+                                    }}
+                                >
+                                    <ErrorBoundary
+                                        fallbackRender={fallbackRenderOver(
+                                            'Failed to display tokens list'
+                                        )}
+                                    >
+                                        <JettonAssetStyled
+                                            jetton={sortedAssets[virtualRow.index]}
+                                        />
+                                        <Divider />
+                                    </ErrorBoundary>
+                                </div>
+                            ))}
+                        </>
+                    )}
             </TokensPageBody>
         </DesktopViewPageLayout>
     );

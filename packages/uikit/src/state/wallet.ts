@@ -487,10 +487,13 @@ export const useAddTronToAccount = () => {
         let updatedAccount: Account;
         switch (activeAccount.type) {
             case 'mnemonic':
-                updatedAccount = standardTonAccountToAccountWithTron(activeAccount, getMnemonic);
+                updatedAccount = await standardTonAccountToAccountWithTron(
+                    activeAccount,
+                    getMnemonic
+                );
                 break;
             case 'mam':
-                updatedAccount = mamAccountToMamAccountWithTron(activeAccount);
+                updatedAccount = await mamAccountToMamAccountWithTron(activeAccount, getMnemonic);
                 break;
             default:
                 assertUnreachable(activeAccount);

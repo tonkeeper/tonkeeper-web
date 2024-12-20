@@ -23,6 +23,11 @@ export const useTronApi = () => {
     return useMemo(() => new TronApi(apiUrl, apiKey), [apiKey, apiUrl]);
 };
 
+export const useCanUseTronForActiveWallet = () => {
+    const account = useActiveAccount();
+    return isAccountTronCompatible(account);
+};
+
 export const useActiveTronWallet = (): TronWallet | undefined => {
     const account = useActiveAccount();
 
@@ -33,11 +38,13 @@ export const useActiveTronWallet = (): TronWallet | undefined => {
     return undefined;
 };
 
+export type TronBalances = { trx: AssetAmount<TronAsset>; usdt: AssetAmount<TronAsset> } | null;
+
 export const useTronBalances = () => {
     const tronApi = useTronApi();
     const activeWallet = useActiveTronWallet();
 
-    return useQuery<{ trx: AssetAmount<TronAsset>; usdt: AssetAmount<TronAsset> } | null, Error>(
+    return useQuery<TronBalances, Error>(
         [QueryKey.tronAssets, activeWallet?.address],
         async () => {
             if (!activeWallet) {

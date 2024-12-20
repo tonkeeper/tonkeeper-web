@@ -109,8 +109,6 @@ export interface DeprecatedWalletState {
     theme?: string;
 
     proxy?: WalletProxy;
-
-    tron?: TronWalletStorage;
 }
 
 export type WalletId = string;

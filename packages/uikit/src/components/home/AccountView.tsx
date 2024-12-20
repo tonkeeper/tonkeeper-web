@@ -1,5 +1,4 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
 import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
@@ -8,7 +7,6 @@ import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useTronWalletState } from '../../state/tron/tron';
 import { CopyIcon } from '../Icon';
 import {
     FullHeightBlockResponsive,
@@ -199,7 +197,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     );
 };
 
-const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
+const ReceiveTron: FC<{ tron: any }> = ({ tron }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { extension } = useAppContext();
@@ -241,11 +239,10 @@ export const ReceiveContent: FC<{
 }> = ({ chain = BLOCKCHAIN_NAME.TON, jetton, handleClose }) => {
     const { standalone } = useAppContext();
     const [active] = useState(chain);
-    const { data: tron } = useTronWalletState(active === BLOCKCHAIN_NAME.TRON);
     const tonRef = useRef<HTMLDivElement>(null);
     const tronRef = useRef<HTMLDivElement>(null);
 
-    const isTon = active === BLOCKCHAIN_NAME.TON || !tron;
+    const isTon = active === BLOCKCHAIN_NAME.TON; /*|| !tron*/
     const nodeRef = isTon ? tonRef : tronRef;
     const state = isTon ? 'ton' : 'tron';
 
@@ -280,7 +277,7 @@ export const ReceiveContent: FC<{
                                     }
                                 />
                             ) : (
-                                <ReceiveTron tron={tron} />
+                                <ReceiveTron tron={null} />
                             )}
                         </div>
                     </CSSTransition>

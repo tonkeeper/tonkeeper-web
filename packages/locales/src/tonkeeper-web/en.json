@@ -8,6 +8,7 @@
   "accounts_manage_folder_name": "Folder Name",
   "accounts_new_folder": "New Folder",
   "actionTitle": "Open the wallet",
+  "activate": "Activate",
   "add": "Add",
   "add_dns_address": "Add wallet address that domain %1% will link to.",
   "add_wallet_existing_multisig_description": "%{number} wallets managed by your wallet list",

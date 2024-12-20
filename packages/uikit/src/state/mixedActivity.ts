@@ -1,7 +1,9 @@
 import { InfiniteData } from '@tanstack/react-query';
 import { AccountEvent, AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
-import { TronEvent, TronEvents } from '@tonkeeper/core/dist/tronApi';
 import { GenericActivity, groupGenericActivity } from './activity';
+
+type TronEvent = any;
+type TronEvents = any; // TODO
 
 export interface TronActivity {
     kind: 'tron';

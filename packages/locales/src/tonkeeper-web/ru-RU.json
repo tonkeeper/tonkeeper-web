@@ -8,6 +8,7 @@
   "accounts_manage_folder_name": "Имя папки",
   "accounts_new_folder": "Новая папка",
   "actionTitle": "Открыть Кошелек",
+  "activate": "Активировать",
   "add": "Добавить",
   "add_dns_address": "Добавьте адрес кошелька, на который будет ссылаться домен %1%",
   "add_wallet_existing_multisig_description": "%{number} кошельков управляются вашим списком кошельков",

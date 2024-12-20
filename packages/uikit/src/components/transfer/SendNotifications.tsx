@@ -1,7 +1,6 @@
 import { TransferInitParams } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { jettonToTonAsset, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
@@ -115,9 +114,9 @@ const SendContent: FC<{
         }
 
         _setRecipient(value);
-        if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
+        /* if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
             setAmountViewState({ token: toTronAsset(tronBalances.balances[0]) });
-        }
+        }*/
     };
 
     const onRecipient = (data: RecipientData) => {
