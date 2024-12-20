@@ -8,6 +8,8 @@ import {
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { sendBackground } from '../../libs/backgroudService';
 import { SendTransactionAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
@@ -15,11 +17,21 @@ export const TonConnectSubscription = () => {
     const { mutateAsync: responseSendAsync } = useResponseSendMutation();
     const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
 
+    const queryClient = useQueryClient();
+
+    const onTransaction = useCallback(
+        async (request: SendTransactionAppRequest) => {
+            await queryClient.invalidateQueries([QueryKey.account]);
+            setRequest(request);
+        },
+        [setRequest]
+    );
+
     useSendNotificationAnalytics(request?.connection?.manifest);
 
     useEffect(() => {
-        window.backgroundApi.onTonConnectTransaction(setRequest);
-    }, [setRequest]);
+        window.backgroundApi.onTonConnectTransaction(onTransaction);
+    }, [onTransaction]);
 
     useEffect(() => {
         window.backgroundApi.onTonConnectDisconnect(disconnect);
