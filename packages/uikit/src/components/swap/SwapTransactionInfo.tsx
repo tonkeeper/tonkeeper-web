@@ -1,5 +1,5 @@
 import { css, styled } from 'styled-components';
-import { Body2Class, Body3 } from '../Text';
+import { Body2Class, Body3, Body3Class } from "../Text";
 import { IconButton } from '../fields/IconButton';
 import { useState } from 'react';
 import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
@@ -33,32 +33,6 @@ const TxInfoHeader = styled.div`
     }
 `;
 
-const AccordionContent = styled.div`
-    transform: translateY(-100%);
-    visibility: hidden;
-    transition: transform 0.2s ease-in-out, visibility 0.2s ease-in-out;
-`;
-
-const AccordionAnimation = styled.div<{ isOpened: boolean; animationCompleted: boolean }>`
-    display: grid;
-    grid-template-rows: ${p => (p.isOpened ? '1fr' : '0fr')};
-    overflow: ${p => (p.animationCompleted && p.isOpened ? 'visible' : 'hidden')};
-    transition: grid-template-rows 0.2s ease-in-out;
-
-    ${AccordionContent} {
-        ${p =>
-            p.isOpened &&
-            css`
-                transform: translateY(0);
-                visibility: visible;
-            `}
-    }
-`;
-
-const AccordionBody = styled.div`
-    min-height: 0;
-`;
-
 const AccordionButton = styled(IconButton)<{ isOpened: boolean }>`
     transform: ${p => (p.isOpened ? 'rotate(180deg)' : 'rotate(0deg)')};
     transition: transform 0.2s ease-in-out;
@@ -89,7 +63,7 @@ const Tooltip = styled.div<{ placement: 'top' | 'bottom' }>`
     background-color: ${p => p.theme.backgroundContentTint};
     padding: 8px 12px;
     ${BorderSmallResponsive};
-    ${Body2Class};
+    ${Body3Class};
 
     ${p =>
         p.placement === 'top'

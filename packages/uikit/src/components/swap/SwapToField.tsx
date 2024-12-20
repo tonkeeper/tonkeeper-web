@@ -16,6 +16,10 @@ const FiledContainerStyled = styled.div`
     border-radius: ${p =>
         p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
     padding: 6px 12px;
+
+    &:empty {
+        display: none;
+    }
 `;
 
 const FiledHeader = styled.div`

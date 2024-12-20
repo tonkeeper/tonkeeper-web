@@ -11,6 +11,7 @@ import { Switch } from '../../components/fields/Switch';
 import { Badge } from '../../components/shared';
 import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -18,6 +19,7 @@ const CookieSettings = () => {
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
+        await sdk.storage.set(AppKey.PRO_AUTH_TOKEN, null);
         await client.invalidateQueries();
     });
 

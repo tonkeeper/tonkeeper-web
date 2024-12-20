@@ -1,6 +1,5 @@
 import { styled } from 'styled-components';
 import { useEncodeSwapToTonConnectParams } from '@tonkeeper/uikit/dist/state/swap/useEncodeSwap';
-import { useState } from 'react';
 import {
     useSelectedSwap,
     useSwapFromAmount,
@@ -18,6 +17,8 @@ import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { SwapWidgetHeader } from './SwapWidgetHeader';
 import { getTonkeeperInjectionContext } from '../libs/tonkeeper-injection-context';
 import { SwapWidgetFooter } from './SwapWidgetFooter';
+import { SwapWidgetTxSentNotification } from './SwapWidgetTxSent';
+import { useDisclosure } from '@tonkeeper/uikit/dist/hooks/useDisclosure';
 
 const MainFormWrapper = styled.div`
     height: 100%;
@@ -54,30 +55,56 @@ const ChangeIconStyled = styled(IconButton)`
 
 export const SwapWidgetPage = () => {
     const { isLoading, mutateAsync: encode } = useEncodeSwapToTonConnectParams({
-        ignoreBattery: true
+        forceCalculateBattery: true
     });
-    const [hasBeenSent, setHasBeenSent] = useState<boolean>(false);
     const [selectedSwap] = useSelectedSwap();
     const [fromAsset, setFromAsset] = useSwapFromAsset();
     const [toAsset, setToAsset] = useSwapToAsset();
     const [_, setFromAmount] = useSwapFromAmount();
+    const { isOpen, onClose, onOpen } = useDisclosure();
 
     const onConfirm = async () => {
         const params = await encode(selectedSwap! as NonNullableFields<CalculatedSwap>);
 
         const ctx = getTonkeeperInjectionContext()!;
 
-        ctx.sendTransaction({
-            source: ctx.address,
-            // legacy tonkeeper api, timestamp in ms
-            valid_until: params.valid_until * 1000,
-            messages: params.messages.map(m => ({
-                address: m.address,
-                amount: m.amount.toString(),
-                payload: m.payload
-            }))
-        }).finally(() => setHasBeenSent(false));
-        setHasBeenSent(true);
+        try {
+            const result = await ctx.sendTransaction({
+                source: ctx.address,
+                /**
+                 * legacy tonkeeper api, timestamp in ms
+                 */
+                valid_until: params.valid_until * 1000,
+                messages: params.messages.map(m => ({
+                    address: m.address,
+                    amount: m.amount.toString(),
+                    payload: m.payload
+                })),
+                messagesVariants: params.messagesVariants
+                    ? Object.fromEntries(
+                          Object.entries(params.messagesVariants).map(([k, v]) => [
+                              k,
+                              v.map(m => ({
+                                  address: m.address,
+                                  amount: m.amount.toString(),
+                                  payload: m.payload
+                              }))
+                          ])
+                      )
+                    : undefined
+            });
+
+            /**
+              old tonkeeper android versions return empty result instead of throwing
+             */
+            if (!result) {
+                throw new Error('Operation failed');
+            }
+
+            onOpen();
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const onChangeFields = () => {
@@ -97,10 +124,11 @@ export const SwapWidgetPage = () => {
                 </ChangeIconStyled>
             </SwapFromField>
             <SwapToField separateInfo />
-            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || hasBeenSent} />
+            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading} />
             <Spacer />
             <SwapWidgetFooter />
             <SwapTokensListNotification />
+            <SwapWidgetTxSentNotification isOpen={isOpen} onClose={onClose} />
         </MainFormWrapper>
     );
 };

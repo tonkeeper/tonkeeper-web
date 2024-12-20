@@ -40,6 +40,7 @@ export enum AppKey {
     USER_ID = 'user_id',
     PRO = 'pro_state',
     PRO_BACKUP = 'pro_backup',
+    PRO_AUTH_TOKEN = 'pro_auth_token',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',

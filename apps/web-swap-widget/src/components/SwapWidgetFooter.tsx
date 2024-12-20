@@ -13,6 +13,10 @@ const Row = styled.div`
     ${Body3Class}
 `;
 
+const RowWrap = styled(Row)`
+    flex-wrap: wrap;
+`;
+
 const Link = styled.a`
     display: flex;
     align-items: center;
@@ -42,7 +46,7 @@ export const SwapWidgetFooter = () => {
                 </Link>
                 &nbsp;{t('and')}&nbsp;TON
             </Row>
-            <Row>
+            <RowWrap>
                 <Link href="https://tonkeeper.com/privacy" target="_blank">
                     {t('legal_privacy')}
                 </Link>
@@ -50,7 +54,7 @@ export const SwapWidgetFooter = () => {
                 <Link href="https://tonkeeper.com/terms" target="_blank">
                     {t('legal_terms')}
                 </Link>
-            </Row>
+            </RowWrap>
         </Wrapper>
     );
 };

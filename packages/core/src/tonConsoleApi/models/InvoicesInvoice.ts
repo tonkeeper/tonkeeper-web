@@ -1,7 +1,8 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CryptoCurrency } from './CryptoCurrency';
 import type { InvoiceStatus } from './InvoiceStatus';
 export type InvoicesInvoice = {
     id: string;
@@ -16,5 +17,6 @@ export type InvoicesInvoice = {
     date_change: number;
     date_expire: number;
     date_create: number;
+    currency: CryptoCurrency;
 };
 

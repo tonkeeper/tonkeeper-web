@@ -1,3 +1,5 @@
+import { getWindow } from '@tonkeeper/core/dist/service/telegramOauth';
+
 export function getUserOS() {
     if (navigator.userAgent.includes('Win')) {
         return 'windows';
@@ -83,4 +85,8 @@ export function listenBroadcastMessages(channel: string, onMessage: (message: st
     } catch (e) {
         console.error(e);
     }
+}
+
+export function isTouchDevice() {
+    return getWindow()?.matchMedia('(pointer: coarse)').matches;
 }

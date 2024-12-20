@@ -14,7 +14,8 @@ import { useMemo } from 'react';
 import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { SlidersIcon } from '../../components/Icon';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useWalletFilteredNftList } from "../../state/nft";
+import { useWalletFilteredNftList } from '../../state/nft';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -71,6 +72,14 @@ const SettingsButtonStyled = styled(IconButtonTransparentBackground)`
 `;
 
 export const DesktopDns = () => {
+    return (
+        <HideOnReview>
+            <DesktopDnsContent />
+        </HideOnReview>
+    );
+};
+
+export const DesktopDnsContent = () => {
     const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
     const navigate = useNavigate();
