@@ -32,10 +32,14 @@ import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wal
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    TRON_TRX_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { BorderSmallResponsive } from '../../components/shared/Styles';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -175,6 +179,18 @@ const CoinInfoWrapper = styled.div`
         width: 56px;
         height: 56px;
         border-radius: 50%;
+    }
+`;
+
+const TronCoinInfoWrapper = styled.div`
+    padding: 1rem 0;
+    display: flex;
+
+    gap: 1rem;
+
+    > img {
+        width: 56px;
+        height: 56px;
     }
 `;
 
@@ -321,6 +337,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
 
 export const TronUSDTPage = () => {
     const { t } = useTranslation();
+    const sdk = useAppSdk();
 
     const asset = TRON_USDT_ASSET;
     const { fiat } = useAppContext();
@@ -338,13 +355,25 @@ export const TronUSDTPage = () => {
         return balances.usdt;
     }, [balances]);
 
+    const trxBalance = useMemo(() => {
+        if (balances === undefined) {
+            return undefined;
+        }
+
+        if (balances === null) {
+            return new AssetAmount({ weiAmount: 0, asset: TRON_TRX_ASSET });
+        }
+
+        return balances.trx;
+    }, [balances]);
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader backButton borderBottom={true}>
                 <Label2>{asset.symbol}</Label2>
             </DesktopViewHeader>
             <CoinHeaderStyled>
-                <CoinInfoWrapper>
+                <TronCoinInfoWrapper>
                     <img src={asset.image} alt={asset.symbol} />
                     {usdtBalance !== undefined && (
                         <CoinInfoAmounts>
@@ -352,7 +381,7 @@ export const TronUSDTPage = () => {
                             <Body2>{formatFiatCurrency(fiat, usdtBalance.relativeAmount)}</Body2>
                         </CoinInfoAmounts>
                     )}
-                </CoinInfoWrapper>
+                </TronCoinInfoWrapper>
                 <HeaderButtonsContainer>
                     <ButtonStyled
                         size="small"
@@ -362,13 +391,90 @@ export const TronUSDTPage = () => {
                         <ArrowUpIcon />
                         {t('wallet_send')}
                     </ButtonStyled>
-                    <ButtonStyled size="small" onClick={() => {}}>
+                    <ButtonStyled
+                        size="small"
+                        onClick={() => {
+                            sdk.uiEvents.emit('receive', {
+                                method: 'receive',
+                                params: {
+                                    chain: BLOCKCHAIN_NAME.TRON,
+                                    jetton: asset.id
+                                }
+                            });
+                        }}
+                    >
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
+            {!!trxBalance && (
+                <TronTopUpTRX relativeAssetBalance={trxBalance.stringAssetRelativeAmount} />
+            )}
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
         </DesktopViewPageLayout>
+    );
+};
+
+const TronTopUpUSDTWrapper = styled.div`
+    background-color: ${p => p.theme.backgroundContent};
+    ${BorderSmallResponsive};
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 16px;
+
+    > ${Body2} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const TextContainer = styled.div`
+    > * {
+        display: block;
+    }
+
+    > ${Body2} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const SmallDivider = styled.div`
+    width: 100%;
+    height: 1px;
+    background-color: ${p => p.theme.separatorCommon};
+`;
+
+const TronTopUpTRX: FC<{ relativeAssetBalance: string }> = ({ relativeAssetBalance }) => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    return (
+        <>
+            <TronTopUpUSDTWrapper>
+                <TextContainer>
+                    <Label2>{t('tron_top_up_trx_title')}</Label2>
+                    <Body2>
+                        {t('tron_top_up_trx_description', { balance: relativeAssetBalance })}
+                    </Body2>
+                </TextContainer>
+                <Button
+                    size="small"
+                    onClick={() => {
+                        sdk.uiEvents.emit('receive', {
+                            method: 'receive',
+                            params: {
+                                chain: BLOCKCHAIN_NAME.TRON,
+                                jetton: TRON_TRX_ASSET.id
+                            }
+                        });
+                    }}
+                >
+                    {t('tron_top_up_trx_button')}
+                </Button>
+            </TronTopUpUSDTWrapper>
+            <SmallDivider />
+        </>
     );
 };

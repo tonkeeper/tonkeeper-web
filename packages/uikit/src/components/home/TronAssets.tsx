@@ -13,12 +13,17 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useAddTronToAccount } from '../../state/wallet';
+import styled from 'styled-components';
 
 const usdtRate = {
     diff7d: '',
     diff24h: '',
     prices: 1
 };
+
+const TokenLogoNotRounded = styled(TokenLogo)`
+    border-radius: unset;
+`;
 
 const tronAssetRate = (asset: TronAsset) => {
     if (asset.id === TRON_USDT_ASSET.id) {
@@ -44,7 +49,11 @@ const TronAssetComponent: FC<{ assetAmount: AssetAmount<TronAsset>; className?: 
             className={className}
         >
             <ListItemPayload>
-                <TokenLogo src={assetAmount.image} />
+                {assetAmount.asset.id === TRON_USDT_ASSET.id ? (
+                    <TokenLogoNotRounded src={assetAmount.image} />
+                ) : (
+                    <TokenLogo src={assetAmount.image} />
+                )}
                 <TokenLayout
                     name={assetAmount.asset.name!}
                     symbol={assetAmount.asset.symbol}
@@ -68,7 +77,7 @@ const InactiveUSDA: FC<{ className?: string }> = ({ className }) => {
     return (
         <ListItem className={className}>
             <ListItemPayload>
-                <TokenLogo src={TRON_USDT_ASSET.image} />
+                <TokenLogoNotRounded src={TRON_USDT_ASSET.image} />
                 <TokenLayout
                     name={TRON_USDT_ASSET.name!}
                     symbol={TRON_USDT_ASSET.symbol}

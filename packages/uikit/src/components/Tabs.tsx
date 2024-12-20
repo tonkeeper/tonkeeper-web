@@ -4,26 +4,29 @@ import { Button } from './fields/Button';
 
 const TabsBlock = styled.div`
     display: flex;
-    padding: 3px;
+    padding: 4px;
     position: relative;
     justify-content: center;
     gap: 3px;
     user-select: none;
-    border-radius: ${props => props.theme.cornerMedium};
+    border-radius: ${props => props.theme.corner2xSmall};
     background: ${props => props.theme.backgroundContent};
+    width: fit-content;
 `;
 
 export function Tabs<T extends string>({
     active,
     values,
-    setActive
+    setActive,
+    className
 }: {
     active: T;
     values: { name: string; id: T }[];
     setActive: (value: T) => void;
+    className?: string;
 }) {
     return (
-        <TabsBlock>
+        <TabsBlock className={className}>
             {values.map(item => (
                 <Button
                     size="small"

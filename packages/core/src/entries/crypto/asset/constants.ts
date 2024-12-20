@@ -11,7 +11,7 @@ export const TRON_USDT_ASSET: TronAsset = {
     decimals: 6,
     address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
     blockchain: BLOCKCHAIN_NAME.TRON,
-    image: 'https://wallet.tonkeeper.com/img/usdt.svg'
+    image: 'https://wallet.tonkeeper.com/img/usdt-trc20.png'
 };
 
 export const TRON_TRX_ASSET: TronAsset = {
