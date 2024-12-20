@@ -69,6 +69,12 @@ export interface JettonPreview {
      * @memberof JettonPreview
      */
     customPayloadApiUri?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof JettonPreview
+     */
+    score?: number;
 }
 
 
@@ -103,6 +109,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'image': json['image'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
+        'score': json['score'] == null ? undefined : json['score'],
     };
 }
 
@@ -124,6 +131,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'image': value['image'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'custom_payload_api_uri': value['customPayloadApiUri'],
+        'score': value['score'],
     };
 }
 

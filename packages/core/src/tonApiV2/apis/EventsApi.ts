@@ -16,13 +16,10 @@
 import * as runtime from '../runtime';
 import type {
   Event,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     EventFromJSON,
     EventToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetEventRequest {

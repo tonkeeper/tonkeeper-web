@@ -46,7 +46,6 @@ models/BlockParamLimits.ts
 models/BlockRaw.ts
 models/BlockValueFlow.ts
 models/BlockchainAccountInspect.ts
-models/BlockchainAccountInspectMethodsInner.ts
 models/BlockchainBlock.ts
 models/BlockchainBlockShards.ts
 models/BlockchainBlockShardsShardsInner.ts
@@ -74,6 +73,8 @@ models/BlockchainConfig31.ts
 models/BlockchainConfig40.ts
 models/BlockchainConfig43.ts
 models/BlockchainConfig44.ts
+models/BlockchainConfig45.ts
+models/BlockchainConfig45ContractsInner.ts
 models/BlockchainConfig5.ts
 models/BlockchainConfig6.ts
 models/BlockchainConfig7.ts
@@ -95,6 +96,7 @@ models/DecodedMessageExtInMsgDecoded.ts
 models/DecodedMessageExtInMsgDecodedWalletHighloadV2.ts
 models/DecodedMessageExtInMsgDecodedWalletV3.ts
 models/DecodedMessageExtInMsgDecodedWalletV4.ts
+models/DecodedMessageExtInMsgDecodedWalletV5.ts
 models/DecodedRawMessage.ts
 models/DecodedRawMessageMessage.ts
 models/DepositStakeAction.ts
@@ -106,12 +108,15 @@ models/DomainBids.ts
 models/DomainInfo.ts
 models/DomainNames.ts
 models/DomainRenewAction.ts
+models/EcPreview.ts
 models/ElectionsDepositStakeAction.ts
 models/ElectionsRecoverStakeAction.ts
 models/EmulateMessageToWalletRequest.ts
 models/EmulateMessageToWalletRequestParamsInner.ts
 models/EncryptedComment.ts
 models/Event.ts
+models/ExtraCurrency.ts
+models/ExtraCurrencyTransferAction.ts
 models/FoundAccounts.ts
 models/FoundAccountsAddressesInner.ts
 models/GasLimitPrices.ts
@@ -156,7 +161,6 @@ models/GetStakingPoolInfo200Response.ts
 models/GetStakingPools200Response.ts
 models/GetStorageProviders200Response.ts
 models/GetTonConnectPayload200Response.ts
-models/GetWalletBackup200Response.ts
 models/ImagePreview.ts
 models/InitStateRaw.ts
 models/InscriptionBalance.ts
@@ -184,6 +188,7 @@ models/JettonsBalances.ts
 models/MarketTonRates.ts
 models/Message.ts
 models/MessageConsequences.ts
+models/Method.ts
 models/MethodExecutionResult.ts
 models/MisbehaviourPunishmentConfig.ts
 models/ModelError.ts
@@ -219,8 +224,9 @@ models/SignRawMessage.ts
 models/SignRawParams.ts
 models/SizeLimitsConfig.ts
 models/SmartContractAction.ts
+models/Source.ts
+models/SourceFile.ts
 models/StateInit.ts
-models/StatusDefaultResponse.ts
 models/StoragePhase.ts
 models/StorageProvider.ts
 models/Subscription.ts

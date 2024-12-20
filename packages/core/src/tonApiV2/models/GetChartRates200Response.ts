@@ -21,10 +21,10 @@ import { mapValues } from '../runtime';
 export interface GetChartRates200Response {
     /**
      * 
-     * @type {{ [key: string]: any; }}
+     * @type {Array<Array<any>>}
      * @memberof GetChartRates200Response
      */
-    points: { [key: string]: any; };
+    points: Array<Array<any>>;
 }
 
 /**

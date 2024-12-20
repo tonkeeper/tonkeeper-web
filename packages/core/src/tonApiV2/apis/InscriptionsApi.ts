@@ -18,7 +18,6 @@ import type {
   AccountEvents,
   GetInscriptionOpTemplate200Response,
   InscriptionBalances,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     AccountEventsFromJSON,
@@ -27,8 +26,6 @@ import {
     GetInscriptionOpTemplate200ResponseToJSON,
     InscriptionBalancesFromJSON,
     InscriptionBalancesToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountInscriptionsRequest {

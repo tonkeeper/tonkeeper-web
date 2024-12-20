@@ -20,6 +20,13 @@ import {
     UnSubscriptionActionToJSON,
     UnSubscriptionActionToJSONTyped,
 } from './UnSubscriptionAction';
+import type { ExtraCurrencyTransferAction } from './ExtraCurrencyTransferAction';
+import {
+    ExtraCurrencyTransferActionFromJSON,
+    ExtraCurrencyTransferActionFromJSONTyped,
+    ExtraCurrencyTransferActionToJSON,
+    ExtraCurrencyTransferActionToJSONTyped,
+} from './ExtraCurrencyTransferAction';
 import type { DomainRenewAction } from './DomainRenewAction';
 import {
     DomainRenewActionFromJSON,
@@ -187,6 +194,12 @@ export interface Action {
     tonTransfer?: TonTransferAction;
     /**
      * 
+     * @type {ExtraCurrencyTransferAction}
+     * @memberof Action
+     */
+    extraCurrencyTransfer?: ExtraCurrencyTransferAction;
+    /**
+     * 
      * @type {ContractDeployAction}
      * @memberof Action
      */
@@ -319,6 +332,7 @@ export interface Action {
  */
 export const ActionTypeEnum = {
     TonTransfer: 'TonTransfer',
+    ExtraCurrencyTransfer: 'ExtraCurrencyTransfer',
     JettonTransfer: 'JettonTransfer',
     JettonBurn: 'JettonBurn',
     JettonMint: 'JettonMint',
@@ -376,6 +390,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'type': json['type'],
         'status': json['status'],
         'tonTransfer': json['TonTransfer'] == null ? undefined : TonTransferActionFromJSON(json['TonTransfer']),
+        'extraCurrencyTransfer': json['ExtraCurrencyTransfer'] == null ? undefined : ExtraCurrencyTransferActionFromJSON(json['ExtraCurrencyTransfer']),
         'contractDeploy': json['ContractDeploy'] == null ? undefined : ContractDeployActionFromJSON(json['ContractDeploy']),
         'jettonTransfer': json['JettonTransfer'] == null ? undefined : JettonTransferActionFromJSON(json['JettonTransfer']),
         'jettonBurn': json['JettonBurn'] == null ? undefined : JettonBurnActionFromJSON(json['JettonBurn']),
@@ -414,6 +429,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'type': value['type'],
         'status': value['status'],
         'TonTransfer': TonTransferActionToJSON(value['tonTransfer']),
+        'ExtraCurrencyTransfer': ExtraCurrencyTransferActionToJSON(value['extraCurrencyTransfer']),
         'ContractDeploy': ContractDeployActionToJSON(value['contractDeploy']),
         'JettonTransfer': JettonTransferActionToJSON(value['jettonTransfer']),
         'JettonBurn': JettonBurnActionToJSON(value['jettonBurn']),

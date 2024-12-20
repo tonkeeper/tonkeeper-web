@@ -19,7 +19,6 @@ import type {
   GaslessEstimateRequest,
   GaslessSendRequest,
   SignRawParams,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     GaslessConfigFromJSON,
@@ -30,8 +29,6 @@ import {
     GaslessSendRequestToJSON,
     SignRawParamsFromJSON,
     SignRawParamsToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GaslessEstimateOperationRequest {
