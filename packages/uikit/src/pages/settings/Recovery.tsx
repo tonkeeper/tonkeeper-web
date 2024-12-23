@@ -1,4 +1,8 @@
-import { AccountId, isMnemonicAndPassword } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountId,
+    isAccountTronCompatible,
+    isMnemonicAndPassword
+} from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -9,6 +13,11 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { getAccountMnemonic, getMAMWalletMnemonic } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
+import { Body2Class } from '../../components/Text';
+import { useTranslation } from '../../hooks/translation';
+import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
+import { SpinnerRing } from '../../components/Icon';
+import { useSetNotificationOnBack } from '../../components/Notification';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
@@ -75,32 +84,78 @@ const BackButtonBlockStyled = styled(BackButtonBlock)`
         `}
 `;
 
+const TronButton = styled.button`
+    margin-top: 15px;
+    padding: 4px 8px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+
+    ${Body2Class};
+    color: ${p => p.theme.textSecondary};
+`;
+
+const SpinnerRingStyled = styled(SpinnerRing)`
+    margin: 16px auto;
+`;
+
 export const RecoveryContent: FC<{
     accountId: AccountId;
     walletId?: WalletId;
     isPage?: boolean;
     onClose?: () => void;
 }> = ({ accountId, walletId, isPage = true, onClose }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
-    const onBack = useCallback(() => {
-        onClose ? onClose() : navigate(-1);
-    }, [onClose, navigate]);
+    const onBack = useCallback(() => (onClose ? onClose() : navigate(-1)), [onClose, navigate]);
 
     const mnemonic = useMnemonic(onBack, accountId, walletId);
     const account = useAccountState(accountId);
+    const [isExportingTRC20, setIsExportingTrc20] = useState(false);
 
-    if (!mnemonic) {
-        return <Wrapper />;
+    const [mnemonicToShow, setMnemonicToShow] = useState(mnemonic);
+    useEffect(() => {
+        setMnemonicToShow(mnemonic);
+    }, [mnemonic]);
+
+    const onHideTron = () => {
+        setMnemonicToShow(mnemonic);
+        setIsExportingTrc20(false);
+    };
+
+    useSetNotificationOnBack(isExportingTRC20 ? onHideTron : undefined);
+
+    if (!mnemonicToShow) {
+        return (
+            <Wrapper>
+                <SpinnerRingStyled />
+            </Wrapper>
+        );
     }
+
+    const hasTronWallet = account && isAccountTronCompatible(account) && !!account.activeTronWallet;
+
+    const onShowTron = async () => {
+        const tronMnemonic = await tonMnemonicToTronMnemonic(mnemonic!);
+        setMnemonicToShow(tronMnemonic);
+        setIsExportingTrc20(true);
+    };
+
+    const wordsType =
+        account?.type === 'mam' && walletId === undefined
+            ? 'mam'
+            : isExportingTRC20
+            ? 'tron'
+            : 'standard';
 
     return (
         <Wrapper>
             {isPage && <BackButtonBlockStyled onClick={onBack} />}
-            <WordsGridAndHeaders
-                mnemonic={mnemonic}
-                showMamInfo={account?.type === 'mam' && walletId === undefined}
-                allowCopy
-            />
+            <WordsGridAndHeaders mnemonic={mnemonicToShow} type={wordsType} allowCopy />
+
+            {hasTronWallet && !isExportingTRC20 && (
+                <TronButton onClick={onShowTron}>{t('export_trc_20_wallet')}</TronButton>
+            )}
         </Wrapper>
     );
 };
