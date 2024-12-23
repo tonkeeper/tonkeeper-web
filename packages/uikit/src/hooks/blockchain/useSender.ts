@@ -173,6 +173,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const account = useActiveAccount();
     const batteryConfig = useBatteryServiceConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
+    const { data: twoFaConfig } = useTwoFAWalletConfig();
 
     return useQuery<SenderChoiceUserAvailable[]>(
         [
@@ -181,9 +182,14 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             account,
             batteryAuthToken,
             batteryEnableConfig.disableOperations,
-            batteryConfig
+            batteryConfig,
+            twoFaConfig?.status
         ],
         async () => {
+            if (twoFaConfig?.status === 'active') {
+                return [TWO_FA_SENDER_CHOICE];
+            }
+
             if (account.type === 'ledger') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
