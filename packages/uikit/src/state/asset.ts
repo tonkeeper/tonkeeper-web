@@ -8,10 +8,10 @@ import { isBasicAsset, packAssetId } from '@tonkeeper/core/dist/entries/crypto/a
 import {
     KNOWN_TON_ASSETS,
     TON_ASSET,
+    TRON_TRX_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
@@ -61,13 +61,10 @@ export function useUserAssetBalance<
         }
     } else {
         isLoading = tronBalances.isLoading;
-        const token = tronBalances.data?.balances.find(i => i.token.address === asset.address);
-        if (token && isBasicAsset(asset)) {
-            data = new AssetAmount<TronAsset>({
-                asset,
-                weiAmount: token.weiAmount,
-                image: token.token.image
-            });
+        if (asset.address === TRON_USDT_ASSET.address) {
+            data = tronBalances.data?.usdt;
+        } else if (asset.address === TRON_TRX_ASSET.address) {
+            data = tronBalances.data?.trx;
         } else {
             data = '0';
         }
@@ -82,7 +79,6 @@ export function useUserAssetBalance<
 export function useAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
     const id = packAssetId(blockchain, address);
     const { data: jettons } = useJettonList();
-    const { data: balances } = useTronBalances();
 
     if (id === TON_ASSET.id) {
         return 'https://wallet.tonkeeper.com/img/toncoin.svg';
@@ -93,11 +89,11 @@ export function useAssetImage({ blockchain, address }: AssetIdentification): str
     }
 
     if (typeof address === 'string') {
-        return balances?.balances.find(i => i.token.address === address)?.token.image;
-    } else {
-        return jettons?.balances.find(i => address.equals(Address.parse(i.jetton.address)))?.jetton
-            .image;
+        throw new Error('Unexpected address');
     }
+
+    return jettons?.balances.find(i => address.equals(Address.parse(i.jetton.address)))?.jetton
+        .image;
 }
 
 export function useAssetAmountFiatEquivalent(assetAmount: AssetAmount): {

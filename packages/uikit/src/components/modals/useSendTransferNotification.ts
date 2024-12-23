@@ -1,17 +1,19 @@
 import { useAppSdk } from '../../hooks/appSdk';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { useCallback } from 'react';
-import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
+import { TransferInitParams } from '@tonkeeper/core/dist/AppSdk';
 
 export const useSendTransferNotification = () => {
     const sdk = useAppSdk();
 
     const onOpen = useCallback(
-        (params?: TonTransferParams) => {
+        (params?: TransferInitParams) => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
-                params: { chain: BLOCKCHAIN_NAME.TON, ...params, from: 'wallet' }
+                params: {
+                    ...params,
+                    from: 'wallet'
+                }
             });
         },
         [sdk]

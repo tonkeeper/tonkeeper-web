@@ -54,6 +54,8 @@ import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
 import { useAnalyticsTrack } from '../../hooks/amplitude';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -114,9 +116,9 @@ const SendContent: FC<{
         }
 
         _setRecipient(value);
-        /* if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
-            setAmountViewState({ token: toTronAsset(tronBalances.balances[0]) });
-        }*/
+        if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
+            setAmountViewState({ token: TRON_USDT_ASSET });
+        }
     };
 
     const onRecipient = (data: RecipientData) => {
@@ -228,10 +230,9 @@ const SendContent: FC<{
             return;
         }
 
-        // TODO: ENABLE TRON
-        // if (seeIfValidTronAddress(signature)) {
-        //     return processTron(signature);
-        // }
+        if (seeIfValidTronAddress(signature)) {
+            return processTron(signature);
+        }
 
         return sdk.uiEvents.emit('copy', {
             method: 'copy',
@@ -424,6 +425,13 @@ const SendActionNotification = () => {
 
             const transfer = options.params;
             setChain(options.params.chain);
+
+            if (transfer.chain === BLOCKCHAIN_NAME.TRON) {
+                setOpen(true);
+                track('send_open', { from: transfer.from });
+                return;
+            }
+
             if (transfer.address) {
                 getAccountAsync({ address: transfer.address }).then(account => {
                     setTonTransfer(makeTransferInitData(transfer, account, jettons));

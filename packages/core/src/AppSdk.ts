@@ -16,7 +16,11 @@ export type TransferInitParams =
           chain: BLOCKCHAIN_NAME.TON;
           from: string;
       })
-    | Record<string, never>;
+    | {
+          chain: BLOCKCHAIN_NAME.TRON;
+          from: string;
+          address?: string;
+      };
 
 export type ReceiveInitParams = {
     chain?: BLOCKCHAIN_NAME;
