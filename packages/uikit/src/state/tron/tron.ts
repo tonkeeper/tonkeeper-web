@@ -13,6 +13,7 @@ import {
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import { useDevSettings } from '../dev';
 
 export const useTronApi = () => {
     const appContext = useAppContext();
@@ -23,13 +24,30 @@ export const useTronApi = () => {
     return useMemo(() => new TronApi(apiUrl, apiKey), [apiKey, apiUrl]);
 };
 
+export const useIsTronEnabledGlobally = () => {
+    const { data: devSettings } = useDevSettings();
+
+    return devSettings?.tronEnabled;
+};
+
 export const useCanUseTronForActiveWallet = () => {
+    const isTronEnabled = useIsTronEnabledGlobally();
     const account = useActiveAccount();
+
+    if (!isTronEnabled) {
+        return false;
+    }
+
     return isAccountTronCompatible(account);
 };
 
 export const useActiveTronWallet = (): TronWallet | undefined => {
     const account = useActiveAccount();
+    const isTronEnabled = useIsTronEnabledGlobally();
+
+    if (!isTronEnabled) {
+        return undefined;
+    }
 
     if (isAccountTronCompatible(account)) {
         return account.activeTronWallet;

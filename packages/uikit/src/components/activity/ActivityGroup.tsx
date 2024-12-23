@@ -1,6 +1,5 @@
 import { InfiniteData } from '@tanstack/react-query';
 import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
-import { TronEvents } from '@tonkeeper/core/dist/tronApi';
 import React, { FC, useMemo, useState } from 'react';
 import { formatActivityDate, GenericActivityGroup, getActivityTitle } from '../../state/activity';
 import { MixedActivity, getMixedActivityGroups } from '../../state/mixedActivity';
@@ -16,7 +15,7 @@ export const ActivityList: FC<{
     isFetched: boolean;
     isFetchingNextPage: boolean;
     tonEvents?: InfiniteData<AccountEvents>;
-    tronEvents?: InfiniteData<TronEvents>;
+    tronEvents?: InfiniteData<unknown>;
 }> = ({ isFetched, isFetchingNextPage, tonEvents, tronEvents }) => {
     const activity = useMemo<GenericActivityGroup<MixedActivity>[]>(() => {
         return getMixedActivityGroups(tonEvents, tronEvents);

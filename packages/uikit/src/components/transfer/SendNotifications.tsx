@@ -4,8 +4,8 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { jettonToTonAsset, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
-    TonTransferParams,
-    parseTonTransferWithAddress
+    parseTonTransferWithAddress,
+    TonTransferParams
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
@@ -17,7 +17,7 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useJettonList } from '../../state/jetton';
-import { useTronBalances } from '../../state/tron/tron';
+import { useActiveTronWallet } from '../../state/tron/tron';
 import {
     Notification,
     NotificationFooter,
@@ -38,16 +38,16 @@ import { AmountState } from './amountView/amountState';
 import {
     AmountHeaderBlock,
     AmountMainButton,
+    childFactoryCreator,
     ConfirmMainButton,
+    duration,
     InitTransferData,
     MainButton,
-    RecipientHeaderBlock,
-    Wrapper,
-    childFactoryCreator,
-    duration,
+    makeTransferInitAmountState,
     makeTransferInitData,
+    RecipientHeaderBlock,
     TransferViewHeaderBlock,
-    makeTransferInitAmountState
+    Wrapper
 } from './common';
 import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -103,7 +103,7 @@ const SendContent: FC<{
         }
     }, []);
 
-    const { data: tronBalances } = useTronBalances();
+    const activeTronWallet = useActiveTronWallet();
 
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
 
@@ -116,7 +116,7 @@ const SendContent: FC<{
         }
 
         _setRecipient(value);
-        if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
+        if (activeTronWallet && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
             setAmountViewState({ token: TRON_USDT_ASSET });
         }
     };
@@ -154,6 +154,9 @@ const SendContent: FC<{
     };
 
     const processTron = (address: string) => {
+        if (!activeTronWallet) {
+            return;
+        }
         const item = { address: address, blockchain: BLOCKCHAIN_NAME.TRON } as const;
 
         setRecipient({
@@ -263,6 +266,19 @@ const SendContent: FC<{
         });
     }, [amountViewState?.token?.id, amountViewState?.coinValue]);
 
+    let acceptBlockchains: BLOCKCHAIN_NAME[] = [];
+    if (chain) {
+        if (chain === BLOCKCHAIN_NAME.TRON && !activeTronWallet) {
+            acceptBlockchains = [BLOCKCHAIN_NAME.TON];
+        } else {
+            acceptBlockchains = [chain];
+        }
+    } else {
+        acceptBlockchains = activeTronWallet
+            ? [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
+            : [BLOCKCHAIN_NAME.TON];
+    }
+
     return (
         <Wrapper standalone={standalone} extension={extension}>
             <TransitionGroup childFactory={childFactoryCreator(right)}>
@@ -300,7 +316,7 @@ const SendContent: FC<{
                                     onScan={onScan}
                                     keyboard="decimal"
                                     isExternalLoading={isAccountLoading}
-                                    acceptBlockchains={chain ? [chain] : undefined}
+                                    acceptBlockchains={acceptBlockchains}
                                     MainButton={MainButton}
                                     HeaderBlock={() => (
                                         <RecipientHeaderBlock

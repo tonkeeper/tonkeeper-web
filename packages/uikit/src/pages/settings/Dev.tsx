@@ -69,12 +69,36 @@ const EnableTwoFASettings = () => {
     );
 };
 
+const EnableTronSettings = () => {
+    const { mutate: mutateSettings } = useMutateDevSettings();
+    const { data: devSettings } = useDevSettings();
+
+    return (
+        <ListBlock>
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <TextAndBadge>
+                        <Label1>Enable USDT TRC-20</Label1>
+                        <Badge color="accentRed">Experimental</Badge>
+                    </TextAndBadge>
+                    <Switch
+                        disabled={!devSettings}
+                        checked={!!devSettings?.tronEnabled}
+                        onChange={checked => mutateSettings({ tronEnabled: checked })}
+                    />
+                </ListItemPayload>
+            </ListItem>
+        </ListBlock>
+    );
+};
+
 export const DevSettings = React.memo(() => {
     return (
         <>
             <SubHeader title="Dev Menu" />
             <InnerBody>
                 <EnableTwoFASettings />
+                <EnableTronSettings />
                 <CookieSettings />
                 {/* TODO: ENABLE TRON */}
                 {/* <SettingsList items={items2} /> */}
