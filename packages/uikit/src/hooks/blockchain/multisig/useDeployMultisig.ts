@@ -29,6 +29,9 @@ import {
     MultisigEncoder,
     MultisigConfig
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
+import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
+import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
 
 export const useDeployMultisig = (
     params:
@@ -51,13 +54,22 @@ export const useDeployMultisig = (
     const notifyError = useNotifyErrorHandle();
     const rawTransactionService = useTonRawTransactionService();
 
+    const accountAndWallet = wallets.find(w => w.wallet.id === params?.fromWallet);
+    const { data: twoFaConfig } = useTwoFAWalletConfig({
+        account: accountAndWallet?.account,
+        walletId: accountAndWallet?.wallet.id
+    });
+    const twoFaApi = useTwoFAApi();
+    const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
+        useConfirmTwoFANotification();
+    const twoFAServiceConfig = useTwoFAServiceConfig();
+
     return useMutation<string | undefined, Error>(async () => {
         try {
             if (!params) {
                 throw new Error('Unknown error, params are empty');
             }
 
-            const accountAndWallet = wallets.find(w => w.wallet.id === params.fromWallet);
             if (!accountAndWallet) {
                 throw new Error('Wallet not found');
             }
@@ -89,6 +101,20 @@ export const useDeployMultisig = (
             let sender: Sender;
             if (signer.type === 'ledger') {
                 sender = new LedgerMessageSender(api, accountAndWallet.wallet, signer);
+            } else if (twoFaConfig?.status === 'active') {
+                sender = new TwoFAMessageSender(
+                    { tonApi: api, twoFaApi },
+                    accountAndWallet.wallet,
+                    signer,
+                    twoFaConfig.pluginAddress,
+                    {
+                        openConfirmModal: () => {
+                            openTwoFaConfirmTelegram();
+                            return closeTwoFaConfirmTelegram;
+                        },
+                        confirmMessageTGTtlSeconds: twoFAServiceConfig.confirmMessageTGTtlSeconds
+                    }
+                );
             } else {
                 sender = new WalletMessageSender(api, accountAndWallet.wallet, signer);
             }

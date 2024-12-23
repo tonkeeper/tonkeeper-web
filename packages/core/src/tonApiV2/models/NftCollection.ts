@@ -84,8 +84,7 @@ export interface NftCollection {
  */
 export const NftCollectionApprovedByEnum = {
     Getgems: 'getgems',
-    Tonkeeper: 'tonkeeper',
-    TonDiamonds: 'ton.diamonds'
+    Tonkeeper: 'tonkeeper'
 } as const;
 export type NftCollectionApprovedByEnum = typeof NftCollectionApprovedByEnum[keyof typeof NftCollectionApprovedByEnum];
 

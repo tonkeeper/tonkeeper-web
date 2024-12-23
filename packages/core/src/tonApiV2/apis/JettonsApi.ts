@@ -16,15 +16,17 @@
 import * as runtime from '../runtime';
 import type {
   Event,
+  GetAccountsRequest,
   JettonHolders,
   JettonInfo,
   JettonTransferPayload,
   Jettons,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     EventFromJSON,
     EventToJSON,
+    GetAccountsRequestFromJSON,
+    GetAccountsRequestToJSON,
     JettonHoldersFromJSON,
     JettonHoldersToJSON,
     JettonInfoFromJSON,
@@ -33,8 +35,6 @@ import {
     JettonTransferPayloadToJSON,
     JettonsFromJSON,
     JettonsToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetJettonHoldersRequest {
@@ -45,6 +45,10 @@ export interface GetJettonHoldersRequest {
 
 export interface GetJettonInfoRequest {
     accountId: string;
+}
+
+export interface GetJettonInfosByAddressesRequest {
+    getAccountsRequest?: GetAccountsRequest;
 }
 
 export interface GetJettonTransferPayloadRequest {
@@ -98,6 +102,20 @@ export interface JettonsApiInterface {
      * Get jetton metadata by jetton master address
      */
     getJettonInfo(requestParameters: GetJettonInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonInfo>;
+
+    /**
+     * Get jetton metadata items by jetton master addresses
+     * @param {GetAccountsRequest} [getAccountsRequest] a list of account ids
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JettonsApiInterface
+     */
+    getJettonInfosByAddressesRaw(requestParameters: GetJettonInfosByAddressesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Jettons>>;
+
+    /**
+     * Get jetton metadata items by jetton master addresses
+     */
+    getJettonInfosByAddresses(requestParameters: GetJettonInfosByAddressesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Jettons>;
 
     /**
      * Get jetton\'s custom payload and state init required for transfer
@@ -222,6 +240,35 @@ export class JettonsApi extends runtime.BaseAPI implements JettonsApiInterface {
      */
     async getJettonInfo(requestParameters: GetJettonInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonInfo> {
         const response = await this.getJettonInfoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get jetton metadata items by jetton master addresses
+     */
+    async getJettonInfosByAddressesRaw(requestParameters: GetJettonInfosByAddressesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Jettons>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v2/jettons/_bulk`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: GetAccountsRequestToJSON(requestParameters['getAccountsRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => JettonsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get jetton metadata items by jetton master addresses
+     */
+    async getJettonInfosByAddresses(requestParameters: GetJettonInfosByAddressesRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Jettons> {
+        const response = await this.getJettonInfosByAddressesRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

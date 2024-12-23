@@ -10,17 +10,16 @@ import { FC } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
-import { AppRoute, SettingsRoute } from '../libs/routes';
+import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
 import {
     useAccountsState,
     useActiveAccount,
-    useActiveTonNetwork,
     useActiveWallet,
     useMutateActiveTonWallet
 } from '../state/wallet';
 import { DropDown } from './DropDown';
-import { DoneIcon, DownIcon, PlusIcon, SettingsIcon } from './Icon';
+import { DoneIcon, DownIcon, ExclamationMarkTriangleIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
 import { ListItem, ListItemPayload } from './List';
 import { H1, H3, Label1, Label2 } from './Text';
@@ -33,6 +32,9 @@ import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 
 import { useSideBarItems } from '../state/folders';
+import { useTwoFAWalletConfig } from '../state/two-fa';
+import { BorderSmallResponsive } from './shared/Styles';
+import { hexToRGBA } from '../libs/css';
 
 const Block = styled.div<{
     center?: boolean;
@@ -298,45 +300,73 @@ const TitleStyled = styled(Title)`
     align-items: center;
 `;
 
+const TwoFARecoveryStarted = styled(Link)`
+    text-decoration: unset;
+    box-sizing: border-box;
+    min-height: 36px;
+    ${BorderSmallResponsive};
+    background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
+    color: ${p => p.theme.accentOrange};
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    transition: background-color 0.1s ease-in;
+    width: fit-content;
+    margin: 0 auto;
+
+    &:hover {
+        background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.2)};
+    }
+`;
+
 export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const account = useActiveAccount();
     const { onOpen: addWallet } = useAddWalletNotification();
+    const { t } = useTranslation();
+    const { data: twoFAConfig } = useTwoFAWalletConfig();
 
     const accounts = useAccountsState();
     const shouldShowIcon = accounts.length > 1;
 
-    const network = getNetworkByAccount(account);
-
     return (
-        <Block center>
-            <DropDownContainerStyle />
-            <DropDown
-                center
-                payload={onClose => <DropDownPayload onClose={onClose} onCreate={addWallet} />}
-                containerClassName="header-dd-container"
-            >
-                <TitleStyled>
-                    {shouldShowIcon && (
-                        <WalletEmoji
-                            emoji={
-                                account.type === 'mam'
-                                    ? account.activeDerivation.emoji
-                                    : account.emoji
-                            }
-                        />
-                    )}
-                    <TitleName>
-                        {account.type === 'mam' ? account.activeDerivation.name : account.name}
-                    </TitleName>
+        <>
+            <Block center>
+                <DropDownContainerStyle />
+                <DropDown
+                    center
+                    payload={onClose => <DropDownPayload onClose={onClose} onCreate={addWallet} />}
+                    containerClassName="header-dd-container"
+                >
+                    <TitleStyled>
+                        {shouldShowIcon && (
+                            <WalletEmoji
+                                emoji={
+                                    account.type === 'mam'
+                                        ? account.activeDerivation.emoji
+                                        : account.emoji
+                                }
+                            />
+                        )}
+                        <TitleName>
+                            {account.type === 'mam' ? account.activeDerivation.name : account.name}
+                        </TitleName>
 
-                    <DownIconWrapper>
-                        <DownIcon />
-                    </DownIconWrapper>
-                </TitleStyled>
-            </DropDown>
+                        <DownIconWrapper>
+                            <DownIcon />
+                        </DownIconWrapper>
+                    </TitleStyled>
+                </DropDown>
 
-            {showQrScan && <ScanButton />}
-        </Block>
+                {showQrScan && <ScanButton />}
+            </Block>
+            {twoFAConfig?.status === 'disabling' && (
+                <TwoFARecoveryStarted to={AppRoute.settings + WalletSettingsRoute.twoFa}>
+                    <ExclamationMarkTriangleIcon />
+                    <Label2>{t('wallet_2fa_recovery_started')}</Label2>
+                </TwoFARecoveryStarted>
+            )}
+        </>
     );
 };
 

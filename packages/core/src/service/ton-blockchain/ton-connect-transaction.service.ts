@@ -20,6 +20,7 @@ import { Cell } from '@ton/core';
 import { assertUnreachable } from '../../utils/types';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
 import { maxBigNumber } from '../../utils/common';
+import { TwoFAMessageSender } from './sender/two-fa-message-sender';
 
 export class TonConnectTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
@@ -76,7 +77,8 @@ export class TonConnectTransactionService {
         if (
             sender instanceof LedgerMessageSender ||
             sender instanceof MultisigCreateOrderSender ||
-            sender instanceof WalletMessageSender
+            sender instanceof WalletMessageSender ||
+            sender instanceof TwoFAMessageSender
         ) {
             return 'standard';
         }

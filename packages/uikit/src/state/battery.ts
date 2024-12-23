@@ -8,7 +8,6 @@ import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useAppContext } from '../hooks/appContext';
 import BigNumber from 'bignumber.js';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -24,6 +23,7 @@ import {
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useTwoFAWalletConfig } from './two-fa';
 
 export const useBatteryApi = () => {
     const config = useActiveConfig();
@@ -185,6 +185,10 @@ export const useBatteryUnitTonRate = () => {
 export const useBatteryEnabledConfig = () => {
     const network = useActiveTonNetwork();
     const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
+    const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
+
+    const disableDueToTwoFA =
+        twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
 
     return useMemo(() => {
         if (network === Network.TESTNET) {
@@ -196,10 +200,10 @@ export const useBatteryEnabledConfig = () => {
         }
         return {
             isBeta: battery_beta ?? false,
-            disableWhole: disable_battery ?? false,
+            disableWhole: disableDueToTwoFA || (disable_battery ?? false),
             disableOperations: disable_battery ? true : disable_battery_send ?? false
         };
-    }, [battery_beta, disable_battery, disable_battery_send, network]);
+    }, [battery_beta, disable_battery, disable_battery_send, network, disableDueToTwoFA]);
 };
 
 /**

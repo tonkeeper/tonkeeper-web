@@ -29,7 +29,6 @@ import type {
   JettonsBalances,
   Multisigs,
   NftItems,
-  StatusDefaultResponse,
   Subscriptions,
   TraceIDs,
 } from '../models/index';
@@ -62,8 +61,6 @@ import {
     MultisigsToJSON,
     NftItemsFromJSON,
     NftItemsToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
     SubscriptionsFromJSON,
     SubscriptionsToJSON,
     TraceIDsFromJSON,

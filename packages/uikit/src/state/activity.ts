@@ -7,8 +7,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useAppContext } from '../hooks/appContext';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { atom, useAtom } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
@@ -16,6 +15,7 @@ import { MixedActivity } from './mixedActivity';
 import { seeIfTonTransfer } from './ton/tonActivity';
 import { useActiveApi, useActiveWallet } from './wallet';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { useTwoFAWalletConfig } from './two-fa';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -149,6 +149,8 @@ export const useFetchFilteredActivity = (asset?: string) => {
     const wallet = useActiveWallet();
     const api = useActiveApi();
     const { asset: selectedAsset, filterSpam, onlyInitiator } = useHistoryFilters();
+    const { data: twoFAConfig } = useTwoFAWalletConfig();
+    const twoFaPlugin = twoFAConfig?.status === 'active' ? twoFAConfig.pluginAddress : undefined;
 
     return useInfiniteQuery({
         queryKey: [
@@ -157,7 +159,8 @@ export const useFetchFilteredActivity = (asset?: string) => {
             asset,
             selectedAsset?.id,
             onlyInitiator,
-            filterSpam
+            filterSpam,
+            twoFaPlugin
         ],
         queryFn: async ({ pageParam = undefined }) => {
             let activity: AccountEvents;
@@ -205,6 +208,20 @@ export const useFetchFilteredActivity = (asset?: string) => {
             if (filterSpam) {
                 activity.events = activity.events.filter(event => !event.isScam);
             }
+
+            if (twoFaPlugin) {
+                activity.events = activity.events.map(event => {
+                    if (
+                        event.actions[0].tonTransfer &&
+                        event.actions[0].tonTransfer.sender.address === twoFaPlugin
+                    ) {
+                        event.actions = event.actions.slice(1);
+                    }
+
+                    return event;
+                });
+            }
+
             return activity;
         },
         getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined),

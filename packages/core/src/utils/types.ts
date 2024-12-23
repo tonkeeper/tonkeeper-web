@@ -13,3 +13,8 @@ export function notNullish<T>(x: T | null | undefined): x is T {
 }
 
 export type AllOrNone<T> = Required<T> | Partial<Record<keyof T, undefined>>;
+
+/**
+ * hex chars string with 0x prefix
+ */
+export type HexStringPrefixed = `0x${string}`;

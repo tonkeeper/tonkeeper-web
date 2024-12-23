@@ -67,6 +67,12 @@ export interface JettonInfo {
     metadata: JettonMetadata;
     /**
      * 
+     * @type {string}
+     * @memberof JettonInfo
+     */
+    preview: string;
+    /**
+     * 
      * @type {JettonVerificationType}
      * @memberof JettonInfo
      */
@@ -77,6 +83,12 @@ export interface JettonInfo {
      * @memberof JettonInfo
      */
     holdersCount: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof JettonInfo
+     */
+    score?: number;
 }
 
 
@@ -88,6 +100,7 @@ export function instanceOfJettonInfo(value: object): value is JettonInfo {
     if (!('mintable' in value) || value['mintable'] === undefined) return false;
     if (!('totalSupply' in value) || value['totalSupply'] === undefined) return false;
     if (!('metadata' in value) || value['metadata'] === undefined) return false;
+    if (!('preview' in value) || value['preview'] === undefined) return false;
     if (!('verification' in value) || value['verification'] === undefined) return false;
     if (!('holdersCount' in value) || value['holdersCount'] === undefined) return false;
     return true;
@@ -107,8 +120,10 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'totalSupply': json['total_supply'],
         'admin': json['admin'] == null ? undefined : AccountAddressFromJSON(json['admin']),
         'metadata': JettonMetadataFromJSON(json['metadata']),
+        'preview': json['preview'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'holdersCount': json['holders_count'],
+        'score': json['score'] == null ? undefined : json['score'],
     };
 }
 
@@ -127,8 +142,10 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'total_supply': value['totalSupply'],
         'admin': AccountAddressToJSON(value['admin']),
         'metadata': JettonMetadataToJSON(value['metadata']),
+        'preview': value['preview'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'holders_count': value['holdersCount'],
+        'score': value['score'],
     };
 }
 

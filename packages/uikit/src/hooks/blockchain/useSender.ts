@@ -42,9 +42,13 @@ import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-b
 import { useAssets } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import { toNano } from '@ton/core';
+import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../state/two-fa';
+import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
+import { useConfirmTwoFANotification } from '../../components/modals/ConfirmTwoFANotificationControlled';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
+    | { type: 'two_fa' }
     | { type: 'external' }
     | { type: 'battery' }
     | { type: 'gasless'; asset: TonAsset };
@@ -69,6 +73,7 @@ export const useAvailableSendersChoices = (
     const gaslessConfig = useGaslessConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const [walletInfo] = useAssets();
+    const { data: twoFaConfig } = useTwoFAWalletConfig();
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
@@ -83,7 +88,8 @@ export const useAvailableSendersChoices = (
             batteryReservedAmount,
             gaslessConfig,
             batteryEnableConfig.disableOperations,
-            walletInfo
+            walletInfo,
+            twoFaConfig
         ],
         () => {
             if (account.type !== 'mnemonic' && account.type !== 'mam') {
@@ -91,6 +97,10 @@ export const useAvailableSendersChoices = (
             }
             if (operation.type === 'multisend-transfer') {
                 return [EXTERNAL_SENDER_CHOICE];
+            }
+
+            if (twoFaConfig?.status === 'active') {
+                return [TWO_FA_SENDER_CHOICE];
             }
 
             let batteryAvailable = false;
@@ -148,7 +158,10 @@ export const useAvailableSendersChoices = (
         },
         {
             enabled:
-                batteryBalance !== undefined && walletInfo !== undefined && config !== undefined
+                batteryBalance !== undefined &&
+                walletInfo !== undefined &&
+                config !== undefined &&
+                twoFaConfig !== undefined
         }
     );
 };
@@ -160,6 +173,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const account = useActiveAccount();
     const batteryConfig = useBatteryServiceConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
+    const { data: twoFaConfig } = useTwoFAWalletConfig();
 
     return useQuery<SenderChoiceUserAvailable[]>(
         [
@@ -168,9 +182,14 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             account,
             batteryAuthToken,
             batteryEnableConfig.disableOperations,
-            batteryConfig
+            batteryConfig,
+            twoFaConfig?.status
         ],
         async () => {
+            if (twoFaConfig?.status === 'active') {
+                return [TWO_FA_SENDER_CHOICE];
+            }
+
             if (account.type === 'ledger') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
@@ -215,6 +234,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
 };
 
 export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies SenderChoice;
+export const TWO_FA_SENDER_CHOICE = { type: 'two_fa' } as const satisfies SenderChoice;
 export const BATTERY_SENDER_CHOICE = { type: 'battery' } as const satisfies SenderChoice;
 
 export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'external' }) => {
@@ -227,6 +247,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
     const { mutateAsync } = useRequestBatteryAuthToken();
     const accounts = useAccountsState();
     const gaslessConfig = useGaslessConfig();
+    const twoFaApi = useTwoFAApi();
+    const { data: twoFAConfig } = useTwoFAWalletConfig();
 
     const wallet = activeAccount.activeTonWallet;
 
@@ -281,6 +303,19 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
                     throw new Error("Can't send a transfer using this account");
                 }
                 return new WalletMessageSender(api, wallet, estimationSigner);
+            }
+
+            if (senderChoice.type === 'two_fa') {
+                if (twoFAConfig?.status !== 'active') {
+                    throw new Error('2FA is not active');
+                }
+
+                return new TwoFAMessageSender(
+                    { tonApi: api, twoFaApi },
+                    wallet,
+                    estimationSigner,
+                    twoFAConfig.pluginAddress
+                );
             }
 
             if (senderChoice.type === 'external') {
@@ -343,7 +378,9 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'ext
         batteryApi,
         batteryConfig,
         mutateAsync,
-        gaslessConfig
+        gaslessConfig,
+        twoFaApi,
+        twoFAConfig
     ]);
 };
 
@@ -358,10 +395,16 @@ export const useGetSender = () => {
     const { mutateAsync } = useRequestBatteryAuthToken();
     const accounts = useAccountsState();
     const gaslessConfig = useGaslessConfig();
+    const twoFaApi = useTwoFAApi();
+    const { data: twoFAConfig } = useTwoFAWalletConfig();
+    const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
+        useConfirmTwoFANotification();
+    const twoFAServiceConfig = useTwoFAServiceConfig();
 
     const wallet = activeAccount.activeTonWallet;
 
     return useCallback(
+        // eslint-disable-next-line complexity
         async (senderChoice: SenderChoice = { type: 'external' }): Promise<Sender> => {
             if (activeAccount.type === 'watch-only') {
                 throw new Error("Can't send a transfer using this account");
@@ -436,6 +479,26 @@ export const useGetSender = () => {
                 return new LedgerMessageSender(api, wallet, signer);
             }
 
+            if (senderChoice.type === 'two_fa') {
+                if (twoFAConfig?.status !== 'active' && twoFAConfig?.status !== 'disabling') {
+                    throw new Error('2FA is not active');
+                }
+
+                return new TwoFAMessageSender(
+                    { tonApi: api, twoFaApi },
+                    wallet,
+                    signer,
+                    twoFAConfig.pluginAddress,
+                    {
+                        openConfirmModal: () => {
+                            openTwoFaConfirmTelegram();
+                            return closeTwoFaConfirmTelegram;
+                        },
+                        confirmMessageTGTtlSeconds: twoFAServiceConfig.confirmMessageTGTtlSeconds
+                    }
+                );
+            }
+
             if (senderChoice.type === 'external') {
                 return new WalletMessageSender(api, wallet, signer);
             }
@@ -498,7 +561,12 @@ export const useGetSender = () => {
             getSigner,
             activeAccount,
             mutateAsync,
-            gaslessConfig
+            gaslessConfig,
+            twoFaApi,
+            twoFAConfig,
+            openTwoFaConfirmTelegram,
+            closeTwoFaConfirmTelegram,
+            twoFAServiceConfig.confirmMessageTGTtlSeconds
         ]
     );
 };

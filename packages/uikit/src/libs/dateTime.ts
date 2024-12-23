@@ -59,6 +59,10 @@ export const timeFromNow = (date: number, locale: 'en' | 'ru' = 'en') => {
     return dayjs(dt).locale(locale).calendar(null, conf);
 };
 
+export const formattedDateTimeStamp = (date: Date, locale: ILocale) => {
+    return dayjs(date).locale(locale).format('LL');
+};
+
 export function getTimeRemaining(endTime: Date) {
     const now = new Date();
     const timeDifference = endTime.getTime() - now.getTime();

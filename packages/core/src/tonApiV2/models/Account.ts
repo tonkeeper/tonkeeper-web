@@ -20,6 +20,13 @@ import {
     AccountStatusToJSON,
     AccountStatusToJSONTyped,
 } from './AccountStatus';
+import type { ExtraCurrency } from './ExtraCurrency';
+import {
+    ExtraCurrencyFromJSON,
+    ExtraCurrencyFromJSONTyped,
+    ExtraCurrencyToJSON,
+    ExtraCurrencyToJSONTyped,
+} from './ExtraCurrency';
 
 /**
  * 
@@ -39,6 +46,12 @@ export interface Account {
      * @memberof Account
      */
     balance: number;
+    /**
+     * 
+     * @type {Array<ExtraCurrency>}
+     * @memberof Account
+     */
+    extraBalance?: Array<ExtraCurrency>;
     /**
      * {'USD': 1, 'IDR': 1000}
      * @type {{ [key: string]: any; }}
@@ -134,6 +147,7 @@ export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         
         'address': json['address'],
         'balance': json['balance'],
+        'extraBalance': json['extra_balance'] == null ? undefined : ((json['extra_balance'] as Array<any>).map(ExtraCurrencyFromJSON)),
         'currenciesBalance': json['currencies_balance'] == null ? undefined : json['currencies_balance'],
         'lastActivity': json['last_activity'],
         'status': AccountStatusFromJSON(json['status']),
@@ -161,6 +175,7 @@ export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
         
         'address': value['address'],
         'balance': value['balance'],
+        'extra_balance': value['extraBalance'] == null ? undefined : ((value['extraBalance'] as Array<any>).map(ExtraCurrencyToJSON)),
         'currencies_balance': value['currenciesBalance'],
         'last_activity': value['lastActivity'],
         'status': AccountStatusToJSON(value['status']),
