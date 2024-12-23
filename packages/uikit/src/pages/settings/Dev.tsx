@@ -7,7 +7,7 @@ import { CloseIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
-import { Label1 } from '../../components/Text';
+import { Body3, Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
 import { Badge } from '../../components/shared';
 import styled from 'styled-components';
@@ -40,6 +40,15 @@ const CookieSettings = () => {
     return <SettingsList items={items} />;
 };
 
+const TextColumns = styled.div`
+    display: flex;
+    flex-direction: column;
+
+    & > ${Body3} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
 const TextAndBadge = styled.div`
     display: flex;
     align-items: center;
@@ -54,10 +63,13 @@ const EnableTwoFASettings = () => {
         <ListBlock>
             <ListItem hover={false}>
                 <ListItemPayload>
-                    <TextAndBadge>
-                        <Label1>Enable 2FA</Label1>
-                        <Badge color="textSecondary">Experimental</Badge>
-                    </TextAndBadge>
+                    <TextColumns>
+                        <TextAndBadge>
+                            <Label1>Enable 2FA</Label1>
+                            <Badge color="textSecondary">Experimental</Badge>
+                        </TextAndBadge>
+                        <Body3>Available only for W5 wallets</Body3>
+                    </TextColumns>
                     <Switch
                         disabled={!devSettings}
                         checked={!!devSettings?.twoFAEnabled}
