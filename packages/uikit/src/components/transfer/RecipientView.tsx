@@ -272,23 +272,6 @@ export const RecipientView: FC<{
         }
         setAddress(item);
         ref.current?.focus();
-        // if (ios && keyboard) openIosKeyboard(keyboard);
-
-        // if (seeIfValidTronAddress(item.address)) {
-        //     setRecipient({
-        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
-        //         done: false
-        //     });
-        // } else {
-        //     const to = await getAccountAsync(item);
-        //     if (to.memoRequired) return;
-        //     setRecipient({
-        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
-        //         toAccount: to,
-        //         comment,
-        //         done: false
-        //     });
-        // }
     };
 
     return (

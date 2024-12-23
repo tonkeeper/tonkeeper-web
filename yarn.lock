@@ -7320,15 +7320,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton-keychain/trx@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "@ton-keychain/trx@npm:0.0.6"
+"@ton-keychain/trx@npm:^0.0.7":
+  version: 0.0.7
+  resolution: "@ton-keychain/trx@npm:0.0.7"
   dependencies:
     "@noble/hashes": "npm:^1.3.3"
     "@scure/bip39": "npm:^1.2.2"
     "@ton-keychain/core": "npm:^0.0.4"
     ethers: "npm:^6.9.2"
-  checksum: 10/21f1987073f8fc925ca97e01294c7cf6c7b18a7091b0c9fbadda3d3bd65a9d73800384c35726aeb019f11f47e96348578867fc406cf02989a6e25ed299018250
+  checksum: 10/2a0e93f610218104fdfae7e7bf0efbf7093d380c0de1555d98c603e1844013c3048981227774a8254db1b94720d2e8c4cc9860c5f1d37088b4c494256ac7d29f
   languageName: node
   linkType: hard
 
@@ -7399,7 +7399,7 @@ __metadata:
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.2"
     "@ton-keychain/core": "npm:^0.0.4"
-    "@ton-keychain/trx": "npm:^0.0.6"
+    "@ton-keychain/trx": "npm:^0.0.7"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@ton/ton": "npm:^15.1.0"
@@ -7408,6 +7408,7 @@ __metadata:
     ethers: "npm:^6.13.4"
     npm-run-all: "npm:^4.1.5"
     query-string: "npm:^8.1.0"
+    tronweb: "npm:^6.0.0"
     tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
     yarn-run-all: "npm:^3.1.1"
@@ -7659,7 +7660,7 @@ __metadata:
     "@tanstack/react-query": "npm:4.3.4"
     "@tanstack/react-virtual": "npm:^3.8.3"
     "@ton-keychain/core": "npm:^0.0.4"
-    "@ton-keychain/trx": "npm:^0.0.6"
+    "@ton-keychain/trx": "npm:^0.0.7"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
     "@tonkeeper/core": "npm:0.1.0"
@@ -7682,6 +7683,7 @@ __metadata:
     country-flag-icons: "npm:^1.5.7"
     country-list-js: "npm:^3.1.7"
     dayjs: "npm:^1.11.10"
+    ethers: "npm:^6.13.4"
     framer-motion: "npm:^11.3.28"
     react: "npm:^18.2.0"
     react-beautiful-dnd: "npm:^13.1.1"
@@ -7700,6 +7702,7 @@ __metadata:
     slick-carousel: "npm:^1.8.1"
     storybook-addon-turbo-build: "npm:^1.1.0"
     styled-components: "npm:^6.1.1"
+    tronweb: "npm:^6.0.0"
     tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
     uuid: "npm:^9.0.0"
@@ -7800,6 +7803,13 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: 10/ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
+  languageName: node
+  linkType: hard
+
+"@tronweb3/google-protobuf@npm:^3.21.2":
+  version: 3.21.2
+  resolution: "@tronweb3/google-protobuf@npm:3.21.2"
+  checksum: 10/00d9344e0d32af7af3e55087ffb60b8663ce2c180e8450e5e76b72e5d7309dc2b6ce9999dece7aa48050b626e6f50622dc2614d80e5bb4bcd259512363aaa048
   languageName: node
   linkType: hard
 
@@ -10480,6 +10490,17 @@ __metadata:
     form-data: "npm:^4.0.0"
     proxy-from-env: "npm:^1.1.0"
   checksum: 10/3f9a79eaf1d159544fca9576261ff867cbbff64ed30017848e4210e49f3b01e97cf416390150e6fdf6633f336cd43dc1151f890bbd09c3c01ad60bb0891eee63
+  languageName: node
+  linkType: hard
+
+"axios@npm:^1.7.4":
+  version: 1.7.9
+  resolution: "axios@npm:1.7.9"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/b7a5f660ea53ba9c2a745bf5ad77ad8bf4f1338e13ccc3f9f09f810267d6c638c03dac88b55dae8dc98b79c57d2d6835be651d58d2af97c174f43d289a9fd007
   languageName: node
   linkType: hard
 
@@ -15369,7 +15390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^6.13.4, ethers@npm:^6.9.2":
+"ethers@npm:^6.13.1, ethers@npm:^6.13.4, ethers@npm:^6.9.2":
   version: 6.13.4
   resolution: "ethers@npm:6.13.4"
   dependencies:
@@ -15396,6 +15417,13 @@ __metadata:
     stream-combiner: "npm:~0.0.4"
     through: "npm:~2.3.1"
   checksum: 10/48ea0e17df89ff45778c25e7111a6691401c902162823ddd7656d83fc972e75380f789f7a48f272f50fe7015420cc04f835d458560bf95e34b2c7a479570c8fb
+  languageName: node
+  linkType: hard
+
+"eventemitter3@npm:^3.1.0":
+  version: 3.1.2
+  resolution: "eventemitter3@npm:3.1.2"
+  checksum: 10/e2886001beb52cd2fe47d2470fd6266b7c70bd3ac356c0041a7e64336ed57bb1fc9b07bc9043d34b39913488a8d81bfcde62d3af597974980aa01b50844d869b
   languageName: node
   linkType: hard
 
@@ -27921,6 +27949,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tronweb@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "tronweb@npm:6.0.0"
+  dependencies:
+    "@babel/runtime": "npm:^7.0.0"
+    "@tronweb3/google-protobuf": "npm:^3.21.2"
+    axios: "npm:^1.7.4"
+    bignumber.js: "npm:^9.0.1"
+    ethereum-cryptography: "npm:^2.1.3"
+    ethers: "npm:^6.13.1"
+    eventemitter3: "npm:^3.1.0"
+    semver: "npm:^5.6.0"
+    validator: "npm:^13.7.0"
+  checksum: 10/93ae9d761273018150e90fb5f20f78df109a58cff031a3bc05f31370c05ca1b6c9b4a3bc1a39c24a59b3c12915243c577935d6d8ce2b4accf36c38bd81c29047
+  languageName: node
+  linkType: hard
+
 "trough@npm:^1.0.0":
   version: 1.0.5
   resolution: "trough@npm:1.0.5"
@@ -29041,6 +29086,13 @@ __metadata:
     spdx-correct: "npm:^3.0.0"
     spdx-expression-parse: "npm:^3.0.0"
   checksum: 10/86242519b2538bb8aeb12330edebb61b4eb37fd35ef65220ab0b03a26c0592c1c8a7300d32da3cde5abd08d18d95e8dabfad684b5116336f6de9e6f207eec224
+  languageName: node
+  linkType: hard
+
+"validator@npm:^13.7.0":
+  version: 13.12.0
+  resolution: "validator@npm:13.12.0"
+  checksum: 10/db6eb0725e2b67d60d30073ae8573982713b5903195d031dc3c7db7e82df8b74e8c13baef8e2106d146d979599fd61a06cde1fec5c148e4abd53d52817ff0fd9
   languageName: node
   linkType: hard
 

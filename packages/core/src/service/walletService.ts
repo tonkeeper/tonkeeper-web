@@ -143,6 +143,19 @@ export const tronWalletByTonMnemonic = async (
     }
 };
 
+export const tonMnemonicToTronMnemonic = async (
+    mnemonic: string[],
+    mnemonicType: MnemonicType = 'ton'
+): Promise<string[]> => {
+    if (mnemonicType === 'ton') {
+        const tonAccount = await KeychainTonAccount.fromMnemonic(mnemonic);
+        const trxProvider = KeychainTrxAccountsProvider.fromEntropy(tonAccount.entropy);
+        return trxProvider.mnemonics;
+    } else {
+        return mnemonic;
+    }
+};
+
 export const getContextApiByNetwork = (context: CreateWalletContext, network: Network) => {
     const api = network === Network.TESTNET ? context.testnetApi : context.mainnetApi;
     return api;

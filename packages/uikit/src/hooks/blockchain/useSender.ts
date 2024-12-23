@@ -1,10 +1,10 @@
 import {
     BatteryMessageSender,
-    LedgerMessageSender,
-    WalletMessageSender,
-    MultisigCreateOrderSender,
     GaslessMessageSender,
-    Sender
+    LedgerMessageSender,
+    MultisigCreateOrderSender,
+    Sender,
+    WalletMessageSender
 } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { useAppContext } from '../appContext';
 import {
@@ -23,13 +23,17 @@ import {
     useBatteryServiceConfig,
     useRequestBatteryAuthToken
 } from '../../state/battery';
-import { useGetAccountSigner } from '../../state/mnemonic';
+import { getTronSigner, useGetAccountSigner } from '../../state/mnemonic';
 import { useCallback, useMemo } from 'react';
 import {
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Account, AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
+import {
+    Account,
+    AccountTonMultisig,
+    isAccountTronCompatible
+} from '@tonkeeper/core/dist/entries/account';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { getMultisigSignerInfo } from '../../state/multisig';
 import { GaslessConfig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -45,6 +49,12 @@ import { toNano } from '@ton/core';
 import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../state/two-fa';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 import { useConfirmTwoFANotification } from '../../components/modals/ConfirmTwoFANotificationControlled';
+import { useTronApi } from '../../state/tron/tron';
+import { TronSender } from '@tonkeeper/core/dist/service/tron-blockchain/tron-sender';
+import { useAppSdk } from '../appSdk';
+import { useCheckTouchId } from '../../state/password';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -62,7 +72,7 @@ export type SenderTypeUserAvailable = SenderChoiceUserAvailable['type'];
 
 export const useAvailableSendersChoices = (
     operation:
-        | { type: 'transfer'; asset: TonAsset }
+        | { type: 'transfer'; asset: TonAsset | TronAsset }
         | { type: 'multisend-transfer'; asset: TonAsset }
         | { type: 'nfr_transfer' }
 ) => {
@@ -92,6 +102,9 @@ export const useAvailableSendersChoices = (
             twoFaConfig
         ],
         () => {
+            if (asset?.blockchain === BLOCKCHAIN_NAME.TRON) {
+                return [EXTERNAL_SENDER_CHOICE];
+            }
             if (account.type !== 'mnemonic' && account.type !== 'mam') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
@@ -580,4 +593,38 @@ const isGaslessAvailable = ({
         isStandardTonWallet(account.activeTonWallet) &&
         account.activeTonWallet.version === WalletVersion.V5R1
     );
+};
+
+export const useGetTronSender = () => {
+    const sdk = useAppSdk();
+    const tronApi = useTronApi();
+    const activeAccount = useActiveAccount();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
+    return useCallback(() => {
+        const signer = getTronSigner(sdk, tronApi, activeAccount, checkTouchId);
+
+        if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
+            throw new Error('Tron is not enabled for the active wallet');
+        }
+
+        return new TronSender(tronApi, activeAccount.activeTronWallet, signer);
+    }, [tronApi, activeAccount, checkTouchId]);
+};
+
+export const useGetTronEstimationSender = () => {
+    const tronApi = useTronApi();
+    const activeAccount = useActiveAccount();
+
+    return useCallback(() => {
+        const signer = (): Promise<never> => {
+            throw new Error('Unexpected call');
+        };
+
+        if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
+            throw new Error('Tron is not enabled for the active wallet');
+        }
+
+        return new TronSender(tronApi, activeAccount.activeTronWallet, signer);
+    }, [tronApi]);
 };

@@ -4,12 +4,14 @@ import { TonAsset } from './ton-asset';
 import { TronAsset } from './tron-asset';
 import { Address } from '@ton/core';
 
+const usdtAddress = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t';
+
 export const TRON_USDT_ASSET: TronAsset = {
-    id: packAssetId(BLOCKCHAIN_NAME.TRON, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'),
+    id: packAssetId(BLOCKCHAIN_NAME.TRON, usdtAddress),
     symbol: 'USDT',
     name: 'Tether USDT',
     decimals: 6,
-    address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+    address: usdtAddress,
     blockchain: BLOCKCHAIN_NAME.TRON,
     image: 'https://wallet.tonkeeper.com/img/usdt-trc20.png'
 };

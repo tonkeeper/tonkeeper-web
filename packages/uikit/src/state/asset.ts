@@ -85,7 +85,7 @@ export function useAssetImage({ blockchain, address }: AssetIdentification): str
     }
 
     if (id === TRON_USDT_ASSET.id) {
-        return 'https://wallet-dev.tonkeeper.com/img/usdt.svg';
+        return TRON_USDT_ASSET.image;
     }
 
     if (typeof address === 'string') {

@@ -40,6 +40,7 @@ import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/a
 import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
+import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -342,6 +343,7 @@ export const TronUSDTPage = () => {
     const asset = TRON_USDT_ASSET;
     const { fiat } = useAppContext();
     const { data: balances } = useTronBalances();
+    const { onOpen: sendTransfer } = useSendTransferNotification();
 
     const usdtBalance = useMemo(() => {
         if (balances === undefined) {
@@ -385,7 +387,7 @@ export const TronUSDTPage = () => {
                 <HeaderButtonsContainer>
                     <ButtonStyled
                         size="small"
-                        onClick={() => {}}
+                        onClick={() => sendTransfer({ chain: BLOCKCHAIN_NAME.TRON })}
                         disabled={usdtBalance?.weiAmount.isZero()}
                     >
                         <ArrowUpIcon />

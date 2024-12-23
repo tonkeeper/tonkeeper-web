@@ -98,6 +98,14 @@ abstract class TonMnemonic extends Clonable implements IAccountVersionsEditable 
         this.tronWallet = networks?.tron;
     }
 
+    getTronWallet(id: WalletId) {
+        if (id === this.activeTronWallet?.id) {
+            return this.activeTronWallet;
+        }
+
+        return undefined;
+    }
+
     getTonWallet(id: WalletId) {
         return this.allTonWallets.find(w => w.id === id);
     }
@@ -483,6 +491,10 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
 
     getTonWallet(id: WalletId) {
         return this.allTonWallets.find(w => w.id === id);
+    }
+
+    getTronWallet(id: WalletId) {
+        return this.derivations.map(d => d.tronWallet).find(item => item?.id === id);
     }
 
     getTonWalletsDerivation(id: WalletId) {

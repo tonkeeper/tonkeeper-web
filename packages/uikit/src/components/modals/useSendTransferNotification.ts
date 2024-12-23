@@ -6,7 +6,7 @@ export const useSendTransferNotification = () => {
     const sdk = useAppSdk();
 
     const onOpen = useCallback(
-        (params?: TransferInitParams) => {
+        (params?: Omit<TransferInitParams, 'from'>) => {
             sdk.uiEvents.emit('transfer', {
                 method: 'transfer',
                 id: Date.now(),
