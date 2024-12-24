@@ -29,7 +29,6 @@ import { TonEstimation } from '../../../entries/send';
 import { LedgerTransaction } from '../../ledger/connector';
 import { WalletMessageSender } from './wallet-message-sender';
 import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
-import { UserCancelledError } from '@tonkeeper/uikit/dist/libs/errors/UserCancelledError';
 
 export class LedgerMessageSender {
     constructor(
@@ -237,8 +236,8 @@ export class LedgerMessageSender {
             );
         } catch (e) {
             console.error(e);
-            if (e instanceof UserCancelledError) {
-                throw e;
+            if (typeof e === 'object' && e && 'name' in e && e.name === 'UserCancelledError') {
+                throw e as Error;
             }
             throw new LedgerError(
                 typeof e === 'string'
