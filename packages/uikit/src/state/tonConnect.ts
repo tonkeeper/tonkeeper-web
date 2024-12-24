@@ -181,9 +181,6 @@ export const useConnectTonConnectAppMutation = () => {
                         })
                     );
                 }
-
-                console.log(result);
-                debugger
             }
         }
 
