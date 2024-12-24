@@ -12,7 +12,8 @@ import {
     getTTL,
     getWalletSeqNo,
     tonConnectAddressIsBounceable,
-    toStateInit
+    toStateInit,
+    estimationSigner
 } from '../utils';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
@@ -25,6 +26,10 @@ import { MessagePayloadParam, serializePayload } from '../encoder/types';
 import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { TonEstimation } from '../../../entries/send';
+import { LedgerTransaction } from '../../ledger/connector';
+import { WalletMessageSender } from './wallet-message-sender';
+import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
+import { UserCancelledError } from '@tonkeeper/uikit/dist/libs/errors/UserCancelledError';
 
 export class LedgerMessageSender {
     constructor(
@@ -32,6 +37,17 @@ export class LedgerMessageSender {
         private readonly wallet: TonWalletStandard,
         private readonly signer: LedgerSigner
     ) {}
+
+    private async sign<T extends LedgerTransaction | LedgerTransaction[]>(
+        tx: T
+    ): Promise<T extends LedgerTransaction ? Cell : Cell[]> {
+        if (Array.isArray(tx)) {
+            return this.signer(tx) as Promise<T extends LedgerTransaction ? Cell : Cell[]>;
+        } else {
+            const res = await this.signer([tx]);
+            return res[0] as T extends LedgerTransaction ? Cell : Cell[];
+        }
+    }
 
     tonRawTransfer = async ({
         to,
@@ -48,7 +64,7 @@ export class LedgerMessageSender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to,
             bounce,
             amount: value,
@@ -79,7 +95,7 @@ export class LedgerMessageSender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to: Address.parse(to),
             bounce: await userInputAddressIsBounceable(this.api, to),
             amount: BigInt(weiAmount.toFixed(0)),
@@ -134,7 +150,7 @@ export class LedgerMessageSender {
         const { customPayload, stateInit, jettonWalletAddress } =
             await jettonEncoder.jettonCustomPayload(tonAssetAddressToString(amount.asset.address));
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to: Address.parse(jettonWalletAddress),
             bounce: true,
             amount: JettonEncoder.jettonTransferAmount,
@@ -171,7 +187,7 @@ export class LedgerMessageSender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to: Address.parse(nftAddress),
             bounce: true,
             amount: nftTransferAmount,
@@ -193,32 +209,34 @@ export class LedgerMessageSender {
     };
 
     tonConnectTransfer = async (transfer: TonConnectTransactionPayload) => {
-        if (transfer.messages.length !== 1) {
-            throw new LedgerError('Ledger signer does not support multiple messages');
-        }
-
         const { timestamp, seqno, contract } = await this.getTransferParameters();
-        const message = transfer.messages[0];
 
-        let transferCell: Cell;
+        let transferCells: Cell[];
         try {
-            transferCell = await this.signer({
-                to: Address.parse(message.address),
-                bounce: await tonConnectAddressIsBounceable(this.api, message.address),
-                amount: BigInt(message.amount),
-                seqno,
-                timeout: getTTL(timestamp),
-                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-                payload: message.payload
-                    ? {
-                          type: 'unsafe',
-                          message: Cell.fromBase64(message.payload)
-                      }
-                    : undefined,
-                stateInit: toStateInit(message.stateInit)
-            });
+            transferCells = await this.sign(
+                await Promise.all(
+                    transfer.messages.map(async (message, index) => ({
+                        to: Address.parse(message.address),
+                        bounce: await tonConnectAddressIsBounceable(this.api, message.address),
+                        amount: BigInt(message.amount),
+                        seqno: seqno + index,
+                        timeout: getTTL(timestamp + index * 60),
+                        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                        payload: message.payload
+                            ? {
+                                  type: 'unsafe' as const,
+                                  message: Cell.fromBase64(message.payload)
+                              }
+                            : undefined,
+                        stateInit: toStateInit(message.stateInit)
+                    }))
+                )
+            );
         } catch (e) {
             console.error(e);
+            if (e instanceof UserCancelledError) {
+                throw e;
+            }
             throw new LedgerError(
                 typeof e === 'string'
                     ? e
@@ -228,7 +246,28 @@ export class LedgerMessageSender {
             );
         }
 
-        return this.toSenderObject(externalMessage(contract, seqno, transferCell));
+        const externalMessages = transferCells.map((cell, index) =>
+            externalMessage(contract, seqno + index, cell)
+        );
+
+        return {
+            send: async () => {
+                await new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
+                    sendBlockchainMessageRequest: {
+                        batch: externalMessages.map(message => message.toBoc().toString('base64'))
+                    }
+                });
+                return externalMessages[0];
+            },
+            estimate: async (): Promise<TonEstimation> => {
+                return new WalletMessageSender(this.api, this.wallet, estimationSigner).estimate(
+                    await new TonConnectEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                        ...transfer,
+                        variant: 'standard'
+                    })
+                );
+            }
+        };
     };
 
     private async getTransferParameters() {

@@ -194,8 +194,8 @@ export const getSigner = async (
                     d => d.activeTonWalletId === wallet!.id
                 )!;
                 const path = getLedgerAccountPathByIndex(derivation.index);
-                const callback = async (transaction: LedgerTransaction) =>
-                    pairLedgerByNotification<'transaction'>(sdk, path, { transaction });
+                const callback = async (transactions: LedgerTransaction[]) =>
+                    pairLedgerByNotification<'transaction'>(sdk, path, { transactions });
                 callback.type = 'ledger' as const;
                 return callback;
             }
@@ -457,14 +457,14 @@ const pairLedgerByNotification = async <T extends 'transaction' | 'ton-proof'>(
     path: number[],
     request: T extends 'transaction'
         ? {
-              transaction: LedgerTransaction;
+              transactions: LedgerTransaction[];
           }
         : {
               tonProof: LedgerTonProofRequest;
           }
-): Promise<T extends 'transaction' ? Cell : LedgerTonProofResponse> => {
+): Promise<T extends 'transaction' ? Cell[] : LedgerTonProofResponse> => {
     const id = Date.now();
-    return new Promise<T extends 'transaction' ? Cell : LedgerTonProofResponse>(
+    return new Promise<T extends 'transaction' ? Cell[] : LedgerTonProofResponse>(
         (resolve, reject) => {
             sdk.uiEvents.emit('ledger', {
                 method: 'ledger',
@@ -484,9 +484,12 @@ const pairLedgerByNotification = async <T extends 'transaction' | 'ton-proof'>(
                     if (
                         params &&
                         typeof params === 'object' &&
-                        (params instanceof Cell || 'signature' in params)
+                        ((Array.isArray(params) && params[0] instanceof Cell) ||
+                            'signature' in params)
                     ) {
-                        resolve(params as T extends 'transaction' ? Cell : LedgerTonProofResponse);
+                        resolve(
+                            params as T extends 'transaction' ? Cell[] : LedgerTonProofResponse
+                        );
                     } else {
                         if (params instanceof Error) {
                             reject(params);

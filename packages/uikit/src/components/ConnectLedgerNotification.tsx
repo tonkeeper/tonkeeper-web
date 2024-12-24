@@ -36,7 +36,7 @@ const ButtonsBlock = styled.div`
 `;
 
 type LedgerContentLedgerParams =
-    | { path: number[]; transaction: LedgerTransaction; onSubmit: (result: Cell) => void }
+    | { path: number[]; transactions: LedgerTransaction[]; onSubmit: (result: Cell[]) => void }
     | {
           path: number[];
           tonProof: LedgerTonProofRequest;
@@ -49,6 +49,7 @@ export const LedgerContent: FC<{
 }> = ({ ledgerParams, onClose }) => {
     const { t } = useTranslation();
     const [isCompleted, setIsCompleted] = useState(false);
+    const [currentTxToConfirmIndex, setCurrentTxToConfirmIndex] = useState(0);
 
     const {
         mutateAsync: connectLedger,
@@ -62,21 +63,25 @@ export const LedgerContent: FC<{
         try {
             const transport = await connectLedger();
             try {
-                if ('transaction' in ledgerParams) {
-                    const val = await transport.signTransaction(
-                        ledgerParams.path,
-                        ledgerParams.transaction
-                    );
-                    setIsCompleted(true);
-                    setTimeout(() => ledgerParams.onSubmit(val), 500);
-                } else {
+                if ('tonProof' in ledgerParams) {
                     const val = await transport.getAddressProof(
                         ledgerParams.path,
                         ledgerParams.tonProof
                     );
                     setIsCompleted(true);
                     setTimeout(() => ledgerParams.onSubmit(val), 500);
+                    return;
                 }
+
+                const result: Cell[] = [];
+                for (const transaction of ledgerParams.transactions) {
+                    const val = await transport.signTransaction(ledgerParams.path, transaction);
+                    result.push(val);
+                    setCurrentTxToConfirmIndex(i => i + 1);
+                }
+
+                setIsCompleted(true);
+                setTimeout(() => ledgerParams.onSubmit(result), 500);
             } catch (e) {
                 console.error(e);
                 if (
@@ -115,9 +120,20 @@ export const LedgerContent: FC<{
         currentStep = 'all-completed';
     }
 
+    const connectionStepsProps =
+        'transactions' in ledgerParams
+            ? {
+                  transactionsToSign: ledgerParams.transactions.length,
+                  signingTransactionIndex: currentTxToConfirmIndex,
+                  action: 'transaction' as const
+              }
+            : {
+                  action: 'ton-proof' as const
+              };
+
     return (
         <ConnectLedgerWrapper>
-            <LedgerConnectionStepsStyled showConfirmTxStep currentStep={currentStep} />
+            <LedgerConnectionStepsStyled {...connectionStepsProps} currentStep={currentStep} />
             <ButtonsBlock>
                 <Button
                     secondary
@@ -142,7 +158,7 @@ const ConnectLedgerNotification = () => {
     const { t } = useTranslation();
 
     const [ledgerParams, setLedgerParams] = useState<
-        | { path: number[]; transaction: LedgerTransaction }
+        | { path: number[]; transactions: LedgerTransaction[] }
         | { path: number[]; tonProof: LedgerTonProofRequest }
         | undefined
     >(undefined);
@@ -154,7 +170,7 @@ const ConnectLedgerNotification = () => {
     }, []);
 
     const onSubmit = useCallback(
-        (result: Cell) => {
+        (result: Cell[] | LedgerTonProofResponse) => {
             sdk.uiEvents.emit('response', {
                 method: 'response',
                 id: requestId,
@@ -184,7 +200,7 @@ const ConnectLedgerNotification = () => {
             method: 'ledger';
             id?: number | undefined;
             params:
-                | { path: number[]; transaction: LedgerTransaction }
+                | { path: number[]; transactions: LedgerTransaction[] }
                 | { path: number[]; tonProof: LedgerTonProofRequest };
         }) => {
             setLedgerParams(options.params!);

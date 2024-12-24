@@ -388,7 +388,7 @@ export const tonDisconnectRequest = async (options: { storage: IStorage; webView
 
 const getMaxMessages = (account: Account) => {
     if (account.type === 'ledger') {
-        return 1;
+        return 4;
     }
 
     const wallet = account.activeTonWallet;

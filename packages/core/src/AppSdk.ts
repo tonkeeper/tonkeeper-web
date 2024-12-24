@@ -39,7 +39,7 @@ export interface UIEvents {
         wallet: TonWalletStandard;
     };
     ledger:
-        | { path: number[]; transaction: LedgerTransaction }
+        | { path: number[]; transactions: LedgerTransaction[] }
         | { path: number[]; tonProof: LedgerTonProofRequest };
     keystone: { message: Buffer; messageType: KeystoneMessageType; pathInfo?: KeystonePathInfo };
     loading: void;
