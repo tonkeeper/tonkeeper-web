@@ -10,12 +10,13 @@ import {
     useActiveWallet
 } from './wallet';
 import { useDevSettings } from './dev';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { AccountId, Account } from '@tonkeeper/core/dist/entries/account';
 import { AuthApi, Configuration } from '@tonkeeper/core/dist/2faApi';
 import { useEffect, useMemo } from 'react';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
@@ -97,12 +98,15 @@ export const useTwoFAServiceConfig = () => {
     }, [config]);
 };
 
-export const useTwoFAWalletConfig = () => {
+export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: WalletId }) => {
     const sdk = useAppSdk();
-    const account = useActiveAccount();
+    const activeAccount = useActiveAccount();
+    const account = options?.account ?? activeAccount;
     const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
 
-    const wallet = account.activeTonWallet;
+    const wallet = options?.walletId
+        ? account.getTonWallet(options.walletId)!
+        : account.activeTonWallet;
     const twoFAApi = useTwoFAApi();
     const api = useActiveApi();
 

@@ -12,6 +12,12 @@ import { Badge } from '../../components/shared';
 import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import { Body3, Label1 } from '../../components/Text';
+import { Switch } from '../../components/fields/Switch';
+import { Badge } from '../../components/shared';
+import styled from 'styled-components';
+import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -40,11 +46,21 @@ const CookieSettings = () => {
     return <SettingsList items={items} />;
 };
 
+const TextColumns = styled.div`
+    display: flex;
+    flex-direction: column;
+
+    & > ${Body3} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
 const TextAndBadge = styled.div`
     display: flex;
     align-items: center;
     gap: 6px;
 `;
+
 
 const EnableTwoFASettings = () => {
     const { mutate: mutateSettings } = useMutateDevSettings();
@@ -77,10 +93,13 @@ const EnableTronSettings = () => {
         <ListBlock>
             <ListItem hover={false}>
                 <ListItemPayload>
+                  <TextColumns>
                     <TextAndBadge>
-                        <Label1>Enable USDT TRC-20</Label1>
-                        <Badge color="accentRed">Experimental</Badge>
+                      <Label1>Enable 2FA</Label1>
+                      <Badge color="textSecondary">Experimental</Badge>
                     </TextAndBadge>
+                    <Body3>Available only for W5 wallets</Body3>
+                  </TextColumns>
                     <Switch
                         disabled={!devSettings}
                         checked={!!devSettings?.tronEnabled}

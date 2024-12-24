@@ -100,6 +100,11 @@ export const ConfirmView2FATelegramContent: FC<{
         }
     }, [secondsLeft, onClose]);
 
+    const onHelp = () => {
+        onClose();
+        document.getElementById('react-portal-modal-container')?.remove();
+    };
+
     return (
         <ContentWrapper>
             <CircularTimerStyled totalSeconds={totalSeconds} secondsLeft={secondsLeft} />
@@ -113,7 +118,7 @@ export const ConfirmView2FATelegramContent: FC<{
             </Button>
             <CannotAccessTgText>
                 {t('two_fa_confirm_tg_cannot_access_tg')}
-                <Link to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} onClick={onClose}>
+                <Link to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} onClick={onHelp}>
                     {' '}
                     {t('help')}
                 </Link>

@@ -115,6 +115,13 @@ export class TwoFAMessageSender implements ISender {
             gaslessEstimateRequestMessagesInner: { boc: int.toBoc().toString('base64') }
         });
 
+        if (
+            result.actions[0].tonTransfer &&
+            result.actions[0].tonTransfer.sender.address === this.pluginAddress
+        ) {
+            result.actions = result.actions.slice(1);
+        }
+
         return {
             extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.extra * -1 }),
             event: result
