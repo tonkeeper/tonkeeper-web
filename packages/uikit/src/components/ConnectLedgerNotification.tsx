@@ -3,7 +3,11 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { Notification } from './Notification';
 import { Button } from './fields/Button';
-import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
+import {
+    LedgerTonProofRequest,
+    LedgerTonProofResponse,
+    LedgerTransaction
+} from '@tonkeeper/core/dist/service/ledger/connector';
 import { useConnectLedgerMutation } from '../state/ledger';
 import styled from 'styled-components';
 import { Cell } from '@ton/core';
@@ -31,11 +35,18 @@ const ButtonsBlock = styled.div`
     }
 `;
 
+type LedgerContentLedgerParams =
+    | { path: number[]; transaction: LedgerTransaction; onSubmit: (result: Cell) => void }
+    | {
+          path: number[];
+          tonProof: LedgerTonProofRequest;
+          onSubmit: (result: LedgerTonProofResponse) => void;
+      };
+
 export const LedgerContent: FC<{
-    ledgerParams: { path: number[]; transaction: LedgerTransaction };
+    ledgerParams: LedgerContentLedgerParams;
     onClose: (reason?: unknown) => void;
-    onSubmit: (result: Cell) => void;
-}> = ({ ledgerParams, onClose, onSubmit }) => {
+}> = ({ ledgerParams, onClose }) => {
     const { t } = useTranslation();
     const [isCompleted, setIsCompleted] = useState(false);
 
@@ -47,29 +58,41 @@ export const LedgerContent: FC<{
         reset: resetConnection
     } = useConnectLedgerMutation();
 
-    const connect = () => {
-        connectLedger()
-            .then(transport =>
-                transport
-                    .signTransaction(ledgerParams.path, ledgerParams.transaction)
-                    .then(val => {
-                        setIsCompleted(true);
-                        setTimeout(() => onSubmit(val), 500);
-                    })
-                    .catch(e => {
-                        console.error(e);
-                        if (
-                            typeof e === 'object' &&
-                            'message' in e &&
-                            e.message.includes('0x6985')
-                        ) {
-                            onClose(new UserCancelledError('Cancel auth request'));
-                        } else {
-                            onClose(e);
-                        }
-                    })
-            )
-            .catch(console.debug);
+    const connect = async () => {
+        try {
+            const transport = await connectLedger();
+            try {
+                if ('transaction' in ledgerParams) {
+                    const val = await transport.signTransaction(
+                        ledgerParams.path,
+                        ledgerParams.transaction
+                    );
+                    setIsCompleted(true);
+                    setTimeout(() => ledgerParams.onSubmit(val), 500);
+                } else {
+                    const val = await transport.getAddressProof(
+                        ledgerParams.path,
+                        ledgerParams.tonProof
+                    );
+                    setIsCompleted(true);
+                    setTimeout(() => ledgerParams.onSubmit(val), 500);
+                }
+            } catch (e) {
+                console.error(e);
+                if (
+                    typeof e === 'object' &&
+                    e &&
+                    'message' in e &&
+                    (e.message as string).includes('0x6985')
+                ) {
+                    onClose(new UserCancelledError('Cancel auth request'));
+                } else {
+                    onClose(e);
+                }
+            }
+        } catch (error) {
+            console.debug(error);
+        }
     };
 
     useEffect(() => {
@@ -119,7 +142,9 @@ const ConnectLedgerNotification = () => {
     const { t } = useTranslation();
 
     const [ledgerParams, setLedgerParams] = useState<
-        { path: number[]; transaction: LedgerTransaction } | undefined
+        | { path: number[]; transaction: LedgerTransaction }
+        | { path: number[]; tonProof: LedgerTonProofRequest }
+        | undefined
     >(undefined);
     const [requestId, setId] = useState<number | undefined>(undefined);
 
@@ -158,7 +183,9 @@ const ConnectLedgerNotification = () => {
         const handler = (options: {
             method: 'ledger';
             id?: number | undefined;
-            params: { path: number[]; transaction: LedgerTransaction };
+            params:
+                | { path: number[]; transaction: LedgerTransaction }
+                | { path: number[]; tonProof: LedgerTonProofRequest };
         }) => {
             setLedgerParams(options.params!);
             setId(options.id);
@@ -171,7 +198,12 @@ const ConnectLedgerNotification = () => {
 
     const Content = useCallback(() => {
         if (!ledgerParams || !requestId) return undefined;
-        return <LedgerContent ledgerParams={ledgerParams} onClose={onCancel} onSubmit={onSubmit} />;
+        return (
+            <LedgerContent
+                ledgerParams={{ ...ledgerParams, onSubmit } as LedgerContentLedgerParams}
+                onClose={onCancel}
+            />
+        );
     }, [sdk, ledgerParams, requestId, onCancel, onSubmit]);
 
     return (

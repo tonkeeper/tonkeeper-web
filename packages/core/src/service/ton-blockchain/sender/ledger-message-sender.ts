@@ -25,7 +25,6 @@ import { MessagePayloadParam, serializePayload } from '../encoder/types';
 import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { TonEstimation } from '../../../entries/send';
-import { Network } from '../../../entries/network';
 
 export class LedgerMessageSender {
     constructor(

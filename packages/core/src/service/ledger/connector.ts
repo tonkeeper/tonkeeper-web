@@ -14,6 +14,21 @@ const withDeadline = <T>(p: Promise<T>, ms: number): Promise<T> =>
 
 export type LedgerTonTransport = TonTransport;
 export type LedgerTransaction = Parameters<TonTransport['signTransaction']>[1];
+export type LedgerTonProofRequest = {
+    domain: string;
+    timestamp: number;
+    payload: Buffer;
+    testOnly?: boolean;
+    bounceable?: boolean;
+    chain?: number;
+    subwalletId?: number;
+    walletVersion?: 'v3r2' | 'v4';
+};
+
+export type LedgerTonProofResponse = {
+    signature: Buffer;
+    hash: Buffer;
+};
 
 export const connectLedger = async () => {
     let transport: Transport;

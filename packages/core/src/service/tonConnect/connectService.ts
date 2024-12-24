@@ -292,11 +292,12 @@ export const tonConnectProofPayload = (
     origin: string,
     wallet: string,
     payload: string
-): ConnectProofPayload => {
+): ConnectProofPayload & { domain: string } => {
     const timestampBuffer = Buffer.allocUnsafe(8);
     timestampBuffer.writeBigInt64LE(BigInt(timestamp));
 
-    const domainBuffer = Buffer.from(new URL(origin).host);
+    const domain = new URL(origin).host;
+    const domainBuffer = Buffer.from(domain);
 
     const domainLengthBuffer = Buffer.allocUnsafe(4);
     domainLengthBuffer.writeInt32LE(domainBuffer.byteLength);
@@ -329,7 +330,8 @@ export const tonConnectProofPayload = (
         domainBuffer,
         payload,
         origin,
-        messageBuffer
+        messageBuffer,
+        domain
     };
 };
 

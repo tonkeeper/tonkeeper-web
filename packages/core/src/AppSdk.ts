@@ -6,7 +6,7 @@ import { NFT } from './entries/nft';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
 import { TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
-import { LedgerTransaction } from './service/ledger/connector';
+import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
 
 export type GetPasswordType = 'confirm' | 'unlock';
@@ -38,7 +38,9 @@ export interface UIEvents {
         boc: string;
         wallet: TonWalletStandard;
     };
-    ledger: { path: number[]; transaction: LedgerTransaction };
+    ledger:
+        | { path: number[]; transaction: LedgerTransaction }
+        | { path: number[]; tonProof: LedgerTonProofRequest };
     keystone: { message: Buffer; messageType: KeystoneMessageType; pathInfo?: KeystonePathInfo };
     loading: void;
     transfer: TransferInitParams;
