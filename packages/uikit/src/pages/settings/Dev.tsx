@@ -5,12 +5,6 @@ import { SettingsItem, SettingsList } from '../../components/settings/SettingsLi
 import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
-import { Label1 } from '../../components/Text';
-import { Switch } from '../../components/fields/Switch';
-import { Badge } from '../../components/shared';
-import styled from 'styled-components';
-import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { Body3, Label1 } from '../../components/Text';
@@ -61,7 +55,6 @@ const TextAndBadge = styled.div`
     gap: 6px;
 `;
 
-
 const EnableTwoFASettings = () => {
     const { mutate: mutateSettings } = useMutateDevSettings();
     const { data: devSettings } = useDevSettings();
@@ -93,13 +86,13 @@ const EnableTronSettings = () => {
         <ListBlock>
             <ListItem hover={false}>
                 <ListItemPayload>
-                  <TextColumns>
-                    <TextAndBadge>
-                      <Label1>Enable 2FA</Label1>
-                      <Badge color="textSecondary">Experimental</Badge>
-                    </TextAndBadge>
-                    <Body3>Available only for W5 wallets</Body3>
-                  </TextColumns>
+                    <TextColumns>
+                        <TextAndBadge>
+                            <Label1>Enable 2FA</Label1>
+                            <Badge color="textSecondary">Experimental</Badge>
+                        </TextAndBadge>
+                        <Body3>Available only for W5 wallets</Body3>
+                    </TextColumns>
                     <Switch
                         disabled={!devSettings}
                         checked={!!devSettings?.tronEnabled}
