@@ -142,8 +142,8 @@ const ConnectContent: FC<{
     }
 
     const tonProofRequested = params.items.some(item => item.name === 'ton_proof');
-    const cantConnectLedger =
-        selectedAccountAndWallet.account.type === 'ledger' && tonProofRequested;
+    const cantConnectProof =
+        selectedAccountAndWallet.account.type === 'ton-multisig' && tonProofRequested;
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
@@ -187,15 +187,13 @@ const ConnectContent: FC<{
                         fullWidth
                         primary
                         loading={isLoading}
-                        disabled={isLoading || cantConnectLedger || isReadOnly}
+                        disabled={isLoading || cantConnectProof || isReadOnly}
                         type="submit"
                     >
                         {t('ton_login_connect_button')}
                     </Button>
                 )}
-                {cantConnectLedger && (
-                    <LedgerError>{t('ledger_operation_not_supported')}</LedgerError>
-                )}
+                {cantConnectProof && <LedgerError>{t('operation_not_supported')}</LedgerError>}
                 {isReadOnly && <LedgerError>{t('operation_not_supported')}</LedgerError>}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
