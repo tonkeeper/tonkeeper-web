@@ -3,7 +3,7 @@ import { BatteryMessageSender, GaslessMessageSender, LedgerMessageSender, Sender
 import BigNumber from 'bignumber.js';
 import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { TonContract } from '../../entries/wallet';
-import { Address, Cell, internal, SendMode } from '@ton/core';
+import { Address, Cell, internal, SendMode, StateInit } from '@ton/core';
 import { assertBalanceEnough } from './utils';
 import { TON_ASSET } from '../../entries/crypto/asset/constants';
 import { maxBigNumber } from '../../utils/common';
@@ -13,7 +13,7 @@ export type TonRawTransaction = {
     value: bigint;
     bounce?: boolean;
     body?: Cell;
-    stateInit?: Cell;
+    init?: StateInit;
     sendMode?: SendMode;
 };
 

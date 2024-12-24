@@ -3,7 +3,7 @@ import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import BigNumber from 'bignumber.js';
 import { LedgerSigner } from '../../../entries/signer';
 import { walletContractFromState } from '../../wallet/contractService';
-import { Address, Cell, comment as encodeComment, SendMode } from '@ton/core';
+import { Address, Cell, comment as encodeComment, SendMode, StateInit } from '@ton/core';
 import {
     externalMessage,
     userInputAddressIsBounceable,
@@ -54,13 +54,15 @@ export class LedgerMessageSender {
         value,
         body,
         bounce,
-        sendMode
+        sendMode,
+        init
     }: {
         to: Address;
         value: bigint;
         body?: Cell;
         sendMode: SendMode;
         bounce: boolean;
+        init?: StateInit;
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
@@ -71,6 +73,7 @@ export class LedgerMessageSender {
             seqno,
             timeout: getTTL(timestamp),
             sendMode: sendMode,
+            stateInit: init,
             payload: body
                 ? {
                       type: 'unsafe',

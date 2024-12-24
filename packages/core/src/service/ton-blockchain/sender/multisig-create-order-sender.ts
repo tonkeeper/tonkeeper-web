@@ -11,7 +11,6 @@ import BigNumber from 'bignumber.js';
 import { LedgerMessageSender } from './ledger-message-sender';
 import { internal, SendMode } from '@ton/core';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { Network } from '../../../entries/network';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(
