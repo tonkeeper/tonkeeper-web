@@ -13,6 +13,8 @@ import {
   tonConnectSSE
 } from "../../libs/tonConnect";
 import { useActiveWallet } from "@tonkeeper/uikit/dist/state/wallet";
+import { useQueryClient } from "@tanstack/react-query";
+import { QueryKey } from "@tonkeeper/uikit/dist/libs/queryKey";
 
 export const TonConnectSubscription = () => {
   const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
@@ -22,10 +24,16 @@ export const TonConnectSubscription = () => {
   const { data: appConnections } = useAppTonConnectConnections();
   const wallet = useActiveWallet();
   const activeWalletConnections = useMemo(() => appConnections?.find(c => c.wallet.id === wallet.id)?.connections, [appConnections, wallet.id]);
+  const queryClient = useQueryClient();
 
   useSendNotificationAnalytics(request?.connection?.manifest);
 
-  useEffect(() => subscribeToTonConnectSendTransaction(setRequest), [setRequest]);
+  const onTransaction = useCallback(async (request: SendTransactionAppRequest) => {
+    await queryClient.invalidateQueries([QueryKey.account]);
+    setRequest(request);
+  }, [setRequest]);
+
+  useEffect(() => subscribeToTonConnectSendTransaction(onTransaction), [onTransaction]);
 
   useEffect(() => subscribeToTonConnectDisconnect(disconnect), [disconnect]);
 

@@ -455,11 +455,11 @@ export const useGetSender = () => {
                 );
                 const signer = await getSigner(signerAccount.id, signerWallet.id);
 
-                if (signer.type !== 'cell') {
-                    throw new Error('Unexpected signer type');
+                if (signer.type === 'cell') {
+                    return new WalletMessageSender(api, signerWallet, signer);
+                } else {
+                    return new LedgerMessageSender(api, signerWallet, signer);
                 }
-
-                return new WalletMessageSender(api, signerWallet, signer);
             }
 
             if (!isStandardTonWallet(wallet)) {

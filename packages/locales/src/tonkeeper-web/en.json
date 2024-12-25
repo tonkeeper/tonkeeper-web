@@ -170,6 +170,8 @@
   "ledger_operation_not_supported": "The operation is not available for Ledger wallets. Select another wallet and try again.",
   "ledger_pair_subtitle": "Hardware module, Bluetooth or USB-C, limited TON features",
   "ledger_pair_title": "Pair with Ledger",
+  "ledger_steps_confirm_num_tx": "Confirm transaction #{number} on Ledger",
+  "ledger_steps_confirm_proof": "Confirm action on Ledger",
   "ledger_steps_confirm_tx": "Confirm your transaction on Ledger",
   "ledger_steps_connect": "Connect Ledger to your device",
   "ledger_steps_install_ton": "Install TON App  ",

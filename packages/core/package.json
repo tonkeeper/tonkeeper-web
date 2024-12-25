@@ -25,7 +25,7 @@
         "@keystonehq/keystone-sdk": "0.7.2",
         "@ledgerhq/hw-transport-webhid": "^6.28.6",
         "@ledgerhq/hw-transport-webusb": "^6.28.6",
-        "@ton-community/ton-ledger": "^7.2.0-pre.2",
+        "@ton-community/ton-ledger": "^7.2.0-pre.3",
         "@ton-keychain/core": "^0.0.4",
         "@ton/core": "0.56.0",
         "@ton/crypto": "3.2.0",

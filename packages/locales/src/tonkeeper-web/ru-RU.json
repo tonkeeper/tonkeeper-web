@@ -163,6 +163,8 @@
   "ledger_operation_not_supported": "Операция недоступна для кошельков Ledger. Выберите другой кошелек и повторите попытку.",
   "ledger_pair_subtitle": "Более высокий уровень безопасности благодаря аппаратному кошельку",
   "ledger_pair_title": "Подключить Ledger",
+  "ledger_steps_confirm_num_tx": "Подтвердите транзакцию #{number} в Ledger",
+  "ledger_steps_confirm_proof": "Подтвердите действие в Ledger",
   "ledger_steps_confirm_tx": "Подтвердите транзакцию в Ledger",
   "ledger_steps_connect": "Подключите Ledger к своему устройству",
   "ledger_steps_install_ton": "Установить приложение ",
