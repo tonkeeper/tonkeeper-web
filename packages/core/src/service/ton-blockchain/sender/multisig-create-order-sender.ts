@@ -9,7 +9,7 @@ import { MultisigEncoder } from '../encoder/multisig-encoder/multisig-encoder';
 import { WalletMessageSender } from './wallet-message-sender';
 import BigNumber from 'bignumber.js';
 import { LedgerMessageSender } from './ledger-message-sender';
-import { internal, SendMode } from '@ton/core';
+import { fromNano, internal, SendMode } from '@ton/core';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class MultisigCreateOrderSender implements ISender {
@@ -26,6 +26,7 @@ export class MultisigCreateOrderSender implements ISender {
     }
 
     public async send(outgoing: WalletOutgoingMessage) {
+        await this.checkTransactionPossibility();
         const wrappedMessage = await this.wrapMessage(outgoing);
 
         if (this.signer.type === 'ledger') {
@@ -88,5 +89,11 @@ export class MultisigCreateOrderSender implements ISender {
                 }))
             }
         });
+    }
+
+    private async checkTransactionPossibility() {
+        const requiredBalance = new BigNumber(fromNano(MultisigEncoder.createOrderAmount) + 0.02);
+
+        await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.hostWallet.rawAddress);
     }
 }
