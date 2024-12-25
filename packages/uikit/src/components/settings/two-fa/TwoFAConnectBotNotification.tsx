@@ -79,6 +79,7 @@ const TelegramIconStyled = styled(TelegramIcon)`
 
 const Body2Styled = styled(Body2)`
     margin-top: 4px;
+    text-align: center;
     color: ${p => p.theme.textSecondary};
 `;
 

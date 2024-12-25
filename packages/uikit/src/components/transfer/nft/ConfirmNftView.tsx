@@ -82,6 +82,10 @@ const useNftTransferEstimation = (
             return BATTERY_SENDER_CHOICE;
         }
 
+        if (selectedSenderType === 'two_fa') {
+            return TWO_FA_SENDER_CHOICE;
+        }
+
         throw new Error(`Unsupported sender type for nft transfer ${selectedSenderType}`);
     }, [selectedSenderType, account]);
 
@@ -252,7 +256,6 @@ export const ConfirmNftView: FC<{
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-        handleSubmit();
     };
 
     return (

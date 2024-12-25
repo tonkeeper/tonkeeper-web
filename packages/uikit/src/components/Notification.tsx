@@ -420,6 +420,14 @@ NotificationOverlay.displayName = 'NotificationOverlay';
 
 export type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
 
+const allNotificationsControl$ = {
+    closeHandlers: new Set<() => void>()
+};
+
+export function closeAllNotifications() {
+    allNotificationsControl$.closeHandlers.forEach(handler => handler());
+}
+
 export const Notification: FC<{
     isOpen: boolean;
     handleClose: () => void;
@@ -446,6 +454,14 @@ export const Notification: FC<{
     useEffect(() => {
         setTimeout(() => setOpen(isOpen));
     }, [isOpen]);
+
+    useEffect(() => {
+        allNotificationsControl$.closeHandlers.add(handleClose);
+
+        return () => {
+            allNotificationsControl$.closeHandlers.delete(handleClose);
+        };
+    }, [handleClose]);
 
     const sdk = useAppSdk();
     const nodeRef = useRef<HTMLDivElement>(null);

@@ -222,11 +222,15 @@ const TwoFAActiveContent = () => {
         mutateAsync: getReconnectTGLink,
         data: reconnectTGLink,
         reset: resetReconnectTGLink
-    } = useGetBoundingTwoFABotLink();
+    } = useGetBoundingTwoFABotLink({ forReconnect: true });
 
     const onClickReconnectTG = async () => {
-        await getReconnectTGLink();
-        onOpenReconnectTG();
+        try {
+            await getReconnectTGLink();
+            onOpenReconnectTG();
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const onClickCloseReconnectTG = () => {
@@ -269,6 +273,7 @@ const TwoFAActiveContent = () => {
             </ContentWrapper>
             <WarningBlock>
                 <WarningBlockText>
+                    <li>{t('two_fa_settings_warning_can_not_recover')}</li>
                     <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
                     <li>{t('two_fa_settings_warning_balance_required')}</li>
                     <li>{t('two_fa_settings_warning_battery_gasless')}</li>

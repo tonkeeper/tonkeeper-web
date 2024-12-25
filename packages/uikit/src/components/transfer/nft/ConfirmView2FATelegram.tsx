@@ -1,4 +1,4 @@
-import { Notification } from '../../Notification';
+import { closeAllNotifications, Notification } from '../../Notification';
 import styled from 'styled-components';
 import { FC, useEffect, useRef } from 'react';
 import { useCountdown } from '../../../hooks/useCountDown';
@@ -102,7 +102,7 @@ export const ConfirmView2FATelegramContent: FC<{
 
     const onHelp = () => {
         onClose();
-        document.getElementById('react-portal-modal-container')?.remove();
+        closeAllNotifications();
     };
 
     return (
