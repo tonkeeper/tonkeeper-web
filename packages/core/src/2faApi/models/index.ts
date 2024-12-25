@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './ConnectRequest';
+export * from './ErrorCode';
 export * from './ExistsExtensionRequest';
 export * from './Message';
 export * from './MessageID';

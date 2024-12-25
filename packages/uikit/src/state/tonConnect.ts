@@ -5,11 +5,12 @@ import {
     DAppManifest
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
+    createTonProofItem,
     getAppConnections,
     getTonConnectParams,
+    tonConnectProofPayload,
     toTonAddressItemReply,
-    toTonProofItemReply,
-    tonConnectProofPayload
+    toTonProofItemReply
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
     AccountConnection,
@@ -22,11 +23,12 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { subject } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
-import { signTonConnectOver } from './mnemonic';
+import { getLedgerTonProofSigner, signTonConnectOver } from './mnemonic';
 import {
     isStandardTonWallet,
     TonWalletStandard,
-    WalletId
+    WalletId,
+    WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import {
@@ -109,7 +111,7 @@ export const useConnectTonConnectAppMutation = () => {
             walletId: WalletId;
         }
     >(async ({ request, manifest, webViewUrl, account, walletId }) => {
-        const selectedIsLedget = account.type === 'ledger';
+        const selectedIsLedger = account.type === 'ledger';
         const network = getNetworkByAccount(account);
         const api = getContextApiByNetwork(appContext, network);
 
@@ -127,32 +129,58 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(toTonAddressItemReply(wallet, network));
             }
             if (item.name === 'ton_proof') {
-                if (!isStandardTonWallet(wallet) || selectedIsLedget) {
+                if (!isStandardTonWallet(wallet)) {
                     throw new TxConfirmationCustomError(
                         "Current wallet doesn't support connection to the service"
                     );
                 }
-                const signTonConnect = signTonConnectOver({
-                    sdk,
-                    accountId: account.id,
-                    t,
-                    checkTouchId
-                });
-                const timestamp = await getServerTime(api);
+
                 const proof = tonConnectProofPayload(
-                    timestamp,
+                    await getServerTime(api),
                     webViewUrl ?? manifest.url,
                     wallet.rawAddress,
                     item.payload
                 );
-                result.push(
-                    await toTonProofItemReply({
-                        storage: sdk.storage,
-                        account,
-                        signTonConnect,
-                        proof
-                    })
-                );
+
+                if (selectedIsLedger) {
+                    const ledgerTonProofSigner = await getLedgerTonProofSigner(sdk, account.id, {
+                        walletId: wallet.id
+                    });
+
+                    if (
+                        wallet.version !== WalletVersion.V3R2 &&
+                        wallet.version !== WalletVersion.V4R2
+                    ) {
+                        throw new TxConfirmationCustomError(
+                            "Current wallet doesn't support connection to the service"
+                        );
+                    }
+
+                    const { signature } = await ledgerTonProofSigner({
+                        domain: proof.domain,
+                        timestamp: proof.timestamp,
+                        payload: Buffer.from(proof.payload),
+                        walletVersion: wallet.version === WalletVersion.V3R2 ? 'v3r2' : 'v4'
+                    });
+
+                    result.push({ name: 'ton_proof', proof: createTonProofItem(signature, proof) });
+                } else {
+                    const signTonConnect = signTonConnectOver({
+                        sdk,
+                        accountId: account.id,
+                        wallet,
+                        t,
+                        checkTouchId
+                    });
+                    result.push(
+                        await toTonProofItemReply({
+                            storage: sdk.storage,
+                            account,
+                            signTonConnect,
+                            proof
+                        })
+                    );
+                }
             }
         }
 

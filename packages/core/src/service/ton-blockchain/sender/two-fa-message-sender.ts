@@ -7,17 +7,22 @@ import { WalletContractV5R1 } from '@ton/ton';
 import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { AuthApi, Configuration as TwoFaConfiguration, MessageApi } from '../../../2faApi';
+import {
+    AuthApi,
+    Configuration as TwoFaConfiguration,
+    MessageApi,
+    MessageState
+} from '../../../2faApi';
 import {
     Address,
     beginCell,
     Cell,
+    external,
     internal,
+    MessageRelaxed,
     storeMessage,
     storeMessageRelaxed,
-    toNano,
-    external,
-    MessageRelaxed
+    toNano
 } from '@ton/core';
 import { TwoFAEncoder } from '../encoder/two-fa-encoder';
 import { AccountsApi, BlockchainApi, EmulationApi } from '../../../tonApiV2';
@@ -53,7 +58,7 @@ export class TwoFAMessageSender implements ISender {
             removeExtensionRequest: {
                 dataToSign: params.dataToSign.toBoc().toString('hex'),
                 signature: params.signature.toString('hex'),
-                wallet: this.pluginAddress, // TODO временно для Захара, поменять на кошелек
+                wallet: this.wallet.rawAddress, // TODO временно для Захара, поменять на кошелек
                 stateInit: walletStateInitFromState(this.wallet)
             }
         });
@@ -61,10 +66,14 @@ export class TwoFAMessageSender implements ISender {
         const closeConfirmModal = this.options.openConfirmModal?.();
 
         lastSearchingMessageId = res.messageId;
-        const result = Cell.fromBase64(await this.bocByMsgId(res.messageId));
-
-        closeConfirmModal?.();
-        return result;
+        try {
+            return Cell.fromBase64(await this.bocByMsgId(res.messageId));
+        } catch (e) {
+            console.error(e);
+            throw e;
+        } finally {
+            closeConfirmModal?.();
+        }
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {
@@ -148,7 +157,7 @@ export class TwoFAMessageSender implements ISender {
             removeExtensionRequest: {
                 dataToSign: dataToSign.toBoc().toString('hex'),
                 signature: signature.toString('hex'),
-                wallet: this.pluginAddress, // TODO временно для Захара, поменять на кошелек
+                wallet: this.wallet.rawAddress, // TODO временно для Захара, поменять на кошелек
                 stateInit: walletStateInitFromState(this.wallet)
             }
         });
@@ -156,10 +165,13 @@ export class TwoFAMessageSender implements ISender {
         const closeConfirmModal = this.options.openConfirmModal?.();
 
         lastSearchingMessageId = res.messageId;
-        const result = Cell.fromBase64(await this.bocByMsgId(res.messageId));
-        closeConfirmModal?.();
-
-        return result;
+        try {
+            return Cell.fromBase64(await this.bocByMsgId(res.messageId));
+        } catch (e) {
+            console.error(e);
+        } finally {
+            closeConfirmModal?.();
+        }
     }
 
     public async sendCancelRecovery() {
@@ -318,22 +330,32 @@ export class TwoFAMessageSender implements ISender {
 
         const maxAttempts = confirmMessageTGTtlMS / timeoutMS;
 
-        try {
-            const result = await new MessageApi(this.api.twoFaApi).getMessageInfo({ id: msgId });
-            if (!result.extMsg) {
-                throw new Error('Message not found');
-            }
+        if (attempt >= maxAttempts) {
+            throw new Error('Message was not confirmed in timeout');
+        }
 
-            return result.extMsg;
+        let result;
+        try {
+            result = await new MessageApi(this.api.twoFaApi).getMessageInfo({ id: msgId });
         } catch (e) {
             console.error(e);
+        }
 
-            if (attempt < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, timeoutMS));
-                return this.bocByMsgId(msgId, attempt + 1);
-            } else {
-                throw e;
+        if (result) {
+            if (result.state === MessageState.Failed || result.state === MessageState.Canceled) {
+                throw new Error('Message was not confirmed');
+            }
+
+            if (result.state === MessageState.Expired) {
+                throw new Error('Message was not confirmed in timeout');
+            }
+
+            if (result.state === MessageState.Confirmed) {
+                return result.extMsg!;
             }
         }
+
+        await new Promise(resolve => setTimeout(resolve, timeoutMS));
+        return this.bocByMsgId(msgId, attempt + 1);
     }
 }

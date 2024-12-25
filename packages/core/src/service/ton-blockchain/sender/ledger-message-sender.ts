@@ -3,7 +3,7 @@ import { BlockchainApi, EmulationApi } from '../../../tonApiV2';
 import BigNumber from 'bignumber.js';
 import { LedgerSigner } from '../../../entries/signer';
 import { walletContractFromState } from '../../wallet/contractService';
-import { Address, Cell, comment as encodeComment, SendMode } from '@ton/core';
+import { Address, Cell, comment as encodeComment, SendMode, StateInit } from '@ton/core';
 import {
     externalMessage,
     userInputAddressIsBounceable,
@@ -12,7 +12,8 @@ import {
     getTTL,
     getWalletSeqNo,
     tonConnectAddressIsBounceable,
-    toStateInit
+    toStateInit,
+    estimationSigner
 } from '../utils';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
@@ -21,41 +22,107 @@ import { JettonEncoder } from '../encoder/jetton-encoder';
 import { NFTEncoder } from '../encoder/nft-encoder';
 import { TonConnectTransactionPayload } from '../../../entries/tonConnect';
 import { LedgerError } from '../../../errors/LedgerError';
-import { MessagePayloadParam, serializePayload } from '../encoder/types';
+import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from '../encoder/types';
 import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { TonEstimation } from '../../../entries/send';
-import { Network } from '../../../entries/network';
+import { LedgerTransaction } from '../../ledger/connector';
+import { WalletMessageSender } from './wallet-message-sender';
+import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
+import { ISender } from './ISender';
 
-export class LedgerMessageSender {
+export class LedgerMessageSender implements ISender {
     constructor(
         private readonly api: APIConfig,
         private readonly wallet: TonWalletStandard,
         private readonly signer: LedgerSigner
     ) {}
 
+    public get excessAddress() {
+        return this.wallet.rawAddress;
+    }
+
+    private async sign<T extends LedgerTransaction | LedgerTransaction[]>(
+        tx: T
+    ): Promise<T extends LedgerTransaction ? Cell : Cell[]> {
+        if (Array.isArray(tx)) {
+            return this.signer(tx) as Promise<T extends LedgerTransaction ? Cell : Cell[]>;
+        } else {
+            const res = await this.signer([tx]);
+            return res[0] as T extends LedgerTransaction ? Cell : Cell[];
+        }
+    }
+
+    private async toExternals(outgoing: WalletOutgoingMessage) {
+        const { timestamp, seqno, contract } = await this.getTransferParameters();
+
+        const transferCells = await this.sign(
+            outgoing.messages.map((message, index) => {
+                if (message.info.type !== 'internal') {
+                    throw new Error('Only internal messages are supported by Ledger');
+                }
+
+                return {
+                    to: message.info.dest,
+                    bounce: message.info.bounce,
+                    amount: message.info.value.coins,
+                    seqno: seqno + index,
+                    timeout: getTTL(timestamp + index * 60),
+                    sendMode: outgoing.sendMode,
+                    payload: message.body
+                        ? {
+                              type: 'unsafe' as const,
+                              message: message.body
+                          }
+                        : undefined,
+                    stateInit: message.init ?? undefined
+                };
+            })
+        );
+
+        return transferCells.map((cell, index) => externalMessage(contract, seqno + index, cell));
+    }
+
+    public async send(outgoing: WalletOutgoingMessage) {
+        const externals = await this.toExternals(outgoing);
+
+        await new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
+            sendBlockchainMessageRequest: {
+                batch: externals.map(message => message.toBoc().toString('base64'))
+            }
+        });
+        return externals[0];
+    }
+
+    public async estimate(outgoing: WalletOutgoingMessage) {
+        return new WalletMessageSender(this.api, this.wallet, estimationSigner).estimate(outgoing);
+    }
+
     tonRawTransfer = async ({
         to,
         value,
         body,
         bounce,
-        sendMode
+        sendMode,
+        init
     }: {
         to: Address;
         value: bigint;
         body?: Cell;
         sendMode: SendMode;
         bounce: boolean;
+        init?: StateInit;
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to,
             bounce,
             amount: value,
             seqno,
             timeout: getTTL(timestamp),
             sendMode: sendMode,
+            stateInit: init,
             payload: body
                 ? {
                       type: 'unsafe',
@@ -80,7 +147,7 @@ export class LedgerMessageSender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to: Address.parse(to),
             bounce: await userInputAddressIsBounceable(this.api, to),
             amount: BigInt(weiAmount.toFixed(0)),
@@ -135,7 +202,7 @@ export class LedgerMessageSender {
         const { customPayload, stateInit, jettonWalletAddress } =
             await jettonEncoder.jettonCustomPayload(tonAssetAddressToString(amount.asset.address));
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to: Address.parse(jettonWalletAddress),
             bounce: true,
             amount: JettonEncoder.jettonTransferAmount,
@@ -172,7 +239,7 @@ export class LedgerMessageSender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.signer({
+        const transfer = await this.sign({
             to: Address.parse(nftAddress),
             bounce: true,
             amount: nftTransferAmount,
@@ -194,32 +261,34 @@ export class LedgerMessageSender {
     };
 
     tonConnectTransfer = async (transfer: TonConnectTransactionPayload) => {
-        if (transfer.messages.length !== 1) {
-            throw new LedgerError('Ledger signer does not support multiple messages');
-        }
-
         const { timestamp, seqno, contract } = await this.getTransferParameters();
-        const message = transfer.messages[0];
 
-        let transferCell: Cell;
+        let transferCells: Cell[];
         try {
-            transferCell = await this.signer({
-                to: Address.parse(message.address),
-                bounce: await tonConnectAddressIsBounceable(this.api, message.address),
-                amount: BigInt(message.amount),
-                seqno,
-                timeout: getTTL(timestamp),
-                sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-                payload: message.payload
-                    ? {
-                          type: 'unsafe',
-                          message: Cell.fromBase64(message.payload)
-                      }
-                    : undefined,
-                stateInit: toStateInit(message.stateInit)
-            });
+            transferCells = await this.sign(
+                await Promise.all(
+                    transfer.messages.map(async (message, index) => ({
+                        to: Address.parse(message.address),
+                        bounce: await tonConnectAddressIsBounceable(this.api, message.address),
+                        amount: BigInt(message.amount),
+                        seqno: seqno + index,
+                        timeout: getTTL(timestamp + index * 60),
+                        sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                        payload: message.payload
+                            ? {
+                                  type: 'unsafe' as const,
+                                  message: Cell.fromBase64(message.payload)
+                              }
+                            : undefined,
+                        stateInit: toStateInit(message.stateInit)
+                    }))
+                )
+            );
         } catch (e) {
             console.error(e);
+            if (typeof e === 'object' && e && 'name' in e && e.name === 'UserCancelledError') {
+                throw e as Error;
+            }
             throw new LedgerError(
                 typeof e === 'string'
                     ? e
@@ -229,7 +298,28 @@ export class LedgerMessageSender {
             );
         }
 
-        return this.toSenderObject(externalMessage(contract, seqno, transferCell));
+        const externalMessages = transferCells.map((cell, index) =>
+            externalMessage(contract, seqno + index, cell)
+        );
+
+        return {
+            send: async () => {
+                await new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
+                    sendBlockchainMessageRequest: {
+                        batch: externalMessages.map(message => message.toBoc().toString('base64'))
+                    }
+                });
+                return externalMessages[0];
+            },
+            estimate: async (): Promise<TonEstimation> => {
+                return new WalletMessageSender(this.api, this.wallet, estimationSigner).estimate(
+                    await new TonConnectEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                        ...transfer,
+                        variant: 'standard'
+                    })
+                );
+            }
+        };
     };
 
     private async getTransferParameters() {

@@ -52,7 +52,7 @@ export const Notifications = () => {
                 } | null) => {
                     if (!data) return;
                     if (result) {
-                        sendBackground.message('approveRequest', { id: data.id, payload: result });
+                        sendBackground.message('approveRequest', { id: data.id, payload: result.replyItems });
                     } else {
                         sendBackground.message('rejectRequest', data.id);
                     }

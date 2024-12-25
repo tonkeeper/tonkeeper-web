@@ -2,12 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAnalyticsTrack } from '../../amplitude';
 import { useActiveWallet, useInvalidateActiveWalletQueries } from '../../../state/wallet';
-import { useNotifyErrorHandle } from '../../useNotification';
-import { TWO_FA_SENDER_CHOICE, useGetSender } from '../useSender';
+import { useNotifyErrorHandle, useToast } from '../../useNotification';
+import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 import { QueryKey } from '../../../libs/queryKey';
+import { useTranslation } from '../../translation';
 
 export function useSendTwoFARemove() {
     const track = useAnalyticsTrack();
@@ -17,6 +18,8 @@ export function useSendTwoFARemove() {
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const wallet = useActiveWallet();
     const queryClient = useQueryClient();
+    const toast = useToast();
+    const { t } = useTranslation();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -28,7 +31,11 @@ export function useSendTwoFARemove() {
                 throw new Error('Cant remove two fa plugin using this wallet');
             }
 
-            const sender = (await getSender(TWO_FA_SENDER_CHOICE)) as TwoFAMessageSender;
+            const sender = await getSender(EXTERNAL_SENDER_CHOICE);
+
+            if (!(sender instanceof TwoFAMessageSender)) {
+                throw new Error('Unexpected sender');
+            }
 
             await sender.sendRemoveExtension();
 
@@ -38,7 +45,11 @@ export function useSendTwoFARemove() {
                 wallet: wallet.rawAddress
             });
         } catch (e) {
-            await notifyError(e);
+            try {
+                await notifyError(e);
+            } catch {
+                toast(t('please_try_again_later'));
+            }
             return false;
         }
 

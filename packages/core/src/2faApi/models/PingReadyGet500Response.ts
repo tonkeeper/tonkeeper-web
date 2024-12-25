@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ErrorCode } from './ErrorCode';
+import {
+    ErrorCodeFromJSON,
+    ErrorCodeFromJSONTyped,
+    ErrorCodeToJSON,
+    ErrorCodeToJSONTyped,
+} from './ErrorCode';
+
 /**
  * 
  * @export
@@ -25,13 +33,22 @@ export interface PingReadyGet500Response {
      * @memberof PingReadyGet500Response
      */
     error: string;
+    /**
+     * 
+     * @type {ErrorCode}
+     * @memberof PingReadyGet500Response
+     */
+    code: ErrorCode;
 }
+
+
 
 /**
  * Check if a given object implements the PingReadyGet500Response interface.
  */
 export function instanceOfPingReadyGet500Response(value: object): value is PingReadyGet500Response {
     if (!('error' in value) || value['error'] === undefined) return false;
+    if (!('code' in value) || value['code'] === undefined) return false;
     return true;
 }
 
@@ -46,6 +63,7 @@ export function PingReadyGet500ResponseFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'error': json['error'],
+        'code': ErrorCodeFromJSON(json['code']),
     };
 }
 
@@ -61,6 +79,7 @@ export function PingReadyGet500ResponseFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'error': value['error'],
+        'code': ErrorCodeToJSON(value['code']),
     };
 }
 

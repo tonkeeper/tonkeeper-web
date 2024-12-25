@@ -1,6 +1,6 @@
 import { createModalControl } from './createModalControl';
 import React, { FC, useEffect, useState } from 'react';
-import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../state/two-fa';
+import { useTwoFAServiceConfig, useTwoFAWalletConfigMayBeOfMultisigHost } from '../../state/two-fa';
 import styled from 'styled-components';
 import { Notification } from '../Notification';
 import { ConfirmView2FATelegramContent } from '../transfer/nft/ConfirmView2FATelegram';
@@ -27,7 +27,7 @@ export const ConfirmTwoFANotificationControlled = () => {
 
 const Content: FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
     const { confirmMessageTGTtlSeconds } = useTwoFAServiceConfig();
-    const { data: walletConfig } = useTwoFAWalletConfig();
+    const { data: walletConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
     const authLink = walletConfig && 'botUrl' in walletConfig ? walletConfig.botUrl : undefined;
 
     const [creationTimeSeconds, setCreationTimeSeconds] = useState<number>();

@@ -91,6 +91,9 @@ jobs:
               if: always() && runner.os == 'macOS'
               run: |
                   rm ${{ github.workspace }}/AuthKey.p8
+    ipad-build:
+        uses: ./.github/workflows/ipad-build.yaml
+        secrets: inherit
 
     web-build:
         uses: ./.github/workflows/web-build.yaml

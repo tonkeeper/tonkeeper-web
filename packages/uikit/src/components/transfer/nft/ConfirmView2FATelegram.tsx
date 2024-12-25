@@ -1,4 +1,4 @@
-import { Notification } from '../../Notification';
+import { closeAllNotifications } from '../../Notification';
 import styled from 'styled-components';
 import { FC, useEffect, useRef } from 'react';
 import { useCountdown } from '../../../hooks/useCountDown';
@@ -6,45 +6,9 @@ import { Body2, Body2Class, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import { Button } from '../../fields/Button';
 import { TelegramIcon } from '../../Icon';
-import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { Link } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-
-const NotificationStyled = styled(Notification)`
-    .dialog-header {
-        padding-bottom: 0;
-    }
-`;
-
-export const ConfirmView2FATelegram: FC<{
-    isOpen: boolean;
-    onClose: () => void;
-    creationDateMS: number;
-}> = ({ isOpen, onClose, creationDateMS }) => {
-    const { confirmMessageTGTtlSeconds } = useTwoFAServiceConfig();
-    const { data: walletConfig } = useTwoFAWalletConfig();
-    const authLink = walletConfig && 'botUrl' in walletConfig ? walletConfig.botUrl : undefined;
-
-    const creationTimeSeconds = Math.round(creationDateMS / 1000);
-
-    const validUntilSeconds = creationTimeSeconds + confirmMessageTGTtlSeconds;
-
-    return (
-        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-            {() =>
-                !!authLink && (
-                    <ConfirmView2FATelegramContent
-                        validUntilSeconds={validUntilSeconds}
-                        onClose={onClose}
-                        openTgLink={authLink}
-                        creationTimeSeconds={creationTimeSeconds}
-                    />
-                )
-            }
-        </NotificationStyled>
-    );
-};
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -102,7 +66,7 @@ export const ConfirmView2FATelegramContent: FC<{
 
     const onHelp = () => {
         onClose();
-        document.getElementById('react-portal-modal-container')?.remove();
+        closeAllNotifications();
     };
 
     return (

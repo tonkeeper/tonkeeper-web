@@ -3,24 +3,22 @@ import { useActiveMultisigAccountHost, useActiveMultisigWalletInfo } from '../..
 import { useAsyncQueryData } from '../../useAsyncQueryData';
 import { MultisigOrder } from '@tonkeeper/core/dist/tonApiV2';
 import { useActiveApi, useInvalidateActiveWalletQueries } from '../../../state/wallet';
-import { useTonRawTransactionService } from '../useBlockchainService';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 
-import { useAppContext } from '../../appContext';
 import { useNotifyErrorHandle } from '../../useNotification';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
 import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 
 export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
     const { data: multisigInfoData } = useActiveMultisigWalletInfo();
     const multisigInfoPromise = useAsyncQueryData(multisigInfoData);
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
     const { signerWallet } = useActiveMultisigAccountHost();
-    const api = useActiveApi();
 
-    const rawTransactionService = useTonRawTransactionService();
     const getSender = useGetSender();
     const notifyError = useNotifyErrorHandle();
+    const api = useActiveApi();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -34,7 +32,7 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
                 orderAddress
             );
 
-            await rawTransactionService.send(
+            await new TonRawTransactionService(api, signerWallet).send(
                 await getSender(EXTERNAL_SENDER_CHOICE),
                 zeroFee,
                 message

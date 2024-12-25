@@ -1,10 +1,9 @@
 import styled, { css } from 'styled-components';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { DoneIcon, DotIcon, ResponsiveSpinner } from '../Icon';
 import { Body2, Body2Class } from '../Text';
 import { LedgerIcon } from './LedgerIcons';
 import { Dot } from '../Dot';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig } from '../../state/wallet';
@@ -65,10 +64,12 @@ const AStyled = styled.span`
 `;
 
 export const LedgerConnectionSteps: FC<{
-    showConfirmTxStep?: boolean;
+    transactionsToSign?: number;
+    signingTransactionIndex?: number;
+    action?: 'transaction' | 'ton-proof';
     currentStep: 'connect' | 'open-ton' | 'confirm-tx' | 'all-completed';
     className?: string;
-}> = ({ currentStep, showConfirmTxStep, className }) => {
+}> = ({ currentStep, transactionsToSign, signingTransactionIndex, className, action }) => {
     const config = useActiveConfig();
     const { t } = useTranslation();
 
@@ -85,6 +86,11 @@ export const LedgerConnectionSteps: FC<{
         sdk.openPage(faqBaseUrl + enPath);
     };
 
+    const txToSignIndexes = useMemo(
+        () => new Array(transactionsToSign).fill(0).map((_, i) => i),
+        [transactionsToSign]
+    );
+
     return (
         <CardStyled className={className}>
             <ImageStyled>
@@ -92,7 +98,7 @@ export const LedgerConnectionSteps: FC<{
                     step={
                         currentStep !== 'all-completed'
                             ? currentStep
-                            : showConfirmTxStep
+                            : transactionsToSign
                             ? 'confirm-tx'
                             : 'open-ton'
                     }
@@ -121,7 +127,7 @@ export const LedgerConnectionSteps: FC<{
                         }
                     >
                         {t('ledger_steps_open_ton')}
-                        {!showConfirmTxStep && (
+                        {!transactionsToSign && (
                             <>
                                 <Dot />
                                 <AStyled onClick={onOpenFaq}>
@@ -131,7 +137,7 @@ export const LedgerConnectionSteps: FC<{
                         )}
                     </Body2Colored>
                 </TextBlockStyled>
-                {showConfirmTxStep && (
+                {transactionsToSign === 1 || action === 'ton-proof' ? (
                     <TextBlockStyled>
                         <StepIcon
                             state={
@@ -143,10 +149,40 @@ export const LedgerConnectionSteps: FC<{
                             }
                         />
                         <Body2Colored isCompleted={currentStep === 'all-completed'}>
-                            {t('ledger_steps_confirm_tx')}
+                            {t(
+                                action === 'ton-proof'
+                                    ? 'ledger_steps_confirm_proof'
+                                    : 'ledger_steps_confirm_tx'
+                            )}
                         </Body2Colored>
                     </TextBlockStyled>
-                )}
+                ) : transactionsToSign && transactionsToSign > 1 ? (
+                    txToSignIndexes.map(index => (
+                        <TextBlockStyled key={index}>
+                            <StepIcon
+                                state={
+                                    currentStep === 'connect' ||
+                                    currentStep === 'open-ton' ||
+                                    (currentStep === 'confirm-tx' &&
+                                        index > signingTransactionIndex!)
+                                        ? 'future'
+                                        : currentStep === 'confirm-tx' &&
+                                          signingTransactionIndex === index
+                                        ? 'active'
+                                        : 'completed'
+                                }
+                            />
+                            <Body2Colored
+                                isCompleted={
+                                    currentStep === 'all-completed' ||
+                                    index < signingTransactionIndex!
+                                }
+                            >
+                                {t('ledger_steps_confirm_num_tx', { number: index + 1 })}
+                            </Body2Colored>
+                        </TextBlockStyled>
+                    ))
+                ) : null}
             </TextStepsContainer>
         </CardStyled>
     );

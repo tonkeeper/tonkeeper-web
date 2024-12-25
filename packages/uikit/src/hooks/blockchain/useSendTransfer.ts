@@ -10,7 +10,6 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
-    TWO_FA_SENDER_CHOICE,
     useGetSender,
     useGetTronSender
 } from './useSender';
@@ -62,8 +61,6 @@ export function useSendTransfer<T extends Asset>({
                         type: 'gasless',
                         asset: amount.asset
                     } as const;
-                } else if (senderType === 'two_fa') {
-                    senderChoice = TWO_FA_SENDER_CHOICE;
                 }
 
                 if (!senderChoice) {

@@ -21,7 +21,8 @@ export const MessageState = {
     Waiting: 'waiting',
     Expired: 'expired',
     Confirmed: 'confirmed',
-    Failed: 'failed'
+    Failed: 'failed',
+    Canceled: 'canceled'
 } as const;
 export type MessageState = typeof MessageState[keyof typeof MessageState];
 

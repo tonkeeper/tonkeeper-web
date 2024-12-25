@@ -38,7 +38,6 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
-    TWO_FA_SENDER_CHOICE,
     useAvailableSendersChoices,
     useGetEstimationSender,
     useGetSender
@@ -162,8 +161,6 @@ const useSendNft = (
                 senderChoice = EXTERNAL_SENDER_CHOICE;
             } else if (options.selectedSenderType === 'battery') {
                 senderChoice = BATTERY_SENDER_CHOICE;
-            } else if (options.selectedSenderType === 'two_fa') {
-                senderChoice = TWO_FA_SENDER_CHOICE;
             } else {
                 throw new Error(
                     `Unsupported sender type for nft transfer ${options.selectedSenderType}`
@@ -252,7 +249,6 @@ export const ConfirmNftView: FC<{
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-        handleSubmit();
     };
 
     return (

@@ -17,6 +17,9 @@ import { useSignTonProof } from '../hooks/accountUtils';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useToast } from '../hooks/useNotification';
+import { useTranslation } from '../hooks/translation';
+import { getMultisigSignerInfo } from './multisig';
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
@@ -96,6 +99,30 @@ export const useTwoFAServiceConfig = () => {
             botUrl: config['2fa_bot_url'] ?? 'https://t.me/tonkeeper_2fa_bot'
         };
     }, [config]);
+};
+
+export const useTwoFAWalletConfigMayBeOfMultisigHost = () => {
+    const accounts = useAccountsState();
+    const activeAccount = useActiveAccount();
+    let multisigSignerInfo;
+    try {
+        if (activeAccount.type !== 'ton-multisig') {
+            multisigSignerInfo = null;
+        } else {
+            multisigSignerInfo = getMultisigSignerInfo(accounts, activeAccount);
+        }
+    } catch (e) {
+        multisigSignerInfo = null;
+    }
+
+    return useTwoFAWalletConfig(
+        multisigSignerInfo
+            ? {
+                  account: multisigSignerInfo.signerAccount,
+                  walletId: multisigSignerInfo.signerWallet.id
+              }
+            : undefined
+    );
 };
 
 export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: WalletId }) => {
@@ -232,35 +259,59 @@ export const useRemoveAccountTwoFAData = () => {
     });
 };
 
-export const useGetBoundingTwoFABotLink = () => {
+export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean }) => {
     const twoFAApi = useTwoFAApi();
     const { mutateAsync: signTonProof } = useSignTonProof();
     const address = useActiveWallet().rawAddress;
     const serviceConfig = useTwoFAServiceConfig();
+    const toast = useToast();
+    const { t } = useTranslation();
 
     return useMutation<string>(async () => {
-        const { payload } = await new AuthApi(twoFAApi).getPayload();
-        const origin = serviceConfig.baseUrl;
+        try {
+            const { payload } = await new AuthApi(twoFAApi).getPayload();
+            const origin = serviceConfig.baseUrl;
 
-        const { timestamp, signature, stateInit, domain } = await signTonProof({
-            origin,
-            payload
-        });
+            const { timestamp, signature, stateInit, domain } = await signTonProof({
+                origin,
+                payload
+            });
 
-        const res = await new AuthApi(twoFAApi).connect({
-            connectRequest: {
-                address,
-                proof: {
-                    timestamp,
-                    stateInit,
-                    domain: domain.value,
-                    payload,
-                    signature
-                }
+            let res;
+            if (options?.forReconnect) {
+                res = await new AuthApi(twoFAApi).reConnect({
+                    connectRequest: {
+                        address,
+                        proof: {
+                            timestamp,
+                            stateInit,
+                            domain: domain.value,
+                            payload,
+                            signature
+                        }
+                    }
+                });
+            } else {
+                res = await new AuthApi(twoFAApi).connect({
+                    connectRequest: {
+                        address,
+                        proof: {
+                            timestamp,
+                            stateInit,
+                            domain: domain.value,
+                            payload,
+                            signature
+                        }
+                    }
+                });
             }
-        });
 
-        return res.url;
+            return res.url;
+        } catch (e) {
+            console.error(e);
+            toast(t('please_try_again_later'));
+            throw e;
+        }
     });
 };
 

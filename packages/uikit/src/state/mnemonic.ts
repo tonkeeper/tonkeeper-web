@@ -13,7 +13,11 @@ import { CellSigner, Signer, TronSigner } from '@tonkeeper/core/dist/entries/sig
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
-import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
+import {
+    LedgerTonProofRequest,
+    LedgerTonProofResponse,
+    LedgerTransaction
+} from '@tonkeeper/core/dist/service/ledger/connector';
 import {
     decryptWalletMnemonic,
     mnemonicToKeypair
@@ -199,8 +203,8 @@ export const getSigner = async (
                     d => d.activeTonWalletId === wallet!.id
                 )!;
                 const path = getLedgerAccountPathByIndex(derivation.index);
-                const callback = async (transaction: LedgerTransaction) =>
-                    pairLedgerByNotification(sdk, path, transaction);
+                const callback = async (transactions: LedgerTransaction[]) =>
+                    pairLedgerByNotification<'transaction'>(sdk, path, { transactions });
                 callback.type = 'ledger' as const;
                 return callback;
             }
@@ -488,42 +492,88 @@ const pairKeystoneByNotification = async (
     });
 };
 
-const pairLedgerByNotification = async (
+export const getLedgerTonProofSigner = async (
+    sdk: IAppSdk,
+    accountId: AccountId,
+    {
+        walletId
+    }: {
+        walletId?: WalletId;
+    } = {}
+): Promise<(request: LedgerTonProofRequest) => Promise<LedgerTonProofResponse>> => {
+    const account = await accountsStorage(sdk.storage).getAccount(accountId);
+    if (!account) {
+        throw new Error('Account not found');
+    }
+
+    if (account.type !== 'ledger') {
+        throw new Error('Unexpected account type');
+    }
+
+    const wallet =
+        walletId !== undefined ? account.getTonWallet(walletId) : account.activeTonWallet;
+
+    const derivation = account.allAvailableDerivations.find(
+        d => d.activeTonWalletId === wallet!.id
+    )!;
+    const path = getLedgerAccountPathByIndex(derivation.index);
+    const callback = async (tonProof: LedgerTonProofRequest) =>
+        pairLedgerByNotification<'ton-proof'>(sdk, path, { tonProof });
+    callback.type = 'ledger' as const;
+    return callback;
+};
+
+const pairLedgerByNotification = async <T extends 'transaction' | 'ton-proof'>(
     sdk: IAppSdk,
     path: number[],
-    transaction: LedgerTransaction
-): Promise<Cell> => {
+    request: T extends 'transaction'
+        ? {
+              transactions: LedgerTransaction[];
+          }
+        : {
+              tonProof: LedgerTonProofRequest;
+          }
+): Promise<T extends 'transaction' ? Cell[] : LedgerTonProofResponse> => {
     const id = Date.now();
-    return new Promise<Cell>((resolve, reject) => {
-        sdk.uiEvents.emit('ledger', {
-            method: 'ledger',
-            id,
-            params: { path, transaction }
-        });
+    return new Promise<T extends 'transaction' ? Cell[] : LedgerTonProofResponse>(
+        (resolve, reject) => {
+            sdk.uiEvents.emit('ledger', {
+                method: 'ledger',
+                id,
+                params: { path, ...request }
+            });
 
-        const onCallback = (message: {
-            method: 'response';
-            id?: number | undefined;
-            params: unknown;
-        }) => {
-            if (message.id === id) {
-                const { params } = message;
-                sdk.uiEvents.off('response', onCallback);
+            const onCallback = (message: {
+                method: 'response';
+                id?: number | undefined;
+                params: unknown;
+            }) => {
+                if (message.id === id) {
+                    const { params } = message;
+                    sdk.uiEvents.off('response', onCallback);
 
-                if (params && typeof params === 'object' && params instanceof Cell) {
-                    resolve(params as Cell);
-                } else {
-                    if (params instanceof Error) {
-                        reject(params);
+                    if (
+                        params &&
+                        typeof params === 'object' &&
+                        ((Array.isArray(params) && params[0] instanceof Cell) ||
+                            'signature' in params)
+                    ) {
+                        resolve(
+                            params as T extends 'transaction' ? Cell[] : LedgerTonProofResponse
+                        );
                     } else {
-                        reject(new Error(params?.toString()));
+                        if (params instanceof Error) {
+                            reject(params);
+                        } else {
+                            reject(new Error(params?.toString()));
+                        }
                     }
                 }
-            }
-        };
+            };
 
-        sdk.uiEvents.on('response', onCallback);
-    });
+            sdk.uiEvents.on('response', onCallback);
+        }
+    );
 };
 
 export const useGetActiveAccountMnemonic = () => {
