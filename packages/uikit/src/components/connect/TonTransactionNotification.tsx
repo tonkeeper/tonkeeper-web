@@ -32,7 +32,6 @@ import {
     EXTERNAL_SENDER_CHOICE,
     SenderChoice,
     SenderChoiceUserAvailable,
-    TWO_FA_SENDER_CHOICE,
     useGetEstimationSender,
     useGetSender,
     useTonConnectAvailableSendersChoices
@@ -187,10 +186,6 @@ const ConnectContent: FC<{
 
         if (selectedSenderType === EXTERNAL_SENDER_CHOICE.type) {
             return EXTERNAL_SENDER_CHOICE;
-        }
-
-        if (selectedSenderType === TWO_FA_SENDER_CHOICE.type) {
-            return TWO_FA_SENDER_CHOICE;
         }
 
         throw new Error('Unexpected sender choice');

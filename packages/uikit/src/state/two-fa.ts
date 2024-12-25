@@ -19,6 +19,7 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useToast } from '../hooks/useNotification';
 import { useTranslation } from '../hooks/translation';
+import { getMultisigSignerInfo } from './multisig';
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
@@ -98,6 +99,30 @@ export const useTwoFAServiceConfig = () => {
             botUrl: config['2fa_bot_url'] ?? 'https://t.me/tonkeeper_2fa_bot'
         };
     }, [config]);
+};
+
+export const useTwoFAWalletConfigMayBeOfMultisigHost = () => {
+    const accounts = useAccountsState();
+    const activeAccount = useActiveAccount();
+    let multisigSignerInfo;
+    try {
+        if (activeAccount.type !== 'ton-multisig') {
+            multisigSignerInfo = null;
+        } else {
+            multisigSignerInfo = getMultisigSignerInfo(accounts, activeAccount);
+        }
+    } catch (e) {
+        multisigSignerInfo = null;
+    }
+
+    return useTwoFAWalletConfig(
+        multisigSignerInfo
+            ? {
+                  account: multisigSignerInfo.signerAccount,
+                  walletId: multisigSignerInfo.signerWallet.id
+              }
+            : undefined
+    );
 };
 
 export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: WalletId }) => {

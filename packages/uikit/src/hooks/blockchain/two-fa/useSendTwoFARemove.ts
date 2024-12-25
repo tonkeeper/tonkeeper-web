@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAnalyticsTrack } from '../../amplitude';
 import { useActiveWallet, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useNotifyErrorHandle, useToast } from '../../useNotification';
-import { TWO_FA_SENDER_CHOICE, useGetSender } from '../useSender';
+import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
@@ -31,7 +31,11 @@ export function useSendTwoFARemove() {
                 throw new Error('Cant remove two fa plugin using this wallet');
             }
 
-            const sender = (await getSender(TWO_FA_SENDER_CHOICE)) as TwoFAMessageSender;
+            const sender = await getSender(EXTERNAL_SENDER_CHOICE);
+
+            if (!(sender instanceof TwoFAMessageSender)) {
+                throw new Error('Unexpected sender');
+            }
 
             await sender.sendRemoveExtension();
 

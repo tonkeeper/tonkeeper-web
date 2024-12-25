@@ -38,7 +38,6 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
-    TWO_FA_SENDER_CHOICE,
     useAvailableSendersChoices,
     useGetEstimationSender,
     useGetSender
@@ -80,10 +79,6 @@ const useNftTransferEstimation = (
 
         if (selectedSenderType === 'battery') {
             return BATTERY_SENDER_CHOICE;
-        }
-
-        if (selectedSenderType === 'two_fa') {
-            return TWO_FA_SENDER_CHOICE;
         }
 
         throw new Error(`Unsupported sender type for nft transfer ${selectedSenderType}`);
@@ -166,8 +161,6 @@ const useSendNft = (
                 senderChoice = EXTERNAL_SENDER_CHOICE;
             } else if (options.selectedSenderType === 'battery') {
                 senderChoice = BATTERY_SENDER_CHOICE;
-            } else if (options.selectedSenderType === 'two_fa') {
-                senderChoice = TWO_FA_SENDER_CHOICE;
             } else {
                 throw new Error(
                     `Unsupported sender type for nft transfer ${options.selectedSenderType}`
