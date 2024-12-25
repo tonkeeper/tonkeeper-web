@@ -51,6 +51,10 @@ export interface ExistsExtensionOperationRequest {
     existsExtensionRequest?: ExistsExtensionRequest;
 }
 
+export interface ReConnectRequest {
+    connectRequest?: ConnectRequest;
+}
+
 export interface RemoveExtensionOperationRequest {
     removeExtensionRequest?: RemoveExtensionRequest;
 }
@@ -105,6 +109,21 @@ export interface AuthApiInterface {
      * Retrieve the payload
      */
     getPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload>;
+
+    /**
+     * 
+     * @summary Relink your account with the Telegram bot
+     * @param {ConnectRequest} [connectRequest] Data that is expected
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AuthApiInterface
+     */
+    reConnectRaw(requestParameters: ReConnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Url>>;
+
+    /**
+     * Relink your account with the Telegram bot
+     */
+    reConnect(requestParameters: ReConnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url>;
 
     /**
      * 
@@ -209,6 +228,35 @@ export class AuthApi extends runtime.BaseAPI implements AuthApiInterface {
      */
     async getPayload(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Payload> {
         const response = await this.getPayloadRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Relink your account with the Telegram bot
+     */
+    async reConnectRaw(requestParameters: ReConnectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Url>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/reconnect`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ConnectRequestToJSON(requestParameters['connectRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UrlFromJSON(jsonValue));
+    }
+
+    /**
+     * Relink your account with the Telegram bot
+     */
+    async reConnect(requestParameters: ReConnectRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Url> {
+        const response = await this.reConnectRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
