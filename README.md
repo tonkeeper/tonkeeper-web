@@ -1,4 +1,4 @@
-# Tonkeeper Web Monorepo
+tab# Tonkeeper Web Monorepo
 
 Tonkeeper Web is a non-custodial crypto wallet and gateway to blockchain dApps.
 
@@ -27,7 +27,7 @@ yarn build:web
 
 Compressed build could be found in `/apps/web/dist` once they're built.
 
-### Build extension script
+esc### Build extension script
 
 ```sh
 # Install dependencies
@@ -40,7 +40,7 @@ yarn build:extension
 Compressed builds could be found in `/apps/extension/dist/chrome` and `/apps/extension/dist/firefox`
 once they're built.
 
-### Build desktop script
+tab### Build desktop script
 
 ```sh
 # Install dependencies
