@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { AssetData } from '../components/home/Jettons';
 import { useJettonList } from './jetton';
-import { useActiveWallet, useWalletAccountInfo } from './wallet';
+import { useActiveTonWalletConfig, useActiveWallet, useWalletAccountInfo } from './wallet';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     TON_ASSET,
@@ -32,6 +32,45 @@ export const useAssets = () => {
     }, [info, jettons, wallet, tronBalances]);
 
     return [assets, error, isJettonLoading || isAccountLoading, jettonError] as const;
+};
+
+export const useAllChainsAssets = () => {
+    const [assets] = useAssets();
+    const { data: config } = useActiveTonWalletConfig();
+
+    return useMemo<AssetAmount[] | undefined>(() => {
+        if (!assets || !config) return undefined;
+
+        const result: AssetAmount[] = [
+            new AssetAmount({ asset: TON_ASSET, weiAmount: assets.ton.info.balance })
+        ];
+        config.pinnedTokens.forEach(p => {
+            if (p === TRON_USDT_ASSET.address && assets.tron) {
+                result.push(assets.tron.usdt);
+            } else {
+                const jetton = assets.ton.jettons.balances.find(i => i.jetton.address === p);
+                if (jetton) {
+                    result.push(jettonToTonAssetAmount(jetton));
+                }
+            }
+        });
+
+        if (
+            assets.tron &&
+            !result.some(i => i.asset.id === TRON_USDT_ASSET.id) &&
+            !config.hiddenTokens.includes(TRON_USDT_ASSET.address)
+        ) {
+            result.push(assets.tron.usdt);
+        }
+
+        assets.ton.jettons.balances
+            .filter(b => !config.pinnedTokens.includes(b.jetton.address))
+            .forEach(b => {
+                result.push(jettonToTonAssetAmount(b));
+            });
+
+        return result;
+    }, [assets, config]);
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

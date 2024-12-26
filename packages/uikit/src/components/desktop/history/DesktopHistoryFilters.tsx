@@ -3,18 +3,18 @@ import { SelectDropDown } from '../../fields/Select';
 import React, { FC } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
 import styled, { css } from 'styled-components';
-import { useAssets } from '../../../state/home';
+import { useAllChainsAssets } from '../../../state/home';
 import { ChevronDownIcon, CoinsHorizontalIcon, SlidersIcon } from '../../Icon';
 import { Checkbox } from '../../fields/Checkbox';
 import { isInitiatorFiltrationForAssetAvailable, useHistoryFilters } from '../../../state/activity';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useTranslation } from '../../../hooks/translation';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { Badge } from '../../shared';
 
-const AssetIcon = styled.img`
+const AssetIcon = styled.img<{ $noBorders?: boolean }>`
     width: 24px;
     height: 24px;
-    border-radius: ${props => props.theme.cornerFull};
+    border-radius: ${props => !props.$noBorders && props.theme.cornerFull};
     margin-right: 12px;
 
     pointer-events: none;
@@ -60,9 +60,13 @@ const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
     }
 `;
 
+const TRCBadge = styled(Badge)`
+    margin-left: 8px;
+`;
+
 export const AssetHistoryFilter = () => {
     const { t } = useTranslation();
-    const [assets] = useAssets();
+    const assets = useAllChainsAssets();
     const { asset: selectedAsset, setAsset } = useHistoryFilters();
     if (!assets) {
         return null;
@@ -85,35 +89,27 @@ export const AssetHistoryFilter = () => {
                         <AllAssetsIcon />
                         <Label2>{t('history_filters_all_assets')}</Label2>
                     </DropDownItem>
-                    <DropDownItemsDivider />
-                    <DropDownItem
-                        onClick={() => {
-                            setAsset(TON_ASSET);
-                            onClose();
-                        }}
-                        isSelected={selectedAsset?.id === TON_ASSET.id}
-                    >
-                        <AssetIcon src="https://wallet.tonkeeper.com/img/toncoin.svg" />
-                        <Label2>TON</Label2>
-                    </DropDownItem>
-                    {assets.ton.jettons.balances.map(jetton => {
-                        const asset = jettonToTonAsset(jetton.jetton.address, assets.ton.jettons);
-                        return (
-                            <>
-                                <DropDownItemsDivider />
-                                <DropDownItem
-                                    onClick={() => {
-                                        setAsset(asset);
-                                        onClose();
-                                    }}
-                                    isSelected={selectedAsset?.id === asset.id}
-                                >
-                                    <AssetIcon src={jetton.jetton.image} />
-                                    <Label2>{jetton.jetton.symbol}</Label2>
-                                </DropDownItem>
-                            </>
-                        );
-                    })}
+                    {assets.map(assetAmount => (
+                        <>
+                            <DropDownItemsDivider />
+                            <DropDownItem
+                                onClick={() => {
+                                    setAsset(assetAmount.asset);
+                                    onClose();
+                                }}
+                                isSelected={selectedAsset?.id === assetAmount.asset.id}
+                            >
+                                <AssetIcon
+                                    src={assetAmount.image}
+                                    $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id}
+                                />
+                                <Label2>{assetAmount.asset.symbol}</Label2>
+                                {assetAmount.asset.id === TRON_USDT_ASSET.id && (
+                                    <TRCBadge color="textSecondary">TRC20</TRCBadge>
+                                )}
+                            </DropDownItem>
+                        </>
+                    ))}
                 </DropDownContent>
             )}
         >

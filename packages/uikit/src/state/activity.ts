@@ -2,7 +2,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
     isTon,
-    TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
@@ -19,6 +18,8 @@ import { useActiveTronWallet, useTronApi } from './tron/tron';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { TronApi, TronHistoryItem } from '@tonkeeper/core/dist/tronApi';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -161,33 +162,51 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
         ],
         queryFn: async ({ pageParam = undefined }) => {
             let assetTonApiId: string | undefined;
+            let isTronUSDTAsset = false;
             if (selectedAsset) {
-                assetTonApiId = tonAssetAddressToString(selectedAsset.address);
+                if (selectedAsset.id === TRON_USDT_ASSET.id) {
+                    isTronUSDTAsset = true;
+                } else if (isTonAsset(selectedAsset)) {
+                    assetTonApiId = tonAssetAddressToString(selectedAsset.address);
+                }
             }
             if (assetAddress) {
-                assetTonApiId =
-                    assetAddress.toLowerCase() === CryptoCurrency.TON.toLowerCase()
-                        ? 'TON'
-                        : assetAddress;
+                if (assetAddress === TRON_USDT_ASSET.address) {
+                    isTronUSDTAsset = true;
+                } else {
+                    assetTonApiId =
+                        assetAddress.toLowerCase() === CryptoCurrency.TON.toLowerCase()
+                            ? 'TON'
+                            : assetAddress;
+                }
             }
 
+            const emptyResult = Promise.resolve({
+                nextFrom: 0,
+                events: []
+            });
+
             const [tonActivity, tronActivity] = await Promise.all([
-                fetchTonActivity({
-                    pageParam: pageParam?.tonNextFrom,
-                    assetTonApiId,
-                    api,
-                    wallet,
-                    onlyInitiator,
-                    filterSpam,
-                    twoFaPluginAddress: twoFaPlugin
-                }),
-                fetchTronActivity({
-                    tronApi,
-                    tronWalletAddress: tronWallet?.address,
-                    pageParam: pageParam?.tronNextFrom,
-                    onlyInitiator,
-                    filterSpam
-                })
+                isTronUSDTAsset
+                    ? emptyResult
+                    : fetchTonActivity({
+                          pageParam: pageParam?.tonNextFrom,
+                          assetTonApiId,
+                          api,
+                          wallet,
+                          onlyInitiator,
+                          filterSpam,
+                          twoFaPluginAddress: twoFaPlugin
+                      }),
+                assetTonApiId
+                    ? emptyResult
+                    : fetchTronActivity({
+                          tronApi,
+                          tronWalletAddress: tronWallet?.address,
+                          pageParam: pageParam?.tronNextFrom,
+                          onlyInitiator,
+                          filterSpam
+                      })
             ]);
 
             return {
@@ -258,7 +277,7 @@ async function fetchTronActivity({
 
     const tronActivity = await tronApi.getTransfersHistory(tronWalletAddress, {
         limit: pageLimit,
-        maxTimestamp: pageParam,
+        maxTimestamp: pageParam ? pageParam - 1 : undefined,
         onlyInitiator,
         filterSpam
     });
@@ -372,7 +391,7 @@ export const defaultHistoryFilters = {
 };
 
 const historyFilters$ = atom<{
-    asset: TonAsset | undefined;
+    asset: Asset | undefined;
     onlyInitiator: boolean;
     filterSpam: boolean;
 }>(defaultHistoryFilters);
@@ -402,7 +421,7 @@ export const useHistoryFilters = () => {
     }, [setFilters, mutate, filters.filterSpam]);
 
     const setAsset = useCallback(
-        (asset: TonAsset | undefined) => {
+        (asset: Asset | undefined) => {
             setFilters(f => ({ ...f, asset }));
         },
         [setFilters]
@@ -416,11 +435,11 @@ export const useHistoryFilters = () => {
     };
 };
 
-export const isInitiatorFiltrationForAssetAvailable = (asset: TonAsset | undefined): boolean => {
+export const isInitiatorFiltrationForAssetAvailable = (asset: Asset | undefined): boolean => {
     if (!asset) {
         return true;
     }
-    return isTon(asset.address);
+    return !isTonAsset(asset) || isTon(asset.address);
 };
 
 export const useScrollMonitor = (

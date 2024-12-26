@@ -46,7 +46,7 @@ export const TronTransferDesktopAction: FC<{
                     <HistoryCellComment isScam={isScam} />
                     <HistoryCellAmount
                         amount={action.assetAmount.weiAmount.toFixed(0)}
-                        symbol={action.assetAmount.asset.symbol + ' (TRC-20)'}
+                        symbol={action.assetAmount.asset.symbol + ' (TRC20)'}
                         decimals={action.assetAmount.asset.decimals}
                         isFailed={isFailed}
                         isSpam={isScam}
@@ -63,7 +63,7 @@ export const TronTransferDesktopAction: FC<{
                 <HistoryCellComment />
                 <HistoryCellAmount
                     amount={action.assetAmount.weiAmount.toFixed(0)}
-                    symbol={action.assetAmount.asset.symbol + ' (TRC-20)'}
+                    symbol={action.assetAmount.asset.symbol + ' (TRC20)'}
                     decimals={action.assetAmount.asset.decimals}
                     isFailed={isFailed}
                     isNegative

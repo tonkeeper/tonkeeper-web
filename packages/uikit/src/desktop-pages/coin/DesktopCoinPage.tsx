@@ -369,8 +369,21 @@ export const TronUSDTPage = () => {
         return balances.trx;
     }, [balances]);
 
+    const ref = useRef<HTMLDivElement>(null);
+    const {
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        data: activity,
+        refetch
+    } = useFetchFilteredActivity(TRON_USDT_ASSET.address);
+
+    useScrollMonitor(ref, 5000, refetch);
+
+    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
+
     return (
-        <DesktopViewPageLayout>
+        <DesktopViewPageLayout ref={ref}>
             <DesktopViewHeader backButton borderBottom={true}>
                 <Label2>{asset.symbol}</Label2>
             </DesktopViewHeader>
@@ -414,6 +427,9 @@ export const TronUSDTPage = () => {
                 <TronTopUpTRX relativeAssetBalance={trxBalance.stringAssetRelativeAmount} />
             )}
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
+            <HistoryContainer>
+                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
+            </HistoryContainer>
         </DesktopViewPageLayout>
     );
 };

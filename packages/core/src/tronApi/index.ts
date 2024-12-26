@@ -232,7 +232,7 @@ export class TronApi {
             url.searchParams.set('max_timestamp', options.maxTimestamp.toString());
         }
 
-        if (options?.onlyInitiator !== undefined) {
+        if (options?.onlyInitiator === true) {
             url.searchParams.set('only_from', 'true');
         }
 
