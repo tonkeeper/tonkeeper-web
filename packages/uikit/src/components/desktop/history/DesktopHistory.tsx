@@ -7,7 +7,10 @@ import {
     CategorizedActivity,
     CategorizedActivityItemGroup
 } from '../../../state/activity';
-import { ActionData, ActivityNotification } from '../../activity/ton/ActivityNotification';
+import {
+    ActivityNotification,
+    ActivityNotificationData
+} from '../../activity/ton/ActivityNotification';
 
 const ContainerQuery = styled.div`
     container-type: inline-size;
@@ -68,7 +71,7 @@ const FetchingRows = styled.div`
 const HistoryEvents: FC<{
     className?: string;
     aggregatedActivity: CategorizedActivity;
-    setSelectedActivity: React.Dispatch<React.SetStateAction<ActionData | undefined>>;
+    setSelectedActivity: React.Dispatch<React.SetStateAction<ActivityNotificationData | undefined>>;
 }> = ({ className, aggregatedActivity, setSelectedActivity }) => {
     return (
         <ContainerQuery>
@@ -94,7 +97,9 @@ export const DesktopHistory: FC<{
     isFetchingNextPage: boolean;
     className?: string;
 }> = ({ activity, isFetchingNextPage, className }) => {
-    const [selectedActivity, setSelectedActivity] = useState<ActionData | undefined>();
+    const [selectedActivity, setSelectedActivity] = useState<
+        ActivityNotificationData | undefined
+    >();
 
     const aggregatedActivity: CategorizedActivity = useMemo(() => {
         const double = new Set();

@@ -7,8 +7,9 @@ import { HistoryAction } from './ton/HistoryAction';
 import { HistoryGridCell } from './ton/HistoryGrid';
 import { ChevronDownIcon, SpinnerRing } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
-import { ActionData } from '../../activity/ton/ActivityNotification';
+import { ActivityNotificationData } from '../../activity/ton/ActivityNotification';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
+import { TronHistoryAction } from './tron/TronHistoryAction';
 
 const EventDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
@@ -51,7 +52,7 @@ const GroupItemLeftSpacer = styled.div`
 
 export const HistoryEvent: FC<{
     group: CategorizedActivityItem;
-    onActionClick: (actionData: ActionData) => void;
+    onActionClick: (actionData: ActivityNotificationData) => void;
 }> = ({ group, onActionClick }) => {
     if (group.type === 'single') {
         return <HistoryEventSingle item={group.item} onActionClick={onActionClick} />;
@@ -62,7 +63,7 @@ export const HistoryEvent: FC<{
 
 const HistoryEventSingle: FC<{
     item: ActivityItem;
-    onActionClick: (actionData: ActionData) => void;
+    onActionClick: (actionData: ActivityNotificationData) => void;
     onCollapse?: () => void;
     onExpand?: () => void;
     isGroupItem?: boolean;
@@ -71,7 +72,25 @@ const HistoryEventSingle: FC<{
     const { t } = useTranslation();
 
     if (item.type === 'tron') {
-        return
+        return (
+            <HistoryEventWrapper
+                onClick={() =>
+                    onExpand
+                        ? onExpand()
+                        : onActionClick({
+                              type: 'tron',
+                              timestamp: item.timestamp,
+                              event: item.event
+                          })
+                }
+            >
+                <HistoryDateCell>
+                    <Body2>{formattedDate}</Body2>
+                </HistoryDateCell>
+                <TronHistoryAction action={item.event} />
+                <EventDivider />
+            </HistoryEventWrapper>
+        );
     }
 
     const event = item.event;
@@ -95,6 +114,7 @@ const HistoryEventSingle: FC<{
                         onExpand
                             ? onExpand()
                             : onActionClick({
+                                  type: 'ton',
                                   timestamp: item.timestamp,
                                   action,
                                   isScam: event.isScam,
@@ -155,7 +175,7 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
 
 const HistoryEventGroup: FC<{
     items: ActivityItem[];
-    onActionClick: (actionData: ActionData) => void;
+    onActionClick: (actionData: ActivityNotificationData) => void;
 }> = ({ items, onActionClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 

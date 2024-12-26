@@ -139,7 +139,7 @@ export const groupActivityItems = (list: ActivityItem[]) => {
     return result;
 };
 
-export const useFetchFilteredActivity = (asset?: string) => {
+export const useFetchFilteredActivity = (assetAddress?: string) => {
     const wallet = useActiveWallet();
     const api = useActiveApi();
     const { asset: selectedAsset, filterSpam, onlyInitiator } = useHistoryFilters();
@@ -152,7 +152,7 @@ export const useFetchFilteredActivity = (asset?: string) => {
         queryKey: [
             wallet.rawAddress,
             QueryKey.activity,
-            asset,
+            assetAddress,
             selectedAsset?.id,
             onlyInitiator,
             filterSpam,
@@ -164,9 +164,11 @@ export const useFetchFilteredActivity = (asset?: string) => {
             if (selectedAsset) {
                 assetTonApiId = tonAssetAddressToString(selectedAsset.address);
             }
-            if (asset) {
+            if (assetAddress) {
                 assetTonApiId =
-                    asset.toLowerCase() === CryptoCurrency.TON.toLowerCase() ? 'TON' : asset;
+                    assetAddress.toLowerCase() === CryptoCurrency.TON.toLowerCase()
+                        ? 'TON'
+                        : assetAddress;
             }
 
             const [tonActivity, tronActivity] = await Promise.all([
@@ -182,7 +184,9 @@ export const useFetchFilteredActivity = (asset?: string) => {
                 fetchTronActivity({
                     tronApi,
                     tronWalletAddress: tronWallet?.address,
-                    pageParam: pageParam?.tronNextFrom
+                    pageParam: pageParam?.tronNextFrom,
+                    onlyInitiator,
+                    filterSpam
                 })
             ]);
 
@@ -233,11 +237,15 @@ const sortAndPackActivityItems = (
 async function fetchTronActivity({
     tronApi,
     tronWalletAddress,
-    pageParam
+    pageParam,
+    onlyInitiator,
+    filterSpam
 }: {
     tronApi: TronApi;
     tronWalletAddress?: string;
     pageParam?: number;
+    onlyInitiator: boolean;
+    filterSpam: boolean;
 }) {
     if (pageParam === 0 || !tronWalletAddress) {
         return {
@@ -246,12 +254,17 @@ async function fetchTronActivity({
         };
     }
 
+    const pageLimit = 20;
+
     const tronActivity = await tronApi.getTransfersHistory(tronWalletAddress, {
-        limit: 20,
-        maxTimestamp: pageParam
+        limit: pageLimit,
+        maxTimestamp: pageParam,
+        onlyInitiator,
+        filterSpam
     });
 
-    const nextFrom = tronActivity.length < 20 ? 0 : tronActivity[tronActivity.length - 1].timestamp;
+    const nextFrom =
+        tronActivity.length < pageLimit ? 0 : tronActivity[tronActivity.length - 1].timestamp;
 
     return {
         nextFrom,

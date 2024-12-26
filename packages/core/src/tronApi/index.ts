@@ -20,11 +20,14 @@ type TronTokenDTO = {
 };
 
 export type TronHistoryItemTransferAsset = {
+    type: 'asset-transfer';
     assetAmount: AssetAmount<TronAsset>;
     timestamp: number;
     transactionHash: string;
     from: string;
     to: string;
+    isScam: boolean;
+    isFailed: boolean;
 };
 export type TronHistoryItem = TronHistoryItemTransferAsset;
 
@@ -212,7 +215,12 @@ export class TronApi {
 
     async getTransfersHistory(
         address: string,
-        options?: { limit?: number; maxTimestamp?: number }
+        options?: {
+            limit?: number;
+            maxTimestamp?: number;
+            onlyInitiator?: boolean;
+            filterSpam?: boolean;
+        }
     ): Promise<TronHistoryItem[]> {
         const url = new URL(`${this.baseURL}/v1/accounts/${address}/transactions/trc20`);
 
@@ -222,6 +230,10 @@ export class TronApi {
 
         if (options?.maxTimestamp !== undefined) {
             url.searchParams.set('max_timestamp', options.maxTimestamp.toString());
+        }
+
+        if (options?.onlyInitiator !== undefined) {
+            url.searchParams.set('only_from', 'true');
         }
 
         const response = await (
@@ -244,12 +256,26 @@ export class TronApi {
                     return null;
                 }
 
+                const assetAmount = new AssetAmount({
+                    weiAmount: item.value,
+                    asset: TRON_USDT_ASSET
+                });
+
+                const isScam = assetAmount.relativeAmount.lt(1);
+
+                if (options?.filterSpam && isScam) {
+                    return null;
+                }
+
                 return {
-                    assetAmount: new AssetAmount({ weiAmount: item.value, asset: TRON_USDT_ASSET }),
+                    type: 'asset-transfer',
+                    assetAmount,
                     timestamp: item.block_timestamp,
                     transactionHash: item.transaction_id,
                     from: item.from,
-                    to: item.to
+                    to: item.to,
+                    isScam,
+                    isFailed: false // TODO
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);
