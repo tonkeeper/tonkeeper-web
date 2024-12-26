@@ -140,7 +140,8 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
     const isSuitableAccount = account.type === 'mnemonic' || account.type === 'mam';
     const serviceConfig = useTwoFAServiceConfig();
 
-    return useQuery<TwoFAWalletConfig>(
+    const isEnabled = isSuitableAccount;
+    const query = useQuery<TwoFAWalletConfig>(
         [QueryKey.twoFAWalletConfig, wallet.id, isTwoFAEnabledGlobally],
         async () => {
             const twoFAEncoder = new TwoFAEncoder(api, wallet.rawAddress);
@@ -214,7 +215,7 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
         },
         {
             keepPreviousData: true,
-            enabled: isSuitableAccount,
+            enabled: isEnabled,
             refetchInterval: d =>
                 d?.status === 'tg-bot-bounding' || d?.status === 'ready-for-deployment'
                     ? 1000
@@ -223,6 +224,11 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
                     : false
         }
     );
+
+    return {
+        ...query,
+        isEnabled
+    };
 };
 
 const authUrlToBotUrl = (authUrl: string) => {

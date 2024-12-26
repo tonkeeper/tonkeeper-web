@@ -77,7 +77,7 @@ export const useAvailableSendersChoices = (
     const gaslessConfig = useGaslessConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const [walletInfo] = useAssets();
-    const { data: twoFaConfig } = useTwoFAWalletConfig();
+    const { data: twoFaConfig, isEnabled: isTwoFAEnabled } = useTwoFAWalletConfig();
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
@@ -165,7 +165,7 @@ export const useAvailableSendersChoices = (
                 batteryBalance !== undefined &&
                 walletInfo !== undefined &&
                 config !== undefined &&
-                twoFaConfig !== undefined
+                (!isTwoFAEnabled || twoFaConfig !== undefined)
         }
     );
 };
@@ -236,7 +236,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
 export const EXTERNAL_SENDER_CHOICE = { type: 'external' } as const satisfies SenderChoice;
 export const BATTERY_SENDER_CHOICE = { type: 'battery' } as const satisfies SenderChoice;
 
-export const useGetEstimationSender = (senderChoice: SenderChoice = { type: 'external' }) => {
+export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SENDER_CHOICE) => {
     const appContext = useAppContext();
     const api = useActiveApi();
     const batteryApi = useBatteryApi();
@@ -411,7 +411,7 @@ export const useGetSender = () => {
 
     return useCallback(
         // eslint-disable-next-line complexity
-        async (senderChoice: SenderChoice = { type: 'external' }): Promise<Sender> => {
+        async (senderChoice: SenderChoice = EXTERNAL_SENDER_CHOICE): Promise<Sender> => {
             if (activeAccount.type === 'watch-only') {
                 throw new Error("Can't send a transfer using this account");
             }
