@@ -1,7 +1,6 @@
-import { MixedActivity } from '../../../state/mixedActivity';
 import { FC, useState, MouseEvent } from 'react';
 import styled from 'styled-components';
-import { GenericActivity, GroupedActivityItem } from '../../../state/activity';
+import { ActivityItem, CategorizedActivityItem } from '../../../state/activity';
 import { Body2 } from '../../Text';
 import { useDateTimeFormatFromNow } from '../../../hooks/useDateTimeFormat';
 import { HistoryAction } from './ton/HistoryAction';
@@ -51,7 +50,7 @@ const GroupItemLeftSpacer = styled.div`
 `;
 
 export const HistoryEvent: FC<{
-    group: GroupedActivityItem;
+    group: CategorizedActivityItem;
     onActionClick: (actionData: ActionData) => void;
 }> = ({ group, onActionClick }) => {
     if (group.type === 'single') {
@@ -62,7 +61,7 @@ export const HistoryEvent: FC<{
 };
 
 const HistoryEventSingle: FC<{
-    item: GenericActivity<MixedActivity>;
+    item: ActivityItem;
     onActionClick: (actionData: ActionData) => void;
     onCollapse?: () => void;
     onExpand?: () => void;
@@ -71,11 +70,11 @@ const HistoryEventSingle: FC<{
     const formattedDate = useDateTimeFormatFromNow(item.timestamp);
     const { t } = useTranslation();
 
-    if (item.event.kind === 'tron') {
-        return null;
+    if (item.type === 'tron') {
+        return
     }
 
-    const event = item.event.event;
+    const event = item.event;
 
     const handleChevronClick = (e: MouseEvent<HTMLButtonElement>) => {
         onExpand?.();
@@ -155,7 +154,7 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
 `;
 
 const HistoryEventGroup: FC<{
-    items: GenericActivity<MixedActivity>[];
+    items: ActivityItem[];
     onActionClick: (actionData: ActionData) => void;
 }> = ({ items, onActionClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);

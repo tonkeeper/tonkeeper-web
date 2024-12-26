@@ -1,7 +1,7 @@
 import { InfiniteData } from '@tanstack/react-query';
 import { AccountEvents } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useMemo, useState } from 'react';
-import { formatActivityDate, GenericActivityGroup, getActivityTitle } from '../../state/activity';
+import { formatActivityDate, ActivityItemsDatedGroup, getActivityTitle } from '../../state/activity';
 import { MixedActivity, getMixedActivityGroups } from '../../state/mixedActivity';
 import { CoinHistorySkeleton, HistoryBlock, SkeletonListWithImages } from '../Skeleton';
 import { Group, List, Title } from './ActivityLayout';
@@ -17,7 +17,7 @@ export const ActivityList: FC<{
     tonEvents?: InfiniteData<AccountEvents>;
     tronEvents?: InfiniteData<unknown>;
 }> = ({ isFetched, isFetchingNextPage, tonEvents, tronEvents }) => {
-    const activity = useMemo<GenericActivityGroup<MixedActivity>[]>(() => {
+    const activity = useMemo<ActivityItemsDatedGroup<MixedActivity>[]>(() => {
         return getMixedActivityGroups(tonEvents, tronEvents);
     }, [tonEvents, tronEvents]);
 
@@ -33,7 +33,7 @@ export const ActivityList: FC<{
 };
 
 export const MixedActivityGroup: FC<{
-    items: GenericActivityGroup<MixedActivity>[];
+    items: ActivityItemsDatedGroup<MixedActivity>[];
 }> = ({ items }) => {
     const [tonAction, seTonAction] = useState<ActionData | undefined>(undefined);
     const [tronAction, setTronAction] = useState<TronActionData | undefined>(undefined);

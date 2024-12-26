@@ -1,8 +1,32 @@
 import BigNumber from 'bignumber.js';
 import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
 import { TronWeb } from 'tronweb';
+import { TronAsset } from '../entries/crypto/asset/tron-asset';
+import { AssetAmount } from '../entries/crypto/asset/asset-amount';
+import { notNullish } from '../utils/types';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
+
+type TronTokenDTO = {
+    transaction_id: string; // no 0x
+    token_info: {
+        address: string;
+    };
+    block_timestamp: number; // ms
+    from: string;
+    to: string;
+    type: 'Transfer';
+    value: string;
+};
+
+export type TronHistoryItemTransferAsset = {
+    assetAmount: AssetAmount<TronAsset>;
+    timestamp: number;
+    transactionHash: string;
+    from: string;
+    to: string;
+};
+export type TronHistoryItem = TronHistoryItemTransferAsset;
 
 export class TronApi {
     public readonly baseURL: string;
@@ -184,5 +208,50 @@ export class TronApi {
             console.error('Error estimating energy:', error);
             throw error;
         }
+    }
+
+    async getTransfersHistory(
+        address: string,
+        options?: { limit?: number; maxTimestamp?: number }
+    ): Promise<TronHistoryItem[]> {
+        const url = new URL(`${this.baseURL}/v1/accounts/${address}/transactions/trc20`);
+
+        if (options?.limit !== undefined) {
+            url.searchParams.set('limit', options.limit.toString());
+        }
+
+        if (options?.maxTimestamp !== undefined) {
+            url.searchParams.set('max_timestamp', options.maxTimestamp.toString());
+        }
+
+        const response = await (
+            await fetch(url, {
+                method: 'GET',
+                headers: this.headers
+            })
+        ).json();
+
+        if (!response?.success || !response?.data || !Array.isArray(response.data)) {
+            throw new Error('Error fetching transfers history');
+        }
+
+        return response.data
+            .map((item: TronTokenDTO) => {
+                if (item.type !== 'Transfer') {
+                    return null;
+                }
+                if (item.token_info?.address !== TRON_USDT_ASSET.address) {
+                    return null;
+                }
+
+                return {
+                    assetAmount: new AssetAmount({ weiAmount: item.value, asset: TRON_USDT_ASSET }),
+                    timestamp: item.block_timestamp,
+                    transactionHash: item.transaction_id,
+                    from: item.from,
+                    to: item.to
+                } satisfies TronHistoryItemTransferAsset;
+            })
+            .filter(notNullish);
     }
 }

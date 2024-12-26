@@ -23,7 +23,6 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
-import { getMixedActivity } from '../../state/mixedActivity';
 import { toTokenRate, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
@@ -297,16 +296,17 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
-    const { fetchNextPage, hasNextPage, isFetchingNextPage, data, refetch } =
-        useFetchFilteredActivity(token);
+    const {
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        data: activity,
+        refetch
+    } = useFetchFilteredActivity(token);
 
     useScrollMonitor(ref, 5000, refetch);
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
-
-    const activity = useMemo(() => {
-        return getMixedActivity(data, undefined);
-    }, [data]);
 
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {
