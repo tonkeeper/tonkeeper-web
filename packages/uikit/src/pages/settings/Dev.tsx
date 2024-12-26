@@ -88,10 +88,9 @@ const EnableTronSettings = () => {
                 <ListItemPayload>
                     <TextColumns>
                         <TextAndBadge>
-                            <Label1>Enable 2FA</Label1>
-                            <Badge color="textSecondary">Experimental</Badge>
+                            <Label1>Enable TRON USDT</Label1>
+                            <Badge color="accentRed">Experimental</Badge>
                         </TextAndBadge>
-                        <Body3>Available only for W5 wallets</Body3>
                     </TextColumns>
                     <Switch
                         disabled={!devSettings}
@@ -112,8 +111,6 @@ export const DevSettings = React.memo(() => {
                 <EnableTwoFASettings />
                 <EnableTronSettings />
                 <CookieSettings />
-                {/* TODO: ENABLE TRON */}
-                {/* <SettingsList items={items2} /> */}
             </InnerBody>
         </>
     );
