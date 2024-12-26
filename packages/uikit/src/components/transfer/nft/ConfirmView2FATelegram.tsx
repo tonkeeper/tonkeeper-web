@@ -82,7 +82,7 @@ export const ConfirmView2FATelegramContent: FC<{
             </Button>
             <CannotAccessTgText>
                 {t('two_fa_confirm_tg_cannot_access_tg')}
-                <Link to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} onClick={onHelp}>
+                <Link to={AppRoute.settings + WalletSettingsRoute.twoFa} onClick={onHelp}>
                     {' '}
                     {t('help')}
                 </Link>

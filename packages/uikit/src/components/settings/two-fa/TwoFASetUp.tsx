@@ -2,7 +2,7 @@ import { Button } from '../../fields/Button';
 import {
     TwoFAWalletConfig,
     useBoundTwoFABot,
-    useDisconnectTwoFABot,
+    useGetBoundingTwoFABotLink,
     useIsTwoFAActivationProcess,
     useTwoFAWalletConfig
 } from '../../../state/two-fa';
@@ -10,7 +10,10 @@ import styled, { useTheme } from 'styled-components';
 import { Body2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import { FC, forwardRef, LegacyRef, useLayoutEffect, useRef, useState } from 'react';
-import { TwoFAConnectBotNotification } from './TwoFAConnectBotNotification';
+import {
+    TwoFAConnectBotNotification,
+    TwoFAReConnectBotNotification
+} from './TwoFAConnectBotNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 import { DeployTwoFAConfirmNotification } from './DeployTwoFAConfirmNotification';
@@ -76,7 +79,31 @@ const LinkTGStep = forwardRef<HTMLElement, { config: TwoFAWalletConfig }>(({ con
     const isStepActive = config === null || config.status === 'tg-bot-bounding';
 
     const { mutateAsync: boundBot } = useBoundTwoFABot();
-    const { mutate: disconnect } = useDisconnectTwoFABot();
+
+    const {
+        isOpen: isOpenReconnectTG,
+        onClose: onCloseReconnectTG,
+        onOpen: onOpenReconnectTG
+    } = useDisclosure();
+    const {
+        mutateAsync: getReconnectTGLink,
+        data: reconnectTGLink,
+        reset: resetReconnectTGLink
+    } = useGetBoundingTwoFABotLink({ forReconnect: true });
+
+    const onClickReconnectTG = async () => {
+        try {
+            await getReconnectTGLink();
+            onOpenReconnectTG();
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const onClickCloseReconnectTG = () => {
+        onCloseReconnectTG();
+        setTimeout(resetReconnectTGLink, 300);
+    };
 
     const onClickContinue = async () => {
         if (config === null) {
@@ -102,9 +129,16 @@ const LinkTGStep = forwardRef<HTMLElement, { config: TwoFAWalletConfig }>(({ con
                         {t('continue')}
                     </Button>
                 ) : (
-                    <Button onClick={() => disconnect()}>{t('disconnect')}</Button>
+                    <Button onClick={() => onClickReconnectTG()}>
+                        {t('two_fa_settings_change_tg_short_button')}
+                    </Button>
                 )}
             </StepContainer>
+            <TwoFAReConnectBotNotification
+                isOpen={isOpenReconnectTG}
+                onClose={onClickCloseReconnectTG}
+                authLink={reconnectTGLink}
+            />
             <TwoFAConnectBotNotification isOpen={isOpen} onClose={onClose} />
         </>
     );

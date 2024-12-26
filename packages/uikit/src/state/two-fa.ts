@@ -263,14 +263,13 @@ export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean })
     const twoFAApi = useTwoFAApi();
     const { mutateAsync: signTonProof } = useSignTonProof();
     const address = useActiveWallet().rawAddress;
-    const serviceConfig = useTwoFAServiceConfig();
     const toast = useToast();
     const { t } = useTranslation();
 
     return useMutation<string>(async () => {
         try {
             const { payload } = await new AuthApi(twoFAApi).getPayload();
-            const origin = serviceConfig.baseUrl;
+            const origin = 'https://2fa.tonkeeper.com';
 
             const { timestamp, signature, stateInit, domain } = await signTonProof({
                 origin,
@@ -333,29 +332,6 @@ export const useBoundTwoFABot = () => {
         await client.invalidateQueries([QueryKey.twoFAWalletConfig]);
 
         return authUrl;
-    });
-};
-
-export const useDisconnectTwoFABot = () => {
-    const client = useQueryClient();
-    const twoFaConfig = useTwoFAWalletConfig().data;
-    const sdk = useAppSdk();
-    const wallet = useActiveWallet();
-
-    return useMutation(async () => {
-        if (!twoFaConfig) {
-            throw new Error('Unexpected two fa config');
-        }
-
-        if (
-            twoFaConfig.status !== 'tg-bot-bounding' &&
-            twoFaConfig.status !== 'ready-for-deployment'
-        ) {
-            throw new Error(`Cannot disconnect bot for status ${twoFaConfig.status}`);
-        }
-
-        await sdk.storage.set(twoFaWalletConfigStorageKey(wallet.id), null);
-        await client.invalidateQueries([QueryKey.twoFAWalletConfig]);
     });
 };
 
