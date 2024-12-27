@@ -1,6 +1,6 @@
 import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
-import { useFormatFiat } from '../../../state/rates';
+import { useFormatFiat, useUSDTRate } from '../../../state/rates';
 import { ListBlock } from '../../List';
 import { ActivityDetailsHeader } from '../ActivityDetailsLayout';
 import {
@@ -25,18 +25,13 @@ const TronActionDetailsBlock: FC<PropsWithChildren<{ transactionHash: string }>>
     );
 };
 
-const usdtRate = {
-    diff7d: '',
-    diff24h: '',
-    prices: 1
-};
-
 export const TronTransferActionNotification: FC<ActivityNotificationDataTron> = ({
     timestamp,
     event
 }) => {
     const wallet = useActiveTronWallet()!;
-    const { fiatAmount } = useFormatFiat(usdtRate, event.assetAmount.relativeAmount);
+    const { data: rate } = useUSDTRate();
+    const { fiatAmount } = useFormatFiat(rate, event.assetAmount.relativeAmount);
 
     const isScam = event.isScam;
     const kind = event.to === wallet.address ? 'received' : 'send';

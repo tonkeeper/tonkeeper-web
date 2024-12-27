@@ -4,7 +4,7 @@ import { CoinSkeletonPage } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { Action, ActionsRow } from '../../components/home/Actions';
 import { CoinInfo } from '../../components/jettons/Info';
-import { TokenRate, useFormatFiat } from '../../state/rates';
+import { useFormatFiat, useUSDTRate } from '../../state/rates';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { useTronBalances } from '../../state/tron/tron';
@@ -15,14 +15,9 @@ import { useSendTransferNotification } from '../../components/modals/useSendTran
 import { MobileAssetHistory } from './Jetton';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
-const usdtRate: TokenRate = {
-    prices: 1,
-    diff7d: '',
-    diff24h: ''
-};
-
 const TronUsdtHeader: FC<{ assetAmount: AssetAmount<TronAsset> }> = ({ assetAmount }) => {
-    const { fiatAmount } = useFormatFiat(usdtRate, assetAmount.relativeAmount);
+    const { data: rate } = useUSDTRate();
+    const { fiatAmount } = useFormatFiat(rate, assetAmount.relativeAmount);
 
     return (
         <CoinInfo

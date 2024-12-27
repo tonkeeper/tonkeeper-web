@@ -28,7 +28,8 @@ import {
     tokenRate as getTokenRate,
     getTonFiatAmount,
     toTokenRate,
-    useRate
+    useRate,
+    useUSDTRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
@@ -203,6 +204,8 @@ export const useAccountTotalBalance = () => {
         () => account.allTonWallets.map(w => w.rawAddress),
         [account]
     );
+    const { data: tronBalances } = useTronBalances();
+    const { data: rate } = useUSDTRate();
 
     return useQuery<BigNumber>(
         [QueryKey.allWalletsTotalBalance, fiat, allWalletsAddresses],
@@ -215,10 +218,19 @@ export const useAccountTotalBalance = () => {
                 currency: fiat
             });
 
-            return result
+            const totalTonAssetsBalances = result
                 .map(row => new BigNumber((row.cells[0] as DashboardCellNumeric).value))
                 .reduce((v, acc) => acc.plus(v), new BigNumber(0));
-        }
+
+            if (!tronBalances) {
+                return totalTonAssetsBalances;
+            }
+
+            return totalTonAssetsBalances.plus(
+                tronBalances.usdt.relativeAmount.multipliedBy(rate?.prices ?? 0)
+            );
+        },
+        { enabled: tronBalances !== undefined && rate !== undefined }
     );
 };
 

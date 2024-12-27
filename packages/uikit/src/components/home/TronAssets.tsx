@@ -1,7 +1,7 @@
-import React, { FC, forwardRef, useMemo } from 'react';
+import React, { FC, forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
-import { useFormatFiat } from '../../state/rates';
+import { useFormatFiat, useUSDTRate } from '../../state/rates';
 import { ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -15,23 +15,9 @@ import { useAddTronToAccount } from '../../state/wallet';
 import styled from 'styled-components';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
-const usdtRate = {
-    diff7d: '',
-    diff24h: '',
-    prices: 1
-};
-
 const TokenLogoNotRounded = styled(TokenLogo)`
     border-radius: unset;
 `;
-
-const tronAssetRate = (asset: TronAsset) => {
-    if (asset.id === TRON_USDT_ASSET.id) {
-        return usdtRate;
-    }
-
-    return undefined;
-};
 
 export const TronAssetComponent = forwardRef<
     HTMLDivElement,
@@ -42,8 +28,7 @@ export const TronAssetComponent = forwardRef<
 >(({ assetAmount, className }, ref) => {
     const navigate = useNavigate();
 
-    const rate = useMemo(() => tronAssetRate(assetAmount.asset), [assetAmount.asset.id]);
-
+    const { data: rate } = useUSDTRate();
     const { fiatPrice, fiatAmount } = useFormatFiat(rate, assetAmount.relativeAmount);
 
     return (
@@ -78,6 +63,7 @@ const InactiveUSDA: FC<{ className?: string }> = ({ className }) => {
 
     const { mutate, isLoading } = useAddTronToAccount();
     const isFullWidth = useIsFullWidthMode();
+    const { data: rate } = useUSDTRate();
 
     return (
         <ListItem className={className}>
@@ -87,10 +73,10 @@ const InactiveUSDA: FC<{ className?: string }> = ({ className }) => {
                     name={TRON_USDT_ASSET.name!}
                     symbol={TRON_USDT_ASSET.symbol}
                     balance=""
-                    secondary={formatFiatCurrency(fiat, usdtRate.prices)}
+                    secondary={rate?.prices ? formatFiatCurrency(fiat, rate?.prices) : undefined}
                     fiatAmount=""
                     label="TRC20"
-                    rate={usdtRate}
+                    rate={rate}
                 />
                 <Button
                     {...(isFullWidth ? { secondary: true } : { primary: true })}

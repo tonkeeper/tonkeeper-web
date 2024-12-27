@@ -23,7 +23,7 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
-import { toTokenRate, useRate } from '../../state/rates';
+import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
@@ -382,6 +382,8 @@ export const TronUSDTPage = () => {
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
+    const { data: rate } = useUSDTRate();
+
     return (
         <DesktopViewPageLayout ref={ref}>
             <DesktopViewHeader backButton borderBottom={true}>
@@ -393,7 +395,12 @@ export const TronUSDTPage = () => {
                     {usdtBalance !== undefined && (
                         <CoinInfoAmounts>
                             <Num3>{usdtBalance.stringAssetRelativeAmount}</Num3>
-                            <Body2>{formatFiatCurrency(fiat, usdtBalance.relativeAmount)}</Body2>
+                            <Body2>
+                                {formatFiatCurrency(
+                                    fiat,
+                                    usdtBalance.relativeAmount.multipliedBy(rate?.prices ?? 0)
+                                )}
+                            </Body2>
                         </CoinInfoAmounts>
                     )}
                 </TronCoinInfoWrapper>
