@@ -169,12 +169,12 @@ const AsideHeaderMultiChainWallet: FC<{ width: number }> = ({ width }) => {
                     <Label2>{name || t('wallet_title')}</Label2>
                     <MultichainLine>
                         <Body3>{t('multichain')}</Body3>
-                        <ChevronDownIcon />
                         <AccountAndWalletBadgesGroup
                             account={account}
                             walletId={account.activeTonWallet.id}
                             size="s"
                         />
+                        <ChevronDownIcon />
                     </MultichainLine>
                 </TextContainer>
                 <WalletEmoji emoji={emoji} emojiSize="24px" containerSize="24px" />

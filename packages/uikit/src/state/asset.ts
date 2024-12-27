@@ -150,6 +150,9 @@ export const useWalletTotalBalance = () => {
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const fiat = useUserFiat();
 
+    const { data: tronBalances } = useTronBalances();
+    const { data: usdtRate } = useUSDTRate();
+
     const client = useQueryClient();
     return useQuery<BigNumber>(
         [QueryKey.total, fiat, assets, tonRate],
@@ -157,13 +160,19 @@ export const useWalletTotalBalance = () => {
             if (!assets) {
                 return new BigNumber(0);
             }
-            return (
-                getTonFiatAmount(client, fiat, assets)
-                    // .plus(getTRC20FiatAmount(client, fiat, assets))
-                    .plus(getJettonsFiatAmount(fiat, assets))
+            const tonAssetsAmount = getTonFiatAmount(client, fiat, assets).plus(
+                getJettonsFiatAmount(fiat, assets)
+            );
+
+            if (!tronBalances || !usdtRate?.prices) {
+                return tonAssetsAmount;
+            }
+
+            return tonAssetsAmount.plus(
+                tronBalances.usdt.relativeAmount.multipliedBy(usdtRate.prices)
             );
         },
-        { enabled: !!assets && !!tonRate }
+        { enabled: !!assets && !!tonRate && !!usdtRate && tronBalances !== undefined }
     );
 };
 
