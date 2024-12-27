@@ -88,6 +88,11 @@ const EnableTronSettings = () => {
     const { mutate: mutateSettings } = useMutateDevSettings();
     const { data: devSettings } = useDevSettings();
 
+    const config = useActiveConfig();
+    if (config.flags?.disable_tron) {
+        return null;
+    }
+
     return (
         <ListBlock>
             <ListItem hover={false}>

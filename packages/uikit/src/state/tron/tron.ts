@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAppContext } from '../../hooks/appContext';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../tonendpoint';
-import { useActiveAccount } from '../wallet';
+import { useActiveAccount, useActiveConfig } from '../wallet';
 import { useMemo } from 'react';
 import { isAccountTronCompatible } from '@tonkeeper/core/dist/entries/account';
 import { TronWallet } from '@tonkeeper/core/dist/entries/tron/tron-wallet';
@@ -26,6 +26,11 @@ export const useTronApi = () => {
 
 export const useIsTronEnabledGlobally = () => {
     const { data: devSettings } = useDevSettings();
+    const config = useActiveConfig();
+
+    if (config.flags?.disable_tron) {
+        return false;
+    }
 
     return devSettings?.tronEnabled;
 };
@@ -43,11 +48,6 @@ export const useCanUseTronForActiveWallet = () => {
 
 export const useActiveTronWallet = (): TronWallet | undefined => {
     const account = useActiveAccount();
-    const isTronEnabled = useIsTronEnabledGlobally();
-
-    if (!isTronEnabled) {
-        return undefined;
-    }
 
     if (isAccountTronCompatible(account)) {
         return account.activeTronWallet;
