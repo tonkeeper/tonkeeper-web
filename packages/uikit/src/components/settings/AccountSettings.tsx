@@ -29,7 +29,7 @@ import {
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
 import { useBatteryEnabledConfig } from '../../state/battery';
-import { useIsTwoFAEnabledGlobally } from '../../state/two-fa';
+import { useCanViewTwoFA } from '../../state/two-fa';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -40,7 +40,7 @@ const SingleAccountSettings = () => {
     const { proFeatures } = useAppContext();
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
-    const twoFAEnabled = useIsTwoFAEnabledGlobally();
+    const twoFAEnabled = useCanViewTwoFA();
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -180,7 +180,7 @@ const MultipleAccountSettings = () => {
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
-    const twoFAEnabled = useIsTwoFAEnabledGlobally();
+    const twoFAEnabled = useCanViewTwoFA();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
 
