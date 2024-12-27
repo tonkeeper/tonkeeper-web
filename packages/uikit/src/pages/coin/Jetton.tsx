@@ -1,13 +1,16 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { AccountsApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
+import { JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import React, { FC, useMemo, useRef } from 'react';
+import React, { FC, Suspense, useMemo, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
-import { CoinSkeletonPage } from '../../components/Skeleton';
+import {
+    ActivitySkeletonPage,
+    CoinSkeletonPage,
+    SkeletonListWithImages
+} from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { ActivityList } from '../../components/activity/ActivityGroup';
+import { MobileActivityList } from '../../components/activity/MobileActivityList';
 import { ActionsRow } from '../../components/home/Actions';
 import { ReceiveAction } from '../../components/home/ReceiveAction';
 import { SwapAction } from '../../components/home/SwapAction';
@@ -16,40 +19,57 @@ import { SendAction } from '../../components/transfer/SendActionButton';
 import { useAppContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
-import { useActiveApi, useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
+import EmptyActivity from '../../components/activity/EmptyActivity';
 
-const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
-    balance,
-    innerRef
-}) => {
-    const api = useActiveApi();
+export const MobileAssetHistory: FC<{
+    assetAddress: string;
+    innerRef: React.RefObject<HTMLDivElement>;
+}> = ({ assetAddress, innerRef }) => {
     const { standalone } = useAppContext();
-    const wallet = useActiveWallet();
 
-    const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
-        queryKey: [balance.walletAddress.address, QueryKey.activity, JettonKey.history],
-        queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
-                accountId: wallet.rawAddress,
-                jettonId: balance.jetton.address,
-                limit: 20,
-                beforeLt: pageParam
-            }),
-        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
-    });
+    const {
+        refetch,
+        isFetched: isActivityFetched,
+        fetchNextPage: fetchActivityNextPage,
+        hasNextPage: hasActivityNextPage,
+        isFetchingNextPage: isActivityFetchingNextPage,
+        data: activity
+    } = useFetchFilteredActivity(assetAddress);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, innerRef);
+    useScrollMonitor(innerRef, 5000, refetch);
+
+    const isFetchingNextPage = isActivityFetchingNextPage;
+
+    useFetchNext(
+        hasActivityNextPage,
+        isFetchingNextPage,
+        fetchActivityNextPage,
+        standalone,
+        innerRef
+    );
+
+    if (!isActivityFetched || !activity) {
+        return <ActivitySkeletonPage />;
+    }
+
+    if (activity.length === 0) {
+        return (
+            <Suspense fallback={<ActivitySkeletonPage />}>
+                <EmptyActivity />
+            </Suspense>
+        );
+    }
 
     return (
-        <ActivityList
-            isFetched={isFetched}
-            isFetchingNextPage={isFetchingNextPage}
-            tonEvents={data}
-        />
+        <>
+            <MobileActivityList items={activity} />
+            {isFetchingNextPage && <SkeletonListWithImages size={3} />}
+        </>
     );
 };
 
@@ -104,7 +124,7 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
                     {swapAsset && <SwapAction fromAsset={swapAsset} />}
                 </ActionsRow>
 
-                <JettonHistory balance={balance} innerRef={ref} />
+                <MobileAssetHistory assetAddress={balance.jetton.address} innerRef={ref} />
             </InnerBody>
         </>
     );

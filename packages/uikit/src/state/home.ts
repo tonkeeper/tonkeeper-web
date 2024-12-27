@@ -35,11 +35,11 @@ export const useAssets = () => {
 };
 
 export const useAllChainsAssets = () => {
-    const [assets] = useAssets();
+    const [assets, error, _, jettonError] = useAssets();
     const { data: config } = useActiveTonWalletConfig();
 
-    return useMemo<AssetAmount[] | undefined>(() => {
-        if (!assets || !config) return undefined;
+    return useMemo<{ assets: AssetAmount[] | undefined; error: Error | undefined }>(() => {
+        if (!assets || !config) return { assets: undefined, error: undefined };
 
         const result: AssetAmount[] = [
             new AssetAmount({ asset: TON_ASSET, weiAmount: assets.ton.info.balance })
@@ -69,8 +69,8 @@ export const useAllChainsAssets = () => {
                 result.push(jettonToTonAssetAmount(b));
             });
 
-        return result;
-    }, [assets, config]);
+        return { assets: result, error: error ?? jettonError ?? undefined };
+    }, [assets, error, jettonError, config]);
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

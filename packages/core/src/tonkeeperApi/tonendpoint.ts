@@ -86,13 +86,13 @@ export interface TonendpointConfig {
      */
     tablet_enable_additional_security?: boolean;
 
-  '2fa_public_key'?: string;
-  '2fa_api_url'?: string;
-  '2fa_tg_confirm_send_message_ttl_seconds'?: number;
-  '2fa_tg_linked_ttl_seconds'?: number;
-  '2fa_bot_url'?: string;
+    '2fa_public_key'?: string;
+    '2fa_api_url'?: string;
+    '2fa_tg_confirm_send_message_ttl_seconds'?: number;
+    '2fa_tg_linked_ttl_seconds'?: number;
+    '2fa_bot_url'?: string;
 
-  tron_api_url?: string;
+    tron_api_url?: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';

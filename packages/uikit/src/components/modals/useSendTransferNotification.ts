@@ -12,8 +12,8 @@ export const useSendTransferNotification = () => {
                 id: Date.now(),
                 params: {
                     ...params,
-                    from: 'wallet'
-                }
+                    from: 'wallet' as const
+                } as TransferInitParams
             });
         },
         [sdk]

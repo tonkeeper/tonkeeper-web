@@ -66,7 +66,7 @@ const TRCBadge = styled(Badge)`
 
 export const AssetHistoryFilter = () => {
     const { t } = useTranslation();
-    const assets = useAllChainsAssets();
+    const { assets } = useAllChainsAssets();
     const { asset: selectedAsset, setAsset } = useHistoryFilters();
     if (!assets) {
         return null;

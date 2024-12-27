@@ -6,10 +6,9 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { QueryKey } from '../../libs/queryKey';
-import { useActiveAccount, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
+import { useActiveAccount, useActiveWallet } from '../../state/wallet';
 import { Body3, Label2, Num2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
-import { AssetData } from './Jettons';
 import { useWalletTotalBalance } from '../../state/asset';
 import { useTranslation } from '../../hooks/translation';
 import { AccountAndWalletBadgesGroup, NetworkBadge } from '../account/AccountBadge';
@@ -88,7 +87,6 @@ export const BalanceSkeleton = () => {
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
-    assets: AssetData;
 }> = ({ error, isFetching }) => {
     const { t } = useTranslation();
     const account = useActiveAccount();

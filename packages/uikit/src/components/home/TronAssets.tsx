@@ -1,4 +1,4 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, forwardRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat } from '../../state/rates';
@@ -7,13 +7,13 @@ import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TronBalances } from '../../state/tron/tron';
 import { Button } from '../fields/Button';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useAddTronToAccount } from '../../state/wallet';
 import styled from 'styled-components';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const usdtRate = {
     diff7d: '',
@@ -33,10 +33,13 @@ const tronAssetRate = (asset: TronAsset) => {
     return undefined;
 };
 
-const TronAssetComponent: FC<{ assetAmount: AssetAmount<TronAsset>; className?: string }> = ({
-    assetAmount,
-    className
-}) => {
+export const TronAssetComponent = forwardRef<
+    HTMLDivElement,
+    {
+        assetAmount: AssetAmount<TronAsset>;
+        className?: string;
+    }
+>(({ assetAmount, className }, ref) => {
     const navigate = useNavigate();
 
     const rate = useMemo(() => tronAssetRate(assetAmount.asset), [assetAmount.asset.id]);
@@ -47,6 +50,7 @@ const TronAssetComponent: FC<{ assetAmount: AssetAmount<TronAsset>; className?: 
         <ListItem
             onClick={() => navigate(AppRoute.coins + '/' + assetAmount.asset.id)}
             className={className}
+            ref={ref}
         >
             <ListItemPayload>
                 {assetAmount.asset.id === TRON_USDT_ASSET.id ? (
@@ -66,13 +70,14 @@ const TronAssetComponent: FC<{ assetAmount: AssetAmount<TronAsset>; className?: 
             </ListItemPayload>
         </ListItem>
     );
-};
+});
 
 const InactiveUSDA: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { fiat } = useAppContext();
 
     const { mutate, isLoading } = useAddTronToAccount();
+    const isFullWidth = useIsFullWidthMode();
 
     return (
         <ListItem className={className}>
@@ -87,7 +92,12 @@ const InactiveUSDA: FC<{ className?: string }> = ({ className }) => {
                     label="TRC20"
                     rate={usdtRate}
                 />
-                <Button secondary size="small" loading={isLoading} onClick={() => mutate()}>
+                <Button
+                    {...(isFullWidth ? { secondary: true } : { primary: true })}
+                    size="small"
+                    loading={isLoading}
+                    onClick={() => mutate()}
+                >
                     {t('activate')}
                 </Button>
             </ListItemPayload>
@@ -95,11 +105,16 @@ const InactiveUSDA: FC<{ className?: string }> = ({ className }) => {
     );
 };
 
-export const TronAssets: FC<{ balances: TronBalances; className?: string }> = React.memo(
-    ({ balances, className }) => {
-        if (!balances) {
+export const TronAssets: FC<{ usdt: AssetAmount | null; className?: string }> = React.memo(
+    ({ usdt, className }) => {
+        if (!usdt) {
             return <InactiveUSDA className={className} />;
         }
-        return <TronAssetComponent assetAmount={balances.usdt} className={className} />;
+        return (
+            <TronAssetComponent
+                assetAmount={usdt as AssetAmount<TronAsset>}
+                className={className}
+            />
+        );
     }
 );
