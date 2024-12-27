@@ -10,12 +10,7 @@ import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/ut
 import { MultisigConfig } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/types';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
-import {
-    TwoFAWalletConfig,
-    useIsTwoFAEnabledGlobally,
-    useTwoFAApi,
-    useTwoFAServiceConfig
-} from '../../../state/two-fa';
+import { TwoFAWalletConfig, useTwoFAApi, useTwoFAServiceConfig } from '../../../state/two-fa';
 import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
 import { QueryKey } from '../../../libs/queryKey';
 
@@ -24,7 +19,6 @@ export const useEstimateDeployMultisig = () => {
     const rawTransactionService = useTonRawTransactionService();
     const api = useActiveApi();
 
-    const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
     const queryClient = useQueryClient();
     const twoFaApi = useTwoFAApi();
     const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
@@ -51,8 +45,7 @@ export const useEstimateDeployMultisig = () => {
 
         const twoFaConfig = queryClient.getQueryData<TwoFAWalletConfig>([
             QueryKey.twoFAWalletConfig,
-            walletState.id,
-            isTwoFAEnabledGlobally
+            walletState.id
         ]);
 
         let sender;

@@ -56,6 +56,10 @@ const twoFaWalletConfigStorageKey = (walletId: string) =>
 
 export const useIsTwoFAEnabledGlobally = () => {
     const { data: settings } = useDevSettings();
+    const config = useActiveConfig();
+    if (config.flags?.disable_2fa) {
+        return false;
+    }
 
     return settings?.twoFAEnabled ?? false;
 };
@@ -129,7 +133,6 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
     const sdk = useAppSdk();
     const activeAccount = useActiveAccount();
     const account = options?.account ?? activeAccount;
-    const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
 
     const wallet = options?.walletId
         ? account.getTonWallet(options.walletId)!
@@ -142,7 +145,7 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
 
     const isEnabled = isSuitableAccount;
     const query = useQuery<TwoFAWalletConfig>(
-        [QueryKey.twoFAWalletConfig, wallet.id, isTwoFAEnabledGlobally],
+        [QueryKey.twoFAWalletConfig, wallet.id],
         async () => {
             const twoFAEncoder = new TwoFAEncoder(api, wallet.rawAddress);
             const twoFAState = await new TwoFAEncoder(api, wallet.rawAddress).getPluginState();

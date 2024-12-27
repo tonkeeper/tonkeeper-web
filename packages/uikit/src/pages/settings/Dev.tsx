@@ -12,6 +12,7 @@ import { Switch } from '../../components/fields/Switch';
 import { Badge } from '../../components/shared';
 import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
+import { useActiveConfig } from '../../state/wallet';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -58,6 +59,11 @@ const TextAndBadge = styled.div`
 const EnableTwoFASettings = () => {
     const { mutate: mutateSettings } = useMutateDevSettings();
     const { data: devSettings } = useDevSettings();
+
+    const config = useActiveConfig();
+    if (config.flags?.disable_2fa) {
+        return null;
+    }
 
     return (
         <ListBlock>
