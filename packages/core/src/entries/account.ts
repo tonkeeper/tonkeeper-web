@@ -148,7 +148,7 @@ export class AccountTonMnemonic extends TonMnemonic {
         activeTonWalletId: WalletId;
         tonWallets: TonWalletStandard[];
         mnemonicType: MnemonicType;
-        networks: {
+        networks?: {
             tron: TronWallet;
         };
     }) {

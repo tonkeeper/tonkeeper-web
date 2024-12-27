@@ -235,6 +235,7 @@ export const createStandardTonAccountByMnemonic = async (
     options: {
         versions?: WalletVersion[];
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+        generateTronWallet?: boolean;
     }
 ) => {
     const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets, tronWallet } =
@@ -255,9 +256,11 @@ export const createStandardTonAccountByMnemonic = async (
         activeTonWalletId: walletIdToActivate,
         tonWallets: wallets,
         mnemonicType,
-        networks: {
-            tron: tronWallet
-        }
+        networks: options?.generateTronWallet
+            ? {
+                  tron: tronWallet
+              }
+            : undefined
     });
 };
 
@@ -549,6 +552,7 @@ export const createMAMAccountByMnemonic = async (
     options: {
         selectedDerivations?: number[];
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+        generateTronWallet?: boolean;
     }
 ) => {
     const rootAccount = await TonKeychainRoot.fromMnemonic(rootMnemonic, {
@@ -617,7 +621,9 @@ export const createMAMAccountByMnemonic = async (
                     index: w.derivationIndex,
                     tonWallets,
                     activeTonWalletId: tonWallets[0].id,
-                    tronWallet: await tronWalletByTonMnemonic(w.tonAccount.mnemonics)
+                    tronWallet: options?.generateTronWallet
+                        ? await tronWalletByTonMnemonic(w.tonAccount.mnemonics)
+                        : undefined
                 },
                 shouldAdd: w.shouldAdd
             };
