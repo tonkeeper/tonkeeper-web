@@ -1,5 +1,7 @@
 import { RefObject, useEffect, useLayoutEffect, useRef } from 'react';
 
+function useEventListener(): void;
+
 function useEventListener<K extends keyof MediaQueryListEventMap>(
     eventName: K,
     handler: (event: MediaQueryListEventMap[K]) => void,
@@ -37,8 +39,8 @@ function useEventListener<
     KM extends keyof MediaQueryListEventMap,
     T extends HTMLElement | MediaQueryList | void = void
 >(
-    eventName: KW | KH | KM,
-    handler: (
+    eventName?: KW | KH | KM,
+    handler?: (
         event: WindowEventMap[KW] | HTMLElementEventMap[KH] | MediaQueryListEventMap[KM] | Event
     ) => void,
     element?: RefObject<T>,
@@ -51,11 +53,14 @@ function useEventListener<
     }, [handler]);
 
     useEffect(() => {
+        if (!eventName) {
+            return;
+        }
         const targetElement: T | Window = element?.current ?? window;
 
         if (!(targetElement && targetElement.addEventListener)) return;
 
-        const listener: typeof handler = event => savedHandler.current(event);
+        const listener: typeof handler = event => savedHandler.current!(event);
 
         targetElement.addEventListener(eventName, listener, options);
 

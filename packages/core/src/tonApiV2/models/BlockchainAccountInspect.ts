@@ -18,6 +18,7 @@ import {
     BlockchainAccountInspectMethodsInnerFromJSON,
     BlockchainAccountInspectMethodsInnerFromJSONTyped,
     BlockchainAccountInspectMethodsInnerToJSON,
+    BlockchainAccountInspectMethodsInnerToJSONTyped,
 } from './BlockchainAccountInspectMethodsInner';
 
 /**
@@ -89,10 +90,15 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function BlockchainAccountInspectToJSON(value?: BlockchainAccountInspect | null): any {
+  export function BlockchainAccountInspectToJSON(json: any): BlockchainAccountInspect {
+      return BlockchainAccountInspectToJSONTyped(json, false);
+  }
+
+  export function BlockchainAccountInspectToJSONTyped(value?: BlockchainAccountInspect | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'code': value['code'],

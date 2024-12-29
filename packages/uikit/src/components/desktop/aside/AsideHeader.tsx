@@ -8,6 +8,7 @@ import { AsideHeaderPreferences } from './AsideHeaderPreferences';
 import { AsideHeaderDiscover } from './AsideHeaderDiscover';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../Error';
+import { AsideHeaderAccount } from './AsideHeaderAccount';
 
 export const AsideHeaderContent: FC<{ width: number }> = ({ width }) => {
     const route = useAsideActiveRoute();
@@ -26,6 +27,10 @@ export const AsideHeaderContent: FC<{ width: number }> = ({ width }) => {
 
     if (route === AppRoute.browser) {
         return <AsideHeaderDiscover width={width} />;
+    }
+
+    if (route === AppRoute.accountSettings) {
+        return <AsideHeaderAccount width={width} />;
     }
 
     return <AsideHeaderContainer width={width} />;

@@ -10,6 +10,7 @@ import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
 import { LinkNft } from './LinkNft';
 import { RenewNft } from './RenewNft';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const getMarketplaceUrl = (nftItem: NftItem) => {
     const { marketplace } = nftItem.metadata;
@@ -29,18 +30,20 @@ const ViewOnMarketButton: FC<{ url: string }> = ({ url }) => {
     const sdk = useAppSdk();
 
     return (
-        <Button
-            size="large"
-            secondary
-            fullWidth
-            onClick={e => {
-                e.preventDefault();
-                e.stopPropagation();
-                sdk.openPage(url);
-            }}
-        >
-            {t('nft_open_in_marketplace')}
-        </Button>
+        <HideOnReview>
+            <Button
+                size="large"
+                secondary
+                fullWidth
+                onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    sdk.openPage(url);
+                }}
+            >
+                {t('nft_open_in_marketplace')}
+            </Button>
+        </HideOnReview>
     );
 };
 const ActionTransfer: FC<{

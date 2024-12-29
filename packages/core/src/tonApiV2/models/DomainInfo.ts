@@ -18,6 +18,7 @@ import {
     NftItemFromJSON,
     NftItemFromJSONTyped,
     NftItemToJSON,
+    NftItemToJSONTyped,
 } from './NftItem';
 
 /**
@@ -70,10 +71,15 @@ export function DomainInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function DomainInfoToJSON(value?: DomainInfo | null): any {
+  export function DomainInfoToJSON(json: any): DomainInfo {
+      return DomainInfoToJSONTyped(json, false);
+  }
+
+  export function DomainInfoToJSONTyped(value?: DomainInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

@@ -10,6 +10,14 @@
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]
         },
+        "build:swap-widget": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
+        "build:ipad": {
+            "dependsOn": ["^build:pkg"],
+            "outputs": [".next/**", "dist/**"]
+        },
         "build:twa": {
             "dependsOn": ["^build:pkg"],
             "outputs": [".next/**", "dist/**"]

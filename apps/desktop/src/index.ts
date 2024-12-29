@@ -9,7 +9,7 @@ import {
     setProtocolHandlerOSX,
     setProtocolHandlerWindowsLinux
 } from './electron/protocol';
-import { TonConnectSSE } from './electron/sseEvetns';
+import { tonConnectSSE } from './electron/sseEvetns';
 
 app.setName('Tonkeeper Pro');
 
@@ -21,22 +21,19 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
-const connection = TonConnectSSE.getInstance();
-
-
 const onUnLock = () => {
     log.info('unlock-screen');
-    connection.reconnect();
+    tonConnectSSE.reconnect();
 };
 
-if (process.platform != "linux") {
+if (process.platform != 'linux') {
     powerMonitor.on('unlock-screen', onUnLock);
 }
 
 app.on('before-quit', async e => {
     e.preventDefault();
-    connection.destroy();
-    if (process.platform != "linux") {
+    tonConnectSSE.destroy();
+    if (process.platform != 'linux') {
         powerMonitor.off('unlock-screen', onUnLock);
     }
 

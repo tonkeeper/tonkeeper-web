@@ -1,0 +1,135 @@
+name: Tonkeeper iPad Build
+on:
+    workflow_call:
+        secrets:
+            APP_STORE_CONNECT_TEAM_ID:
+                required: true
+            APPLE_API_ISSUER:
+                required: true
+            APPLE_API_KEY:
+                required: true
+            APPLE_API_KEY_ID:
+                required: true
+            BUILD_CERTIFICATE_BASE64:
+                required: true
+            BUILD_CERTIFICATE_PASSPHRASE:
+                required: true
+            BUILD_PROVISION_PROFILE_BASE64:
+                required: true
+            REACT_APP_MEASUREMENT_ID:
+                required: true
+            VITE_APP_APTABASE:
+                required: true
+            REACT_APP_TG_BOT_ID:
+                required: true
+            REACT_APP_STONFI_REFERRAL_ADDRESS:
+                required: true
+env:
+    node-version: 20.18.1
+    ruby-version: 3.3.6
+
+jobs:
+    ipad-build:
+        name: ipad-build
+        runs-on: macos-15
+        timeout-minutes: 20
+
+        steps:
+            - name: Checkout to git repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.node-version }}
+
+            - name: Pods cache
+              uses: actions/cache@v4
+              with:
+                  path: ./apps/tablet/ios/App/Pods
+                  key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pods-
+
+            - name: Set up Ruby and Gemfile dependencies
+              uses: ruby/setup-ruby@v1
+              with:
+                  ruby-version: ${{ env.ruby-version }}
+                  bundler-cache: true
+                  working-directory: './apps/tablet'
+
+            - name: Enable Corepack
+              run: |
+                  corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
+            - name: Run install
+              uses: borales/actions-yarn@v5
+              with:
+                  cmd: install
+
+            - name: Install pods dependencies
+              working-directory: ./apps/tablet/ios/App
+              run: bundle exec pod install
+
+            - name: Run build js and capacitor
+              uses: borales/actions-yarn@v5
+              env:
+                  VITE_APP_AMPLITUDE: ''
+                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
+                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
+                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
+                  VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
+                  VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
+                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
+              with:
+                  cmd: build:ipad
+
+            - name: Build & upload iOS binary
+              working-directory: ./apps/tablet
+              run: bundle exec fastlane ios beta
+              env:
+                  APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
+                  BUNDLE_IDENTIFIER: com.tonapps.tonkeeperpro
+                  BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+                  P12_PASSWORD: ${{ secrets.BUILD_CERTIFICATE_PASSPHRASE }}
+                  APPLE_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+                  APPLE_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER }}
+                  APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
+                  APPLE_PROFILE_NAME: GitHub CI/CD iPad
+                  BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+
+            - name: Upload logs to artifacts
+              uses: actions/upload-artifact@v3
+              if: failure()
+              with:
+                  name: gum-logs
+                  path: /Users/runner/Library/Logs/gym/*.log
+
+            - name: Summary
+              run: |
+                  echo '### Successful iPad build 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
+                  echo 'The app with build version: ${{ env.VERSION_CODE }}(${{ env.BUILD_CODE }})' >> $GITHUB_STEP_SUMMARY
+                  echo 'Uploaded to TestFlight' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              if: github.event_name == 'pull_request'
+              with:
+                  message: |
+                      ### Successful iPad build 🚀🚀🚀
+                      Well done!
+                      The app with build version: ${{ env.VERSION_CODE }}(${{ env.BUILD_CODE }})
+                      Uploaded to TestFlight
+                  comment-tag: ipad_build

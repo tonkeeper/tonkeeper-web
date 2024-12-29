@@ -18,18 +18,21 @@ import {
     PriceFromJSON,
     PriceFromJSONTyped,
     PriceToJSON,
+    PriceToJSONTyped,
 } from './Price';
 import type { NftItem } from './NftItem';
 import {
     NftItemFromJSON,
     NftItemFromJSONTyped,
     NftItemToJSON,
+    NftItemToJSONTyped,
 } from './NftItem';
 import type { AccountAddress } from './AccountAddress';
 import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -112,10 +115,15 @@ export function AuctionBidActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function AuctionBidActionToJSON(value?: AuctionBidAction | null): any {
+  export function AuctionBidActionToJSON(json: any): AuctionBidAction {
+      return AuctionBidActionToJSONTyped(json, false);
+  }
+
+  export function AuctionBidActionToJSONTyped(value?: AuctionBidAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'auction_type': value['auctionType'],

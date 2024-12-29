@@ -16,10 +16,10 @@
 import * as runtime from '../runtime';
 import type {
   AccountEvent,
-  DecodeMessageRequest,
   DecodedMessage,
   EmulateMessageToWalletRequest,
   Event,
+  GaslessEstimateRequestMessagesInner,
   MessageConsequences,
   StatusDefaultResponse,
   Trace,
@@ -27,14 +27,14 @@ import type {
 import {
     AccountEventFromJSON,
     AccountEventToJSON,
-    DecodeMessageRequestFromJSON,
-    DecodeMessageRequestToJSON,
     DecodedMessageFromJSON,
     DecodedMessageToJSON,
     EmulateMessageToWalletRequestFromJSON,
     EmulateMessageToWalletRequestToJSON,
     EventFromJSON,
     EventToJSON,
+    GaslessEstimateRequestMessagesInnerFromJSON,
+    GaslessEstimateRequestMessagesInnerToJSON,
     MessageConsequencesFromJSON,
     MessageConsequencesToJSON,
     StatusDefaultResponseFromJSON,
@@ -43,25 +43,25 @@ import {
     TraceToJSON,
 } from '../models/index';
 
-export interface DecodeMessageOperationRequest {
-    decodeMessageRequest: DecodeMessageRequest;
+export interface DecodeMessageRequest {
+    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
 }
 
 export interface EmulateMessageToAccountEventRequest {
     accountId: string;
-    decodeMessageRequest: DecodeMessageRequest;
+    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
     acceptLanguage?: string;
     ignoreSignatureCheck?: boolean;
 }
 
 export interface EmulateMessageToEventRequest {
-    decodeMessageRequest: DecodeMessageRequest;
+    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
     acceptLanguage?: string;
     ignoreSignatureCheck?: boolean;
 }
 
 export interface EmulateMessageToTraceRequest {
-    decodeMessageRequest: DecodeMessageRequest;
+    gaslessEstimateRequestMessagesInner: GaslessEstimateRequestMessagesInner;
     ignoreSignatureCheck?: boolean;
 }
 
@@ -79,22 +79,22 @@ export interface EmulateMessageToWalletOperationRequest {
 export interface EmulationApiInterface {
     /**
      * Decode a given message. Only external incoming messages can be decoded currently.
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
+     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EmulationApiInterface
      */
-    decodeMessageRaw(requestParameters: DecodeMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DecodedMessage>>;
+    decodeMessageRaw(requestParameters: DecodeMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DecodedMessage>>;
 
     /**
      * Decode a given message. Only external incoming messages can be decoded currently.
      */
-    decodeMessage(requestParameters: DecodeMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DecodedMessage>;
+    decodeMessage(requestParameters: DecodeMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DecodedMessage>;
 
     /**
      * Emulate sending message to blockchain
      * @param {string} accountId account ID
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
+     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {string} [acceptLanguage] 
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
@@ -110,7 +110,7 @@ export interface EmulationApiInterface {
 
     /**
      * Emulate sending message to blockchain
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
+     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {string} [acceptLanguage] 
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
@@ -126,7 +126,7 @@ export interface EmulationApiInterface {
 
     /**
      * Emulate sending message to blockchain
-     * @param {DecodeMessageRequest} decodeMessageRequest bag-of-cells serialized to hex
+     * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -164,11 +164,11 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     /**
      * Decode a given message. Only external incoming messages can be decoded currently.
      */
-    async decodeMessageRaw(requestParameters: DecodeMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DecodedMessage>> {
-        if (requestParameters['decodeMessageRequest'] == null) {
+    async decodeMessageRaw(requestParameters: DecodeMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<DecodedMessage>> {
+        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
             throw new runtime.RequiredError(
-                'decodeMessageRequest',
-                'Required parameter "decodeMessageRequest" was null or undefined when calling decodeMessage().'
+                'gaslessEstimateRequestMessagesInner',
+                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling decodeMessage().'
             );
         }
 
@@ -183,7 +183,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
+            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => DecodedMessageFromJSON(jsonValue));
@@ -192,7 +192,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     /**
      * Decode a given message. Only external incoming messages can be decoded currently.
      */
-    async decodeMessage(requestParameters: DecodeMessageOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DecodedMessage> {
+    async decodeMessage(requestParameters: DecodeMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DecodedMessage> {
         const response = await this.decodeMessageRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -208,10 +208,10 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             );
         }
 
-        if (requestParameters['decodeMessageRequest'] == null) {
+        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
             throw new runtime.RequiredError(
-                'decodeMessageRequest',
-                'Required parameter "decodeMessageRequest" was null or undefined when calling emulateMessageToAccountEvent().'
+                'gaslessEstimateRequestMessagesInner',
+                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToAccountEvent().'
             );
         }
 
@@ -234,7 +234,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
+            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventFromJSON(jsonValue));
@@ -252,10 +252,10 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToEventRaw(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>> {
-        if (requestParameters['decodeMessageRequest'] == null) {
+        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
             throw new runtime.RequiredError(
-                'decodeMessageRequest',
-                'Required parameter "decodeMessageRequest" was null or undefined when calling emulateMessageToEvent().'
+                'gaslessEstimateRequestMessagesInner',
+                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToEvent().'
             );
         }
 
@@ -278,7 +278,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
+            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => EventFromJSON(jsonValue));
@@ -296,10 +296,10 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
      * Emulate sending message to blockchain
      */
     async emulateMessageToTraceRaw(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>> {
-        if (requestParameters['decodeMessageRequest'] == null) {
+        if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
             throw new runtime.RequiredError(
-                'decodeMessageRequest',
-                'Required parameter "decodeMessageRequest" was null or undefined when calling emulateMessageToTrace().'
+                'gaslessEstimateRequestMessagesInner',
+                'Required parameter "gaslessEstimateRequestMessagesInner" was null or undefined when calling emulateMessageToTrace().'
             );
         }
 
@@ -318,7 +318,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: DecodeMessageRequestToJSON(requestParameters['decodeMessageRequest']),
+            body: GaslessEstimateRequestMessagesInnerToJSON(requestParameters['gaslessEstimateRequestMessagesInner']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => TraceFromJSON(jsonValue));

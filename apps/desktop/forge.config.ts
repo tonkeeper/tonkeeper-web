@@ -3,6 +3,7 @@ import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerRpm } from '@electron-forge/maker-rpm';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
+import MakerAppImage from '@pengx17/electron-forge-maker-appimage';
 import { AutoUnpackNativesPlugin } from '@electron-forge/plugin-auto-unpack-natives';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
 import { PublisherGithub } from '@electron-forge/publisher-github';
@@ -103,7 +104,17 @@ const config: ForgeConfig = {
                 options: { ...devAndRpmOptions, compression: 'xz' } as MakerDebConfigOptions
             },
             ['linux']
-        )
+        ),
+        ...(process.argv[3] === 'x64'
+            ? [
+                  new MakerAppImage(
+                      {
+                          options: devAndRpmOptions
+                      },
+                      ['linux']
+                  )
+              ]
+            : [])
     ],
     plugins: [
         new AutoUnpackNativesPlugin({}),

@@ -1,20 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import {
-    ConnectTransferError,
-    EstimateData,
-    estimateTonConnectTransfer,
-    sendTonConnectTransfer,
-    tonConnectTransferError
-} from '@tonkeeper/core/dist/service/transfer/tonService';
-import { FC, useCallback, useEffect } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
-import { getSigner } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import { CheckmarkCircleIcon, ErrorIcon, ExclamationMarkCircleIcon } from '../Icon';
 import {
     Notification,
@@ -28,12 +18,29 @@ import {
 import { SkeletonListWithImages } from '../Skeleton';
 import { H2, Label2, Label3 } from '../Text';
 import { Button } from '../fields/Button';
-import { ResultButton } from '../transfer/common';
+import { MainButton, ResultButton, TransferViewHeaderBlock } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
-import { useActiveStandardTonWallet, useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import { useIsActiveAccountMultisig } from '../../state/multisig';
+import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
+import { MultisigOrderFormView } from '../transfer/MultisigOrderFormView';
+import { useTonConnectTransactionService } from '../../hooks/blockchain/useBlockchainService';
+import {
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    SenderChoice,
+    SenderChoiceUserAvailable,
+    useGetEstimationSender,
+    useGetSender,
+    useTonConnectAvailableSendersChoices
+} from '../../hooks/blockchain/useSender';
+import { useToQueryKeyPart } from '../../hooks/useToQueryKeyPart';
+import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
+import { ActionFeeDetailsUniversal, SelectSenderDropdown } from '../activity/NotificationCommon';
+import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -56,26 +63,45 @@ const ButtonRowStyled = styled.div`
     }
 `;
 
-const useSendMutation = (params: TonConnectTransactionPayload, waitInvalidation?: boolean) => {
+const useSendMutation = (
+    params: TonConnectTransactionPayload,
+    estimate: TonEstimationDetailed,
+    options: {
+        senderChoice: SenderChoice;
+        multisigTTL?: MultisigOrderLifetimeMinutes;
+        waitInvalidation?: boolean;
+    }
+) => {
     const account = useActiveAccount();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
     const client = useQueryClient();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const getSender = useGetSender();
+    const tonConenctService = useTonConnectTransactionService();
 
     return useMutation<string, Error>(async () => {
-        if (!isAccountControllable(account)) {
-            throw new Error("Can't estimate when account is not controllable");
+        if (account.type === 'watch-only') {
+            throw new Error('Cant use this account');
         }
 
-        const signer = await getSigner(sdk, account.id, checkTouchId);
+        let sender: Sender;
+        if (account.type === 'ton-multisig') {
+            if (!options.multisigTTL) {
+                throw new Error('TTL must be specified for multisig sending');
+            }
 
-        const boc = await sendTonConnectTransfer(api, account, params, signer);
+            sender = await getSender({
+                type: 'multisig',
+                ttlSeconds: 60 * Number(options.multisigTTL)
+            });
+        } else {
+            sender = await getSender(options.senderChoice);
+        }
+
+        const boc = await tonConenctService.send(sender, estimate, params);
 
         const invalidationPromise = client.invalidateQueries(
             anyOfKeysParts(account.id, account.activeTonWallet.id)
         );
-        if (waitInvalidation) {
+        if (options.waitInvalidation) {
             await invalidationPromise;
         }
         return boc;
@@ -127,50 +153,56 @@ const ResultButtonErrored = styled(ResultButton)`
     height: fit-content;
 `;
 
-const NotificationIssue: FC<{
-    kind: 'not-enough-balance';
-    handleClose: (result?: string) => void;
-}> = ({ handleClose }) => {
-    const { t } = useTranslation();
-
-    return (
-        <NotificationBlock>
-            <ErrorStyled>
-                <ErrorIcon />
-                <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
-            </ErrorStyled>
-
-            <ButtonGap />
-            <NotificationFooterPortal>
-                <NotificationFooter>
-                    <ButtonRowStyled>
-                        <Button size="large" type="button" onClick={() => handleClose()}>
-                            {t('notifications_alert_cancel')}
-                        </Button>
-                    </ButtonRowStyled>
-                </NotificationFooter>
-            </NotificationFooterPortal>
-        </NotificationBlock>
-    );
-};
+const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
+    background-color: transparent;
+    width: 100%;
+    margin-top: -24px;
+`;
 
 const ConnectContent: FC<{
     params: TonConnectTransactionPayload;
     handleClose: (result?: string) => void;
     waitInvalidation?: boolean;
-}> = ({ params, handleClose, waitInvalidation }) => {
+    multisigTTL?: MultisigOrderLifetimeMinutes;
+}> = ({ params, handleClose, waitInvalidation, multisigTTL }) => {
     const sdk = useAppSdk();
 
     const { t } = useTranslation();
 
-    const { data: issues, isFetched } = useTransactionError(params);
-    const { data: estimate, isLoading: isEstimating, isError } = useEstimation(params, isFetched);
+    const { data: availableSendersChoices } = useTonConnectAvailableSendersChoices(params);
+    const [selectedSenderType, onSenderTypeChange] = useState<SenderChoiceUserAvailable['type']>(
+        EXTERNAL_SENDER_CHOICE.type
+    );
+    useEffect(() => {
+        if (availableSendersChoices && availableSendersChoices[0]) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [availableSendersChoices]);
+
+    const senderChoice: SenderChoice = useMemo(() => {
+        if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
+            return BATTERY_SENDER_CHOICE;
+        }
+
+        if (selectedSenderType === EXTERNAL_SENDER_CHOICE.type) {
+            return EXTERNAL_SENDER_CHOICE;
+        }
+
+        throw new Error('Unexpected sender choice');
+    }, [selectedSenderType]);
+
+    const {
+        data: estimate,
+        isLoading: isEstimating,
+        isError,
+        error
+    } = useEstimation(params, senderChoice);
     const {
         mutateAsync,
         isLoading,
         error: sendError,
         data: sendResult
-    } = useSendMutation(params, waitInvalidation);
+    } = useSendMutation(params, estimate!, { multisigTTL, waitInvalidation, senderChoice });
 
     useEffect(() => {
         if (sdk.twaExpand) {
@@ -190,10 +222,6 @@ const ConnectContent: FC<{
         }
     };
 
-    if (issues?.kind !== undefined) {
-        return <NotificationIssue kind={issues?.kind} handleClose={handleClose} />;
-    }
-
     if (isEstimating) {
         return <NotificationSkeleton handleClose={handleClose} />;
     }
@@ -203,7 +231,29 @@ const ConnectContent: FC<{
 
     return (
         <NotificationBlock>
-            <EmulationList isError={isError} estimate={estimate} />
+            {error && error instanceof NotEnoughBalanceError ? (
+                <>
+                    <ErrorStyled>
+                        <ErrorIcon />
+                        <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
+                    </ErrorStyled>
+                    <SelectSenderDropdown
+                        availableSendersChoices={availableSendersChoices}
+                        onSenderTypeChange={onSenderTypeChange}
+                        selectedSenderType={selectedSenderType}
+                    />
+                </>
+            ) : (
+                <EmulationList isError={isError} event={estimate?.event} hideExtraDetails />
+            )}
+            {!!estimate?.extra && (
+                <ActionFeeDetailsUniversalStyled
+                    availableSendersChoices={availableSendersChoices}
+                    selectedSenderType={selectedSenderType}
+                    onSenderTypeChange={onSenderTypeChange}
+                    extra={estimate.extra}
+                />
+            )}
             <ButtonGap />
             <NotificationFooterPortal>
                 <NotificationFooter>
@@ -234,7 +284,7 @@ const ConnectContent: FC<{
                                 type="button"
                                 primary
                                 loading={isLoading}
-                                disabled={isLoading}
+                                disabled={isLoading || isError}
                                 onClick={onSubmit}
                             >
                                 {t('confirm')}
@@ -247,30 +297,33 @@ const ConnectContent: FC<{
     );
 };
 
-const useEstimation = (params: TonConnectTransactionPayload, errorFetched: boolean) => {
-    const { api } = useAppContext();
+const useEstimation = (params: TonConnectTransactionPayload, senderChoice: SenderChoice) => {
     const account = useActiveAccount();
+    const accounts = useAccountsState();
 
-    return useQuery<EstimateData, Error>(
-        [QueryKey.estimate, params],
+    const getSender = useGetEstimationSender(senderChoice);
+    const getSenderKey = useToQueryKeyPart(getSender);
+    const tonConenctService = useTonConnectTransactionService();
+
+    return useQuery<TonEstimationDetailed, Error>(
+        [QueryKey.estimate, params, account, accounts, getSenderKey],
         async () => {
-            if (!isAccountControllable(account)) {
-                throw new Error("Can't estimate when account is not controllable");
+            if (account.type === 'watch-only') {
+                throw new Error('Cant use this account');
             }
-            const accountEvent = await estimateTonConnectTransfer(api, account, params);
-            return { accountEvent };
+
+            const sender = await getSender!();
+
+            const result = await tonConenctService.estimate(sender, params);
+
+            if (!isTonEstimationDetailed(result)) {
+                throw new Error("Can't get estimation details");
+            }
+
+            return result;
         },
-        { enabled: errorFetched }
+        { enabled: !!getSender }
     );
-};
-
-const useTransactionError = (params: TonConnectTransactionPayload) => {
-    const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
-
-    return useQuery<ConnectTransferError, Error>([QueryKey.estimate, 'error', params], async () => {
-        return tonConnectTransferError(api, wallet, params);
-    });
 };
 
 const NotificationTitleRowStyled = styled(NotificationTitleRow)`
@@ -301,27 +354,64 @@ export const TonTransactionNotification: FC<{
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
     const wallets = useAccountsState();
+    const isActiveAccountMultisig = useIsActiveAccountMultisig();
+    const [multisigTTL, setMultisigTTL] = useState<MultisigOrderLifetimeMinutes | undefined>();
+
+    const onClose = useCallback(
+        (boc?: string) => {
+            setTimeout(() => setMultisigTTL(undefined), 400);
+            handleClose(boc);
+        },
+        [setMultisigTTL, handleClose]
+    );
+
     const Content = useCallback(() => {
         if (!params) return undefined;
+
+        if (isActiveAccountMultisig && !multisigTTL) {
+            return (
+                <MultisigOrderFormView
+                    onSubmit={form => setMultisigTTL(form.lifetime)}
+                    MainButton={MainButton}
+                    Header={() => (
+                        <TransferViewHeaderBlock
+                            title={t('multisig_create_order_title')}
+                            onClose={onClose}
+                        />
+                    )}
+                    isAnimationProcess={false}
+                />
+            );
+        }
+
         return (
             <>
                 {wallets.length > 1 && (
-                    <NotificationTitleWithWalletName onClose={() => handleClose()} />
+                    <NotificationTitleWithWalletName onClose={() => onClose()} />
                 )}
                 <ConnectContent
                     params={params}
-                    handleClose={boc => (params != null ? handleClose(boc) : undefined)}
+                    handleClose={boc => (params != null ? onClose(boc) : undefined)}
                     waitInvalidation={waitInvalidation}
+                    multisigTTL={multisigTTL}
                 />
             </>
         );
-    }, [origin, params, handleClose, wallets.length]);
+    }, [
+        origin,
+        params,
+        onClose,
+        wallets.length,
+        isActiveAccountMultisig,
+        multisigTTL,
+        setMultisigTTL
+    ]);
 
     return (
         <>
             <Notification
                 isOpen={params != null}
-                handleClose={() => handleClose()}
+                handleClose={() => onClose()}
                 title={wallets.length > 1 ? undefined : t('txActions_signRaw_title')}
                 hideButton
             >

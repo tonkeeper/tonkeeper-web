@@ -1,15 +1,14 @@
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { LogoutButton } from '../BackButton';
 import { CenterContainer } from '../Layout';
-import { Body2, H2 } from '../Text';
-import { Button } from '../fields/Button';
-import { Input } from '../fields/Input';
+import { Body2, H2Label2Responsive } from '../Text';
+import { ButtonResponsiveSize } from '../fields/Button';
+import { TonRecipientInput } from '../fields/TonRecipientInput';
+import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
+import { Address } from '@ton/core';
 
-const Block = styled.form`
+const Block = styled.div`
     display: flex;
     text-align: center;
     gap: 1rem;
@@ -25,30 +24,19 @@ export const AddressInput: FC<{
     afterInput: (address: string) => void;
     isLoading?: boolean;
     className?: string;
-}> = ({ afterInput, isLoading, className }) => {
+    onIsDirtyChange?: (isDirty: boolean) => void;
+}> = ({ afterInput, isLoading, className, onIsDirtyChange }) => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
 
     const ref = useRef<HTMLInputElement>(null);
 
-    const [error, setError] = useState<string | undefined>(undefined);
+    const [error, setError] = useState<boolean>(false);
+    const [isDataLoading, setDataIsLoading] = useState<boolean>(false);
+    const [recipient, setRecipient] = useState<TonRecipient | undefined>();
 
-    const [address, setAddress] = useState('');
-    const valid = useMemo(() => {
-        return seeIfValidTonAddress(address);
-    }, [address]);
-
-    const onCreate: React.FormEventHandler<HTMLFormElement> = async e => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        if (valid) {
-            afterInput(address);
-        } else {
-            sdk.hapticNotification('error');
-            setError('invalid');
-        }
-    };
+    useEffect(() => {
+        onIsDirtyChange?.(!!recipient);
+    }, [recipient]);
 
     useEffect(() => {
         if (ref.current) {
@@ -58,33 +46,28 @@ export const AddressInput: FC<{
 
     return (
         <CenterContainer className={className}>
-            <LogoutButton />
-            <Block onSubmit={onCreate}>
+            <Block>
                 <div>
-                    <H2>{t('add_watch_only_title')}</H2>
+                    <H2Label2Responsive>{t('add_watch_only_title')}</H2Label2Responsive>
                     <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
                 </div>
-                <Input
+                <TonRecipientInput
                     ref={ref}
-                    label={t('wallet_address')}
-                    value={address}
-                    onChange={value => {
-                        setAddress(value);
-                        setError(undefined);
-                    }}
-                    isValid={error === undefined || valid}
+                    onChange={setRecipient}
+                    onIsErroredChange={setError}
+                    onIsLoadingChange={setDataIsLoading}
+                    placeholder={t('wallet_address')}
                 />
-                <Button
-                    size="large"
+                <ButtonResponsiveSize
                     fullWidth
                     primary
                     marginTop
-                    loading={isLoading}
-                    disabled={!!error}
-                    type="submit"
+                    loading={isLoading || isDataLoading}
+                    disabled={error || !recipient}
+                    onClick={() => afterInput(Address.parse(recipient!.address).toRawString())}
                 >
                     {t('continue')}
-                </Button>
+                </ButtonResponsiveSize>
             </Block>
         </CenterContainer>
     );

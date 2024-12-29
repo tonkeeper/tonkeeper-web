@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -12,6 +12,7 @@ export class AuthService {
     /**
      * Auth via telegram
      * The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
+     *
      * @param requestBody Data that is expected from Telegram
      * @returns Ok Ok
      * @throws ApiError
@@ -54,6 +55,7 @@ export class AuthService {
     /**
      * Auth via TON Connect
      * The token is recorded in the database and in the user's cookies.  If the user logs in under different browsers, then each authorization will have its own token.
+     *
      * @param requestBody Data that is expected
      * @returns Ok Ok
      * @throws ApiError

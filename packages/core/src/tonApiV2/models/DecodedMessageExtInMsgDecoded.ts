@@ -18,18 +18,21 @@ import {
     DecodedMessageExtInMsgDecodedWalletV4FromJSON,
     DecodedMessageExtInMsgDecodedWalletV4FromJSONTyped,
     DecodedMessageExtInMsgDecodedWalletV4ToJSON,
+    DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped,
 } from './DecodedMessageExtInMsgDecodedWalletV4';
 import type { DecodedMessageExtInMsgDecodedWalletV3 } from './DecodedMessageExtInMsgDecodedWalletV3';
 import {
     DecodedMessageExtInMsgDecodedWalletV3FromJSON,
     DecodedMessageExtInMsgDecodedWalletV3FromJSONTyped,
     DecodedMessageExtInMsgDecodedWalletV3ToJSON,
+    DecodedMessageExtInMsgDecodedWalletV3ToJSONTyped,
 } from './DecodedMessageExtInMsgDecodedWalletV3';
 import type { DecodedMessageExtInMsgDecodedWalletHighloadV2 } from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
 import {
     DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON,
     DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSONTyped,
     DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON,
+    DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSONTyped,
 } from './DecodedMessageExtInMsgDecodedWalletHighloadV2';
 
 /**
@@ -81,10 +84,15 @@ export function DecodedMessageExtInMsgDecodedFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function DecodedMessageExtInMsgDecodedToJSON(value?: DecodedMessageExtInMsgDecoded | null): any {
+  export function DecodedMessageExtInMsgDecodedToJSON(json: any): DecodedMessageExtInMsgDecoded {
+      return DecodedMessageExtInMsgDecodedToJSONTyped(json, false);
+  }
+
+  export function DecodedMessageExtInMsgDecodedToJSONTyped(value?: DecodedMessageExtInMsgDecoded | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'wallet_v3': DecodedMessageExtInMsgDecodedWalletV3ToJSON(value['walletV3']),

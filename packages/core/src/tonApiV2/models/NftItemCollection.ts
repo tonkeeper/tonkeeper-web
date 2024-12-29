@@ -65,10 +65,15 @@ export function NftItemCollectionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function NftItemCollectionToJSON(value?: NftItemCollection | null): any {
+  export function NftItemCollectionToJSON(json: any): NftItemCollection {
+      return NftItemCollectionToJSONTyped(json, false);
+  }
+
+  export function NftItemCollectionToJSONTyped(value?: NftItemCollection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

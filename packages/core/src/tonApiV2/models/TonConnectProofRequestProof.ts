@@ -18,6 +18,7 @@ import {
     TonConnectProofRequestProofDomainFromJSON,
     TonConnectProofRequestProofDomainFromJSONTyped,
     TonConnectProofRequestProofDomainToJSON,
+    TonConnectProofRequestProofDomainToJSONTyped,
 } from './TonConnectProofRequestProofDomain';
 
 /**
@@ -87,10 +88,15 @@ export function TonConnectProofRequestProofFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function TonConnectProofRequestProofToJSON(value?: TonConnectProofRequestProof | null): any {
+  export function TonConnectProofRequestProofToJSON(json: any): TonConnectProofRequestProof {
+      return TonConnectProofRequestProofToJSONTyped(json, false);
+  }
+
+  export function TonConnectProofRequestProofToJSONTyped(value?: TonConnectProofRequestProof | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'timestamp': value['timestamp'],

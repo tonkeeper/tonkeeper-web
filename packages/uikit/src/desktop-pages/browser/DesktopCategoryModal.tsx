@@ -18,7 +18,7 @@ export const DesktopCategoryModal: FC<{
     onClose: () => void;
 }> = ({ category, isOpen, onClose }) => {
     return (
-        <Notification isOpen={isOpen} handleClose={onClose} hideButton title={category.title}>
+        <Notification isOpen={isOpen} handleClose={onClose} title={category.title}>
             {() =>
                 category.apps.map(app => (
                     <DesktopCategoryGroupItemStyled item={app} key={app.url} />

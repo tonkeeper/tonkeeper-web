@@ -7,6 +7,8 @@ import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes'
 import { useJettonList } from '../../state/jetton';
 import { useWalletNftList } from '../../state/nft';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useRenameNotification } from '../modals/RenameNotificationControlled';
+import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { DeleteAccountNotification } from './DeleteAccountNotification';
 import {
     AppsIcon,
@@ -16,13 +18,16 @@ import {
     SaleBadgeIcon,
     SecurityIcon,
     SettingsProIcon,
-    WalletsIcon
+    WalletsIcon,
+    BatteryIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import {
-    isAccountControllable,
-    isAccountVersionEditable
+    isAccountTonWalletStandard,
+    isAccountVersionEditable,
+    isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
+import { useBatteryEnabledConfig } from '../../state/battery';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -31,18 +36,57 @@ const SingleAccountSettings = () => {
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
+    const { onOpen: rename } = useRenameNotification();
+    const batteryEnableConfig = useBatteryEnabledConfig();
+
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        if (account.type === 'mnemonic') {
+        if (account.type === 'mnemonic' || account.type === 'mam') {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
             });
         }
+        if (account.type === 'mam') {
+            items.push({
+                name: t('settings_backup_wallet'),
+                icon: <RecoveryPhraseIcon />,
+                action: () =>
+                    navigate(
+                        relative(
+                            SettingsRoute.recovery +
+                                '/' +
+                                account.id +
+                                '?wallet=' +
+                                account.activeTonWallet.id
+                        )
+                    )
+            });
 
-        if (account.type === 'mnemonic' || account.type === 'ton-only') {
+            items.push({
+                name: t('customize'),
+                icon: <WalletEmoji containerSize="28px" emojiSize="28px" emoji={account.emoji} />,
+                action: () =>
+                    rename({
+                        accountId: account.id,
+                        derivationIndex: account.activeDerivation.index
+                    })
+            });
+
+            items.push({
+                name: t('settings_mam_indexes'),
+                icon: `#${account.derivations.length.toString()}`,
+                action: () => navigate(relative(WalletSettingsRoute.derivations))
+            });
+        }
+
+        if (
+            account.type === 'mnemonic' ||
+            account.type === 'testnet' ||
+            account.type === 'ton-only'
+        ) {
             items.push({
                 name: t('settings_wallet_version'),
                 icon: walletVersionText(account.activeTonWallet.version),
@@ -88,11 +132,20 @@ const SingleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        if (isAccountControllable(account)) {
+        if (isAccountTonWalletStandard(account)) {
             items.push({
                 name: t('settings_connected_apps'),
                 icon: <AppsIcon />,
                 action: () => navigate(relative(WalletSettingsRoute.connectedApps))
+            });
+        }
+
+        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
+        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+            items.push({
+                name: t('battery_title'),
+                icon: <BatteryIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.battery))
             });
         }
 
@@ -114,6 +167,8 @@ const MultipleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const { proFeatures } = useAppContext();
     const account = useActiveAccount();
+    const { onOpen: rename } = useRenameNotification();
+    const batteryEnableConfig = useBatteryEnabledConfig();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
 
@@ -147,11 +202,49 @@ const MultipleAccountSettings = () => {
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
-        if (account.type === 'mnemonic') {
+        if (isMnemonicAndPassword(account)) {
             items.push({
                 name: t('settings_recovery_phrase'),
                 icon: <RecoveryPhraseIcon />,
                 action: () => navigate(relative(SettingsRoute.recovery))
+            });
+        }
+        if (account.type === 'mam') {
+            items.push({
+                name: t('settings_backup_wallet'),
+                icon: <RecoveryPhraseIcon />,
+                action: () =>
+                    navigate(
+                        relative(
+                            SettingsRoute.recovery +
+                                '/' +
+                                account.id +
+                                '?wallet=' +
+                                account.activeTonWallet.id
+                        )
+                    )
+            });
+
+            items.push({
+                name: t('customize'),
+                icon: (
+                    <WalletEmoji
+                        containerSize="28px"
+                        emojiSize="28px"
+                        emoji={account.activeDerivation.emoji}
+                    />
+                ),
+                action: () =>
+                    rename({
+                        accountId: account.id,
+                        derivationIndex: account.activeDerivation.index
+                    })
+            });
+
+            items.push({
+                name: t('settings_mam_indexes'),
+                icon: `#${account.derivations.length.toString()}`,
+                action: () => navigate(relative(WalletSettingsRoute.derivations))
             });
         }
 
@@ -193,13 +286,23 @@ const MultipleAccountSettings = () => {
             icon: <SecurityIcon />,
             action: () => navigate(relative(SettingsRoute.security))
         });
-        if (isAccountControllable(account)) {
+        if (isAccountTonWalletStandard(account)) {
             items.push({
                 name: t('settings_connected_apps'),
                 icon: <AppsIcon />,
                 action: () => navigate(relative(WalletSettingsRoute.connectedApps))
             });
         }
+
+        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
+        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+            items.push({
+                name: t('battery_title'),
+                icon: <BatteryIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.battery))
+            });
+        }
+
         items.push({
             name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,

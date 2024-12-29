@@ -8,9 +8,17 @@ export interface DAppManifest {
     privacyPolicyUrl?: string;
 }
 
+export enum TON_CONNECT_MSG_VARIANTS_ID {
+    BATTERY = 'battery',
+    GASLESS = 'gasless'
+}
+
 export interface TonConnectTransactionPayload {
     valid_until: number; // 1658253458;
     messages: TonConnectTransactionPayloadMessage[];
+    messagesVariants?: Partial<
+        Record<TON_CONNECT_MSG_VARIANTS_ID, TonConnectTransactionPayloadMessage[]>
+    >;
 }
 
 export interface TonConnectTransactionPayloadMessage {
@@ -237,7 +245,7 @@ export interface TonAddressItemReply {
     address: string;
     network: string;
     walletStateInit: string;
-    publicKey: string;
+    publicKey?: string;
 }
 
 export interface TonProofItem {
@@ -297,4 +305,10 @@ export interface TonConnectMessageRequest {
     message: string;
     from: string;
     connection: AccountConnection;
+}
+
+export interface SendTransactionAppRequest {
+    id: string;
+    connection: AccountConnection;
+    payload: TonConnectTransactionPayload;
 }

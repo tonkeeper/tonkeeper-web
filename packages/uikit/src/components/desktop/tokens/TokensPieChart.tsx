@@ -1,8 +1,8 @@
-import { Cell, Pie, PieChart } from 'recharts';
 import { FC, memo, useMemo, useState } from 'react';
+import { Cell, Pie, PieChart } from 'recharts';
 import styled from 'styled-components';
+import { TokenDistribution } from '../../../state/asset';
 import { Body3, Label3 } from '../../Text';
-import { TokenDistribution } from "../../../state/asset";
 
 const Container = styled.div<{ activeAddress: string | undefined }>`
     container-type: inline-size;
@@ -45,6 +45,10 @@ const LegendContainer = styled.div`
 
     @container (max-width: 560px) {
         grid-auto-flow: row;
+
+        .second {
+            display: none;
+        }
     }
 `;
 
@@ -116,13 +120,14 @@ export const TokensPieChart: FC<{
                 onTokenClick={onTokenClick}
             />
             <LegendContainer>
-                {distribution.map(d => (
+                {distribution.map((d, index) => (
                     <TokenRow
                         key={tokenName(d)}
                         opacity={activeAddress && activeAddress !== tokenAddress(d) ? 0.4 : 1}
                         onMouseOver={() => setActiveAddress(tokenAddress(d))}
                         onMouseOut={() => setActiveAddress(undefined)}
                         onClick={() => onTokenClick('type' in d.meta ? 'others' : d.meta.address)}
+                        className={index > 4 ? 'second' : undefined}
                     >
                         <TokenCircle bg={d.meta.color} />
                         <Label3>{tokenName(d)}</Label3>

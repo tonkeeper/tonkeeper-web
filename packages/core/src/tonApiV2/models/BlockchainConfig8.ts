@@ -57,10 +57,15 @@ export function BlockchainConfig8FromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function BlockchainConfig8ToJSON(value?: BlockchainConfig8 | null): any {
+  export function BlockchainConfig8ToJSON(json: any): BlockchainConfig8 {
+      return BlockchainConfig8ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig8ToJSONTyped(value?: BlockchainConfig8 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'version': value['version'],

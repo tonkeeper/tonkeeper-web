@@ -73,10 +73,15 @@ export function PoolImplementationFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function PoolImplementationToJSON(value?: PoolImplementation | null): any {
+  export function PoolImplementationToJSON(json: any): PoolImplementation {
+      return PoolImplementationToJSONTyped(json, false);
+  }
+
+  export function PoolImplementationToJSONTyped(value?: PoolImplementation | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

@@ -2,9 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
-import { Account, AccountsApi, DNSApi } from '@tonkeeper/core/dist/tonApiV2';
+import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
-    debounce,
     formatAddress,
     seeIfValidTonAddress,
     seeIfValidTronAddress
@@ -19,6 +18,7 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { scrollToTop } from '../../libs/common';
 import { QueryKey } from '../../libs/queryKey';
 import { useIsActiveWalletLedger } from '../../state/ledger';
+import { useActiveApi, useActiveTonNetwork } from '../../state/wallet';
 import { Gap } from '../Layout';
 import {
     FullHeightBlock,
@@ -32,7 +32,7 @@ import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
-import { useActiveTonNetwork } from '../../state/wallet';
+import { useResolveDns } from '../../state/dns';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -43,7 +43,7 @@ const Warning = styled(Body2)`
 `;
 
 export const useGetToAccount = () => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useMutation<Account, Error, BaseRecipient | DnsRecipient>(recipient => {
         const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
         return new AccountsApi(api.tonApiV2).getAccount({ accountId });
@@ -51,7 +51,7 @@ export const useGetToAccount = () => {
 };
 
 const useToAccount = (isValid: boolean, recipient: BaseRecipient | DnsRecipient) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const accountId = 'dns' in recipient ? recipient.dns.address : recipient.address;
     return useQuery<Account, Error>(
         [QueryKey.account, accountId],
@@ -70,41 +70,6 @@ export const seeIfInvalidDns = (value: string) => {
     );
 };
 
-const useDnsWallet = (value: string) => {
-    const { api } = useAppContext();
-
-    const [name, setName] = useState('');
-
-    const update = useMemo(() => {
-        return debounce<[string]>(v => setName(v), 400);
-    }, [setName]);
-
-    update(value);
-
-    return useQuery(
-        [QueryKey.dns, value, name],
-        async () => {
-            if (value !== name) {
-                return null;
-            }
-            let dns = name.trim();
-            if (seeIfInvalidDns(dns)) {
-                return null;
-            }
-            dns = dns.toString().toLowerCase();
-            const result = await new DNSApi(api.tonApiV2).dnsResolve({ domainName: dns });
-            if (!result.wallet) {
-                return null;
-            }
-            return result.wallet;
-        },
-        {
-            retry: 0,
-            keepPreviousData: false
-        }
-    );
-};
-
 const seeIfValidTonRecipient = (recipient: BaseRecipient | DnsRecipient) => {
     return 'dns' in recipient || seeIfValidTonAddress(recipient.address);
 };
@@ -116,6 +81,7 @@ export const RecipientView: FC<{
     setRecipient: (options: RecipientData) => void;
     keyboard?: 'decimal';
     onScan: (value: string) => void;
+    onBack?: () => void;
     isExternalLoading?: boolean;
     acceptBlockchains?: BLOCKCHAIN_NAME[];
     MainButton: (props: { isLoading: boolean; onClick: () => void }) => JSX.Element;
@@ -148,7 +114,13 @@ export const RecipientView: FC<{
         data?.address ?? defaultRecipient
     );
 
-    const { data: dnsWallet, isFetching: isDnsFetching } = useDnsWallet(recipient.address);
+    useEffect(() => {
+        if (data) {
+            setAddress(data?.address);
+        }
+    }, [data]);
+
+    const { data: dnsWallet, isFetching: isDnsFetching } = useResolveDns(recipient.address);
 
     useEffect(() => {
         const timer = setTimeout(() => scrollToTop(), 300);
@@ -219,7 +191,9 @@ export const RecipientView: FC<{
     const isMemoValid = useMemo(() => {
         if (isLedger) {
             // only ascii symbols are supported by ledger
-            return /^[ -~]*$/gm.test(comment);
+            if (!/^[ -~]*$/gm.test(comment)) {
+                return false;
+            }
         }
 
         if (!toAccount) return true;
@@ -254,7 +228,7 @@ export const RecipientView: FC<{
         return recipient.address;
     }, [recipient, network]);
 
-    const showAddress = useShowAddress(ref, formatted, toAccount);
+    const showAddress = useShowAddress(ref, formatted, toAccount?.address);
 
     const handleSubmit = () => {
         setSubmit(true);
@@ -346,6 +320,7 @@ export const RecipientView: FC<{
 
             {isValidForBlockchain !== BLOCKCHAIN_NAME.TRON && (
                 <TextArea
+                    id="transaction-comment"
                     onSubmit={handleSubmit}
                     value={comment}
                     onChange={setComment}

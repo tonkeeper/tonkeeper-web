@@ -3,6 +3,26 @@ import { WalletId, WalletVersion, walletVersionText } from '@tonkeeper/core/dist
 import { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { Badge } from '../shared';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+
+export const NetworkBadge: FC<
+    PropsWithChildren<{
+        network: Network;
+        size?: 's' | 'm';
+        className?: string;
+    }>
+> = ({ network, size = 'm', className, children }) => {
+    if (network === Network.TESTNET) {
+        return (
+            <Badge size={size} color="accentRed" className={className}>
+                {children || 'Testnet'}
+            </Badge>
+        );
+    }
+
+    return null;
+};
 
 export const AccountBadge: FC<
     PropsWithChildren<{
@@ -13,7 +33,7 @@ export const AccountBadge: FC<
 > = ({ accountType, size = 'm', className, children }) => {
     if (accountType === 'ledger') {
         return (
-            <Badge size={size} color="accentGreen" className={className}>
+            <Badge size={size} color="accentPurple" className={className}>
                 {children || 'Ledger'}
             </Badge>
         );
@@ -29,7 +49,7 @@ export const AccountBadge: FC<
 
     if (accountType === 'keystone') {
         return (
-            <Badge size={size} color="accentOrange" className={className}>
+            <Badge size={size} color="accentPurple" className={className}>
                 {children || 'Keystone'}
             </Badge>
         );
@@ -37,7 +57,7 @@ export const AccountBadge: FC<
 
     if (accountType === 'watch-only') {
         return (
-            <Badge size={size} color="accentRed" className={className}>
+            <Badge size={size} color="accentOrange" className={className}>
                 {children || 'Watch Only'}
             </Badge>
         );
@@ -47,6 +67,14 @@ export const AccountBadge: FC<
         return (
             <Badge size={size} color="accentBlueConstant" className={className}>
                 {children || 'Multi'}
+            </Badge>
+        );
+    }
+
+    if (accountType === 'ton-multisig') {
+        return (
+            <Badge size={size} color="accentGreen" className={className}>
+                {children || 'Multisig'}
             </Badge>
         );
     }
@@ -140,7 +168,10 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
-    if (account.type === 'mnemonic' && account.tonWallets.length > 1) {
+    if (
+        (account.type === 'mnemonic' || account.type === 'testnet') &&
+        account.tonWallets.length > 1
+    ) {
         const wallet = account.tonWallets.find(w => w.id === walletId);
         if (wallet) {
             return (
@@ -165,5 +196,13 @@ export const AccountAndWalletBadgesGroup: FC<{
         );
     }
 
-    return null;
+    if (account.type === 'ton-multisig') {
+        return <AccountBadge className={className} size={size} accountType={account.type} />;
+    }
+
+    if (account.type === 'mnemonic' || account.type === 'testnet') {
+        return null;
+    }
+
+    assertUnreachable(account);
 };

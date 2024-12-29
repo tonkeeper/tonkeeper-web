@@ -1,30 +1,49 @@
+import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
-import { mnemonicToPrivateKey, sha256_sync, sign } from '@ton/crypto';
+import { sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { AuthPassword } from '@tonkeeper/core/dist/entries/password';
+import { AccountId, isMnemonicAndPassword } from '@tonkeeper/core/dist/entries/account';
+import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
-import { LedgerTransaction } from '@tonkeeper/core/dist/service/ledger/connector';
-import { decryptWalletMnemonic } from '@tonkeeper/core/dist/service/mnemonicService';
+import {
+    LedgerTonProofRequest,
+    LedgerTonProofResponse,
+    LedgerTransaction
+} from '@tonkeeper/core/dist/service/ledger/connector';
+import {
+    decryptWalletMnemonic,
+    mnemonicToKeypair
+} from '@tonkeeper/core/dist/service/mnemonicService';
 import {
     parseSignerSignature,
     storeTransactionAndCreateDeepLink
 } from '@tonkeeper/core/dist/service/signerService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
-import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
-import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { TonKeychainRoot } from '@ton-keychain/core';
+import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
+import { useAppSdk } from '../hooks/appSdk';
+import { useCallback } from 'react';
+import { useActiveAccount } from './wallet';
+import { useCheckTouchId } from './password';
 
-export const signTonConnectOver = (
-    sdk: IAppSdk,
-    accountId: AccountId,
-    t: (text: string) => string,
-    checkTouchId: () => Promise<void>
-) => {
+export const signTonConnectOver = ({
+    sdk,
+    accountId,
+    checkTouchId,
+    wallet,
+    t
+}: {
+    sdk: IAppSdk;
+    accountId: AccountId;
+    wallet?: TonWalletStandard;
+    t: (text: string) => string;
+    checkTouchId: () => Promise<void>;
+}) => {
     return async (bufferToSign: Buffer) => {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
 
@@ -50,23 +69,19 @@ export const signTonConnectOver = (
                 );
                 return Buffer.from(result, 'hex');
             }
+            case 'testnet':
             case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
-                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
                 );
             }
             case 'mam': {
-                const wallet = account.activeTonWallet;
-                const mnemonic = await getMAMWalletMnemonic(
-                    sdk,
-                    account.id,
-                    wallet.id,
-                    checkTouchId
-                );
-                const keyPair = await mnemonicToPrivateKey(mnemonic);
+                const w = wallet ?? account.activeTonWallet;
+                const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id, checkTouchId);
+                const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -75,6 +90,9 @@ export const signTonConnectOver = (
             case 'watch-only': {
                 throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
             }
+            case 'ton-multisig': {
+                throw new TxConfirmationCustomError("Can't use multisig wallet with this dApp");
+            }
             default: {
                 assertUnreachable(account);
             }
@@ -82,9 +100,9 @@ export const signTonConnectOver = (
     };
 };
 
-export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
+export const signTonConnectMnemonicOver = (mnemonic: string[], mnemonicType: MnemonicType) => {
     return async (bufferToSign: Buffer) => {
-        const keyPair = await mnemonicToPrivateKey(mnemonic);
+        const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
         const signature = nacl.sign.detached(
             Buffer.from(sha256_sync(bufferToSign)),
             keyPair.secretKey
@@ -93,10 +111,37 @@ export const signTonConnectMnemonicOver = (mnemonic: string[]) => {
     };
 };
 
+export const useGetActiveAccountSigner = () => {
+    const account = useActiveAccount();
+    const _getSigner = useGetAccountSigner();
+    return useCallback(
+        (walletId?: WalletId) => {
+            return _getSigner(account.id, walletId);
+        },
+        [account, _getSigner]
+    );
+};
+
+export const useGetAccountSigner = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+
+    return useCallback(
+        (accountId: AccountId, walletId?: WalletId) =>
+            getSigner(sdk, accountId, checkTouchId, walletId ? { walletId } : undefined),
+        [sdk, checkTouchId]
+    );
+};
+
 export const getSigner = async (
     sdk: IAppSdk,
     accountId: AccountId,
-    checkTouchId: () => Promise<void>
+    checkTouchId: () => Promise<void>,
+    {
+        walletId
+    }: {
+        walletId?: WalletId;
+    } = {}
 ): Promise<Signer> => {
     try {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
@@ -104,13 +149,17 @@ export const getSigner = async (
             throw new Error('Wallet not found');
         }
 
+        const wallet =
+            walletId !== undefined ? account.getTonWallet(walletId) : account.activeTonWallet;
+
         switch (account.type) {
             case 'ton-only': {
                 if (account.auth.kind === 'signer') {
                     const callback = async (message: Cell) => {
                         const result = await pairSignerByNotification(
                             sdk,
-                            message.toBoc({ idx: false }).toString('base64')
+                            message.toBoc({ idx: false }).toString('base64'),
+                            wallet as TonWalletStandard
                         );
                         return parseSignerSignature(result);
                     };
@@ -119,12 +168,11 @@ export const getSigner = async (
                 }
 
                 if (account.auth.kind === 'signer-deeplink') {
-                    const wallet = account.activeTonWallet;
                     const callback = async (message: Cell) => {
                         const deeplink = await storeTransactionAndCreateDeepLink(
                             sdk,
-                            wallet.publicKey,
-                            wallet.version,
+                            (wallet as TonWalletStandard).publicKey,
+                            (wallet as TonWalletStandard).version,
                             message.toBoc({ idx: false }).toString('base64')
                         );
 
@@ -142,8 +190,12 @@ export const getSigner = async (
                 return assertUnreachable(account.auth);
             }
             case 'ledger': {
-                const callback = async (path: number[], transaction: LedgerTransaction) =>
-                    pairLedgerByNotification(sdk, path, transaction);
+                const derivation = account.allAvailableDerivations.find(
+                    d => d.activeTonWalletId === wallet!.id
+                )!;
+                const path = getLedgerAccountPathByIndex(derivation.index);
+                const callback = async (transactions: LedgerTransaction[]) =>
+                    pairLedgerByNotification<'transaction'>(sdk, path, { transactions });
                 callback.type = 'ledger' as const;
                 return callback;
             }
@@ -161,28 +213,37 @@ export const getSigner = async (
                 return callback;
             }
             case 'mam': {
-                const wallet = account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(
                     sdk,
                     account.id,
-                    wallet.id,
+                    wallet!.id,
                     checkTouchId
                 );
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToPrivateKey(mnemonic);
+                    const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
                 return callback;
             }
-            default: {
+            case 'testnet':
+            case 'mnemonic': {
                 const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToPrivateKey(mnemonic);
+                    const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
                 return callback;
+            }
+            case 'watch-only': {
+                throw new Error('Cannot get signer for watch-only account');
+            }
+            case 'ton-multisig': {
+                throw new Error('Cannot get signer for multisig account');
+            }
+            default: {
+                assertUnreachable(account);
             }
         }
     } catch (e) {
@@ -216,7 +277,7 @@ export const getMAMWalletMnemonic = async (
     }
 
     const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
-    const root = await TonKeychainRoot.fromMnemonic(mnemonic);
+    const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
     const tonAccount = await root.getTonAccount(derivation.index);
     return tonAccount.mnemonics;
 };
@@ -227,11 +288,7 @@ export const getMnemonicAndPassword = async (
     checkTouchId: () => Promise<void>
 ): Promise<{ mnemonic: string[]; password?: string }> => {
     const account = await accountsStorage(sdk.storage).getAccount(accountId);
-    if (
-        !account ||
-        (account.type !== 'mnemonic' && account.type !== 'mam') ||
-        !('auth' in account)
-    ) {
+    if (!account || !isMnemonicAndPassword(account) || !('auth' in account)) {
         throw new Error('Unexpected auth method for account');
     }
 
@@ -291,13 +348,17 @@ export const getPasswordByNotification = async (sdk: IAppSdk): Promise<string> =
     });
 };
 
-const pairSignerByNotification = async (sdk: IAppSdk, boc: string): Promise<string> => {
+const pairSignerByNotification = async (
+    sdk: IAppSdk,
+    boc: string,
+    wallet: TonWalletStandard
+): Promise<string> => {
     const id = Date.now();
     return new Promise<string>((resolve, reject) => {
         sdk.uiEvents.emit('signer', {
             method: 'signer',
             id,
-            params: boc
+            params: { boc, wallet }
         });
 
         const onCallback = (message: {
@@ -360,40 +421,86 @@ const pairKeystoneByNotification = async (
     });
 };
 
-const pairLedgerByNotification = async (
+export const getLedgerTonProofSigner = async (
+    sdk: IAppSdk,
+    accountId: AccountId,
+    {
+        walletId
+    }: {
+        walletId?: WalletId;
+    } = {}
+): Promise<(request: LedgerTonProofRequest) => Promise<LedgerTonProofResponse>> => {
+    const account = await accountsStorage(sdk.storage).getAccount(accountId);
+    if (!account) {
+        throw new Error('Account not found');
+    }
+
+    if (account.type !== 'ledger') {
+        throw new Error('Unexpected account type');
+    }
+
+    const wallet =
+        walletId !== undefined ? account.getTonWallet(walletId) : account.activeTonWallet;
+
+    const derivation = account.allAvailableDerivations.find(
+        d => d.activeTonWalletId === wallet!.id
+    )!;
+    const path = getLedgerAccountPathByIndex(derivation.index);
+    const callback = async (tonProof: LedgerTonProofRequest) =>
+        pairLedgerByNotification<'ton-proof'>(sdk, path, { tonProof });
+    callback.type = 'ledger' as const;
+    return callback;
+};
+
+const pairLedgerByNotification = async <T extends 'transaction' | 'ton-proof'>(
     sdk: IAppSdk,
     path: number[],
-    transaction: LedgerTransaction
-): Promise<Cell> => {
+    request: T extends 'transaction'
+        ? {
+              transactions: LedgerTransaction[];
+          }
+        : {
+              tonProof: LedgerTonProofRequest;
+          }
+): Promise<T extends 'transaction' ? Cell[] : LedgerTonProofResponse> => {
     const id = Date.now();
-    return new Promise<Cell>((resolve, reject) => {
-        sdk.uiEvents.emit('ledger', {
-            method: 'ledger',
-            id,
-            params: { path, transaction }
-        });
+    return new Promise<T extends 'transaction' ? Cell[] : LedgerTonProofResponse>(
+        (resolve, reject) => {
+            sdk.uiEvents.emit('ledger', {
+                method: 'ledger',
+                id,
+                params: { path, ...request }
+            });
 
-        const onCallback = (message: {
-            method: 'response';
-            id?: number | undefined;
-            params: unknown;
-        }) => {
-            if (message.id === id) {
-                const { params } = message;
-                sdk.uiEvents.off('response', onCallback);
+            const onCallback = (message: {
+                method: 'response';
+                id?: number | undefined;
+                params: unknown;
+            }) => {
+                if (message.id === id) {
+                    const { params } = message;
+                    sdk.uiEvents.off('response', onCallback);
 
-                if (params && typeof params === 'object' && params instanceof Cell) {
-                    resolve(params as Cell);
-                } else {
-                    if (params instanceof Error) {
-                        reject(params);
+                    if (
+                        params &&
+                        typeof params === 'object' &&
+                        ((Array.isArray(params) && params[0] instanceof Cell) ||
+                            'signature' in params)
+                    ) {
+                        resolve(
+                            params as T extends 'transaction' ? Cell[] : LedgerTonProofResponse
+                        );
                     } else {
-                        reject(new Error(params?.toString()));
+                        if (params instanceof Error) {
+                            reject(params);
+                        } else {
+                            reject(new Error(params?.toString()));
+                        }
                     }
                 }
-            }
-        };
+            };
 
-        sdk.uiEvents.on('response', onCallback);
-    });
+            sdk.uiEvents.on('response', onCallback);
+        }
+    );
 };

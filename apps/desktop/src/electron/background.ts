@@ -1,8 +1,9 @@
 import { shell, systemPreferences, app } from 'electron';
 import keytar from 'keytar';
 import { Message } from '../libs/message';
-import { TonConnectSSE } from './sseEvetns';
 import { mainStorage } from './storageService';
+import { cookieJar } from './cookie';
+import { tonConnectSSE } from './sseEvetns';
 
 const service = 'tonkeeper.com';
 
@@ -29,9 +30,9 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'get-keychain':
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
         case 'reconnect':
-            return await TonConnectSSE.getInstance().reconnect();
+            return await tonConnectSSE.reconnect();
         case 'ton-connect-send-disconnect':
-            return await TonConnectSSE.getInstance().sendDisconnect(message.connection);
+            return await tonConnectSSE.sendDisconnect(message.connection);
         case 'can-prompt-touch-id':
             try {
                 return !!systemPreferences?.canPromptTouchID?.();
@@ -43,6 +44,9 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             return systemPreferences.promptTouchID(message.reason);
         case 'get-preferred-system-languages':
             return app.getPreferredSystemLanguages();
+        case 'clean-cookie': {
+            return cookieJar.removeAllCookies();
+        }
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

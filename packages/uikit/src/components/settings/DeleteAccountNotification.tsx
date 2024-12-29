@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { Body1, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
+import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
 
 const NotificationBlock = styled.div`
     display: flex;
@@ -35,8 +35,8 @@ const DisclaimerLink = styled(Label1)`
     margin-left: 2.35rem;
 `;
 
-const DeleteContent: FC<{
-    onClose: (action: () => void) => void;
+export const DeleteNotificationContent: FC<{
+    onClose: () => void;
     accountId: AccountId;
     isKeystone: boolean;
     isReadOnly: boolean;
@@ -45,10 +45,12 @@ const DeleteContent: FC<{
     const { t } = useTranslation();
     const [checked, setChecked] = useState(isKeystone || isReadOnly);
     const { mutateAsync, isLoading } = useMutateLogOut();
+    const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
         await mutateAsync(accountId);
-        onClose(() => navigate(AppRoute.home));
+        navigate(AppRoute.home);
+        onClose();
     };
 
     return (
@@ -71,13 +73,10 @@ const DeleteContent: FC<{
                         </Checkbox>
                     </DisclaimerText>
                     <DisclaimerLink
-                        onClick={() =>
-                            onClose(() =>
-                                navigate(
-                                    AppRoute.settings + SettingsRoute.recovery + '/' + accountId
-                                )
-                            )
-                        }
+                        onClick={() => {
+                            onRecovery({ accountId });
+                            onClose();
+                        }}
                     >
                         {t('Back_up_now')}
                     </DisclaimerLink>
@@ -103,10 +102,10 @@ export const DeleteAccountNotification: FC<{
     handleClose: () => void;
 }> = ({ account, handleClose }) => {
     const Content = useCallback(
-        (afterClose: (action: () => void) => void) => {
+        (afterClose: () => void) => {
             if (!account) return undefined;
             return (
-                <DeleteContent
+                <DeleteNotificationContent
                     accountId={account.id}
                     onClose={afterClose}
                     isKeystone={account.type === 'keystone'}
@@ -124,19 +123,15 @@ export const DeleteAccountNotification: FC<{
     );
 };
 
-const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClose }) => {
+const DeleteAllContent: FC<{ onClose: () => void }> = ({ onClose }) => {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
     const { mutateAsync, isLoading } = useMutateDeleteAll();
-    const client = useQueryClient();
 
     const onDelete = async () => {
         await mutateAsync();
-        onClose(async () => {
-            await client.invalidateQueries();
-            navigate(AppRoute.home);
-        });
+        window.location.href = window.location.href;
     };
 
     return (
@@ -153,9 +148,10 @@ const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClo
                     </Checkbox>
                 </DisclaimerText>
                 <DisclaimerLink
-                    onClick={() =>
-                        onClose(() => navigate(AppRoute.settings + SettingsRoute.recovery))
-                    }
+                    onClick={() => {
+                        navigate(AppRoute.settings + SettingsRoute.recovery);
+                        onClose();
+                    }}
                 >
                     {t('Back_up_now')}
                 </DisclaimerLink>
@@ -179,7 +175,7 @@ export const DeleteAllNotification: FC<{
     handleClose: () => void;
 }> = ({ open, handleClose }) => {
     const Content = useCallback(
-        (afterClose: (action: () => void) => void) => {
+        (afterClose: () => void) => {
             if (!open) return undefined;
             return <DeleteAllContent onClose={afterClose} />;
         },

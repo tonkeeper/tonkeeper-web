@@ -1,8 +1,10 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import React, { FC, useLayoutEffect, useRef } from 'react';
+import { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
+import { PencilIcon } from '../../components/Icon';
+import { NotificationFooterPortal } from '../../components/Notification';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
@@ -12,31 +14,29 @@ import {
     useActiveAccount,
     useCreateMAMAccountDerivation,
     useHideMAMAccountDerivation,
-    useEnableMAMAccountDerivation
+    useEnableMAMAccountDerivation,
+    useActiveConfig
 } from '../../state/wallet';
-import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
+import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
-import { AccountBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
-import { NotificationFooterPortal } from '../../components/Notification';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { PencilIcon } from '../../components/Icon';
-import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
-import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import { useProState } from '../../state/pro';
 import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
-import { useAppContext } from '../../hooks/appContext';
-import { scrollToContainersBottom } from '../../libs/web';
+import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
+import { scrollToContainersBottom } from '../../libs/web';
+import { useProState } from '../../state/pro';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -66,7 +66,7 @@ export const MAMIndexesPage = () => {
     const isFullWidth = useIsFullWidthMode();
 
     if (account.type !== 'mam') {
-        return null;
+        return <Navigate to="../" />;
     }
 
     if (isFullWidth) {
@@ -109,6 +109,26 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
     }
 `;
 
+const NameContainer = styled.div`
+    display: flex;
+    gap: 1rem;
+`;
+const ListItemPayload = styled.div`
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1rem 1rem 0;
+    box-sizing: border-box;
+    gap: 10px;
+
+    width: 100%;
+
+    ${props =>
+        props.theme.displayType === 'full-width'
+            ? 'align-items: center;'
+            : 'flex-direction: column;'}
+`;
+
 const ContentWrapper = styled.div``;
 
 export const MAMIndexesPageContent: FC<{
@@ -118,9 +138,8 @@ export const MAMIndexesPageContent: FC<{
     buttonWrapperClassName?: string;
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const { data: proState } = useProState();
-    const { onOpen: recovery } = useRecoveryNotification();
     const { onOpen: buyPro } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -206,28 +225,6 @@ export const MAMIndexesPageContent: FC<{
     return (
         <ContentWrapper className={className} ref={ref}>
             <ListBlockStyled>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <WalletEmoji containerSize="24px" emoji={account.emoji} />
-                        <FirstLineContainer>
-                            <Label2>{account.name}</Label2>
-                            <AccountBadge accountType="mam" />
-                        </FirstLineContainer>
-                        <ButtonsContainer>
-                            <IconButtonTransparentBackgroundStyled
-                                onClick={() => rename({ accountId: account.id })}
-                            >
-                                <PencilIcon />
-                            </IconButtonTransparentBackgroundStyled>
-                            <Button
-                                onClick={() => recovery({ accountId: account.id })}
-                                loading={isLoading}
-                            >
-                                {t('backup_screen_title')}
-                            </Button>
-                        </ButtonsContainer>
-                    </ListItemPayload>
-                </ListItem>
                 {balances.map((balance, cycleIndex) => {
                     const derivationIndex = account.allAvailableDerivations[cycleIndex].index;
                     const derivation = account.allAvailableDerivations.find(
@@ -241,17 +238,22 @@ export const MAMIndexesPageContent: FC<{
                     return (
                         <ListItem hover={false} key={balance.address}>
                             <ListItemPayload>
-                                <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
-                                <TextContainer>
-                                    <FirstLineContainer>
-                                        <Label2>{derivation.name}</Label2>
-                                        <WalletIndexBadge>#{derivationIndex + 1}</WalletIndexBadge>
-                                    </FirstLineContainer>
-                                    <Body2Secondary>
-                                        {toShortValue(formatAddress(balance.address)) + ' '}·
-                                        {' ' + toFormattedTonBalance(balance.tonBalance)}&nbsp;TON
-                                    </Body2Secondary>
-                                </TextContainer>
+                                <NameContainer>
+                                    <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
+                                    <TextContainer>
+                                        <FirstLineContainer>
+                                            <Label2>{derivation.name}</Label2>
+                                            <WalletIndexBadge>
+                                                #{derivationIndex + 1}
+                                            </WalletIndexBadge>
+                                        </FirstLineContainer>
+                                        <Body2Secondary>
+                                            {toShortValue(formatAddress(balance.address)) + ' '}·
+                                            {' ' + toFormattedTonBalance(balance.tonBalance)}
+                                            &nbsp;TON
+                                        </Body2Secondary>
+                                    </TextContainer>
+                                </NameContainer>
                                 {isDerivationAdded ? (
                                     <ButtonsContainer>
                                         <IconButtonTransparentBackgroundStyled
@@ -302,9 +304,11 @@ export const MAMIndexesPageContent: FC<{
             <NotificationFooterPortal>
                 <FooterButtonContainerStyled className={buttonWrapperClassName}>
                     {showByProButton ? (
-                        <Button primary fullWidth onClick={buyPro}>
-                            {t('settings_mam_add_wallet_with_pro')}
-                        </Button>
+                        <HideOnReview>
+                            <Button primary fullWidth onClick={buyPro}>
+                                {t('settings_mam_add_wallet_with_pro')}
+                            </Button>
+                        </HideOnReview>
                     ) : (
                         <Button fullWidth onClick={onCreateDerivation}>
                             {t('settings_mam_add_wallet')}

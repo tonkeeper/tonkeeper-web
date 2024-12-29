@@ -1,6 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AccountsApi, JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -21,13 +20,14 @@ import { JettonKey, QueryKey } from '../../libs/queryKey';
 import { useJettonBalance, useJettonInfo } from '../../state/jetton';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useActiveApi, useActiveWallet, useIsActiveWalletWatchOnly } from '../../state/wallet';
 
 const JettonHistory: FC<{ balance: JettonBalance; innerRef: React.RefObject<HTMLDivElement> }> = ({
     balance,
     innerRef
 }) => {
-    const { api, standalone } = useAppContext();
+    const api = useActiveApi();
+    const { standalone } = useAppContext();
     const wallet = useActiveWallet();
 
     const { isFetched, hasNextPage, data, isFetchingNextPage, fetchNextPage } = useInfiniteQuery({
@@ -99,9 +99,7 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
             <InnerBody ref={ref}>
                 <JettonHeader balance={balance} info={info} />
                 <ActionsRow>
-                    {!isReadOnly && (
-                        <SendAction asset={info.metadata.address} chain={BLOCKCHAIN_NAME.TON} />
-                    )}
+                    {!isReadOnly && <SendAction asset={info.metadata.address} />}
                     <ReceiveAction jetton={info.metadata.address} />
                     {swapAsset && <SwapAction fromAsset={swapAsset} />}
                 </ActionsRow>

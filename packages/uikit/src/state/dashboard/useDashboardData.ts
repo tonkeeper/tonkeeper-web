@@ -6,9 +6,10 @@ import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
-import { useAccountsState } from '../wallet';
 import { ClientColumns, useDashboardColumnsAsForm } from './useDashboardColumns';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
+import { useAccountsOrdered } from '../folders';
+import { seeIfMainnnetAccount } from '@tonkeeper/core/dist/entries/account';
 
 export function useDashboardData() {
     const { data: columns } = useDashboardColumnsAsForm();
@@ -21,10 +22,10 @@ export function useDashboardData() {
     const selectedColIds = selectedColumns?.map(c => c.id);
     const client = useQueryClient();
 
-    const accountsState = useAccountsState();
-    const mainnetWallets = accountsState.flatMap(a =>
-        a.allTonWallets.map(item => ({ ...item, account: a }))
-    );
+    const accountsState = useAccountsOrdered();
+    const mainnetWallets = accountsState
+        .filter(seeIfMainnnetAccount)
+        .flatMap(a => a.allTonWallets.map(item => ({ ...item, account: a })));
     const idsMainnet = mainnetWallets.map(w => w!.id);
 
     return useQuery<DashboardRow[]>(

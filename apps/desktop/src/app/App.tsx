@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
@@ -40,19 +40,20 @@ import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/Des
 import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
+import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import {
+    I18nContext,
+    TranslationContext,
+    useTWithReplaces
+} from '@tonkeeper/uikit/dist/hooks/translation';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
@@ -66,11 +67,7 @@ import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
-import {
-    useAccountsStateQuery,
-    useActiveAccountQuery,
-    useActiveTonNetwork
-} from '@tonkeeper/uikit/dist/state/wallet';
+import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -88,6 +85,10 @@ import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
 import { DeepLinkSubscription } from './components/DeepLink';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
+import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
+import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -128,14 +129,16 @@ const GlobalStyle = createGlobalStyle`
 const sdk = new DesktopAppSdk();
 const TARGET_ENV = 'desktop';
 
-const langs = 'en,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
+const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
 
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
 declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
 
 export const Providers = () => {
-    const { t, i18n } = useTranslation();
+    const { t: tSimple, i18n } = useTranslation();
+
+    const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
         const languages = langs.split(',');
@@ -263,11 +266,12 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
 `;
 
 export const Loader: FC = () => {
-    const network = useActiveTonNetwork();
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
     const { data: accounts, isLoading: isWalletsLoading } = useAccountsStateQuery();
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: devSettings } = useDevSettings();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    const { isLoading: globalSetupLoading } = useGlobalSetup();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -276,13 +280,11 @@ export const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        network,
         lang,
         platform: 'desktop'
     });
-    const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const navigate = useNavigate();
     useAppHeight();
 
     const { data: tracker } = useAnalytics(sdk.version, activeAccount, accounts);
@@ -303,18 +305,26 @@ export const Loader: FC = () => {
         activeWalletLoading ||
         isLangLoading ||
         isWalletsLoading ||
-        config === undefined ||
+        serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
-        !devSettings
+        !devSettings ||
+        globalPreferencesLoading ||
+        globalSetupLoading
     ) {
         return <Loading />;
     }
 
     const context: IAppContext = {
-        api: getApiConfig(config, network, REACT_APP_TONCONSOLE_API),
+        mainnetApi: getApiConfig(
+            serverConfig.mainnetConfig,
+            Network.MAINNET,
+            REACT_APP_TONCONSOLE_API
+        ),
+        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: serverConfig.mainnetConfig,
+        testnetConfig: serverConfig.testnetConfig,
         tonendpoint,
         standalone: true,
         extension: false,
@@ -330,18 +340,12 @@ export const Loader: FC = () => {
 
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content activeAccount={activeAccount} lock={lock} />
-                        <CopyNotification hideSimpleCopyNotifications />
-                        <QrScanner />
-                        <ModalsRoot />
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
+            <AppContext.Provider value={context}>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification hideSimpleCopyNotifications />
+                <QrScanner />
+                <ModalsRoot />
+            </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 };
@@ -374,10 +378,7 @@ export const Content: FC<{
         return (
             <FullSizeWrapperBounded className="full-size-wrapper">
                 <InitializeContainer fullHeight={false}>
-                    <Routes>
-                        <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                        <Route path="*" element={<Initialize />} />
-                    </Routes>
+                    <Initialize />
                 </InitializeContainer>
             </FullSizeWrapperBounded>
         );
@@ -392,6 +393,10 @@ export const Content: FC<{
                     <Route path={AppRoute.browser} element={<DesktopBrowser />} />
                     <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
                     <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
+                    <Route
+                        path={any(AppRoute.accountSettings)}
+                        element={<DesktopAccountSettingsPage />}
+                    />
                     <Route path="*" element={<WalletContent />} />
                 </Routes>
             </WideContent>
@@ -419,6 +424,14 @@ const WalletContent = () => {
                             <Route path={AppRoute.coins}>
                                 <Route path=":name/*" element={<DesktopCoinPage />} />
                             </Route>
+                            <Route
+                                path={AppRoute.multisigWallets}
+                                element={<DesktopManageMultisigsPage />}
+                            />
+                            <Route
+                                path={AppRoute.multisigOrders}
+                                element={<DesktopMultisigOrdersPage />}
+                            />
                             <Route
                                 path={any(AppRoute.walletSettings)}
                                 element={<DesktopWalletSettingsRouting />}

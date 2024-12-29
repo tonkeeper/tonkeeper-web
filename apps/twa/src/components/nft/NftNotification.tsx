@@ -4,7 +4,7 @@ import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
     TonTransferParams,
-    parseTonTransfer
+    parseTonTransferWithAddress
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { ConfirmViewButtons } from '@tonkeeper/uikit/dist/components/transfer/ConfirmView';
 import {
@@ -49,7 +49,6 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
 
     const mainButton = useMainButton();
     const { mutateAsync: getAccountAsync } = useGetToAccount();
-    const { mutateAsync: checkBalanceAsync, isLoading: isChecking } = useMinimalBalance();
 
     const indexRef = useRef<HTMLDivElement>(null);
     const recipientRef = useRef<HTMLDivElement>(null);
@@ -71,7 +70,6 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     const favoriteState = useFavoriteNotification(onFavorite);
 
     const onRecipient = async (data: RecipientData) => {
-        await checkBalanceAsync();
         setRight(true);
         setRecipient(data as TonRecipientData);
         setView('confirm');
@@ -95,7 +93,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     }, []);
 
     const processRecipient = useCallback(
-        async ({ address }: TonTransferParams) => {
+        async ({ address }: { address: string }) => {
             const item = { address: address };
             const toAccount = await getAccountAsync(item);
 
@@ -110,7 +108,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
     );
 
     const onScan = async (signature: string) => {
-        const param = parseTonTransfer({ url: signature });
+        const param = parseTonTransferWithAddress({ url: signature });
         if (param === null) {
             return sdk.uiEvents.emit('copy', {
                 method: 'copy',
@@ -150,7 +148,6 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
                                 data={recipient}
                                 setRecipient={onRecipient}
                                 onScan={onScan}
-                                isExternalLoading={isChecking}
                                 acceptBlockchains={[BLOCKCHAIN_NAME.TON]}
                                 MainButton={RecipientTwaMainButton}
                                 HeaderBlock={() => (

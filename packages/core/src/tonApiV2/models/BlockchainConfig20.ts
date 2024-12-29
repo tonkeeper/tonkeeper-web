@@ -18,6 +18,7 @@ import {
     GasLimitPricesFromJSON,
     GasLimitPricesFromJSONTyped,
     GasLimitPricesToJSON,
+    GasLimitPricesToJSONTyped,
 } from './GasLimitPrices';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainConfig20FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig20ToJSON(value?: BlockchainConfig20 | null): any {
+  export function BlockchainConfig20ToJSON(json: any): BlockchainConfig20 {
+      return BlockchainConfig20ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig20ToJSONTyped(value?: BlockchainConfig20 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'gas_limits_prices': GasLimitPricesToJSON(value['gasLimitsPrices']),

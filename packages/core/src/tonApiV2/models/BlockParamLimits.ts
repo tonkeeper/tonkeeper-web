@@ -65,10 +65,15 @@ export function BlockParamLimitsFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function BlockParamLimitsToJSON(value?: BlockParamLimits | null): any {
+  export function BlockParamLimitsToJSON(json: any): BlockParamLimits {
+      return BlockParamLimitsToJSONTyped(json, false);
+  }
+
+  export function BlockParamLimitsToJSONTyped(value?: BlockParamLimits | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'underload': value['underload'],

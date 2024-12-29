@@ -16,7 +16,7 @@ import {
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
@@ -45,7 +45,7 @@ export const LedgerIndexesPage = () => {
     const account = useActiveAccount();
     const isFullWidth = useIsFullWidthMode();
     if (account.type !== 'ledger') {
-        return null;
+        return <Navigate to="../" />;
     }
 
     if (isFullWidth) {

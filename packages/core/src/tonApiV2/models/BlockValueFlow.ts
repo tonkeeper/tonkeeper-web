@@ -18,6 +18,7 @@ import {
     BlockCurrencyCollectionFromJSON,
     BlockCurrencyCollectionFromJSONTyped,
     BlockCurrencyCollectionToJSON,
+    BlockCurrencyCollectionToJSONTyped,
 } from './BlockCurrencyCollection';
 
 /**
@@ -127,10 +128,15 @@ export function BlockValueFlowFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function BlockValueFlowToJSON(value?: BlockValueFlow | null): any {
+  export function BlockValueFlowToJSON(json: any): BlockValueFlow {
+      return BlockValueFlowToJSONTyped(json, false);
+  }
+
+  export function BlockValueFlowToJSONTyped(value?: BlockValueFlow | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'from_prev_blk': BlockCurrencyCollectionToJSON(value['fromPrevBlk']),

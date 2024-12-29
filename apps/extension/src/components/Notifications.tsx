@@ -1,4 +1,4 @@
-import { ConnectItemReply } from '@tonkeeper/core/dist/entries/tonConnect';
+import { ConnectItemReply, DAppManifest } from "@tonkeeper/core/dist/entries/tonConnect";
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
@@ -6,6 +6,8 @@ import { useNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude'
 import { useCallback, useEffect, useState } from 'react';
 import { askBackground, sendBackground } from '../event';
 import { NotificationData } from '../libs/event';
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
 
 export const Notifications = () => {
     const [data, setData] = useState<NotificationData | undefined>(undefined);
@@ -42,10 +44,15 @@ export const Notifications = () => {
             <TonConnectNotification
                 origin={data?.origin}
                 params={data?.kind === 'tonConnectRequest' ? data.data : null}
-                handleClose={(payload?: ConnectItemReply[]) => {
+                handleClose={(result: {
+                  replyItems: ConnectItemReply[];
+                  manifest: DAppManifest;
+                  account: Account;
+                  walletId: WalletId;
+                } | null) => {
                     if (!data) return;
-                    if (payload) {
-                        sendBackground.message('approveRequest', { id: data.id, payload });
+                    if (result) {
+                        sendBackground.message('approveRequest', { id: data.id, payload: result });
                     } else {
                         sendBackground.message('rejectRequest', data.id);
                     }

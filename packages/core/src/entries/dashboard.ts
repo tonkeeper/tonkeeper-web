@@ -95,13 +95,15 @@ export function toStringDashboardCell(cell: DashboardCell): string {
         case 'string':
             return cell.value;
         case 'address':
-            return Address.parse(cell.raw).toString();
+            return Address.parse(cell.raw).toString({ bounceable: false });
         case 'numeric':
             return cell.value;
         case 'numeric_crypto':
             return cell.value.div(10 ** cell.decimals).toString() + ' ' + cell.symbol;
         case 'numeric_fiat':
             return cell.value.toString() + ' ' + cell.fiat;
+        default:
+            return assertUnreachable(cell);
     }
 }
 
@@ -138,6 +140,7 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             );
         case 'ton-only':
         case 'mnemonic':
+        case 'testnet':
             if (account.allTonWallets.length === 1) {
                 return baseInfo;
             }
@@ -150,7 +153,9 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             return baseInfo + ' ' + walletVersionText(walletVersion);
         case 'keystone':
             return baseInfo;
+        case 'ton-multisig':
+            return baseInfo + ' ' + 'multisig';
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }

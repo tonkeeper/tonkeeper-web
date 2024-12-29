@@ -95,6 +95,9 @@ export interface DeprecatedWalletState {
 
     revision: number;
 
+    /**
+     * @deprecated
+     */
     network?: Network;
 
     hiddenJettons?: string[];
@@ -119,6 +122,7 @@ export type TonContract = {
 export type TonWalletStandard = TonContract & {
     publicKey: string;
     version: WalletVersion;
+    network?: Network;
 };
 
 export type DerivationItem = {
@@ -144,6 +148,11 @@ export interface TonWalletConfig {
     hiddenNfts: string[];
     trustedNfts: string[];
     spamNfts: string[];
+    batterySettings: {
+        enabledForSwaps: boolean;
+        enabledForTokens: boolean;
+        enabledForNfts: boolean;
+    };
 }
 
 export const defaultPreferencesConfig: TonWalletConfig = {
@@ -152,7 +161,12 @@ export const defaultPreferencesConfig: TonWalletConfig = {
     pinnedNfts: [],
     hiddenNfts: [],
     trustedNfts: [],
-    spamNfts: []
+    spamNfts: [],
+    batterySettings: {
+        enabledForSwaps: true,
+        enabledForTokens: true,
+        enabledForNfts: true
+    }
 };
 
 export interface TronWalletStorage {

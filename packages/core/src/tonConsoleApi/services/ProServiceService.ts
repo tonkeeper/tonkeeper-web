@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -42,12 +42,15 @@ export class ProServiceService {
     /**
      * Auth via TonConnect
      * @param requestBody Data that is expected
-     * @returns Ok Ok
+     * @returns any Ok
      * @throws ApiError
      */
     public static proServiceTonConnectAuth(
         requestBody?: TonConnectProof,
-    ): CancelablePromise<Ok> {
+    ): CancelablePromise<{
+        ok: boolean;
+        auth_token: string;
+    }> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/auth/proof/check',
@@ -63,10 +66,13 @@ export class ProServiceService {
     }
     /**
      * Logout from the system
-     * @returns Ok Ok
+     * @returns any Ok
      * @throws ApiError
      */
-    public static proServiceLogout(): CancelablePromise<Ok> {
+    public static proServiceLogout(): CancelablePromise<{
+        ok: boolean;
+        auth_token: string;
+    }> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/logout',
@@ -207,6 +213,7 @@ export class ProServiceService {
         is_trial: boolean;
         used_trial: boolean;
         next_charge?: number;
+        auth_token: string;
     }> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -222,12 +229,15 @@ export class ProServiceService {
     /**
      * Activate pro trial period
      * @param requestBody Data that is expected from Telegram
-     * @returns Ok Ok
+     * @returns any Ok
      * @throws ApiError
      */
     public static proServiceTrial(
         requestBody?: TgAuth,
-    ): CancelablePromise<Ok> {
+    ): CancelablePromise<{
+        ok: boolean;
+        auth_token: string;
+    }> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/trial',
@@ -321,12 +331,15 @@ export class ProServiceService {
     /**
      * Update the state
      * @param requestBody Data that is expected
-     * @returns Ok Ok
+     * @returns any Ok
      * @throws ApiError
      */
     public static proServiceUpdateState(
         requestBody?: ProServiceState,
-    ): CancelablePromise<Ok> {
+    ): CancelablePromise<{
+        ok: boolean;
+        auth_token: string;
+    }> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/services/pro/state',
@@ -342,10 +355,13 @@ export class ProServiceService {
     }
     /**
      * Delete the state
-     * @returns Ok Ok
+     * @returns any Ok
      * @throws ApiError
      */
-    public static proServiceDeleteState(): CancelablePromise<Ok> {
+    public static proServiceDeleteState(): CancelablePromise<{
+        ok: boolean;
+        auth_token: string;
+    }> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/services/pro/state',

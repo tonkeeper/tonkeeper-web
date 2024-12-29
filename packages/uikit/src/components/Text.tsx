@@ -20,6 +20,17 @@ export const H2 = styled.h2`
     margin: 0 0 0.25rem;
 `;
 
+export const H2Label2Responsive = styled(H2)`
+    user-select: none;
+
+    ${p => p.theme.displayType === 'full-width' && Label2Class}
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            margin-bottom: 4px;
+        `}
+`;
+
 export const H3 = styled.h3`
     font-style: normal;
     font-weight: 700;
@@ -48,11 +59,15 @@ export const Label2 = styled.span`
     ${Label2Class}
 `;
 
-export const Label3 = styled.span`
+export const Label3Class = css`
     font-style: normal;
     font-weight: 600;
     font-size: 12px;
     line-height: 16px;
+`;
+
+export const Label3 = styled.span`
+    ${Label3Class}
 `;
 
 export const Label4 = styled.span`
@@ -67,6 +82,24 @@ export const Body1 = styled.span`
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
+`;
+
+export const Body1Body2Responsive = styled(Body1)<{ secondary?: boolean }>`
+    user-select: none;
+
+    ${p =>
+        p.secondary &&
+        css`
+            color: ${p => p.theme.textSecondary};
+        `}
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            ${Body2Class};
+        `}
+
+    text-wrap: balance;
 `;
 
 export const Body2Class = css`
@@ -107,4 +140,22 @@ export const Num3 = styled.span`
     font-weight: 510;
     font-size: 24px;
     line-height: 32px;
+`;
+
+export const Mono = styled.span`
+    font-family: ${p => p.theme.fontMono};
+`;
+
+export const TextEllipsis = css`
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+`;
+
+export const NoSelectText = css`
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 `;

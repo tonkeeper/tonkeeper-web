@@ -18,6 +18,7 @@ import {
     SignRawMessageFromJSON,
     SignRawMessageFromJSONTyped,
     SignRawMessageToJSON,
+    SignRawMessageToJSONTyped,
 } from './SignRawMessage';
 
 /**
@@ -88,10 +89,15 @@ export function SignRawParamsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function SignRawParamsToJSON(value?: SignRawParams | null): any {
+  export function SignRawParamsToJSON(json: any): SignRawParams {
+      return SignRawParamsToJSONTyped(json, false);
+  }
+
+  export function SignRawParamsToJSONTyped(value?: SignRawParams | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'relay_address': value['relayAddress'],

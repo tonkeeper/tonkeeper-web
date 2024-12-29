@@ -15,13 +15,17 @@ import {
     useTonConnectLastEventId
 } from '../../state/tonConnect';
 import { TonTransactionNotification } from './TonTransactionNotification';
-import { SendTransactionAppRequest, useResponseSendMutation } from './connectHook';
+import { useResponseSendMutation } from './connectHook';
 
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
+import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
+import { SendTransactionAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
 
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
 };
+
+const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
 
 const TonConnectSubscription = () => {
     const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
@@ -118,9 +122,31 @@ const TonConnectSubscription = () => {
             } finally {
                 setRequest(undefined);
             }
+
+            sendBroadcastMessage(
+                BROADCAST_TAG,
+                JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
+            );
         },
         [request, responseSendAsync, setRequest]
     );
+
+    useEffect(() => {
+        if (!request) {
+            return;
+        }
+
+        return listenBroadcastMessages(BROADCAST_TAG, message => {
+            const val = JSON.parse(message);
+            if (val.id !== request.id) {
+                return;
+            }
+
+            if (val.event === 'close-tx-confirmation') {
+                setRequest(undefined);
+            }
+        });
+    }, [request]);
 
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(connection => {

@@ -57,10 +57,15 @@ export function ImagePreviewFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ImagePreviewToJSON(value?: ImagePreview | null): any {
+  export function ImagePreviewToJSON(json: any): ImagePreview {
+      return ImagePreviewToJSONTyped(json, false);
+  }
+
+  export function ImagePreviewToJSONTyped(value?: ImagePreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'resolution': value['resolution'],

@@ -5,7 +5,7 @@ import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop';
+    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet' | 'swap-widget-web';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -65,6 +65,26 @@ export interface TonendpointConfig {
      * @deprecated use ton api
      */
     tonEndpointAPIKey?: string;
+
+    multisig_help_url?: string;
+
+    multisig_about_url?: string;
+
+    batteryHost?: string;
+    batteryMeanFees?: string;
+    batteryMeanPrice_swap?: string;
+    batteryMeanPrice_jetton?: string;
+    batteryMeanPrice_nft?: string;
+    batteryRefundEndpoint?: string;
+    batteryReservedAmount?: string;
+    battery_beta?: boolean;
+    disable_battery?: boolean;
+    disable_battery_send?: boolean;
+
+    /**
+     * "secret" flag name to determine if the app is on ios review
+     */
+    tablet_enable_additional_security?: boolean;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';
@@ -136,9 +156,9 @@ export class Tonendpoint {
         return params.toString();
     };
 
-    boot = async (): Promise<TonendpointConfig> => {
+    boot = async (network: Network): Promise<TonendpointConfig> => {
         const response = await this.fetchApi(
-            `https://boot.tonkeeper.com/keys?${this.toSearchParams()}`,
+            `https://boot.tonkeeper.com/keys?${this.toSearchParams({ network })}`,
             {
                 method: 'GET'
             }
@@ -189,8 +209,11 @@ export class Tonendpoint {
     };
 }
 
-export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<TonendpointConfig> => {
-    const result = await tonendpoint.boot();
+export const getServerConfig = async (
+    tonendpoint: Tonendpoint,
+    network: Network
+): Promise<TonendpointConfig> => {
+    const result = await tonendpoint.boot(network);
 
     return {
         flags: {},

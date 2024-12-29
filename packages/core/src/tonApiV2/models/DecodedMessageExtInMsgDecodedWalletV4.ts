@@ -18,6 +18,7 @@ import {
     DecodedRawMessageFromJSON,
     DecodedRawMessageFromJSONTyped,
     DecodedRawMessageToJSON,
+    DecodedRawMessageToJSONTyped,
 } from './DecodedRawMessage';
 
 /**
@@ -88,10 +89,15 @@ export function DecodedMessageExtInMsgDecodedWalletV4FromJSONTyped(json: any, ig
     };
 }
 
-export function DecodedMessageExtInMsgDecodedWalletV4ToJSON(value?: DecodedMessageExtInMsgDecodedWalletV4 | null): any {
+  export function DecodedMessageExtInMsgDecodedWalletV4ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV4 {
+      return DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped(json, false);
+  }
+
+  export function DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV4 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'subwallet_id': value['subwalletId'],

@@ -1,10 +1,10 @@
 import { NftItem, TrustType } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from '../../hooks/translation';
+import { useActiveTonWalletConfig } from '../../state/wallet';
 import { VerificationIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
-import { useActiveTonWalletConfig } from '../../state/wallet';
-import { useTranslation } from '../../hooks/translation';
 import { SpamBadge } from '../activity/NotificationCommon';
 
 const TextContent = styled.span`
@@ -67,6 +67,10 @@ export const NftCollectionBody3: FC<{ nft: NftItem }> = React.memo(({ nft }) => 
 
     if (isSuspicious && !isTrusted) {
         return <HeaderSuspicious>{t('suspicious_label_short')}</HeaderSuspicious>;
+    }
+
+    if (!(nft.collection?.name ?? nft.metadata.description)) {
+        return null;
     }
 
     return (

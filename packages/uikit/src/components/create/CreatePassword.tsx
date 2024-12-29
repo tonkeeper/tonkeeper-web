@@ -1,3 +1,4 @@
+import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -6,7 +7,6 @@ import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
-import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 
 const Block = styled.form`
     display: flex;
@@ -56,6 +56,7 @@ export const CreatePassword: FC<{
             <Block onSubmit={onCreate}>
                 <H2>{t('Create_password')}</H2>
                 <Input
+                    id="create-password"
                     ref={ref}
                     type="password"
                     label={t('Password')}
@@ -69,6 +70,7 @@ export const CreatePassword: FC<{
                 />
 
                 <Input
+                    id="create-password-confirm"
                     type="password"
                     label={t('ConfirmPassword')}
                     value={confirm}

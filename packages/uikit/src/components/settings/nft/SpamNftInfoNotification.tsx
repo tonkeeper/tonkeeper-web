@@ -9,6 +9,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { Button } from '../../../components/fields/Button';
 import { CopyButton } from '../../../components/CopyButton';
 import { useTranslation } from '../../../hooks/translation';
+import { useActiveTonNetwork } from '../../../state/wallet';
 
 const ContentWrapper = styled.div``;
 
@@ -49,7 +50,8 @@ export const SpamNftInfoNotification: FC<{
     onClose: (confirmNotSpam?: boolean) => void;
 }> = ({ isOpen, onClose, nft }) => {
     const { t } = useTranslation();
-    const address = nft ? toShortValue(formatAddress(nft.address)) : '';
+    const network = useActiveTonNetwork();
+    const address = nft ? toShortValue(formatAddress(nft.address, network, true)) : '';
     return (
         <Notification
             title={t('approval_details_token')}
@@ -78,7 +80,9 @@ export const SpamNftInfoNotification: FC<{
                                     </Body2>
                                     <Body2>{address}</Body2>
                                 </TextBlock>
-                                <CopyButton content={nft ? formatAddress(nft.address) : ''} />
+                                <CopyButton
+                                    content={nft ? formatAddress(nft.address, network, true) : ''}
+                                />
                             </ListItemPayloadStyled>
                         </ListItemElement>
                     </ListBlockStyled>

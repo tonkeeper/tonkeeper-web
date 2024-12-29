@@ -5,7 +5,6 @@ import {
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
@@ -24,6 +23,8 @@ import { CommonCountryButton } from '../fields/RoundedButton';
 import { Action } from './Actions';
 import { BuyItemNotification } from './BuyItemNotification';
 import { BuyIcon, SellIcon } from './HomeIcons';
+import { useActiveConfig } from '../../state/wallet';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ items, kind }) => {
     return (
@@ -53,7 +54,7 @@ const ActionNotification: FC<{
     const { data: country } = useUserCountry();
 
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     return (
         <Block>
             <NotificationHeaderPortal>
@@ -116,9 +117,11 @@ export const BuyNotification: FC<{
     }, [open, buy]);
 
     return (
-        <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
-            {Content}
-        </Notification>
+        <HideOnReview>
+            <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
+                {Content}
+            </Notification>
+        </HideOnReview>
     );
 };
 
@@ -142,10 +145,10 @@ export const BuyAction: FC = () => {
     }, [searchParams, setSearchParams]);
 
     return (
-        <>
+        <HideOnReview>
             <Action icon={<BuyIcon />} title={'wallet_buy'} action={toggle} />
             <BuyNotification buy={buy} open={open} handleClose={toggle} />
-        </>
+        </HideOnReview>
     );
 };
 

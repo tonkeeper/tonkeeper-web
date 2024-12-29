@@ -94,6 +94,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
                 <TonkeeperIcon />
             </Logo>
             <Input
+                id="unlock-password"
                 ref={ref}
                 value={password}
                 onChange={onChange}

@@ -22,14 +22,17 @@ import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
-import { useFetchFilteredActivity } from '../../state/activity';
+import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { getMixedActivity } from '../../state/mixedActivity';
-import { useRate } from '../../state/rates';
+import { toTokenRate, useRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
-import { useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
+import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -71,15 +74,18 @@ const ButtonStyled = styled(Button)`
 const CoinHeader: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const network = useActiveTonNetwork();
+
     const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: buy } = useTonendpointBuyMethods();
-    const canBuy = token === CryptoCurrency.TON;
+    const canBuy = token === CryptoCurrency.TON && network !== Network.TESTNET;
     const { data: swapAssets } = useAllSwapAssets();
 
     const currentAssetAddress = tonAssetAddressFromString(token);
-    const swapAsset = isReadOnly
-        ? undefined
-        : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
+    const swapAsset =
+        isReadOnly || network === Network.TESTNET
+            ? undefined
+            : swapAssets?.find(a => eqAddresses(a.address, currentAssetAddress));
 
     const [_, setSwapFromAsset] = useSwapFromAsset();
     const navigate = useNavigate();
@@ -101,7 +107,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                             sdk.uiEvents.emit('transfer', {
                                 method: 'transfer',
                                 id: Date.now(),
-                                params: { asset: token, chain: BLOCKCHAIN_NAME.TON }
+                                params: { jetton: token, chain: BLOCKCHAIN_NAME.TON, from: 'token' }
                             })
                         }
                     >
@@ -114,25 +120,33 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     onClick={() => {
                         sdk.uiEvents.emit('receive', {
                             method: 'receive',
-                            params: {}
+                            params:
+                                token === CryptoCurrency.TON
+                                    ? {}
+                                    : {
+                                          chain: BLOCKCHAIN_NAME.TON,
+                                          jetton: token
+                                      }
                         });
                     }}
                 >
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                {swapAsset && (
-                    <ButtonStyled size="small" onClick={onSwap}>
-                        <SwapIcon />
-                        {t('wallet_swap')}
-                    </ButtonStyled>
-                )}
-                {canBuy && (
-                    <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIcon />
-                        {t('wallet_buy')}
-                    </ButtonStyled>
-                )}
+                <HideOnReview>
+                    {swapAsset && (
+                        <ButtonStyled size="small" onClick={onSwap}>
+                            <SwapIcon />
+                            {t('wallet_swap')}
+                        </ButtonStyled>
+                    )}
+                    {canBuy && (
+                        <ButtonStyled size="small" onClick={onOpen}>
+                            <PlusIcon />
+                            {t('wallet_buy')}
+                        </ButtonStyled>
+                    )}
+                </HideOnReview>
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </CoinHeaderStyled>
@@ -170,7 +184,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
 
     const asset: { symbol: string; image: string; amount: string; fiatAmount: string } | undefined =
         useMemo(() => {
-            if (!assets || !rate) {
+            if (!assets) {
                 return undefined;
             }
 
@@ -182,7 +196,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                     amount: format(amount),
                     fiatAmount: formatFiatCurrency(
                         fiat,
-                        new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount))
+                        rate ? new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount)) : 0
                     )
                 };
             }
@@ -203,9 +217,12 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                 amount: format(amount, jettonBalance.jetton.decimals),
                 fiatAmount: formatFiatCurrency(
                     fiat,
-                    new BigNumber(rate.prices || 0).multipliedBy(
-                        shiftedDecimals(jettonBalance.balance, jettonBalance.jetton.decimals)
-                    )
+                    jettonBalance.price
+                        ? shiftedDecimals(
+                              jettonBalance.balance,
+                              jettonBalance.jetton.decimals
+                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                        : 0
                 )
             };
         }, [assets, format, rate, fiat]);
@@ -235,18 +252,28 @@ const HistorySubheader = styled(Label2)`
 
 const HistoryContainer = styled.div`
     overflow-x: auto;
+    overflow-y: hidden;
+`;
+
+const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
+    > *:last-child {
+        margin-left: auto;
+        width: fit-content;
+    }
+
+    padding-right: 0;
 `;
 
 export const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
-    const { standalone } = useAppContext();
-
-    const { fetchNextPage, hasNextPage, isFetchingNextPage, data } =
+    const { fetchNextPage, hasNextPage, isFetchingNextPage, data, refetch } =
         useFetchFilteredActivity(token);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, standalone, ref);
+    useScrollMonitor(ref, 5000, refetch);
+
+    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
     const activity = useMemo(() => {
         return getMixedActivity(data, undefined);
@@ -267,9 +294,10 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeader backButton borderBottom={true}>
+            <DesktopViewHeaderStyled backButton borderBottom={true}>
                 <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-            </DesktopViewHeader>
+                <OtherHistoryFilters disableInitiatorFilter={token !== CryptoCurrency.TON} />
+            </DesktopViewHeaderStyled>
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>

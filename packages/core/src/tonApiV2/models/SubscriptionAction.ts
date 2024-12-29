@@ -18,6 +18,7 @@ import {
     AccountAddressFromJSON,
     AccountAddressFromJSONTyped,
     AccountAddressToJSON,
+    AccountAddressToJSONTyped,
 } from './AccountAddress';
 
 /**
@@ -88,10 +89,15 @@ export function SubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function SubscriptionActionToJSON(value?: SubscriptionAction | null): any {
+  export function SubscriptionActionToJSON(json: any): SubscriptionAction {
+      return SubscriptionActionToJSONTyped(json, false);
+  }
+
+  export function SubscriptionActionToJSONTyped(value?: SubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'subscriber': AccountAddressToJSON(value['subscriber']),

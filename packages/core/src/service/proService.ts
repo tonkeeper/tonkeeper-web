@@ -11,13 +11,12 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { isStandardTonWallet, TonWalletStandard, WalletVersion } from '../entries/wallet';
+import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
     InvoiceStatus,
     InvoicesInvoice,
-    Lang,
     ProServiceDashboardCellAddress,
     ProServiceDashboardCellNumericCrypto,
     ProServiceDashboardCellNumericFiat,
@@ -27,11 +26,13 @@ import {
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
+import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
-import { getServerTime } from './transfer/common';
+import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
-import { accountsStorage } from './accountsStorage';
+import { getNetworkByAccount } from '../entries/account';
+import { Network } from '../entries/network';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -42,9 +43,12 @@ export const getBackupState = async (storage: IStorage) => {
     return backup ?? toEmptySubscription();
 };
 
-export const getProState = async (storage: IStorage): Promise<ProState> => {
+export const getProState = async (
+    authTokenService: ProAuthTokenService,
+    storage: IStorage
+): Promise<ProState> => {
     try {
-        return await loadProState(storage);
+        return await loadProState(authTokenService, storage);
     } catch (e) {
         console.error(e);
         return {
@@ -79,14 +83,24 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-export const loadProState = async (storage: IStorage): Promise<ProState> => {
+export type ProAuthTokenService = {
+    attachToken: () => Promise<void>;
+    onTokenUpdated: (token: string | null) => Promise<void>;
+};
+
+const loadProState = async (
+    authService: ProAuthTokenService,
+    storage: IStorage
+): Promise<ProState> => {
+    await authService.attachToken();
     const user = await ProServiceService.proServiceGetUserInfo();
 
     let authorizedWallet: ProStateWallet | null = null;
     if (user.pub_key && user.version) {
-        const wallets = (await accountsStorage(storage).getAccounts()).flatMap(
-            a => a.allTonWallets
-        );
+        const wallets = (await accountsStorage(storage).getAccounts())
+            .filter(a => getNetworkByAccount(a) === Network.MAINNET)
+            .flatMap(a => a.allTonWallets);
+
         const actualWallet = wallets
             .filter(isStandardTonWallet)
             .find(
@@ -144,16 +158,8 @@ export const loadProState = async (storage: IStorage): Promise<ProState> => {
     };
 };
 
-export const checkAuthCookie = async () => {
-    try {
-        await ProServiceService.proServiceVerify();
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-
 export const authViaTonConnect = async (
+    authService: ProAuthTokenService,
     api: APIConfig,
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
@@ -184,13 +190,17 @@ export const authViaTonConnect = async (
     if (!result.ok) {
         throw new Error('Unable to authorize');
     }
+
+    await authService.onTokenUpdated(result.auth_token);
 };
 
-export const logoutTonConsole = async () => {
+export const logoutTonConsole = async (authService: ProAuthTokenService) => {
     const result = await ProServiceService.proServiceLogout();
     if (!result.ok) {
         throw new Error('Unable to logout');
     }
+
+    await authService.onTokenUpdated(null);
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
@@ -234,6 +244,16 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
+export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
+    for (let i = 0; i < 10; i++) {
+        const state = await getProState(authService, storage);
+        if (state.subscription.valid) {
+            return;
+        }
+        await delay(5000);
+    }
+};
+
 export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     let updated = invoice;
 
@@ -247,12 +267,20 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export async function startProServiceTrial(botId: string, lang?: string) {
+export async function startProServiceTrial(
+    authService: ProAuthTokenService,
+    botId: string,
+    lang?: string
+) {
     const tgData = await loginViaTG(botId, lang);
     if (!tgData) {
         return false;
     }
-    return (await ProServiceService.proServiceTrial(tgData)).ok;
+    const result = await ProServiceService.proServiceTrial(tgData);
+
+    await authService.onTokenUpdated(result.auth_token);
+
+    return result.ok;
 }
 
 export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {
@@ -268,6 +296,11 @@ export async function getDashboardColumns(lang?: string): Promise<DashboardColum
         defaultIsChecked: item.checked_default,
         onlyPro: item.only_pro
     }));
+}
+
+enum Lang {
+    EN = 'en',
+    RU = 'ru'
 }
 
 export async function getDashboardData(

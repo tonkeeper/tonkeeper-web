@@ -2,19 +2,22 @@ import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute, ImportRoute } from '../../libs/routes';
 import { Body2, Body3Class, Label1, Label2Class } from '../Text';
-import {
-    ImportIcon,
-    KeystoneIcon,
-    LedgerIcon,
-    RightIcon,
-    SignerIcon,
-    WatchOnlyIcon
-} from './ImportIcons';
 import { BorderSmallResponsive } from '../shared/Styles';
-import { PlusIcon } from '../Icon';
 import { Badge } from '../shared';
+import { useAccountsState } from '../../state/wallet';
+import {
+    WalletImportIcon,
+    WalletKeystoneIcon,
+    WalletLedgerIcon,
+    WalletMagnifyingGlassIcon,
+    WalletPencilIcon,
+    WalletPlusIcon,
+    WalletSignerIcon,
+    WalletTestnetIcon
+} from './WalletIcons';
+import { ChevronRightIcon } from '../Icon';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const AddMethod = styled.button`
     display: flex;
@@ -40,9 +43,11 @@ const AddMethod = styled.button`
 
 const ButtonIcon = styled.div`
     color: ${props => props.theme.accentBlue};
-    height: 28px;
-    display: flex;
-    align-items: center;
+    flex-shrink: 0;
+`;
+
+const RightIconStyled = styled(ChevronRightIcon)`
+    color: ${props => props.theme.iconTertiary};
     flex-shrink: 0;
 `;
 
@@ -63,6 +68,7 @@ const AddMethodLabel = styled(Label1)`
     display: flex;
     align-items: center;
     gap: 4px;
+    color: ${p => p.theme.textPrimary};
     ${p => p.theme.displayType === 'full-width' && Label2Class}
 `;
 
@@ -78,22 +84,37 @@ const GroupsDivider = styled(Body2)`
     margin: 24px 0 16px;
 `;
 
-const PlusIconStyled = styled(PlusIcon)`
-    height: 28px;
-    width: 28px;
-`;
+export const addWalletMethod = [
+    'multisig',
+    'create-standard',
+    'create-mam',
+    'import',
+    'watch-only',
+    'signer',
+    'keystone',
+    'ledger',
+    'testnet'
+] as const;
+export type AddWalletMethod = (typeof addWalletMethod)[number];
 
-export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onSelect }) => {
+export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }> = ({
+    onSelect
+}) => {
     const { t } = useTranslation();
-    const { hideMam, hideSigner, hideLedger, hideKeystone } = useAppContext();
+    const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig } = useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
+
+    const accounts = useAccountsState();
+    const canAddMultisig = accounts.some(
+        acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
+    );
 
     return (
         <AddMethodsWrapper>
             <AddMethodsGroup>
-                <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.create)}>
+                <AddMethod onClick={() => onSelect('create-standard')}>
                     <ButtonIcon>
-                        <PlusIconStyled />
+                        <WalletPlusIcon />
                     </ButtonIcon>
                     <AddMethodText>
                         <AddMethodLabel>{t('import_new_wallet')}</AddMethodLabel>
@@ -101,14 +122,12 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                             {t('import_new_wallet_description')}
                         </AddMethodDescription>
                     </AddMethodText>
-                    <ButtonIcon>
-                        <RightIcon />
-                    </ButtonIcon>
+                    <RightIconStyled />
                 </AddMethod>
                 {!hideMam && (
-                    <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.mam)}>
+                    <AddMethod onClick={() => onSelect('create-mam')}>
                         <ButtonIcon>
-                            <PlusIconStyled />
+                            <WalletPlusIcon />
                         </ButtonIcon>
                         <AddMethodText>
                             <AddMethodLabel>
@@ -119,28 +138,24 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                                 {t('add_wallet_modal_mam_subtitle')}
                             </AddMethodDescription>
                         </AddMethodText>
-                        <ButtonIcon>
-                            <RightIcon />
-                        </ButtonIcon>
+                        <RightIconStyled />
                     </AddMethod>
                 )}
-                <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.import)}>
+                <AddMethod onClick={() => onSelect('import')}>
                     <ButtonIcon>
-                        <ImportIcon />
+                        <WalletImportIcon />
                     </ButtonIcon>
                     <AddMethodText>
                         <AddMethodLabel>{t('import_existing_wallet')}</AddMethodLabel>
                         <AddMethodDescription>
-                            {t('import_existing_wallet_description')}
+                            {t('import_existing_wallet_description_extended')}
                         </AddMethodDescription>
                     </AddMethodText>
-                    <ButtonIcon>
-                        <RightIcon />
-                    </ButtonIcon>
+                    <RightIconStyled />
                 </AddMethod>
-                <AddMethod onClick={() => onSelect(AppRoute.import + ImportRoute.readOnly)}>
+                <AddMethod onClick={() => onSelect('watch-only')}>
                     <ButtonIcon>
-                        <WatchOnlyIcon />
+                        <WalletMagnifyingGlassIcon />
                     </ButtonIcon>
                     <AddMethodText>
                         <AddMethodLabel>{t('add_wallet_modal_watch_only_title')}</AddMethodLabel>
@@ -148,9 +163,40 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                             {t('add_wallet_modal_watch_only_subtitle')}
                         </AddMethodDescription>
                     </AddMethodText>
+                    <RightIconStyled />
+                </AddMethod>
+                <HideOnReview>
+                    {canAddMultisig && !hideMultisig && (
+                        <AddMethod onClick={() => onSelect('multisig')}>
+                            <ButtonIcon>
+                                <WalletPencilIcon />
+                            </ButtonIcon>
+                            <AddMethodText>
+                                <AddMethodLabel>
+                                    {t('add_wallet_new_multisig_title')}{' '}
+                                    <HideOnReview>
+                                        <Badge color="accentBlue">PRO</Badge>
+                                    </HideOnReview>
+                                </AddMethodLabel>
+                                <AddMethodDescription>
+                                    {t('add_wallet_new_multisig_description')}
+                                </AddMethodDescription>
+                            </AddMethodText>
+                            <RightIconStyled />
+                        </AddMethod>
+                    )}
+                </HideOnReview>
+                <AddMethod onClick={() => onSelect('testnet')}>
                     <ButtonIcon>
-                        <RightIcon />
+                        <WalletTestnetIcon />
                     </ButtonIcon>
+                    <AddMethodText>
+                        <AddMethodLabel>{t('add_wallet_modal_testnet_title')}</AddMethodLabel>
+                        <AddMethodDescription>
+                            {t('add_wallet_modal_testnet_subtitle')}
+                        </AddMethodDescription>
+                    </AddMethodText>
+                    <RightIconStyled />
                 </AddMethod>
             </AddMethodsGroup>
             {!hideAllHardwareWallets && (
@@ -158,11 +204,9 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                     <GroupsDivider>{t('add_wallet_group_hardware_title')}</GroupsDivider>
                     <AddMethodsGroup>
                         {!hideSigner && (
-                            <AddMethod
-                                onClick={() => onSelect(AppRoute.import + ImportRoute.signer)}
-                            >
+                            <AddMethod onClick={() => onSelect('signer')}>
                                 <ButtonIcon>
-                                    <SignerIcon />
+                                    <WalletSignerIcon />
                                 </ButtonIcon>
                                 <AddMethodText>
                                     <AddMethodLabel>{t('import_signer')}</AddMethodLabel>
@@ -170,17 +214,13 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                                         {t('import_signer_description')}
                                     </AddMethodDescription>
                                 </AddMethodText>
-                                <ButtonIcon>
-                                    <RightIcon />
-                                </ButtonIcon>
+                                <RightIconStyled />
                             </AddMethod>
                         )}
                         {!hideLedger && (
-                            <AddMethod
-                                onClick={() => onSelect(AppRoute.import + ImportRoute.ledger)}
-                            >
+                            <AddMethod onClick={() => onSelect('ledger')}>
                                 <ButtonIcon>
-                                    <LedgerIcon />
+                                    <WalletLedgerIcon />
                                 </ButtonIcon>
                                 <AddMethodText>
                                     <AddMethodLabel>{t('ledger_pair_title')}</AddMethodLabel>
@@ -188,17 +228,13 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                                         {t('ledger_pair_subtitle')}
                                     </AddMethodDescription>
                                 </AddMethodText>
-                                <ButtonIcon>
-                                    <RightIcon />
-                                </ButtonIcon>
+                                <RightIconStyled />
                             </AddMethod>
                         )}
                         {!hideKeystone && (
-                            <AddMethod
-                                onClick={() => onSelect(AppRoute.import + ImportRoute.keystone)}
-                            >
+                            <AddMethod onClick={() => onSelect('keystone')}>
                                 <ButtonIcon>
-                                    <KeystoneIcon />
+                                    <WalletKeystoneIcon />
                                 </ButtonIcon>
                                 <AddMethodText>
                                     <AddMethodLabel>{t('keystone_pair_title')}</AddMethodLabel>
@@ -206,9 +242,7 @@ export const AddWalletContent: FC<{ onSelect: (path: string) => void }> = ({ onS
                                         {t('keystone_pair_subtitle')}
                                     </AddMethodDescription>
                                 </AddMethodText>
-                                <ButtonIcon>
-                                    <RightIcon />
-                                </ButtonIcon>
+                                <RightIconStyled />
                             </AddMethod>
                         )}
                     </AddMethodsGroup>

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -19,13 +19,13 @@ import {
 } from '@tonkeeper/uikit/dist/components/Skeleton';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
-import {
-    AfterImportAction,
-    AppSdkContext,
-    OnImportAction
-} from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
-import { I18nContext, TranslationContext } from '@tonkeeper/uikit/dist/hooks/translation';
+import {
+    I18nContext,
+    TranslationContext,
+    useTWithReplaces
+} from '@tonkeeper/uikit/dist/hooks/translation';
 import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
@@ -62,6 +62,8 @@ import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
+import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -160,7 +162,9 @@ const getUsePadding = (platform: TwaPlatform): boolean => {
 };
 
 const TwaApp: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
-    const { t, i18n } = useTranslation();
+    const { t: tSimple, i18n } = useTranslation();
+
+    const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
         const client: I18nContext = {
@@ -225,6 +229,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const { data: lang, isLoading: isLangLoading } = useUserLanguage();
     const { data: fiat } = useUserFiatQuery();
     const { data: devSettings } = useDevSettings();
+    const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
+    const { isLoading: globalSetupLoading } = useGlobalSetup();
 
     const lock = useLock(sdk);
     const network = useActiveTonNetwork();
@@ -235,9 +241,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         network,
         lang
     });
-    const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const navigate = useNavigate();
     const { data: tracker } = useAnalytics(
         activeAccount || undefined,
         accounts,
@@ -249,10 +254,12 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         isWalletsLoading ||
         activeWalletLoading ||
         isLangLoading ||
-        config === undefined ||
+        serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
-        !devSettings
+        !devSettings ||
+        globalPreferencesLoading ||
+        globalSetupLoading
     ) {
         return <Loading />;
     }
@@ -260,9 +267,11 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
 
     const context: IAppContext = {
-        api: getApiConfig(config, network),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
+        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
         fiat,
-        config,
+        mainnetConfig: serverConfig.mainnetConfig,
+        testnetConfig: serverConfig.testnetConfig,
         tonendpoint,
         standalone: true,
         extension: false,
@@ -273,29 +282,24 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideKeystone: !showQrScan,
         hideQrScanner: !showQrScan,
         hideMam: true,
+        hideMultisig: true,
         defaultWalletVersion: WalletVersion.V5R1,
         browserLength: 4
     };
 
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <OnImportAction.Provider value={navigate}>
-                <AfterImportAction.Provider
-                    value={() => navigate(AppRoute.home, { replace: true })}
-                >
-                    <AppContext.Provider value={context}>
-                        <Content
-                            activeAccount={activeAccount}
-                            lock={lock}
-                            showQrScan={showQrScan}
-                            sdk={sdk}
-                        />
-                        <CopyNotification />
-                        <ModalsRoot />
-                        {showQrScan && <TwaQrScanner />}
-                    </AppContext.Provider>
-                </AfterImportAction.Provider>
-            </OnImportAction.Provider>
+            <AppContext.Provider value={context}>
+                <Content
+                    activeAccount={activeAccount}
+                    lock={lock}
+                    showQrScan={showQrScan}
+                    sdk={sdk}
+                />
+                <CopyNotification />
+                <ModalsRoot />
+                {showQrScan && <TwaQrScanner />}
+            </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 };
@@ -319,10 +323,7 @@ const InitPages: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     return (
         <InitWrapper>
             <Suspense fallback={<Loading />}>
-                <Routes>
-                    <Route path={any(AppRoute.import)} element={<ImportRouter />} />
-                    <Route path="*" element={<Initialize />} />
-                </Routes>
+                <Initialize />
             </Suspense>
         </InitWrapper>
     );

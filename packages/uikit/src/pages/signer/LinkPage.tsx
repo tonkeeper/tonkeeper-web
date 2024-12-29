@@ -8,6 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
 import { useAccountsStorage } from '../../hooks/useStorage';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const useAddWalletMutation = () => {
     const sdk = useAppSdk();
@@ -21,7 +22,13 @@ const useAddWalletMutation = () => {
             if (publicKey === null) {
                 sdk.topMessage('Missing public key');
             } else {
-                const state = await accountBySignerDeepLink(context, sdk.storage, publicKey, name);
+                const state = await accountBySignerDeepLink(
+                    context,
+                    Network.MAINNET,
+                    sdk.storage,
+                    publicKey,
+                    name
+                );
                 await accountsStorage.addAccountToState(state);
                 await client.invalidateQueries([QueryKey.account]);
             }

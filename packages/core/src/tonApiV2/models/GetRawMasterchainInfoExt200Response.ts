@@ -18,12 +18,14 @@ import {
     BlockRawFromJSON,
     BlockRawFromJSONTyped,
     BlockRawToJSON,
+    BlockRawToJSONTyped,
 } from './BlockRaw';
 import type { InitStateRaw } from './InitStateRaw';
 import {
     InitStateRawFromJSON,
     InitStateRawFromJSONTyped,
     InitStateRawToJSON,
+    InitStateRawToJSONTyped,
 } from './InitStateRaw';
 
 /**
@@ -118,10 +120,15 @@ export function GetRawMasterchainInfoExt200ResponseFromJSONTyped(json: any, igno
     };
 }
 
-export function GetRawMasterchainInfoExt200ResponseToJSON(value?: GetRawMasterchainInfoExt200Response | null): any {
+  export function GetRawMasterchainInfoExt200ResponseToJSON(json: any): GetRawMasterchainInfoExt200Response {
+      return GetRawMasterchainInfoExt200ResponseToJSONTyped(json, false);
+  }
+
+  export function GetRawMasterchainInfoExt200ResponseToJSONTyped(value?: GetRawMasterchainInfoExt200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'mode': value['mode'],

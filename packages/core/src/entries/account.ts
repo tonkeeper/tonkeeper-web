@@ -1,6 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { KeystonePathInfo } from '../service/keystone/types';
-import { AuthKeychain, AuthPassword, AuthSigner, AuthSignerDeepLink } from './password';
+import {
+    AuthKeychain,
+    AuthPassword,
+    AuthSigner,
+    AuthSignerDeepLink,
+    MnemonicType
+} from './password';
 import {
     DerivationItem,
     TonContract,
@@ -9,6 +15,7 @@ import {
     DerivationItemNamed
 } from './wallet';
 import { assertUnreachable } from '../utils/types';
+import { Network } from './network';
 
 /**
  * @deprecated
@@ -32,7 +39,7 @@ export interface IAccount {
     setActiveTonWallet(walletId: WalletId): void;
 }
 
-export interface IAccountControllable extends IAccount {
+export interface IAccountTonWalletStandard extends IAccount {
     get allTonWallets(): TonWalletStandard[];
     get activeTonWallet(): TonWalletStandard;
 
@@ -40,7 +47,7 @@ export interface IAccountControllable extends IAccount {
     setActiveTonWallet(walletId: WalletId): void;
 }
 
-export interface IAccountVersionsEditable extends IAccountControllable {
+export interface IAccountVersionsEditable extends IAccountTonWalletStandard {
     addTonWalletToActiveDerivation(wallet: TonWalletStandard): void;
     removeTonWalletFromActiveDerivation(walletId: WalletId): void;
 }
@@ -53,9 +60,7 @@ export class Clonable {
     }
 }
 
-export class AccountTonMnemonic extends Clonable implements IAccountVersionsEditable {
-    public readonly type = 'mnemonic';
-
+abstract class TonMnemonic extends Clonable implements IAccountVersionsEditable {
     get allTonWallets() {
         return this.tonWallets;
     }
@@ -73,7 +78,8 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         public emoji: string,
         public auth: AuthPassword | AuthKeychain,
         public activeTonWalletId: WalletId,
-        public tonWallets: TonWalletStandard[]
+        public tonWallets: TonWalletStandard[],
+        public mnemonicType?: MnemonicType
     ) {
         super();
     }
@@ -108,6 +114,13 @@ export class AccountTonMnemonic extends Clonable implements IAccountVersionsEdit
         }
         this.activeTonWalletId = walletId;
     }
+}
+export class AccountTonMnemonic extends TonMnemonic {
+    public readonly type = 'mnemonic';
+}
+
+export class AccountTonTestnet extends TonMnemonic {
+    public readonly type = 'testnet';
 }
 
 export class AccountTonWatchOnly extends Clonable implements IAccount {
@@ -148,7 +161,7 @@ export class AccountTonWatchOnly extends Clonable implements IAccount {
     }
 }
 
-export class AccountLedger extends Clonable implements IAccountControllable {
+export class AccountLedger extends Clonable implements IAccountTonWalletStandard {
     public readonly type = 'ledger';
 
     get allTonWallets() {
@@ -247,7 +260,7 @@ export class AccountLedger extends Clonable implements IAccountControllable {
     }
 }
 
-export class AccountKeystone extends Clonable implements IAccountControllable {
+export class AccountKeystone extends Clonable implements IAccountTonWalletStandard {
     public readonly type = 'keystone';
 
     get allTonWallets() {
@@ -340,7 +353,7 @@ export class AccountTonOnly extends Clonable implements IAccountVersionsEditable
     }
 }
 
-export class AccountMAM extends Clonable implements IAccountControllable {
+export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
     static getNewDerivationFallbackName(index = 0) {
         return 'Wallet ' + (index + 1);
     }
@@ -479,44 +492,194 @@ export class AccountMAM extends Clonable implements IAccountControllable {
     }
 }
 
-export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly;
+export class AccountTonMultisig extends Clonable implements IAccount {
+    public readonly type = 'ton-multisig';
 
-export type AccountControllable =
+    get allTonWallets() {
+        return [this.tonWallet];
+    }
+
+    get activeTonWallet() {
+        return this.tonWallet;
+    }
+
+    /**
+     *  @param id eq to `tonWallet.id`
+     */
+    constructor(
+        public readonly id: AccountId,
+        public name: string,
+        public emoji: string,
+        public tonWallet: TonContract,
+        public hostWallets: {
+            address: string;
+            isPinned: boolean;
+        }[],
+        public selectedHostWalletId: WalletId
+    ) {
+        super();
+    }
+
+    getTonWallet(id: WalletId) {
+        if (id !== this.tonWallet.id) {
+            return undefined;
+        }
+
+        return this.tonWallet;
+    }
+
+    setActiveTonWallet(walletId: WalletId) {
+        if (walletId !== this.tonWallet.id) {
+            throw new Error('Cannot add ton wallet to watch only account');
+        }
+    }
+
+    setSelectedHostWalletId(walletId: WalletId) {
+        if (!this.hostWallets.some(w => w.address === walletId)) {
+            throw new Error('Host wallet not found');
+        }
+
+        this.selectedHostWalletId = walletId;
+    }
+
+    setHostWallets(wallets: { address: string; isPinned: boolean }[]) {
+        this.hostWallets = wallets;
+        if (!this.hostWallets.some(w => w.address === this.selectedHostWalletId)) {
+            this.selectedHostWalletId = this.hostWallets[0].address;
+        }
+    }
+
+    addHostWallet(wallet: WalletId) {
+        if (this.hostWallets.some(w => w.address === wallet)) {
+            return;
+        }
+
+        this.hostWallets.push({ address: wallet, isPinned: false });
+    }
+
+    removeHostWallet(wallet: WalletId) {
+        this.hostWallets = this.hostWallets.filter(w => w.address !== wallet);
+    }
+
+    togglePinForWallet(walletId: WalletId) {
+        if (!this.hostWallets.some(w => w.address === walletId)) {
+            throw new Error('Host wallet not found');
+        }
+
+        this.hostWallets = this.hostWallets.map(w => {
+            if (w.address === walletId) {
+                return { ...w, isPinned: !w.isPinned };
+            }
+
+            return w;
+        });
+    }
+
+    isPinnedForWallet(walletId: WalletId) {
+        return this.hostWallets.find(w => w.address === walletId)?.isPinned ?? false;
+    }
+}
+
+export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly | AccountTonTestnet;
+
+export type AccountTonWalletStandard =
     | AccountVersionEditable
     | AccountLedger
     | AccountKeystone
     | AccountMAM;
 
-export type Account = AccountControllable | AccountTonWatchOnly;
+export type Account = AccountTonWalletStandard | AccountTonWatchOnly | AccountTonMultisig;
 
 export function isAccountVersionEditable(account: Account): account is AccountVersionEditable {
     switch (account.type) {
         case 'mnemonic':
         case 'ton-only':
+        case 'testnet':
             return true;
         case 'ledger':
         case 'keystone':
         case 'watch-only':
         case 'mam':
+        case 'ton-multisig':
             return false;
+        default:
+            return assertUnreachable(account);
     }
-
-    assertUnreachable(account);
 }
 
-export function isAccountControllable(account: Account): account is AccountControllable {
+export function isAccountTonWalletStandard(account: Account): account is AccountTonWalletStandard {
     switch (account.type) {
         case 'keystone':
         case 'mnemonic':
         case 'ledger':
         case 'ton-only':
         case 'mam':
+        case 'testnet':
             return true;
         case 'watch-only':
+        case 'ton-multisig':
             return false;
+        default:
+            return assertUnreachable(account);
     }
+}
 
-    assertUnreachable(account);
+export function isAccountCanManageMultisigs(account: Account): boolean {
+    switch (account.type) {
+        case 'mnemonic':
+        case 'ton-only':
+        case 'mam':
+        case 'ledger':
+            return true;
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+        case 'testnet':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
+export function isMnemonicAndPassword(
+    account: Account
+): account is AccountTonMnemonic | AccountTonTestnet | AccountMAM {
+    switch (account.type) {
+        case 'mam':
+        case 'mnemonic':
+        case 'testnet':
+            return true;
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
+export function getNetworkByAccount(account: Account): Network {
+    switch (account.type) {
+        case 'testnet':
+            return Network.TESTNET;
+        case 'mam':
+        case 'mnemonic':
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return Network.MAINNET;
+        default:
+            assertUnreachable(account);
+    }
+}
+
+export function seeIfMainnnetAccount(account: Account): boolean {
+    const network = getNetworkByAccount(account);
+    return network === Network.MAINNET;
 }
 
 export type AccountsState = Account[];
@@ -529,21 +692,20 @@ export function serializeAccount(account: Account): string {
 
 const prototypes = {
     mnemonic: AccountTonMnemonic.prototype,
+    testnet: AccountTonTestnet.prototype,
     ledger: AccountLedger.prototype,
     keystone: AccountKeystone.prototype,
     'ton-only': AccountTonOnly.prototype,
     'watch-only': AccountTonWatchOnly.prototype,
-    mam: AccountMAM.prototype
+    mam: AccountMAM.prototype,
+    'ton-multisig': AccountTonMultisig.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {
     Object.setPrototypeOf(accountStruct, prototypes[accountStruct.type]);
 }
 
-export function getWalletById(
-    accounts: IAccountControllable[],
-    walletId: WalletId
-): TonWalletStandard | undefined {
+export function getWalletById(accounts: Account[], walletId: WalletId): TonContract | undefined {
     for (const account of accounts || []) {
         const wallet = account.getTonWallet(walletId);
         if (wallet) {
@@ -563,3 +725,11 @@ export function getAccountByWalletById(
         }
     }
 }
+
+export type AccountsFolderStored = {
+    id: string;
+    type: 'folder';
+    accounts: AccountId[];
+    name: string;
+    lastIsOpened: boolean;
+};

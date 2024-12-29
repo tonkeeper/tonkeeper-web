@@ -8,6 +8,8 @@ export type AuthState =
     | AuthLedger
     | AuthKeystone;
 
+export type MnemonicType = 'ton' | 'bip39';
+
 export interface AuthPassword {
     kind: 'password';
     encryptedMnemonic: string;

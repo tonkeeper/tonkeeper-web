@@ -1,30 +1,18 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-    estimateNftTransfer,
-    sendNftTransfer
-} from '@tonkeeper/core/dist/service/transfer/nftService';
+import { useMutation, useQuery } from '@tanstack/react-query';
+
 import { NftItem } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, ReactNode, useState } from 'react';
+import React, { FC, ReactNode, useEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../../../hooks/appContext';
-import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 import { Gap } from '../../Layout';
 import { ListBlock } from '../../List';
 import { FullHeightBlock } from '../../Notification';
-import { notifyError } from '../common';
 
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    TonRecipientData,
-    TransferEstimation,
-    TransferEstimationEvent
-} from '@tonkeeper/core/dist/entries/send';
+import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../../hooks/amplitude';
 import { QueryKey } from '../../../libs/queryKey';
-import { getSigner } from '../../../state/mnemonic';
-import { useCheckTouchId } from '../../../state/password';
 import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
     ConfirmViewContext,
@@ -34,73 +22,172 @@ import {
 } from '../ConfirmView';
 import { NftDetailsBlock } from './Common';
 import {
+    useAccountsState,
     useActiveAccount,
-    useActiveStandardTonWallet,
     useInvalidateActiveWalletQueries
 } from '../../../state/wallet';
-import { isAccountControllable } from '@tonkeeper/core/dist/entries/account';
+import {
+    useActiveMultisigAccountHost,
+    useActiveMultisigWalletInfo,
+    useIsActiveAccountMultisig
+} from '../../../state/multisig';
+import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
+import { MultisigTransferDetails } from '../multisig/MultisigTransferDetails';
+import { styled } from 'styled-components';
+import {
+    BATTERY_SENDER_CHOICE,
+    EXTERNAL_SENDER_CHOICE,
+    SenderTypeUserAvailable,
+    useAvailableSendersChoices,
+    useGetEstimationSender,
+    useGetSender
+} from '../../../hooks/blockchain/useSender';
+import { useTonRawTransactionService } from '../../../hooks/blockchain/useBlockchainService';
+import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
+import BigNumber from 'bignumber.js';
+import { comment } from '@ton/core';
+import { useNotifyErrorHandle } from '../../../hooks/useNotification';
+import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
+import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
     weiAmount: 0
 });
 
-const useNftTransferEstimation = (nftItem: NftItem, data?: TonRecipientData) => {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
-    const wallet = useActiveStandardTonWallet();
-    const client = useQueryClient();
+const useNftTransferEstimation = (
+    nftItem: NftItem,
+    data: TonRecipientData,
+    selectedSenderType: SenderTypeUserAvailable | undefined
+) => {
+    const account = useActiveAccount();
+    const accounts = useAccountsState();
+    const notifyError = useNotifyErrorHandle();
 
-    return useQuery<TransferEstimation<TonAsset>, Error>(
-        [QueryKey.estimate, data?.address],
+    const senderChoice = useMemo(() => {
+        if (!selectedSenderType) {
+            return undefined;
+        }
+
+        if (account.type === 'ton-multisig') {
+            return { type: 'multisig', ttlSeconds: 5 * 60 } as const;
+        }
+        if (selectedSenderType === 'external') {
+            return EXTERNAL_SENDER_CHOICE;
+        }
+
+        if (selectedSenderType === 'battery') {
+            return BATTERY_SENDER_CHOICE;
+        }
+
+        throw new Error(`Unsupported sender type for nft transfer ${selectedSenderType}`);
+    }, [selectedSenderType, account]);
+
+    const getSender = useGetEstimationSender(senderChoice);
+    const getSenderKey = useToQueryKeyPart(getSender);
+    const rawTransactionService = useTonRawTransactionService();
+
+    return useQuery<TonEstimation, Error>(
+        [QueryKey.estimate, data?.address, accounts, getSenderKey],
         async () => {
             try {
-                const payload = await estimateNftTransfer(api, wallet, data!, nftItem);
-                const fee = new AssetAmount({
-                    asset: TON_ASSET,
-                    weiAmount: payload.event.extra * -1
+                if (account.type === 'watch-only') {
+                    throw new Error('account not controllable');
+                }
+
+                const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
+                const sender = await getSender!();
+                const nftTransferMsg = nftEncoder.encodeNftTransfer({
+                    nftAddress: nftItem.address,
+                    recipientAddress: data!.address.address,
+                    forwardPayload: data!.comment ? comment(data.comment) : null,
+                    responseAddress:
+                        'excessAddress' in sender && sender.excessAddress
+                            ? sender.excessAddress
+                            : undefined
                 });
-                return { fee, payload };
+
+                return await rawTransactionService.estimate(sender, nftTransferMsg);
             } catch (e) {
-                await notifyError(client, sdk, t, e);
+                await notifyError(e);
                 throw e;
             }
         },
-        { enabled: data != null }
+        { enabled: data != null && !!getSender && senderChoice !== undefined }
     );
 };
 
 const useSendNft = (
     recipient: TonRecipientData,
     nftItem: NftItem,
-    fee?: TransferEstimationEvent
+    fee: AssetAmount<TonAsset> | undefined,
+    options: {
+        multisigTTL?: MultisigOrderLifetimeMinutes;
+        selectedSenderType: SenderTypeUserAvailable;
+    }
 ) => {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { api } = useAppContext();
     const account = useActiveAccount();
-    const client = useQueryClient();
     const track2 = useTransactionAnalytics();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
 
+    const getSender = useGetSender();
+    const rawTransactionService = useTonRawTransactionService();
+    const notifyError = useNotifyErrorHandle();
+
     return useMutation<boolean, Error>(async () => {
-        if (!isAccountControllable(account)) {
+        if (account.type === 'watch-only') {
             console.error("Can't send a transfer using this account");
             return false;
         }
 
         if (!fee) return false;
 
-        const signer = await getSigner(sdk, account.id, checkTouchId).catch(() => null);
-        if (signer === null) return false;
+        if (fee.asset.id !== TON_ASSET.id) {
+            throw new Error(`Unexpected fee asset ${fee.asset.symbol}`);
+        }
 
-        track2('send-nft');
         try {
-            await sendNftTransfer(api, account, recipient, nftItem, fee, signer);
+            let senderChoice;
+            if (account.type === 'ton-multisig') {
+                if (options.multisigTTL === undefined) {
+                    throw new Error('TTL must be specified for multisig sending');
+                }
+                senderChoice = {
+                    type: 'multisig',
+                    ttlSeconds: 60 * Number(options.multisigTTL)
+                } as const;
+            } else if (options.selectedSenderType === 'external') {
+                senderChoice = EXTERNAL_SENDER_CHOICE;
+            } else if (options.selectedSenderType === 'battery') {
+                senderChoice = BATTERY_SENDER_CHOICE;
+            } else {
+                throw new Error(
+                    `Unsupported sender type for nft transfer ${options.selectedSenderType}`
+                );
+            }
+
+            const sender = await getSender(senderChoice);
+
+            const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
+            const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(
+                fee.weiAmount
+            );
+            const nftTransferMsg = nftEncoder.encodeNftTransfer({
+                nftAddress: nftItem.address,
+                recipientAddress: recipient.address.address,
+                forwardPayload: recipient.comment ? comment(recipient.comment) : null,
+                nftTransferAmountWei,
+                responseAddress:
+                    'excessAddress' in sender && sender.excessAddress
+                        ? sender.excessAddress
+                        : undefined
+            });
+
+            await rawTransactionService.send(sender, zeroFee, nftTransferMsg);
+            track2('send-nft');
         } catch (e) {
-            await notifyError(client, sdk, t, e);
+            await notifyError(e);
         }
 
         await invalidateAccountQueries();
@@ -108,22 +195,37 @@ const useSendNft = (
     });
 };
 
+const operationTypeSendNFT = { type: 'nfr_transfer' } as const;
+
 export const ConfirmNftView: FC<{
     recipient: TonRecipientData;
     nftItem: NftItem;
     onClose: () => void;
     headerBlock: ReactNode;
     mainButton: ReactNode;
-}> = ({ recipient, onClose, nftItem, headerBlock, mainButton }) => {
+    multisigTTL?: MultisigOrderLifetimeMinutes;
+}> = ({ recipient, onClose, nftItem, headerBlock, mainButton, multisigTTL }) => {
     const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
     const { t } = useTranslation();
+    const isActiveMultisig = useIsActiveAccountMultisig();
 
-    const estimation = useNftTransferEstimation(nftItem, recipient);
+    const { data: availableSendersChoices } = useAvailableSendersChoices(operationTypeSendNFT);
+    const [selectedSenderType, onSenderTypeChange] = useState<
+        SenderTypeUserAvailable | undefined
+    >();
+    useEffect(() => {
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [availableSendersChoices]);
+
+    const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
     const { mutateAsync, isLoading, error, reset } = useSendNft(
         recipient,
         nftItem,
-        estimation.data?.payload
+        estimation.data?.extra,
+        { multisigTTL, selectedSenderType: selectedSenderType! }
     );
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');
@@ -171,15 +273,46 @@ export const ConfirmNftView: FC<{
                 </Info>
                 <ListBlock margin={false} fullWidth>
                     <ConfirmViewDetailsRecipient />
-                    <ConfirmViewDetailsFee />
+                    <ConfirmViewDetailsFee
+                        availableSendersChoices={availableSendersChoices}
+                        selectedSenderType={selectedSenderType}
+                        onSenderTypeChange={onSenderTypeChange}
+                    />
                     <ConfirmViewDetailsComment />
                 </ListBlock>
 
                 <NftDetailsBlock nftItem={nftItem} />
 
                 <Gap />
+                {isActiveMultisig && multisigTTL ? (
+                    <MayBeMultisigDetalis ttl={multisigTTL} />
+                ) : null}
                 {mainButton}
             </FullHeightBlock>
         </ConfirmViewContext.Provider>
+    );
+};
+
+const MultisigTransferDetailsStyled = styled(MultisigTransferDetails)`
+    margin-bottom: 1rem;
+`;
+
+const MayBeMultisigDetalis: FC<{ ttl: MultisigOrderLifetimeMinutes }> = ({ ttl }) => {
+    const { data: multisigInfo } = useActiveMultisigWalletInfo();
+    const { signerWallet } = useActiveMultisigAccountHost();
+
+    if (!multisigInfo) {
+        return null;
+    }
+
+    return (
+        <MultisigTransferDetailsStyled
+            status="progress"
+            signedWallets={[]}
+            threshold={multisigInfo.threshold}
+            pendingWallets={multisigInfo.signers}
+            hostAddress={signerWallet.rawAddress}
+            secondsLeft={Number(ttl) * 60}
+        />
     );
 };

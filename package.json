@@ -8,10 +8,12 @@
     "scripts": {
         "build": "npx turbo build",
         "build:web": "npx turbo build:web",
-        "build:twa": "npx turbo build:twa && yarn deploy:twa",
-        "deploy:twa": "npx wrangler pages deploy apps/twa/build",
+        "build:twa": "npx turbo build:twa",
+        "deploy:twa": "npx turbo build:twa && npx wrangler pages deploy apps/twa/build",
         "build:extension": "npx turbo build:extension",
         "build:desktop": "npx turbo build:desktop",
+        "build:ipad": "npx turbo build:ipad",
+        "build:swap-widget": "npx turbo build:swap-widget",
         "build:pkg": "npx turbo build:pkg"
     },
     "private": true,
@@ -39,8 +41,12 @@
     "workspaces": {
         "packages": [
             "packages/*",
-            "apps/*"
+            "apps/*",
+            "tests/*"
         ]
     },
-    "packageManager": "yarn@4.3.0"
+    "packageManager": "yarn@4.3.0",
+    "dependencies": {
+        "@tonkeeper/uikit": "workspace:^"
+    }
 }

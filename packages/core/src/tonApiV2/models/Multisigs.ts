@@ -18,6 +18,7 @@ import {
     MultisigFromJSON,
     MultisigFromJSONTyped,
     MultisigToJSON,
+    MultisigToJSONTyped,
 } from './Multisig';
 
 /**
@@ -56,10 +57,15 @@ export function MultisigsFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function MultisigsToJSON(value?: Multisigs | null): any {
+  export function MultisigsToJSON(json: any): Multisigs {
+      return MultisigsToJSONTyped(json, false);
+  }
+
+  export function MultisigsToJSONTyped(value?: Multisigs | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'multisigs': ((value['multisigs'] as Array<any>).map(MultisigToJSON)),

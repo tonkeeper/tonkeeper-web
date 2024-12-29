@@ -18,6 +18,7 @@ import {
     BlockchainBlockFromJSON,
     BlockchainBlockFromJSONTyped,
     BlockchainBlockToJSON,
+    BlockchainBlockToJSONTyped,
 } from './BlockchainBlock';
 
 /**
@@ -56,10 +57,15 @@ export function BlockchainBlocksFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function BlockchainBlocksToJSON(value?: BlockchainBlocks | null): any {
+  export function BlockchainBlocksToJSON(json: any): BlockchainBlocks {
+      return BlockchainBlocksToJSONTyped(json, false);
+  }
+
+  export function BlockchainBlocksToJSONTyped(value?: BlockchainBlocks | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'blocks': ((value['blocks'] as Array<any>).map(BlockchainBlockToJSON)),

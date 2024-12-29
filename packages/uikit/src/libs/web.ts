@@ -1,3 +1,5 @@
+import { getWindow } from '@tonkeeper/core/dist/service/telegramOauth';
+
 export function getUserOS() {
     if (navigator.userAgent.includes('Win')) {
         return 'windows';
@@ -39,4 +41,52 @@ function getClosestScrollableParent(element: HTMLElement) {
 export function scrollToContainersBottom(element: HTMLElement) {
     const scrollableParent = getClosestScrollableParent(element);
     scrollableParent.scrollTop = scrollableParent.scrollHeight;
+}
+
+export function sendBroadcastMessage(channel: string, request: string) {
+    try {
+        if (typeof BroadcastChannel === 'undefined') {
+            return;
+        }
+        const bc = new BroadcastChannel(channel);
+
+        bc.postMessage(request);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+let broadcastListeners: ((message: string) => void)[] = [];
+const addBroadcastListener = (listener: (message: string) => void) => {
+    broadcastListeners.push(listener);
+
+    return () => {
+        broadcastListeners = broadcastListeners.filter(l => l !== listener);
+    };
+};
+
+const channels: Record<string, BroadcastChannel> = {};
+
+export function listenBroadcastMessages(channel: string, onMessage: (message: string) => void) {
+    try {
+        if (typeof BroadcastChannel === 'undefined') {
+            return;
+        }
+        let bc = channels[channel];
+        if (!bc) {
+            bc = new BroadcastChannel(channel);
+            channels[channel] = bc;
+            bc.onmessage = event => {
+                broadcastListeners.forEach(l => l(event.data));
+            };
+        }
+
+        return addBroadcastListener(onMessage);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+export function isTouchDevice() {
+    return getWindow()?.matchMedia('(pointer: coarse)').matches;
 }

@@ -18,6 +18,7 @@ import {
     TransactionFromJSON,
     TransactionFromJSONTyped,
     TransactionToJSON,
+    TransactionToJSONTyped,
 } from './Transaction';
 
 /**
@@ -56,10 +57,15 @@ export function TransactionsFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function TransactionsToJSON(value?: Transactions | null): any {
+  export function TransactionsToJSON(json: any): Transactions {
+      return TransactionsToJSONTyped(json, false);
+  }
+
+  export function TransactionsToJSONTyped(value?: Transactions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'transactions': ((value['transactions'] as Array<any>).map(TransactionToJSON)),

@@ -18,6 +18,7 @@ import {
     WalletDNSFromJSON,
     WalletDNSFromJSONTyped,
     WalletDNSToJSON,
+    WalletDNSToJSONTyped,
 } from './WalletDNS';
 
 /**
@@ -77,10 +78,15 @@ export function DnsRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function DnsRecordToJSON(value?: DnsRecord | null): any {
+  export function DnsRecordToJSON(json: any): DnsRecord {
+      return DnsRecordToJSONTyped(json, false);
+  }
+
+  export function DnsRecordToJSONTyped(value?: DnsRecord | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'wallet': WalletDNSToJSON(value['wallet']),

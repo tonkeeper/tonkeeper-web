@@ -57,10 +57,15 @@ export function BlockchainConfig14FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function BlockchainConfig14ToJSON(value?: BlockchainConfig14 | null): any {
+  export function BlockchainConfig14ToJSON(json: any): BlockchainConfig14 {
+      return BlockchainConfig14ToJSONTyped(json, false);
+  }
+
+  export function BlockchainConfig14ToJSONTyped(value?: BlockchainConfig14 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'masterchain_block_fee': value['masterchainBlockFee'],

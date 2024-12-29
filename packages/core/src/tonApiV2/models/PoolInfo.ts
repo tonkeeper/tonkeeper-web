@@ -18,6 +18,7 @@ import {
     PoolImplementationTypeFromJSON,
     PoolImplementationTypeFromJSONTyped,
     PoolImplementationTypeToJSON,
+    PoolImplementationTypeToJSONTyped,
 } from './PoolImplementationType';
 
 /**
@@ -168,10 +169,15 @@ export function PoolInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function PoolInfoToJSON(value?: PoolInfo | null): any {
+  export function PoolInfoToJSON(json: any): PoolInfo {
+      return PoolInfoToJSONTyped(json, false);
+  }
+
+  export function PoolInfoToJSONTyped(value?: PoolInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

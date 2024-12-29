@@ -18,6 +18,7 @@ import {
     TransactionFromJSON,
     TransactionFromJSONTyped,
     TransactionToJSON,
+    TransactionToJSONTyped,
 } from './Transaction';
 
 /**
@@ -78,10 +79,15 @@ export function TraceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tra
     };
 }
 
-export function TraceToJSON(value?: Trace | null): any {
+  export function TraceToJSON(json: any): Trace {
+      return TraceToJSONTyped(json, false);
+  }
+
+  export function TraceToJSONTyped(value?: Trace | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'transaction': TransactionToJSON(value['transaction']),

@@ -1,0 +1,15 @@
+name: Tonkeeper Web Playwright
+on:
+    workflow_dispatch:
+        inputs:
+            base-url:
+                type: string
+                description: App Url
+                default: https://wallet.tonkeeper.com
+jobs:
+    web-tests:
+        uses: ./.github/workflows/web-tests.yaml
+        with:
+            base-url: ${{ inputs.base-url }}
+            transaction: true
+        secrets: inherit

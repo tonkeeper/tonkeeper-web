@@ -3,6 +3,7 @@ export enum AppRoute {
     import = '/import',
     settings = '/settings',
     walletSettings = '/wallet-settings',
+    accountSettings = '/account-settings',
     browser = '/browser',
     activity = '/activity',
     purchases = '/purchases',
@@ -11,6 +12,8 @@ export enum AppRoute {
     signer = '/signer',
     publish = '/publish',
     swap = '/swap',
+    multisigOrders = '/multisig-orders',
+    multisigWallets = '/multisig-wallets',
     home = '/'
 }
 
@@ -21,16 +24,6 @@ export enum AppProRoute {
 
 export enum SignerRoute {
     link = 'link'
-}
-
-export enum ImportRoute {
-    import = '/import',
-    create = '/create',
-    signer = '/signer',
-    ledger = '/ledger',
-    keystone = '/keystone',
-    readOnly = '/watch-only',
-    mam = '/mam'
 }
 
 export enum SettingsRoute {
@@ -62,7 +55,9 @@ export enum WalletSettingsRoute {
     jettons = '/jettons',
     nft = '/nft',
     connectedApps = '/connected-apps',
-    derivations = '/derivations'
+    derivations = '/derivations',
+    battery = '/battery',
+    notification = '/notification'
 }
 
 export enum BrowserRoute {

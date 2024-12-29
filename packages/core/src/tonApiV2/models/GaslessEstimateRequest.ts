@@ -13,12 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { DecodeMessageRequest } from './DecodeMessageRequest';
+import type { GaslessEstimateRequestMessagesInner } from './GaslessEstimateRequestMessagesInner';
 import {
-    DecodeMessageRequestFromJSON,
-    DecodeMessageRequestFromJSONTyped,
-    DecodeMessageRequestToJSON,
-} from './DecodeMessageRequest';
+    GaslessEstimateRequestMessagesInnerFromJSON,
+    GaslessEstimateRequestMessagesInnerFromJSONTyped,
+    GaslessEstimateRequestMessagesInnerToJSON,
+    GaslessEstimateRequestMessagesInnerToJSONTyped,
+} from './GaslessEstimateRequestMessagesInner';
 
 /**
  * 
@@ -40,10 +41,10 @@ export interface GaslessEstimateRequest {
     walletPublicKey: string;
     /**
      * 
-     * @type {Array<DecodeMessageRequest>}
+     * @type {Array<GaslessEstimateRequestMessagesInner>}
      * @memberof GaslessEstimateRequest
      */
-    messages: Array<DecodeMessageRequest>;
+    messages: Array<GaslessEstimateRequestMessagesInner>;
 }
 
 /**
@@ -68,19 +69,24 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
         
         'walletAddress': json['wallet_address'],
         'walletPublicKey': json['wallet_public_key'],
-        'messages': ((json['messages'] as Array<any>).map(DecodeMessageRequestFromJSON)),
+        'messages': ((json['messages'] as Array<any>).map(GaslessEstimateRequestMessagesInnerFromJSON)),
     };
 }
 
-export function GaslessEstimateRequestToJSON(value?: GaslessEstimateRequest | null): any {
+  export function GaslessEstimateRequestToJSON(json: any): GaslessEstimateRequest {
+      return GaslessEstimateRequestToJSONTyped(json, false);
+  }
+
+  export function GaslessEstimateRequestToJSONTyped(value?: GaslessEstimateRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'wallet_address': value['walletAddress'],
         'wallet_public_key': value['walletPublicKey'],
-        'messages': ((value['messages'] as Array<any>).map(DecodeMessageRequestToJSON)),
+        'messages': ((value['messages'] as Array<any>).map(GaslessEstimateRequestMessagesInnerToJSON)),
     };
 }
 

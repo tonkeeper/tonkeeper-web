@@ -5,10 +5,11 @@ import { TronBalances } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, forwardRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../../hooks/appContext';
 import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
-import { useFormatFiat, useRate } from '../../state/rates';
+import { toTokenRate, useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 
@@ -68,7 +69,7 @@ export const JettonAsset = forwardRef<
 >(({ jetton, className }, ref) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-
+    const { fiat } = useAppContext();
     const [amount, address] = useMemo(
         () => [
             formatDecimals(jetton.balance, jetton.jetton.decimals),
@@ -78,7 +79,10 @@ export const JettonAsset = forwardRef<
     );
     const balance = useFormatBalance(amount, jetton.jetton.decimals);
 
-    const { data } = useRate(address);
+    const data = useMemo(
+        () => (jetton.price ? toTokenRate(jetton.price, fiat) : undefined),
+        [jetton.price, fiat]
+    );
     const { fiatPrice, fiatAmount } = useFormatFiat(data, amount);
 
     return (

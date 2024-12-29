@@ -129,10 +129,15 @@ export function SubscriptionFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function SubscriptionToJSON(value?: Subscription | null): any {
+  export function SubscriptionToJSON(json: any): Subscription {
+      return SubscriptionToJSONTyped(json, false);
+  }
+
+  export function SubscriptionToJSONTyped(value?: Subscription | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'address': value['address'],

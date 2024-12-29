@@ -2,6 +2,7 @@ import { Address } from '@ton/core';
 import { decodeBase58, sha256 } from 'ethers';
 import { Network } from '../entries/network';
 import { CryptoCurrency } from '../entries/crypto';
+import BigNumber from 'bignumber.js';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -129,3 +130,9 @@ export const seeIfValidTronAddress = (address: string): boolean => {
         return false;
     }
 };
+
+export function bufferToBigInt(buffer: Buffer) {
+    return BigInt(`0x${buffer.toString('hex')}`);
+}
+
+export const maxBigNumber = (a: BigNumber, b: BigNumber) => (a > b ? a : b);

@@ -1,10 +1,13 @@
-name: Tonkeeper Pull-Request
+name: PR
 on:
     workflow_dispatch:
     pull_request:
 
 env:
     node-version: 20.11.1
+
+permissions:
+    pull-requests: write
 
 jobs:
     desktop-build:
@@ -15,11 +18,11 @@ jobs:
                     - os: ubuntu-latest
                       command: make:intel
                       tag: x64
-                      dist: /apps/desktop/out/make/deb/x64
+                      dist: /apps/desktop/out/make
                     - os: ubuntu-latest
                       command: make:arm
                       tag: arm64
-                      dist: /apps/desktop/out/make/deb/arm64
+                      dist: /apps/desktop/out/make
                     - os: windows-latest
                       command: make:intel
                       tag: x64
@@ -79,6 +82,14 @@ jobs:
                   p12-file-base64: ${{ secrets.IDENTITY_P12_B64 }}
                   p12-password: ${{ secrets.IDENTITY_PASSPHRASE }}
 
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
             - name: Run install
               uses: borales/actions-yarn@v5
               with:
@@ -118,7 +129,13 @@ jobs:
                   rm ${{ github.workspace }}/AuthKey.p8
 
     web-build:
-        name: web-build
+        uses: ./.github/workflows/web-build.yaml
+        with:
+            environment: ${{ github.head_ref }}
+        secrets: inherit
+
+    twa-build:
+        name: twa-build
         runs-on: ubuntu-latest
         timeout-minutes: 10
 
@@ -135,6 +152,14 @@ jobs:
               run: |
                   corepack enable
 
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
+
             - name: Run install
               uses: borales/actions-yarn@v5
               with:
@@ -143,22 +168,40 @@ jobs:
             - name: Run build
               uses: borales/actions-yarn@v5
               env:
-                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
+                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
+                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
               with:
-                  cmd: build:web
+                  cmd: build:twa
 
-            - name: Publish to Cloudflare Pages
-              uses: cloudflare/pages-action@v1
+            - name: Publish TWA to Cloudflare Pages
+              id: deploy
+              uses: cloudflare/wrangler-action@v3
               with:
                   apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
                   accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  projectName: tonkeeper-web
-                  directory: apps/web/dist
-                  wranglerVersion: '3'
+                  command:
+                      pages deploy apps/twa/dist --project-name=tonkeeper-telegram
+                      --branch=feature/twa
+
+            - name: Summary
+              run: |
+                  echo '### Successful TWA deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
+                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
+                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
+                  echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
+
+            - name: Comment PR
+              uses: thollander/actions-comment-pull-request@v3
+              with:
+                  message: |
+                      ### Successful TWA deployment 🚀🚀🚀
+                      Well done!
+                      Link to test environment:
+                      https://t.me/tonkeeperdevbot
+                  comment-tag: twa_deploy
 
     extension-build:
         name: extension-build
@@ -177,6 +220,14 @@ jobs:
             - name: Enable Corepack
               run: |
                   corepack enable
+
+            - name: Yarn cache
+              uses: actions/cache@v4
+              with:
+                  path: ./.yarn
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-yarn-
 
             - name: Run install
               uses: borales/actions-yarn@v5
@@ -207,3 +258,20 @@ jobs:
                   retention-days: 10
                   path: |
                       ${{ github.workspace }}/apps/extension/dist/firefox
+
+    ipad-build:
+        uses: ./.github/workflows/ipad-build.yaml
+        secrets: inherit
+
+    swap-widget-build:
+        uses: ./.github/workflows/swap-widget-build.yaml
+        with:
+            environment: ${{ github.head_ref }}
+        secrets: inherit
+
+    web-tests:
+        needs: web-build
+        uses: ./.github/workflows/web-tests.yaml
+        with:
+            base-url: ${{ needs.web-build.outputs.deployment-url }}
+        secrets: inherit

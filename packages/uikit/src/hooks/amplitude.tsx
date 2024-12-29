@@ -26,6 +26,19 @@ export type AmplitudeTransactionType =
     | 'multi-send-ton'
     | 'multi-send-jetton';
 
+export const useAnalyticsTrack = () => {
+    const tracker = useContext(AmplitudeAnalyticsContext);
+
+    return useCallback(
+        (name: string, params: Record<string, any>) => {
+            if (tracker) {
+                tracker.track(name, params);
+            }
+        },
+        [tracker]
+    );
+};
+
 export const useTransactionAnalytics = () => {
     const tracker = useContext(AmplitudeAnalyticsContext);
 
@@ -76,7 +89,7 @@ export const useOpenBrowser = () => {
 
     return useCallback(() => {
         if (tracker) {
-            tracker.track('open_browser', {});
+            tracker.track('browser_open', { from: 'wallet' });
         }
     }, [tracker]);
 };
@@ -85,9 +98,9 @@ export const useClickBrowser = () => {
     const tracker = useContext(AmplitudeAnalyticsContext);
 
     return useCallback(
-        (dapp: string, source: string) => {
+        (url: string, source: string) => {
             if (tracker) {
-                tracker.track('click_dapp', { dapp, source });
+                tracker.track('click_dapp', { url, source });
             }
         },
         [tracker]

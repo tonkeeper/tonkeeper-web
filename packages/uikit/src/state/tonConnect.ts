@@ -1,45 +1,61 @@
-import { QueryKey } from '../libs/queryKey';
-import { useAppSdk } from '../hooks/appSdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-    AccountConnection,
-    getTonWalletConnections,
-    saveAccountConnection,
-    setAccountConnection
-} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { useAppContext } from '../hooks/appContext';
 import {
     ConnectItemReply,
     ConnectRequest,
     DAppManifest
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { subject } from '../libs/atom';
-import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
-import { useTranslation } from '../hooks/translation';
-import { useCheckTouchId } from './password';
 import {
+    createTonProofItem,
     getAppConnections,
     getTonConnectParams,
     tonConnectProofPayload,
     toTonAddressItemReply,
     toTonProofItemReply
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { signTonConnectOver } from './mnemonic';
-import { getServerTime } from '@tonkeeper/core/dist/service/transfer/common';
-import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    AccountConnection,
+    getTonWalletConnections,
+    saveAccountConnection,
+    setAccountConnection
+} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
+import { useAppSdk } from '../hooks/appSdk';
+import { useTranslation } from '../hooks/translation';
+import { subject } from '../libs/atom';
+import { QueryKey } from '../libs/queryKey';
+import { getLedgerTonProofSigner, signTonConnectOver } from './mnemonic';
+import {
+    isStandardTonWallet,
+    TonWalletStandard,
+    WalletId,
+    WalletVersion
+} from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { useActiveWallet, useAccountsState, useActiveAccount, useActiveTonNetwork } from './wallet';
-import { isAccountControllable } from "@tonkeeper/core/dist/entries/account";
+import {
+    Account,
+    getNetworkByAccount,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
+import { useCheckTouchId } from './password';
+import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
+import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
+import { useAppContext } from '../hooks/appContext';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
-    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
+
+    const { data } = useAccountsStateQuery();
+
+    const wallets = data?.flatMap(a => a.allTonWallets);
 
     return useQuery<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]>(
-        [QueryKey.tonConnectConnection, wallets.map(i => i.id)],
+        [QueryKey.tonConnectConnection, wallets?.map(i => i.id)],
         async () => {
             return getAppConnections(sdk.storage);
-        }
+        },
+        { enabled: wallets !== undefined }
     );
 };
 
@@ -78,14 +94,11 @@ export const useActiveWalletTonConnectConnections = () => {
 };
 
 export const useConnectTonConnectAppMutation = () => {
-    const account = useActiveAccount();
+    const appContext = useAppContext();
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { api } = useAppContext();
     const { t } = useTranslation();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const network = useActiveTonNetwork();
-    const activeIsLedger = account.type === 'ledger';
 
     return useMutation<
         ConnectItemReply[],
@@ -94,12 +107,19 @@ export const useConnectTonConnectAppMutation = () => {
             request: ConnectRequest;
             manifest: DAppManifest;
             webViewUrl?: string;
+            account: Account;
+            walletId: WalletId;
         }
-    >(async ({ request, manifest, webViewUrl }) => {
-        const wallet = account.activeTonWallet;
-        if (!isStandardTonWallet(wallet)) {
-            throw new Error('Only standard ton wallets can be connected');
+    >(async ({ request, manifest, webViewUrl, account, walletId }) => {
+        const selectedIsLedger = account.type === 'ledger';
+        const network = getNetworkByAccount(account);
+        const api = getContextApiByNetwork(appContext, network);
+
+        const wallet = account.getTonWallet(walletId);
+        if (!wallet) {
+            throw new Error('Wallet not found');
         }
+
         const params = await getTonConnectParams(request);
 
         const result = [] as ConnectItemReply[];
@@ -109,25 +129,58 @@ export const useConnectTonConnectAppMutation = () => {
                 result.push(toTonAddressItemReply(wallet, network));
             }
             if (item.name === 'ton_proof') {
-                if (activeIsLedger) {
-                    throw new Error('Ledger doesnt support ton_proof');
+                if (!isStandardTonWallet(wallet)) {
+                    throw new TxConfirmationCustomError(
+                        "Current wallet doesn't support connection to the service"
+                    );
                 }
-                const signTonConnect = signTonConnectOver(sdk, account.id, t, checkTouchId);
-                const timestamp = await getServerTime(api);
+
                 const proof = tonConnectProofPayload(
-                    timestamp,
+                    await getServerTime(api),
                     webViewUrl ?? manifest.url,
                     wallet.rawAddress,
                     item.payload
                 );
-                result.push(
-                    await toTonProofItemReply({
-                        storage: sdk.storage,
-                        account,
-                        signTonConnect,
-                        proof
-                    })
-                );
+
+                if (selectedIsLedger) {
+                    const ledgerTonProofSigner = await getLedgerTonProofSigner(sdk, account.id, {
+                        walletId: wallet.id
+                    });
+
+                    if (
+                        wallet.version !== WalletVersion.V3R2 &&
+                        wallet.version !== WalletVersion.V4R2
+                    ) {
+                        throw new TxConfirmationCustomError(
+                            "Current wallet doesn't support connection to the service"
+                        );
+                    }
+
+                    const { signature } = await ledgerTonProofSigner({
+                        domain: proof.domain,
+                        timestamp: proof.timestamp,
+                        payload: Buffer.from(proof.payload),
+                        walletVersion: wallet.version === WalletVersion.V3R2 ? 'v3r2' : 'v4'
+                    });
+
+                    result.push({ name: 'ton_proof', proof: createTonProofItem(signature, proof) });
+                } else {
+                    const signTonConnect = signTonConnectOver({
+                        sdk,
+                        accountId: account.id,
+                        wallet,
+                        t,
+                        checkTouchId
+                    });
+                    result.push(
+                        await toTonProofItemReply({
+                            storage: sdk.storage,
+                            account,
+                            signTonConnect,
+                            proof
+                        })
+                    );
+                }
             }
         }
 
@@ -168,7 +221,7 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const client = useQueryClient();
-    const accounts = useAccountsState().filter(isAccountControllable);
+    const accounts = useAccountsState().filter(isAccountTonWalletStandard);
 
     return useMutation(async (connection: AccountConnection | 'all') => {
         if (!isStandardTonWallet(wallet)) {
@@ -194,7 +247,9 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
         if (sdk.notifications) {
             await Promise.all(
                 connectionsToDisconnect.map(c =>
-                    sdk.notifications?.unsubscribeTonConnect(c.clientSessionId)
+                    sdk.notifications
+                        ?.unsubscribeTonConnect(c.clientSessionId)
+                        .catch(e => console.warn(e))
                 )
             );
         }
