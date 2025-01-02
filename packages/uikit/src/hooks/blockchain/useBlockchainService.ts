@@ -1,6 +1,5 @@
 import { TonAssetTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transaction.service';
 import { useActiveAccount, useActiveApi } from '../../state/wallet';
-import { useAppContext } from '../appContext';
 import { useMemo } from 'react';
 import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
