@@ -22,20 +22,25 @@ import { JettonEncoder } from '../encoder/jetton-encoder';
 import { NFTEncoder } from '../encoder/nft-encoder';
 import { TonConnectTransactionPayload } from '../../../entries/tonConnect';
 import { LedgerError } from '../../../errors/LedgerError';
-import { MessagePayloadParam, serializePayload } from '../encoder/types';
+import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from '../encoder/types';
 import { TonPayloadFormat } from '@ton-community/ton-ledger/dist/TonTransport';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { TonEstimation } from '../../../entries/send';
 import { LedgerTransaction } from '../../ledger/connector';
 import { WalletMessageSender } from './wallet-message-sender';
 import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
+import { ISender } from './ISender';
 
-export class LedgerMessageSender {
+export class LedgerMessageSender implements ISender {
     constructor(
         private readonly api: APIConfig,
         private readonly wallet: TonWalletStandard,
         private readonly signer: LedgerSigner
     ) {}
+
+    public get excessAddress() {
+        return this.wallet.rawAddress;
+    }
 
     private async sign<T extends LedgerTransaction | LedgerTransaction[]>(
         tx: T
@@ -46,6 +51,51 @@ export class LedgerMessageSender {
             const res = await this.signer([tx]);
             return res[0] as T extends LedgerTransaction ? Cell : Cell[];
         }
+    }
+
+    private async toExternals(outgoing: WalletOutgoingMessage) {
+        const { timestamp, seqno, contract } = await this.getTransferParameters();
+
+        const transferCells = await this.sign(
+            outgoing.messages.map((message, index) => {
+                if (message.info.type !== 'internal') {
+                    throw new Error('Only internal messages are supported by Ledger');
+                }
+
+                return {
+                    to: message.info.dest,
+                    bounce: message.info.bounce,
+                    amount: message.info.value.coins,
+                    seqno: seqno + index,
+                    timeout: getTTL(timestamp + index * 60),
+                    sendMode: outgoing.sendMode,
+                    payload: message.body
+                        ? {
+                              type: 'unsafe' as const,
+                              message: message.body
+                          }
+                        : undefined,
+                    stateInit: message.init ?? undefined
+                };
+            })
+        );
+
+        return transferCells.map((cell, index) => externalMessage(contract, seqno + index, cell));
+    }
+
+    public async send(outgoing: WalletOutgoingMessage) {
+        const externals = await this.toExternals(outgoing);
+
+        await new BlockchainApi(this.api.tonApiV2).sendBlockchainMessage({
+            sendBlockchainMessageRequest: {
+                batch: externals.map(message => message.toBoc().toString('base64'))
+            }
+        });
+        return externals[0];
+    }
+
+    public async estimate(outgoing: WalletOutgoingMessage) {
+        return new WalletMessageSender(this.api, this.wallet, estimationSigner).estimate(outgoing);
     }
 
     tonRawTransfer = async ({

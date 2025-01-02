@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { useAppContext } from '../hooks/appContext';
 import {
     AccountsApi,
     BlockchainApi,

@@ -58,6 +58,7 @@ export function useSendTransfer<T extends Asset>({
                         asset: amount.asset
                     } as const;
                 }
+
                 if (!senderChoice) {
                     throw new Error('Unexpected sender choice');
                 }

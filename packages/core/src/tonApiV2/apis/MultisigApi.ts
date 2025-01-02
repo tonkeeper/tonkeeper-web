@@ -16,13 +16,10 @@
 import * as runtime from '../runtime';
 import type {
   Multisig,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     MultisigFromJSON,
     MultisigToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetMultisigAccountRequest {

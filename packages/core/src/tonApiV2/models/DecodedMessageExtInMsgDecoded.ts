@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { DecodedMessageExtInMsgDecodedWalletV5 } from './DecodedMessageExtInMsgDecodedWalletV5';
+import {
+    DecodedMessageExtInMsgDecodedWalletV5FromJSON,
+    DecodedMessageExtInMsgDecodedWalletV5FromJSONTyped,
+    DecodedMessageExtInMsgDecodedWalletV5ToJSON,
+    DecodedMessageExtInMsgDecodedWalletV5ToJSONTyped,
+} from './DecodedMessageExtInMsgDecodedWalletV5';
 import type { DecodedMessageExtInMsgDecodedWalletV4 } from './DecodedMessageExtInMsgDecodedWalletV4';
 import {
     DecodedMessageExtInMsgDecodedWalletV4FromJSON,
@@ -55,6 +62,12 @@ export interface DecodedMessageExtInMsgDecoded {
     walletV4?: DecodedMessageExtInMsgDecodedWalletV4;
     /**
      * 
+     * @type {DecodedMessageExtInMsgDecodedWalletV5}
+     * @memberof DecodedMessageExtInMsgDecoded
+     */
+    walletV5?: DecodedMessageExtInMsgDecodedWalletV5;
+    /**
+     * 
      * @type {DecodedMessageExtInMsgDecodedWalletHighloadV2}
      * @memberof DecodedMessageExtInMsgDecoded
      */
@@ -80,6 +93,7 @@ export function DecodedMessageExtInMsgDecodedFromJSONTyped(json: any, ignoreDisc
         
         'walletV3': json['wallet_v3'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletV3FromJSON(json['wallet_v3']),
         'walletV4': json['wallet_v4'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletV4FromJSON(json['wallet_v4']),
+        'walletV5': json['wallet_v5'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletV5FromJSON(json['wallet_v5']),
         'walletHighloadV2': json['wallet_highload_v2'] == null ? undefined : DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSON(json['wallet_highload_v2']),
     };
 }
@@ -97,6 +111,7 @@ export function DecodedMessageExtInMsgDecodedFromJSONTyped(json: any, ignoreDisc
         
         'wallet_v3': DecodedMessageExtInMsgDecodedWalletV3ToJSON(value['walletV3']),
         'wallet_v4': DecodedMessageExtInMsgDecodedWalletV4ToJSON(value['walletV4']),
+        'wallet_v5': DecodedMessageExtInMsgDecodedWalletV5ToJSON(value['walletV5']),
         'wallet_highload_v2': DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON(value['walletHighloadV2']),
     };
 }

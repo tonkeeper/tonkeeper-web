@@ -55,6 +55,7 @@ import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService
 import { useAccountsStateQuery, useAccountsState } from './accounts';
 import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
+import { useRemoveAccountTwoFAData } from './two-fa';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -699,6 +700,7 @@ export const useMutateLogOut = () => {
     const { folders } = useGlobalPreferences();
     const deleteFolder = useDeleteFolder();
     const accounts = useAccountsState();
+    const { mutateAsync: removeAccountTwoFA } = useRemoveAccountTwoFAData();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
@@ -721,6 +723,7 @@ export const useMutateLogOut = () => {
             .map(acc => acc.id);
 
         await storage.removeAccountsFromState([accountId, ...multisigs]);
+        await removeAccountTwoFA(accountId);
         await client.invalidateQueries([QueryKey.account]);
         await client.invalidateQueries([QueryKey.pro]);
         if (folder) {
