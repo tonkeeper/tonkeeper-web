@@ -21,6 +21,7 @@ export const plugins = [
             process.env.REACT_APP_STONFI_REFERRAL_ADDRESS
         ),
         REACT_APP_APTABASE: JSON.stringify(process.env.REACT_APP_APTABASE),
-        REACT_APP_APTABASE_HOST: JSON.stringify(process.env.REACT_APP_APTABASE_HOST)
+        REACT_APP_APTABASE_HOST: JSON.stringify(process.env.REACT_APP_APTABASE_HOST),
+        REACT_APP_TRON_API_KEY: JSON.stringify(process.env.REACT_APP_TRON_API_KEY)
     })
 ];

@@ -1,9 +1,7 @@
-import { FC, Suspense, useCallback, useMemo, useRef } from 'react';
+import { FC, Suspense, useRef } from 'react';
 import styled from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
-import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { getMixedActivity } from '../../state/mixedActivity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
@@ -21,8 +19,6 @@ import {
     AssetHistoryFilter,
     OtherHistoryFilters
 } from '../../components/desktop/history/DesktopHistoryFilters';
-import { useQueryClient } from '@tanstack/react-query';
-import { QueryKey } from '../../libs/queryKey';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -85,29 +81,25 @@ export const DesktopHistoryPage: FC = () => {
 
     const {
         refetch,
-        isFetched: isTonFetched,
-        fetchNextPage: fetchTonNextPage,
-        hasNextPage: hasTonNextPage,
-        isFetchingNextPage: isTonFetchingNextPage,
-        data: tonEvents
+        isFetched: isActivityFetched,
+        fetchNextPage: fetchActivityNextPage,
+        hasNextPage: hasActivityNextPage,
+        isFetchingNextPage: isActivityFetchingNextPage,
+        data: activity
     } = useFetchFilteredActivity();
 
     useScrollMonitor(ref, 5000, refetch);
 
-    const isFetchingNextPage = isTonFetchingNextPage;
+    const isFetchingNextPage = isActivityFetchingNextPage;
 
-    useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, true, ref);
-
-    const activity = useMemo(() => {
-        return getMixedActivity(tonEvents, undefined);
-    }, [tonEvents]);
+    useFetchNext(hasActivityNextPage, isFetchingNextPage, fetchActivityNextPage, true, ref);
 
     const onOpenExplorer = () =>
         config.accountExplorer
             ? sdk.openPage(config.accountExplorer.replace('%s', formatAddress(wallet.rawAddress)))
             : undefined;
 
-    if (!isTonFetched!) {
+    if (!isActivityFetched!) {
         return (
             <HistoryPageWrapper>
                 <HistoryHeaderContainer borderBottom={false}>
@@ -129,7 +121,7 @@ export const DesktopHistoryPage: FC = () => {
         );
     }
 
-    if (activity.length === 0) {
+    if (activity?.length === 0) {
         return (
             <Suspense fallback={<ActivitySkeletonPage />}>
                 <EmptyActivity />

@@ -8,10 +8,11 @@ export const Info = styled.div`
     margin-bottom: 1rem;
 `;
 
-export const Image = styled.img<{ full?: boolean }>`
+export const Image = styled.img<{ full?: boolean; $noBorders?: boolean }>`
     width: 96px;
     height: 96px;
-    border-radius: ${props => (props.full ? props.theme.cornerFull : props.theme.cornerMedium)};
+    border-radius: ${props =>
+        props.$noBorders ? 'none' : props.full ? props.theme.cornerFull : props.theme.cornerMedium};
 `;
 
 export const ImageMock = styled.div<{ full?: boolean }>`

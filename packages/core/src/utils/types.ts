@@ -4,6 +4,10 @@ export function assertUnreachable(_: never): never {
     throw new Error("Didn't expect to get here");
 }
 
+export function assertUnreachableSoft(_: never): void {
+    console.error("Didn't expect to get here", _);
+}
+
 export type NonNullableFields<T> = {
     [P in keyof T]: NonNullable<T[P]>;
 };

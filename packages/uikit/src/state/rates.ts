@@ -10,6 +10,11 @@ import { useAppContext } from '../hooks/appContext';
 import { formatFiatCurrency } from '../hooks/balance';
 import { QueryKey } from '../libs/queryKey';
 import { useActiveApi } from './wallet';
+import {
+    TON_USDT_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export interface TokenRate {
     diff7d: string;
@@ -81,6 +86,34 @@ export const useRate = (token: string) => {
 
                 // TODO need refactoring -- two reactive sources of the tokens rates
                 setTimeout(() => client.invalidateQueries([QueryKey.total]));
+                return tokenRate;
+            } catch (e) {
+                throw e;
+            }
+        },
+        { retry: 0 }
+    );
+};
+
+export const useUSDTRate = () => {
+    const { tonApiV2 } = useActiveApi();
+    const { fiat } = useAppContext();
+
+    return useQuery<TokenRate, Error>(
+        getRateKey(fiat, TRON_USDT_ASSET.address),
+        async () => {
+            const token = tonAssetAddressToString(TON_USDT_ASSET.address);
+            const value = await new RatesApi(tonApiV2).getRates({
+                tokens: [token],
+                currencies: [fiat]
+            });
+
+            try {
+                const tokenRate = toTokenRate(value.rates[token], fiat);
+                if (!tokenRate || !tokenRate.prices) {
+                    throw new Error(`Missing price for token: ${token}`);
+                }
+
                 return tokenRate;
             } catch (e) {
                 throw e;

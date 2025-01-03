@@ -167,7 +167,7 @@ export const RecipientView: FC<{
         }
 
         return null;
-    }, [recipient]);
+    }, [recipient, acceptBlockchains]);
 
     const isValidAddress = useMemo(() => {
         if (acceptBlockchains && acceptBlockchains.length === 1) {
@@ -235,10 +235,13 @@ export const RecipientView: FC<{
         let isValid;
         switch (isValidForBlockchain) {
             case BLOCKCHAIN_NAME.TON:
-                isValid = isMemoValid && toAccount;
+                isValid =
+                    isMemoValid && toAccount && acceptBlockchains?.includes(BLOCKCHAIN_NAME.TON);
                 break;
             case BLOCKCHAIN_NAME.TRON:
-                isValid = seeIfValidTronAddress(recipient.address);
+                isValid =
+                    seeIfValidTronAddress(recipient.address) &&
+                    acceptBlockchains?.includes(BLOCKCHAIN_NAME.TRON);
         }
         if (isValid) {
             if (ios && keyboard) openIosKeyboard(keyboard);
@@ -272,23 +275,6 @@ export const RecipientView: FC<{
         }
         setAddress(item);
         ref.current?.focus();
-        // if (ios && keyboard) openIosKeyboard(keyboard);
-
-        // if (seeIfValidTronAddress(item.address)) {
-        //     setRecipient({
-        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TRON },
-        //         done: false
-        //     });
-        // } else {
-        //     const to = await getAccountAsync(item);
-        //     if (to.memoRequired) return;
-        //     setRecipient({
-        //         address: { ...item, blockchain: BLOCKCHAIN_NAME.TON },
-        //         toAccount: to,
-        //         comment,
-        //         done: false
-        //     });
-        // }
     };
 
     return (

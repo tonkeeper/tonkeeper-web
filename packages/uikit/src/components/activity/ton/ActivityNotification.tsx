@@ -7,7 +7,7 @@ import {
     DomainRenewActionDetails,
     SmartContractExecActionDetails,
     TonTransferActionNotification
-} from './ActivityActionDetails';
+} from './TonActivityActionDetails';
 import { ContractDeployActionDetails } from './ContractDeployAction';
 import {
     JettonBurnActionNotification,
@@ -22,6 +22,10 @@ import {
     WithdrawStakeActionNotification
 } from './StakeNotifications';
 import { SubscribeActionDetails, UnSubscribeActionDetails } from './SubscribeAction';
+import { TronHistoryItem } from '@tonkeeper/core/dist/tronApi';
+import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
+import { useTranslation } from '../../../hooks/translation';
+import { TronTransferActionNotification } from '../tron/TronActivityActionDetails';
 
 export interface ActionData {
     isScam: boolean;
@@ -30,7 +34,23 @@ export interface ActionData {
     event: AccountEvent;
 }
 
-const ActivityContent: FC<ActionData> = props => {
+export interface ActivityNotificationDataTon {
+    type: 'ton';
+    isScam: boolean;
+    action: Action;
+    timestamp: number;
+    event: AccountEvent;
+}
+
+export interface ActivityNotificationDataTron {
+    type: 'tron';
+    event: TronHistoryItem;
+    timestamp: number;
+}
+
+export type ActivityNotificationData = ActivityNotificationDataTon | ActivityNotificationDataTron;
+
+const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
     switch (props.action.type) {
         case 'TonTransfer':
             return <TonTransferActionNotification {...props} />;
@@ -77,20 +97,30 @@ const ActivityContent: FC<ActionData> = props => {
     }
 };
 
+const ActivityContentTron: FC<ActivityNotificationDataTron> = props => {
+    const { t } = useTranslation();
+    switch (props.event.type) {
+        case 'asset-transfer':
+            return <TronTransferActionNotification {...props} />;
+        default: {
+            assertUnreachableSoft(props.event.type);
+            return <>{t('txActions_signRaw_types_unknownTransaction')}</>;
+        }
+    }
+};
+
 export const ActivityNotification: FC<{
-    value: ActionData | undefined;
+    value: ActivityNotificationData | undefined;
     handleClose: () => void;
 }> = ({ value, handleClose }) => {
     const Content = useCallback(() => {
         if (!value) return undefined;
-        return (
-            <ActivityContent
-                isScam={value.isScam}
-                action={value.action}
-                timestamp={value.timestamp}
-                event={value.event}
-            />
-        );
+
+        if (value.type === 'tron') {
+            return <ActivityContentTron {...value} />;
+        } else {
+            return <ActivityContentTon {...value} />;
+        }
     }, [value, handleClose]);
 
     return (

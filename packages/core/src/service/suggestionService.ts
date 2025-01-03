@@ -41,36 +41,6 @@ export const deleteFavoriteSuggestion = async (
     storage.set(`${AppKey.FAVOURITES}_${publicKey}`, items);
 };
 
-/*const getTronSuggestionsList = async (
-    api: APIConfig,
-    wallet: DeprecatedWalletState,
-    seeIfAddressIsAdded: (list: LatestSuggestion[], address: string) => boolean
-) => {
-    const list = [] as LatestSuggestion[];
-
-    if (wallet.tron) {
-        const tronItems = await new TronApi(api.tronApi).getTransactions({
-            ownerAddress: wallet.tron.ownerWalletAddress,
-            limit: 100
-        });
-
-        tronItems.events.forEach(event => {
-            event.actions.forEach(({ sendTRC20 }) => {
-                if (sendTRC20 && !seeIfAddressIsAdded(list, sendTRC20.recipient)) {
-                    list.push({
-                        isFavorite: false,
-                        timestamp: event.timestamp,
-                        address: sendTRC20.recipient,
-                        blockchain: BLOCKCHAIN_NAME.TRON
-                    });
-                }
-            });
-        });
-    }
-
-    return list;
-};*/
-
 const getTonSuggestionsList = async (
     api: APIConfig,
     wallet: TonWalletStandard,
@@ -128,8 +98,8 @@ export const getSuggestionsList = async (
             switch (name) {
                 case BLOCKCHAIN_NAME.TON:
                     return getTonSuggestionsList(api, wallet, seeIfAddressIsAdded);
-                /*                case BLOCKCHAIN_NAME.TRON:
-                    return getTronSuggestionsList(api, wallet, seeIfAddressIsAdded);*/
+                case BLOCKCHAIN_NAME.TRON:
+                    return [];
                 default:
                     throw new Error('Unexpected chain');
             }

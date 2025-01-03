@@ -10,11 +10,14 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
-    useGetSender
+    useGetSender,
+    useGetTronSender
 } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 
 export function useSendTransfer<T extends Asset>({
     recipient,
@@ -34,6 +37,7 @@ export function useSendTransfer<T extends Asset>({
     const notifyError = useNotifyErrorHandle();
     const getSender = useGetSender();
     const transferService = useTonAssetTransferService();
+    const getTronSender = useGetTronSender();
 
     return useMutation<boolean, Error>(async () => {
         try {
@@ -79,8 +83,11 @@ export function useSendTransfer<T extends Asset>({
                     from: 'send_confirm',
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
                 });
+            } else if (amount.asset.id === TRON_USDT_ASSET.id) {
+                const tronSender = getTronSender();
+                await tronSender.send(recipient.address.address, amount as AssetAmount<TronAsset>);
             } else {
-                throw new Error('Disable trc 20 transactions');
+                throw new Error('Unexpected asset');
             }
         } catch (e) {
             await notifyError(e);

@@ -13,6 +13,7 @@ import {
     getNetworkByAccount,
     getWalletById,
     isAccountTonWalletStandard,
+    isAccountTronCompatible,
     isAccountVersionEditable,
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
@@ -40,7 +41,10 @@ import {
     getContextApiByNetwork,
     getStandardTonWalletVersions,
     getTonWalletStandard,
-    getWalletAddress
+    getWalletAddress,
+    mamAccountToMamAccountWithTron,
+    standardTonAccountToAccountWithTron,
+    tronWalletByTonMnemonic
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -49,13 +53,19 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { getAccountMnemonic, getPasswordByNotification } from './mnemonic';
+import {
+    getAccountMnemonic,
+    getPasswordByNotification,
+    useGetActiveAccountMnemonic
+} from './mnemonic';
 import { useCheckTouchId } from './password';
 import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
 import { useAccountsStateQuery, useAccountsState } from './accounts';
 import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { useIsTronEnabledGlobally } from './tron/tron';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -207,6 +217,7 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -239,7 +250,8 @@ export const useCreateMAMAccountDerivation = () => {
             emoji: account.emoji,
             index: newDerivationIndex,
             tonWallets,
-            activeTonWalletId: tonWallets[0].id
+            activeTonWalletId: tonWallets[0].id,
+            tronWallet: isTronEnabled ? await tronWalletByTonMnemonic(mnemonic) : undefined
         });
 
         await storage.updateAccountInState(account);
@@ -465,11 +477,43 @@ export const useCreateAccountTestnet = () => {
     });
 };
 
+export const useAddTronToAccount = () => {
+    const getMnemonic = useGetActiveAccountMnemonic();
+    const activeAccount = useActiveAccount();
+    const accountsStorage = useAccountsStorage();
+    const client = useQueryClient();
+
+    return useMutation(async () => {
+        if (!isAccountTronCompatible(activeAccount)) {
+            throw new Error('Account is not tron compatible');
+        }
+
+        let updatedAccount: Account;
+        switch (activeAccount.type) {
+            case 'mnemonic':
+                updatedAccount = await standardTonAccountToAccountWithTron(
+                    activeAccount,
+                    getMnemonic
+                );
+                break;
+            case 'mam':
+                updatedAccount = await mamAccountToMamAccountWithTron(activeAccount, getMnemonic);
+                break;
+            default:
+                assertUnreachable(activeAccount);
+        }
+
+        await accountsStorage.updateAccountInState(updatedAccount);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.account, updatedAccount.id));
+    });
+};
+
 export const useCreateAccountMnemonic = () => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<
         AccountTonMnemonic,
@@ -497,7 +541,8 @@ export const useCreateAccountMnemonic = () => {
                     auth: {
                         kind: 'keychain'
                     },
-                    versions
+                    versions,
+                    generateTronWallet: isTronEnabled
                 }
             );
 
@@ -528,7 +573,8 @@ export const useCreateAccountMnemonic = () => {
                     kind: 'password',
                     encryptedMnemonic
                 },
-                versions
+                versions,
+                generateTronWallet: isTronEnabled
             }
         );
 
@@ -545,6 +591,7 @@ export const useCreateAccountMAM = () => {
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<
         AccountMAM,
@@ -561,7 +608,8 @@ export const useCreateAccountMAM = () => {
                 selectedDerivations,
                 auth: {
                     kind: 'keychain'
-                }
+                },
+                generateTronWallet: isTronEnabled
             });
 
             await sdk.keychain.setPassword(
@@ -586,7 +634,8 @@ export const useCreateAccountMAM = () => {
             auth: {
                 kind: 'password',
                 encryptedMnemonic
-            }
+            },
+            generateTronWallet: isTronEnabled
         });
 
         await addAccountToState(account);

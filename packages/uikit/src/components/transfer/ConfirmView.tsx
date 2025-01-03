@@ -275,7 +275,11 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
         recipient && isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
     return (
         <Info className={className}>
-            {icon ? <Image full src={image} /> : <ImageMock full />}
+            {icon ? (
+                <Image $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id} full src={image} />
+            ) : (
+                <ImageMock full />
+            )}
             <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
             <Title>{title}</Title>
         </Info>

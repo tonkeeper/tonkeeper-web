@@ -1,13 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import {
     AccountAddress,
     AccountEvent,
     JettonSwapActionDexEnum
 } from '@tonkeeper/core/dist/tonApiV2';
-import { TronEvent, TronFee } from '@tonkeeper/core/dist/tronApi';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
@@ -120,18 +118,6 @@ export const toDexName = (dex: JettonSwapActionDexEnum) => {
         default:
             return dex;
     }
-};
-
-export const TronErrorActivityNotification: FC<PropsWithChildren<{ event: TronEvent }>> = ({
-    children,
-    event
-}) => {
-    const { t } = useTranslation();
-    return (
-        <TronActionDetailsBlock event={event}>
-            <Title>{children ?? t('txActions_signRaw_types_unknownTransaction')}</Title>
-        </TronActionDetailsBlock>
-    );
 };
 
 export const ErrorActivityNotification: FC<PropsWithChildren<{ event: AccountEvent }>> = ({
@@ -334,29 +320,6 @@ export const ActionExtraDetails: FC<{
                 <ColumnText
                     right
                     text={`${amount} ${CryptoCurrency.TON}`}
-                    secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
-                />
-            </ListItemPayload>
-        </ListItem>
-    );
-};
-
-export const ActionTronFeeDetails: FC<{
-    fees: TronFee;
-}> = ({ fees }) => {
-    const { t } = useTranslation();
-
-    const amount = useMemo(() => formatDecimals(fees.amount, fees.token.decimals), [fees]);
-    const { data } = useRate(fees.token.symbol);
-    const { fiatAmount } = useFormatFiat(data, amount);
-
-    return (
-        <ListItem hover={false}>
-            <ListItemPayload>
-                <Label>{t('transaction_fee')}</Label>
-                <ColumnText
-                    right
-                    text={`${amount} ${fees.token.symbol}`}
                     secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
                 />
             </ListItemPayload>
@@ -582,23 +545,7 @@ export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> 
     );
 };
 
-export const TronActionDetailsBlock: FC<PropsWithChildren<{ event: TronEvent }>> = ({
-    event,
-    children
-}) => {
-    const network = useActiveTonNetwork();
-    const url =
-        network === Network.TESTNET
-            ? 'https://nile.tronscan.org/#/transaction/%s'
-            : 'https://tronscan.org/#/transaction/%s';
-    return (
-        <CommonActionDetailsBlock url={url} eventId={event.txHash}>
-            {children}
-        </CommonActionDetailsBlock>
-    );
-};
-
-const CommonActionDetailsBlock: FC<PropsWithChildren<{ eventId: string; url: string }>> = ({
+export const CommonActionDetailsBlock: FC<PropsWithChildren<{ eventId: string; url: string }>> = ({
     children,
     eventId,
     url

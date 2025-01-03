@@ -89,6 +89,7 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
+import { TronApi } from '@tonkeeper/core/dist/tronApi';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -134,6 +135,7 @@ const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
 declare const REACT_APP_TONCONSOLE_API: string;
 declare const REACT_APP_TG_BOT_ID: string;
 declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
+declare const REACT_APP_TRON_API_KEY: string;
 
 export const Providers = () => {
     const { t: tSimple, i18n } = useTranslation();
@@ -333,7 +335,8 @@ export const Loader: FC = () => {
         ios: false,
         env: {
             tgAuthBotId: REACT_APP_TG_BOT_ID,
-            stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS
+            stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS,
+            tronApiKey: REACT_APP_TRON_API_KEY
         },
         defaultWalletVersion: WalletVersion.V5R1
     };

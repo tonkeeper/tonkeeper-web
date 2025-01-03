@@ -1,76 +1,86 @@
 import { useQuery } from '@tanstack/react-query';
-import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { TronApi, TronBalance, TronBalances, TronToken } from '@tonkeeper/core/dist/tronApi';
 import { useAppContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../tonendpoint';
-import { useActiveApi } from '../wallet';
+import { useActiveAccount, useActiveConfig } from '../wallet';
+import { useMemo } from 'react';
+import { isAccountTronCompatible } from '@tonkeeper/core/dist/entries/account';
+import { TronWallet } from '@tonkeeper/core/dist/entries/tron/tron-wallet';
+import { TronApi } from '@tonkeeper/core/dist/tronApi';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import {
+    TRON_TRX_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import { useDevSettings } from '../dev';
 
-enum TronKeys {
-    state,
-    balance
-}
+export const useTronApi = () => {
+    const appContext = useAppContext();
+    const apiKey = appContext.env?.tronApiKey;
 
-export const useTronWalletState = (enabled = true) => {
-    const { tronApi } = useActiveApi();
-    /*    const client = useQueryClient();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();*/
+    const apiUrl = appContext.mainnetConfig.tron_api_url || 'https://api.trongrid.io';
 
-    return useQuery<TronWalletState | undefined, Error>(
-        [TronKeys.state],
-        async () => {
-            return undefined;
-            /*  if (wallet.tron) {
-                return getTronWalletState(wallet.tron, wallet.network);
-            }
-
-            const mnemonic = await getMnemonic(sdk, wallet.publicKey, checkTouchId);
-            const tron = await importTronWallet(sdk.storage, tronApi, wallet, mnemonic);
-
-            const result = getTronWalletState(tron, wallet.network);
-
-            client.invalidateQueries([QueryKey.account, QueryKey.wallet]);
-            return result;*/
-        },
-        { enabled }
-    );
+    return useMemo(() => new TronApi(apiUrl, apiKey), [apiKey, apiUrl]);
 };
 
-export const useTronTokens = () => {
-    const { tronApi } = useActiveApi();
-    // const wallet = useWalletContext();
-    return useQuery<TronToken[], Error>(
-        [QueryKey.tron, /*wallet.network,*/ TronKeys.balance],
-        async () => {
-            const sdk = new TronApi(tronApi);
-            const { tokens } = await sdk.getSettings();
-            return tokens;
-        }
-    );
+export const useIsTronEnabledGlobally = () => {
+    const { data: devSettings } = useDevSettings();
+    const config = useActiveConfig();
+
+    if (config.flags?.disable_tron) {
+        return false;
+    }
+
+    return devSettings?.tronEnabled;
 };
+
+export const useCanUseTronForActiveWallet = () => {
+    const isTronEnabled = useIsTronEnabledGlobally();
+    const account = useActiveAccount();
+
+    if (!isTronEnabled) {
+        return false;
+    }
+
+    return isAccountTronCompatible(account);
+};
+
+export const useActiveTronWallet = (): TronWallet | undefined => {
+    const account = useActiveAccount();
+
+    if (isAccountTronCompatible(account)) {
+        return account.activeTronWallet;
+    }
+
+    return undefined;
+};
+
+export type TronBalances = { trx: AssetAmount<TronAsset>; usdt: AssetAmount<TronAsset> } | null;
 
 export const useTronBalances = () => {
-    const { tronApi } = useActiveApi();
-    /*const wallet = useWalletContext();*/
+    const tronApi = useTronApi();
+    const activeWallet = useActiveTronWallet();
 
     return useQuery<TronBalances, Error>(
-        [QueryKey.tron, /*wallet.network,*/ TronKeys.balance],
+        [QueryKey.tronAssets, activeWallet?.address],
         async () => {
-            return { balances: [] };
-            /*const sdk = new TronApi(tronApi);
+            if (!activeWallet) {
+                return null;
+            }
+            const balances = await tronApi.getBalances(activeWallet?.address);
 
-            if (wallet.tron) {
-                const { walletAddress } = getTronWalletState(wallet.tron, wallet.network);
-                return sdk.getWalletBalances({
-                    walletAddress
-                });
-            } else {
-                //  const { tokens } = await sdk.getSettings();
-                return {
-                    balances: [] // tokens.map(token => ({ token, weiAmount: '0' }))
-                };
-            }*/
+            const trx = new AssetAmount<TronAsset>({
+                asset: TRON_TRX_ASSET,
+                weiAmount: balances.trx
+            });
+
+            const usdt = new AssetAmount<TronAsset>({
+                asset: TRON_USDT_ASSET,
+                weiAmount: balances.usdt
+            });
+
+            return { trx, usdt };
         },
         {
             refetchInterval: DefaultRefetchInterval,
@@ -80,43 +90,3 @@ export const useTronBalances = () => {
         }
     );
 };
-
-export const useTronBalance = (tron: TronWalletState, address: string | undefined) => {
-    const { tronApi } = useActiveApi();
-    // const wallet = useWalletContext();
-
-    return useQuery<TronBalance, Error>([QueryKey.tron, address], async () => {
-        if (!address) {
-            throw new Error('missing token address');
-        }
-        const sdk = new TronApi(tronApi);
-
-        const { balances } = await sdk.getWalletBalances({
-            walletAddress: tron.walletAddress
-        });
-
-        const balance = balances.find(item => item.token.address === address);
-        if (!balance) {
-            throw new Error('missing token balance');
-        }
-
-        return balance;
-    });
-};
-
-/*
-export const useCleanUpTronStore = () => {
-    const wallet = useWalletContext();
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-
-    return useMutation(async () => {
-        // eslint-disable-next-line unused-imports/no-unused-vars
-        const { tron, ...rest } = wallet;
-        if (wallet.tron) {
-            await setWalletState(sdk.storage, rest);
-            await client.invalidateQueries();
-        }
-    });
-};
-*/

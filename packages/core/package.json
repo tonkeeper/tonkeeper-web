@@ -9,7 +9,6 @@
         "start": "tsc -w",
         "sdk": "npm-run-all -p generate:*",
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
-        "generate:tronApi": "rm -fr src/tronApi && docker build -f resource/Dockerfile.tronApi . -t tronapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tronapisdk",
         "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUOCGQXJBM2BFNOB6XREZ2ZZZCA' --output ./src/tonConsoleApi",
         "generate:swapsApi": "rm -r ./src/swapsApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/swaps-backend/master/swagger.yaml?token=GHSAT0AAAAAACJYQUODBKR67AB7WULZBFWEZSUUGFQ' --output ./src/swapsApi",
         "generate:batteryApi": "rm -fr ./src/batteryApi && docker build -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
@@ -27,13 +26,15 @@
         "@ledgerhq/hw-transport-webusb": "^6.28.6",
         "@ton-community/ton-ledger": "^7.2.0-pre.3",
         "@ton-keychain/core": "^0.0.4",
+        "@ton-keychain/trx": "^0.0.7",
         "@ton/core": "0.56.0",
         "@ton/crypto": "3.2.0",
         "@ton/ton": "^15.1.0",
         "bignumber.js": "^9.1.1",
         "bip39": "^3.1.0",
-        "ethers": "^6.6.5",
+        "ethers": "^6.13.4",
         "query-string": "^8.1.0",
+        "tronweb": "^6.0.0",
         "tweetnacl": "^1.0.3"
     }
 }

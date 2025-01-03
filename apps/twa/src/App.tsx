@@ -284,7 +284,10 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideMam: true,
         hideMultisig: true,
         defaultWalletVersion: WalletVersion.V5R1,
-        browserLength: 4
+        browserLength: 4,
+        env: {
+            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
+        }
     };
 
     return (
