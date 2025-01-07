@@ -1,33 +1,55 @@
-import { TronEvent } from '@tonkeeper/core/dist/tronApi';
-import React, { FC } from 'react';
+import { FC } from 'react';
 import { ListItem } from '../../List';
-import { ProgressIcon } from '../ActivityLayout';
-import { TronActionData } from './ActivityNotification';
-import { TronActivityAction } from './TronActivityAction';
+import { TronHistoryItem, TronHistoryItemTransferAsset } from '@tonkeeper/core/dist/tronApi';
+import { ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayout';
+import { useActiveTronWallet } from '../../../state/tron/tron';
+import { ErrorAction } from '../CommonAction';
+import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
 
 export const TronActivityEvents: FC<{
-    event: TronEvent;
-    date: string;
-    timestamp: number;
-    setTronAction: (value: TronActionData) => void;
-}> = ({ event, date, timestamp, setTronAction }) => {
+    event: TronHistoryItem;
+    formattedDate: string;
+    onClick: () => void;
+}> = ({ event, onClick, formattedDate }) => {
     return (
         <>
-            {event.actions.map((action, index) => (
-                <ListItem
-                    key={index}
-                    onClick={() =>
-                        setTronAction({
-                            action,
-                            timestamp: timestamp,
-                            event
-                        })
-                    }
-                >
-                    <TronActivityAction action={action} date={date} />
-                    {event.inProgress && <ProgressIcon />}
-                </ListItem>
-            ))}
+            <ListItem onClick={onClick}>
+                <TronTransferAction event={event} formattedDate={formattedDate} />
+            </ListItem>
         </>
+    );
+};
+
+const TronTransferAction: FC<{
+    event: TronHistoryItemTransferAsset;
+    formattedDate: string;
+}> = ({ event, formattedDate }) => {
+    const wallet = useActiveTronWallet();
+
+    if (!wallet) {
+        return <ErrorAction />;
+    }
+
+    if (event.to === wallet?.address) {
+        return (
+            <ReceiveActivityAction
+                amount={event.assetAmount.stringRelativeAmount}
+                sender={event.from}
+                symbol={event.assetAmount.asset.symbol}
+                date={formattedDate}
+                isScam={event.isScam}
+                status={event.isFailed ? ActionStatusEnum.Failed : ActionStatusEnum.Ok}
+            />
+        );
+    }
+    return (
+        <SendActivityAction
+            amount={event.assetAmount.stringRelativeAmount}
+            symbol={event.assetAmount.asset.symbol}
+            recipient={event.to}
+            date={formattedDate}
+            isScam={event.isScam}
+            status={event.isFailed ? ActionStatusEnum.Failed : ActionStatusEnum.Ok}
+        />
     );
 };

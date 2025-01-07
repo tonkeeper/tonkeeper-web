@@ -36,7 +36,7 @@ export enum QueryKey {
     featuredRecommendations = 'recommendations',
     experimental = 'experimental',
 
-    tron = 'tron',
+    tronAssets = 'tronAssets',
     rate = 'rate',
     total = 'total',
     distribution = 'distribution',
