@@ -388,8 +388,6 @@ export const tonDisconnectRequest = async (options: { storage: IStorage; webView
 
 const getMaxMessages = (account: Account) => {
     if (account.type === 'ledger') {
-        return 1; // TODO disable multisend for ledger temporary until tonapi fix send batch
-
         return 4;
     }
 

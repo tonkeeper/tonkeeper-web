@@ -46,9 +46,6 @@ export class LedgerMessageSender implements ISender {
         tx: T
     ): Promise<T extends LedgerTransaction ? Cell : Cell[]> {
         if (Array.isArray(tx)) {
-            if (tx.length > 1) {
-                throw new Error('Only one transaction is supported by Ledger'); // TODO disable multisend for ledger temporary until tonapi fix send batch
-            }
             return this.signer(tx) as Promise<T extends LedgerTransaction ? Cell : Cell[]>;
         } else {
             const res = await this.signer([tx]);
