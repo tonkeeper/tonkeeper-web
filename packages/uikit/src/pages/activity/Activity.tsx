@@ -1,81 +1,36 @@
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC, Suspense, useCallback, useMemo, useRef } from 'react';
+import React, { FC, Suspense, useRef } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonListWithImages } from '../../components/Skeleton';
-import { MixedActivityGroup } from '../../components/activity/ActivityGroup';
 
 import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { QueryKey } from '../../libs/queryKey';
-import { getMixedActivityGroups } from '../../state/mixedActivity';
-import { useActiveApi, useActiveTonNetwork, useActiveWallet } from '../../state/wallet';
-import { useScrollMonitor } from '../../state/activity';
+import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
+import { MobileActivityList } from '../../components/activity/MobileActivityList';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
 const Activity: FC = () => {
-    const wallet = useActiveWallet();
-    const network = useActiveTonNetwork();
-    const api = useActiveApi();
     const { standalone } = useAppContext();
 
     const ref = useRef<HTMLDivElement>(null);
 
     const {
-        isFetched: isTonFetched,
-        fetchNextPage: fetchTonNextPage,
-        hasNextPage: hasTonNextPage,
-        isFetchingNextPage: isTonFetchingNextPage,
-        data: tonEvents
-    } = useInfiniteQuery({
-        queryKey: [wallet.rawAddress, QueryKey.activity, 'all', network],
-        queryFn: ({ pageParam = undefined }) =>
-            new AccountsApi(api.tonApiV2).getAccountEvents({
-                accountId: wallet.rawAddress,
-                limit: 20,
-                beforeLt: pageParam,
-                subjectOnly: true
-            }),
-        getNextPageParam: lastPage => (lastPage.nextFrom > 0 ? lastPage.nextFrom : undefined)
-    });
+        refetch,
+        isFetched: isActivityFetched,
+        fetchNextPage: fetchActivityNextPage,
+        hasNextPage: hasActivityNextPage,
+        isFetchingNextPage: isActivityFetchingNextPage,
+        data: activity
+    } = useFetchFilteredActivity();
 
-    const client = useQueryClient();
-    const invalidate = useCallback(() => {
-        return client.invalidateQueries([wallet.rawAddress, QueryKey.activity, 'all']);
-    }, []);
+    useScrollMonitor(ref, 5000, refetch);
 
-    useScrollMonitor(ref, 5000, invalidate);
+    const isFetchingNextPage = isActivityFetchingNextPage;
 
-    // const {
-    //     isFetched: isTronFetched,
-    //     data: tronEvents,
-    //     isFetchingNextPage: isTronFetchingNextPage,
-    //     hasNextPage: hasTronNextPage,
-    //     fetchNextPage: fetchTronNextPage
-    // } = useInfiniteQuery({
-    //     queryKey: [wallet.tron?.ownerWalletAddress, wallet.network, QueryKey.tron],
-    //     queryFn: ({ pageParam = undefined }) =>
-    //         new TronApi(api.tronApi).getTransactions({
-    //             ownerAddress: wallet.tron!.ownerWalletAddress,
-    //             fingerprint: pageParam,
-    //             limit: 100
-    //         }),
-    //     getNextPageParam: lastPage => lastPage.fingerprint,
-    //     enabled: wallet.tron !== undefined
-    // });
+    useFetchNext(hasActivityNextPage, isFetchingNextPage, fetchActivityNextPage, standalone, ref);
 
-    const isFetchingNextPage = isTonFetchingNextPage;
-
-    useFetchNext(hasTonNextPage, isFetchingNextPage, fetchTonNextPage, standalone, ref);
-    //  useFetchNext(hasTronNextPage, isFetchingNextPage, fetchTronNextPage, standalone, ref);
-
-    const activity = useMemo(() => {
-        return getMixedActivityGroups(tonEvents, undefined);
-    }, [tonEvents]);
-
-    if (!isTonFetched) {
+    if (!isActivityFetched || !activity) {
         return <ActivitySkeletonPage />;
     }
 
@@ -91,7 +46,7 @@ const Activity: FC = () => {
         <>
             <ActivityHeader />
             <InnerBody ref={ref}>
-                <MixedActivityGroup key={activity[0][0]} items={activity} />
+                <MobileActivityList items={activity} />
                 {isFetchingNextPage && <SkeletonListWithImages size={3} />}
             </InnerBody>
         </>

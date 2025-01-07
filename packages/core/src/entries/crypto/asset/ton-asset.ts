@@ -4,6 +4,7 @@ import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
 import { AssetAmount } from './asset-amount';
+import { TronAsset } from './tron-asset';
 
 export type TonAssetAddress = Address | 'TON';
 export function isTon(address: TonAssetAddress): address is 'TON' {
@@ -23,6 +24,10 @@ export function tonAssetAddressToString(address: TonAsset['address']): string {
 
 export function tonAssetAddressFromString(address: string): TonAsset['address'] {
     return address === 'TON' ? address : Address.parse(address);
+}
+
+export function assetAddressToString(address: TonAsset['address'] | TronAsset['address']): string {
+    return typeof address === 'string' ? address : address.toRawString();
 }
 
 export function jettonToTonAsset(address: string, jettons: JettonsBalances): TonAsset {

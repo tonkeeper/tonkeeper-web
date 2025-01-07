@@ -5,11 +5,13 @@ import { AppKey } from '../Keys';
 export interface DevSettings {
     tonNetwork: Network;
     twoFAEnabled: boolean;
+    tronEnabled: boolean;
 }
 
 const defaultDevSettings: DevSettings = {
     tonNetwork: Network.MAINNET,
-    twoFAEnabled: false
+    twoFAEnabled: false,
+    tronEnabled: false
 };
 
 export const getDevSettings = async (storage: IStorage) => {

@@ -71,17 +71,44 @@ const EnableTwoFASettings = () => {
         <ListBlock>
             <ListItem hover={false}>
                 <ListItemPayload>
-                    <TextColumns>
-                        <TextAndBadge>
-                            <Label1>Enable 2FA</Label1>
-                            <Badge color="textSecondary">Experimental</Badge>
-                        </TextAndBadge>
-                        <Body3>Available only for W5 wallets</Body3>
-                    </TextColumns>
+                    <TextAndBadge>
+                        <Label1>Enable 2FA</Label1>
+                        <Badge color="textSecondary">Experimental</Badge>
+                    </TextAndBadge>
                     <Switch
                         disabled={!devSettings}
                         checked={!!devSettings?.twoFAEnabled}
                         onChange={checked => mutateSettings({ twoFAEnabled: checked })}
+                    />
+                </ListItemPayload>
+            </ListItem>
+        </ListBlock>
+    );
+};
+
+const EnableTronSettings = () => {
+    const { mutate: mutateSettings } = useMutateDevSettings();
+    const { data: devSettings } = useDevSettings();
+
+    const config = useActiveConfig();
+    if (config.flags?.disable_tron) {
+        return null;
+    }
+
+    return (
+        <ListBlock>
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <TextColumns>
+                        <TextAndBadge>
+                            <Label1>Enable TRON USDT</Label1>
+                            <Badge color="accentRed">Experimental</Badge>
+                        </TextAndBadge>
+                    </TextColumns>
+                    <Switch
+                        disabled={!devSettings}
+                        checked={!!devSettings?.tronEnabled}
+                        onChange={checked => mutateSettings({ tronEnabled: checked })}
                     />
                 </ListItemPayload>
             </ListItem>
@@ -95,9 +122,8 @@ export const DevSettings = React.memo(() => {
             <SubHeader title="Dev Menu" />
             <InnerBody>
                 <EnableTwoFASettings />
+                <EnableTronSettings />
                 <CookieSettings />
-                {/* TODO: ENABLE TRON */}
-                {/* <SettingsList items={items2} /> */}
             </InnerBody>
         </>
     );

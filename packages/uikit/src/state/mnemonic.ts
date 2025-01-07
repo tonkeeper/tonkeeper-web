@@ -2,9 +2,14 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
 import { sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { AccountId, isMnemonicAndPassword } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountId,
+    isAccountTronCompatible,
+    isMnemonicAndPassword,
+    Account
+} from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
-import { CellSigner, Signer } from '@tonkeeper/core/dist/entries/signer';
+import { CellSigner, Signer, TronSigner } from '@tonkeeper/core/dist/entries/signer';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
@@ -30,6 +35,10 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useCallback } from 'react';
 import { useActiveAccount } from './wallet';
 import { useCheckTouchId } from './password';
+import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
+import { TronWeb } from 'tronweb';
+import type { Transaction } from 'tronweb/src/types/Transaction';
+import { TronApi } from '@tonkeeper/core/dist/tronApi';
 
 export const signTonConnectOver = ({
     sdk,
@@ -241,6 +250,68 @@ export const getSigner = async (
             }
             case 'ton-multisig': {
                 throw new Error('Cannot get signer for multisig account');
+            }
+            default: {
+                assertUnreachable(account);
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+export const getTronSigner = (
+    sdk: IAppSdk,
+    tronApi: TronApi,
+    account: Account,
+    checkTouchId: () => Promise<void>
+): TronSigner => {
+    try {
+        if (!isAccountTronCompatible(account)) {
+            throw new Error("Account doesn't support tron");
+        }
+
+        const wallet = account.activeTronWallet;
+
+        if (!wallet) {
+            throw new Error('Wallet not found');
+        }
+
+        switch (account.type) {
+            case 'mam': {
+                return async (tx: Transaction) => {
+                    const tonMnemonic = await getMAMWalletMnemonic(
+                        sdk,
+                        account.id,
+                        wallet!.id,
+                        checkTouchId
+                    );
+                    const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');
+
+                    const tronWeb = new TronWeb({
+                        fullHost: tronApi.baseURL,
+                        privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
+                    });
+
+                    return tronWeb.trx.sign(tx);
+                };
+            }
+            case 'mnemonic': {
+                return async (tx: Transaction) => {
+                    const tonMnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
+                    const tronMnemonic = await tonMnemonicToTronMnemonic(
+                        tonMnemonic,
+                        account.mnemonicType
+                    );
+
+                    const tronWeb = new TronWeb({
+                        fullHost: tronApi.baseURL,
+                        privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
+                    });
+
+                    return tronWeb.trx.sign(tx);
+                };
             }
             default: {
                 assertUnreachable(account);
@@ -503,4 +574,15 @@ const pairLedgerByNotification = async <T extends 'transaction' | 'ton-proof'>(
             sdk.uiEvents.on('response', onCallback);
         }
     );
+};
+
+export const useGetActiveAccountMnemonic = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const activeAccount = useActiveAccount();
+    const accountId = activeAccount.id;
+
+    return useCallback(async () => {
+        return getAccountMnemonic(sdk, accountId, checkTouchId);
+    }, [sdk, checkTouchId, accountId]);
 };

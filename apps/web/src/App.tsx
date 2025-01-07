@@ -193,7 +193,8 @@ const Loader: FC = () => {
         hideMultisig: isMobile,
         env: {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
+            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
+            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
         }
     };
 

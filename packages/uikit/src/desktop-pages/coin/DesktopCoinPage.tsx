@@ -1,10 +1,9 @@
 import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useMemo, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Label2, Num3 } from '../../components/Text';
@@ -24,8 +23,7 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
-import { getMixedActivity } from '../../state/mixedActivity';
-import { toTokenRate, useRate } from '../../state/rates';
+import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
@@ -33,6 +31,15 @@ import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wal
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import {
+    TRON_TRX_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { BorderSmallResponsive } from '../../components/shared/Styles';
+import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -44,9 +51,18 @@ export const DesktopCoinPage = () => {
         }
     }, [name]);
 
+    const canUseTron = useActiveTronWallet();
+
     if (!name) return <></>;
 
     const token = name === 'ton' ? CryptoCurrency.TON : name;
+
+    if (token === TRON_USDT_ASSET.id) {
+        if (!canUseTron) {
+            return <Navigate to={AppRoute.home} />;
+        }
+        return <TronUSDTPage />;
+    }
 
     return <CoinPage token={token} />;
 };
@@ -166,6 +182,18 @@ const CoinInfoWrapper = styled.div`
     }
 `;
 
+const TronCoinInfoWrapper = styled.div`
+    padding: 1rem 0;
+    display: flex;
+
+    gap: 1rem;
+
+    > img {
+        width: 56px;
+        height: 56px;
+    }
+`;
+
 const CoinInfoAmounts = styled.div`
     > * {
         display: block;
@@ -264,20 +292,21 @@ const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
     padding-right: 0;
 `;
 
-export const CoinPage: FC<{ token: string }> = ({ token }) => {
+const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const ref = useRef<HTMLDivElement>(null);
 
-    const { fetchNextPage, hasNextPage, isFetchingNextPage, data, refetch } =
-        useFetchFilteredActivity(token);
+    const {
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        data: activity,
+        refetch
+    } = useFetchFilteredActivity(token);
 
     useScrollMonitor(ref, 5000, refetch);
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
-
-    const activity = useMemo(() => {
-        return getMixedActivity(data, undefined);
-    }, [data]);
 
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {
@@ -304,5 +333,173 @@ export const CoinPage: FC<{ token: string }> = ({ token }) => {
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
         </DesktopViewPageLayout>
+    );
+};
+
+export const TronUSDTPage = () => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    const asset = TRON_USDT_ASSET;
+    const { fiat } = useAppContext();
+    const { data: balances } = useTronBalances();
+    const { onOpen: sendTransfer } = useSendTransferNotification();
+
+    const usdtBalance = useMemo(() => {
+        if (balances === undefined) {
+            return undefined;
+        }
+
+        if (balances === null) {
+            return new AssetAmount({ weiAmount: 0, asset: TRON_USDT_ASSET });
+        }
+
+        return balances.usdt;
+    }, [balances]);
+
+    const trxBalance = useMemo(() => {
+        if (balances === undefined) {
+            return undefined;
+        }
+
+        if (balances === null) {
+            return new AssetAmount({ weiAmount: 0, asset: TRON_TRX_ASSET });
+        }
+
+        return balances.trx;
+    }, [balances]);
+
+    const ref = useRef<HTMLDivElement>(null);
+    const {
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        data: activity,
+        refetch
+    } = useFetchFilteredActivity(TRON_USDT_ASSET.address);
+
+    useScrollMonitor(ref, 5000, refetch);
+
+    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
+
+    const { data: rate } = useUSDTRate();
+
+    return (
+        <DesktopViewPageLayout ref={ref}>
+            <DesktopViewHeader backButton borderBottom={true}>
+                <Label2>{asset.symbol}</Label2>
+            </DesktopViewHeader>
+            <CoinHeaderStyled>
+                <TronCoinInfoWrapper>
+                    <img src={asset.image} alt={asset.symbol} />
+                    {usdtBalance !== undefined && (
+                        <CoinInfoAmounts>
+                            <Num3>{usdtBalance.stringAssetRelativeAmount}</Num3>
+                            <Body2>
+                                {formatFiatCurrency(
+                                    fiat,
+                                    usdtBalance.relativeAmount.multipliedBy(rate?.prices ?? 0)
+                                )}
+                            </Body2>
+                        </CoinInfoAmounts>
+                    )}
+                </TronCoinInfoWrapper>
+                <HeaderButtonsContainer>
+                    <ButtonStyled
+                        size="small"
+                        onClick={() => sendTransfer({ chain: BLOCKCHAIN_NAME.TRON })}
+                        disabled={usdtBalance?.weiAmount.isZero()}
+                    >
+                        <ArrowUpIcon />
+                        {t('wallet_send')}
+                    </ButtonStyled>
+                    <ButtonStyled
+                        size="small"
+                        onClick={() => {
+                            sdk.uiEvents.emit('receive', {
+                                method: 'receive',
+                                params: {
+                                    chain: BLOCKCHAIN_NAME.TRON,
+                                    jetton: asset.id
+                                }
+                            });
+                        }}
+                    >
+                        <ArrowDownIcon />
+                        {t('wallet_receive')}
+                    </ButtonStyled>
+                </HeaderButtonsContainer>
+            </CoinHeaderStyled>
+            {!!trxBalance && (
+                <TronTopUpTRX relativeAssetBalance={trxBalance.stringAssetRelativeAmount} />
+            )}
+            <HistorySubheader>{t('page_header_history')}</HistorySubheader>
+            <HistoryContainer>
+                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
+            </HistoryContainer>
+        </DesktopViewPageLayout>
+    );
+};
+
+const TronTopUpUSDTWrapper = styled.div`
+    background-color: ${p => p.theme.backgroundContent};
+    ${BorderSmallResponsive};
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 16px;
+
+    > ${Body2} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const TextContainer = styled.div`
+    > * {
+        display: block;
+    }
+
+    > ${Body2} {
+        color: ${p => p.theme.textSecondary};
+    }
+`;
+
+const SmallDivider = styled.div`
+    width: 100%;
+    height: 1px;
+    background-color: ${p => p.theme.separatorCommon};
+`;
+
+const TronTopUpTRX: FC<{ relativeAssetBalance: string }> = ({ relativeAssetBalance }) => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+
+    return (
+        <>
+            <TronTopUpUSDTWrapper>
+                <TextContainer>
+                    <Label2>{t('tron_top_up_trx_title')}</Label2>
+                    <Body2>
+                        {t('tron_top_up_trx_description', { balance: relativeAssetBalance })}
+                    </Body2>
+                </TextContainer>
+                <Button
+                    size="small"
+                    onClick={() => {
+                        sdk.uiEvents.emit('receive', {
+                            method: 'receive',
+                            params: {
+                                chain: BLOCKCHAIN_NAME.TRON,
+                                jetton: TRON_TRX_ASSET.id
+                            }
+                        });
+                    }}
+                >
+                    {t('tron_top_up_trx_button')}
+                </Button>
+            </TronTopUpUSDTWrapper>
+            <SmallDivider />
+        </>
     );
 };
