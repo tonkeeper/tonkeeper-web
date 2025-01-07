@@ -1,5 +1,6 @@
 import {
     AccountId,
+    isAccountBip39,
     isAccountTronCompatible,
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
@@ -133,7 +134,11 @@ export const RecoveryContent: FC<{
         );
     }
 
-    const hasTronWallet = account && isAccountTronCompatible(account) && !!account.activeTronWallet;
+    const hasTronWallet =
+        account &&
+        isAccountTronCompatible(account) &&
+        !!account.activeTronWallet &&
+        !isAccountBip39(account);
 
     const onShowTron = async () => {
         const tronMnemonic = await tonMnemonicToTronMnemonic(mnemonic!);

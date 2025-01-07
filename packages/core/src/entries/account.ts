@@ -776,6 +776,23 @@ export function isAccountTronCompatible(
     }
 }
 
+export function isAccountBip39(account: Account) {
+    switch (account.type) {
+        case 'testnet':
+        case 'mnemonic':
+            return account.mnemonicType === 'bip39';
+        case 'mam':
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
 export type AccountsState = Account[];
 
 export const defaultAccountState: AccountsState = [];
