@@ -11,6 +11,7 @@ import { useSwapFromAsset, useSwapToAsset } from '@tonkeeper/uikit/dist/state/sw
 import { useAllSwapAssets } from '@tonkeeper/uikit/dist/state/swap/useSwapAssets';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Address } from '@ton/core';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -102,6 +103,8 @@ export const useApplyQueryParams = () => {
                           tonAssetAddressToString(asset.address).toLowerCase() ===
                           Address.parse(fromAssetParam).toRawString()
                   )
+                : fromAssetParam?.toLowerCase() === 'ton'
+                ? TON_ASSET
                 : undefined;
         if (fromAssetToSet) {
             setFromAsset(fromAssetToSet);
@@ -114,6 +117,8 @@ export const useApplyQueryParams = () => {
                           tonAssetAddressToString(asset.address).toLowerCase() ===
                           Address.parse(toAssetParam).toRawString()
                   )
+                : toAssetParam?.toLowerCase() === 'ton'
+                ? TON_ASSET
                 : undefined;
         if (toAssetToSet) {
             setToAsset(toAssetToSet);
