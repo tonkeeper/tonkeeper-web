@@ -7542,6 +7542,48 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tonkeeper/mobile@workspace:apps/mobile":
+  version: 0.0.0-use.local
+  resolution: "@tonkeeper/mobile@workspace:apps/mobile"
+  dependencies:
+    "@capacitor/app": "npm:^6.0.1"
+    "@capacitor/camera": "npm:latest"
+    "@capacitor/cli": "npm:latest"
+    "@capacitor/clipboard": "npm:^6.0.1"
+    "@capacitor/core": "npm:latest"
+    "@capacitor/device": "npm:^6.0.2"
+    "@capacitor/haptics": "npm:^6.0.2"
+    "@capacitor/ios": "npm:^6.1.2"
+    "@capacitor/preferences": "npm:^6.0.2"
+    "@capacitor/push-notifications": "npm:^6.0.3"
+    "@capacitor/splash-screen": "npm:latest"
+    "@tanstack/react-query": "npm:4.3.4"
+    "@tonkeeper/core": "npm:0.1.0"
+    "@tonkeeper/locales": "npm:0.1.0"
+    "@tonkeeper/uikit": "npm:0.1.0"
+    "@types/eventsource": "npm:^1.1.15"
+    "@types/react": "npm:^18.0.26"
+    "@types/react-dom": "npm:^18.0.9"
+    "@types/styled-components": "npm:^5.1.26"
+    "@vitejs/plugin-react": "npm:^4.2.1"
+    buffer: "npm:^6.0.3"
+    copy-to-clipboard: "npm:^3.3.3"
+    crypto-browserify: "npm:^3.12.0"
+    eventsource: "npm:^2.0.2"
+    i18next: "npm:^23.7.7"
+    react: "npm:18.2.0"
+    react-dom: "npm:18.2.0"
+    react-i18next: "npm:^13.5.0"
+    react-router-dom: "npm:^6.20.1"
+    stream-browserify: "npm:^3.0.0"
+    styled-components: "npm:^6.1.1"
+    typescript: "npm:^5.6.3"
+    uuid: "npm:^11.0.2"
+    vite: "npm:^5.4.2"
+    vite-plugin-node-polyfills: "npm:0.17.0"
+  languageName: unknown
+  linkType: soft
+
 "@tonkeeper/playwrite@workspace:tests/playwright":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/playwrite@workspace:tests/playwright"
