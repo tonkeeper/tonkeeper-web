@@ -4150,6 +4150,46 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ionic/core@npm:8.4.1":
+  version: 8.4.1
+  resolution: "@ionic/core@npm:8.4.1"
+  dependencies:
+    "@stencil/core": "npm:4.20.0"
+    ionicons: "npm:^7.2.2"
+    tslib: "npm:^2.1.0"
+  checksum: 10/79995543f5d4629c8bbfcc53d8d80714730fad342bc04b102c4270d1cdd73720b86738e07df644128e66372cc37cd3a5ec287bc7494fb8f36d10d286cf8c2b50
+  languageName: node
+  linkType: hard
+
+"@ionic/react-router@npm:^8.4.1":
+  version: 8.4.1
+  resolution: "@ionic/react-router@npm:8.4.1"
+  dependencies:
+    "@ionic/react": "npm:8.4.1"
+    tslib: "npm:*"
+  peerDependencies:
+    react: ">=16.8.6"
+    react-dom: ">=16.8.6"
+    react-router: ^5.0.1
+    react-router-dom: ^5.0.1
+  checksum: 10/a40b5875111605939c055e7e34d08544d1d5949b31ca578a5e36bb6c979c690ef520c59c470351f0bc34b608fd29fdbead0a822adc3742fb026a407283630b66
+  languageName: node
+  linkType: hard
+
+"@ionic/react@npm:8.4.1, @ionic/react@npm:^8.4.1":
+  version: 8.4.1
+  resolution: "@ionic/react@npm:8.4.1"
+  dependencies:
+    "@ionic/core": "npm:8.4.1"
+    ionicons: "npm:^7.0.0"
+    tslib: "npm:*"
+  peerDependencies:
+    react: ">=16.8.6"
+    react-dom: ">=16.8.6"
+  checksum: 10/efc58e75652f580165f05bf2b2981553e096ca6c010f333efaf77d420e9500027e30dab4919ae21e1b94f0fe654c5aaffca9d8bc1db46b1c7765d3e2c949ff22
+  languageName: node
+  linkType: hard
+
 "@ionic/utils-array@npm:2.1.5":
   version: 2.1.5
   resolution: "@ionic/utils-array@npm:2.1.5"
@@ -5829,6 +5869,24 @@ __metadata:
   dependencies:
     "@sinonjs/commons": "npm:^1.7.0"
   checksum: 10/da50ddd68411617fcf72d9fb70b621aa2a6d17faa93a2769c7af390c88b40e045f84544db022dd1ac30a6db115d2a0f96473854d4a106b0174351f22d42910ce
+  languageName: node
+  linkType: hard
+
+"@stencil/core@npm:4.20.0":
+  version: 4.20.0
+  resolution: "@stencil/core@npm:4.20.0"
+  bin:
+    stencil: bin/stencil
+  checksum: 10/ae5b7495c62d5b789f38691026cf7c0774566d46b5c86b7e9757b6812f9ffa086d238f8cea533d71e9598684e2bfab88a05205b7d8df320e0d46ff630f8ba09f
+  languageName: node
+  linkType: hard
+
+"@stencil/core@npm:^4.0.3":
+  version: 4.23.2
+  resolution: "@stencil/core@npm:4.23.2"
+  bin:
+    stencil: bin/stencil
+  checksum: 10/ee3c402111cad88bfad28f79b18e1088f56d7161aff71da0f7d126210a0a06dd2fc54dde26e294671b91afce34335a97da9d4a3962aa565e80e9c9c9e0fa2791
   languageName: node
   linkType: hard
 
@@ -7557,6 +7615,8 @@ __metadata:
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/push-notifications": "npm:^6.0.3"
     "@capacitor/splash-screen": "npm:latest"
+    "@ionic/react": "npm:^8.4.1"
+    "@ionic/react-router": "npm:^8.4.1"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
@@ -7591,48 +7651,6 @@ __metadata:
     "@playwright/test": "npm:^1.48.1"
     "@types/node": "npm:^22.7.9"
     dotenv: "npm:^16.4.5"
-  languageName: unknown
-  linkType: soft
-
-"@tonkeeper/tablet@workspace:apps/tablet":
-  version: 0.0.0-use.local
-  resolution: "@tonkeeper/tablet@workspace:apps/tablet"
-  dependencies:
-    "@capacitor/app": "npm:^6.0.1"
-    "@capacitor/camera": "npm:latest"
-    "@capacitor/cli": "npm:latest"
-    "@capacitor/clipboard": "npm:^6.0.1"
-    "@capacitor/core": "npm:latest"
-    "@capacitor/device": "npm:^6.0.2"
-    "@capacitor/haptics": "npm:^6.0.2"
-    "@capacitor/ios": "npm:^6.1.2"
-    "@capacitor/preferences": "npm:^6.0.2"
-    "@capacitor/push-notifications": "npm:^6.0.3"
-    "@capacitor/splash-screen": "npm:latest"
-    "@tanstack/react-query": "npm:4.3.4"
-    "@tonkeeper/core": "npm:0.1.0"
-    "@tonkeeper/locales": "npm:0.1.0"
-    "@tonkeeper/uikit": "npm:0.1.0"
-    "@types/eventsource": "npm:^1.1.15"
-    "@types/react": "npm:^18.0.26"
-    "@types/react-dom": "npm:^18.0.9"
-    "@types/styled-components": "npm:^5.1.26"
-    "@vitejs/plugin-react": "npm:^4.2.1"
-    buffer: "npm:^6.0.3"
-    copy-to-clipboard: "npm:^3.3.3"
-    crypto-browserify: "npm:^3.12.0"
-    eventsource: "npm:^2.0.2"
-    i18next: "npm:^23.7.7"
-    react: "npm:18.2.0"
-    react-dom: "npm:18.2.0"
-    react-i18next: "npm:^13.5.0"
-    react-router-dom: "npm:^6.20.1"
-    stream-browserify: "npm:^3.0.0"
-    styled-components: "npm:^6.1.1"
-    typescript: "npm:^5.6.3"
-    uuid: "npm:^11.0.2"
-    vite: "npm:^5.4.2"
-    vite-plugin-node-polyfills: "npm:0.17.0"
   languageName: unknown
   linkType: soft
 
@@ -17990,6 +18008,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ionicons@npm:^7.0.0, ionicons@npm:^7.2.2":
+  version: 7.4.0
+  resolution: "ionicons@npm:7.4.0"
+  dependencies:
+    "@stencil/core": "npm:^4.0.3"
+  checksum: 10/364c1d723cd93a6d205ad8aab035c29eea038aa29b0cd5a227c93e7e77872e438ead1e2a90c7a1b8f8a0b58adbb7a14be18f6bd339a124b7bff26f018a0bf3a8
+  languageName: node
+  linkType: hard
+
 "ip@npm:^2.0.0":
   version: 2.0.0
   resolution: "ip@npm:2.0.0"
@@ -28128,6 +28155,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:*, tslib@npm:^2.6.2":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
+  languageName: node
+  linkType: hard
+
 "tslib@npm:2.7.0":
   version: 2.7.0
   resolution: "tslib@npm:2.7.0"
@@ -28153,13 +28187,6 @@ __metadata:
   version: 2.6.3
   resolution: "tslib@npm:2.6.3"
   checksum: 10/52109bb681f8133a2e58142f11a50e05476de4f075ca906d13b596ae5f7f12d30c482feb0bff167ae01cfc84c5803e575a307d47938999246f5a49d174fc558c
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.6.2":
-  version: 2.8.1
-  resolution: "tslib@npm:2.8.1"
-  checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
   languageName: node
   linkType: hard
 

@@ -16,6 +16,7 @@
     "scripts": {
         "start": "./live-reload.sh",
         "build": "./build.sh",
+        "web": "vite",
         "preview": "vite preview",
         "sync": "cap sync",
         "build:ipad": "./build.sh"
@@ -31,6 +32,8 @@
         "@capacitor/preferences": "^6.0.2",
         "@capacitor/push-notifications": "^6.0.3",
         "@capacitor/splash-screen": "latest",
+        "@ionic/react": "^8.4.1",
+        "@ionic/react-router": "^8.4.1",
         "@tanstack/react-query": "4.3.4",
         "@tonkeeper/core": "0.1.0",
         "@tonkeeper/locales": "0.1.0",

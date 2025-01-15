@@ -3,50 +3,18 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
-import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
-import MemoryScroll from '@tonkeeper/uikit/dist/components/MemoryScroll';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
-import PairKeystoneNotification from '@tonkeeper/uikit/dist/components/PairKeystoneNotification';
-import PairSignerNotification from '@tonkeeper/uikit/dist/components/PairSignerNotification';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
-import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
-import { WalletAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/WalletAsideMenu';
-import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
-import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
-import { DesktopWalletHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopWalletHeader';
-import ReceiveNotification from '@tonkeeper/uikit/dist/components/home/ReceiveNotification';
-import NftNotification from '@tonkeeper/uikit/dist/components/nft/NftNotification';
-import {
-    AddFavoriteNotification,
-    EditFavoriteNotification
-} from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import SendActionNotification from '@tonkeeper/uikit/dist/components/transfer/SendNotifications';
-import SendNftNotification from '@tonkeeper/uikit/dist/components/transfer/nft/SendNftNotification';
-import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
-import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
-import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
-import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
-import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
-import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
-import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
-import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
-import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
-import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
-import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
-import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { AmplitudeAnalyticsContext } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
 import {
@@ -54,16 +22,11 @@ import {
     TranslationContext,
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
-import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
 import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
@@ -71,28 +34,21 @@ import {
     useActiveAccountQuery,
     useActiveTonNetwork
 } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { FC, Suspense, useCallback, useEffect, useMemo } from "react";
+import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    Outlet,
-    Route,
-    RouterProvider,
-    Routes,
-    createMemoryRouter,
-    useLocation
-} from 'react-router-dom';
-import styled, { createGlobalStyle } from 'styled-components';
-import { TABLET_APPLICATION_ID, TabletAppSdk } from "../libs/appSdk";
-import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
-import { DeepLinkSubscription } from './components/DeepLink';
-import { TonConnectSubscription } from './components/TonConnectSubscription';
+import { RouterProvider, createMemoryRouter } from 'react-router-dom';
+import { createGlobalStyle } from 'styled-components';
+import { TABLET_APPLICATION_ID, TabletAppSdk } from '../libs/appSdk';
+import { useAnalytics, useAppHeight, useLayout } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
-import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
-import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
-import { PullToRefresh } from "./components/PullToRefresh";
-import { TabletNotifications } from "../libs/tabletNotifications";
+import { TabletNotifications } from '../libs/tabletNotifications';
+import { NarrowContent } from './app-content/NarrowContent';
+import { WideContent } from './app-content/WideContent';
+import { IonApp, setupIonicReact } from '@ionic/react';
+
+setupIonicReact();
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -213,69 +169,6 @@ const ThemeAndContent = () => {
     );
 };
 
-const FullSizeWrapper = styled(Container)`
-    max-width: 800px;
-`;
-
-const Wrapper = styled.div`
-    box-sizing: border-box;
-
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: ${props => props.theme.backgroundPage};
-    white-space: pre-wrap;
-`;
-
-const WideLayout = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-`;
-
-const WideContent = styled.div`
-    flex: 1;
-    min-width: 0;
-    min-height: 0;
-`;
-
-const WalletLayout = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-`;
-
-const WalletLayoutBody = styled.div`
-    flex: 1;
-    display: flex;
-    max-height: calc(100% - ${desktopHeaderContainerHeight});
-`;
-
-const WalletRoutingWrapper = styled.div`
-    flex: 1;
-    overflow: auto;
-    position: relative;
-`;
-
-const PreferencesLayout = styled.div`
-    height: calc(100% - ${desktopHeaderContainerHeight});
-    display: flex;
-    overflow: auto;
-`;
-
-const PreferencesRoutingWrapper = styled.div`
-    flex: 1;
-    overflow: auto;
-    position: relative;
-`;
-
-const FullSizeWrapperBounded = styled(FullSizeWrapper)`
-    max-height: 100%;
-    overflow: auto;
-
-    justify-content: center;
-`;
-
 export const Loader: FC = () => {
     const network = useActiveTonNetwork();
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
@@ -357,156 +250,26 @@ export const Loader: FC = () => {
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
             <AppContext.Provider value={context}>
-                <Content activeAccount={activeAccount} lock={lock} />
-                <CopyNotification hideSimpleCopyNotifications />
-                <QrScanner />
-                <ModalsRoot />
+                <IonApp>
+                    <Content activeAccount={activeAccount} lock={lock} />
+                    <CopyNotification hideSimpleCopyNotifications />
+                    <QrScanner />
+                    <ModalsRoot />
+                </IonApp>
             </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );
 };
 
-const usePrefetch = () => {
-    useRecommendations();
-    useCanPromptTouchId();
-};
-
-export const Content: FC<{
+const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
-}> = ({ activeAccount, lock }) => {
-    const location = useLocation();
-    useWindowsScroll();
-    useAppWidth();
-    useTrackLocation();
-    usePrefetch();
-    useDebuggingTools();
+}> = props => {
+    const isMobile = useLayout();
 
-    if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+    if (isMobile) {
+        return <NarrowContent {...props} />;
     }
 
-    if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
-        return (
-            <FullSizeWrapperBounded className="full-size-wrapper">
-                <InitializeContainer fullHeight={false}>
-                    <Initialize />
-                </InitializeContainer>
-            </FullSizeWrapperBounded>
-        );
-    }
-
-    return (
-        <WideLayout>
-            <AsideMenu />
-            <WideContent>
-                <Routes>
-                    <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
-                    <Route path={AppRoute.browser} element={<DesktopBrowser />} />
-                    <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
-                    <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
-                    <Route
-                        path={any(AppRoute.accountSettings)}
-                        element={<DesktopAccountSettingsPage />}
-                    />
-                    <Route path="*" element={<WalletContent />} />
-                </Routes>
-            </WideContent>
-            <BackgroundElements />
-        </WideLayout>
-    );
-};
-
-const WalletContent = () => {
-    return (
-        <WalletLayout>
-            <DesktopWalletHeader />
-
-            <WalletLayoutBody>
-                <WalletAsideMenu />
-                <WalletRoutingWrapper className="hide-scrollbar">
-                    <Routes>
-                        <Route element={<OldAppRouting />}>
-                            <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
-                            <Route
-                                path={any(AppRoute.purchases)}
-                                element={<DesktopCollectables />}
-                            />
-                            <Route path={any(AppRoute.dns)} element={<DesktopDns />} />
-                            <Route path={AppRoute.coins}>
-                                <Route path=":name/*" element={<DesktopCoinPage />} />
-                            </Route>
-                            <Route
-                                path={AppRoute.multisigWallets}
-                                element={<DesktopManageMultisigsPage />}
-                            />
-                            <Route
-                                path={AppRoute.multisigOrders}
-                                element={<DesktopMultisigOrdersPage />}
-                            />
-                            <Route
-                                path={any(AppRoute.walletSettings)}
-                                element={<DesktopWalletSettingsRouting />}
-                            />
-                            <Route path={AppRoute.swap} element={<DesktopSwapPage />} />
-                            <Route path="*" element={<DesktopTokens />} />
-                        </Route>
-                    </Routes>
-                </WalletRoutingWrapper>
-            </WalletLayoutBody>
-        </WalletLayout>
-    );
-};
-
-const PreferencesContent = () => {
-    return (
-        <>
-            <DesktopPreferencesHeader />
-            <PreferencesLayout>
-                <PreferencesAsideMenu />
-                <PreferencesRoutingWrapper className="hide-scrollbar">
-                    <DesktopPreferencesRouting />
-                </PreferencesRoutingWrapper>
-            </PreferencesLayout>
-        </>
-    );
-};
-
-const OldAppRouting = () => {
-    return (
-        <Wrapper>
-            <Outlet />
-            <MemoryScroll />
-        </Wrapper>
-    );
-};
-
-const BackgroundElements = () => {
-    const onRefresh = useCallback(async () => {
-        const promise1 = queryClient.invalidateQueries();
-        const promise2 = new Promise(r => setTimeout(r, 1000));
-
-        await Promise.all([promise1, promise2]);
-    }, []);
-
-    return (
-        <>
-            <SendActionNotification />
-            <ReceiveNotification />
-            <TonConnectSubscription />
-            <NftNotification />
-            <SendNftNotification />
-            <AddFavoriteNotification />
-            <EditFavoriteNotification />
-            <DeepLinkSubscription />
-            <PairSignerNotification />
-            <ConnectLedgerNotification />
-            <PairKeystoneNotification />
-            <PullToRefresh onRefresh={onRefresh} />
-        </>
-    );
+    return <WideContent {...props} />;
 };
