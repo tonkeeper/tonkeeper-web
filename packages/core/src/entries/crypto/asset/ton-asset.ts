@@ -1,33 +1,58 @@
 import { Address } from '@ton/core';
-import { JettonBalance, JettonsBalances } from '../../../tonApiV2';
+import { ExtraCurrency, JettonBalance, JettonsBalances } from '../../../tonApiV2';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
 import { AssetAmount } from './asset-amount';
 import { TronAsset } from './tron-asset';
+import { seeIfValidTonAddress } from '../../../utils/common';
 
-export type TonAssetAddress = Address | 'TON';
+export type TonAssetAddress = TonAsset['address'];
 export function isTon(address: TonAssetAddress): address is 'TON' {
     return address === 'TON';
 }
 
-export interface TonAssetIdentification {
-    address: Address | 'TON';
+export interface TonMainAsset {
+    address: 'TON';
     blockchain: BLOCKCHAIN_NAME.TON;
 }
 
-export interface TonAsset extends BasicAsset, TonAssetIdentification {}
+export interface TonExtraCurrencyAsset {
+    address: string;
+    blockchain: BLOCKCHAIN_NAME.TON;
+}
+
+export interface TonJettonAsset {
+    address: Address;
+    blockchain: BLOCKCHAIN_NAME.TON;
+}
+
+export type TonAssetIdentification = TonMainAsset | TonExtraCurrencyAsset | TonJettonAsset;
+
+export type TonAsset = BasicAsset & TonAssetIdentification;
 
 export function tonAssetAddressToString(address: TonAsset['address']): string {
     return typeof address === 'string' ? address : address.toRawString();
 }
 
 export function tonAssetAddressFromString(address: string): TonAsset['address'] {
-    return address === 'TON' ? address : Address.parse(address);
+    return seeIfValidTonAddress(address) ? Address.parse(address) : address;
 }
 
 export function assetAddressToString(address: TonAsset['address'] | TronAsset['address']): string {
     return typeof address === 'string' ? address : address.toRawString();
+}
+
+export function extraBalanceToTonAsset(extraBalance: ExtraCurrency): TonAsset {
+    return {
+        id: String(extraBalance.preview.id),
+        symbol: extraBalance.preview.symbol,
+        name: extraBalance.preview.symbol,
+        decimals: extraBalance.preview.decimals,
+        address: extraBalance.preview.symbol,
+        blockchain: BLOCKCHAIN_NAME.TON,
+        image: extraBalance.preview.image
+    };
 }
 
 export function jettonToTonAsset(address: string, jettons: JettonsBalances): TonAsset {
@@ -75,5 +100,9 @@ export function legacyTonAssetId(
     if (tonAsset.address === 'TON') {
         return 'TON';
     }
-    return options?.userFriendly ? tonAsset.address.toString() : tonAsset.address.toRawString();
+    if (Address.isAddress(tonAsset.address)) {
+        return options?.userFriendly ? tonAsset.address.toString() : tonAsset.address.toRawString();
+    } else {
+        return tonAsset.address;
+    }
 }

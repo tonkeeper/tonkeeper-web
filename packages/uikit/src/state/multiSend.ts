@@ -150,6 +150,9 @@ export const useParseCsvListMutation = () => {
 
             let token = TON_ASSET;
             if (crypto && !isTon(crypto)) {
+                if (!Address.isAddress(crypto)) {
+                    throw new Error('Unable to get token info for extra currency.');
+                }
                 const response = await new JettonsApi(api.tonApiV2).getJettonInfo({
                     accountId: crypto.toRawString()
                 });

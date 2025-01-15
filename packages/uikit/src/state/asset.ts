@@ -300,6 +300,20 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
                 })
             );
 
+            if (assets.ton.info.extraBalance) {
+                for (let extra of assets.ton.info.extraBalance) {
+                    // TODO: Extra Currency token rate
+                    const dist: Omit<TokenDistribution, 'percent'> = {
+                        fiatBalance: new BigNumber(0),
+                        meta: convertJettonToTokenMeta(
+                            { isNative: true, balance: Number(extra.amount) },
+                            0
+                        )
+                    };
+                    tokensOmited.push(dist);
+                }
+            }
+
             const total = tokensOmited.reduce(
                 (acc, t) => t.fiatBalance.plus(acc),
                 new BigNumber(0)

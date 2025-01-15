@@ -24,6 +24,7 @@ import {
 import { useJettonList } from '../../state/jetton';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { Address } from '@ton/core';
 
 export interface TonAssetData {
     info: Account;
@@ -140,6 +141,7 @@ export const JettonAsset = forwardRef<
                     balance={balance.stringRelativeAmount}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}
+                    label={Address.isAddress(balance.asset.address) ? 'TON' : 'TON Extra Currency'}
                     rate={rate}
                 />
             </ListItemPayload>
