@@ -33,9 +33,9 @@ import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useJettonList } from '@tonkeeper/uikit/dist/state/jetton';
-import { useActiveTronWallet, useTronBalances } from "@tonkeeper/uikit/dist/state/tron/tron";
+import { useActiveTronWallet, useTronBalances } from '@tonkeeper/uikit/dist/state/tron/tron';
 import BigNumber from 'bignumber.js';
-import { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { FavoriteView, useFavoriteNotification } from './FavoriteNotification';
@@ -51,8 +51,9 @@ import {
     RecipientTwaHeaderBlock
 } from './SendNotificationHeader';
 import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/amplitude';
-import { TRON_USDT_ASSET } from "@tonkeeper/core/dist/entries/crypto/asset/constants";
-import { seeIfValidTronAddress } from "@tonkeeper/core/dist/utils/common";
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
+import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 
 const Body = styled.div`
     padding: 0 16px 16px;
@@ -249,7 +250,6 @@ const SendContent: FC<{
         confirm: confirmRef
     }[view];
 
-
     const assetAmount = useMemo(() => {
         if (!amountViewState?.token || !amountViewState?.coinValue) {
             return null;
@@ -270,8 +270,8 @@ const SendContent: FC<{
         }
     } else {
         acceptBlockchains = activeTronWallet
-          ? [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
-          : [BLOCKCHAIN_NAME.TON];
+            ? [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
+            : [BLOCKCHAIN_NAME.TON];
     }
 
     return (
@@ -348,6 +348,7 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const { data: jettons } = useJettonList();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
+    const wallet = useActiveWallet();
 
     const sdk = useAppSdk();
     const track = useAnalyticsTrack();
@@ -371,15 +372,21 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
                 return;
             }
 
-            if (transfer.address) {
-                getAccountAsync({ address: transfer.address }).then(account => {
-                    setTonTransfer(makeTransferInitData(transfer, account, jettons));
+            getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
+                if (transfer.address && seeIfValidTonAddress(transfer.address)) {
+                    getAccountAsync({ address: transfer.address }).then(toAccount => {
+                        setTonTransfer(
+                            makeTransferInitData(transfer, fromAccount, toAccount, jettons)
+                        );
+                        setOpen(true);
+                    });
+                } else {
+                    setTonTransfer({
+                        initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
+                    });
                     setOpen(true);
-                });
-            } else {
-                setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
-                setOpen(true);
-            }
+                }
+            });
             track('send_open', { from: transfer.from });
         };
 

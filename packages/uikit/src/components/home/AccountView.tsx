@@ -29,7 +29,7 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../state/wallet';
 import { AccountBadge } from '../account/AccountBadge';
-import { useAssetImage } from '../../state/asset';
+import { useTonAssetImage } from '../../state/asset';
 import {
     TON_ASSET,
     TRON_TRX_ASSET,
@@ -168,7 +168,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
-    const assetImage = useAssetImage({
+    const assetImage = useTonAssetImage({
         blockchain: BLOCKCHAIN_NAME.TON,
         address: jetton ? Address.parse(jetton) : TON_ASSET.address
     });

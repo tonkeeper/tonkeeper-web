@@ -1,6 +1,6 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { tokenToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
@@ -388,6 +388,7 @@ export interface InitTransferData {
 
 export const makeTransferInitData = (
     tonTransfer: TonTransferParams,
+    fromAccount: Account,
     toAccount: Account,
     jettons: JettonsBalances | undefined
 ): InitTransferData => {
@@ -405,7 +406,7 @@ export const makeTransferInitData = (
         done: toAccount.memoRequired ? tonTransfer.text !== '' && tonTransfer.text !== null : true
     };
 
-    const initAmountState = makeTransferInitAmountState(tonTransfer, jettons);
+    const initAmountState = makeTransferInitAmountState(tonTransfer, fromAccount, jettons);
 
     return {
         initRecipient,
@@ -415,10 +416,15 @@ export const makeTransferInitData = (
 
 export const makeTransferInitAmountState = (
     transfer: Pick<TonTransferParams, 'amount' | 'jetton'>,
+    account: Account | undefined,
     jettons: JettonsBalances | undefined
 ): Partial<AmountState> => {
     try {
-        const token = jettonToTonAsset(transfer.jetton || 'TON', jettons || { balances: [] });
+        const token = tokenToTonAsset(
+            transfer.jetton || 'TON',
+            account,
+            jettons || { balances: [] }
+        );
 
         if (!transfer.amount) {
             return {
@@ -440,5 +446,4 @@ export const makeTransferInitAmountState = (
     } catch {
         return {};
     }
-    return {};
 };

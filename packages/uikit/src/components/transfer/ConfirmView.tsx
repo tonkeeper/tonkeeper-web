@@ -18,7 +18,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
+import { useAssetAmountFiatEquivalent, useTonAssetImage, useAssetImage } from '../../state/asset';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Gap } from '../Layout';
 import { ListBlock } from '../List';

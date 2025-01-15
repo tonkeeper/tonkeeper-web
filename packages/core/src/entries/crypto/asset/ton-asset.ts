@@ -1,5 +1,5 @@
 import { Address } from '@ton/core';
-import { ExtraCurrency, JettonBalance, JettonsBalances } from '../../../tonApiV2';
+import { Account, ExtraCurrency, JettonBalance, JettonsBalances } from '../../../tonApiV2';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
@@ -53,6 +53,26 @@ export function extraBalanceToTonAsset(extraBalance: ExtraCurrency): TonAsset {
         blockchain: BLOCKCHAIN_NAME.TON,
         image: extraBalance.preview.image
     };
+}
+
+export function tokenToTonAsset(
+    token: string,
+    info: Account | undefined,
+    jettons: JettonsBalances
+): TonAsset {
+    if (token === 'TON') {
+        return TON_ASSET;
+    }
+
+    if (seeIfValidTonAddress(token)) {
+        return jettonToTonAsset(token, jettons);
+    }
+
+    const extra = info?.extraBalance?.find(item => item.preview.symbol === token);
+    if (!extra) {
+        throw new Error(`Extra currency ${extra} not found`);
+    }
+    return extraBalanceToTonAsset(extra);
 }
 
 export function jettonToTonAsset(address: string, jettons: JettonsBalances): TonAsset {

@@ -35,6 +35,7 @@ import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -51,11 +52,17 @@ export function useUserAssetBalance<
         if (asset.address === 'TON') {
             isLoading = tonWalletInfo.isLoading;
             data = tonWalletInfo?.data?.balance || '0';
-        } else {
+        } else if (Address.isAddress(asset.address)) {
             isLoading = jettons.isLoading;
             data =
                 jettons.data?.balances.find(i => i.jetton.address === legacyTonAssetId(asset))
                     ?.balance || '0';
+        } else {
+            isLoading = tonWalletInfo.isLoading;
+            const extra = tonWalletInfo.data?.extraBalance?.find(
+                item => item.preview.symbol === asset.address
+            );
+            data = extra?.amount || '0';
         }
         if (isBasicAsset(asset)) {
             data = new AssetAmount<TonAsset>({ asset, weiAmount: data });
@@ -77,16 +84,16 @@ export function useUserAssetBalance<
     };
 }
 
-export function useAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
+export function useAssetImage(asset: Asset): string | undefined {
+    return asset.image;
+}
+
+export function useTonAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
     const id = packAssetId(blockchain, address);
     const { data: jettons } = useJettonList();
 
     if (id === TON_ASSET.id) {
         return 'https://wallet.tonkeeper.com/img/toncoin.svg';
-    }
-
-    if (id === TRON_USDT_ASSET.id) {
-        return TRON_USDT_ASSET.image;
     }
 
     if (typeof address === 'string') {
