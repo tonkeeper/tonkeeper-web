@@ -85,6 +85,53 @@ const TonTransferAction: FC<{
     );
 };
 
+const ExtraCurrencyTransferAction: FC<{
+    action: Action;
+    date: string;
+    isScam: boolean;
+}> = ({ action, date, isScam }) => {
+    const wallet = useActiveWallet();
+    const { extraCurrencyTransfer } = action;
+    const network = useActiveTonNetwork();
+
+    const format = useFormatCoinValue();
+
+    if (!extraCurrencyTransfer) {
+        return <ErrorAction />;
+    }
+
+    if (extraCurrencyTransfer.recipient.address === wallet.rawAddress) {
+        return (
+            <ReceiveActivityAction
+                amount={format(extraCurrencyTransfer.amount)}
+                sender={
+                    extraCurrencyTransfer.sender.name ??
+                    toShortValue(formatAddress(extraCurrencyTransfer.sender.address, network))
+                }
+                symbol={extraCurrencyTransfer.currency.symbol}
+                date={date}
+                isScam={extraCurrencyTransfer.sender.isScam || isScam}
+                comment={extraCurrencyTransfer.comment}
+                status={action.status}
+            />
+        );
+    }
+    return (
+        <SendActivityAction
+            amount={format(extraCurrencyTransfer.amount)}
+            symbol={extraCurrencyTransfer.currency.symbol}
+            recipient={
+                extraCurrencyTransfer.recipient.name ??
+                toShortValue(formatAddress(extraCurrencyTransfer.recipient.address, network))
+            }
+            date={date}
+            isScam={isScam}
+            comment={extraCurrencyTransfer.comment}
+            status={action.status}
+        />
+    );
+};
+
 export const SmartContractExecAction: FC<{
     action: Action;
     date: string;
@@ -248,6 +295,8 @@ export const ActivityAction: FC<{
             return <WithdrawRequestStakeAction action={action} date={date} />;
         case 'DomainRenew':
             return <DomainRenewAction action={action} date={date} />;
+        case 'ExtraCurrencyTransfer':
+            return <ExtraCurrencyTransferAction action={action} date={date} isScam={isScam} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {

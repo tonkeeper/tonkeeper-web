@@ -5,6 +5,7 @@ import { ErrorActivityNotification } from '../NotificationCommon';
 import {
     AuctionBidActionDetails,
     DomainRenewActionDetails,
+    ExtraCurrencyTransferNotification,
     SmartContractExecActionDetails,
     TonTransferActionNotification
 } from './TonActivityActionDetails';
@@ -84,6 +85,8 @@ const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
             return <WithdrawRequestStakeActionNotification {...props} />;
         case 'NftPurchase':
             return <NftPurchaseActionDetails {...props} />;
+        case 'ExtraCurrencyTransfer':
+            return <ExtraCurrencyTransferNotification {...props} />;
         case 'Unknown':
             return <ErrorActivityNotification event={props.event} />;
         default: {

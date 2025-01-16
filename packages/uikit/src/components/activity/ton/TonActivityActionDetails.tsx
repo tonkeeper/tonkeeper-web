@@ -1,5 +1,10 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { AccountEvent, ActionStatusEnum, TonTransferAction } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    AccountEvent,
+    ActionStatusEnum,
+    ExtraCurrencyTransferAction,
+    TonTransferAction
+} from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -165,5 +170,69 @@ export const SmartContractExecActionDetails: FC<ActionData> = ({ action, timesta
                 <TransferOpCode operation={smartContractExec.operation} />
             </ListBlock>
         </ActionDetailsBlock>
+    );
+};
+
+const ExtraCurrencyTransferActionContent: FC<{
+    extraCurrencyTransfer: ExtraCurrencyTransferAction;
+    timestamp: number;
+    event: AccountEvent;
+    isScam: boolean;
+    status?: ActionStatusEnum;
+}> = ({ extraCurrencyTransfer, timestamp, event, isScam, status }) => {
+    const wallet = useActiveWallet();
+    const { data } = useRate(extraCurrencyTransfer.currency.symbol);
+    const { fiatAmount } = useFormatFiat(
+        data,
+        formatDecimals(extraCurrencyTransfer.amount, extraCurrencyTransfer.currency.decimals)
+    );
+
+    const kind =
+        extraCurrencyTransfer.recipient.address === wallet.rawAddress ? 'received' : 'send';
+
+    return (
+        <ActionDetailsBlock event={event}>
+            <ActivityDetailsHeader
+                isScam={isScam}
+                amount={extraCurrencyTransfer.amount}
+                symbol={extraCurrencyTransfer.currency.symbol}
+                total={fiatAmount}
+                timestamp={timestamp}
+                kind={kind}
+                status={status}
+            />
+            <ListBlock margin={false} fullWidth>
+                {kind === 'received' && (
+                    <ActionSenderDetails sender={extraCurrencyTransfer.sender} />
+                )}
+                {kind === 'send' && (
+                    <ActionRecipientDetails recipient={extraCurrencyTransfer.recipient} />
+                )}
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
+                <TransferComment comment={isScam ? undefined : extraCurrencyTransfer.comment} />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
+};
+
+export const ExtraCurrencyTransferNotification: FC<ActionData> = ({
+    action,
+    timestamp,
+    event,
+    isScam
+}) => {
+    const { extraCurrencyTransfer } = action;
+    if (!extraCurrencyTransfer) {
+        return <ErrorActivityNotification event={event} />;
+    }
+    return (
+        <ExtraCurrencyTransferActionContent
+            extraCurrencyTransfer={extraCurrencyTransfer}
+            event={event}
+            isScam={isScam}
+            timestamp={timestamp}
+            status={action.status}
+        />
     );
 };
