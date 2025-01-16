@@ -141,7 +141,6 @@ export const JettonAsset = forwardRef<
                     balance={balance.stringRelativeAmount}
                     secondary={fiatPrice}
                     fiatAmount={fiatAmount}
-                    label={Address.isAddress(balance.asset.address) ? 'TON' : 'TON Extra Currency'}
                     rate={rate}
                 />
             </ListItemPayload>
