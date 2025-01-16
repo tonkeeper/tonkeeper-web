@@ -313,7 +313,7 @@ const getAsset = async (api: APIConfig, address: TonAssetAddress): Promise<TonAs
                     blockchain: BLOCKCHAIN_NAME.TON,
                     address,
                     id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-                    image: response.metadata.image
+                    image: response.preview
                 } as const)
         );
         swapAssetsCache.set(address, p);

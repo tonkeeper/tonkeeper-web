@@ -159,7 +159,7 @@ export const useParseCsvListMutation = () => {
 
                 token = {
                     address: crypto,
-                    image: response.metadata.image,
+                    image: response.preview,
                     blockchain: BLOCKCHAIN_NAME.TON,
                     name: response.metadata.name,
                     symbol: response.metadata.symbol,
