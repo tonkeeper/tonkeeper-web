@@ -1,19 +1,14 @@
-import {
-    Address,
-    Cell,
-    CurrencyCollection,
-    Dictionary,
-    MessageRelaxed,
-    SendMode,
-    StateInit
-} from '@ton/core';
+import { Address, SendMode } from '@ton/core';
 import { userInputAddressIsBounceable } from '../utils';
 import BigNumber from 'bignumber.js';
 import { APIConfig } from '../../../entries/apis';
 import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
+import { EncoderBase } from './encoder-base';
 
-export class ExtraCurrencyEncoder {
-    constructor(private readonly api: APIConfig, private readonly _walletAddress: string) {}
+export class ExtraCurrencyEncoder extends EncoderBase {
+    constructor(private readonly api: APIConfig, private readonly _walletAddress: string) {
+        super();
+    }
 
     encodeTransfer = async (
         transfer:
@@ -37,39 +32,6 @@ export class ExtraCurrencyEncoder {
             return this.encodeSingleTransfer(transfer);
         }
     };
-
-    private extraCurrencyValue(src: { id: number; weiAmount: BigNumber }): CurrencyCollection {
-        const other = Dictionary.empty(Dictionary.Keys.Uint(32), Dictionary.Values.BigVarUint(5));
-
-        other.set(src.id, BigInt(src.weiAmount.toFixed(0)));
-
-        return { coins: BigInt('0'), other };
-    }
-
-    private internalMessage(src: {
-        to: Address;
-        value: CurrencyCollection;
-        bounce: boolean;
-        init?: StateInit;
-        body?: Cell;
-    }): MessageRelaxed {
-        return {
-            info: {
-                type: 'internal',
-                dest: src.to,
-                value: src.value,
-                bounce: src.bounce,
-                ihrDisabled: true,
-                bounced: false,
-                ihrFee: 0n,
-                forwardFee: 0n,
-                createdAt: 0,
-                createdLt: 0n
-            },
-            init: src.init ?? undefined,
-            body: src.body ?? Cell.EMPTY
-        };
-    }
 
     private encodeSingleTransfer = async ({
         id,
