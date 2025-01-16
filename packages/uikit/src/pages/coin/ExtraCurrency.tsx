@@ -11,6 +11,7 @@ import { useFormatBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useFormatFiat, useRate } from '../../state/rates';
 import { useWalletAccountInfo } from '../../state/wallet';
+import { MobileAssetHistory } from './Jetton';
 
 const ItemHeader: FC<{ extra: ExtraCurrency }> = ({ extra }) => {
     const amount = useMemo(() => formatDecimals(extra.amount, extra.preview.decimals), [extra]);
@@ -47,7 +48,7 @@ export const ExtraCurrencyPage: FC<{ name: string }> = ({ name }) => {
             <InnerBody ref={ref}>
                 <ItemHeader extra={extra} />
                 <HomeActions chain={BLOCKCHAIN_NAME.TON} />
-                {/* TODO: Extra Currency History */}
+                <MobileAssetHistory innerRef={ref} assetAddress={extra.preview.symbol} />
             </InnerBody>
         </>
     );

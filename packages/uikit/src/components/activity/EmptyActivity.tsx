@@ -10,7 +10,6 @@ import { ArrowDownIcon, PlusIcon } from '../Icon';
 import { HideOnReview } from '../ios/HideOnReview';
 
 const EmptyBody = styled.div`
-    margin-top: -64px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
