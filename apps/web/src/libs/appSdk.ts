@@ -24,7 +24,7 @@ export class BrowserAppSdk extends BaseApp {
         this.topMessage(notification);
     };
     openPage = async (url: string) => {
-        window.open(url, '_black');
+        window.open(url, '_black', 'noreferrer,noopener');
     };
 
     disableScroll = disableScroll;
