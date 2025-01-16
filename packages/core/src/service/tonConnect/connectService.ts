@@ -93,7 +93,7 @@ const getManifestResponse = async (manifestUrl: string) => {
         /**
          * Request file with CORS header;
          */
-        return await fetch(`https://manifest-proxy.nkuznetsov.workers.dev/${manifestUrl}`);
+        return await fetch(`https://c.tonapi.io/json?url=${btoa(manifestUrl)}`);
     }
 };
 
