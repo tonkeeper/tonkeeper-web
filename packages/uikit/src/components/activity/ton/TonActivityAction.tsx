@@ -103,7 +103,10 @@ const ExtraCurrencyTransferAction: FC<{
     if (extraCurrencyTransfer.recipient.address === wallet.rawAddress) {
         return (
             <ReceiveActivityAction
-                amount={format(extraCurrencyTransfer.amount)}
+                amount={format(
+                    extraCurrencyTransfer.amount,
+                    extraCurrencyTransfer.currency.decimals
+                )}
                 sender={
                     extraCurrencyTransfer.sender.name ??
                     toShortValue(formatAddress(extraCurrencyTransfer.sender.address, network))
@@ -118,7 +121,7 @@ const ExtraCurrencyTransferAction: FC<{
     }
     return (
         <SendActivityAction
-            amount={format(extraCurrencyTransfer.amount)}
+            amount={format(extraCurrencyTransfer.amount, extraCurrencyTransfer.currency.decimals)}
             symbol={extraCurrencyTransfer.currency.symbol}
             recipient={
                 extraCurrencyTransfer.recipient.name ??

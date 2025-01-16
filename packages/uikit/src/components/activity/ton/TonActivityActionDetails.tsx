@@ -195,6 +195,7 @@ const ExtraCurrencyTransferActionContent: FC<{
             <ActivityDetailsHeader
                 isScam={isScam}
                 amount={extraCurrencyTransfer.amount}
+                decimals={extraCurrencyTransfer.currency.decimals}
                 symbol={extraCurrencyTransfer.currency.symbol}
                 total={fiatAmount}
                 timestamp={timestamp}
