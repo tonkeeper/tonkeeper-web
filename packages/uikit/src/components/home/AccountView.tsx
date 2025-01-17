@@ -1,5 +1,9 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { formatAddress, formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
+import {
+    formatAddress,
+    formatTransferUrl,
+    seeIfValidTonAddress
+} from '@tonkeeper/core/dist/utils/common';
 import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -25,7 +29,7 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../state/wallet';
 import { AccountBadge } from '../account/AccountBadge';
-import { useAssetImage } from '../../state/asset';
+import { useTonAssetImage } from '../../state/asset';
 import {
     TON_ASSET,
     TRON_TRX_ASSET,
@@ -164,7 +168,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
-    const assetImage = useAssetImage({
+    const assetImage = useTonAssetImage({
         blockchain: BLOCKCHAIN_NAME.TON,
         address: jetton ? Address.parse(jetton) : TON_ASSET.address
     });
@@ -310,10 +314,7 @@ export const ReceiveContent: FC<{
                             {isTon ? (
                                 <ReceiveTon
                                     jetton={
-                                        jetton?.toLowerCase() ===
-                                        TON_ASSET.address.toString().toLowerCase()
-                                            ? undefined
-                                            : jetton
+                                        jetton && seeIfValidTonAddress(jetton) ? jetton : undefined
                                     }
                                 />
                             ) : (

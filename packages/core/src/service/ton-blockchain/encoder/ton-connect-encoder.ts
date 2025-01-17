@@ -6,9 +6,12 @@ import {
     TON_CONNECT_MSG_VARIANTS_ID,
     TonConnectTransactionPayload
 } from '../../../entries/tonConnect';
+import { EncoderBase } from './encoder-base';
 
-export class TonConnectEncoder {
-    constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
+export class TonConnectEncoder extends EncoderBase {
+    constructor(private readonly api: APIConfig, private readonly walletAddress: string) {
+        super();
+    }
 
     encodeTransfer = async (
         transfer: TonConnectTransactionPayload & {
@@ -30,10 +33,13 @@ export class TonConnectEncoder {
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             messages: await Promise.all(
                 messages.map(async item =>
-                    internal({
+                    this.internalMessage({
                         to: Address.parse(item.address),
                         bounce: await tonConnectAddressIsBounceable(this.api, item.address),
-                        value: BigInt(item.amount),
+                        value: this.currencyValue({
+                            amount: item.amount,
+                            extraCurrencies: item.extra_currencies
+                        }),
                         init: toStateInit(item.stateInit),
                         body: item.payload ? Cell.fromBase64(item.payload) : undefined
                     })

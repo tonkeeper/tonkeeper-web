@@ -55,7 +55,8 @@ import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
 import { useAnalyticsTrack } from '../../hooks/amplitude';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
+import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
+import { useActiveWallet } from '../../state/wallet';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -426,6 +427,7 @@ const SendActionNotification = () => {
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);
     const { data: jettons } = useJettonList();
+    const wallet = useActiveWallet();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
     const sdk = useAppSdk();
@@ -448,15 +450,21 @@ const SendActionNotification = () => {
                 return;
             }
 
-            if (transfer.address) {
-                getAccountAsync({ address: transfer.address }).then(account => {
-                    setTonTransfer(makeTransferInitData(transfer, account, jettons));
+            getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
+                if (transfer.address && seeIfValidTonAddress(transfer.address)) {
+                    getAccountAsync({ address: transfer.address }).then(toAccount => {
+                        setTonTransfer(
+                            makeTransferInitData(transfer, fromAccount, toAccount, jettons)
+                        );
+                        setOpen(true);
+                    });
+                } else {
+                    setTonTransfer({
+                        initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
+                    });
                     setOpen(true);
-                });
-            } else {
-                setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
-                setOpen(true);
-            }
+                }
+            });
 
             track('send_open', { from: transfer.from });
         };

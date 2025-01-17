@@ -7,7 +7,10 @@ import { MultiSendFormTokenized } from '../../../hooks/blockchain/useSendMultiTr
 import { formatFiatCurrency, formatter } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';
 import { useRate } from '../../../state/rates';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    TonAsset,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useTranslation } from '../../../hooks/translation';
 
@@ -79,7 +82,7 @@ const ReceiversTable: FC<{ form: MultiSendFormTokenized; asset: TonAsset }> = ({
     };
 
     const { fiat } = useAppContext();
-    const { data: rate } = useRate(asset.address === 'TON' ? 'TON' : asset.address.toRawString());
+    const { data: rate } = useRate(tonAssetAddressToString(asset.address));
 
     const fiatToString = (weiAmount: MultiSendFormTokenized['rows'][number]['weiAmount']) => {
         return formatFiatCurrency(

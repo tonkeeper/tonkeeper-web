@@ -60,3 +60,50 @@ export const TonTransferDesktopAction: FC<{
         </>
     );
 };
+
+export const ExtraCurrencyTransferDesktopAction: FC<{
+    action: Action;
+    isScam: boolean;
+}> = ({ action, isScam }) => {
+    const wallet = useActiveWallet();
+    const { extraCurrencyTransfer } = action;
+
+    if (!extraCurrencyTransfer) {
+        return <ErrorRow />;
+    }
+
+    if (eqAddresses(extraCurrencyTransfer.recipient.address, wallet.rawAddress)) {
+        return (
+            <>
+                <HistoryCellActionReceived isScam={isScam} isFailed={action.status === 'failed'} />
+                <HistoryCellAccount account={extraCurrencyTransfer.sender} />
+                <ActionRow>
+                    <HistoryCellComment comment={extraCurrencyTransfer.comment} isScam={isScam} />
+                    <HistoryCellAmount
+                        amount={extraCurrencyTransfer.amount}
+                        symbol={extraCurrencyTransfer.currency.symbol}
+                        decimals={extraCurrencyTransfer.currency.decimals}
+                        isFailed={action.status === 'failed'}
+                        isSpam={isScam}
+                    />
+                </ActionRow>
+            </>
+        );
+    }
+    return (
+        <>
+            <HistoryCellActionSent isFailed={action.status === 'failed'} />
+            <HistoryCellAccount account={extraCurrencyTransfer.recipient} />
+            <ActionRow>
+                <HistoryCellComment comment={extraCurrencyTransfer.comment} />
+                <HistoryCellAmount
+                    amount={extraCurrencyTransfer.amount}
+                    symbol={extraCurrencyTransfer.currency.symbol}
+                    decimals={extraCurrencyTransfer.currency.decimals}
+                    isFailed={action.status === 'failed'}
+                    isNegative
+                />
+            </ActionRow>
+        </>
+    );
+};

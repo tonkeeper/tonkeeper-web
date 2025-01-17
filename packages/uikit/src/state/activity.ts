@@ -10,9 +10,9 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { atom, useAtom } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
-import { seeIfTonTransfer } from './ton/tonActivity';
+import { seeIfExtraCurrencyTransfer, seeIfTonTransfer } from './ton/tonActivity';
 import { useActiveApi, useActiveWallet } from './wallet';
-import { debounce } from '@tonkeeper/core/dist/utils/common';
+import { debounce, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useTwoFAWalletConfig } from './two-fa';
 import { useActiveTronWallet, useTronApi } from './tron/tron';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
@@ -325,7 +325,14 @@ async function fetchTonActivity({
             initiator: onlyInitiator ? onlyInitiator : undefined
         });
     } else {
-        if (assetTonApiId! === 'TON') {
+        if (seeIfValidTonAddress(assetTonApiId)) {
+            tonActivity = await new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
+                accountId: wallet.rawAddress,
+                jettonId: assetTonApiId!,
+                limit: 20,
+                beforeLt: pageParam
+            });
+        } else if (assetTonApiId === 'TON') {
             tonActivity = await new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.rawAddress,
                 limit: 20,
@@ -339,11 +346,17 @@ async function fetchTonActivity({
                 return event.actions.length > 0;
             });
         } else {
-            tonActivity = await new AccountsApi(api.tonApiV2).getAccountJettonHistoryByID({
+            tonActivity = await new AccountsApi(api.tonApiV2).getAccountEvents({
                 accountId: wallet.rawAddress,
-                jettonId: assetTonApiId!,
                 limit: 20,
-                beforeLt: pageParam
+                beforeLt: pageParam,
+                subjectOnly: true,
+                initiator: onlyInitiator ? onlyInitiator : undefined
+            });
+
+            tonActivity.events = tonActivity.events.filter(event => {
+                event.actions = event.actions.filter(seeIfExtraCurrencyTransfer(assetTonApiId));
+                return event.actions.length > 0;
             });
         }
     }

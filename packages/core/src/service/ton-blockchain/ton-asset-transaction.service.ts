@@ -12,6 +12,8 @@ import { getTonEstimationTonFee, TonEstimation } from '../../entries/send';
 import { isStandardTonWallet, TonContract } from '../../entries/wallet';
 import { MessagePayloadParam } from './encoder/types';
 import { assertMessagesNumberSupported } from './utils';
+import { seeIfValidTonAddress } from '../../utils/common';
+import { ExtraCurrencyEncoder } from './encoder/extra-currency-encoder';
 
 export type TransferParams =
     | {
@@ -31,10 +33,50 @@ export class TonAssetTransactionService {
     constructor(private readonly api: APIConfig, private readonly wallet: TonContract) {}
 
     async estimate(sender: Sender, params: TransferParams): Promise<TonEstimation> {
+        if (this.isExtraCurrency(params)) {
+            return this.estimateExtraCurrency(sender, params);
+        }
         if (this.isJettonTransfer(params)) {
             return this.estimateJetton(sender, params);
         } else {
             return this.estimateTon(sender, params);
+        }
+    }
+
+    private async estimateExtraCurrency(
+        sender: Sender,
+        params: TransferParams
+    ): Promise<TonEstimation> {
+        // await this.checkTransferPossibility(sender, params); // TODO: Extra Currency validation
+
+        if (Array.isArray(params)) {
+            if (sender instanceof LedgerMessageSender) {
+                throw new Error('Ledger multisend is not supported.');
+            } else {
+                return sender.estimate(
+                    await new ExtraCurrencyEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        params.map(p => ({
+                            ...p,
+                            weiAmount: p.amount.weiAmount,
+                            id: Number(p.amount.asset.id)
+                        }))
+                    )
+                );
+            }
+        } else {
+            if (sender instanceof LedgerMessageSender) {
+                throw new Error('Ledger extra currency transfer is not supported.'); // TODO: Extra Currency - check ledger
+            } else {
+                return sender.estimate(
+                    await new ExtraCurrencyEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        {
+                            ...params,
+                            weiAmount: params.amount.weiAmount,
+                            id: Number(params.amount.asset.id)
+                        }
+                    )
+                );
+            }
         }
     }
 
@@ -94,10 +136,52 @@ export class TonAssetTransactionService {
     }
 
     async send(sender: Sender, estimation: TonEstimation, params: TransferParams) {
+        if (this.isExtraCurrency(params)) {
+            return this.sendExtraCurrency(sender, estimation, params);
+        }
         if (this.isJettonTransfer(params)) {
             await this.sendJetton(sender, estimation, params);
         } else {
             await this.sendTon(sender, estimation, params);
+        }
+    }
+    private async sendExtraCurrency(
+        sender: Sender,
+        estimation: TonEstimation,
+        params: TransferParams
+    ) {
+        // await this.checkTransferPossibility(sender, params, estimation); // TODO: Extra Currency validation
+
+        if (Array.isArray(params)) {
+            if (sender instanceof LedgerMessageSender) {
+                throw new Error('Ledger multisend is not supported.');
+            } else {
+                return sender.send(
+                    await new ExtraCurrencyEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        params.map(p => ({
+                            ...p,
+                            weiAmount: p.amount.weiAmount,
+                            id: Number(p.amount.asset.id)
+                        }))
+                    )
+                );
+            }
+        } else {
+            if (sender instanceof LedgerMessageSender) {
+                return (
+                    await sender.tonTransfer({ ...params, weiAmount: params.amount.weiAmount })
+                ).send();
+            } else {
+                return sender.send(
+                    await new ExtraCurrencyEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                        {
+                            ...params,
+                            weiAmount: params.amount.weiAmount,
+                            id: Number(params.amount.asset.id)
+                        }
+                    )
+                );
+            }
         }
     }
 
@@ -180,6 +264,14 @@ export class TonAssetTransactionService {
             ...params,
             responseAddress: sender.excessAddress
         };
+    }
+
+    private isExtraCurrency(params: TransferParams) {
+        const token = Array.isArray(params)
+            ? params[0].amount.asset.address
+            : params.amount.asset.address;
+
+        return token !== TON_ASSET.address && !seeIfValidTonAddress(token.toString());
     }
 
     private isJettonTransfer(params: TransferParams) {

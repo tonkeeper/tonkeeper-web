@@ -2,7 +2,8 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import {
     TonAsset,
     jettonToTonAsset,
-    legacyTonAssetId
+    legacyTonAssetId,
+    tokenToTonAsset
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { isNumeric } from '@tonkeeper/core/dist/utils/send';
@@ -139,7 +140,7 @@ export const AmountView: FC<{
             if (!jettons) return;
             dispatch({
                 kind: 'select',
-                payload: { token: jettonToTonAsset(address, jettons) }
+                payload: { token: tokenToTonAsset(address, info, jettons) }
             });
         },
         [dispatch, jettons]

@@ -1,7 +1,10 @@
 import { FC } from 'react';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 
-import { TonTransferDesktopAction } from './TonTransferDesktopAction';
+import {
+    ExtraCurrencyTransferDesktopAction,
+    TonTransferDesktopAction
+} from './TonTransferDesktopAction';
 import { NftPurchaseDesktopAction, NftTransferDesktopAction } from './NftDesktopActions';
 import {
     JettonBurnDesktopAction,
@@ -56,6 +59,8 @@ export const HistoryAction: FC<{
             return <WithdrawRequestStakeDesktopAction action={action} />;
         case 'DomainRenew':
             return <DomainRenewDesktopAction action={action} />;
+        case 'ExtraCurrencyTransfer':
+            return <ExtraCurrencyTransferDesktopAction action={action} isScam={isScam} />;
         case 'Unknown':
             return <UnknownDesktopAction action={action} />;
         default: {

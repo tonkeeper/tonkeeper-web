@@ -87,6 +87,32 @@ const AssetDropDown: FC<{
                     ) : undefined}
                 </ListItemPayload>
             </ListItem>
+            {info?.extraBalance?.map(item => {
+                return (
+                    <ListItem
+                        dropDown
+                        key={item.preview.symbol}
+                        onClick={() => {
+                            setJetton(item.preview.symbol);
+                            onClose();
+                        }}
+                    >
+                        <ListItemPayload>
+                            <AssetInfo>
+                                <AssetImage src={item.preview.image}></AssetImage>
+                                <Label1>{item.preview.symbol}</Label1>
+                                <Amount>{format(item.amount, item.preview.decimals)}</Amount>
+                            </AssetInfo>
+
+                            {item.preview.symbol === jetton ? (
+                                <Icon ref={ref}>
+                                    <DoneIcon />
+                                </Icon>
+                            ) : undefined}
+                        </ListItemPayload>
+                    </ListItem>
+                );
+            })}
             {jettons.balances.map(item => {
                 return (
                     <ListItem
