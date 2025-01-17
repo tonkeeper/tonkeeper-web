@@ -520,7 +520,7 @@
 
 /* PATCHED */ const origin =  REACT_APP_TG_BOT_ORIGIN;
 /* PATCHED */ var popup_url = Telegram.Login.widgetsOrigin + '/auth?bot_id=' + encodeURIComponent(options.bot_id) + '&origin=' + encodeURIComponent(origin) + (options.request_access ? '&request_access=' + encodeURIComponent(options.request_access) : '') + ('&lang=' + encodeURIComponent(options.lang)) + '&return_to=' + encodeURIComponent(origin);
-        var popup = window.open(popup_url, '_blank', 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',status=0,location=0,menubar=0,toolbar=0');
+/* PATCHED */ var popup = window.open(popup_url, '_blank', 'noreferrer,noopener,width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',status=0,location=0,menubar=0,toolbar=0');
         TelegramLogin.popups[bot_id] = {
           window: popup,
           authFinished: false

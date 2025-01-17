@@ -84,7 +84,7 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
     };
 
     openPage = async (url: string) => {
-        getWindow()?.open(url, '_blank');
+        getWindow()?.open(url, '_blank', 'noreferrer,noopener');
     };
 
     version = packageJson.version ?? 'Unknown';
