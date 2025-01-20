@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { AppRoute } from '../../libs/routes';
 import { JettonContent } from './Jetton';
 import { TonPage } from './Ton';
@@ -6,6 +6,8 @@ import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/const
 import { TronUsdtContent } from './TronUsdt';
 import { useNavigate } from '../../hooks/useNavigate';
 import { useParams } from '../../hooks/useParams';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { ExtraCurrencyPage } from './ExtraCurrency';
 
 const CoinPage = () => {
     const navigate = useNavigate();
@@ -24,7 +26,11 @@ const CoinPage = () => {
     } else if (name === 'ton') {
         return <TonPage />;
     } else {
-        return <JettonContent jettonAddress={decodeURIComponent(name)} />;
+        if (seeIfValidTonAddress(decodeURIComponent(name))) {
+            return <JettonContent jettonAddress={decodeURIComponent(name)} />;
+        } else {
+            return <ExtraCurrencyPage name={name} />;
+        }
     }
 };
 

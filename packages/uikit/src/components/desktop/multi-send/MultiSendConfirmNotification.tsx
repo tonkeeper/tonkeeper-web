@@ -4,7 +4,7 @@ import { Image, ImageMock } from '../../transfer/Confirm';
 import { MultiSendForm } from '../../../state/multiSend';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import styled from 'styled-components';
-import { useAssetImage } from '../../../state/asset';
+import { useTonAssetImage, useAssetImage } from '../../../state/asset';
 import { Body1, Body2, Body2Class, Body3, Body3Class, Label2, Num2 } from '../../Text';
 import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';

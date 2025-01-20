@@ -24,6 +24,7 @@ import { useJettonList } from '../../state/jetton';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useNavigate } from '../../hooks/useNavigate';
+import { Address } from '@ton/core';
 
 export interface TonAssetData {
     info: Account;
