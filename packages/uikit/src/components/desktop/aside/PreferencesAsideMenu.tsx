@@ -14,7 +14,7 @@ import {
     SlidersIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
@@ -31,6 +31,7 @@ import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { NavLink } from '../../shared/NavLink';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;

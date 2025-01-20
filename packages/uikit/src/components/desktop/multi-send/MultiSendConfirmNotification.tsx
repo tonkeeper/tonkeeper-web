@@ -8,7 +8,7 @@ import { useAssetImage } from '../../../state/asset';
 import { Body1, Body2, Body2Class, Body3, Body3Class, Label2, Num2 } from '../../Text';
 import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
-import { formatFiatCurrency, useFormatCoinValue } from '../../../hooks/balance';
+import { formatFiatCurrency } from '../../../hooks/balance';
 import { ListBlock, ListItem } from '../../List';
 import { useTranslation } from '../../../hooks/translation';
 import { useEstimateMultiTransfer } from '../../../hooks/blockchain/useEstimateMultiTransferFee';
@@ -22,7 +22,6 @@ import {
     MultiSendFormTokenized,
     useSendMultiTransfer
 } from '../../../hooks/blockchain/useSendMultiTransfer';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { MultiSendReceiversNotification } from './MultiSendReceiversNotification';
@@ -34,6 +33,7 @@ import {
     SenderTypeUserAvailable,
     useAvailableSendersChoices
 } from '../../../hooks/blockchain/useSender';
+import { useNavigate } from '../../../hooks/useNavigate';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -291,8 +291,6 @@ const ButtonBlock: FC<{
         isLoading: isSending,
         data: doneSend
     } = useSendMultiTransfer();
-
-    const format = useFormatCoinValue();
 
     const onClick = async () => {
         const confirmed = await send({

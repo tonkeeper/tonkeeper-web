@@ -1,5 +1,4 @@
 import React, { FC, forwardRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useUSDTRate } from '../../state/rates';
 import { ListItem } from '../List';
@@ -14,6 +13,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useAddTronToAccount } from '../../state/wallet';
 import styled from 'styled-components';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { useNavigate } from "../../hooks/useNavigate";
 
 const TokenLogoNotRounded = styled(TokenLogo)`
     border-radius: unset;

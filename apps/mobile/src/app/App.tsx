@@ -37,18 +37,21 @@ import {
 import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
-import { TABLET_APPLICATION_ID, TabletAppSdk } from '../libs/appSdk';
+import { CAPACITOR_APPLICATION_ID, TabletAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { TabletNotifications } from '../libs/tabletNotifications';
 import { NarrowContent } from './app-content/NarrowContent';
-import { WideContent } from './app-content/WideContent';
-import { IonApp, setupIonicReact } from '@ionic/react';
+import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
+import { IonReactRouter } from '@ionic/react-router';
+import { IonicOverride } from './app-content/ionic-override';
 
-setupIonicReact();
+setupIonicReact({
+    swipeBackEnabled: true,
+    navAnimation: iosTransitionAnimation
+});
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -62,6 +65,8 @@ const queryClient = new QueryClient({
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
     
+    ${IonicOverride};
+
     body {
         font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
     }
@@ -123,7 +128,7 @@ export const Providers = () => {
     }, [t, i18n]);
 
     useEffect(() => {
-        document.body.classList.add(TABLET_APPLICATION_ID);
+        document.body.classList.add(CAPACITOR_APPLICATION_ID);
     }, []);
 
     return (
@@ -141,15 +146,14 @@ export const Providers = () => {
     );
 };
 
-const router = createMemoryRouter([
-    {
-        path: '/*',
-        element: <Providers />
-    }
-]);
-
 export const App = () => {
-    return <RouterProvider router={router} />;
+    return (
+        <IonApp>
+            <IonReactRouter>
+                <Providers />
+            </IonReactRouter>
+        </IonApp>
+    );
 };
 
 const ThemeAndContent = () => {
@@ -183,11 +187,11 @@ export const Loader: FC = () => {
     const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TABLET_APPLICATION_ID,
+        targetEnv: CAPACITOR_APPLICATION_ID,
         build: sdk.version,
         network,
         lang,
-        platform: TABLET_APPLICATION_ID
+        platform: 'tablet' // TODO CAPACITOR_APPLICATION_ID
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
@@ -271,5 +275,6 @@ const Content: FC<{
         return <NarrowContent {...props} />;
     }
 
-    return <WideContent {...props} />;
+    // return <WideContent {...props} />;
+    return <NarrowContent {...props} />;
 };

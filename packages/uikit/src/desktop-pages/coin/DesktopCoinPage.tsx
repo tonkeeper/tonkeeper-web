@@ -3,7 +3,6 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useMemo, useRef } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Label2, Num3 } from '../../components/Text';
@@ -40,6 +39,9 @@ import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
+import { useNavigate } from '../../hooks/useNavigate';
+import { Navigate } from '../../components/shared/Navigate';
+import { useParams } from '../../hooks/useParams';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();

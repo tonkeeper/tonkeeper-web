@@ -27,13 +27,11 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 
 import { Address } from '@ton/core';
 
-import { useAppContext } from '../../hooks/appContext';
 import { RenameWalletContent } from '../settings/wallet-name/WalletNameNotification';
 import { AddWalletContext } from './AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAppSdk } from '../../hooks/appSdk';
 import { MultisigConfigForm, MultisigUseForm } from '../multisig/MultisigConfigForm';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import {
     MultisigConfig,
@@ -42,6 +40,7 @@ import {
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useNavigate } from '../../hooks/useNavigate';
 
 const ContentWrapper = styled.div`
     display: flex;

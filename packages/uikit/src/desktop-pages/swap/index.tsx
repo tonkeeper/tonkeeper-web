@@ -7,13 +7,13 @@ import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
-import { Navigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { Navigate } from '../../components/shared/Navigate';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;

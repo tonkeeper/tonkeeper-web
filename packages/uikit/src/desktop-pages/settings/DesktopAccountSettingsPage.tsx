@@ -1,4 +1,3 @@
-import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
@@ -17,6 +16,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useMAMIndexesSettingsNotification } from '../../components/modals/MAMIndexesSettingsNotification';
 import { DesktopAccountHeader } from '../../components/desktop/header/DesktopAccountHeader';
+import { Navigate } from '../../components/shared/Navigate';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;

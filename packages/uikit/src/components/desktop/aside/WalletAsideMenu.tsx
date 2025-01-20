@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
@@ -30,6 +30,7 @@ import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { NavLink } from '../../shared/NavLink';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;

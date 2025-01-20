@@ -2,7 +2,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
@@ -31,6 +31,7 @@ import { AsideMenuFolder } from './AsideMenuFolder';
 
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { useNavigate } from '../../../hooks/useNavigate';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;

@@ -19,6 +19,8 @@ import {
     AssetHistoryFilter,
     OtherHistoryFilters
 } from '../../components/desktop/history/DesktopHistoryFilters';
+import { ErrorBoundary } from 'react-error-boundary';
+import { fallbackRenderOver } from '../../components/Error';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
@@ -71,7 +73,15 @@ const LoaderContainer = styled.div`
     }
 `;
 
-export const DesktopHistoryPage: FC = () => {
+export const DesktopHistoryPage = () => {
+    return (
+        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display history page')}>
+            <DesktopHistoryPageContent />
+        </ErrorBoundary>
+    );
+};
+
+const DesktopHistoryPageContent: FC = () => {
     const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const config = useActiveConfig();

@@ -1,14 +1,37 @@
 import styled, { css } from 'styled-components';
-import React, { FC, ReactNode, useCallback } from 'react';
-import { useAppSdk } from '../../hooks/appSdk';
-import { useNavigate } from 'react-router-dom';
+import React, { FC, forwardRef, PropsWithChildren, ReactNode, useCallback } from 'react';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon } from '../Icon';
 import { IconButton } from '../fields/IconButton';
+import { useNavigate } from '../../hooks/useNavigate';
+import { IonContent, IonPage } from '@ionic/react';
 
-export const DesktopViewPageLayout = styled.div<{ borderBottom?: boolean }>`
+const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
 `;
+
+export const DesktopViewPageLayout: FC<PropsWithChildren> = forwardRef<
+    HTMLDivElement,
+    PropsWithChildren<{ className?: string }>
+>(({ children, className }, ref) => {
+    const platform = useAppTargetEnv();
+
+    if (platform === 'mobile') {
+        return (
+            <IonPage>
+                <IonContent className={className} ref={ref}>
+                    {children}
+                </IonContent>
+            </IonPage>
+        );
+    } else
+        return (
+            <DesktopViewPageLayoutSimple ref={ref} className={className}>
+                {children}
+            </DesktopViewPageLayoutSimple>
+        );
+});
 
 export const DesktopViewHeaderStyled = styled.div<{
     withBackButton?: boolean;

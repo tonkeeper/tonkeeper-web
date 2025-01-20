@@ -3,12 +3,12 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
-import { getTabletOS, TABLET_APPLICATION_ID } from "./appSdk";
-import { AptabaseWeb } from "@tonkeeper/uikit/dist/hooks/analytics/aptabase-web";
-import { AppRoute } from "@tonkeeper/uikit/dist/libs/routes";
-import { useNavigate } from "react-router-dom";
+import { CAPACITOR_APPLICATION_ID, getTabletOS } from './appSdk';
+import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
+import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { useNavigate } from '@tonkeeper/uikit/dist/hooks/useNavigate';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -52,21 +52,21 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
         [QueryKey.analytics],
         async () => {
             const tracker = new AnalyticsGroup(
-                  new AptabaseWeb(
+                new AptabaseWeb(
                     import.meta.env.VITE_APP_APTABASE_HOST,
                     import.meta.env.VITE_APP_APTABASE,
                     version
-                  )
+                )
             );
 
             tracker.init({
-                application: 'Tablet',
+                application: CAPACITOR_APPLICATION_ID,
                 walletType: toWalletType(activeAccount?.activeTonWallet),
                 activeAccount: activeAccount!,
                 accounts: accounts!,
                 network,
                 version,
-                platform: `${TABLET_APPLICATION_ID}-${await getTabletOS()}`
+                platform: `${CAPACITOR_APPLICATION_ID}-${await getTabletOS()}`
             });
 
             return tracker;

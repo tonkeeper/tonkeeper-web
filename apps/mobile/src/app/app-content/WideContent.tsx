@@ -1,3 +1,4 @@
+/*
 import { FC } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
@@ -163,7 +164,7 @@ const WalletContent = () => {
                             />
                             <Route path={any(AppRoute.dns)} element={<DesktopDns />} />
                             <Route path={AppRoute.coins}>
-                                <Route path=":name/*" element={<DesktopCoinPage />} />
+                                <Route path=":name/!*" element={<DesktopCoinPage />} />
                             </Route>
                             <Route
                                 path={AppRoute.multisigWallets}
@@ -209,3 +210,4 @@ const OldAppRouting = () => {
         </Wrapper>
     );
 };
+*/

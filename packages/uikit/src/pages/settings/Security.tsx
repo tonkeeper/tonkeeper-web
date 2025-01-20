@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
@@ -22,6 +21,7 @@ import {
 } from '../../state/password';
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 import styled from 'styled-components';
+import { useNavigate } from "../../hooks/useNavigate";
 
 const LockSwitch = () => {
     const { t } = useTranslation();

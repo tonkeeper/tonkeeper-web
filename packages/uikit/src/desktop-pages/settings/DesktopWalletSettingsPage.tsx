@@ -1,5 +1,5 @@
 import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
@@ -11,7 +11,7 @@ import {
     SaleBadgeIcon,
     SwitchIcon,
     UnpinIconOutline
-} from "../../components/Icon";
+} from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
@@ -44,6 +44,7 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
+import { useNavigate } from "../../hooks/useNavigate";
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;

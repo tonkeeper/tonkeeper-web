@@ -16,7 +16,6 @@ import {
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
@@ -24,6 +23,8 @@ import {
     DesktopViewHeader,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from '../../hooks/useNavigate';
 
 const TextContainer = styled.span`
     flex-direction: column;

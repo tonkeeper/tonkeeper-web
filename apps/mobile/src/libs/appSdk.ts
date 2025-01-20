@@ -5,15 +5,15 @@ import {
     KeychainPassword,
     NotificationService,
     TouchId
-} from "@tonkeeper/core/dist/AppSdk";
-import packageJson from "../../package.json";
-import { TabletStorage } from "./storage";
-import { Clipboard } from "@capacitor/clipboard";
-import { getWindow } from "./utils";
-import { Biometric, SecureStorage } from "./plugins";
-import { CapacitorCookies } from "@capacitor/core";
-import { Device } from "@capacitor/device";
-import { Haptics, NotificationType } from "@capacitor/haptics";
+} from '@tonkeeper/core/dist/AppSdk';
+import packageJson from '../../package.json';
+import { TabletStorage } from './storage';
+import { Clipboard } from '@capacitor/clipboard';
+import { getWindow } from './utils';
+import { Biometric, SecureStorage } from './plugins';
+import { CapacitorCookies } from '@capacitor/core';
+import { Device } from '@capacitor/device';
+import { Haptics, NotificationType } from '@capacitor/haptics';
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -38,7 +38,7 @@ export class CookieTablet implements CookieService {
 }
 
 export class TouchIdTablet implements TouchId {
-    constructor(private alert: (text: string) => void) { }
+    constructor(private alert: (text: string) => void) {}
 
     canPrompt = async () => {
         try {
@@ -46,7 +46,7 @@ export class TouchIdTablet implements TouchId {
             return result.isAvailable;
         } catch (e) {
             console.error('TOUCH ID rejected, cause', e);
-            return  false;
+            return false;
         }
     };
 
@@ -62,11 +62,15 @@ export class TouchIdTablet implements TouchId {
     };
 }
 
-export const TABLET_APPLICATION_ID = 'tablet' as const;
+export const CAPACITOR_APPLICATION_ID = import.meta.env.VITE_APP_CAPACITOR_APPLICATION_ID as
+    | 'tablet'
+    | 'mobile';
 
 export class TabletAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainTablet();
+
     cookie = new CookieTablet();
+
     /**
      * initialises in the App component when config is fetched
      */
@@ -89,14 +93,16 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
 
     version = packageJson.version ?? 'Unknown';
 
-    targetEnv = TABLET_APPLICATION_ID;
+    targetEnv = CAPACITOR_APPLICATION_ID;
 
     hapticNotification = (type: 'success' | 'error') => {
-        return Haptics.notification({type: type === 'success' ? NotificationType.Success : NotificationType.Error});
+        return Haptics.notification({
+            type: type === 'success' ? NotificationType.Success : NotificationType.Error
+        });
     };
 }
 
-export const getTabletOS = async ()=> {
+export const getTabletOS = async () => {
     const info = await Device.getInfo();
     return info.platform;
-}
+};

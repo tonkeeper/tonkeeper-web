@@ -6,7 +6,6 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { WordsGridAndHeaders } from '../../components/create/Words';
@@ -19,6 +18,10 @@ import { useTranslation } from '../../hooks/translation';
 import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
 import { SpinnerRing } from '../../components/Icon';
 import { useSetNotificationOnBack } from '../../components/Notification';
+import { Navigate } from '../../components/shared/Navigate';
+import { useSearchParams } from '../../hooks/useSearchParams';
+import { useNavigate } from '../../hooks/useNavigate';
+import { useParams } from '../../hooks/useParams';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
@@ -108,7 +111,7 @@ export const RecoveryContent: FC<{
 }> = ({ accountId, walletId, isPage = true, onClose }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const onBack = useCallback(() => (onClose ? onClose() : navigate(-1)), [onClose, navigate]);
+    const onBack = useCallback(() => (onClose ? onClose() : navigate('../')), [onClose, navigate]);
 
     const mnemonic = useMnemonic(onBack, accountId, walletId);
     const account = useAccountState(accountId);

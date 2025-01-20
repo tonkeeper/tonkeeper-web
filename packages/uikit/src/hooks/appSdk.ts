@@ -7,3 +7,7 @@ export const useAppSdk = () => {
     return useContext(AppSdkContext);
 };
 
+export const useAppTargetEnv = () => {
+    const sdk = useAppSdk();
+    return sdk.targetEnv;
+};

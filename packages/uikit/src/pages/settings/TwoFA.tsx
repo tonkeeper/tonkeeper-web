@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Body3Class, Label2 } from '../../components/Text';
-import { Navigate } from 'react-router-dom';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
@@ -35,6 +34,7 @@ import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { formattedDateTimeStamp } from '../../libs/dateTime';
 import { useSendTwoFACancelRecovery } from '../../hooks/blockchain/two-fa/useSendTwoFCancelRecovery';
 import { useSendTwoFARemove } from '../../hooks/blockchain/two-fa/useSendTwoFARemove';
+import { Navigate } from "../../components/shared/Navigate";
 
 export const TwoFAPage = () => {
     const canViewTwoFA = useCanViewTwoFA();

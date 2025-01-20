@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { JettonContent } from './Jetton';
 import { TonPage } from './Ton';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronUsdtContent } from './TronUsdt';
+import { useNavigate } from '../../hooks/useNavigate';
+import { useParams } from '../../hooks/useParams';
 
 const CoinPage = () => {
     const navigate = useNavigate();

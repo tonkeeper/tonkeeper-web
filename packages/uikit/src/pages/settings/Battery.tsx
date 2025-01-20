@@ -3,7 +3,6 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Label2 } from '../../components/Text';
 import { useActiveAccount, useActiveConfig } from '../../state/wallet';
-import { Navigate } from 'react-router-dom';
 import {
     DesktopViewHeader,
     DesktopViewPageLayout
@@ -29,6 +28,7 @@ import { BatteryRechargeNotification } from '../../components/settings/battery/B
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppRoute } from '../../libs/routes';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { Navigate } from '../../components/shared/Navigate';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();

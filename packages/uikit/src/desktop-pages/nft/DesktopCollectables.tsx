@@ -2,7 +2,7 @@ import { NftsList } from '../../components/nft/Nfts';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -15,6 +15,7 @@ import { useMemo } from 'react';
 import { SlidersIcon } from '../../components/Icon';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useWalletFilteredNftList } from '../../state/nft';
+import { useNavigate } from '../../hooks/useNavigate';
 
 const gap = '10px';
 const maxColumnsNumber = 4;

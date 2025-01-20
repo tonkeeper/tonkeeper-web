@@ -1,7 +1,6 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import country from 'country-list-js';
 import React, { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
@@ -11,6 +10,7 @@ import { Input } from '../../components/fields/Input';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useTranslation } from '../../hooks/translation';
 import { useAutoCountry, useCountrySetting, useMutateUserCountry } from '../../state/country';
+import { useSearchParams } from '../../hooks/useSearchParams';
 
 const Block = styled.div`
     margin-bottom: 32px;
@@ -23,7 +23,7 @@ export const CountrySettings = () => {
     const { data: detected } = useAutoCountry();
     const { mutate } = useMutateUserCountry();
 
-    let [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const search = useMemo(() => {
         return new URLSearchParams(searchParams).get('search') ?? '';

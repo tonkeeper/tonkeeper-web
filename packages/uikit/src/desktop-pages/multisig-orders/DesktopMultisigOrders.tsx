@@ -16,11 +16,9 @@ import React, { FC, useEffect, useMemo } from 'react';
 import { Button } from '../../components/fields/Button';
 
 import { styled } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { Multisig, type MultisigOrder, Risk } from '@tonkeeper/core/dist/tonApiV2';
 import { AppRoute } from '../../libs/routes';
-import { Navigate } from 'react-router-dom';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 import { toTimeLeft } from '@tonkeeper/core/dist/utils/date';
 import { ArrowUpIcon } from '../../components/Icon';
@@ -32,6 +30,7 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
 import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 import { useActiveConfig } from '../../state/wallet';
+import { Navigate } from "../../components/shared/Navigate";
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;

@@ -1,12 +1,11 @@
 import React, { FC, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative } from '../../libs/routes';
 import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import { useActiveConfig } from '../../state/wallet';
+import { useNavigate } from '../../hooks/useNavigate';
 
 export const SettingsSocialList: FC = React.memo(() => {
     const navigate = useNavigate();

@@ -29,19 +29,19 @@ import {
 import { styled } from 'styled-components';
 import { Dot } from '../../components/Dot';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
 import { Address } from '@ton/core';
 import { AppRoute } from '../../libs/routes';
-import { Navigate, useNavigate } from 'react-router-dom';
 import {
     AccountTonMultisig,
     isAccountCanManageMultisigs
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from "../../hooks/useNavigate";
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;

@@ -29,7 +29,6 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../compo
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
 import { Address } from '@ton/core';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import {
@@ -37,11 +36,8 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-
-const LedgerError = styled(Body2)`
-    margin: 0.5rem 0;
-    color: ${p => p.theme.accentRed};
-`;
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from "../../hooks/useNavigate";
 
 const TextContainer = styled.span`
     flex-direction: column;

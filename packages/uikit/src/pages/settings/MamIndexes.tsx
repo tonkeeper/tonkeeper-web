@@ -20,7 +20,6 @@ import {
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -37,6 +36,8 @@ import { usePrevious } from '../../hooks/usePrevious';
 import { scrollToContainersBottom } from '../../libs/web';
 import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from '../../hooks/useNavigate';
 
 const FirstLineContainer = styled.div`
     display: flex;

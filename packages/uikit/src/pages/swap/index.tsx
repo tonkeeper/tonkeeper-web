@@ -1,5 +1,5 @@
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
-import { Navigate } from 'react-router-dom';
+import { Navigate } from '../../components/shared/Navigate';
 
 export default () => {
     const [_, setIsOpen] = useSwapMobileNotification();

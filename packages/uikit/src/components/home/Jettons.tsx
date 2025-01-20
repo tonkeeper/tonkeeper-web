@@ -1,7 +1,6 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, forwardRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
@@ -24,6 +23,7 @@ import {
 import { useJettonList } from '../../state/jetton';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useNavigate } from '../../hooks/useNavigate';
 
 export interface TonAssetData {
     info: Account;
