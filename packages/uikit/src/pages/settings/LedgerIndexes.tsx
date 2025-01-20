@@ -24,7 +24,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { Navigate } from '../../components/shared/Navigate';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const TextContainer = styled.span`
     flex-direction: column;

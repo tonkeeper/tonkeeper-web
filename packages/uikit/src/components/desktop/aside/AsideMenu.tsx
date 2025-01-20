@@ -31,7 +31,7 @@ import { AsideMenuFolder } from './AsideMenuFolder';
 
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useNavigate } from '../../../hooks/useNavigate';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;

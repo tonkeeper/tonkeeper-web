@@ -6,7 +6,7 @@ import { relative, SettingsRoute } from '../../libs/routes';
 import { MessageIcon, NotificationIcon } from '../Icon';
 import { LocalizationIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 export const ThemeSettings = () => {
     const sdk = useAppSdk();

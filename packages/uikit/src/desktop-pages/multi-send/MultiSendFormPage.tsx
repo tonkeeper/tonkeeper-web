@@ -4,8 +4,8 @@ import { Label2 } from '../../components/Text';
 import { MultiSendTable } from '../../components/desktop/multi-send/MultiSendTable';
 import { MultiSendList, useUserMultiSendLists } from '../../state/multiSend';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useNavigate } from '../../hooks/useNavigate';
-import { useParams } from '../../hooks/useParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useParams } from '../../hooks/router/useParams';
 
 const PageWrapper = styled.div`
     overflow: auto;

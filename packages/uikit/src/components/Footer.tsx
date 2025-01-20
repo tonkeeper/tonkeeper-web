@@ -8,7 +8,7 @@ import { AppRoute } from '../libs/routes';
 import { ActivityIcon, BrowserIcon, SettingsIcon, WalletIcon } from './NavigationIcons';
 import { Label3 } from './Text';
 import { HideOnReview } from './ios/HideOnReview';
-import { useNavigate } from '../hooks/useNavigate';
+import { useNavigate } from '../hooks/router/useNavigate';
 
 const Button = styled.div<{ active: boolean }>`
     user-select: none;

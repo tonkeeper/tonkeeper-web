@@ -10,7 +10,7 @@ import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const NotificationBlock = styled.div`
     display: flex;

@@ -15,7 +15,7 @@ import { useMemo } from 'react';
 import { SlidersIcon } from '../../components/Icon';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useWalletFilteredNftList } from '../../state/nft';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const gap = '10px';
 const maxColumnsNumber = 4;

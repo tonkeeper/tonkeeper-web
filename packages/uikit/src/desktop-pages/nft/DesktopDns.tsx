@@ -16,7 +16,7 @@ import { SlidersIcon } from '../../components/Icon';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useWalletFilteredNftList } from '../../state/nft';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const gap = '10px';
 const maxColumnsNumber = 4;

@@ -7,7 +7,7 @@ import { Label1 } from '../Text';
 import { NftsList } from '../nft/Nfts';
 import { JettonList } from './Jettons';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { useSearchParams } from '../../hooks/useSearchParams';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
 
 const TabsBlock = styled.div`
     display: flex;

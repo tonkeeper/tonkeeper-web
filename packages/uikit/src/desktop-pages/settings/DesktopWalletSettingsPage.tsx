@@ -44,7 +44,7 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
-import { useNavigate } from "../../hooks/useNavigate";
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;

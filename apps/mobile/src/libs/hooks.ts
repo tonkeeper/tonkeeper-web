@@ -8,7 +8,7 @@ import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { CAPACITOR_APPLICATION_ID, getTabletOS } from './appSdk';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
-import { useNavigate } from '@tonkeeper/uikit/dist/hooks/useNavigate';
+import { useNavigate } from 'packages/uikit/src/hooks/router/useNavigate';
 
 export const useAppHeight = () => {
     useEffect(() => {

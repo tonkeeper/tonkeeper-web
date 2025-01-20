@@ -26,7 +26,7 @@ import { useAccountLabel } from '../../hooks/accountUtils';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 
 import { useAccountsDNDDrop, useSideBarItems } from '../../state/folders';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const Row = styled.div`
     display: flex;

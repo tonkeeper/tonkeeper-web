@@ -7,7 +7,7 @@ import { AppRoute } from '../libs/routes';
 import { ChevronLeftIcon } from './Icon';
 import { Label2 } from './Text';
 import { RoundedButton } from './fields/RoundedButton';
-import { useNavigate } from '../hooks/useNavigate';
+import { useNavigate } from '../hooks/router/useNavigate';
 
 const BackBlock = styled.div`
     position: absolute;

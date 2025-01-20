@@ -4,8 +4,8 @@ import { JettonContent } from './Jetton';
 import { TonPage } from './Ton';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronUsdtContent } from './TronUsdt';
-import { useNavigate } from '../../hooks/useNavigate';
-import { useParams } from '../../hooks/useParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { ExtraCurrencyPage } from './ExtraCurrency';
 

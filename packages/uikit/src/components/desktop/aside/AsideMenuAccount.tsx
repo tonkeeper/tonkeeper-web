@@ -41,7 +41,7 @@ import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettin
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
-import { useNavigate } from '../../../hooks/useNavigate';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;

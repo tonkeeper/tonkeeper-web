@@ -41,7 +41,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { Navigate } from '../../components/shared/Navigate';
-import { useNavigate } from "../../hooks/useNavigate";
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;

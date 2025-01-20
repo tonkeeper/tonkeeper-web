@@ -33,7 +33,7 @@ import {
     SenderTypeUserAvailable,
     useAvailableSendersChoices
 } from '../../../hooks/blockchain/useSender';
-import { useNavigate } from '../../../hooks/useNavigate';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const ConfirmWrapper = styled.div`
     display: flex;

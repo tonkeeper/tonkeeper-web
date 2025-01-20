@@ -53,8 +53,8 @@ import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useNavigate } from '../../../hooks/useNavigate';
-import { useBlocker } from '../../../hooks/useBlocker';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useBlocker } from '../../../hooks/router/useBlocker';
 
 const FormHeadingWrapper = styled.div`
     display: flex;

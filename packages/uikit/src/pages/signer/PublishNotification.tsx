@@ -9,8 +9,8 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { useActiveApi, useActiveStandardTonWallet } from '../../state/wallet';
-import { useSearchParams } from '../../hooks/useSearchParams';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const usePublishMessage = (signatureHex: string) => {
     const sdk = useAppSdk();

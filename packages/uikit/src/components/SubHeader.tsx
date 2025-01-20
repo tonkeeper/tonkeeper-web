@@ -6,7 +6,7 @@ import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 import { RoundedButton } from './fields/RoundedButton';
 import { DesktopBackButton } from './desktop/DesktopViewLayout';
-import { useNavigate } from "../hooks/useNavigate";
+import { useNavigate } from "../hooks/router/useNavigate";
 
 export const WithHeadingDivider = styled.div``;
 

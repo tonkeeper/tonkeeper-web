@@ -26,7 +26,7 @@ import {
 } from '../../components/Notification';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
-import { useNavigate } from "../../hooks/useNavigate";
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;

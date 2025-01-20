@@ -37,7 +37,7 @@ import { scrollToContainersBottom } from '../../libs/web';
 import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const FirstLineContainer = styled.div`
     display: flex;

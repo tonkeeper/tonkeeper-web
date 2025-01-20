@@ -6,7 +6,7 @@ import { ListBlock } from '../../components/List';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { RecommendationPageListItemSkeleton } from '../../components/skeletons/BrowserSkeletons';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { useParams } from '../../hooks/useParams';
+import { useParams } from '../../hooks/router/useParams';
 
 export const CategoryPage = () => {
     const { id } = useParams();

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Route, Switch, useLocation } from 'react-router-dom';
+import { Route, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useAppWidth } from '../../libs/hooks';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -28,7 +28,7 @@ import { Container } from '@tonkeeper/uikit';
 import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
 import { BackgroundElements, usePrefetch } from './common';
 import './ionic-styles';
-import { IonMenu, IonPage, IonRouterOutlet } from '@ionic/react';
+import { IonMenu, IonRouterOutlet } from '@ionic/react';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 import { DesktopConnectedAppsSettings } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopConnectedAppsSettings';
 import { DesktopNftSettings } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopNftSettings';
@@ -45,16 +45,6 @@ import { MobileProHeader } from '@tonkeeper/uikit/dist/components/mobile-pro/hea
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
-`;
-
-const Wrapper = styled.div`
-    box-sizing: border-box;
-
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    background-color: ${props => props.theme.backgroundPage};
-    white-space: pre-wrap;
 `;
 
 const WideLayout = styled.div`
@@ -80,12 +70,6 @@ const WalletLayoutBody = styled.div`
     flex: 1;
     display: flex;
     max-height: calc(100% - 52px);
-`;
-
-const WalletRoutingWrapper = styled.div`
-    flex: 1;
-    overflow: auto;
-    position: relative;
 `;
 
 const PreferencesLayout = styled.div`
@@ -234,38 +218,6 @@ export const NarrowContent: FC<{
             </WideContent>
             <BackgroundElements />
         </WideLayout>
-    );
-};
-
-const WalletContent = () => {
-    return (
-        <IonPage>
-            {/*   <WalletLayout>
-                <MobileProHeader />
-
-                <WalletLayoutBody>
-                    <WalletRoutingWrapper className="hide-scrollbar">
-                        <Wrapper>*/}
-            <Switch>
-                <Route path={AppRoute.activity} component={DesktopHistoryPage} />
-                <Route path={any(AppRoute.purchases)} component={DesktopCollectables} />
-                <Route path={any(AppRoute.dns)} component={DesktopDns} />
-                <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
-                <Route path={AppRoute.multisigWallets} component={DesktopManageMultisigsPage} />
-                <Route path={AppRoute.multisigOrders} component={DesktopMultisigOrdersPage} />
-                <Route
-                    path={any(AppRoute.walletSettings)}
-                    component={DesktopWalletSettingsRouting}
-                />
-                <Route path={AppRoute.swap} component={DesktopSwapPage} />
-                <Route component={DesktopTokens} />
-            </Switch>
-            {/*<MemoryScroll />*/}
-            {/* </Wrapper>
-                    </WalletRoutingWrapper>
-                </WalletLayoutBody>
-            </WalletLayout>*/}
-        </IonPage>
     );
 };
 

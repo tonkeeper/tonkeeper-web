@@ -13,7 +13,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useAddTronToAccount } from '../../state/wallet';
 import styled from 'styled-components';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { useNavigate } from "../../hooks/useNavigate";
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const TokenLogoNotRounded = styled(TokenLogo)`
     border-radius: unset;

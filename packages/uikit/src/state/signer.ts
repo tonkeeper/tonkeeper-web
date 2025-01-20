@@ -5,7 +5,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { useNavigate } from '../hooks/useNavigate';
+import { useNavigate } from '../hooks/router/useNavigate';
 
 export const usePairSignerMutation = () => {
     const sdk = useAppSdk();

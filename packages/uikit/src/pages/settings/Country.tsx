@@ -10,7 +10,7 @@ import { Input } from '../../components/fields/Input';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useTranslation } from '../../hooks/translation';
 import { useAutoCountry, useCountrySetting, useMutateUserCountry } from '../../state/country';
-import { useSearchParams } from '../../hooks/useSearchParams';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
 
 const Block = styled.div`
     margin-bottom: 32px;

@@ -5,7 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative } from '../../libs/routes';
 import { TonkeeperIcon } from '../Icon';
 import { Body3, Label2 } from '../Text';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const Block = styled.div`
     user-select: none;

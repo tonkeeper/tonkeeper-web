@@ -11,7 +11,7 @@ import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon } from '../Icon';
 import { IconButton } from '../fields/IconButton';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 import { IonContent, IonPage } from '@ionic/react';
 
 const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`

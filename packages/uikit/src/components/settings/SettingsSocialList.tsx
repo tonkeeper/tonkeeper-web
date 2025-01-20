@@ -5,7 +5,7 @@ import { SettingsRoute, relative } from '../../libs/routes';
 import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import { useActiveConfig } from '../../state/wallet';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 export const SettingsSocialList: FC = React.memo(() => {
     const navigate = useNavigate();

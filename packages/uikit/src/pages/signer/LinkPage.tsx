@@ -8,8 +8,8 @@ import { QueryKey } from '../../libs/queryKey';
 import { AppRoute } from '../../libs/routes';
 import { useAccountsStorage } from '../../hooks/useStorage';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useSearchParams } from '../../hooks/useSearchParams';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const useAddWalletMutation = () => {
     const sdk = useAppSdk();

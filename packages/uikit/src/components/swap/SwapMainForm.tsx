@@ -20,7 +20,7 @@ import { SwapFromField } from './SwapFromField';
 import { SwapProviders } from './SwapProviders';
 import { SwapToField } from './SwapToField';
 import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
-import { useNavigate } from "../../hooks/useNavigate";
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const MainFormWrapper = styled.div`
     display: flex;

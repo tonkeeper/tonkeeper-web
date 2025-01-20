@@ -21,9 +21,9 @@ import { ImportListNotification } from '../../components/desktop/multi-send/impo
 import { useActiveWallet } from '../../state/wallet';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { AppRoute } from '../../libs/routes';
-import { useNavigate } from '../../hooks/useNavigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
-import { useParams } from '../../hooks/useParams';
+import { useParams } from '../../hooks/router/useParams';
 
 const PageWrapper = styled.div`
     overflow: auto;

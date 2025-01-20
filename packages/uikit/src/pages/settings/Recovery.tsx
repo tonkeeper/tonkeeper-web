@@ -19,9 +19,9 @@ import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletSe
 import { SpinnerRing } from '../../components/Icon';
 import { useSetNotificationOnBack } from '../../components/Notification';
 import { Navigate } from '../../components/shared/Navigate';
-import { useSearchParams } from '../../hooks/useSearchParams';
-import { useNavigate } from '../../hooks/useNavigate';
-import { useParams } from '../../hooks/useParams';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useParams } from '../../hooks/router/useParams';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();

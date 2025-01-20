@@ -9,7 +9,7 @@ import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger
 import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
-import { useNavigate } from '../hooks/useNavigate';
+import { useNavigate } from '../hooks/router/useNavigate';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';
