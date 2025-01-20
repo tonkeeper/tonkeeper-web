@@ -1,5 +1,12 @@
 import styled, { css } from 'styled-components';
-import React, { FC, forwardRef, PropsWithChildren, ReactNode, useCallback } from 'react';
+import React, {
+    FC,
+    ForwardedRef,
+    forwardRef,
+    PropsWithChildren,
+    ReactNode,
+    useCallback
+} from 'react';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon } from '../Icon';
@@ -20,7 +27,7 @@ export const DesktopViewPageLayout: FC<PropsWithChildren> = forwardRef<
     if (platform === 'mobile') {
         return (
             <IonPage>
-                <IonContent className={className} ref={ref}>
+                <IonContent className={className} ref={ref as ForwardedRef<HTMLIonContentElement>}>
                     {children}
                 </IonContent>
             </IonPage>
