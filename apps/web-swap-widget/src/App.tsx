@@ -190,7 +190,8 @@ const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        lang
+        lang,
+        platform: 'swap-widget-web'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
