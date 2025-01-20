@@ -43,3 +43,10 @@ export const groupAndFilterTonActivityItems = (
         pageParams: []
     };
 };
+
+export const seeIfExtraCurrencyTransfer = (symbol: string) => (action: Action) => {
+    return (
+        action.type === 'ExtraCurrencyTransfer' &&
+        action.extraCurrencyTransfer?.currency.symbol === symbol
+    );
+};

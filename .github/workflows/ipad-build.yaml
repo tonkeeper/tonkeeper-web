@@ -109,13 +109,6 @@ jobs:
                   APPLE_PROFILE_NAME: GitHub CI/CD iPad
                   BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
 
-            - name: Upload logs to artifacts
-              uses: actions/upload-artifact@v3
-              if: failure()
-              with:
-                  name: gum-logs
-                  path: /Users/runner/Library/Logs/gym/*.log
-
             - name: Summary
               run: |
                   echo '### Successful iPad build 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY

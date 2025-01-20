@@ -40,6 +40,7 @@ import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -229,29 +230,41 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
                 };
             }
 
-            const jettonBalance = assets.ton.jettons.balances.find(b =>
-                eqAddresses(b.jetton.address, token)
-            );
+            if (seeIfValidTonAddress(token)) {
+                const jettonBalance = assets.ton.jettons.balances.find(b =>
+                    eqAddresses(b.jetton.address, token)
+                );
 
-            if (!jettonBalance) {
-                return undefined;
+                if (!jettonBalance) {
+                    return undefined;
+                }
+
+                const amount = jettonBalance.balance;
+
+                return {
+                    image: jettonBalance.jetton.image,
+                    symbol: jettonBalance.jetton.symbol,
+                    amount: format(amount, jettonBalance.jetton.decimals),
+                    fiatAmount: formatFiatCurrency(
+                        fiat,
+                        jettonBalance.price
+                            ? shiftedDecimals(
+                                  jettonBalance.balance,
+                                  jettonBalance.jetton.decimals
+                              ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                            : 0
+                    )
+                };
             }
 
-            const amount = jettonBalance.balance;
+            const extra = assets.ton.info.extraBalance?.find(item => item.preview.symbol === token);
 
+            if (!extra) return undefined;
             return {
-                image: jettonBalance.jetton.image,
-                symbol: jettonBalance.jetton.symbol,
-                amount: format(amount, jettonBalance.jetton.decimals),
-                fiatAmount: formatFiatCurrency(
-                    fiat,
-                    jettonBalance.price
-                        ? shiftedDecimals(
-                              jettonBalance.balance,
-                              jettonBalance.jetton.decimals
-                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
-                        : 0
-                )
+                image: extra.preview.image,
+                symbol: extra.preview.symbol,
+                amount: format(extra.amount, extra.preview.decimals),
+                fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
             };
         }, [assets, format, rate, fiat]);
 
@@ -317,8 +330,12 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             return t('Toncoin');
         }
 
-        return assets.ton.jettons.balances.find(b => eqAddresses(b.jetton.address, token))?.jetton
-            .symbol;
+        if (seeIfValidTonAddress(decodeURIComponent(token))) {
+            return assets.ton.jettons.balances.find(b => eqAddresses(b.jetton.address, token))
+                ?.jetton.symbol;
+        } else {
+            return token;
+        }
     }, [assets, t, token]);
 
     return (

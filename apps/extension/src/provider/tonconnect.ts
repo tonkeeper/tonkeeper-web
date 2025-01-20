@@ -52,7 +52,8 @@ export const getDeviceInfo = (): DeviceInfo => {
             'SendTransaction',
             {
                 name: 'SendTransaction',
-                maxMessages: 4
+                maxMessages: 4,
+                extraCurrenciesSupported: true
             }
         ]
     };

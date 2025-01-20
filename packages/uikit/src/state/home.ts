@@ -11,10 +11,15 @@ import {
     TRON_TRX_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { jettonToTonAssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    extraBalanceToTonAsset,
+    jettonToTonAssetAmount,
+    TonAsset
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 import { useTronBalances } from './tron/tron';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { Address } from '@ton/core';
 
 export const useAssets = () => {
     const wallet = useActiveWallet();
@@ -25,6 +30,7 @@ export const useAssets = () => {
 
     const assets = useMemo<AssetData | undefined>(() => {
         if (!info || !jettons || tronBalances === undefined) return undefined;
+
         return {
             ton: { info, jettons: jettons ?? { balances: [] } },
             tron: tronBalances
@@ -44,6 +50,17 @@ export const useAllChainsAssets = () => {
         const result: AssetAmount[] = [
             new AssetAmount({ asset: TON_ASSET, weiAmount: assets.ton.info.balance })
         ];
+
+        if (assets.ton.info.extraBalance) {
+            for (let extra of assets.ton.info.extraBalance) {
+                const asset = new AssetAmount<TonAsset>({
+                    weiAmount: new BigNumber(extra.amount),
+                    asset: extraBalanceToTonAsset(extra)
+                });
+                result.push(asset);
+            }
+        }
+
         config.pinnedTokens.forEach(p => {
             if (p === TRON_USDT_ASSET.address && assets.tron) {
                 result.push(assets.tron.usdt);
@@ -85,10 +102,19 @@ export const useAssetWeiBalance = (asset: AssetIdentification) => {
             if (asset.address === 'TON') {
                 return new BigNumber(assets.ton.info.balance);
             }
-            const jAddress = asset.address.toRawString();
-            return new BigNumber(
-                assets.ton.jettons.balances.find(i => i.jetton.address === jAddress)?.balance || '0'
-            );
+            if (Address.isAddress(asset.address)) {
+                const jAddress = asset.address.toRawString();
+                return new BigNumber(
+                    assets.ton.jettons.balances.find(i => i.jetton.address === jAddress)?.balance ||
+                        '0'
+                );
+            } else {
+                return new BigNumber(
+                    assets.ton.info.extraBalance?.find(
+                        item => item.preview.symbol === asset.address
+                    )?.amount || '0'
+                );
+            }
         } else if (asset.blockchain === BLOCKCHAIN_NAME.TRON) {
             if (asset.address === TRON_USDT_ASSET.address) {
                 return assets.tron?.usdt.weiAmount || new BigNumber(0);
