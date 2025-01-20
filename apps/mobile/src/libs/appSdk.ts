@@ -66,6 +66,10 @@ export const CAPACITOR_APPLICATION_ID = import.meta.env.VITE_APP_CAPACITOR_APPLI
     | 'tablet'
     | 'mobile';
 
+if (CAPACITOR_APPLICATION_ID !== 'tablet' && CAPACITOR_APPLICATION_ID !== 'mobile') {
+    throw new Error('VITE_APP_CAPACITOR_APPLICATION_ID must be tablet or mobile');
+}
+
 export class TabletAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainTablet();
 
