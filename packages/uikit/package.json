@@ -16,6 +16,7 @@
     "dependencies": {
         "@amplitude/analytics-browser": "^2.1.0",
         "@aptabase/web": "^0.4.2",
+        "@ionic/core": "^8.4.1",
         "@ionic/react": "^8.4.1",
         "@keystonehq/keystone-sdk": "0.7.2",
         "@ngraveio/bc-ur": "^1.1.13",

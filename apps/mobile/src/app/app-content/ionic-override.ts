@@ -11,4 +11,15 @@ export const IonicOverride = css`
             box-sizing: content-box;
         }
     }
+
+    ion-menu {
+        --width: 256px;
+        outline: none;
+
+        &::part(container) {
+            background-color: ${p => p.theme.backgroundContent};
+            border-top-right-radius: ${p => p.theme.cornerSmall};
+            border-bottom-right-radius: ${p => p.theme.cornerSmall};
+        }
+    }
 `;

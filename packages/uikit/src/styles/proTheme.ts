@@ -90,5 +90,6 @@ export const proTheme: DefaultTheme = {
     cornerFull: '100%',
     fontMono: 'ui-monospace, SF Mono, monospace, Roboto Mono, Menlo, Consolas, Courier',
     displayType: 'compact',
+    proType: undefined,
     os: undefined
 };

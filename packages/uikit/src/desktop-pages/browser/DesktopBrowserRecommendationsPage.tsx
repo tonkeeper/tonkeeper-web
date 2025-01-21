@@ -5,6 +5,8 @@ import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 import { DesktopCategoryBlock } from './DesktopCategoryBlock';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import { useAppTargetEnv } from '../../hooks/appSdk';
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -20,7 +22,7 @@ const CategoryBlockStyled = styled(DesktopCategoryBlock)`
     }
 `;
 
-const CategoriesWrapper = styled.div`
+const CategoriesWrapper = styled(DesktopViewPageLayout)`
     padding-bottom: 0.5rem;
     overflow: auto;
     height: 100%;
@@ -28,6 +30,7 @@ const CategoriesWrapper = styled.div`
 
 export const DesktopBrowserRecommendationsPage: FC = () => {
     const { data } = useRecommendations();
+    const targetEnv = useAppTargetEnv();
 
     const track = useOpenBrowser();
     useEffect(() => {
@@ -41,7 +44,10 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     return (
         <HideOnReview>
             <CategoriesWrapper>
-                <PromotionsCarouselStyled apps={data.apps} slidesToShow={2} />
+                <PromotionsCarouselStyled
+                    apps={data.apps}
+                    slidesToShow={targetEnv === 'mobile' ? 1 : 2}
+                />
                 {data.categories.map((category, index) => (
                     <CategoryBlockStyled
                         key={category.id}

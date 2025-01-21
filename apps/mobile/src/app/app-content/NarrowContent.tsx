@@ -42,6 +42,7 @@ import { DesktopWalletSettingsPage } from '@tonkeeper/uikit/dist/desktop-pages/s
 import { ActiveRecovery, Recovery } from '@tonkeeper/uikit/dist/pages/settings/Recovery';
 import { JettonsSettings } from '@tonkeeper/uikit/dist/pages/settings/Jettons';
 import { MobileProHeader } from '@tonkeeper/uikit/dist/components/mobile-pro/header/MobileProHeader';
+import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -125,7 +126,9 @@ export const NarrowContent: FC<{
             <WideContent>
                 <WalletLayout>
                     <MobileProHeader />
-                    <IonMenu contentId="main-content">Menu content</IonMenu>
+                    <IonMenu menuId="aside-nav" contentId="main-content">
+                        <AsideMenu />
+                    </IonMenu>
                     <WalletLayoutBody>
                         <IonRouterOutlet id="main-content">
                             <Route path={AppProRoute.dashboard} component={DashboardPage} />

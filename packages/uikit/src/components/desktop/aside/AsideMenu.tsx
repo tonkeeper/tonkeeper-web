@@ -32,6 +32,8 @@ import { AsideMenuFolder } from './AsideMenuFolder';
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useNavigate } from '../../../hooks/router/useNavigate';
+import { NotForTargetEnv } from '../../shared/TargetEnv';
+import { useMenuController } from '../../../hooks/ionic';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -39,7 +41,12 @@ const AsideContainer = styled.div<{ width: number }>`
     height: 100%;
     position: relative;
     width: ${p => p.width}px;
-    border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+        `}
 
     * {
         user-select: none;
@@ -98,6 +105,12 @@ const AsideMenuBottom = styled.div`
 
     background: ${p => p.theme.backgroundContent};
     padding-bottom: 0.5rem;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding-bottom: 34px;
+        `}
 `;
 
 const AsideMenuBottomContent = styled.div`
@@ -158,24 +171,27 @@ export const AsideMenuDNDItem = forwardRef<
     useEffect(() => {
         setOptimisticWalletId(activeWalletId);
     }, [activeWalletId]);
+    const menuController = useMenuController('aside-nav');
 
     const handleNavigateHome = useCallback(() => {
+        menuController.close();
         if (shouldNavigateHome(location.pathname)) {
             return navigate(AppRoute.home);
         } else {
             scrollToTop();
         }
-    }, [location.pathname]);
+    }, [location.pathname, menuController]);
 
     const onClickWallet = useCallback(
         (walletId: WalletId) => {
+            menuController.close();
             if (shouldNavigateHome(location.pathname)) {
                 setOptimisticActiveRoute(undefined);
             }
             setOptimisticWalletId(walletId);
             setActiveWallet(walletId).then(handleNavigateHome);
         },
-        [setActiveWallet, handleNavigateHome, location.pathname]
+        [setActiveWallet, handleNavigateHome, location.pathname, menuController]
     );
 
     if (!item) {
@@ -256,9 +272,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { ref, closeBottom } = useIsScrolled();
 
     const activeRoute = useAsideActiveRoute();
+    const menuController = useMenuController('aside-nav');
 
     const handleNavigateClick = useCallback(
         (route: string) => {
+            menuController.close();
             if (location.pathname !== route) {
                 return navigate(route);
             } else {
@@ -336,7 +354,9 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                     <AccountDNDBlock items={items} />
                 </ScrollContainer>
                 <AsideMenuBottom>
-                    <DividerStyled isHidden={!closeBottom} />
+                    <NotForTargetEnv env="mobile">
+                        <DividerStyled isHidden={!closeBottom} />
+                    </NotForTargetEnv>
                     <AsideMenuBottomContent>
                         <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
                             <IconWrapper>
@@ -363,13 +383,16 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                     </HideOnReview>
                 </AsideMenuBottom>
             </AsideContentContainer>
-            <AsideResizeHandle
-                onMouseDown={() => {
-                    isResizing.current = true;
-                    document.body.style.cursor = 'col-resize';
-                    document.documentElement.classList.add('no-user-select');
-                }}
-            />
+            <NotForTargetEnv env="mobile">
+                <AsideResizeHandle
+                    onMouseDown={() => {
+                        isResizing.current = true;
+                        document.body.style.cursor = 'col-resize';
+                        document.documentElement.classList.add('no-user-select');
+                    }}
+                />
+                )
+            </NotForTargetEnv>
         </AsideContainer>
     );
 };

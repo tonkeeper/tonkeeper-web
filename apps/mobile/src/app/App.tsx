@@ -159,7 +159,12 @@ export const App = () => {
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
     return (
-        <UserThemeProvider displayType="full-width" isPro={data?.valid} isProSupported>
+        <UserThemeProvider
+            displayType="full-width"
+            isPro={data?.valid}
+            isProSupported
+            proDisplayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'mobile' : 'desktop'}
+        >
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />

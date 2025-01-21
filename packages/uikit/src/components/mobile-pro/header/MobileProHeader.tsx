@@ -5,9 +5,30 @@ import { fallbackRenderOver } from '../../Error';
 import { MobileProHeaderWallet } from './MobileProHeaderWallet';
 import { MobileProHeaderAccount } from './MobileProHeaderAccount';
 import { MobileProHeaderContainer } from './MobileProHeaderElements';
+import { FC, PropsWithChildren } from 'react';
+import { IconButtonTransparentBackground } from '../../fields/IconButton';
+import { ChevronLeftIcon } from '../../Icon';
+import { Label2 } from '../../Text';
+import { useTranslation } from '../../../hooks/translation';
+import styled from 'styled-components';
+import { useNavigate } from "../../../hooks/router/useNavigate";
+
+const MobileProHeaderContainerStyled = styled(MobileProHeaderContainer)`
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ${IconButtonTransparentBackground} {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+    }
+`;
 
 const MobileProHeaderContent = () => {
     const route = useAsideActiveRoute();
+    const { t } = useTranslation();
 
     if (!route) {
         return <MobileProHeaderWallet />;
@@ -17,7 +38,22 @@ const MobileProHeaderContent = () => {
         return <MobileProHeaderAccount />;
     }
 
+    if (route === AppRoute.browser) {
+        return <MobileProHeaderContentSimple>{t('browser_title')}</MobileProHeaderContentSimple>;
+    }
     return <MobileProHeaderContainer />;
+};
+
+const MobileProHeaderContentSimple: FC<PropsWithChildren> = ({ children }) => {
+    const navigate = useNavigate();
+    return (
+        <MobileProHeaderContainerStyled>
+            <IconButtonTransparentBackground onClick={() => navigate(-1)}>
+                <ChevronLeftIcon />
+            </IconButtonTransparentBackground>
+            <Label2>{children}</Label2>
+        </MobileProHeaderContainerStyled>
+    );
 };
 
 export const MobileProHeader = () => {

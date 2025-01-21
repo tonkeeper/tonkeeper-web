@@ -18,7 +18,7 @@ const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
 `;
 
-export const DesktopViewPageLayout: FC<PropsWithChildren> = forwardRef<
+export const DesktopViewPageLayout = forwardRef<
     HTMLDivElement,
     PropsWithChildren<{ className?: string }>
 >(({ children, className }, ref) => {

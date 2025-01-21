@@ -21,6 +21,7 @@ import { useUserFiat } from '../../../state/fiat';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { Skeleton } from '../../shared/Skeleton';
 import { formatFiatCurrency } from '../../../hooks/balance';
+import { useMenuController } from '../../../hooks/ionic';
 
 const HeaderContainer = styled(MobileProHeaderContainer)`
     display: flex;
@@ -212,7 +213,7 @@ const AsideHeaderSingleChainWallet = () => {
     const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
     const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
 
-    const menuRef = useRef<HTMLIonMenuElement>(null);
+    const menuController = useMenuController('aside-nav');
 
     return (
         <HeaderContainer>
@@ -220,7 +221,7 @@ const AsideHeaderSingleChainWallet = () => {
                 emoji={emoji}
                 emojiSize="24px"
                 containerSize="24px"
-                onClick={() => menuRef.current?.open()}
+                onClick={() => menuController.open()}
             />
             <TextContainer onClick={onCopy}>
                 <WalletNameWrapper>
