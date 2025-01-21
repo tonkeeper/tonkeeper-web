@@ -45,7 +45,7 @@ const AsideContainer = styled.div<{ width: number }>`
     ${p =>
         p.theme.proDisplayType === 'desktop' &&
         css`
-            border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+            border-right: 1px solid ${theme.backgroundContentAttention};
         `}
 
     * {
@@ -109,12 +109,20 @@ const AsideMenuBottom = styled.div`
     ${p =>
         p.theme.proDisplayType === 'mobile' &&
         css`
-            padding-bottom: 34px;
+            padding-bottom: env(safe-area-inset-bottom);
         `}
 `;
 
 const AsideMenuBottomContent = styled.div`
     padding: 0.5rem 0;
+`;
+
+const SubscriptionBlockWrapper = styled.div`
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding-left: 0.5rem;
+        `}
 `;
 
 const DraggingBlock = styled.div<{ $isDragging: boolean }>`
@@ -378,7 +386,9 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <ErrorBoundary
                             fallbackRender={fallbackRenderOver('Failed to load Pro State')}
                         >
-                            <SubscriptionInfoBlock />
+                            <SubscriptionBlockWrapper>
+                                <SubscriptionInfoBlock />
+                            </SubscriptionBlockWrapper>
                         </ErrorBoundary>
                     </HideOnReview>
                 </AsideMenuBottom>

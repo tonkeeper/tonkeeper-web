@@ -259,12 +259,10 @@ export const Loader: FC = () => {
     return (
         <AmplitudeAnalyticsContext.Provider value={tracker}>
             <AppContext.Provider value={context}>
-                <IonApp>
-                    <Content activeAccount={activeAccount} lock={lock} />
-                    <CopyNotification hideSimpleCopyNotifications />
-                    <QrScanner />
-                    <ModalsRoot />
-                </IonApp>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification hideSimpleCopyNotifications />
+                <QrScanner />
+                <ModalsRoot />
             </AppContext.Provider>
         </AmplitudeAnalyticsContext.Provider>
     );

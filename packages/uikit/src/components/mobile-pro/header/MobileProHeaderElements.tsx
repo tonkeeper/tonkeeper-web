@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 
 export const MobileProHeaderContainer = styled.div`
-    box-sizing: border-box;
-    padding: 8px;
+    box-sizing: content-box;
+    padding: calc(env(safe-area-inset-top) + 8px) 8px 8px;
     background: ${p => p.theme.backgroundContent};
-    height: 52px;
+    height: 36px;
 `;
