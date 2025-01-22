@@ -16,7 +16,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import styled, { css, useTheme } from 'styled-components';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
@@ -28,6 +28,7 @@ import { H2, H3, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { useAppPlatform } from '../hooks/appContext';
+import { IonContent, IonModal } from '@ionic/react';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -219,6 +220,12 @@ const TitleRow = styled.div`
         p.theme.displayType === 'full-width' &&
         css`
             margin-bottom: 0;
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            height: 46px;
         `}
 `;
 
@@ -437,6 +444,107 @@ export const Notification: FC<{
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
+}> = props => {
+    const targetEnv = useAppTargetEnv();
+
+    if (targetEnv === 'mobile') {
+        return <NotificationIonic {...props} />;
+    }
+
+    return <NotificationDesktopAndWeb {...props} />;
+};
+
+export const NotificationIonic: FC<{
+    isOpen: boolean;
+    handleClose: () => void;
+    hideButton?: boolean;
+    title?: ReactNode;
+    footer?: ReactNode;
+    children: (afterClose: (action?: () => void) => void) => React.ReactNode;
+    className?: string;
+}> = ({ children, isOpen, hideButton, handleClose, title, footer, className }) => {
+    const [onBack, setOnBack] = useState<(() => void) | undefined>();
+    const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
+    const onClose = useCallback(() => {
+        if (!onCloseInterceptor) {
+            handleClose();
+        } else {
+            onCloseInterceptor(handleClose);
+        }
+    }, [handleClose, onCloseInterceptor]);
+
+    const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
+    const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
+
+    const Child = useMemo(() => {
+        return children((afterClose?: () => void) => {
+            setTimeout(() => afterClose && afterClose(), 100);
+            onClose();
+        });
+    }, [isOpen, children, onClose]);
+
+    return (
+        <NotificationContext.Provider
+            value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
+        >
+            <IonModal
+                isOpen={isOpen}
+                onDidDismiss={onClose}
+                initialBreakpoint={1}
+                breakpoints={[0, 1]}
+                handle={false}
+                className={className}
+            >
+                <IonicModalContentStyled>
+                    <HeaderWrapper ref={setHeaderElement}>
+                        {(title || !hideButton) && (
+                            <NotificationHeader className="dialog-header">
+                                <NotificationTitleRow
+                                    onBack={onBack}
+                                    handleClose={hideButton ? undefined : onClose}
+                                >
+                                    {title}
+                                </NotificationTitleRow>
+                            </NotificationHeader>
+                        )}
+                    </HeaderWrapper>
+                    {Child}
+                    <FooterWrapper ref={setFooterElement}>{footer}</FooterWrapper>
+                </IonicModalContentStyled>
+            </IonModal>
+        </NotificationContext.Provider>
+    );
+};
+
+const IonicModalContentStyled = styled(IonContent)`
+    display: contents;
+
+    &::part(scroll) {
+        border-top-right-radius: ${props => props.theme.cornerMedium};
+        border-top-left-radius: ${props => props.theme.cornerMedium};
+        padding: 0 1rem 1rem;
+        position: relative;
+    }
+
+    &::part(background) {
+        border-top-right-radius: ${props => props.theme.cornerMedium};
+        border-top-left-radius: ${props => props.theme.cornerMedium};
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+`;
+
+export const NotificationDesktopAndWeb: FC<{
+    isOpen: boolean;
+    handleClose: () => void;
+    hideButton?: boolean;
+    backShadow?: boolean;
+    title?: ReactNode;
+    footer?: ReactNode;
+    children: (afterClose: (action?: () => void) => void) => React.ReactNode;
+    className?: string;
 }> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
     const animationTime = 200;
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -635,8 +743,13 @@ export const NotificationHeaderStyled = styled.div`
         p.theme.displayType === 'full-width' &&
         css`
             background: ${p.theme.backgroundPage};
-            padding-top: 16px;
             padding-bottom: 16px;
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            padding-top: 16px;
         `}
 `;
 

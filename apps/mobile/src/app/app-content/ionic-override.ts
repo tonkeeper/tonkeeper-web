@@ -22,4 +22,18 @@ export const IonicOverride = css`
             border-bottom-right-radius: ${p => p.theme.cornerSmall};
         }
     }
+
+    ion-modal {
+        --height: auto;
+
+        &::part(content) {
+            background: transparent;
+        }
+
+        .ion-page {
+            max-height: calc(100vh - 20px - env(safe-area-inset-top));
+            position: relative;
+            contain: content;
+        }
+    }
 `;
