@@ -496,20 +496,22 @@ export const NotificationIonic: FC<{
                 className={className}
             >
                 <IonicModalContentStyled>
-                    <HeaderWrapper ref={setHeaderElement}>
-                        {(title || !hideButton) && (
-                            <NotificationHeader className="dialog-header">
-                                <NotificationTitleRow
-                                    onBack={onBack}
-                                    handleClose={hideButton ? undefined : onClose}
-                                >
-                                    {title}
-                                </NotificationTitleRow>
-                            </NotificationHeader>
-                        )}
-                    </HeaderWrapper>
-                    {Child}
-                    <FooterWrapper ref={setFooterElement}>{footer}</FooterWrapper>
+                    <AnimateHeightChange>
+                        <HeaderWrapper ref={setHeaderElement}>
+                            {(title || !hideButton) && (
+                                <NotificationHeader className="dialog-header">
+                                    <NotificationTitleRow
+                                        onBack={onBack}
+                                        handleClose={hideButton ? undefined : onClose}
+                                    >
+                                        {title}
+                                    </NotificationTitleRow>
+                                </NotificationHeader>
+                            )}
+                        </HeaderWrapper>
+                        {Child}
+                        <FooterWrapper ref={setFooterElement}>{footer}</FooterWrapper>
+                    </AnimateHeightChange>
                 </IonicModalContentStyled>
             </IonModal>
         </NotificationContext.Provider>
