@@ -1,5 +1,5 @@
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
-import { AppRoute } from '../../../libs/routes';
+import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../Error';
 import { MobileProHeaderWallet } from './MobileProHeaderWallet';
@@ -41,6 +41,11 @@ const MobileProHeaderContent = () => {
     if (route === AppRoute.browser) {
         return <MobileProHeaderContentSimple>{t('browser_title')}</MobileProHeaderContentSimple>;
     }
+
+    if (route === AppProRoute.dashboard) {
+        return <MobileProHeaderContentSimple>{t('aside_dashboard')}</MobileProHeaderContentSimple>;
+    }
+
     return <MobileProHeaderContainer />;
 };
 

@@ -743,13 +743,13 @@ export const NotificationHeaderStyled = styled.div`
         p.theme.displayType === 'full-width' &&
         css`
             background: ${p.theme.backgroundPage};
-            padding-bottom: 16px;
         `}
 
     ${p =>
         p.theme.proDisplayType === 'desktop' &&
         css`
             padding-top: 16px;
+            padding-bottom: 16px;
         `}
 `;
 
