@@ -1,12 +1,5 @@
 import styled, { css } from 'styled-components';
-import React, {
-    FC,
-    ForwardedRef,
-    forwardRef,
-    PropsWithChildren,
-    ReactNode,
-    useCallback
-} from 'react';
+import React, { FC, forwardRef, PropsWithChildren, ReactNode, useCallback } from 'react';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon } from '../Icon';
@@ -18,6 +11,11 @@ const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
 `;
 
+const DesktopViewPageLayoutSimpleIonic = styled.div<{ borderBottom?: boolean }>`
+    overflow: auto;
+    height: 100%;
+`;
+
 export const DesktopViewPageLayout = forwardRef<
     HTMLDivElement,
     PropsWithChildren<{ className?: string }>
@@ -27,8 +25,10 @@ export const DesktopViewPageLayout = forwardRef<
     if (platform === 'mobile') {
         return (
             <IonPage>
-                <IonContent className={className} ref={ref as ForwardedRef<HTMLIonContentElement>}>
-                    {children}
+                <IonContent>
+                    <DesktopViewPageLayoutSimpleIonic ref={ref} className={className}>
+                        {children}
+                    </DesktopViewPageLayoutSimpleIonic>
                 </IonContent>
             </IonPage>
         );

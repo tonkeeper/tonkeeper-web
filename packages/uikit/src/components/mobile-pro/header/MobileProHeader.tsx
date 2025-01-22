@@ -11,7 +11,7 @@ import { ChevronLeftIcon } from '../../Icon';
 import { Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
-import { useNavigate } from "../../../hooks/router/useNavigate";
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const MobileProHeaderContainerStyled = styled(MobileProHeaderContainer)`
     position: relative;
@@ -21,7 +21,7 @@ const MobileProHeaderContainerStyled = styled(MobileProHeaderContainer)`
 
     ${IconButtonTransparentBackground} {
         position: absolute;
-        top: 8px;
+        top: calc(env(safe-area-inset-top) + 8px);
         left: 8px;
     }
 `;
