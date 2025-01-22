@@ -6,7 +6,7 @@ import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { useTranslation } from '../../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useAppSdk } from '../../../hooks/appSdk';
-import { ChevronDownIcon, CopyIcon, DoneIcon, EllipsisIcon } from '../../Icon';
+import { ChevronDownIcon, ChevronRightIcon, CopyIcon, DoneIcon, EllipsisIcon } from '../../Icon';
 import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
 import { MobileProHeaderContainer } from './MobileProHeaderElements';
 import { useActiveTronWallet } from '../../../state/tron/tron';
@@ -22,6 +22,7 @@ import { useWalletTotalBalance } from '../../../state/asset';
 import { Skeleton } from '../../shared/Skeleton';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useMenuController } from '../../../hooks/ionic';
+import { MobileProWalletMenu, useIsProWalletMenuOpened } from '../MobileProWalletMenu';
 
 const HeaderContainer = styled(MobileProHeaderContainer)`
     display: flex;
@@ -196,6 +197,7 @@ const AsideHeaderSingleChainWallet = () => {
     const activeWallet = account.activeTonWallet;
     const [copied, setIsCopied] = useState(false);
     const sdk = useAppSdk();
+    const manuController = useMenuController('wallet-nav');
 
     const network = useActiveTonNetwork();
 
@@ -214,37 +216,43 @@ const AsideHeaderSingleChainWallet = () => {
     const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
 
     const menuController = useMenuController('aside-nav');
+    const [isMenuOpened] = useIsProWalletMenuOpened();
 
     return (
-        <HeaderContainer>
-            <WalletEmoji
-                emoji={emoji}
-                emojiSize="24px"
-                containerSize="24px"
-                onClick={() => menuController.open()}
-            />
-            <TextContainer onClick={onCopy}>
-                <WalletNameWrapper>
-                    {name || t('wallet_title')}
-                    <AccountAndWalletBadgesGroup
-                        account={account}
-                        walletId={account.activeTonWallet.id}
-                        size="s"
-                    />
-                </WalletNameWrapper>
-                <AddressWrapper>
-                    {copied ? t('copied') : toShortValue(address)}
-                    <Dot />
-                    {isLoading ? (
-                        <Skeleton width="50px" height="16px" />
-                    ) : (
-                        formatFiatCurrency(fiat, balance || 0)
-                    )}
-                </AddressWrapper>
-            </TextContainer>
-            <IconButtonTransparentBackground>
-                <EllipsisIcon />
-            </IconButtonTransparentBackground>
-        </HeaderContainer>
+        <>
+            <MobileProWalletMenu />
+            <HeaderContainer>
+                <WalletEmoji
+                    emoji={emoji}
+                    emojiSize="24px"
+                    containerSize="24px"
+                    onClick={() => menuController.open()}
+                />
+                <TextContainer onClick={onCopy}>
+                    <WalletNameWrapper>
+                        {name || t('wallet_title')}
+                        <AccountAndWalletBadgesGroup
+                            account={account}
+                            walletId={account.activeTonWallet.id}
+                            size="s"
+                        />
+                    </WalletNameWrapper>
+                    <AddressWrapper>
+                        {copied ? t('copied') : toShortValue(address)}
+                        <Dot />
+                        {isLoading ? (
+                            <Skeleton width="50px" height="16px" />
+                        ) : (
+                            formatFiatCurrency(fiat, balance || 0)
+                        )}
+                    </AddressWrapper>
+                </TextContainer>
+                <IconButtonTransparentBackground
+                    onClick={() => (isMenuOpened ? manuController.close() : manuController.open())}
+                >
+                    {isMenuOpened ? <ChevronRightIcon /> : <EllipsisIcon />}
+                </IconButtonTransparentBackground>
+            </HeaderContainer>
+        </>
     );
 };

@@ -18,7 +18,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
-import { useAssetAmountFiatEquivalent, useTonAssetImage, useAssetImage } from '../../state/asset';
+import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
 import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Gap } from '../Layout';
 import { ListBlock } from '../List';
@@ -30,7 +30,7 @@ import {
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { RoundedButton } from '../fields/RoundedButton';
+import { RoundedButtonResponsive } from '../fields/RoundedButton';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
@@ -237,9 +237,9 @@ export const ConfirmViewTitle: FC<PropsWithChildren> = () => {
     return (
         <NotificationTitleBlock>
             {onBack ? (
-                <RoundedButton onClick={onBack}>
+                <RoundedButtonResponsive onClick={onBack}>
                     <ChevronLeftIcon />
-                </RoundedButton>
+                </RoundedButtonResponsive>
             ) : (
                 <div />
             )}

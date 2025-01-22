@@ -98,15 +98,17 @@ export const DesktopCollectablesContent = () => {
 
     if (!filteredNft.length) {
         return (
-            <NFTEmptyPage>
-                <NFTEmptyContainer>
-                    <Label2>{t('collectibles_empty_header')}</Label2>
-                    <Body2>{t('nft_empty_description')}</Body2>
-                    <LinkStyled to={AppRoute.browser}>
-                        <Button size="small">{t('nft_empty_go_discover_button')}</Button>
-                    </LinkStyled>
-                </NFTEmptyContainer>
-            </NFTEmptyPage>
+            <DesktopViewPageLayout>
+                <NFTEmptyPage>
+                    <NFTEmptyContainer>
+                        <Label2>{t('collectibles_empty_header')}</Label2>
+                        <Body2>{t('nft_empty_description')}</Body2>
+                        <LinkStyled to={AppRoute.browser}>
+                            <Button size="small">{t('nft_empty_go_discover_button')}</Button>
+                        </LinkStyled>
+                    </NFTEmptyContainer>
+                </NFTEmptyPage>
+            </DesktopViewPageLayout>
         );
     }
 

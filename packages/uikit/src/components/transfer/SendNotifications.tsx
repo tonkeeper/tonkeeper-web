@@ -481,7 +481,6 @@ const SendActionNotification = () => {
     }, []);
 
     const Content = useCallback(() => {
-        if (!open) return undefined;
         return (
             <SendContent
                 onClose={onClose}

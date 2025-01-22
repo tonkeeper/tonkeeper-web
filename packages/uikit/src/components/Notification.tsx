@@ -24,7 +24,7 @@ import { RoundedButton, ButtonMock } from './fields/RoundedButton';
 import { ArrowLeftIcon, ChevronLeftIcon, CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
-import { H2, H3, Label2 } from './Text';
+import { H2, H3Label2Responsive, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { useAppPlatform } from '../hooks/appContext';
@@ -221,12 +221,6 @@ const TitleRow = styled.div`
         css`
             margin-bottom: 0;
         `}
-
-    ${p =>
-        p.theme.proDisplayType === 'mobile' &&
-        css`
-            height: 46px;
-        `}
 `;
 
 const FooterWrapper = styled.div`
@@ -264,7 +258,7 @@ const HeaderWrapper = styled.div`
     }
 `;
 
-const RowTitle = styled(H3)`
+const RowTitle = styled(H3Label2Responsive)`
     overflow: hidden;
     margin: 0;
     user-select: none;
@@ -367,6 +361,12 @@ export const NotificationTitleBlock = styled.div`
     align-items: flex-start;
     width: 100%;
     gap: 1rem;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            align-items: center;
+        `}
 `;
 
 const DesktopCloseButtonStyled = styled(IconButtonTransparentBackground)`
@@ -522,7 +522,7 @@ const IonicModalContentStyled = styled(IonContent)`
     &::part(scroll) {
         border-top-right-radius: ${props => props.theme.cornerMedium};
         border-top-left-radius: ${props => props.theme.cornerMedium};
-        padding: 0 1rem 1rem;
+        padding: 0 1rem 0;
         position: relative;
     }
 
@@ -743,6 +743,8 @@ export const NotificationHeaderStyled = styled.div`
         p.theme.displayType === 'full-width' &&
         css`
             background: ${p.theme.backgroundPage};
+            padding-top: 8px;
+            padding-bottom: 8px;
         `}
 
     ${p =>

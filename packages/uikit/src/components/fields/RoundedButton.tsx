@@ -1,6 +1,8 @@
-import React, { FC } from 'react';
+import React, { FC, ForwardedRef, forwardRef, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { GlobIcon } from '../Icon';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { IconButtonTransparentBackground } from './IconButton';
 
 export const ButtonMock = styled.div`
     flex-shrink: 0;
@@ -54,3 +56,21 @@ export const RoundedButton = styled(ButtonMock)`
         background-color: ${props => props.theme.backgroundContentTint};
     }
 `;
+
+export const RoundedButtonResponsive = forwardRef<
+    HTMLDivElement,
+    PropsWithChildren<{ className?: string; onClick?: () => void }>
+>((props, ref) => {
+    const isFullWidthMode = useIsFullWidthMode();
+
+    if (isFullWidthMode) {
+        return (
+            <IconButtonTransparentBackground
+                ref={ref as ForwardedRef<HTMLButtonElement>}
+                {...props}
+            />
+        );
+    }
+
+    return <RoundedButton ref={ref} {...props} />;
+});

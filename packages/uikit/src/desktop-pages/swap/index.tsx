@@ -1,8 +1,11 @@
-import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 import { Label2 } from '../../components/Text';
 import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { SwapProviders } from '../../components/swap/SwapProviders';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
@@ -14,10 +17,16 @@ import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSetti
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
+import { NotForTargetEnv } from '../../components/shared/TargetEnv';
 
-const SwapPageWrapper = styled.div`
+const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
-    min-width: 580px;
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            min-width: 580px;
+        `}
 `;
 
 const HeaderButtons = styled.div`
@@ -38,7 +47,7 @@ const ContentWrapper = styled.div`
     margin: 0 auto;
 
     > * {
-        width: calc(50% - 4px);
+        width: ${p => (p.theme.proDisplayType === 'desktop' ? 'calc(50% - 4px)' : '100%')};
     }
 `;
 
@@ -64,9 +73,11 @@ const DesktopSwapPageContent = () => {
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />
-                <div>
-                    <SwapProviders />
-                </div>
+                <NotForTargetEnv env="mobile">
+                    <div>
+                        <SwapProviders />
+                    </div>
+                </NotForTargetEnv>
             </ContentWrapper>
         </SwapPageWrapper>
     );

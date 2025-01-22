@@ -10,6 +10,7 @@ import { MultisigOrderNotificationControlled } from './modals/MultisigOrderNotif
 import { DeleteAccountNotificationControlled } from './modals/DeleteAccountNotificationControlled';
 import { ManageFolderNotificationControlled } from './modals/ManageFolderNotificationControlled';
 import { ConfirmTwoFANotificationControlled } from './modals/ConfirmTwoFANotificationControlled';
+import { BuyNotificationControlled } from './modals/BuyNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -26,6 +27,7 @@ export const ModalsRoot = () => {
             <DeleteAccountNotificationControlled />
             <ManageFolderNotificationControlled />
             <ConfirmTwoFANotificationControlled />
+            <BuyNotificationControlled />
         </>
     );
 };

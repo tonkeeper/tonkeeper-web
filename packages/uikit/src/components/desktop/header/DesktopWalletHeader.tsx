@@ -2,9 +2,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
-import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
-import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
 import {
     useActiveTonNetwork,
     useActiveWallet,
@@ -15,7 +13,6 @@ import { ArrowDownIcon, ArrowUpIcon, ExclamationMarkTriangleIcon, PlusIconSmall 
 import { Button } from '../../fields/Button';
 import { Link } from 'react-router-dom';
 import { AppProRoute, AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { BuyNotification } from '../../home/BuyAction';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
@@ -26,6 +23,7 @@ import { BorderSmallResponsive } from '../../shared/Styles';
 import { hexToRGBA } from '../../../libs/css';
 import { Label2 } from '../../Text';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
+import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -82,8 +80,7 @@ const DesktopWalletHeaderPayload = () => {
     usePreFetchRates();
     const { data: balance, isLoading } = useWalletTotalBalance();
     const sdk = useAppSdk();
-    const { isOpen, onClose, onOpen } = useDisclosure();
-    const { data: buy } = useTonendpointBuyMethods();
+    const { onOpen: onBuy } = useBuyNotification();
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
     const activeWallet = useActiveWallet();
@@ -134,7 +131,7 @@ const DesktopWalletHeaderPayload = () => {
                     </ButtonStyled>
                     <HideOnReview>
                         {network !== Network.TESTNET && (
-                            <ButtonStyled size="small" onClick={onOpen}>
+                            <ButtonStyled size="small" onClick={onBuy}>
                                 <PlusIconSmall />
                                 {t('wallet_buy')}
                             </ButtonStyled>
@@ -142,8 +139,6 @@ const DesktopWalletHeaderPayload = () => {
                     </HideOnReview>
                 </ButtonsContainer>
             </DesktopRightPart>
-
-            <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </DesktopHeaderContainer>
     );
 };

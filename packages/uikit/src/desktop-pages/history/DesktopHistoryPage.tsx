@@ -1,5 +1,5 @@
 import { FC, Suspense, useRef } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import EmptyActivity from '../../components/activity/EmptyActivity';
@@ -28,9 +28,14 @@ const HistoryPageWrapper = styled(DesktopViewPageLayout)`
 `;
 
 const HistoryContainer = styled.div`
-    overflow-x: auto;
-    overflow-y: hidden;
     min-height: calc(100% - 53px);
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            overflow-x: auto;
+            overflow-y: hidden;
+        `}
 `;
 
 const HistoryHeaderContainer = styled(DesktopViewHeader)`

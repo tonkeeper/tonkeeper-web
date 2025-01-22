@@ -144,8 +144,8 @@ export const NarrowContent: FC<{
                             />
 
                             <Route path={AppRoute.activity} component={DesktopHistoryPage} />
-                            <Route path={any(AppRoute.purchases)} component={DesktopCollectables} />
-                            <Route path={any(AppRoute.dns)} component={DesktopDns} />
+                            <Route path={AppRoute.purchases} component={DesktopCollectables} />
+                            <Route path={AppRoute.dns} component={DesktopDns} />
                             <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
                             <Route
                                 path={AppRoute.multisigWallets}

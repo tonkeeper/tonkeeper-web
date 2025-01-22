@@ -1,5 +1,5 @@
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
-import { AppProRoute, AppRoute } from '../../../libs/routes';
+import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../Error';
 import { MobileProHeaderWallet } from './MobileProHeaderWallet';
@@ -12,6 +12,13 @@ import { Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
 import { useNavigate } from '../../../hooks/router/useNavigate';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useAllWalletsTotalBalance } from '../../../state/asset';
+import { Skeleton } from '../../shared/Skeleton';
+import { formatFiatCurrency } from '../../../hooks/balance';
+import { useActiveTonNetwork } from '../../../state/wallet';
+import { Link } from 'react-router-dom';
+import { useUserFiat } from '../../../state/fiat';
 
 const MobileProHeaderContainerStyled = styled(MobileProHeaderContainer)`
     position: relative;
@@ -26,9 +33,19 @@ const MobileProHeaderContainerStyled = styled(MobileProHeaderContainer)`
     }
 `;
 
+const BalanceContainer = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+`;
+
 const MobileProHeaderContent = () => {
     const route = useAsideActiveRoute();
     const { t } = useTranslation();
+    const { data: balance, isLoading } = useAllWalletsTotalBalance(Network.MAINNET);
+    const network = useActiveTonNetwork();
+    const fiat = useUserFiat();
 
     if (!route) {
         return <MobileProHeaderWallet />;
@@ -43,7 +60,20 @@ const MobileProHeaderContent = () => {
     }
 
     if (route === AppProRoute.dashboard) {
-        return <MobileProHeaderContentSimple>{t('aside_dashboard')}</MobileProHeaderContentSimple>;
+        return (
+            <MobileProHeaderContentSimple>
+                {isLoading ? (
+                    <Skeleton width="100px" height="36px" />
+                ) : (
+                    <BalanceContainer>
+                        <Label2>{formatFiatCurrency(fiat, balance || 0)}</Label2>
+                    </BalanceContainer>
+                )}
+                {network === Network.TESTNET && (
+                    <Link to={AppRoute.settings + SettingsRoute.dev}>Testnet</Link>
+                )}
+            </MobileProHeaderContentSimple>
+        );
     }
 
     return <MobileProHeaderContainer />;

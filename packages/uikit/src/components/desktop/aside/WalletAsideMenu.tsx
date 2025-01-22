@@ -1,19 +1,22 @@
 import { useLocation } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
-import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
+import { AppProRoute, AppRoute, WalletSettingsRoute } from '../../../libs/routes';
 import {
     useActiveAccount,
     useActiveTonNetwork,
     useIsActiveWalletWatchOnly
 } from '../../../state/wallet';
 import {
+    ArrowDownIcon,
+    ArrowUpIcon,
     BatteryIcon,
     ClockSmoothIcon,
     CoinsIcon,
     InboxIcon,
     ListIcon,
+    PlusIconSmall,
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
@@ -31,11 +34,17 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
+import { ForTargetEnv } from '../../shared/TargetEnv';
+import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { useBuyNotification } from '../../modals/BuyNotificationControlled';
+import { useEffect } from 'react';
+import { useMenuController } from '../../../hooks/ionic';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
     width: fit-content;
-    border-right: 1px solid ${p => p.theme.backgroundContentAttention};
     background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
 
     > a {
@@ -46,6 +55,12 @@ const WalletAsideContainer = styled.div`
     * {
         user-select: none;
     }
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            border-right: 1px solid ${p.theme.backgroundContentAttention};
+        `}
 `;
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
@@ -62,6 +77,10 @@ const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
 `;
 
+const GroupsGap = styled.div`
+    height: 1rem;
+`;
+
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
@@ -70,6 +89,10 @@ export const WalletAsideMenu = () => {
     const account = useActiveAccount();
     const showMultisigs = isAccountCanManageMultisigs(account);
     const network = useActiveTonNetwork();
+    const { onOpen: sendTransfer } = useSendTransferNotification();
+    const navigate = useNavigate();
+    const sdk = useAppSdk();
+    const { onOpen: onBuy } = useBuyNotification();
 
     const isTestnet = network === Network.TESTNET;
 
@@ -79,9 +102,48 @@ export const WalletAsideMenu = () => {
     const canUseBattery =
         (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
 
+    const menuController = useMenuController('wallet-nav');
+    useEffect(() => {
+        menuController.close();
+    }, [location]);
+
     return (
         <WalletAsideContainer>
-            <NavLink to={AppRoute.home}>
+            <ForTargetEnv env="mobile">
+                <AsideMenuItemStyled isSelected={false} onClick={() => sendTransfer()}>
+                    <ArrowUpIcon />
+                    <Label2>{t('wallet_send')}</Label2>
+                </AsideMenuItemStyled>
+                <HideOnReview>
+                    <AsideMenuItemStyled
+                        isSelected={false}
+                        onClick={() => navigate(AppProRoute.multiSend)}
+                    >
+                        <ArrowUpIcon />
+                        <Label2>{t('wallet_multi_send')}</Label2>
+                    </AsideMenuItemStyled>
+                </HideOnReview>
+                <AsideMenuItemStyled
+                    isSelected={false}
+                    onClick={() => {
+                        sdk.uiEvents.emit('receive', {
+                            method: 'receive',
+                            params: {}
+                        });
+                    }}
+                >
+                    <ArrowDownIcon />
+                    <Label2>{t('wallet_receive')}</Label2>
+                </AsideMenuItemStyled>
+                <HideOnReview>
+                    <AsideMenuItemStyled isSelected={false} onClick={onBuy}>
+                        <PlusIconSmall />
+                        <Label2>{t('wallet_buy')}</Label2>
+                    </AsideMenuItemStyled>
+                </HideOnReview>
+                <GroupsGap />
+            </ForTargetEnv>
+            <NavLink to={AppRoute.home} end>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
                         <CoinsIcon />

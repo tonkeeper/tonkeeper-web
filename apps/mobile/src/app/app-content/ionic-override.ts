@@ -21,6 +21,10 @@ export const IonicOverride = css`
             border-top-right-radius: ${p => p.theme.cornerSmall};
             border-bottom-right-radius: ${p => p.theme.cornerSmall};
         }
+
+        &[side='end']::part(container) {
+            border-radius: ${p => p.theme.cornerSmall} 0 0 ${p => p.theme.cornerSmall};
+        }
     }
 
     ion-modal {

@@ -51,6 +51,7 @@ export const DesktopViewHeaderStyled = styled.div<{
     box-sizing: content-box;
     position: sticky;
     top: 0;
+    left: 0;
     z-index: 10;
     background-color: ${p => p.theme.backgroundPage};
 

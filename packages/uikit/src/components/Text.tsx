@@ -1,4 +1,6 @@
 import styled, { css } from 'styled-components';
+import { ForwardedRef, forwardRef, PropsWithChildren } from 'react';
+import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 
 export const H1 = styled.h1`
     font-style: normal;
@@ -159,3 +161,20 @@ export const NoSelectText = css`
     -ms-user-select: none;
     user-select: none;
 `;
+
+const Label2Block = styled(Label2)`
+    display: block;
+`;
+
+export const H3Label2Responsive = forwardRef<
+    HTMLSpanElement,
+    PropsWithChildren<{ className?: string }>
+>((props, ref) => {
+    const isFullWidth = useIsFullWidthMode();
+
+    if (isFullWidth) {
+        return <Label2Block ref={ref} {...props} />;
+    }
+
+    return <H3 ref={ref as ForwardedRef<HTMLHeadingElement>} {...props} />;
+});
