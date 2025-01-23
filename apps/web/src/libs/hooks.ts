@@ -8,7 +8,7 @@ import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 
 export const useAppHeight = () => {
     useEffect(() => {
