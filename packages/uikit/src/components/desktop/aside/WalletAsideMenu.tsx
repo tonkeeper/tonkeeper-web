@@ -41,6 +41,7 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
+import { useShouldReplaceNav } from '../../../hooks/router/useShouldReplaceNav';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -245,9 +246,13 @@ const SettingsListText = styled.div`
 const BatterySettingsListItem = () => {
     const { t } = useTranslation();
     const { data: batteryBalance } = useBatteryBalance();
+    const replaceNavigate = useShouldReplaceNav();
 
     return (
-        <NavLink to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+        <NavLink
+            to={AppRoute.walletSettings + WalletSettingsRoute.battery}
+            replace={replaceNavigate}
+        >
             {({ isActive }) => (
                 <AsideMenuItemStyled isSelected={isActive}>
                     <BatteryIcon />

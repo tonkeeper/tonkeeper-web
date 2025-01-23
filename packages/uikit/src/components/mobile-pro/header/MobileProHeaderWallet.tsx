@@ -28,8 +28,8 @@ const HeaderContainer = styled(MobileProHeaderContainer)`
     display: flex;
     gap: 10px;
     align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
+    justify-content: center;
+    position: relative;
 `;
 
 const TextContainer = styled.div`
@@ -186,7 +186,20 @@ const AsideHeaderMultiChainWallet = () => {
 const WalletNameWrapper = styled(Label2)`
     display: flex !important;
     align-items: center;
+    justify-content: center;
     gap: 6px;
+`;
+
+const WalletEmojiStyled = styled(WalletEmoji)`
+    top: calc(14px + env(safe-area-inset-top));
+    left: 10px;
+    position: absolute;
+`;
+
+const IconButtonStyled = styled(IconButtonTransparentBackground)`
+    top: calc(8px + env(safe-area-inset-top));
+    right: 0;
+    position: absolute;
 `;
 
 const AsideHeaderSingleChainWallet = () => {
@@ -222,7 +235,7 @@ const AsideHeaderSingleChainWallet = () => {
         <>
             <MobileProWalletMenu />
             <HeaderContainer>
-                <WalletEmoji
+                <WalletEmojiStyled
                     emoji={emoji}
                     emojiSize="24px"
                     containerSize="24px"
@@ -247,11 +260,11 @@ const AsideHeaderSingleChainWallet = () => {
                         )}
                     </AddressWrapper>
                 </TextContainer>
-                <IconButtonTransparentBackground
+                <IconButtonStyled
                     onClick={() => (isMenuOpened ? manuController.close() : manuController.open())}
                 >
                     {isMenuOpened ? <ChevronRightIcon /> : <EllipsisIcon />}
-                </IconButtonTransparentBackground>
+                </IconButtonStyled>
             </HeaderContainer>
         </>
     );
