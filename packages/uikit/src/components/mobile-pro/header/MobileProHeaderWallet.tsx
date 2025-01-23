@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import React, { useRef, useState } from 'react';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body2, Body3, Body3Class, Label2 } from '../../Text';
@@ -23,13 +23,21 @@ import { Skeleton } from '../../shared/Skeleton';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useMenuController } from '../../../hooks/ionic';
 import { MobileProWalletMenu, useIsProWalletMenuOpened } from '../MobileProWalletMenu';
+import { useLocation } from 'react-router-dom';
+import { AppRoute } from '../../../libs/routes';
 
-const HeaderContainer = styled(MobileProHeaderContainer)`
+const HeaderContainer = styled(MobileProHeaderContainer)<{ $transparent?: boolean }>`
     display: flex;
     gap: 10px;
     align-items: center;
     justify-content: center;
     position: relative;
+
+    ${p =>
+        p.$transparent &&
+        css`
+            background: transparent;
+        `}
 `;
 
 const TextContainer = styled.div`
@@ -132,6 +140,8 @@ const AsideHeaderMultiChainWallet = () => {
     const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
     const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
 
+    const location = useLocation();
+
     return (
         <SelectDropDown
             top="calc(100% - 12px)"
@@ -164,7 +174,7 @@ const AsideHeaderMultiChainWallet = () => {
                 </DropDownContent>
             )}
         >
-            <HeaderContainer>
+            <HeaderContainer $transparent={location.pathname === AppRoute.home}>
                 <TextContainer>
                     <Label2>{name || t('wallet_title')}</Label2>
                     <MultichainLine>
@@ -231,10 +241,12 @@ const AsideHeaderSingleChainWallet = () => {
     const menuController = useMenuController('aside-nav');
     const [isMenuOpened] = useIsProWalletMenuOpened();
 
+    const location = useLocation();
+
     return (
         <>
             <MobileProWalletMenu />
-            <HeaderContainer>
+            <HeaderContainer $transparent={location.pathname === AppRoute.home}>
                 <WalletEmojiStyled
                     emoji={emoji}
                     emojiSize="24px"

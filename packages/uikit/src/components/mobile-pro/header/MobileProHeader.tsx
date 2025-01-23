@@ -91,9 +91,28 @@ const MobileProHeaderContentSimple: FC<PropsWithChildren> = ({ children }) => {
     );
 };
 
+const HeaderBackground = styled.div`
+    opacity: 1;
+    display: block;
+    content: "''";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background: ${p => p.theme.backgroundContent};
+
+    &.hidden {
+        opacity: 0;
+    }
+`;
+
+export const mobileHeaderBackgroundId = 'mobile-header-background';
+
 export const MobileProHeader = () => {
     return (
         <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display aside header')}>
+            <HeaderBackground id={mobileHeaderBackgroundId} />
             <MobileProHeaderContent />
         </ErrorBoundary>
     );

@@ -13,7 +13,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useAddTronToAccount } from '../../state/wallet';
 import styled from 'styled-components';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { useNavigate } from "../../hooks/router/useNavigate";
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const TokenLogoNotRounded = styled(TokenLogo)`
     border-radius: unset;
@@ -33,7 +33,9 @@ export const TronAssetComponent = forwardRef<
 
     return (
         <ListItem
-            onClick={() => navigate(AppRoute.coins + '/' + assetAmount.asset.id)}
+            onClick={() =>
+                navigate(AppRoute.coins + '/' + assetAmount.asset.id, { replace: false })
+            }
             className={className}
             ref={ref}
         >

@@ -34,14 +34,13 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv } from '../../shared/TargetEnv';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
-import { useShouldReplaceNav } from '../../../hooks/router/useShouldReplaceNav';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -144,14 +143,34 @@ export const WalletAsideMenu = () => {
                 </HideOnReview>
                 <GroupsGap />
             </ForTargetEnv>
-            <NavLink to={AppRoute.home} end>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
-                        <CoinsIcon />
-                        <Label2>{t('wallet_aside_tokens')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
+            <ForTargetEnv env="mobile">
+                <NavLink to={AppRoute.home} end>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <CoinsIcon />
+                            <Label2>Home</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                <NavLink to={AppRoute.coins} end>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                            <CoinsIcon />
+                            <Label2>{t('wallet_aside_tokens')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            </ForTargetEnv>
+            <NotForTargetEnv env="mobile">
+                <NavLink to={AppRoute.home} end>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                            <CoinsIcon />
+                            <Label2>{t('wallet_aside_tokens')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            </NotForTargetEnv>
             <NavLink to={AppRoute.activity}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
@@ -246,13 +265,9 @@ const SettingsListText = styled.div`
 const BatterySettingsListItem = () => {
     const { t } = useTranslation();
     const { data: batteryBalance } = useBatteryBalance();
-    const replaceNavigate = useShouldReplaceNav();
 
     return (
-        <NavLink
-            to={AppRoute.walletSettings + WalletSettingsRoute.battery}
-            replace={replaceNavigate}
-        >
+        <NavLink to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
             {({ isActive }) => (
                 <AsideMenuItemStyled isSelected={isActive}>
                     <BatteryIcon />

@@ -26,17 +26,25 @@ export const useNavigate = () => {
                         : location.pathname + '/' + path;
                 }
 
-                const shouldReplace =
-                    options.replace || (options.replace === undefined && replaceNavigate);
-
                 if (ionRouter.routeInfo !== undefined) {
+                    const isStepBack = location.pathname.startsWith(finalPath);
+
+                    let shouldReplace = options.replace;
+                    if (shouldReplace === undefined) {
+                        if (isStepBack) {
+                            shouldReplace = false;
+                        } else if (!finalPath.startsWith(location.pathname)) {
+                            shouldReplace = true;
+                        }
+                    }
+
                     if (shouldReplace) {
-                        ionRouter.push(finalPath, 'forward', 'replace');
+                        ionRouter.push(finalPath, isStepBack ? 'back' : 'forward', 'replace');
                     } else {
-                        ionRouter.push(finalPath, 'forward', 'push');
+                        ionRouter.push(finalPath, isStepBack ? 'back' : 'forward', 'push');
                     }
                 } else {
-                    if (shouldReplace) {
+                    if (options.replace) {
                         history.replace(finalPath);
                     } else {
                         history.push(finalPath);

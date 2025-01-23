@@ -24,7 +24,6 @@ import { useJettonList } from '../../state/jetton';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useNavigate } from '../../hooks/router/useNavigate';
-import { Address } from '@ton/core';
 
 export interface TonAssetData {
     info: Account;
@@ -54,7 +53,11 @@ export const TonAsset = forwardRef<
     const { fiatPrice, fiatAmount } = useFormatFiat(data, balance.relativeAmount);
 
     return (
-        <ListItem onClick={() => navigate(AppRoute.coins + '/ton')} className={className} ref={ref}>
+        <ListItem
+            onClick={() => navigate(AppRoute.coins + '/ton', { replace: false })}
+            className={className}
+            ref={ref}
+        >
             <ListItemPayload>
                 <TokenLogo src="https://wallet.tonkeeper.com/img/toncoin.svg" />
                 <TokenLayout
@@ -126,7 +129,10 @@ export const JettonAsset = forwardRef<
                     AppRoute.coins +
                         `/${encodeURIComponent(
                             tonAssetAddressToString((balance.asset as TonAssetType).address)
-                        )}`
+                        )}`,
+                    {
+                        replace: false
+                    }
                 )
             }
             className={className}

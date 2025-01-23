@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useLayoutEffect } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Route, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -19,7 +19,6 @@ import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
-import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
 import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
 import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
@@ -41,8 +40,13 @@ import { Notifications } from '@tonkeeper/uikit/dist/pages/settings/Notification
 import { DesktopWalletSettingsPage } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsPage';
 import { ActiveRecovery, Recovery } from '@tonkeeper/uikit/dist/pages/settings/Recovery';
 import { JettonsSettings } from '@tonkeeper/uikit/dist/pages/settings/Jettons';
-import { MobileProHeader } from '@tonkeeper/uikit/dist/components/mobile-pro/header/MobileProHeader';
+import {
+    mobileHeaderBackgroundId,
+    MobileProHeader
+} from '@tonkeeper/uikit/dist/components/mobile-pro/header/MobileProHeader';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
+import { MobileProHomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProHomePage';
+import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -60,10 +64,45 @@ const WideContent = styled.div`
     min-height: 0;
 `;
 
-const WalletLayout = styled.div`
+const Gradient = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 256px;
+    opacity: 0.16;
+
+    background: linear-gradient(
+        180deg,
+        #7665e5 0%,
+        rgba(118, 101, 229, 0.99) 6.67%,
+        rgba(118, 101, 229, 0.96) 13.33%,
+        rgba(118, 101, 229, 0.92) 20%,
+        rgba(118, 101, 229, 0.85) 26.67%,
+        rgba(118, 101, 229, 0.77) 33.33%,
+        rgba(118, 101, 229, 0.67) 40%,
+        rgba(118, 101, 229, 0.56) 46.67%,
+        rgba(118, 101, 229, 0.44) 53.33%,
+        rgba(118, 101, 229, 0.33) 60%,
+        rgba(118, 101, 229, 0.23) 66.67%,
+        rgba(118, 101, 229, 0.15) 73.33%,
+        rgba(118, 101, 229, 0.08) 80%,
+        rgba(118, 101, 229, 0.04) 86.67%,
+        rgba(118, 101, 229, 0.01) 93.33%,
+        rgba(118, 101, 229, 0) 100%
+    );
+
+    &.hidden {
+        opacity: 0;
+    }
+`;
+
+const WalletLayout = styled.div<{ $gradient: boolean }>`
     display: flex;
     flex-direction: column;
     height: 100%;
+
+    position: relative;
 `;
 
 const WalletLayoutBody = styled.div`
@@ -92,6 +131,8 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     justify-content: center;
 `;
 
+export const homeScreenGradientId = 'home-screen-gradient';
+
 export const NarrowContent: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -102,6 +143,16 @@ export const NarrowContent: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+
+    useLayoutEffect(() => {
+        if (location.pathname === AppRoute.home) {
+            document.getElementById(homeScreenGradientId)!.classList.remove('hidden');
+            document.getElementById(mobileHeaderBackgroundId)!.classList.add('hidden');
+        } else {
+            document.getElementById(homeScreenGradientId)!.classList.add('hidden');
+            document.getElementById(mobileHeaderBackgroundId)!.classList.remove('hidden');
+        }
+    }, [location.pathname]);
 
     if (lock) {
         return (
@@ -124,7 +175,8 @@ export const NarrowContent: FC<{
     return (
         <WideLayout>
             <WideContent>
-                <WalletLayout>
+                <WalletLayout $gradient={location.pathname === AppRoute.home}>
+                    <Gradient id={homeScreenGradientId} />
                     <MobileProHeader />
                     <IonMenu menuId="aside-nav" contentId="main-content">
                         <AsideMenu />
@@ -146,7 +198,6 @@ export const NarrowContent: FC<{
                             <Route path={AppRoute.activity} component={DesktopHistoryPage} />
                             <Route path={AppRoute.purchases} component={DesktopCollectables} />
                             <Route path={AppRoute.dns} component={DesktopDns} />
-                            <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
                             <Route
                                 path={AppRoute.multisigWallets}
                                 component={DesktopManageMultisigsPage}
@@ -160,7 +211,9 @@ export const NarrowContent: FC<{
                                 component={DesktopWalletSettingsRouting}
                             />
                             <Route path={AppRoute.swap} component={DesktopSwapPage} />
-                            <Route path={AppRoute.home} exact component={DesktopTokens} />
+                            <Route path={AppRoute.home} exact component={MobileProHomePage} />
+                            <Route path={AppRoute.coins} exact component={DesktopTokens} />
+                            <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
 
                             <Route
                                 path={`${
