@@ -14,6 +14,7 @@ import {
     BatteryIcon,
     ClockSmoothIcon,
     CoinsIcon,
+    HouseIcon,
     InboxIcon,
     ListIcon,
     PlusIconSmall,
@@ -44,7 +45,6 @@ import { useMenuController } from '../../../hooks/ionic';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
-    width: fit-content;
     background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
 
     > a {
@@ -60,6 +60,7 @@ const WalletAsideContainer = styled.div`
         p.theme.proDisplayType === 'desktop' &&
         css`
             border-right: 1px solid ${p.theme.backgroundContentAttention};
+            width: fit-content;
         `}
 `;
 
@@ -110,6 +111,15 @@ export const WalletAsideMenu = () => {
     return (
         <WalletAsideContainer>
             <ForTargetEnv env="mobile">
+                <NavLink to={AppRoute.home} end>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <HouseIcon />
+                            <Label2>{t('wallet_aside_home')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                <GroupsGap />
                 <AsideMenuItemStyled isSelected={false} onClick={() => sendTransfer()}>
                     <ArrowUpIcon />
                     <Label2>{t('wallet_send')}</Label2>
@@ -142,16 +152,6 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 </HideOnReview>
                 <GroupsGap />
-            </ForTargetEnv>
-            <ForTargetEnv env="mobile">
-                <NavLink to={AppRoute.home} end>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <CoinsIcon />
-                            <Label2>Home</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
                 <NavLink to={AppRoute.coins} end>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>

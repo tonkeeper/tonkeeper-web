@@ -69,7 +69,7 @@ const Gradient = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 256px;
+    height: calc(256px + env(safe-area-inset-top));
     opacity: 0.16;
 
     background: linear-gradient(

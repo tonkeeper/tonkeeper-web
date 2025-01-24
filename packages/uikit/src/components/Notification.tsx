@@ -3,6 +3,7 @@ import React, {
     createContext,
     FC,
     forwardRef,
+    Fragment,
     PropsWithChildren,
     ReactElement,
     ReactNode,
@@ -444,6 +445,7 @@ export const Notification: FC<{
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
+    disableHeightAnimation?: boolean;
 }> = props => {
     const targetEnv = useAppTargetEnv();
 
@@ -462,7 +464,17 @@ export const NotificationIonic: FC<{
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
-}> = ({ children, isOpen, hideButton, handleClose, title, footer, className }) => {
+    disableHeightAnimation?: boolean;
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    handleClose,
+    title,
+    footer,
+    className,
+    disableHeightAnimation
+}) => {
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
     const onClose = useCallback(() => {
@@ -483,6 +495,14 @@ export const NotificationIonic: FC<{
         });
     }, [isOpen, children, onClose]);
 
+    const HeightAnimation = useMemo(() => {
+        if (disableHeightAnimation) {
+            return Fragment;
+        }
+
+        return AnimateHeightChange;
+    }, [disableHeightAnimation]);
+
     return (
         <NotificationContext.Provider
             value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
@@ -496,7 +516,7 @@ export const NotificationIonic: FC<{
                 className={className}
             >
                 <IonicModalContentStyled>
-                    <AnimateHeightChange>
+                    <HeightAnimation>
                         <HeaderWrapper ref={setHeaderElement}>
                             {(title || !hideButton) && (
                                 <NotificationHeader className="dialog-header">
@@ -510,8 +530,9 @@ export const NotificationIonic: FC<{
                             )}
                         </HeaderWrapper>
                         {Child}
+                        <Gap />
                         <FooterWrapper ref={setFooterElement}>{footer}</FooterWrapper>
-                    </AnimateHeightChange>
+                    </HeightAnimation>
                 </IonicModalContentStyled>
             </IonModal>
         </NotificationContext.Provider>
@@ -526,6 +547,9 @@ const IonicModalContentStyled = styled(IonContent)`
         border-top-left-radius: ${props => props.theme.cornerMedium};
         padding: 0 1rem 0;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
     }
 
     &::part(background) {

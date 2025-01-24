@@ -1,6 +1,10 @@
 import { css } from 'styled-components';
 
 export const IonicOverride = css`
+    :root {
+        --ion-modal-default-height: calc(100% - (env(safe-area-inset-top) + 10px));
+    }
+
     ion-content {
         --background: ${p => p.theme.backgroundPage} !important;
         --color: ${p => p.theme.textPrimary};

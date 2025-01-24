@@ -19,8 +19,9 @@ import { useAssetsDistribution } from '../../state/asset';
 import { TronAssets } from '../../components/home/TronAssets';
 import { useActiveTronWallet, useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useAppTargetEnv } from '../../hooks/appSdk';
 
-const DesktopAssetStylesOverride = css`
+export const DesktopAssetStylesOverride = css`
     background-color: transparent;
     transition: background-color 0.15s ease-in-out;
     border-radius: 0;
@@ -79,8 +80,6 @@ const Divider = styled.div`
     width: calc(100% + 32px);
 `;
 
-const itemSize = 77;
-
 const DesktopTokensPayload = () => {
     const { assets: allAssets } = useAllChainsAssets() ?? [];
     const [tonAssetAmount, assets] = useMemo(() => {
@@ -112,6 +111,9 @@ const DesktopTokensPayload = () => {
         mutate({ showTokensChart: !showChart });
         setShowChart(!showChart);
     };
+
+    const env = useAppTargetEnv();
+    const itemSize = env === 'mobile' ? 61 : 77;
 
     const virtualScrollPaddingBase = canUseTron && !tronWallet ? 2 * itemSize : itemSize;
 
