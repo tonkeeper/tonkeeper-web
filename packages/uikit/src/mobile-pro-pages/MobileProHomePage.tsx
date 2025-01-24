@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
 import { IonContent, IonPage } from '@ionic/react';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
 import { MobileProWidgetNfts } from '../components/mobile-pro/home/widgets/MobileProWidgetNfts';
@@ -21,7 +21,13 @@ import { Body3, Label2 } from '../components/Text';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, WalletSettingsRoute } from '../libs/routes';
 import { HideOnReview } from '../components/ios/HideOnReview';
-import { useActiveAccount, useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../state/wallet';
+import {
+    useActiveAccount,
+    useActiveTonNetwork,
+    useActiveTonWalletConfig,
+    useIsActiveWalletWatchOnly,
+    useMutateActiveTonWalletConfig
+} from '../state/wallet';
 import { useIsActiveAccountMultisig, useUnviewedAccountOrdersNumber } from '../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -68,16 +74,10 @@ const SwapIconStyled = styled(SwapIcon)`
 
 export const mobileProHomePageId = 'mobile-pro-home-page';
 
-export const MobileProHomePage = () => {
+const useMobileProHomePageNfts = () => {
     const { data: nfts } = useWalletFilteredNftList();
-    const { t } = useTranslation();
-    const isReadOnly = useIsActiveWalletWatchOnly();
-    const isMultisig = useIsActiveAccountMultisig();
-    const account = useActiveAccount();
-    const showMultisigs = isAccountCanManageMultisigs(account);
-    const network = useActiveTonNetwork();
-    const isTestnet = network === Network.TESTNET;
-    const canUseBattery = useCanUseBattery();
+    const { data: config } = useActiveTonWalletConfig();
+    const { mutate: mutateConfig } = useMutateActiveTonWalletConfig();
 
     const filteredNft = useMemo(
         () =>
@@ -89,7 +89,44 @@ export const MobileProHomePage = () => {
         [nfts]
     );
 
-    const showNftWidget = filteredNft?.length && filteredNft.length >= 3;
+    useEffect(() => {
+        if (filteredNft && config && filteredNft.length !== config.cachedOwnCollectablesNumber) {
+            mutateConfig({ cachedOwnCollectablesNumber: filteredNft.length });
+        }
+    }, [filteredNft, config?.cachedOwnCollectablesNumber, mutateConfig]);
+
+    let showNftWidget = !!config;
+    if (config) {
+        if (
+            config.cachedOwnCollectablesNumber === undefined ||
+            config.cachedOwnCollectablesNumber >= 3
+        ) {
+            showNftWidget = true;
+        } else {
+            showNftWidget = false;
+        }
+    }
+
+    if (filteredNft) {
+        showNftWidget = filteredNft.length >= 3;
+    }
+
+    return {
+        filteredNft,
+        showNftWidget
+    };
+};
+
+export const MobileProHomePage = () => {
+    const { t } = useTranslation();
+    const isReadOnly = useIsActiveWalletWatchOnly();
+    const isMultisig = useIsActiveAccountMultisig();
+    const account = useActiveAccount();
+    const showMultisigs = isAccountCanManageMultisigs(account);
+    const network = useActiveTonNetwork();
+    const isTestnet = network === Network.TESTNET;
+    const canUseBattery = useCanUseBattery();
+    const { showNftWidget, filteredNft } = useMobileProHomePageNfts();
 
     return (
         <IonPage id={mobileProHomePageId}>

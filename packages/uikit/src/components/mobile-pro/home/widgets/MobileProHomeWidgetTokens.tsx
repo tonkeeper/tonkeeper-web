@@ -6,9 +6,11 @@ import { AnyChainAsset, TonAsset } from '../../../home/Jettons';
 import { TronAssets } from '../../../home/TronAssets';
 import { DesktopAssetStylesOverride } from '../../../../desktop-pages/tokens/DesktopTokens';
 import { useAllChainsAssets } from '../../../../state/home';
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useActiveTronWallet, useCanUseTronForActiveWallet } from '../../../../state/tron/tron';
+import { SkeletonImage, SkeletonText } from '../../../shared/Skeleton';
+import { ColumnText } from '../../../Layout';
 
 const Wrapper = styled.div`
     padding-top: 0.5rem;
@@ -32,8 +34,25 @@ const Divider = styled.div`
     width: 100%;
 `;
 
-const Skeletons = () => {
-    return null;
+const SkeletonWrapper = styled.div`
+    padding: 8px 16px;
+    height: 44px;
+    box-sizing: content-box;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+`;
+
+const SkeletonRow = () => {
+    return (
+        <SkeletonWrapper>
+            <SkeletonImage width="40px" />
+            <ColumnText
+                text={<SkeletonText width="200px" />}
+                secondary={<SkeletonText size="small" width="40px" />}
+            ></ColumnText>
+        </SkeletonWrapper>
+    );
 };
 
 export const MobileProHomeWidgetTokens = () => {
@@ -70,7 +89,15 @@ export const MobileProHomeWidgetTokens = () => {
                     ))}
                 </>
             ) : (
-                <Skeletons />
+                <>
+                    <Divider />
+                    <SkeletonRow />
+                    <Divider />
+                    <SkeletonRow />
+                    <Divider />
+                    <SkeletonRow />
+                    <Divider />
+                </>
             )}
         </Wrapper>
     );

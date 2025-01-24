@@ -9,6 +9,7 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
+import { hexToRGBA } from '../../../libs/css';
 
 const Grid = styled.div`
     display: grid;
@@ -41,27 +42,34 @@ const VerticalDivider = styled.div<{ $bottom?: boolean }>`
               `}
 `;
 
-const VerticalDividerTopPart = styled.div`
+const Gradient = styled.div<{ $angel: string }>`
+    ${p => css`
+        background: linear-gradient(
+            ${p.$angel},
+            ${p.theme.backgroundContent} 0%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.99)} 6.67%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.96)} 13.33%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.92)} 20%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.85)} 26.67%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.77)} 33.33%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.67)} 40%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.56)} 46.67%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.44)} 53.33%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.33)} 60%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.23)} 66.67%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.15)} 73.33%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.08)} 80%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.04)} 86.67%,
+            ${hexToRGBA(p.theme.backgroundContent, 0.01)} 93.33%,
+            ${hexToRGBA(p.theme.backgroundContent, 0)} 100%
+        );
+    `};
+`;
+
+const Gradient0: FC<{ className?: string }> = p => <Gradient $angel="0deg" {...p} />;
+
+const VerticalDividerTopPart = styled(Gradient0)`
     height: 24px;
-    background: linear-gradient(
-        0deg,
-        #17171a 0%,
-        rgba(23, 23, 26, 0.99) 6.67%,
-        rgba(23, 23, 26, 0.96) 13.33%,
-        rgba(23, 23, 26, 0.92) 20%,
-        rgba(23, 23, 26, 0.85) 26.67%,
-        rgba(23, 23, 26, 0.77) 33.33%,
-        rgba(23, 23, 26, 0.67) 40%,
-        rgba(23, 23, 26, 0.56) 46.67%,
-        rgba(23, 23, 26, 0.44) 53.33%,
-        rgba(23, 23, 26, 0.33) 60%,
-        rgba(23, 23, 26, 0.23) 66.67%,
-        rgba(23, 23, 26, 0.15) 73.33%,
-        rgba(23, 23, 26, 0.08) 80%,
-        rgba(23, 23, 26, 0.04) 86.67%,
-        rgba(23, 23, 26, 0.01) 93.33%,
-        rgba(23, 23, 26, 0) 100%
-    );
 `;
 
 const VerticalDividerCentralPart = styled.div`
@@ -69,27 +77,8 @@ const VerticalDividerCentralPart = styled.div`
     background: ${p => p.theme.backgroundContent};
 `;
 
-const VerticalDividerBottomPart = styled.div`
-    height: 24px;
-    background: linear-gradient(
-        0deg,
-        #17171a 0%,
-        rgba(23, 23, 26, 0.99) 6.67%,
-        rgba(23, 23, 26, 0.96) 13.33%,
-        rgba(23, 23, 26, 0.92) 20%,
-        rgba(23, 23, 26, 0.85) 26.67%,
-        rgba(23, 23, 26, 0.77) 33.33%,
-        rgba(23, 23, 26, 0.67) 40%,
-        rgba(23, 23, 26, 0.56) 46.67%,
-        rgba(23, 23, 26, 0.44) 53.33%,
-        rgba(23, 23, 26, 0.33) 60%,
-        rgba(23, 23, 26, 0.23) 66.67%,
-        rgba(23, 23, 26, 0.15) 73.33%,
-        rgba(23, 23, 26, 0.08) 80%,
-        rgba(23, 23, 26, 0.04) 86.67%,
-        rgba(23, 23, 26, 0.01) 93.33%,
-        rgba(23, 23, 26, 0) 100%
-    );
+const VerticalDividerBottomPart = styled(VerticalDividerTopPart)`
+    transform: rotate(180deg);
 `;
 
 const HorizontalDivider = styled.div`
@@ -99,26 +88,8 @@ const HorizontalDivider = styled.div`
     grid-column: 1 / -1;
 `;
 
-const HorizontalDividerLeftPart = styled.div`
-    background: linear-gradient(
-        90deg,
-        #17171a 0%,
-        rgba(23, 23, 26, 0.99) 6.67%,
-        rgba(23, 23, 26, 0.96) 13.33%,
-        rgba(23, 23, 26, 0.92) 20%,
-        rgba(23, 23, 26, 0.85) 26.67%,
-        rgba(23, 23, 26, 0.77) 33.33%,
-        rgba(23, 23, 26, 0.67) 40%,
-        rgba(23, 23, 26, 0.56) 46.67%,
-        rgba(23, 23, 26, 0.44) 53.33%,
-        rgba(23, 23, 26, 0.33) 60%,
-        rgba(23, 23, 26, 0.23) 66.67%,
-        rgba(23, 23, 26, 0.15) 73.33%,
-        rgba(23, 23, 26, 0.08) 80%,
-        rgba(23, 23, 26, 0.04) 86.67%,
-        rgba(23, 23, 26, 0.01) 93.33%,
-        rgba(23, 23, 26, 0) 100%
-    );
+const Gradient270: FC<{ className?: string }> = p => <Gradient $angel="270deg" {...p} />;
+const HorizontalDividerLeftPart = styled(Gradient270)`
     width: 48px;
 `;
 
@@ -127,26 +98,8 @@ const HorizontalDividerCentralPart = styled.div`
     flex: 1;
 `;
 
-const HorizontalDividerRightPart = styled.div`
-    background: linear-gradient(
-        90deg,
-        #17171a 0%,
-        rgba(23, 23, 26, 0.99) 6.67%,
-        rgba(23, 23, 26, 0.96) 13.33%,
-        rgba(23, 23, 26, 0.92) 20%,
-        rgba(23, 23, 26, 0.85) 26.67%,
-        rgba(23, 23, 26, 0.77) 33.33%,
-        rgba(23, 23, 26, 0.67) 40%,
-        rgba(23, 23, 26, 0.56) 46.67%,
-        rgba(23, 23, 26, 0.44) 53.33%,
-        rgba(23, 23, 26, 0.33) 60%,
-        rgba(23, 23, 26, 0.23) 66.67%,
-        rgba(23, 23, 26, 0.15) 73.33%,
-        rgba(23, 23, 26, 0.08) 80%,
-        rgba(23, 23, 26, 0.04) 86.67%,
-        rgba(23, 23, 26, 0.01) 93.33%,
-        rgba(23, 23, 26, 0) 100%
-    );
+const Gradient90: FC<{ className?: string }> = p => <Gradient $angel="90deg" {...p} />;
+const HorizontalDividerRightPart = styled(Gradient90)`
     width: 48px;
 `;
 
