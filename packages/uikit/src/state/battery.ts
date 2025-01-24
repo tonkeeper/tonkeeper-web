@@ -25,6 +25,12 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useTwoFAWalletConfig } from './two-fa';
 
+export const useCanUseBattery = () => {
+    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
+    const account = useActiveAccount();
+    return (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+};
+
 export const useBatteryApi = () => {
     const config = useActiveConfig();
     return useMemo(() => {

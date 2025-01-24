@@ -32,7 +32,7 @@ import {
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
@@ -99,9 +99,7 @@ export const WalletAsideMenu = () => {
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
-    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
-    const canUseBattery =
-        (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+    const canUseBattery = useCanUseBattery();
 
     const menuController = useMenuController('wallet-nav');
     useEffect(() => {
@@ -180,15 +178,15 @@ export const WalletAsideMenu = () => {
                 )}
             </NavLink>
 
-            <NavLink to={AppRoute.purchases}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
             <HideOnReview>
+                <NavLink to={AppRoute.purchases}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SaleBadgeIcon />
+                            <Label2>{t('wallet_aside_collectibles')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 <NavLink to={AppRoute.dns}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
