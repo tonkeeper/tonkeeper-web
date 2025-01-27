@@ -1,0 +1,13 @@
+diff --git a/components/swipe-back.js b/components/swipe-back.js
+index 88ba82f43cd98120200fee821db26ddfc410a44a..fd0e77f86c3d1a09f34893a7572910eebfd7d02f 100644
+--- a/components/swipe-back.js
++++ b/components/swipe-back.js
+@@ -14,7 +14,7 @@ const createSwipeBackGesture = (el, canStartHandler, onStartHandler, onMoveHandl
+      * to go back gesture should proceed.
+      */
+     const isAtEdge = (detail) => {
+-        const threshold = 50;
++        const threshold = win.innerWidth;
+         const { startX } = detail;
+         if (rtl) {
+             return startX >= win.innerWidth - threshold;
