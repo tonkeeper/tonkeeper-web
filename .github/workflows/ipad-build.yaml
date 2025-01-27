@@ -48,7 +48,7 @@ jobs:
             - name: Pods cache
               uses: actions/cache@v4
               with:
-                  path: ./apps/tablet/ios/App/Pods
+                  path: ./apps/mobile/ios/App/Pods
                   key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-pods-
@@ -58,7 +58,7 @@ jobs:
               with:
                   ruby-version: ${{ env.ruby-version }}
                   bundler-cache: true
-                  working-directory: './apps/tablet'
+                  working-directory: './apps/mobile'
 
             - name: Enable Corepack
               run: |
@@ -78,7 +78,7 @@ jobs:
                   cmd: install
 
             - name: Install pods dependencies
-              working-directory: ./apps/tablet/ios/App
+              working-directory: ./apps/mobile/ios/App
               run: bundle exec pod install
 
             - name: Run build js and capacitor
@@ -96,7 +96,7 @@ jobs:
                   cmd: build:ipad
 
             - name: Build & upload iOS binary
-              working-directory: ./apps/tablet
+              working-directory: ./apps/mobile
               run: bundle exec fastlane ios beta
               env:
                   APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
