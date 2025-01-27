@@ -62,13 +62,8 @@ export class TouchIdTablet implements TouchId {
     };
 }
 
-export const CAPACITOR_APPLICATION_ID = import.meta.env.VITE_APP_CAPACITOR_APPLICATION_ID as
-    | 'tablet'
-    | 'mobile';
-
-if (CAPACITOR_APPLICATION_ID !== 'tablet' && CAPACITOR_APPLICATION_ID !== 'mobile') {
-    throw new Error('VITE_APP_CAPACITOR_APPLICATION_ID must be tablet or mobile');
-}
+export const CAPACITOR_APPLICATION_ID: 'mobile' | 'tablet' =
+    window.innerWidth <= 550 ? 'mobile' : 'tablet';
 
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainTablet();
