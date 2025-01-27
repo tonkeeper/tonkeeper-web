@@ -31,7 +31,7 @@ import {
     TranslationContext,
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, SettingsRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
@@ -41,7 +41,7 @@ import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state
 import { useActiveAccountQuery, useAccountsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from 'react';
-import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { MemoryRouter, Route, Switch, useLocation } from "react-router-dom";
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { Notifications } from './components/Notifications';
@@ -56,6 +56,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -305,51 +306,42 @@ export const Content: FC<{
 
     return (
         <Wrapper standalone recovery={location.pathname.includes(SettingsRoute.recovery)}>
-            <Routes>
+            <Switch>
                 <Route
                     path={AppRoute.activity}
-                    element={
-                        <Suspense fallback={<ActivitySkeletonPage />}>
-                            <Activity />
-                        </Suspense>
-                    }
-                />
+                >
+                    <Suspense fallback={<ActivitySkeletonPage />}>
+                    <Activity />
+                 </Suspense>
+                </Route>
                 <Route
-                    path={any(AppRoute.browser)}
-                    element={
-                        <Suspense fallback={<BrowserSkeletonPage />}>
-                            <Browser />
-                        </Suspense>
-                    }
-                />
+                    path={AppRoute.browser}
+                >
+                    <Suspense fallback={<BrowserSkeletonPage />}>
+                        <Browser />
+                    </Suspense>
+                </Route>
                 <Route
-                    path={any(AppRoute.settings)}
-                    element={
-                        <Suspense fallback={<SettingsSkeletonPage />}>
-                            <Settings />
-                        </Suspense>
-                    }
-                />
-                <Route path={AppRoute.coins}>
-                    <Route
-                        path=":name/*"
-                        element={
-                            <Suspense fallback={<CoinSkeletonPage />}>
-                                <Coin />
-                            </Suspense>
-                        }
-                    />
+                    path={AppRoute.settings}
+                >
+                    <Suspense fallback={<SettingsSkeletonPage />}>
+                        <Settings />
+                    </Suspense>
+                </Route>
+                <Route path={`${AppRoute.coins}/:name`}>
+                    <Suspense fallback={<CoinSkeletonPage />}>
+                        <Coin />
+                    </Suspense>
                 </Route>
                 <Route
                     path={AppRoute.swap}
-                    element={
-                        <Suspense fallback={null}>
-                            <SwapPage />
-                        </Suspense>
-                    }
-                />
-                <Route path="*" element={<IndexPage />} />
-            </Routes>
+                >
+                    <Suspense fallback={null}>
+                        <SwapPage />
+                    </Suspense>
+                </Route>
+                <Route path="*" component={IndexPage} />
+            </Switch>
             <Footer />
             <MemoryScroll />
             <TonConnectSubscription />
