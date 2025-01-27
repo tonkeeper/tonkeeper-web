@@ -189,4 +189,4 @@ export class MockAppSdk extends BaseApp {
     }
 }
 
-export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa' | 'tablet' | 'swap-widget-web';
+export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa' | 'tablet' | 'swap_widget_web';

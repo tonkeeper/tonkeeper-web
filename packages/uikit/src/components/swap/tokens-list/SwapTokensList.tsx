@@ -224,7 +224,7 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
             <TokenInfo>
                 <TokenInfoLine>
                     <Label2>{swapAsset.assetAmount.asset.symbol}</Label2>
-                    {platform === 'swap-widget-web' ? (
+                    {platform === 'swap_widget_web' ? (
                         <div />
                     ) : (
                         <LinkOutIconWrapper href={explorerUrl} onClick={onClickExplorer}>
