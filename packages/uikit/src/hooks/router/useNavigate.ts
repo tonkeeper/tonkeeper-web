@@ -11,6 +11,11 @@ export const useNavigate = () => {
 
     return useCallback(
         (path: string | -1, options: { relative?: 'path'; replace?: boolean } = {}) => {
+            if (typeof path === 'string' && path.startsWith('.')) {
+                options.relative = 'path';
+                path = path.slice(1);
+            }
+
             if (path === -1) {
                 if (ionRouter.routeInfo !== undefined) {
                     ionRouter.goBack();
@@ -21,9 +26,10 @@ export const useNavigate = () => {
                 let finalPath = path;
 
                 if (options.relative === 'path') {
-                    finalPath = location.pathname.endsWith('/')
-                        ? location.pathname + path
-                        : location.pathname + '/' + path;
+                    finalPath =
+                        location.pathname.endsWith('/') || path.startsWith('/')
+                            ? location.pathname + path
+                            : location.pathname + '/' + path;
                 }
 
                 if (ionRouter.routeInfo !== undefined) {

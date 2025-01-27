@@ -1,4 +1,4 @@
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { SettingsHeader } from '../../components/Header';
 import { ProSettings } from '../../components/settings/ProSettings';
@@ -23,27 +23,31 @@ import { BatteryPage } from './Battery';
 import { TwoFAPage } from './TwoFA';
 
 const SettingsRouter = () => {
+    const { path } = useRouteMatch();
     return (
         <Switch>
-            <Route path={SettingsRoute.localization} component={Localization} />
-            <Route path={SettingsRoute.legal} component={Legal} />
-            <Route path={SettingsRoute.dev} component={DevSettings} />
-            <Route path={SettingsRoute.fiat} component={FiatCurrency} />
-            <Route path={SettingsRoute.account} component={Account} />
-            <Route path={SettingsRoute.notification} component={Notifications} />
-            <Route path={`${SettingsRoute.recovery}/:accountId`} component={Recovery} />
-            <Route path={SettingsRoute.recovery} component={ActiveRecovery} exact />
-            <Route path={SettingsRoute.version} component={WalletVersionPage} />
-            <Route path={SettingsRoute.ledgerIndexes} component={LedgerIndexesPage} />
-            <Route path={SettingsRoute.jettons} component={JettonsSettings} />
-            <Route path={SettingsRoute.nft} component={NFTSettings} />
-            <Route path={SettingsRoute.security} component={SecuritySettings} />
-            <Route path={SettingsRoute.country} component={CountrySettings} />
-            <Route path={SettingsRoute.pro} component={ProSettings} />
-            <Route path={WalletSettingsRoute.connectedApps} component={ConnectedAppsSettings} />
-            <Route path={WalletSettingsRoute.derivations} component={MAMIndexesPage} />
-            <Route path={WalletSettingsRoute.battery} component={BatteryPage} />
-            <Route path={WalletSettingsRoute.twoFa} component={TwoFAPage} />
+            <Route path={path + SettingsRoute.localization} component={Localization} />
+            <Route path={path + SettingsRoute.legal} component={Legal} />
+            <Route path={path + SettingsRoute.dev} component={DevSettings} />
+            <Route path={path + SettingsRoute.fiat} component={FiatCurrency} />
+            <Route path={path + SettingsRoute.account} component={Account} />
+            <Route path={path + SettingsRoute.notification} component={Notifications} />
+            <Route path={path + `${SettingsRoute.recovery}/:accountId`} component={Recovery} />
+            <Route path={path + SettingsRoute.recovery} component={ActiveRecovery} exact />
+            <Route path={path + SettingsRoute.version} component={WalletVersionPage} />
+            <Route path={path + SettingsRoute.ledgerIndexes} component={LedgerIndexesPage} />
+            <Route path={path + SettingsRoute.jettons} component={JettonsSettings} />
+            <Route path={path + SettingsRoute.nft} component={NFTSettings} />
+            <Route path={path + SettingsRoute.security} component={SecuritySettings} />
+            <Route path={path + SettingsRoute.country} component={CountrySettings} />
+            <Route path={path + SettingsRoute.pro} component={ProSettings} />
+            <Route
+                path={path + WalletSettingsRoute.connectedApps}
+                component={ConnectedAppsSettings}
+            />
+            <Route path={path + WalletSettingsRoute.derivations} component={MAMIndexesPage} />
+            <Route path={path + WalletSettingsRoute.battery} component={BatteryPage} />
+            <Route path={path + WalletSettingsRoute.twoFa} component={TwoFAPage} />
             <Route
                 path="*"
                 render={() => (

@@ -17,17 +17,16 @@ import {
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppRoute, SignerRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, SignerRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useEffect, useMemo } from "react";
+import React, { FC, Suspense, useMemo } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
 import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
-import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -133,11 +132,6 @@ export const MobileContent: FC<{
     standalone: boolean;
 }> = ({ activeAccount, lock, standalone }) => {
     const location = useLocation();
-    const nav = useNavigate();
-
-    useEffect(() => {
-      nav(AppRoute.activity)
-    }, [nav])
 
     if (lock) {
         return (
@@ -185,21 +179,19 @@ export const MobileContent: FC<{
                 </Suspense>
                 </Route>
                 <Route
-                    path={any(AppRoute.browser)}
+                    path={AppRoute.browser}
                 > <Suspense fallback={<BrowserSkeletonPage />}>
                   <Browser />
                 </Suspense></Route>
                 <Route
-                    path={any(AppRoute.settings)}
+                    path={AppRoute.settings}
                 > <Suspense fallback={<SettingsSkeletonPage />}>
                   <Settings />
                 </Suspense></Route>
-                <Route path={AppRoute.coins}>
-                    <Route
-                        path=":name/*"
-                    > <Suspense fallback={<CoinSkeletonPage />}>
+                <Route path={`${AppRoute.coins}/:name`}>
+                    <Suspense fallback={<CoinSkeletonPage />}>
                       <Coin />
-                    </Suspense></Route>
+                    </Suspense>
                 </Route>
                 <Route
                     path={AppRoute.swap}
