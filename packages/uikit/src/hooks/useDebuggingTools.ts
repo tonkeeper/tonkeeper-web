@@ -97,7 +97,7 @@ export const useSwapWidgetDebuggingTools = () => {
                         return;
                     }
 
-                    window.localStorage.setItem('test-injection-context', 'true');
+                    window.localStorage.setItem('tonkeeper::test-injection-context', 'true');
                 }
             };
         }
