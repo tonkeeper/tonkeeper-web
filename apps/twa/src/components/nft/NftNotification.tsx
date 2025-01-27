@@ -2,10 +2,7 @@ import { useMainButton } from '@tma.js/sdk-react';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import { RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import {
-    TonTransferParams,
-    parseTonTransferWithAddress
-} from '@tonkeeper/core/dist/service/deeplinkingService';
+import { parseTonTransferWithAddress } from '@tonkeeper/core/dist/service/deeplinkingService';
 import { ConfirmViewButtons } from '@tonkeeper/uikit/dist/components/transfer/ConfirmView';
 import {
     RecipientView,
@@ -17,7 +14,6 @@ import {
     duration
 } from '@tonkeeper/uikit/dist/components/transfer/common';
 import { ConfirmNftView } from '@tonkeeper/uikit/dist/components/transfer/nft/ConfirmNftView';
-import { useMinimalBalance } from '@tonkeeper/uikit/dist/components/transfer/nft/hooks';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';

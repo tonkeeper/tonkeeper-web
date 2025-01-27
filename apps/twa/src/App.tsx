@@ -26,7 +26,7 @@ import {
     TranslationContext,
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
 import { Platform as TwaPlatform, initViewport } from '@tma.js/sdk';
@@ -51,7 +51,7 @@ import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, useLocation } from "react-router-dom";
 import styled, { ThemeProvider } from 'styled-components';
 import StandardErrorBoundary from './components/ErrorBoundary';
 import { InitDataLogger } from './components/InitData';
@@ -64,6 +64,7 @@ import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -357,10 +358,12 @@ const Content: FC<{
 
     return (
         <>
-            <Routes>
-                <Route path={AppRoute.swap} element={<SwapScreen />} />
-                <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
-            </Routes>
+            <Switch>
+                <Route path={AppRoute.swap} component={SwapScreen} />
+                <Route path="*">
+                    <MainPages showQrScan={showQrScan} sdk={sdk} />
+                </Route>
+            </Switch>
             <Suspense>
                 <PairSignerNotification />
                 <PairKeystoneNotification />
@@ -394,55 +397,46 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
     return (
         <TwaNotification>
             <Wrapper standalone={getUsePadding(sdk.launchParams.platform)}>
-                <Routes>
+                <Switch>
                     <Route
                         path={AppRoute.activity}
-                        element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
-                            </Suspense>
-                        }
-                    />
+                    >
+                        <Suspense fallback={<ActivitySkeletonPage />}>
+                            <Activity />
+                        </Suspense>
+                    </Route>
                     <Route
-                        path={any(AppRoute.browser)}
-                        element={
-                            <Suspense fallback={<BrowserSkeletonPage />}>
-                                <Browser />
-                            </Suspense>
-                        }
-                    />
+                        path={AppRoute.browser}
+                    >
+                        <Suspense fallback={<BrowserSkeletonPage />}>
+                            <Browser />
+                        </Suspense>
+                    </Route>
                     <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
-                    <Route path={AppRoute.coins}>
-                        <Route
-                            path=":name/*"
-                            element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
-                                </Suspense>
-                            }
-                        />
+                        path={AppRoute.settings}
+                    >
+                        <Suspense fallback={<SettingsSkeletonPage />}>
+                            <Settings />
+                        </Suspense>
+                    </Route>
+                    <Route path={`${AppRoute.coins}/:name`}>
+                        <Suspense fallback={<CoinSkeletonPage />}>
+                            <Coin />
+                        </Suspense>
                     </Route>
                     <Route
                         path="*"
-                        element={
-                            <>
-                                <Header showQrScan={showQrScan} />
-                                <InnerBody>
-                                    <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
-                                    </Suspense>
-                                </InnerBody>
-                            </>
-                        }
-                    />
-                </Routes>
+                    >
+                        <>
+                            <Header showQrScan={showQrScan} />
+                            <InnerBody>
+                                <Suspense fallback={<HomeSkeleton />}>
+                                    <Home />
+                                </Suspense>
+                            </InnerBody>
+                        </>
+                    </Route>
+                </Switch>
                 <Footer standalone={getUsePadding(sdk.launchParams.platform)} />
                 <MemoryScroll />
                 <Suspense>
