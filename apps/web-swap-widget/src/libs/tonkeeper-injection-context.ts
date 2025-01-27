@@ -35,7 +35,7 @@ export const getTonkeeperInjectionContext = () => {
 };
 
 export const provideMockInjectionContext = () => {
-    if (getWindow()?.localStorage.getItem('test-injection-context') !== 'true') {
+    if (getWindow()?.localStorage.getItem('tonkeeper::test-injection-context') !== 'true') {
         return;
     }
 
