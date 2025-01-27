@@ -146,11 +146,11 @@ export const NarrowContent: FC<{
 
     useLayoutEffect(() => {
         if (location.pathname === AppRoute.home) {
-            document.getElementById(homeScreenGradientId)!.classList.remove('hidden');
-            document.getElementById(mobileHeaderBackgroundId)!.classList.add('hidden');
+            document.getElementById(homeScreenGradientId)?.classList.remove('hidden');
+            document.getElementById(mobileHeaderBackgroundId)?.classList.add('hidden');
         } else {
-            document.getElementById(homeScreenGradientId)!.classList.add('hidden');
-            document.getElementById(mobileHeaderBackgroundId)!.classList.remove('hidden');
+            document.getElementById(homeScreenGradientId)?.classList.add('hidden');
+            document.getElementById(mobileHeaderBackgroundId)?.classList.remove('hidden');
         }
     }, [location.pathname]);
 
