@@ -1,11 +1,11 @@
 import { TonConnectSSE } from "@tonkeeper/core/dist/service/tonConnect/ton-connect-sse";
-import { TabletStorage } from "./storage";
+import { CapacitorStorage } from "./storage";
 import { AccountConnection } from "@tonkeeper/core/dist/service/tonConnect/connectionService";
 import { SendTransactionAppRequest } from "@tonkeeper/core/dist/entries/tonConnect";
 import { App } from "@capacitor/app";
 
 export const tonConnectSSE = new TonConnectSSE({
-  storage: new TabletStorage(),
+  storage: new CapacitorStorage(),
   listeners: {
     onDisconnect: connection => {
       onDisconnectListeners.forEach(listener => listener(connection));

@@ -1,4 +1,4 @@
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom';
+import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import { ProSettings } from '../../components/settings/ProSettings';
 import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Localization } from '../../pages/settings/Localization';
@@ -23,9 +23,11 @@ const OldSettingsLayoutWrapper = styled.div`
 `;
 
 export const DesktopPreferencesRouting = () => {
+    const { path } = useRouteMatch();
+
     return (
         <Switch>
-            <Route path={SettingsRoute.account} component={DesktopManageAccountsPage} />
+            <Route path={path + SettingsRoute.account} component={DesktopManageAccountsPage} />
 
             <Route
                 path={[
@@ -42,45 +44,65 @@ export const DesktopPreferencesRouting = () => {
                     SettingsRoute.security,
                     SettingsRoute.country,
                     SettingsRoute.pro
-                ]}
+                ].map(item => path + item)}
                 render={() => (
                     <OldSettingsLayoutWrapper>
                         <Switch>
-                            <Route path={SettingsRoute.localization} component={Localization} />
-                            <Route path={SettingsRoute.legal} component={Legal} />
-                            <Route path={SettingsRoute.theme} component={UserTheme} />
-                            <Route path={SettingsRoute.dev} component={DevSettings} />
-                            <Route path={SettingsRoute.fiat} component={FiatCurrency} />
-                            <Route path={SettingsRoute.notification} component={Notifications} />
-                            <Route path={SettingsRoute.recovery} component={NavigateToRecovery} />
-                            <Route path={SettingsRoute.version}>
+                            <Route
+                                path={path + SettingsRoute.localization}
+                                component={Localization}
+                            />
+                            <Route path={path + SettingsRoute.legal} component={Legal} />
+                            <Route path={path + SettingsRoute.theme} component={UserTheme} />
+                            <Route path={path + SettingsRoute.dev} component={DevSettings} />
+                            <Route path={path + SettingsRoute.fiat} component={FiatCurrency} />
+                            <Route
+                                path={path + SettingsRoute.notification}
+                                component={Notifications}
+                            />
+                            <Route
+                                path={path + SettingsRoute.recovery}
+                                component={NavigateToRecovery}
+                            />
+                            <Route path={path + SettingsRoute.version}>
                                 <Redirect
                                     to={AppRoute.walletSettings + WalletSettingsRoute.version}
                                 />
                             </Route>
-                            <Route path={SettingsRoute.jettons}>
+                            <Route path={path + SettingsRoute.jettons}>
                                 <Redirect
                                     to={AppRoute.walletSettings + WalletSettingsRoute.jettons}
                                 />
                             </Route>
-                            <Route path={SettingsRoute.twoFa}>
+                            <Route path={path + SettingsRoute.twoFa}>
                                 <Redirect
                                     to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}
                                 />
                             </Route>
-                            <Route path={SettingsRoute.security} component={SecuritySettings} />
-                            <Route path={SettingsRoute.country} component={CountrySettings} />
-                            <Route path={SettingsRoute.pro} component={ProSettings} />
+                            <Route
+                                path={path + SettingsRoute.security}
+                                component={SecuritySettings}
+                            />
+                            <Route
+                                path={path + SettingsRoute.country}
+                                component={CountrySettings}
+                            />
+                            <Route path={path + SettingsRoute.pro} component={ProSettings} />
                             <Route
                                 path="*"
-                                render={() => <Redirect to={SettingsRoute.account} />}
+                                render={() => (
+                                    <Redirect to={AppRoute.settings + SettingsRoute.account} />
+                                )}
                             />
                         </Switch>
                     </OldSettingsLayoutWrapper>
                 )}
             />
 
-            <Route path="*" render={() => <Redirect to={SettingsRoute.account} />} />
+            <Route
+                path="*"
+                render={() => <Redirect to={AppRoute.settings + SettingsRoute.account} />}
+            />
         </Switch>
     );
 };

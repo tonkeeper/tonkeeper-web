@@ -7,7 +7,7 @@ import {
     TouchId
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
-import { TabletStorage } from './storage';
+import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
 import { getWindow } from './utils';
 import { Biometric, SecureStorage } from './plugins';
@@ -70,7 +70,7 @@ if (CAPACITOR_APPLICATION_ID !== 'tablet' && CAPACITOR_APPLICATION_ID !== 'mobil
     throw new Error('VITE_APP_CAPACITOR_APPLICATION_ID must be tablet or mobile');
 }
 
-export class TabletAppSdk extends BaseApp implements IAppSdk {
+export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainTablet();
 
     cookie = new CookieTablet();
@@ -83,7 +83,7 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
     touchId = new TouchIdTablet(this.topMessage.bind(this));
 
     constructor() {
-        super(new TabletStorage());
+        super(new CapacitorStorage());
     }
 
     copyToClipboard = async (value: string, notification?: string) => {
@@ -106,7 +106,7 @@ export class TabletAppSdk extends BaseApp implements IAppSdk {
     };
 }
 
-export const getTabletOS = async () => {
+export const getCapacitorDeviceOS = async () => {
     const info = await Device.getInfo();
     return info.platform;
 };

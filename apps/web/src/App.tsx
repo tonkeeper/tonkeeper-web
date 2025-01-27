@@ -103,8 +103,10 @@ const Providers: FC<PropsWithChildren> = () => {
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
+    const isMobile = useLayout();
+
     return (
-        <UserThemeProvider isPro={data?.valid} isProSupported>
+        <UserThemeProvider isPro={data?.valid} isProSupported proDisplayType="desktop" displayType={isMobile ? 'compact' : 'full-width'}>
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />

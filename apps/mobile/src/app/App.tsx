@@ -38,11 +38,11 @@ import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createGlobalStyle } from 'styled-components';
-import { CAPACITOR_APPLICATION_ID, TabletAppSdk } from '../libs/appSdk';
-import { useAnalytics, useAppHeight, useLayout } from '../libs/hooks';
+import { CAPACITOR_APPLICATION_ID, CapacitorAppSdk } from '../libs/appSdk';
+import { useAnalytics, useAppHeight } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
-import { TabletNotifications } from '../libs/tabletNotifications';
+import { CapacitorNotifications } from '../libs/capacitorNotifications';
 import { homeScreenGradientId, NarrowContent } from './app-content/NarrowContent';
 import { createAnimation, IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
@@ -50,6 +50,7 @@ import { IonicOverride } from './app-content/ionic-override';
 import type { TransitionOptions } from '@ionic/core/dist/types/utils/transition';
 import { mobileProHomePageId } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProHomePage';
 import { mobileHeaderBackgroundId } from '@tonkeeper/uikit/dist/components/mobile-pro/header/MobileProHeader';
+import { WideContent } from './app-content/WideContent';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -146,7 +147,7 @@ const GlobalStyle = createGlobalStyle`
     }
 `;
 
-const sdk = new TabletAppSdk();
+const sdk = new CapacitorAppSdk();
 
 const langs = import.meta.env.VITE_APP_LOCALES;
 
@@ -162,7 +163,9 @@ export const Providers = () => {
             i18n: {
                 enable: true,
                 reloadResources: i18n.reloadResources,
-                changeLanguage: i18n.changeLanguage as any,
+                changeLanguage: async (lang: string) => {
+                    await i18n.changeLanguage(lang);
+                },
                 language: i18n.language,
                 languages: languages
             }
@@ -257,7 +260,7 @@ export const Loader: FC = () => {
 
     useEffect(() => {
         if (config && config.mainnetConfig.tonapiIOEndpoint) {
-            sdk.notifications = new TabletNotifications(config.mainnetConfig, sdk.storage);
+            sdk.notifications = new CapacitorNotifications(config.mainnetConfig, sdk.storage);
         }
     }, [config]);
 
@@ -315,12 +318,9 @@ const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = props => {
-    const isMobile = useLayout();
-
-    if (isMobile) {
+    if (CAPACITOR_APPLICATION_ID === 'mobile') {
         return <NarrowContent {...props} />;
     }
 
-    // return <WideContent {...props} />;
-    return <NarrowContent {...props} />;
+    return <WideContent {...props} />;
 };

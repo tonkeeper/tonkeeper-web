@@ -1,12 +1,11 @@
-import { NotificationService } from "@tonkeeper/core/dist/AppSdk";
-import { TonContract } from "@tonkeeper/core/dist/entries/wallet";
-import { PushNotifications, Token } from "@capacitor/push-notifications";
-import { TonendpointConfig } from "@tonkeeper/core/dist/tonkeeperApi/tonendpoint";
-import { Device } from "@capacitor/device";
-import { APIConfig } from "@tonkeeper/core/dist/entries/apis";
-import { IStorage } from "@tonkeeper/core/dist/Storage";
-import { AppKey } from "@tonkeeper/core/dist/Keys";
-
+import { NotificationService } from '@tonkeeper/core/dist/AppSdk';
+import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
+import { PushNotifications, Token } from '@capacitor/push-notifications';
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { Device } from '@capacitor/device';
+import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
+import { IStorage } from '@tonkeeper/core/dist/Storage';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 const requestPushPermission = async () => {
     const permission = await PushNotifications.requestPermissions();
@@ -38,34 +37,41 @@ const requestPushPermission = async () => {
     await PushNotifications.register();
 
     return p;
-}
+};
 
 const removeLastSlash = (url: string) => url.replace(/\/$/, '');
 
-export class TabletNotifications implements NotificationService {
+export class CapacitorNotifications implements NotificationService {
     private readonly baseUrl: string;
+
     constructor(config: TonendpointConfig, private readonly storage: IStorage) {
         this.baseUrl = removeLastSlash(config.tonapiIOEndpoint!);
     }
 
-    async subscribe(_: APIConfig, wallet: TonContract, __: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>) {
+    async subscribe(
+        _: APIConfig,
+        wallet: TonContract,
+        __: (bufferToSign: Buffer) => Promise<Buffer | Uint8Array>
+    ) {
         const token = await requestPushPermission();
 
         const endpoint = `${this.baseUrl}/v1/internal/pushes/plain/subscribe`;
         const deviceId = await Device.getId();
 
-        const result = await (await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                locale:  (await Device.getLanguageCode()).value,
-                device: deviceId.identifier,
-                accounts: [{ address: wallet.rawAddress }],
-                token
-            }),
-        })).json();
+        const result = await (
+            await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    locale: (await Device.getLanguageCode()).value,
+                    device: deviceId.identifier,
+                    accounts: [{ address: wallet.rawAddress }],
+                    token
+                })
+            })
+        ).json();
 
         if (!result.ok) {
             throw new Error('Subscribe failed due to API error');
@@ -75,20 +81,23 @@ export class TabletNotifications implements NotificationService {
         records[wallet.rawAddress] = true;
         await this.storage.set(AppKey.NOTIFICATIONS, records);
     }
+
     async unsubscribe(address?: string) {
         const deviceId = await Device.getId();
         const endpoint = `${this.baseUrl}/v1/internal/pushes/plain/unsubscribe`;
 
-        const result = await (await fetch(endpoint, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                device: deviceId.identifier,
-                accounts: address ? [{ address }] : undefined
-            }),
-        })).json();
+        const result = await (
+            await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    device: deviceId.identifier,
+                    accounts: address ? [{ address }] : undefined
+                })
+            })
+        ).json();
 
         if (!result.ok) {
             throw new Error('Unsubscribe failed due to API error');
@@ -98,18 +107,21 @@ export class TabletNotifications implements NotificationService {
         if (address) {
             records[address] = false;
         } else {
-            records = {}
+            records = {};
         }
 
         await PushNotifications.unregister();
         await this.storage.set(AppKey.NOTIFICATIONS, records);
     }
+
     async subscribeTonConnect() {
         // TODO
     }
+
     async unsubscribeTonConnect() {
         // TODO
     }
+
     async subscribed(address: string) {
         const records = await this.getRecords();
         return records[address] ?? false;

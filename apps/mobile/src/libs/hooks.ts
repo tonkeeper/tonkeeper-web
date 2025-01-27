@@ -5,7 +5,7 @@ import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/h
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect, useState } from 'react';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
-import { CAPACITOR_APPLICATION_ID, getTabletOS } from './appSdk';
+import { CAPACITOR_APPLICATION_ID, getCapacitorDeviceOS } from './appSdk';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useNavigate } from '@tonkeeper/uikit/src/hooks/router/useNavigate';
@@ -66,7 +66,7 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
                 accounts: accounts!,
                 network,
                 version,
-                platform: `${CAPACITOR_APPLICATION_ID}-${await getTabletOS()}`
+                platform: `${CAPACITOR_APPLICATION_ID}-${await getCapacitorDeviceOS()}`
             });
 
             return tracker;

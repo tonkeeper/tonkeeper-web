@@ -402,7 +402,6 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         document.documentElement.classList.add('no-user-select');
                     }}
                 />
-                )
             </NotForTargetEnv>
         </AsideContainer>
     );
