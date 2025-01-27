@@ -7506,6 +7506,7 @@ __metadata:
     "@types/node": "npm:^20.10.3"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
+    "@types/react-router-dom": "npm:^5.3.3"
     "@types/tough-cookie": "npm:^4"
     "@types/uuid": "npm:^9.0.7"
     "@typescript-eslint/eslint-plugin": "npm:^5.0.0"
@@ -7534,7 +7535,7 @@ __metadata:
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
     react-i18next: "npm:^13.5.0"
-    react-router-dom: "npm:^6.20.1"
+    react-router-dom: "npm:^5.3.4"
     stream-browserify: "npm:^3.0.0"
     style-loader: "npm:^3.0.0"
     styled-components: "npm:^6.1.1"
@@ -7640,7 +7641,6 @@ __metadata:
     copy-to-clipboard: "npm:^3.3.3"
     crypto-browserify: "npm:^3.12.0"
     eventsource: "npm:^2.0.2"
-    history: "npm:^4.10.1"
     i18next: "npm:^23.7.7"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"
@@ -17413,7 +17413,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"history@npm:^4.10.1, history@npm:^4.9.0":
+"history@npm:^4.9.0":
   version: 4.10.1
   resolution: "history@npm:4.10.1"
   dependencies:
@@ -24642,7 +24642,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:^6.20.1, react-router-dom@npm:^6.4.5":
+"react-router-dom@npm:^6.4.5":
   version: 6.21.0
   resolution: "react-router-dom@npm:6.21.0"
   dependencies:

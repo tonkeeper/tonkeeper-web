@@ -55,10 +55,9 @@ import {
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppProRoute, AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppProRoute, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
-import ImportRouter from '@tonkeeper/uikit/dist/pages/import';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProvider';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
@@ -71,15 +70,7 @@ import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/d
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-    Outlet,
-    Route,
-    RouterProvider,
-    Routes,
-    createMemoryRouter,
-    useLocation,
-    useNavigate
-} from 'react-router-dom';
+import { Route, useLocation, Switch, MemoryRouter } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import { DesktopAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight, useAppWidth } from '../libs/hooks';
@@ -89,7 +80,6 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
-import { TronApi } from '@tonkeeper/core/dist/tronApi';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -176,21 +166,23 @@ export const Providers = () => {
     );
 };
 
-const router = createMemoryRouter([
-    {
-        path: '/*',
-        element: <Providers />
-    }
-]);
-
 export const App = () => {
-    return <RouterProvider router={router} />;
+    return (
+        <MemoryRouter>
+            <Providers />
+        </MemoryRouter>
+    );
 };
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
     return (
-        <UserThemeProvider displayType="full-width" isPro={data?.valid} isProSupported>
+        <UserThemeProvider
+            displayType="full-width"
+            isPro={data?.valid}
+            isProSupported
+            proDisplayType="desktop"
+        >
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
@@ -391,17 +383,14 @@ export const Content: FC<{
         <WideLayout>
             <AsideMenu />
             <WideContent>
-                <Routes>
-                    <Route path={AppProRoute.dashboard} element={<DashboardPage />} />
-                    <Route path={AppRoute.browser} element={<DesktopBrowser />} />
-                    <Route path={any(AppRoute.settings)} element={<PreferencesContent />} />
-                    <Route path={any(AppProRoute.multiSend)} element={<DesktopMultiSendPage />} />
-                    <Route
-                        path={any(AppRoute.accountSettings)}
-                        element={<DesktopAccountSettingsPage />}
-                    />
-                    <Route path="*" element={<WalletContent />} />
-                </Routes>
+                <Switch>
+                    <Route path={AppProRoute.dashboard} component={DashboardPage} />
+                    <Route path={AppRoute.browser} component={DesktopBrowser} />
+                    <Route path={AppRoute.settings} component={PreferencesContent} />
+                    <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
+                    <Route path={AppRoute.accountSettings} component={DesktopAccountSettingsPage} />
+                    <Route path="*" component={WalletContent} />
+                </Switch>
             </WideContent>
             <BackgroundElements />
         </WideLayout>
@@ -416,33 +405,29 @@ const WalletContent = () => {
             <WalletLayoutBody>
                 <WalletAsideMenu />
                 <WalletRoutingWrapper className="hide-scrollbar">
-                    <Routes>
-                        <Route element={<OldAppRouting />}>
-                            <Route path={AppRoute.activity} element={<DesktopHistoryPage />} />
-                            <Route
-                                path={any(AppRoute.purchases)}
-                                element={<DesktopCollectables />}
-                            />
-                            <Route path={any(AppRoute.dns)} element={<DesktopDns />} />
-                            <Route path={AppRoute.coins}>
-                                <Route path=":name/*" element={<DesktopCoinPage />} />
-                            </Route>
+                    <Wrapper>
+                        <Switch>
+                            <Route path={AppRoute.activity} component={DesktopHistoryPage} />
+                            <Route path={AppRoute.purchases} component={DesktopCollectables} />
+                            <Route path={AppRoute.dns} component={DesktopDns} />
+                            <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
                             <Route
                                 path={AppRoute.multisigWallets}
-                                element={<DesktopManageMultisigsPage />}
+                                component={DesktopManageMultisigsPage}
                             />
                             <Route
                                 path={AppRoute.multisigOrders}
-                                element={<DesktopMultisigOrdersPage />}
+                                component={DesktopMultisigOrdersPage}
                             />
                             <Route
-                                path={any(AppRoute.walletSettings)}
-                                element={<DesktopWalletSettingsRouting />}
+                                path={AppRoute.walletSettings}
+                                component={DesktopWalletSettingsRouting}
                             />
-                            <Route path={AppRoute.swap} element={<DesktopSwapPage />} />
-                            <Route path="*" element={<DesktopTokens />} />
-                        </Route>
-                    </Routes>
+                            <Route path={AppRoute.swap} component={DesktopSwapPage} />
+                            <Route path="*" component={DesktopTokens} />
+                        </Switch>
+                        <MemoryScroll />
+                    </Wrapper>
                 </WalletRoutingWrapper>
             </WalletLayoutBody>
         </WalletLayout>
@@ -460,15 +445,6 @@ const PreferencesContent = () => {
                 </PreferencesRoutingWrapper>
             </PreferencesLayout>
         </>
-    );
-};
-
-const OldAppRouting = () => {
-    return (
-        <Wrapper>
-            <Outlet />
-            <MemoryScroll />
-        </Wrapper>
     );
 };
 
