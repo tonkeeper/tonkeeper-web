@@ -7,13 +7,13 @@ export const useMenuController = (type: 'aside-nav' | 'wallet-nav') => {
                 const menu = document.querySelector(
                     `ion-menu[menu-id="${type}"]`
                 ) as HTMLIonMenuElement | null;
-                menu?.open();
+                return menu?.open();
             },
             close: () => {
                 const menu = document.querySelector(
                     `ion-menu[menu-id="${type}"]`
                 ) as HTMLIonMenuElement | null;
-                menu?.close();
+                return menu?.close();
             }
         };
     }, [type]);

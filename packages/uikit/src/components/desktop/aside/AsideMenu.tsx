@@ -45,7 +45,7 @@ const AsideContainer = styled.div<{ width: number }>`
     ${p =>
         p.theme.proDisplayType === 'desktop' &&
         css`
-            border-right: 1px solid ${theme.backgroundContentAttention};
+            border-right: 1px solid ${p.theme.backgroundContentAttention};
         `}
 
     * {
@@ -191,13 +191,14 @@ export const AsideMenuDNDItem = forwardRef<
     }, [location.pathname, menuController]);
 
     const onClickWallet = useCallback(
-        (walletId: WalletId) => {
-            menuController.close();
+        async (walletId: WalletId) => {
             if (shouldNavigateHome(location.pathname)) {
                 setOptimisticActiveRoute(undefined);
             }
             setOptimisticWalletId(walletId);
-            setActiveWallet(walletId).then(handleNavigateHome);
+            await menuController.close();
+            await setActiveWallet(walletId);
+            handleNavigateHome();
         },
         [setActiveWallet, handleNavigateHome, location.pathname, menuController]
     );

@@ -14,6 +14,14 @@ export const IonicOverride = css`
         * {
             box-sizing: content-box;
         }
+
+        &::part(scroll) {
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
     }
 
     ion-menu {

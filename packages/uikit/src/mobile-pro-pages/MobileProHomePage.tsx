@@ -38,12 +38,13 @@ const IonContentStyled = styled(IonContent)`
     &::part(background) {
         background: transparent;
     }
+
+    &::part(scroll) {
+        padding-bottom: env(safe-area-inset-bottom);
+        overscroll-behavior: auto;
+    }
 `;
 
-const PageWrapper = styled.div`
-    overflow: auto;
-    height: 100%;
-`;
 const MobileProHomeBalanceStyled = styled(MobileProHomeBalance)`
     margin: 32px 8px 8px;
 `;
@@ -131,44 +132,42 @@ export const MobileProHomePage = () => {
     return (
         <IonPage id={mobileProHomePageId}>
             <IonContentStyled>
-                <PageWrapper>
-                    <MobileProHomeBalanceStyled />
-                    <MobileProHomeActionsStyled />
-                    <MobileProHomeWidgetTokens />
-                    {showNftWidget && <MobileProWidgetNfts nfts={filteredNft} />}
-                    <MenuWrapper>
-                        <HideOnReview>
-                            {!showNftWidget && (
-                                <MenuItem to={AppRoute.purchases}>
-                                    <SaleBadgeIcon />
-                                    <Label2>{t('wallet_aside_collectibles')}</Label2>
-                                </MenuItem>
-                            )}
-                            <MenuItem to={AppRoute.dns}>
-                                <SparkIcon />
-                                <Label2>{t('wallet_aside_domains')}</Label2>
+                <MobileProHomeBalanceStyled />
+                <MobileProHomeActionsStyled />
+                <MobileProHomeWidgetTokens />
+                {showNftWidget && <MobileProWidgetNfts nfts={filteredNft} />}
+                <MenuWrapper>
+                    <HideOnReview>
+                        {!showNftWidget && (
+                            <MenuItem to={AppRoute.purchases}>
+                                <SaleBadgeIcon />
+                                <Label2>{t('wallet_aside_collectibles')}</Label2>
                             </MenuItem>
-                            {!isReadOnly && !isTestnet && (
-                                <MenuItem to={AppRoute.swap}>
-                                    <SwapIconStyled />
-                                    <Label2>{t('wallet_swap')}</Label2>
-                                </MenuItem>
-                            )}
-                            {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
-                            {showMultisigs && !isTestnet && (
-                                <MenuItem to={AppRoute.multisigWallets}>
-                                    <ListIcon />
-                                    <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                                </MenuItem>
-                            )}
-                            {canUseBattery && <BatterySettingsListItem />}
-                        </HideOnReview>
-                        <MenuItem to={AppRoute.walletSettings}>
-                            <SettingsSmoothIcon />
-                            <Label2>{t('wallet_aside_settings')}</Label2>
+                        )}
+                        <MenuItem to={AppRoute.dns}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
                         </MenuItem>
-                    </MenuWrapper>
-                </PageWrapper>
+                        {!isReadOnly && !isTestnet && (
+                            <MenuItem to={AppRoute.swap}>
+                                <SwapIconStyled />
+                                <Label2>{t('wallet_swap')}</Label2>
+                            </MenuItem>
+                        )}
+                        {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+                        {showMultisigs && !isTestnet && (
+                            <MenuItem to={AppRoute.multisigWallets}>
+                                <ListIcon />
+                                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                            </MenuItem>
+                        )}
+                        {canUseBattery && <BatterySettingsListItem />}
+                    </HideOnReview>
+                    <MenuItem to={AppRoute.walletSettings}>
+                        <SettingsSmoothIcon />
+                        <Label2>{t('wallet_aside_settings')}</Label2>
+                    </MenuItem>
+                </MenuWrapper>
             </IonContentStyled>
         </IonPage>
     );

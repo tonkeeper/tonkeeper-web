@@ -96,10 +96,10 @@ const HeaderBackground = styled.div`
     display: block;
     content: "''";
     position: absolute;
-    top: 0;
+    top: calc(0 + env(safe-area-inset-top));
     left: 0;
     right: 0;
-    height: 52px;
+    height: calc(52px + env(safe-area-inset-top));
     background: ${p => p.theme.backgroundContent};
 
     &.hidden {

@@ -114,6 +114,7 @@ const DesktopTokensPayload = () => {
 
     const env = useAppTargetEnv();
     const itemSize = env === 'mobile' ? 61 : 77;
+    const chartSize = env === 'mobile' ? 388 : 192;
 
     const virtualScrollPaddingBase = canUseTron && !tronWallet ? 2 * itemSize : itemSize;
 
@@ -123,7 +124,9 @@ const DesktopTokensPayload = () => {
         estimateSize: () => itemSize,
         getItemKey: index => assets![index].asset.id,
         paddingStart:
-            canShowChart && showChart ? 192 + virtualScrollPaddingBase : virtualScrollPaddingBase
+            canShowChart && showChart
+                ? chartSize + virtualScrollPaddingBase
+                : virtualScrollPaddingBase
     });
 
     const onTokenClick = useCallback(
