@@ -4159,7 +4159,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/core@npm:8.4.2, @ionic/core@npm:^8.4.1":
+"@ionic/core@npm:8.4.2":
   version: 8.4.2
   resolution: "@ionic/core@npm:8.4.2"
   dependencies:
@@ -7713,7 +7713,7 @@ __metadata:
     "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
-    "@ionic/core": "npm:^8.4.1"
+    "@ionic/core": "npm:^8.4.2"
     "@ionic/react": "npm:^8.4.2"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ngraveio/bc-ur": "npm:^1.1.13"
