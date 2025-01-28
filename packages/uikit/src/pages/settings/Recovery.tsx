@@ -22,11 +22,13 @@ import { Navigate } from '../../components/shared/Navigate';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useParams } from '../../hooks/router/useParams';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
     if (isMnemonicAndPassword(account)) {
-        return <RecoveryContent accountId={account.id} />;
+        return <RecoveryPageContent accountId={account.id} />;
     } else {
         return <Navigate to="../" replace={true} />;
     }
@@ -40,7 +42,7 @@ export const Recovery = () => {
     }, [searchParams, location]);
 
     if (accountId) {
-        return <RecoveryContent accountId={accountId} walletId={walletId} />;
+        return <RecoveryPageContent accountId={accountId} walletId={walletId} />;
     } else {
         return <ActiveRecovery />;
     }
@@ -102,6 +104,24 @@ const TronButton = styled.button`
 const SpinnerRingStyled = styled(SpinnerRing)`
     margin: 16px auto;
 `;
+
+const RecoveryPageContent: FC<{
+    accountId: AccountId;
+    walletId?: WalletId;
+    isPage?: boolean;
+    onClose?: () => void;
+}> = props => {
+    const isDesktopPro = useIsFullWidthMode();
+    if (isDesktopPro) {
+        return (
+            <DesktopViewPageLayout>
+                <RecoveryContent {...props} />
+            </DesktopViewPageLayout>
+        );
+    }
+
+    return <RecoveryContent {...props} />;
+};
 
 export const RecoveryContent: FC<{
     accountId: AccountId;

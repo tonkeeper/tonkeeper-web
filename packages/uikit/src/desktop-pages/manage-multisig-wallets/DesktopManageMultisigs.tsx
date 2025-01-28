@@ -29,7 +29,7 @@ import {
 import { styled } from 'styled-components';
 import { Dot } from '../../components/Dot';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
@@ -41,7 +41,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { Navigate } from '../../components/shared/Navigate';
-import { useNavigate } from "../../hooks/router/useNavigate";
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -64,6 +64,7 @@ export const DesktopManageMultisigsPage = () => {
     const activeAccount = useActiveAccount();
     const isActiveAccountMultisigManagable = isAccountCanManageMultisigs(activeAccount);
     const { onOpen: addWallet } = useAddWalletNotification();
+    const env = useAppTargetEnv();
 
     if (!isActiveAccountMultisigManagable) {
         return <Navigate to={AppRoute.home} />;
@@ -71,7 +72,7 @@ export const DesktopManageMultisigsPage = () => {
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
-            <DesktopViewHeader borderBottom={!closeTop}>
+            <DesktopViewHeader borderBottom={!closeTop} backButton={env === 'mobile'}>
                 <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
                 <NewMultisigButton onClick={() => addWallet({ walletType: 'multisig' })}>
                     {t('add_wallet_new_multisig_title')}

@@ -7,7 +7,7 @@ import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { SwapProviders } from '../../components/swap/SwapProviders';
 import { css, styled } from 'styled-components';
 import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -56,6 +56,7 @@ const DesktopSwapPageContent = () => {
     const { isSwapsEnabled } = useSwapsConfig();
     const sdk = useAppSdk();
     const swapLink = useStonfiSwapLink(swapFromAsset$.value.address, swapToAsset$.value.address);
+    const env = useAppTargetEnv();
 
     if (!isSwapsEnabled) {
         sdk.openPage(swapLink);
@@ -64,7 +65,7 @@ const DesktopSwapPageContent = () => {
 
     return (
         <SwapPageWrapper>
-            <DesktopViewHeader backButton={false}>
+            <DesktopViewHeader backButton={env === 'mobile'}>
                 <Label2>{t('wallet_swap')}</Label2>
                 <HeaderButtons>
                     <SwapRefreshButton />

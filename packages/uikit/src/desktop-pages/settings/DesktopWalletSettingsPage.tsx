@@ -42,9 +42,9 @@ import {
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import React from 'react';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
-import { useNavigate } from "../../hooks/router/useNavigate";
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -117,10 +117,11 @@ export const DesktopWalletSettingsPage = () => {
     const canViewTwoFA = useCanViewTwoFA();
 
     const notificationsAvailable = useAppSdk().notifications !== undefined;
+    const env = useAppTargetEnv();
 
     return (
         <DesktopViewPageLayout>
-            <DesktopViewHeader borderBottom>
+            <DesktopViewHeader borderBottom backButton={env === 'mobile'}>
                 <Label2>{t('settings_title')}</Label2>
             </DesktopViewHeader>
             <SettingsListBlock>

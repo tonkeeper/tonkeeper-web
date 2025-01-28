@@ -49,9 +49,12 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
 
 const TokensHeaderContainer = styled(DesktopViewHeader)`
     flex-shrink: 0;
-    justify-content: space-between;
     border-bottom: 1px solid ${p => p.theme.separatorCommon};
     padding-right: 0;
+
+    > *:nth-child(3) {
+        margin-left: auto;
+    }
 `;
 
 const TokensPageBody = styled.div`
@@ -151,7 +154,7 @@ const DesktopTokensPayload = () => {
 
     return (
         <DesktopViewPageLayout ref={containerRef}>
-            <TokensHeaderContainer>
+            <TokensHeaderContainer backButton={env === 'mobile'}>
                 <Label2>{t('jettons_list_title')}</Label2>
                 {canShowChart && (
                     <HideButton onClick={onToggleChart}>

@@ -1,5 +1,5 @@
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
-import { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -14,7 +14,7 @@ import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonListWithImages } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { H3 } from '../../components/Text';
+import { H3, Label2 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useJettonRawList,
@@ -30,6 +30,11 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useTronBalances } from '../../state/tron/tron';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    DesktopViewHeader,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -248,14 +253,11 @@ const Title = styled(H3)`
     margin: 14px 0;
 `;
 
-export const JettonsSettings = () => {
-    const { t } = useTranslation();
-
+const useSettingsAssets = () => {
     const { data: jettons } = useJettonRawList();
     const { data: tronBalances } = useTronBalances();
-    const { data: config } = useActiveTonWalletConfig();
 
-    const assets = useMemo(() => {
+    return useMemo(() => {
         if (!jettons || tronBalances === undefined) {
             return undefined;
         }
@@ -267,6 +269,23 @@ export const JettonsSettings = () => {
 
         return [tronBalances.usdt as AssetAmount].concat(tonAssets as AssetAmount[]);
     }, [jettons, tronBalances]);
+};
+
+export const JettonsSettings = () => {
+    const isFullWidth = useIsFullWidthMode();
+
+    if (isFullWidth) {
+        return <JettonsSettingsProMode />;
+    }
+
+    return <JettonsSettingsClassicMode />;
+};
+
+const JettonsSettingsClassicMode = () => {
+    const { t } = useTranslation();
+
+    const { data: config } = useActiveTonWalletConfig();
+    const assets = useSettingsAssets();
 
     if (!assets || !config) {
         return <JettonSkeleton />;
@@ -276,22 +295,69 @@ export const JettonsSettings = () => {
         <>
             <SubHeader title={t('settings_jettons_list')} />
             <InnerBody>
-                {config.pinnedTokens.length > 0 ? (
-                    <>
-                        <Title>{t('pinned_jettons')}</Title>
-                        <PinnedJettonList jettons={assets} config={config} />
-                    </>
-                ) : undefined}
-
-                <Title>{t('all_assets_jettons')}</Title>
-                <ListBlock>
-                    {assets.map(jetton => (
-                        <ListItemElement key={jetton.asset.id} hover={false} ios={true}>
-                            <SampleJettonRow jetton={jetton} config={config} />
-                        </ListItemElement>
-                    ))}
-                </ListBlock>
+                <JettonsSettingsContent config={config} assets={assets} />
             </InnerBody>
+        </>
+    );
+};
+
+const DesktopContentWrapper = styled.div`
+    padding: 0 1rem;
+`;
+
+const JettonsSettingsProMode = () => {
+    const { data: config } = useActiveTonWalletConfig();
+    const assets = useSettingsAssets();
+    const { t } = useTranslation();
+
+    if (!assets || !config) {
+        return (
+            <DesktopViewPageLayout>
+                <DesktopViewHeader backButton>
+                    <Label2>{t('settings_jettons_list')}</Label2>
+                </DesktopViewHeader>
+                <DesktopContentWrapper>
+                    <SkeletonListWithImages size={5} />
+                </DesktopContentWrapper>
+            </DesktopViewPageLayout>
+        );
+    }
+
+    return (
+        <DesktopViewPageLayout>
+            <DesktopViewHeader backButton>
+                <Label2>{t('settings_jettons_list')}</Label2>
+            </DesktopViewHeader>
+
+            <DesktopContentWrapper>
+                <JettonsSettingsContent config={config} assets={assets} />
+            </DesktopContentWrapper>
+        </DesktopViewPageLayout>
+    );
+};
+
+const JettonsSettingsContent: FC<{ config: TonWalletConfig; assets: AssetAmount[] }> = ({
+    config,
+    assets
+}) => {
+    const { t } = useTranslation();
+    return (
+        <>
+            {config.pinnedTokens.length > 0 ? (
+                <>
+                    <Title>{t('pinned_jettons')}</Title>
+                    <PinnedJettonList jettons={assets} config={config} />
+                </>
+            ) : undefined}
+
+            <Title>{t('all_assets_jettons')}</Title>
+            <ListBlock>
+                {assets.map(jetton => (
+                    <ListItemElement key={jetton.asset.id} hover={false} ios={true}>
+                        <SampleJettonRow jetton={jetton} config={config} />
+                    </ListItemElement>
+                ))}
+            </ListBlock>
         </>
     );
 };

@@ -23,7 +23,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { IconButton, IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { BatteryRechargeNotification } from '../../components/settings/battery/BatteryRechargeNotification';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppRoute } from '../../libs/routes';
@@ -82,11 +82,12 @@ export const BatteryPageLayout: FC = () => {
     const isFullWidth = useIsFullWidthMode();
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const env = useAppTargetEnv();
 
     if (isFullWidth) {
         return (
             <DesktopViewPageLayout>
-                <DesktopViewHeaderStyled borderBottom>
+                <DesktopViewHeaderStyled borderBottom backButton={env === 'mobile'}>
                     <Label2>{t('battery_title')}</Label2>
                     {data?.batteryUnitsBalance.gt(0) && (
                         <SettingsButton onClick={onOpen}>

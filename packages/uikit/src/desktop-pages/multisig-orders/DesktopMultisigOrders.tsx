@@ -16,7 +16,7 @@ import React, { FC, useEffect, useMemo } from 'react';
 import { Button } from '../../components/fields/Button';
 
 import { styled } from 'styled-components';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { Multisig, type MultisigOrder, Risk } from '@tonkeeper/core/dist/tonApiV2';
 import { AppRoute } from '../../libs/routes';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
@@ -30,7 +30,7 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
 import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 import { useActiveConfig } from '../../state/wallet';
-import { Navigate } from "../../components/shared/Navigate";
+import { Navigate } from '../../components/shared/Navigate';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -40,6 +40,7 @@ export const DesktopMultisigOrdersPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { t } = useTranslation();
     const isAccountMultisig = useIsActiveAccountMultisig();
+    const env = useAppTargetEnv();
 
     if (!isAccountMultisig) {
         return <Navigate to={AppRoute.home} />;
@@ -47,7 +48,7 @@ export const DesktopMultisigOrdersPage = () => {
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
-            <DesktopViewHeader borderBottom={!closeTop}>
+            <DesktopViewHeader borderBottom={!closeTop} backButton={env === 'mobile'}>
                 <Label2>{t('wallet_aside_orders')}</Label2>
             </DesktopViewHeader>
             <DesktopMultisigOrdersPageBody />
