@@ -1,5 +1,5 @@
 diff --git a/components/swipe-back.js b/components/swipe-back.js
-index 88ba82f43cd98120200fee821db26ddfc410a44a..fd0e77f86c3d1a09f34893a7572910eebfd7d02f 100644
+index 88ba82f43cd98120200fee821db26ddfc410a44a..035f6db859a6f340bcc064516827e06abec40e53 100644
 --- a/components/swipe-back.js
 +++ b/components/swipe-back.js
 @@ -14,7 +14,7 @@ const createSwipeBackGesture = (el, canStartHandler, onStartHandler, onMoveHandl
@@ -11,3 +11,12 @@ index 88ba82f43cd98120200fee821db26ddfc410a44a..fd0e77f86c3d1a09f34893a7572910ee
          const { startX } = detail;
          if (rtl) {
              return startX >= win.innerWidth - threshold;
+@@ -48,7 +48,7 @@ const createSwipeBackGesture = (el, canStartHandler, onStartHandler, onMoveHandl
+         const width = win.innerWidth;
+         const stepValue = delta / width;
+         const velocity = getVelocityX(detail);
+-        const z = width / 2.0;
++        const z = width / 6.0;
+         const shouldComplete = velocity >= 0 && (velocity > 0.2 || delta > z);
+         const missing = shouldComplete ? 1 - stepValue : stepValue;
+         const missingDistance = missing * width;
