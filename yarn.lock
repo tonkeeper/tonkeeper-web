@@ -4170,14 +4170,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/core@patch:@ionic/core@npm%3A8.4.1#~/.yarn/patches/@ionic-core-npm-8.4.1-06aafe2c49.patch":
-  version: 8.4.1
-  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.1#~/.yarn/patches/@ionic-core-npm-8.4.1-06aafe2c49.patch::version=8.4.1&hash=1815ca"
+"@ionic/core@npm:^8.4.1":
+  version: 8.4.2
+  resolution: "@ionic/core@npm:8.4.2"
   dependencies:
     "@stencil/core": "npm:4.20.0"
     ionicons: "npm:^7.2.2"
     tslib: "npm:^2.1.0"
-  checksum: 10/c3d7077ded328a4cfdd3476f15b741896e75d80c1abbf59ac19ab738eaa3350a00d14d20e75975e6f26b3d2554567787c99a2def816db485405b77d9a862b3bb
+  checksum: 10/ab6cd446cc03512016d31a9649e41fdbfa847392f0da4534257ac9e2ce6cff2c0e45ae4ba59932ada05258e89b8a3ede934ff1c4e89d37751e126ba17940f9ed
   languageName: node
   linkType: hard
 
@@ -7724,7 +7724,7 @@ __metadata:
     "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
-    "@ionic/core": "patch:@ionic/core@npm%3A8.4.1#~/.yarn/patches/@ionic-core-npm-8.4.1-06aafe2c49.patch"
+    "@ionic/core": "npm:^8.4.1"
     "@ionic/react": "npm:^8.4.1"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ngraveio/bc-ur": "npm:^1.1.13"
