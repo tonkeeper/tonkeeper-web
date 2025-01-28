@@ -29,7 +29,10 @@ import {
     useIsActiveAccountMultisig,
     useUnviewedAccountOrdersNumber
 } from '../../../state/multisig';
-import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
+import {
+    isAccountCanManageMultisigs,
+    isAccountTonWalletStandard
+} from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
@@ -96,6 +99,7 @@ export const WalletAsideMenu = () => {
     const { onOpen: onBuy } = useBuyNotification();
 
     const isTestnet = network === Network.TESTNET;
+    const isStandardTonWallet = isAccountTonWalletStandard(account);
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -118,18 +122,22 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
                 <GroupsGap />
-                <AsideMenuItemStyled isSelected={false} onClick={() => sendTransfer()}>
-                    <ArrowUpIcon />
-                    <Label2>{t('wallet_send')}</Label2>
-                </AsideMenuItemStyled>
-                <HideOnReview>
-                    <AsideMenuItemStyled
-                        isSelected={false}
-                        onClick={() => navigate(AppProRoute.multiSend)}
-                    >
+                {!isReadOnly && (
+                    <AsideMenuItemStyled isSelected={false} onClick={() => sendTransfer()}>
                         <ArrowUpIcon />
-                        <Label2>{t('wallet_multi_send')}</Label2>
+                        <Label2>{t('wallet_send')}</Label2>
                     </AsideMenuItemStyled>
+                )}
+                <HideOnReview>
+                    {!isReadOnly && isStandardTonWallet && (
+                        <AsideMenuItemStyled
+                            isSelected={false}
+                            onClick={() => navigate(AppProRoute.multiSend)}
+                        >
+                            <ArrowUpIcon />
+                            <Label2>{t('wallet_multi_send')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
                 </HideOnReview>
                 <AsideMenuItemStyled
                     isSelected={false}

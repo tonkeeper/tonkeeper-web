@@ -10,6 +10,14 @@ import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
 import { hexToRGBA } from '../../../libs/css';
+import {
+    useActiveAccount,
+    useActiveTonNetwork,
+    useIsActiveWalletWatchOnly
+} from '../../../state/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const Grid = styled.div`
     display: grid;
@@ -17,13 +25,20 @@ const Grid = styled.div`
     grid-template-rows: 72px 1px 72px;
 `;
 
-const ActionCell = styled.div`
+const ActionCell = styled.div<{ $disabled?: boolean }>`
     padding: 16px 8px;
     gap: 4px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
+    ${p =>
+        p.$disabled &&
+        css`
+            opacity: 0.35;
+            pointer-events: none;
+        `}
 
     svg {
         color: ${p => p.theme.iconSecondary};
@@ -110,10 +125,15 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
     const sdk = useAppSdk();
     const { onOpen: onBuy } = useBuyNotification();
     const { onScan, NotificationComponent } = useSmartScanner();
+    const activeAccount = useActiveAccount();
+
+    const isReadOnly = useIsActiveWalletWatchOnly();
+    const isTestnet = useActiveTonNetwork() === Network.TESTNET;
+    const isStandardTon = isAccountTonWalletStandard(activeAccount);
 
     return (
         <Grid className={className}>
-            <ActionCell onClick={() => sendTransfer()}>
+            <ActionCell $disabled={isReadOnly} onClick={() => sendTransfer()}>
                 <ArrowUpIcon />
                 <Label2>{t('wallet_send')}</Label2>
             </ActionCell>
@@ -136,35 +156,43 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
                 <VerticalDividerTopPart />
                 <VerticalDividerCentralPart />
             </VerticalDivider>
-            <ActionCell onClick={onScan}>
+            <ActionCell onClick={onScan} $disabled={isReadOnly}>
                 <ScanIcon />
                 <Label2>{t('wallet_scan_btn')}</Label2>
             </ActionCell>
-            <HorizontalDivider>
-                <HorizontalDividerLeftPart />
-                <HorizontalDividerCentralPart />
-                <HorizontalDividerRightPart />
-            </HorizontalDivider>
-            <ActionCell onClick={() => navigate(AppRoute.swap)}>
-                <SwapIcon />
-                <Label2>{t('wallet_swap')}</Label2>
-            </ActionCell>
-            <VerticalDivider $bottom>
-                <VerticalDividerCentralPart />
-                <VerticalDividerBottomPart />
-            </VerticalDivider>
-            <ActionCell onClick={() => navigate(AppProRoute.multiSend)}>
-                <ArrowUpIcon />
-                <Label2>{t('wallet_multi_send')}</Label2>
-            </ActionCell>
-            <VerticalDivider $bottom>
-                <VerticalDividerCentralPart />
-                <VerticalDividerBottomPart />
-            </VerticalDivider>
-            <ActionCell onClick={onBuy}>
-                <PlusIcon />
-                <Label2>{t('wallet_buy')}</Label2>
-            </ActionCell>
+            <HideOnReview>
+                <HorizontalDivider>
+                    <HorizontalDividerLeftPart />
+                    <HorizontalDividerCentralPart />
+                    <HorizontalDividerRightPart />
+                </HorizontalDivider>
+                <ActionCell
+                    onClick={() => navigate(AppRoute.swap)}
+                    $disabled={isReadOnly || !isStandardTon || isTestnet}
+                >
+                    <SwapIcon />
+                    <Label2>{t('wallet_swap')}</Label2>
+                </ActionCell>
+                <VerticalDivider $bottom>
+                    <VerticalDividerCentralPart />
+                    <VerticalDividerBottomPart />
+                </VerticalDivider>
+                <ActionCell
+                    onClick={() => navigate(AppProRoute.multiSend)}
+                    $disabled={isReadOnly || !isStandardTon}
+                >
+                    <ArrowUpIcon />
+                    <Label2>{t('wallet_multi_send')}</Label2>
+                </ActionCell>
+                <VerticalDivider $bottom>
+                    <VerticalDividerCentralPart />
+                    <VerticalDividerBottomPart />
+                </VerticalDivider>
+                <ActionCell onClick={onBuy}>
+                    <PlusIcon />
+                    <Label2>{t('wallet_buy')}</Label2>
+                </ActionCell>
+            </HideOnReview>
             {NotificationComponent}
         </Grid>
     );
