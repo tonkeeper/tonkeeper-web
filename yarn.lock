@@ -4170,17 +4170,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/core@patch:@ionic/core@npm%3A8.4.1#~/.yarn/patches/@ionic-core-npm-8.4.1-06aafe2c49.patch":
-  version: 8.4.1
-  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.1#~/.yarn/patches/@ionic-core-npm-8.4.1-06aafe2c49.patch::version=8.4.1&hash=9fd8ff"
-  dependencies:
-    "@stencil/core": "npm:4.20.0"
-    ionicons: "npm:^7.2.2"
-    tslib: "npm:^2.1.0"
-  checksum: 10/98ccd888433f31e4cabcb24b8c444d4ef6d45b831d615f137bb0f7bdc4a5e679041eecfe8fae3b2d954ba77b501a81f8a83f353232025bc7f28c36ede96ab16b
-  languageName: node
-  linkType: hard
-
 "@ionic/react-router@npm:^8.4.1":
   version: 8.4.1
   resolution: "@ionic/react-router@npm:8.4.1"
@@ -7724,7 +7713,7 @@ __metadata:
     "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
-    "@ionic/core": "patch:@ionic/core@npm%3A8.4.1#~/.yarn/patches/@ionic-core-npm-8.4.1-06aafe2c49.patch"
+    "@ionic/core": "npm:8.4.1"
     "@ionic/react": "npm:^8.4.1"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ngraveio/bc-ur": "npm:^1.1.13"
