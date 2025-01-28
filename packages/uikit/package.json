@@ -16,8 +16,8 @@
     "dependencies": {
         "@amplitude/analytics-browser": "^2.1.0",
         "@aptabase/web": "^0.4.2",
-        "@ionic/core": "^8.4.2",
-        "@ionic/react": "^8.4.1",
+        "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch",
+        "@ionic/react": "^8.4.2",
         "@keystonehq/keystone-sdk": "0.7.2",
         "@ngraveio/bc-ur": "^1.1.13",
         "@tanstack/react-query": "4.3.4",

@@ -4159,18 +4159,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/core@npm:8.4.1":
-  version: 8.4.1
-  resolution: "@ionic/core@npm:8.4.1"
-  dependencies:
-    "@stencil/core": "npm:4.20.0"
-    ionicons: "npm:^7.2.2"
-    tslib: "npm:^2.1.0"
-  checksum: 10/79995543f5d4629c8bbfcc53d8d80714730fad342bc04b102c4270d1cdd73720b86738e07df644128e66372cc37cd3a5ec287bc7494fb8f36d10d286cf8c2b50
-  languageName: node
-  linkType: hard
-
-"@ionic/core@npm:^8.4.2":
+"@ionic/core@npm:8.4.2, @ionic/core@npm:^8.4.1":
   version: 8.4.2
   resolution: "@ionic/core@npm:8.4.2"
   dependencies:
@@ -4181,32 +4170,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ionic/react-router@npm:^8.4.1":
-  version: 8.4.1
-  resolution: "@ionic/react-router@npm:8.4.1"
+"@ionic/react-router@npm:^8.4.2":
+  version: 8.4.2
+  resolution: "@ionic/react-router@npm:8.4.2"
   dependencies:
-    "@ionic/react": "npm:8.4.1"
+    "@ionic/react": "npm:8.4.2"
     tslib: "npm:*"
   peerDependencies:
     react: ">=16.8.6"
     react-dom: ">=16.8.6"
     react-router: ^5.0.1
     react-router-dom: ^5.0.1
-  checksum: 10/a40b5875111605939c055e7e34d08544d1d5949b31ca578a5e36bb6c979c690ef520c59c470351f0bc34b608fd29fdbead0a822adc3742fb026a407283630b66
+  checksum: 10/bca3498263a0ba6e00052925b538cf5810a5d9211b19eaf3596feccff91e977e935a56bd906151364e45945c322d1b3442ce2526382399f5a363a8c90ac7b993
   languageName: node
   linkType: hard
 
-"@ionic/react@npm:8.4.1, @ionic/react@npm:^8.4.1":
-  version: 8.4.1
-  resolution: "@ionic/react@npm:8.4.1"
+"@ionic/react@npm:8.4.2, @ionic/react@npm:^8.4.2":
+  version: 8.4.2
+  resolution: "@ionic/react@npm:8.4.2"
   dependencies:
-    "@ionic/core": "npm:8.4.1"
+    "@ionic/core": "npm:8.4.2"
     ionicons: "npm:^7.0.0"
     tslib: "npm:*"
   peerDependencies:
     react: ">=16.8.6"
     react-dom: ">=16.8.6"
-  checksum: 10/efc58e75652f580165f05bf2b2981553e096ca6c010f333efaf77d420e9500027e30dab4919ae21e1b94f0fe654c5aaffca9d8bc1db46b1c7765d3e2c949ff22
+  checksum: 10/53f37afeda2d4dd2ba8010618ebd0aa75a72722be4b84f16cac6c8a715e4bf40eb9bdba563b129cd5fd91236cde49641796ae3f5b08893407bef9e9106f6f662
   languageName: node
   linkType: hard
 
@@ -7630,8 +7619,8 @@ __metadata:
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/push-notifications": "npm:^6.0.3"
     "@capacitor/splash-screen": "npm:latest"
-    "@ionic/react": "npm:^8.4.1"
-    "@ionic/react-router": "npm:^8.4.1"
+    "@ionic/react": "npm:^8.4.2"
+    "@ionic/react-router": "npm:^8.4.2"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
@@ -7724,8 +7713,8 @@ __metadata:
     "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@babel/core": "npm:^7.20.5"
-    "@ionic/core": "npm:^8.4.2"
-    "@ionic/react": "npm:^8.4.1"
+    "@ionic/core": "npm:^8.4.1"
+    "@ionic/react": "npm:^8.4.2"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ngraveio/bc-ur": "npm:^1.1.13"
     "@storybook/addon-actions": "npm:^6.5.14"
