@@ -50,6 +50,8 @@ import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ConfirmView } from '../transfer/ConfirmView';
 import { useNotifyError } from '../../hooks/useNotification';
 import { HideOnReview } from '../ios/HideOnReview';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { DesktopViewPageLayout } from '../desktop/DesktopViewLayout';
 
 const Block = styled.div`
     display: flex;
@@ -451,6 +453,33 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 };
 
 export const ProSettings: FC = () => {
+    return (
+        <HideOnReview>
+            <ProSettingsResponsive />
+        </HideOnReview>
+    );
+};
+
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    padding: 1rem 1rem 0;
+    box-sizing: border-box;
+
+    * {
+        box-sizing: border-box;
+    }
+`;
+
+export const ProSettingsResponsive: FC = () => {
+    const isProDisplay = useIsFullWidthMode();
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayoutStyled>
+                <ProSettingsContent />
+            </DesktopViewPageLayoutStyled>
+        );
+    }
+
     return (
         <HideOnReview>
             <SubHeader />

@@ -1,12 +1,17 @@
 import { FC, useLayoutEffect } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Route, useLocation } from 'react-router-dom';
+import { Redirect, Route, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useAppWidth } from '../../libs/hooks';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
-import { any, AppProRoute, AppRoute, WalletSettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import {
+    AppProRoute,
+    AppRoute,
+    SettingsRoute,
+    WalletSettingsRoute
+} from '@tonkeeper/uikit/dist/libs/routes';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
@@ -17,14 +22,9 @@ import { DesktopDns } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopDns';
 import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/DesktopCoinPage';
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
-import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
-import { DesktopPreferencesHeader } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopPreferencesHeader';
-import { PreferencesAsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/PreferencesAsideMenu';
-import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/preferences/DesktopPreferencesRouting';
 import styled from 'styled-components';
 import { Container } from '@tonkeeper/uikit';
-import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
 import { BackgroundElements, usePrefetch } from './common';
 import './ionic-styles';
 import { IonMenu, IonRouterOutlet } from '@ionic/react';
@@ -47,6 +47,17 @@ import {
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { MobileProHomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProHomePage';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
+import { DesktopManageAccountsPage } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopManageWalletsSettings';
+import { Localization } from '@tonkeeper/uikit/dist/pages/settings/Localization';
+import { Legal } from '@tonkeeper/uikit/dist/pages/settings/Legal';
+import { UserTheme } from '@tonkeeper/uikit/dist/pages/settings/Theme';
+import { DevSettings } from '@tonkeeper/uikit/dist/pages/settings/Dev';
+import { FiatCurrency } from '@tonkeeper/uikit/dist/pages/settings/FiatCurrency';
+import { SecuritySettings } from '@tonkeeper/uikit/dist/pages/settings/Security';
+import { CountrySettings } from '@tonkeeper/uikit/dist/pages/settings/Country';
+import { ProSettings } from '@tonkeeper/uikit/dist/components/settings/ProSettings';
+import { MobileProPreferencesPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProPreferencesPage';
+import { Navigate } from '@tonkeeper/uikit/dist/components/shared/Navigate';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -112,18 +123,6 @@ const WalletLayoutBody = styled.div`
     max-height: calc(100% - 52px);
 `;
 
-const PreferencesLayout = styled.div`
-    height: calc(100% - ${desktopHeaderContainerHeight});
-    display: flex;
-    overflow: auto;
-`;
-
-const PreferencesRoutingWrapper = styled.div`
-    flex: 1;
-    overflow: auto;
-    position: relative;
-`;
-
 const FullSizeWrapperBounded = styled(FullSizeWrapper)`
     max-height: 100%;
     overflow: auto;
@@ -144,16 +143,6 @@ export const NarrowContent: FC<{
     usePrefetch();
     useDebuggingTools();
 
-    useLayoutEffect(() => {
-        if (location.pathname === AppRoute.home) {
-            document.getElementById(homeScreenGradientId)?.classList.remove('hidden');
-            document.getElementById(mobileHeaderBackgroundId)?.classList.add('hidden');
-        } else {
-            document.getElementById(homeScreenGradientId)?.classList.add('hidden');
-            document.getElementById(mobileHeaderBackgroundId)?.classList.remove('hidden');
-        }
-    }, [location.pathname]);
-
     if (lock) {
         return (
             <FullSizeWrapper>
@@ -172,6 +161,22 @@ export const NarrowContent: FC<{
         );
     }
 
+    return <NarrowContentAppRouting />;
+};
+
+const NarrowContentAppRouting = () => {
+    const location = useLocation();
+
+    useLayoutEffect(() => {
+        if (location.pathname === AppRoute.home) {
+            document.getElementById(homeScreenGradientId)?.classList.remove('hidden');
+            document.getElementById(mobileHeaderBackgroundId)?.classList.add('hidden');
+        } else {
+            document.getElementById(homeScreenGradientId)?.classList.add('hidden');
+            document.getElementById(mobileHeaderBackgroundId)?.classList.remove('hidden');
+        }
+    }, [location.pathname]);
+
     return (
         <WideLayout>
             <WideContent>
@@ -182,16 +187,13 @@ export const NarrowContent: FC<{
                         <AsideMenu />
                     </IonMenu>
                     <WalletLayoutBody>
+                        {/* Ionic doesn't support nested routing well */}
                         <IonRouterOutlet id="main-content">
                             <Route path={AppProRoute.dashboard} component={DashboardPage} />
                             <Route path={AppRoute.browser} component={DesktopBrowser} />
-                            <Route path={any(AppRoute.settings)} component={PreferencesContent} />
+                            <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
                             <Route
-                                path={any(AppProRoute.multiSend)}
-                                component={DesktopMultiSendPage}
-                            />
-                            <Route
-                                path={any(AppRoute.accountSettings)}
+                                path={AppRoute.accountSettings}
                                 component={DesktopAccountSettingsPage}
                             />
 
@@ -206,15 +208,17 @@ export const NarrowContent: FC<{
                                 path={AppRoute.multisigOrders}
                                 component={DesktopMultisigOrdersPage}
                             />
-                            <Route
-                                path={any(AppRoute.walletSettings)}
-                                component={DesktopWalletSettingsRouting}
-                            />
                             <Route path={AppRoute.swap} component={DesktopSwapPage} />
                             <Route path={AppRoute.home} exact component={MobileProHomePage} />
                             <Route path={AppRoute.coins} exact component={DesktopTokens} />
                             <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
 
+                            {/* Wallet settings */}
+                            <Route
+                                path={AppRoute.walletSettings}
+                                exact
+                                component={DesktopWalletSettingsPage}
+                            />
                             <Route
                                 path={`${
                                     AppRoute.walletSettings + WalletSettingsRoute.recovery
@@ -263,11 +267,71 @@ export const NarrowContent: FC<{
                                 path={AppRoute.walletSettings + WalletSettingsRoute.notification}
                                 component={Notifications}
                             />
+                            {/* Wallet settings */}
+
+                            {/* App preferences */}
                             <Route
-                                path={AppRoute.walletSettings}
+                                path={AppRoute.settings}
+                                component={MobileProPreferencesPage}
                                 exact
-                                component={DesktopWalletSettingsPage}
                             />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.account}
+                                component={DesktopManageAccountsPage}
+                            />
+
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.localization}
+                                component={Localization}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.legal}
+                                component={Legal}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.theme}
+                                component={UserTheme}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.dev}
+                                component={DevSettings}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.fiat}
+                                component={FiatCurrency}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.security}
+                                component={SecuritySettings}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.country}
+                                component={CountrySettings}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.pro}
+                                component={ProSettings}
+                            />
+                            <Route
+                                path={AppRoute.settings + SettingsRoute.recovery}
+                                component={NavigateToRecovery}
+                            />
+                            <Route path={AppRoute.settings + SettingsRoute.version}>
+                                <Redirect
+                                    to={AppRoute.walletSettings + WalletSettingsRoute.version}
+                                />
+                            </Route>
+                            <Route path={AppRoute.settings + SettingsRoute.jettons}>
+                                <Redirect
+                                    to={AppRoute.walletSettings + WalletSettingsRoute.jettons}
+                                />
+                            </Route>
+                            <Route path={AppRoute.settings + SettingsRoute.twoFa}>
+                                <Redirect
+                                    to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}
+                                />
+                            </Route>
+                            {/* App preferences */}
                         </IonRouterOutlet>
                     </WalletLayoutBody>
                 </WalletLayout>
@@ -277,16 +341,10 @@ export const NarrowContent: FC<{
     );
 };
 
-const PreferencesContent = () => {
-    return (
-        <>
-            <DesktopPreferencesHeader />
-            <PreferencesLayout>
-                <PreferencesAsideMenu />
-                <PreferencesRoutingWrapper className="hide-scrollbar">
-                    <DesktopPreferencesRouting />
-                </PreferencesRoutingWrapper>
-            </PreferencesLayout>
-        </>
-    );
+const NavigateToRecovery = () => {
+    const location = useLocation();
+
+    const newPath = location.pathname.replace(AppRoute.settings, AppRoute.walletSettings);
+
+    return <Navigate to={{ pathname: newPath, search: location.search }} replace={true} />;
 };

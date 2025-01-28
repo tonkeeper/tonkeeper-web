@@ -7,6 +7,8 @@ import { SubHeader } from '../../components/SubHeader';
 import { H3 } from '../../components/Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 
 const Icon = styled.span`
     display: flex;
@@ -17,9 +19,16 @@ const Title = styled(H3)`
     margin: 14px 0;
 `;
 
+const TitleDesktop = styled(H3)`
+    margin: 14px 0;
+    padding: 0 1rem;
+`;
+
 export const Legal = React.memo(() => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
+    const isProDisplay = useIsFullWidthMode();
+
     const items = useMemo<SettingsItem[]>(() => {
         return [
             {
@@ -56,6 +65,16 @@ export const Legal = React.memo(() => {
             }
         ];
     }, [t]);
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayout>
+                <SettingsList items={items} />
+                <TitleDesktop>{t('legal_licenses_title')}</TitleDesktop>
+                <SettingsList items={licenses} />
+            </DesktopViewPageLayout>
+        );
+    }
 
     return (
         <>

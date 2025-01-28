@@ -4,14 +4,10 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../Error';
 import { MobileProHeaderWallet } from './MobileProHeaderWallet';
 import { MobileProHeaderAccount } from './MobileProHeaderAccount';
-import { MobileProHeaderContainer } from './MobileProHeaderElements';
-import { FC, PropsWithChildren } from 'react';
-import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { ChevronLeftIcon } from '../../Icon';
+import { MobileProHeaderContainer, MobileProHeaderContentSimple } from './MobileProHeaderElements';
 import { Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
-import { useNavigate } from '../../../hooks/router/useNavigate';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useAllWalletsTotalBalance } from '../../../state/asset';
 import { Skeleton } from '../../shared/Skeleton';
@@ -19,19 +15,7 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useActiveTonNetwork } from '../../../state/wallet';
 import { Link } from 'react-router-dom';
 import { useUserFiat } from '../../../state/fiat';
-
-const MobileProHeaderContainerStyled = styled(MobileProHeaderContainer)`
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    ${IconButtonTransparentBackground} {
-        position: absolute;
-        top: calc(env(safe-area-inset-top) + 8px);
-        left: 8px;
-    }
-`;
+import { MobileProPreferencesHeader } from './MobileProPreferencesHeader';
 
 const BalanceContainer = styled.div`
     display: flex;
@@ -76,19 +60,11 @@ const MobileProHeaderContent = () => {
         );
     }
 
-    return <MobileProHeaderContainer />;
-};
+    if (route === AppRoute.settings) {
+        return <MobileProPreferencesHeader />;
+    }
 
-const MobileProHeaderContentSimple: FC<PropsWithChildren> = ({ children }) => {
-    const navigate = useNavigate();
-    return (
-        <MobileProHeaderContainerStyled>
-            <IconButtonTransparentBackground onClick={() => navigate(-1)}>
-                <ChevronLeftIcon />
-            </IconButtonTransparentBackground>
-            <Label2>{children}</Label2>
-        </MobileProHeaderContainerStyled>
-    );
+    return <MobileProHeaderContainer />;
 };
 
 const HeaderBackground = styled.div`

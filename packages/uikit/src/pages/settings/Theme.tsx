@@ -10,18 +10,29 @@ import {
     useUserUIPreferences
 } from '../../state/theme';
 import { capitalize } from '../../libs/common';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 
 export const UserTheme = () => {
     const { t } = useTranslation();
 
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutateAsync } = useMutateUserUIPreferences();
+    const isProDisplay = useIsFullWidthMode();
 
     const items: SettingsItem[] = Object.keys(availableThemes).map(name => ({
         name: capitalize(name),
         icon: uiPreferences?.theme === name ? <CheckIcon /> : undefined,
         action: () => mutateAsync({ theme: name as 'dark' | 'pro' })
     }));
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayout>
+                <SettingsList items={items} />
+            </DesktopViewPageLayout>
+        );
+    }
 
     return (
         <>

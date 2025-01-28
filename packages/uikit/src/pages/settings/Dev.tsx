@@ -6,13 +6,21 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import {
+    ListBlock,
+    ListBlockDesktopAdaptive,
+    ListItem,
+    ListItemElement,
+    ListItemPayload
+} from '../../components/List';
 import { Body3, Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
 import { Badge } from '../../components/shared';
 import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { useActiveConfig } from '../../state/wallet';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -68,7 +76,7 @@ const EnableTwoFASettings = () => {
     }
 
     return (
-        <ListBlock>
+        <ListBlockDesktopAdaptive>
             <ListItem hover={false}>
                 <ListItemPayload>
                     <TextAndBadge>
@@ -82,7 +90,7 @@ const EnableTwoFASettings = () => {
                     />
                 </ListItemPayload>
             </ListItem>
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 };
 
@@ -96,7 +104,7 @@ const EnableTronSettings = () => {
     }
 
     return (
-        <ListBlock>
+        <ListBlockDesktopAdaptive>
             <ListItem hover={false}>
                 <ListItemPayload>
                     <TextColumns>
@@ -112,11 +120,33 @@ const EnableTronSettings = () => {
                     />
                 </ListItemPayload>
             </ListItem>
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 };
 
+const DesktopWrapper = styled(DesktopViewPageLayout)`
+    ${ListBlock} {
+        margin-bottom: 0;
+    }
+
+    ${ListItemElement} {
+        min-height: 56px;
+    }
+`;
+
 export const DevSettings = React.memo(() => {
+    const isProDisplay = useIsFullWidthMode();
+
+    if (isProDisplay) {
+        return (
+            <DesktopWrapper>
+                <EnableTwoFASettings />
+                <EnableTronSettings />
+                <CookieSettings />
+            </DesktopWrapper>
+        );
+    }
+
     return (
         <>
             <SubHeader title="Dev Menu" />
