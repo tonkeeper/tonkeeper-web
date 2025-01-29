@@ -86,6 +86,14 @@ export const DesktopHistoryPage = () => {
     );
 };
 
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    height: 100%;
+
+    > * {
+        height: 100%;
+    }
+`;
+
 const DesktopHistoryPageContent: FC = () => {
     const wallet = useActiveWallet();
     const sdk = useAppSdk();
@@ -139,7 +147,9 @@ const DesktopHistoryPageContent: FC = () => {
     if (activity?.length === 0) {
         return (
             <Suspense fallback={<ActivitySkeletonPage />}>
-                <EmptyActivity />
+                <DesktopViewPageLayoutStyled>
+                    <EmptyActivity />
+                </DesktopViewPageLayoutStyled>
             </Suspense>
         );
     }

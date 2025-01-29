@@ -82,12 +82,12 @@ const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
 
             .grid-area-account {
                 grid-area: account;
-                margin-left: 24px;
+                margin-left: 22px;
             }
 
             .grid-area-comment {
                 grid-area: comment;
-                margin-left: 24px;
+                margin-left: 22px;
             }
 
             > div {

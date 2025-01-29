@@ -11,7 +11,7 @@ import { ActivityNotificationData } from '../../activity/ton/ActivityNotificatio
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { TronHistoryAction } from './tron/TronHistoryAction';
 
-const EventDivider = styled.div`
+const EventDivider = styled.div.attrs({ className: 'event-groups-divider' })`
     background-color: ${p => p.theme.separatorCommon};
     height: 1px;
     grid-column: 1/-1;

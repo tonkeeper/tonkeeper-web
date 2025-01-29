@@ -10,6 +10,7 @@ import { KnownNFTDnsCollections } from '../components/nft/NftView';
 import { Link } from '../components/shared/Link';
 import {
     BatteryIcon,
+    ClockSmoothIcon,
     InboxIcon,
     ListIcon,
     SaleBadgeIcon,
@@ -33,6 +34,8 @@ import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/accoun
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useCanUseBattery } from '../state/battery';
 import { RoundedBadge } from '../components/shared/Badge';
+import { MobileProWidgetHistory } from '../components/mobile-pro/home/widgets/MobileProWidgetHistory';
+import { useFetchFilteredActivity } from '../state/activity';
 
 const IonContentStyled = styled(IonContent)`
     &::part(background) {
@@ -118,6 +121,31 @@ const useMobileProHomePageNfts = () => {
     };
 };
 
+const useMobileProHomePageHistory = () => {
+    const { data: activity } = useFetchFilteredActivity();
+    const { data: config } = useActiveTonWalletConfig();
+    const { mutate: mutateConfig } = useMutateActiveTonWalletConfig();
+
+    useEffect(() => {
+        if (activity && config && !config.cachedHasHistory) {
+            mutateConfig({ cachedHasHistory: !!activity.length });
+        }
+    }, [activity, config?.cachedHasHistory, mutateConfig]);
+
+    let showHistoryWidget = config?.cachedHasHistory !== false;
+
+    if (activity) {
+        showHistoryWidget = !!activity.length;
+    }
+
+    const slicedActivity = useMemo(() => activity?.slice(0, 1), [activity]);
+
+    return {
+        activity: slicedActivity,
+        showHistoryWidget
+    };
+};
+
 export const MobileProHomePage = () => {
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -128,6 +156,7 @@ export const MobileProHomePage = () => {
     const isTestnet = network === Network.TESTNET;
     const canUseBattery = useCanUseBattery();
     const { showNftWidget, filteredNft } = useMobileProHomePageNfts();
+    const { showHistoryWidget, activity } = useMobileProHomePageHistory();
 
     return (
         <IonPage id={mobileProHomePageId}>
@@ -136,8 +165,15 @@ export const MobileProHomePage = () => {
                 <MobileProHomeActionsStyled />
                 <MobileProHomeWidgetTokens />
                 {showNftWidget && <MobileProWidgetNfts nfts={filteredNft} />}
+                {showHistoryWidget && <MobileProWidgetHistory activity={activity} />}
                 <MenuWrapper>
                     <HideOnReview>
+                        {!showHistoryWidget && (
+                            <MenuItem to={AppRoute.activity}>
+                                <ClockSmoothIcon />
+                                <Label2>{t('wallet_aside_history')}</Label2>
+                            </MenuItem>
+                        )}
                         {!showNftWidget && (
                             <MenuItem to={AppRoute.purchases}>
                                 <SaleBadgeIcon />

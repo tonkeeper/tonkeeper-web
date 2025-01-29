@@ -156,6 +156,7 @@ export interface TonWalletConfig {
         enabledForNfts: boolean;
     };
     cachedOwnCollectablesNumber?: number;
+    cachedHasHistory?: boolean;
 }
 
 export const defaultPreferencesConfig: TonWalletConfig = {
