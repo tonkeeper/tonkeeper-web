@@ -1,5 +1,5 @@
 import { FC, useState, MouseEvent } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { ActivityItem, CategorizedActivityItem } from '../../../state/activity';
 import { Body2 } from '../../Text';
 import { useDateTimeFormatFromNow } from '../../../hooks/useDateTimeFormat';
@@ -16,9 +16,23 @@ const EventDivider = styled.div`
     height: 1px;
     grid-column: 1/-1;
     margin: 0 -1rem;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            margin: 0.25rem -1rem;
+        `}
 `;
 
-export const HistoryGridTimeCell = styled(HistoryGridCell)``;
+export const HistoryGridTimeCell = styled(HistoryGridCell).attrs({ className: 'grid-area-time' })`
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            &:empty {
+                height: 0;
+            }
+        `}
+`;
 
 const HistoryDateCell = styled(HistoryGridTimeCell)`
     display: flex;
