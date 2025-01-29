@@ -29,12 +29,15 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
-import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
+import { useSwapWidgetDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import styled, { createGlobalStyle } from 'styled-components';
 import { SwapWidgetPage } from './components/SwapWidgetPage';
 import { useAccountsStorage } from '@tonkeeper/uikit/dist/hooks/useStorage';
 import { AccountTonWatchOnly } from '@tonkeeper/core/dist/entries/account';
-import { getTonkeeperInjectionContext } from './libs/tonkeeper-injection-context';
+import {
+    getTonkeeperInjectionContext,
+    provideMockInjectionContext
+} from './libs/tonkeeper-injection-context';
 import { Address } from '@ton/core';
 import { defaultLanguage } from './i18n';
 
@@ -47,8 +50,10 @@ const queryClient = new QueryClient({
     }
 });
 
+provideMockInjectionContext();
+
 const sdk = new WidgetAppSdk();
-const TARGET_ENV = 'swap-widget-web';
+const TARGET_ENV = 'swap_widget_web';
 
 const queryParams = new URLSearchParams(new URL(window.location.href).search);
 
@@ -125,6 +130,8 @@ const WidgetGlobalStyle = createGlobalStyle`
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
+    useSwapWidgetDebuggingTools();
+
     return (
         <UserThemeProvider
             isPro={false}
@@ -162,7 +169,7 @@ const ProvideActiveAccount: FC<PropsWithChildren> = ({ children }) => {
                     id: addressRaw
                 })
             ])
-            .then(() => setIsLoading(false));
+            .then(() => setTimeout(() => setIsLoading(false)));
     }, []);
 
     if (isLoading) {
@@ -191,7 +198,7 @@ const Loader: FC = () => {
         targetEnv: TARGET_ENV,
         build: sdk.version,
         lang,
-        platform: 'swap-widget-web'
+        platform: 'swap_widget_web'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
@@ -266,7 +273,6 @@ const Content: FC<{
     useAppWidth(standalone);
     useKeyboardHeight();
     useTrackLocation();
-    useDebuggingTools();
     const isApplied = useApplyQueryParams();
 
     if (!isApplied) {
