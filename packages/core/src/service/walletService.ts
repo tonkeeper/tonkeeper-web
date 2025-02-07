@@ -11,10 +11,11 @@ import {
     AccountMAM,
     AccountTonMnemonic,
     AccountTonMultisig,
-    AccountTonOnly, AccountTonSK,
+    AccountTonOnly,
+    AccountTonSK,
     AccountTonTestnet,
     AccountTonWatchOnly
-} from "../entries/account";
+} from '../entries/account';
 import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword, MnemonicType } from '../entries/password';
@@ -162,7 +163,7 @@ export const getContextApiByNetwork = (context: CreateWalletContext, network: Ne
     return api;
 };
 
-const ]createPayloadOfStandardTonAccount = async (
+const createPayloadOfStandardTonAccount = async (
     appContext: CreateWalletContext,
     storage: IStorage,
     mnemonic: string[],
