@@ -64,6 +64,7 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 }
                 setSecret(_secret);
             } catch (e) {
+                console.error(e);
                 onBack();
             }
         })();
@@ -149,7 +150,7 @@ export const RecoveryContent: FC<{
 
     useSetNotificationOnBack(isExportingTRC20 ? onHideTron : undefined);
 
-    if (!mnemonicToShow) {
+    if (!mnemonicToShow && secret?.type !== 'sk') {
         return (
             <Wrapper>
                 <SpinnerRingStyled />
