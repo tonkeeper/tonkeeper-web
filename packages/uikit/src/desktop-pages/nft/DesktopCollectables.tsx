@@ -3,19 +3,17 @@ import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
 import { Link } from 'react-router-dom';
-import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { AppRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { useMemo } from 'react';
-import { SlidersIcon } from '../../components/Icon';
-import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useWalletFilteredNftList } from '../../state/nft';
-import { useNavigate } from '../../hooks/router/useNavigate';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 
 const gap = '10px';
@@ -75,10 +73,6 @@ const LinkStyled = styled(Link)`
     margin: 0 auto;
 `;
 
-const SettingsButtonStyled = styled(IconButtonTransparentBackground)`
-    margin-left: auto;
-`;
-
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
 
@@ -97,7 +91,6 @@ export const DesktopCollectables = () => {
 export const DesktopCollectablesContent = () => {
     const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const env = useAppTargetEnv();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
@@ -120,8 +113,8 @@ export const DesktopCollectablesContent = () => {
         return (
             <DesktopViewPageLayoutStyled>
                 {env === 'mobile' && (
-                    <DesktopViewHeader borderBottom={!closeTop} backButton={true}>
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
+                    <DesktopViewHeader borderBottom={!closeTop}>
+                        <DesktopViewHeaderContent title={t('wallet_aside_collectibles')} />
                     </DesktopViewHeader>
                 )}
                 <NFTEmptyPage>
@@ -139,13 +132,8 @@ export const DesktopCollectablesContent = () => {
 
     return (
         <DesktopViewPageLayout ref={scrollRef}>
-            <DesktopViewHeader borderBottom={!closeTop} backButton={env === 'mobile'}>
-                <Label2>{t('wallet_aside_collectibles')}</Label2>
-                <SettingsButtonStyled
-                    onClick={() => navigate(AppRoute.walletSettings + WalletSettingsRoute.nft)}
-                >
-                    <SlidersIcon />
-                </SettingsButtonStyled>
+            <DesktopViewHeader borderBottom={!closeTop}>
+                <DesktopViewHeaderContent title={t('wallet_aside_collectibles')} />
             </DesktopViewHeader>
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>

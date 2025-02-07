@@ -22,7 +22,7 @@ import { useWalletTotalBalance } from '../../../state/asset';
 import { Skeleton } from '../../shared/Skeleton';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useMenuController } from '../../../hooks/ionic';
-import { MobileProWalletMenu, useIsProWalletMenuOpened } from '../MobileProWalletMenu';
+import { useIsProWalletMenuOpened } from '../MobileProWalletMenu';
 import { useLocation } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 
@@ -245,7 +245,6 @@ const AsideHeaderSingleChainWallet = () => {
 
     return (
         <>
-            <MobileProWalletMenu />
             <HeaderContainer $transparent={location.pathname === AppRoute.home}>
                 <WalletEmojiStyled
                     emoji={emoji}

@@ -43,58 +43,16 @@ import { useAnalytics, useAppHeight } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { CapacitorNotifications } from '../libs/capacitorNotifications';
-import { homeScreenGradientId, NarrowContent } from './app-content/NarrowContent';
-import { createAnimation, IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
+import { NarrowContent } from './app-content/NarrowContent';
+import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { IonicOverride } from './app-content/ionic-override';
-import type { TransitionOptions } from '@ionic/core/dist/types/utils/transition';
-import { mobileProHomePageId } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProHomePage';
-import { mobileHeaderBackgroundId } from '@tonkeeper/uikit/dist/components/mobile-pro/header/MobileProHeader';
 import { WideContent } from './app-content/WideContent';
 
 setupIonicReact({
     swipeBackEnabled: true,
-    navAnimation: (navEl: HTMLElement, opts: TransitionOptions) => {
-        const isEnteringHomePage = opts.enteringEl.id === mobileProHomePageId;
-        const isLeavingHomePage = opts.leavingEl?.id === mobileProHomePageId;
-
-        const baseAnimation = iosTransitionAnimation(navEl, opts);
-
-        if (!isEnteringHomePage && !isLeavingHomePage) {
-            return baseAnimation;
-        }
-
-        const gradient = document.getElementById(homeScreenGradientId);
-        const header = document.getElementById(mobileHeaderBackgroundId);
-
-        if (!gradient || !header) {
-            return baseAnimation;
-        }
-
-        const gradientAnimation = createAnimation()
-            .addElement(gradient)
-            .fromTo('opacity', isEnteringHomePage ? '0' : '0.16', isEnteringHomePage ? '0.16' : '0')
-            .afterAddWrite(() => {
-                if (getComputedStyle(gradient).opacity === '0') {
-                    gradient.classList.add('hidden');
-                } else {
-                    gradient.classList.remove('hidden');
-                }
-            });
-
-        const headerAnimation = createAnimation()
-            .addElement(header)
-            .fromTo('opacity', isEnteringHomePage ? '1' : '0', isEnteringHomePage ? '0' : '1')
-            .afterAddWrite(() => {
-                if (getComputedStyle(header).opacity === '0') {
-                    header.classList.add('hidden');
-                } else {
-                    header.classList.remove('hidden');
-                }
-            });
-
-        return baseAnimation.addAnimation(headerAnimation).addAnimation(gradientAnimation);
-    }
+    mode: 'ios',
+    navAnimation: iosTransitionAnimation
 });
 
 const queryClient = new QueryClient({

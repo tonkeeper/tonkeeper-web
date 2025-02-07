@@ -7,7 +7,11 @@ import { useTranslation } from '../../hooks/translation';
 import { getLanguageName } from '../../libs/common';
 import { useMutateUserLanguage } from '../../state/language';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 export const Localization = () => {
@@ -27,6 +31,9 @@ export const Localization = () => {
     if (isProDisplay) {
         return (
             <DesktopViewPageLayout>
+                <DesktopViewHeader>
+                    <DesktopViewHeaderContent title="Lang" />
+                </DesktopViewHeader>
                 <SettingsList items={items} />
             </DesktopViewPageLayout>
         );

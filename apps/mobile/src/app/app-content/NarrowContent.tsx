@@ -1,4 +1,4 @@
-import { FC, useLayoutEffect } from 'react';
+import { FC } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Redirect, Route, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -40,10 +40,7 @@ import { Notifications } from '@tonkeeper/uikit/dist/pages/settings/Notification
 import { DesktopWalletSettingsPage } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsPage';
 import { ActiveRecovery, Recovery } from '@tonkeeper/uikit/dist/pages/settings/Recovery';
 import { JettonsSettings } from '@tonkeeper/uikit/dist/pages/settings/Jettons';
-import {
-    mobileHeaderBackgroundId,
-    MobileProHeader
-} from '@tonkeeper/uikit/dist/components/mobile-pro/header/MobileProHeader';
+
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
 import { MobileProHomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProHomePage';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
@@ -58,6 +55,8 @@ import { CountrySettings } from '@tonkeeper/uikit/dist/pages/settings/Country';
 import { ProSettings } from '@tonkeeper/uikit/dist/components/settings/ProSettings';
 import { MobileProPreferencesPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProPreferencesPage';
 import { Navigate } from '@tonkeeper/uikit/dist/components/shared/Navigate';
+import { MobileProFooter } from '@tonkeeper/uikit/dist/components/mobile-pro/footer/MobileProFooter';
+import { MobileProWalletMenu } from '@tonkeeper/uikit/dist/components/mobile-pro/MobileProWalletMenu';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -73,39 +72,6 @@ const WideContent = styled.div`
     flex: 1;
     min-width: 0;
     min-height: 0;
-`;
-
-const Gradient = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: calc(256px + env(safe-area-inset-top));
-    opacity: 0.16;
-
-    background: linear-gradient(
-        180deg,
-        #7665e5 0%,
-        rgba(118, 101, 229, 0.99) 6.67%,
-        rgba(118, 101, 229, 0.96) 13.33%,
-        rgba(118, 101, 229, 0.92) 20%,
-        rgba(118, 101, 229, 0.85) 26.67%,
-        rgba(118, 101, 229, 0.77) 33.33%,
-        rgba(118, 101, 229, 0.67) 40%,
-        rgba(118, 101, 229, 0.56) 46.67%,
-        rgba(118, 101, 229, 0.44) 53.33%,
-        rgba(118, 101, 229, 0.33) 60%,
-        rgba(118, 101, 229, 0.23) 66.67%,
-        rgba(118, 101, 229, 0.15) 73.33%,
-        rgba(118, 101, 229, 0.08) 80%,
-        rgba(118, 101, 229, 0.04) 86.67%,
-        rgba(118, 101, 229, 0.01) 93.33%,
-        rgba(118, 101, 229, 0) 100%
-    );
-
-    &.hidden {
-        opacity: 0;
-    }
 `;
 
 const WalletLayout = styled.div<{ $gradient: boolean }>`
@@ -129,8 +95,6 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
 
     justify-content: center;
 `;
-
-export const homeScreenGradientId = 'home-screen-gradient';
 
 export const NarrowContent: FC<{
     activeAccount?: Account | null;
@@ -165,27 +129,14 @@ export const NarrowContent: FC<{
 };
 
 const NarrowContentAppRouting = () => {
-    const location = useLocation();
-
-    useLayoutEffect(() => {
-        if (location.pathname === AppRoute.home) {
-            document.getElementById(homeScreenGradientId)?.classList.remove('hidden');
-            document.getElementById(mobileHeaderBackgroundId)?.classList.add('hidden');
-        } else {
-            document.getElementById(homeScreenGradientId)?.classList.add('hidden');
-            document.getElementById(mobileHeaderBackgroundId)?.classList.remove('hidden');
-        }
-    }, [location.pathname]);
-
     return (
         <WideLayout>
             <WideContent>
                 <WalletLayout $gradient={location.pathname === AppRoute.home}>
-                    <Gradient id={homeScreenGradientId} />
-                    <MobileProHeader />
                     <IonMenu menuId="aside-nav" contentId="main-content">
                         <AsideMenu />
                     </IonMenu>
+                    <MobileProWalletMenu />
                     <WalletLayoutBody>
                         {/* Ionic doesn't support nested routing well */}
                         <IonRouterOutlet id="main-content">
@@ -334,6 +285,7 @@ const NarrowContentAppRouting = () => {
                             {/* App preferences */}
                         </IonRouterOutlet>
                     </WalletLayoutBody>
+                    <MobileProFooter />
                 </WalletLayout>
             </WideContent>
             <BackgroundElements />

@@ -4,6 +4,7 @@ import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -77,7 +78,7 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
             <DesktopAccountHeader />
             <DesktopViewPageLayout>
                 <DesktopViewHeader borderBottom>
-                    <Label2>{t('settings_title')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_title')} />
                 </DesktopViewHeader>
                 <SettingsListBlock>
                     <SettingsListItem onClick={() => rename({ accountId: account.id })}>

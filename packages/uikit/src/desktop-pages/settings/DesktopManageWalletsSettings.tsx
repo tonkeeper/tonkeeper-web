@@ -36,6 +36,7 @@ import {
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import {
@@ -158,10 +159,14 @@ export const DesktopManageAccountsPage = () => {
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('Manage_wallets')}</Label2>
-                <NewFolderButton onClick={() => manageFolders()}>
-                    {t('accounts_new_folder')}
-                </NewFolderButton>
+                <DesktopViewHeaderContent
+                    title={t('Manage_wallets')}
+                    right={
+                        <NewFolderButton onClick={() => manageFolders()}>
+                            {t('accounts_new_folder')}
+                        </NewFolderButton>
+                    }
+                />
             </DesktopViewHeader>
             <DragDropContext onDragEnd={handleDrop}>
                 <Droppable droppableId="settings_wallets" type="all_items">

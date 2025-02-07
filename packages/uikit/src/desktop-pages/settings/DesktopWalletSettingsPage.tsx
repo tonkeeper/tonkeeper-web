@@ -16,6 +16,7 @@ import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -42,7 +43,7 @@ import {
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import React from 'react';
-import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useNavigate } from '../../hooks/router/useNavigate';
 
@@ -117,12 +118,11 @@ export const DesktopWalletSettingsPage = () => {
     const canViewTwoFA = useCanViewTwoFA();
 
     const notificationsAvailable = useAppSdk().notifications !== undefined;
-    const env = useAppTargetEnv();
 
     return (
         <DesktopViewPageLayout>
-            <DesktopViewHeader borderBottom backButton={env === 'mobile'}>
-                <Label2>{t('settings_title')}</Label2>
+            <DesktopViewHeader borderBottom>
+                <DesktopViewHeaderContent title={t('settings_title')} />
             </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem

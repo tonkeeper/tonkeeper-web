@@ -1,10 +1,12 @@
 import { IonMenu } from '@ionic/react';
 import { WalletAsideMenu } from '../desktop/aside/WalletAsideMenu';
-import styled from 'styled-components';
 import { atom, useAtom } from '../../libs/atom';
+import styled from 'styled-components';
 
 const IonMenuStyled = styled(IonMenu)`
-    margin-top: calc(52px + env(safe-area-inset-top));
+    &::part(container) {
+        padding-top: env(safe-area-inset-top);
+    }
 `;
 
 const isProWalletMenuOpen$ = atom(false);

@@ -1,4 +1,5 @@
 import { css } from 'styled-components';
+import { Label1Class, Label2Class } from '@tonkeeper/uikit';
 
 export const IonicOverride = css`
     :root {
@@ -50,6 +51,30 @@ export const IonicOverride = css`
             max-height: calc(100vh - 20px - env(safe-area-inset-top));
             position: relative;
             contain: content;
+        }
+    }
+
+    ion-toolbar {
+        --background: ${p => p.theme.backgroundContent};
+        --color: ${p => p.theme.textPrimary};
+    }
+
+    ion-back-button {
+        color: ${p => p.theme.accentBlue};
+    }
+
+    ion-title {
+        ${Label1Class};
+    }
+
+    ion-back-button {
+        &::part(text) {
+            ${Label2Class}
+        }
+
+        &::part(icon) {
+            width: 20px;
+            height: 20px;
         }
     }
 `;

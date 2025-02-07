@@ -43,11 +43,15 @@ export const H3 = styled.h3`
     user-select: none;
 `;
 
-export const Label1 = styled.span`
+export const Label1Class = css`
     font-style: normal;
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
+`;
+
+export const Label1 = styled.span`
+    ${Label1Class};
 `;
 
 export const Label2Class = css`

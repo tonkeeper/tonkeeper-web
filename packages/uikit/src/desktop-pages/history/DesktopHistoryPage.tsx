@@ -5,6 +5,7 @@ import { useFetchNext } from '../../hooks/useFetchNext';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
@@ -157,14 +158,20 @@ const DesktopHistoryPageContent: FC = () => {
     return (
         <HistoryPageWrapper ref={ref}>
             <HistoryHeaderContainer borderBottom={true}>
-                <Label2>{t('page_header_history')}</Label2>
-                <ExplorerButton onClick={onOpenExplorer}>
-                    <LinkOutIcon color="currentColor" />
-                </ExplorerButton>
-                <FiltersWrapper>
-                    <AssetHistoryFilter />
-                    <OtherHistoryFilters />
-                </FiltersWrapper>
+                <DesktopViewHeaderContent
+                    title={t('page_header_history')}
+                    right={
+                        <>
+                            <ExplorerButton onClick={onOpenExplorer}>
+                                <LinkOutIcon color="currentColor" />
+                            </ExplorerButton>
+                            <FiltersWrapper>
+                                <AssetHistoryFilter />
+                                <OtherHistoryFilters />
+                            </FiltersWrapper>
+                        </>
+                    }
+                />
             </HistoryHeaderContainer>
             <HistoryContainer>
                 <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />

@@ -1,8 +1,8 @@
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Label2 } from '../../components/Text';
 import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { SwapProviders } from '../../components/swap/SwapProviders';
 import { css, styled } from 'styled-components';
@@ -56,7 +56,6 @@ const DesktopSwapPageContent = () => {
     const { isSwapsEnabled } = useSwapsConfig();
     const sdk = useAppSdk();
     const swapLink = useStonfiSwapLink(swapFromAsset$.value.address, swapToAsset$.value.address);
-    const env = useAppTargetEnv();
 
     if (!isSwapsEnabled) {
         sdk.openPage(swapLink);
@@ -65,12 +64,16 @@ const DesktopSwapPageContent = () => {
 
     return (
         <SwapPageWrapper>
-            <DesktopViewHeader backButton={env === 'mobile'}>
-                <Label2>{t('wallet_swap')}</Label2>
-                <HeaderButtons>
-                    <SwapRefreshButton />
-                    <SwapSettingsButton />
-                </HeaderButtons>
+            <DesktopViewHeader>
+                <DesktopViewHeaderContent
+                    title={t('wallet_swap')}
+                    right={
+                        <HeaderButtons>
+                            <SwapRefreshButton />
+                            <SwapSettingsButton />
+                        </HeaderButtons>
+                    }
+                />
             </DesktopViewHeader>
             <ContentWrapper>
                 <SwapMainForm />

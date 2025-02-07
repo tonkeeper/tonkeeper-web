@@ -113,15 +113,6 @@ export const WalletAsideMenu = () => {
     return (
         <WalletAsideContainer>
             <ForTargetEnv env="mobile">
-                <NavLink to={AppRoute.home} end>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <HouseIcon />
-                            <Label2>{t('wallet_aside_home')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-                <GroupsGap />
                 {!isReadOnly && (
                     <AsideMenuItemStyled isSelected={false} onClick={() => sendTransfer()}>
                         <ArrowUpIcon />

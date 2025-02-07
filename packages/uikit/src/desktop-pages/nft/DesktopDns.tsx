@@ -7,6 +7,7 @@ import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
@@ -126,7 +127,7 @@ export const DesktopDnsContent = () => {
             <DesktopViewPageLayoutStyled>
                 {env === 'mobile' && (
                     <DesktopViewHeader borderBottom={!closeTop} backButton={true}>
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
+                        <DesktopViewHeaderContent title={t('wallet_aside_collectibles')} />
                     </DesktopViewHeader>
                 )}
                 <NFTEmptyPage>
@@ -144,13 +145,19 @@ export const DesktopDnsContent = () => {
 
     return (
         <DesktopViewPageLayout ref={scrollRef}>
-            <DesktopViewHeader borderBottom={!closeTop} backButton={env === 'mobile'}>
-                <Label2>{t('wallet_aside_domains')}</Label2>
-                <SettingsButtonStyled
-                    onClick={() => navigate(AppRoute.walletSettings + WalletSettingsRoute.nft)}
-                >
-                    <SlidersIcon />
-                </SettingsButtonStyled>
+            <DesktopViewHeader borderBottom={!closeTop}>
+                <DesktopViewHeaderContent
+                    title={t('wallet_aside_domains')}
+                    right={
+                        <SettingsButtonStyled
+                            onClick={() =>
+                                navigate(AppRoute.walletSettings + WalletSettingsRoute.nft)
+                            }
+                        >
+                            <SlidersIcon />
+                        </SettingsButtonStyled>
+                    }
+                />
             </DesktopViewHeader>
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>

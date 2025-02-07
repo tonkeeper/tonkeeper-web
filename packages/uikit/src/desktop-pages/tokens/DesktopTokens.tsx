@@ -4,9 +4,10 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import styled, { css } from 'styled-components';
 import { fallbackRenderOver } from '../../components/Error';
-import { Body2, Label2 } from '../../components/Text';
+import { Body2 } from '../../components/Text';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
@@ -155,18 +156,22 @@ const DesktopTokensPayload = () => {
     return (
         <DesktopViewPageLayout ref={containerRef}>
             <TokensHeaderContainer backButton={env === 'mobile'}>
-                <Label2>{t('jettons_list_title')}</Label2>
-                {canShowChart && (
-                    <HideButton onClick={onToggleChart}>
-                        <Body2>
-                            {t(
-                                showChart
-                                    ? 'tokens_hide_statistics_btn'
-                                    : 'tokens_show_statistics_btn'
-                            )}
-                        </Body2>
-                    </HideButton>
-                )}
+                <DesktopViewHeaderContent
+                    title={t('jettons_list_title')}
+                    right={
+                        canShowChart && (
+                            <HideButton onClick={onToggleChart}>
+                                <Body2>
+                                    {t(
+                                        showChart
+                                            ? 'tokens_hide_statistics_btn'
+                                            : 'tokens_show_statistics_btn'
+                                    )}
+                                </Body2>
+                            </HideButton>
+                        )
+                    }
+                />
             </TokensHeaderContainer>
             <TokensPageBody
                 style={{

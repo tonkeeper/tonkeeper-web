@@ -3,11 +3,12 @@ import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
 import { FC, useEffect, useMemo, useRef } from 'react';
-import styled, { css } from "styled-components";
+import styled, { css } from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
@@ -347,8 +348,14 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     return (
         <DesktopViewPageLayout ref={ref}>
             <DesktopViewHeaderStyled backButton borderBottom={true}>
-                <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-                <OtherHistoryFilters disableInitiatorFilter={token !== CryptoCurrency.TON} />
+                <DesktopViewHeaderContent
+                    title={assetSymbol || 'Unknown asset'}
+                    right={
+                        <OtherHistoryFilters
+                            disableInitiatorFilter={token !== CryptoCurrency.TON}
+                        />
+                    }
+                />
             </DesktopViewHeaderStyled>
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>

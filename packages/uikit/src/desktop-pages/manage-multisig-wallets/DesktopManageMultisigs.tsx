@@ -1,5 +1,6 @@
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body2Class, Body3, Label2 } from '../../components/Text';
@@ -29,7 +30,7 @@ import {
 import { styled } from 'styled-components';
 import { Dot } from '../../components/Dot';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
@@ -64,7 +65,6 @@ export const DesktopManageMultisigsPage = () => {
     const activeAccount = useActiveAccount();
     const isActiveAccountMultisigManagable = isAccountCanManageMultisigs(activeAccount);
     const { onOpen: addWallet } = useAddWalletNotification();
-    const env = useAppTargetEnv();
 
     if (!isActiveAccountMultisigManagable) {
         return <Navigate to={AppRoute.home} />;
@@ -72,11 +72,15 @@ export const DesktopManageMultisigsPage = () => {
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
-            <DesktopViewHeader borderBottom={!closeTop} backButton={env === 'mobile'}>
-                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                <NewMultisigButton onClick={() => addWallet({ walletType: 'multisig' })}>
-                    {t('add_wallet_new_multisig_title')}
-                </NewMultisigButton>
+            <DesktopViewHeader borderBottom={!closeTop}>
+                <DesktopViewHeaderContent
+                    title={t('wallet_aside_multisig_wallets')}
+                    right={
+                        <NewMultisigButton onClick={() => addWallet({ walletType: 'multisig' })}>
+                            {t('add_wallet_new_multisig_title')}
+                        </NewMultisigButton>
+                    }
+                />
             </DesktopViewHeader>
             <DesktopManageMultisigsPageBody />
         </DesktopViewPageLayoutStyled>

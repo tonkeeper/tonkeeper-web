@@ -1,5 +1,6 @@
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { Body2, Body2Class, Label2 } from '../../components/Text';
@@ -48,8 +49,8 @@ export const DesktopMultisigOrdersPage = () => {
 
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
-            <DesktopViewHeader borderBottom={!closeTop} backButton={env === 'mobile'}>
-                <Label2>{t('wallet_aside_orders')}</Label2>
+            <DesktopViewHeader borderBottom={!closeTop}>
+                <DesktopViewHeaderContent title={t('wallet_aside_orders')} />
             </DesktopViewHeader>
             <DesktopMultisigOrdersPageBody />
         </DesktopViewPageLayoutStyled>

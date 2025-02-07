@@ -1,11 +1,30 @@
 import styled, { css } from 'styled-components';
-import React, { FC, forwardRef, PropsWithChildren, ReactNode, useCallback } from 'react';
+import React, {
+    createContext,
+    FC,
+    forwardRef,
+    PropsWithChildren,
+    ReactNode,
+    useCallback,
+    useContext,
+    useId
+} from 'react';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
 import { ArrowLeftIcon } from '../Icon';
 import { IconButton } from '../fields/IconButton';
 import { useNavigate } from '../../hooks/router/useNavigate';
-import { IonContent, IonPage } from '@ionic/react';
+import {
+    IonBackButton,
+    IonButtons,
+    IonContent,
+    IonHeader,
+    IonPage,
+    IonTitle,
+    IonToolbar
+} from '@ionic/react';
+import ReactPortal from '../ReactPortal';
+import { Label2 } from '../Text';
 
 const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
@@ -16,21 +35,26 @@ const DesktopViewPageLayoutSimpleIonic = styled.div<{ borderBottom?: boolean }>`
     height: 100%;
 `;
 
+const DesktopViewPageLayoutContext = createContext<string | undefined>(undefined);
+
 export const DesktopViewPageLayout = forwardRef<
     HTMLDivElement,
     PropsWithChildren<{ className?: string }>
 >(({ children, className }, ref) => {
     const platform = useAppTargetEnv();
+    const id = useId();
 
     if (platform === 'mobile') {
         return (
-            <IonPage>
-                <IonContent>
-                    <DesktopViewPageLayoutSimpleIonic ref={ref} className={className}>
-                        {children}
-                    </DesktopViewPageLayoutSimpleIonic>
-                </IonContent>
-            </IonPage>
+            <DesktopViewPageLayoutContext.Provider value={id}>
+                <IonPage id={id}>
+                    <IonContent>
+                        <DesktopViewPageLayoutSimpleIonic ref={ref} className={className}>
+                            {children}
+                        </DesktopViewPageLayoutSimpleIonic>
+                    </IonContent>
+                </IonPage>
+            </DesktopViewPageLayoutContext.Provider>
         );
     } else
         return (
@@ -114,6 +138,23 @@ export const DesktopViewHeader: FC<{
     className?: string;
     borderBottom?: boolean;
 }> = ({ children, backButton, borderBottom, className }) => {
+    const portalId = useContext(DesktopViewPageLayoutContext);
+
+    if (portalId !== undefined) {
+        return (
+            <ReactPortal wrapperId={portalId}>
+                <IonHeader>
+                    <IonToolbar>
+                        <IonButtons slot="start">
+                            <IonBackButton />
+                        </IonButtons>
+                        {children}
+                    </IonToolbar>
+                </IonHeader>
+            </ReactPortal>
+        );
+    }
+
     return (
         <DesktopViewHeaderStyled
             withBackButton={!!backButton}
@@ -123,5 +164,28 @@ export const DesktopViewHeader: FC<{
             {backButton && typeof backButton === 'boolean' ? <BackButtonStyled /> : backButton}
             {children}
         </DesktopViewHeaderStyled>
+    );
+};
+
+export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> = ({
+    title,
+    right
+}) => {
+    const env = useAppTargetEnv();
+
+    if (env !== 'mobile') {
+        return (
+            <>
+                <Label2>{title}</Label2>
+                {right}
+            </>
+        );
+    }
+
+    return (
+        <>
+            <IonTitle>{title}</IonTitle>
+            <IonButtons slot="end">{right}</IonButtons>
+        </>
     );
 };
