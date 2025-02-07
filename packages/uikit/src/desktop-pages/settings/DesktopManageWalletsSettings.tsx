@@ -30,6 +30,7 @@ import {
     AccountTonMnemonic,
     AccountTonMultisig,
     AccountTonOnly,
+    AccountTonSK,
     AccountTonTestnet,
     AccountTonWatchOnly
 } from '@tonkeeper/core/dist/entries/account';
@@ -332,7 +333,7 @@ const MultisigItemRow = forwardRef<
 });
 
 const AccountMnemonicRow: FC<{
-    account: AccountTonMnemonic | AccountTonTestnet;
+    account: AccountTonMnemonic | AccountTonTestnet | AccountTonSK;
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
@@ -687,6 +688,7 @@ const AccountRow: FC<{
     switch (account.type) {
         case 'mnemonic':
         case 'testnet':
+        case 'sk':
             return <AccountMnemonicRow account={account} {...rest} />;
         case 'ledger':
             return <AccountLedgerRow account={account} {...rest} />;

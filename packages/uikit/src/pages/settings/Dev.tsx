@@ -13,6 +13,10 @@ import { Badge } from '../../components/shared';
 import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { useActiveConfig } from '../../state/wallet';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { Notification } from '../../components/Notification';
+import { ImportBySKWallet } from '../import/ImportBySKWallet';
+import { Button } from '../../components/fields/Button';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -116,6 +120,21 @@ const EnableTronSettings = () => {
     );
 };
 
+const AddAccountBySK = () => {
+    const { isOpen, onClose, onOpen } = useDisclosure();
+
+    return (
+        <>
+            <Button onClick={onOpen} primary>
+                Add account with private key
+            </Button>
+            <Notification isOpen={isOpen} handleClose={onClose}>
+                {() => <ImportBySKWallet afterCompleted={onClose} />}
+            </Notification>
+        </>
+    );
+};
+
 export const DevSettings = React.memo(() => {
     return (
         <>
@@ -124,6 +143,7 @@ export const DevSettings = React.memo(() => {
                 <EnableTwoFASettings />
                 <EnableTronSettings />
                 <CookieSettings />
+                <AddAccountBySK />
             </InnerBody>
         </>
     );

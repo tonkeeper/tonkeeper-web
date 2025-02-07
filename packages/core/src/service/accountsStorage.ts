@@ -37,6 +37,8 @@ export class AccountsStorage {
         } else {
             state.forEach(bindAccountToClass);
         }
+
+        await this.migrateAccountSecret(state);
         return state ?? defaultAccountState;
     };
 
@@ -190,6 +192,28 @@ export class AccountsStorage {
             )?.id || null
         );
     };
+
+    private migrateAccountSecret = async (accounts: Account[] | null) => {
+        if (!accounts) {
+            return;
+        }
+        let needUpdate = false;
+
+        accounts.forEach(account => {
+            if ('auth' in account && account.auth.kind === 'password') {
+                if ((account.auth as unknown as { encryptedMnemonic: string }).encryptedMnemonic) {
+                    account.auth.encryptedSecret = (
+                        account.auth as unknown as { encryptedMnemonic: string }
+                    ).encryptedMnemonic;
+                    needUpdate = true;
+                }
+            }
+        });
+
+        if (needUpdate) {
+            await this.setAccounts(accounts);
+        }
+    };
 }
 
 export const accountsStorage = (storage: IStorage): AccountsStorage => new AccountsStorage(storage);
@@ -237,7 +261,7 @@ async function migrateToAccountsState(storage: IStorage): Promise<AccountsState 
 
                 auth = {
                     kind: walletAuth.kind,
-                    encryptedMnemonic
+                    encryptedSecret: encryptedMnemonic
                 };
             } else if (walletAuth.kind === 'keychain') {
                 auth = {
