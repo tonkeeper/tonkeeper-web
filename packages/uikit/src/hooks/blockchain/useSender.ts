@@ -36,12 +36,12 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { getMultisigSignerInfo } from '../../state/multisig';
-import { GaslessConfig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { GaslessConfig, Multisig } from '@tonkeeper/core/dist/tonApiV2';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useGaslessConfig } from '../../state/gasless';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
 import { useAssets } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
@@ -60,6 +60,7 @@ import { useAppSdk } from '../appSdk';
 import { useCheckTouchId } from '../../state/password';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import { QueryKey } from '../../libs/queryKey';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -261,6 +262,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
     const gaslessConfig = useGaslessConfig();
     const twoFaApi = useTwoFAApi();
     const { data: twoFAConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
+    const client = useQueryClient();
 
     const wallet = activeAccount.activeTonWallet;
 
@@ -287,10 +289,10 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
                     activeAccount as AccountTonMultisig
                 );
 
-                const multisigApi = new MultisigApi(api.tonApiV2);
-                const multisig = await multisigApi.getMultisigAccount({
-                    accountId: activeAccount.activeTonWallet.rawAddress
-                });
+                const multisig = await client.fetchQuery<Multisig>([
+                    QueryKey.multisigWallet,
+                    activeAccount.activeTonWallet.rawAddress
+                ]);
                 if (!multisig) {
                     throw new Error('Multisig not found');
                 }
@@ -398,7 +400,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         mutateAsync,
         gaslessConfig,
         twoFaApi,
-        twoFAConfig
+        twoFAConfig,
+        client
     ]);
 };
 
@@ -422,6 +425,8 @@ export const useGetSender = () => {
 
     const wallet = activeAccount.activeTonWallet;
 
+    const client = useQueryClient();
+
     return useCallback(
         // eslint-disable-next-line complexity
         async (senderChoice: SenderChoice = EXTERNAL_SENDER_CHOICE): Promise<Sender> => {
@@ -443,10 +448,10 @@ export const useGetSender = () => {
                 );
                 const signer = await getSigner(signerAccount.id, signerWallet.id);
 
-                const multisigApi = new MultisigApi(api.tonApiV2);
-                const multisig = await multisigApi.getMultisigAccount({
-                    accountId: activeAccount.activeTonWallet.rawAddress
-                });
+                const multisig = await client.fetchQuery<Multisig>([
+                    QueryKey.multisigWallet,
+                    activeAccount.activeTonWallet.rawAddress
+                ]);
                 if (!multisig) {
                     throw new Error('Multisig not found');
                 }
@@ -619,7 +624,8 @@ export const useGetSender = () => {
             twoFAConfig,
             openTwoFaConfirmTelegram,
             closeTwoFaConfirmTelegram,
-            twoFAServiceConfig.confirmMessageTGTtlSeconds
+            twoFAServiceConfig.confirmMessageTGTtlSeconds,
+            client
         ]
     );
 };
