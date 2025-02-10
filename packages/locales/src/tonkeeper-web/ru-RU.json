@@ -295,6 +295,7 @@
   "receive_trx": "Получить Tron TRX",
   "receive_trx_description": "Отправляйте на этот адрес только Tron TRX, иначе вы можете потерять свои средства.",
   "recipients": "Получатели",
+  "recovery_wallet_secret_key": "Приватный ключ кошелька",
   "Redo": "Повторить",
   "Reload": "Перезагрузить",
   "Rename": "Переименовать",

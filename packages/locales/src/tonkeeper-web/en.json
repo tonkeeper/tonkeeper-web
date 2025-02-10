@@ -306,6 +306,7 @@
   "receive_trx": "Receive Tron TRX",
   "receive_trx_description": "Send only Tron TRX to this address, or you might lose your funds.",
   "recipients": "Recipients",
+  "recovery_wallet_secret_key": "Wallet's private key",
   "Redo": "Redo",
   "Reload": "Reload",
   "Rename": "Rename",

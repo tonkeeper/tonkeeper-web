@@ -6,7 +6,7 @@ import {
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
@@ -15,7 +15,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { getAccountSecret, getMAMWalletMnemonic } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
-import { Body2Class } from '../../components/Text';
+import { Body2Class, H2Label2Responsive } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
 import { SpinnerRing } from '../../components/Icon';
@@ -115,7 +115,7 @@ const mnemonicBySecret = (secret: AccountSecret | undefined) => {
 };
 
 const SKWrapper = styled.div`
-    margin: 1rem;
+    margin: 1rem 0;
     padding: 1rem;
     ${BorderSmallResponsive};
     ${Body2Class};
@@ -180,6 +180,7 @@ export const RecoveryContent: FC<{
     if (secret?.type === 'sk') {
         return (
             <Wrapper>
+                <H2Label2Responsive>{t('recovery_wallet_secret_key')}</H2Label2Responsive>
                 <BackButtonBlockStyled onClick={onBack} />
                 <SKWrapper>{secret.sk}</SKWrapper>
             </Wrapper>
@@ -189,7 +190,7 @@ export const RecoveryContent: FC<{
     return (
         <Wrapper>
             {isPage && <BackButtonBlockStyled onClick={onBack} />}
-            <WordsGridAndHeaders mnemonic={mnemonicToShow} type={wordsType} allowCopy />
+            <WordsGridAndHeaders mnemonic={mnemonicToShow!} type={wordsType} allowCopy />
 
             {hasTronWallet && !isExportingTRC20 && (
                 <TronButton onClick={onShowTron}>{t('export_trc_20_wallet')}</TronButton>
