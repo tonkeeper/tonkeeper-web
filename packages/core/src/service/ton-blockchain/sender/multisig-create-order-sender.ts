@@ -8,6 +8,8 @@ import { MultisigEncoder } from '../encoder/multisig-encoder/multisig-encoder';
 import BigNumber from 'bignumber.js';
 import { fromNano, internal, SendMode } from '@ton/core';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
+import { estimateOrderByOutgoingMessage } from '../encoder/multisig-encoder/multisig-utils';
+import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(
@@ -33,12 +35,21 @@ export class MultisigCreateOrderSender implements ISender {
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {
-        const wrappedMessage = await this.wrapMessage(outgoing);
+        await this.checkTransactionPossibility();
 
-        return this.hostWalletSender.estimate({
-            sendMode: SendMode.IGNORE_ERRORS,
-            messages: [internal(wrappedMessage)]
+        const timestamp = await getServerTime(this.api);
+
+        const result = await estimateOrderByOutgoingMessage({
+            api: this.api,
+            multisig: this.multisig,
+            orderValidUntilSeconds: timestamp + this.ttlSeconds,
+            outgoing
         });
+
+        return {
+            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.event.extra * -1 }),
+            event: result.event
+        };
     }
 
     private async wrapMessage(outgoing: WalletOutgoingMessage) {
