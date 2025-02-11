@@ -38,7 +38,7 @@
         "react-is": "^18.2.0",
         "ts-node": "^10.9.1",
         "typescript": "5.2.2",
-        "vite": "^5.0.11",
+        "vite": "^5.1.8",
         "vite-plugin-node-polyfills": "0.17.0"
     },
     "scripts": {
