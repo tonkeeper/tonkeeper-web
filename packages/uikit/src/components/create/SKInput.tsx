@@ -65,7 +65,8 @@ export const SKInput: FC<{
                     value={sk}
                     onChange={onChange}
                     isValid={!error}
-                    label={t('sk_input_label')}
+                    label={t('recovery_wallet_secret_key')}
+                    helpText={t('sk_input_label')}
                 />
                 <ButtonResponsiveSize
                     fullWidth
