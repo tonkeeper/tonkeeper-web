@@ -17,8 +17,6 @@ export const decryptWalletSecret = async (
 ): Promise<AccountSecret> => {
     const secret = await decrypt(encryptedSecret, password);
     return walletSecretFromString(secret);
-
-    throw new Error('Wallet secret not valid');
 };
 
 export const walletSecretFromString = async (secret: string): Promise<AccountSecret> => {
