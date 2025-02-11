@@ -131,7 +131,7 @@ export const DesktopCollectablesContent = () => {
     }
 
     return (
-        <DesktopViewPageLayout ref={scrollRef}>
+        <DesktopViewPageLayout ref={scrollRef} mobileContentPaddingTop>
             <DesktopViewHeader borderBottom={!closeTop}>
                 <DesktopViewHeaderContent title={t('wallet_aside_collectibles')} />
             </DesktopViewHeader>

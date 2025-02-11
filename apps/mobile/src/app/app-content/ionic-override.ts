@@ -77,4 +77,9 @@ export const IonicOverride = css`
             height: 20px;
         }
     }
+
+    .header-translucent-ios ion-toolbar,
+    .footer-translucent-ios ion-toolbar {
+        --opacity: 0.9;
+    }
 `;

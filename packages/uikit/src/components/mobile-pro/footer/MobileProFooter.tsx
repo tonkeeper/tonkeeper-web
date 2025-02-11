@@ -43,6 +43,12 @@ const IonToolbarStyled = styled(IonToolbar)`
     padding-bottom: min(10px, env(safe-area-inset-bottom, 0px)) !important;
 `;
 
+const IonFooterStyled = styled(IonFooter)`
+    position: fixed;
+    bottom: 0;
+    height: 82px;
+`;
+
 export const MobileProFooter = () => {
     const account = useActiveAccount();
     const navigate = useNavigate();
@@ -52,7 +58,7 @@ export const MobileProFooter = () => {
     const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
     const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
     return (
-        <IonFooter translucent={true}>
+        <IonFooterStyled translucent={true}>
             <IonToolbarStyled>
                 <FooterContainer>
                     <Tab onClick={() => navigate(AppRoute.home)}>
@@ -70,7 +76,7 @@ export const MobileProFooter = () => {
                     </Tab>
                 </FooterContainer>
             </IonToolbarStyled>
-        </IonFooter>
+        </IonFooterStyled>
     );
 };
 

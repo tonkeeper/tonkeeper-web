@@ -144,7 +144,7 @@ export const DesktopDnsContent = () => {
     }
 
     return (
-        <DesktopViewPageLayout ref={scrollRef}>
+        <DesktopViewPageLayout ref={scrollRef} mobileContentPaddingTop>
             <DesktopViewHeader borderBottom={!closeTop}>
                 <DesktopViewHeaderContent
                     title={t('wallet_aside_domains')}

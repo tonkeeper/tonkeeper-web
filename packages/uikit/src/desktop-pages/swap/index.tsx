@@ -7,7 +7,7 @@ import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { SwapProviders } from '../../components/swap/SwapProviders';
 import { css, styled } from 'styled-components';
 import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
-import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -63,7 +63,7 @@ const DesktopSwapPageContent = () => {
     }
 
     return (
-        <SwapPageWrapper>
+        <SwapPageWrapper mobileContentPaddingTop>
             <DesktopViewHeader>
                 <DesktopViewHeaderContent
                     title={t('wallet_swap')}

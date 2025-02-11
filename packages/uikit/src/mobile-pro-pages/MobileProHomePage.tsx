@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonPage } from '@ionic/react';
 import React, { useEffect, useMemo } from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
@@ -147,46 +147,35 @@ const useMobileProHomePageHistory = () => {
     };
 };
 
-const IonHeaderStyled = styled(IonHeader)`
-    position: relative;
-    overflow: visible; // Позволяет градиенту выходить за пределы
+const Gradient = styled.div`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(256px + env(safe-area-inset-top));
 
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: calc(256px + env(safe-area-inset-top));
+    opacity: 0.16;
+    background: linear-gradient(
+        180deg,
+        #7665e5 0%,
+        rgba(118, 101, 229, 0.99) 6.67%,
+        rgba(118, 101, 229, 0.96) 13.33%,
+        rgba(118, 101, 229, 0.92) 20%,
+        rgba(118, 101, 229, 0.85) 26.67%,
+        rgba(118, 101, 229, 0.77) 33.33%,
+        rgba(118, 101, 229, 0.67) 40%,
+        rgba(118, 101, 229, 0.56) 46.67%,
+        rgba(118, 101, 229, 0.44) 53.33%,
+        rgba(118, 101, 229, 0.33) 60%,
+        rgba(118, 101, 229, 0.23) 66.67%,
+        rgba(118, 101, 229, 0.15) 73.33%,
+        rgba(118, 101, 229, 0.08) 80%,
+        rgba(118, 101, 229, 0.04) 86.67%,
+        rgba(118, 101, 229, 0.01) 93.33%,
+        rgba(118, 101, 229, 0) 100%
+    );
 
-        opacity: 0.16;
-        background: linear-gradient(
-            180deg,
-            #7665e5 0%,
-            rgba(118, 101, 229, 0.99) 6.67%,
-            rgba(118, 101, 229, 0.96) 13.33%,
-            rgba(118, 101, 229, 0.92) 20%,
-            rgba(118, 101, 229, 0.85) 26.67%,
-            rgba(118, 101, 229, 0.77) 33.33%,
-            rgba(118, 101, 229, 0.67) 40%,
-            rgba(118, 101, 229, 0.56) 46.67%,
-            rgba(118, 101, 229, 0.44) 53.33%,
-            rgba(118, 101, 229, 0.33) 60%,
-            rgba(118, 101, 229, 0.23) 66.67%,
-            rgba(118, 101, 229, 0.15) 73.33%,
-            rgba(118, 101, 229, 0.08) 80%,
-            rgba(118, 101, 229, 0.04) 86.67%,
-            rgba(118, 101, 229, 0.01) 93.33%,
-            rgba(118, 101, 229, 0) 100%
-        );
-
-        z-index: -1;
-    }
-`;
-
-const IonToolbarStyled = styled(IonToolbar)`
-    --background: transparent;
-    --border-width: 0 !important;
+    z-index: -1;
 `;
 
 const IonTitleWrapper = styled.div`
@@ -194,6 +183,11 @@ const IonTitleWrapper = styled.div`
     gap: 6px;
     align-items: center;
     justify-content: center;
+    padding: 12px;
+`;
+
+const FooterGap = styled.div`
+    height: 82px;
 `;
 
 export const MobileProHomePage = () => {
@@ -212,24 +206,19 @@ export const MobileProHomePage = () => {
 
     return (
         <IonPage id={mobileProHomePageId}>
-            <IonHeaderStyled>
-                <IonToolbarStyled>
-                    <IonTitle>
-                        <IonTitleWrapper>
-                            <Label2>
-                                {activeAccount.type === 'mam'
-                                    ? activeAccount.activeDerivation.name
-                                    : activeAccount.name}
-                            </Label2>
-                            <AccountAndWalletBadgesGroup
-                                account={activeAccount}
-                                walletId={activeAccount.activeTonWallet.id}
-                            />
-                        </IonTitleWrapper>
-                    </IonTitle>
-                </IonToolbarStyled>
-            </IonHeaderStyled>
-            <IonContentStyled>
+            <IonContentStyled fullscreen>
+                <IonTitleWrapper>
+                    <Label2>
+                        {activeAccount.type === 'mam'
+                            ? activeAccount.activeDerivation.name
+                            : activeAccount.name}
+                    </Label2>
+                    <AccountAndWalletBadgesGroup
+                        account={activeAccount}
+                        walletId={activeAccount.activeTonWallet.id}
+                    />
+                </IonTitleWrapper>
+                <Gradient />
                 <MobileProHomeBalanceStyled />
                 <MobileProHomeActionsStyled />
                 <MobileProHomeWidgetTokens />
@@ -273,6 +262,7 @@ export const MobileProHomePage = () => {
                         <Label2>{t('wallet_aside_settings')}</Label2>
                     </MenuItem>
                 </MenuWrapper>
+                <FooterGap />
             </IonContentStyled>
         </IonPage>
     );

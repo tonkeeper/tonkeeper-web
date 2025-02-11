@@ -324,7 +324,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         refetch
     } = useFetchFilteredActivity(token);
 
-    useScrollMonitor(ref, 5000, refetch);
+    useScrollMonitor(refetch, 5000, ref);
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
@@ -408,7 +408,7 @@ export const TronUSDTPage = () => {
         refetch
     } = useFetchFilteredActivity(TRON_USDT_ASSET.address);
 
-    useScrollMonitor(ref, 5000, refetch);
+    useScrollMonitor(refetch, 5000, ref);
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 

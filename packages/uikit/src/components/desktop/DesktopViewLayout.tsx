@@ -7,7 +7,9 @@ import React, {
     ReactNode,
     useCallback,
     useContext,
-    useId
+    useId,
+    useLayoutEffect,
+    useRef
 } from 'react';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
@@ -30,26 +32,59 @@ const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
 `;
 
-const DesktopViewPageLayoutSimpleIonic = styled.div<{ borderBottom?: boolean }>`
-    overflow: auto;
+const DesktopViewPageLayoutSimpleIonic = styled.div<{ $mobileContentPaddingTop?: boolean }>`
     height: 100%;
+
+    ${p =>
+        p.$mobileContentPaddingTop &&
+        css`
+            padding-top: 1rem;
+            box-sizing: border-box;
+        `}
+
+    &::after {
+        position: relative;
+        display: block;
+        content: '';
+        height: 82px;
+        background: transparent;
+    }
 `;
 
 const DesktopViewPageLayoutContext = createContext<string | undefined>(undefined);
 
 export const DesktopViewPageLayout = forwardRef<
     HTMLDivElement,
-    PropsWithChildren<{ className?: string }>
->(({ children, className }, ref) => {
+    PropsWithChildren<{ className?: string; mobileContentPaddingTop?: boolean }>
+>(({ children, className, mobileContentPaddingTop }, ref) => {
     const platform = useAppTargetEnv();
     const id = useId();
+
+    const contentRef = useRef<HTMLIonContentElement>(null);
+
+    useLayoutEffect(() => {
+        if (contentRef.current) {
+            contentRef.current.getScrollElement().then(scrollElem => {
+                if (ref) {
+                    if (typeof ref === 'function') {
+                        ref(scrollElem as HTMLDivElement);
+                    } else if (typeof ref === 'object') {
+                        ref.current = scrollElem as HTMLDivElement;
+                    }
+                }
+            });
+        }
+    }, []);
 
     if (platform === 'mobile') {
         return (
             <DesktopViewPageLayoutContext.Provider value={id}>
                 <IonPage id={id}>
-                    <IonContent>
-                        <DesktopViewPageLayoutSimpleIonic ref={ref} className={className}>
+                    <IonContent ref={contentRef} fullscreen={true}>
+                        <DesktopViewPageLayoutSimpleIonic
+                            className={className}
+                            $mobileContentPaddingTop={mobileContentPaddingTop}
+                        >
                             {children}
                         </DesktopViewPageLayoutSimpleIonic>
                     </IonContent>
@@ -142,8 +177,8 @@ export const DesktopViewHeader: FC<{
 
     if (portalId !== undefined) {
         return (
-            <ReactPortal wrapperId={portalId}>
-                <IonHeader>
+            <ReactPortal wrapperId={portalId} position="first">
+                <IonHeader translucent={true}>
                     <IonToolbar>
                         <IonButtons slot="start">
                             <IonBackButton />

@@ -86,7 +86,6 @@ const WalletLayoutBody = styled.div`
     position: relative;
     flex: 1;
     display: flex;
-    max-height: calc(100% - 52px);
 `;
 
 const FullSizeWrapperBounded = styled(FullSizeWrapper)`

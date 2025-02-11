@@ -456,15 +456,16 @@ export const isInitiatorFiltrationForAssetAvailable = (asset: Asset | undefined)
 };
 
 export const useScrollMonitor = (
-    elementRef: React.RefObject<HTMLDivElement>,
+    callback: () => void,
     timeout: number,
-    callback: () => void
+    elementRef?: React.RefObject<HTMLDivElement>
 ) => {
     const [isAtTop, setIsAtTop] = useState(true);
+    const [element, setElement] = useState(elementRef?.current);
 
     useEffect(() => {
         const handleScroll = debounce(() => {
-            if (elementRef.current && elementRef.current.scrollTop < 5) {
+            if (element && element.scrollTop < 5) {
                 setIsAtTop(true);
             } else {
                 setIsAtTop(false);
@@ -472,11 +473,11 @@ export const useScrollMonitor = (
         }, 20);
 
         handleScroll();
-        elementRef.current?.addEventListener('scroll', handleScroll);
+        element?.addEventListener('scroll', handleScroll);
         return () => {
-            elementRef.current?.removeEventListener('scroll', handleScroll);
+            element?.removeEventListener('scroll', handleScroll);
         };
-    }, [elementRef.current]);
+    }, [element]);
 
     useLayoutEffect(() => {
         const timer = setInterval(() => {
@@ -488,4 +489,6 @@ export const useScrollMonitor = (
             clearInterval(timer);
         };
     }, [isAtTop, callback]);
+
+    return setElement;
 };

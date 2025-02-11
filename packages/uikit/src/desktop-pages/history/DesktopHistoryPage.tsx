@@ -1,4 +1,4 @@
-import { FC, Suspense, useRef } from 'react';
+import { FC, Suspense, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import { ActivitySkeletonPage } from '../../components/Skeleton';
 import { useFetchNext } from '../../hooks/useFetchNext';
@@ -24,8 +24,12 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
-    overflow: auto;
-    min-height: 100%;
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            overflow: auto;
+            min-height: 100%;
+        `}
 `;
 
 const HistoryContainer = styled.div`
@@ -101,8 +105,6 @@ const DesktopHistoryPageContent: FC = () => {
     const config = useActiveConfig();
     const { t } = useTranslation();
 
-    const ref = useRef<HTMLDivElement>(null);
-
     const {
         refetch,
         isFetched: isActivityFetched,
@@ -112,11 +114,21 @@ const DesktopHistoryPageContent: FC = () => {
         data: activity
     } = useFetchFilteredActivity();
 
-    useScrollMonitor(ref, 5000, refetch);
+    const setMonitorRef = useScrollMonitor(refetch, 5000);
 
     const isFetchingNextPage = isActivityFetchingNextPage;
 
-    useFetchNext(hasActivityNextPage, isFetchingNextPage, fetchActivityNextPage, true, ref);
+    const setFetchNextRef = useFetchNext(
+        hasActivityNextPage,
+        isFetchingNextPage,
+        fetchActivityNextPage,
+        true
+    );
+
+    const refCallback = useCallback((el: HTMLDivElement) => {
+        setFetchNextRef(el);
+        setMonitorRef(el);
+    }, []);
 
     const onOpenExplorer = () =>
         config.accountExplorer
@@ -156,7 +168,7 @@ const DesktopHistoryPageContent: FC = () => {
     }
 
     return (
-        <HistoryPageWrapper ref={ref}>
+        <HistoryPageWrapper ref={refCallback}>
             <HistoryHeaderContainer borderBottom={true}>
                 <DesktopViewHeaderContent
                     title={t('page_header_history')}
