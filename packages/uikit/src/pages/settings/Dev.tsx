@@ -3,7 +3,7 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk } from '../../hooks/appSdk';
-import { CloseIcon, SpinnerIcon } from '../../components/Icon';
+import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
@@ -16,7 +16,6 @@ import { useActiveConfig } from '../../state/wallet';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { Notification } from '../../components/Notification';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
-import { Button } from '../../components/fields/Button';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -123,16 +122,23 @@ const EnableTronSettings = () => {
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
-    return (
-        <>
-            <Button onClick={onOpen} primary>
-                Add account with private key
-            </Button>
-            <Notification isOpen={isOpen} handleClose={onClose}>
-                {() => <ImportBySKWallet afterCompleted={onClose} />}
-            </Notification>
-        </>
-    );
+
+    const items = useMemo<SettingsItem[]>(() => {
+        return [
+            {
+                name: 'Add account with private key',
+                icon: <PlusIcon />,
+                action: () => onOpen()
+            }
+        ];
+    }, [onOpen]);
+
+    return <>
+        <SettingsList items={items} />
+        <Notification isOpen={isOpen} handleClose={onClose}>
+            {() => <ImportBySKWallet afterCompleted={onClose} />}
+        </Notification>
+    </>;
 };
 
 export const DevSettings = React.memo(() => {
