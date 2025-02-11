@@ -20,7 +20,7 @@ import {
 } from '../entries/account';
 
 import { DeprecatedAccountState } from '../entries/account';
-import { AuthState, DeprecatedAuthState } from '../entries/password';
+import { AuthPassword, AuthState, DeprecatedAuthState } from '../entries/password';
 import { assertUnreachable, notNullish } from '../utils/types';
 import { getFallbackAccountEmoji } from './walletService';
 
@@ -202,9 +202,14 @@ export class AccountsStorage {
         accounts.forEach(account => {
             if ('auth' in account && account.auth.kind === 'password') {
                 if ((account.auth as unknown as { encryptedMnemonic: string }).encryptedMnemonic) {
-                    account.auth.encryptedSecret = (
-                        account.auth as unknown as { encryptedMnemonic: string }
-                    ).encryptedMnemonic;
+                    const auth: AuthPassword = {
+                        kind: account.auth.kind,
+                        encryptedSecret: (
+                            account.auth as unknown as { encryptedMnemonic: string }
+                        ).encryptedMnemonic
+                    };
+                    (account.auth as unknown as AuthPassword) = auth;
+                    
                     needUpdate = true;
                 }
             }
