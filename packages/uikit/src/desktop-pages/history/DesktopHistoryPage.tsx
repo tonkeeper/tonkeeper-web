@@ -12,7 +12,6 @@ import { DesktopHistory } from '../../components/desktop/history/DesktopHistory'
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig, useActiveWallet } from '../../state/wallet';
-import { Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
@@ -22,6 +21,7 @@ import {
 } from '../../components/desktop/history/DesktopHistoryFilters';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
+import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     ${p =>
@@ -43,15 +43,6 @@ const HistoryContainer = styled.div`
         `}
 `;
 
-const HistoryHeaderContainer = styled(DesktopViewHeader)`
-    flex-shrink: 0;
-    justify-content: flex-start;
-    padding-right: 0;
-    > *:last-child {
-        margin-left: auto;
-    }
-`;
-
 const ExplorerButton = styled.button`
     border: none;
     background-color: transparent;
@@ -68,8 +59,12 @@ const ExplorerButton = styled.button`
     }
 `;
 
-const FiltersWrapper = styled.div`
+const ExplorerButtonMobile = styled.div`
+    align-items: center;
+    justify-content: center;
     display: flex;
+    gap: 6px;
+    padding: 0 8px;
 `;
 
 const LoaderContainer = styled.div`
@@ -96,6 +91,16 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
 
     > * {
         height: 100%;
+    }
+`;
+
+const DesktopViewHeaderContentRightStyled = styled(DesktopViewHeaderContent.Right)`
+    margin-left: 0;
+    justify-content: space-between;
+    width: 100%;
+
+    > *:first-child {
+        margin-right: auto;
     }
 `;
 
@@ -135,19 +140,48 @@ const DesktopHistoryPageContent: FC = () => {
             ? sdk.openPage(config.accountExplorer.replace('%s', formatAddress(wallet.rawAddress)))
             : undefined;
 
+    const rightPart = (
+        <>
+            <ForTargetEnv env="mobile">
+                <DesktopViewHeaderContent.Right>
+                    <DesktopViewHeaderContent.RightItem>
+                        <ExplorerButtonMobile onClick={onOpenExplorer}>
+                            <LinkOutIcon color="currentColor" />
+                            Tonviewer
+                        </ExplorerButtonMobile>
+                    </DesktopViewHeaderContent.RightItem>
+                    <DesktopViewHeaderContent.RightItem>
+                        <OtherHistoryFilters />
+                    </DesktopViewHeaderContent.RightItem>
+                    <DesktopViewHeaderContent.RightItem>
+                        <AssetHistoryFilter />
+                    </DesktopViewHeaderContent.RightItem>
+                </DesktopViewHeaderContent.Right>
+            </ForTargetEnv>
+            <NotForTargetEnv env="mobile">
+                <DesktopViewHeaderContentRightStyled>
+                    <DesktopViewHeaderContent.RightItem>
+                        <ExplorerButton onClick={onOpenExplorer}>
+                            <LinkOutIcon color="currentColor" />
+                        </ExplorerButton>
+                    </DesktopViewHeaderContent.RightItem>
+                    <DesktopViewHeaderContent.RightItem>
+                        <AssetHistoryFilter />
+                    </DesktopViewHeaderContent.RightItem>
+                    <DesktopViewHeaderContent.RightItem>
+                        <OtherHistoryFilters />
+                    </DesktopViewHeaderContent.RightItem>
+                </DesktopViewHeaderContentRightStyled>
+            </NotForTargetEnv>
+        </>
+    );
+
     if (!isActivityFetched!) {
         return (
             <HistoryPageWrapper>
-                <HistoryHeaderContainer borderBottom={false}>
-                    <Label2>{t('page_header_history')}</Label2>
-                    <ExplorerButton onClick={onOpenExplorer}>
-                        <LinkOutIcon color="currentColor" />
-                    </ExplorerButton>
-                    <FiltersWrapper>
-                        <AssetHistoryFilter />
-                        <OtherHistoryFilters />
-                    </FiltersWrapper>
-                </HistoryHeaderContainer>
+                <DesktopViewHeader borderBottom={true}>
+                    <DesktopViewHeaderContent title={t('page_header_history')} right={rightPart} />
+                </DesktopViewHeader>
                 <HistoryContainer>
                     <LoaderContainer>
                         <SpinnerRing />
@@ -169,22 +203,9 @@ const DesktopHistoryPageContent: FC = () => {
 
     return (
         <HistoryPageWrapper ref={refCallback}>
-            <HistoryHeaderContainer borderBottom={true}>
-                <DesktopViewHeaderContent
-                    title={t('page_header_history')}
-                    right={
-                        <>
-                            <ExplorerButton onClick={onOpenExplorer}>
-                                <LinkOutIcon color="currentColor" />
-                            </ExplorerButton>
-                            <FiltersWrapper>
-                                <AssetHistoryFilter />
-                                <OtherHistoryFilters />
-                            </FiltersWrapper>
-                        </>
-                    }
-                />
-            </HistoryHeaderContainer>
+            <DesktopViewHeader borderBottom={true}>
+                <DesktopViewHeaderContent title={t('page_header_history')} right={rightPart} />
+            </DesktopViewHeader>
             <HistoryContainer>
                 <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />
             </HistoryContainer>

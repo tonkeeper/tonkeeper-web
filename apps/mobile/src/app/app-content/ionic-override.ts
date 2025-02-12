@@ -63,6 +63,10 @@ export const IonicOverride = css`
         color: ${p => p.theme.accentBlue};
     }
 
+    ion-button {
+        --color: ${p => p.theme.accentBlue};
+    }
+
     ion-title {
         ${Label1Class};
     }
@@ -80,6 +84,6 @@ export const IonicOverride = css`
 
     .header-translucent-ios ion-toolbar,
     .footer-translucent-ios ion-toolbar {
-        --opacity: 0.9;
+        --opacity: 0.92;
     }
 `;

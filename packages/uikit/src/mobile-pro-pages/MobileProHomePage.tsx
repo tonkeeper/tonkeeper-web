@@ -45,7 +45,7 @@ const IonContentStyled = styled(IonContent)`
 
     &::part(scroll) {
         padding-bottom: env(safe-area-inset-bottom);
-        overscroll-behavior: auto;
+        /*overscroll-behavior: auto;*/
     }
 `;
 

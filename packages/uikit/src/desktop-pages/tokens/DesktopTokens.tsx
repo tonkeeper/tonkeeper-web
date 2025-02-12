@@ -21,6 +21,8 @@ import { TronAssets } from '../../components/home/TronAssets';
 import { useActiveTronWallet, useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useAppTargetEnv } from '../../hooks/appSdk';
+import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 export const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -48,16 +50,6 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
     ${DesktopAssetStylesOverride}
 `;
 
-const TokensHeaderContainer = styled(DesktopViewHeader)`
-    flex-shrink: 0;
-    border-bottom: 1px solid ${p => p.theme.separatorCommon};
-    padding-right: 0;
-
-    > *:nth-child(3) {
-        margin-left: auto;
-    }
-`;
-
 const TokensPageBody = styled.div`
     padding: 0 1rem 1rem;
 
@@ -69,12 +61,27 @@ const TokensPageBody = styled.div`
 const HideButton = styled.button`
     border: none;
     background-color: transparent;
-    padding: 0.5rem 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
 
-    color: ${p => p.theme.textAccent};
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            padding: 0.5rem 1rem;
+            color: ${p.theme.textAccent};
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            justify-content: flex-start;
+            width: 100%;
+            > svg {
+                width: 16px;
+                height: 16px;
+            }
+        `}
 `;
 
 const Divider = styled.div`
@@ -155,24 +162,31 @@ const DesktopTokensPayload = () => {
 
     return (
         <DesktopViewPageLayout ref={containerRef}>
-            <TokensHeaderContainer backButton={env === 'mobile'}>
+            <DesktopViewHeader borderBottom>
                 <DesktopViewHeaderContent
                     title={t('jettons_list_title')}
                     right={
                         canShowChart && (
-                            <HideButton onClick={onToggleChart}>
-                                <Body2>
-                                    {t(
-                                        showChart
-                                            ? 'tokens_hide_statistics_btn'
-                                            : 'tokens_show_statistics_btn'
-                                    )}
-                                </Body2>
-                            </HideButton>
+                            <DesktopViewHeaderContent.Right>
+                                <DesktopViewHeaderContent.RightItem>
+                                    <HideButton onClick={onToggleChart}>
+                                        <ForTargetEnv env="mobile">
+                                            {showChart ? <InvisibleIcon /> : <VisibleIcon />}
+                                        </ForTargetEnv>
+                                        <Body2>
+                                            {t(
+                                                showChart
+                                                    ? 'tokens_hide_statistics_btn'
+                                                    : 'tokens_show_statistics_btn'
+                                            )}
+                                        </Body2>
+                                    </HideButton>
+                                </DesktopViewHeaderContent.RightItem>
+                            </DesktopViewHeaderContent.Right>
                         )
                     }
                 />
-            </TokensHeaderContainer>
+            </DesktopViewHeader>
             <TokensPageBody
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`,

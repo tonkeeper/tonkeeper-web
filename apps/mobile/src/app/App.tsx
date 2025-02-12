@@ -37,7 +37,7 @@ import {
 import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, css } from 'styled-components';
 import { CAPACITOR_APPLICATION_ID, CapacitorAppSdk } from '../libs/appSdk';
 import { useAnalytics, useAppHeight } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
@@ -46,7 +46,6 @@ import { CapacitorNotifications } from '../libs/capacitorNotifications';
 import { NarrowContent } from './app-content/NarrowContent';
 import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { IonicOverride } from './app-content/ionic-override';
 import { WideContent } from './app-content/WideContent';
 
 setupIonicReact({
@@ -66,8 +65,6 @@ const queryClient = new QueryClient({
 
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
-    
-    ${IonicOverride};
 
     body {
         font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
@@ -97,7 +94,11 @@ const GlobalStyle = createGlobalStyle`
       -webkit-user-select: none;
       user-select: none;
 
-      overscroll-behavior: none;
+        ${() =>
+            CAPACITOR_APPLICATION_ID === 'tablet' &&
+            css`
+                overscroll-behavior: none;
+            `}
     }
 
     a {

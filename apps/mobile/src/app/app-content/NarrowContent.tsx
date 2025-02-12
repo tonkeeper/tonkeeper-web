@@ -23,7 +23,7 @@ import { DesktopCoinPage } from '@tonkeeper/uikit/dist/desktop-pages/coin/Deskto
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 import { Container } from '@tonkeeper/uikit';
 import { BackgroundElements, usePrefetch } from './common';
 import './ionic-styles';
@@ -57,6 +57,7 @@ import { MobileProPreferencesPage } from '@tonkeeper/uikit/dist/mobile-pro-pages
 import { Navigate } from '@tonkeeper/uikit/dist/components/shared/Navigate';
 import { MobileProFooter } from '@tonkeeper/uikit/dist/components/mobile-pro/footer/MobileProFooter';
 import { MobileProWalletMenu } from '@tonkeeper/uikit/dist/components/mobile-pro/MobileProWalletMenu';
+import { IonicOverride } from './ionic-override';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -96,6 +97,18 @@ const FullSizeWrapperBounded = styled(FullSizeWrapper)`
 `;
 
 export const NarrowContent: FC<{
+    activeAccount?: Account | null;
+    lock: boolean;
+}> = ({ activeAccount, lock }) => {
+    return (
+        <>
+            <NarrowEnvGlobalStyles />
+            <NarrowContentBody activeAccount={activeAccount} lock={lock} />
+        </>
+    );
+};
+
+const NarrowContentBody: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = ({ activeAccount, lock }) => {
@@ -299,3 +312,7 @@ const NavigateToRecovery = () => {
 
     return <Navigate to={{ pathname: newPath, search: location.search }} replace={true} />;
 };
+
+export const NarrowEnvGlobalStyles = createGlobalStyle`
+    ${IonicOverride};
+`;

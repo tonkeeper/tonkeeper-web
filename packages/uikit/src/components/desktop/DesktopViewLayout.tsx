@@ -1,5 +1,6 @@
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import React, {
+    Children,
     createContext,
     FC,
     forwardRef,
@@ -13,20 +14,24 @@ import React, {
 } from 'react';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
-import { ArrowLeftIcon } from '../Icon';
+import { ArrowLeftIcon, EllipsisIcon } from '../Icon';
 import { IconButton } from '../fields/IconButton';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import {
     IonBackButton,
+    IonButton,
     IonButtons,
     IonContent,
     IonHeader,
     IonPage,
+    IonPopover,
     IonTitle,
     IonToolbar
 } from '@ionic/react';
 import ReactPortal from '../ReactPortal';
 import { Label2 } from '../Text';
+import { SelectDropDown } from '../fields/Select';
+import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 
 const DesktopViewPageLayoutSimple = styled.div<{ borderBottom?: boolean }>`
     overflow: auto;
@@ -103,7 +108,7 @@ export const DesktopViewHeaderStyled = styled.div<{
     withBackButton?: boolean;
     borderBottom?: boolean;
 }>`
-    padding: 1rem 1rem 1rem ${props => (props.withBackButton ? '0' : '1rem')};
+    padding: 1rem 0 1rem ${props => (props.withBackButton ? '0' : '1rem')};
     height: 20px;
     display: flex;
     align-items: center;
@@ -202,10 +207,10 @@ export const DesktopViewHeader: FC<{
     );
 };
 
-export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> = ({
-    title,
-    right
-}) => {
+export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> & {
+    Right: typeof DesktopViewHeaderContentRight;
+    RightItem: typeof DesktopViewHeaderContentRightItem;
+} = ({ title, right }) => {
     const env = useAppTargetEnv();
 
     if (env !== 'mobile') {
@@ -224,3 +229,101 @@ export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> 
         </>
     );
 };
+
+const DesktopViewHeaderContentRight: FC<{ children: ReactNode; className?: string }> = ({
+    children,
+    className
+}) => {
+    const env = useAppTargetEnv();
+
+    if (env === 'mobile') {
+        return (
+            <DesktopViewHeaderContentRightMobile className={className}>
+                {children}
+            </DesktopViewHeaderContentRightMobile>
+        );
+    }
+
+    return (
+        <DesktopViewHeaderContentRightDesktop className={className}>
+            {children}
+        </DesktopViewHeaderContentRightDesktop>
+    );
+};
+
+const DesktopViewHeaderContentRightDesktop = styled.div`
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+`;
+
+const DesktopViewHeaderContentRightMobile: FC<PropsWithChildren<{ className?: string }>> = ({
+    children,
+    className
+}) => {
+    const triggerId = useId();
+    return (
+        <IonButtons slot="primary" className={className}>
+            <IonButton>
+                <DDGlobalStyle />
+                <SelectDropDown
+                    containerClassName="dd-select-container-header"
+                    top="44px"
+                    right="8px"
+                    portal
+                    payload={() => (
+                        <DropDownContent>
+                            {Children.toArray(children).map(elem => (
+                                <>
+                                    {elem}
+                                    <DropDownItemsDivider />
+                                </>
+                            ))}
+                        </DropDownContent>
+                    )}
+                >
+                    <EllipsisIcon />
+                </SelectDropDown>
+            </IonButton>
+            <IonPopover trigger={triggerId} side="top" alignment="center">
+                <IonContent class="ion-padding">Hello World!</IonContent>
+            </IonPopover>
+        </IonButtons>
+    );
+};
+
+const DDGlobalStyle = createGlobalStyle`
+    .dd-select-container-header {
+        overflow: visible;
+    }
+`;
+
+const DropDownItemStyled = styled(DropDownItem)`
+    &:empty {
+        display: none;
+
+        & + ${DropDownItemsDivider} {
+            display: none;
+        }
+    }
+`;
+
+const DesktopViewHeaderContentRightItem: FC<PropsWithChildren<{ className?: string }>> = ({
+    children,
+    className
+}) => {
+    const env = useAppTargetEnv();
+
+    if (env === 'mobile') {
+        return (
+            <DropDownItemStyled isSelected={false} className={className}>
+                {children}
+            </DropDownItemStyled>
+        );
+    }
+
+    return <div className={className}>{children}</div>;
+};
+
+DesktopViewHeaderContent.Right = DesktopViewHeaderContentRight;
+DesktopViewHeaderContent.RightItem = DesktopViewHeaderContentRightItem;

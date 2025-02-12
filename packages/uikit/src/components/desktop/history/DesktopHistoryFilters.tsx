@@ -10,6 +10,7 @@ import { isInitiatorFiltrationForAssetAvailable, useHistoryFilters } from '../..
 import { useTranslation } from '../../../hooks/translation';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Badge } from '../../shared';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 
 const AssetIcon = styled.img<{ $noBorders?: boolean }>`
     width: 24px;
@@ -20,9 +21,22 @@ const AssetIcon = styled.img<{ $noBorders?: boolean }>`
     pointer-events: none;
 `;
 
+const AssetIconSm = styled(AssetIcon)`
+    width: 16px;
+    height: 16px;
+    margin-right: 0;
+`;
+
 const AllAssetsIcon = styled(CoinsHorizontalIcon)`
     margin-right: 12px;
     color: ${p => p.theme.iconSecondary};
+`;
+
+const AllAssetsIconSm = styled(AllAssetsIcon)`
+    width: 16px;
+    height: 16px;
+    margin-right: 0;
+    color: ${p => p.theme.iconPrimary};
 `;
 
 const DropDownButton = styled.button`
@@ -31,13 +45,20 @@ const DropDownButton = styled.button`
     display: flex;
     align-items: center;
     gap: 6px;
-    color: ${p => p.theme.textSecondary};
+    color: ${p =>
+        p.theme.proDisplayType === 'mobile' ? p.theme.textPrimary : p.theme.textSecondary};
 `;
 
 const DropDownTokensButton = styled(DropDownButton)`
     padding-left: 12px;
     padding-right: 8px;
     white-space: nowrap;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding-left: 8px;
+        `}
 `;
 
 const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
@@ -50,7 +71,7 @@ const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
         content: '';
         position: absolute;
         top: -6px;
-        right: 10px;
+        left: 20px;
         height: 6px;
         width: 6px;
         background-color: ${p => p.theme.accentBlue};
@@ -114,6 +135,16 @@ export const AssetHistoryFilter = () => {
             )}
         >
             <DropDownTokensButton>
+                <ForTargetEnv env="mobile">
+                    {selectedAsset ? (
+                        <AssetIconSm
+                            src={selectedAsset.image}
+                            $noBorders={selectedAsset.id === TRON_USDT_ASSET.id}
+                        />
+                    ) : (
+                        <AllAssetsIconSm />
+                    )}
+                </ForTargetEnv>
                 <Body2>
                     {selectedAsset ? selectedAsset.symbol : t('history_filters_all_assets')}
                 </Body2>
@@ -199,7 +230,14 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
             )}
         >
             <DropDownOtherFiltersButton $badge={filterSpam || onlyInitiatorChecked}>
-                <SlidersIcon />
+                <ForTargetEnv env="mobile">
+                    <SlidersIcon />
+                    <Body2>{t('settings_title')}</Body2>
+                    <ChevronDownIcon />
+                </ForTargetEnv>
+                <NotForTargetEnv env="mobile">
+                    <SlidersIcon />
+                </NotForTargetEnv>
             </DropDownOtherFiltersButton>
         </SelectDropDown>
     );
