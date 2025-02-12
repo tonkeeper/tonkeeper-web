@@ -9,7 +9,7 @@ import {
     useCreateAccountTestnet,
     useMutateRenameAccount
 } from '../../state/wallet';
-import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
+import { ChoseWalletVersions, ChoseWalletVersionsByMnemonic } from "../../components/create/ChoseWalletVersions";
 import { AccountTonTestnet, getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
 import {
     createStandardTestnetAccountByMnemonic,
@@ -143,7 +143,7 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
     };
 
     const onRename = async (form: { name: string; emoji: string }) => {
-        let newAcc: AccountTonTestnet = await renameAccount({
+        const newAcc: AccountTonTestnet = await renameAccount({
             id: createdAccount!.id,
             ...form
         });
@@ -234,7 +234,7 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
 
     if (!createdAccount) {
         return (
-            <ChoseWalletVersions
+            <ChoseWalletVersionsByMnemonic
                 network={Network.TESTNET}
                 mnemonic={mnemonic}
                 mnemonicType={'ton'}

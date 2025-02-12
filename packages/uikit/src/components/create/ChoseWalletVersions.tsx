@@ -66,18 +66,41 @@ const SubmitBlock = styled.div`
     width: 100%;
 `;
 
-export const ChoseWalletVersions: FC<{
+export const ChoseWalletVersionsByMnemonic: FC<{
     mnemonic: string[];
     mnemonicType: MnemonicType;
     network: Network;
     onSubmit: (versions: WalletVersion[]) => void;
     isLoading?: boolean;
 }> = ({ mnemonic, onSubmit, network, isLoading, mnemonicType }) => {
+    const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        mnemonicToKeypair(mnemonic, mnemonicType).then(keypair =>
+            setPublicKey(keypair.publicKey.toString('hex'))
+        );
+    }, [mnemonic]);
+
+    return (
+        <ChoseWalletVersions
+            network={network}
+            publicKey={publicKey}
+            onSubmit={onSubmit}
+            isLoading={isLoading}
+        />
+    );
+};
+
+export const ChoseWalletVersions: FC<{
+    publicKey: string | undefined;
+    network: Network;
+    onSubmit: (versions: WalletVersion[]) => void;
+    isLoading?: boolean;
+}> = ({ publicKey, onSubmit, network, isLoading }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { defaultWalletVersion } = useAppContext();
 
-    const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
     const { data: wallets } = useStandardTonWalletVersions(network, publicKey);
     const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
     const accountState = useAccountState(mayBeCreateAccountId(network, publicKey));
@@ -87,12 +110,6 @@ export const ChoseWalletVersions: FC<{
             hideIosKeyboard();
         }
     }, []);
-
-    useEffect(() => {
-        mnemonicToKeypair(mnemonic, mnemonicType).then(keypair =>
-            setPublicKey(keypair.publicKey.toString('hex'))
-        );
-    }, [mnemonic]);
 
     useLayoutEffect(() => {
         if (wallets) {

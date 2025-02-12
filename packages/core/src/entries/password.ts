@@ -12,7 +12,7 @@ export type MnemonicType = 'ton' | 'bip39';
 
 export interface AuthPassword {
     kind: 'password';
-    encryptedMnemonic: string;
+    encryptedSecret: string;
 }
 
 export interface AuthKeychain {

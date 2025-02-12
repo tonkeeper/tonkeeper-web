@@ -11,7 +11,7 @@ import {
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
-import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
+import { ChoseWalletVersions, ChoseWalletVersionsByMnemonic } from "../../components/create/ChoseWalletVersions";
 import {
     AccountMAM,
     AccountTonMnemonic,
@@ -430,7 +430,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     if (!createdAccount) {
         return (
-            <ChoseWalletVersions
+            <ChoseWalletVersionsByMnemonic
                 network={Network.MAINNET}
                 mnemonic={mnemonic}
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}

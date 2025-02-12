@@ -4,19 +4,62 @@ import {
     mnemonicToPrivateKey,
     mnemonicValidate as validateStandardTonMnemonic
 } from '@ton/crypto';
-import { AuthPassword, MnemonicType } from '../entries/password';
-import { decrypt } from './cryptoService';
+import { MnemonicType } from '../entries/password';
+import { decrypt, encrypt } from './cryptoService';
 import { mnemonicToSeed, validateMnemonic as validBip39Mnemonic } from 'bip39';
 import { deriveED25519Path } from './ed25519';
 import { assertUnreachable } from '../utils/types';
+import { AccountSecret } from '../entries/account';
 
-export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, password: string) => {
-    const mnemonic = (await decrypt(state.auth.encryptedMnemonic, password)).split(' ');
-    const isValid = await seeIfMnemonicValid(mnemonic);
-    if (!isValid) {
-        throw new Error('Wallet mnemonic not valid');
+export const decryptWalletSecret = async (
+    encryptedSecret: string,
+    password: string
+): Promise<AccountSecret> => {
+    const secret = await decrypt(encryptedSecret, password);
+    return walletSecretFromString(secret);
+};
+
+export const walletSecretFromString = async (secret: string): Promise<AccountSecret> => {
+    const isValidMnemonic = await seeIfMnemonicValid(secret.split(' '));
+    if (isValidMnemonic) {
+        return {
+            type: 'mnemonic',
+            mnemonic: secret.split(' ')
+        };
     }
-    return mnemonic;
+
+    if (isValidSK(secret)) {
+        return {
+            type: 'sk',
+            sk: secret
+        };
+    }
+
+    throw new Error('Wallet secret not valid');
+};
+
+export const walletSecretToString = (secret: AccountSecret): string => {
+    if (secret.type === 'mnemonic') {
+        return secret.mnemonic.join(' ');
+    }
+
+    if (secret.type === 'sk') {
+        return secret.sk;
+    }
+
+    assertUnreachable(secret);
+};
+
+export const encryptWalletSecret = async (
+    secret: AccountSecret,
+    password: string
+): Promise<string> => {
+    const stringSecret = walletSecretToString(secret);
+    return encrypt(stringSecret, password);
+};
+
+export const isValidSK = (sk: string) => {
+    return /^[0-9a-fA-F]{128}$/.test(sk);
 };
 
 export const seeIfMnemonicValid = async (mnemonic: string[]) => {

@@ -1,12 +1,13 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
-import { sha256_sync, sign } from '@ton/crypto';
+import { keyPairFromSecretKey, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
     AccountId,
     isAccountTronCompatible,
     isMnemonicAndPassword,
-    Account
+    Account,
+    AccountSecret
 } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { CellSigner, Signer, TronSigner } from '@tonkeeper/core/dist/entries/signer';
@@ -19,8 +20,9 @@ import {
     LedgerTransaction
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import {
-    decryptWalletMnemonic,
-    mnemonicToKeypair
+    decryptWalletSecret,
+    mnemonicToKeypair,
+    walletSecretFromString
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import {
     parseSignerSignature,
@@ -80,8 +82,11 @@ export const signTonConnectOver = ({
             }
             case 'testnet':
             case 'mnemonic': {
-                const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
-                const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
+                const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+                if (secret.type !== 'mnemonic') {
+                    throw new Error('Unexpected secret type');
+                }
+                const keyPair = await mnemonicToKeypair(secret.mnemonic, account.mnemonicType);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -91,6 +96,17 @@ export const signTonConnectOver = ({
                 const w = wallet ?? account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id, checkTouchId);
                 const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
+                return nacl.sign.detached(
+                    Buffer.from(sha256_sync(bufferToSign)),
+                    keyPair.secretKey
+                );
+            }
+            case 'sk': {
+                const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+                if (secret.type !== 'sk') {
+                    throw new Error('Unexpected secret type');
+                }
+                const keyPair = keyPairFromSecretKey(Buffer.from(secret.sk, 'hex'));
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -237,9 +253,24 @@ export const getSigner = async (
             }
             case 'testnet':
             case 'mnemonic': {
-                const mnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
+                const secret = await getAccountSecret(sdk, account.id, checkTouchId);
+                if (secret.type !== 'mnemonic') {
+                    throw new Error('Unexpected secret type');
+                }
                 const callback = async (message: Cell) => {
-                    const keyPair = await mnemonicToKeypair(mnemonic, account.mnemonicType);
+                    const keyPair = await mnemonicToKeypair(secret.mnemonic, account.mnemonicType);
+                    return sign(message.hash(), keyPair.secretKey);
+                };
+                callback.type = 'cell' as const;
+                return callback;
+            }
+            case 'sk': {
+                const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+                if (secret.type !== 'sk') {
+                    throw new Error('Unexpected secret type');
+                }
+                const callback = async (message: Cell) => {
+                    const keyPair = keyPairFromSecretKey(Buffer.from(secret.sk, 'hex'));
                     return sign(message.hash(), keyPair.secretKey);
                 };
                 callback.type = 'cell' as const;
@@ -299,7 +330,11 @@ export const getTronSigner = (
             }
             case 'mnemonic': {
                 return async (tx: Transaction) => {
-                    const tonMnemonic = await getAccountMnemonic(sdk, account.id, checkTouchId);
+                    const secret = await getAccountSecret(sdk, account.id, checkTouchId);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    const tonMnemonic = secret.mnemonic;
                     const tronMnemonic = await tonMnemonicToTronMnemonic(
                         tonMnemonic,
                         account.mnemonicType
@@ -323,13 +358,13 @@ export const getTronSigner = (
     }
 };
 
-export const getAccountMnemonic = async (
+export const getAccountSecret = async (
     sdk: IAppSdk,
     accountId: AccountId,
     checkTouchId: () => Promise<void>
-): Promise<string[]> => {
-    const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
-    return mnemonic;
+): Promise<AccountSecret> => {
+    const { secret } = await getSecretAndPassword(sdk, accountId, checkTouchId);
+    return secret;
 };
 
 export const getMAMWalletMnemonic = async (
@@ -347,17 +382,20 @@ export const getMAMWalletMnemonic = async (
         throw new Error('Derivation not found');
     }
 
-    const { mnemonic } = await getMnemonicAndPassword(sdk, accountId, checkTouchId);
-    const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
+    const { secret } = await getSecretAndPassword(sdk, accountId, checkTouchId);
+    if (secret.type !== 'mnemonic') {
+        throw new Error('Unexpected secret type');
+    }
+    const root = await TonKeychainRoot.fromMnemonic(secret.mnemonic, { allowLegacyMnemonic: true });
     const tonAccount = await root.getTonAccount(derivation.index);
     return tonAccount.mnemonics;
 };
 
-export const getMnemonicAndPassword = async (
+export const getSecretAndPassword = async (
     sdk: IAppSdk,
     accountId: AccountId,
     checkTouchId: () => Promise<void>
-): Promise<{ mnemonic: string[]; password?: string }> => {
+): Promise<{ secret: AccountSecret; password?: string }> => {
     const account = await accountsStorage(sdk.storage).getAccount(accountId);
     if (!account || !isMnemonicAndPassword(account) || !('auth' in account)) {
         throw new Error('Unexpected auth method for account');
@@ -366,13 +404,13 @@ export const getMnemonicAndPassword = async (
     switch (account.auth.kind) {
         case 'password': {
             const password = await getPasswordByNotification(sdk);
-            const mnemonic = await decryptWalletMnemonic(
-                account as { auth: AuthPassword },
+            const secret = await decryptWalletSecret(
+                (account.auth as AuthPassword).encryptedSecret,
                 password
             );
             return {
                 password,
-                mnemonic
+                secret
             };
         }
         case 'keychain': {
@@ -381,8 +419,8 @@ export const getMnemonicAndPassword = async (
             }
             await checkTouchId();
 
-            const mnemonic = await sdk.keychain.getPassword(account.auth.keychainStoreKey);
-            return { mnemonic: mnemonic.split(' ') };
+            const secret = await sdk.keychain.getPassword(account.auth.keychainStoreKey);
+            return { secret: await walletSecretFromString(secret) };
         }
         default:
             throw new Error('Unexpected auth method');
@@ -576,13 +614,13 @@ const pairLedgerByNotification = async <T extends 'transaction' | 'ton-proof'>(
     );
 };
 
-export const useGetActiveAccountMnemonic = () => {
+export const useGetActiveAccountSecret = () => {
     const sdk = useAppSdk();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
     const activeAccount = useActiveAccount();
     const accountId = activeAccount.id;
 
     return useCallback(async () => {
-        return getAccountMnemonic(sdk, accountId, checkTouchId);
+        return getAccountSecret(sdk, accountId, checkTouchId);
     }, [sdk, checkTouchId, accountId]);
 };
