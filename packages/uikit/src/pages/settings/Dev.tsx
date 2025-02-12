@@ -16,6 +16,7 @@ import { useActiveConfig } from '../../state/wallet';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { Notification } from '../../components/Notification';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -122,7 +123,6 @@ const EnableTronSettings = () => {
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
 
-
     const items = useMemo<SettingsItem[]>(() => {
         return [
             {
@@ -133,12 +133,16 @@ const AddAccountBySK = () => {
         ];
     }, [onOpen]);
 
-    return <>
-        <SettingsList items={items} />
-        <Notification isOpen={isOpen} handleClose={onClose}>
-            {() => <ImportBySKWallet afterCompleted={onClose} />}
-        </Notification>
-    </>;
+    return (
+        <>
+            <SettingsList items={items} />
+            <AddWalletContext.Provider value={{ navigateHome: onClose }}>
+                <Notification isOpen={isOpen} handleClose={onClose}>
+                    {() => <ImportBySKWallet afterCompleted={onClose} />}
+                </Notification>
+            </AddWalletContext.Provider>
+        </>
+    );
 };
 
 export const DevSettings = React.memo(() => {
