@@ -8,14 +8,15 @@ import {
     MouseEvent as ReactMouseEvent
 } from 'react';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import styled from 'styled-components';
 
-export const Link: FC<ComponentProps<typeof RouterLink>> = props => {
+export const Link: FC<ComponentProps<typeof RouterLink> & { contents?: boolean }> = props => {
     const env = useAppTargetEnv();
     const navigate = useNavigate();
 
     if (env === 'mobile') {
         return (
-            <div
+            <MobileRouterLinkStyled
                 {...(props as DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>)}
                 onClick={e => {
                     props.onClick?.(e as unknown as ReactMouseEvent<HTMLAnchorElement, MouseEvent>);
@@ -25,5 +26,15 @@ export const Link: FC<ComponentProps<typeof RouterLink>> = props => {
         );
     }
 
-    return <RouterLink {...props} />;
+    return <RouterLinkStyled {...props} />;
 };
+
+const RouterLinkStyled = styled(RouterLink)<{ contents?: boolean }>`
+    ${p => p.contents && 'display: contents'};
+    color: inherit;
+`;
+
+const MobileRouterLinkStyled = styled.div<{ contents?: boolean }>`
+    ${p => p.contents && 'display: contents'};
+    color: inherit;
+`;

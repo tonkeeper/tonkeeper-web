@@ -2,9 +2,9 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, useEffect, useMemo, useRef } from 'react';
+import { FC, RefCallback, useEffect, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
+import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
@@ -44,6 +44,8 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
 import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { mergeRefs } from '../../libs/common';
+import { ExternalLink } from '../../components/shared/ExternalLink';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -303,19 +305,15 @@ const HistoryContainer = styled.div`
         `}
 `;
 
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
-    > *:last-child {
-        margin-left: auto;
-        width: fit-content;
-    }
-
-    padding-right: 0;
+const TonViewerLink = styled(ExternalLink)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
 `;
 
 const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
-    const ref = useRef<HTMLDivElement>(null);
-
     const {
         fetchNextPage,
         hasNextPage,
@@ -324,9 +322,9 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         refetch
     } = useFetchFilteredActivity(token);
 
-    useScrollMonitor(refetch, 5000, ref);
+    const scrollMonitorRef = useScrollMonitor(refetch, 5000);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
+    const fetchRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
 
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {
@@ -345,18 +343,42 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         }
     }, [assets, t, token]);
 
+    const { mainnetConfig } = useAppContext();
+    const tonviewer = mainnetConfig.accountExplorer
+        ? new URL(mainnetConfig.accountExplorer).origin
+        : 'https://tonviewer.com';
+
     return (
-        <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeaderStyled backButton borderBottom={true}>
+        <DesktopViewPageLayout
+            ref={mergeRefs(scrollMonitorRef, fetchRef) as RefCallback<HTMLDivElement>}
+        >
+            <DesktopViewHeader backButton borderBottom>
                 <DesktopViewHeaderContent
                     title={assetSymbol || 'Unknown asset'}
                     right={
-                        <OtherHistoryFilters
-                            disableInitiatorFilter={token !== CryptoCurrency.TON}
-                        />
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem>
+                                <TonViewerLink
+                                    href={
+                                        token === CryptoCurrency.TON
+                                            ? tonviewer + '/price'
+                                            : mainnetConfig.accountExplorer?.replace('%s', token) ??
+                                              tonviewer
+                                    }
+                                >
+                                    <LinkOutIcon color="currentColor" />
+                                    {t('tokenDetails_tonviewer_button')}
+                                </TonViewerLink>
+                            </DesktopViewHeaderContent.RightItem>
+                            <DesktopViewHeaderContent.RightItem>
+                                <OtherHistoryFilters
+                                    disableInitiatorFilter={token !== CryptoCurrency.TON}
+                                />
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
                     }
                 />
-            </DesktopViewHeaderStyled>
+            </DesktopViewHeader>
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
@@ -416,7 +438,7 @@ export const TronUSDTPage = () => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeader backButton borderBottom={true}>
+            <DesktopViewHeader backButton borderBottom>
                 <Label2>{asset.symbol}</Label2>
             </DesktopViewHeader>
             <CoinHeaderStyled>

@@ -14,7 +14,7 @@ import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonListWithImages } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { H3, Label2 } from '../../components/Text';
+import { H3 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useJettonRawList,
@@ -32,6 +32,7 @@ import { useTronBalances } from '../../state/tron/tron';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
@@ -314,7 +315,7 @@ const JettonsSettingsProMode = () => {
         return (
             <DesktopViewPageLayout>
                 <DesktopViewHeader backButton>
-                    <Label2>{t('settings_jettons_list')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_jettons_list')} />
                 </DesktopViewHeader>
                 <DesktopContentWrapper>
                     <SkeletonListWithImages size={5} />
@@ -326,7 +327,7 @@ const JettonsSettingsProMode = () => {
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader backButton>
-                <Label2>{t('settings_jettons_list')}</Label2>
+                <DesktopViewHeaderContent title={t('settings_jettons_list')} />
             </DesktopViewHeader>
 
             <DesktopContentWrapper>

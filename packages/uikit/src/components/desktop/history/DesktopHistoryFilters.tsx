@@ -50,28 +50,39 @@ const DropDownButton = styled.button`
 `;
 
 const DropDownTokensButton = styled(DropDownButton)`
-    padding-left: 12px;
-    padding-right: 8px;
     white-space: nowrap;
 
     ${p =>
         p.theme.proDisplayType === 'mobile' &&
         css`
-            padding-left: 8px;
+            width: 100%;
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            padding-right: 8px;
+            padding-left: 12px;
         `}
 `;
 
 const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
     position: relative;
     height: 20px;
-    padding-left: 8px;
     padding-right: 16px;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            width: 100%;
+            padding-right: 0;
+        `}
 
     &::after {
         content: '';
         position: absolute;
-        top: -6px;
-        left: 20px;
+        top: -3px;
+        left: 14px;
         height: 6px;
         width: 6px;
         background-color: ${p => p.theme.accentBlue};
@@ -83,6 +94,14 @@ const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
 
 const TRCBadge = styled(Badge)`
     margin-left: 8px;
+`;
+
+const ChevronDownIconRight = styled(ChevronDownIcon)`
+    margin-left: auto;
+`;
+
+const DropDownItemAsset = styled(DropDownItem)`
+    color: ${p => p.theme.textPrimary};
 `;
 
 export const AssetHistoryFilter = () => {
@@ -100,7 +119,7 @@ export const AssetHistoryFilter = () => {
             width="200px"
             payload={onClose => (
                 <DropDownContent>
-                    <DropDownItem
+                    <DropDownItemAsset
                         onClick={() => {
                             setAsset(undefined);
                             onClose();
@@ -109,11 +128,11 @@ export const AssetHistoryFilter = () => {
                     >
                         <AllAssetsIcon />
                         <Label2>{t('history_filters_all_assets')}</Label2>
-                    </DropDownItem>
+                    </DropDownItemAsset>
                     {assets.map(assetAmount => (
                         <>
                             <DropDownItemsDivider />
-                            <DropDownItem
+                            <DropDownItemAsset
                                 onClick={() => {
                                     setAsset(assetAmount.asset);
                                     onClose();
@@ -128,7 +147,7 @@ export const AssetHistoryFilter = () => {
                                 {assetAmount.asset.id === TRON_USDT_ASSET.id && (
                                     <TRCBadge color="textSecondary">TRC20</TRCBadge>
                                 )}
-                            </DropDownItem>
+                            </DropDownItemAsset>
                         </>
                     ))}
                 </DropDownContent>
@@ -148,7 +167,7 @@ export const AssetHistoryFilter = () => {
                 <Body2>
                     {selectedAsset ? selectedAsset.symbol : t('history_filters_all_assets')}
                 </Body2>
-                <ChevronDownIcon />
+                <ChevronDownIconRight />
             </DropDownTokensButton>
         </SelectDropDown>
     );
@@ -160,6 +179,8 @@ const CheckboxStyled = styled(Checkbox)`
 `;
 
 const DropDownItemStyled = styled(DropDownItem)<{ $isDisabled?: boolean }>`
+    color: ${p => p.theme.textPrimary};
+
     ${p =>
         p.$isDisabled &&
         css`
@@ -233,7 +254,7 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
                 <ForTargetEnv env="mobile">
                     <SlidersIcon />
                     <Body2>{t('settings_title')}</Body2>
-                    <ChevronDownIcon />
+                    <ChevronDownIconRight />
                 </ForTargetEnv>
                 <NotForTargetEnv env="mobile">
                     <SlidersIcon />

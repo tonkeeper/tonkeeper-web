@@ -1,6 +1,6 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useLayoutEffect, useRef } from 'react';
+import React, { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { PencilIcon } from '../../components/Icon';
@@ -26,6 +26,7 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
@@ -74,7 +75,7 @@ export const MAMIndexesPage = () => {
         return (
             <DesktopViewPageLayout>
                 <DesktopViewHeader backButton>
-                    <Label2>{t('settings_mam_indexes')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_mam_indexes')} />
                 </DesktopViewHeader>
                 <MAMIndexesPageContentStyled
                     buttonWrapperClassName="mam-page-sticky-button-wrapper"

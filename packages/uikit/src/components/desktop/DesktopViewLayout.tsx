@@ -1,9 +1,12 @@
 import styled, { createGlobalStyle, css } from 'styled-components';
 import React, {
     Children,
+    cloneElement,
+    ComponentProps,
     createContext,
     FC,
     forwardRef,
+    isValidElement,
     PropsWithChildren,
     ReactNode,
     useCallback,
@@ -29,7 +32,7 @@ import {
     IonToolbar
 } from '@ionic/react';
 import ReactPortal from '../ReactPortal';
-import { Label2 } from '../Text';
+import { Body2Class, Label2 } from '../Text';
 import { SelectDropDown } from '../fields/Select';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 
@@ -255,6 +258,7 @@ const DesktopViewHeaderContentRightDesktop = styled.div`
     margin-left: auto;
     display: flex;
     align-items: center;
+    gap: 12px;
 `;
 
 const DesktopViewHeaderContentRightMobile: FC<PropsWithChildren<{ className?: string }>> = ({
@@ -271,11 +275,15 @@ const DesktopViewHeaderContentRightMobile: FC<PropsWithChildren<{ className?: st
                     top="44px"
                     right="8px"
                     portal
-                    payload={() => (
+                    payload={close => (
                         <DropDownContent>
                             {Children.toArray(children).map(elem => (
                                 <>
-                                    {elem}
+                                    {isValidElement<
+                                        ComponentProps<typeof DesktopViewHeaderContentRightItem>
+                                    >(elem)
+                                        ? cloneElement(elem, { _closeDropDown: close })
+                                        : elem}
                                     <DropDownItemsDivider />
                                 </>
                             ))}
@@ -299,6 +307,10 @@ const DDGlobalStyle = createGlobalStyle`
 `;
 
 const DropDownItemStyled = styled(DropDownItem)`
+    ${Body2Class};
+
+    gap: 6px;
+
     &:empty {
         display: none;
 
@@ -308,22 +320,61 @@ const DropDownItemStyled = styled(DropDownItem)`
     }
 `;
 
-const DesktopViewHeaderContentRightItem: FC<PropsWithChildren<{ className?: string }>> = ({
-    children,
-    className
-}) => {
+const DesktopViewHeaderContentRightItem: FC<
+    PropsWithChildren<{
+        className?: string;
+        closeDropDownOnClick?: boolean;
+        onClick?: () => void;
+        asDesktopButton?: boolean;
+        _closeDropDown?: () => void;
+    }>
+> = ({ children, className, closeDropDownOnClick, _closeDropDown, onClick, asDesktopButton }) => {
     const env = useAppTargetEnv();
 
     if (env === 'mobile') {
         return (
-            <DropDownItemStyled isSelected={false} className={className}>
+            <DropDownItemStyled
+                isSelected={false}
+                className={className}
+                onClick={() => {
+                    onClick?.();
+                    if (closeDropDownOnClick) {
+                        _closeDropDown?.();
+                    }
+                }}
+            >
                 {children}
             </DropDownItemStyled>
         );
     }
 
-    return <div className={className}>{children}</div>;
+    return (
+        <DesktopRightItem $asButton={asDesktopButton} className={className} onClick={onClick}>
+            {children}
+        </DesktopRightItem>
+    );
 };
+
+const DesktopRightItem = styled.div<{ $asButton?: boolean }>`
+    ${Body2Class};
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: ${p => p.theme.textSecondary};
+
+    ${p =>
+        p.$asButton &&
+        css`
+            padding: 8px;
+            cursor: pointer;
+            color: ${p.theme.textAccent};
+
+            &:last-child {
+                padding-right: 16px;
+            }
+        `}
+`;
 
 DesktopViewHeaderContent.Right = DesktopViewHeaderContentRight;
 DesktopViewHeaderContent.RightItem = DesktopViewHeaderContentRightItem;

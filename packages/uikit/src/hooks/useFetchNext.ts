@@ -1,5 +1,5 @@
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 export const useFetchNext = (
     hasNextPage: boolean | undefined,
@@ -41,5 +41,5 @@ export const useFetchNext = (
         };
     }, [hasNextPage, standalone, element]);
 
-    return setElement;
+    return setElement as Dispatch<SetStateAction<HTMLDivElement | null>>;
 };

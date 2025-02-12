@@ -6,7 +6,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvent, AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { atom, useAtom } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
@@ -490,5 +490,5 @@ export const useScrollMonitor = (
         };
     }, [isAtTop, callback]);
 
-    return setElement;
+    return setElement as Dispatch<SetStateAction<HTMLDivElement | null>>;
 };

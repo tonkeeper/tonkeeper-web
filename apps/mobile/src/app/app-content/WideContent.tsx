@@ -156,9 +156,7 @@ const WalletContent = () => {
                             <Route path={AppRoute.activity} component={DesktopHistoryPage} />
                             <Route path={AppRoute.purchases} component={DesktopCollectables} />
                             <Route path={AppRoute.dns} component={DesktopDns} />
-                            <Route path={AppRoute.coins}>
-                                <Route path=":name/!*" component={DesktopCoinPage} />
-                            </Route>
+                            <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
                             <Route
                                 path={AppRoute.multisigWallets}
                                 component={DesktopManageMultisigsPage}

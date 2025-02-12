@@ -1,11 +1,11 @@
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Body3Class, Label2 } from '../../components/Text';
 import {
-    DesktopViewHeader,
+    DesktopViewHeader, DesktopViewHeaderContent,
     DesktopViewPageLayout
-} from '../../components/desktop/DesktopViewLayout';
+} from "../../components/desktop/DesktopViewLayout";
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
 import { ExclamationMarkTriangleIcon, SpinnerRing } from '../../components/Icon';
@@ -34,7 +34,7 @@ import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { formattedDateTimeStamp } from '../../libs/dateTime';
 import { useSendTwoFACancelRecovery } from '../../hooks/blockchain/two-fa/useSendTwoFCancelRecovery';
 import { useSendTwoFARemove } from '../../hooks/blockchain/two-fa/useSendTwoFARemove';
-import { Navigate } from "../../components/shared/Navigate";
+import { Navigate } from '../../components/shared/Navigate';
 
 export const TwoFAPage = () => {
     const canViewTwoFA = useCanViewTwoFA();
@@ -83,7 +83,7 @@ export const TwoFAPageLayout: FC = () => {
         return (
             <DesktopViewPageLayoutStyled>
                 <DesktopViewHeader borderBottom backButton>
-                    <Label2>{t('two_fa_long')}</Label2>
+                    <DesktopViewHeaderContent title={t('two_fa_long')} />
                 </DesktopViewHeader>
                 <TwoFAPageContentWrapper>
                     <TwoFAPageContent />

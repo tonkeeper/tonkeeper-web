@@ -2,7 +2,6 @@ import { NftsList } from '../../components/nft/Nfts';
 import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
-import { Link } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -14,11 +13,11 @@ import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { useMemo } from 'react';
 import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { SlidersIcon } from '../../components/Icon';
-import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useWalletFilteredNftList } from '../../state/nft';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { useNavigate } from '../../hooks/router/useNavigate';
 import { useAppTargetEnv } from '../../hooks/appSdk';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { Link } from '../../components/shared/Link';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -77,10 +76,6 @@ const LinkStyled = styled(Link)`
     margin: 0 auto;
 `;
 
-const SettingsButtonStyled = styled(IconButtonTransparentBackground)`
-    margin-left: auto;
-`;
-
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
 
@@ -90,6 +85,14 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
             display: flex;
             flex-direction: column;
         `}
+`;
+
+const ExplorerLinkStyled = styled(Link)`
+    padding-right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
 `;
 
 export const DesktopDns = () => {
@@ -103,7 +106,6 @@ export const DesktopDns = () => {
 export const DesktopDnsContent = () => {
     const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
-    const navigate = useNavigate();
     const env = useAppTargetEnv();
 
     const { ref: scrollRef, closeTop } = useIsScrolled();
@@ -149,13 +151,16 @@ export const DesktopDnsContent = () => {
                 <DesktopViewHeaderContent
                     title={t('wallet_aside_domains')}
                     right={
-                        <SettingsButtonStyled
-                            onClick={() =>
-                                navigate(AppRoute.walletSettings + WalletSettingsRoute.nft)
-                            }
-                        >
-                            <SlidersIcon />
-                        </SettingsButtonStyled>
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem closeDropDownOnClick>
+                                <ExplorerLinkStyled
+                                    to={AppRoute.walletSettings + WalletSettingsRoute.nft}
+                                >
+                                    <SlidersIcon />
+                                    <ForTargetEnv env="mobile">{t('settings_title')}</ForTargetEnv>
+                                </ExplorerLinkStyled>
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
                     }
                 />
             </DesktopViewHeader>

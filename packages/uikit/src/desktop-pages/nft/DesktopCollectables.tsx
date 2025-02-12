@@ -2,8 +2,7 @@ import { NftsList } from '../../components/nft/Nfts';
 import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../../components/Text';
 import { Button } from '../../components/fields/Button';
-import { Link } from 'react-router-dom';
-import { AppRoute } from '../../libs/routes';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTranslation } from '../../hooks/translation';
 import {
     DesktopViewHeader,
@@ -15,6 +14,9 @@ import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { useMemo } from 'react';
 import { useWalletFilteredNftList } from '../../state/nft';
 import { useAppTargetEnv } from '../../hooks/appSdk';
+import { SlidersIcon } from '../../components/Icon';
+import { Link } from '../../components/shared/Link';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -88,6 +90,14 @@ export const DesktopCollectables = () => {
     return <DesktopCollectablesContent />;
 };
 
+const ExplorerLinkStyled = styled(Link)`
+    padding-right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+`;
+
 export const DesktopCollectablesContent = () => {
     const { data: nfts } = useWalletFilteredNftList();
     const { t } = useTranslation();
@@ -133,7 +143,21 @@ export const DesktopCollectablesContent = () => {
     return (
         <DesktopViewPageLayout ref={scrollRef} mobileContentPaddingTop>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <DesktopViewHeaderContent title={t('wallet_aside_collectibles')} />
+                <DesktopViewHeaderContent
+                    title={t('wallet_aside_collectibles')}
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem closeDropDownOnClick>
+                                <ExplorerLinkStyled
+                                    to={AppRoute.walletSettings + WalletSettingsRoute.nft}
+                                >
+                                    <SlidersIcon />
+                                    <ForTargetEnv env="mobile">{t('settings_title')}</ForTargetEnv>
+                                </ExplorerLinkStyled>
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
             </DesktopViewHeader>
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>

@@ -22,6 +22,7 @@ import {
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { Body2 } from '../../components/Text';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     ${p =>
@@ -61,10 +62,10 @@ const ExplorerButton = styled.button`
 
 const ExplorerButtonMobile = styled.div`
     align-items: center;
-    justify-content: center;
     display: flex;
     gap: 6px;
-    padding: 0 8px;
+    padding: 0 !important;
+    width: 100%;
 `;
 
 const LoaderContainer = styled.div`
@@ -147,7 +148,7 @@ const DesktopHistoryPageContent: FC = () => {
                     <DesktopViewHeaderContent.RightItem>
                         <ExplorerButtonMobile onClick={onOpenExplorer}>
                             <LinkOutIcon color="currentColor" />
-                            Tonviewer
+                            <Body2>Tonviewer</Body2>
                         </ExplorerButtonMobile>
                     </DesktopViewHeaderContent.RightItem>
                     <DesktopViewHeaderContent.RightItem>
