@@ -25,6 +25,14 @@ export const IonicOverride = css`
         }
     }
 
+    ion-modal.modal-card {
+        ion-content {
+            * {
+                box-sizing: border-box;
+            }
+        }
+    }
+
     ion-menu {
         --width: 256px;
         outline: none;
@@ -40,7 +48,7 @@ export const IonicOverride = css`
         }
     }
 
-    ion-modal {
+    ion-modal:not(.modal-card) {
         --height: auto;
 
         &::part(content) {
