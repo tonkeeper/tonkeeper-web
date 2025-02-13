@@ -7337,7 +7337,7 @@ __metadata:
     styled-components: "npm:^6.1.1"
     typescript: "npm:^5.6.3"
     uuid: "npm:^11.0.2"
-    vite: "npm:^5.1.8"
+    vite: "npm:^5.4.12"
     vite-plugin-node-polyfills: "npm:0.17.0"
   languageName: unknown
   linkType: soft
@@ -7383,7 +7383,7 @@ __metadata:
     styled-components: "npm:^6.1.1"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^4.9.4"
-    vite: "npm:^5.1.8"
+    vite: "npm:^5.4.12"
     web-vitals: "npm:^2.1.4"
   languageName: unknown
   linkType: soft
@@ -7494,7 +7494,7 @@ __metadata:
     styled-components: "npm:^6.1.1"
     ts-node: "npm:^10.9.1"
     typescript: "npm:5.2.2"
-    vite: "npm:^5.1.8"
+    vite: "npm:^5.4.12"
     vite-plugin-node-polyfills: "npm:0.17.0"
   languageName: unknown
   linkType: soft
@@ -7535,7 +7535,7 @@ __metadata:
     styled-components: "npm:^6.1.1"
     ts-node: "npm:^10.9.1"
     typescript: "npm:5.2.2"
-    vite: "npm:^5.1.8"
+    vite: "npm:^5.4.12"
     vite-plugin-node-polyfills: "npm:0.17.0"
   languageName: unknown
   linkType: soft
@@ -10390,18 +10390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.7":
-  version: 1.7.9
-  resolution: "axios@npm:1.7.9"
-  dependencies:
-    follow-redirects: "npm:^1.15.6"
-    form-data: "npm:^4.0.0"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10/b7a5f660ea53ba9c2a745bf5ad77ad8bf4f1338e13ccc3f9f09f810267d6c638c03dac88b55dae8dc98b79c57d2d6835be651d58d2af97c174f43d289a9fd007
-  languageName: node
-  linkType: hard
-
-"axios@npm:^1.7.4":
+"axios@npm:^1.6.7, axios@npm:^1.7.4":
   version: 1.7.9
   resolution: "axios@npm:1.7.9"
   dependencies:
@@ -26768,9 +26757,9 @@ __metadata:
   linkType: hard
 
 "store2@npm:^2.12.0":
-  version: 2.14.2
-  resolution: "store2@npm:2.14.2"
-  checksum: 10/896cb4c75b94b630206e0ef414f78d656a5d2498127094d9d0852e1e7b88509b3a7972c92cad3e74ee34ef6b06d25083ad2ac38880254ccb2d40b7930dc0ed01
+  version: 2.14.4
+  resolution: "store2@npm:2.14.4"
+  checksum: 10/c92713e75544693b47053531b6e98d7b538512061017e06b8c7e99937da67866856227862f7bf1a818ecc36673b8d343c7b67c9cce03bd4ba0f68eff7cccaa8c
   languageName: node
   linkType: hard
 
@@ -28533,11 +28522,11 @@ __metadata:
   linkType: hard
 
 "undici@npm:^5.22.1":
-  version: 5.28.4
-  resolution: "undici@npm:5.28.4"
+  version: 5.28.5
+  resolution: "undici@npm:5.28.5"
   dependencies:
     "@fastify/busboy": "npm:^2.0.0"
-  checksum: 10/a666a9f5ac4270c659fafc33d78b6b5039a0adbae3e28f934774c85dcc66ea91da907896f12b414bd6f578508b44d5dc206fa636afa0e49a4e1c9e99831ff065
+  checksum: 10/459cd84ab75fe90d696fa2634a8b5b23f9e1080b27236c6809bd74e51862be85df6d95b4a8fed3ee42554495008cb3c05f1bc9d4a1807478f433cca567003d70
   languageName: node
   linkType: hard
 
@@ -29205,9 +29194,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.1.8":
-  version: 5.4.11
-  resolution: "vite@npm:5.4.11"
+"vite@npm:^5.4.12":
+  version: 5.4.14
+  resolution: "vite@npm:5.4.14"
   dependencies:
     esbuild: "npm:^0.21.3"
     fsevents: "npm:~2.3.3"
@@ -29244,7 +29233,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10/719c4dea896e9547958643354003c8c9ea98e5367196d98f5f46cffb3ec963fead3ea5853f5af941c79bbfb73583dec19bbb0d28d2f644b95d7f59c55e22919d
+  checksum: 10/ce382f4059eb6c939823b8f62163794752243755d84c71a4b73ad0f7d4d9f4c7a557a6ef4c78e0640f4bcf5ae5ec6b20c7ee4816419af3c81ba275f478b73468
   languageName: node
   linkType: hard
 
