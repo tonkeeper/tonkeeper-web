@@ -1,7 +1,6 @@
 import { TransferInitParams } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { toTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import {
@@ -34,9 +33,9 @@ import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useJettonList } from '@tonkeeper/uikit/dist/state/jetton';
-import { useTronBalances } from '@tonkeeper/uikit/dist/state/tron/tron';
+import { useActiveTronWallet, useTronBalances } from '@tonkeeper/uikit/dist/state/tron/tron';
 import BigNumber from 'bignumber.js';
-import { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FC, PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import styled from 'styled-components';
 import { FavoriteView, useFavoriteNotification } from './FavoriteNotification';
@@ -52,6 +51,9 @@ import {
     RecipientTwaHeaderBlock
 } from './SendNotificationHeader';
 import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
+import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 
 const Body = styled.div`
     padding: 0 16px 16px;
@@ -93,9 +95,9 @@ const SendContent: FC<{
         }
     }, []);
 
-    const { data: tronBalances } = useTronBalances();
-
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
+
+    const activeTronWallet = useActiveTronWallet();
 
     const setRecipient = (value: RecipientData) => {
         if (
@@ -106,8 +108,8 @@ const SendContent: FC<{
         }
 
         _setRecipient(value);
-        if (tronBalances && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
-            setAmountViewState({ token: toTronAsset(tronBalances.balances[0]) });
+        if (activeTronWallet && value.address.blockchain === BLOCKCHAIN_NAME.TRON) {
+            setAmountViewState({ token: TRON_USDT_ASSET });
         }
     };
 
@@ -152,6 +154,9 @@ const SendContent: FC<{
     };
 
     const processTron = (address: string) => {
+        if (!activeTronWallet) {
+            return;
+        }
         const item = { address: address, blockchain: BLOCKCHAIN_NAME.TRON } as const;
 
         setRecipient({
@@ -228,10 +233,9 @@ const SendContent: FC<{
             return;
         }
 
-        // TODO: ENABLE TRON
-        // if (seeIfValidTronAddress(signature)) {
-        //     return processTron(signature);
-        // }
+        if (seeIfValidTronAddress(signature)) {
+            return processTron(signature);
+        }
 
         return sdk.uiEvents.emit('copy', {
             method: 'copy',
@@ -246,7 +250,6 @@ const SendContent: FC<{
         confirm: confirmRef
     }[view];
 
-
     const assetAmount = useMemo(() => {
         if (!amountViewState?.token || !amountViewState?.coinValue) {
             return null;
@@ -257,6 +260,19 @@ const SendContent: FC<{
             amount: amountViewState!.coinValue!
         });
     }, [amountViewState?.token, amountViewState?.coinValue]);
+
+    let acceptBlockchains: BLOCKCHAIN_NAME[] = [];
+    if (chain) {
+        if (chain === BLOCKCHAIN_NAME.TRON && !activeTronWallet) {
+            acceptBlockchains = [BLOCKCHAIN_NAME.TON];
+        } else {
+            acceptBlockchains = [chain];
+        }
+    } else {
+        acceptBlockchains = activeTronWallet
+            ? [BLOCKCHAIN_NAME.TON, BLOCKCHAIN_NAME.TRON]
+            : [BLOCKCHAIN_NAME.TON];
+    }
 
     return (
         <Wrapper standalone={false} extension={true}>
@@ -279,7 +295,7 @@ const SendContent: FC<{
                                 onScan={onScan}
                                 keyboard="decimal"
                                 isExternalLoading={isAccountLoading}
-                                acceptBlockchains={chain ? [chain] : undefined}
+                                acceptBlockchains={acceptBlockchains}
                                 MainButton={RecipientTwaMainButton}
                                 HeaderBlock={() => <RecipientTwaHeaderBlock onClose={onClose} />}
                                 fitContent
@@ -332,6 +348,7 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const { data: jettons } = useJettonList();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
+    const wallet = useActiveWallet();
 
     const sdk = useAppSdk();
     const track = useAnalyticsTrack();
@@ -348,15 +365,28 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
             reset();
             const transfer = options.params;
             setChain(chain);
-            if (transfer.address) {
-                getAccountAsync({ address: transfer.address }).then(account => {
-                    setTonTransfer(makeTransferInitData(transfer, account, jettons));
-                    setOpen(true);
-                });
-            } else {
-                setTonTransfer({ initAmountState: makeTransferInitAmountState(transfer, jettons) });
+
+            if (transfer.chain === BLOCKCHAIN_NAME.TRON) {
                 setOpen(true);
+                track('send_open', { from: transfer.from });
+                return;
             }
+
+            getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
+                if (transfer.address && seeIfValidTonAddress(transfer.address)) {
+                    getAccountAsync({ address: transfer.address }).then(toAccount => {
+                        setTonTransfer(
+                            makeTransferInitData(transfer, fromAccount, toAccount, jettons)
+                        );
+                        setOpen(true);
+                    });
+                } else {
+                    setTonTransfer({
+                        initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
+                    });
+                    setOpen(true);
+                }
+            });
             track('send_open', { from: transfer.from });
         };
 

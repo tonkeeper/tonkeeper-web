@@ -16,6 +16,11 @@ export type TransferInitParams =
           chain: BLOCKCHAIN_NAME.TON;
           from: string;
       })
+    | {
+          chain: BLOCKCHAIN_NAME.TRON;
+          from: string;
+          address?: string;
+      }
     | Record<string, never>;
 
 export type ReceiveInitParams = {
@@ -184,4 +189,4 @@ export class MockAppSdk extends BaseApp {
     }
 }
 
-export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa' | 'tablet' | 'swap-widget-web';
+export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa' | 'tablet' | 'swap_widget_web';

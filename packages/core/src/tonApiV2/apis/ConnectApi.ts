@@ -18,7 +18,6 @@ import type {
   AccountInfoByStateInit,
   GetAccountInfoByStateInitRequest,
   GetTonConnectPayload200Response,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     AccountInfoByStateInitFromJSON,
@@ -27,8 +26,6 @@ import {
     GetAccountInfoByStateInitRequestToJSON,
     GetTonConnectPayload200ResponseFromJSON,
     GetTonConnectPayload200ResponseToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAccountInfoByStateInitOperationRequest {

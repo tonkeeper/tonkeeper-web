@@ -52,6 +52,10 @@ export const DesktopPreferencesRouting = () => {
                         <Navigate to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
                     }
                 />
+                <Route
+                    path={SettingsRoute.twoFa}
+                    element={<Navigate to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} />}
+                />
                 <Route path={SettingsRoute.security} element={<SecuritySettings />} />
                 <Route path={SettingsRoute.country} element={<CountrySettings />} />
                 <Route path={SettingsRoute.pro} element={<ProSettings />} />

@@ -249,7 +249,6 @@ export const ConfirmNftView: FC<{
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-        handleSubmit();
     };
 
     return (

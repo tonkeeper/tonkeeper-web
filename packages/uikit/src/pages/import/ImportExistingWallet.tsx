@@ -6,7 +6,6 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
-    useActiveTonNetwork,
     useCreateAccountMAM,
     useCreateAccountMnemonic,
     useMutateRenameAccount,
@@ -44,12 +43,14 @@ import {
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
     const fiat = useUserFiat();
     const sdk = useAppSdk();
     const accounts = useAccountsState();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<
         {
@@ -123,7 +124,8 @@ const useProcessMnemonic = () => {
                         WalletVersion.V4R2,
                         WalletVersion.V3R2,
                         WalletVersion.V3R1
-                    ]
+                    ],
+                    generateTronWallet: isTronEnabled
                 }
             );
 
@@ -171,7 +173,8 @@ const useProcessMnemonic = () => {
                         WalletVersion.V4R2,
                         WalletVersion.V3R2,
                         WalletVersion.V3R1
-                    ]
+                    ],
+                    generateTronWallet: isTronEnabled
                 }
             );
 

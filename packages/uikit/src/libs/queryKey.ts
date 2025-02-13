@@ -36,7 +36,7 @@ export enum QueryKey {
     featuredRecommendations = 'recommendations',
     experimental = 'experimental',
 
-    tron = 'tron',
+    tronAssets = 'tronAssets',
     rate = 'rate',
     total = 'total',
     distribution = 'distribution',
@@ -66,7 +66,12 @@ export enum QueryKey {
     batteryBalance = 'batteryBalance',
     estimateBatteryPurchase = 'estimateBatteryPurchase',
 
-    gaslessConfig = 'gaslessConfig'
+    gaslessConfig = 'gaslessConfig',
+
+    twoFAWalletConfig = 'twoFAWalletConfig',
+    twoFAActivationProcess = 'twoFAActivationProcess',
+    twoFARemovingProcess = 'twoFARemovingProcess',
+    twoFACancellRecoveryProcess = 'twoFARemovingProcess'
 }
 
 export enum JettonKey {

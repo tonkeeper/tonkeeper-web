@@ -33,6 +33,9 @@ import { walletContract } from './wallet/contractService';
 import { TonKeychainRoot, KeychainTonAccount } from '@ton-keychain/core';
 import { mnemonicToKeypair } from './mnemonicService';
 import { FiatCurrencies } from '../entries/fiat';
+import { KeychainTrxAccountsProvider, TronAddressUtils } from '@ton-keychain/trx';
+import { TronWallet } from '../entries/tron/tron-wallet';
+import { ethers } from 'ethers';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -116,6 +119,43 @@ interface CreateWalletContext {
     defaultWalletVersion: WalletVersion;
 }
 
+export const tronWalletByTonMnemonic = async (
+    mnemonic: string[],
+    mnemonicType: MnemonicType = 'ton'
+): Promise<TronWallet> => {
+    if (mnemonicType === 'ton') {
+        const tonAccount = await KeychainTonAccount.fromMnemonic(mnemonic);
+        const trxProvider = KeychainTrxAccountsProvider.fromEntropy(tonAccount.entropy);
+        const trxAccount = trxProvider.getAccount();
+
+        return { id: trxAccount.address, address: trxAccount.address };
+    } else {
+        const node = ethers.HDNodeWallet.fromPhrase(
+            mnemonic.join(' '),
+            undefined,
+            "m/44'/195'/0'/0"
+        );
+        const address = TronAddressUtils.hexToBase58(node.deriveChild(0).address);
+        return {
+            id: address,
+            address
+        };
+    }
+};
+
+export const tonMnemonicToTronMnemonic = async (
+    mnemonic: string[],
+    mnemonicType: MnemonicType = 'ton'
+): Promise<string[]> => {
+    if (mnemonicType === 'ton') {
+        const tonAccount = await KeychainTonAccount.fromMnemonic(mnemonic);
+        const trxProvider = KeychainTrxAccountsProvider.fromEntropy(tonAccount.entropy);
+        return trxProvider.mnemonics;
+    } else {
+        return mnemonic;
+    }
+};
+
 export const getContextApiByNetwork = (context: CreateWalletContext, network: Network) => {
     const api = network === Network.TESTNET ? context.testnetApi : context.mainnetApi;
     return api;
@@ -164,7 +204,9 @@ const createPayloadOfStandardTonAccount = async (
 
     const walletIdToActivate = wallets.slice().sort(sortWalletsByVersion)[0].id;
 
-    return { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets };
+    const tronWallet = await tronWalletByTonMnemonic(mnemonic, mnemonicType);
+
+    return { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets, tronWallet };
 };
 
 export const mayBeCreateAccountId = (
@@ -193,9 +235,10 @@ export const createStandardTonAccountByMnemonic = async (
     options: {
         versions?: WalletVersion[];
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+        generateTronWallet?: boolean;
     }
 ) => {
-    const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets } =
+    const { name, emoji, publicKey, walletAuth, walletIdToActivate, wallets, tronWallet } =
         await createPayloadOfStandardTonAccount(
             appContext,
             storage,
@@ -205,14 +248,42 @@ export const createStandardTonAccountByMnemonic = async (
             Network.MAINNET
         );
 
-    return new AccountTonMnemonic(
-        createAccountId(Network.MAINNET, publicKey),
+    return AccountTonMnemonic.create({
+        id: createAccountId(Network.MAINNET, publicKey),
         name,
         emoji,
-        walletAuth,
-        walletIdToActivate,
-        wallets,
-        mnemonicType
+        auth: walletAuth,
+        activeTonWalletId: walletIdToActivate,
+        tonWallets: wallets,
+        mnemonicType,
+        networks: options?.generateTronWallet
+            ? {
+                  tron: tronWallet
+              }
+            : undefined
+    });
+};
+
+export const standardTonAccountToAccountWithTron = async (
+    account: AccountTonMnemonic,
+    getAccountMnemonic: () => Promise<string[]>
+) => {
+    const tronWallet = await tronWalletByTonMnemonic(
+        await getAccountMnemonic(),
+        account.mnemonicType
+    );
+
+    return new AccountTonMnemonic(
+        account.id,
+        account.name,
+        account.emoji,
+        account.auth,
+        account.activeTonWalletId,
+        account.tonWallets,
+        account.mnemonicType,
+        {
+            tron: tronWallet
+        }
     );
 };
 
@@ -236,15 +307,15 @@ export const createStandardTestnetAccountByMnemonic = async (
             Network.TESTNET
         );
 
-    return new AccountTonTestnet(
-        createAccountId(Network.TESTNET, publicKey),
+    return AccountTonTestnet.create({
+        id: createAccountId(Network.TESTNET, publicKey),
         name,
         emoji,
-        walletAuth,
-        walletIdToActivate,
-        wallets,
+        auth: walletAuth,
+        activeTonWalletId: walletIdToActivate,
+        tonWallets: wallets,
         mnemonicType
-    );
+    });
 };
 
 const versionMap: Record<string, WalletVersion> = {
@@ -481,6 +552,7 @@ export const createMAMAccountByMnemonic = async (
     options: {
         selectedDerivations?: number[];
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+        generateTronWallet?: boolean;
     }
 ) => {
     const rootAccount = await TonKeychainRoot.fromMnemonic(rootMnemonic, {
@@ -523,8 +595,8 @@ export const createMAMAccountByMnemonic = async (
         rootAccount.id
     );
 
-    const namedDerivations: { item: DerivationItemNamed; shouldAdd: boolean }[] =
-        childTonWallets.map(w => {
+    const namedDerivations: { item: DerivationItemNamed; shouldAdd: boolean }[] = await Promise.all(
+        childTonWallets.map(async w => {
             const tonWallet = walletContract(
                 w.tonAccount.publicKey,
                 appContext.defaultWalletVersion,
@@ -548,11 +620,15 @@ export const createMAMAccountByMnemonic = async (
                     emoji,
                     index: w.derivationIndex,
                     tonWallets,
-                    activeTonWalletId: tonWallets[0].id
+                    activeTonWalletId: tonWallets[0].id,
+                    tronWallet: options?.generateTronWallet
+                        ? await tronWalletByTonMnemonic(w.tonAccount.mnemonics)
+                        : undefined
                 },
                 shouldAdd: w.shouldAdd
             };
-        });
+        })
+    );
 
     const addedDerivationIndexes = namedDerivations.filter(d => d.shouldAdd).map(d => d.item.index);
     if (addedDerivationIndexes.length === 0) {
@@ -567,6 +643,35 @@ export const createMAMAccountByMnemonic = async (
         addedDerivationIndexes[0],
         addedDerivationIndexes,
         namedDerivations.map(d => d.item)
+    );
+};
+
+export const mamAccountToMamAccountWithTron = async (
+    account: AccountMAM,
+    getAccountMnemonic: () => Promise<string[]>
+) => {
+    const rootAccount = await TonKeychainRoot.fromMnemonic(await getAccountMnemonic());
+
+    const derivations = await Promise.all(
+        account.allAvailableDerivations.map(async d => {
+            const tonAccount = await rootAccount.getTonAccount(d.index);
+            const tronWallet = await tronWalletByTonMnemonic(tonAccount.mnemonics);
+
+            return {
+                ...d,
+                tronWallet
+            };
+        })
+    );
+
+    return new AccountMAM(
+        account.id,
+        account.name,
+        account.emoji,
+        account.auth,
+        account.activeDerivationIndex,
+        account.addedDerivationsIndexes,
+        derivations
     );
 };
 
