@@ -11,8 +11,13 @@ import { SettingsItem, SettingsList } from '../../components/settings/SettingsLi
 import { useTranslation } from '../../hooks/translation';
 import { useAutoCountry, useCountrySetting, useMutateUserCountry } from '../../state/country';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const Block = styled.div`
     margin-bottom: 32px;
@@ -85,6 +90,11 @@ export const CountrySettings = () => {
     if (isProDisplay) {
         return (
             <DesktopViewPageLayoutStyled>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('country')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <DesktopBlock>
                     <Input
                         size="small"

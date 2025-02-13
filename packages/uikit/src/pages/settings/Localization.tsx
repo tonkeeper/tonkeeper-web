@@ -13,6 +13,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 export const Localization = () => {
     const { t, i18n } = useTranslation();
@@ -31,9 +32,11 @@ export const Localization = () => {
     if (isProDisplay) {
         return (
             <DesktopViewPageLayout>
-                <DesktopViewHeader>
-                    <DesktopViewHeaderContent title="Lang" />
-                </DesktopViewHeader>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('Localization')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <SettingsList items={items} />
             </DesktopViewPageLayout>
         );

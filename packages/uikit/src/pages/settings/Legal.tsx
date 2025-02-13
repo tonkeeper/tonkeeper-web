@@ -8,7 +8,12 @@ import { H3 } from '../../components/Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const Icon = styled.span`
     display: flex;
@@ -69,6 +74,13 @@ export const Legal = React.memo(() => {
     if (isProDisplay) {
         return (
             <DesktopViewPageLayout>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent
+                            title={t('legal_header_title')}
+                        ></DesktopViewHeaderContent>
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <SettingsList items={items} />
                 <TitleDesktop>{t('legal_licenses_title')}</TitleDesktop>
                 <SettingsList items={licenses} />

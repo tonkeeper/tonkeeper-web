@@ -255,7 +255,11 @@ const NavigateToRecovery = () => {
 const PreferencesModal = () => {
     const [presentingElement, setPresentingElement] = useState<HTMLElement | null>(null);
 
-    const settingsHistory = useRef(createIsolatedMemoryHistory());
+    const settingsHistory = useRef(
+        createIsolatedMemoryHistory([
+            { pathname: AppRoute.settings, search: '', hash: '', state: null }
+        ])
+    );
 
     useLayoutEffect(() => {
         setPresentingElement(document.getElementById('main-content'));
@@ -267,7 +271,9 @@ const PreferencesModal = () => {
         const unblock = history.block(location => {
             if (location.pathname?.startsWith(AppRoute.settings)) {
                 setSettingsOpen(true);
-                settingsHistory.current.push(location.pathname);
+                if (location.pathname !== AppRoute.settings) {
+                    settingsHistory.current.push(location.pathname);
+                }
                 return false;
             }
             return undefined;

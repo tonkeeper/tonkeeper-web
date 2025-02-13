@@ -14,11 +14,12 @@ import {
     ListIcon,
     PencilIcon,
     PlusIcon,
+    PlusIconSmall,
     ReorderIcon,
     TrashBinIcon
 } from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
-import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
+import { Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveTonNetwork } from '../../state/wallet';
@@ -65,6 +66,7 @@ import {
     useSideBarItems
 } from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -133,20 +135,6 @@ const BottomButtonContainer = styled.div`
     padding: 1rem;
 `;
 
-const NewFolderButton = styled.button`
-    border: none;
-    background-color: transparent;
-    padding: 0.5rem 1rem;
-    margin-right: -1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: ${p => p.theme.textAccent};
-    margin-left: auto;
-    ${Body2Class};
-`;
-
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { onOpen: addWallet } = useAddWalletNotification();
@@ -162,9 +150,17 @@ export const DesktopManageAccountsPage = () => {
                 <DesktopViewHeaderContent
                     title={t('Manage_wallets')}
                     right={
-                        <NewFolderButton onClick={() => manageFolders()}>
-                            {t('accounts_new_folder')}
-                        </NewFolderButton>
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem
+                                onClick={() => manageFolders()}
+                                asDesktopButton
+                            >
+                                <ForTargetEnv env="mobile">
+                                    <PlusIconSmall />
+                                </ForTargetEnv>
+                                {t('accounts_new_folder')}
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
                     }
                 />
             </DesktopViewHeader>

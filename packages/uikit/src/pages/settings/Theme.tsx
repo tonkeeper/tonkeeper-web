@@ -11,7 +11,12 @@ import {
 } from '../../state/theme';
 import { capitalize } from '../../libs/common';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 export const UserTheme = () => {
     const { t } = useTranslation();
@@ -29,6 +34,11 @@ export const UserTheme = () => {
     if (isProDisplay) {
         return (
             <DesktopViewPageLayout>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('Theme')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <SettingsList items={items} />
             </DesktopViewPageLayout>
         );

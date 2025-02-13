@@ -17,7 +17,7 @@ export const MobileProPreferencesPage = () => {
     const { t } = useTranslation();
     return (
         <DesktopViewPageLayout>
-            <DesktopViewHeader>
+            <DesktopViewHeader backButton={false}>
                 <DesktopViewHeaderContent title={t('aside_settings')}></DesktopViewHeaderContent>
             </DesktopViewHeader>
             <PreferencesAsideMenuStyled />

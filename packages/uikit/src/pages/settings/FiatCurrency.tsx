@@ -9,7 +9,12 @@ import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateUserFiat } from '../../state/fiat';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 export const FiatCurrency = () => {
     const { t, i18n } = useTranslation();
@@ -35,6 +40,11 @@ export const FiatCurrency = () => {
     if (isProDisplay) {
         return (
             <DesktopViewPageLayout>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('settings_primary_currency')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <SettingsList items={items} />
             </DesktopViewPageLayout>
         );

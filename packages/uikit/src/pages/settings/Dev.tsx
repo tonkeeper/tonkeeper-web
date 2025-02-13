@@ -20,7 +20,12 @@ import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { useActiveConfig } from '../../state/wallet';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -140,6 +145,11 @@ export const DevSettings = React.memo(() => {
     if (isProDisplay) {
         return (
             <DesktopWrapper>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title="Dev Menu" />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <EnableTwoFASettings />
                 <EnableTronSettings />
                 <CookieSettings />

@@ -188,9 +188,11 @@ export const DesktopViewHeader: FC<{
             <ReactPortal wrapperId={portalId} position="first">
                 <IonHeader translucent={true}>
                     <IonToolbar>
-                        <IonButtons slot="start">
-                            <IonBackButton />
-                        </IonButtons>
+                        {backButton !== false && (
+                            <IonButtons slot="start">
+                                <IonBackButton />
+                            </IonButtons>
+                        )}
                         {children}
                     </IonToolbar>
                 </IonHeader>

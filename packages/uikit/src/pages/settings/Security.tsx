@@ -28,7 +28,12 @@ import {
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 import styled from 'styled-components';
 import { useNavigate } from '../../hooks/router/useNavigate';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -153,6 +158,11 @@ export const SecuritySettings = () => {
     if (isProDisplay) {
         return (
             <DesktopWrapper>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('settings_security')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <LockSwitch />
                 <TouchIdSwitch />
                 <ChangePassword />

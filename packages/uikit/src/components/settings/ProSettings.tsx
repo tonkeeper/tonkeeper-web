@@ -51,7 +51,12 @@ import { ConfirmView } from '../transfer/ConfirmView';
 import { useNotifyError } from '../../hooks/useNotification';
 import { HideOnReview } from '../ios/HideOnReview';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { DesktopViewPageLayout } from '../desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../shared/TargetEnv';
 
 const Block = styled.div`
     display: flex;
@@ -471,10 +476,16 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
 
 export const ProSettingsResponsive: FC = () => {
     const isProDisplay = useIsFullWidthMode();
+    const { t } = useTranslation();
 
     if (isProDisplay) {
         return (
             <DesktopViewPageLayoutStyled>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('tonkeeper_pro')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <ProSettingsContent />
             </DesktopViewPageLayoutStyled>
         );
