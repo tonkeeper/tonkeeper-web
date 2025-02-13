@@ -1,13 +1,4 @@
-import {
-    ComponentProps,
-    createContext,
-    FC,
-    PropsWithChildren,
-    useEffect,
-    useLayoutEffect,
-    useRef,
-    useState
-} from 'react';
+import { ComponentProps, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Redirect, Route, useHistory, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -151,139 +142,105 @@ const NarrowContentBody: FC<{
     return <NarrowContentAppRouting />;
 };
 
-const HistoryStackContext = createContext<string[]>([]);
-
-export const HistoryStackProvider: FC<PropsWithChildren> = ({ children }) => {
-    const location = useLocation();
-    const [historyStack, setHistoryStack] = useState<string[]>([]);
-
-    useEffect(() => {
-        setHistoryStack(prev => [...prev, location.pathname]);
-    }, [location]);
-
-    return (
-        <HistoryStackContext.Provider value={historyStack}>{children}</HistoryStackContext.Provider>
-    );
-};
-
 const NarrowContentAppRouting = () => {
     return (
-        <HistoryStackProvider>
-            <WideLayout>
-                <WideContent id="main-id--">
-                    <WalletLayout $gradient={location.pathname === AppRoute.home}>
-                        <IonMenu menuId="aside-nav" contentId="main-content">
-                            <AsideMenu />
-                        </IonMenu>
-                        <MobileProWalletMenu />
-                        <WalletLayoutBody>
-                            {/* Ionic doesn't support nested routing well */}
-                            <IonRouterOutlet id="main-content">
-                                <Route path={AppProRoute.dashboard} component={DashboardPage} />
-                                <Route path={AppRoute.browser} component={DesktopBrowser} />
-                                <Route
-                                    path={AppProRoute.multiSend}
-                                    component={DesktopMultiSendPage}
-                                />
-                                <Route
-                                    path={AppRoute.accountSettings}
-                                    component={DesktopAccountSettingsPage}
-                                />
+        <WideLayout>
+            <WideContent id="main-id--">
+                <WalletLayout $gradient={location.pathname === AppRoute.home}>
+                    <IonMenu menuId="aside-nav" contentId="main-content">
+                        <AsideMenu />
+                    </IonMenu>
+                    <MobileProWalletMenu />
+                    <WalletLayoutBody>
+                        {/* Ionic doesn't support nested routing well */}
+                        <IonRouterOutlet id="main-content">
+                            <Route path={AppProRoute.dashboard} component={DashboardPage} />
+                            <Route path={AppRoute.browser} component={DesktopBrowser} />
+                            <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
+                            <Route
+                                path={AppRoute.accountSettings}
+                                component={DesktopAccountSettingsPage}
+                            />
 
-                                <Route path={AppRoute.activity} component={DesktopHistoryPage} />
-                                <Route path={AppRoute.purchases} component={DesktopCollectables} />
-                                <Route path={AppRoute.dns} component={DesktopDns} />
-                                <Route
-                                    path={AppRoute.multisigWallets}
-                                    component={DesktopManageMultisigsPage}
-                                />
-                                <Route
-                                    path={AppRoute.multisigOrders}
-                                    component={DesktopMultisigOrdersPage}
-                                />
-                                <Route path={AppRoute.swap} component={DesktopSwapPage} />
-                                <Route path={AppRoute.home} exact component={MobileProHomePage} />
-                                <Route path={AppRoute.coins} exact component={DesktopTokens} />
-                                <Route
-                                    path={`${AppRoute.coins}/:name`}
-                                    component={DesktopCoinPage}
-                                />
+                            <Route path={AppRoute.activity} component={DesktopHistoryPage} />
+                            <Route path={AppRoute.purchases} component={DesktopCollectables} />
+                            <Route path={AppRoute.dns} component={DesktopDns} />
+                            <Route
+                                path={AppRoute.multisigWallets}
+                                component={DesktopManageMultisigsPage}
+                            />
+                            <Route
+                                path={AppRoute.multisigOrders}
+                                component={DesktopMultisigOrdersPage}
+                            />
+                            <Route path={AppRoute.swap} component={DesktopSwapPage} />
+                            <Route path={AppRoute.home} exact component={MobileProHomePage} />
+                            <Route path={AppRoute.coins} exact component={DesktopTokens} />
+                            <Route path={`${AppRoute.coins}/:name`} component={DesktopCoinPage} />
 
-                                {/* Wallet settings */}
-                                <Route
-                                    path={AppRoute.walletSettings}
-                                    exact
-                                    component={DesktopWalletSettingsPage}
-                                />
-                                <Route
-                                    path={`${
-                                        AppRoute.walletSettings + WalletSettingsRoute.recovery
-                                    }/:accountId`}
-                                    component={Recovery}
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.recovery}
-                                    component={ActiveRecovery}
-                                    exact
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.jettons}
-                                    component={JettonsSettings}
-                                />
+                            {/* Wallet settings */}
+                            <Route
+                                path={AppRoute.walletSettings}
+                                exact
+                                component={DesktopWalletSettingsPage}
+                            />
+                            <Route
+                                path={`${
+                                    AppRoute.walletSettings + WalletSettingsRoute.recovery
+                                }/:accountId`}
+                                component={Recovery}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.recovery}
+                                component={ActiveRecovery}
+                                exact
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.jettons}
+                                component={JettonsSettings}
+                            />
 
-                                <Route
-                                    path={
-                                        AppRoute.walletSettings + WalletSettingsRoute.connectedApps
-                                    }
-                                    component={DesktopConnectedAppsSettings}
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.nft}
-                                    component={DesktopNftSettings}
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.derivations}
-                                    component={MAMIndexesPage}
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.battery}
-                                    component={BatteryPage}
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.version}
-                                    component={WalletVersionPage}
-                                />
-                                <Route
-                                    path={
-                                        AppRoute.walletSettings + WalletSettingsRoute.ledgerIndexes
-                                    }
-                                    component={LedgerIndexesPage}
-                                />
-                                <Route
-                                    path={AppRoute.walletSettings + WalletSettingsRoute.twoFa}
-                                    component={TwoFAPage}
-                                />
-                                <Route
-                                    path={
-                                        AppRoute.walletSettings + WalletSettingsRoute.notification
-                                    }
-                                    component={Notifications}
-                                />
-                                {/* Wallet settings */}
-
-                                {/*  <Route
-                                    path={AppRoute.settings}
-                                    render={() => <PreferencesModal />}
-                                />*/}
-                            </IonRouterOutlet>
-                        </WalletLayoutBody>
-                        <MobileProFooter />
-                    </WalletLayout>
-                    <PreferencesModal />
-                </WideContent>
-                <BackgroundElements />
-            </WideLayout>
-        </HistoryStackProvider>
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}
+                                component={DesktopConnectedAppsSettings}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.nft}
+                                component={DesktopNftSettings}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.derivations}
+                                component={MAMIndexesPage}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.battery}
+                                component={BatteryPage}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.version}
+                                component={WalletVersionPage}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.ledgerIndexes}
+                                component={LedgerIndexesPage}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.twoFa}
+                                component={TwoFAPage}
+                            />
+                            <Route
+                                path={AppRoute.walletSettings + WalletSettingsRoute.notification}
+                                component={Notifications}
+                            />
+                            {/* Wallet settings */}
+                        </IonRouterOutlet>
+                    </WalletLayoutBody>
+                    <MobileProFooter />
+                </WalletLayout>
+                <PreferencesModal />
+            </WideContent>
+            <BackgroundElements />
+        </WideLayout>
     );
 };
 
