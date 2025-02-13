@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -32,6 +32,8 @@ import styled from 'styled-components';
 import { Container } from '@tonkeeper/uikit';
 import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/desktop/header/DesktopHeaderElements';
 import { BackgroundElements, usePrefetch } from './common';
+import { PullToRefresh } from '../components/PullToRefresh';
+import { useQueryClient } from '@tanstack/react-query';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -107,6 +109,14 @@ export const WideContent: FC<{
     usePrefetch();
     useDebuggingTools();
 
+    const queryClient = useQueryClient();
+    const onRefresh = useCallback(async () => {
+        const promise1 = queryClient.invalidateQueries();
+        const promise2 = new Promise(r => setTimeout(r, 1000));
+
+        await Promise.all([promise1, promise2]);
+    }, [queryClient]);
+
     if (lock) {
         return (
             <FullSizeWrapper>
@@ -139,6 +149,7 @@ export const WideContent: FC<{
                 </Switch>
             </WideContentStyled>
             <BackgroundElements />
+            <PullToRefresh onRefresh={onRefresh} />
         </WideLayout>
     );
 };

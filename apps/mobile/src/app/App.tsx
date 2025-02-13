@@ -67,6 +67,7 @@ const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
 
     body {
+        background: ${p => p.theme.backgroundPage};
         font-family: '-apple-system', BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, Tahoma, Verdana, 'sans-serif';
     }
     
