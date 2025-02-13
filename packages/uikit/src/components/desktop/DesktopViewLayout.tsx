@@ -11,9 +11,11 @@ import React, {
     ReactNode,
     useCallback,
     useContext,
+    useEffect,
     useId,
     useLayoutEffect,
-    useRef
+    useRef,
+    useState
 } from 'react';
 import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { useNativeBackButton } from '../BackButton';
@@ -27,7 +29,6 @@ import {
     IonContent,
     IonHeader,
     IonPage,
-    IonPopover,
     IonTitle,
     IonToolbar
 } from '@ionic/react';
@@ -263,18 +264,34 @@ const DesktopViewHeaderContentRightDesktop = styled.div`
     gap: 12px;
 `;
 
+const defaultDDTop = 44;
+const ddTopShift = 31;
+
 const DesktopViewHeaderContentRightMobile: FC<PropsWithChildren<{ className?: string }>> = ({
     children,
     className
 }) => {
-    const triggerId = useId();
+    const iconRef = useRef<SVGSVGElement>(null);
+    const [top, setTop] = useState(defaultDDTop);
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (iconRef.current) {
+                const rect = iconRef.current.getBoundingClientRect();
+                if (rect.top !== defaultDDTop - ddTopShift) {
+                    setTop(rect.top + ddTopShift);
+                }
+            }
+        }, 400);
+    }, []);
+
     return (
         <IonButtons slot="primary" className={className}>
             <IonButton>
                 <DDGlobalStyle />
                 <SelectDropDown
                     containerClassName="dd-select-container-header"
-                    top="44px"
+                    top={top + 'px'}
                     right="8px"
                     portal
                     payload={close => (
@@ -292,12 +309,9 @@ const DesktopViewHeaderContentRightMobile: FC<PropsWithChildren<{ className?: st
                         </DropDownContent>
                     )}
                 >
-                    <EllipsisIcon />
+                    <EllipsisIcon ref={iconRef} />
                 </SelectDropDown>
             </IonButton>
-            <IonPopover trigger={triggerId} side="top" alignment="center">
-                <IonContent class="ion-padding">Hello World!</IonContent>
-            </IonPopover>
         </IonButtons>
     );
 };
