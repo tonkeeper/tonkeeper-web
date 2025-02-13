@@ -11,7 +11,7 @@ import {
     SaleBadgeIcon,
     SwitchIcon,
     UnpinIconOutline
-} from "../../components/Icon";
+} from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
@@ -143,7 +143,9 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                {(account.type === 'mnemonic' || account.type === 'testnet') && (
+                {(account.type === 'mnemonic' ||
+                    account.type === 'testnet' ||
+                    account.type === 'sk') && (
                     <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
                         <KeyIcon />
                         <Label2>{t('settings_backup_seed')}</Label2>
