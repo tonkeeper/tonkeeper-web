@@ -287,31 +287,31 @@ const DesktopViewHeaderContentRightMobile: FC<PropsWithChildren<{ className?: st
 
     return (
         <IonButtons slot="primary" className={className}>
-            <IonButton>
-                <DDGlobalStyle />
-                <SelectDropDown
-                    containerClassName="dd-select-container-header"
-                    top={top + 'px'}
-                    right="8px"
-                    portal
-                    payload={close => (
-                        <DropDownContent>
-                            {Children.toArray(children).map(elem => (
-                                <>
-                                    {isValidElement<
-                                        ComponentProps<typeof DesktopViewHeaderContentRightItem>
-                                    >(elem)
-                                        ? cloneElement(elem, { _closeDropDown: close })
-                                        : elem}
-                                    <DropDownItemsDivider />
-                                </>
-                            ))}
-                        </DropDownContent>
-                    )}
-                >
+            <DDGlobalStyle />
+            <SelectDropDown
+                containerClassName="dd-select-container-header"
+                top={top + 'px'}
+                right="8px"
+                portal
+                payload={close => (
+                    <DropDownContent>
+                        {Children.toArray(children).map(elem => (
+                            <>
+                                {isValidElement<
+                                    ComponentProps<typeof DesktopViewHeaderContentRightItem>
+                                >(elem)
+                                    ? cloneElement(elem, { _closeDropDown: close })
+                                    : elem}
+                                <DropDownItemsDivider />
+                            </>
+                        ))}
+                    </DropDownContent>
+                )}
+            >
+                <IonButton>
                     <EllipsisIcon ref={iconRef} />
-                </SelectDropDown>
-            </IonButton>
+                </IonButton>
+            </SelectDropDown>
         </IonButtons>
     );
 };
