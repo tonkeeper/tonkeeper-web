@@ -14,7 +14,8 @@ common.exec('npx react-app-rewired build', {
     env: {
         ...process.env,
         INLINE_RUNTIME_CHUNK: false,
-        REACT_APP_EXTENSION_TYPE: '%%%EXTENSION%%%'
+        REACT_APP_EXTENSION_TYPE: '%%%EXTENSION%%%',
+        REACT_APP_STORE_URL: '%%%STORE_URL%%%'
     }
 });
 
@@ -50,6 +51,11 @@ fs.copySync(buildDir, buildDirChrome);
 
 chrome.updateChromeManifest(buildDirChrome, packageJson.version);
 common.addEnvironmentVariable(buildDirChrome, '%%%EXTENSION%%%', 'Chrome');
+common.addEnvironmentVariable(
+    buildDirChrome,
+    '%%%STORE_URL%%%',
+    'https://chromewebstore.google.com/detail/tonkeeper-%E2%80%94-wallet-for-to/omaabbefbmiijedngplfjmnooppbclkk/reviews'
+);
 
 child_process.execSync(
     `zip ../tonkeeper_chrome_v${packageJson.version}.zip -r ${buildDirChrome}/ *`,
@@ -77,6 +83,11 @@ fs.copySync(buildDir, buildDirFireFox);
 
 firefox.updateFireFoxManifest(buildDirFireFox, packageJson.version);
 common.addEnvironmentVariable(buildDirFireFox, '%%%EXTENSION%%%', 'FireFox');
+common.addEnvironmentVariable(
+    buildDirFireFox,
+    '%%%STORE_URL%%%',
+    'https://addons.mozilla.org/en-US/firefox/addon/tonkeeper/'
+);
 
 child_process.execSync(
     `zip ../tonkeeper_firefox_v${packageJson.version}.zip -r ${buildDirFireFox}/ *`,

@@ -181,7 +181,7 @@ export const RecoveryContent: FC<{
         return (
             <Wrapper>
                 <H2Label2Responsive>{t('recovery_wallet_secret_key')}</H2Label2Responsive>
-                <BackButtonBlockStyled onClick={onBack} />
+                {isPage ? <BackButtonBlockStyled onClick={onBack} /> : null}
                 <SKWrapper>{secret.sk}</SKWrapper>
             </Wrapper>
         );

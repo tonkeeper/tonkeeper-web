@@ -125,6 +125,8 @@ export interface IAppSdk {
 
     notifications?: NotificationService;
     targetEnv: TargetEnv;
+
+    storeUrl?: string;
 }
 
 export abstract class BaseApp implements IAppSdk {
