@@ -191,8 +191,8 @@ export class TwoFAMessageSender implements ISender {
         const signature = await this.signer(dataToSign);
 
         const body = beginCell()
-            .storeBuffer(signature)
             .storeSlice(dataToSign.beginParse())
+            .storeBuffer(signature)
             .endCell();
 
         const ext = beginCell()
