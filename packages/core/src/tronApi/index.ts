@@ -5,6 +5,7 @@ import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
 import { Configuration, DefaultApi, EstimatedTronTx } from '../batteryApi';
+import type { Transaction } from 'tronweb/lib/commonjs/types';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
 
@@ -31,6 +32,11 @@ export type TronHistoryItemTransferAsset = {
     isFailed: boolean;
 };
 export type TronHistoryItem = TronHistoryItemTransferAsset;
+
+export type TronResources = {
+    energy: number;
+    bandwidth: number;
+};
 
 export class TronApi {
     public readonly tronGridBaseUrl: string;
@@ -105,18 +111,40 @@ export class TronApi {
         };
     }
 
+    public async sendTransaction(
+        tx: Transaction,
+        fromWallet: string,
+        resources: TronResources,
+        options: { xTonConnectAuth: string }
+    ) {
+        this.batteryApi.tronSend({
+            xTonConnectAuth: options.xTonConnectAuth,
+            tronSendRequest: {
+                tx: JSON.stringify(tx), // TODO tron
+                wallet: fromWallet,
+                energy: resources.energy,
+                bandwidth: resources.bandwidth
+            }
+        });
+    }
+
     public async estimateBatteryCharges(params: {
         from: string;
         contractAddress: string;
         selector: string;
         data: string;
-    }): Promise<EstimatedTronTx> {
+    }): Promise<{ estimation: EstimatedTronTx; resources: TronResources }> {
         const resources = await this.estimateResources(params);
 
-        return this.batteryApi.tronEstimate({
+        const estimation = await this.batteryApi.tronEstimate({
             wallet: params.from,
             ...resources
         });
+
+        return {
+            estimation,
+            resources
+        };
     }
 
     private async estimateResources(params: {
@@ -124,7 +152,7 @@ export class TronApi {
         contractAddress: string;
         selector: string;
         data: string;
-    }) {
+    }): Promise<TronResources> {
         try {
             const response = await (
                 await fetch(`${this.tronGridBaseUrl}/wallet/triggerconstantcontract`, {

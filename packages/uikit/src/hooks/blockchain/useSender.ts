@@ -656,15 +656,19 @@ export const useGetTronSender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
+    const { data: authToken } = useBatteryAuthToken();
 
-    return useCallback(() => {
+    return useCallback(async () => {
         const signer = getTronSigner(sdk, tronApi, activeAccount, checkTouchId);
 
         if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
             throw new Error('Tron is not enabled for the active wallet');
         }
 
-        return new TronSender(tronApi, activeAccount.activeTronWallet, signer);
+        const token = authToken ?? (await requestToken());
+
+        return new TronSender(tronApi, activeAccount.activeTronWallet, signer, token);
     }, [tronApi, activeAccount, checkTouchId]);
 };
 
@@ -681,6 +685,6 @@ export const useGetTronEstimationSender = () => {
             throw new Error('Tron is not enabled for the active wallet');
         }
 
-        return new TronSender(tronApi, activeAccount.activeTronWallet, signer);
+        return new TronSender(tronApi, activeAccount.activeTronWallet, signer, '');
     }, [tronApi]);
 };

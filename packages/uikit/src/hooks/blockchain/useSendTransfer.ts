@@ -2,7 +2,12 @@ import { useMutation } from '@tanstack/react-query';
 import { isTonAsset, Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Estimation, TonRecipientData, TronRecipientData } from '@tonkeeper/core/dist/entries/send';
+import {
+    Estimation,
+    TonRecipientData,
+    TronEstimation,
+    TronRecipientData
+} from '@tonkeeper/core/dist/entries/send';
 import { useAnalyticsTrack } from '../amplitude';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
@@ -84,8 +89,12 @@ export function useSendTransfer<T extends Asset>({
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
                 });
             } else if (amount.asset.id === TRON_USDT_ASSET.id) {
-                const tronSender = getTronSender();
-                await tronSender.send(recipient.address.address, amount as AssetAmount<TronAsset>);
+                const tronSender = await getTronSender();
+                await tronSender.send(
+                    recipient.address.address,
+                    amount as AssetAmount<TronAsset>,
+                    (estimation as TronEstimation).resources
+                );
             } else {
                 throw new Error('Unexpected asset');
             }

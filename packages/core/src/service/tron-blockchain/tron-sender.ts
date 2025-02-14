@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { TronApi } from '../../tronApi';
+import { TronApi, TronResources } from '../../tronApi';
 import { TRON_USDT_ASSET } from '../../entries/crypto/asset/constants';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../entries/crypto/asset/tron-asset';
@@ -20,10 +20,11 @@ export class TronSender {
     constructor(
         private tronApi: TronApi,
         private walletInfo: TronWallet,
-        private tronSigner: TronSigner
+        private tronSigner: TronSigner,
+        private readonly xTonConnectAuth: string
     ) {}
 
-    async send(to: string, assetAmount: AssetAmount<TronAsset>) {
+    async send(to: string, assetAmount: AssetAmount<TronAsset>, resources: TronResources) {
         if (assetAmount.asset.id !== TRON_USDT_ASSET.id) {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
@@ -46,11 +47,10 @@ export class TronSender {
         );
 
         const signedTx = await this.tronSigner(tx.transaction);
-        const result = await tronWeb.trx.sendRawTransaction(signedTx);
-
-        if (!result.result) {
-            throw new Error('err');
-        }
+        console.log(JSON.stringify(signedTx)); // TODO tron remove
+        await this.tronApi.sendTransaction(signedTx, this.walletInfo.address, resources, {
+            xTonConnectAuth: this.xTonConnectAuth
+        });
     }
 
     async estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation> {
@@ -58,7 +58,7 @@ export class TronSender {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
-        const estimation = await this.tronApi.estimateBatteryCharges({
+        const { estimation, resources } = await this.tronApi.estimateBatteryCharges({
             from: this.walletInfo.address,
             contractAddress: assetAmount.asset.address,
             selector: TronSender.transferSelector,
@@ -74,7 +74,8 @@ export class TronSender {
             fee: {
                 type: 'battery' as const,
                 charges: estimation.totalCharges
-            }
+            },
+            resources
         };
     }
 }
