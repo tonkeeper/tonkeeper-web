@@ -27,7 +27,6 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 
 import { Address } from '@ton/core';
 
-import { useAppContext } from '../../hooks/appContext';
 import { RenameWalletContent } from '../settings/wallet-name/WalletNameNotification';
 import { AddWalletContext } from './AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
@@ -244,7 +243,7 @@ const CreateMultisigFormPage: FC<{
             allowArbitrarySeqno: false
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
-        setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.extra.weiAmount });
+        setDeployArgs({ multisigConfig, fromWallet, fee: result?.fee });
     };
 
     const mutateAsync = useCallback(async () => {

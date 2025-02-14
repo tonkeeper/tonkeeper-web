@@ -21,6 +21,7 @@ import {
     useBatteryBalance,
     useBatteryEnabledConfig,
     useBatteryServiceConfig,
+    useBatteryUnitTonRate,
     useRequestBatteryAuthToken
 } from '../../state/battery';
 import { getTronSigner, useGetAccountSigner } from '../../state/mnemonic';
@@ -191,6 +192,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const batteryConfig = useBatteryServiceConfig();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const { data: twoFaConfig } = useTwoFAWalletConfig();
+    const batteryUnitTonRate = useBatteryUnitTonRate();
 
     return useQuery<SenderChoiceUserAvailable[]>(
         [
@@ -200,7 +202,8 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             batteryAuthToken,
             batteryEnableConfig.disableOperations,
             batteryConfig,
-            twoFaConfig?.status
+            twoFaConfig?.status,
+            batteryUnitTonRate
         ],
         async () => {
             if (account.type === 'ledger' || twoFaConfig?.status === 'active') {
@@ -222,7 +225,8 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                     {
                         messageTtl: batteryConfig.messageTtl,
                         excessAddress: batteryConfig.excessAccount,
-                        authToken: batteryAuthToken
+                        authToken: batteryAuthToken,
+                        batteryUnitTonRate
                     },
                     { batteryApi, tonApi: api },
                     account.activeTonWallet,
@@ -261,6 +265,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
     const gaslessConfig = useGaslessConfig();
     const twoFaApi = useTwoFAApi();
     const { data: twoFAConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
+    const batteryUnitTonRate = useBatteryUnitTonRate();
 
     const wallet = activeAccount.activeTonWallet;
 
@@ -373,7 +378,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
                     {
                         excessAddress: batteryConfig.excessAccount,
                         messageTtl: batteryConfig.messageTtl,
-                        authToken: _authToken!
+                        authToken: _authToken!,
+                        batteryUnitTonRate
                     },
                     {
                         tonApi: api,
@@ -398,7 +404,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         mutateAsync,
         gaslessConfig,
         twoFaApi,
-        twoFAConfig
+        twoFAConfig,
+        batteryUnitTonRate
     ]);
 };
 
@@ -419,6 +426,7 @@ export const useGetSender = () => {
     const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
         useConfirmTwoFANotification();
     const twoFAServiceConfig = useTwoFAServiceConfig();
+    const batteryUnitTonRate = useBatteryUnitTonRate();
 
     const wallet = activeAccount.activeTonWallet;
 
@@ -591,7 +599,8 @@ export const useGetSender = () => {
                     {
                         excessAddress: batteryConfig.excessAccount,
                         messageTtl: batteryConfig.messageTtl,
-                        authToken: batteryToken
+                        authToken: batteryToken,
+                        batteryUnitTonRate
                     },
                     {
                         tonApi: api,
@@ -619,7 +628,8 @@ export const useGetSender = () => {
             twoFAConfig,
             openTwoFaConfirmTelegram,
             closeTwoFaConfirmTelegram,
-            twoFAServiceConfig.confirmMessageTGTtlSeconds
+            twoFAServiceConfig.confirmMessageTGTtlSeconds,
+            batteryUnitTonRate
         ]
     );
 };
@@ -646,15 +656,19 @@ export const useGetTronSender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
+    const { data: authToken } = useBatteryAuthToken();
 
-    return useCallback(() => {
+    return useCallback(async () => {
         const signer = getTronSigner(sdk, tronApi, activeAccount, checkTouchId);
 
         if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
             throw new Error('Tron is not enabled for the active wallet');
         }
 
-        return new TronSender(tronApi, activeAccount.activeTronWallet, signer);
+        const token = authToken ?? (await requestToken());
+
+        return new TronSender(tronApi, activeAccount.activeTronWallet, signer, token);
     }, [tronApi, activeAccount, checkTouchId]);
 };
 
@@ -671,6 +685,6 @@ export const useGetTronEstimationSender = () => {
             throw new Error('Tron is not enabled for the active wallet');
         }
 
-        return new TronSender(tronApi, activeAccount.activeTronWallet, signer);
+        return new TronSender(tronApi, activeAccount.activeTronWallet, signer, '');
     }, [tronApi]);
 };
