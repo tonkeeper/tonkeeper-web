@@ -321,7 +321,7 @@ export const getTronSigner = (
                     const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');
 
                     const tronWeb = new TronWeb({
-                        fullHost: tronApi.baseURL,
+                        fullHost: tronApi.tronGridBaseUrl,
                         privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
                     });
 
@@ -341,7 +341,7 @@ export const getTronSigner = (
                     );
 
                     const tronWeb = new TronWeb({
-                        fullHost: tronApi.baseURL,
+                        fullHost: tronApi.tronGridBaseUrl,
                         privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
                     });
 

@@ -4,6 +4,7 @@ import { TronWeb } from 'tronweb';
 import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
+import { Configuration, DefaultApi, EstimatedTronTx } from '../batteryApi';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
 
@@ -32,24 +33,30 @@ export type TronHistoryItemTransferAsset = {
 export type TronHistoryItem = TronHistoryItemTransferAsset;
 
 export class TronApi {
-    public readonly baseURL: string;
+    public readonly tronGridBaseUrl: string;
+
+    private readonly batteryApi: DefaultApi;
 
     public get headers() {
         return {
-            ...(this.apiKey && {
-                'TRON-PRO-API-KEY': this.apiKey
+            ...(this.trongrid.apiKey && {
+                'TRON-PRO-API-KEY': this.trongrid.apiKey
             }),
             'Content-Type': 'application/json'
         };
     }
 
-    constructor(baseURL: string, private readonly apiKey?: string) {
-        this.baseURL = removeTrailingSlash(baseURL);
+    constructor(
+        private readonly trongrid: { baseURL: string; readonly apiKey?: string },
+        batteryConfig: Configuration
+    ) {
+        this.tronGridBaseUrl = removeTrailingSlash(trongrid.baseURL);
+        this.batteryApi = new DefaultApi(batteryConfig);
     }
 
     async getBalances(address: string) {
         const res = await (
-            await fetch(`${this.baseURL}/v1/accounts/${address}`, {
+            await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
                 headers: this.headers
             })
         ).json();
@@ -98,7 +105,21 @@ export class TronApi {
         };
     }
 
-    async estimateEnergy(params: {
+    public async estimateBatteryCharges(params: {
+        from: string;
+        contractAddress: string;
+        selector: string;
+        data: string;
+    }): Promise<EstimatedTronTx> {
+        const resources = await this.estimateResources(params);
+
+        return this.batteryApi.tronEstimate({
+            wallet: params.from,
+            ...resources
+        });
+    }
+
+    private async estimateResources(params: {
         from: string;
         contractAddress: string;
         selector: string;
@@ -106,7 +127,7 @@ export class TronApi {
     }) {
         try {
             const response = await (
-                await fetch(`${this.baseURL}/wallet/triggerconstantcontract`, {
+                await fetch(`${this.tronGridBaseUrl}/wallet/triggerconstantcontract`, {
                     method: 'POST',
                     headers: this.headers,
                     body: JSON.stringify({
@@ -132,7 +153,24 @@ export class TronApi {
                 throw new Error('Estimating energy error');
             }
 
-            return energy;
+            if (!response.transaction || !response.transaction.raw_data_hex) {
+                throw new Error('Transaction data missing in response');
+            }
+
+            /**
+             * https://developers.tron.network/docs/faq#5-how-to-calculate-the-bandwidth-and-energy-consumed-when-callingdeploying-a-contract
+             */
+            const DATA_HEX_PROTOBUF_EXTRA = 3;
+            const MAX_RESULT_SIZE_IN_TX = 64;
+            const A_SIGNATURE = 67;
+
+            const bandwidth =
+                Buffer.from(response.transaction.raw_data_hex, 'hex').length +
+                DATA_HEX_PROTOBUF_EXTRA +
+                MAX_RESULT_SIZE_IN_TX +
+                A_SIGNATURE;
+
+            return { energy, bandwidth };
         } catch (error) {
             console.error('Error estimating energy:', error);
             throw error;
@@ -161,7 +199,7 @@ export class TronApi {
                     type: 'Function'
                 }
             ];
-            const contract = new TronWeb({ fullHost: this.baseURL }).contract(
+            const contract = new TronWeb({ fullHost: this.tronGridBaseUrl }).contract(
                 abi,
                 TRON_USDT_ASSET.address
             );
@@ -186,7 +224,7 @@ export class TronApi {
     async rpc(method: string, params: string[] = []) {
         try {
             const response = await (
-                await fetch(`${this.baseURL}/jsonrpc`, {
+                await fetch(`${this.tronGridBaseUrl}/jsonrpc`, {
                     method: 'POST',
                     headers: this.headers,
                     body: JSON.stringify({
@@ -222,7 +260,7 @@ export class TronApi {
             filterSpam?: boolean;
         }
     ): Promise<TronHistoryItem[]> {
-        const url = new URL(`${this.baseURL}/v1/accounts/${address}/transactions/trc20`);
+        const url = new URL(`${this.tronGridBaseUrl}/v1/accounts/${address}/transactions/trc20`);
 
         if (options?.limit !== undefined) {
             url.searchParams.set('limit', options.limit.toString());

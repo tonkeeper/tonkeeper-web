@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
 import { TronApi } from '../../tronApi';
-import { TRON_TRX_ASSET, TRON_USDT_ASSET } from '../../entries/crypto/asset/constants';
+import { TRON_USDT_ASSET } from '../../entries/crypto/asset/constants';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../entries/crypto/asset/tron-asset';
-import BigNumber from 'bignumber.js';
 import { TronSigner } from '../../entries/signer';
 import { TronWallet } from '../../entries/tron/tron-wallet';
 import { TronAddressUtils } from '@ton-keychain/trx';
 import { TronWeb } from 'tronweb';
+import { TronEstimation } from '../../entries/send';
 const AbiCoder = ethers.AbiCoder;
 
 const toHexAddress = (base58: string) => {
@@ -29,7 +29,7 @@ export class TronSender {
         }
 
         const tronWeb = new TronWeb({
-            fullHost: this.tronApi.baseURL
+            fullHost: this.tronApi.tronGridBaseUrl
         });
 
         const functionSelector = 'transfer(address,uint256)';
@@ -53,12 +53,12 @@ export class TronSender {
         }
     }
 
-    async estimate(to: string, assetAmount: AssetAmount<TronAsset>) {
+    async estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation> {
         if (assetAmount.asset.id !== TRON_USDT_ASSET.id) {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
-        const estimatedGas = await this.tronApi.estimateEnergy({
+        const estimation = await this.tronApi.estimateBatteryCharges({
             from: this.walletInfo.address,
             contractAddress: assetAmount.asset.address,
             selector: TronSender.transferSelector,
@@ -70,15 +70,11 @@ export class TronSender {
                 .replace(/^(0x)/, '')
         });
 
-        const gasPrice = parseInt(await this.tronApi.rpc('eth_gasPrice'));
-
-        const trxToBurn = estimatedGas * gasPrice;
-
         return {
-            extra: new AssetAmount({
-                weiAmount: new BigNumber(trxToBurn.toString()),
-                asset: TRON_TRX_ASSET
-            })
+            fee: {
+                type: 'battery' as const,
+                charges: estimation.totalCharges
+            }
         };
     }
 }

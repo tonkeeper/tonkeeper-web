@@ -14,14 +14,16 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { useDevSettings } from '../dev';
+import { useBatteryApi } from '../battery';
 
 export const useTronApi = () => {
     const appContext = useAppContext();
     const apiKey = appContext.env?.tronApiKey;
 
     const apiUrl = appContext.mainnetConfig.tron_api_url || 'https://api.trongrid.io';
+    const batteryApi = useBatteryApi();
 
-    return useMemo(() => new TronApi(apiUrl, apiKey), [apiKey, apiUrl]);
+    return useMemo(() => new TronApi({ baseURL: apiUrl, apiKey }, batteryApi), [apiKey, apiUrl]);
 };
 
 export const useIsTronEnabledGlobally = () => {
