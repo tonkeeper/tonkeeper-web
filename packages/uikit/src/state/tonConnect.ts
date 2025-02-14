@@ -26,7 +26,7 @@ import { QueryKey } from '../libs/queryKey';
 import { getLedgerTonProofSigner, signTonConnectOver } from './mnemonic';
 import {
     isStandardTonWallet,
-    TonWalletStandard,
+    TonContract,
     WalletId,
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
@@ -50,7 +50,7 @@ export const useAppTonConnectConnections = () => {
 
     const wallets = data?.flatMap(a => a.allTonWallets);
 
-    return useQuery<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]>(
+    return useQuery<{ wallet: TonContract; connections: AccountConnection[] }[]>(
         [QueryKey.tonConnectConnection, wallets?.map(i => i.id)],
         async () => {
             return getAppConnections(sdk.storage);
@@ -224,9 +224,6 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const accounts = useAccountsState().filter(isAccountTonWalletStandard);
 
     return useMutation(async (connection: AccountConnection | 'all') => {
-        if (!isStandardTonWallet(wallet)) {
-            throw new Error('Only standard ton wallets can be disconnected');
-        }
         let connectionsToDisconnect: AccountConnection[];
         if (sdk.targetEnv !== 'extension') {
             connectionsToDisconnect = await disconnectFromWallet(sdk.storage, connection, wallet);
@@ -261,7 +258,10 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
 const disconnectFromWallet = async (
     storage: IStorage,
     connection: AccountConnection | 'all',
-    wallet: Pick<TonWalletStandard, 'publicKey' | 'id'>
+    wallet: {
+        id: string;
+        publicKey?: string;
+    }
 ) => {
     let connections = await getTonWalletConnections(storage, wallet);
     const connectionsToDisconnect = connection === 'all' ? connections : [connection];

@@ -8,11 +8,11 @@ import {
     useDisconnectTonConnectApp
 } from '../../state/tonConnect';
 import { ListBlock, ListItem } from '../List';
-import { Loading } from '../Loading';
 import { Body2, Body3, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmDisconnectNotification } from './ConfirmDisconnectNotification';
 import { formatDappUrl } from './utils';
+import { SpinnerRing } from '../Icon';
 
 const DesktopListContainer = styled.ul`
     padding: 0;
@@ -87,6 +87,11 @@ const DisconnectButton = styled(Button)`
     height: 32px;
 `;
 
+const SpinnerRingStyled = styled(SpinnerRing)`
+    transform: scale(1.5);
+    margin: 0 auto;
+`;
+
 export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { data: connections, refetch } = useActiveWalletTonConnectConnections();
@@ -109,7 +114,7 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
     if (!connections) {
         return (
             <FullHeightContainer className={className}>
-                <Loading />
+                <SpinnerRingStyled />
             </FullHeightContainer>
         );
     }

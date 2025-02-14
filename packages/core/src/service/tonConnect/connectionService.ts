@@ -81,7 +81,7 @@ export const saveAccountConnection = async (options: {
  */
 export const disconnectAccountConnection = async (options: {
     storage: IStorage;
-    wallet: TonWalletStandard;
+    wallet: TonContract;
     webViewUrl: string;
 }) => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
