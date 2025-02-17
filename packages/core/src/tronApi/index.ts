@@ -117,10 +117,10 @@ export class TronApi {
         resources: TronResources,
         options: { xTonConnectAuth: string }
     ) {
-        this.batteryApi.tronSend({
+        return this.batteryApi.tronSend({
             xTonConnectAuth: options.xTonConnectAuth,
             tronSendRequest: {
-                tx: JSON.stringify(tx), // TODO tron
+                tx: Buffer.from(JSON.stringify(tx)).toString('base64'),
                 wallet: fromWallet,
                 energy: resources.energy,
                 bandwidth: resources.bandwidth
@@ -135,6 +135,9 @@ export class TronApi {
         data: string;
     }): Promise<{ estimation: EstimatedTronTx; resources: TronResources }> {
         const resources = await this.estimateResources(params);
+        const bandwidhAvailable = await this.getAccountBandwidth(params.from);
+
+        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
 
         const estimation = await this.batteryApi.tronEstimate({
             wallet: params.from,
@@ -145,6 +148,25 @@ export class TronApi {
             estimation,
             resources
         };
+    }
+
+    private async getAccountBandwidth(address: string): Promise<number> {
+        const res = await (
+            await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
+                headers: this.headers
+            })
+        ).json();
+
+        if (!res?.success || !res?.data) {
+            throw new Error('Fetch tron balances failed');
+        }
+
+        const info = res?.data?.[0];
+        if (!info) {
+            return 0;
+        }
+
+        return info.free_net_usage || 0;
     }
 
     private async estimateResources(params: {
