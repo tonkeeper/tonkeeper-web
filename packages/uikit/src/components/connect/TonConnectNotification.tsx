@@ -220,7 +220,7 @@ const SelectAccountDropDown: FC<{
         <SelectDropDown
             right="0"
             top="-64px"
-            width="min(calc(var(--app-width) - 2rem), 400px)"
+            width="100%"
             payload={onClose => (
                 <DropDownContent>
                     {accountsAndWallets.map(accountAndWallet => (

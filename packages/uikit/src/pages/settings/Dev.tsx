@@ -17,6 +17,7 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import { Notification } from '../../components/Notification';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
+import { useNavigate } from 'react-router-dom';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -122,6 +123,7 @@ const EnableTronSettings = () => {
 
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const navigate = useNavigate();
 
     const items = useMemo<SettingsItem[]>(() => {
         return [
@@ -138,7 +140,14 @@ const AddAccountBySK = () => {
             <SettingsList items={items} />
             <AddWalletContext.Provider value={{ navigateHome: onClose }}>
                 <Notification isOpen={isOpen} handleClose={onClose}>
-                    {() => <ImportBySKWallet afterCompleted={onClose} />}
+                    {() => (
+                        <ImportBySKWallet
+                            afterCompleted={() => {
+                                onClose();
+                                navigate('/');
+                            }}
+                        />
+                    )}
                 </Notification>
             </AddWalletContext.Provider>
         </>
