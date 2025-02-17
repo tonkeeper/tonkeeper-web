@@ -6,9 +6,24 @@ import {
     Multisig,
     MultisigOrder
 } from '../../../../tonApiV2';
-import { Address, beginCell, Cell, toNano, storeMessage, Dictionary } from '@ton/core';
+import {
+    Address,
+    beginCell,
+    Cell,
+    toNano,
+    storeMessage,
+    Dictionary,
+    storeMessageRelaxed
+} from '@ton/core';
 import { bufferToBigInt } from '../../../../utils/common';
-import { MultisigConfig, MultisigOrderStatus } from './types';
+import {
+    Action,
+    MultisigConfig,
+    MultisigOrderStatus,
+    TransferRequest,
+    UpdateRequest
+} from './types';
+import { WalletOutgoingMessage } from '../types';
 
 export type OrderEstimation =
     | { type: 'transfer'; event: AccountEvent }
@@ -183,12 +198,38 @@ export function orderStatus(order: MultisigOrder): MultisigOrderStatus {
     return 'expired';
 }
 
-async function estimateOrderByBodyCell(options: {
+export async function estimateOrderByOutgoingMessage(params: {
+    api: APIConfig;
+    multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
+    outgoing: WalletOutgoingMessage;
+    orderValidUntilSeconds: number;
+}) {
+    const orderBodyCell = packMultisigOrderBody(
+        params.outgoing.messages.map(message => ({
+            type: 'transfer',
+            message,
+            sendMode: params.outgoing.sendMode
+        }))
+    );
+
+    let emulation = await estimateOrderByBodyCell({
+        api: params.api,
+        orderBodyCell,
+        multisig: params.multisig,
+        orderValidUntilSeconds: params.orderValidUntilSeconds
+    });
+
+    emulation = hideMultisigCallFromEstimation(params.multisig.address, emulation);
+
+    return emulation;
+}
+
+export async function estimateOrderByBodyCell(options: {
     api: APIConfig;
     multisig: Pick<Multisig, 'address' | 'signers' | 'threshold'>;
     orderBodyCell: Cell;
     orderValidUntilSeconds: number;
-    orderSeqno?: number;
+    orderSeqno?: number | bigint;
 }) {
     let orderSeqno: number | bigint | undefined = options.orderSeqno;
     if (orderSeqno === undefined) {
@@ -300,4 +341,40 @@ function hideMultisigCallFromEstimation(
     });
 
     return { ...estimation, event: { ...estimation.event, actions } };
+}
+
+export function packMultisigOrderBody(actions: Array<Action>) {
+    const order_dict = Dictionary.empty(Dictionary.Keys.Uint(8), Dictionary.Values.Cell());
+    if (actions.length > 255) {
+        throw new Error('For action chains above 255, use packLarge method');
+    } else {
+        // pack transfers to the order_body cell
+        for (let i = 0; i < actions.length; i++) {
+            const action = actions[i];
+            const actionCell =
+                action.type === 'transfer'
+                    ? packTransferRequest(action)
+                    : packUpdateRequest(action);
+            order_dict.set(i, actionCell);
+        }
+        return beginCell().storeDictDirect(order_dict).endCell();
+    }
+}
+
+function packTransferRequest(transfer: TransferRequest) {
+    const message = beginCell().store(storeMessageRelaxed(transfer.message)).endCell();
+    return beginCell()
+        .storeUint(MultisigOp.actions.send_message, MultisigParams.bitsize.op)
+        .storeUint(transfer.sendMode, 8)
+        .storeRef(message)
+        .endCell();
+}
+
+function packUpdateRequest(update: UpdateRequest) {
+    return beginCell()
+        .storeUint(MultisigOp.actions.update_multisig_params, MultisigParams.bitsize.op)
+        .storeUint(update.threshold, MultisigParams.bitsize.signerIndex)
+        .storeRef(beginCell().storeDictDirect(arrayToCell(update.signers)))
+        .storeDict(arrayToCell(update.proposers))
+        .endCell();
 }
