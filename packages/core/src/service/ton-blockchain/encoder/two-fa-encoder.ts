@@ -15,11 +15,11 @@ import { Builder } from '@ton/ton';
 import { getServerTime, getTTL } from '../utils';
 
 export class TwoFAEncoder {
-    public static readonly deployPluginValue = toNano(0.15); // TODO 0.5
+    public static readonly deployPluginValue = toNano(0.15);
 
-    public static readonly refillAtValue = toNano(0.08); // TODO 0.4
+    public static readonly refillAtValue = toNano(0.1);
 
-    public static readonly refillValue = toNano(0.08); // TODO 0.1
+    public static readonly refillValue = toNano(0.1);
 
     /**
      * install#43563174 service_pubkey:uint256 seed_pubkey:uint256 = InternalMessage;
@@ -117,10 +117,10 @@ export class TwoFAEncoder {
         const validUntil = getTTL(timestamp);
 
         return beginCell()
-            .storeUint(opCode, 32) // op code of the method
+            .storeUint(opCode, 32)
             .storeUint(await this.getPluginSeqno(pluginAddress), 32)
             .storeUint(validUntil, 64)
-            .storeBuilder(payload) // payload of the method
+            .storeBuilder(payload)
             .endCell();
     }
 
