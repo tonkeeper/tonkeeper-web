@@ -58,7 +58,7 @@ export class TwoFAMessageSender implements ISender {
             removeExtensionRequest: {
                 dataToSign: params.dataToSign.toBoc().toString('hex'),
                 signature: params.signature.toString('hex'),
-                wallet: this.wallet.rawAddress, // TODO временно для Захара, поменять на кошелек
+                wallet: this.wallet.rawAddress,
                 stateInit: walletStateInitFromState(this.wallet)
             }
         });
@@ -85,7 +85,6 @@ export class TwoFAMessageSender implements ISender {
         /**
          * Emulate internal message from the plugin to the wallet
          */
-
         const msgByValue = (value: bigint): Cell =>
             beginCell()
                 .storeWritable(
@@ -157,7 +156,7 @@ export class TwoFAMessageSender implements ISender {
             removeExtensionRequest: {
                 dataToSign: dataToSign.toBoc().toString('hex'),
                 signature: signature.toString('hex'),
-                wallet: this.wallet.rawAddress, // TODO временно для Захара, поменять на кошелек
+                wallet: this.wallet.rawAddress,
                 stateInit: walletStateInitFromState(this.wallet)
             }
         });
@@ -191,8 +190,8 @@ export class TwoFAMessageSender implements ISender {
         const signature = await this.signer(dataToSign);
 
         const body = beginCell()
-            .storeBuffer(signature)
             .storeSlice(dataToSign.beginParse())
+            .storeBuffer(signature)
             .endCell();
 
         const ext = beginCell()

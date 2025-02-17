@@ -65,8 +65,6 @@ const EnableTwoFASettings = () => {
     const { mutate: mutateSettings } = useMutateDevSettings();
     const { data: devSettings } = useDevSettings();
 
-    return null; // TODO force disable 2fa on frontend. SC must be improved
-
     const config = useActiveConfig();
     if (config.flags?.disable_2fa) {
         return null;

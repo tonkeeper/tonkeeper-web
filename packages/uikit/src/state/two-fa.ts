@@ -91,9 +91,7 @@ export const useTwoFAServiceConfig = () => {
             throw new Error('2fa_public_key not found');
         }
 
-        const servicePubKey = BigInt(
-            '0x' + Buffer.from(config['2fa_public_key'], 'base64').toString('hex')
-        );
+        const servicePubKey = BigInt('0x' + config['2fa_public_key']);
 
         return {
             baseUrl: config['2fa_api_url'],
