@@ -308,7 +308,6 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     const ref = useRef<HTMLDivElement>(null);
 
     const {
-        isFetching,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
@@ -346,10 +345,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
-                <DesktopHistory
-                    isFetchingNextPage={isFetchingNextPage || isFetching}
-                    activity={activity}
-                />
+                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
         </DesktopViewPageLayout>
     );
@@ -378,7 +374,6 @@ export const TronUSDTPage = () => {
 
     const ref = useRef<HTMLDivElement>(null);
     const {
-        isFetching,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
@@ -441,10 +436,7 @@ export const TronUSDTPage = () => {
             <TronUseBatteryBanner />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
-                <DesktopHistory
-                    isFetchingNextPage={isFetchingNextPage || isFetching}
-                    activity={activity}
-                />
+                <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
         </DesktopViewPageLayout>
     );

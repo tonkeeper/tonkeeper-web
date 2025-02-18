@@ -158,7 +158,7 @@ export const DesktopHistory: FC<{
     }, [activity]);
 
     const key = aggregatedActivity.length ? aggregatedActivity[0].key : undefined;
-    if (!isFetchingNextPage && !activity?.length) {
+    if (activity && !activity.length) {
         return <NoTransactionsYet>{t('history_no_transactions_yet')}</NoTransactionsYet>;
     }
 
