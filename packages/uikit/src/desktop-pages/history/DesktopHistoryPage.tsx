@@ -80,6 +80,7 @@ export const DesktopHistoryPage: FC = () => {
     const ref = useRef<HTMLDivElement>(null);
 
     const {
+        isFetching,
         refetch,
         isFetched: isActivityFetched,
         fetchNextPage: fetchActivityNextPage,
@@ -142,7 +143,10 @@ export const DesktopHistoryPage: FC = () => {
                 </FiltersWrapper>
             </HistoryHeaderContainer>
             <HistoryContainer>
-                <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />
+                <DesktopHistory
+                    activity={activity}
+                    isFetchingNextPage={isFetchingNextPage || isFetching}
+                />
             </HistoryContainer>
         </HistoryPageWrapper>
     );

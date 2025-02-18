@@ -30,6 +30,8 @@ export type TronHistoryItemTransferAsset = {
     to: string;
     isScam: boolean;
     isFailed: boolean;
+    batteryChargesFee?: number;
+    isPending?: boolean;
 };
 export type TronHistoryItem = TronHistoryItemTransferAsset;
 
@@ -308,6 +310,28 @@ export class TronApi {
             maxTimestamp?: number;
             onlyInitiator?: boolean;
             filterSpam?: boolean;
+        },
+        batteryAuthToken?: string
+    ): Promise<TronHistoryItem[]> {
+        const trongridHistory = await this.getBlockchainTransfersHistory(address, options);
+        const batteryHistory = await this.getBatteryTransfersHistory(options, batteryAuthToken);
+
+        return batteryHistory
+            .concat(
+                trongridHistory.filter(item =>
+                    batteryHistory.every(i => i.transactionHash !== item.transactionHash)
+                )
+            )
+            .sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    private async getBlockchainTransfersHistory(
+        address: string,
+        options?: {
+            limit?: number;
+            maxTimestamp?: number;
+            onlyInitiator?: boolean;
+            filterSpam?: boolean;
         }
     ): Promise<TronHistoryItem[]> {
         const url = new URL(`${this.tronGridBaseUrl}/v1/accounts/${address}/transactions/trc20`);
@@ -363,7 +387,48 @@ export class TronApi {
                     from: item.from,
                     to: item.to,
                     isScam,
-                    isFailed: false // TODO
+                    isFailed: false, // TODO tron
+                    isPending: false
+                } satisfies TronHistoryItemTransferAsset;
+            })
+            .filter(notNullish);
+    }
+
+    private async getBatteryTransfersHistory(
+        options?: {
+            limit?: number;
+            maxTimestamp?: number;
+        },
+        batteryAuthToken?: string
+    ): Promise<TronHistoryItem[]> {
+        if (!batteryAuthToken) {
+            return [];
+        }
+
+        const response = await this.batteryApi.getTronTransactions({
+            xTonConnectAuth: batteryAuthToken,
+            maxTimestamp: options?.maxTimestamp,
+            limit: options?.limit
+        });
+
+        return response.transactions
+            .map(item => {
+                const assetAmount = new AssetAmount({
+                    weiAmount: item.amount,
+                    asset: TRON_USDT_ASSET
+                });
+
+                return {
+                    type: 'asset-transfer',
+                    assetAmount,
+                    timestamp: item.timestamp,
+                    transactionHash: item.txid,
+                    from: item.fromAccount,
+                    to: item.toAccount,
+                    isScam: false,
+                    isFailed: item.isFailed,
+                    isPending: item.isPending,
+                    batteryChargesFee: item.batteryCharges
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);
