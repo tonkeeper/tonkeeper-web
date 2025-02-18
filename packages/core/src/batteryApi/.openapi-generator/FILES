@@ -228,6 +228,8 @@ models/TransactionType.ts
 models/Transactions.ts
 models/TransactionsTransactionsInner.ts
 models/TronSendRequest.ts
+models/TronTransactionsList.ts
+models/TronTransactionsListTransactionsInner.ts
 models/TrustType.ts
 models/TvmStackRecord.ts
 models/UnSubscriptionAction.ts

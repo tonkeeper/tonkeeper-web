@@ -49,6 +49,7 @@ import type {
   Status,
   Transactions,
   TronSendRequest,
+  TronTransactionsList,
 } from '../models/index';
 import {
     AndroidBatteryPurchaseRequestFromJSON,
@@ -119,6 +120,8 @@ import {
     TransactionsToJSON,
     TronSendRequestFromJSON,
     TronSendRequestToJSON,
+    TronTransactionsListFromJSON,
+    TronTransactionsListToJSON,
 } from '../models/index';
 
 export interface AndroidBatteryPurchaseOperationRequest {
@@ -216,6 +219,12 @@ export interface GetTransactionsRequest {
     xTonConnectAuth: string;
     limit?: number;
     offset?: number;
+}
+
+export interface GetTronTransactionsRequest {
+    xTonConnectAuth: string;
+    limit?: number;
+    maxTimestamp?: number;
 }
 
 export interface IosBatteryPurchaseOperationRequest {
@@ -554,6 +563,21 @@ export interface DefaultApiInterface {
      * This method returns a list of transactions made by a specific user.
      */
     getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions>;
+
+    /**
+     * 
+     * @param {string} xTonConnectAuth 
+     * @param {number} [limit] 
+     * @param {number} [maxTimestamp] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronTransactionsRaw(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronTransactionsList>>;
+
+    /**
+     */
+    getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList>;
 
     /**
      * verify an in-app purchase
@@ -1512,6 +1536,49 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions> {
         const response = await this.getTransactionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getTronTransactionsRaw(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronTransactionsList>> {
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getTronTransactions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['maxTimestamp'] != null) {
+            queryParameters['max_timestamp'] = requestParameters['maxTimestamp'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
+        }
+
+        const response = await this.request({
+            path: `/v0/tron/transactions`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TronTransactionsListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList> {
+        const response = await this.getTronTransactionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

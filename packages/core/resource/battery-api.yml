@@ -232,6 +232,22 @@ paths:
                 $ref: '#/components/schemas/SentTronTx'
         'default':
           $ref: '#/components/responses/Error'
+  /v0/tron/transactions:
+    get:
+      operationId: getTronTransactions
+      parameters:
+        - $ref: '#/components/parameters/token'
+        - $ref: '#/components/parameters/limitQuery'
+        - $ref: '#/components/parameters/maxTimestamp'
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TronTransactionsList'
+        'default':
+          $ref: '#/components/responses/Error'
   /purchase-battery/android:
     post:
       description: verify an in-app purchase
@@ -765,6 +781,13 @@ components:
       schema:
         type: integer
         default: 0
+    maxTimestamp:
+      in: query
+      name: max_timestamp
+      required: false
+      schema:
+        type: integer
+        format: int64
     i18n:
       in: header
       name: Accept-Language
@@ -1291,6 +1314,42 @@ components:
       properties:
         status:
           type: string
+    TronTransactionsList:
+      type: object
+      required:
+        - transactions
+      properties:
+        transactions:
+          type: array
+          items:
+            type: object
+            required:
+              - txid
+              - timestamp
+              - from_account
+              - to_account
+              - amount
+              - is_pending
+              - is_failed
+              - battery_charges
+            properties:
+              txid:
+                type: string
+              from_account:
+                type: string
+              to_account:
+                type: string
+              amount:
+                type: string
+              is_pending:
+                type: boolean
+              is_failed:
+                type: boolean
+              battery_charges:
+                type: integer
+              timestamp:
+                type: integer
+                format: int64
     AndroidBatteryPurchaseStatus:
       type: object
       required:

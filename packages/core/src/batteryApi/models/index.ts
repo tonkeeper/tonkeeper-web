@@ -223,6 +223,8 @@ export * from './TransactionType';
 export * from './Transactions';
 export * from './TransactionsTransactionsInner';
 export * from './TronSendRequest';
+export * from './TronTransactionsList';
+export * from './TronTransactionsListTransactionsInner';
 export * from './TrustType';
 export * from './TvmStackRecord';
 export * from './UnSubscriptionAction';
