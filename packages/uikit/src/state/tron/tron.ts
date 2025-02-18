@@ -1,9 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAppContext } from '../../hooks/appContext';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval } from '../tonendpoint';
-import { useActiveAccount, useActiveConfig } from '../wallet';
-import { useMemo } from 'react';
+import {
+    useActiveAccount,
+    useActiveConfig,
+    useActiveTonWalletConfig,
+    useAddTronToAccount
+} from '../wallet';
+import { useEffect, useMemo } from 'react';
 import { isAccountTronCompatible } from '@tonkeeper/core/dist/entries/account';
 import { TronWallet } from '@tonkeeper/core/dist/entries/tron/tron-wallet';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
@@ -15,6 +20,56 @@ import {
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { useDevSettings } from '../dev';
 import { useBatteryApi } from '../battery';
+import { useGlobalPreferences, useMutateGlobalPreferences } from '../global-preferences';
+import { useToggleHideJettonMutation } from '../jetton';
+
+export const useIsTronEnabledForActiveWallet = () => {
+    const isTronEnabled = useIsTronEnabledGlobally();
+    const tronWallet = useActiveTronWallet();
+    const { data } = useActiveTonWalletConfig();
+
+    return (
+        isTronEnabled && tronWallet && data && !data.hiddenTokens.includes(TRON_USDT_ASSET.address)
+    );
+};
+
+export const useToggleIsTronEnabledForActiveWallet = () => {
+    const { mutateAsync: activateTron } = useAddTronToAccount();
+    const tronWallet = useActiveTronWallet();
+
+    const { data: config } = useActiveTonWalletConfig();
+    const { mutateAsync: toggleHiddenJetton } = useToggleHideJettonMutation();
+
+    return useMutation(() => {
+        if (!tronWallet) {
+            return activateTron();
+        }
+
+        if (!config) {
+            return Promise.resolve();
+        }
+
+        return toggleHiddenJetton({ config, jettonAddress: TRON_USDT_ASSET.address });
+    });
+};
+
+export const useHighlightTronFeatureForActiveWallet = () => {
+    const canUseTron = useCanUseTronForActiveWallet();
+    const globalPreferences = useGlobalPreferences();
+
+    return canUseTron && globalPreferences.highlightFeatures.tron;
+};
+
+export const useAutoMarkTronFeatureAsSeen = () => {
+    const { mutate } = useMutateGlobalPreferences();
+    const globalPreferences = useGlobalPreferences();
+
+    useEffect(() => {
+        if (globalPreferences.highlightFeatures.tron) {
+            mutate({ highlightFeatures: { ...globalPreferences.highlightFeatures, tron: false } });
+        }
+    }, [mutate, globalPreferences.highlightFeatures, globalPreferences.highlightFeatures.tron]);
+};
 
 export const useTronApi = () => {
     const appContext = useAppContext();

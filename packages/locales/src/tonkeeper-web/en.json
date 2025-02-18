@@ -325,6 +325,7 @@
   "settings_backup_wallet": "Backup Wallet",
   "settings_collectibles_list": "Collectibles",
   "settings_connected_apps": "Connected Apps",
+  "settings_enable_tron_description": "Use USDT TRC20 without TRX. Fees are covered by Tonkeeper Battery, making transfers 30% cheaper than in other wallets.",
   "settings_hide_current_wallet": "Hide Current Wallet",
   "settings_hide_multisig": "Hide Multisig Wallet",
   "settings_ledger_indexes": "Ledger subwallets",
