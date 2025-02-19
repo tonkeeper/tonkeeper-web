@@ -4,6 +4,7 @@ import { useFormatFiat, useUSDTRate } from '../../../state/rates';
 import { ListBlock } from '../../List';
 import { ActivityDetailsHeader } from '../ActivityDetailsLayout';
 import {
+    ActionFeeDetails,
     ActionRecipientAddress,
     ActionSenderAddress,
     ActionTransactionDetails,
@@ -56,6 +57,7 @@ export const TronTransferActionNotification: FC<ActivityNotificationDataTron> = 
                 {kind === 'received' && <ActionSenderAddress address={event.from} />}
                 {kind === 'send' && <ActionRecipientAddress address={event.to} />}
                 <ActionTransactionDetails eventId={event.transactionHash} />
+                {!!event.fee && <ActionFeeDetails fee={event.fee} />}
             </ListBlock>
         </TronActionDetailsBlock>
     );

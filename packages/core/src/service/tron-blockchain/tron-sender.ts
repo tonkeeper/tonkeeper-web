@@ -30,7 +30,8 @@ export class TronSender {
         }
 
         const tronWeb = new TronWeb({
-            fullHost: this.tronApi.tronGridBaseUrl
+            fullHost: this.tronApi.tronGridBaseUrl,
+            privateKey: undefined
         });
 
         const functionSelector = 'transfer(address,uint256)';
@@ -38,7 +39,7 @@ export class TronSender {
             { type: 'address', value: to },
             { type: 'uint256', value: assetAmount.weiAmount.toFixed(0) }
         ];
-        const tx = await tronWeb.transactionBuilder.triggerSmartContract(
+        const { transaction } = await tronWeb.transactionBuilder.triggerSmartContract(
             assetAmount.asset.address,
             functionSelector,
             {},
@@ -46,8 +47,15 @@ export class TronSender {
             this.walletInfo.address
         );
 
-        const signedTx = await this.tronSigner(tx.transaction);
-        console.log(JSON.stringify(signedTx)); // TODO tron remove
+        /**
+         * set tx lifetime to 10 minutes
+         */
+        const transactionExtended = await tronWeb.transactionBuilder.extendExpiration(
+            transaction,
+            60 * 10
+        );
+
+        const signedTx = await this.tronSigner(transactionExtended);
         await this.tronApi.sendTransaction(signedTx, this.walletInfo.address, resources, {
             xTonConnectAuth: this.xTonConnectAuth
         });

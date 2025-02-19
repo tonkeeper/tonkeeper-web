@@ -6,6 +6,7 @@ import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
 import { Configuration, DefaultApi, EstimatedTronTx } from '../batteryApi';
 import type { Transaction } from 'tronweb/lib/commonjs/types';
+import { TransactionFee } from '../entries/crypto/transaction-fee';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
 
@@ -30,8 +31,8 @@ export type TronHistoryItemTransferAsset = {
     to: string;
     isScam: boolean;
     isFailed: boolean;
-    batteryChargesFee?: number;
-    isPending?: boolean;
+    fee?: TransactionFee;
+    inProgress?: boolean;
 };
 export type TronHistoryItem = TronHistoryItemTransferAsset;
 
@@ -53,6 +54,8 @@ export class TronApi {
             'Content-Type': 'application/json'
         };
     }
+
+    private safetyMargin: number | undefined;
 
     constructor(
         private readonly trongrid: { baseURL: string; readonly apiKey?: string },
@@ -136,7 +139,9 @@ export class TronApi {
         selector: string;
         data: string;
     }): Promise<{ estimation: EstimatedTronTx; resources: TronResources }> {
-        const resources = await this.estimateResources(params);
+        const resources = await this.applyResourcesSafetyMargin(
+            await this.estimateResources(params)
+        );
         const bandwidhAvailable = await this.getAccountBandwidth(params.from);
 
         resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
@@ -169,6 +174,21 @@ export class TronApi {
         }
 
         return info.free_net_usage || 0;
+    }
+
+    private async applyResourcesSafetyMargin(resources: TronResources) {
+        const { energy, bandwidth } = resources;
+
+        if (this.safetyMargin === undefined) {
+            const config = await this.batteryApi.getTronConfig();
+            const backendMargin = parseInt(config.safetyMarginPercent);
+            this.safetyMargin = (isFinite(backendMargin) ? backendMargin : 3) / 100;
+        }
+
+        return {
+            energy: Math.ceil(energy * (1 + this.safetyMargin)),
+            bandwidth: Math.ceil(bandwidth * (1 + this.safetyMargin))
+        };
     }
 
     private async estimateResources(params: {
@@ -212,7 +232,7 @@ export class TronApi {
             /**
              * https://developers.tron.network/docs/faq#5-how-to-calculate-the-bandwidth-and-energy-consumed-when-callingdeploying-a-contract
              */
-            const DATA_HEX_PROTOBUF_EXTRA = 3;
+            const DATA_HEX_PROTOBUF_EXTRA = 9;
             const MAX_RESULT_SIZE_IN_TX = 64;
             const A_SIGNATURE = 67;
 
@@ -373,7 +393,7 @@ export class TronApi {
                     asset: TRON_USDT_ASSET
                 });
 
-                const isScam = assetAmount.relativeAmount.lt(1);
+                const isScam = item.to === address && assetAmount.relativeAmount.lt(1);
 
                 if (options?.filterSpam && isScam) {
                     return null;
@@ -387,8 +407,8 @@ export class TronApi {
                     from: item.from,
                     to: item.to,
                     isScam,
-                    isFailed: false, // TODO tron
-                    isPending: false
+                    isFailed: false,
+                    inProgress: false
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);
@@ -421,14 +441,17 @@ export class TronApi {
                 return {
                     type: 'asset-transfer',
                     assetAmount,
-                    timestamp: item.timestamp,
+                    timestamp: item.timestamp * 1000,
                     transactionHash: item.txid,
                     from: item.fromAccount,
                     to: item.toAccount,
                     isScam: false,
                     isFailed: item.isFailed,
-                    isPending: item.isPending,
-                    batteryChargesFee: item.batteryCharges
+                    inProgress: item.isPending,
+                    fee: {
+                        type: 'battery' as const,
+                        charges: item.batteryCharges
+                    }
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);

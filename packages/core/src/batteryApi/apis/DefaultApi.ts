@@ -36,6 +36,7 @@ import type {
   EstimatedTronTx,
   GaslessEstimation,
   GetTonConnectPayloadDefaultResponse,
+  GetTronConfig200Response,
   IOSBatteryPurchaseStatus,
   IosBatteryPurchaseRequest,
   PromoCodeBatteryPurchaseRequest,
@@ -94,6 +95,8 @@ import {
     GaslessEstimationToJSON,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
+    GetTronConfig200ResponseFromJSON,
+    GetTronConfig200ResponseToJSON,
     IOSBatteryPurchaseStatusFromJSON,
     IOSBatteryPurchaseStatusToJSON,
     IosBatteryPurchaseRequestFromJSON,
@@ -563,6 +566,18 @@ export interface DefaultApiInterface {
      * This method returns a list of transactions made by a specific user.
      */
     getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>>;
+
+    /**
+     */
+    getTronConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTronConfig200Response>;
 
     /**
      * 
@@ -1536,6 +1551,30 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions> {
         const response = await this.getTransactionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v0/tron/config`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetTronConfig200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getTronConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTronConfig200Response> {
+        const response = await this.getTronConfigRaw(initOverrides);
         return await response.value();
     }
 

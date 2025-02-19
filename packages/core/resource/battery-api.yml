@@ -184,6 +184,24 @@ paths:
           description: "success"
         'default':
           $ref: '#/components/responses/Error'
+  /v0/tron/config:
+    get:
+      operationId: getTronConfig
+      responses:
+        '200':
+          description: TBD
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - safety_margin_percent
+                properties:
+                  safety_margin_percent:
+                    type: string
+                    example: "1.5"
+        'default':
+          $ref: '#/components/responses/Error'
   /v0/tron/estimate:
     get:
       description: Estimate cost of sending a tx in Tron network

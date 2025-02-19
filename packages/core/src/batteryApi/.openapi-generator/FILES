@@ -128,6 +128,7 @@ models/GaslessConfigGasJettonsInner.ts
 models/GaslessEstimation.ts
 models/GetTonConnectPayload200Response.ts
 models/GetTonConnectPayloadDefaultResponse.ts
+models/GetTronConfig200Response.ts
 models/IOSBatteryPurchaseStatus.ts
 models/IOSBatteryPurchaseStatusTransactionsInner.ts
 models/IOSBatteryPurchaseStatusTransactionsInnerError.ts

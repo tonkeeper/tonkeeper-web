@@ -123,6 +123,7 @@ export * from './GaslessConfigGasJettonsInner';
 export * from './GaslessEstimation';
 export * from './GetTonConnectPayload200Response';
 export * from './GetTonConnectPayloadDefaultResponse';
+export * from './GetTronConfig200Response';
 export * from './IOSBatteryPurchaseStatus';
 export * from './IOSBatteryPurchaseStatusTransactionsInner';
 export * from './IOSBatteryPurchaseStatusTransactionsInnerError';

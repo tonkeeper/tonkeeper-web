@@ -1,17 +1,15 @@
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import {
     AccountAddress,
     AccountEvent,
     JettonSwapActionDexEnum
 } from '@tonkeeper/core/dist/tonApiV2';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, PropsWithChildren, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { formatFiatCurrency, useCoinFullBalance } from '../../hooks/balance';
+import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent } from '../../state/asset';
 import { useFormatFiat, useRate } from '../../state/rates';
@@ -36,6 +34,9 @@ import {
     TransactionFeeBattery,
     TransactionFeeTonAsset
 } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -73,6 +74,11 @@ const Timestamp = styled(Body1)`
 export const Label = styled(Body1)`
     user-select: none;
     color: ${props => props.theme.textSecondary};
+`;
+
+export const LabelPrimary = styled(Body1)`
+    user-select: none;
+    color: ${props => props.theme.textPrimary};
 `;
 
 export const ActionDate: FC<{
@@ -308,23 +314,73 @@ export const ActionDeployerDetails: FC<{ deployer: string }> = ({ deployer }) =>
 export const ActionExtraDetails: FC<{
     extra: number;
 }> = ({ extra }) => {
+    const fee = useMemo(
+        () => ({
+            type: 'ton-asset' as const,
+            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: extra })
+        }),
+        [extra]
+    );
+
+    return <ActionFeeTonAssetDetails fee={fee} />;
+};
+
+export const ActionFeeDetails: FC<{
+    fee: TransactionFee;
+}> = ({ fee }) => {
+    if (fee.type === 'ton-asset') {
+        return <ActionFeeTonAssetDetails fee={fee} />;
+    }
+
+    if (fee.type === 'battery') {
+        return <ActionFeeBatteryDetails fee={fee} />;
+    }
+
+    assertUnreachableSoft(fee);
+    return null;
+};
+
+export const ActionFeeTonAssetDetails: FC<{
+    fee: TransactionFeeTonAsset;
+}> = ({ fee }) => {
     const { t } = useTranslation();
 
-    const feeAmount = extra < 0 ? extra * -1 : extra;
-    const amount = useCoinFullBalance(feeAmount);
+    const feeAbs = useMemo(
+        () => new AssetAmount({ asset: fee.extra.asset, weiAmount: fee.extra.weiAmount.abs() }),
+        [fee.extra]
+    );
 
-    const { data } = useRate(CryptoCurrency.TON);
-    const { fiatAmount } = useFormatFiat(data, formatDecimals(feeAmount));
+    const { data: rate } = useRate(tonAssetAddressToString(fee.extra.asset.address));
+    const { fiatAmount } = useFormatFiat(rate, feeAbs.relativeAmount);
 
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label>{extra > 0 ? t('txActions_refund') : t('transaction_fee')}</Label>
+                <Label>
+                    {fee.extra.relativeAmount.gt(0) ? t('txActions_refund') : t('transaction_fee')}
+                </Label>
                 <ColumnText
                     right
-                    text={`${amount} ${CryptoCurrency.TON}`}
+                    text={feeAbs.stringAssetRelativeAmount}
                     secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
                 />
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+export const ActionFeeBatteryDetails: FC<{
+    fee: TransactionFeeBattery;
+}> = ({ fee }) => {
+    const { t } = useTranslation();
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{t('transaction_fee')}</Label>
+                <LabelPrimary>
+                    {t('battery_n_battery_charges', { charges: fee.charges })}
+                </LabelPrimary>
             </ListItemPayload>
         </ListItem>
     );
