@@ -28,7 +28,7 @@ export abstract class EncoderBase {
 
         const other = this.getOtherDict();
 
-        for (let extra of src.extraCurrencies) {
+        for (const extra of src.extraCurrencies) {
             other.set(extra.id, BigInt(extra.value));
         }
 
