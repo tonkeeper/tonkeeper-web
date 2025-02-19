@@ -38,7 +38,7 @@ export class TonConnectEncoder extends EncoderBase {
                         bounce: await tonConnectAddressIsBounceable(this.api, item.address),
                         value: this.currencyValue({
                             amount: item.amount,
-                            extraCurrencies: item.extra_currencies
+                            extraCurrency: item.extraCurrency
                         }),
                         init: toStateInit(item.stateInit),
                         body: item.payload ? Cell.fromBase64(item.payload) : undefined
