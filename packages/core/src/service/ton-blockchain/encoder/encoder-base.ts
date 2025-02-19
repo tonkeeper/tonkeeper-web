@@ -13,7 +13,7 @@ export abstract class EncoderBase {
 
     protected currencyValue(src: {
         amount: string | number;
-        extraCurrency:
+        extra_currency:
             | {
                   [k: number]: string;
               }
@@ -21,12 +21,12 @@ export abstract class EncoderBase {
     }): CurrencyCollection {
         const coins = BigInt(src.amount);
 
-        if (!src.extraCurrency) {
+        if (!src.extra_currency) {
             return { coins };
         }
 
         const other = this.getOtherDict();
-        for (let [id, value] of Object.entries(src.extraCurrency)) {
+        for (let [id, value] of Object.entries(src.extra_currency)) {
             other.set(Number(id), BigInt(value));
         }
         return { coins, other };

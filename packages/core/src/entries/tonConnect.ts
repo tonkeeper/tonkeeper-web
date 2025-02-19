@@ -26,7 +26,7 @@ export interface TonConnectTransactionPayloadMessage {
     amount: string | number;
     payload?: string; // base64 cell
     stateInit?: string; // base64 cell
-    extraCurrency?: {
+    extra_currency?: {
         [k: number]: string;
     };
 }
