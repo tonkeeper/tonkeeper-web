@@ -9,8 +9,8 @@ import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { useCheckTouchId } from '../../../state/password';
 import { useTranslation } from '../../translation';
-import { anyOfKeysParts } from '../../../libs/queryKey';
-import { AccountsApi, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { anyOfKeysParts, QueryKey } from '../../../libs/queryKey';
+import { AccountsApi, Multisig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsStorage } from '../../useStorage';
 import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
 import {
@@ -149,16 +149,26 @@ const checkIfMultisigExists = async (options: { api: APIConfig; address: Address
 };
 
 export const useAwaitMultisigIsDeployed = () => {
-    const api = useActiveApi();
     const client = useQueryClient();
     const accounts = useAccountsStorage();
+    const api = useActiveApi();
+
     return useMutation<void, Error, { multisigAddress: string; deployerWalletId: WalletId }>(
         async ({ multisigAddress, deployerWalletId }) => {
             const awaitIsDeployed = async (attempt = 0): Promise<void> => {
                 try {
-                    const deployed = await new MultisigApi(api.tonApiV2).getMultisigAccount({
-                        accountId: multisigAddress
-                    });
+                    await client.prefetchQuery(
+                        [QueryKey.multisigWallet, multisigAddress],
+                        async () =>
+                            new MultisigApi(api.tonApiV2).getMultisigAccount({
+                                accountId: multisigAddress
+                            })
+                    );
+                    await client.refetchQueries([QueryKey.multisigWallet, multisigAddress]);
+                    const deployed = client.getQueryData<Multisig>([
+                        QueryKey.multisigWallet,
+                        multisigAddress
+                    ]);
 
                     if (deployed?.address) {
                         return;

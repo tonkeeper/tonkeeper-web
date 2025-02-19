@@ -727,6 +727,24 @@ export function isAccountTonWalletStandard(account: Account): account is Account
     }
 }
 
+export function isAccountSupportTonConnect(account: Account): boolean {
+    switch (account.type) {
+        case 'keystone':
+        case 'mnemonic':
+        case 'ledger':
+        case 'ton-only':
+        case 'mam':
+        case 'testnet':
+        case 'sk':
+        case 'ton-multisig':
+            return true;
+        case 'watch-only':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
 export function isAccountCanManageMultisigs(account: Account): boolean {
     switch (account.type) {
         case 'mnemonic':
