@@ -18,7 +18,6 @@ import {
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { useDevSettings } from '../dev';
 import { useBatteryApi } from '../battery';
 import { useGlobalPreferences, useMutateGlobalPreferences } from '../global-preferences';
 import { useToggleHideJettonMutation } from '../jetton';
@@ -82,14 +81,9 @@ export const useTronApi = () => {
 };
 
 export const useIsTronEnabledGlobally = () => {
-    const { data: devSettings } = useDevSettings();
     const config = useActiveConfig();
 
-    if (config.flags?.disable_tron) {
-        return false;
-    }
-
-    return devSettings?.tronEnabled;
+    return !config.flags?.disable_tron;
 };
 
 export const useCanUseTronForActiveWallet = () => {
