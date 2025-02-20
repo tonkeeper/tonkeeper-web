@@ -246,12 +246,12 @@ const ConnectContent: FC<{
             ) : (
                 <EmulationList isError={isError} event={estimate?.event} hideExtraDetails />
             )}
-            {!!estimate?.extra && (
+            {!!estimate?.fee && (
                 <ActionFeeDetailsUniversalStyled
                     availableSendersChoices={availableSendersChoices}
                     selectedSenderType={selectedSenderType}
                     onSenderTypeChange={onSenderTypeChange}
-                    extra={estimate.extra}
+                    fee={estimate.fee}
                 />
             )}
             <ButtonGap />

@@ -8,12 +8,8 @@ import { AppRoute } from '../../libs/routes';
 import { toTokenRate, useFormatFiat, useRate } from '../../state/rates';
 import { ListBlock, ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
-import {
-    TronBalances,
-    useActiveTronWallet,
-    useCanUseTronForActiveWallet
-} from '../../state/tron/tron';
-import { TronAssetComponent, TronAssets } from './TronAssets';
+import { TronBalances } from '../../state/tron/tron';
+import { TronAssetComponent } from './TronAssets';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { isTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
@@ -24,7 +20,6 @@ import {
 import { useJettonList } from '../../state/jetton';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { Address } from '@ton/core';
 
 export interface TonAssetData {
     info: Account;
@@ -34,10 +29,6 @@ export interface TonAssetData {
 export interface AssetData {
     ton: TonAssetData;
     tron: TronBalances;
-}
-
-export interface AssetProps {
-    assets: AssetData;
 }
 
 export const TonAsset = forwardRef<
@@ -155,14 +146,11 @@ export const JettonList: FC<{ assets: AssetAmount[] }> = ({ assets }) => {
             assets.filter(item => item.asset.id !== TON_ASSET.id)
         ];
     }, [assets]);
-    const canUseTron = useCanUseTronForActiveWallet();
-    const tronWallet = useActiveTronWallet();
 
     return (
         <>
             <ListBlock noUserSelect>
                 <TonAsset balance={tonAssetAmount} />
-                {!tronWallet && canUseTron && <TronAssets usdt={null} />}
             </ListBlock>
             <ListBlock noUserSelect>
                 {restAssets.map(item => (

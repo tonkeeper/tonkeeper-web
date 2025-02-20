@@ -3,7 +3,7 @@ import { useTonRawTransactionService } from '../useBlockchainService';
 import { useActiveAccount } from '../../../state/wallet';
 import { useMutation } from '@tanstack/react-query';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
-import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useTransactionAnalytics } from '../../amplitude';
 
 export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) => {
@@ -18,7 +18,7 @@ export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) 
         const nftEncoder = new NFTEncoder(walletAddress);
         await rawTransactionService.send(
             await getSender(EXTERNAL_SENDER_CHOICE),
-            zeroFee,
+            zeroFeeEstimation,
             nftEncoder.encodeNftLink(args)
         );
         track2('link-dns');

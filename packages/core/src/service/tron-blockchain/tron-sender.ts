@@ -1,13 +1,13 @@
 import { ethers } from 'ethers';
-import { TronApi } from '../../tronApi';
-import { TRON_TRX_ASSET, TRON_USDT_ASSET } from '../../entries/crypto/asset/constants';
+import { TronApi, TronResources } from '../../tronApi';
+import { TRON_USDT_ASSET } from '../../entries/crypto/asset/constants';
 import { AssetAmount } from '../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../entries/crypto/asset/tron-asset';
-import BigNumber from 'bignumber.js';
 import { TronSigner } from '../../entries/signer';
 import { TronWallet } from '../../entries/tron/tron-wallet';
 import { TronAddressUtils } from '@ton-keychain/trx';
 import { TronWeb } from 'tronweb';
+import { TronEstimation } from '../../entries/send';
 const AbiCoder = ethers.AbiCoder;
 
 const toHexAddress = (base58: string) => {
@@ -20,16 +20,18 @@ export class TronSender {
     constructor(
         private tronApi: TronApi,
         private walletInfo: TronWallet,
-        private tronSigner: TronSigner
+        private tronSigner: TronSigner,
+        private readonly xTonConnectAuth: string
     ) {}
 
-    async send(to: string, assetAmount: AssetAmount<TronAsset>) {
+    async send(to: string, assetAmount: AssetAmount<TronAsset>, resources: TronResources) {
         if (assetAmount.asset.id !== TRON_USDT_ASSET.id) {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
         const tronWeb = new TronWeb({
-            fullHost: this.tronApi.baseURL
+            fullHost: this.tronApi.tronGridBaseUrl,
+            privateKey: undefined
         });
 
         const functionSelector = 'transfer(address,uint256)';
@@ -37,7 +39,7 @@ export class TronSender {
             { type: 'address', value: to },
             { type: 'uint256', value: assetAmount.weiAmount.toFixed(0) }
         ];
-        const tx = await tronWeb.transactionBuilder.triggerSmartContract(
+        const { transaction } = await tronWeb.transactionBuilder.triggerSmartContract(
             assetAmount.asset.address,
             functionSelector,
             {},
@@ -45,20 +47,26 @@ export class TronSender {
             this.walletInfo.address
         );
 
-        const signedTx = await this.tronSigner(tx.transaction);
-        const result = await tronWeb.trx.sendRawTransaction(signedTx);
+        /**
+         * set tx lifetime to 10 minutes
+         */
+        const transactionExtended = await tronWeb.transactionBuilder.extendExpiration(
+            transaction,
+            60 * 10
+        );
 
-        if (!result.result) {
-            throw new Error('err');
-        }
+        const signedTx = await this.tronSigner(transactionExtended);
+        await this.tronApi.sendTransaction(signedTx, this.walletInfo.address, resources, {
+            xTonConnectAuth: this.xTonConnectAuth
+        });
     }
 
-    async estimate(to: string, assetAmount: AssetAmount<TronAsset>) {
+    async estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation> {
         if (assetAmount.asset.id !== TRON_USDT_ASSET.id) {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
-        const estimatedGas = await this.tronApi.estimateEnergy({
+        const { estimation, resources } = await this.tronApi.estimateBatteryCharges({
             from: this.walletInfo.address,
             contractAddress: assetAmount.asset.address,
             selector: TronSender.transferSelector,
@@ -70,15 +78,12 @@ export class TronSender {
                 .replace(/^(0x)/, '')
         });
 
-        const gasPrice = parseInt(await this.tronApi.rpc('eth_gasPrice'));
-
-        const trxToBurn = estimatedGas * gasPrice;
-
         return {
-            extra: new AssetAmount({
-                weiAmount: new BigNumber(trxToBurn.toString()),
-                asset: TRON_TRX_ASSET
-            })
+            fee: {
+                type: 'battery' as const,
+                charges: estimation.totalCharges
+            },
+            resources
         };
     }
 }

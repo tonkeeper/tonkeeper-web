@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Words } from '../../components/create/Words';
@@ -24,6 +24,7 @@ import {
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
+import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
@@ -41,6 +42,7 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     const [infoPagePassed, setInfoPagePassed] = useState(false);
     const [wordsPagePassed, setWordsPagePassed] = useState(false);
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
 
     const [wordsShown, setWordsShown] = useState(false);
 
@@ -107,6 +109,10 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
             return () => setWordsPagePassed(false);
         }
 
+        if (editNamePagePassed && !selectNetworksPassed) {
+            return () => setEditNamePagePassed(false);
+        }
+
         return undefined;
     }, [
         wordsShown,
@@ -114,7 +120,9 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
         navigateHome,
         infoPagePassed,
         wordsPagePassed,
-        createdAccount
+        createdAccount,
+        editNamePagePassed,
+        selectNetworksPassed
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -196,8 +204,13 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
+                buttonText={t('continue')}
             />
         );
+    }
+
+    if (!selectNetworksPassed) {
+        return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
     return <FinalView afterCompleted={afterCompleted} />;

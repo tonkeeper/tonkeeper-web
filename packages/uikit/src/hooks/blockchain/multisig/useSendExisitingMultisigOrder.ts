@@ -7,7 +7,7 @@ import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 
 import { useNotifyErrorHandle } from '../../useNotification';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-encoder';
-import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 
 export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['address']) {
@@ -34,7 +34,7 @@ export function useSendExisitingMultisigOrder(orderAddress: MultisigOrder['addre
 
             await new TonRawTransactionService(api, signerWallet).send(
                 await getSender(EXTERNAL_SENDER_CHOICE),
-                zeroFee,
+                zeroFeeEstimation,
                 message
             );
 

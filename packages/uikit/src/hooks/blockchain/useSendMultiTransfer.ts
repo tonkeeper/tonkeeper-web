@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
+import { TonEstimation, TonRecipient } from "@tonkeeper/core/dist/entries/send";
 
 import BigNumber from 'bignumber.js';
 import { useTransactionAnalytics } from '../amplitude';
@@ -52,10 +52,10 @@ export function useSendMultiTransfer() {
         {
             form: MultiSendFormTokenized;
             asset: TonAsset;
-            feeEstimation: BigNumber;
+            estimation: TonEstimation;
             senderChoice: SenderChoiceUserAvailable;
         }
-    >(async ({ form, asset, feeEstimation, senderChoice }) => {
+    >(async ({ form, asset, estimation, senderChoice }) => {
         const walletId = account.activeTonWallet.id;
         try {
             if (!isAccountTonWalletStandard(account)) {
@@ -68,7 +68,7 @@ export function useSendMultiTransfer() {
 
             await transferService.send(
                 await getSender(senderChoice),
-                { extra: new AssetAmount({ asset: TON_ASSET, weiAmount: feeEstimation }) },
+                estimation,
                 multiSendFormToTransferMessages(asset, form)
             );
 

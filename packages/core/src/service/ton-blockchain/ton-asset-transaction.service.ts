@@ -145,6 +145,7 @@ export class TonAssetTransactionService {
             await this.sendTon(sender, estimation, params);
         }
     }
+
     private async sendExtraCurrency(
         sender: Sender,
         estimation: TonEstimation,
@@ -323,14 +324,14 @@ export class TonAssetTransactionService {
                 : params.amount.weiAmount;
         }
 
-        if (estimation) {
-            if (isTon(estimation.extra.asset.address) && !isNoGasSender) {
+        if (estimation && estimation.fee.type === 'ton-asset') {
+            if (isTon(estimation.fee.extra.asset.address) && !isNoGasSender) {
                 requiredTonBalance = (requiredTonBalance || new BigNumber(0)).plus(
                     getTonEstimationTonFee(estimation)
                 );
-            } else if (estimation.extra.asset.id === this.getTransferAsset(params).id) {
+            } else if (estimation.fee.extra.asset.id === this.getTransferAsset(params).id) {
                 requiredJettonBalance = (requiredJettonBalance || new BigNumber(0)).plus(
-                    estimation.extra.weiAmount
+                    estimation.fee.extra.weiAmount
                 );
             }
 
