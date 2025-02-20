@@ -13,25 +13,22 @@ export abstract class EncoderBase {
 
     protected currencyValue(src: {
         amount: string | number;
-        extraCurrencies:
+        extra_currency:
             | {
-                  id: number;
-                  value: string;
-              }[]
+                  [k: number]: string;
+              }
             | undefined;
     }): CurrencyCollection {
         const coins = BigInt(src.amount);
 
-        if (!src.extraCurrencies) {
+        if (!src.extra_currency) {
             return { coins };
         }
 
         const other = this.getOtherDict();
-
-        for (const extra of src.extraCurrencies) {
-            other.set(extra.id, BigInt(extra.value));
+        for (const [id, value] of Object.entries(src.extra_currency)) {
+            other.set(Number(id), BigInt(value));
         }
-
         return { coins, other };
     }
 
