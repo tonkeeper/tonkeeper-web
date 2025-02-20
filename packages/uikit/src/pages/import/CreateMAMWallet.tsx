@@ -27,6 +27,7 @@ import {
 } from '../../components/Notification';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
+import { useIsTronEnabledGlobally } from "../../state/tron/tron";
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
@@ -48,9 +49,10 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
 
     const [wordsShown, setWordsShown] = useState(false);
     const { mutate: mutateActiveAccountConfig } = useMutateActiveAccountConfig();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
 
     const onSelectNetworks = ({ tron }: { tron: boolean }) => {
-        if (tron !== defaultAccountConfig.enableTron) {
+        if (tron !== (defaultAccountConfig.enableTron && isTronEnabledGlobally)) {
             mutateActiveAccountConfig({
                 enableTron: tron
             });

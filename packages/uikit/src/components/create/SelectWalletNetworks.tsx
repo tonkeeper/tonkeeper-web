@@ -9,9 +9,10 @@ import { AssetBlockchainBadge } from '../account/AccountBadge';
 import { Button } from '../fields/Button';
 import {
     useIsTronEnabledForActiveWallet,
+    useIsTronEnabledGlobally,
     useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 const Wrapper = styled.div`
     display: flex;
@@ -67,6 +68,17 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
     const { t } = useTranslation();
     const { mutate: toggleTron } = useToggleIsTronEnabledForActiveWallet();
     const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+
+    useEffect(() => {
+        if (!isTronEnabledGlobally) {
+            onContinue({ tron: false });
+        }
+    }, [isTronEnabledGlobally]);
+
+    if (!isTronEnabledGlobally) {
+        return null;
+    }
 
     return (
         <Wrapper>

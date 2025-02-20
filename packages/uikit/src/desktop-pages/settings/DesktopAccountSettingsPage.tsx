@@ -87,7 +87,9 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
     const canUseTron = useIsTronEnabledGlobally();
     const { data: accountConfig } = useActiveAccountConfig();
     const { mutate: mutateAccountConfig } = useMutateActiveAccountConfig();
-    const isTronEnabled = accountConfig?.enableTron ?? defaultAccountConfig.enableTron;
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const isTronEnabled =
+        accountConfig?.enableTron ?? (defaultAccountConfig.enableTron && isTronEnabledGlobally);
 
     return (
         <>

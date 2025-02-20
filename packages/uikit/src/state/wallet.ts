@@ -679,6 +679,7 @@ export const useCreateAccountMAM = () => {
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
 
     return useMutation<
         AccountMAM,
@@ -695,7 +696,7 @@ export const useCreateAccountMAM = () => {
             mnemonic
         };
 
-        const isTronEnabled = defaultAccountConfig.enableTron;
+        const isTronEnabled = defaultAccountConfig.enableTron && isTronEnabledGlobally;
 
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
