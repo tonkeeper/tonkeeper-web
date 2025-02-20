@@ -27,7 +27,7 @@ export const useIsTronEnabledForActiveWallet = () => {
     const tronWallet = useActiveTronWallet();
     const { data } = useActiveTonWalletConfig();
 
-    return (
+    return Boolean(
         isTronEnabled && tronWallet && data && !data.hiddenTokens.includes(TRON_USDT_ASSET.address)
     );
 };
