@@ -61,7 +61,9 @@ const ButtonContainer = styled.div`
     box-sizing: border-box;
 `;
 
-export const SelectWalletNetworks: FC<{ onContinue: () => void }> = ({ onContinue }) => {
+export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) => void }> = ({
+    onContinue
+}) => {
     const { t } = useTranslation();
     const { mutate: toggleTron } = useToggleIsTronEnabledForActiveWallet();
     const isTronEnabled = useIsTronEnabledForActiveWallet();
@@ -98,7 +100,7 @@ export const SelectWalletNetworks: FC<{ onContinue: () => void }> = ({ onContinu
                 </ListItem>
             </ListBlockStyled>
             <ButtonContainer>
-                <Button fullWidth primary onClick={onContinue}>
+                <Button fullWidth primary onClick={() => onContinue({ tron: isTronEnabled })}>
                     {t('continue')}
                 </Button>
             </ButtonContainer>

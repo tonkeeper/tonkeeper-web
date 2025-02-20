@@ -13,6 +13,7 @@ import { FinalView } from './Password';
 import { Account, AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import {
     useCreateAccountMAM,
+    useMutateActiveAccountConfig,
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
@@ -25,6 +26,7 @@ import {
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
+import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
@@ -45,6 +47,17 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
 
     const [wordsShown, setWordsShown] = useState(false);
+    const { mutate: mutateActiveAccountConfig } = useMutateActiveAccountConfig();
+
+    const onSelectNetworks = ({ tron }: { tron: boolean }) => {
+        if (tron !== defaultAccountConfig.enableTron) {
+            mutateActiveAccountConfig({
+                enableTron: tron
+            });
+        }
+
+        setSelectNetworksPassed(true);
+    };
 
     useEffect(() => {
         if (infoPagePassed) {
@@ -210,7 +223,7 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     }
 
     if (!selectNetworksPassed) {
-        return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
+        return <SelectWalletNetworks onContinue={onSelectNetworks} />;
     }
 
     return <FinalView afterCompleted={afterCompleted} />;

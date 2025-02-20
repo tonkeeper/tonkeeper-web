@@ -315,6 +315,8 @@
   "select_networks_modal_ton_title": "Токены в TON",
   "select_networks_modal_tron_description": "Используйте USD₮ TRC20 без TRX. Комиссии покрываются Tonkeeper Battery, что делает переводы на 30% дешевле, чем в других кошельках.",
   "send_change_fee_payment_method": "Изменить способ оплаты",
+  "settings_account_enable_tron_description": "Используйте USD₮ TRC20 без TRX. Комиссии покрываются Tonkeeper Battery, что делает переводы на 30% дешевле, чем в других кошельках.",
+  "settings_account_enable_tron_title": "Добавить USD₮ TRC20 по умолчанию в новые кошельки в этом аккаунте",
   "settings_backup_account": "Резервная копия аккаунта",
   "settings_backup_account_mam_description": "Используется для восстановления доступа к вашему мультикаккаунту и всем связанным с ним кошелькам.",
   "settings_backup_wallet": "Резервная копия кошелька",

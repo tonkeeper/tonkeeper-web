@@ -326,6 +326,8 @@
   "select_networks_modal_ton_title": "TON assets",
   "select_networks_modal_tron_description": "Use USD₮ TRC20 without TRX. Fees are covered by Tonkeeper Battery, making transfers 30% cheaper than in other wallets.",
   "send_change_fee_payment_method": "Change Payment Method",
+  "settings_account_enable_tron_description": "Use USD₮ TRC20 without TRX. Fees are covered by Tonkeeper Battery, making transfers 30% cheaper than in other wallets.",
+  "settings_account_enable_tron_title": "Add USD₮ TRC20 by default to new wallets in this account",
   "settings_backup_account": "Backup Account",
   "settings_backup_account_mam_description": "Used to restore access to your multi-wallet account and all associated wallets",
   "settings_backup_wallet": "Backup Wallet",
