@@ -3,7 +3,7 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk } from '../../hooks/appSdk';
-import { CloseIcon, SpinnerIcon } from '../../components/Icon';
+import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
@@ -13,6 +13,11 @@ import { Badge } from '../../components/shared';
 import styled from 'styled-components';
 import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { useActiveConfig } from '../../state/wallet';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { Notification } from '../../components/Notification';
+import { ImportBySKWallet } from '../import/ImportBySKWallet';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
+import { useNavigate } from 'react-router-dom';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -114,6 +119,39 @@ const EnableTronSettings = () => {
     );
 };
 
+const AddAccountBySK = () => {
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const navigate = useNavigate();
+
+    const items = useMemo<SettingsItem[]>(() => {
+        return [
+            {
+                name: 'Add account with private key',
+                icon: <PlusIcon />,
+                action: () => onOpen()
+            }
+        ];
+    }, [onOpen]);
+
+    return (
+        <>
+            <SettingsList items={items} />
+            <AddWalletContext.Provider value={{ navigateHome: onClose }}>
+                <Notification isOpen={isOpen} handleClose={onClose}>
+                    {() => (
+                        <ImportBySKWallet
+                            afterCompleted={() => {
+                                onClose();
+                                navigate('/');
+                            }}
+                        />
+                    )}
+                </Notification>
+            </AddWalletContext.Provider>
+        </>
+    );
+};
+
 export const DevSettings = React.memo(() => {
     return (
         <>
@@ -122,6 +160,7 @@ export const DevSettings = React.memo(() => {
                 <EnableTwoFASettings />
                 <EnableTronSettings />
                 <CookieSettings />
+                <AddAccountBySK />
             </InnerBody>
         </>
     );

@@ -25,7 +25,7 @@ export const ExternalLink: FC<
     const platform = useAppPlatform();
     const sdk = useAppSdk();
 
-    if (platform === 'web' || platform === 'swap-widget-web') {
+    if (platform === 'web' || platform === 'swap_widget_web') {
         return (
             <AStyled
                 className={className}

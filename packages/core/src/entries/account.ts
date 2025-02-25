@@ -189,6 +189,28 @@ export class AccountTonTestnet extends TonMnemonic {
     }
 }
 
+export class AccountTonSK extends TonMnemonic {
+    public readonly type = 'sk';
+
+    static create(params: {
+        id: AccountId;
+        name: string;
+        emoji: string;
+        auth: AuthPassword | AuthKeychain;
+        activeTonWalletId: WalletId;
+        tonWallets: TonWalletStandard[];
+    }) {
+        return new AccountTonSK(
+            params.id,
+            params.name,
+            params.emoji,
+            params.auth,
+            params.activeTonWalletId,
+            params.tonWallets
+        );
+    }
+}
+
 export class AccountTonWatchOnly extends Clonable implements IAccount {
     public readonly type = 'watch-only';
 
@@ -655,7 +677,11 @@ export class AccountTonMultisig extends Clonable implements IAccount {
     }
 }
 
-export type AccountVersionEditable = AccountTonMnemonic | AccountTonOnly | AccountTonTestnet;
+export type AccountVersionEditable =
+    | AccountTonMnemonic
+    | AccountTonOnly
+    | AccountTonTestnet
+    | AccountTonSK;
 
 export type AccountTonWalletStandard =
     | AccountVersionEditable
@@ -670,6 +696,7 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'mnemonic':
         case 'ton-only':
         case 'testnet':
+        case 'sk':
             return true;
         case 'ledger':
         case 'keystone':
@@ -690,9 +717,28 @@ export function isAccountTonWalletStandard(account: Account): account is Account
         case 'ton-only':
         case 'mam':
         case 'testnet':
+        case 'sk':
             return true;
         case 'watch-only':
         case 'ton-multisig':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
+export function isAccountSupportTonConnect(account: Account): boolean {
+    switch (account.type) {
+        case 'keystone':
+        case 'mnemonic':
+        case 'ledger':
+        case 'ton-only':
+        case 'mam':
+        case 'testnet':
+        case 'sk':
+        case 'ton-multisig':
+            return true;
+        case 'watch-only':
             return false;
         default:
             return assertUnreachable(account);
@@ -705,6 +751,7 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'ton-only':
         case 'mam':
         case 'ledger':
+        case 'sk':
             return true;
         case 'watch-only':
         case 'ton-multisig':
@@ -723,6 +770,7 @@ export function isMnemonicAndPassword(
         case 'mam':
         case 'mnemonic':
         case 'testnet':
+        case 'sk':
             return true;
         case 'ton-only':
         case 'ledger':
@@ -746,6 +794,7 @@ export function getNetworkByAccount(account: Account): Network {
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
+        case 'sk':
             return Network.MAINNET;
         default:
             assertUnreachable(account);
@@ -770,6 +819,7 @@ export function isAccountTronCompatible(
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
+        case 'sk':
             return false;
         default:
             return assertUnreachable(account);
@@ -787,6 +837,7 @@ export function isAccountBip39(account: Account) {
         case 'watch-only':
         case 'ton-multisig':
         case 'keystone':
+        case 'sk':
             return false;
         default:
             return assertUnreachable(account);
@@ -809,7 +860,8 @@ const prototypes = {
     'ton-only': AccountTonOnly.prototype,
     'watch-only': AccountTonWatchOnly.prototype,
     mam: AccountMAM.prototype,
-    'ton-multisig': AccountTonMultisig.prototype
+    'ton-multisig': AccountTonMultisig.prototype,
+    sk: AccountTonSK.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {
@@ -844,3 +896,15 @@ export type AccountsFolderStored = {
     name: string;
     lastIsOpened: boolean;
 };
+
+export type AccountSecretMnemonic = {
+    type: 'mnemonic';
+    mnemonic: string[];
+};
+
+export type AccountSecretSK = {
+    type: 'sk';
+    sk: string;
+};
+
+export type AccountSecret = AccountSecretMnemonic | AccountSecretSK;
