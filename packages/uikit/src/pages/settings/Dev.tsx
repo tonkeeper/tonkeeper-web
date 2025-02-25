@@ -75,8 +75,8 @@ const EnableTwoFASettings = () => {
             <ListItem hover={false}>
                 <ListItemPayload>
                     <TextAndBadge>
-                        <Label1>Enable 2FA</Label1>
-                        <Badge color="textSecondary">Experimental</Badge>
+                        <Label1>Enable 2FA, only for W5 wallets</Label1>
+                        <Badge color="accentRed">Experimental</Badge>
                     </TextAndBadge>
                     <Switch
                         disabled={!devSettings}

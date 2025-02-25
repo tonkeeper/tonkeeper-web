@@ -18,7 +18,7 @@ const NotificationStyled = styled(Notification)`
 
 export const DisableTwoFAConfirmNotification: FC<{
     isOpen: boolean;
-    onClose: (confirmed?: boolean) => void;
+    onClose: (confirmed: boolean) => void;
 }> = ({ isOpen, onClose }) => {
     return (
         <NotificationStyled isOpen={isOpen} handleClose={() => onClose(false)}>
@@ -46,7 +46,7 @@ const ButtonsContainer = styled.div`
 `;
 
 const NotificationContent: FC<{
-    onClose: (confirmed?: boolean) => void;
+    onClose: (confirmed: boolean) => void;
 }> = ({ onClose }) => {
     const { t } = useTranslation();
 
