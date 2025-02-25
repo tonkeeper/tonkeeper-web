@@ -17,7 +17,7 @@ import { useSignTonProof } from '../hooks/accountUtils';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { TonWalletStandard, WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { useToast } from '../hooks/useNotification';
+import { useNotifyErrorHandle, useToast } from '../hooks/useNotification';
 import { useTranslation } from '../hooks/translation';
 import { getMultisigSignerInfo } from './multisig';
 
@@ -276,6 +276,7 @@ export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean })
     const address = useActiveWallet().rawAddress;
     const toast = useToast();
     const { t } = useTranslation();
+    const notifyError = useNotifyErrorHandle();
 
     return useMutation<string>(async () => {
         try {
@@ -318,8 +319,11 @@ export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean })
 
             return res.url;
         } catch (e) {
-            console.error(e);
-            toast(t('please_try_again_later'));
+            try {
+                await notifyError(e);
+            } catch {
+                toast(t('please_try_again_later'));
+            }
             throw e;
         }
     });
