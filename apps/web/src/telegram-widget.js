@@ -611,7 +611,7 @@
                 var popup = window.open(
                     popup_url,
                     '_blank',
-/* PATCHED */     'noreferrer,noopener,width=' +
+                    'width=' +
                         width +
                         ',height=' +
                         height +
