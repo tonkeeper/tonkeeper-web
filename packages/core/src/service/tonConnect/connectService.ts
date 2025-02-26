@@ -162,7 +162,7 @@ export const getDeviceInfo = (appVersion: string, maxMessages: number): DeviceIn
             {
                 name: 'SendTransaction',
                 maxMessages: maxMessages,
-                extraCurrenciesSupported: true
+                extraCurrencySupported: true
             }
         ]
     };
