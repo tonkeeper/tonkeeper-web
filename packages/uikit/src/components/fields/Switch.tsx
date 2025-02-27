@@ -44,8 +44,8 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
             transition: margin 0.2s ease-in-out;
         `}
 
-    &:before,
-  &:after {
+    &::before,
+    &::after {
         display: block;
         float: left;
         width: 50%;
@@ -58,16 +58,16 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
         box-sizing: border-box;
     }
 
-    &:before {
-        content: attr(data-yes);
+    &::before {
+        content: '';
         text-transform: uppercase;
         padding-left: 10px;
         background-color: ${props => props.theme.buttonPrimaryBackground};
         color: ${props => props.theme.textPrimary};
     }
 
-    &:after {
-        content: attr(data-no);
+    &::after {
+        content: '';
         text-transform: uppercase;
         padding-right: 10px;
         background-color: ${props => props.theme.backgroundContentTint};
