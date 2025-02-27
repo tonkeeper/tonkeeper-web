@@ -172,7 +172,7 @@ export enum SEND_TRANSACTION_ERROR_CODES {
 export type SendTransactionFeature = {
     name: 'SendTransaction';
     maxMessages: number;
-    extraCurrenciesSupported?: boolean;
+    extraCurrencySupported?: boolean;
 };
 
 export type SendTransactionFeatureDeprecated = 'SendTransaction';

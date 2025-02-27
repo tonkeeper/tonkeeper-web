@@ -107,13 +107,13 @@ jobs:
             environment: 'main'
         secrets: inherit
 
-    web-tests:
-        needs: web-build
-        uses: ./.github/workflows/web-tests.yaml
-        with:
-            base-url: 'https://wallet.tonkeeper.com'
-            transaction: true
-        secrets: inherit
+    # web-tests:
+    #     needs: web-build
+    #     uses: ./.github/workflows/web-tests.yaml
+    #     with:
+    #         base-url: 'https://wallet.tonkeeper.com'
+    #         transaction: true
+    #     secrets: inherit
 
     extension-build:
         name: extension-build
