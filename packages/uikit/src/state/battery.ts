@@ -29,7 +29,7 @@ export const useBatteryApi = () => {
     const config = useActiveConfig();
     return useMemo(() => {
         return new Configuration({
-            basePath: 'https://testnet-battery.tonkeeper.com'// config.batteryHost || 'https://battery.tonkeeper.com' TODO tron remove
+            basePath: config.batteryHost || 'https://battery.tonkeeper.com'
         });
     }, []);
 };
