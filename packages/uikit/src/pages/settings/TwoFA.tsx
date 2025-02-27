@@ -241,13 +241,11 @@ const TwoFAActiveContent = () => {
     const { mutateAsync: removeTwoFA, isLoading: isRemovingLoading } = useSendTwoFARemove();
     const { data: isRemovingProcess } = useIsTwoFARemovingProcess();
 
-    const onClickCloseDisconnect = async (confirmed?: boolean) => {
+    const onClickCloseDisconnect = async (confirmed: boolean) => {
         onCloseDisconnect();
-        if (!confirmed) {
-            return;
+        if (confirmed === true) {
+            await removeTwoFA();
         }
-
-        await removeTwoFA();
     };
 
     return (

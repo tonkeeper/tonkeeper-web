@@ -16,8 +16,8 @@ import { useEffect, useMemo } from 'react';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useToast } from '../hooks/useNotification';
+import { TonWalletStandard, WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { useNotifyErrorHandle, useToast } from '../hooks/useNotification';
 import { useTranslation } from '../hooks/translation';
 import { getMultisigSignerInfo } from './multisig';
 
@@ -71,7 +71,9 @@ export const useCanViewTwoFA = () => {
 
     const isSuitableAccount = account.type === 'mnemonic' || account.type === 'mam';
 
-    return (isEnabled && isSuitableAccount) || data?.status === 'active';
+    const isW5 =
+        (account.activeTonWallet as Partial<TonWalletStandard>)?.version === WalletVersion.V5R1;
+    return (isEnabled && isSuitableAccount && isW5) || data?.status === 'active';
 };
 
 export const useTwoFAApi = () => {
@@ -91,9 +93,7 @@ export const useTwoFAServiceConfig = () => {
             throw new Error('2fa_public_key not found');
         }
 
-        const servicePubKey = BigInt(
-            '0x' + Buffer.from(config['2fa_public_key'], 'base64').toString('hex')
-        );
+        const servicePubKey = BigInt('0x' + config['2fa_public_key']);
 
         return {
             baseUrl: config['2fa_api_url'],
@@ -134,16 +134,18 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
     const activeAccount = useActiveAccount();
     const account = options?.account ?? activeAccount;
 
-    const wallet = options?.walletId
-        ? account.getTonWallet(options.walletId)!
-        : account.activeTonWallet;
+    const wallet = (
+        options?.walletId ? account.getTonWallet(options.walletId)! : account.activeTonWallet
+    ) as TonWalletStandard;
+
     const twoFAApi = useTwoFAApi();
     const api = useActiveApi();
 
     const isSuitableAccount = account.type === 'mnemonic' || account.type === 'mam';
     const serviceConfig = useTwoFAServiceConfig();
 
-    const isEnabled = isSuitableAccount;
+    const isEnabled = isSuitableAccount && wallet.version == WalletVersion.V5R1;
+
     const query = useQuery<TwoFAWalletConfig>(
         [QueryKey.twoFAWalletConfig, wallet.id],
         async () => {
@@ -217,7 +219,7 @@ export const useTwoFAWalletConfig = (options?: { account?: Account; walletId?: W
             return config;
         },
         {
-            keepPreviousData: true,
+            //  keepPreviousData: true,
             enabled: isEnabled,
             refetchInterval: d =>
                 d?.status === 'tg-bot-bounding' || d?.status === 'ready-for-deployment'
@@ -274,6 +276,7 @@ export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean })
     const address = useActiveWallet().rawAddress;
     const toast = useToast();
     const { t } = useTranslation();
+    const notifyError = useNotifyErrorHandle();
 
     return useMutation<string>(async () => {
         try {
@@ -316,8 +319,11 @@ export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean })
 
             return res.url;
         } catch (e) {
-            console.error(e);
-            toast(t('please_try_again_later'));
+            try {
+                await notifyError(e);
+            } catch {
+                toast(t('please_try_again_later'));
+            }
             throw e;
         }
     });
