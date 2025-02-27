@@ -20,22 +20,37 @@ import type {
   AppStoreNotificationRequest,
   ApplyPromoRequest,
   Balance,
+  BatteryCharged,
   Config,
   CreateCustomRefundRequest,
+  CreatePromoCampaign200Response,
+  CreatePromoCampaignRequest,
   EmulateMessageToWalletRequest,
+  EnterpriseEstimate200Response,
+  EnterpriseEstimateRequest,
+  EnterpriseGetMessage200Response,
+  EnterpriseGetStatus200Response,
+  EnterpriseSend200Response,
+  EnterpriseWalletConfig,
   EstimateGaslessCostRequest,
+  EstimatedTronTx,
   GaslessEstimation,
   GetTonConnectPayloadDefaultResponse,
+  GetTronConfig200Response,
   IOSBatteryPurchaseStatus,
   IosBatteryPurchaseRequest,
   PromoCodeBatteryPurchaseRequest,
   PromoCodeBatteryPurchaseStatus,
+  PromoUsed,
   Purchases,
   RechargeMethods,
   RequestRefundRequest,
   ResetUserBalanceRequest,
+  SentTronTx,
   Status,
   Transactions,
+  TronSendRequest,
+  TronTransactionsList,
 } from '../models/index';
 import {
     AndroidBatteryPurchaseRequestFromJSON,
@@ -48,18 +63,40 @@ import {
     ApplyPromoRequestToJSON,
     BalanceFromJSON,
     BalanceToJSON,
+    BatteryChargedFromJSON,
+    BatteryChargedToJSON,
     ConfigFromJSON,
     ConfigToJSON,
     CreateCustomRefundRequestFromJSON,
     CreateCustomRefundRequestToJSON,
+    CreatePromoCampaign200ResponseFromJSON,
+    CreatePromoCampaign200ResponseToJSON,
+    CreatePromoCampaignRequestFromJSON,
+    CreatePromoCampaignRequestToJSON,
     EmulateMessageToWalletRequestFromJSON,
     EmulateMessageToWalletRequestToJSON,
+    EnterpriseEstimate200ResponseFromJSON,
+    EnterpriseEstimate200ResponseToJSON,
+    EnterpriseEstimateRequestFromJSON,
+    EnterpriseEstimateRequestToJSON,
+    EnterpriseGetMessage200ResponseFromJSON,
+    EnterpriseGetMessage200ResponseToJSON,
+    EnterpriseGetStatus200ResponseFromJSON,
+    EnterpriseGetStatus200ResponseToJSON,
+    EnterpriseSend200ResponseFromJSON,
+    EnterpriseSend200ResponseToJSON,
+    EnterpriseWalletConfigFromJSON,
+    EnterpriseWalletConfigToJSON,
     EstimateGaslessCostRequestFromJSON,
     EstimateGaslessCostRequestToJSON,
+    EstimatedTronTxFromJSON,
+    EstimatedTronTxToJSON,
     GaslessEstimationFromJSON,
     GaslessEstimationToJSON,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
+    GetTronConfig200ResponseFromJSON,
+    GetTronConfig200ResponseToJSON,
     IOSBatteryPurchaseStatusFromJSON,
     IOSBatteryPurchaseStatusToJSON,
     IosBatteryPurchaseRequestFromJSON,
@@ -68,6 +105,8 @@ import {
     PromoCodeBatteryPurchaseRequestToJSON,
     PromoCodeBatteryPurchaseStatusFromJSON,
     PromoCodeBatteryPurchaseStatusToJSON,
+    PromoUsedFromJSON,
+    PromoUsedToJSON,
     PurchasesFromJSON,
     PurchasesToJSON,
     RechargeMethodsFromJSON,
@@ -76,10 +115,16 @@ import {
     RequestRefundRequestToJSON,
     ResetUserBalanceRequestFromJSON,
     ResetUserBalanceRequestToJSON,
+    SentTronTxFromJSON,
+    SentTronTxToJSON,
     StatusFromJSON,
     StatusToJSON,
     TransactionsFromJSON,
     TransactionsToJSON,
+    TronSendRequestFromJSON,
+    TronSendRequestToJSON,
+    TronTransactionsListFromJSON,
+    TronTransactionsListToJSON,
 } from '../models/index';
 
 export interface AndroidBatteryPurchaseOperationRequest {
@@ -101,6 +146,37 @@ export interface CreateCustomRefundOperationRequest {
     createCustomRefundRequest: CreateCustomRefundRequest;
 }
 
+export interface CreatePromoCampaignOperationRequest {
+    token: string;
+    createPromoCampaignRequest: CreatePromoCampaignRequest;
+}
+
+export interface EnterpriseEstimateOperationRequest {
+    xEnterpriseAuth: string;
+    walletId: string;
+    enterpriseEstimateRequest: EnterpriseEstimateRequest;
+}
+
+export interface EnterpriseGetMessageRequest {
+    xEnterpriseAuth: string;
+    msgId: string;
+}
+
+export interface EnterpriseGetStatusRequest {
+    xEnterpriseAuth: string;
+}
+
+export interface EnterpriseGetWalletConfigRequest {
+    xEnterpriseAuth: string;
+    walletId: string;
+}
+
+export interface EnterpriseSendRequest {
+    xEnterpriseAuth: string;
+    walletId: string;
+    enterpriseEstimateRequest: EnterpriseEstimateRequest;
+}
+
 export interface EstimateGaslessCostOperationRequest {
     jettonMaster: string;
     estimateGaslessCostRequest: EstimateGaslessCostRequest;
@@ -117,6 +193,14 @@ export interface ExtendRefundPeriodRequest {
 export interface GetBalanceRequest {
     xTonConnectAuth: string;
     units?: GetBalanceUnitsEnum;
+}
+
+export interface GetBatteryChargedRequest {
+    accountId: string;
+}
+
+export interface GetPromoUsedRequest {
+    promo: string;
 }
 
 export interface GetPurchasesRequest {
@@ -138,6 +222,12 @@ export interface GetTransactionsRequest {
     xTonConnectAuth: string;
     limit?: number;
     offset?: number;
+}
+
+export interface GetTronTransactionsRequest {
+    xTonConnectAuth: string;
+    limit?: number;
+    maxTimestamp?: number;
 }
 
 export interface IosBatteryPurchaseOperationRequest {
@@ -165,6 +255,17 @@ export interface ResetUserBalanceOperationRequest {
 export interface SendMessageRequest {
     xTonConnectAuth: string;
     emulateMessageToWalletRequest: EmulateMessageToWalletRequest;
+}
+
+export interface TronEstimateRequest {
+    wallet: string;
+    energy?: number;
+    bandwidth?: number;
+}
+
+export interface TronSendOperationRequest {
+    xTonConnectAuth: string;
+    tronSendRequest: TronSendRequest;
 }
 
 export interface VerifyPurchasePromoRequest {
@@ -236,6 +337,91 @@ export interface DefaultApiInterface {
 
     /**
      * 
+     * @param {string} token 
+     * @param {CreatePromoCampaignRequest} createPromoCampaignRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    createPromoCampaignRaw(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreatePromoCampaign200Response>>;
+
+    /**
+     */
+    createPromoCampaign(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreatePromoCampaign200Response>;
+
+    /**
+     * 
+     * @param {string} xEnterpriseAuth 
+     * @param {string} walletId 
+     * @param {EnterpriseEstimateRequest} enterpriseEstimateRequest bag-of-cells serialized to base64
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseEstimateRaw(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseEstimate200Response>>;
+
+    /**
+     */
+    enterpriseEstimate(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseEstimate200Response>;
+
+    /**
+     * 
+     * @param {string} xEnterpriseAuth 
+     * @param {string} msgId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseGetMessageRaw(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetMessage200Response>>;
+
+    /**
+     */
+    enterpriseGetMessage(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseGetMessage200Response>;
+
+    /**
+     * 
+     * @param {string} xEnterpriseAuth 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseGetStatusRaw(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetStatus200Response>>;
+
+    /**
+     */
+    enterpriseGetStatus(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseGetStatus200Response>;
+
+    /**
+     * 
+     * @param {string} xEnterpriseAuth 
+     * @param {string} walletId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseGetWalletConfigRaw(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseWalletConfig>>;
+
+    /**
+     */
+    enterpriseGetWalletConfig(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseWalletConfig>;
+
+    /**
+     * 
+     * @param {string} xEnterpriseAuth 
+     * @param {string} walletId 
+     * @param {EnterpriseEstimateRequest} enterpriseEstimateRequest bag-of-cells serialized to base64
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    enterpriseSendRaw(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseSend200Response>>;
+
+    /**
+     */
+    enterpriseSend(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseSend200Response>;
+
+    /**
+     * 
      * @param {string} jettonMaster 
      * @param {EstimateGaslessCostRequest} estimateGaslessCostRequest 
      * @param {string} [xTonConnectAuth] 
@@ -281,6 +467,20 @@ export interface DefaultApiInterface {
     getBalance(requestParameters: GetBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Balance>;
 
     /**
+     * This method returns information about a user\'s balance.
+     * @param {string} accountId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getBatteryChargedRaw(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BatteryCharged>>;
+
+    /**
+     * This method returns information about a user\'s balance.
+     */
+    getBatteryCharged(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BatteryCharged>;
+
+    /**
      * This method returns information about Battery Service.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -292,6 +492,19 @@ export interface DefaultApiInterface {
      * This method returns information about Battery Service.
      */
     getConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Config>;
+
+    /**
+     * 
+     * @param {string} promo 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getPromoUsedRaw(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoUsed>>;
+
+    /**
+     */
+    getPromoUsed(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromoUsed>;
 
     /**
      * This method returns a list of purchases made by a specific user.
@@ -353,6 +566,33 @@ export interface DefaultApiInterface {
      * This method returns a list of transactions made by a specific user.
      */
     getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions>;
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>>;
+
+    /**
+     */
+    getTronConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTronConfig200Response>;
+
+    /**
+     * 
+     * @param {string} xTonConnectAuth 
+     * @param {number} [limit] 
+     * @param {number} [maxTimestamp] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    getTronTransactionsRaw(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronTransactionsList>>;
+
+    /**
+     */
+    getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList>;
 
     /**
      * verify an in-app purchase
@@ -428,6 +668,37 @@ export interface DefaultApiInterface {
      * Send message to blockchain
      */
     sendMessage(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+
+    /**
+     * Estimate cost of sending a tx in Tron network
+     * @param {string} wallet 
+     * @param {number} [energy] 
+     * @param {number} [bandwidth] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    tronEstimateRaw(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EstimatedTronTx>>;
+
+    /**
+     * Estimate cost of sending a tx in Tron network
+     */
+    tronEstimate(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EstimatedTronTx>;
+
+    /**
+     * send TRON tx
+     * @param {string} xTonConnectAuth 
+     * @param {TronSendRequest} tronSendRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    tronSendRaw(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SentTronTx>>;
+
+    /**
+     * send TRON tx
+     */
+    tronSend(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SentTronTx>;
 
     /**
      * 
@@ -622,6 +893,274 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
     /**
      */
+    async createPromoCampaignRaw(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreatePromoCampaign200Response>> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling createPromoCampaign().'
+            );
+        }
+
+        if (requestParameters['createPromoCampaignRequest'] == null) {
+            throw new runtime.RequiredError(
+                'createPromoCampaignRequest',
+                'Required parameter "createPromoCampaignRequest" was null or undefined when calling createPromoCampaign().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/restricted/promo-campaign`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: CreatePromoCampaignRequestToJSON(requestParameters['createPromoCampaignRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => CreatePromoCampaign200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async createPromoCampaign(requestParameters: CreatePromoCampaignOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreatePromoCampaign200Response> {
+        const response = await this.createPromoCampaignRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async enterpriseEstimateRaw(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseEstimate200Response>> {
+        if (requestParameters['xEnterpriseAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xEnterpriseAuth',
+                'Required parameter "xEnterpriseAuth" was null or undefined when calling enterpriseEstimate().'
+            );
+        }
+
+        if (requestParameters['walletId'] == null) {
+            throw new runtime.RequiredError(
+                'walletId',
+                'Required parameter "walletId" was null or undefined when calling enterpriseEstimate().'
+            );
+        }
+
+        if (requestParameters['enterpriseEstimateRequest'] == null) {
+            throw new runtime.RequiredError(
+                'enterpriseEstimateRequest',
+                'Required parameter "enterpriseEstimateRequest" was null or undefined when calling enterpriseEstimate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
+        const response = await this.request({
+            path: `/enterprise/wallets/{wallet_id}/estimate`.replace(`{${"wallet_id"}}`, encodeURIComponent(String(requestParameters['walletId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EnterpriseEstimateRequestToJSON(requestParameters['enterpriseEstimateRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseEstimate200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async enterpriseEstimate(requestParameters: EnterpriseEstimateOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseEstimate200Response> {
+        const response = await this.enterpriseEstimateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async enterpriseGetMessageRaw(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetMessage200Response>> {
+        if (requestParameters['xEnterpriseAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xEnterpriseAuth',
+                'Required parameter "xEnterpriseAuth" was null or undefined when calling enterpriseGetMessage().'
+            );
+        }
+
+        if (requestParameters['msgId'] == null) {
+            throw new runtime.RequiredError(
+                'msgId',
+                'Required parameter "msgId" was null or undefined when calling enterpriseGetMessage().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
+        const response = await this.request({
+            path: `/enterprise/messages/{msg_id}`.replace(`{${"msg_id"}}`, encodeURIComponent(String(requestParameters['msgId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseGetMessage200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async enterpriseGetMessage(requestParameters: EnterpriseGetMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseGetMessage200Response> {
+        const response = await this.enterpriseGetMessageRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async enterpriseGetStatusRaw(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseGetStatus200Response>> {
+        if (requestParameters['xEnterpriseAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xEnterpriseAuth',
+                'Required parameter "xEnterpriseAuth" was null or undefined when calling enterpriseGetStatus().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
+        const response = await this.request({
+            path: `/enterprise/status`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseGetStatus200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async enterpriseGetStatus(requestParameters: EnterpriseGetStatusRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseGetStatus200Response> {
+        const response = await this.enterpriseGetStatusRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async enterpriseGetWalletConfigRaw(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseWalletConfig>> {
+        if (requestParameters['xEnterpriseAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xEnterpriseAuth',
+                'Required parameter "xEnterpriseAuth" was null or undefined when calling enterpriseGetWalletConfig().'
+            );
+        }
+
+        if (requestParameters['walletId'] == null) {
+            throw new runtime.RequiredError(
+                'walletId',
+                'Required parameter "walletId" was null or undefined when calling enterpriseGetWalletConfig().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
+        const response = await this.request({
+            path: `/enterprise/wallets/{wallet_id}/config`.replace(`{${"wallet_id"}}`, encodeURIComponent(String(requestParameters['walletId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseWalletConfigFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async enterpriseGetWalletConfig(requestParameters: EnterpriseGetWalletConfigRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseWalletConfig> {
+        const response = await this.enterpriseGetWalletConfigRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async enterpriseSendRaw(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EnterpriseSend200Response>> {
+        if (requestParameters['xEnterpriseAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xEnterpriseAuth',
+                'Required parameter "xEnterpriseAuth" was null or undefined when calling enterpriseSend().'
+            );
+        }
+
+        if (requestParameters['walletId'] == null) {
+            throw new runtime.RequiredError(
+                'walletId',
+                'Required parameter "walletId" was null or undefined when calling enterpriseSend().'
+            );
+        }
+
+        if (requestParameters['enterpriseEstimateRequest'] == null) {
+            throw new runtime.RequiredError(
+                'enterpriseEstimateRequest',
+                'Required parameter "enterpriseEstimateRequest" was null or undefined when calling enterpriseSend().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['xEnterpriseAuth'] != null) {
+            headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
+        const response = await this.request({
+            path: `/enterprise/wallets/{wallet_id}/send`.replace(`{${"wallet_id"}}`, encodeURIComponent(String(requestParameters['walletId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EnterpriseEstimateRequestToJSON(requestParameters['enterpriseEstimateRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EnterpriseSend200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async enterpriseSend(requestParameters: EnterpriseSendRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EnterpriseSend200Response> {
+        const response = await this.enterpriseSendRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async estimateGaslessCostRaw(requestParameters: EstimateGaslessCostOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessEstimation>> {
         if (requestParameters['jettonMaster'] == null) {
             throw new runtime.RequiredError(
@@ -757,6 +1296,43 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     * This method returns information about a user\'s balance.
+     */
+    async getBatteryChargedRaw(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BatteryCharged>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getBatteryCharged().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['accountId'] != null) {
+            queryParameters['account_id'] = requestParameters['accountId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/battery-charged`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BatteryChargedFromJSON(jsonValue));
+    }
+
+    /**
+     * This method returns information about a user\'s balance.
+     */
+    async getBatteryCharged(requestParameters: GetBatteryChargedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BatteryCharged> {
+        const response = await this.getBatteryChargedRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * This method returns information about Battery Service.
      */
     async getConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Config>> {
@@ -779,6 +1355,41 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async getConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Config> {
         const response = await this.getConfigRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getPromoUsedRaw(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PromoUsed>> {
+        if (requestParameters['promo'] == null) {
+            throw new runtime.RequiredError(
+                'promo',
+                'Required parameter "promo" was null or undefined when calling getPromoUsed().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['promo'] != null) {
+            queryParameters['promo'] = requestParameters['promo'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/promo-used`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => PromoUsedFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getPromoUsed(requestParameters: GetPromoUsedRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PromoUsed> {
+        const response = await this.getPromoUsedRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -940,6 +1551,73 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async getTransactions(requestParameters: GetTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Transactions> {
         const response = await this.getTransactionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getTronConfigRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GetTronConfig200Response>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v0/tron/config`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => GetTronConfig200ResponseFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getTronConfig(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GetTronConfig200Response> {
+        const response = await this.getTronConfigRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getTronTransactionsRaw(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TronTransactionsList>> {
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling getTronTransactions().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['maxTimestamp'] != null) {
+            queryParameters['max_timestamp'] = requestParameters['maxTimestamp'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
+        }
+
+        const response = await this.request({
+            path: `/v0/tron/transactions`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TronTransactionsListFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList> {
+        const response = await this.getTronTransactionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -1181,6 +1859,98 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async sendMessage(requestParameters: SendMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.sendMessageRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Estimate cost of sending a tx in Tron network
+     */
+    async tronEstimateRaw(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<EstimatedTronTx>> {
+        if (requestParameters['wallet'] == null) {
+            throw new runtime.RequiredError(
+                'wallet',
+                'Required parameter "wallet" was null or undefined when calling tronEstimate().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['energy'] != null) {
+            queryParameters['energy'] = requestParameters['energy'];
+        }
+
+        if (requestParameters['bandwidth'] != null) {
+            queryParameters['bandwidth'] = requestParameters['bandwidth'];
+        }
+
+        if (requestParameters['wallet'] != null) {
+            queryParameters['wallet'] = requestParameters['wallet'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v0/tron/estimate`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => EstimatedTronTxFromJSON(jsonValue));
+    }
+
+    /**
+     * Estimate cost of sending a tx in Tron network
+     */
+    async tronEstimate(requestParameters: TronEstimateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<EstimatedTronTx> {
+        const response = await this.tronEstimateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * send TRON tx
+     */
+    async tronSendRaw(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SentTronTx>> {
+        if (requestParameters['xTonConnectAuth'] == null) {
+            throw new runtime.RequiredError(
+                'xTonConnectAuth',
+                'Required parameter "xTonConnectAuth" was null or undefined when calling tronSend().'
+            );
+        }
+
+        if (requestParameters['tronSendRequest'] == null) {
+            throw new runtime.RequiredError(
+                'tronSendRequest',
+                'Required parameter "tronSendRequest" was null or undefined when calling tronSend().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
+        }
+
+        const response = await this.request({
+            path: `/v0/tron/send`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: TronSendRequestToJSON(requestParameters['tronSendRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SentTronTxFromJSON(jsonValue));
+    }
+
+    /**
+     * send TRON tx
+     */
+    async tronSend(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SentTronTx> {
+        const response = await this.tronSendRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**

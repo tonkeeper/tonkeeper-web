@@ -11,7 +11,7 @@ import {
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
-import { ChoseWalletVersions, ChoseWalletVersionsByMnemonic } from "../../components/create/ChoseWalletVersions";
+import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
 import {
     AccountMAM,
     AccountTonMnemonic,
@@ -44,6 +44,8 @@ import {
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
+import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
+import { useTranslation } from '../../hooks/translation';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
@@ -231,6 +233,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
 
 export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
+    const { t } = useTranslation();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [createdAccount, setCreatedAccount] = useState<
@@ -245,6 +248,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     >();
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
     const [notificationsSubscribePagePassed, setNotificationsSubscribePagePassed] = useState(false);
     const { mutateAsync: renameAccount, isLoading: renameAccountLoading } =
         useMutateRenameAccount<AccountTonMnemonic>();
@@ -369,6 +373,10 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
             };
         }
 
+        if (editNamePagePassed && !selectNetworksPassed) {
+            return () => setEditNamePagePassed(false);
+        }
+
         return undefined;
     }, [
         mnemonic,
@@ -377,7 +385,9 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         existingAccountAndWallet,
         isMnemonicFormDirty,
         selectedMnemonicType,
-        isCreatingMam
+        isCreatingMam,
+        editNamePagePassed,
+        selectNetworksPassed
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -465,8 +475,13 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
+                buttonText={t('continue')}
             />
         );
+    }
+
+    if (!selectNetworksPassed) {
+        return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
     if (

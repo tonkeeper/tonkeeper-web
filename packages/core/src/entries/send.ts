@@ -1,12 +1,13 @@
 import { Account, AccountEvent, WalletDNS } from '../tonApiV2';
 import { BLOCKCHAIN_NAME } from './crypto';
-import { AssetAmount } from './crypto/asset/asset-amount';
 import { TonAsset } from './crypto/asset/ton-asset';
 import { TronAsset } from './crypto/asset/tron-asset';
 import { Suggestion } from './suggestion';
 import { Asset } from './crypto/asset/asset';
 import BigNumber from 'bignumber.js';
 import { TON_ASSET } from './crypto/asset/constants';
+import { TransactionFeeBattery, TransactionFeeTonAsset } from './crypto/transaction-fee';
+import { TronResources } from '../tronApi';
 
 export type BaseRecipient = Suggestion | { address: string; bounce?: boolean };
 
@@ -57,17 +58,17 @@ export type TonEstimation = {
      * positive if fee
      * negative if there will be a refund
      */
-    extra: AssetAmount<TonAsset>;
+    fee: TransactionFeeTonAsset | TransactionFeeBattery;
     event?: AccountEvent;
 };
 
 export function getTonEstimationTonFee(estimation: TonEstimation | undefined): BigNumber {
-    if (
-        estimation &&
-        estimation.extra.asset.id === TON_ASSET.id &&
-        estimation.extra.weiAmount.gte(0)
-    ) {
-        return estimation.extra.weiAmount;
+    if (estimation?.fee.type !== 'ton-asset') {
+        return new BigNumber(0);
+    }
+
+    if (estimation.fee.extra.asset.id === TON_ASSET.id && estimation.fee.extra.weiAmount.gte(0)) {
+        return estimation.fee.extra.weiAmount;
     }
 
     return new BigNumber(0);
@@ -82,7 +83,8 @@ export const isTonEstimationDetailed = (
 };
 
 export type TronEstimation = {
-    extra: AssetAmount<TronAsset>;
+    fee: TransactionFeeBattery;
+    resources: TronResources;
 };
 
 export type Estimation<T extends Asset = Asset> = T extends TonAsset

@@ -84,9 +84,16 @@ const HistoryEventSingle: FC<{
                           })
                 }
             >
-                <HistoryDateCell>
-                    <Body2>{formattedDate}</Body2>
-                </HistoryDateCell>
+                {item.event.inProgress ? (
+                    <PendingEventCell>
+                        <SpinnerRing />
+                        <Body2>{t('transaction_type_pending') + '…'}</Body2>
+                    </PendingEventCell>
+                ) : (
+                    <HistoryDateCell>
+                        <Body2>{formattedDate}</Body2>
+                    </HistoryDateCell>
+                )}
                 <TronHistoryAction action={item.event} />
                 <EventDivider />
             </HistoryEventWrapper>

@@ -26,7 +26,7 @@ export abstract class EncoderBase {
         }
 
         const other = this.getOtherDict();
-        for (let [id, value] of Object.entries(src.extra_currency)) {
+        for (const [id, value] of Object.entries(src.extra_currency)) {
             other.set(Number(id), BigInt(value));
         }
         return { coins, other };

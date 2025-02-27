@@ -4,8 +4,9 @@ import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { Network } from '../../entries/network';
 import { TonWalletConfig } from '../../entries/wallet';
+import { AccountId } from '../../entries/account';
 
-const defaultConfig: TonWalletConfig = {
+const defaultWalletConfig: TonWalletConfig = {
     pinnedNfts: [],
     hiddenNfts: [],
     pinnedTokens: [],
@@ -42,9 +43,9 @@ export const getActiveWalletConfig = async (
         config = await migration(sdk.storage, address, network);
     }
     if (!config) {
-        return defaultConfig;
+        return defaultWalletConfig;
     }
-    return { ...defaultConfig, ...config };
+    return { ...defaultWalletConfig, ...config };
 };
 
 export const setActiveWalletConfig = async (
@@ -55,4 +56,27 @@ export const setActiveWalletConfig = async (
 ) => {
     const formatted = Address.parse(address).toString({ testOnly: network === Network.TESTNET });
     await storage.set(`${AppKey.WALLET_CONFIG}_${formatted}`, config);
+};
+
+/**
+ * Account config is for MAM accounts where each wallet has own config and account itself has own config
+ */
+export type AccountConfig = {
+    enableTron?: boolean;
+};
+
+export const defaultAccountConfig = {
+    enableTron: true
+} satisfies AccountConfig;
+
+const accountStorageKey = (id: AccountId) => `${AppKey.ACCOUNT_CONFIG}_${id}`;
+
+export const getAccountConfig = async (sdk: IAppSdk, id: AccountId) => {
+    const config = await sdk.storage.get<AccountConfig>(accountStorageKey(id));
+
+    return { ...defaultAccountConfig, ...config };
+};
+
+export const setAccountConfig = async (storage: IStorage, id: AccountId, config: AccountConfig) => {
+    await storage.set(accountStorageKey(id), config);
 };

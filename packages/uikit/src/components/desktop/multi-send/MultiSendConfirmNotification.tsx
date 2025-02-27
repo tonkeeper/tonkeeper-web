@@ -4,11 +4,11 @@ import { Image, ImageMock } from '../../transfer/Confirm';
 import { MultiSendForm } from '../../../state/multiSend';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import styled from 'styled-components';
-import { useTonAssetImage, useAssetImage } from '../../../state/asset';
+import { useAssetImage } from '../../../state/asset';
 import { Body1, Body2, Body2Class, Body3, Body3Class, Label2, Num2 } from '../../Text';
 import { useRate } from '../../../state/rates';
 import { useAppContext } from '../../../hooks/appContext';
-import { formatFiatCurrency, useFormatCoinValue } from '../../../hooks/balance';
+import { formatFiatCurrency } from '../../../hooks/balance';
 import { ListBlock, ListItem } from '../../List';
 import { useTranslation } from '../../../hooks/translation';
 import { useEstimateMultiTransfer } from '../../../hooks/blockchain/useEstimateMultiTransferFee';
@@ -34,6 +34,7 @@ import {
     SenderTypeUserAvailable,
     useAvailableSendersChoices
 } from '../../../hooks/blockchain/useSender';
+import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -224,7 +225,7 @@ const MultiSendConfirmContent: FC<{
                         <Label2>{listName}</Label2>
                     </ListItemStyled>
                     <ActionFeeDetailsUniversalStyled
-                        extra={estimateData?.extra}
+                        fee={estimateData?.fee}
                         availableSendersChoices={availableSendersChoices}
                         selectedSenderType={selectedSenderType}
                         onSenderTypeChange={onSenderTypeChange}
@@ -233,7 +234,7 @@ const MultiSendConfirmContent: FC<{
                 <ButtonBlock
                     form={formTokenized}
                     asset={asset}
-                    feeEstimation={estimateData?.extra.weiAmount}
+                    estimation={estimateData}
                     onSuccess={() => {
                         setTimeout(() => {
                             onClose();
@@ -272,18 +273,10 @@ const ButtonBlock: FC<{
     isLoading: boolean;
     form: MultiSendFormTokenized;
     asset: TonAsset;
-    feeEstimation: BigNumber | undefined;
+    estimation: TonEstimation | undefined;
     estimationError: Error | null;
     selectedSenderChoice: SenderChoiceUserAvailable | undefined;
-}> = ({
-    onSuccess,
-    form,
-    asset,
-    feeEstimation,
-    isLoading,
-    estimationError,
-    selectedSenderChoice
-}) => {
+}> = ({ onSuccess, form, asset, estimation, isLoading, estimationError, selectedSenderChoice }) => {
     const { t } = useTranslation();
     const {
         mutateAsync: send,
@@ -292,13 +285,11 @@ const ButtonBlock: FC<{
         data: doneSend
     } = useSendMultiTransfer();
 
-    const format = useFormatCoinValue();
-
     const onClick = async () => {
         const confirmed = await send({
             form,
             asset,
-            feeEstimation: feeEstimation!,
+            estimation: estimation!,
             senderChoice: selectedSenderChoice!
         });
         if (confirmed) {
