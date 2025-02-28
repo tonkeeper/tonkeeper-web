@@ -1,17 +1,15 @@
-import {
-    Address,
-    beginCell,
-    Cell,
-    contractAddress,
-    Dictionary,
-    storeMessageRelaxed,
-    toNano
-} from '@ton/core';
+import { Address, beginCell, Cell, contractAddress, toNano } from '@ton/core';
 import { getTonkeeperQueryId } from '../../utils';
 import { Multisig } from '../../../../tonApiV2';
 import { APIConfig } from '../../../../entries/apis';
-import { Action, MultisigConfig, NewOrder, TransferRequest, UpdateRequest } from './types';
-import { arrayToCell, getOrderSeqno, MultisigOp, MultisigParams } from './multisig-utils';
+import { Action, MultisigConfig, NewOrder } from './types';
+import {
+    arrayToCell,
+    getOrderSeqno,
+    MultisigOp,
+    MultisigParams,
+    packMultisigOrderBody
+} from './multisig-utils';
 
 export class MultisigEncoder {
     public static readonly deployMultisigValue = toNano(0.1);
@@ -121,44 +119,8 @@ export class MultisigEncoder {
             .storeUint(addrIdx, MultisigParams.bitsize.signerIndex)
             .storeUint(expirationDate, MultisigParams.bitsize.time);
 
-        const order_cell = this.packOrderBody(actions);
+        const order_cell = packMultisigOrderBody(actions);
         return msgBody.storeRef(order_cell).endCell();
-    }
-
-    private packOrderBody(actions: Array<Action>) {
-        const order_dict = Dictionary.empty(Dictionary.Keys.Uint(8), Dictionary.Values.Cell());
-        if (actions.length > 255) {
-            throw new Error('For action chains above 255, use packLarge method');
-        } else {
-            // pack transfers to the order_body cell
-            for (let i = 0; i < actions.length; i++) {
-                const action = actions[i];
-                const actionCell =
-                    action.type === 'transfer'
-                        ? this.packTransferRequest(action)
-                        : this.packUpdateRequest(action);
-                order_dict.set(i, actionCell);
-            }
-            return beginCell().storeDictDirect(order_dict).endCell();
-        }
-    }
-
-    private packTransferRequest(transfer: TransferRequest) {
-        const message = beginCell().store(storeMessageRelaxed(transfer.message)).endCell();
-        return beginCell()
-            .storeUint(MultisigOp.actions.send_message, MultisigParams.bitsize.op)
-            .storeUint(transfer.sendMode, 8)
-            .storeRef(message)
-            .endCell();
-    }
-
-    private packUpdateRequest(update: UpdateRequest) {
-        return beginCell()
-            .storeUint(MultisigOp.actions.update_multisig_params, MultisigParams.bitsize.op)
-            .storeUint(update.threshold, MultisigParams.bitsize.signerIndex)
-            .storeRef(beginCell().storeDictDirect(arrayToCell(update.signers)))
-            .storeDict(arrayToCell(update.proposers))
-            .endCell();
     }
 
     private getOrderSeqno = async (multisigAddress: string) => {

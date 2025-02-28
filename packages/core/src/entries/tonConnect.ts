@@ -26,7 +26,9 @@ export interface TonConnectTransactionPayloadMessage {
     amount: string | number;
     payload?: string; // base64 cell
     stateInit?: string; // base64 cell
-    extra_currencies?: [{ id: number; value: string }];
+    extra_currency?: {
+        [k: number]: string;
+    };
 }
 
 export type TonConnectAccount = {
@@ -170,7 +172,7 @@ export enum SEND_TRANSACTION_ERROR_CODES {
 export type SendTransactionFeature = {
     name: 'SendTransaction';
     maxMessages: number;
-    extraCurrenciesSupported?: boolean;
+    extraCurrencySupported?: boolean;
 };
 
 export type SendTransactionFeatureDeprecated = 'SendTransaction';
