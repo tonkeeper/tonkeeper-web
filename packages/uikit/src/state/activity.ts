@@ -20,6 +20,7 @@ import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { TronApi, TronHistoryItem } from '@tonkeeper/core/dist/tronApi';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { useBatteryAuthToken } from './battery';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -148,6 +149,7 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
     const twoFaPlugin = twoFAConfig?.status === 'active' ? twoFAConfig.pluginAddress : undefined;
     const tronApi = useTronApi();
     const tronWallet = useActiveTronWallet();
+    const { data: batteryAuthToken } = useBatteryAuthToken();
 
     const query = useInfiniteQuery({
         queryKey: [
@@ -158,7 +160,8 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
             onlyInitiator,
             filterSpam,
             twoFaPlugin,
-            tronWallet
+            tronWallet,
+            batteryAuthToken
         ],
         queryFn: async ({ pageParam = undefined }) => {
             let assetTonApiId: string | undefined;
@@ -205,7 +208,8 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
                           tronWalletAddress: tronWallet?.address,
                           pageParam: pageParam?.tronNextFrom,
                           onlyInitiator,
-                          filterSpam
+                          filterSpam,
+                          batteryAuthToken: batteryAuthToken ?? undefined
                       })
             ]);
 
@@ -258,13 +262,15 @@ async function fetchTronActivity({
     tronWalletAddress,
     pageParam,
     onlyInitiator,
-    filterSpam
+    filterSpam,
+    batteryAuthToken
 }: {
     tronApi: TronApi;
     tronWalletAddress?: string;
     pageParam?: number;
     onlyInitiator: boolean;
     filterSpam: boolean;
+    batteryAuthToken: string | undefined;
 }) {
     if (pageParam === 0 || !tronWalletAddress) {
         return {
@@ -275,12 +281,16 @@ async function fetchTronActivity({
 
     const pageLimit = 20;
 
-    const tronActivity = await tronApi.getTransfersHistory(tronWalletAddress, {
-        limit: pageLimit,
-        maxTimestamp: pageParam ? pageParam - 1 : undefined,
-        onlyInitiator,
-        filterSpam
-    });
+    const tronActivity = await tronApi.getTransfersHistory(
+        tronWalletAddress,
+        {
+            limit: pageLimit,
+            maxTimestamp: pageParam ? pageParam - 1 : undefined,
+            onlyInitiator,
+            filterSpam
+        },
+        batteryAuthToken
+    );
 
     const nextFrom =
         tronActivity.length < pageLimit ? 0 : tronActivity[tronActivity.length - 1].timestamp;

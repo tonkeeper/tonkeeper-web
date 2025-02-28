@@ -30,7 +30,11 @@ import {
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
+    AccountConfig,
+    defaultAccountConfig,
+    getAccountConfig,
     getActiveWalletConfig,
+    setAccountConfig,
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
@@ -220,7 +224,6 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -251,6 +254,8 @@ export const useCreateMAMAccountDerivation = () => {
                 rawAddress: tonWallet.address.toRawString()
             }
         ];
+
+        const isTronEnabled = (await getAccountConfig(sdk, accountId)).enableTron;
 
         account.addDerivation({
             name: account.getNewDerivationFallbackName(),
@@ -674,7 +679,7 @@ export const useCreateAccountMAM = () => {
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
-    const isTronEnabled = useIsTronEnabledGlobally();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
 
     return useMutation<
         AccountMAM,
@@ -690,6 +695,8 @@ export const useCreateAccountMAM = () => {
             type: 'mnemonic',
             mnemonic
         };
+
+        const isTronEnabled = defaultAccountConfig.enableTron && isTronEnabledGlobally;
 
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
@@ -1013,6 +1020,36 @@ export const useMutateActiveTonWalletConfig = () => {
 
         await client.invalidateQueries({
             predicate: q => q.queryKey.includes(QueryKey.walletConfig)
+        });
+    });
+};
+
+export const useActiveAccountConfig = () => {
+    const account = useActiveAccount();
+    const sdk = useAppSdk();
+    return useQuery<AccountConfig, Error>(
+        [account.id, QueryKey.accountConfig],
+        async () => getAccountConfig(sdk, account.id),
+        {
+            keepPreviousData: true
+        }
+    );
+};
+
+export const useMutateActiveAccountConfig = () => {
+    const account = useActiveAccount();
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    return useMutation<void, Error, Partial<AccountConfig>>(async newConfig => {
+        const config = await getAccountConfig(sdk, account.id);
+
+        await setAccountConfig(sdk.storage, account.id, {
+            ...config,
+            ...newConfig
+        });
+
+        await client.invalidateQueries({
+            predicate: q => q.queryKey.includes(QueryKey.accountConfig)
         });
     });
 };

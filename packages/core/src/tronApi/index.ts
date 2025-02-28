@@ -4,6 +4,9 @@ import { TronWeb } from 'tronweb';
 import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
+import { Configuration, DefaultApi, EstimatedTronTx } from '../batteryApi';
+import type { Transaction } from 'tronweb/lib/commonjs/types';
+import { TransactionFee } from '../entries/crypto/transaction-fee';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
 
@@ -28,28 +31,43 @@ export type TronHistoryItemTransferAsset = {
     to: string;
     isScam: boolean;
     isFailed: boolean;
+    fee?: TransactionFee;
+    inProgress?: boolean;
 };
 export type TronHistoryItem = TronHistoryItemTransferAsset;
 
+export type TronResources = {
+    energy: number;
+    bandwidth: number;
+};
+
 export class TronApi {
-    public readonly baseURL: string;
+    public readonly tronGridBaseUrl: string;
+
+    private readonly batteryApi: DefaultApi;
 
     public get headers() {
         return {
-            ...(this.apiKey && {
-                'TRON-PRO-API-KEY': this.apiKey
+            ...(this.trongrid.apiKey && {
+                'TRON-PRO-API-KEY': this.trongrid.apiKey
             }),
             'Content-Type': 'application/json'
         };
     }
 
-    constructor(baseURL: string, private readonly apiKey?: string) {
-        this.baseURL = removeTrailingSlash(baseURL);
+    private safetyMargin: number | undefined;
+
+    constructor(
+        private readonly trongrid: { baseURL: string; readonly apiKey?: string },
+        batteryConfig: Configuration
+    ) {
+        this.tronGridBaseUrl = removeTrailingSlash(trongrid.baseURL);
+        this.batteryApi = new DefaultApi(batteryConfig);
     }
 
     async getBalances(address: string) {
         const res = await (
-            await fetch(`${this.baseURL}/v1/accounts/${address}`, {
+            await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
                 headers: this.headers
             })
         ).json();
@@ -98,15 +116,90 @@ export class TronApi {
         };
     }
 
-    async estimateEnergy(params: {
+    public async sendTransaction(
+        tx: Transaction,
+        fromWallet: string,
+        resources: TronResources,
+        options: { xTonConnectAuth: string }
+    ) {
+        return this.batteryApi.tronSend({
+            xTonConnectAuth: options.xTonConnectAuth,
+            tronSendRequest: {
+                tx: Buffer.from(JSON.stringify(tx)).toString('base64'),
+                wallet: fromWallet,
+                energy: resources.energy,
+                bandwidth: resources.bandwidth
+            }
+        });
+    }
+
+    public async estimateBatteryCharges(params: {
         from: string;
         contractAddress: string;
         selector: string;
         data: string;
-    }) {
+    }): Promise<{ estimation: EstimatedTronTx; resources: TronResources }> {
+        const resources = await this.applyResourcesSafetyMargin(
+            await this.estimateResources(params)
+        );
+        const bandwidhAvailable = await this.getAccountBandwidth(params.from);
+
+        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
+
+        const estimation = await this.batteryApi.tronEstimate({
+            wallet: params.from,
+            ...resources
+        });
+
+        return {
+            estimation,
+            resources
+        };
+    }
+
+    private async getAccountBandwidth(address: string): Promise<number> {
+        const res = await (
+            await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
+                headers: this.headers
+            })
+        ).json();
+
+        if (!res?.success || !res?.data) {
+            throw new Error('Fetch tron balances failed');
+        }
+
+        const info = res?.data?.[0];
+        if (!info) {
+            return 0;
+        }
+
+        return info.free_net_usage || 0;
+    }
+
+    private async applyResourcesSafetyMargin(resources: TronResources) {
+        const { energy, bandwidth } = resources;
+
+        if (this.safetyMargin === undefined) {
+            const config = await this.batteryApi.getTronConfig();
+            const backendMargin = parseInt(config.safetyMarginPercent);
+            this.safetyMargin = (isFinite(backendMargin) ? backendMargin : 3) / 100;
+        }
+
+        return {
+            energy: Math.ceil(energy * (1 + this.safetyMargin)),
+            bandwidth: Math.ceil(bandwidth * (1 + this.safetyMargin))
+        };
+    }
+
+    private async estimateResources(params: {
+        from: string;
+        contractAddress: string;
+        selector: string;
+        data: string;
+    }): Promise<TronResources> {
         try {
             const response = await (
-                await fetch(`${this.baseURL}/wallet/triggerconstantcontract`, {
+                await fetch(`${this.tronGridBaseUrl}/wallet/triggerconstantcontract`, {
                     method: 'POST',
                     headers: this.headers,
                     body: JSON.stringify({
@@ -132,7 +225,24 @@ export class TronApi {
                 throw new Error('Estimating energy error');
             }
 
-            return energy;
+            if (!response.transaction || !response.transaction.raw_data_hex) {
+                throw new Error('Transaction data missing in response');
+            }
+
+            /**
+             * https://developers.tron.network/docs/faq#5-how-to-calculate-the-bandwidth-and-energy-consumed-when-callingdeploying-a-contract
+             */
+            const DATA_HEX_PROTOBUF_EXTRA = 9;
+            const MAX_RESULT_SIZE_IN_TX = 64;
+            const A_SIGNATURE = 67;
+
+            const bandwidth =
+                Buffer.from(response.transaction.raw_data_hex, 'hex').length +
+                DATA_HEX_PROTOBUF_EXTRA +
+                MAX_RESULT_SIZE_IN_TX +
+                A_SIGNATURE;
+
+            return { energy, bandwidth };
         } catch (error) {
             console.error('Error estimating energy:', error);
             throw error;
@@ -161,7 +271,7 @@ export class TronApi {
                     type: 'Function'
                 }
             ];
-            const contract = new TronWeb({ fullHost: this.baseURL }).contract(
+            const contract = new TronWeb({ fullHost: this.tronGridBaseUrl }).contract(
                 abi,
                 TRON_USDT_ASSET.address
             );
@@ -186,7 +296,7 @@ export class TronApi {
     async rpc(method: string, params: string[] = []) {
         try {
             const response = await (
-                await fetch(`${this.baseURL}/jsonrpc`, {
+                await fetch(`${this.tronGridBaseUrl}/jsonrpc`, {
                     method: 'POST',
                     headers: this.headers,
                     body: JSON.stringify({
@@ -220,9 +330,31 @@ export class TronApi {
             maxTimestamp?: number;
             onlyInitiator?: boolean;
             filterSpam?: boolean;
+        },
+        batteryAuthToken?: string
+    ): Promise<TronHistoryItem[]> {
+        const trongridHistory = await this.getBlockchainTransfersHistory(address, options);
+        const batteryHistory = await this.getBatteryTransfersHistory(options, batteryAuthToken);
+
+        return batteryHistory
+            .concat(
+                trongridHistory.filter(item =>
+                    batteryHistory.every(i => i.transactionHash !== item.transactionHash)
+                )
+            )
+            .sort((a, b) => b.timestamp - a.timestamp);
+    }
+
+    private async getBlockchainTransfersHistory(
+        address: string,
+        options?: {
+            limit?: number;
+            maxTimestamp?: number;
+            onlyInitiator?: boolean;
+            filterSpam?: boolean;
         }
     ): Promise<TronHistoryItem[]> {
-        const url = new URL(`${this.baseURL}/v1/accounts/${address}/transactions/trc20`);
+        const url = new URL(`${this.tronGridBaseUrl}/v1/accounts/${address}/transactions/trc20`);
 
         if (options?.limit !== undefined) {
             url.searchParams.set('limit', options.limit.toString());
@@ -261,7 +393,7 @@ export class TronApi {
                     asset: TRON_USDT_ASSET
                 });
 
-                const isScam = assetAmount.relativeAmount.lt(1);
+                const isScam = item.to === address && assetAmount.relativeAmount.lt(1);
 
                 if (options?.filterSpam && isScam) {
                     return null;
@@ -275,7 +407,51 @@ export class TronApi {
                     from: item.from,
                     to: item.to,
                     isScam,
-                    isFailed: false // TODO
+                    isFailed: false,
+                    inProgress: false
+                } satisfies TronHistoryItemTransferAsset;
+            })
+            .filter(notNullish);
+    }
+
+    private async getBatteryTransfersHistory(
+        options?: {
+            limit?: number;
+            maxTimestamp?: number;
+        },
+        batteryAuthToken?: string
+    ): Promise<TronHistoryItem[]> {
+        if (!batteryAuthToken) {
+            return [];
+        }
+
+        const response = await this.batteryApi.getTronTransactions({
+            xTonConnectAuth: batteryAuthToken,
+            maxTimestamp: options?.maxTimestamp,
+            limit: options?.limit
+        });
+
+        return response.transactions
+            .map(item => {
+                const assetAmount = new AssetAmount({
+                    weiAmount: item.amount,
+                    asset: TRON_USDT_ASSET
+                });
+
+                return {
+                    type: 'asset-transfer',
+                    assetAmount,
+                    timestamp: item.timestamp * 1000,
+                    transactionHash: item.txid,
+                    from: item.fromAccount,
+                    to: item.toAccount,
+                    isScam: false,
+                    isFailed: item.isFailed,
+                    inProgress: item.isPending,
+                    fee: {
+                        type: 'battery' as const,
+                        charges: item.batteryCharges
+                    }
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);

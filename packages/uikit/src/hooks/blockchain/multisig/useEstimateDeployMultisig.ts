@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useAccountsState, useActiveApi } from '../../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { Address } from '@ton/core';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { useTonRawTransactionService } from '../useBlockchainService';
@@ -13,6 +12,7 @@ import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/
 import { TwoFAWalletConfig, useTwoFAApi, useTwoFAServiceConfig } from '../../../state/two-fa';
 import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
 import { QueryKey } from '../../../libs/queryKey';
+import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 
 export const useEstimateDeployMultisig = () => {
     const accounts = useAccountsState();
@@ -26,7 +26,7 @@ export const useEstimateDeployMultisig = () => {
     const twoFAServiceConfig = useTwoFAServiceConfig();
 
     return useMutation<
-        { extra: AssetAmount; address: Address },
+        { fee: TransactionFee; address: Address },
         Error,
         { multisigConfig: MultisigConfig; fromWallet: WalletId }
     >(async ({ multisigConfig, fromWallet }) => {
@@ -76,7 +76,7 @@ export const useEstimateDeployMultisig = () => {
         );
 
         return {
-            extra: estimation.extra,
+            fee: estimation.fee,
             address
         };
     });

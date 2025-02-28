@@ -31,6 +31,7 @@ models/Auction.ts
 models/AuctionBidAction.ts
 models/Auctions.ts
 models/Balance.ts
+models/BatteryCharged.ts
 models/BlockCurrencyCollection.ts
 models/BlockCurrencyCollectionOtherInner.ts
 models/BlockLimits.ts
@@ -80,9 +81,14 @@ models/BouncePhaseType.ts
 models/ComputePhase.ts
 models/ComputeSkipReason.ts
 models/Config.ts
+models/ConfigGasProxyInner.ts
 models/ConfigProposalSetup.ts
 models/ContractDeployAction.ts
 models/CreateCustomRefundRequest.ts
+models/CreatePromoCampaign200Response.ts
+models/CreatePromoCampaign200ResponseParticipantsInner.ts
+models/CreatePromoCampaignRequest.ts
+models/CreatePromoCampaignRequestParticipantsInner.ts
 models/CreditPhase.ts
 models/DecodedMessage.ts
 models/DecodedMessageExtInMsgDecoded.ts
@@ -105,7 +111,14 @@ models/ElectionsDepositStakeAction.ts
 models/ElectionsRecoverStakeAction.ts
 models/EmulateMessageToWalletRequest.ts
 models/EncryptedComment.ts
+models/EnterpriseEstimate200Response.ts
+models/EnterpriseEstimateRequest.ts
+models/EnterpriseGetMessage200Response.ts
+models/EnterpriseGetStatus200Response.ts
+models/EnterpriseSend200Response.ts
+models/EnterpriseWalletConfig.ts
 models/EstimateGaslessCostRequest.ts
+models/EstimatedTronTx.ts
 models/Event.ts
 models/FoundAccounts.ts
 models/FoundAccountsAddressesInner.ts
@@ -115,6 +128,7 @@ models/GaslessConfigGasJettonsInner.ts
 models/GaslessEstimation.ts
 models/GetTonConnectPayload200Response.ts
 models/GetTonConnectPayloadDefaultResponse.ts
+models/GetTronConfig200Response.ts
 models/IOSBatteryPurchaseStatus.ts
 models/IOSBatteryPurchaseStatusTransactionsInner.ts
 models/IOSBatteryPurchaseStatusTransactionsInnerError.ts
@@ -170,6 +184,7 @@ models/Price.ts
 models/PromoCodeBatteryPurchaseRequest.ts
 models/PromoCodeBatteryPurchaseStatus.ts
 models/PromoCodeBatteryPurchaseStatusError.ts
+models/PromoUsed.ts
 models/Purchases.ts
 models/PurchasesPurchasesInner.ts
 models/PurchasesPurchasesInnerRefundInformation.ts
@@ -180,10 +195,12 @@ models/RechargeMethodsMethodsInner.ts
 models/ReducedBlock.ts
 models/ReducedBlocks.ts
 models/Refund.ts
+models/RelayerSendingEstimation.ts
 models/RequestRefundRequest.ts
 models/ResetUserBalanceRequest.ts
 models/Risk.ts
 models/Sale.ts
+models/SentTronTx.ts
 models/Seqno.ts
 models/ServiceStatus.ts
 models/SignRawMessage.ts
@@ -211,6 +228,9 @@ models/Transaction.ts
 models/TransactionType.ts
 models/Transactions.ts
 models/TransactionsTransactionsInner.ts
+models/TronSendRequest.ts
+models/TronTransactionsList.ts
+models/TronTransactionsListTransactionsInner.ts
 models/TrustType.ts
 models/TvmStackRecord.ts
 models/UnSubscriptionAction.ts

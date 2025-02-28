@@ -1,5 +1,5 @@
 import { mnemonicNew } from '@ton/crypto';
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Words } from '../../components/create/Words';
@@ -23,6 +23,7 @@ import {
 } from '../../components/Notification';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
+import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 
 export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
@@ -39,6 +40,7 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
     const [infoPagePassed, setInfoPagePassed] = useState(false);
     const [wordsPagePassed, setWordsPagePassed] = useState(false);
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
     const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
 
     const [wordsShown, setWordsShown] = useState(false);
@@ -88,6 +90,10 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
             return () => setWordsPagePassed(false);
         }
 
+        if (editNamePagePassed && !selectNetworksPassed) {
+            return () => setEditNamePagePassed(false);
+        }
+
         return undefined;
     }, [
         wordsShown,
@@ -95,7 +101,9 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
         navigateHome,
         infoPagePassed,
         wordsPagePassed,
-        createdAccount
+        createdAccount,
+        editNamePagePassed,
+        selectNetworksPassed
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -184,8 +192,13 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
                 }}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameLoading}
+                buttonText={t('continue')}
             />
         );
+    }
+
+    if (!selectNetworksPassed) {
+        return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
     if (sdk.notifications && !notificationsSubscribePagePassed) {

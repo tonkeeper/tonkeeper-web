@@ -8,12 +8,18 @@ export interface GlobalPreferences {
     folders: AccountsFolderStored[];
     sideBarOrder: string[];
     historyFilterSpam: boolean;
+    highlightFeatures: {
+        tron: boolean;
+    };
 }
 
 const defaultGlobalPreferences: GlobalPreferences = {
     folders: [],
     sideBarOrder: [],
-    historyFilterSpam: false
+    historyFilterSpam: false,
+    highlightFeatures: {
+        tron: true
+    }
 };
 
 export const useGlobalPreferencesQuery = () => {

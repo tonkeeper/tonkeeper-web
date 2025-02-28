@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { InvalidateQueryFilters } from '@tanstack/react-query';
 
 export enum QueryKey {
@@ -5,6 +7,7 @@ export enum QueryKey {
     wallet = 'wallet',
     wallets = 'wallets',
     walletConfig = 'wallet_config',
+    accountConfig = 'accountConfig',
     lock = 'lock',
     touchId = 'touchId',
     canPromptTouchId = 'canPromptTouchId',
