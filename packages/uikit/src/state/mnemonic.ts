@@ -315,7 +315,7 @@ export const getTronSigner = (
                     const tonMnemonic = await getMAMWalletMnemonic(
                         sdk,
                         account.id,
-                        wallet!.id,
+                        account.activeTonWallet.id,
                         checkTouchId
                     );
                     const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');

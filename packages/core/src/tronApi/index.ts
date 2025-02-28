@@ -116,6 +116,13 @@ export class TronApi {
         };
     }
 
+    public async activateWallet(wallet: string, options: { xTonConnectAuth: string }) {
+        return this.batteryApi.tronSend({
+            xTonConnectAuth: options.xTonConnectAuth,
+            tronSendRequest: { tx: '', wallet }
+        });
+    }
+
     public async sendTransaction(
         tx: Transaction,
         fromWallet: string,
