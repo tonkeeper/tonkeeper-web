@@ -17,7 +17,6 @@ import { useAllChainsAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
-import { useActiveTronWallet, useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
@@ -117,7 +116,7 @@ const DesktopTokensPayload = () => {
     const itemSize = env === 'mobile' ? 61 : 77;
     const chartSize = env === 'mobile' ? 388 : 192;
 
-    const virtualScrollPaddingBase = canUseTron && !tronWallet ? 2 * itemSize : itemSize;
+    const virtualScrollPaddingBase = itemSize;
 
     const rowVirtualizer = useVirtualizer({
         count: assets?.length ?? 0,

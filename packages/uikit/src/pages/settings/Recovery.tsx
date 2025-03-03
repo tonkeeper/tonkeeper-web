@@ -25,6 +25,7 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { useParams } from '../../hooks/router/useParams';
 import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { BorderSmallResponsive } from '../../components/shared/Styles';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
@@ -129,11 +130,11 @@ const RecoveryPageContent: FC<{
 };
 
 const mnemonicBySecret = (secret: AccountSecret | undefined) => {
-  if (secret?.type === 'mnemonic') {
-    return secret.mnemonic;
-  }
+    if (secret?.type === 'mnemonic') {
+        return secret.mnemonic;
+    }
 
-  return undefined;
+    return undefined;
 };
 
 const SKWrapper = styled.div`
@@ -145,7 +146,6 @@ const SKWrapper = styled.div`
     font-family: ${p => p.theme.fontMono};
     word-break: break-all;
 `;
-
 
 export const RecoveryContent: FC<{
     accountId: AccountId;

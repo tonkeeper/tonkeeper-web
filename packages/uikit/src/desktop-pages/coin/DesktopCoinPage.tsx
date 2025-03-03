@@ -44,6 +44,7 @@ import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { mergeRefs } from '../../libs/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
 import { useBatteryBalance } from '../../state/battery';
+import { Link } from "../../components/shared/Link";
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();

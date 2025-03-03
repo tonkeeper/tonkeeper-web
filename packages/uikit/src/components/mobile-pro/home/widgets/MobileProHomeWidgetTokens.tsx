@@ -3,12 +3,10 @@ import { WidgetHeader } from './common';
 import { useTranslation } from '../../../../hooks/translation';
 import { AppRoute } from '../../../../libs/routes';
 import { AnyChainAsset, TonAsset } from '../../../home/Jettons';
-import { TronAssets } from '../../../home/TronAssets';
 import { DesktopAssetStylesOverride } from '../../../../desktop-pages/tokens/DesktopTokens';
 import { useAllChainsAssets } from '../../../../state/home';
 import React, { useMemo } from 'react';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useActiveTronWallet, useCanUseTronForActiveWallet } from '../../../../state/tron/tron';
 import { SkeletonImage, SkeletonText } from '../../../shared/Skeleton';
 import { ColumnText } from '../../../Layout';
 
@@ -17,10 +15,6 @@ const Wrapper = styled.div`
 `;
 
 const TonAssetStyled = styled(TonAsset)`
-    ${DesktopAssetStylesOverride}
-`;
-
-const TronAssetsStyled = styled(TronAssets)`
     ${DesktopAssetStylesOverride}
 `;
 
@@ -64,8 +58,6 @@ export const MobileProHomeWidgetTokens = () => {
             allAssets?.filter(item => item.asset.id !== TON_ASSET.id).slice(0, 2)
         ];
     }, [allAssets]);
-    const tronWallet = useActiveTronWallet();
-    const canUseTron = useCanUseTronForActiveWallet();
 
     return (
         <Wrapper>
@@ -75,12 +67,6 @@ export const MobileProHomeWidgetTokens = () => {
                     <Divider />
                     <TonAssetStyled balance={tonAssetAmount} />
                     <Divider />
-                    {canUseTron && !tronWallet && (
-                        <>
-                            <TronAssetsStyled usdt={null} />
-                            <Divider />
-                        </>
-                    )}
                     {assets.map(asset => (
                         <>
                             <AnyChainAssetStyled balance={asset} key={asset.asset.id} />
