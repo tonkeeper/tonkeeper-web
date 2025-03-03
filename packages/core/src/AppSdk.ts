@@ -125,6 +125,8 @@ export interface IAppSdk {
 
     notifications?: NotificationService;
     targetEnv: TargetEnv;
+
+    storeUrl?: string;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -195,5 +197,5 @@ export type TargetEnv =
     | 'desktop'
     | 'twa'
     | 'tablet'
-    | 'swap-widget-web'
+    | 'swap_widget_web'
     | 'mobile';

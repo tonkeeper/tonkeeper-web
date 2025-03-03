@@ -83,5 +83,7 @@ export class ExtensionAppSdk extends BaseApp {
 
     version = packageJson.version ?? 'Unknown';
 
-    targetEnv= 'extension' as const;
+    targetEnv = 'extension' as const;
+
+    storeUrl = process.env.REACT_APP_STORE_URL;
 }

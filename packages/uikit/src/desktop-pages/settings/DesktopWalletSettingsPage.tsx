@@ -35,7 +35,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import { WalletIndexBadge } from '../../components/account/AccountBadge';
+import { AssetBlockchainBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     useActiveMultisigAccountHost,
     useIsActiveAccountMultisig,
@@ -46,6 +46,13 @@ import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import {
+  useAutoMarkTronFeatureAsSeen,
+  useCanUseTronForActiveWallet,
+  useIsTronEnabledForActiveWallet,
+  useToggleIsTronEnabledForActiveWallet
+} from '../../state/tron/tron';
+import { Switch } from '../../components/fields/Switch';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -85,6 +92,18 @@ const LinkStyled = styled(Link)`
 const Body3Row = styled(Body3)`
     display: flex;
     align-items: center;
+    gap: 6px;
+`;
+
+const SwitchStyled = styled(Switch)`
+    margin-left: auto;
+    flex-shrink: 0;
+`;
+
+const LabelWithBadge = styled(Label2)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
 `;
 
 export const DesktopWalletSettingsPage = () => {
@@ -119,6 +138,11 @@ export const DesktopWalletSettingsPage = () => {
 
     const notificationsAvailable = useAppSdk().notifications !== undefined;
 
+    useAutoMarkTronFeatureAsSeen();
+    const canUseTron = useCanUseTronForActiveWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const { mutate: onToggleTron } = useToggleIsTronEnabledForActiveWallet();
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
@@ -145,7 +169,9 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                {(account.type === 'mnemonic' || account.type === 'testnet') && (
+                {(account.type === 'mnemonic' ||
+                    account.type === 'testnet' ||
+                    account.type === 'sk') && (
                     <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
                         <KeyIcon />
                         <Label2>{t('settings_backup_seed')}</Label2>
@@ -224,6 +250,23 @@ export const DesktopWalletSettingsPage = () => {
                     </LinkStyled>
                 )}
             </SettingsListBlock>
+            {canUseTron && (
+                <>
+                    <DesktopViewDivider />
+                    <SettingsListBlock>
+                        <SettingsListItem onClick={() => onToggleTron()}>
+                            <CoinsIcon />
+                            <SettingsListText>
+                                <LabelWithBadge>
+                                    USD₮<AssetBlockchainBadge>TRC20</AssetBlockchainBadge>
+                                </LabelWithBadge>
+                                <Body3>{t('settings_enable_tron_description')}</Body3>
+                            </SettingsListText>
+                            <SwitchStyled checked={!!isTronEnabled} />
+                        </SettingsListItem>
+                    </SettingsListBlock>
+                </>
+            )}
             <>
                 {isMultisig ? (
                     <>

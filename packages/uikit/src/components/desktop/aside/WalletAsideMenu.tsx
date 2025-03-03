@@ -45,6 +45,7 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
+import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -71,6 +72,7 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
     padding-right: 50px;
     height: unset;
+    position: relative;
 
     > svg {
         color: ${p => p.theme.iconSecondary};
@@ -84,6 +86,17 @@ const SwapIconStyled = styled(SwapIcon)`
 const GroupsGap = styled.div`
     height: 1rem;
 `;
+
+const HighlightedIcon = styled.div`
+    width: 8px;
+    height: 8px;
+    background-color: ${p => p.theme.accentRed};
+    border-radius: ${p => p.theme.cornerFull};
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 4px);
+`;
+
 
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
@@ -109,6 +122,8 @@ export const WalletAsideMenu = () => {
     useEffect(() => {
         menuController.close();
     }, [location]);
+
+    const highlightTron = useHighlightTronFeatureForActiveWallet();
 
     return (
         <WalletAsideContainer>
@@ -222,6 +237,7 @@ export const WalletAsideMenu = () => {
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                        {highlightTron && <HighlightedIcon />}
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

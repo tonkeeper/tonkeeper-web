@@ -2,7 +2,7 @@ import React, { FC, useMemo } from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative } from '../../libs/routes';
-import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon } from './SettingsIcons';
+import { ContactSupportIcon, LegalDocumentsIcon, TelegramIcon, StarIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import { useActiveConfig } from '../../state/wallet';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -15,6 +15,15 @@ export const SettingsSocialList: FC = React.memo(() => {
     const { t } = useTranslation();
     const items = useMemo(() => {
         const result = [] as SettingsItem[];
+
+        if (sdk.storeUrl) {
+            result.push({
+                name: t('settings_rate'),
+                icon: <StarIcon />,
+                action: () => sdk.storeUrl && sdk.openPage(sdk.storeUrl)
+            });
+        }
+
         return result.concat([
             {
                 name: t('settings_support'),

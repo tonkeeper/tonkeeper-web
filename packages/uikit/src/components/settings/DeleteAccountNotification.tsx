@@ -49,8 +49,8 @@ export const DeleteNotificationContent: FC<{
 
     const onDelete = async () => {
         await mutateAsync(accountId);
-        navigate(AppRoute.home);
         onClose();
+        navigate(AppRoute.home);
     };
 
     return (

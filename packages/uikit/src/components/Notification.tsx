@@ -679,7 +679,7 @@ export const NotificationDesktopAndWeb: FC<{
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
-    const isInWidget = useAppPlatform() === 'swap-widget-web';
+    const isInWidget = useAppPlatform() === 'swap_widget_web';
 
     return (
         <NotificationContext.Provider

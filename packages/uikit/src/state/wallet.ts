@@ -4,9 +4,12 @@ import {
     Account,
     AccountId,
     AccountMAM,
+    AccountSecretMnemonic,
+    AccountSecretSK,
     AccountsState,
     AccountTonMnemonic,
     AccountTonMultisig,
+    AccountTonSK,
     AccountTonTestnet,
     AccountTonWatchOnly,
     getAccountByWalletById,
@@ -26,9 +29,12 @@ import {
     WalletId,
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
-import { encrypt } from '@tonkeeper/core/dist/service/cryptoService';
 import {
+    AccountConfig,
+    defaultAccountConfig,
+    getAccountConfig,
     getActiveWalletConfig,
+    setAccountConfig,
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
@@ -38,6 +44,7 @@ import {
     createReadOnlyTonAccountByAddress,
     createStandardTestnetAccountByMnemonic,
     createStandardTonAccountByMnemonic,
+    createStandardTonAccountBySK,
     getContextApiByNetwork,
     getStandardTonWalletVersions,
     getTonWalletStandard,
@@ -53,13 +60,13 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import {
-    getAccountMnemonic,
-    getPasswordByNotification,
-    useGetActiveAccountMnemonic
-} from './mnemonic';
+import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
 import { useCheckTouchId } from './password';
-import { seeIfMnemonicValid } from '@tonkeeper/core/dist/service/mnemonicService';
+import {
+    encryptWalletSecret,
+    seeIfMnemonicValid,
+    walletSecretToString
+} from '@tonkeeper/core/dist/service/mnemonicService';
 import { useAccountsStateQuery, useAccountsState } from './accounts';
 import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
@@ -217,7 +224,6 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: checkTouchId } = useCheckTouchId();
-    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -226,7 +232,11 @@ export const useCreateMAMAccountDerivation = () => {
         }
         const newDerivationIndex = account.lastAddedIndex + 1;
 
-        const mnemonic = await getAccountMnemonic(sdk, accountId, checkTouchId);
+        const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+        if (secret.type !== 'mnemonic') {
+            throw new Error('Unexpected secret type');
+        }
+        const mnemonic = secret.mnemonic;
 
         const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
         const tonAccount = await root.getTonAccount(newDerivationIndex);
@@ -244,6 +254,8 @@ export const useCreateMAMAccountDerivation = () => {
                 rawAddress: tonWallet.address.toRawString()
             }
         ];
+
+        const isTronEnabled = (await getAccountConfig(sdk, accountId)).enableTron;
 
         account.addDerivation({
             name: account.getNewDerivationFallbackName(),
@@ -419,6 +431,11 @@ export const useCreateAccountTestnet = () => {
             selectAccount?: boolean;
         }
     >(async ({ mnemonic, password, versions, selectAccount, mnemonicType }) => {
+        const accountSecret: AccountSecretMnemonic = {
+            type: 'mnemonic',
+            mnemonic
+        };
+
         const valid = await seeIfMnemonicValid(mnemonic);
         if (!valid) {
             throw new Error('Mnemonic is not valid.');
@@ -440,7 +457,7 @@ export const useCreateAccountTestnet = () => {
 
             await sdk.keychain.setPassword(
                 (account.auth as AuthKeychain).keychainStoreKey,
-                mnemonic.join(' ')
+                walletSecretToString(accountSecret)
             );
 
             await addAccountToState(account);
@@ -454,7 +471,6 @@ export const useCreateAccountTestnet = () => {
             password = await getPasswordByNotification(sdk);
         }
 
-        const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
         const account = await createStandardTestnetAccountByMnemonic(
             context,
             sdk.storage,
@@ -463,7 +479,7 @@ export const useCreateAccountTestnet = () => {
             {
                 auth: {
                     kind: 'password',
-                    encryptedMnemonic
+                    encryptedSecret: await encryptWalletSecret(accountSecret, password)
                 },
                 versions
             }
@@ -478,10 +494,18 @@ export const useCreateAccountTestnet = () => {
 };
 
 export const useAddTronToAccount = () => {
-    const getMnemonic = useGetActiveAccountMnemonic();
+    const getSecret = useGetActiveAccountSecret();
     const activeAccount = useActiveAccount();
     const accountsStorage = useAccountsStorage();
     const client = useQueryClient();
+
+    const getMnemonic = async () => {
+        const secret = await getSecret();
+        if (secret.type !== 'mnemonic') {
+            throw new Error('Unexpected secret type');
+        }
+        return secret.mnemonic;
+    };
 
     return useMutation(async () => {
         if (!isAccountTronCompatible(activeAccount)) {
@@ -526,6 +550,10 @@ export const useCreateAccountMnemonic = () => {
             selectAccount?: boolean;
         }
     >(async ({ mnemonic, password, versions, selectAccount, mnemonicType }) => {
+        const accountSecret: AccountSecretMnemonic = {
+            type: 'mnemonic',
+            mnemonic
+        };
         const valid = await seeIfMnemonicValid(mnemonic);
         if (!valid) {
             throw new Error('Mnemonic is not valid.');
@@ -548,7 +576,7 @@ export const useCreateAccountMnemonic = () => {
 
             await sdk.keychain.setPassword(
                 (account.auth as AuthKeychain).keychainStoreKey,
-                mnemonic.join(' ')
+                walletSecretToString(accountSecret)
             );
 
             await addAccountToState(account);
@@ -562,7 +590,6 @@ export const useCreateAccountMnemonic = () => {
             password = await getPasswordByNotification(sdk);
         }
 
-        const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
         const account = await createStandardTonAccountByMnemonic(
             context,
             sdk.storage,
@@ -571,7 +598,7 @@ export const useCreateAccountMnemonic = () => {
             {
                 auth: {
                     kind: 'password',
-                    encryptedMnemonic
+                    encryptedSecret: await encryptWalletSecret(accountSecret, password)
                 },
                 versions,
                 generateTronWallet: isTronEnabled
@@ -586,35 +613,37 @@ export const useCreateAccountMnemonic = () => {
     });
 };
 
-export const useCreateAccountMAM = () => {
+export const useCreateAccountTonSK = () => {
     const sdk = useAppSdk();
     const context = useAppContext();
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
-    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<
-        AccountMAM,
+        AccountTonSK,
         Error,
         {
-            mnemonic: string[];
-            selectedDerivations?: number[];
+            sk: string;
             password?: string;
+            versions: WalletVersion[];
             selectAccount?: boolean;
         }
-    >(async ({ selectedDerivations, mnemonic, password, selectAccount }) => {
+    >(async ({ sk, password, versions, selectAccount }) => {
+        const accountSecret: AccountSecretSK = {
+            type: 'sk',
+            sk
+        };
         if (sdk.keychain) {
-            const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
-                selectedDerivations,
+            const account = await createStandardTonAccountBySK(context, sdk.storage, sk, {
                 auth: {
                     kind: 'keychain'
                 },
-                generateTronWallet: isTronEnabled
+                versions
             });
 
             await sdk.keychain.setPassword(
                 (account.auth as AuthKeychain).keychainStoreKey,
-                mnemonic.join(' ')
+                walletSecretToString(accountSecret)
             );
 
             await addAccountToState(account);
@@ -628,12 +657,77 @@ export const useCreateAccountMAM = () => {
             password = await getPasswordByNotification(sdk);
         }
 
-        const encryptedMnemonic = await encrypt(mnemonic.join(' '), password);
+        const encryptedSK = await encryptWalletSecret(accountSecret, password);
+        const account = await createStandardTonAccountBySK(context, sdk.storage, sk, {
+            auth: {
+                kind: 'password',
+                encryptedSecret: encryptedSK
+            },
+            versions
+        });
+
+        await addAccountToState(account);
+        if (selectAccount) {
+            await selectAccountMutation(account.id);
+        }
+        return account;
+    });
+};
+
+export const useCreateAccountMAM = () => {
+    const sdk = useAppSdk();
+    const context = useAppContext();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+
+    return useMutation<
+        AccountMAM,
+        Error,
+        {
+            mnemonic: string[];
+            selectedDerivations?: number[];
+            password?: string;
+            selectAccount?: boolean;
+        }
+    >(async ({ selectedDerivations, mnemonic, password, selectAccount }) => {
+        const accountSecret: AccountSecretMnemonic = {
+            type: 'mnemonic',
+            mnemonic
+        };
+
+        const isTronEnabled = defaultAccountConfig.enableTron && isTronEnabledGlobally;
+
+        if (sdk.keychain) {
+            const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
+                selectedDerivations,
+                auth: {
+                    kind: 'keychain'
+                },
+                generateTronWallet: isTronEnabled
+            });
+
+            await sdk.keychain.setPassword(
+                (account.auth as AuthKeychain).keychainStoreKey,
+                walletSecretToString(accountSecret)
+            );
+
+            await addAccountToState(account);
+            if (selectAccount) {
+                await selectAccountMutation(account.id);
+            }
+            return account;
+        }
+
+        if (!password) {
+            password = await getPasswordByNotification(sdk);
+        }
+
         const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
             selectedDerivations,
             auth: {
                 kind: 'password',
-                encryptedMnemonic
+                encryptedSecret: await encryptWalletSecret(accountSecret, password)
             },
             generateTronWallet: isTronEnabled
         });
@@ -926,6 +1020,36 @@ export const useMutateActiveTonWalletConfig = () => {
 
         await client.invalidateQueries({
             predicate: q => q.queryKey.includes(QueryKey.walletConfig)
+        });
+    });
+};
+
+export const useActiveAccountConfig = () => {
+    const account = useActiveAccount();
+    const sdk = useAppSdk();
+    return useQuery<AccountConfig, Error>(
+        [account.id, QueryKey.accountConfig],
+        async () => getAccountConfig(sdk, account.id),
+        {
+            keepPreviousData: true
+        }
+    );
+};
+
+export const useMutateActiveAccountConfig = () => {
+    const account = useActiveAccount();
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    return useMutation<void, Error, Partial<AccountConfig>>(async newConfig => {
+        const config = await getAccountConfig(sdk, account.id);
+
+        await setAccountConfig(sdk.storage, account.id, {
+            ...config,
+            ...newConfig
+        });
+
+        await client.invalidateQueries({
+            predicate: q => q.queryKey.includes(QueryKey.accountConfig)
         });
     });
 };

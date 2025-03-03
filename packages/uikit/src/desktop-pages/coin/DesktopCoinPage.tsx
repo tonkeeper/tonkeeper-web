@@ -20,7 +20,7 @@ import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { AppRoute } from '../../libs/routes';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
@@ -31,10 +31,7 @@ import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wal
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import {
-    TRON_TRX_ASSET,
-    TRON_USDT_ASSET
-} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
@@ -46,6 +43,7 @@ import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { mergeRefs } from '../../libs/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
+import { useBatteryBalance } from '../../state/battery';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -409,18 +407,6 @@ export const TronUSDTPage = () => {
         return balances.usdt;
     }, [balances]);
 
-    const trxBalance = useMemo(() => {
-        if (balances === undefined) {
-            return undefined;
-        }
-
-        if (balances === null) {
-            return new AssetAmount({ weiAmount: 0, asset: TRON_TRX_ASSET });
-        }
-
-        return balances.trx;
-    }, [balances]);
-
     const ref = useRef<HTMLDivElement>(null);
     const {
         fetchNextPage,
@@ -482,9 +468,7 @@ export const TronUSDTPage = () => {
                     </ButtonStyled>
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
-            {!!trxBalance && (
-                <TronTopUpTRX relativeAssetBalance={trxBalance.stringAssetRelativeAmount} />
-            )}
+            <TronUseBatteryBanner />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
@@ -523,33 +507,26 @@ const SmallDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
-const TronTopUpTRX: FC<{ relativeAssetBalance: string }> = ({ relativeAssetBalance }) => {
+const TronUseBatteryBanner = () => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
+    const { data: batteryBalance } = useBatteryBalance();
+
+    if (batteryBalance && batteryBalance.batteryUnitsBalance.gt(500)) {
+        return null;
+    }
 
     return (
         <>
             <TronTopUpUSDTWrapper>
                 <TextContainer>
-                    <Label2>{t('tron_top_up_trx_title')}</Label2>
-                    <Body2>
-                        {t('tron_top_up_trx_description', { balance: relativeAssetBalance })}
-                    </Body2>
+                    <Label2>{t('tron_battery_required_banner_title')}</Label2>
+                    <Body2>{t('tron_battery_required_banner_description')}</Body2>
                 </TextContainer>
-                <Button
-                    size="small"
-                    onClick={() => {
-                        sdk.uiEvents.emit('receive', {
-                            method: 'receive',
-                            params: {
-                                chain: BLOCKCHAIN_NAME.TRON,
-                                jetton: TRON_TRX_ASSET.id
-                            }
-                        });
-                    }}
-                >
-                    {t('tron_top_up_trx_button')}
-                </Button>
+                <Link to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+                    <Button primary size="small">
+                        {t('tron_battery_required_banner_button')}
+                    </Button>
+                </Link>
             </TronTopUpUSDTWrapper>
             <SmallDivider />
         </>

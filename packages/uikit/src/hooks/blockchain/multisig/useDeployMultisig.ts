@@ -9,9 +9,8 @@ import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { useCheckTouchId } from '../../../state/password';
 import { useTranslation } from '../../translation';
-import { anyOfKeysParts } from '../../../libs/queryKey';
-import BigNumber from 'bignumber.js';
-import { AccountsApi, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
+import { anyOfKeysParts, QueryKey } from '../../../libs/queryKey';
+import { AccountsApi, Multisig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsStorage } from '../../useStorage';
 import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
 import {
@@ -22,8 +21,6 @@ import {
 import { useNotifyErrorHandle } from '../../useNotification';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { Address } from '@ton/core';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import {
     MultisigEncoder,
@@ -32,13 +29,14 @@ import {
 import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
+import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 
 export const useDeployMultisig = (
     params:
         | {
               multisigConfig: MultisigConfig;
               fromWallet: WalletId;
-              feeWei: BigNumber;
+              fee: TransactionFee;
           }
         | undefined
 ) => {
@@ -122,7 +120,7 @@ export const useDeployMultisig = (
             await rawTransactionService.send(
                 sender,
                 {
-                    extra: new AssetAmount({ asset: TON_ASSET, weiAmount: params.feeWei })
+                    fee: params.fee
                 },
                 message
             );
@@ -151,16 +149,26 @@ const checkIfMultisigExists = async (options: { api: APIConfig; address: Address
 };
 
 export const useAwaitMultisigIsDeployed = () => {
-    const api = useActiveApi();
     const client = useQueryClient();
     const accounts = useAccountsStorage();
+    const api = useActiveApi();
+
     return useMutation<void, Error, { multisigAddress: string; deployerWalletId: WalletId }>(
         async ({ multisigAddress, deployerWalletId }) => {
             const awaitIsDeployed = async (attempt = 0): Promise<void> => {
                 try {
-                    const deployed = await new MultisigApi(api.tonApiV2).getMultisigAccount({
-                        accountId: multisigAddress
-                    });
+                    await client.prefetchQuery(
+                        [QueryKey.multisigWallet, multisigAddress],
+                        async () =>
+                            new MultisigApi(api.tonApiV2).getMultisigAccount({
+                                accountId: multisigAddress
+                            })
+                    );
+                    await client.refetchQueries([QueryKey.multisigWallet, multisigAddress]);
+                    const deployed = client.getQueryData<Multisig>([
+                        QueryKey.multisigWallet,
+                        multisigAddress
+                    ]);
 
                     if (deployed?.address) {
                         return;

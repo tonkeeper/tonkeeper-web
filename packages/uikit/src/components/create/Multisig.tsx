@@ -243,7 +243,7 @@ const CreateMultisigFormPage: FC<{
             allowArbitrarySeqno: false
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
-        setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.extra.weiAmount });
+        setDeployArgs({ multisigConfig, fromWallet, fee: result?.fee });
     };
 
     const mutateAsync = useCallback(async () => {

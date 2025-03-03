@@ -117,6 +117,24 @@ export const WalletIndexBadge: FC<
     );
 };
 
+export const AssetBlockchainBadge: FC<
+    PropsWithChildren<{
+        size?: 's' | 'm';
+        className?: string;
+    }>
+> = ({ size = 'm', className, children }) => {
+    return (
+        <Badge
+            size={size}
+            background="backgroundContentAttention"
+            color="textSecondary"
+            className={className}
+        >
+            {children}
+        </Badge>
+    );
+};
+
 const Container = styled.div`
     flex-shrink: 0;
     display: flex;
@@ -200,7 +218,7 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
-    if (account.type === 'mnemonic' || account.type === 'testnet') {
+    if (account.type === 'mnemonic' || account.type === 'testnet' || account.type === 'sk') {
         return null;
     }
 

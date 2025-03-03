@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { RecipientData, isTonRecipientData, Estimation } from '@tonkeeper/core/dist/entries/send';
 import React, {
     Children,
     FC,
@@ -51,11 +51,7 @@ type ConfirmViewContextValue = {
     recipient?: RecipientData;
     assetAmount: AssetAmount;
     estimation: {
-        data:
-            | {
-                  extra: AssetAmount;
-              }
-            | undefined;
+        data: Pick<Estimation, 'fee'> | undefined;
         isLoading: boolean;
     };
     formState: {
@@ -87,11 +83,7 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         availableSendersChoices?: SenderChoiceUserAvailable[];
         selectedSenderType?: SenderTypeUserAvailable;
         estimation: {
-            data:
-                | {
-                      extra: AssetAmount<T>;
-                  }
-                | undefined;
+            data: Pick<Estimation<T>, 'fee'> | undefined;
             isLoading: boolean;
             error?: Error | null;
         };
@@ -323,7 +315,7 @@ export const ConfirmViewDetailsFee: FC<{
 
     return (
         <ActionFeeDetailsUniversal
-            extra={estimation.isLoading ? undefined : estimation.data?.extra}
+            fee={estimation.isLoading ? undefined : estimation.data?.fee}
             onSenderTypeChange={onSenderTypeChange}
             availableSendersChoices={availableSendersChoices}
             selectedSenderType={selectedSenderType}
