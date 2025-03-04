@@ -48,7 +48,7 @@ jobs:
             - name: Pods cache
               uses: actions/cache@v4
               with:
-                  path: ./apps/tablet/ios/App/Pods
+                  path: ./apps/mobile/ios/App/Pods
                   key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-pods-
@@ -58,7 +58,7 @@ jobs:
               with:
                   ruby-version: ${{ env.ruby-version }}
                   bundler-cache: true
-                  working-directory: './apps/tablet'
+                  working-directory: './apps/mobile'
 
             - name: Enable Corepack
               run: |
@@ -78,7 +78,7 @@ jobs:
                   cmd: install
 
             - name: Install pods dependencies
-              working-directory: ./apps/tablet/ios/App
+              working-directory: ./apps/mobile/ios/App
               run: bundle exec pod install
 
             - name: Run build js and capacitor
@@ -96,7 +96,7 @@ jobs:
                   cmd: build:ipad
 
             - name: Build & upload iOS binary
-              working-directory: ./apps/tablet
+              working-directory: ./apps/mobile
               run: bundle exec fastlane ios beta
               env:
                   APP_STORE_CONNECT_TEAM_ID: ${{ secrets.APP_STORE_CONNECT_TEAM_ID }}
@@ -108,13 +108,6 @@ jobs:
                   APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
                   APPLE_PROFILE_NAME: GitHub CI/CD iPad
                   BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
-
-            - name: Upload logs to artifacts
-              uses: actions/upload-artifact@v3
-              if: failure()
-              with:
-                  name: gum-logs
-                  path: /Users/runner/Library/Logs/gym/*.log
 
             - name: Summary
               run: |

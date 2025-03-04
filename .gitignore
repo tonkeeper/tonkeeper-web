@@ -39,7 +39,8 @@ testem.log
 Thumbs.db
 
 .turbo
-.yarn
+.yarn/cache
+.yarn/install-state.gz
 .history
 
 .env

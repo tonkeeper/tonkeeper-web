@@ -1,15 +1,19 @@
-import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
+import { CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveAccount } from '../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveAccountConfig,
+    useMutateActiveAccountConfig
+} from '../../state/wallet';
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
@@ -17,6 +21,10 @@ import React, { FC, useEffect, useState } from 'react';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useMAMIndexesSettingsNotification } from '../../components/modals/MAMIndexesSettingsNotification';
 import { DesktopAccountHeader } from '../../components/desktop/header/DesktopAccountHeader';
+import { Navigate } from '../../components/shared/Navigate';
+import { useIsTronEnabledGlobally } from '../../state/tron/tron';
+import { Switch } from '../../components/fields/Switch';
+import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -48,6 +56,11 @@ const SettingsListText = styled.div`
     }
 `;
 
+const SwitchStyled = styled(Switch)`
+    margin-left: auto;
+    flex-shrink: 0;
+`;
+
 const DesktopAccountSettingsPage: FC = () => {
     const account = useActiveAccount();
     const [waiting, setWaiting] = useState(true);
@@ -72,12 +85,19 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
     const { onOpen: changeIndexes } = useMAMIndexesSettingsNotification();
     const { onOpen: onDelete } = useDeleteAccountNotification();
 
+    const canUseTron = useIsTronEnabledGlobally();
+    const { data: accountConfig } = useActiveAccountConfig();
+    const { mutate: mutateAccountConfig } = useMutateActiveAccountConfig();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const isTronEnabled =
+        accountConfig?.enableTron ?? (defaultAccountConfig.enableTron && isTronEnabledGlobally);
+
     return (
         <>
             <DesktopAccountHeader />
             <DesktopViewPageLayout>
                 <DesktopViewHeader borderBottom>
-                    <Label2>{t('settings_title')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_title')} />
                 </DesktopViewHeader>
                 <SettingsListBlock>
                     <SettingsListItem onClick={() => rename({ accountId: account.id })}>
@@ -110,6 +130,26 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
                         </SettingsListText>
                     </SettingsListItem>
                 </SettingsListBlock>
+                {canUseTron && (
+                    <>
+                        <DesktopViewDivider />
+                        <SettingsListBlock>
+                            <SettingsListItem
+                                onClick={() =>
+                                    accountConfig !== undefined &&
+                                    mutateAccountConfig({ enableTron: !isTronEnabled })
+                                }
+                            >
+                                <CoinsIcon />
+                                <SettingsListText>
+                                    <Label2>{t('settings_account_enable_tron_title')}</Label2>
+                                    <Body3>{t('settings_account_enable_tron_description')}</Body3>
+                                </SettingsListText>
+                                <SwitchStyled checked={isTronEnabled} />
+                            </SettingsListItem>
+                        </SettingsListBlock>
+                    </>
+                )}
                 <DesktopViewDivider />
                 <SettingsListBlock>
                     <SettingsListItem onClick={() => onDelete({ accountId: account.id })}>

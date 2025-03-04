@@ -62,6 +62,13 @@ import {
     BlockchainConfig23ToJSON,
     BlockchainConfig23ToJSONTyped,
 } from './BlockchainConfig23';
+import type { BlockchainConfig45 } from './BlockchainConfig45';
+import {
+    BlockchainConfig45FromJSON,
+    BlockchainConfig45FromJSONTyped,
+    BlockchainConfig45ToJSON,
+    BlockchainConfig45ToJSONTyped,
+} from './BlockchainConfig45';
 import type { BlockchainConfig20 } from './BlockchainConfig20';
 import {
     BlockchainConfig20FromJSON,
@@ -453,6 +460,12 @@ export interface BlockchainConfig {
     _44: BlockchainConfig44;
     /**
      * 
+     * @type {BlockchainConfig45}
+     * @memberof BlockchainConfig
+     */
+    _45?: BlockchainConfig45;
+    /**
+     * 
      * @type {BlockchainConfig71}
      * @memberof BlockchainConfig
      */
@@ -550,6 +563,7 @@ export function BlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator: bo
         '_40': json['40'] == null ? undefined : BlockchainConfig40FromJSON(json['40']),
         '_43': json['43'] == null ? undefined : BlockchainConfig43FromJSON(json['43']),
         '_44': BlockchainConfig44FromJSON(json['44']),
+        '_45': json['45'] == null ? undefined : BlockchainConfig45FromJSON(json['45']),
         '_71': json['71'] == null ? undefined : BlockchainConfig71FromJSON(json['71']),
         '_72': json['72'] == null ? undefined : BlockchainConfig71FromJSON(json['72']),
         '_73': json['73'] == null ? undefined : BlockchainConfig71FromJSON(json['73']),
@@ -608,6 +622,7 @@ export function BlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator: bo
         '40': BlockchainConfig40ToJSON(value['_40']),
         '43': BlockchainConfig43ToJSON(value['_43']),
         '44': BlockchainConfig44ToJSON(value['_44']),
+        '45': BlockchainConfig45ToJSON(value['_45']),
         '71': BlockchainConfig71ToJSON(value['_71']),
         '72': BlockchainConfig71ToJSON(value['_72']),
         '73': BlockchainConfig71ToJSON(value['_73']),

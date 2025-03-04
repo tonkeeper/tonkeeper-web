@@ -21,7 +21,6 @@ import type {
   Event,
   GaslessEstimateRequestMessagesInner,
   MessageConsequences,
-  StatusDefaultResponse,
   Trace,
 } from '../models/index';
 import {
@@ -37,8 +36,6 @@ import {
     GaslessEstimateRequestMessagesInnerToJSON,
     MessageConsequencesFromJSON,
     MessageConsequencesToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';

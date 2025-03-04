@@ -15,6 +15,7 @@ export enum AppKey {
     ACCOUNTS = 'accounts',
     ACTIVE_ACCOUNT_ID = 'active_account_id',
     WALLET_CONFIG = 'wallet_config',
+    ACCOUNT_CONFIG = 'account_config',
     GLOBAL_PREFERENCES_CONFIG = 'global_preferences_config',
     MULTISIG_VIEWED_ORDERS = 'viewed_multisig_orders',
 
@@ -47,5 +48,8 @@ export enum AppKey {
     SWAP_OPTIONS = 'swap_options',
 
     BATTERY_AUTH_TOKEN = 'battery_auth_token',
+
+    TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config',
+
     NOTIFICATIONS = 'notifications'
 }

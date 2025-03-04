@@ -32,7 +32,7 @@ import {
     saveAccountConnection
 } from './connectionService';
 import { SessionCrypto } from './protocol';
-import { Account, isAccountTonWalletStandard } from '../../entries/account';
+import { Account, isAccountSupportTonConnect } from '../../entries/account';
 
 export function parseTonConnect(options: { url: string }): TonConnectParams | string {
     try {
@@ -93,7 +93,7 @@ const getManifestResponse = async (manifestUrl: string) => {
         /**
          * Request file with CORS header;
          */
-        return await fetch(`https://manifest-proxy.nkuznetsov.workers.dev/${manifestUrl}`);
+        return await fetch(`https://c.tonapi.io/json?url=${btoa(manifestUrl)}`);
     }
 };
 
@@ -161,7 +161,8 @@ export const getDeviceInfo = (appVersion: string, maxMessages: number): DeviceIn
             'SendTransaction',
             {
                 name: 'SendTransaction',
-                maxMessages: maxMessages
+                maxMessages: maxMessages,
+                extraCurrencySupported: true
             }
         ]
     };
@@ -171,7 +172,7 @@ export const getDappConnection = async (
     storage: IStorage,
     origin: string,
     account?: TonConnectAccount
-): Promise<{ wallet: TonWalletStandard; connection: AccountConnection } | undefined> => {
+): Promise<{ wallet: TonContract; connection: AccountConnection } | undefined> => {
     const appConnections = await getAppConnections(storage);
     if (account) {
         const walletState = appConnections.find(c => c.wallet.rawAddress === account?.address);
@@ -196,9 +197,9 @@ export const getDappConnection = async (
 
 export const getAppConnections = async (
     storage: IStorage
-): Promise<{ wallet: TonWalletStandard; connections: AccountConnection[] }[]> => {
+): Promise<{ wallet: TonContract; connections: AccountConnection[] }[]> => {
     const accounts = (await accountsStorage(storage).getAccounts()).filter(
-        isAccountTonWalletStandard
+        isAccountSupportTonConnect
     );
     if (!accounts.length) {
         throw new TonConnectError(
@@ -246,7 +247,14 @@ export const tonReConnectRequest = async (
             CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
         );
     }
-    return [toTonAddressItemReply(connection.wallet, connection.wallet.network ?? Network.MAINNET)];
+    return [
+        toTonAddressItemReply(
+            connection.wallet,
+            'network' in connection.wallet
+                ? (connection.wallet.network as Network)
+                : Network.MAINNET
+        )
+    ];
 };
 
 export const toTonAddressItemReply = (

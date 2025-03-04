@@ -8,10 +8,10 @@ import { isBasicAsset, packAssetId } from '@tonkeeper/core/dist/entries/crypto/a
 import {
     KNOWN_TON_ASSETS,
     TON_ASSET,
+    TRON_TRX_ASSET,
     TRON_USDT_ASSET
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset, legacyTonAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { DashboardCellNumeric } from '@tonkeeper/core/dist/entries/dashboard';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
@@ -28,12 +28,14 @@ import {
     tokenRate as getTokenRate,
     getTonFiatAmount,
     toTokenRate,
-    useRate
+    useRate,
+    useUSDTRate
 } from './rates';
 import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -50,24 +52,27 @@ export function useUserAssetBalance<
         if (asset.address === 'TON') {
             isLoading = tonWalletInfo.isLoading;
             data = tonWalletInfo?.data?.balance || '0';
-        } else {
+        } else if (Address.isAddress(asset.address)) {
             isLoading = jettons.isLoading;
             data =
                 jettons.data?.balances.find(i => i.jetton.address === legacyTonAssetId(asset))
                     ?.balance || '0';
+        } else {
+            isLoading = tonWalletInfo.isLoading;
+            const extra = tonWalletInfo.data?.extraBalance?.find(
+                item => item.preview.symbol === asset.address
+            );
+            data = extra?.amount || '0';
         }
         if (isBasicAsset(asset)) {
             data = new AssetAmount<TonAsset>({ asset, weiAmount: data });
         }
     } else {
         isLoading = tronBalances.isLoading;
-        const token = tronBalances.data?.balances.find(i => i.token.address === asset.address);
-        if (token && isBasicAsset(asset)) {
-            data = new AssetAmount<TronAsset>({
-                asset,
-                weiAmount: token.weiAmount,
-                image: token.token.image
-            });
+        if (asset.address === TRON_USDT_ASSET.address) {
+            data = tronBalances.data?.usdt;
+        } else if (asset.address === TRON_TRX_ASSET.address) {
+            data = tronBalances.data?.trx;
         } else {
             data = '0';
         }
@@ -79,25 +84,24 @@ export function useUserAssetBalance<
     };
 }
 
-export function useAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
+export function useAssetImage(asset: Asset): string | undefined {
+    return asset.image;
+}
+
+export function useTonAssetImage({ blockchain, address }: AssetIdentification): string | undefined {
     const id = packAssetId(blockchain, address);
     const { data: jettons } = useJettonList();
-    const { data: balances } = useTronBalances();
 
     if (id === TON_ASSET.id) {
         return 'https://wallet.tonkeeper.com/img/toncoin.svg';
     }
 
-    if (id === TRON_USDT_ASSET.id) {
-        return 'https://wallet-dev.tonkeeper.com/img/usdt.svg';
+    if (typeof address === 'string') {
+        throw new Error('Unexpected address');
     }
 
-    if (typeof address === 'string') {
-        return balances?.balances.find(i => i.token.address === address)?.token.image;
-    } else {
-        return jettons?.balances.find(i => address.equals(Address.parse(i.jetton.address)))?.jetton
-            .image;
-    }
+    return jettons?.balances.find(i => address.equals(Address.parse(i.jetton.address)))?.jetton
+        .image;
 }
 
 export function useAssetAmountFiatEquivalent(assetAmount: AssetAmount): {
@@ -153,6 +157,9 @@ export const useWalletTotalBalance = () => {
     const { data: tonRate } = useRate(CryptoCurrency.TON);
     const fiat = useUserFiat();
 
+    const { data: tronBalances } = useTronBalances();
+    const { data: usdtRate } = useUSDTRate();
+
     const client = useQueryClient();
     return useQuery<BigNumber>(
         [QueryKey.total, fiat, assets, tonRate],
@@ -160,13 +167,19 @@ export const useWalletTotalBalance = () => {
             if (!assets) {
                 return new BigNumber(0);
             }
-            return (
-                getTonFiatAmount(client, fiat, assets)
-                    // .plus(getTRC20FiatAmount(client, fiat, assets))
-                    .plus(getJettonsFiatAmount(fiat, assets))
+            const tonAssetsAmount = getTonFiatAmount(client, fiat, assets).plus(
+                getJettonsFiatAmount(fiat, assets)
+            );
+
+            if (!tronBalances || !usdtRate?.prices) {
+                return tonAssetsAmount;
+            }
+
+            return tonAssetsAmount.plus(
+                tronBalances.usdt.relativeAmount.multipliedBy(usdtRate.prices)
             );
         },
-        { enabled: !!assets && !!tonRate }
+        { enabled: !!assets && !!tonRate && !!usdtRate && tronBalances !== undefined }
     );
 };
 
@@ -207,6 +220,8 @@ export const useAccountTotalBalance = () => {
         () => account.allTonWallets.map(w => w.rawAddress),
         [account]
     );
+    const { data: tronBalances } = useTronBalances();
+    const { data: rate } = useUSDTRate();
 
     return useQuery<BigNumber>(
         [QueryKey.allWalletsTotalBalance, fiat, allWalletsAddresses],
@@ -219,10 +234,19 @@ export const useAccountTotalBalance = () => {
                 currency: fiat
             });
 
-            return result
+            const totalTonAssetsBalances = result
                 .map(row => new BigNumber((row.cells[0] as DashboardCellNumeric).value))
                 .reduce((v, acc) => acc.plus(v), new BigNumber(0));
-        }
+
+            if (!tronBalances) {
+                return totalTonAssetsBalances;
+            }
+
+            return totalTonAssetsBalances.plus(
+                tronBalances.usdt.relativeAmount.multipliedBy(rate?.prices ?? 0)
+            );
+        },
+        { enabled: tronBalances !== undefined && rate !== undefined }
     );
 };
 
@@ -282,6 +306,20 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
                     };
                 })
             );
+
+            if (assets.ton.info.extraBalance) {
+                for (let extra of assets.ton.info.extraBalance) {
+                    // TODO: Extra Currency token rate
+                    const dist: Omit<TokenDistribution, 'percent'> = {
+                        fiatBalance: new BigNumber(0),
+                        meta: convertJettonToTokenMeta(
+                            { isNative: true, balance: Number(extra.amount) },
+                            0
+                        )
+                    };
+                    tokensOmited.push(dist);
+                }
+            }
 
             const total = tokensOmited.reduce(
                 (acc, t) => t.fiatBalance.plus(acc),

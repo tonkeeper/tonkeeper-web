@@ -6,13 +6,12 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
-    useActiveTonNetwork,
     useCreateAccountMAM,
     useCreateAccountMnemonic,
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
-import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
+import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
 import {
     AccountMAM,
     AccountTonMnemonic,
@@ -44,12 +43,16 @@ import {
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useIsTronEnabledGlobally } from '../../state/tron/tron';
+import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
+import { useTranslation } from '../../hooks/translation';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
     const fiat = useUserFiat();
     const sdk = useAppSdk();
     const accounts = useAccountsState();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<
         {
@@ -123,7 +126,8 @@ const useProcessMnemonic = () => {
                         WalletVersion.V4R2,
                         WalletVersion.V3R2,
                         WalletVersion.V3R1
-                    ]
+                    ],
+                    generateTronWallet: isTronEnabled
                 }
             );
 
@@ -171,7 +175,8 @@ const useProcessMnemonic = () => {
                         WalletVersion.V4R2,
                         WalletVersion.V3R2,
                         WalletVersion.V3R1
-                    ]
+                    ],
+                    generateTronWallet: isTronEnabled
                 }
             );
 
@@ -228,6 +233,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
 
 export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
+    const { t } = useTranslation();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [createdAccount, setCreatedAccount] = useState<
@@ -242,6 +248,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     >();
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
     const [notificationsSubscribePagePassed, setNotificationsSubscribePagePassed] = useState(false);
     const { mutateAsync: renameAccount, isLoading: renameAccountLoading } =
         useMutateRenameAccount<AccountTonMnemonic>();
@@ -366,6 +373,10 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
             };
         }
 
+        if (editNamePagePassed && !selectNetworksPassed) {
+            return () => setEditNamePagePassed(false);
+        }
+
         return undefined;
     }, [
         mnemonic,
@@ -374,7 +385,9 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         existingAccountAndWallet,
         isMnemonicFormDirty,
         selectedMnemonicType,
-        isCreatingMam
+        isCreatingMam,
+        editNamePagePassed,
+        selectNetworksPassed
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -427,7 +440,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     if (!createdAccount) {
         return (
-            <ChoseWalletVersions
+            <ChoseWalletVersionsByMnemonic
                 network={Network.MAINNET}
                 mnemonic={mnemonic}
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
@@ -462,8 +475,13 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
+                buttonText={t('continue')}
             />
         );
+    }
+
+    if (!selectNetworksPassed) {
+        return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
     if (

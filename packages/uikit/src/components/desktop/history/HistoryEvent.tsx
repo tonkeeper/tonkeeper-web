@@ -1,24 +1,38 @@
-import { MixedActivity } from '../../../state/mixedActivity';
 import { FC, useState, MouseEvent } from 'react';
-import styled from 'styled-components';
-import { GenericActivity, GroupedActivityItem } from '../../../state/activity';
+import styled, { css } from 'styled-components';
+import { ActivityItem, CategorizedActivityItem } from '../../../state/activity';
 import { Body2 } from '../../Text';
 import { useDateTimeFormatFromNow } from '../../../hooks/useDateTimeFormat';
 import { HistoryAction } from './ton/HistoryAction';
 import { HistoryGridCell } from './ton/HistoryGrid';
 import { ChevronDownIcon, SpinnerRing } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
-import { ActionData } from '../../activity/ton/ActivityNotification';
+import { ActivityNotificationData } from '../../activity/ton/ActivityNotification';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
+import { TronHistoryAction } from './tron/TronHistoryAction';
 
-const EventDivider = styled.div`
+const EventDivider = styled.div.attrs({ className: 'event-groups-divider' })`
     background-color: ${p => p.theme.separatorCommon};
     height: 1px;
     grid-column: 1/-1;
     margin: 0 -1rem;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            margin: 0.25rem -1rem;
+        `}
 `;
 
-export const HistoryGridTimeCell = styled(HistoryGridCell)``;
+export const HistoryGridTimeCell = styled(HistoryGridCell).attrs({ className: 'grid-area-time' })`
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            &:empty {
+                height: 0;
+            }
+        `}
+`;
 
 const HistoryDateCell = styled(HistoryGridTimeCell)`
     display: flex;
@@ -51,8 +65,8 @@ const GroupItemLeftSpacer = styled.div`
 `;
 
 export const HistoryEvent: FC<{
-    group: GroupedActivityItem;
-    onActionClick: (actionData: ActionData) => void;
+    group: CategorizedActivityItem;
+    onActionClick: (actionData: ActivityNotificationData) => void;
 }> = ({ group, onActionClick }) => {
     if (group.type === 'single') {
         return <HistoryEventSingle item={group.item} onActionClick={onActionClick} />;
@@ -62,8 +76,8 @@ export const HistoryEvent: FC<{
 };
 
 const HistoryEventSingle: FC<{
-    item: GenericActivity<MixedActivity>;
-    onActionClick: (actionData: ActionData) => void;
+    item: ActivityItem;
+    onActionClick: (actionData: ActivityNotificationData) => void;
     onCollapse?: () => void;
     onExpand?: () => void;
     isGroupItem?: boolean;
@@ -71,11 +85,36 @@ const HistoryEventSingle: FC<{
     const formattedDate = useDateTimeFormatFromNow(item.timestamp);
     const { t } = useTranslation();
 
-    if (item.event.kind === 'tron') {
-        return null;
+    if (item.type === 'tron') {
+        return (
+            <HistoryEventWrapper
+                onClick={() =>
+                    onExpand
+                        ? onExpand()
+                        : onActionClick({
+                              type: 'tron',
+                              timestamp: item.timestamp,
+                              event: item.event
+                          })
+                }
+            >
+                {item.event.inProgress ? (
+                    <PendingEventCell>
+                        <SpinnerRing />
+                        <Body2>{t('transaction_type_pending') + '…'}</Body2>
+                    </PendingEventCell>
+                ) : (
+                    <HistoryDateCell>
+                        <Body2>{formattedDate}</Body2>
+                    </HistoryDateCell>
+                )}
+                <TronHistoryAction action={item.event} />
+                <EventDivider />
+            </HistoryEventWrapper>
+        );
     }
 
-    const event = item.event.event;
+    const event = item.event;
 
     const handleChevronClick = (e: MouseEvent<HTMLButtonElement>) => {
         onExpand?.();
@@ -96,6 +135,7 @@ const HistoryEventSingle: FC<{
                         onExpand
                             ? onExpand()
                             : onActionClick({
+                                  type: 'ton',
                                   timestamp: item.timestamp,
                                   action,
                                   isScam: event.isScam,
@@ -155,8 +195,8 @@ const IconButtonTransparentBackgroundStyled = styled(IconButtonTransparentBackgr
 `;
 
 const HistoryEventGroup: FC<{
-    items: GenericActivity<MixedActivity>[];
-    onActionClick: (actionData: ActionData) => void;
+    items: ActivityItem[];
+    onActionClick: (actionData: ActivityNotificationData) => void;
 }> = ({ items, onActionClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
 

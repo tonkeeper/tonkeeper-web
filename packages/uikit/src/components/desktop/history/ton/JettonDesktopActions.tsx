@@ -143,7 +143,7 @@ export const JettonSwapDesktopAction: FC<{ action: Action }> = ({ action }) => {
             <HistoryCellAccount account={{ name: toDexName(jettonSwap.dex) }} />
             <ActionRow>
                 <HistoryCellComment />
-                <SwapHistoryCell>
+                <SwapHistoryCell className="grid-area-amount">
                     <HistoryCellAmount
                         amount={assetIn.amount}
                         symbol={assetIn.symbol}

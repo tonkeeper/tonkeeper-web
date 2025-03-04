@@ -18,8 +18,8 @@ import {
     AccountTonWatchOnly,
     Account,
     getNetworkByAccount,
-    AccountTonTestnet
-} from '@tonkeeper/core/dist/entries/account';
+    AccountTonTestnet, AccountTonSK
+} from "@tonkeeper/core/dist/entries/account";
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
@@ -39,9 +39,9 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;
@@ -125,7 +125,7 @@ const AsideMultisigItem = forwardRef<
 });
 
 export const AsideMenuAccountMnemonic: FC<{
-    account: AccountTonMnemonic | AccountTonTestnet;
+    account: AccountTonMnemonic | AccountTonTestnet | AccountTonSK;
     mightBeHighlighted: boolean;
     selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
@@ -482,6 +482,7 @@ export const AsideMenuAccount: FC<{
     switch (account.type) {
         case 'mnemonic':
         case 'testnet':
+        case 'sk':
             return <AsideMenuAccountMnemonic account={account} {...rest} />;
         case 'ledger':
             return <AsideMenuAccountLedger account={account} {...rest} />;

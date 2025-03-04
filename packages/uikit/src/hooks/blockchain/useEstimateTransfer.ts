@@ -9,7 +9,8 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderTypeUserAvailable,
-    useGetEstimationSender
+    useGetEstimationSender,
+    useGetTronEstimationSender
 } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
@@ -17,6 +18,8 @@ import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useToQueryKeyPart } from '../useToQueryKeyPart';
 import { useMemo } from 'react';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 
 export function useEstimateTransfer({
     recipient,
@@ -59,9 +62,20 @@ export function useEstimateTransfer({
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
     const getSenderKey = useToQueryKeyPart(getSender);
+    const getTronSender = useGetTronEstimationSender();
+    const getTronEstimationSenderKey = useToQueryKeyPart(getTronSender);
 
     return useQuery<Estimation, Error>(
-        [QueryKey.estimate, recipient, amount, isMax, getSenderKey, transferService, notifyError],
+        [
+            QueryKey.estimate,
+            recipient,
+            amount,
+            isMax,
+            getSenderKey,
+            getTronEstimationSenderKey,
+            transferService,
+            notifyError
+        ],
         async () => {
             const comment = (recipient as TonRecipientData).comment;
             try {
@@ -77,8 +91,14 @@ export function useEstimateTransfer({
                         isMax,
                         payload: comment ? { type: 'comment', value: comment } : undefined
                     });
+                } else if (amount.asset.id === TRON_USDT_ASSET.id) {
+                    const tronSender = getTronSender();
+                    return await tronSender.estimate(
+                        recipient.address.address,
+                        amount as AssetAmount<TronAsset>
+                    );
                 } else {
-                    throw new Error('Tron is not supported');
+                    throw new Error('Unexpected asset');
                 }
             } catch (e) {
                 await notifyError(e);

@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import {
+    ListBlock,
+    ListBlockDesktopAdaptive,
+    ListItem,
+    ListItemElement,
+    ListItemPayload
+} from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
 import { Label1 } from '../../components/Text';
 import { ChangePasswordNotification } from '../../components/create/ChangePassword';
@@ -22,6 +27,13 @@ import {
 } from '../../state/password';
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 import styled from 'styled-components';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -33,14 +45,14 @@ const LockSwitch = () => {
 
     if (isPasswordSet) {
         return (
-            <ListBlock>
+            <ListBlockDesktopAdaptive>
                 <ListItem hover={false}>
                     <ListItemPayload>
                         <Label1>{t('Lock_screen')}</Label1>
                         <Switch checked={!!data} onChange={toggleLock} />
                     </ListItemPayload>
                 </ListItem>
-            </ListBlock>
+            </ListBlockDesktopAdaptive>
         );
     } else {
         return <></>;
@@ -63,14 +75,14 @@ const TouchIdSwitch = () => {
     }
 
     return (
-        <ListBlock>
+        <ListBlockDesktopAdaptive>
             <ListItem hover={false}>
                 <ListItemPayload>
                     <Label1Capitalised>{t('biometry_default')}</Label1Capitalised>
                     <Switch checked={!!touchIdEnabled} onChange={mutate} />
                 </ListItemPayload>
             </ListItem>
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 };
 
@@ -129,8 +141,36 @@ const ShowPhrases = () => {
     return <SettingsList items={items} />;
 };
 
+const DesktopWrapper = styled(DesktopViewPageLayout)`
+    ${ListBlock} {
+        margin-bottom: 0;
+    }
+
+    ${ListItemElement} {
+        min-height: 56px;
+    }
+`;
+
 export const SecuritySettings = () => {
     const { t } = useTranslation();
+    const isProDisplay = useIsFullWidthMode();
+
+    if (isProDisplay) {
+        return (
+            <DesktopWrapper>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('settings_security')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <LockSwitch />
+                <TouchIdSwitch />
+                <ChangePassword />
+                <ShowPhrases />
+            </DesktopWrapper>
+        );
+    }
+
     return (
         <>
             <SubHeader title={t('settings_security')} />

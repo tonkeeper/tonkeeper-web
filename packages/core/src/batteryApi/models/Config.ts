@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ConfigGasProxyInner } from './ConfigGasProxyInner';
+import {
+    ConfigGasProxyInnerFromJSON,
+    ConfigGasProxyInnerFromJSONTyped,
+    ConfigGasProxyInnerToJSON,
+    ConfigGasProxyInnerToJSONTyped,
+} from './ConfigGasProxyInner';
+
 /**
  * 
  * @export
@@ -43,6 +51,12 @@ export interface Config {
      * @memberof Config
      */
     messageTtl: number;
+    /**
+     * 
+     * @type {Array<ConfigGasProxyInner>}
+     * @memberof Config
+     */
+    gasProxy: Array<ConfigGasProxyInner>;
 }
 
 /**
@@ -53,6 +67,7 @@ export function instanceOfConfig(value: object): value is Config {
     if (!('fundReceiver' in value) || value['fundReceiver'] === undefined) return false;
     if (!('excessAccount' in value) || value['excessAccount'] === undefined) return false;
     if (!('messageTtl' in value) || value['messageTtl'] === undefined) return false;
+    if (!('gasProxy' in value) || value['gasProxy'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +85,7 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'fundReceiver': json['fund_receiver'],
         'excessAccount': json['excess_account'],
         'messageTtl': json['message_ttl'],
+        'gasProxy': ((json['gas_proxy'] as Array<any>).map(ConfigGasProxyInnerFromJSON)),
     };
 }
 
@@ -88,6 +104,7 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'fund_receiver': value['fundReceiver'],
         'excess_account': value['excessAccount'],
         'message_ttl': value['messageTtl'],
+        'gas_proxy': ((value['gasProxy'] as Array<any>).map(ConfigGasProxyInnerToJSON)),
     };
 }
 

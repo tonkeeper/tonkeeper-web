@@ -19,6 +19,9 @@ export class ExtensionAppSdk extends BaseApp {
 
     openPage = (url: string) => {
         return new Promise<void>((resolve, reject) => {
+            if (!url.startsWith('http')) {
+                reject('Invalid url');
+            }
             browser.tabs.create({ url }).then(newTab => {
                 const error = checkForError();
                 if (error) {
@@ -80,5 +83,7 @@ export class ExtensionAppSdk extends BaseApp {
 
     version = packageJson.version ?? 'Unknown';
 
-    targetEnv= 'extension' as const;
+    targetEnv = 'extension' as const;
+
+    storeUrl = process.env.REACT_APP_STORE_URL;
 }

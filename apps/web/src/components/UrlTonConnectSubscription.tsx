@@ -6,7 +6,8 @@ import {
   useGetConnectInfo
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 import { AppRoute } from "@tonkeeper/uikit/dist/libs/routes";
 import { Account } from "@tonkeeper/core/dist/entries/account";
 import { WalletId } from "@tonkeeper/core/dist/entries/wallet";

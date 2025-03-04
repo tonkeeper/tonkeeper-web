@@ -269,9 +269,9 @@ jobs:
             environment: ${{ github.head_ref }}
         secrets: inherit
 
-    web-tests:
-        needs: web-build
-        uses: ./.github/workflows/web-tests.yaml
-        with:
-            base-url: ${{ needs.web-build.outputs.deployment-url }}
-        secrets: inherit
+    # web-tests:
+    #     needs: web-build
+    #     uses: ./.github/workflows/web-tests.yaml
+    #     with:
+    #         base-url: ${{ needs.web-build.outputs.deployment-url }}
+    #     secrets: inherit

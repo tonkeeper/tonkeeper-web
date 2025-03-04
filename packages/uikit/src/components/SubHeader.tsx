@@ -1,5 +1,4 @@
 import React, { FC, PropsWithChildren, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled, { createGlobalStyle, css, useTheme } from 'styled-components';
 import { useAppSdk } from '../hooks/appSdk';
 import { useNativeBackButton } from './BackButton';
@@ -7,6 +6,7 @@ import { ChevronLeftIcon } from './Icon';
 import { H3 } from './Text';
 import { RoundedButton } from './fields/RoundedButton';
 import { DesktopBackButton } from './desktop/DesktopViewLayout';
+import { useNavigate } from "../hooks/router/useNavigate";
 
 export const WithHeadingDivider = styled.div``;
 

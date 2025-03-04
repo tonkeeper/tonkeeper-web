@@ -1,7 +1,6 @@
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import country from 'country-list-js';
 import React, { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { CheckIcon } from '../../components/Icon';
@@ -11,9 +10,29 @@ import { Input } from '../../components/fields/Input';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useTranslation } from '../../hooks/translation';
 import { useAutoCountry, useCountrySetting, useMutateUserCountry } from '../../state/country';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const Block = styled.div`
     margin-bottom: 32px;
+`;
+
+const DesktopBlock = styled.div`
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    background: ${p => p.theme.backgroundPage};
+    z-index: 1;
+`;
+
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    display: initial;
 `;
 
 export const CountrySettings = () => {
@@ -22,16 +41,17 @@ export const CountrySettings = () => {
     const { data: selected } = useCountrySetting();
     const { data: detected } = useAutoCountry();
     const { mutate } = useMutateUserCountry();
+    const isProDisplay = useIsFullWidthMode();
 
-    let [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const search = useMemo(() => {
         return new URLSearchParams(searchParams).get('search') ?? '';
     }, [searchParams]);
 
     const setSearch = useCallback(
-        (search: string) => {
-            setSearchParams({ search }, { replace: true });
+        (s: string) => {
+            setSearchParams({ search: s }, { replace: true });
         },
         [setSearchParams]
     );
@@ -49,7 +69,7 @@ export const CountrySettings = () => {
 
     const countries = useMemo<SettingsItem[]>(() => {
         return Object.entries(country.all)
-            .filter(([key, value]) =>
+            .filter(([_, value]) =>
                 (value as any).name.toLowerCase().includes(search.trim().toLowerCase())
             )
             .map(([key, value]) => {
@@ -59,11 +79,36 @@ export const CountrySettings = () => {
                             key
                         ) ?? (value as any).name,
                     preIcon: <CountryIcon country={key} />,
-                    icon: selected == key ? <CheckIcon /> : undefined,
+                    icon: selected === key ? <CheckIcon /> : undefined,
                     action: () => mutate(key)
                 };
             });
     }, [selected, mutate, search]);
+
+    const desktopItems = useMemo(() => autoItem.concat(countries), [countries, autoItem]);
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayoutStyled>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('country')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <DesktopBlock>
+                    <Input
+                        size="small"
+                        id="country-search"
+                        value={search}
+                        onChange={setSearch}
+                        label={t('settings_search_engine')}
+                        clearButton
+                    />
+                </DesktopBlock>
+                <SettingsList items={desktopItems} />
+            </DesktopViewPageLayoutStyled>
+        );
+    }
 
     return (
         <>

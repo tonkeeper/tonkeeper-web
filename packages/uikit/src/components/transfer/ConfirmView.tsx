@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Asset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { RecipientData, isTonRecipientData } from '@tonkeeper/core/dist/entries/send';
+import { RecipientData, isTonRecipientData, Estimation } from '@tonkeeper/core/dist/entries/send';
 import React, {
     Children,
     FC,
@@ -30,7 +30,7 @@ import {
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { RoundedButton } from '../fields/RoundedButton';
+import { RoundedButtonResponsive } from '../fields/RoundedButton';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
@@ -51,11 +51,7 @@ type ConfirmViewContextValue = {
     recipient?: RecipientData;
     assetAmount: AssetAmount;
     estimation: {
-        data:
-            | {
-                  extra: AssetAmount;
-              }
-            | undefined;
+        data: Pick<Estimation, 'fee'> | undefined;
         isLoading: boolean;
     };
     formState: {
@@ -87,11 +83,7 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         availableSendersChoices?: SenderChoiceUserAvailable[];
         selectedSenderType?: SenderTypeUserAvailable;
         estimation: {
-            data:
-                | {
-                      extra: AssetAmount<T>;
-                  }
-                | undefined;
+            data: Pick<Estimation<T>, 'fee'> | undefined;
             isLoading: boolean;
             error?: Error | null;
         };
@@ -193,7 +185,6 @@ export function ConfirmView<T extends Asset = Asset>({
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.stopPropagation();
         e.preventDefault();
-        handleSubmit();
     };
 
     return (
@@ -238,9 +229,9 @@ export const ConfirmViewTitle: FC<PropsWithChildren> = () => {
     return (
         <NotificationTitleBlock>
             {onBack ? (
-                <RoundedButton onClick={onBack}>
+                <RoundedButtonResponsive onClick={onBack}>
                     <ChevronLeftIcon />
-                </RoundedButton>
+                </RoundedButtonResponsive>
             ) : (
                 <div />
             )}
@@ -276,7 +267,11 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
         recipient && isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
     return (
         <Info className={className}>
-            {icon ? <Image full src={image} /> : <ImageMock full />}
+            {icon ? (
+                <Image $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id} full src={image} />
+            ) : (
+                <ImageMock full />
+            )}
             <SendingTitle>{t('confirm_sending_title')}</SendingTitle>
             <Title>{title}</Title>
         </Info>
@@ -320,7 +315,7 @@ export const ConfirmViewDetailsFee: FC<{
 
     return (
         <ActionFeeDetailsUniversal
-            extra={estimation.isLoading ? undefined : estimation.data?.extra}
+            fee={estimation.isLoading ? undefined : estimation.data?.fee}
             onSenderTypeChange={onSenderTypeChange}
             availableSendersChoices={availableSendersChoices}
             selectedSenderType={selectedSenderType}

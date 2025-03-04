@@ -55,6 +55,9 @@ export class TwaAppSdk extends BaseApp {
     };
 
     openPage = async (url: string) => {
+        if (!url.startsWith('http')) {
+            throw new Error('Invalid url');
+        }
         if (url.includes('t.me')) {
             this.utils.openTelegramLink(url);
         } else {

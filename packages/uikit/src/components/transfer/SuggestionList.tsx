@@ -14,7 +14,6 @@ import {
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
@@ -236,6 +235,10 @@ export const SuggestionList: FC<{
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data } = useLatestSuggestion(acceptBlockchains);
+
+    if (acceptBlockchains?.length === 1 && acceptBlockchains?.[0] === BLOCKCHAIN_NAME.TRON) {
+        return null;
+    }
 
     if (!data) {
         return (

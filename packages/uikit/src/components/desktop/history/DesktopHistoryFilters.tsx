@@ -3,26 +3,40 @@ import { SelectDropDown } from '../../fields/Select';
 import React, { FC } from 'react';
 import { Body2, Body3, Label2 } from '../../Text';
 import styled, { css } from 'styled-components';
-import { useAssets } from '../../../state/home';
+import { useAllChainsAssets } from '../../../state/home';
 import { ChevronDownIcon, CoinsHorizontalIcon, SlidersIcon } from '../../Icon';
 import { Checkbox } from '../../fields/Checkbox';
 import { isInitiatorFiltrationForAssetAvailable, useHistoryFilters } from '../../../state/activity';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { jettonToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useTranslation } from '../../../hooks/translation';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { Badge } from '../../shared';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 
-const AssetIcon = styled.img`
+const AssetIcon = styled.img<{ $noBorders?: boolean }>`
     width: 24px;
     height: 24px;
-    border-radius: ${props => props.theme.cornerFull};
+    border-radius: ${props => !props.$noBorders && props.theme.cornerFull};
     margin-right: 12px;
 
     pointer-events: none;
 `;
 
+const AssetIconSm = styled(AssetIcon)`
+    width: 16px;
+    height: 16px;
+    margin-right: 0;
+`;
+
 const AllAssetsIcon = styled(CoinsHorizontalIcon)`
     margin-right: 12px;
     color: ${p => p.theme.iconSecondary};
+`;
+
+const AllAssetsIconSm = styled(AllAssetsIcon)`
+    width: 16px;
+    height: 16px;
+    margin-right: 0;
+    color: ${p => p.theme.iconPrimary};
 `;
 
 const DropDownButton = styled.button`
@@ -31,26 +45,44 @@ const DropDownButton = styled.button`
     display: flex;
     align-items: center;
     gap: 6px;
-    color: ${p => p.theme.textSecondary};
+    color: ${p =>
+        p.theme.proDisplayType === 'mobile' ? p.theme.textPrimary : p.theme.textSecondary};
 `;
 
 const DropDownTokensButton = styled(DropDownButton)`
-    padding-left: 12px;
-    padding-right: 8px;
     white-space: nowrap;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            width: 100%;
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            padding-right: 8px;
+            padding-left: 12px;
+        `}
 `;
 
 const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
     position: relative;
     height: 20px;
-    padding-left: 8px;
     padding-right: 16px;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            width: 100%;
+            padding-right: 0;
+        `}
 
     &::after {
         content: '';
         position: absolute;
-        top: -6px;
-        right: 10px;
+        top: -3px;
+        left: 14px;
         height: 6px;
         width: 6px;
         background-color: ${p => p.theme.accentBlue};
@@ -60,9 +92,21 @@ const DropDownOtherFiltersButton = styled(DropDownButton)<{ $badge: boolean }>`
     }
 `;
 
+const TRCBadge = styled(Badge)`
+    margin-left: 8px;
+`;
+
+const ChevronDownIconRight = styled(ChevronDownIcon)`
+    margin-left: auto;
+`;
+
+const DropDownItemAsset = styled(DropDownItem)`
+    color: ${p => p.theme.textPrimary};
+`;
+
 export const AssetHistoryFilter = () => {
     const { t } = useTranslation();
-    const [assets] = useAssets();
+    const { assets } = useAllChainsAssets();
     const { asset: selectedAsset, setAsset } = useHistoryFilters();
     if (!assets) {
         return null;
@@ -75,7 +119,7 @@ export const AssetHistoryFilter = () => {
             width="200px"
             payload={onClose => (
                 <DropDownContent>
-                    <DropDownItem
+                    <DropDownItemAsset
                         onClick={() => {
                             setAsset(undefined);
                             onClose();
@@ -84,44 +128,46 @@ export const AssetHistoryFilter = () => {
                     >
                         <AllAssetsIcon />
                         <Label2>{t('history_filters_all_assets')}</Label2>
-                    </DropDownItem>
-                    <DropDownItemsDivider />
-                    <DropDownItem
-                        onClick={() => {
-                            setAsset(TON_ASSET);
-                            onClose();
-                        }}
-                        isSelected={selectedAsset?.id === TON_ASSET.id}
-                    >
-                        <AssetIcon src="https://wallet.tonkeeper.com/img/toncoin.svg" />
-                        <Label2>TON</Label2>
-                    </DropDownItem>
-                    {assets.ton.jettons.balances.map(jetton => {
-                        const asset = jettonToTonAsset(jetton.jetton.address, assets.ton.jettons);
-                        return (
-                            <>
-                                <DropDownItemsDivider />
-                                <DropDownItem
-                                    onClick={() => {
-                                        setAsset(asset);
-                                        onClose();
-                                    }}
-                                    isSelected={selectedAsset?.id === asset.id}
-                                >
-                                    <AssetIcon src={jetton.jetton.image} />
-                                    <Label2>{jetton.jetton.symbol}</Label2>
-                                </DropDownItem>
-                            </>
-                        );
-                    })}
+                    </DropDownItemAsset>
+                    {assets.map(assetAmount => (
+                        <>
+                            <DropDownItemsDivider />
+                            <DropDownItemAsset
+                                onClick={() => {
+                                    setAsset(assetAmount.asset);
+                                    onClose();
+                                }}
+                                isSelected={selectedAsset?.id === assetAmount.asset.id}
+                            >
+                                <AssetIcon
+                                    src={assetAmount.image}
+                                    $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id}
+                                />
+                                <Label2>{assetAmount.asset.symbol}</Label2>
+                                {assetAmount.asset.id === TRON_USDT_ASSET.id && (
+                                    <TRCBadge color="textSecondary">TRC20</TRCBadge>
+                                )}
+                            </DropDownItemAsset>
+                        </>
+                    ))}
                 </DropDownContent>
             )}
         >
             <DropDownTokensButton>
+                <ForTargetEnv env="mobile">
+                    {selectedAsset ? (
+                        <AssetIconSm
+                            src={selectedAsset.image}
+                            $noBorders={selectedAsset.id === TRON_USDT_ASSET.id}
+                        />
+                    ) : (
+                        <AllAssetsIconSm />
+                    )}
+                </ForTargetEnv>
                 <Body2>
                     {selectedAsset ? selectedAsset.symbol : t('history_filters_all_assets')}
                 </Body2>
-                <ChevronDownIcon />
+                <ChevronDownIconRight />
             </DropDownTokensButton>
         </SelectDropDown>
     );
@@ -133,6 +179,8 @@ const CheckboxStyled = styled(Checkbox)`
 `;
 
 const DropDownItemStyled = styled(DropDownItem)<{ $isDisabled?: boolean }>`
+    color: ${p => p.theme.textPrimary};
+
     ${p =>
         p.$isDisabled &&
         css`
@@ -203,7 +251,14 @@ export const OtherHistoryFilters: FC<{ disableInitiatorFilter?: boolean }> = ({
             )}
         >
             <DropDownOtherFiltersButton $badge={filterSpam || onlyInitiatorChecked}>
-                <SlidersIcon />
+                <ForTargetEnv env="mobile">
+                    <SlidersIcon />
+                    <Body2>{t('settings_title')}</Body2>
+                    <ChevronDownIconRight />
+                </ForTargetEnv>
+                <NotForTargetEnv env="mobile">
+                    <SlidersIcon />
+                </NotForTargetEnv>
             </DropDownOtherFiltersButton>
         </SelectDropDown>
     );

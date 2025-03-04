@@ -1,11 +1,12 @@
 import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
     CoinsIcon,
     ExitIcon,
     KeyIcon,
+    LockIcon,
     NotificationOutlineIcon,
     SaleBadgeIcon,
     SwitchIcon,
@@ -15,6 +16,7 @@ import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -33,7 +35,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import { WalletIndexBadge } from '../../components/account/AccountBadge';
+import { AssetBlockchainBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     useActiveMultisigAccountHost,
     useIsActiveAccountMultisig,
@@ -42,6 +44,15 @@ import {
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useCanViewTwoFA } from '../../state/two-fa';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import {
+  useAutoMarkTronFeatureAsSeen,
+  useCanUseTronForActiveWallet,
+  useIsTronEnabledForActiveWallet,
+  useToggleIsTronEnabledForActiveWallet
+} from '../../state/tron/tron';
+import { Switch } from '../../components/fields/Switch';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -81,6 +92,18 @@ const LinkStyled = styled(Link)`
 const Body3Row = styled(Body3)`
     display: flex;
     align-items: center;
+    gap: 6px;
+`;
+
+const SwitchStyled = styled(Switch)`
+    margin-left: auto;
+    flex-shrink: 0;
+`;
+
+const LabelWithBadge = styled(Label2)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
 `;
 
 export const DesktopWalletSettingsPage = () => {
@@ -111,12 +134,19 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
+    const canViewTwoFA = useCanViewTwoFA();
+
     const notificationsAvailable = useAppSdk().notifications !== undefined;
+
+    useAutoMarkTronFeatureAsSeen();
+    const canUseTron = useCanUseTronForActiveWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const { mutate: onToggleTron } = useToggleIsTronEnabledForActiveWallet();
 
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
-                <Label2>{t('settings_title')}</Label2>
+                <DesktopViewHeaderContent title={t('settings_title')} />
             </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem
@@ -139,7 +169,9 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                {(account.type === 'mnemonic' || account.type === 'testnet') && (
+                {(account.type === 'mnemonic' ||
+                    account.type === 'testnet' ||
+                    account.type === 'sk') && (
                     <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
                         <KeyIcon />
                         <Label2>{t('settings_backup_seed')}</Label2>
@@ -154,6 +186,16 @@ export const DesktopWalletSettingsPage = () => {
                         <KeyIcon />
                         <Label2>{t('settings_backup_wallet')}</Label2>
                     </SettingsListItem>
+                )}
+                {canViewTwoFA && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}>
+                        <SettingsListItem>
+                            <LockIcon />
+                            <SettingsListText>
+                                <Label2>{t('two_fa_long')}</Label2>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
                 )}
                 {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
@@ -208,6 +250,23 @@ export const DesktopWalletSettingsPage = () => {
                     </LinkStyled>
                 )}
             </SettingsListBlock>
+            {canUseTron && (
+                <>
+                    <DesktopViewDivider />
+                    <SettingsListBlock>
+                        <SettingsListItem onClick={() => onToggleTron()}>
+                            <CoinsIcon />
+                            <SettingsListText>
+                                <LabelWithBadge>
+                                    USD₮<AssetBlockchainBadge>TRC20</AssetBlockchainBadge>
+                                </LabelWithBadge>
+                                <Body3>{t('settings_enable_tron_description')}</Body3>
+                            </SettingsListText>
+                            <SwitchStyled checked={!!isTronEnabled} />
+                        </SettingsListItem>
+                    </SettingsListBlock>
+                </>
+            )}
             <>
                 {isMultisig ? (
                     <>

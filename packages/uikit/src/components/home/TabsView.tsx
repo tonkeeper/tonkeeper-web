@@ -1,11 +1,13 @@
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
 import React, { FC, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { Label1 } from '../Text';
 import { NftsList } from '../nft/Nfts';
-import { AssetData, JettonList } from './Jettons';
+import { JettonList } from './Jettons';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
 
 const TabsBlock = styled.div`
     display: flex;
@@ -91,7 +93,7 @@ const Tabs: FC<{ tab: HomeTabs; onTab: (value: HomeTabs) => void }> = ({ tab, on
 const collectibles = 'collectibles';
 
 export const TabsView: FC<{
-    assets: AssetData;
+    assets: AssetAmount[];
     nfts: NFT[];
 }> = ({ assets, nfts }) => {
     const location = useLocation();

@@ -1,6 +1,5 @@
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
-import { JettonBalance } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, useCallback, useMemo } from 'react';
+import React, { FC, useCallback, useMemo } from 'react';
 import {
     DragDropContext,
     Draggable,
@@ -16,7 +15,6 @@ import { ListBlock, ListItemElement, ListItemPayload } from '../../components/Li
 import { SkeletonListWithImages } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
 import { H3 } from '../../components/Text';
-import { useCoinFullBalance } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import {
     useJettonRawList,
@@ -25,6 +23,19 @@ import {
     useTogglePinJettonMutation
 } from '../../state/jetton';
 import { useActiveTonWalletConfig } from '../../state/wallet';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import {
+    assetAddressToString,
+    jettonToTonAssetAmount
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useTronBalances } from '../../state/tron/tron';
+import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -40,10 +51,10 @@ const Row = styled.div`
     display: flex;
     gap: 1rem;
 `;
-const Logo = styled.img`
+const Logo = styled.img<{ $noCorners?: boolean }>`
     width: 44px;
     height: 44px;
-    border-radius: ${props => props.theme.cornerFull};
+    border-radius: ${props => (props.$noCorners ? 'none' : props.theme.cornerFull)};
 `;
 
 const Icon = styled.span`
@@ -57,37 +68,40 @@ const RadioWrapper = styled.span`
     cursor: pointer;
 `;
 
-const SampleJettonRow: FC<{ jetton: JettonBalance; config: TonWalletConfig }> = ({
+const SampleJettonRow: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
     jetton,
     config
 }) => {
     const { t } = useTranslation();
 
-    const balance = useCoinFullBalance(jetton.balance, jetton.jetton.decimals);
+    const jettonAddress = assetAddressToString(jetton.asset.address);
 
     const { mutate: togglePin } = useTogglePinJettonMutation();
     const { mutate: toggleHide } = useToggleHideJettonMutation();
 
     const visible = useMemo(() => {
-        return !config.hiddenTokens.includes(jetton.jetton.address);
+        return !config.hiddenTokens.includes(jettonAddress);
     }, [config.hiddenTokens]);
 
     const pinned = useMemo(() => {
-        return config.pinnedTokens.includes(jetton.jetton.address);
+        return config.pinnedTokens.includes(jettonAddress);
     }, [config.pinnedTokens]);
 
     return (
         <ListItemPayload>
             <Row>
-                <Logo src={jetton.jetton.image} />
+                <Logo
+                    src={jetton.asset.image}
+                    $noCorners={jetton.asset.id === TRON_USDT_ASSET.id}
+                />
                 <ColumnText
-                    text={jetton.jetton.name ?? t('Unknown_COIN')}
-                    secondary={`${balance} ${jetton.jetton.symbol}`}
+                    text={jetton.asset.name ?? t('Unknown_COIN')}
+                    secondary={jetton.stringAssetRelativeAmount}
                 />
             </Row>
             <Row>
                 {visible && (
-                    <RadioWrapper onClick={() => togglePin({ config, jetton })}>
+                    <RadioWrapper onClick={() => togglePin({ config, jettonAddress })}>
                         {pinned ? (
                             <TurnOnIcon>
                                 <PinIcon />
@@ -99,7 +113,7 @@ const SampleJettonRow: FC<{ jetton: JettonBalance; config: TonWalletConfig }> = 
                         )}
                     </RadioWrapper>
                 )}
-                <RadioWrapper onClick={() => toggleHide({ config, jetton })}>
+                <RadioWrapper onClick={() => toggleHide({ config, jettonAddress })}>
                     {visible ? (
                         <TurnOnIcon>
                             <VisibleIcon />
@@ -117,19 +131,19 @@ const SampleJettonRow: FC<{ jetton: JettonBalance; config: TonWalletConfig }> = 
 
 export const PinnedJettonList: FC<{
     config: TonWalletConfig;
-    jettons: JettonBalance[];
+    jettons: AssetAmount[];
 }> = ({ config, jettons }) => {
     const { mutate } = useSavePinnedJettonOrderMutation();
 
     const list = useMemo(
         () =>
             config.pinnedTokens.reduce((acc, item) => {
-                const jetton = jettons.find(j => j.jetton.address === item);
+                const jetton = jettons.find(j => assetAddressToString(j.asset.address) === item);
                 if (jetton) {
                     acc.push(jetton);
                 }
                 return acc;
-            }, [] as JettonBalance[]),
+            }, [] as AssetAmount[]),
         [jettons, config]
     );
 
@@ -140,7 +154,7 @@ export const PinnedJettonList: FC<{
             const [reorderedItem] = updatedList.splice(droppedItem.source.index, 1);
             updatedList.splice(droppedItem.destination.index, 0, reorderedItem);
 
-            const pinnedTokens = updatedList.map(item => item.jetton.address);
+            const pinnedTokens = updatedList.map(item => assetAddressToString(item.asset.address));
             mutate({ config, pinnedTokens });
         },
         [config, list, mutate]
@@ -153,8 +167,8 @@ export const PinnedJettonList: FC<{
                     <ListBlock {...provided.droppableProps} ref={provided.innerRef} noUserSelect>
                         {list.map((jetton, index) => (
                             <Draggable
-                                key={jetton.jetton.address}
-                                draggableId={jetton.jetton.address}
+                                key={jetton.asset.id}
+                                draggableId={jetton.asset.id}
                                 index={index}
                             >
                                 {p => (
@@ -182,7 +196,7 @@ export const PinnedJettonList: FC<{
 };
 
 const JettonRow: FC<{
-    jetton: JettonBalance;
+    jetton: AssetAmount;
     config: TonWalletConfig;
     dragHandleProps: DraggableProvidedDragHandleProps | null | undefined;
 }> = ({ jetton, config, dragHandleProps }) => {
@@ -190,19 +204,27 @@ const JettonRow: FC<{
 
     const { mutate: togglePin } = useTogglePinJettonMutation();
 
-    const balance = useCoinFullBalance(jetton.balance, jetton.jetton.decimals);
-
     return (
         <ListItemPayload>
             <Row>
-                <Logo src={jetton.jetton.image} />
+                <Logo
+                    src={jetton.asset.image}
+                    $noCorners={jetton.asset.id === TRON_USDT_ASSET.id}
+                />
                 <ColumnText
-                    text={jetton.jetton.name ?? t('Unknown_COIN')}
-                    secondary={`${balance} ${jetton.jetton.symbol}`}
+                    text={jetton.asset.name ?? t('Unknown_COIN')}
+                    secondary={jetton.stringAssetRelativeAmount}
                 />
             </Row>
             <Row>
-                <RadioWrapper onClick={() => togglePin({ config, jetton })}>
+                <RadioWrapper
+                    onClick={() =>
+                        togglePin({
+                            config,
+                            jettonAddress: assetAddressToString(jetton.asset.address)
+                        })
+                    }
+                >
                     <TurnOnIcon>
                         <PinIcon />
                     </TurnOnIcon>
@@ -232,13 +254,41 @@ const Title = styled(H3)`
     margin: 14px 0;
 `;
 
+const useSettingsAssets = () => {
+    const { data: jettons } = useJettonRawList();
+    const { data: tronBalances } = useTronBalances();
+
+    return useMemo(() => {
+        if (!jettons || tronBalances === undefined) {
+            return undefined;
+        }
+
+        const tonAssets = jettons.balances.map(jettonToTonAssetAmount);
+        if (!tronBalances?.usdt) {
+            return tonAssets as AssetAmount[];
+        }
+
+        return [tronBalances.usdt as AssetAmount].concat(tonAssets as AssetAmount[]);
+    }, [jettons, tronBalances]);
+};
+
 export const JettonsSettings = () => {
+    const isFullWidth = useIsFullWidthMode();
+
+    if (isFullWidth) {
+        return <JettonsSettingsProMode />;
+    }
+
+    return <JettonsSettingsClassicMode />;
+};
+
+const JettonsSettingsClassicMode = () => {
     const { t } = useTranslation();
 
-    const { data: jettons } = useJettonRawList();
     const { data: config } = useActiveTonWalletConfig();
+    const assets = useSettingsAssets();
 
-    if (!jettons || !config) {
+    if (!assets || !config) {
         return <JettonSkeleton />;
     }
 
@@ -246,22 +296,69 @@ export const JettonsSettings = () => {
         <>
             <SubHeader title={t('settings_jettons_list')} />
             <InnerBody>
-                {config.pinnedTokens.length > 0 ? (
-                    <>
-                        <Title>{t('pinned_jettons')}</Title>
-                        <PinnedJettonList jettons={jettons.balances} config={config} />
-                    </>
-                ) : undefined}
-
-                <Title>{t('all_assets_jettons')}</Title>
-                <ListBlock>
-                    {jettons.balances.map(jetton => (
-                        <ListItemElement key={jetton.jetton.address} hover={false} ios={true}>
-                            <SampleJettonRow jetton={jetton} config={config} />
-                        </ListItemElement>
-                    ))}
-                </ListBlock>
+                <JettonsSettingsContent config={config} assets={assets} />
             </InnerBody>
+        </>
+    );
+};
+
+const DesktopContentWrapper = styled.div`
+    padding: 0 1rem;
+`;
+
+const JettonsSettingsProMode = () => {
+    const { data: config } = useActiveTonWalletConfig();
+    const assets = useSettingsAssets();
+    const { t } = useTranslation();
+
+    if (!assets || !config) {
+        return (
+            <DesktopViewPageLayout>
+                <DesktopViewHeader backButton>
+                    <DesktopViewHeaderContent title={t('settings_jettons_list')} />
+                </DesktopViewHeader>
+                <DesktopContentWrapper>
+                    <SkeletonListWithImages size={5} />
+                </DesktopContentWrapper>
+            </DesktopViewPageLayout>
+        );
+    }
+
+    return (
+        <DesktopViewPageLayout>
+            <DesktopViewHeader backButton>
+                <DesktopViewHeaderContent title={t('settings_jettons_list')} />
+            </DesktopViewHeader>
+
+            <DesktopContentWrapper>
+                <JettonsSettingsContent config={config} assets={assets} />
+            </DesktopContentWrapper>
+        </DesktopViewPageLayout>
+    );
+};
+
+const JettonsSettingsContent: FC<{ config: TonWalletConfig; assets: AssetAmount[] }> = ({
+    config,
+    assets
+}) => {
+    const { t } = useTranslation();
+    return (
+        <>
+            {config.pinnedTokens.length > 0 ? (
+                <>
+                    <Title>{t('pinned_jettons')}</Title>
+                    <PinnedJettonList jettons={assets} config={config} />
+                </>
+            ) : undefined}
+
+            <Title>{t('all_assets_jettons')}</Title>
+            <ListBlock>
+                {assets.map(jetton => (
+                    <ListItemElement key={jetton.asset.id} hover={false} ios={true}>
+                        <SampleJettonRow jetton={jetton} config={config} />
+                    </ListItemElement>
+                ))}
+            </ListBlock>
         </>
     );
 };

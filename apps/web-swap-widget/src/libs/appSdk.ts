@@ -28,7 +28,7 @@ export class WidgetAppSdk extends BaseApp {
     };
 
     openPage = async (url: string) => {
-        window.open(url, '_black');
+        window.open(url, '_black', 'noreferrer,noopener');
     };
 
     disableScroll = disableScroll;

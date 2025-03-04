@@ -30,7 +30,8 @@ export const UpdateWalletName: FC<{
     name?: string;
     submitHandler: ({ name, emoji }: { name: string; emoji: string }) => void;
     isLoading?: boolean;
-}> = ({ walletEmoji, submitHandler, name: nameProp, isLoading }) => {
+    buttonText?: string;
+}> = ({ walletEmoji, submitHandler, name: nameProp, isLoading, buttonText }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLInputElement | null>(null);
@@ -82,7 +83,7 @@ export const UpdateWalletName: FC<{
                     type="submit"
                     loading={isLoading}
                 >
-                    {t('add_edit_favorite_save')}
+                    {buttonText ?? t('add_edit_favorite_save')}
                 </ButtonResponsiveSize>
             </Block>
         </CenterContainer>

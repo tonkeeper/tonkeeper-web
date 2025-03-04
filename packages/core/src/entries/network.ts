@@ -1,8 +1,6 @@
 import { Configuration as ConfigurationV2 } from '../tonApiV2';
 import { OpenAPI as TonConsoleApi } from '../tonConsoleApi';
 import { TonendpointConfig } from '../tonkeeperApi/tonendpoint';
-import { Configuration as TronConfiguration } from '../tronApi';
-import { TronApi, TronChain } from './tron';
 
 export enum Network {
     MAINNET = -239,
@@ -25,12 +23,6 @@ export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => 
     });
 };
 
-const getTronClient = (current?: Network) => {
-    return new TronConfiguration({
-        basePath: TronApi[current === Network.MAINNET ? TronChain.MAINNET : TronChain.NILE]
-    });
-};
-
 export const getApiConfig = (config: TonendpointConfig, network: Network, TonConsoleBase = '') => {
     // Global config
     if (TonConsoleBase) {
@@ -39,7 +31,6 @@ export const getApiConfig = (config: TonendpointConfig, network: Network, TonCon
     }
 
     return {
-        tonApiV2: getTonClientV2(config, network),
-        tronApi: getTronClient(network)
+        tonApiV2: getTonClientV2(config, network)
     };
 };

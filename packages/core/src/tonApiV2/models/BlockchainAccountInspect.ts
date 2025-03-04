@@ -13,13 +13,20 @@
  */
 
 import { mapValues } from '../runtime';
-import type { BlockchainAccountInspectMethodsInner } from './BlockchainAccountInspectMethodsInner';
+import type { Method } from './Method';
 import {
-    BlockchainAccountInspectMethodsInnerFromJSON,
-    BlockchainAccountInspectMethodsInnerFromJSONTyped,
-    BlockchainAccountInspectMethodsInnerToJSON,
-    BlockchainAccountInspectMethodsInnerToJSONTyped,
-} from './BlockchainAccountInspectMethodsInner';
+    MethodFromJSON,
+    MethodFromJSONTyped,
+    MethodToJSON,
+    MethodToJSONTyped,
+} from './Method';
+import type { Source } from './Source';
+import {
+    SourceFromJSON,
+    SourceFromJSONTyped,
+    SourceToJSON,
+    SourceToJSONTyped,
+} from './Source';
 
 /**
  * 
@@ -41,16 +48,22 @@ export interface BlockchainAccountInspect {
     codeHash: string;
     /**
      * 
-     * @type {Array<BlockchainAccountInspectMethodsInner>}
+     * @type {Array<Method>}
      * @memberof BlockchainAccountInspect
      */
-    methods: Array<BlockchainAccountInspectMethodsInner>;
+    methods: Array<Method>;
     /**
      * 
      * @type {string}
      * @memberof BlockchainAccountInspect
      */
-    compiler?: BlockchainAccountInspectCompilerEnum;
+    compiler: BlockchainAccountInspectCompilerEnum;
+    /**
+     * 
+     * @type {Source}
+     * @memberof BlockchainAccountInspect
+     */
+    source?: Source;
 }
 
 
@@ -58,7 +71,9 @@ export interface BlockchainAccountInspect {
  * @export
  */
 export const BlockchainAccountInspectCompilerEnum = {
-    Func: 'func'
+    Func: 'func',
+    Fift: 'fift',
+    Tact: 'tact'
 } as const;
 export type BlockchainAccountInspectCompilerEnum = typeof BlockchainAccountInspectCompilerEnum[keyof typeof BlockchainAccountInspectCompilerEnum];
 
@@ -70,6 +85,7 @@ export function instanceOfBlockchainAccountInspect(value: object): value is Bloc
     if (!('code' in value) || value['code'] === undefined) return false;
     if (!('codeHash' in value) || value['codeHash'] === undefined) return false;
     if (!('methods' in value) || value['methods'] === undefined) return false;
+    if (!('compiler' in value) || value['compiler'] === undefined) return false;
     return true;
 }
 
@@ -85,8 +101,9 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
         
         'code': json['code'],
         'codeHash': json['code_hash'],
-        'methods': ((json['methods'] as Array<any>).map(BlockchainAccountInspectMethodsInnerFromJSON)),
-        'compiler': json['compiler'] == null ? undefined : json['compiler'],
+        'methods': ((json['methods'] as Array<any>).map(MethodFromJSON)),
+        'compiler': json['compiler'],
+        'source': json['source'] == null ? undefined : SourceFromJSON(json['source']),
     };
 }
 
@@ -103,8 +120,9 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
         
         'code': value['code'],
         'code_hash': value['codeHash'],
-        'methods': ((value['methods'] as Array<any>).map(BlockchainAccountInspectMethodsInnerToJSON)),
+        'methods': ((value['methods'] as Array<any>).map(MethodToJSON)),
         'compiler': value['compiler'],
+        'source': SourceToJSON(value['source']),
     };
 }
 

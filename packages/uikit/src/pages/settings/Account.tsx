@@ -5,7 +5,6 @@ import {
     DraggableProvidedDragHandleProps,
     Droppable
 } from 'react-beautiful-dnd';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { DropDown } from '../../components/DropDown';
@@ -22,12 +21,12 @@ import { RenameWalletNotification } from '../../components/settings/wallet-name/
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useAccountsState } from '../../state/wallet';
 import { Account as AccountType } from '@tonkeeper/core/dist/entries/account';
 import { useAccountLabel } from '../../hooks/accountUtils';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 
-import { useAccountsDNDDrop, useSideBarItems } from "../../state/folders";
+import { useAccountsDNDDrop, useSideBarItems } from '../../state/folders';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const Row = styled.div`
     display: flex;

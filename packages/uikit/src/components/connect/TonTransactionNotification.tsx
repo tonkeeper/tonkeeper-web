@@ -196,7 +196,7 @@ const ConnectContent: FC<{
         isLoading: isEstimating,
         isError,
         error
-    } = useEstimation(params, senderChoice);
+    } = useEstimation(params, senderChoice, { multisigTTL });
     const {
         mutateAsync,
         isLoading,
@@ -246,12 +246,12 @@ const ConnectContent: FC<{
             ) : (
                 <EmulationList isError={isError} event={estimate?.event} hideExtraDetails />
             )}
-            {!!estimate?.extra && (
+            {!!estimate?.fee && (
                 <ActionFeeDetailsUniversalStyled
                     availableSendersChoices={availableSendersChoices}
                     selectedSenderType={selectedSenderType}
                     onSenderTypeChange={onSenderTypeChange}
-                    extra={estimate.extra}
+                    fee={estimate.fee}
                 />
             )}
             <ButtonGap />
@@ -297,11 +297,26 @@ const ConnectContent: FC<{
     );
 };
 
-const useEstimation = (params: TonConnectTransactionPayload, senderChoice: SenderChoice) => {
+const useEstimation = (
+    params: TonConnectTransactionPayload,
+    senderChoice: SenderChoice,
+    options: { multisigTTL?: MultisigOrderLifetimeMinutes }
+) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
 
-    const getSender = useGetEstimationSender(senderChoice);
+    const senderChoiceComputed = useMemo(() => {
+        if (account.type === 'ton-multisig') {
+            return {
+                type: 'multisig' as const,
+                ttlSeconds: 60 * Number(options?.multisigTTL ?? '60')
+            };
+        }
+
+        return senderChoice;
+    }, [senderChoice, options?.multisigTTL, account.type]);
+
+    const getSender = useGetEstimationSender(senderChoiceComputed);
     const getSenderKey = useToQueryKeyPart(getSender);
     const tonConenctService = useTonConnectTransactionService();
 

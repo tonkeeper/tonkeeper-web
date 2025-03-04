@@ -1,10 +1,20 @@
 import { HistoryEvent, HistoryGridTimeCell } from './HistoryEvent';
 import { SpinnerRing } from '../../Icon';
 import React, { FC, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { GenericActivity } from '../../../state/activity';
-import { MixedActivity } from '../../../state/mixedActivity';
-import { ActionData, ActivityNotification } from '../../activity/ton/ActivityNotification';
+import styled, { css } from 'styled-components';
+import {
+    ActivityItem,
+    CategorizedActivity,
+    CategorizedActivityItemGroup
+} from '../../../state/activity';
+import {
+    ActivityNotification,
+    ActivityNotificationData
+} from '../../activity/ton/ActivityNotification';
+import { ForTargetEnv } from '../../shared/TargetEnv';
+import { Body2Class } from '../../Text';
+import { useTranslation } from '../../../hooks/translation';
+
 
 const ContainerQuery = styled.div`
     container-type: inline-size;
@@ -29,26 +39,72 @@ const GridSizer4 = styled.div`
 `;
 
 const HistoryEventsGrid = styled.div<{ withBorder?: boolean }>`
-    display: grid;
-    grid-template-columns: 152px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
-    column-gap: 8px;
-    padding: 0 1rem;
-
-    @container (max-width: 800px) {
-        grid-template-columns: fit-content(256px) fit-content(256px) minmax(40px, 1fr);
-
-        ${HistoryGridTimeCell} {
-            grid-column: 1 / -1;
-
-            &:empty {
-                display: none;
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            display: grid;
+            grid-template-columns: 152px fit-content(256px) fit-content(256px) minmax(40px, 1fr);
+            column-gap: 8px;
+            padding: 0 1rem;
+            * {
+                box-sizing: content-box;
             }
-        }
 
-        ${GridSizer1} {
-            grid-column: 1 / -1;
-        }
-    }
+            @container (max-width: 800px) {
+                grid-template-columns: fit-content(256px) fit-content(256px) minmax(40px, 1fr);
+
+                ${HistoryGridTimeCell} {
+                    grid-column: 1 / -1;
+
+                    &:empty {
+                        display: none;
+                    }
+                }
+
+                ${GridSizer1} {
+                    grid-column: 1 / -1;
+                }
+            }
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            .grid-area-time {
+                grid-area: time;
+            }
+
+            .grid-area-action {
+                grid-area: action;
+            }
+
+            .grid-area-amount {
+                grid-area: amount;
+                justify-self: end;
+            }
+
+            .grid-area-account {
+                grid-area: account;
+                margin-left: 22px;
+            }
+
+            .grid-area-comment {
+                grid-area: comment;
+                margin-left: 22px;
+            }
+
+            > div {
+                display: grid;
+                grid-template-areas:
+                    'time time'
+                    'action amount'
+                    'account account'
+                    'comment comment';
+                column-gap: 8px;
+                padding: 0.25rem 1rem;
+                align-items: center;
+            }
+        `}
 `;
 
 const FetchingRows = styled.div`
@@ -62,33 +118,20 @@ const FetchingRows = styled.div`
     }
 `;
 
-type GroupedActivityItemSingle = {
-    type: 'single';
-    item: GenericActivity<MixedActivity>;
-    key: string;
-};
-
-type GroupedActivityItemGroup = {
-    type: 'group';
-    items: GenericActivity<MixedActivity>[];
-    category: 'spam';
-    key: string;
-};
-
-type GroupedActivity = (GroupedActivityItemSingle | GroupedActivityItemGroup)[];
-
 const HistoryEvents: FC<{
     className?: string;
-    aggregatedActivity: GroupedActivity;
-    setSelectedActivity: React.Dispatch<React.SetStateAction<ActionData | undefined>>;
+    aggregatedActivity: CategorizedActivity;
+    setSelectedActivity: React.Dispatch<React.SetStateAction<ActivityNotificationData | undefined>>;
 }> = ({ className, aggregatedActivity, setSelectedActivity }) => {
     return (
         <ContainerQuery>
             <HistoryEventsGrid className={className}>
-                <GridSizer1 />
-                <GridSizer2 />
-                <GridSizer3 />
-                <GridSizer4 />
+                <ForTargetEnv env="desktop">
+                    <GridSizer1 />
+                    <GridSizer2 />
+                    <GridSizer3 />
+                    <GridSizer4 />
+                </ForTargetEnv>
                 {aggregatedActivity.map(group => (
                     <HistoryEvent
                         group={group}
@@ -101,18 +144,28 @@ const HistoryEvents: FC<{
     );
 };
 
+const NoTransactionsYet = styled.div`
+    padding: 24px 32px;
+    ${Body2Class};
+    color: ${p => p.theme.textSecondary};
+    text-align: center;
+`;
+
 export const DesktopHistory: FC<{
-    activity: GenericActivity<MixedActivity>[] | undefined;
+    activity: ActivityItem[] | undefined;
     isFetchingNextPage: boolean;
     className?: string;
 }> = ({ activity, isFetchingNextPage, className }) => {
-    const [selectedActivity, setSelectedActivity] = useState<ActionData | undefined>();
+    const { t } = useTranslation();
+    const [selectedActivity, setSelectedActivity] = useState<
+        ActivityNotificationData | undefined
+    >();
 
-    const aggregatedActivity: GroupedActivity = useMemo(() => {
+    const aggregatedActivity: CategorizedActivity = useMemo(() => {
         const double = new Set();
 
         const groupped = (activity ?? []).reduce((acc, item) => {
-            if (item.event.kind === 'tron' || !item.event.event.isScam) {
+            if (item.type === 'tron' || !item.event.isScam) {
                 if (!double.has(item.key)) {
                     double.add(item.key);
                     acc.push({
@@ -125,7 +178,7 @@ export const DesktopHistory: FC<{
             }
 
             if (acc.length > 0 && acc[acc.length - 1].type === 'group') {
-                const group = acc[acc.length - 1] as GroupedActivityItemGroup;
+                const group = acc[acc.length - 1] as CategorizedActivityItemGroup;
                 group.items.push(item);
                 group.key = item.key;
                 return acc;
@@ -139,7 +192,7 @@ export const DesktopHistory: FC<{
             });
 
             return acc;
-        }, [] as GroupedActivity);
+        }, [] as CategorizedActivity);
 
         return groupped.map(i => {
             if (i.type === 'group' && i.items.length === 1) {
@@ -155,6 +208,10 @@ export const DesktopHistory: FC<{
     }, [activity]);
 
     const key = aggregatedActivity.length ? aggregatedActivity[0].key : undefined;
+    if (activity && !activity.length) {
+        return <NoTransactionsYet>{t('history_no_transactions_yet')}</NoTransactionsYet>;
+    }
+
     return (
         <>
             <ActivityNotification

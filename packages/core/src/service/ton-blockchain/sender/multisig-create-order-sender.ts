@@ -1,16 +1,15 @@
 import { APIConfig } from '../../../entries/apis';
 import { assertBalanceEnough, getServerTime } from '../utils';
-import { Signer } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { type Multisig } from '../../../tonApiV2';
 import { TonWalletStandard } from '../../../entries/wallet';
 import { ISender } from './ISender';
 import { MultisigEncoder } from '../encoder/multisig-encoder/multisig-encoder';
-import { WalletMessageSender } from './wallet-message-sender';
 import BigNumber from 'bignumber.js';
-import { LedgerMessageSender } from './ledger-message-sender';
-import { internal, SendMode } from '@ton/core';
+import { fromNano, internal, SendMode } from '@ton/core';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
+import { estimateOrderByOutgoingMessage } from '../encoder/multisig-encoder/multisig-utils';
+import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(
@@ -18,7 +17,7 @@ export class MultisigCreateOrderSender implements ISender {
         private readonly multisig: Multisig,
         private readonly ttlSeconds: number,
         private readonly hostWallet: TonWalletStandard,
-        private readonly signer: Signer
+        private readonly hostWalletSender: ISender
     ) {}
 
     public get excessAddress() {
@@ -26,43 +25,34 @@ export class MultisigCreateOrderSender implements ISender {
     }
 
     public async send(outgoing: WalletOutgoingMessage) {
+        await this.checkTransactionPossibility();
         const wrappedMessage = await this.wrapMessage(outgoing);
 
-        if (this.signer.type === 'ledger') {
-            const sender = new LedgerMessageSender(this.api, this.hostWallet, this.signer);
-            return (
-                await sender.tonRawTransfer({
-                    ...wrappedMessage,
-                    sendMode: SendMode.IGNORE_ERRORS
-                })
-            ).send();
-        }
-
-        const sender = new WalletMessageSender(this.api, this.hostWallet, this.signer);
-        return sender.send({
+        return this.hostWalletSender.send({
             sendMode: SendMode.IGNORE_ERRORS,
             messages: [internal(wrappedMessage)]
         });
     }
 
     public async estimate(outgoing: WalletOutgoingMessage) {
-        const wrappedMessage = await this.wrapMessage(outgoing);
+        await this.checkTransactionPossibility();
 
-        if (this.signer.type === 'ledger') {
-            const sender = new LedgerMessageSender(this.api, this.hostWallet, this.signer);
-            return (
-                await sender.tonRawTransfer({
-                    ...wrappedMessage,
-                    sendMode: SendMode.IGNORE_ERRORS
-                })
-            ).estimate();
-        }
+        const timestamp = await getServerTime(this.api);
 
-        const sender = new WalletMessageSender(this.api, this.hostWallet, this.signer);
-        return sender.estimate({
-            sendMode: SendMode.IGNORE_ERRORS,
-            messages: [internal(wrappedMessage)]
+        const result = await estimateOrderByOutgoingMessage({
+            api: this.api,
+            multisig: this.multisig,
+            orderValidUntilSeconds: timestamp + this.ttlSeconds,
+            outgoing
         });
+
+        return {
+            fee: {
+                type: 'ton-asset' as const,
+                extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.event.extra * -1 })
+            },
+            event: result.event
+        };
     }
 
     private async wrapMessage(outgoing: WalletOutgoingMessage) {
@@ -88,5 +78,11 @@ export class MultisigCreateOrderSender implements ISender {
                 }))
             }
         });
+    }
+
+    private async checkTransactionPossibility() {
+        const requiredBalance = new BigNumber(fromNano(MultisigEncoder.createOrderAmount) + 0.02);
+
+        await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.hostWallet.rawAddress);
     }
 }

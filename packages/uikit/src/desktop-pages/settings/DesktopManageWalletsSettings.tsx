@@ -14,11 +14,12 @@ import {
     ListIcon,
     PencilIcon,
     PlusIcon,
+    PlusIconSmall,
     ReorderIcon,
     TrashBinIcon
 } from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
-import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
+import { Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveTonNetwork } from '../../state/wallet';
@@ -30,12 +31,14 @@ import {
     AccountTonMnemonic,
     AccountTonMultisig,
     AccountTonOnly,
+    AccountTonSK,
     AccountTonTestnet,
     AccountTonWatchOnly
 } from '@tonkeeper/core/dist/entries/account';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import {
@@ -64,6 +67,7 @@ import {
     useSideBarItems
 } from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -132,20 +136,6 @@ const BottomButtonContainer = styled.div`
     padding: 1rem;
 `;
 
-const NewFolderButton = styled.button`
-    border: none;
-    background-color: transparent;
-    padding: 0.5rem 1rem;
-    margin-right: -1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: ${p => p.theme.textAccent};
-    margin-left: auto;
-    ${Body2Class};
-`;
-
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { onOpen: addWallet } = useAddWalletNotification();
@@ -158,10 +148,22 @@ export const DesktopManageAccountsPage = () => {
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('Manage_wallets')}</Label2>
-                <NewFolderButton onClick={() => manageFolders()}>
-                    {t('accounts_new_folder')}
-                </NewFolderButton>
+                <DesktopViewHeaderContent
+                    title={t('Manage_wallets')}
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem
+                                onClick={() => manageFolders()}
+                                asDesktopButton
+                            >
+                                <ForTargetEnv env="mobile">
+                                    <PlusIconSmall />
+                                </ForTargetEnv>
+                                {t('accounts_new_folder')}
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
             </DesktopViewHeader>
             <DragDropContext onDragEnd={handleDrop}>
                 <Droppable droppableId="settings_wallets" type="all_items">
@@ -332,7 +334,7 @@ const MultisigItemRow = forwardRef<
 });
 
 const AccountMnemonicRow: FC<{
-    account: AccountTonMnemonic | AccountTonTestnet;
+    account: AccountTonMnemonic | AccountTonTestnet | AccountTonSK;
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
@@ -687,6 +689,7 @@ const AccountRow: FC<{
     switch (account.type) {
         case 'mnemonic':
         case 'testnet':
+        case 'sk':
             return <AccountMnemonicRow account={account} {...rest} />;
         case 'ledger':
             return <AccountLedgerRow account={account} {...rest} />;
