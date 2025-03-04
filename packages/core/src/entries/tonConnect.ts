@@ -62,13 +62,15 @@ export interface ConnectEventError {
     };
 }
 
+export interface TonConnectEventPayload {
+    items: ConnectItemReply[];
+    device: DeviceInfo;
+}
+
 export interface ConnectEventSuccess {
     event: 'connect';
     id: number;
-    payload: {
-        items: ConnectItemReply[];
-        device: DeviceInfo;
-    };
+    payload: TonConnectEventPayload;
 }
 
 export type ConnectItem = TonAddressItem | TonProofItem;
