@@ -9,7 +9,7 @@
 import browser from 'webextension-polyfill';
 import { BackgroundEvents, backgroundEventsEmitter, popUpEventEmitter, RESPONSE } from '../event';
 import memoryStore from '../store/memoryStore';
-import { AptabaseExtensionService } from './bachgroundAptabaseService';
+import { AptabaseExtensionService } from './backgroundAptabaseService';
 import { closeCurrentPopUp, getPopup } from './dApp/notificationService';
 
 let popUpPort: browser.Runtime.Port;
@@ -74,7 +74,6 @@ popUpEventEmitter.on('accountsChanged', message => {
 popUpEventEmitter.on('tonConnectDisconnect', message => {
     backgroundEventsEmitter.emit('tonConnectDisconnect', message);
 });
-
 
 popUpEventEmitter.on('proxyChanged', message => {
     backgroundEventsEmitter.emit('proxyChanged', message);
