@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-    ConnectItemReply,
     DAppManifest,
-    SendTransactionAppRequest
+    SendTransactionAppRequest,
+    TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     parseTonTransferWithAddress,
@@ -81,7 +81,7 @@ export const useGetConnectInfo = () => {
 export interface AppConnectionProps {
     params: TonConnectParams;
     result: {
-        replyItems: ConnectItemReply[];
+        replyItems: TonConnectEventPayload;
         manifest: DAppManifest;
         account: Account;
         walletId: WalletId;
@@ -100,7 +100,7 @@ export const useResponseConnectionMutation = () => {
                 walletId: result.walletId,
                 manifest: result.manifest,
                 params,
-                replyItems: result.replyItems,
+                replyItems: result.replyItems.items,
                 appVersion: sdk.version
             });
 

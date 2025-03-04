@@ -19,6 +19,11 @@
     "background": {
         "service_worker": "background.js"
     },
+    "host_permissions": [
+        "https://c.tonapi.io/*",
+        "https://tonapi.io/*",
+        "https://testnet.tonapi.io/*"
+    ],
     "content_scripts": [
         {
             "matches": ["file://*/*", "http://*/*", "https://*/*"],

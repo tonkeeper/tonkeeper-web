@@ -2,62 +2,13 @@ import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import {
     ConnectEvent,
     ConnectEventError,
-    ConnectItemReply,
     ConnectRequest,
-    DeviceInfo,
     DisconnectEvent,
     SendTransactionRpcRequest,
-    SendTransactionRpcResponse
+    SendTransactionRpcResponse,
+    TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import packageJson from '../../package.json';
 import { TonProvider } from '../provider/index';
-
-function getPlatform(): DeviceInfo['platform'] {
-    const platform =
-        (window.navigator as any)?.userAgentData?.platform || window.navigator.platform;
-
-    const userAgent = window.navigator.userAgent;
-
-    const macosPlatforms = ['macOS', 'Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
-    const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
-    const iphonePlatforms = ['iPhone'];
-    const iosPlatforms = ['iPad', 'iPod'];
-
-    let os: DeviceInfo['platform'] | null = null;
-
-    if (macosPlatforms.indexOf(platform) !== -1) {
-        os = 'mac';
-    } else if (iphonePlatforms.indexOf(platform) !== -1) {
-        os = 'iphone';
-    } else if (iosPlatforms.indexOf(platform) !== -1) {
-        os = 'ipad';
-    } else if (windowsPlatforms.indexOf(platform) !== -1) {
-        os = 'windows';
-    } else if (/Android/.test(userAgent)) {
-        os = 'linux';
-    } else if (/Linux/.test(platform)) {
-        os = 'linux';
-    }
-
-    return os!;
-}
-
-export const getDeviceInfo = (): DeviceInfo => {
-    return {
-        platform: getPlatform()!,
-        appName: 'Tonkeeper',
-        appVersion: packageJson.version,
-        maxProtocolVersion: 2,
-        features: [
-            'SendTransaction',
-            {
-                name: 'SendTransaction',
-                maxMessages: 4,
-                extraCurrencySupported: true
-            }
-        ]
-    };
-};
 
 const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
     return {
@@ -101,7 +52,7 @@ export interface WalletInfo {
 }
 
 export interface TonConnectBridge {
-    deviceInfo: DeviceInfo; // see Requests/Responses spec
+    //  deviceInfo: DeviceInfo; // see Requests/Responses spec
     walletInfo?: WalletInfo;
     protocolVersion: number; // max supported Ton Connect version (e.g. 2)
     isWalletBrowser: boolean; // if the page is opened into wallet's browser
@@ -116,7 +67,6 @@ type TonConnectCallback = (event: WalletEvent) => void;
 export class TonConnect implements TonConnectBridge {
     callbacks: TonConnectCallback[] = [];
 
-    deviceInfo: DeviceInfo = getDeviceInfo();
     walletInfo: WalletInfo = {
         name: 'Tonkeeper',
         image: 'https://tonkeeper.com/assets/tonconnect-icon.png',
@@ -156,7 +106,7 @@ export class TonConnect implements TonConnectBridge {
             );
         }
         try {
-            const items = await this.provider.send<ConnectItemReply[]>(
+            const payload = await this.provider.send<TonConnectEventPayload>(
                 'tonConnect_connect',
                 message
             );
@@ -164,10 +114,7 @@ export class TonConnect implements TonConnectBridge {
             return this.notify({
                 event: 'connect',
                 id: Date.now(),
-                payload: {
-                    items: items,
-                    device: getDeviceInfo()
-                }
+                payload: payload
             });
         } catch (e) {
             if (e instanceof TonConnectError) {
@@ -193,17 +140,15 @@ export class TonConnect implements TonConnectBridge {
 
     restoreConnection = async (): Promise<ConnectEvent> => {
         try {
-            const items = await this.provider.send<ConnectItemReply[]>('tonConnect_reconnect', [
-                { name: 'ton_addr' }
-            ]);
+            const payload = await this.provider.send<TonConnectEventPayload>(
+                'tonConnect_reconnect',
+                [{ name: 'ton_addr' }]
+            );
 
             return this.notify({
                 event: 'connect',
                 id: Date.now(),
-                payload: {
-                    items: items,
-                    device: getDeviceInfo()
-                }
+                payload: payload
             });
         } catch (e) {
             if (e instanceof TonConnectError) {

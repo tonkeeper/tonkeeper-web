@@ -1,4 +1,4 @@
-import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
@@ -6,24 +6,24 @@ import {
     useGetConnectInfo
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
-import { subscribeToTonOrTonConnectUrlOpened, tonConnectSSE } from "../../libs/tonConnect";
-import { Account } from "@tonkeeper/core/dist/entries/account";
-import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
+import { subscribeToTonOrTonConnectUrlOpened, tonConnectSSE } from '../../libs/tonConnect';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectParams | null>(null);
 
     const { mutateAsync, reset } = useGetConnectInfo();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-      useResponseConnectionMutation();
+        useResponseConnectionMutation();
 
     const handlerClose = async (
-      result: {
-          replyItems: ConnectItemReply[];
-          manifest: DAppManifest;
-          account: Account;
-          walletId: WalletId;
-      } | null
+        result: {
+            replyItems: TonConnectEventPayload;
+            manifest: DAppManifest;
+            account: Account;
+            walletId: WalletId;
+        } | null
     ) => {
         if (!params) return;
         responseReset();
@@ -43,10 +43,10 @@ export const DeepLinkSubscription = () => {
     }, []);
 
     return (
-      <TonConnectNotification
-        origin={undefined}
-        params={params?.request ?? null}
-        handleClose={handlerClose}
-      />
+        <TonConnectNotification
+            origin={undefined}
+            params={params?.request ?? null}
+            handleClose={handlerClose}
+        />
     );
 };

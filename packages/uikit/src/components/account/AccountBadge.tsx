@@ -187,7 +187,7 @@ export const AccountAndWalletBadgesGroup: FC<{
     }
 
     if (
-        (account.type === 'mnemonic' || account.type === 'testnet') &&
+        (account.type === 'mnemonic' || account.type === 'testnet' || account.type === 'sk') &&
         account.tonWallets.length > 1
     ) {
         const wallet = account.tonWallets.find(w => w.id === walletId);
