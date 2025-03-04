@@ -1,6 +1,5 @@
 import {
     CONNECT_EVENT_ERROR_CODES,
-    ConnectItemReply,
     ConnectRequest,
     TonConnectAccount,
     TonConnectEventPayload,

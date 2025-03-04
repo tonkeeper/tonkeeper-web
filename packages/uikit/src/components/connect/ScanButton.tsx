@@ -1,8 +1,4 @@
-import {
-    ConnectItemReply,
-    DAppManifest,
-    TonConnectEventPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';

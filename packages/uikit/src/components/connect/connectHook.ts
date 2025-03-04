@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-    ConnectItemReply,
     DAppManifest,
     SendTransactionAppRequest,
     TonConnectEventPayload
