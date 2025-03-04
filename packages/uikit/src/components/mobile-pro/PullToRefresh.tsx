@@ -1,4 +1,4 @@
-import { createGesture, Gesture, IonSpinner } from '@ionic/react';
+import { IonSpinner } from '@ionic/react';
 import { ForTargetEnv } from '../shared/TargetEnv';
 import { FC, PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -95,51 +95,51 @@ const Refresher: FC<{ onRefresh: () => Promise<void>; paddingBottom?: string }> 
             return;
         }
 
-        let gesture: Gesture | undefined;
+        let startY = 0;
+        let currentY = 0;
 
-        container.getScrollElement().then(el => {
-            el.addEventListener('touchmove', e => {
-                isOverscroll.current = el.scrollTop <= 0 && e.touches[0].clientY > startY;
-            });
-
-            let startY = 0;
-            let currentY = 0;
-
-            gesture = createGesture({
-                el,
-                threshold: 0,
-                gestureName: 'pull-refresh-1',
-                onStart: ev => {
+        const onTouchStart = (e: TouchEvent) => {
+            container.getScrollElement().then(el => {
+                if (el.scrollTop <= 0) {
+                    startY = e.touches[0].clientY;
+                    isOverscroll.current = true;
                     setStatus('pulling');
-                    startY = ev.startY;
                     setIsEnded(false);
-                    return true;
-                },
-                onMove: ev => {
-                    if (statusRef.current === 'refreshing' || statusRef.current === 'done') return;
-
-                    currentY = ev.currentY;
-                    const deltaY = currentY - startY;
-
-                    if (deltaY <= 0 || !isOverscroll.current) {
-                        return;
-                    }
-
-                    if (deltaY > pullToActivate) {
-                        setStatus('refreshing');
-                        onRefresh().finally(() => setStatus('done'));
-                    }
-                },
-                onEnd: () => {
-                    setIsEnded(true);
                 }
             });
+        };
 
-            gesture.enable();
-        });
+        const onTouchMove = (e: TouchEvent) => {
+            if (!isOverscroll || statusRef.current === 'refreshing' || statusRef.current === 'done')
+                return;
+
+            currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+
+            if (deltaY <= 0) {
+                isOverscroll.current = false;
+                return;
+            }
+
+            if (deltaY > pullToActivate) {
+                setStatus('refreshing');
+                onRefresh().finally(() => setStatus('done'));
+            }
+        };
+
+        const onTouchEnd = () => {
+            isOverscroll.current = false;
+            setIsEnded(true);
+        };
+
+        container.addEventListener('touchstart', onTouchStart);
+        container.addEventListener('touchmove', onTouchMove, { passive: false });
+        container.addEventListener('touchend', onTouchEnd);
 
         return () => {
-            gesture?.destroy();
+            container.removeEventListener('touchstart', onTouchStart);
+            container.removeEventListener('touchmove', onTouchMove);
+            container.removeEventListener('touchend', onTouchEnd);
         };
     }, [onRefresh]);
 
