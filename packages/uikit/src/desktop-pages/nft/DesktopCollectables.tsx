@@ -17,6 +17,8 @@ import { useAppTargetEnv } from '../../hooks/appSdk';
 import { SlidersIcon } from '../../components/Icon';
 import { Link } from '../../components/shared/Link';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { QueryKey } from '../../libs/queryKey';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -159,6 +161,7 @@ export const DesktopCollectablesContent = () => {
                     }
                 />
             </DesktopViewHeader>
+            <PullToRefresh invalidate={QueryKey.nft} />
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>
     );

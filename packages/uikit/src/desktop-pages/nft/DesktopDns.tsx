@@ -18,6 +18,8 @@ import { HideOnReview } from '../../components/ios/HideOnReview';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { Link } from '../../components/shared/Link';
+import { QueryKey } from '../../libs/queryKey';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -164,6 +166,7 @@ export const DesktopDnsContent = () => {
                     }
                 />
             </DesktopViewHeader>
+            <PullToRefresh invalidate={QueryKey.nft} />
             <NFTPageBody>{filteredNft && <NftsListStyled nfts={filteredNft} />}</NFTPageBody>
         </DesktopViewPageLayout>
     );

@@ -23,6 +23,8 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
 import { Body2 } from '../../components/Text';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { QueryKey } from '../../libs/queryKey';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     ${p =>
@@ -207,6 +209,7 @@ const DesktopHistoryPageContent: FC = () => {
             <DesktopViewHeader borderBottom={true}>
                 <DesktopViewHeaderContent title={t('page_header_history')} right={rightPart} />
             </DesktopViewHeader>
+            <PullToRefresh invalidate={QueryKey.activity} />
             <HistoryContainer>
                 <DesktopHistory activity={activity} isFetchingNextPage={isFetchingNextPage} />
             </HistoryContainer>

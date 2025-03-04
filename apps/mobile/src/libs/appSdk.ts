@@ -13,7 +13,7 @@ import { getWindow } from './utils';
 import { Biometric, SecureStorage } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
-import { Haptics, NotificationType } from '@capacitor/haptics';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -94,7 +94,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     targetEnv = CAPACITOR_APPLICATION_ID;
 
-    hapticNotification = (type: 'success' | 'error') => {
+    hapticNotification = (type: 'success' | 'error' | 'impact_medium') => {
+        if (type === 'impact_medium') {
+            return Haptics.impact({ style: ImpactStyle.Medium });
+        }
+
         return Haptics.notification({
             type: type === 'success' ? NotificationType.Success : NotificationType.Error
         });

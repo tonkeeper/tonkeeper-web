@@ -44,7 +44,9 @@ import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { mergeRefs } from '../../libs/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
 import { useBatteryBalance } from '../../state/battery';
-import { Link } from "../../components/shared/Link";
+import { Link } from '../../components/shared/Link';
+import { QueryKey } from '../../libs/queryKey';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -378,6 +380,12 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
                     }
                 />
             </DesktopViewHeader>
+            <PullToRefresh
+                invalidate={[
+                    QueryKey.activity,
+                    token === CryptoCurrency.TON ? QueryKey.info : QueryKey.jettons
+                ]}
+            />
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
@@ -428,6 +436,7 @@ export const TronUSDTPage = () => {
             <DesktopViewHeader backButton borderBottom>
                 <Label2>{asset.symbol}</Label2>
             </DesktopViewHeader>
+            <PullToRefresh invalidate={[QueryKey.activity, QueryKey.tronAssets]} />
             <CoinHeaderStyled>
                 <TronCoinInfoWrapper>
                     <img src={asset.image} alt={asset.symbol} />

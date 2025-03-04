@@ -17,7 +17,7 @@ import React, { FC, useEffect, useMemo } from 'react';
 import { Button } from '../../components/fields/Button';
 
 import { styled } from 'styled-components';
-import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
+import { useAppSdk } from '../../hooks/appSdk';
 import { Multisig, type MultisigOrder, Risk } from '@tonkeeper/core/dist/tonApiV2';
 import { AppRoute } from '../../libs/routes';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
@@ -32,6 +32,8 @@ import { useDateTimeFormatFromNow } from '../../hooks/useDateTimeFormat';
 import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
 import { useActiveConfig } from '../../state/wallet';
 import { Navigate } from '../../components/shared/Navigate';
+import { QueryKey } from '../../libs/queryKey';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -41,7 +43,6 @@ export const DesktopMultisigOrdersPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { t } = useTranslation();
     const isAccountMultisig = useIsActiveAccountMultisig();
-    const env = useAppTargetEnv();
 
     if (!isAccountMultisig) {
         return <Navigate to={AppRoute.home} />;
@@ -65,10 +66,20 @@ const DesktopMultisigOrdersPageBody = () => {
     }
 
     if (!multisig.orders.length) {
-        return <EmptyOrdersPage />;
+        return (
+            <>
+                <PullToRefresh invalidate={QueryKey.multisigWallet} />
+                <EmptyOrdersPage />
+            </>
+        );
     }
 
-    return <ManageExistingMultisigOrders multisig={multisig} />;
+    return (
+        <>
+            <PullToRefresh invalidate={QueryKey.multisigWallet} paddingBottom="30px" />
+            <ManageExistingMultisigOrders multisig={multisig} />
+        </>
+    );
 };
 
 export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multisig }) => {

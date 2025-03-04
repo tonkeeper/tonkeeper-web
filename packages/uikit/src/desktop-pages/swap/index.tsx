@@ -18,6 +18,8 @@ import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
 import { NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { QueryKey } from '../../libs/queryKey';
 
 const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
@@ -75,6 +77,7 @@ const DesktopSwapPageContent = () => {
                     }
                 />
             </DesktopViewHeader>
+            <PullToRefresh invalidate={QueryKey.swapCalculate} />
             <ContentWrapper>
                 <SwapMainForm />
                 <NotForTargetEnv env="mobile">

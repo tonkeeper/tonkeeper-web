@@ -31,6 +31,8 @@ import { AppRoute } from '../../libs/routes';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { QueryKey } from '../../libs/queryKey';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
@@ -108,6 +110,7 @@ export const BatteryPageLayout: FC = () => {
                         }
                     />
                 </DesktopViewHeader>
+                <PullToRefresh invalidate={QueryKey.batteryBalance} />
                 <BatteryPageContent />
                 <BatterySettingsNotification isOpen={isOpen} onClose={onClose} />
             </DesktopViewPageLayout>

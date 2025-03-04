@@ -13,7 +13,7 @@ import {
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
 import { AnyChainAsset, TonAsset } from '../../components/home/Jettons';
 import { useTranslation } from '../../hooks/translation';
-import { useAllChainsAssets } from '../../state/home';
+import { allChainsAssetsKeys, useAllChainsAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
@@ -21,6 +21,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 
 export const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -176,6 +177,7 @@ const DesktopTokensPayload = () => {
                     }
                 />
             </DesktopViewHeader>
+            <PullToRefresh invalidate={allChainsAssetsKeys} />
             <TokensPageBody
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`,

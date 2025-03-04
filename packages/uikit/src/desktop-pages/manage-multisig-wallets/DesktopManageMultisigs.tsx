@@ -44,6 +44,8 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { Navigate } from '../../components/shared/Navigate';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { QueryKey } from '../../libs/queryKey';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -93,10 +95,20 @@ const DesktopManageMultisigsPageBody = () => {
     }
 
     if (!multisigs.length) {
-        return <EmptyMultisigsPage />;
+        return (
+            <>
+                <PullToRefresh invalidate={QueryKey.multisigWallets} />
+                <EmptyMultisigsPage />
+            </>
+        );
     }
 
-    return <ManageExistingMultisigWallets multisigs={multisigs} />;
+    return (
+        <>
+            <PullToRefresh invalidate={QueryKey.multisigWallets} paddingBottom="30px" />
+            <ManageExistingMultisigWallets multisigs={multisigs} />
+        </>
+    );
 };
 
 const TextContainer = styled.div`
