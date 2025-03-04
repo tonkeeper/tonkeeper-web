@@ -20,6 +20,7 @@ import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-ass
 import { useTronBalances } from './tron/tron';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
+import { QueryKey } from '../libs/queryKey';
 
 export const useAssets = () => {
     const wallet = useActiveWallet();
@@ -40,6 +41,8 @@ export const useAssets = () => {
     return [assets, error, isJettonLoading || isAccountLoading, jettonError] as const;
 };
 
+export const allChainsAssetsKeys = [QueryKey.jettons, QueryKey.tronAssets, QueryKey.info];
+
 export const useAllChainsAssets = () => {
     const [assets, error, _, jettonError] = useAssets();
     const { data: config } = useActiveTonWalletConfig();
@@ -52,7 +55,7 @@ export const useAllChainsAssets = () => {
         ];
 
         if (assets.ton.info.extraBalance) {
-            for (let extra of assets.ton.info.extraBalance) {
+            for (const extra of assets.ton.info.extraBalance) {
                 const asset = new AssetAmount<TonAsset>({
                     weiAmount: new BigNumber(extra.amount),
                     asset: extraBalanceToTonAsset(extra)

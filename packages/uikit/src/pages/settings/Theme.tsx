@@ -10,18 +10,39 @@ import {
     useUserUIPreferences
 } from '../../state/theme';
 import { capitalize } from '../../libs/common';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 export const UserTheme = () => {
     const { t } = useTranslation();
 
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutateAsync } = useMutateUserUIPreferences();
+    const isProDisplay = useIsFullWidthMode();
 
     const items: SettingsItem[] = Object.keys(availableThemes).map(name => ({
         name: capitalize(name),
         icon: uiPreferences?.theme === name ? <CheckIcon /> : undefined,
         action: () => mutateAsync({ theme: name as 'dark' | 'pro' })
     }));
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayout>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('Theme')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <SettingsList items={items} />
+            </DesktopViewPageLayout>
+        );
+    }
 
     return (
         <>

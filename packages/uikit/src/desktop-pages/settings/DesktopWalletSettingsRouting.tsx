@@ -1,8 +1,7 @@
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { WalletSettingsRoute } from '../../libs/routes';
 import { ActiveRecovery, Recovery } from '../../pages/settings/Recovery';
 import { WalletVersionPage } from '../../pages/settings/Version';
-import { JettonsSettings } from '../../pages/settings/Jettons';
 import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
 import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
@@ -12,42 +11,51 @@ import { LedgerIndexesPage } from '../../pages/settings/LedgerIndexes';
 import { BatteryPage } from '../../pages/settings/Battery';
 import { Notifications } from '../../pages/settings/Notification';
 import { TwoFAPage } from '../../pages/settings/TwoFA';
+import { JettonsSettings } from '../../pages/settings/Jettons';
 
 const OldSettingsLayoutWrapper = styled.div`
     padding-top: 64px;
     position: relative;
 `;
 
-const OldSettingsLayout = () => {
-    return (
-        <OldSettingsLayoutWrapper>
-            <Outlet />
-        </OldSettingsLayoutWrapper>
-    );
-};
-
 export const DesktopWalletSettingsRouting = () => {
+    const { path } = useRouteMatch();
+
     return (
-        <Routes>
-            <Route element={<OldSettingsLayout />}>
-                <Route path={WalletSettingsRoute.recovery}>
-                    <Route path=":accountId" element={<Recovery />} />
-                    <Route index element={<ActiveRecovery />} />
-                </Route>
-                <Route path={WalletSettingsRoute.jettons} element={<JettonsSettings />} />
-            </Route>
+        <Switch>
             <Route
-                path={WalletSettingsRoute.connectedApps}
-                element={<DesktopConnectedAppsSettings />}
+                path={[path + WalletSettingsRoute.recovery]}
+                render={() => {
+                    return (
+                        <OldSettingsLayoutWrapper>
+                            <Switch>
+                                <Route
+                                    path={path + `${WalletSettingsRoute.recovery}/:accountId`}
+                                    component={Recovery}
+                                />
+                                <Route
+                                    path={path + WalletSettingsRoute.recovery}
+                                    component={ActiveRecovery}
+                                    exact
+                                />
+                            </Switch>
+                        </OldSettingsLayoutWrapper>
+                    );
+                }}
             />
-            <Route path={WalletSettingsRoute.nft} element={<DesktopNftSettings />} />
-            <Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />
-            <Route path={WalletSettingsRoute.battery} element={<BatteryPage />} />
-            <Route path={WalletSettingsRoute.version} element={<WalletVersionPage />} />
-            <Route path={WalletSettingsRoute.ledgerIndexes} element={<LedgerIndexesPage />} />
-            <Route path={WalletSettingsRoute.twoFa} element={<TwoFAPage />} />
-            <Route path={WalletSettingsRoute.notification} element={<Notifications />} />
-            <Route path="*" element={<DesktopWalletSettingsPage />} />
-        </Routes>
+            <Route
+                path={path + WalletSettingsRoute.connectedApps}
+                component={DesktopConnectedAppsSettings}
+            />
+            <Route path={path + WalletSettingsRoute.jettons} component={JettonsSettings} />
+            <Route path={path + WalletSettingsRoute.nft} component={DesktopNftSettings} />
+            <Route path={path + WalletSettingsRoute.derivations} component={MAMIndexesPage} />
+            <Route path={path + WalletSettingsRoute.battery} component={BatteryPage} />
+            <Route path={path + WalletSettingsRoute.version} component={WalletVersionPage} />
+            <Route path={path + WalletSettingsRoute.ledgerIndexes} component={LedgerIndexesPage} />
+            <Route path={path + WalletSettingsRoute.twoFa} component={TwoFAPage} />
+            <Route path={path + WalletSettingsRoute.notification} component={Notifications} />
+            <Route path="*" component={DesktopWalletSettingsPage} />
+        </Switch>
     );
 };

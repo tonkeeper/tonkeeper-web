@@ -6,7 +6,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvent, AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { atom, useAtom } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
@@ -466,15 +466,16 @@ export const isInitiatorFiltrationForAssetAvailable = (asset: Asset | undefined)
 };
 
 export const useScrollMonitor = (
-    elementRef: React.RefObject<HTMLDivElement>,
+    callback: () => void,
     timeout: number,
-    callback: () => void
+    elementRef?: React.RefObject<HTMLDivElement>
 ) => {
     const [isAtTop, setIsAtTop] = useState(true);
+    const [element, setElement] = useState(elementRef?.current);
 
     useEffect(() => {
         const handleScroll = debounce(() => {
-            if (elementRef.current && elementRef.current.scrollTop < 5) {
+            if (element && element.scrollTop < 5) {
                 setIsAtTop(true);
             } else {
                 setIsAtTop(false);
@@ -482,11 +483,11 @@ export const useScrollMonitor = (
         }, 20);
 
         handleScroll();
-        elementRef.current?.addEventListener('scroll', handleScroll);
+        element?.addEventListener('scroll', handleScroll);
         return () => {
-            elementRef.current?.removeEventListener('scroll', handleScroll);
+            element?.removeEventListener('scroll', handleScroll);
         };
-    }, [elementRef.current]);
+    }, [element]);
 
     useLayoutEffect(() => {
         const timer = setInterval(() => {
@@ -498,4 +499,6 @@ export const useScrollMonitor = (
             clearInterval(timer);
         };
     }, [isAtTop, callback]);
+
+    return setElement as Dispatch<SetStateAction<HTMLDivElement | null>>;
 };

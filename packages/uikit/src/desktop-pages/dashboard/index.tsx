@@ -1,12 +1,14 @@
 import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
 import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopDashboardHeader';
 import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
 import { ProBanner } from '../../components/pro/ProBanner';
 import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import { NotForTargetEnv } from '../../components/shared/TargetEnv';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -18,7 +20,7 @@ const ProBannerWrapper = styled.div`
     background: ${p => p.theme.gradientBackgroundBottom};
 `;
 
-const PageWrapper = styled.div`
+const PageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
     position: relative;
     height: calc(100% - ${desktopHeaderContainerHeight});
@@ -26,6 +28,12 @@ const PageWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            height: calc(100% - env(safe-area-inset-top));
+        `}
 `;
 
 const DashboardPage: FC = () => {
@@ -34,7 +42,9 @@ const DashboardPage: FC = () => {
 
     return (
         <>
-            <DesktopDashboardHeader />
+            <NotForTargetEnv env="mobile">
+                <DesktopDashboardHeader />
+            </NotForTargetEnv>
             <PageWrapper>
                 <DashboardTableStyled />
                 <HideOnReview>

@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -7,6 +6,7 @@ import { relative, SettingsRoute } from '../../libs/routes';
 import { MessageIcon, NotificationIcon } from '../Icon';
 import { LocalizationIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 export const ThemeSettings = () => {
     const sdk = useAppSdk();

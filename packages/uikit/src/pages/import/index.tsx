@@ -1,7 +1,7 @@
-import { Routes } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
 
 const ImportRouter = () => {
-    return <Routes></Routes>;
+    return <Switch />;
 };
 
 export default ImportRouter;

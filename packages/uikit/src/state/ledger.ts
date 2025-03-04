@@ -6,11 +6,10 @@ import {
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import { useAppContext } from '../hooks/appContext';
 import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
 import { useAppSdk } from '../hooks/appSdk';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '../hooks/router/useNavigate';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';

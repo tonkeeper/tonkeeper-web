@@ -2,13 +2,13 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, useEffect, useMemo, useRef } from 'react';
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, SwapIcon } from '../../components/Icon';
+import { FC, RefCallback, useEffect, useMemo, useRef } from 'react';
+import styled, { css } from 'styled-components';
+import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { DesktopHistory } from '../../components/desktop/history/DesktopHistory';
@@ -37,8 +37,16 @@ import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { Navigate } from '../../components/shared/Navigate';
+import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { mergeRefs } from '../../libs/common';
+import { ExternalLink } from '../../components/shared/ExternalLink';
 import { useBatteryBalance } from '../../state/battery';
+import { Link } from '../../components/shared/Link';
+import { QueryKey } from '../../libs/queryKey';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -290,23 +298,23 @@ const HistorySubheader = styled(Label2)`
 `;
 
 const HistoryContainer = styled.div`
-    overflow-x: auto;
-    overflow-y: hidden;
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            overflow-x: auto;
+            overflow-y: hidden;
+        `}
 `;
 
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
-    > *:last-child {
-        margin-left: auto;
-        width: fit-content;
-    }
-
-    padding-right: 0;
+const TonViewerLink = styled(ExternalLink)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
 `;
 
 const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
-    const ref = useRef<HTMLDivElement>(null);
-
     const {
         fetchNextPage,
         hasNextPage,
@@ -315,9 +323,9 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         refetch
     } = useFetchFilteredActivity(token);
 
-    useScrollMonitor(ref, 5000, refetch);
+    const scrollMonitorRef = useScrollMonitor(refetch, 5000);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
+    const fetchRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
 
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {
@@ -336,12 +344,48 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         }
     }, [assets, t, token]);
 
+    const { mainnetConfig } = useAppContext();
+    const tonviewer = mainnetConfig.accountExplorer
+        ? new URL(mainnetConfig.accountExplorer).origin
+        : 'https://tonviewer.com';
+
     return (
-        <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeaderStyled backButton borderBottom={true}>
-                <Label2>{assetSymbol || 'Unknown asset'}</Label2>
-                <OtherHistoryFilters disableInitiatorFilter={token !== CryptoCurrency.TON} />
-            </DesktopViewHeaderStyled>
+        <DesktopViewPageLayout
+            ref={mergeRefs(scrollMonitorRef, fetchRef) as RefCallback<HTMLDivElement>}
+        >
+            <DesktopViewHeader backButton borderBottom>
+                <DesktopViewHeaderContent
+                    title={assetSymbol || 'Unknown asset'}
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem>
+                                <TonViewerLink
+                                    href={
+                                        token === CryptoCurrency.TON
+                                            ? tonviewer + '/price'
+                                            : mainnetConfig.accountExplorer?.replace('%s', token) ??
+                                              tonviewer
+                                    }
+                                >
+                                    <LinkOutIcon color="currentColor" />
+                                    {t('tokenDetails_tonviewer_button')}
+                                </TonViewerLink>
+                            </DesktopViewHeaderContent.RightItem>
+                            <DesktopViewHeaderContent.RightItem>
+                                <OtherHistoryFilters
+                                    disableInitiatorFilter={token !== CryptoCurrency.TON}
+                                />
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
+            </DesktopViewHeader>
+            <PullToRefresh
+                invalidate={[
+                    QueryKey.activity,
+                    token === CryptoCurrency.TON ? QueryKey.info : QueryKey.jettons
+                ]}
+            />
             <CoinHeader token={token} />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
@@ -381,7 +425,7 @@ export const TronUSDTPage = () => {
         refetch
     } = useFetchFilteredActivity(TRON_USDT_ASSET.address);
 
-    useScrollMonitor(ref, 5000, refetch);
+    useScrollMonitor(refetch, 5000, ref);
 
     useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
 
@@ -389,9 +433,10 @@ export const TronUSDTPage = () => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeader backButton borderBottom={true}>
+            <DesktopViewHeader backButton borderBottom>
                 <Label2>{asset.symbol}</Label2>
             </DesktopViewHeader>
+            <PullToRefresh invalidate={[QueryKey.activity, QueryKey.tronAssets]} />
             <CoinHeaderStyled>
                 <TronCoinInfoWrapper>
                     <img src={asset.image} alt={asset.symbol} />

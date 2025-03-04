@@ -1,7 +1,6 @@
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { NonNullableFields } from '@tonkeeper/core/dist/utils/types';
 import { FC, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { styled, useTheme } from 'styled-components';
 import { AppRoute } from '../../libs/routes';
 import { CalculatedSwap } from '../../state/swap/useCalculatedSwap';
@@ -21,6 +20,7 @@ import { SwapFromField } from './SwapFromField';
 import { SwapProviders } from './SwapProviders';
 import { SwapToField } from './SwapToField';
 import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const MainFormWrapper = styled.div`
     display: flex;

@@ -48,5 +48,8 @@
     "packageManager": "yarn@4.3.0",
     "dependencies": {
         "@tonkeeper/uikit": "workspace:^"
+    },
+    "resolutions": {
+        "@ionic/core@npm:8.4.2": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch"
     }
 }

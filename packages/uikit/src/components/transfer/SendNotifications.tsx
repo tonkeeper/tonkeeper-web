@@ -57,6 +57,7 @@ import { useAnalyticsTrack } from '../../hooks/amplitude';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveWallet } from '../../state/wallet';
+import styled, { css } from 'styled-components';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -422,6 +423,14 @@ const SendContent: FC<{
     );
 };
 
+const NotificationStyled = styled(Notification)`
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            --height: calc(100% - (env(safe-area-inset-top) + 10px));
+        `}
+`;
+
 const SendActionNotification = () => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
@@ -481,7 +490,6 @@ const SendActionNotification = () => {
     }, []);
 
     const Content = useCallback(() => {
-        if (!open) return undefined;
         return (
             <SendContent
                 onClose={onClose}
@@ -493,9 +501,16 @@ const SendActionNotification = () => {
     }, [open, tonTransfer, chain]);
 
     return (
-        <Notification isOpen={open} handleClose={onClose} hideButton backShadow footer={<></>}>
+        <NotificationStyled
+            isOpen={open}
+            handleClose={onClose}
+            hideButton
+            backShadow
+            footer={<></>}
+            disableHeightAnimation
+        >
             {Content}
-        </Notification>
+        </NotificationStyled>
     );
 };
 

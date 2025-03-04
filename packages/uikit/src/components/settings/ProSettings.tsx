@@ -50,6 +50,13 @@ import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ConfirmView } from '../transfer/ConfirmView';
 import { useNotifyError } from '../../hooks/useNotification';
 import { HideOnReview } from '../ios/HideOnReview';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../shared/TargetEnv';
 
 const Block = styled.div`
     display: flex;
@@ -451,6 +458,39 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 };
 
 export const ProSettings: FC = () => {
+    return (
+        <HideOnReview>
+            <ProSettingsResponsive />
+        </HideOnReview>
+    );
+};
+
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    padding: 1rem 1rem 0;
+    box-sizing: border-box;
+
+    * {
+        box-sizing: border-box;
+    }
+`;
+
+export const ProSettingsResponsive: FC = () => {
+    const isProDisplay = useIsFullWidthMode();
+    const { t } = useTranslation();
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayoutStyled>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('tonkeeper_pro')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <ProSettingsContent />
+            </DesktopViewPageLayoutStyled>
+        );
+    }
+
     return (
         <HideOnReview>
             <SubHeader />

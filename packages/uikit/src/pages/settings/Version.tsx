@@ -11,11 +11,11 @@ import {
     AccountVersionEditable,
     getNetworkByAccount
 } from '@tonkeeper/core/dist/entries/account';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label1, Label2 } from '../../components/Text';
+import { Body2, Label1 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useStandardTonWalletVersions,
@@ -29,19 +29,16 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../compo
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
 import { Address } from '@ton/core';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-
-const LedgerError = styled(Body2)`
-    margin: 0.5rem 0;
-    color: ${p => p.theme.accentRed};
-`;
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const TextContainer = styled.span`
     flex-direction: column;
@@ -66,7 +63,7 @@ export const WalletVersionPage = () => {
         return (
             <DesktopViewPageLayout>
                 <DesktopViewHeader backButton>
-                    <Label2>{t('settings_wallet_version')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_wallet_version')} />
                 </DesktopViewHeader>
                 <WalletVersionPageContent />
             </DesktopViewPageLayout>

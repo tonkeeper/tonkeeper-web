@@ -6,8 +6,7 @@ import {
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { WordsGridAndHeaders } from '../../components/create/Words';
@@ -20,12 +19,18 @@ import { useTranslation } from '../../hooks/translation';
 import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
 import { SpinnerRing } from '../../components/Icon';
 import { useSetNotificationOnBack } from '../../components/Notification';
+import { Navigate } from '../../components/shared/Navigate';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useParams } from '../../hooks/router/useParams';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
     if (isMnemonicAndPassword(account)) {
-        return <RecoveryContent accountId={account.id} />;
+        return <RecoveryPageContent accountId={account.id} />;
     } else {
         return <Navigate to="../" replace={true} />;
     }
@@ -39,7 +44,7 @@ export const Recovery = () => {
     }, [searchParams, location]);
 
     if (accountId) {
-        return <RecoveryContent accountId={accountId} walletId={walletId} />;
+        return <RecoveryPageContent accountId={accountId} walletId={walletId} />;
     } else {
         return <ActiveRecovery />;
     }
@@ -106,6 +111,24 @@ const SpinnerRingStyled = styled(SpinnerRing)`
     margin: 16px auto;
 `;
 
+const RecoveryPageContent: FC<{
+    accountId: AccountId;
+    walletId?: WalletId;
+    isPage?: boolean;
+    onClose?: () => void;
+}> = props => {
+    const isDesktopPro = useIsFullWidthMode();
+    if (isDesktopPro) {
+        return (
+            <DesktopViewPageLayout>
+                <RecoveryContent {...props} />
+            </DesktopViewPageLayout>
+        );
+    }
+
+    return <RecoveryContent {...props} />;
+};
+
 const mnemonicBySecret = (secret: AccountSecret | undefined) => {
     if (secret?.type === 'mnemonic') {
         return secret.mnemonic;
@@ -132,7 +155,7 @@ export const RecoveryContent: FC<{
 }> = ({ accountId, walletId, isPage = true, onClose }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const onBack = useCallback(() => (onClose ? onClose() : navigate(-1)), [onClose, navigate]);
+    const onBack = useCallback(() => (onClose ? onClose() : navigate('../')), [onClose, navigate]);
 
     const secret = useSecret(onBack, accountId, walletId);
     const account = useAccountState(accountId);

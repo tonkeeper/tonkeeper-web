@@ -29,8 +29,8 @@ import {
 import { MultisigConfigDiff } from '../multisig/MultisigConfigDiff';
 import { Address } from '@ton/core';
 import { BorderSmallResponsive } from '../shared/Styles';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const ButtonGap = styled.div`
     ${props =>

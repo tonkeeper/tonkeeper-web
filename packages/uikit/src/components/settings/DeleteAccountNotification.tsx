@@ -1,6 +1,5 @@
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { FC, useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
@@ -11,6 +10,7 @@ import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const NotificationBlock = styled.div`
     display: flex;

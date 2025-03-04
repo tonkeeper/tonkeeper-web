@@ -9,7 +9,6 @@ import {
 import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { LedgerTonTransport } from '@tonkeeper/core/dist/service/ledger/connector';
 import { Body2, H2Label2Responsive } from '../../components/Text';
-import { useNavigate } from 'react-router-dom';
 import { useAppSdk } from '../../hooks/appSdk';
 import { AppRoute } from '../../libs/routes';
 import { useNativeBackButton } from '../../components/BackButton';
@@ -27,6 +26,7 @@ import {
 } from '../../components/Notification';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;

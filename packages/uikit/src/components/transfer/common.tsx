@@ -10,8 +10,8 @@ import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon } from '../Icon';
 import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
-import { Body1, H3 } from '../Text';
-import { RoundedButton, ButtonMock } from '../fields/RoundedButton';
+import { Body1, H3Label2Responsive } from '../Text';
+import { ButtonMock, RoundedButtonResponsive } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
@@ -287,7 +287,7 @@ export const TransferViewHeaderBlock: FC<{ title: string; onClose: () => void }>
     return (
         <NotificationTitleBlock>
             <ButtonMock />
-            <H3>{title}</H3>
+            <H3Label2Responsive>{title}</H3Label2Responsive>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
     );
@@ -301,13 +301,13 @@ export const RecipientHeaderBlock: FC<{
     return (
         <NotificationTitleBlock>
             {onBack ? (
-                <RoundedButton onClick={onBack}>
+                <RoundedButtonResponsive onClick={onBack}>
                     <ChevronLeftIcon />
-                </RoundedButton>
+                </RoundedButtonResponsive>
             ) : (
                 <ButtonMock />
             )}
-            <H3>{title}</H3>
+            <H3Label2Responsive>{title}</H3Label2Responsive>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
     );
@@ -324,9 +324,9 @@ export const AmountHeaderBlock: AmountHeaderBlockComponent = ({ onBack, onClose,
     const { t } = useTranslation();
     return (
         <NotificationTitleBlock>
-            <RoundedButton onClick={onBack}>
+            <RoundedButtonResponsive onClick={onBack}>
                 <ChevronLeftIcon />
-            </RoundedButton>
+            </RoundedButtonResponsive>
             <Center>
                 <Title>{t('txActions_amount')}</Title>
                 {children}

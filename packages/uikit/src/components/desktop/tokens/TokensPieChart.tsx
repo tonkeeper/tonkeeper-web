@@ -1,6 +1,6 @@
 import { FC, memo, useMemo, useState } from 'react';
 import { Cell, Pie, PieChart } from 'recharts';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { TokenDistribution } from '../../../state/asset';
 import { Body3, Label3 } from '../../Text';
 
@@ -30,6 +30,13 @@ const Container = styled.div<{ activeAddress: string | undefined }>`
     path#${p => p.activeAddress} {
         opacity: 1;
     }
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            flex-direction: column;
+            align-items: center;
+        `}
 `;
 
 const LegendContainer = styled.div`
@@ -43,13 +50,24 @@ const LegendContainer = styled.div`
 
     cursor: default;
 
-    @container (max-width: 560px) {
-        grid-auto-flow: row;
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            @container (max-width: 560px) {
+                grid-auto-flow: row;
 
-        .second {
-            display: none;
-        }
-    }
+                .second {
+                    display: none;
+                }
+            }
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            height: 160px;
+            max-width: 100%;
+        `}
 `;
 
 const TokenRow = styled.div<{ opacity?: number }>`
@@ -62,6 +80,14 @@ const TokenRow = styled.div<{ opacity?: number }>`
     cursor: pointer;
 
     transition: opacity 0.15s ease-in-out;
+    overflow: hidden;
+`;
+
+const TokenLabel = styled(Label3)`
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 1;
+    overflow: hidden;
 `;
 
 const TokenCircle = styled.div<{ bg: string }>`
@@ -130,7 +156,7 @@ export const TokensPieChart: FC<{
                         className={index > 4 ? 'second' : undefined}
                     >
                         <TokenCircle bg={d.meta.color} />
-                        <Label3>{tokenName(d)}</Label3>
+                        <TokenLabel>{tokenName(d)}</TokenLabel>
                         <TokenPercentValue>{d.percent}</TokenPercentValue>
                         <TokenPercentSymbol>%</TokenPercentSymbol>
                     </TokenRow>

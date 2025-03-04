@@ -3,6 +3,7 @@ import React, {
     createContext,
     FC,
     forwardRef,
+    Fragment,
     PropsWithChildren,
     ReactElement,
     ReactNode,
@@ -16,7 +17,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import styled, { css, useTheme } from 'styled-components';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
@@ -24,10 +25,11 @@ import { RoundedButton, ButtonMock } from './fields/RoundedButton';
 import { ArrowLeftIcon, ChevronLeftIcon, CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
-import { H2, H3, Label2 } from './Text';
+import { H2, H3Label2Responsive, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { useAppPlatform } from '../hooks/appContext';
+import { IonContent, IonModal } from '@ionic/react';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -257,7 +259,7 @@ const HeaderWrapper = styled.div`
     }
 `;
 
-const RowTitle = styled(H3)`
+const RowTitle = styled(H3Label2Responsive)`
     overflow: hidden;
     margin: 0;
     user-select: none;
@@ -360,6 +362,12 @@ export const NotificationTitleBlock = styled.div`
     align-items: flex-start;
     width: 100%;
     gap: 1rem;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            align-items: center;
+        `}
 `;
 
 const DesktopCloseButtonStyled = styled(IconButtonTransparentBackground)`
@@ -429,6 +437,132 @@ export function closeAllNotifications() {
 }
 
 export const Notification: FC<{
+    isOpen: boolean;
+    handleClose: () => void;
+    hideButton?: boolean;
+    backShadow?: boolean;
+    title?: ReactNode;
+    footer?: ReactNode;
+    children: (afterClose: (action?: () => void) => void) => React.ReactNode;
+    className?: string;
+    disableHeightAnimation?: boolean;
+}> = props => {
+    const targetEnv = useAppTargetEnv();
+
+    if (targetEnv === 'mobile') {
+        return <NotificationIonic {...props} />;
+    }
+
+    return <NotificationDesktopAndWeb {...props} />;
+};
+
+export const NotificationIonic: FC<{
+    isOpen: boolean;
+    handleClose: () => void;
+    hideButton?: boolean;
+    title?: ReactNode;
+    footer?: ReactNode;
+    children: (afterClose: (action?: () => void) => void) => React.ReactNode;
+    className?: string;
+    disableHeightAnimation?: boolean;
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    handleClose,
+    title,
+    footer,
+    className,
+    disableHeightAnimation
+}) => {
+    const [onBack, setOnBack] = useState<(() => void) | undefined>();
+    const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
+    const onClose = useCallback(() => {
+        if (!onCloseInterceptor) {
+            handleClose();
+        } else {
+            onCloseInterceptor(handleClose);
+        }
+    }, [handleClose, onCloseInterceptor]);
+
+    const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
+    const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
+
+    const Child = useMemo(() => {
+        return children((afterClose?: () => void) => {
+            setTimeout(() => afterClose && afterClose(), 100);
+            onClose();
+        });
+    }, [isOpen, children, onClose]);
+
+    const HeightAnimation = useMemo(() => {
+        if (disableHeightAnimation) {
+            return Fragment;
+        }
+
+        return AnimateHeightChange;
+    }, [disableHeightAnimation]);
+
+    return (
+        <NotificationContext.Provider
+            value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
+        >
+            <IonModal
+                isOpen={isOpen}
+                onDidDismiss={onClose}
+                initialBreakpoint={1}
+                breakpoints={[0, 1]}
+                handle={false}
+                className={className}
+            >
+                <IonicModalContentStyled>
+                    <HeightAnimation>
+                        <HeaderWrapper ref={setHeaderElement}>
+                            {(title || !hideButton) && (
+                                <NotificationHeader className="dialog-header">
+                                    <NotificationTitleRow
+                                        onBack={onBack}
+                                        handleClose={hideButton ? undefined : onClose}
+                                    >
+                                        {title}
+                                    </NotificationTitleRow>
+                                </NotificationHeader>
+                            )}
+                        </HeaderWrapper>
+                        {Child}
+                        <Gap />
+                        <FooterWrapper ref={setFooterElement}>{footer}</FooterWrapper>
+                    </HeightAnimation>
+                </IonicModalContentStyled>
+            </IonModal>
+        </NotificationContext.Provider>
+    );
+};
+
+const IonicModalContentStyled = styled(IonContent)`
+    display: contents;
+
+    &::part(scroll) {
+        border-top-right-radius: ${props => props.theme.cornerMedium};
+        border-top-left-radius: ${props => props.theme.cornerMedium};
+        padding: 0 1rem 0;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+    }
+
+    &::part(background) {
+        border-top-right-radius: ${props => props.theme.cornerMedium};
+        border-top-left-radius: ${props => props.theme.cornerMedium};
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+`;
+
+export const NotificationDesktopAndWeb: FC<{
     isOpen: boolean;
     handleClose: () => void;
     hideButton?: boolean;
@@ -635,6 +769,13 @@ export const NotificationHeaderStyled = styled.div`
         p.theme.displayType === 'full-width' &&
         css`
             background: ${p.theme.backgroundPage};
+            padding-top: 8px;
+            padding-bottom: 8px;
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
             padding-top: 16px;
             padding-bottom: 16px;
         `}

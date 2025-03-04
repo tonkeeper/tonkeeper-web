@@ -1,8 +1,9 @@
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Body2Class, Label2 } from '../../components/Text';
+import { Body2Class } from '../../components/Text';
 import { ConnectedAppsList } from '../../components/connected-apps/ConnectedAppsList';
 import { styled } from 'styled-components';
 import {
@@ -56,12 +57,16 @@ export const DesktopConnectedAppsSettings = () => {
     return (
         <DesktopViewPageLayoutStyled>
             <DesktopViewHeaderStyled backButton>
-                <Label2>{t('settings_connected_apps')}</Label2>
-                {showDisconnectAll && (
-                    <DisconnectAllButton onClick={onOpen}>
-                        {t('disconnect_all_apps')}
-                    </DisconnectAllButton>
-                )}
+                <DesktopViewHeaderContent
+                    title={t('settings_connected_apps')}
+                    right={
+                        showDisconnectAll && (
+                            <DisconnectAllButton onClick={onOpen}>
+                                {t('disconnect_all_apps')}
+                            </DisconnectAllButton>
+                        )
+                    }
+                />
             </DesktopViewHeaderStyled>
             <ConnectedAppsListStyled />
             <ConfirmDisconnectNotification
