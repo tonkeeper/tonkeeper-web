@@ -1,8 +1,4 @@
-import {
-    ConnectItemReply,
-    DAppManifest,
-    TonConnectEventPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
