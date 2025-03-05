@@ -477,6 +477,12 @@ const SmallDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
+const LinkStyled = styled(Link)`
+    text-decoration: unset;
+    color: ${p => p.theme.textPrimary};
+    display: contents;
+`;
+
 const TronUseBatteryBanner = () => {
     const { t } = useTranslation();
     const { data: batteryBalance } = useBatteryBalance();
@@ -492,11 +498,11 @@ const TronUseBatteryBanner = () => {
                     <Label2>{t('tron_battery_required_banner_title')}</Label2>
                     <Body2>{t('tron_battery_required_banner_description')}</Body2>
                 </TextContainer>
-                <Link to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
                     <Button primary size="small">
                         {t('tron_battery_required_banner_button')}
                     </Button>
-                </Link>
+                </LinkStyled>
             </TronTopUpUSDTWrapper>
             <SmallDivider />
         </>
