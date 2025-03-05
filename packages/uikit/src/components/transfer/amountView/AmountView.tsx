@@ -1,9 +1,8 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import {
-    TonAsset,
-    jettonToTonAsset,
     legacyTonAssetId,
-    tokenToTonAsset
+    tokenToTonAsset,
+    TonAsset
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { isNumeric } from '@tonkeeper/core/dist/utils/send';
@@ -41,6 +40,7 @@ import {
     AmountBlock,
     AssetBadge,
     InputBlock,
+    inputToBigNumber,
     MaxButton,
     MaxRow,
     RecipientAddress,
@@ -50,8 +50,7 @@ import {
     SecondaryAmount,
     SelectCenter,
     SubTitle,
-    Symbol,
-    inputToBigNumber
+    Symbol
 } from './AmountViewUI';
 import { AssetSelect } from './AssetSelect';
 import { defaultSize, getInputSize, useAutoFocusOnChange, useButtonPosition } from './amountHooks';
@@ -61,8 +60,43 @@ import {
     toInitAmountState,
     toTokenRateSymbol
 } from './amountState';
+import { useBatteryAuthToken } from '../../../state/battery';
+import { TransferBatteryRequired } from '../TransferBatteryRequired';
 
 export const AmountView: FC<{
+    onClose: () => void;
+    onBack: (state: AmountState) => void;
+    onConfirm: (state: AmountState) => void;
+    recipient: RecipientData;
+    defaults?: Partial<AmountState>;
+    MainButton: AmountMainButtonComponent;
+    HeaderBlock: AmountHeaderBlockComponent;
+    isAnimationProcess: boolean;
+}> = props => {
+    const batteryAuthToken = useBatteryAuthToken();
+
+    if (props.recipient.address.blockchain === BLOCKCHAIN_NAME.TRON && !batteryAuthToken) {
+        if (batteryAuthToken === undefined) {
+            return null;
+        } else {
+            return (
+                <TransferBatteryRequired
+                    onBack={() =>
+                        props.onBack(
+                            toInitAmountState(props.defaults, props.recipient.address.blockchain)
+                        )
+                    }
+                    onClose={props.onClose}
+                    isAnimationProcess={props.isAnimationProcess}
+                />
+            );
+        }
+    }
+
+    return <AmountViewContent {...props} />;
+};
+
+const AmountViewContent: FC<{
     onClose: () => void;
     onBack: (state: AmountState) => void;
     onConfirm: (state: AmountState) => void;

@@ -9,7 +9,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useActiveTonWalletConfig } from '../../../state/wallet';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 
-const BatteryIconCharging = () => {
+export const BatteryIconCharging = () => {
     const theme = useTheme();
 
     return (
