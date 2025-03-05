@@ -39,6 +39,7 @@ import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useBatteryBalance } from '../../state/battery';
+import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -389,9 +390,13 @@ export const TronUSDTPage = () => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeader backButton borderBottom={true}>
+            <DesktopViewHeaderStyled backButton borderBottom={true}>
                 <Label2>{asset.symbol}</Label2>
-            </DesktopViewHeader>
+                <AssetBlockchainBadge size="m" marginLeft="6px">
+                    TRC20
+                </AssetBlockchainBadge>
+                <OtherHistoryFilters disableInitiatorFilter />
+            </DesktopViewHeaderStyled>
             <CoinHeaderStyled>
                 <TronCoinInfoWrapper>
                     <img src={asset.image} alt={asset.symbol} />
