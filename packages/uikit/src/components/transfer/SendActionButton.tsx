@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
-import { useAppSdk } from '../../hooks/appSdk';
 import { Action } from '../home/Actions';
 import { SendIcon } from '../home/HomeIcons';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { useAppSdk } from '../../hooks/appSdk';
+import { TransferInitParams } from '@tonkeeper/core/dist/AppSdk';
 
-export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
+export const SendAction: FC<{ asset?: string; chain?: BLOCKCHAIN_NAME }> = ({ asset, chain }) => {
     const sdk = useAppSdk();
 
     return (
@@ -17,9 +18,9 @@ export const SendAction: FC<{ asset?: string }> = ({ asset }) => {
                     id: Date.now(),
                     params: {
                         jetton: asset,
-                        chain: BLOCKCHAIN_NAME.TON,
+                        chain: chain,
                         from: asset === 'TON' ? 'wallet' : 'token'
-                    }
+                    } as TransferInitParams
                 })
             }
         />
