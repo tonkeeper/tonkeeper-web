@@ -30,6 +30,12 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useBatteryEnabledConfig } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
+import {
+    useCanUseTronForActiveWallet,
+    useIsTronEnabledForActiveWallet,
+    useToggleIsTronEnabledForActiveWallet
+} from '../../state/tron/tron';
+import { AssetBlockchainBadge } from '../account/AccountBadge';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -41,6 +47,10 @@ const SingleAccountSettings = () => {
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const twoFAEnabled = useCanViewTwoFA();
+
+    const canUseTron = useCanUseTronForActiveWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const { mutate: onToggleTron } = useToggleIsTronEnabledForActiveWallet();
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -159,9 +169,27 @@ const SingleAccountSettings = () => {
                 action: () => navigate(relative(WalletSettingsRoute.battery))
             });
         }
+        if (canUseTron) {
+            items.push({
+                name: 'USD₮ TRC20',
+                icon: isTronEnabled ? 'On' : 'Off',
+                action: () => onToggleTron()
+            });
+        }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig]);
+    }, [
+        t,
+        navigate,
+        account,
+        jettons,
+        nft,
+        twoFAEnabled,
+        batteryEnableConfig,
+        canUseTron,
+        isTronEnabled,
+        onToggleTron
+    ]);
 
     return (
         <>
@@ -181,6 +209,10 @@ const MultipleAccountSettings = () => {
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const twoFAEnabled = useCanViewTwoFA();
+
+    const canUseTron = useCanUseTronForActiveWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const { mutate: onToggleTron } = useToggleIsTronEnabledForActiveWallet();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
 
@@ -323,13 +355,33 @@ const MultipleAccountSettings = () => {
             });
         }
 
+        if (canUseTron) {
+            items.push({
+                name: 'USD₮ TRC20',
+                icon: isTronEnabled ? 'On' : 'Off',
+                action: () => onToggleTron()
+            });
+        }
+
         items.push({
             name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig]);
+    }, [
+        t,
+        navigate,
+        wallet,
+        account,
+        jettons,
+        nft,
+        twoFAEnabled,
+        batteryEnableConfig,
+        canUseTron,
+        isTronEnabled,
+        onToggleTron
+    ]);
 
     return (
         <>
