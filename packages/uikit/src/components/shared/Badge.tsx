@@ -12,6 +12,7 @@ const BadgeStyled = styled.div<{
 }>`
     display: ${p => p.display};
     flex-shrink: 0;
+    height: fit-content;
 
     ${p =>
         p.size === 'm'
