@@ -54,7 +54,7 @@ export const Badge: FC<
         background?: string;
         marginLeft?: string;
     }>
-> = ({ color, className, children, display = 'block', size = 'm', marginLeft }) => {
+> = ({ color, className, children, display = 'block', size = 'm', marginLeft, background }) => {
     return (
         <BadgeStyled
             className={className}
@@ -62,6 +62,7 @@ export const Badge: FC<
             display={display}
             size={size}
             $marginLeft={marginLeft}
+            background={background}
         >
             {children}
         </BadgeStyled>

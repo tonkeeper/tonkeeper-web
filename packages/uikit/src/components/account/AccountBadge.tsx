@@ -138,7 +138,7 @@ export const AssetBlockchainBadge: FC<
     return (
         <Badge
             size={size}
-            background="backgroundContentAttention"
+            background="backgroundContentTint"
             color="textSecondary"
             className={className}
             marginLeft={marginLeft}
