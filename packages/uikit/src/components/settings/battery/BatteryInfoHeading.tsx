@@ -175,9 +175,12 @@ export const BatteryInfoHeading = () => {
             enabledForTokens: 'battery_transactions_type_transfer',
             enabledForNfts: 'battery_transactions_types_nft'
         };
-        const willBePaidItems = Object.entries(config.batterySettings)
-            .filter(([_, v]) => v)
-            .map(([k]) => t(translationsMap[k as keyof TonWalletConfig['batterySettings']]))
+        const willBePaidItems = [t('battery_transactions_type_usdt_trc20_transfer')]
+            .concat(
+                Object.entries(config.batterySettings)
+                    .filter(([_, v]) => v)
+                    .map(([k]) => t(translationsMap[k as keyof TonWalletConfig['batterySettings']]))
+            )
             .join(', ');
 
         willBePaidText = t('battery_info_will_be_paid', { items: willBePaidItems });
@@ -200,7 +203,7 @@ export const BatteryInfoHeading = () => {
                 </Label2>
                 {balance.batteryUnitsBalance.isZero() ? (
                     <div>
-                        <Body2>{t('battery_capabilities_description')}</Body2>{' '}
+                        <Body2>{t('battery_capabilities_description_web')}</Body2>{' '}
                         <Body2Highlighted onClick={onOpen}>
                             {t('battery_capabilities_supported_transactions_label')}
                         </Body2Highlighted>

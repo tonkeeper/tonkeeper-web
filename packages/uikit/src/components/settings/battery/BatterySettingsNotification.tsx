@@ -12,7 +12,6 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../List'
 import { Checkbox } from '../../fields/Checkbox';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { Button } from '../../fields/Button';
-import { useAppContext } from '../../../hooks/appContext';
 import { useBatteryUnitTonRate } from '../../../state/battery';
 import BigNumber from 'bignumber.js';
 
@@ -92,6 +91,16 @@ const ListBlockStyled = styled(ListBlockDesktopAdaptive)<{ $hideSelection?: bool
     > * {
         cursor: ${p => (p.$hideSelection ? 'auto' : 'pointer')};
     }
+
+    ${p =>
+        p.$hideSelection &&
+        css`
+            > *:last-child {
+                > * {
+                    border-bottom: none !important;
+                }
+            }
+        `}
 `;
 
 const CheckboxStyled = styled(Checkbox)`
@@ -168,6 +177,10 @@ const BatterySettingsNotificationContent: FC<{
         .div(rate)
         .integerValue(BigNumber.ROUND_UP)
         .toNumber();
+    const batteryTRC20Charges = new BigNumber(batteryMeanPrice_nft || '0.01') // TODO
+        .div(rate)
+        .integerValue(BigNumber.ROUND_UP)
+        .toNumber();
 
     return (
         <>
@@ -180,6 +193,19 @@ const BatterySettingsNotificationContent: FC<{
                 </Heading>
             )}
             <ListBlockStyled $hideSelection={hideSelection}>
+                <ListItem hover={false}>
+                    <ListItemPayload>
+                        <ListItemText>
+                            <Label2>{t('battery_settings_trc20_transfer_title')}</Label2>
+                            <Body3>
+                                {t('battery_settings_token_transfer_price', {
+                                    charges: batteryTRC20Charges
+                                })}
+                            </Body3>
+                        </ListItemText>
+                        {!hideSelection && <CheckboxStyled disabled checked />}
+                    </ListItemPayload>
+                </ListItem>
                 <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForSwaps')}>
                     <ListItemPayload>
                         <ListItemText>
