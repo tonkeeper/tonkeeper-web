@@ -172,7 +172,7 @@ const SingleAccountSettings = () => {
         }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig]);
+    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
 
     return (
         <>
@@ -350,7 +350,7 @@ const MultipleAccountSettings = () => {
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig]);
+    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
 
     return (
         <>
