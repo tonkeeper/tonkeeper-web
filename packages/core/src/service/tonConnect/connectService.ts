@@ -7,7 +7,6 @@ import { Network } from '../../entries/network';
 import {
     CONNECT_EVENT_ERROR_CODES,
     ConnectEvent,
-    ConnectItem,
     ConnectItemReply,
     ConnectRequest,
     DAppManifest,
@@ -18,6 +17,7 @@ import {
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
     TonConnectAccount,
+    TonConnectEventPayload,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
 import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
@@ -238,8 +238,9 @@ export const checkWalletConnectionOrDie = async (options: {
 
 export const tonReConnectRequest = async (
     storage: IStorage,
+    version: string,
     webViewUrl: string
-): Promise<ConnectItem[]> => {
+): Promise<TonConnectEventPayload> => {
     const connection = await getDappConnection(storage, webViewUrl);
     if (!connection) {
         throw new TonConnectError(
@@ -247,14 +248,23 @@ export const tonReConnectRequest = async (
             CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
         );
     }
-    return [
-        toTonAddressItemReply(
-            connection.wallet,
-            'network' in connection.wallet
-                ? (connection.wallet.network as Network)
-                : Network.MAINNET
-        )
-    ];
+
+    const maxMessages =
+        isStandardTonWallet(connection.wallet) && connection.wallet.version === WalletVersion.V5R1
+            ? 255
+            : 4;
+
+    return {
+        items: [
+            toTonAddressItemReply(
+                connection.wallet,
+                'network' in connection.wallet
+                    ? (connection.wallet.network as Network)
+                    : Network.MAINNET
+            )
+        ],
+        device: getDeviceInfo(version, maxMessages)
+    };
 };
 
 export const toTonAddressItemReply = (

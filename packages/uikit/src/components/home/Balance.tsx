@@ -22,7 +22,7 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { SelectDropDown } from '../fields/Select';
 import { TON_ASSET, TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { ChevronDownIcon, CopyIcon, DoneIcon } from '../Icon';
-import { useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
+import { useActiveTronWallet, useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
 
 const Block = styled.div`
     display: flex;
@@ -103,7 +103,7 @@ export const Balance: FC<{
     const client = useQueryClient();
     const network = getNetworkByAccount(account);
 
-    const tronWallet = useIsTronEnabledForActiveWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
 
     const { data: total } = useWalletTotalBalance();
 
@@ -126,7 +126,7 @@ export const Balance: FC<{
                 <span>{formatFiatCurrency(fiat, total || 0)}</span>
                 <NetworkBadge network={network} />
             </Amount>
-            {tronWallet ? <AddressMultiChain /> : <AddressSingleChain />}
+            {isTronEnabled ? <AddressMultiChain /> : <AddressSingleChain />}
         </Block>
     );
 };
