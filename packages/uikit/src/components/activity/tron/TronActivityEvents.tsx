@@ -5,6 +5,7 @@ import { ReceiveActivityAction, SendActivityAction } from '../ActivityActionLayo
 import { useActiveTronWallet } from '../../../state/tron/tron';
 import { ErrorAction } from '../CommonAction';
 import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
+import { ProgressIcon } from '../ActivityLayout';
 
 export const TronActivityEvents: FC<{
     event: TronHistoryItem;
@@ -15,6 +16,7 @@ export const TronActivityEvents: FC<{
         <>
             <ListItem onClick={onClick}>
                 <TronTransferAction event={event} formattedDate={formattedDate} />
+                {event.inProgress && <ProgressIcon />}
             </ListItem>
         </>
     );

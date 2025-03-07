@@ -49,8 +49,6 @@ import { comment } from '@ton/core';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TransactionFee } from "@tonkeeper/core/dist/entries/crypto/transaction-fee";
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -122,7 +120,7 @@ const useNftTransferEstimation = (
 const useSendNft = (
     recipient: TonRecipientData,
     nftItem: NftItem,
-    fee: TransactionFee | undefined,
+    estimation: TonEstimation | undefined,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
         selectedSenderType: SenderTypeUserAvailable;
@@ -142,10 +140,10 @@ const useSendNft = (
             return false;
         }
 
-        if (!fee) return false;
+        if (!estimation) return false;
 
-        if (fee.type !== 'ton-asset' || fee.extra.asset.id !== TON_ASSET.id) {
-            throw new Error(`Unexpected fee ${fee}`);
+        if (estimation.fee.type === 'ton-asset' && estimation.fee.extra.asset.id !== TON_ASSET.id) {
+            throw new Error(`Unexpected fee ${estimation.fee}`);
         }
 
         try {
@@ -172,7 +170,7 @@ const useSendNft = (
 
             const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
             const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(
-                fee.extra.weiAmount
+                Math.abs(estimation.event?.extra ?? 0)
             );
             const nftTransferMsg = nftEncoder.encodeNftTransfer({
                 nftAddress: nftItem.address,
@@ -225,7 +223,7 @@ export const ConfirmNftView: FC<{
     const { mutateAsync, isLoading, error, reset } = useSendNft(
         recipient,
         nftItem,
-        estimation.data?.fee,
+        estimation.data,
         { multisigTTL, selectedSenderType: selectedSenderType! }
     );
 

@@ -10,7 +10,7 @@ import { ChevronDownIcon, CopyIcon, DoneIcon } from '../../Icon';
 import { Transition } from 'react-transition-group';
 import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
 import { AsideHeaderContainer } from './AsideHeaderElements';
-import { useActiveTronWallet, useIsTronEnabledForActiveWallet } from '../../../state/tron/tron';
+import { useIsTronEnabledForActiveWallet } from '../../../state/tron/tron';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../../DropDown';
 import { SelectDropDown } from '../../fields/Select';
 import { AccountMAM, AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
@@ -63,9 +63,9 @@ const DoneIconStyled = styled(DoneIcon)`
 `;
 
 export const AsideHeaderWallet: FC<{ width: number }> = ({ width }) => {
-    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const tronWallet = useIsTronEnabledForActiveWallet();
 
-    if (!isTronEnabled) {
+    if (!tronWallet) {
         return <AsideHeaderSingleChainWallet width={width} />;
     }
 

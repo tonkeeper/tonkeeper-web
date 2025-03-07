@@ -8,10 +8,13 @@ import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { ChevronLeftIcon } from '../Icon';
-import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import {
+    NotificationBackButton,
+    NotificationCancelButton,
+    NotificationTitleBlock
+} from '../Notification';
 import { Body1, H3 } from '../Text';
-import { RoundedButton, ButtonMock } from '../fields/RoundedButton';
+import { ButtonMock } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
@@ -300,13 +303,7 @@ export const RecipientHeaderBlock: FC<{
 }> = ({ title, onClose, onBack }) => {
     return (
         <NotificationTitleBlock>
-            {onBack ? (
-                <RoundedButton onClick={onBack}>
-                    <ChevronLeftIcon />
-                </RoundedButton>
-            ) : (
-                <ButtonMock />
-            )}
+            {onBack ? <NotificationBackButton onBack={onBack} /> : <ButtonMock />}
             <H3>{title}</H3>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
@@ -324,9 +321,7 @@ export const AmountHeaderBlock: AmountHeaderBlockComponent = ({ onBack, onClose,
     const { t } = useTranslation();
     return (
         <NotificationTitleBlock>
-            <RoundedButton onClick={onBack}>
-                <ChevronLeftIcon />
-            </RoundedButton>
+            <NotificationBackButton onBack={onBack} />
             <Center>
                 <Title>{t('txActions_amount')}</Title>
                 {children}

@@ -891,7 +891,6 @@ components:
           schema:
             type: object
             required:
-              - tx
               - wallet
             properties:
               tx:
@@ -1105,6 +1104,7 @@ components:
         - message_ttl
         - charge_cost
         - gas_proxy
+        - mean_prices
       properties:
         charge_cost:
           description: "cost of 1 charge in TON"
@@ -1131,6 +1131,21 @@ components:
             properties:
               address:
                 type: string
+        mean_prices:
+          type: object
+          required:
+            - battery_mean_price_swap
+            - battery_mean_price_jetton
+            - battery_mean_price_nft
+          properties:
+            battery_mean_price_swap:
+              type: integer
+            battery_mean_price_jetton:
+              type: integer
+            battery_mean_price_nft:
+              type: integer
+            battery_mean_price_tron_usdt:
+              type: integer
     GaslessEstimation:
       type: object
       required:
@@ -1368,6 +1383,8 @@ components:
               timestamp:
                 type: integer
                 format: int64
+              trongrid_result:
+                type: integer
     AndroidBatteryPurchaseStatus:
       type: object
       required:

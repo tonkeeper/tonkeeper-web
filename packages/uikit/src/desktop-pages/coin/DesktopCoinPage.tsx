@@ -39,6 +39,7 @@ import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useBatteryBalance } from '../../state/battery';
+import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -389,9 +390,13 @@ export const TronUSDTPage = () => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeader backButton borderBottom={true}>
+            <DesktopViewHeaderStyled backButton borderBottom={true}>
                 <Label2>{asset.symbol}</Label2>
-            </DesktopViewHeader>
+                <AssetBlockchainBadge size="m" marginLeft="6px">
+                    TRC20
+                </AssetBlockchainBadge>
+                <OtherHistoryFilters disableInitiatorFilter />
+            </DesktopViewHeaderStyled>
             <CoinHeaderStyled>
                 <TronCoinInfoWrapper>
                     <img src={asset.image} alt={asset.symbol} />
@@ -472,6 +477,12 @@ const SmallDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
 `;
 
+const LinkStyled = styled(Link)`
+    text-decoration: unset;
+    color: ${p => p.theme.textPrimary};
+    display: contents;
+`;
+
 const TronUseBatteryBanner = () => {
     const { t } = useTranslation();
     const { data: batteryBalance } = useBatteryBalance();
@@ -487,11 +498,11 @@ const TronUseBatteryBanner = () => {
                     <Label2>{t('tron_battery_required_banner_title')}</Label2>
                     <Body2>{t('tron_battery_required_banner_description')}</Body2>
                 </TextContainer>
-                <Link to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
                     <Button primary size="small">
                         {t('tron_battery_required_banner_button')}
                     </Button>
-                </Link>
+                </LinkStyled>
             </TronTopUpUSDTWrapper>
             <SmallDivider />
         </>

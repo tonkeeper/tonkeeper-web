@@ -67,6 +67,12 @@ export interface TronTransactionsListTransactionsInner {
      * @memberof TronTransactionsListTransactionsInner
      */
     timestamp: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof TronTransactionsListTransactionsInner
+     */
+    trongridResult?: number;
 }
 
 /**
@@ -102,6 +108,7 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
         'isFailed': json['is_failed'],
         'batteryCharges': json['battery_charges'],
         'timestamp': json['timestamp'],
+        'trongridResult': json['trongrid_result'] == null ? undefined : json['trongrid_result'],
     };
 }
 
@@ -124,6 +131,7 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
         'is_failed': value['isFailed'],
         'battery_charges': value['batteryCharges'],
         'timestamp': value['timestamp'],
+        'trongrid_result': value['trongridResult'],
     };
 }
 

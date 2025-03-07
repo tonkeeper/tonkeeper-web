@@ -24,6 +24,7 @@ import { DesktopAccountHeader } from '../../components/desktop/header/DesktopAcc
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
 import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
+import { hexToRGBA } from '../../libs/css';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -38,7 +39,7 @@ const SettingsListItem = styled.div`
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
     &:hover {
-        background-color: ${p => p.theme.backgroundContentTint};
+        background-color: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.7)};
     }
 
     > svg {

@@ -16,7 +16,6 @@ import { useAllChainsAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
-import { useActiveTronWallet, useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 const DesktopAssetStylesOverride = css`

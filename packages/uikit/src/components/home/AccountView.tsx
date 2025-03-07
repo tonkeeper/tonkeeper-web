@@ -37,8 +37,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Address } from '@ton/core';
 import { Tabs } from '../Tabs';
-import { TronWallet } from '@tonkeeper/core/dist/entries/tron/tron-wallet';
-import { useActiveTronWallet } from '../../state/tron/tron';
+import { useActiveTronWallet, useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -208,10 +207,11 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     );
 };
 
-const ReceiveTron: FC<{ token: string; tronWallet: TronWallet }> = ({ tronWallet, token }) => {
+const ReceiveTron: FC<{ token: string }> = ({ token }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { extension } = useAppContext();
+    const tronWallet = useActiveTronWallet();
 
     const asset = token === TRON_USDT_ASSET.id ? TRON_USDT_ASSET : TRON_TRX_ASSET;
 
@@ -226,6 +226,10 @@ const ReceiveTron: FC<{ token: string; tronWallet: TronWallet }> = ({ tronWallet
             title: t('receive_trx'),
             description: t('receive_trx_description')
         };
+    }
+
+    if (!tronWallet) {
+        return null;
     }
 
     return (
@@ -284,17 +288,17 @@ export const ReceiveContent: FC<{
     const tonRef = useRef<HTMLDivElement>(null);
     const tronRef = useRef<HTMLDivElement>(null);
 
-    const isTon = active === BLOCKCHAIN_NAME.TON; /*|| !tron*/
+    const isTon = active === BLOCKCHAIN_NAME.TON;
     const nodeRef = isTon ? tonRef : tronRef;
 
-    const tronWallet = useActiveTronWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
 
     return (
         <FullHeightBlockResponsive standalone={standalone}>
             <NotificationHeaderPortal>
                 <NotificationHeader>
                     <NotificationTitleRowStyled handleClose={handleClose} center>
-                        {!jetton && tronWallet && (
+                        {!jetton && isTronEnabled && (
                             <TabsStyled active={active} setActive={setActive} values={tabsValues} />
                         )}
                     </NotificationTitleRowStyled>
@@ -318,11 +322,8 @@ export const ReceiveContent: FC<{
                                     }
                                 />
                             ) : (
-                                !!tronWallet && (
-                                    <ReceiveTron
-                                        token={jetton || TRON_USDT_ASSET.id}
-                                        tronWallet={tronWallet}
-                                    />
+                                !!isTronEnabled && (
+                                    <ReceiveTron token={jetton || TRON_USDT_ASSET.id} />
                                 )
                             )}
                         </div>

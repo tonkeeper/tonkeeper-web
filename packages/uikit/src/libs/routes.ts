@@ -58,6 +58,7 @@ export enum WalletSettingsRoute {
     connectedApps = '/connected-apps',
     derivations = '/derivations',
     battery = '/battery',
+    chains = '/chains',
     twoFa = '/two-fa',
     notification = '/notification'
 }

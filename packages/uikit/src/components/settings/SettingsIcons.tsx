@@ -140,6 +140,25 @@ export const ListOfTokensIcon = () => {
     );
 };
 
+export const BlockchainsIcon = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="28"
+            height="28"
+            viewBox="0 0 28 28"
+            fill="none"
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M8 24C4.41015 24 1.5 21.0899 1.5 17.5C1.5 14.7946 3.15285 12.4752 5.50385 11.4966C5.50129 11.4147 5.5 11.3325 5.5 11.25C5.5 6.96979 8.96979 3.5 13.25 3.5C17.1549 3.5 20.3852 6.38793 20.9217 10.1445C24.106 10.8014 26.5 13.6211 26.5 17C26.5 20.866 23.366 24 19.5 24H8Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};
+
 export const SecurityIcon = () => {
     return (
         <svg

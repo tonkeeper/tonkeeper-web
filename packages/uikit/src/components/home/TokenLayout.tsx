@@ -53,7 +53,10 @@ const CoinLabel = styled(Label4)`
     margin-left: 8px;
     padding: 3px 4px;
     border-radius: ${props => props.theme.corner3xSmall};
-    background: ${props => props.theme.backgroundContentTint};
+    background: ${props =>
+        props.theme.displayType === 'full-width'
+            ? props.theme.backgroundContent
+            : props.theme.backgroundContentAttention};
     color: ${props => props.theme.textSecondary};
 `;
 

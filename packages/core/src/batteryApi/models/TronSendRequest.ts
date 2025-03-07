@@ -24,7 +24,7 @@ export interface TronSendRequest {
      * @type {string}
      * @memberof TronSendRequest
      */
-    tx: string;
+    tx?: string;
     /**
      * 
      * @type {number}
@@ -49,7 +49,6 @@ export interface TronSendRequest {
  * Check if a given object implements the TronSendRequest interface.
  */
 export function instanceOfTronSendRequest(value: object): value is TronSendRequest {
-    if (!('tx' in value) || value['tx'] === undefined) return false;
     if (!('wallet' in value) || value['wallet'] === undefined) return false;
     return true;
 }
@@ -64,7 +63,7 @@ export function TronSendRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'tx': json['tx'],
+        'tx': json['tx'] == null ? undefined : json['tx'],
         'energy': json['energy'] == null ? undefined : json['energy'],
         'bandwidth': json['bandwidth'] == null ? undefined : json['bandwidth'],
         'wallet': json['wallet'],

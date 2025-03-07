@@ -77,6 +77,7 @@ export * from './ComputePhase';
 export * from './ComputeSkipReason';
 export * from './Config';
 export * from './ConfigGasProxyInner';
+export * from './ConfigMeanPrices';
 export * from './ConfigProposalSetup';
 export * from './ContractDeployAction';
 export * from './CreateCustomRefundRequest';
