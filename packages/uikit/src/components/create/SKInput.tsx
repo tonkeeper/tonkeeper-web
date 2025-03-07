@@ -1,11 +1,11 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { H2Label2Responsive } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { TextArea } from '../fields/Input';
-import { isValidSK } from '@tonkeeper/core/dist/service/mnemonicService';
+import { isValidSKOrSeed } from '@tonkeeper/core/dist/service/mnemonicService';
 
 const Block = styled.div`
     display: flex;
@@ -35,7 +35,7 @@ export const SKInput: FC<{
         if (!touched) {
             return;
         }
-        if (!sk || !isValidSK(sk)) {
+        if (!sk || !isValidSKOrSeed(sk)) {
             setError(true);
         } else {
             setError(false);

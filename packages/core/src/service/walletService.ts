@@ -37,7 +37,8 @@ import { FiatCurrencies } from '../entries/fiat';
 import { KeychainTrxAccountsProvider, TronAddressUtils } from '@ton-keychain/trx';
 import { TronWallet } from '../entries/tron/tron-wallet';
 import { ethers } from 'ethers';
-import { keyPairFromSecretKey } from '@ton/crypto';
+import { KeyPair, keyPairFromSecretKey } from '@ton/crypto';
+import nacl from 'tweetnacl';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -266,6 +267,24 @@ export const createStandardTonAccountByMnemonic = async (
     });
 };
 
+const keyPairFromSecretKeyOrSeed = (sk: string): KeyPair => {
+    switch (sk.length) {
+        case 128: {
+            return keyPairFromSecretKey(Buffer.from(sk, 'hex'));
+        }
+        case 64: {
+            const pair = nacl.sign.keyPair.fromSeed(Buffer.from(sk, 'hex'));
+            return {
+                secretKey: Buffer.from(pair.secretKey),
+                publicKey: Buffer.from(pair.publicKey)
+            };
+        }
+        default: {
+            throw new Error('Unexpected secretKey size');
+        }
+    }
+};
+
 export const createStandardTonAccountBySK = async (
     appContext: CreateWalletContext,
     storage: IStorage,
@@ -275,7 +294,7 @@ export const createStandardTonAccountBySK = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = keyPairFromSecretKey(Buffer.from(sk, 'hex'));
+    const keyPair = keyPairFromSecretKeyOrSeed(sk);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
