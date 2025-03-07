@@ -53,6 +53,7 @@
   "battery_settings_swap_title": "Swaps via Tonkeeper",
   "battery_settings_token_transfer_price": "≈ {charges} charges per transfer",
   "battery_settings_token_transfer_title": "Token transfer",
+  "battery_settings_trc20_transfer_disclamer": "For USDT TRC20 transactions, battery charge values can fluctuate significantly due to various market factors.",
   "battery_settings_trc20_transfer_title": "USDT TRC20 Transfer Price",
   "battery_transactions_type_usdt_trc20_transfer": "USDT TRC20 Transfers",
   "bring_all_to_front": "Bring All to Front",

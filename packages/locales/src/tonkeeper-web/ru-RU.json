@@ -52,6 +52,7 @@
   "battery_settings_swap_title": "Свопы через Tonkeeper",
   "battery_settings_token_transfer_price": "≈ {charges} зарядов за перевод",
   "battery_settings_token_transfer_title": "Отправка токенов",
+  "battery_settings_trc20_transfer_disclamer": "Для транзакций USDT TRC20 расход зарядов батареи может существенно колебаться из-за различных рыночных факторов.",
   "battery_settings_trc20_transfer_title": "Отправка USDT TRC20",
   "battery_transactions_type_usdt_trc20_transfer": "Отправка USDT TRC20",
   "bring_all_to_front": "Переместить на передний план",

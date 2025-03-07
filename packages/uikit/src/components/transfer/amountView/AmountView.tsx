@@ -60,7 +60,7 @@ import {
     toInitAmountState,
     toTokenRateSymbol
 } from './amountState';
-import { useBatteryAuthToken } from '../../../state/battery';
+import { useBatteryBalance } from '../../../state/battery';
 import { TransferBatteryRequired } from '../TransferBatteryRequired';
 
 export const AmountView: FC<{
@@ -73,10 +73,13 @@ export const AmountView: FC<{
     HeaderBlock: AmountHeaderBlockComponent;
     isAnimationProcess: boolean;
 }> = props => {
-    const batteryAuthToken = useBatteryAuthToken();
+    const { data: batteryBalance } = useBatteryBalance();
 
-    if (props.recipient.address.blockchain === BLOCKCHAIN_NAME.TRON && !batteryAuthToken) {
-        if (batteryAuthToken === undefined) {
+    if (
+        props.recipient.address.blockchain === BLOCKCHAIN_NAME.TRON &&
+        (!batteryBalance || batteryBalance.batteryUnitsBalance.isZero())
+    ) {
+        if (batteryBalance === undefined) {
             return null;
         } else {
             return (

@@ -1,10 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { Notification, NotificationFooterPortal } from '../../Notification';
-import {
-    useActiveConfig,
-    useActiveTonWalletConfig,
-    useMutateActiveTonWalletConfig
-} from '../../../state/wallet';
+import { useActiveTonWalletConfig, useMutateActiveTonWalletConfig } from '../../../state/wallet';
 import styled, { css } from 'styled-components';
 import { Body1Body2Responsive, Body3, H2Label2Responsive, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
@@ -12,8 +8,7 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../List'
 import { Checkbox } from '../../fields/Checkbox';
 import { TonWalletConfig } from '@tonkeeper/core/dist/entries/wallet';
 import { Button } from '../../fields/Button';
-import { useBatteryUnitTonRate } from '../../../state/battery';
-import BigNumber from 'bignumber.js';
+import { useBatteryServiceConfig } from '../../../state/battery';
 
 const NotificationStyled = styled(Notification)<{ $hideSelection?: boolean }>`
     max-width: 400px;
@@ -81,6 +76,11 @@ const ListItemText = styled.div`
     }
 `;
 
+const TronDisclaimer = styled(Body3)`
+    margin-top: 6px;
+    color: ${p => p.theme.accentOrange} !important;
+`;
+
 const ListBlockStyled = styled(ListBlockDesktopAdaptive)<{ $hideSelection?: boolean }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
@@ -142,11 +142,8 @@ const BatterySettingsNotificationContent: FC<{
     onClose: () => void;
 }> = ({ batterySettings, onClose, hideSelection }) => {
     const { t } = useTranslation();
+    const batteryConfig = useBatteryServiceConfig();
 
-    const rate = useBatteryUnitTonRate();
-
-    const { batteryMeanPrice_swap, batteryMeanPrice_jetton, batteryMeanPrice_nft } =
-        useActiveConfig();
     const [batterySettingsOptimistic, setBatterySettingsOptimistic] = useState(batterySettings);
     const { mutateAsync } = useMutateActiveTonWalletConfig();
 
@@ -165,22 +162,10 @@ const BatterySettingsNotificationContent: FC<{
         onClose();
     };
 
-    const batterySwapCharges = new BigNumber(batteryMeanPrice_swap || '0.13')
-        .div(rate)
-        .integerValue(BigNumber.ROUND_UP)
-        .toNumber();
-    const batteryJettonCharges = new BigNumber(batteryMeanPrice_jetton || '0.025')
-        .div(rate)
-        .integerValue(BigNumber.ROUND_UP)
-        .toNumber();
-    const batteryNFTCharges = new BigNumber(batteryMeanPrice_nft || '0.01')
-        .div(rate)
-        .integerValue(BigNumber.ROUND_UP)
-        .toNumber();
-    const batteryTRC20Charges = new BigNumber(batteryMeanPrice_nft || '0.01') // TODO
-        .div(rate)
-        .integerValue(BigNumber.ROUND_UP)
-        .toNumber();
+    const batterySwapCharges = batteryConfig.meanPrices.batteryMeanPriceSwap;
+    const batteryJettonCharges = batteryConfig.meanPrices.batteryMeanPriceJetton;
+    const batteryNFTCharges = batteryConfig.meanPrices.batteryMeanPriceNft;
+    const batteryTRC20Charges = batteryConfig.meanPrices.batteryMeanPriceTronUsdt;
 
     return (
         <>
@@ -193,60 +178,81 @@ const BatterySettingsNotificationContent: FC<{
                 </Heading>
             )}
             <ListBlockStyled $hideSelection={hideSelection}>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <ListItemText>
-                            <Label2>{t('battery_settings_trc20_transfer_title')}</Label2>
-                            <Body3>
-                                {t('battery_settings_token_transfer_price', {
-                                    charges: batteryTRC20Charges
-                                })}
-                            </Body3>
-                        </ListItemText>
-                        {!hideSelection && <CheckboxStyled disabled checked />}
-                    </ListItemPayload>
-                </ListItem>
-                <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForSwaps')}>
-                    <ListItemPayload>
-                        <ListItemText>
-                            <Label2>{t('battery_settings_swap_title')}</Label2>
-                            <Body3>
-                                {t('battery_settings_swap_price', { charges: batterySwapCharges })}
-                            </Body3>
-                        </ListItemText>
-                        {!hideSelection && (
-                            <CheckboxStyled checked={batterySettingsOptimistic.enabledForSwaps} />
-                        )}
-                    </ListItemPayload>
-                </ListItem>
-                <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForNfts')}>
-                    <ListItemPayload>
-                        <ListItemText>
-                            <Label2>{t('battery_settings_nft_title')}</Label2>
-                            <Body3>
-                                {t('battery_settings_nft_price', { charges: batteryNFTCharges })}
-                            </Body3>
-                        </ListItemText>
-                        {!hideSelection && (
-                            <CheckboxStyled checked={batterySettingsOptimistic.enabledForNfts} />
-                        )}
-                    </ListItemPayload>
-                </ListItem>
-                <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForTokens')}>
-                    <ListItemPayload>
-                        <ListItemText>
-                            <Label2>{t('battery_settings_token_transfer_title')}</Label2>
-                            <Body3>
-                                {t('battery_settings_token_transfer_price', {
-                                    charges: batteryJettonCharges
-                                })}
-                            </Body3>
-                        </ListItemText>
-                        {!hideSelection && (
-                            <CheckboxStyled checked={batterySettingsOptimistic.enabledForTokens} />
-                        )}
-                    </ListItemPayload>
-                </ListItem>
+                {!!batteryTRC20Charges && (
+                    <ListItem hover={false}>
+                        <ListItemPayload>
+                            <ListItemText>
+                                <Label2>{t('battery_settings_trc20_transfer_title')}</Label2>
+                                <Body3>
+                                    {t('battery_settings_token_transfer_price', {
+                                        charges: batteryTRC20Charges
+                                    })}
+                                </Body3>
+                                <TronDisclaimer>
+                                    {t('battery_settings_trc20_transfer_disclamer')}
+                                </TronDisclaimer>
+                            </ListItemText>
+                            {!hideSelection && <CheckboxStyled disabled checked />}
+                        </ListItemPayload>
+                    </ListItem>
+                )}
+                {!!batterySwapCharges && (
+                    <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForSwaps')}>
+                        <ListItemPayload>
+                            <ListItemText>
+                                <Label2>{t('battery_settings_swap_title')}</Label2>
+                                <Body3>
+                                    {t('battery_settings_swap_price', {
+                                        charges: batterySwapCharges
+                                    })}
+                                </Body3>
+                            </ListItemText>
+                            {!hideSelection && (
+                                <CheckboxStyled
+                                    checked={batterySettingsOptimistic.enabledForSwaps}
+                                />
+                            )}
+                        </ListItemPayload>
+                    </ListItem>
+                )}
+                {!!batteryNFTCharges && (
+                    <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForNfts')}>
+                        <ListItemPayload>
+                            <ListItemText>
+                                <Label2>{t('battery_settings_nft_title')}</Label2>
+                                <Body3>
+                                    {t('battery_settings_nft_price', {
+                                        charges: batteryNFTCharges
+                                    })}
+                                </Body3>
+                            </ListItemText>
+                            {!hideSelection && (
+                                <CheckboxStyled
+                                    checked={batterySettingsOptimistic.enabledForNfts}
+                                />
+                            )}
+                        </ListItemPayload>
+                    </ListItem>
+                )}
+                {!!batteryJettonCharges && (
+                    <ListItem hover={false} onClick={() => onToggleCheckbox('enabledForTokens')}>
+                        <ListItemPayload>
+                            <ListItemText>
+                                <Label2>{t('battery_settings_token_transfer_title')}</Label2>
+                                <Body3>
+                                    {t('battery_settings_token_transfer_price', {
+                                        charges: batteryJettonCharges
+                                    })}
+                                </Body3>
+                            </ListItemText>
+                            {!hideSelection && (
+                                <CheckboxStyled
+                                    checked={batterySettingsOptimistic.enabledForTokens}
+                                />
+                            )}
+                        </ListItemPayload>
+                    </ListItem>
+                )}
             </ListBlockStyled>
             {!hideSelection && (
                 <ButtonsBlock>

@@ -82,6 +82,7 @@ models/ComputePhase.ts
 models/ComputeSkipReason.ts
 models/Config.ts
 models/ConfigGasProxyInner.ts
+models/ConfigMeanPrices.ts
 models/ConfigProposalSetup.ts
 models/ContractDeployAction.ts
 models/CreateCustomRefundRequest.ts
