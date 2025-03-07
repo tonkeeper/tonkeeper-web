@@ -62,6 +62,10 @@ export const isValidSK = (sk: string) => {
     return /^[0-9a-fA-F]{128}$/.test(sk);
 };
 
+export const isValidSecretKey = (sk: string) => {
+    return isValidSK(sk) || /^[0-9a-fA-F]{64}$/.test(sk);
+};
+
 export const seeIfMnemonicValid = async (mnemonic: string[]) => {
     const isValid = await validateStandardTonMnemonic(mnemonic);
     if (!isValid) {
