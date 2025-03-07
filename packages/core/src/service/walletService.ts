@@ -267,7 +267,7 @@ export const createStandardTonAccountByMnemonic = async (
     });
 };
 
-const createFullKeyPair = (sk: string): KeyPair => {
+const keyPairFromSecretKeyOrSeed = (sk: string): KeyPair => {
     switch (sk.length) {
         case 128: {
             return keyPairFromSecretKey(Buffer.from(sk, 'hex'));
@@ -294,7 +294,7 @@ export const createStandardTonAccountBySK = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = createFullKeyPair(sk);
+    const keyPair = keyPairFromSecretKeyOrSeed(sk);
 
     const publicKey = keyPair.publicKey.toString('hex');
 
