@@ -30,11 +30,16 @@ const AddressText = styled(Body2)`
     color: ${p => p.theme.textTertiary};
 `;
 
+const WalletEmojiStyled = styled(WalletEmoji)`
+    margin-right: 4px;
+`;
+
 export const AccountAndWalletInfo: FC<
     AllOrNone<{ account: Account; walletId: WalletId }> & {
         noPrefix?: boolean;
         hideAddress?: boolean;
         className?: string;
+        onClick?: () => void;
     }
 > = props => {
     const { t } = useTranslation();
@@ -59,12 +64,12 @@ export const AccountAndWalletInfo: FC<
     }
 
     return (
-        <WalletInfoStyled className={props.className}>
+        <WalletInfoStyled className={props.className} onClick={props.onClick}>
+            <WalletEmojiStyled emojiSize="20px" containerSize="20px" emoji={emoji} />
             <NameText>
                 {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
                 {name}
             </NameText>
-            <WalletEmoji emojiSize="20px" containerSize="20px" emoji={emoji} />
             {account.allTonWallets.length > 1 && !props.hideAddress ? (
                 <>
                     <Dot />
