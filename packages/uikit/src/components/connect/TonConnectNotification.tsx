@@ -4,7 +4,11 @@ import {
     DAppManifest,
     TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { getDeviceInfo, getManifest } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import {
+    getDeviceInfo,
+    getManifest,
+    getBrowserPlatform
+} from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -135,7 +139,7 @@ const ConnectContent: FC<{
                     handleClose({
                         replyItems: {
                             items: replyItems,
-                            device: getDeviceInfo(sdk.version, maxMessages)
+                            device: getDeviceInfo(getBrowserPlatform(), sdk.version, maxMessages)
                         },
                         manifest,
                         ...selectedAccountAndWallet
