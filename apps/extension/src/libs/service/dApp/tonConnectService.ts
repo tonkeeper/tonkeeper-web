@@ -1,12 +1,14 @@
 import {
     CONNECT_EVENT_ERROR_CODES,
     ConnectRequest,
+    DeviceInfo,
     TonConnectAccount,
     TonConnectEventPayload,
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     getDappConnection,
+    getDeviceInfo,
     tonDisconnectRequest,
     tonReConnectRequest
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
@@ -21,9 +23,40 @@ import browser from 'webextension-polyfill';
 
 const storage = new ExtensionStorage();
 
-export const tonConnectReConnect = async (origin: string) => {
+const getTonConnectPlatform = (os: browser.Runtime.PlatformOs): DeviceInfo['platform'] => {
+    switch (os) {
+        case 'mac': {
+            return 'mac';
+        }
+        case 'win': {
+            return 'windows';
+        }
+        case 'android': {
+            return 'android';
+        }
+        case 'cros':
+        case 'linux':
+        case 'openbsd': {
+            return 'linux';
+        }
+        default:
+            return '' as any as DeviceInfo['platform'];
+    }
+};
+
+const tonReConnectResponse = async (origin: string): Promise<TonConnectEventPayload> => {
+    const { items, maxMessages } = await tonReConnectRequest(storage, origin);
     const { version } = browser.runtime.getManifest();
-    return await tonReConnectRequest(storage, version, origin);
+    const { os } = await browser.runtime.getPlatformInfo();
+
+    return {
+        items,
+        device: getDeviceInfo(getTonConnectPlatform(os), version, maxMessages)
+    };
+};
+
+export const tonConnectReConnect = async (origin: string) => {
+    return await tonReConnectResponse(origin);
 };
 
 export const tonConnectDisconnect = async (id: number, webViewUrl: string) =>
@@ -73,8 +106,7 @@ export const tonConnectRequest = async (
     if (isTonProof) {
         return connectWithNotification(id, origin, data, logo);
     }
-    const { version } = browser.runtime.getManifest();
-    const reconnect = await tonReConnectRequest(storage, version, origin).catch(() => null);
+    const reconnect = await tonReConnectResponse(origin).catch(() => null);
     if (reconnect) {
         return reconnect;
     } else {

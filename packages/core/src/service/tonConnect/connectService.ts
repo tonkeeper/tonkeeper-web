@@ -17,7 +17,6 @@ import {
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
     TonConnectAccount,
-    TonConnectEventPayload,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
 import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
@@ -120,12 +119,12 @@ export const getManifest = async (request: ConnectRequest) => {
     return manifest;
 };
 
-function getPlatform(): DeviceInfo['platform'] {
+export function getBrowserPlatform(): DeviceInfo['platform'] {
     const platform =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window.navigator as any)?.userAgentData?.platform || window.navigator.platform;
+        (window?.navigator as any)?.userAgentData?.platform || window?.navigator.platform;
 
-    const userAgent = window.navigator.userAgent;
+    const userAgent = window?.navigator.userAgent;
 
     const macosPlatforms = ['macOS', 'Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'];
     const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
@@ -151,9 +150,13 @@ function getPlatform(): DeviceInfo['platform'] {
     return os!;
 }
 
-export const getDeviceInfo = (appVersion: string, maxMessages: number): DeviceInfo => {
+export const getDeviceInfo = (
+    platform: DeviceInfo['platform'],
+    appVersion: string,
+    maxMessages: number
+): DeviceInfo => {
     return {
-        platform: getPlatform()!,
+        platform: platform,
         appName: 'Tonkeeper',
         appVersion: appVersion,
         maxProtocolVersion: 2,
@@ -236,11 +239,15 @@ export const checkWalletConnectionOrDie = async (options: {
     }
 };
 
+export interface ReConnectPayload {
+    items: ConnectItemReply[];
+    maxMessages: number;
+}
+
 export const tonReConnectRequest = async (
     storage: IStorage,
-    version: string,
     webViewUrl: string
-): Promise<TonConnectEventPayload> => {
+): Promise<ReConnectPayload> => {
     const connection = await getDappConnection(storage, webViewUrl);
     if (!connection) {
         throw new TonConnectError(
@@ -263,7 +270,7 @@ export const tonReConnectRequest = async (
                     : Network.MAINNET
             )
         ],
-        device: getDeviceInfo(version, maxMessages)
+        maxMessages
     };
 };
 
@@ -448,7 +455,7 @@ export const saveWalletTonConnect = async (options: {
         event: 'connect',
         payload: {
             items: options.replyItems,
-            device: getDeviceInfo(options.appVersion, maxMessages)
+            device: getDeviceInfo(getBrowserPlatform(), options.appVersion, maxMessages)
         }
     };
 };
