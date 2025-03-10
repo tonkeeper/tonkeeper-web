@@ -25,15 +25,12 @@ import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
 import {
     ConfirmView,
-    ConfirmViewButtons,
-    ConfirmViewButtonsSlot,
     ConfirmViewDetailsAmount,
     ConfirmViewDetailsFee,
     ConfirmViewDetailsSlot,
     ConfirmViewHeadingSlot,
     ConfirmViewTitleSlot
 } from '../transfer/ConfirmView';
-import { ConfirmAndCancelMainButton } from '../transfer/common';
 import { useNftDNSLinkData } from '../../state/nft';
 import { useNotifyErrorHandle, useToast } from '../../hooks/useNotification';
 
@@ -175,9 +172,6 @@ const LinkNftUnlinked: FC<{
                 <ConfirmViewDetailsAmount />
                 <ConfirmViewDetailsFee />
             </ConfirmViewDetailsSlot>
-            <ConfirmViewButtonsSlot>
-                <ConfirmViewButtons MainButton={ConfirmAndCancelMainButton} />
-            </ConfirmViewButtonsSlot>
         </ConfirmView>
     );
 
@@ -345,9 +339,6 @@ const LinkNftLinked: FC<{
                 <ConfirmViewDetailsAmount />
                 <ConfirmViewDetailsFee />
             </ConfirmViewDetailsSlot>
-            <ConfirmViewButtonsSlot>
-                <ConfirmViewButtons MainButton={ConfirmAndCancelMainButton} />
-            </ConfirmViewButtonsSlot>
         </ConfirmView>
     );
 
