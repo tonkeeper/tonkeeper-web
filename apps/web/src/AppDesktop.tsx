@@ -38,6 +38,7 @@ import {
 } from "@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs";
 import { DesktopMultisigOrdersPage } from "@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders";
 import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
+import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 
 const DesktopAccountSettingsPage = React.lazy(
   () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
@@ -169,6 +170,7 @@ const DesktopView: FC<{
     useRecommendations();
     useTrackLocation();
     useDebuggingTools();
+    useRealtimeUpdatesInvalidation();
 
     const updated = useMemo(() => {
         theme.displayType = 'full-width';
