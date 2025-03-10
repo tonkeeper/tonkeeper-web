@@ -454,7 +454,8 @@ export const useHistoryFilters = () => {
         ...filters,
         toggleOnlyInitiator,
         toggleFilterSpam,
-        setAsset
+        setAsset,
+        setFilters
     };
 };
 
