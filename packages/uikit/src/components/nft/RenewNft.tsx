@@ -148,7 +148,16 @@ export const RenewNft: FC<{
                 )}
             </RenewDNSBlock>
             <Notification isOpen={isOpen} hideButton handleClose={() => onClose} backShadow>
-                {child}
+                {() => (
+                    <ConfirmView
+                        onClose={onClose}
+                        recipient={recipient}
+                        assetAmount={dnsRenewAssetAmount}
+                        fitContent
+                        estimation={estimation}
+                        {...mutation}
+                    />
+                )}
             </Notification>
         </>
     );

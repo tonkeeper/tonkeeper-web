@@ -35,7 +35,6 @@ import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
-import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -308,7 +307,7 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
             );
 
             if (assets.ton.info.extraBalance) {
-                for (let extra of assets.ton.info.extraBalance) {
+                for (const extra of assets.ton.info.extraBalance) {
                     // TODO: Extra Currency token rate
                     const dist: Omit<TokenDistribution, 'percent'> = {
                         fiatBalance: new BigNumber(0),
@@ -329,7 +328,6 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
             tokensOmited.sort((a, b) => b.fiatBalance.minus(a.fiatBalance).toNumber());
 
             const tokens: TokenDistribution[] = tokensOmited
-                .slice(0, maxGropusNumber - 1)
                 .map(t => ({
                     ...t,
                     percent: t.fiatBalance
@@ -337,29 +335,30 @@ export function useAssetsDistribution(maxGropusNumber = 10) {
                         .multipliedBy(100)
                         .decimalPlaces(2)
                         .toNumber()
-                }));
+                }))
+                .filter(t => t.percent > 0);
 
-            const includedPercent = tokens.reduce((acc, t) => t.percent + acc, 0);
-            const includedBalance = tokens.reduce(
+            const tokensToDisplay = tokens.slice(0, maxGropusNumber - 1);
+
+            const includedPercent = tokensToDisplay.reduce((acc, t) => t.percent + acc, 0);
+            const includedBalance = tokensToDisplay.reduce(
                 (acc, t) => t.fiatBalance.plus(acc),
                 new BigNumber(0)
             );
 
-            if (tokensOmited.length > maxGropusNumber) {
-                tokens.push({
+            if (tokens.length > maxGropusNumber) {
+                tokensToDisplay.push({
                     percent: new BigNumber(100 - includedPercent).decimalPlaces(2).toNumber(),
                     fiatBalance: total.minus(includedBalance),
                     meta: {
                         type: 'others',
                         color: '#9DA2A4',
-                        tokens: tokensOmited
-                            .slice(maxGropusNumber - 1)
-                            .map(t => t.meta) as TokenMeta[]
+                        tokens: tokens.slice(maxGropusNumber - 1).map(t => t.meta) as TokenMeta[]
                     }
                 });
             }
 
-            return tokens;
+            return tokensToDisplay;
         },
         { enabled: !!assets && !!tonRate }
     );

@@ -27,6 +27,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
+import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -113,6 +114,8 @@ export const MobileView: FC<{
     useKeyboardHeight();
     useTrackLocation();
     useDebuggingTools();
+    useRealtimeUpdatesInvalidation();
+
 
     const updated = useMemo(() => {
         theme.displayType = 'compact';

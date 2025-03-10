@@ -174,7 +174,8 @@ const CreateMultisigAwaitDeployPage: FC<{
                 addAccount({
                     address: multisigAddress,
                     hostWallets,
-                    selectedHostWalletId: deployerWalletId
+                    selectedHostWalletId: deployerWalletId,
+                    pinToWallet: deployerWalletId
                 })
             )
             .then(onDone);

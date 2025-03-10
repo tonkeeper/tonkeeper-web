@@ -52,7 +52,7 @@ export const createMultisigTonAccount = async (
     }
 ) => {
     const rawAddress = Address.parse(address).toRawString();
-    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
+    const { name, emoji } = await accountsStorage(storage).getNewMultisigAccountNameAndEmoji(
         rawAddress.split(':')[1]
     );
 

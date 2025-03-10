@@ -38,7 +38,7 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
         <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
             <ListItemPayload>
                 <Label>{t('transaction_recipient_address')}</Label>
-                <Label1>{toShortValue(address)}</Label1>
+                <Label1>{address}</Label1>
             </ListItemPayload>
         </ListItem>
     );
