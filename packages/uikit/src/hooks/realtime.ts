@@ -1,4 +1,4 @@
-import { useActiveApi, useActiveTonNetwork, useActiveWallet } from '../state/wallet';
+import { useActiveAccountQuery, useActiveApi, useActiveTonNetwork } from '../state/wallet';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
@@ -6,7 +6,9 @@ import { useAppContext } from './appContext';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useRealtimeUpdatesInvalidation = () => {
-    const activeTonWallet = useActiveWallet();
+    const { data: activeAccount } = useActiveAccountQuery();
+    const activeTonWallet = activeAccount?.activeTonWallet;
+
     const client = useQueryClient();
     const api = useActiveApi();
     const { mainnetConfig, testnetConfig } = useAppContext();
@@ -19,7 +21,7 @@ export const useRealtimeUpdatesInvalidation = () => {
     const apiPath = `${api.tonApiV2.basePath}/v2/sse/accounts/transactions`;
 
     useEffect(() => {
-        if (!apiKey) {
+        if (!apiKey || !activeTonWallet) {
             return;
         }
 
@@ -41,5 +43,5 @@ export const useRealtimeUpdatesInvalidation = () => {
         return () => {
             sse.close();
         };
-    }, [activeTonWallet.rawAddress, apiPath, apiKey]);
+    }, [activeTonWallet, apiPath, apiKey]);
 };
