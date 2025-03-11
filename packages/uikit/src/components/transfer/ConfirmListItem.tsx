@@ -11,10 +11,15 @@ import { Label1 } from '../Text';
 import { getRecipientAddress } from './amountView/AmountViewUI';
 import { Label } from './common';
 import { useActiveTonNetwork } from '../../state/wallet';
+import styled from 'styled-components';
 
 export const cropName = (name: string) => {
     return name.length > 19 ? toShortValue(name, 8) : name;
 };
+
+const Label1Styled = styled(Label1)`
+    word-break: break-word;
+`;
 
 const RecipientItem: FC<{ name: string; label: string }> = ({ name, label }) => {
     const { t } = useTranslation();
@@ -24,7 +29,7 @@ const RecipientItem: FC<{ name: string; label: string }> = ({ name, label }) => 
         <ListItem onClick={() => sdk.copyToClipboard(name)}>
             <ListItemPayload>
                 <Label>{t('txActions_signRaw_recipient')}</Label>
-                <Label1>{cropName(label)}</Label1>
+                <Label1Styled>{label}</Label1Styled>
             </ListItemPayload>
         </ListItem>
     );
@@ -38,7 +43,7 @@ const RecipientItemAddress: FC<{ address: string }> = ({ address }) => {
         <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
             <ListItemPayload>
                 <Label>{t('transaction_recipient_address')}</Label>
-                <Label1>{toShortValue(address)}</Label1>
+                <Label1Styled>{address}</Label1Styled>
             </ListItemPayload>
         </ListItem>
     );
@@ -88,7 +93,7 @@ export const RecipientListItem: FC<{ recipient: RecipientData }> = ({ recipient 
         );
     }
 
-    return <RecipientItem name={addrValue} label={toShortValue(addrValue)} />;
+    return <RecipientItem name={addrValue} label={addrValue} />;
 };
 
 export const AmountListItem: FC<{
