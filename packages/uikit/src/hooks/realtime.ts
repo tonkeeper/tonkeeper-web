@@ -16,7 +16,7 @@ export const useRealtimeUpdatesInvalidation = () => {
 
     const apiKey = useMemo(() => {
         return network === Network.TESTNET ? testnetConfig.tonApiV2Key : mainnetConfig.tonApiV2Key;
-    }, [network, mainnetConfig, testnetConfig]);
+    }, [network, mainnetConfig.tonApiV2Key, testnetConfig.tonApiV2Key]);
 
     const apiPath = `${api.tonApiV2.basePath}/v2/sse/accounts/transactions`;
 
@@ -35,7 +35,7 @@ export const useRealtimeUpdatesInvalidation = () => {
             const data = JSON.parse(event.data);
             if (data.account_id) {
                 client.invalidateQueries(
-                    anyOfKeysParts(QueryKey.wallet, QueryKey.account, activeTonWallet.id)
+                    anyOfKeysParts(QueryKey.wallet, QueryKey.account, activeTonWallet.rawAddress)
                 );
             }
         };
@@ -43,5 +43,5 @@ export const useRealtimeUpdatesInvalidation = () => {
         return () => {
             sse.close();
         };
-    }, [activeTonWallet, apiPath, apiKey]);
+    }, [activeTonWallet?.rawAddress, apiPath, apiKey]);
 };
