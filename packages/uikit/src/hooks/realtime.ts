@@ -31,12 +31,24 @@ export const useRealtimeUpdatesInvalidation = () => {
 
         const sse = new EventSource(url.toString());
 
-        sse.onmessage = event => {
-            const data = JSON.parse(event.data);
-            if (data.account_id) {
+        const invalidator = () => {
+            /**
+             * small-time gap to make sure tonapi refreshed the balances
+             */
+            setTimeout(() => {
                 client.invalidateQueries(
                     anyOfKeysParts(QueryKey.wallet, QueryKey.account, activeTonWallet.rawAddress)
                 );
+            }, 500);
+        };
+
+        sse.onopen = () => {
+            invalidator();
+        };
+        sse.onmessage = event => {
+            const data = JSON.parse(event.data);
+            if (data.account_id) {
+                invalidator();
             }
         };
 
