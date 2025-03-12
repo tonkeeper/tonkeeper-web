@@ -1,15 +1,17 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { PlusIconSmall } from '../Icon';
 import { BatteryIconCharging } from '../settings/battery/BatteryInfoHeading';
 import { Body2, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
-import { Button } from '../fields/Button';
+import { ButtonResponsiveSize } from '../fields/Button';
 import React, { FC, useCallback } from 'react';
 import {
     FullHeightBlock,
     NotificationBackButton,
     NotificationCancelButton,
+    NotificationFooter,
+    NotificationFooterPortal,
     NotificationHeader,
     NotificationHeaderPortal,
     NotificationTitleBlock
@@ -47,16 +49,26 @@ export const TransferBatteryRequired: FC<{
             )}
 
             <Icon />
-            <div>
+            <TextContainer>
                 <Label2>{t('transfer_battery_required_title')}</Label2>
                 <Body2Styled>{t('transfer_battery_required_description')}</Body2Styled>
-            </div>
-            <ChargeBatteryButton primary fullWidth onClick={onCharge}>
-                {t('transfer_battery_required_button')}
-            </ChargeBatteryButton>
+            </TextContainer>
+            {!shouldHideHeaderAndFooter && (
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ChargeBatteryButton primary fullWidth onClick={onCharge}>
+                            {t('transfer_battery_required_button')}
+                        </ChargeBatteryButton>
+                    </NotificationFooter>
+                </NotificationFooterPortal>
+            )}
         </FullHeightBlock>
     );
 };
+
+const TextContainer = styled.div`
+    margin-bottom: 24px;
+`;
 
 const Body2Styled = styled(Body2)`
     display: block;
@@ -64,8 +76,13 @@ const Body2Styled = styled(Body2)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const ChargeBatteryButton = styled(Button)`
-    margin-top: 24px;
+const ChargeBatteryButton = styled(ButtonResponsiveSize)`
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            position: absolute;
+            bottom: 16px;
+        `}
 `;
 
 const IconContainer = styled.div`
