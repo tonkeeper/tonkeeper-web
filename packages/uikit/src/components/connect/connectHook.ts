@@ -6,6 +6,7 @@ import {
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     parseTonTransferWithAddress,
+    parseTronTransferWithAddress,
     seeIfBringToFrontLink
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
@@ -38,9 +39,8 @@ export const useGetConnectInfo = () => {
                 return null;
             }
 
-            const transfer = parseTonTransferWithAddress({ url });
-
-            if (transfer) {
+            const tonTransfer = parseTonTransferWithAddress({ url });
+            if (tonTransfer) {
                 sdk.uiEvents.emit('copy', {
                     method: 'copy',
                     id: Date.now(),
@@ -50,7 +50,23 @@ export const useGetConnectInfo = () => {
                 sdk.uiEvents.emit('transfer', {
                     method: 'transfer',
                     id: Date.now(),
-                    params: { chain: BLOCKCHAIN_NAME.TON, ...transfer, from: 'qr-code' }
+                    params: { chain: BLOCKCHAIN_NAME.TON, ...tonTransfer, from: 'qr-code' }
+                });
+                return null;
+            }
+
+            const tronTransfer = parseTronTransferWithAddress({ url });
+            if (tronTransfer) {
+                sdk.uiEvents.emit('copy', {
+                    method: 'copy',
+                    id: Date.now(),
+                    params: t('loading')
+                });
+
+                sdk.uiEvents.emit('transfer', {
+                    method: 'transfer',
+                    id: Date.now(),
+                    params: { chain: BLOCKCHAIN_NAME.TRON, ...tronTransfer, from: 'qr-code' }
                 });
                 return null;
             }
