@@ -96,7 +96,7 @@ const BatteryRechargeNotificationContent: FC<{
         setAsset(preselectedAsset);
     }, [preselectedAsset]);
 
-    const [selectedPackType, setSelectedPackType] = useState<string | undefined>();
+    const [selectedPackId, setSelectedPackId] = useState<string | undefined>();
     const methods = useBatteryAvailableRechargeMethods();
     const packs = useBatteryPacksReservedApplied();
     const [selectedCustomAmount, setSelectedCustomAmount] = useState<{
@@ -148,11 +148,11 @@ const BatteryRechargeNotificationContent: FC<{
             }
         }
 
-        if (!selectedPackType) {
+        if (!selectedPackId) {
             throw new Error('No pack type selected');
         }
-        if (selectedPackType !== 'custom') {
-            const packPrice = packs?.find(p => p.type === selectedPackType)?.price;
+        if (selectedPackId !== 'custom') {
+            const packPrice = packs?.find(p => p.id === selectedPackId)?.price;
 
             if (!unitToTokenRate || !packPrice) {
                 throw new Error('Invalid packs data');
@@ -178,7 +178,7 @@ const BatteryRechargeNotificationContent: FC<{
     };
 
     const isContinueDisabled =
-        !selectedPackType || (selectedPackType === 'custom' && selectedCustomAmount.error);
+        !selectedPackId || (selectedPackId === 'custom' && selectedCustomAmount.error);
 
     return (
         <ContentWrapper>
@@ -196,12 +196,12 @@ const BatteryRechargeNotificationContent: FC<{
             />
             <BatteryPacksSelect
                 asset={asset}
-                selectedPackType={selectedPackType}
-                onPackTypeChange={setSelectedPackType}
+                selectedPackId={selectedPackId}
+                onPackIdChange={setSelectedPackId}
             />
             <BatteryCustomAmountInputStyled
                 asset={asset}
-                hidden={selectedPackType !== 'custom'}
+                hidden={selectedPackId !== 'custom'}
                 onChange={setSelectedCustomAmount}
             />
             <ButtonResponsiveSizeStyled

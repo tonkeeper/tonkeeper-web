@@ -24,6 +24,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useTwoFAWalletConfig } from './two-fa';
+import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
 
 export const useBatteryApi = () => {
     const config = useActiveConfig();
@@ -368,48 +369,65 @@ export const usePurchaseBatteryUnitTokenRate = (assetAddress: string) => {
     }, [methods, assetAddress]);
 };
 
+const imgUrlToName = (url: string) => {
+    return (url.split('/').pop() as string).replace('.png', '').replace('.webp', '');
+};
+
 export const useBatteryPacks = () => {
     const rate = useBatteryUnitTonRate();
+    const config = useActiveConfig();
 
-    return useMemo(
-        () =>
-            [
+    const configPackages = useMemo<
+        {
+            value: number;
+            image: string;
+        }[]
+    >(() => {
+        if (!config.battery_packages) {
+            return [
                 {
-                    type: 'large',
-                    price: AssetAmount.fromRelativeAmount({
-                        asset: TON_ASSET,
-                        amount: rate.multipliedBy(400)
-                    }),
-                    value: AssetAmount.fromRelativeAmount({
-                        asset: TON_ASSET,
-                        amount: rate.multipliedBy(400)
-                    })
+                    value: 1000,
+                    image: 'https://wallet.tonkeeper.com/img/battery/battery-max.png'
                 },
                 {
-                    type: 'medium',
-                    price: AssetAmount.fromRelativeAmount({
-                        asset: TON_ASSET,
-                        amount: rate.multipliedBy(250)
-                    }),
-                    value: AssetAmount.fromRelativeAmount({
-                        asset: TON_ASSET,
-                        amount: rate.multipliedBy(250)
-                    })
+                    value: 400,
+                    image: 'https://wallet.tonkeeper.com/img/battery/battery-100.png'
                 },
                 {
-                    type: 'small',
-                    price: AssetAmount.fromRelativeAmount({
-                        asset: TON_ASSET,
-                        amount: rate.multipliedBy(150)
-                    }),
-                    value: AssetAmount.fromRelativeAmount({
-                        asset: TON_ASSET,
-                        amount: rate.multipliedBy(150)
-                    })
+                    value: 250,
+                    image: 'https://wallet.tonkeeper.com/img/battery/battery-75.png'
+                },
+                {
+                    value: 150,
+                    image: 'https://wallet.tonkeeper.com/img/battery/battery-25.png'
                 }
-            ] as const,
-        [rate]
-    );
+            ];
+        }
+
+        return config.battery_packages;
+    }, [config.battery_packages]);
+
+    return useMemo(() => {
+        const shouldUseSvgImages = configPackages.every(p =>
+            Object.keys(batteryImagesMap).some(key => key === imgUrlToName(p.image))
+        );
+        return configPackages.map(pkg => ({
+            id: pkg.value.toString(),
+            price: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: rate.multipliedBy(pkg.value)
+            }),
+            value: AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: rate.multipliedBy(pkg.value)
+            }),
+            image: shouldUseSvgImages ? (
+                batteryImagesMap[imgUrlToName(pkg.image) as keyof typeof batteryImagesMap]
+            ) : (
+                <FallbackBatteryIcon url={pkg.image} />
+            )
+        }));
+    }, [rate, configPackages]);
 };
 
 export const useBatteryPacksReservedApplied = () => {
