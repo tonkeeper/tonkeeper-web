@@ -167,8 +167,7 @@ paths:
           content:
             application/json:
               schema:
-                additionalProperties: true
-                example: { }
+                $ref: '#/components/schemas/MessageConsequences'
         'default':
           $ref: '#/components/responses/Error'
   /message:
