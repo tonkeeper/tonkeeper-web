@@ -14,6 +14,7 @@ import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicS
 import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
 import { useActiveConfig } from '../../state/wallet';
 import { hexToRGBA } from '../../libs/css';
+import { handleSubmit } from '../../libs/form';
 
 const Block = styled.div`
     display: flex;
@@ -627,7 +628,7 @@ export const ImportWords: FC<{
     };
 
     return (
-        <>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('import_wallet_title_web')}</H2Label2Responsive>
@@ -678,11 +679,12 @@ export const ImportWords: FC<{
                     loading={isLoading}
                     onClick={onSubmit}
                     bottom={standalone}
+                    type="submit"
                 >
                     {t('continue')}
                 </ButtonResponsiveSize>
             </BottomButtonBlock>
-        </>
+        </form>
     );
 };
 

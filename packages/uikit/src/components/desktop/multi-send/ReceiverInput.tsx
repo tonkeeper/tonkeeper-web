@@ -126,6 +126,7 @@ export const ReceiverInput: FC<{
                 ))}
             {!isValidating && inputValue && (
                 <IconButton
+                    type="button"
                     onClick={() => {
                         inputTouched.current = true;
                         setInputValue('');
