@@ -55,7 +55,10 @@ export const BatteryHalfIcon: FC<SVGAttributes<SVGElement>> = props => {
     );
 };
 
-export const BatteryQuarterIcon: FC<SVGAttributes<SVGElement>> = props => {
+export const BatteryQuarterIcon: FC<SVGAttributes<SVGElement> & { color?: string }> = ({
+    color = 'accentBlueConstant',
+    ...props
+}) => {
     const theme = useTheme();
 
     return (
@@ -76,7 +79,7 @@ export const BatteryQuarterIcon: FC<SVGAttributes<SVGElement>> = props => {
             />
             <path
                 d="M3 32.0039C3 30.1347 3 29.2001 3.40192 28.5039C3.66523 28.0478 4.04394 27.6691 4.5 27.4058C5.19615 27.0039 6.13077 27.0039 8 27.0039H16C17.8692 27.0039 18.8038 27.0039 19.5 27.4058C19.9561 27.6691 20.3348 28.0478 20.5981 28.5039C21 29.2001 21 30.1347 21 32.0039C21 33.8731 21 34.8078 20.5981 35.5039C20.3348 35.96 19.9561 36.3387 19.5 36.602C18.8038 37.0039 17.8692 37.0039 16 37.0039H8C6.13077 37.0039 5.19615 37.0039 4.5 36.602C4.04394 36.3387 3.66523 35.96 3.40192 35.5039C3 34.8078 3 33.8731 3 32.0039Z"
-                fill={theme.accentBlueConstant}
+                fill={theme[color]}
             />
         </svg>
     );

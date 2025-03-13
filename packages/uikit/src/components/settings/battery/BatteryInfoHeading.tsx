@@ -27,7 +27,7 @@ export const BatteryBalanceIcon: FC<{ balance: BatteryBalance } & SVGAttributes<
     }
 
     if (balance.batteryUnitsBalance.lte(smallBatteryValue)) {
-        return <BatteryQuarterIcon {...props} />;
+        return <BatteryQuarterIcon color="accentOrange" {...props} />;
     }
 
     if (balance.batteryUnitsBalance.lte(mediumBatteryValue)) {

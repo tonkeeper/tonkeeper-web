@@ -103,6 +103,10 @@ export const BalanceSkeleton = () => {
     );
 };
 
+const BatteryBalanceIconStyled = styled(BatteryBalanceIcon)`
+    cursor: pointer;
+`;
+
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
@@ -138,7 +142,7 @@ export const Balance: FC<{
                 <span>{formatFiatCurrency(fiat, total || 0)}</span>
                 <NetworkBadge network={network} />
                 {!!batteryBalance && (
-                    <BatteryBalanceIcon
+                    <BatteryBalanceIconStyled
                         onClick={() => navigate(AppRoute.settings + WalletSettingsRoute.battery)}
                         balance={batteryBalance}
                     />
