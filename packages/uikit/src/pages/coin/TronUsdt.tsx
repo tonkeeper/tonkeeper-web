@@ -14,6 +14,8 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 import { MobileAssetHistory } from './Jetton';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
+import styled from 'styled-components';
 
 const TronUsdtHeader: FC<{ assetAmount: AssetAmount<TronAsset> }> = ({ assetAmount }) => {
     const { data: rate } = useUSDTRate();
@@ -30,6 +32,12 @@ const TronUsdtHeader: FC<{ assetAmount: AssetAmount<TronAsset> }> = ({ assetAmou
     );
 };
 
+const TRC20Title = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+`;
+
 export const TronUsdtContent = () => {
     const balance = useTronBalances().data?.usdt;
     const ref = useRef<HTMLDivElement>(null);
@@ -42,7 +50,14 @@ export const TronUsdtContent = () => {
 
     return (
         <>
-            <SubHeader title={balance.asset.name} />
+            <SubHeader
+                title={
+                    <TRC20Title>
+                        {balance.asset.name}
+                        <AssetBlockchainBadge>TRC20</AssetBlockchainBadge>
+                    </TRC20Title>
+                }
+            />
             <InnerBody ref={ref}>
                 <TronUsdtHeader assetAmount={balance} />
                 <ActionsRow>
