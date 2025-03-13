@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { Body2, Label2 } from '../../Text';
 import { useTranslation } from '../../../hooks/translation';
 import { BatteryBalance, useBatteryBalance } from '../../../state/battery';
-import { FC } from 'react';
+import { FC, SVGAttributes } from 'react';
 import { Dot } from '../../Dot';
 import { BatterySettingsNotification } from './BatterySettingsNotification';
 import { useDisclosure } from '../../../hooks/useDisclosure';
@@ -18,20 +18,23 @@ import {
 const mediumBatteryValue = 250;
 const smallBatteryValue = 150;
 
-const BatteryIcon: FC<{ balance: BatteryBalance }> = ({ balance }) => {
+export const BatteryBalanceIcon: FC<{ balance: BatteryBalance } & SVGAttributes<SVGElement>> = ({
+    balance,
+    ...props
+}) => {
     if (balance.tonUnitsBalance.weiAmount.isZero()) {
-        return <BatteryChargingIcon />;
+        return <BatteryChargingIcon {...props} />;
     }
 
     if (balance.batteryUnitsBalance.lte(smallBatteryValue)) {
-        return <BatteryQuarterIcon />;
+        return <BatteryQuarterIcon {...props} />;
     }
 
     if (balance.batteryUnitsBalance.lte(mediumBatteryValue)) {
-        return <BatteryHalfIcon />;
+        return <BatteryHalfIcon {...props} />;
     }
 
-    return <BatteryFullIcon />;
+    return <BatteryFullIcon {...props} />;
 };
 
 const Container = styled.div`
@@ -96,7 +99,7 @@ export const BatteryInfoHeading = () => {
 
     return (
         <Container>
-            <BatteryIcon balance={balance} />
+            <BatteryBalanceIcon balance={balance} />
             <TextBlock>
                 <Label2>
                     {t('battery_title')}

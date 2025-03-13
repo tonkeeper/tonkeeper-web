@@ -1,7 +1,7 @@
 import { useTheme } from 'styled-components';
-import { FC } from 'react';
+import { FC, SVGAttributes } from 'react';
 
-export const BatteryFullIcon = () => {
+export const BatteryFullIcon: FC<SVGAttributes<SVGElement>> = props => {
     const theme = useTheme();
 
     return (
@@ -11,6 +11,7 @@ export const BatteryFullIcon = () => {
             height="40"
             viewBox="0 0 24 40"
             fill="none"
+            {...props}
         >
             <path
                 opacity="0.64"
@@ -27,7 +28,7 @@ export const BatteryFullIcon = () => {
     );
 };
 
-export const BatteryHalfIcon = () => {
+export const BatteryHalfIcon: FC<SVGAttributes<SVGElement>> = props => {
     const theme = useTheme();
 
     return (
@@ -37,6 +38,7 @@ export const BatteryHalfIcon = () => {
             height="40"
             viewBox="0 0 24 40"
             fill="none"
+            {...props}
         >
             <path
                 opacity="0.64"
@@ -53,7 +55,7 @@ export const BatteryHalfIcon = () => {
     );
 };
 
-export const BatteryQuarterIcon = () => {
+export const BatteryQuarterIcon: FC<SVGAttributes<SVGElement>> = props => {
     const theme = useTheme();
 
     return (
@@ -63,6 +65,7 @@ export const BatteryQuarterIcon = () => {
             height="40"
             viewBox="0 0 24 40"
             fill="none"
+            {...props}
         >
             <path
                 opacity="0.64"
@@ -79,7 +82,7 @@ export const BatteryQuarterIcon = () => {
     );
 };
 
-export const BatteryChargingIcon = () => {
+export const BatteryChargingIcon: FC<SVGAttributes<SVGElement>> = props => {
     const theme = useTheme();
 
     return (
@@ -89,6 +92,7 @@ export const BatteryChargingIcon = () => {
             viewBox="0 0 24 40"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            {...props}
         >
             <path
                 opacity="0.64"
