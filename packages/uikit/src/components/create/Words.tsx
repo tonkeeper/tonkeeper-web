@@ -142,11 +142,20 @@ const LinkStyled = styled(Body3)`
     cursor: pointer;
 `;
 
+const H2Label2ResponsiveStyled = styled(H2Label2Responsive)`
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            padding: 0 40px;
+        `}
+`;
+
 export const WordsGridAndHeaders: FC<{
     mnemonic: string[];
     type?: 'standard' | 'mam' | 'tron';
     allowCopy?: boolean;
-}> = ({ mnemonic, type, allowCopy }) => {
+    descriptionDown?: boolean;
+}> = ({ mnemonic, type, allowCopy, descriptionDown }) => {
     const { t } = useTranslation();
     const config = useActiveConfig();
     const sdk = useAppSdk();
@@ -155,7 +164,7 @@ export const WordsGridAndHeaders: FC<{
     return (
         <>
             <HeadingBlock>
-                <H2Label2Responsive>
+                <H2Label2ResponsiveStyled>
                     {t(
                         type === 'mam'
                             ? 'secret_words_account_title'
@@ -163,10 +172,16 @@ export const WordsGridAndHeaders: FC<{
                             ? 'export_trc_20_wallet'
                             : 'secret_words_title'
                     )}
-                </H2Label2Responsive>
-                <Body>
-                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
-                </Body>
+                </H2Label2ResponsiveStyled>
+                {!descriptionDown && (
+                    <Body>
+                        {t(
+                            mnemonic.length === 12
+                                ? 'secret_words_caption_12'
+                                : 'secret_words_caption'
+                        )}
+                    </Body>
+                )}
             </HeadingBlock>
 
             {type === 'mam' && (
@@ -199,6 +214,12 @@ export const WordsGridAndHeaders: FC<{
                     </Body1>
                 ))}
             </WorldsGridStyled>
+
+            {descriptionDown && (
+                <Body>
+                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
+                </Body>
+            )}
 
             {allowCopy && (
                 <Button
