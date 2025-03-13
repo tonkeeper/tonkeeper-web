@@ -1,7 +1,6 @@
 import styled, { css } from 'styled-components';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { PlusIconSmall } from '../Icon';
-import { BatteryIconCharging } from '../settings/battery/BatteryInfoHeading';
 import { Body2, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { ButtonResponsiveSize } from '../fields/Button';
@@ -19,6 +18,7 @@ import {
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useNavigate } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { BatteryChargingIcon } from '../settings/battery/BatteryIcons';
 
 export const TransferBatteryRequired: FC<{
     onBack: () => void;
@@ -98,7 +98,7 @@ const IconContainer = styled.div`
 
     *:last-child {
         height: 62px;
-        width: 36px;
+        width: auto;
     }
 `;
 
@@ -107,7 +107,7 @@ const Icon = () => {
         <IconContainer>
             <img src={TRON_USDT_ASSET.image} />
             <PlusIconSmall />
-            <BatteryIconCharging />
+            <BatteryChargingIcon />
         </IconContainer>
     );
 };
