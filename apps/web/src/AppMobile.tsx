@@ -17,7 +17,7 @@ import {
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppRoute, SignerRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute, SignerRoute, any, SettingsRoute } from "@tonkeeper/uikit/dist/libs/routes";
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
@@ -28,6 +28,7 @@ import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
+import { RedirectFromDesktopSettings } from "@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings";
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -97,9 +98,9 @@ const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
     }
 `;
 
-const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean }>`
+const Wrapper = styled(FullSizeWrapper)<{ standalone: boolean; recovery: boolean; }>`
     box-sizing: border-box;
-    padding-top: 64px;
+    padding-top: ${props => (props.recovery ? 0 : 64)}px;
     padding-bottom: ${props => (props.standalone ? '96' : '80')}px;
 `;
 
@@ -176,7 +177,7 @@ export const MobileContent: FC<{
     }
 
     return (
-        <Wrapper standalone={standalone}>
+        <Wrapper standalone={standalone} recovery={location.pathname.includes(SettingsRoute.recovery)}>
             <Routes>
                 <Route
                     path={AppRoute.activity}
@@ -201,6 +202,10 @@ export const MobileContent: FC<{
                             <Settings />
                         </Suspense>
                     }
+                />
+                <Route
+                  path={any(AppRoute.walletSettings)}
+                  element={<RedirectFromDesktopSettings />}
                 />
                 <Route path={AppRoute.coins}>
                     <Route

@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   EmulateMessageToWalletRequest,
   GetTonConnectPayloadDefaultResponse,
+  MessageConsequences,
 } from '../models/index';
 import {
     EmulateMessageToWalletRequestFromJSON,
     EmulateMessageToWalletRequestToJSON,
     GetTonConnectPayloadDefaultResponseFromJSON,
     GetTonConnectPayloadDefaultResponseToJSON,
+    MessageConsequencesFromJSON,
+    MessageConsequencesToJSON,
 } from '../models/index';
 
 export interface EmulateMessageToWalletOperationRequest {
@@ -51,12 +54,12 @@ export interface EmulationApiInterface {
      * @throws {RequiredError}
      * @memberof EmulationApiInterface
      */
-    emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+    emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>>;
 
     /**
      * Emulate sending message to blockchain
      */
-    emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+    emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences>;
 
     /**
      * 
@@ -81,7 +84,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     /**
      * Emulate sending message to blockchain
      */
-    async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>> {
         if (requestParameters['xTonConnectAuth'] == null) {
             throw new runtime.RequiredError(
                 'xTonConnectAuth',
@@ -118,13 +121,13 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
             body: EmulateMessageToWalletRequestToJSON(requestParameters['emulateMessageToWalletRequest']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => MessageConsequencesFromJSON(jsonValue));
     }
 
     /**
      * Emulate sending message to blockchain
      */
-    async emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+    async emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences> {
         const response = await this.emulateMessageToWalletRaw(requestParameters, initOverrides);
         return await response.value();
     }

@@ -22,7 +22,11 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { SelectDropDown } from '../fields/Select';
 import { TON_ASSET, TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { ChevronDownIcon, CopyIcon, DoneIcon } from '../Icon';
-import { useActiveTronWallet, useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
+import { useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
+import { BatteryBalanceIcon } from '../settings/battery/BatteryInfoHeading';
+import { useBatteryBalance } from '../../state/battery';
+import { useNavigate } from 'react-router-dom';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 
 const Block = styled.div`
     display: flex;
@@ -50,6 +54,11 @@ const Amount = styled(Num2)`
     flex-direction: row;
     align-items: center;
     gap: 8px;
+
+    svg:last-child {
+        height: 28px;
+        width: auto;
+    }
 `;
 
 const Error = styled.div`
@@ -94,6 +103,10 @@ export const BalanceSkeleton = () => {
     );
 };
 
+const BatteryBalanceIconStyled = styled(BatteryBalanceIcon)`
+    cursor: pointer;
+`;
+
 export const Balance: FC<{
     error?: Error | null;
     isFetching: boolean;
@@ -106,6 +119,9 @@ export const Balance: FC<{
     const isTronEnabled = useIsTronEnabledForActiveWallet();
 
     const { data: total } = useWalletTotalBalance();
+    const { data: batteryBalance } = useBatteryBalance();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -125,6 +141,12 @@ export const Balance: FC<{
             <Amount>
                 <span>{formatFiatCurrency(fiat, total || 0)}</span>
                 <NetworkBadge network={network} />
+                {!!batteryBalance && (
+                    <BatteryBalanceIconStyled
+                        onClick={() => navigate(AppRoute.settings + WalletSettingsRoute.battery)}
+                        balance={batteryBalance}
+                    />
+                )}
             </Amount>
             {isTronEnabled ? <AddressMultiChain /> : <AddressSingleChain />}
         </Block>

@@ -12,7 +12,8 @@ import styled from 'styled-components';
 import type { AllOrNone } from '@tonkeeper/core/dist/utils/types';
 
 const WalletInfoStyled = styled.div`
-    overflow: hidden;
+    position: relative;
+    overflow: visible;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -32,6 +33,22 @@ const AddressText = styled(Body2)`
 
 const WalletEmojiStyled = styled(WalletEmoji)`
     margin-right: 4px;
+`;
+
+/**
+ * Hack to prevent Safari emoji borders cutting out
+ */
+const EmojiContainer = styled.div`
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+
+    > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
 `;
 
 export const AccountAndWalletInfo: FC<
@@ -65,7 +82,9 @@ export const AccountAndWalletInfo: FC<
 
     return (
         <WalletInfoStyled className={props.className} onClick={props.onClick}>
-            <WalletEmojiStyled emojiSize="20px" containerSize="20px" emoji={emoji} />
+            <EmojiContainer>
+                <WalletEmojiStyled emojiSize="20px" containerSize="20px" emoji={emoji} />
+            </EmojiContainer>
             <NameText>
                 {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
                 {name}

@@ -13,8 +13,9 @@ import {
     useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
 import { FC, useEffect } from 'react';
+import { handleSubmit } from '../../libs/form';
 
-const Wrapper = styled.div`
+const Wrapper = styled.form`
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -90,8 +91,10 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
         return null;
     }
 
+    const onSubmit = () => onContinue({ tron: isTronEnabled });
+
     return (
-        <Wrapper>
+        <Wrapper onSubmit={handleSubmit(onSubmit)}>
             <H2Label2Responsive>{t('select_networks_modal_title')}</H2Label2Responsive>
             <Subtitle>{t('select_networks_modal_subtitle')}</Subtitle>
             <ListBlockStyled>
@@ -122,7 +125,7 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
                 </ListItem>
             </ListBlockStyled>
             <ButtonContainer>
-                <Button fullWidth primary onClick={() => onContinue({ tron: isTronEnabled })}>
+                <Button fullWidth primary onClick={onSubmit} type="submit" autoFocus>
                     {t('continue')}
                 </Button>
             </ButtonContainer>

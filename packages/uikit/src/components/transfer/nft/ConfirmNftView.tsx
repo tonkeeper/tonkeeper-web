@@ -213,19 +213,24 @@ export const ConfirmNftView: FC<{
     const [selectedSenderType, onSenderTypeChange] = useState<
         SenderTypeUserAvailable | undefined
     >();
-    useEffect(() => {
-        if (availableSendersChoices) {
-            onSenderTypeChange(availableSendersChoices[0].type);
-        }
-    }, [availableSendersChoices]);
 
     const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
-    const { mutateAsync, isLoading, error, reset } = useSendNft(
+    const { mutateAsync, isLoading, error, reset, isIdle } = useSendNft(
         recipient,
         nftItem,
         estimation.data,
         { multisigTTL, selectedSenderType: selectedSenderType! }
     );
+
+    useEffect(() => {
+        if (!isIdle) {
+            return;
+        }
+
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [JSON.stringify(availableSendersChoices), isIdle]);
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');
 

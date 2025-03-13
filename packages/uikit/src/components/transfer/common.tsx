@@ -1,8 +1,15 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { tokenToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
+import {
+    RecipientData,
+    TonRecipientData,
+    TronRecipientData
+} from '@tonkeeper/core/dist/entries/send';
+import {
+    TonTransferParams,
+    TronTransferParams
+} from '@tonkeeper/core/dist/service/deeplinkingService';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
@@ -377,11 +384,11 @@ export const notifyError = async (sdk: IAppSdk, t: (value: string) => string, er
 };
 
 export interface InitTransferData {
-    initRecipient?: TonRecipientData;
+    initRecipient?: RecipientData;
     initAmountState?: Partial<AmountState>;
 }
 
-export const makeTransferInitData = (
+export const makeTonTransferInitData = (
     tonTransfer: TonTransferParams,
     fromAccount: Account,
     toAccount: Account,
@@ -406,6 +413,27 @@ export const makeTransferInitData = (
     return {
         initRecipient,
         initAmountState
+    };
+};
+
+export const makeTronTransferInitData = (tronTransfer: TronTransferParams): InitTransferData => {
+    if (!tronTransfer.address) {
+        return {};
+    }
+    const initRecipient: TronRecipientData = {
+        address: {
+            blockchain: BLOCKCHAIN_NAME.TRON,
+            address: tronTransfer.address
+        },
+        done: true
+    };
+
+    // TODO tron: is it safe to parse and paste amount?
+    // TODO tron: amount asset is not specified, do user might be confused transferring usdt instead of TRX
+    // const initAmountState = makeTransferInitAmountState(tonTransfer, fromAccount, jettons);
+
+    return {
+        initRecipient
     };
 };
 

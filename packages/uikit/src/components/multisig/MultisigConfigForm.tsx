@@ -29,7 +29,6 @@ import {
     SelectDropDownHostText,
     SelectField
 } from '../fields/Select';
-import { useAppContext } from '../../hooks/appContext';
 import { AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     Account,
@@ -266,7 +265,7 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
                                 placeholder={t('wallet_address')}
                             />
                         </InputBlock>
-                        <IconButtonTransparentBackground onClick={onRemove}>
+                        <IconButtonTransparentBackground onClick={onRemove} type="button">
                             <CloseIcon />
                         </IconButtonTransparentBackground>
                     </ExternalParticipantCardFirstRow>

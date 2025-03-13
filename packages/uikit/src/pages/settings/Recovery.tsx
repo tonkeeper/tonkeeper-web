@@ -84,6 +84,7 @@ const Wrapper = styled.div`
 `;
 
 const BackButtonBlockStyled = styled(BackButtonBlock)`
+    top: 0;
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
@@ -122,6 +123,22 @@ const SKWrapper = styled.div`
     background: ${p => p.theme.backgroundContent};
     font-family: ${p => p.theme.fontMono};
     word-break: break-all;
+`;
+
+const PageWrapper = styled.div<{ isPage$?: boolean }>`
+    ${p =>
+        p.isPage$ &&
+        css`
+            padding-top: 20px;
+        `}
+`;
+
+const H2Label2ResponsiveStyled = styled(H2Label2Responsive)`
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            padding: 0 40px;
+        `}
 `;
 
 export const RecoveryContent: FC<{
@@ -179,22 +196,33 @@ export const RecoveryContent: FC<{
 
     if (secret?.type === 'sk') {
         return (
-            <Wrapper>
-                <H2Label2Responsive>{t('recovery_wallet_secret_key')}</H2Label2Responsive>
-                {isPage ? <BackButtonBlockStyled onClick={onBack} /> : null}
-                <SKWrapper>{secret.sk}</SKWrapper>
-            </Wrapper>
+            <PageWrapper isPage$={isPage}>
+                <Wrapper>
+                    <H2Label2ResponsiveStyled>
+                        {t('recovery_wallet_secret_key')}
+                    </H2Label2ResponsiveStyled>
+                    {isPage ? <BackButtonBlockStyled onClick={onBack} /> : null}
+                    <SKWrapper>{secret.sk}</SKWrapper>
+                </Wrapper>
+            </PageWrapper>
         );
     }
 
     return (
-        <Wrapper>
-            {isPage && <BackButtonBlockStyled onClick={onBack} />}
-            <WordsGridAndHeaders mnemonic={mnemonicToShow!} type={wordsType} allowCopy />
+        <PageWrapper isPage$={isPage}>
+            <Wrapper>
+                {isPage && <BackButtonBlockStyled onClick={onBack} />}
+                <WordsGridAndHeaders
+                    descriptionDown={isPage}
+                    mnemonic={mnemonicToShow!}
+                    type={wordsType}
+                    allowCopy
+                />
 
-            {hasTronWallet && !isExportingTRC20 && (
-                <TronButton onClick={onShowTron}>{t('export_trc_20_wallet')}</TronButton>
-            )}
-        </Wrapper>
+                {hasTronWallet && !isExportingTRC20 && (
+                    <TronButton onClick={onShowTron}>{t('export_trc_20_wallet')}</TronButton>
+                )}
+            </Wrapper>
+        </PageWrapper>
     );
 };

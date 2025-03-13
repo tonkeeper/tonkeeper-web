@@ -26,8 +26,8 @@ import {
     childFactoryCreator,
     duration,
     makeTransferInitAmountState,
-    makeTransferInitData
-} from '@tonkeeper/uikit/dist/components/transfer/common';
+    makeTonTransferInitData, makeTronTransferInitData
+} from "@tonkeeper/uikit/dist/components/transfer/common";
 import { useAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { openIosKeyboard } from '@tonkeeper/uikit/dist/hooks/ios';
@@ -344,7 +344,7 @@ const SendContent: FC<{
 export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
-    const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);
+    const [transferParams, setTransferParams] = useState<InitTransferData | undefined>(undefined);
     const { data: jettons } = useJettonList();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
@@ -367,7 +367,11 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
             setChain(chain);
 
             if (transfer.chain === BLOCKCHAIN_NAME.TRON) {
+                setTransferParams(
+                  makeTronTransferInitData(transfer)
+                );
                 setOpen(true);
+
                 track('send_open', { from: transfer.from });
                 return;
             }
@@ -375,13 +379,13 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
             getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
                 if (transfer.address && seeIfValidTonAddress(transfer.address)) {
                     getAccountAsync({ address: transfer.address }).then(toAccount => {
-                        setTonTransfer(
-                            makeTransferInitData(transfer, fromAccount, toAccount, jettons)
+                        setTransferParams(
+                            makeTonTransferInitData(transfer, fromAccount, toAccount, jettons)
                         );
                         setOpen(true);
                     });
                 } else {
-                    setTonTransfer({
+                    setTransferParams({
                         initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
                     });
                     setOpen(true);
@@ -397,7 +401,7 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
     }, []);
 
     const onClose = useCallback(() => {
-        setTonTransfer(undefined);
+        setTransferParams(undefined);
         setOpen(false);
     }, []);
 
@@ -407,8 +411,8 @@ export const TwaSendNotification: FC<PropsWithChildren> = ({ children }) => {
                 <SendContent
                     onClose={onClose}
                     chain={chain}
-                    initAmountState={tonTransfer?.initAmountState}
-                    initRecipient={tonTransfer?.initRecipient}
+                    initAmountState={transferParams?.initAmountState}
+                    initRecipient={transferParams?.initRecipient}
                 />
             </Body>
         );
