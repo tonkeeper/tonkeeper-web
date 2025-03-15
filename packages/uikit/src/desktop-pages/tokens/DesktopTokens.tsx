@@ -89,6 +89,9 @@ const DesktopTokensPayload = () => {
     const tonRef = useRef<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
 
+    const tronWallet = useActiveTronWallet();
+    const canUseTron = useCanUseTronForActiveWallet();
+
     useLayoutEffect(() => {
         if (uiPreferences?.showTokensChart !== undefined) {
             setShowChart(uiPreferences.showTokensChart);
@@ -102,7 +105,7 @@ const DesktopTokensPayload = () => {
         setShowChart(!showChart);
     };
 
-    const virtualScrollPaddingBase = itemSize; // TON LINE
+    const virtualScrollPaddingBase = canUseTron && !tronWallet ? 2 * itemSize : itemSize;
 
     const rowVirtualizer = useVirtualizer({
         count: assets?.length ?? 0,
