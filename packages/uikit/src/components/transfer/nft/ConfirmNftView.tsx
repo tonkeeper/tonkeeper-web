@@ -47,9 +47,8 @@ import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/
 import BigNumber from 'bignumber.js';
 import { comment } from '@ton/core';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
-import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -121,7 +120,7 @@ const useNftTransferEstimation = (
 const useSendNft = (
     recipient: TonRecipientData,
     nftItem: NftItem,
-    fee: AssetAmount<TonAsset> | undefined,
+    estimation: TonEstimation | undefined,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
         selectedSenderType: SenderTypeUserAvailable;
@@ -141,10 +140,10 @@ const useSendNft = (
             return false;
         }
 
-        if (!fee) return false;
+        if (!estimation) return false;
 
-        if (fee.asset.id !== TON_ASSET.id) {
-            throw new Error(`Unexpected fee asset ${fee.asset.symbol}`);
+        if (estimation.fee.type === 'ton-asset' && estimation.fee.extra.asset.id !== TON_ASSET.id) {
+            throw new Error(`Unexpected fee ${estimation.fee}`);
         }
 
         try {
@@ -171,7 +170,7 @@ const useSendNft = (
 
             const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
             const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(
-                fee.weiAmount
+                Math.abs(estimation.event?.extra ?? 0)
             );
             const nftTransferMsg = nftEncoder.encodeNftTransfer({
                 nftAddress: nftItem.address,
@@ -184,7 +183,7 @@ const useSendNft = (
                         : undefined
             });
 
-            await rawTransactionService.send(sender, zeroFee, nftTransferMsg);
+            await rawTransactionService.send(sender, zeroFeeEstimation, nftTransferMsg);
             track2('send-nft');
         } catch (e) {
             await notifyError(e);
@@ -214,19 +213,24 @@ export const ConfirmNftView: FC<{
     const [selectedSenderType, onSenderTypeChange] = useState<
         SenderTypeUserAvailable | undefined
     >();
+
+    const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
+    const { mutateAsync, isLoading, error, reset, isIdle } = useSendNft(
+        recipient,
+        nftItem,
+        estimation.data,
+        { multisigTTL, selectedSenderType: selectedSenderType! }
+    );
+
     useEffect(() => {
+        if (!isIdle) {
+            return;
+        }
+
         if (availableSendersChoices) {
             onSenderTypeChange(availableSendersChoices[0].type);
         }
-    }, [availableSendersChoices]);
-
-    const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
-    const { mutateAsync, isLoading, error, reset } = useSendNft(
-        recipient,
-        nftItem,
-        estimation.data?.extra,
-        { multisigTTL, selectedSenderType: selectedSenderType! }
-    );
+    }, [JSON.stringify(availableSendersChoices), isIdle]);
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');
 

@@ -20,7 +20,6 @@ import { CreateKeystoneWallet } from '../../pages/import/CreateKeystoneWallet';
 import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();

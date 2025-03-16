@@ -1,5 +1,15 @@
 FROM openapitools/openapi-generator-cli
 
-COPY ./resource/battery-api.yml ./
+RUN apt-get update && apt-get install -y curl jq && \
+    curl -sSL https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq && \
+    chmod +x /usr/local/bin/yq
+
+ARG GITHUB_TOKEN
+ENV GITHUB_TOKEN=${GITHUB_TOKEN}
+
+COPY ./resource/build_battery_swagger.sh ./
+RUN chmod +x ./build_battery_swagger.sh
+
+RUN ./build_battery_swagger.sh
 
 CMD ["generate", "-i", "./battery-api.yml", "-g", "typescript-fetch", "-o", "/local/src/batteryApi", "-p", "supportsES6=true,withInterfaces=true", "--openapi-normalizer", "KEEP_ONLY_FIRST_TAG_IN_OPERATION=true", "--name-mappings", "iOSBatteryPurchaseStatus=IOSBatteryPurchaseStatus"]

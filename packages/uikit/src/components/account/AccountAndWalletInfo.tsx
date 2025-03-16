@@ -12,7 +12,8 @@ import styled from 'styled-components';
 import type { AllOrNone } from '@tonkeeper/core/dist/utils/types';
 
 const WalletInfoStyled = styled.div`
-    overflow: hidden;
+    position: relative;
+    overflow: visible;
     display: flex;
     align-items: center;
     gap: 4px;
@@ -30,11 +31,32 @@ const AddressText = styled(Body2)`
     color: ${p => p.theme.textTertiary};
 `;
 
+const WalletEmojiStyled = styled(WalletEmoji)`
+    margin-right: 4px;
+`;
+
+/**
+ * Hack to prevent Safari emoji borders cutting out
+ */
+const EmojiContainer = styled.div`
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+
+    > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+`;
+
 export const AccountAndWalletInfo: FC<
     AllOrNone<{ account: Account; walletId: WalletId }> & {
         noPrefix?: boolean;
         hideAddress?: boolean;
         className?: string;
+        onClick?: () => void;
     }
 > = props => {
     const { t } = useTranslation();
@@ -59,12 +81,14 @@ export const AccountAndWalletInfo: FC<
     }
 
     return (
-        <WalletInfoStyled className={props.className}>
+        <WalletInfoStyled className={props.className} onClick={props.onClick}>
+            <EmojiContainer>
+                <WalletEmojiStyled emojiSize="20px" containerSize="20px" emoji={emoji} />
+            </EmojiContainer>
             <NameText>
                 {!props.noPrefix && <>{t('confirmSendModal_wallet')}&nbsp;</>}
                 {name}
             </NameText>
-            <WalletEmoji emojiSize="20px" containerSize="20px" emoji={emoji} />
             {account.allTonWallets.length > 1 && !props.hideAddress ? (
                 <>
                     <Dot />

@@ -4,7 +4,7 @@ import { useActiveAccount } from '../../../state/wallet';
 import { useTransactionAnalytics } from '../../amplitude';
 import { useMutation } from '@tanstack/react-query';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
-import { zeroFee } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 export const useRenewNft = (args: { nftAddress: string }) => {
     const getSender = useGetSender();
@@ -18,7 +18,7 @@ export const useRenewNft = (args: { nftAddress: string }) => {
         const nftEncoder = new NFTEncoder(walletAddress);
         await rawTransactionService.send(
             await getSender(EXTERNAL_SENDER_CHOICE),
-            zeroFee,
+            zeroFeeEstimation,
             nftEncoder.encodeNftRenew(args)
         );
         track2('renew-dns');

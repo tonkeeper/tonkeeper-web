@@ -13,6 +13,21 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ConfigGasProxyInner } from './ConfigGasProxyInner';
+import {
+    ConfigGasProxyInnerFromJSON,
+    ConfigGasProxyInnerFromJSONTyped,
+    ConfigGasProxyInnerToJSON,
+    ConfigGasProxyInnerToJSONTyped,
+} from './ConfigGasProxyInner';
+import type { ConfigMeanPrices } from './ConfigMeanPrices';
+import {
+    ConfigMeanPricesFromJSON,
+    ConfigMeanPricesFromJSONTyped,
+    ConfigMeanPricesToJSON,
+    ConfigMeanPricesToJSONTyped,
+} from './ConfigMeanPrices';
+
 /**
  * 
  * @export
@@ -43,6 +58,18 @@ export interface Config {
      * @memberof Config
      */
     messageTtl: number;
+    /**
+     * 
+     * @type {Array<ConfigGasProxyInner>}
+     * @memberof Config
+     */
+    gasProxy: Array<ConfigGasProxyInner>;
+    /**
+     * 
+     * @type {ConfigMeanPrices}
+     * @memberof Config
+     */
+    meanPrices: ConfigMeanPrices;
 }
 
 /**
@@ -53,6 +80,8 @@ export function instanceOfConfig(value: object): value is Config {
     if (!('fundReceiver' in value) || value['fundReceiver'] === undefined) return false;
     if (!('excessAccount' in value) || value['excessAccount'] === undefined) return false;
     if (!('messageTtl' in value) || value['messageTtl'] === undefined) return false;
+    if (!('gasProxy' in value) || value['gasProxy'] === undefined) return false;
+    if (!('meanPrices' in value) || value['meanPrices'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +99,8 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'fundReceiver': json['fund_receiver'],
         'excessAccount': json['excess_account'],
         'messageTtl': json['message_ttl'],
+        'gasProxy': ((json['gas_proxy'] as Array<any>).map(ConfigGasProxyInnerFromJSON)),
+        'meanPrices': ConfigMeanPricesFromJSON(json['mean_prices']),
     };
 }
 
@@ -88,6 +119,8 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'fund_receiver': value['fundReceiver'],
         'excess_account': value['excessAccount'],
         'message_ttl': value['messageTtl'],
+        'gas_proxy': ((value['gasProxy'] as Array<any>).map(ConfigGasProxyInnerToJSON)),
+        'mean_prices': ConfigMeanPricesToJSON(value['meanPrices']),
     };
 }
 
