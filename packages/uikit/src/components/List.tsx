@@ -176,7 +176,7 @@ export const ListItemElement = styled.div<{
         }
     }}
 
-  & + & > div {
+  &:not(:first-child) > div {
         border-top: 1px solid ${props => props.theme.separatorCommon};
         padding-top: 15px;
     }
@@ -198,7 +198,7 @@ export const ListItemElement = styled.div<{
                 padding-bottom: 7px;
             }
 
-            & + & > div {
+            &:not(:first-child) > div {
                 padding-top: 7px;
             }
         `}

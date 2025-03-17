@@ -315,13 +315,13 @@ export const getTronSigner = (
                     const tonMnemonic = await getMAMWalletMnemonic(
                         sdk,
                         account.id,
-                        wallet!.id,
+                        account.activeTonWallet.id,
                         checkTouchId
                     );
                     const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');
 
                     const tronWeb = new TronWeb({
-                        fullHost: tronApi.baseURL,
+                        fullHost: tronApi.tronGridBaseUrl,
                         privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
                     });
 
@@ -341,7 +341,7 @@ export const getTronSigner = (
                     );
 
                     const tronWeb = new TronWeb({
-                        fullHost: tronApi.baseURL,
+                        fullHost: tronApi.tronGridBaseUrl,
                         privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
                     });
 

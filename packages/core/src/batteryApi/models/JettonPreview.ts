@@ -69,6 +69,12 @@ export interface JettonPreview {
      * @memberof JettonPreview
      */
     customPayloadApiUri?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof JettonPreview
+     */
+    score: number;
 }
 
 
@@ -83,6 +89,7 @@ export function instanceOfJettonPreview(value: object): value is JettonPreview {
     if (!('decimals' in value) || value['decimals'] === undefined) return false;
     if (!('image' in value) || value['image'] === undefined) return false;
     if (!('verification' in value) || value['verification'] === undefined) return false;
+    if (!('score' in value) || value['score'] === undefined) return false;
     return true;
 }
 
@@ -103,6 +110,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'image': json['image'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
+        'score': json['score'],
     };
 }
 
@@ -124,6 +132,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'image': value['image'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'custom_payload_api_uri': value['customPayloadApiUri'],
+        'score': value['score'],
     };
 }
 

@@ -80,6 +80,10 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
+    battery_packages?: {
+        value: number;
+        image: string;
+    }[];
 
     /**
      * "secret" flag name to determine if the app is on ios review

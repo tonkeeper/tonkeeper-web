@@ -20,7 +20,8 @@ import {
     SettingsProIcon,
     WalletsIcon,
     BatteryIcon,
-    LockIcon
+    LockIcon,
+    BlockchainsIcon
 } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 import {
@@ -30,6 +31,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useBatteryEnabledConfig } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
+import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -41,6 +43,7 @@ const SingleAccountSettings = () => {
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const twoFAEnabled = useCanViewTwoFA();
+    const canUseTron = useCanUseTronForActiveWallet();
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -160,8 +163,16 @@ const SingleAccountSettings = () => {
             });
         }
 
+        if (canUseTron) {
+            items.push({
+                name: t('chains_title'),
+                icon: <BlockchainsIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.chains))
+            });
+        }
+
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig]);
+    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
 
     return (
         <>
@@ -185,6 +196,8 @@ const MultipleAccountSettings = () => {
     const [deleteAccount, setDeleteAccount] = useState(false);
 
     const wallet = account.activeTonWallet;
+
+    const canUseTron = useCanUseTronForActiveWallet();
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -323,13 +336,21 @@ const MultipleAccountSettings = () => {
             });
         }
 
+        if (canUseTron) {
+            items.push({
+                name: t('chains_title'),
+                icon: <BlockchainsIcon />,
+                action: () => navigate(relative(WalletSettingsRoute.chains))
+            });
+        }
+
         items.push({
             name: t('Delete_wallet_data'),
             icon: <LogOutIcon />,
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig]);
+    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
 
     return (
         <>

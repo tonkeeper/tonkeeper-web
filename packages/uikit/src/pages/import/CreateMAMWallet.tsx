@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { IconPage } from '../../components/Layout';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { Check, Words } from '../../components/create/Words';
@@ -13,6 +13,7 @@ import { FinalView } from './Password';
 import { Account, AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import {
     useCreateAccountMAM,
+    useMutateActiveAccountConfig,
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
@@ -24,6 +25,9 @@ import {
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
+import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
+import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
+import { useIsTronEnabledGlobally } from "../../state/tron/tron";
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
@@ -41,8 +45,21 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     const [infoPagePassed, setInfoPagePassed] = useState(false);
     const [wordsPagePassed, setWordsPagePassed] = useState(false);
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
 
     const [wordsShown, setWordsShown] = useState(false);
+    const { mutate: mutateActiveAccountConfig } = useMutateActiveAccountConfig();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+
+    const onSelectNetworks = ({ tron }: { tron: boolean }) => {
+        if (tron !== (defaultAccountConfig.enableTron && isTronEnabledGlobally)) {
+            mutateActiveAccountConfig({
+                enableTron: tron
+            });
+        }
+
+        setSelectNetworksPassed(true);
+    };
 
     useEffect(() => {
         if (infoPagePassed) {
@@ -107,6 +124,10 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
             return () => setWordsPagePassed(false);
         }
 
+        if (editNamePagePassed && !selectNetworksPassed) {
+            return () => setEditNamePagePassed(false);
+        }
+
         return undefined;
     }, [
         wordsShown,
@@ -114,7 +135,9 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
         navigateHome,
         infoPagePassed,
         wordsPagePassed,
-        createdAccount
+        createdAccount,
+        editNamePagePassed,
+        selectNetworksPassed
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -196,8 +219,13 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
+                buttonText={t('continue')}
             />
         );
+    }
+
+    if (!selectNetworksPassed) {
+        return <SelectWalletNetworks onContinue={onSelectNetworks} />;
     }
 
     return <FinalView afterCompleted={afterCompleted} />;

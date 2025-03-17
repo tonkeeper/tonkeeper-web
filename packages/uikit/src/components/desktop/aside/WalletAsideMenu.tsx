@@ -30,6 +30,7 @@ import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -51,6 +52,7 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
     padding-right: 50px;
     height: unset;
+    position: relative;
 
     > svg {
         color: ${p => p.theme.iconSecondary};
@@ -59,6 +61,16 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
 
 const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
+`;
+
+const HighlightedIcon = styled.div`
+    width: 8px;
+    height: 8px;
+    background-color: ${p => p.theme.accentRed};
+    border-radius: ${p => p.theme.cornerFull};
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 4px);
 `;
 
 export const WalletAsideMenu = () => {
@@ -77,6 +89,8 @@ export const WalletAsideMenu = () => {
     const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
     const canUseBattery =
         (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+
+    const highlightTron = useHighlightTronFeatureForActiveWallet();
 
     return (
         <WalletAsideContainer>
@@ -142,6 +156,7 @@ export const WalletAsideMenu = () => {
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                        {highlightTron && <HighlightedIcon />}
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

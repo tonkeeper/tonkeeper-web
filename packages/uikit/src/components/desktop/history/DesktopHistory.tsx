@@ -11,6 +11,8 @@ import {
     ActivityNotification,
     ActivityNotificationData
 } from '../../activity/ton/ActivityNotification';
+import { Body2Class } from '../../Text';
+import { useTranslation } from '../../../hooks/translation';
 
 const ContainerQuery = styled.div`
     container-type: inline-size;
@@ -92,11 +94,19 @@ const HistoryEvents: FC<{
     );
 };
 
+const NoTransactionsYet = styled.div`
+    padding: 24px 32px;
+    ${Body2Class};
+    color: ${p => p.theme.textSecondary};
+    text-align: center;
+`;
+
 export const DesktopHistory: FC<{
     activity: ActivityItem[] | undefined;
     isFetchingNextPage: boolean;
     className?: string;
 }> = ({ activity, isFetchingNextPage, className }) => {
+    const { t } = useTranslation();
     const [selectedActivity, setSelectedActivity] = useState<
         ActivityNotificationData | undefined
     >();
@@ -148,6 +158,10 @@ export const DesktopHistory: FC<{
     }, [activity]);
 
     const key = aggregatedActivity.length ? aggregatedActivity[0].key : undefined;
+    if (activity && !activity.length) {
+        return <NoTransactionsYet>{t('history_no_transactions_yet')}</NoTransactionsYet>;
+    }
+
     return (
         <>
             <ActivityNotification

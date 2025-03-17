@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import { seeIfValidTonAddress } from '../utils/common';
+import { seeIfValidTonAddress, seeIfValidTronAddress } from '../utils/common';
 
 export function seeIfBringToFrontLink(options: { url: string }) {
     const { query } = queryString.parseUrl(options.url);
@@ -16,6 +16,11 @@ export interface TonTransferParams {
     amount?: string;
     text?: string;
     jetton?: string;
+}
+
+export interface TronTransferParams {
+    address?: string;
+    amount?: string;
 }
 
 export function parseTonTransferWithAddress(options: { url: string }) {
@@ -48,6 +53,39 @@ export function parseTonTransferWithAddress(options: { url: string }) {
         };
 
         return result;
+    } catch (e) {
+        return null;
+    }
+}
+
+export function parseTronTransferWithAddress(options: { url: string }) {
+    try {
+        const data = queryString.parseUrl(options.url);
+
+        let url = data.url;
+        if (url.startsWith('tron:')) {
+            url = url.slice(5);
+        }
+
+        if (!url) {
+            throw new Error('Empty link');
+        }
+
+        if (!seeIfValidTronAddress(url)) {
+            throw new Error('Unsupported link');
+        }
+
+        const address = url;
+        const amount = typeof data.query.amount === 'string' ? parseFloat(data.query.amount) : NaN;
+
+        if (isFinite(amount)) {
+            return {
+                address,
+                amount
+            };
+        }
+
+        return { address };
     } catch (e) {
         return null;
     }

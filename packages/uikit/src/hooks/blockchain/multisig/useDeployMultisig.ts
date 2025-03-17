@@ -10,7 +10,6 @@ import { useAppSdk } from '../../appSdk';
 import { useCheckTouchId } from '../../../state/password';
 import { useTranslation } from '../../translation';
 import { anyOfKeysParts, QueryKey } from '../../../libs/queryKey';
-import BigNumber from 'bignumber.js';
 import { AccountsApi, Multisig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAccountsStorage } from '../../useStorage';
 import { TxConfirmationCustomError } from '../../../libs/errors/TxConfirmationCustomError';
@@ -22,8 +21,6 @@ import {
 import { useNotifyErrorHandle } from '../../useNotification';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { Address } from '@ton/core';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import {
     MultisigEncoder,
@@ -32,13 +29,14 @@ import {
 import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
+import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 
 export const useDeployMultisig = (
     params:
         | {
               multisigConfig: MultisigConfig;
               fromWallet: WalletId;
-              feeWei: BigNumber;
+              fee: TransactionFee;
           }
         | undefined
 ) => {
@@ -122,7 +120,7 @@ export const useDeployMultisig = (
             await rawTransactionService.send(
                 sender,
                 {
-                    extra: new AssetAmount({ asset: TON_ASSET, weiAmount: params.feeWei })
+                    fee: params.fee
                 },
                 message
             );

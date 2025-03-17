@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { DashboardRow, DashboardRowNullable } from '@tonkeeper/core/dist/entries/dashboard';
-import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
+import { sortWalletsByVersion, TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { getDashboardData } from '@tonkeeper/core/dist/service/proService';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
@@ -9,7 +9,15 @@ import { QueryKey } from '../../libs/queryKey';
 import { ClientColumns, useDashboardColumnsAsForm } from './useDashboardColumns';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useAccountsOrdered } from '../folders';
-import { seeIfMainnnetAccount } from '@tonkeeper/core/dist/entries/account';
+import { seeIfMainnnetAccount, Account } from '@tonkeeper/core/dist/entries/account';
+
+const sortedAccountWallets = (a: Account) => {
+    if (a.type === 'mnemonic' || a.type === 'ton-only') {
+        return [...a.allTonWallets].sort(sortWalletsByVersion);
+    }
+
+    return a.allTonWallets;
+};
 
 export function useDashboardData() {
     const { data: columns } = useDashboardColumnsAsForm();
@@ -25,7 +33,7 @@ export function useDashboardData() {
     const accountsState = useAccountsOrdered();
     const mainnetWallets = accountsState
         .filter(seeIfMainnnetAccount)
-        .flatMap(a => a.allTonWallets.map(item => ({ ...item, account: a })));
+        .flatMap(a => sortedAccountWallets(a).map(item => ({ ...item, account: a })));
     const idsMainnet = mainnetWallets.map(w => w!.id);
 
     return useQuery<DashboardRow[]>(

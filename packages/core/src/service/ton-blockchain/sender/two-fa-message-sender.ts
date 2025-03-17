@@ -131,7 +131,10 @@ export class TwoFAMessageSender implements ISender {
         }
 
         return {
-            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.extra * -1 }),
+            fee: {
+                type: 'ton-asset' as const,
+                extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.extra * -1 })
+            },
             event: result
         };
     }
