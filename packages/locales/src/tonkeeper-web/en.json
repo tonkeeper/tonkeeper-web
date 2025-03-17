@@ -353,6 +353,8 @@
   "settings_multisig_settings": "Multisig Settings",
   "show": "Show",
   "show_all": "Show All",
+  "SignData": "Sign Data",
+  "signDataTextDisclaimer": "Carefully review the message, and if you agree, sign data.",
   "sk_input_label": "Private key in hex format without 0x beginning. Length is 64 or 128 chars",
   "start_trial_notification_description": "Telegram connection is required solely for the purpose of verification that you are not a bot.",
   "start_trial_notification_heading": "Connect Telegram to Pro for Free",

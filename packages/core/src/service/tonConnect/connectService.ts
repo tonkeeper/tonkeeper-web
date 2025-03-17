@@ -166,6 +166,9 @@ export const getDeviceInfo = (
                 name: 'SendTransaction',
                 maxMessages: maxMessages,
                 extraCurrencySupported: true
+            },
+            {
+                name: 'SignData'
             }
         ]
     };
