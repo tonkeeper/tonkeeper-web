@@ -281,7 +281,7 @@ export const useGetBoundingTwoFABotLink = (options?: { forReconnect?: boolean })
     return useMutation<string>(async () => {
         try {
             const { payload } = await new AuthApi(twoFAApi).getPayload();
-            const origin = 'https://2fa.tonkeeper.com';
+            const origin = 'tonkeeper';
 
             const { timestamp, signature, stateInit, domain } = await signTonProof({
                 origin,
