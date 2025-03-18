@@ -67,7 +67,7 @@ export class GaslessMessageSender implements ISender {
                     asset: this.gaslessConfig.payWithAsset,
                     weiAmount: params.commission
                 })
-            }
+            },
         };
     }
 

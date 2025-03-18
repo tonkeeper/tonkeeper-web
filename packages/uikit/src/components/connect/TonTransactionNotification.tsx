@@ -174,10 +174,14 @@ const ConnectContent: FC<{
         EXTERNAL_SENDER_CHOICE.type
     );
     useEffect(() => {
-        if (availableSendersChoices && availableSendersChoices[0]) {
+        if (
+            availableSendersChoices &&
+            availableSendersChoices[0] &&
+            availableSendersChoices[0].type !== selectedSenderType
+        ) {
             onSenderTypeChange(availableSendersChoices[0].type);
         }
-    }, [availableSendersChoices]);
+    }, [JSON.stringify(availableSendersChoices)]);
 
     const senderChoice: SenderChoice = useMemo(() => {
         if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
@@ -188,8 +192,12 @@ const ConnectContent: FC<{
             return EXTERNAL_SENDER_CHOICE;
         }
 
+        if (selectedSenderType === 'gasless') {
+            return availableSendersChoices!.find(s => s.type === 'gasless')!;
+        }
+
         throw new Error('Unexpected sender choice');
-    }, [selectedSenderType]);
+    }, [selectedSenderType, availableSendersChoices]);
 
     const {
         data: estimate,
