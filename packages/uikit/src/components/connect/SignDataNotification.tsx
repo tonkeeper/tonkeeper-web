@@ -1,5 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { SignDataRequestPayload, SignDataResponse } from '@tonkeeper/core/dist/entries/tonConnect';
+import {
+    SignDataRequestPayload,
+    SignDataRequestPayloadCell,
+    SignDataResponse
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
@@ -11,7 +15,7 @@ import {
     NotificationHeaderPortal,
     NotificationTitleRow
 } from '../Notification';
-import { Body2, H3, Label2 } from '../Text';
+import { Body2, H3, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
@@ -22,6 +26,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { signDataOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
+import { handleSubmit } from '../../libs/form';
 
 const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const activeAccount = useActiveAccount();
@@ -81,6 +86,28 @@ const Disclaimer = styled(Body2)`
     color: ${props => props.theme.textSecondary};
 `;
 
+const WarningBlock = styled.div`
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+
+    background-color: ${props => props.theme.accentOrange};
+    position: relative;
+    border-radius: ${props => props.theme.cornerSmall};
+
+    user-select: none;
+`;
+
+const WarningHeader = styled(Label1)`
+    display: block;
+    color: ${props => props.theme.textPrimaryAlternate};
+`;
+
+const WarningBody = styled(Body2)`
+    display: block;
+    color: ${props => props.theme.textPrimaryAlternate};
+`;
+
 const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -93,11 +120,7 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                         <ButtonRow>
                             <Button
                                 size="small"
-                                onClick={e => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    sdk.copyToClipboard(params.text);
-                                }}
+                                onClick={handleSubmit(() => sdk.copyToClipboard(params.text))}
                             >
                                 {t('receiveModal_copy')}
                             </Button>
@@ -106,8 +129,32 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                     <Disclaimer>{t('signDataTextDisclaimer')}</Disclaimer>
                 </>
             );
+        case 'cell':
+            return (
+                <>
+                    <Disclaimer>{t('signDataCellDisclaimer')}</Disclaimer>
+                    <Payload>
+                        <SignText>{params.schema}</SignText>
+                        <ButtonRow>
+                            <Button
+                                size="small"
+                                onClick={handleSubmit(() => sdk.copyToClipboard(params.cell))}
+                            >
+                                {t('receiveModal_copy')}
+                            </Button>
+                        </ButtonRow>
+                    </Payload>
+                </>
+            );
         default:
-            return <></>;
+            return (
+                <>
+                    <WarningBlock>
+                        <WarningHeader>{t('signDataBinaryContent')}</WarningHeader>
+                        <WarningBody>{t('singDataBinaryContentDisclaimer')}</WarningBody>
+                    </WarningBlock>
+                </>
+            );
     }
 };
 const SignContent: FC<{

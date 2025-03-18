@@ -1,7 +1,6 @@
 // Ref: https://github.com/mois-ilya/sign-data-reference/blob/main/src/sign.ts
 
 import { Address } from '@ton/core';
-import nacl from 'tweetnacl';
 import { createTextBinaryHash, createCellHash } from './signUtils';
 import { SignDataRequestPayload, SignDataResponse } from '../../entries/tonConnect';
 
