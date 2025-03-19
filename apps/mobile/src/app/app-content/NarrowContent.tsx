@@ -302,11 +302,9 @@ const PreferencesModal = () => {
                     }
                 >
                     <IonRouterOutlet>
-                        <Route
-                            path={AppRoute.settings}
-                            component={MobileProPreferencesPage}
-                            exact
-                        />
+                        <Route path={AppRoute.settings} exact>
+                            <MobileProPreferencesPage onClose={onClose} />
+                        </Route>
                         <Route
                             path={AppRoute.settings + SettingsRoute.account}
                             component={DesktopManageAccountsPage}
