@@ -1,10 +1,7 @@
 import { TonConnectSSE } from '@tonkeeper/core/dist/service/tonConnect/ton-connect-sse';
 import { TabletStorage } from './storage';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import {
-    SendTransactionAppRequest,
-    TonConnectAppRequestPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { App } from '@capacitor/app';
 
 export const tonConnectSSE = new TonConnectSSE({
