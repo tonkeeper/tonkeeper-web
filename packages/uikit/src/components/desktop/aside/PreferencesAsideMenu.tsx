@@ -54,7 +54,10 @@ const PreferencesAsideContainer = styled.div`
 `;
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
-    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
+    background: ${p =>
+        p.isSelected && p.theme.proDisplayType !== 'mobile'
+            ? p.theme.backgroundContentTint
+            : 'unset'};
     padding-right: 50px;
 
     svg {

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { hexToRGBA } from '../../libs/css';
 
 /**
@@ -24,9 +24,13 @@ export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
         overflow: hidden;
     }
 
-    @media (pointer: fine) {
-        &:hover {
-            background: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.56)};
-        }
-    }
+    ${p =>
+        p.theme.proDisplayType !== 'mobile' &&
+        css`
+            @media (pointer: fine) {
+                &:hover {
+                    background: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.56)};
+                }
+            }
+        `}
 `;
