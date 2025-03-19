@@ -106,11 +106,19 @@ export const getManifest = async (request: ConnectRequest) => {
 
     const manifest: DAppManifest = await response.json();
 
-    const isValid =
+    let isValid =
         manifest &&
         typeof manifest.url === 'string' &&
         typeof manifest.name === 'string' &&
         typeof manifest.iconUrl === 'string';
+
+    try {
+        if (!new URL(manifest.url).hostname.includes('.')) {
+            isValid = false;
+        }
+    } catch {
+        isValid = false;
+    }
 
     if (!isValid) {
         throw new Error('Manifest is not valid');
