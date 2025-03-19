@@ -1,9 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import {
-    SignDataRequestPayload,
-    SignDataRequestPayloadCell,
-    SignDataResponse
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { SignDataRequestPayload, SignDataResponse } from '@tonkeeper/core/dist/entries/tonConnect';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
@@ -15,7 +11,7 @@ import {
     NotificationHeaderPortal,
     NotificationTitleRow
 } from '../Notification';
-import { Body2, H3, Label1, Label2 } from '../Text';
+import { Body2, H2, H3, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
@@ -27,6 +23,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils
 import { signDataOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { handleSubmit } from '../../libs/form';
+import { ErrorIcon } from '../Icon';
 
 const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const activeAccount = useActiveAccount();
@@ -159,12 +156,26 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                 <>
                     <WarningBlock>
                         <WarningHeader>{t('signDataBinaryContent')}</WarningHeader>
-                        <WarningBody>{t('singDataBinaryContentDisclaimer')}</WarningBody>
+                        <WarningBody>{t('signDataBinaryContentDisclaimer')}</WarningBody>
                     </WarningBlock>
                 </>
             );
     }
 };
+
+const ErrorStyled = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 1rem 0px 2rem;
+`;
+
+const Header = styled(H2)`
+    text-align: center;
+`;
+
 const SignContent: FC<{
     origin: string;
     params: SignDataRequestPayload;
@@ -189,6 +200,36 @@ const SignContent: FC<{
             setError(err as Error);
         }
     };
+
+    const isValid = useMemo(() => {
+        switch (params.type) {
+            case 'text': {
+                return params.text != '';
+            }
+            case 'binary': {
+                return params.bytes != '';
+            }
+            case 'cell': {
+                return params.cell != '' && params.schema != '';
+            }
+            default:
+                false;
+        }
+    }, [params]);
+
+    if (!isValid) {
+        return (
+            <NotificationBlock onSubmit={onSubmit}>
+                <ErrorStyled>
+                    <ErrorIcon />
+                    <Header>{t('signDataError')}</Header>
+                </ErrorStyled>
+                <Button size="large" fullWidth primary type="submit">
+                    {t('cancel')}
+                </Button>
+            </NotificationBlock>
+        );
+    }
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
@@ -219,7 +260,7 @@ const SignContent: FC<{
                         disabled={isLoading}
                         type="submit"
                     >
-                        {t('SignData')}
+                        {t('signData')}
                     </Button>
                 )}
             </>
@@ -269,7 +310,7 @@ const NotificationTitleWithWalletName: FC<{ origin: string; onClose: () => void 
                 <NotificationTitleRowStyled handleClose={onClose}>
                     <RowTitle>{title}</RowTitle>
                     <Row>
-                        <NameText>{t('SignData')}</NameText>
+                        <NameText>{t('signData')}</NameText>
                         {wallets.length > 1 ? <AccountAndWalletInfo /> : undefined}
                     </Row>
                 </NotificationTitleRowStyled>
