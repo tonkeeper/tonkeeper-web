@@ -187,9 +187,7 @@ const SignContent: FC<{
     const [error, setError] = useState<Error | null>(null);
 
     const { mutateAsync, isLoading } = useSignMutation(origin, params);
-    const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
-        e.preventDefault();
-
+    const onSubmit = async () => {
         try {
             const result = await mutateAsync();
 
@@ -219,7 +217,7 @@ const SignContent: FC<{
 
     if (!isValid) {
         return (
-            <NotificationBlock onSubmit={onSubmit}>
+            <NotificationBlock onSubmit={handleSubmit(() => handleClose())}>
                 <ErrorStyled>
                     <ErrorIcon />
                     <Header>{t('signDataError')}</Header>
@@ -232,7 +230,7 @@ const SignContent: FC<{
     }
 
     return (
-        <NotificationBlock onSubmit={onSubmit}>
+        <NotificationBlock onSubmit={handleSubmit(onSubmit)}>
             <SignPayload params={params} />
             <>
                 {done && !error && (
