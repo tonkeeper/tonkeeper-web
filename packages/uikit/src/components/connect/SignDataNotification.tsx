@@ -211,7 +211,7 @@ const SignContent: FC<{
                 return params.cell != '' && params.schema != '';
             }
             default:
-                false;
+                return false;
         }
     }, [params]);
 
