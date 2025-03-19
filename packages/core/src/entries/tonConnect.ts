@@ -333,5 +333,15 @@ export interface TonConnectMessageRequest {
 export interface SendTransactionAppRequest {
     id: string;
     connection: AccountConnection;
+    kind: 'sendTransaction';
     payload: TonConnectTransactionPayload;
 }
+
+export interface SignDatAppRequest {
+    id: string;
+    connection: AccountConnection;
+    kind: 'signData';
+    payload: SignDataRequestPayload;
+}
+
+export type TonConnectAppRequestPayload = SendTransactionAppRequest | SignDatAppRequest;

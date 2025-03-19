@@ -7,7 +7,11 @@ import { isStandardTonWallet, WalletId } from '../../entries/wallet';
 import { getLastEventId, subscribeTonConnect } from './httpBridge';
 import { accountsStorage } from '../accountsStorage';
 import { IStorage } from '../../Storage';
-import { SendTransactionAppRequest, TonConnectAppRequest } from '../../entries/tonConnect';
+import {
+    SendTransactionAppRequest,
+    TonConnectAppRequest,
+    TonConnectAppRequestPayload
+} from '../../entries/tonConnect';
 import { getWalletById } from '../../entries/account';
 import { replyBadRequestResponse, replyDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
@@ -24,7 +28,7 @@ type System = {
 
 type Listeners = {
     onDisconnect: (connection: AccountConnection) => void;
-    onSendTransaction: (value: SendTransactionAppRequest) => void;
+    onRequest: (value: TonConnectAppRequestPayload) => void;
 };
 
 export class TonConnectSSE {
@@ -123,45 +127,57 @@ export class TonConnectSSE {
         this.listeners.onDisconnect(connection);
     };
 
+    private selectWallet = async (clientSessionId: string) => {
+        const walletId = this.dist[clientSessionId];
+
+        const activeAccount = await accountsStorage(this.storage).getActiveAccount();
+        if (!activeAccount) {
+            throw new Error('Account not found');
+        }
+        const activeWallet = activeAccount.activeTonWallet;
+
+        await this.system.bringToFront?.();
+
+        if (activeWallet.id !== walletId) {
+            const accountToActivate = (await accountsStorage(this.storage).getAccounts()).find(
+                a => a.getTonWallet(walletId) !== undefined
+            );
+
+            if (!accountToActivate) {
+                throw new Error('Account not found');
+            }
+
+            accountToActivate.setActiveTonWallet(walletId);
+            await accountsStorage(this.storage).updateAccountInState(accountToActivate);
+            await accountsStorage(this.storage).setActiveAccountId(accountToActivate.id);
+            this.system.refresh?.();
+            await delay(500);
+        }
+    };
     private handleMessage = async (params: TonConnectAppRequest) => {
         switch (params.request.method) {
             case 'disconnect': {
                 return this.onDisconnect(params);
             }
             case 'sendTransaction': {
-                const value = {
+                const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
+                    kind: 'sendTransaction',
                     payload: JSON.parse(params.request.params[0])
                 };
-
-                const walletId = this.dist[params.connection.clientSessionId];
-
-                const activeAccount = await accountsStorage(this.storage).getActiveAccount();
-                if (!activeAccount) {
-                    throw new Error('Account not found');
-                }
-                const activeWallet = activeAccount.activeTonWallet;
-
-                await this.system.bringToFront?.();
-
-                if (activeWallet.id !== walletId) {
-                    const accountToActivate = (
-                        await accountsStorage(this.storage).getAccounts()
-                    ).find(a => a.getTonWallet(walletId) !== undefined);
-
-                    if (!accountToActivate) {
-                        throw new Error('Account not found');
-                    }
-
-                    accountToActivate.setActiveTonWallet(walletId);
-                    await accountsStorage(this.storage).updateAccountInState(accountToActivate);
-                    await accountsStorage(this.storage).setActiveAccountId(accountToActivate.id);
-                    this.system.refresh?.();
-                    await delay(500);
-                }
-
-                return this.listeners.onSendTransaction(value);
+                await this.selectWallet(params.connection.clientSessionId);
+                return this.listeners.onRequest(value);
+            }
+            case 'signData': {
+                const value: TonConnectAppRequestPayload = {
+                    connection: params.connection,
+                    id: params.request.id,
+                    kind: 'signData',
+                    payload: params.request.params
+                };
+                await this.selectWallet(params.connection.clientSessionId);
+                return this.listeners.onRequest(value);
             }
             default: {
                 return replyBadRequestResponse(params);

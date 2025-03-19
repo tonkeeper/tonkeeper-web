@@ -65,7 +65,11 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
 
 const Payload = styled.div`
     background: ${props => props.theme.backgroundContent};
-    border-radius: ${props => props.theme.cornerMedium};
+    border-radius: ${props =>
+        props.theme.displayType === 'full-width'
+            ? props.theme.corner2xSmall
+            : props.theme.cornerMedium};
+
     padding: 16px 16px;
     width: 100%;
     box-sizing: border-box;
@@ -93,7 +97,10 @@ const WarningBlock = styled.div`
 
     background-color: ${props => props.theme.accentOrange};
     position: relative;
-    border-radius: ${props => props.theme.cornerSmall};
+    border-radius: ${props =>
+        props.theme.displayType === 'full-width'
+            ? props.theme.corner2xSmall
+            : props.theme.cornerMedium};
 
     user-select: none;
 `;
@@ -135,6 +142,7 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                     <Disclaimer>{t('signDataCellDisclaimer')}</Disclaimer>
                     <Payload>
                         <SignText>{params.schema}</SignText>
+                        <SignText>{params.cell}</SignText>
                         <ButtonRow>
                             <Button
                                 size="small"
