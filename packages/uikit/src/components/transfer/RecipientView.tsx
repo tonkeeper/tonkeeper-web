@@ -302,6 +302,7 @@ export const RecipientView: FC<{
                     label={t('transaction_recipient_address')}
                     isValid={!submitted || (!!isValidForBlockchain && isValidAddress)}
                     disabled={isExternalLoading}
+                    autoFocusTimeout={300}
                 />
             </ShowAddress>
 
