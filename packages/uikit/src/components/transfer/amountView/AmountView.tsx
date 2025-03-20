@@ -1,7 +1,6 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import {
     TonAsset,
-    jettonToTonAsset,
     legacyTonAssetId,
     tokenToTonAsset
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -241,7 +240,7 @@ export const AmountView: FC<{
 
             {!shouldHideHeaderAndFooter && (
                 <NotificationFooterPortal>
-                    <NotificationFooter>
+                    <NotificationFooter mpNoFooterGap>
                         <MainButton
                             ref={refButton}
                             isDisabled={!isValid}

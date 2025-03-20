@@ -33,6 +33,7 @@ import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
 import { SuggestionList } from './SuggestionList';
 import { useResolveDns } from '../../state/dns';
+import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 
 const Warning = styled(Body2)`
     user-select: none;
@@ -319,17 +320,22 @@ export const RecipientView: FC<{
                 <Warning>{t('send_screen_steps_comfirm_comment_required_text')}</Warning>
             )}
 
-            <SuggestionList
-                onSelect={onSelect}
-                disabled={isExternalLoading}
-                acceptBlockchains={acceptBlockchains}
-            />
+            <NotForTargetEnv env="mobile">
+                <SuggestionList
+                    onSelect={onSelect}
+                    disabled={isExternalLoading}
+                    acceptBlockchains={acceptBlockchains}
+                />
 
-            <Gap />
+                <Gap />
+            </NotForTargetEnv>
+            <ForTargetEnv env="mobile">
+                <div />
+            </ForTargetEnv>
 
             {!shouldHideHeaderAndFooter && (
                 <NotificationFooterPortal>
-                    <NotificationFooter>
+                    <NotificationFooter mpNoFooterGap>
                         <MainButton
                             isLoading={isFetching || isDnsFetching}
                             onClick={handleSubmit}

@@ -49,16 +49,18 @@ export const IonicOverride = css`
     }
 
     ion-modal:not(.modal-card) {
-        --height: auto;
-
         &::part(content) {
             background: transparent;
         }
 
-        .ion-page {
-            max-height: calc(100vh - 20px - env(safe-area-inset-top));
-            position: relative;
-            contain: content;
+        &:not(.modal-mobile-fullscreen) {
+            --height: auto;
+
+            .ion-page {
+                max-height: calc(100vh - 20px - env(safe-area-inset-top));
+                position: relative;
+                contain: content;
+            }
         }
     }
 

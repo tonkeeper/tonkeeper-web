@@ -6,7 +6,7 @@ import { useAppContext } from '../../../hooks/appContext';
 import { useTranslation } from '../../../hooks/translation';
 import { Gap } from '../../Layout';
 import { ListBlock } from '../../List';
-import { FullHeightBlock } from '../../Notification';
+import { FullHeightBlock, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -49,8 +49,8 @@ import { comment } from '@ton/core';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
-import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TransactionFee } from "@tonkeeper/core/dist/entries/crypto/transaction-fee";
+import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -205,7 +205,19 @@ export const ConfirmNftView: FC<{
     headerBlock: ReactNode;
     mainButton: ReactNode;
     multisigTTL?: MultisigOrderLifetimeMinutes;
-}> = ({ recipient, onClose, nftItem, headerBlock, mainButton, multisigTTL }) => {
+    isAnimationProcess: boolean;
+}> = ({
+    recipient,
+    onClose,
+    nftItem,
+    headerBlock,
+    mainButton,
+    multisigTTL,
+    isAnimationProcess
+}) => {
+    const isFullWidth = useIsFullWidthMode();
+    const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
+
     const { standalone } = useAppContext();
     const [done, setDone] = useState(false);
     const { t } = useTranslation();
@@ -287,7 +299,11 @@ export const ConfirmNftView: FC<{
                 {isActiveMultisig && multisigTTL ? (
                     <MayBeMultisigDetalis ttl={multisigTTL} />
                 ) : null}
-                {mainButton}
+                {!shouldHideHeaderAndFooter && (
+                    <NotificationFooterPortal>
+                        <NotificationFooter>{mainButton}</NotificationFooter>
+                    </NotificationFooterPortal>
+                )}
             </FullHeightBlock>
         </ConfirmViewContext.Provider>
     );

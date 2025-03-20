@@ -7,6 +7,7 @@ import { ButtonResponsiveSize } from '../fields/Button';
 import { Input } from '../fields/Input';
 import { EmojisList } from '../shared/emoji/EmojisList';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
+import { useMobileModalFullScreenStretcher } from '../../hooks/useElementHeight';
 
 const Block = styled.form`
     display: flex;
@@ -33,6 +34,7 @@ export const UpdateWalletName: FC<{
     buttonText?: string;
 }> = ({ walletEmoji, submitHandler, name: nameProp, isLoading, buttonText }) => {
     const { t } = useTranslation();
+    const { ref: containerRef, stretcher } = useMobileModalFullScreenStretcher();
 
     const ref = useRef<HTMLInputElement | null>(null);
 
@@ -57,35 +59,38 @@ export const UpdateWalletName: FC<{
     const isValid = name.length >= 3;
 
     return (
-        <CenterContainer>
-            <Block onSubmit={onSubmit}>
-                <div>
-                    <H2Label2Responsive>{t('Name_your_wallet')}</H2Label2Responsive>
-                    <Body>{t('Name_your_wallet_description')}</Body>
-                </div>
+        <>
+            <CenterContainer ref={containerRef}>
+                <Block onSubmit={onSubmit}>
+                    <div>
+                        <H2Label2Responsive>{t('Name_your_wallet')}</H2Label2Responsive>
+                        <Body>{t('Name_your_wallet_description')}</Body>
+                    </div>
 
-                <Input
-                    id="wallet-name"
-                    ref={ref}
-                    value={name}
-                    onChange={onChange}
-                    label={t('Wallet_name')}
-                    isValid={isValid}
-                    rightElement={emoji ? <WalletEmoji emoji={emoji} /> : null}
-                />
-                <EmojisList keepShortListForMS={500} onClick={setEmoji} />
+                    <Input
+                        id="wallet-name"
+                        ref={ref}
+                        value={name}
+                        onChange={onChange}
+                        label={t('Wallet_name')}
+                        isValid={isValid}
+                        rightElement={emoji ? <WalletEmoji emoji={emoji} /> : null}
+                    />
+                    <EmojisList keepShortListForMS={500} onClick={setEmoji} />
 
-                <ButtonResponsiveSize
-                    fullWidth
-                    marginTop
-                    primary
-                    disabled={!isValid}
-                    type="submit"
-                    loading={isLoading}
-                >
-                    {buttonText ?? t('add_edit_favorite_save')}
-                </ButtonResponsiveSize>
-            </Block>
-        </CenterContainer>
+                    <ButtonResponsiveSize
+                        fullWidth
+                        marginTop
+                        primary
+                        disabled={!isValid}
+                        type="submit"
+                        loading={isLoading}
+                    >
+                        {buttonText ?? t('add_edit_favorite_save')}
+                    </ButtonResponsiveSize>
+                </Block>
+            </CenterContainer>
+            {stretcher}
+        </>
     );
 };

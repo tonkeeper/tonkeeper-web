@@ -137,6 +137,7 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
                                             onBack={isMultisig ? backToRecipient : undefined}
                                         />
                                     )}
+                                    isAnimationProcess={status === 'exiting'}
                                 />
                             )}
                             {view === 'confirm' && (
@@ -154,6 +155,7 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
                                         />
                                     }
                                     multisigTTL={multisigTimeout}
+                                    isAnimationProcess={status === 'exiting'}
                                 />
                             )}
                         </div>
@@ -187,7 +189,13 @@ const SendNftNotification = () => {
     }, [nftItem, onClose]);
 
     return (
-        <Notification isOpen={!!nftItem} handleClose={onClose} hideButton backShadow>
+        <Notification
+            isOpen={!!nftItem}
+            handleClose={onClose}
+            hideButton
+            backShadow
+            mobileFullScreen
+        >
             {Content}
         </Notification>
     );

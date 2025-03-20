@@ -507,7 +507,7 @@ const SendActionNotification = () => {
             hideButton
             backShadow
             footer={<></>}
-            disableHeightAnimation
+            mobileFullScreen
         >
             {Content}
         </NotificationStyled>
