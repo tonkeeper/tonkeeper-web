@@ -13,11 +13,11 @@ import {
     useOrderInfo
 } from '../../state/multisig';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useCallback, useEffect, useMemo } from 'react';
 import { Button } from '../../components/fields/Button';
 
-import { styled } from 'styled-components';
-import { useAppSdk } from '../../hooks/appSdk';
+import { css, styled } from 'styled-components';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { Multisig, type MultisigOrder, Risk } from '@tonkeeper/core/dist/tonApiV2';
 import { AppRoute } from '../../libs/routes';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
@@ -83,8 +83,8 @@ const DesktopMultisigOrdersPageBody = () => {
 };
 
 export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multisig }) => {
-    const { t } = useTranslation();
     const { mutate: markAsViewed } = useMarkAccountOrdersAsViewed();
+    const targetEnv = useAppTargetEnv();
 
     useEffect(() => {
         markAsViewed({ orders: multisig.orders.map(o => o.address) });
@@ -117,30 +117,132 @@ export const ManageExistingMultisigOrders: FC<{ multisig: Multisig }> = ({ multi
         [multisig.orders]
     );
 
+    if (targetEnv === 'mobile') {
+        return <MobileOrders orders={sortedOrders} />;
+    }
+
+    return <DesktopOrders orders={sortedOrders} />;
+};
+
+const DesktopOrders: FC<{ orders: MultisigOrder[] }> = ({ orders }) => {
+    const { t } = useTranslation();
+
     return (
-        <OrdersGrid>
-            <RowDivider />
+        <DesktopOrdersGrid>
+            <DesktopRowDivider />
             <TH>{t('multisig_orders_th_created')}</TH>
             <TH>{t('multisig_orders_th_status')}</TH>
             <TH>{t('multisig_orders_th_signatures')}</TH>
             <AmountTH>{t('multisig_orders_th_send')}</AmountTH>
             <TH />
-            <RowDivider />
-            {sortedOrders.map(order => (
+            <DesktopRowDivider />
+            {orders.map(order => (
                 <OrderRow key={order.orderSeqno} order={order} />
             ))}
-        </OrdersGrid>
+        </DesktopOrdersGrid>
     );
 };
 
-const OrdersGrid = styled.div`
+const MobileOrders: FC<{ orders: MultisigOrder[] }> = ({ orders }) => {
+    return (
+        <>
+            <DesktopRowDivider />
+            {orders.map(order => (
+                <>
+                    <MobileOrderCard key={order.orderSeqno} order={order} />
+                    <DesktopRowDivider />
+                </>
+            ))}
+        </>
+    );
+};
+
+const useOpenTonviewer = (address: string) => {
+    const sdk = useAppSdk();
+    const config = useActiveConfig();
+
+    return useCallback(() => {
+        const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
+
+        sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
+    }, []);
+};
+
+const MobileOrderCard: FC<{ order: MultisigOrder }> = ({ order }) => {
+    const { t } = useTranslation();
+    const { status, secondsLeft } = useOrderInfo(order);
+    const { onOpen: onView } = useMultisigOrderNotification();
+
+    const onOpenTonviewer = useOpenTonviewer(order.address);
+
+    return (
+        <MobileOrderCardWrapper>
+            <Body2Secondary>{t('multisig_orders_th_created')}</Body2Secondary>
+            {order.creationDate ? (
+                <CreationDateCell creationDate={order.creationDate} />
+            ) : (
+                <Body2Secondary>—</Body2Secondary>
+            )}
+            <Body2Secondary>{t('multisig_orders_th_status')}</Body2Secondary>
+            {status === 'progress' ? (
+                <TimeCell>{toTimeLeft(secondsLeft * 1000)}</TimeCell>
+            ) : (
+                <StatusCell>{t('multisig_status_' + status)}</StatusCell>
+            )}
+            <Body2Secondary>{t('multisig_orders_th_signatures')}</Body2Secondary>
+            <Body2>
+                {t('multisig_signed_value_short', {
+                    signed: order.approvalsNum,
+                    total: order.threshold
+                })}
+            </Body2>
+            <Body2Secondary>{t('multisig_orders_th_send')}</Body2Secondary>
+            <AmountCell risk={order.risk} />
+            <MobileViewButton
+                primary={status === 'progress'}
+                secondary={status !== 'progress'}
+                onClick={() => {
+                    if (status === 'expired') {
+                        onOpenTonviewer();
+                    } else {
+                        onView({ orderAddress: order.address });
+                    }
+                }}
+            >
+                {t('multisig_order_view')}
+            </MobileViewButton>
+        </MobileOrderCardWrapper>
+    );
+};
+
+const MobileViewButton = styled(Button)`
+    grid-column: 1 / -1;
+    margin-top: 12px;
+`;
+
+const MobileOrderCardWrapper = styled.div`
+    padding: 12px 16px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 4px;
+
+    > *:nth-child(2n) {
+        justify-self: end;
+    }
+`;
+
+const Body2Secondary = styled(Body2)`
+    color: ${p => p.theme.textSecondary};
+`;
+
+const DesktopOrdersGrid = styled.div`
     display: grid;
     grid-template-columns: minmax(128px, auto) minmax(96px, auto) minmax(70px, auto) 1fr auto;
     column-gap: 0.5rem;
     padding: 0 1rem;
 `;
 
-const RowDivider = styled.div`
+const DesktopRowDivider = styled.div`
     background-color: ${p => p.theme.separatorCommon};
     height: 1px;
     grid-column: 1/-1;
@@ -152,14 +254,7 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
     const { status, secondsLeft } = useOrderInfo(order);
     const { onOpen: onView } = useMultisigOrderNotification();
 
-    const sdk = useAppSdk();
-    const config = useActiveConfig();
-
-    const onOpenTonviewer = (address: string) => {
-        const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
-
-        sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
-    };
+    const onOpenTonviewer = useOpenTonviewer(order.address);
 
     return (
         <>
@@ -184,7 +279,7 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
                     secondary={status !== 'progress'}
                     onClick={() => {
                         if (status === 'expired') {
-                            onOpenTonviewer(order.address);
+                            onOpenTonviewer();
                         } else {
                             onView({ orderAddress: order.address });
                         }
@@ -193,7 +288,7 @@ const OrderRow: FC<{ order: MultisigOrder }> = ({ order }) => {
                     {t('multisig_order_view')}
                 </Button>
             </ButtonCell>
-            <RowDivider />
+            <DesktopRowDivider />
         </>
     );
 };
@@ -212,7 +307,12 @@ const ArrowUpIconStyled = styled(ArrowUpIcon)`
 const Cell = styled.div`
     display: flex;
     align-items: center;
-    padding: 12px 0;
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            padding: 12px 0;
+        `}
 
     ${Body2Class};
 `;
