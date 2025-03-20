@@ -65,7 +65,7 @@ export const IonicOverride = css`
     }
 
     ion-toolbar {
-        --background: ${p => p.theme.backgroundContent};
+        --background: ${p => p.theme.backgroundPage};
         --color: ${p => p.theme.textPrimary};
     }
 
@@ -94,6 +94,6 @@ export const IonicOverride = css`
 
     .header-translucent-ios ion-toolbar,
     .footer-translucent-ios ion-toolbar {
-        --opacity: 0.92;
+        --opacity: 0.64;
     }
 `;
