@@ -24,6 +24,7 @@ import { signDataOver } from '../../state/mnemonic';
 import { useCheckTouchId } from '../../state/password';
 import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
+import { Cell } from '@ton/core';
 
 const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const activeAccount = useActiveAccount();
@@ -74,6 +75,7 @@ const Payload = styled.div`
 
 const SignText = styled.div`
     font-family: ${props => props.theme.fontMono};
+    word-wrap: break-word;
 `;
 
 const ButtonRow = styled.div`
@@ -111,6 +113,20 @@ const WarningBody = styled(Body2)`
     display: block;
     color: ${props => props.theme.textPrimaryAlternate};
 `;
+
+const stringNotEmpty = (value: string | undefined): value is string => {
+    return value != '' && value != null;
+};
+
+const seeIfValidCell = (value: string | undefined): boolean => {
+    if (!stringNotEmpty(value)) return false;
+    try {
+        Cell.fromBase64(value);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
 const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
     const { t } = useTranslation();
@@ -202,13 +218,13 @@ const SignContent: FC<{
     const isValid = useMemo(() => {
         switch (params.type) {
             case 'text': {
-                return params.text != '';
+                return stringNotEmpty(params.text);
             }
             case 'binary': {
-                return params.bytes != '';
+                return stringNotEmpty(params.bytes);
             }
             case 'cell': {
-                return params.cell != '' && params.schema != '';
+                return stringNotEmpty(params.schema) && seeIfValidCell(params.cell);
             }
             default:
                 return false;
