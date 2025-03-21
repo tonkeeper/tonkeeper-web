@@ -5,8 +5,8 @@ apis/ConnectApi.ts
 apis/DNSApi.ts
 apis/EmulationApi.ts
 apis/EventsApi.ts
+apis/ExtraCurrencyApi.ts
 apis/GaslessApi.ts
-apis/InscriptionsApi.ts
 apis/JettonsApi.ts
 apis/LiteServerApi.ts
 apis/MultisigApi.ts
@@ -115,6 +115,7 @@ models/EmulateMessageToWalletRequest.ts
 models/EmulateMessageToWalletRequestParamsInner.ts
 models/EncryptedComment.ts
 models/Event.ts
+models/ExtraCurrencies.ts
 models/ExtraCurrency.ts
 models/ExtraCurrencyTransferAction.ts
 models/FoundAccounts.ts
@@ -125,13 +126,13 @@ models/GaslessConfigGasJettonsInner.ts
 models/GaslessEstimateRequest.ts
 models/GaslessEstimateRequestMessagesInner.ts
 models/GaslessSendRequest.ts
+models/GaslessTx.ts
 models/GetAccountDiff200Response.ts
 models/GetAccountInfoByStateInitRequest.ts
 models/GetAccountPublicKey200Response.ts
 models/GetAccountsRequest.ts
 models/GetAllRawShardsInfo200Response.ts
 models/GetChartRates200Response.ts
-models/GetInscriptionOpTemplate200Response.ts
 models/GetMarketsRates200Response.ts
 models/GetOutMsgQueueSizes200Response.ts
 models/GetOutMsgQueueSizes200ResponseShardsInner.ts
@@ -163,10 +164,6 @@ models/GetStorageProviders200Response.ts
 models/GetTonConnectPayload200Response.ts
 models/ImagePreview.ts
 models/InitStateRaw.ts
-models/InscriptionBalance.ts
-models/InscriptionBalances.ts
-models/InscriptionMintAction.ts
-models/InscriptionTransferAction.ts
 models/JettonBalance.ts
 models/JettonBalanceLock.ts
 models/JettonBridgeParams.ts

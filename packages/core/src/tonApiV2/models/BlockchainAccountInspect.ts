@@ -45,6 +45,12 @@ export interface BlockchainAccountInspect {
      * @type {string}
      * @memberof BlockchainAccountInspect
      */
+    disassembledCode?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof BlockchainAccountInspect
+     */
     codeHash: string;
     /**
      * 
@@ -100,6 +106,7 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'code': json['code'],
+        'disassembledCode': json['disassembled_code'] == null ? undefined : json['disassembled_code'],
         'codeHash': json['code_hash'],
         'methods': ((json['methods'] as Array<any>).map(MethodFromJSON)),
         'compiler': json['compiler'],
@@ -119,6 +126,7 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'code': value['code'],
+        'disassembled_code': value['disassembledCode'],
         'code_hash': value['codeHash'],
         'methods': ((value['methods'] as Array<any>).map(MethodToJSON)),
         'compiler': value['compiler'],

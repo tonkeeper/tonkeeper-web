@@ -74,7 +74,7 @@ export interface JettonPreview {
      * @type {number}
      * @memberof JettonPreview
      */
-    score?: number;
+    score: number;
 }
 
 
@@ -89,6 +89,7 @@ export function instanceOfJettonPreview(value: object): value is JettonPreview {
     if (!('decimals' in value) || value['decimals'] === undefined) return false;
     if (!('image' in value) || value['image'] === undefined) return false;
     if (!('verification' in value) || value['verification'] === undefined) return false;
+    if (!('score' in value) || value['score'] === undefined) return false;
     return true;
 }
 
@@ -109,7 +110,7 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
         'image': json['image'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'customPayloadApiUri': json['custom_payload_api_uri'] == null ? undefined : json['custom_payload_api_uri'],
-        'score': json['score'] == null ? undefined : json['score'],
+        'score': json['score'],
     };
 }
 

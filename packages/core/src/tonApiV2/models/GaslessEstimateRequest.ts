@@ -29,6 +29,12 @@ import {
 export interface GaslessEstimateRequest {
     /**
      * 
+     * @type {boolean}
+     * @memberof GaslessEstimateRequest
+     */
+    returnEmulation?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof GaslessEstimateRequest
      */
@@ -67,6 +73,7 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'returnEmulation': json['return_emulation'] == null ? undefined : json['return_emulation'],
         'walletAddress': json['wallet_address'],
         'walletPublicKey': json['wallet_public_key'],
         'messages': ((json['messages'] as Array<any>).map(GaslessEstimateRequestMessagesInnerFromJSON)),
@@ -84,6 +91,7 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
 
     return {
         
+        'return_emulation': value['returnEmulation'],
         'wallet_address': value['walletAddress'],
         'wallet_public_key': value['walletPublicKey'],
         'messages': ((value['messages'] as Array<any>).map(GaslessEstimateRequestMessagesInnerToJSON)),
