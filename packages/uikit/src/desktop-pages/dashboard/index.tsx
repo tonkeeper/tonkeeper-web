@@ -2,13 +2,17 @@ import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
-import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopDashboardHeader';
+import {
+    DPDashboardHeader,
+    MPDashboardHeader
+} from '../../components/desktop/header/DashboardHeader';
 import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
 import { ProBanner } from '../../components/pro/ProBanner';
 import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
-import { NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { MPCarouselScroll } from '../../components/shared/MPCarouselScroll';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -43,10 +47,15 @@ const DashboardPage: FC = () => {
     return (
         <>
             <NotForTargetEnv env="mobile">
-                <DesktopDashboardHeader />
+                <DPDashboardHeader />
             </NotForTargetEnv>
             <PageWrapper>
-                <DashboardTableStyled />
+                <ForTargetEnv env="mobile">
+                    <MPDashboardHeader />
+                </ForTargetEnv>
+                <MPCarouselScroll>
+                    <DashboardTableStyled />
+                </MPCarouselScroll>
                 <HideOnReview>
                     {shouldShowProBanner && (
                         <ProBannerWrapper>

@@ -89,7 +89,7 @@ export const DesktopViewPageLayout = forwardRef<
         return (
             <DesktopViewPageLayoutContext.Provider value={id}>
                 <IonPage id={id}>
-                    <IonContent ref={contentRef} fullscreen={true}>
+                    <IonContent ref={contentRef} fullscreen={true} scrollX={true}>
                         <DesktopViewPageLayoutSimpleIonic
                             className={className}
                             $mobileContentPaddingTop={mobileContentPaddingTop}

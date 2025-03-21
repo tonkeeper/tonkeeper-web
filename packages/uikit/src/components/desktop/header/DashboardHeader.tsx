@@ -18,6 +18,9 @@ import {
 } from '../../../state/dashboard/useDashboardColumns';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useAppPlatform } from '../../../hooks/appContext';
+import { DesktopViewHeader, DesktopViewHeaderContent } from '../DesktopViewLayout';
+import { useUserFiat } from '../../../state/fiat';
+import { formatFiatCurrency } from '../../../hooks/balance';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -87,10 +90,46 @@ const DesktopDashboardHeaderPayload = () => {
     );
 };
 
-export const DesktopDashboardHeader = () => {
+export const DPDashboardHeader = () => {
     return (
         <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display desktop header')}>
             <DesktopDashboardHeaderPayload />
         </ErrorBoundary>
+    );
+};
+
+export const MPDashboardHeader = () => {
+    return (
+        <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display desktop header')}>
+            <MPDashboardHeaderPayload />
+        </ErrorBoundary>
+    );
+};
+
+const MPDashboardHeaderPayload = () => {
+    const { data: balance, isLoading } = useAllWalletsTotalBalance(Network.MAINNET);
+    const { t } = useTranslation();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const fiat = useUserFiat();
+
+    return (
+        <DesktopViewHeader>
+            <DesktopViewHeaderContent
+                right={
+                    <DesktopViewHeaderContent.Right>
+                        <DesktopViewHeaderContent.RightItem onClick={onOpen} closeDropDownOnClick>
+                            <SlidersIcon />
+                            {t('Manage')}
+                        </DesktopViewHeaderContent.RightItem>
+                    </DesktopViewHeaderContent.Right>
+                }
+                title={
+                    !isLoading
+                        ? formatFiatCurrency(fiat, balance || 0)
+                        : t('dashboard_manage_modal_title')
+                }
+            ></DesktopViewHeaderContent>
+            <CategoriesModal isOpen={isOpen} onClose={onClose} />
+        </DesktopViewHeader>
     );
 };
