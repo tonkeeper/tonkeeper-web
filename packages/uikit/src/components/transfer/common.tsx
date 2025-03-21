@@ -29,6 +29,7 @@ import { useIsActiveWalletLedger } from '../../state/ledger';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { formatAddress, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
+import { ResponseError } from '@tonkeeper/core/dist/2faApi';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -378,6 +379,13 @@ export const notifyError = async (sdk: IAppSdk, t: (value: string) => string, er
 
     if (seeIfTimeError(error)) {
         sdk.alert(t('send_sending_wrong_time_description'));
+    }
+
+    if (error instanceof ResponseError) {
+        const body = await error.response.json();
+        if ('error' in body) {
+            return sdk.topMessage(body.error);
+        }
     }
 
     throw error;

@@ -56,8 +56,6 @@ const EnableTwoFASettings = () => {
     const { mutate: mutateSettings } = useMutateDevSettings();
     const { data: devSettings } = useDevSettings();
 
-    return null; // TODO force disable 2fa on frontend. SC must be improved
-
     const config = useActiveConfig();
     if (config.flags?.disable_2fa) {
         return null;
@@ -68,8 +66,8 @@ const EnableTwoFASettings = () => {
             <ListItem hover={false}>
                 <ListItemPayload>
                     <TextAndBadge>
-                        <Label1>Enable 2FA</Label1>
-                        <Badge color="textSecondary">Experimental</Badge>
+                        <Label1>Enable 2FA, only for W5 wallets</Label1>
+                        <Badge color="accentRed">Experimental</Badge>
                     </TextAndBadge>
                     <Switch
                         disabled={!devSettings}
