@@ -20,6 +20,13 @@ import {
     SignRawMessageToJSON,
     SignRawMessageToJSONTyped,
 } from './SignRawMessage';
+import type { MessageConsequences } from './MessageConsequences';
+import {
+    MessageConsequencesFromJSON,
+    MessageConsequencesFromJSONTyped,
+    MessageConsequencesToJSON,
+    MessageConsequencesToJSONTyped,
+} from './MessageConsequences';
 
 /**
  * 
@@ -27,6 +34,12 @@ import {
  * @interface SignRawParams
  */
 export interface SignRawParams {
+    /**
+     * 
+     * @type {string}
+     * @memberof SignRawParams
+     */
+    protocolName: string;
     /**
      * 
      * @type {string}
@@ -57,12 +70,19 @@ export interface SignRawParams {
      * @memberof SignRawParams
      */
     messages: Array<SignRawMessage>;
+    /**
+     * 
+     * @type {MessageConsequences}
+     * @memberof SignRawParams
+     */
+    emulation?: MessageConsequences;
 }
 
 /**
  * Check if a given object implements the SignRawParams interface.
  */
 export function instanceOfSignRawParams(value: object): value is SignRawParams {
+    if (!('protocolName' in value) || value['protocolName'] === undefined) return false;
     if (!('relayAddress' in value) || value['relayAddress'] === undefined) return false;
     if (!('commission' in value) || value['commission'] === undefined) return false;
     if (!('from' in value) || value['from'] === undefined) return false;
@@ -81,11 +101,13 @@ export function SignRawParamsFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
+        'protocolName': json['protocol_name'],
         'relayAddress': json['relay_address'],
         'commission': json['commission'],
         'from': json['from'],
         'validUntil': json['valid_until'],
         'messages': ((json['messages'] as Array<any>).map(SignRawMessageFromJSON)),
+        'emulation': json['emulation'] == null ? undefined : MessageConsequencesFromJSON(json['emulation']),
     };
 }
 
@@ -100,11 +122,13 @@ export function SignRawParamsFromJSONTyped(json: any, ignoreDiscriminator: boole
 
     return {
         
+        'protocol_name': value['protocolName'],
         'relay_address': value['relayAddress'],
         'commission': value['commission'],
         'from': value['from'],
         'valid_until': value['validUntil'],
         'messages': ((value['messages'] as Array<any>).map(SignRawMessageToJSON)),
+        'emulation': MessageConsequencesToJSON(value['emulation']),
     };
 }
 

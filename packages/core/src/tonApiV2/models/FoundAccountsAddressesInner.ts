@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { TrustType } from './TrustType';
+import {
+    TrustTypeFromJSON,
+    TrustTypeFromJSONTyped,
+    TrustTypeToJSON,
+    TrustTypeToJSONTyped,
+} from './TrustType';
+
 /**
  * 
  * @export
@@ -37,7 +45,15 @@ export interface FoundAccountsAddressesInner {
      * @memberof FoundAccountsAddressesInner
      */
     preview: string;
+    /**
+     * 
+     * @type {TrustType}
+     * @memberof FoundAccountsAddressesInner
+     */
+    trust: TrustType;
 }
+
+
 
 /**
  * Check if a given object implements the FoundAccountsAddressesInner interface.
@@ -46,6 +62,7 @@ export function instanceOfFoundAccountsAddressesInner(value: object): value is F
     if (!('address' in value) || value['address'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('preview' in value) || value['preview'] === undefined) return false;
+    if (!('trust' in value) || value['trust'] === undefined) return false;
     return true;
 }
 
@@ -62,6 +79,7 @@ export function FoundAccountsAddressesInnerFromJSONTyped(json: any, ignoreDiscri
         'address': json['address'],
         'name': json['name'],
         'preview': json['preview'],
+        'trust': TrustTypeFromJSON(json['trust']),
     };
 }
 
@@ -79,6 +97,7 @@ export function FoundAccountsAddressesInnerFromJSONTyped(json: any, ignoreDiscri
         'address': value['address'],
         'name': value['name'],
         'preview': value['preview'],
+        'trust': TrustTypeToJSON(value['trust']),
     };
 }
 

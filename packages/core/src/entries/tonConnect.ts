@@ -13,12 +13,24 @@ export enum TON_CONNECT_MSG_VARIANTS_ID {
     GASLESS = 'gasless'
 }
 
+export interface BatteryMessagesVariant {
+    messages: TonConnectTransactionPayloadMessage[];
+}
+
+export interface GaslessMessagesVariant {
+    messages: TonConnectTransactionPayloadMessage[];
+    options: {
+        asset: string;
+    };
+}
+
 export interface TonConnectTransactionPayload {
     valid_until: number; // 1658253458;
     messages: TonConnectTransactionPayloadMessage[];
-    messagesVariants?: Partial<
-        Record<TON_CONNECT_MSG_VARIANTS_ID, TonConnectTransactionPayloadMessage[]>
-    >;
+    messagesVariants?: {
+        [TON_CONNECT_MSG_VARIANTS_ID.BATTERY]?: BatteryMessagesVariant;
+        [TON_CONNECT_MSG_VARIANTS_ID.GASLESS]?: GaslessMessagesVariant;
+    };
 }
 
 export interface TonConnectTransactionPayloadMessage {

@@ -60,8 +60,6 @@ models/IOSBatteryPurchaseStatus.ts
 models/IOSBatteryPurchaseStatusTransactionsInner.ts
 models/IOSBatteryPurchaseStatusTransactionsInnerError.ts
 models/ImagePreview.ts
-models/InscriptionMintAction.ts
-models/InscriptionTransferAction.ts
 models/IosBatteryPurchaseRequest.ts
 models/IosBatteryPurchaseRequestTransactionsInner.ts
 models/JettonBurnAction.ts

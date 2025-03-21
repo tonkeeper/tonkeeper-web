@@ -84,7 +84,7 @@ export const SwapWidgetPage = () => {
                     ? Object.fromEntries(
                           Object.entries(params.messagesVariants).map(([k, v]) => [
                               k,
-                              v.map(m => ({
+                              v.messages.map(m => ({
                                   address: m.address,
                                   amount: m.amount.toString(),
                                   payload: m.payload

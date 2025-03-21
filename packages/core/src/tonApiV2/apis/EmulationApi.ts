@@ -89,7 +89,7 @@ export interface EmulationApiInterface {
     decodeMessage(requestParameters: DecodeMessageRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<DecodedMessage>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve account-specific events
      * @param {string} accountId account ID
      * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {string} [acceptLanguage] 
@@ -101,12 +101,12 @@ export interface EmulationApiInterface {
     emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve account-specific events
      */
     emulateMessageToAccountEvent(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvent>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve general blockchain events
      * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {string} [acceptLanguage] 
      * @param {boolean} [ignoreSignatureCheck] 
@@ -117,12 +117,12 @@ export interface EmulationApiInterface {
     emulateMessageToEventRaw(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve general blockchain events
      */
     emulateMessageToEvent(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Event>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve with a detailed execution trace
      * @param {GaslessEstimateRequestMessagesInner} gaslessEstimateRequestMessagesInner bag-of-cells serialized to hex
      * @param {boolean} [ignoreSignatureCheck] 
      * @param {*} [options] Override http request option.
@@ -132,12 +132,12 @@ export interface EmulationApiInterface {
     emulateMessageToTraceRaw(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve with a detailed execution trace
      */
     emulateMessageToTrace(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Trace>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve the resulting wallet state
      * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64/hex and additional parameters to configure emulation
      * @param {string} [acceptLanguage] 
      * @param {*} [options] Override http request option.
@@ -147,7 +147,7 @@ export interface EmulationApiInterface {
     emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>>;
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve the resulting wallet state
      */
     emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences>;
 
@@ -195,7 +195,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve account-specific events
      */
     async emulateMessageToAccountEventRaw(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvent>> {
         if (requestParameters['accountId'] == null) {
@@ -238,7 +238,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve account-specific events
      */
     async emulateMessageToAccountEvent(requestParameters: EmulateMessageToAccountEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvent> {
         const response = await this.emulateMessageToAccountEventRaw(requestParameters, initOverrides);
@@ -246,7 +246,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve general blockchain events
      */
     async emulateMessageToEventRaw(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Event>> {
         if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
@@ -282,7 +282,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve general blockchain events
      */
     async emulateMessageToEvent(requestParameters: EmulateMessageToEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Event> {
         const response = await this.emulateMessageToEventRaw(requestParameters, initOverrides);
@@ -290,7 +290,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve with a detailed execution trace
      */
     async emulateMessageToTraceRaw(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Trace>> {
         if (requestParameters['gaslessEstimateRequestMessagesInner'] == null) {
@@ -322,7 +322,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve with a detailed execution trace
      */
     async emulateMessageToTrace(requestParameters: EmulateMessageToTraceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Trace> {
         const response = await this.emulateMessageToTraceRaw(requestParameters, initOverrides);
@@ -330,7 +330,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve the resulting wallet state
      */
     async emulateMessageToWalletRaw(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MessageConsequences>> {
         if (requestParameters['emulateMessageToWalletRequest'] == null) {
@@ -362,7 +362,7 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
     }
 
     /**
-     * Emulate sending message to blockchain
+     * Emulate sending message to retrieve the resulting wallet state
      */
     async emulateMessageToWallet(requestParameters: EmulateMessageToWalletOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MessageConsequences> {
         const response = await this.emulateMessageToWalletRaw(requestParameters, initOverrides);

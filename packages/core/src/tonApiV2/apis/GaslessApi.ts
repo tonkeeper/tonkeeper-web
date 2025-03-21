@@ -18,6 +18,7 @@ import type {
   GaslessConfig,
   GaslessEstimateRequest,
   GaslessSendRequest,
+  GaslessTx,
   SignRawParams,
 } from '../models/index';
 import {
@@ -27,6 +28,8 @@ import {
     GaslessEstimateRequestToJSON,
     GaslessSendRequestFromJSON,
     GaslessSendRequestToJSON,
+    GaslessTxFromJSON,
+    GaslessTxToJSON,
     SignRawParamsFromJSON,
     SignRawParamsToJSON,
 } from '../models/index';
@@ -34,6 +37,7 @@ import {
 export interface GaslessEstimateOperationRequest {
     masterId: string;
     gaslessEstimateRequest: GaslessEstimateRequest;
+    acceptLanguage?: string;
 }
 
 export interface GaslessSendOperationRequest {
@@ -64,6 +68,7 @@ export interface GaslessApiInterface {
      * Estimates the cost of the given messages and returns a payload to sign
      * @param {string} masterId jetton to pay commission
      * @param {GaslessEstimateRequest} gaslessEstimateRequest bag-of-cells serialized to hex
+     * @param {string} [acceptLanguage] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GaslessApiInterface
@@ -82,12 +87,12 @@ export interface GaslessApiInterface {
      * @throws {RequiredError}
      * @memberof GaslessApiInterface
      */
-    gaslessSendRaw(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>>;
+    gaslessSendRaw(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessTx>>;
 
     /**
      * Submits the signed gasless transaction message to the network
      */
-    gaslessSend(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void>;
+    gaslessSend(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GaslessTx>;
 
 }
 
@@ -146,6 +151,10 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
+        }
+
         const response = await this.request({
             path: `/v2/gasless/estimate/{master_id}`.replace(`{${"master_id"}}`, encodeURIComponent(String(requestParameters['masterId']))),
             method: 'POST',
@@ -168,7 +177,7 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
     /**
      * Submits the signed gasless transaction message to the network
      */
-    async gaslessSendRaw(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async gaslessSendRaw(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GaslessTx>> {
         if (requestParameters['gaslessSendRequest'] == null) {
             throw new runtime.RequiredError(
                 'gaslessSendRequest',
@@ -190,14 +199,15 @@ export class GaslessApi extends runtime.BaseAPI implements GaslessApiInterface {
             body: GaslessSendRequestToJSON(requestParameters['gaslessSendRequest']),
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => GaslessTxFromJSON(jsonValue));
     }
 
     /**
      * Submits the signed gasless transaction message to the network
      */
-    async gaslessSend(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.gaslessSendRaw(requestParameters, initOverrides);
+    async gaslessSend(requestParameters: GaslessSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GaslessTx> {
+        const response = await this.gaslessSendRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

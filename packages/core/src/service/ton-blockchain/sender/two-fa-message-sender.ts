@@ -313,7 +313,6 @@ export class TwoFAMessageSender implements ISender {
         ).execGetMethodForBlockchainAccount({
             accountId: this.pluginAddress,
             methodName: 'get_estimated_attached_value',
-            fixOrder: false,
             args: [forwardMsg.toBoc().toString('base64'), '0x' + actionsNumber.toString(16), '0x0']
         });
 

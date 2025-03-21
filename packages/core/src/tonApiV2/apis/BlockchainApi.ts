@@ -66,7 +66,6 @@ export interface ExecGetMethodForBlockchainAccountRequest {
     accountId: string;
     methodName: string;
     args?: Array<string>;
-    fixOrder?: boolean;
 }
 
 export interface GetBlockchainAccountTransactionsRequest {
@@ -152,7 +151,6 @@ export interface BlockchainApiInterface {
      * @param {string} accountId account ID
      * @param {string} methodName contract get method name
      * @param {Array<string>} [args] 
-     * @param {boolean} [fixOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof BlockchainApiInterface
@@ -465,10 +463,6 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
 
         if (requestParameters['args'] != null) {
             queryParameters['args'] = requestParameters['args'];
-        }
-
-        if (requestParameters['fixOrder'] != null) {
-            queryParameters['fix_order'] = requestParameters['fixOrder'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
