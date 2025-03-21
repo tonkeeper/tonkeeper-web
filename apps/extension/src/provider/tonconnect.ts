@@ -6,9 +6,11 @@ import {
     DisconnectEvent,
     SendTransactionRpcRequest,
     SendTransactionRpcResponse,
+    SignDataRpcRequest,
     TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonProvider } from '../provider/index';
+import { typeOf } from 'react-is';
 
 const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
     return {
@@ -163,11 +165,17 @@ export class TonConnect implements TonConnectBridge {
         }
     };
 
-    send = async (message: SendTransactionRpcRequest): Promise<SendTransactionRpcResponse> => {
+    send = async (
+        message: SendTransactionRpcRequest | SignDataRpcRequest
+    ): Promise<SendTransactionRpcResponse> => {
         try {
+            const payload = Array.isArray(message.params)
+                ? message.params.map(item => JSON.parse(item))
+                : message.params;
+
             const result = await this.provider.send<string>(
                 `tonConnect_${message.method}`,
-                message.params.map(item => JSON.parse(item))
+                payload
             );
             return {
                 result,

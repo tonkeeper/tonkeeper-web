@@ -7405,6 +7405,7 @@ __metadata:
     "@ton/ton": "npm:^15.1.0"
     bignumber.js: "npm:^9.1.1"
     bip39: "npm:^3.1.0"
+    crc-32: "npm:^1.2.2"
     ethers: "npm:^6.13.4"
     npm-run-all: "npm:^4.1.5"
     query-string: "npm:^8.1.0"
@@ -12586,6 +12587,15 @@ __metadata:
     p-filter: "npm:^2.1.0"
     p-map: "npm:^3.0.0"
   checksum: 10/2f0f4031e75ba0e821a30a33d5847e83f59262f51c2fa6187ec05f24ba726934c659746b7b775e7ef5abd9498120a4cb24d8a54f71bb30437933f83290169e9e
+  languageName: node
+  linkType: hard
+
+"crc-32@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "crc-32@npm:1.2.2"
+  bin:
+    crc32: bin/crc32.njs
+  checksum: 10/824f696a5baaf617809aa9cd033313c8f94f12d15ebffa69f10202480396be44aef9831d900ab291638a8022ed91c360696dd5b1ba691eb3f34e60be8835b7c3
   languageName: node
   linkType: hard
 

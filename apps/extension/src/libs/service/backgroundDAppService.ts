@@ -16,6 +16,7 @@ import {
     tonConnectDisconnect,
     tonConnectReConnect,
     tonConnectRequest,
+    tonConnectSignData,
     tonConnectTransaction
 } from './dApp/tonConnectService';
 import { createTonapiRequest } from './backgroundTonapiService';
@@ -119,6 +120,9 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
         }
         case 'tonConnect_sendTransaction': {
             return tonConnectTransaction(message.id, origin, message.params[0], message.params[1]);
+        }
+        case 'tonConnect_signData': {
+            return tonConnectSignData(message.id, origin, message.params[0]);
         }
         case 'tonapi_request': {
             return createTonapiRequest(message.params[0], message.params[1]);

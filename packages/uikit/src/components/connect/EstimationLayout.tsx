@@ -45,6 +45,8 @@ const ExtraDetails: FC<{
 };
 
 const Block = styled.div`
+    width: 100%;
+    box-sizing: border-box;
     padding: 12px 16px;
 
     background-color: ${props => props.theme.accentOrange};

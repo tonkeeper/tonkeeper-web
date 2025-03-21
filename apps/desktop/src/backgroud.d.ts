@@ -6,7 +6,7 @@ interface BackgroundApi {
     electron: () => string;
     message: <Result>(message: Message) => Promise<Result>;
     onTonConnect: (callback: (url: string) => void) => void;
-    onTonConnectTransaction: (callback: (value: SendTransactionAppRequest) => void) => void;
+    onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) => void;
     onTonConnectDisconnect: (callback: (value: AccountConnection) => void) => void;
     onRefresh: (callback: () => void) => void;
 }

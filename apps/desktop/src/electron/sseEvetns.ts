@@ -10,10 +10,8 @@ globalThis.Buffer = BufferPolyfill;
 export const tonConnectSSE = new TonConnectSSE({
     storage: mainStorage,
     listeners: {
-        onDisconnect: connection =>
-            MainWindow.mainWindow.webContents.send('disconnect', connection),
-        onSendTransaction: params =>
-            MainWindow.mainWindow.webContents.send('sendTransaction', params)
+        onDisconnect: params => MainWindow.mainWindow.webContents.send('disconnect', params),
+        onRequest: params => MainWindow.mainWindow.webContents.send('tonConnectRequest', params)
     },
     system: {
         log,
@@ -22,5 +20,5 @@ export const tonConnectSSE = new TonConnectSSE({
             await MainWindow.bringToFront();
         }
     },
-    EventSourcePolyfill: EventSourcePolyfill
+    EventSourcePolyfill: EventSourcePolyfill as any as typeof EventSource
 });
