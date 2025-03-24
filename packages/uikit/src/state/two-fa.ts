@@ -55,13 +55,12 @@ const twoFaWalletConfigStorageKey = (walletId: string) =>
     AppKey.TWO_FA_WALLET_CONFIG + '::' + walletId;
 
 export const useIsTwoFAEnabledGlobally = () => {
-    const { data: settings } = useDevSettings();
     const config = useActiveConfig();
     if (config.flags?.disable_2fa) {
         return false;
+    } else {
+        return true;
     }
-
-    return settings?.twoFAEnabled ?? false;
 };
 
 export const useCanViewTwoFA = () => {

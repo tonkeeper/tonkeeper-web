@@ -6,13 +6,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
-import { Label1 } from '../../components/Text';
-import { Switch } from '../../components/fields/Switch';
-import { Badge } from '../../components/shared';
 import styled from 'styled-components';
-import { useDevSettings, useMutateDevSettings } from '../../state/dev';
-import { useActiveConfig } from '../../state/wallet';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { Notification } from '../../components/Notification';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
@@ -52,34 +46,6 @@ const TextAndBadge = styled.div`
     gap: 6px;
 `;
 
-const EnableTwoFASettings = () => {
-    const { mutate: mutateSettings } = useMutateDevSettings();
-    const { data: devSettings } = useDevSettings();
-
-    const config = useActiveConfig();
-    if (config.flags?.disable_2fa) {
-        return null;
-    }
-
-    return (
-        <ListBlock>
-            <ListItem hover={false}>
-                <ListItemPayload>
-                    <TextAndBadge>
-                        <Label1>Enable 2FA, only for W5 wallets</Label1>
-                        <Badge color="accentRed">Experimental</Badge>
-                    </TextAndBadge>
-                    <Switch
-                        disabled={!devSettings}
-                        checked={!!devSettings?.twoFAEnabled}
-                        onChange={checked => mutateSettings({ twoFAEnabled: checked })}
-                    />
-                </ListItemPayload>
-            </ListItem>
-        </ListBlock>
-    );
-};
-
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const navigate = useNavigate();
@@ -118,7 +84,6 @@ export const DevSettings = React.memo(() => {
         <>
             <SubHeader title="Dev Menu" />
             <InnerBody>
-                <EnableTwoFASettings />
                 <CookieSettings />
                 <AddAccountBySK />
             </InnerBody>
