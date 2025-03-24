@@ -40,12 +40,6 @@ const CookieSettings = () => {
     return <SettingsList items={items} />;
 };
 
-const TextAndBadge = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 6px;
-`;
-
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const navigate = useNavigate();
