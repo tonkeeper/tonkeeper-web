@@ -1,7 +1,5 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
-import { WidgetHeader } from './common';
-import { AppRoute } from '../../../../libs/routes';
 import { useTranslation } from '../../../../hooks/translation';
 import { Skeleton } from '../../../shared/Skeleton';
 import { ActivityItem } from '../../../../state/activity';
@@ -29,7 +27,7 @@ export const MobileProWidgetHistory: FC<{ className?: string; activity?: Activit
 
     return (
         <Wrapper className={className}>
-            <WidgetHeader to={AppRoute.activity}>{t('wallet_aside_history')}</WidgetHeader>
+            <div>{t('wallet_aside_history')}</div>
             {activity ? (
                 <DesktopHistory activity={activity} isFetchingNextPage={false} />
             ) : (

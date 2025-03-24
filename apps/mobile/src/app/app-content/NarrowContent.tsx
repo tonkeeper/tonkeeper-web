@@ -60,6 +60,8 @@ import { CountrySettings } from '@tonkeeper/uikit/dist/pages/settings/Country';
 import { ProSettings } from '@tonkeeper/uikit/dist/components/settings/ProSettings';
 import { IonReactMemoryRouter } from '@ionic/react-router';
 import { createIsolatedMemoryHistory } from '../../libs/isolated-memory-history';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { useAllChainsAssetsWithPrice } from '@tonkeeper/uikit/dist/state/home';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -120,6 +122,19 @@ const NarrowContentBody: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+    const { assets } = useAllChainsAssetsWithPrice();
+
+    const isReady = assets !== undefined;
+
+    useEffect(() => {
+        if (isReady) {
+            SplashScreen.hide();
+        }
+    }, [isReady]);
+
+    if (!isReady) {
+        return null;
+    }
 
     if (lock) {
         return (

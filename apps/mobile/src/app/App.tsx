@@ -46,7 +46,6 @@ import { NarrowContent } from './app-content/NarrowContent';
 import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
-import { SplashScreen } from '@capacitor/splash-screen';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -278,10 +277,6 @@ const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = props => {
-    useEffect(() => {
-        SplashScreen.hide();
-    }, []);
-
     if (CAPACITOR_APPLICATION_ID === 'mobile') {
         return <NarrowContent {...props} />;
     }

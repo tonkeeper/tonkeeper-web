@@ -1,15 +1,12 @@
 import styled from 'styled-components';
-import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
 import { IonContent, IonPage } from '@ionic/react';
-import React, { useEffect, useMemo } from 'react';
+import React from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
-import { MobileProWidgetNfts } from '../components/mobile-pro/home/widgets/MobileProWidgetNfts';
-import { useWalletFilteredNftList } from '../state/nft';
-import { KnownNFTDnsCollections } from '../components/nft/NftView';
 import { Link } from '../components/shared/Link';
 import {
     BatteryIcon,
+    ChevronRightIcon,
     ClockSmoothIcon,
     InboxIcon,
     ListIcon,
@@ -21,22 +18,14 @@ import {
 import { Body3, Label2 } from '../components/Text';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, WalletSettingsRoute } from '../libs/routes';
-import { HideOnReview } from '../components/ios/HideOnReview';
-import {
-    useActiveAccount,
-    useActiveTonNetwork,
-    useActiveTonWalletConfig,
-    useIsActiveWalletWatchOnly,
-    useMutateActiveTonWalletConfig
-} from '../state/wallet';
+import { useActiveAccount, useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../state/wallet';
 import { useIsActiveAccountMultisig, useUnviewedAccountOrdersNumber } from '../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useCanUseBattery } from '../state/battery';
 import { RoundedBadge } from '../components/shared/Badge';
-import { MobileProWidgetHistory } from '../components/mobile-pro/home/widgets/MobileProWidgetHistory';
-import { useFetchFilteredActivity } from '../state/activity';
-import { AccountAndWalletBadgesGroup } from '../components/account/AccountBadge';
+import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
+import { HideOnReview } from '../components/ios/HideOnReview';
 
 const IonContentStyled = styled(IonContent)`
     &::part(background) {
@@ -44,22 +33,23 @@ const IonContentStyled = styled(IonContent)`
     }
 
     &::part(scroll) {
+        padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
         /*overscroll-behavior: auto;*/
     }
 `;
 
-const MobileProHomeBalanceStyled = styled(MobileProHomeBalance)`
-    margin: 32px 8px 8px;
+const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
+    margin: 0 8px 16px;
 `;
 
-const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
-    margin: 0 16px 24px;
+const MobileProHomeWidgetTokensStyled = styled(MobileProHomeWidgetTokens)`
+    margin: 0 8px 16px;
 `;
 
 const MenuItem = styled(Link)`
     height: 40px;
-    padding-left: 1rem;
+    padding: 0 1rem;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -67,10 +57,22 @@ const MenuItem = styled(Link)`
     svg {
         color: ${p => p.theme.iconSecondary};
     }
+
+    > *:last-child {
+        margin-left: auto;
+    }
+`;
+
+const Divider = styled.div`
+    height: 1px;
+    background-color: ${p => p.theme.separatorAlternate};
+    width: 100%;
 `;
 
 const MenuWrapper = styled.div`
-    padding: 8px 0;
+    margin: 0 8px 16px;
+    border-radius: ${p => p.theme.corner2xSmall};
+    background-color: ${p => p.theme.backgroundContent};
 `;
 
 const SwapIconStyled = styled(SwapIcon)`
@@ -78,113 +80,6 @@ const SwapIconStyled = styled(SwapIcon)`
 `;
 
 export const mobileProHomePageId = 'mobile-pro-home-page';
-
-const useMobileProHomePageNfts = () => {
-    const { data: nfts } = useWalletFilteredNftList();
-    const { data: config } = useActiveTonWalletConfig();
-    const { mutate: mutateConfig } = useMutateActiveTonWalletConfig();
-
-    const filteredNft = useMemo(
-        () =>
-            nfts?.filter(
-                nft =>
-                    !nft.collection?.address ||
-                    !KnownNFTDnsCollections.includes(nft.collection.address)
-            ),
-        [nfts]
-    );
-
-    useEffect(() => {
-        if (filteredNft && config && filteredNft.length !== config.cachedOwnCollectablesNumber) {
-            mutateConfig({ cachedOwnCollectablesNumber: filteredNft.length });
-        }
-    }, [filteredNft, config?.cachedOwnCollectablesNumber, mutateConfig]);
-
-    let showNftWidget = !!config;
-    if (config) {
-        if (
-            config.cachedOwnCollectablesNumber === undefined ||
-            config.cachedOwnCollectablesNumber >= 3
-        ) {
-            showNftWidget = true;
-        } else {
-            showNftWidget = false;
-        }
-    }
-
-    if (filteredNft) {
-        showNftWidget = filteredNft.length >= 3;
-    }
-
-    return {
-        filteredNft,
-        showNftWidget
-    };
-};
-
-const useMobileProHomePageHistory = () => {
-    const { data: activity } = useFetchFilteredActivity();
-    const { data: config } = useActiveTonWalletConfig();
-    const { mutate: mutateConfig } = useMutateActiveTonWalletConfig();
-
-    useEffect(() => {
-        if (activity && config && !config.cachedHasHistory) {
-            mutateConfig({ cachedHasHistory: !!activity.length });
-        }
-    }, [activity, config?.cachedHasHistory, mutateConfig]);
-
-    let showHistoryWidget = config?.cachedHasHistory !== false;
-
-    if (activity) {
-        showHistoryWidget = !!activity.length;
-    }
-
-    const slicedActivity = useMemo(() => activity?.slice(0, 1), [activity]);
-
-    return {
-        activity: slicedActivity,
-        showHistoryWidget
-    };
-};
-
-const Gradient = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(256px + env(safe-area-inset-top));
-
-    opacity: 0.16;
-    background: linear-gradient(
-        180deg,
-        #7665e5 0%,
-        rgba(118, 101, 229, 0.99) 6.67%,
-        rgba(118, 101, 229, 0.96) 13.33%,
-        rgba(118, 101, 229, 0.92) 20%,
-        rgba(118, 101, 229, 0.85) 26.67%,
-        rgba(118, 101, 229, 0.77) 33.33%,
-        rgba(118, 101, 229, 0.67) 40%,
-        rgba(118, 101, 229, 0.56) 46.67%,
-        rgba(118, 101, 229, 0.44) 53.33%,
-        rgba(118, 101, 229, 0.33) 60%,
-        rgba(118, 101, 229, 0.23) 66.67%,
-        rgba(118, 101, 229, 0.15) 73.33%,
-        rgba(118, 101, 229, 0.08) 80%,
-        rgba(118, 101, 229, 0.04) 86.67%,
-        rgba(118, 101, 229, 0.01) 93.33%,
-        rgba(118, 101, 229, 0) 100%
-    );
-
-    z-index: -1;
-`;
-
-const IonTitleWrapper = styled.div`
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-`;
 
 const FooterGap = styled.div`
     height: 82px;
@@ -199,67 +94,65 @@ export const MobileProHomePage = () => {
     const network = useActiveTonNetwork();
     const isTestnet = network === Network.TESTNET;
     const canUseBattery = useCanUseBattery();
-    const { showNftWidget, filteredNft } = useMobileProHomePageNfts();
-    const { showHistoryWidget, activity } = useMobileProHomePageHistory();
-
-    const activeAccount = useActiveAccount();
 
     return (
         <IonPage id={mobileProHomePageId}>
             <IonContentStyled fullscreen>
-                <IonTitleWrapper>
-                    <Label2>
-                        {activeAccount.type === 'mam'
-                            ? activeAccount.activeDerivation.name
-                            : activeAccount.name}
-                    </Label2>
-                    <AccountAndWalletBadgesGroup
-                        account={activeAccount}
-                        walletId={activeAccount.activeTonWallet.id}
-                    />
-                </IonTitleWrapper>
-                <Gradient />
-                <MobileProHomeBalanceStyled />
+                <MobileProHomeBalance />
                 <MobileProHomeActionsStyled />
-                <MobileProHomeWidgetTokens />
-                {showNftWidget && <MobileProWidgetNfts nfts={filteredNft} />}
-                {showHistoryWidget && <MobileProWidgetHistory activity={activity} />}
+                <MobileProHomeWidgetTokensStyled />
                 <MenuWrapper>
+                    <MenuItem to={AppRoute.activity}>
+                        <ClockSmoothIcon />
+                        <Label2>{t('wallet_aside_history')}</Label2>
+                        <ChevronRightIcon />
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem to={AppRoute.purchases}>
+                        <SaleBadgeIcon />
+                        <Label2>{t('wallet_aside_collectibles')}</Label2>
+                        <ChevronRightIcon />
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem to={AppRoute.dns}>
+                        <SparkIcon />
+                        <Label2>{t('wallet_aside_domains')}</Label2>
+                        <ChevronRightIcon />
+                    </MenuItem>
+                    <Divider />
                     <HideOnReview>
-                        {!showHistoryWidget && (
-                            <MenuItem to={AppRoute.activity}>
-                                <ClockSmoothIcon />
-                                <Label2>{t('wallet_aside_history')}</Label2>
-                            </MenuItem>
-                        )}
-                        {!showNftWidget && (
-                            <MenuItem to={AppRoute.purchases}>
-                                <SaleBadgeIcon />
-                                <Label2>{t('wallet_aside_collectibles')}</Label2>
-                            </MenuItem>
-                        )}
-                        <MenuItem to={AppRoute.dns}>
-                            <SparkIcon />
-                            <Label2>{t('wallet_aside_domains')}</Label2>
-                        </MenuItem>
                         {!isReadOnly && !isTestnet && (
-                            <MenuItem to={AppRoute.swap}>
-                                <SwapIconStyled />
-                                <Label2>{t('wallet_swap')}</Label2>
-                            </MenuItem>
+                            <>
+                                <MenuItem to={AppRoute.swap}>
+                                    <SwapIconStyled />
+                                    <Label2>{t('wallet_swap')}</Label2>
+                                    <ChevronRightIcon />
+                                </MenuItem>
+                                <Divider />
+                            </>
                         )}
                         {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                         {showMultisigs && !isTestnet && (
-                            <MenuItem to={AppRoute.multisigWallets}>
-                                <ListIcon />
-                                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                            </MenuItem>
+                            <>
+                                <MenuItem to={AppRoute.multisigWallets}>
+                                    <ListIcon />
+                                    <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                                    <ChevronRightIcon />
+                                </MenuItem>
+                                <Divider />
+                            </>
                         )}
-                        {canUseBattery && <BatterySettingsListItem />}
+                        {canUseBattery && (
+                            <>
+                                <BatterySettingsListItem />
+                                <Divider />
+                            </>
+                        )}
                     </HideOnReview>
                     <MenuItem to={AppRoute.walletSettings}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                        <ChevronRightIcon />
                     </MenuItem>
                 </MenuWrapper>
                 <FooterGap />
@@ -311,6 +204,7 @@ const BatterySettingsListItem = () => {
                     </Body3>
                 )}
             </SettingsListText>
+            <ChevronRightIcon />
         </MenuItem>
     );
 };

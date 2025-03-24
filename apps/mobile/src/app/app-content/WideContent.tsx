@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Route, Switch, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
@@ -34,6 +34,7 @@ import { desktopHeaderContainerHeight } from '@tonkeeper/uikit/dist/components/d
 import { BackgroundElements, usePrefetch } from './common';
 import { PullToRefresh } from '../components/PullToRefresh';
 import { useQueryClient } from '@tanstack/react-query';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -108,6 +109,10 @@ export const WideContent: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+
+    useEffect(() => {
+        SplashScreen.hide();
+    }, []);
 
     const queryClient = useQueryClient();
     const onRefresh = useCallback(async () => {
