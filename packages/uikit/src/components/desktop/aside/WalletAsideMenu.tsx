@@ -29,10 +29,7 @@ import {
     useIsActiveAccountMultisig,
     useUnviewedAccountOrdersNumber
 } from '../../../state/multisig';
-import {
-    isAccountCanManageMultisigs,
-    isAccountTonWalletStandard
-} from '@tonkeeper/core/dist/entries/account';
+import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
@@ -40,7 +37,6 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
-import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { useEffect } from 'react';
@@ -106,12 +102,10 @@ export const WalletAsideMenu = () => {
     const showMultisigs = isAccountCanManageMultisigs(account);
     const network = useActiveTonNetwork();
     const { onOpen: sendTransfer } = useSendTransferNotification();
-    const navigate = useNavigate();
     const sdk = useAppSdk();
     const { onOpen: onBuy } = useBuyNotification();
 
     const isTestnet = network === Network.TESTNET;
-    const isStandardTonWallet = isAccountTonWalletStandard(account);
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -164,8 +158,8 @@ export const WalletAsideMenu = () => {
                 </HideOnReview>
                 <GroupsGap />
                 <NavLink to={AppRoute.home} end>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                    {() => (
+                        <AsideMenuItemStyled isSelected={location.pathname === AppRoute.home}>
                             <HouseIcon />
                             <Label2>{t('wallet_aside_home')}</Label2>
                         </AsideMenuItemStyled>
