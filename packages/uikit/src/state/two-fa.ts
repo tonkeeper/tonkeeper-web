@@ -100,7 +100,7 @@ export const useTwoFAServiceConfig = () => {
             servicePubKey,
             confirmMessageTGTtlSeconds: config['2fa_tg_confirm_send_message_ttl_seconds'] ?? 600,
             confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'] ?? 600,
-            botUrl: config['2fa_bot_url'] ?? 'https://t.me/tonkeeper_2fa_bot'
+            botUrl: config['2fa_bot_url'] ?? 'https://t.me/tonkeeper'
         };
     }, [config]);
 };
