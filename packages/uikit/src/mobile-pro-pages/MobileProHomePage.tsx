@@ -68,7 +68,7 @@ const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
 `;
 
-export const mobileProHomePageId = 'mobile-pro-home-page';
+const mobileProHomePageId = 'mobile-pro-home-page';
 
 const FooterGap = styled.div`
     height: 82px;

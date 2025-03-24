@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
-import { AppProRoute, AppRoute, WalletSettingsRoute } from '../../../libs/routes';
+import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
 import {
     useActiveAccount,
     useActiveTonNetwork,
@@ -97,7 +97,6 @@ const HighlightedIcon = styled.div`
     top: calc(50% - 4px);
 `;
 
-
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
@@ -134,7 +133,7 @@ export const WalletAsideMenu = () => {
                         <Label2>{t('wallet_send')}</Label2>
                     </AsideMenuItemStyled>
                 )}
-                <HideOnReview>
+                {/*<HideOnReview>
                     {!isReadOnly && isStandardTonWallet && (
                         <AsideMenuItemStyled
                             isSelected={false}
@@ -144,7 +143,7 @@ export const WalletAsideMenu = () => {
                             <Label2>{t('wallet_multi_send')}</Label2>
                         </AsideMenuItemStyled>
                     )}
-                </HideOnReview>
+                </HideOnReview>*/}
                 <AsideMenuItemStyled
                     isSelected={false}
                     onClick={() => {
@@ -164,6 +163,14 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 </HideOnReview>
                 <GroupsGap />
+                <NavLink to={AppRoute.home} end>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                            <HouseIcon />
+                            <Label2>{t('wallet_aside_home')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 <NavLink to={AppRoute.coins} end>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
