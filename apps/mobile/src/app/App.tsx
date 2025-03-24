@@ -8,7 +8,6 @@ import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
 import { HeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/Header';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
 import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
-import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
@@ -47,6 +46,7 @@ import { NarrowContent } from './app-content/NarrowContent';
 import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
+import { SplashScreen } from '@capacitor/splash-screen';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -235,7 +235,7 @@ export const Loader: FC = () => {
         globalPreferencesLoading ||
         globalSetupLoading
     ) {
-        return <Loading />;
+        return null;
     }
 
     const context: IAppContext = {
@@ -278,6 +278,10 @@ const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = props => {
+    useEffect(() => {
+        SplashScreen.hide();
+    }, []);
+
     if (CAPACITOR_APPLICATION_ID === 'mobile') {
         return <NarrowContent {...props} />;
     }

@@ -47,12 +47,16 @@
 	<string>Tonkeeper use Face ID to securely authenticate your access to mnemonic key.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Tonkeeper use photo library to read QR codes from images.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>NSUserActivityTypeBrowsingWeb</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiredDeviceCapabilities</key>
@@ -62,16 +66,16 @@
 	<key>UIRequiresFullScreen</key>
 	<true/>
 	<key>UIStatusBarHidden</key>
-    <true/>
-    <key>UIStatusBarHidden~iphone</key>
-    <false/>
+	<true/>
+	<key>UIStatusBarHidden~iphone</key>
+	<false/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
-	    <string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
@@ -82,9 +86,5 @@
 		<string>dev-pro.tonconsole.com</string>
 		<string>pro.tonconsole.com</string>
 	</array>
-	<key>NSUserActivityTypes</key>
-    <array>
-        <string>NSUserActivityTypeBrowsingWeb</string>
-    </array>
 </dict>
 </plist>
