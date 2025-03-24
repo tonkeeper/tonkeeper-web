@@ -332,7 +332,7 @@ export const tonConnectProofPayload = (
     const timestampBuffer = Buffer.allocUnsafe(8);
     timestampBuffer.writeBigInt64LE(BigInt(timestamp));
 
-    const domain = new URL(origin).host;
+    const domain = origin.includes('://') ? new URL(origin).host : origin;
     const domainBuffer = Buffer.from(domain);
 
     const domainLengthBuffer = Buffer.allocUnsafe(4);
