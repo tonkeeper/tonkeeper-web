@@ -123,18 +123,16 @@ const NarrowContentBody: FC<{
     usePrefetch();
     useDebuggingTools();
     const { assets } = useAllChainsAssetsWithPrice();
+    const isSplashHidden = useRef(false);
 
     const isReady = assets !== undefined;
 
     useEffect(() => {
-        if (isReady) {
+        if (isReady && !isSplashHidden.current) {
+            isSplashHidden.current = true;
             SplashScreen.hide();
         }
     }, [isReady]);
-
-    if (!isReady) {
-        return null;
-    }
 
     if (lock) {
         return (
@@ -158,11 +156,13 @@ const NarrowContentBody: FC<{
 };
 
 const NarrowContentAppRouting = () => {
+    const location = useLocation();
+
     return (
         <WideLayout>
             <WideContent id="main-id--">
                 <WalletLayout $gradient={location.pathname === AppRoute.home}>
-                    <IonMenu menuId="aside-nav" contentId="main-content">
+                    <IonMenu menuId="aside-nav" contentId="main-content" type="push">
                         <AsideMenu />
                     </IonMenu>
                     <MobileProWalletMenu />
@@ -250,13 +250,17 @@ const NarrowContentAppRouting = () => {
                             {/* Wallet settings */}
                         </IonRouterOutlet>
                     </WalletLayoutBody>
-                    <MobileProFooter />
+                    {shouldDisplayFooter(location.pathname) && <MobileProFooter />}
                 </WalletLayout>
                 <PreferencesModal />
             </WideContent>
             <BackgroundElements />
         </WideLayout>
     );
+};
+
+const shouldDisplayFooter = (loc: string) => {
+    return loc !== AppProRoute.dashboard && !loc.startsWith(AppRoute.browser);
 };
 
 const NavigateToRecovery = () => {

@@ -5,8 +5,14 @@ import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 import { DesktopCategoryBlock } from './DesktopCategoryBlock';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 import { useAppTargetEnv } from '../../hooks/appSdk';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useTranslation } from '../../hooks/translation';
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -29,6 +35,7 @@ const CategoriesWrapper = styled(DesktopViewPageLayout)`
 `;
 
 export const DesktopBrowserRecommendationsPage: FC = () => {
+    const { t } = useTranslation();
     const { data } = useRecommendations();
     const targetEnv = useAppTargetEnv();
 
@@ -44,6 +51,11 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     return (
         <HideOnReview>
             <CategoriesWrapper>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('aside_discover')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
                 <PromotionsCarouselStyled
                     apps={data.apps}
                     slidesToShow={targetEnv === 'mobile' ? 1 : 2}

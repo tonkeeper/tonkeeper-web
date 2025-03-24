@@ -105,12 +105,6 @@ const AsideMenuBottom = styled.div`
 
     background: ${p => p.theme.backgroundContent};
     padding-bottom: 0.5rem;
-
-    ${p =>
-        p.theme.proDisplayType === 'mobile' &&
-        css`
-            padding-bottom: env(safe-area-inset-bottom);
-        `}
 `;
 
 const AsideMenuBottomContent = styled.div`
@@ -337,7 +331,9 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
 
     return (
         <AsideContainer width={asideWidth}>
-            <AsideHeader width={asideWidth} />
+            <NotForTargetEnv env="mobile">
+                <AsideHeader width={asideWidth} />
+            </NotForTargetEnv>
             <AsideContentContainer className={className}>
                 <ScrollContainer ref={ref}>
                     {proFeatures && (

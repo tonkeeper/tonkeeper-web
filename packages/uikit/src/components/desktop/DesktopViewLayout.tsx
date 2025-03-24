@@ -64,10 +64,11 @@ const DesktopViewPageLayoutContext = createContext<string | undefined>(undefined
 
 export const DesktopViewPageLayout = forwardRef<
     HTMLDivElement,
-    PropsWithChildren<{ className?: string; mobileContentPaddingTop?: boolean }>
->(({ children, className, mobileContentPaddingTop }, ref) => {
+    PropsWithChildren<{ className?: string; mobileContentPaddingTop?: boolean; id?: string }>
+>(({ children, className, mobileContentPaddingTop, id: propsId }, ref) => {
     const platform = useAppTargetEnv();
-    const id = useId();
+    const hookId = useId();
+    const id = propsId ?? hookId;
 
     const contentRef = useRef<HTMLIonContentElement>(null);
 
@@ -89,7 +90,7 @@ export const DesktopViewPageLayout = forwardRef<
         return (
             <DesktopViewPageLayoutContext.Provider value={id}>
                 <IonPage id={id}>
-                    <IonContent ref={contentRef} fullscreen={true} scrollX={true}>
+                    <IonContent ref={contentRef} fullscreen={true}>
                         <DesktopViewPageLayoutSimpleIonic
                             className={className}
                             $mobileContentPaddingTop={mobileContentPaddingTop}

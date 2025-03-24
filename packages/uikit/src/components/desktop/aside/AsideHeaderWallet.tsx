@@ -1,12 +1,12 @@
-import styled, { css } from "styled-components";
+import styled from 'styled-components';
 import React, { FC, useRef, useState } from 'react';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body2, Body3, Label2 } from '../../Text';
 import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { useTranslation } from '../../../hooks/translation';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { useAppSdk, useAppTargetEnv } from '../../../hooks/appSdk';
-import { ChevronDownIcon, ChevronLeftIcon, CopyIcon, DoneIcon } from '../../Icon';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { ChevronDownIcon, CopyIcon, DoneIcon } from '../../Icon';
 import { Transition } from 'react-transition-group';
 import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
 import { AsideHeaderContainer } from './AsideHeaderElements';
@@ -16,21 +16,13 @@ import { SelectDropDown } from '../../fields/Select';
 import { AccountMAM, AccountTonMnemonic } from '@tonkeeper/core/dist/entries/account';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TON_ASSET, TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
-import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { useMenuController } from '../../../hooks/ionic';
 
 const HeaderContainer = styled(AsideHeaderContainer)`
     display: flex;
     gap: 10px;
     align-items: center;
     cursor: pointer;
-
-    ${p =>
-        p.theme.proDisplayType === 'desktop' &&
-        css`
-            justify-content: space-between;
-        `}
+    justify-content: space-between;
 `;
 
 const TextContainer = styled.div`
@@ -204,14 +196,8 @@ const AsideHeaderSingleChainWallet: FC<{ width: number }> = ({ width }) => {
     const address = formatAddress(activeWallet.rawAddress, network);
 
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-    const targetEnv = useAppTargetEnv();
-    const menuController = useMenuController('aside-nav');
 
     const onCopy = () => {
-        if (targetEnv === 'mobile') {
-            return;
-        }
-
         clearTimeout(timeoutRef.current);
         sdk.copyToClipboard(address);
         setIsCopied(true);
@@ -237,11 +223,6 @@ const AsideHeaderSingleChainWallet: FC<{ width: number }> = ({ width }) => {
             onMouseOver={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
         >
-            <ForTargetEnv env="mobile">
-                <IconButtonTransparentBackground onClick={() => menuController.close()}>
-                    <ChevronLeftIcon />
-                </IconButtonTransparentBackground>
-            </ForTargetEnv>
             <TextContainer>
                 <Label2>{name || t('wallet_title')}</Label2>
                 <AddressWrapper>
@@ -251,28 +232,21 @@ const AsideHeaderSingleChainWallet: FC<{ width: number }> = ({ width }) => {
                         walletId={account.activeTonWallet.id}
                         size="s"
                     />
-                    <NotForTargetEnv env="mobile">
-                        <Transition
-                            nodeRef={ref}
-                            in={hovered}
-                            timeout={200}
-                            onExited={() => setIsCopied(false)}
-                        >
-                            {state => (
-                                <CopyIconWrapper
-                                    ref={ref}
-                                    opacity={transitionStyles[state].opacity}
-                                >
-                                    {copied ? <DoneIconStyled /> : <CopyIconStyled />}
-                                </CopyIconWrapper>
-                            )}
-                        </Transition>
-                    </NotForTargetEnv>
+                    <Transition
+                        nodeRef={ref}
+                        in={hovered}
+                        timeout={200}
+                        onExited={() => setIsCopied(false)}
+                    >
+                        {state => (
+                            <CopyIconWrapper ref={ref} opacity={transitionStyles[state].opacity}>
+                                {copied ? <DoneIconStyled /> : <CopyIconStyled />}
+                            </CopyIconWrapper>
+                        )}
+                    </Transition>
                 </AddressWrapper>
             </TextContainer>
-            <NotForTargetEnv env="mobile">
-                <WalletEmoji emoji={emoji} emojiSize="24px" containerSize="24px" />
-            </NotForTargetEnv>
+            <WalletEmoji emoji={emoji} emojiSize="24px" containerSize="24px" />
         </HeaderContainer>
     );
 };

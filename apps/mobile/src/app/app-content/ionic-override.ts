@@ -38,13 +38,10 @@ export const IonicOverride = css`
         outline: none;
 
         &::part(container) {
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
             background-color: ${p => p.theme.backgroundContent};
-            border-top-right-radius: ${p => p.theme.cornerSmall};
-            border-bottom-right-radius: ${p => p.theme.cornerSmall};
-        }
-
-        &[side='end']::part(container) {
-            border-radius: ${p => p.theme.cornerSmall} 0 0 ${p => p.theme.cornerSmall};
+            box-sizing: border-box;
         }
     }
 

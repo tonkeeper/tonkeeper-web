@@ -52,7 +52,7 @@ const VerticalDivider = styled.div<{ $bottom?: boolean }>`
                   padding-bottom: 16px;
               `
             : css`
-                  padding-top: 16px;
+                  padding-top: 28px;
               `}
 `;
 
@@ -176,10 +176,7 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
                     <VerticalDividerCentralPart />
                     <VerticalDividerBottomPart />
                 </VerticalDivider>
-                <ActionCell
-                    onClick={() => navigate(AppProRoute.multiSend)}
-                    $disabled={isReadOnly || !isStandardTon}
-                >
+                <ActionCell onClick={() => navigate(AppProRoute.multiSend)} $disabled>
                     <MultisendIcon />
                     <Label2>{t('wallet_multi_send')}</Label2>
                 </ActionCell>

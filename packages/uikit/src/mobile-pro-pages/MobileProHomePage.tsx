@@ -1,5 +1,4 @@
-import styled from 'styled-components';
-import { IonContent, IonPage } from '@ionic/react';
+import styled, { createGlobalStyle } from 'styled-components';
 import React from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
@@ -26,18 +25,8 @@ import { useBatteryBalance, useCanUseBattery } from '../state/battery';
 import { RoundedBadge } from '../components/shared/Badge';
 import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
 import { HideOnReview } from '../components/ios/HideOnReview';
-
-const IonContentStyled = styled(IonContent)`
-    &::part(background) {
-        background: transparent;
-    }
-
-    &::part(scroll) {
-        padding-top: env(safe-area-inset-top);
-        padding-bottom: env(safe-area-inset-bottom);
-        /*overscroll-behavior: auto;*/
-    }
-`;
+import { PullToRefresh } from '../components/mobile-pro/PullToRefresh';
+import { DesktopViewPageLayout } from '../components/desktop/DesktopViewLayout';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -85,6 +74,12 @@ const FooterGap = styled.div`
     height: 82px;
 `;
 
+const MainPageStyles = createGlobalStyle`
+
+    #${mobileProHomePageId} {
+        padding-top: env(safe-area-inset-top);
+    }`;
+
 export const MobileProHomePage = () => {
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -96,8 +91,10 @@ export const MobileProHomePage = () => {
     const canUseBattery = useCanUseBattery();
 
     return (
-        <IonPage id={mobileProHomePageId}>
-            <IonContentStyled fullscreen>
+        <>
+            <MainPageStyles />
+            <DesktopViewPageLayout id={mobileProHomePageId}>
+                <PullToRefresh invalidate={account.id} />
                 <MobileProHomeBalance />
                 <MobileProHomeActionsStyled />
                 <MobileProHomeWidgetTokensStyled />
@@ -156,8 +153,8 @@ export const MobileProHomePage = () => {
                     </MenuItem>
                 </MenuWrapper>
                 <FooterGap />
-            </IonContentStyled>
-        </IonPage>
+            </DesktopViewPageLayout>
+        </>
     );
 };
 
