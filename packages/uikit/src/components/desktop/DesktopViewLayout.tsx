@@ -214,7 +214,12 @@ export const DesktopViewHeader: FC<{
     );
 };
 
-export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> & {
+const MobileTitleWrapper = styled.div`
+    margin: 0 auto;
+    width: fit-content;
+`;
+
+export const DesktopViewHeaderContent: FC<{ title: ReactNode; right?: ReactNode }> & {
     Right: typeof DesktopViewHeaderContentRight;
     RightItem: typeof DesktopViewHeaderContentRightItem;
 } = ({ title, right }) => {
@@ -223,7 +228,7 @@ export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> 
     if (env !== 'mobile') {
         return (
             <>
-                <Label2>{title}</Label2>
+                {typeof title === 'string' ? <Label2>{title}</Label2> : title}
                 {right}
             </>
         );
@@ -231,7 +236,13 @@ export const DesktopViewHeaderContent: FC<{ title: string; right?: ReactNode }> 
 
     return (
         <>
-            <IonTitle>{title}</IonTitle>
+            <IonTitle>
+                {typeof title === 'string' ? (
+                    title
+                ) : (
+                    <MobileTitleWrapper>{title}</MobileTitleWrapper>
+                )}
+            </IonTitle>
             <IonButtons slot="end">{right}</IonButtons>
         </>
     );

@@ -25,8 +25,8 @@ import { ChevronDownIcon, CopyIcon, DoneIcon } from '../Icon';
 import { useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
 import { BatteryBalanceIcon } from '../settings/battery/BatteryInfoHeading';
 import { useBatteryBalance } from '../../state/battery';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const Block = styled.div`
     display: flex;

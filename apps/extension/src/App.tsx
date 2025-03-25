@@ -325,13 +325,13 @@ export const Content: FC<{
                     </Suspense>
                 </Route>
                 <Route
-                    path={any(AppRoute.settings)}
+                    path={AppRoute.settings}
                 >
                     <Suspense fallback={<SettingsSkeletonPage />}>
                         <Settings />
                     </Suspense>
                 </Route>
-                <Route path={any(AppRoute.walletSettings)}>
+                <Route path={AppRoute.walletSettings}>
                   <RedirectFromDesktopSettings />
                 </Route>
                 <Route path={`${AppRoute.coins}/:name`}>

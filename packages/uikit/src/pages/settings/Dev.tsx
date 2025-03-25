@@ -6,19 +6,8 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import {
-    ListBlock,
-    ListBlockDesktopAdaptive,
-    ListItem,
-    ListItemElement,
-    ListItemPayload
-} from '../../components/List';
-import { Label1 } from '../../components/Text';
-import { Switch } from '../../components/fields/Switch';
-import { Badge } from '../../components/shared';
+import { ListBlock, ListItemElement } from '../../components/List';
 import styled from 'styled-components';
-import { useDevSettings, useMutateDevSettings } from '../../state/dev';
-import { useActiveConfig } from '../../state/wallet';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
     DesktopViewHeader,
@@ -113,7 +102,6 @@ export const DevSettings = React.memo(() => {
                         <DesktopViewHeaderContent title="Dev Menu" />
                     </DesktopViewHeader>
                 </ForTargetEnv>
-                <EnableTwoFASettings />
                 <CookieSettings />
                 <AddAccountBySK />
             </DesktopWrapper>

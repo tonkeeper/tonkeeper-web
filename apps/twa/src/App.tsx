@@ -416,14 +416,14 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
                         </Suspense>
                     </Route>
                     <Route
-                        path={any(AppRoute.settings)}
+                        path={AppRoute.settings}
                     >
                         <Suspense fallback={<SettingsSkeletonPage />}>
                             <Settings />
                         </Suspense>
                     </Route>
                     <Route
-                      path={any(AppRoute.walletSettings)}
+                      path={AppRoute.walletSettings}
                     >
                       <RedirectFromDesktopSettings />
                     </Route>

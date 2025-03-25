@@ -49,11 +49,7 @@ export const useAllChainsAssets = () => {
     const data = useAllChainsAssetsWithPrice();
 
     return useMemo(() => {
-        if (data.assets) {
-            return { ...data, assets: data.assets.map(i => i.assetAmount) };
-        }
-
-        return data;
+        return { ...data, assets: data.assets?.map(i => i.assetAmount) };
     }, [data]);
 };
 

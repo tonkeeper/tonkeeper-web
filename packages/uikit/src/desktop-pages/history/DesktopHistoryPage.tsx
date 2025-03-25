@@ -28,7 +28,6 @@ import {
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
-import { Body2 } from '../../components/Text';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
 import { Button } from '../../components/fields/Button';
@@ -162,13 +161,12 @@ const DesktopHistoryPageContent: FC = () => {
         setMonitorRef(el);
     }, []);
 
-
-  const {
-    asset: assetFilter,
-    filterSpam,
-    onlyInitiator: onlyInitiatorFilter,
-    setFilters
-  } = useHistoryFilters();
+    const {
+        asset: assetFilter,
+        filterSpam,
+        onlyInitiator: onlyInitiatorFilter,
+        setFilters
+    } = useHistoryFilters();
 
     const onOpenExplorer = () =>
         config.accountExplorer
@@ -234,16 +232,12 @@ const DesktopHistoryPageContent: FC = () => {
         ) {
             return (
                 <HistoryPageWrapper>
-                    <HistoryHeaderContainer borderBottom>
-                        <Label2>{t('page_header_history')}</Label2>
-                        <ExplorerButton onClick={onOpenExplorer}>
-                            <LinkOutIcon color="currentColor" />
-                        </ExplorerButton>
-                        <FiltersWrapper>
-                            <AssetHistoryFilter />
-                            <OtherHistoryFilters />
-                        </FiltersWrapper>
-                    </HistoryHeaderContainer>
+                    <DesktopViewHeader borderBottom={true}>
+                        <DesktopViewHeaderContent
+                            title={t('page_header_history')}
+                            right={rightPart}
+                        />
+                    </DesktopViewHeader>
                     <EmptyHistoryContainer>
                         <ClearFiltersContent>
                             <Label2>{t('activity_empty_reset_filters_title')}</Label2>

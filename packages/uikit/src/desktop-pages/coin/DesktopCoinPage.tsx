@@ -314,6 +314,12 @@ const TonViewerLink = styled(ExternalLink)`
     width: 100%;
 `;
 
+const LabelWithBadge = styled(Label2)`
+    display: flex;
+    gap: 4px;
+    align-items: center;
+`;
+
 const CoinPage: FC<{ token: string }> = ({ token }) => {
     const { t } = useTranslation();
     const {
@@ -434,14 +440,27 @@ export const TronUSDTPage = () => {
 
     return (
         <DesktopViewPageLayout ref={ref}>
-            <DesktopViewHeaderStyled backButton borderBottom={true}>
-                <Label2>{asset.symbol}</Label2>
-                <AssetBlockchainBadge size="m" marginLeft="6px">
-                    TRC20
-                </AssetBlockchainBadge>
-                <OtherHistoryFilters disableInitiatorFilter />
-            </DesktopViewHeaderStyled>
-           <PullToRefresh invalidate={[QueryKey.activity, QueryKey.tronAssets]} />
+            <DesktopViewHeader backButton borderBottom={true}>
+                <DesktopViewHeaderContent
+                    title={
+                        <LabelWithBadge>
+                            {asset.symbol}
+                            <AssetBlockchainBadge size="m" marginLeft="6px">
+                                TRC20
+                            </AssetBlockchainBadge>
+                        </LabelWithBadge>
+                    }
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem>
+                                <OtherHistoryFilters />
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
+                {/**/}
+            </DesktopViewHeader>
+            <PullToRefresh invalidate={[QueryKey.activity, QueryKey.tronAssets]} />
             <CoinHeaderStyled>
                 <TronCoinInfoWrapper>
                     <img src={asset.image} alt={asset.symbol} />

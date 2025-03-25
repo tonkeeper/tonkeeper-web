@@ -5,7 +5,7 @@ import {
     useGetConnectInfo,
     useResponseConnectionMutation
 } from '../components/connect/connectHook';
-import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { ConnectItemReply, DAppManifest, TonConnectEventPayload } from "@tonkeeper/core/dist/entries/tonConnect";
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useRequestNotificationAnalytics } from './amplitude';
@@ -29,7 +29,7 @@ export const useSmartScanner = () => {
 
     const handlerClose = async (
         result: {
-            replyItems: ConnectItemReply[];
+            replyItems: TonConnectEventPayload;
             manifest: DAppManifest;
             account: Account;
             walletId: WalletId;
