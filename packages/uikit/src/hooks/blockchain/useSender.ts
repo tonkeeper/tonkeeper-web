@@ -528,6 +528,7 @@ export const useGetSender = () => {
                         signer,
                         twoFAConfig.pluginAddress,
                         {
+                            controllerTwoFa,
                             openConfirmModal: () => {
                                 openTwoFaConfirmTelegram();
                                 return closeTwoFaConfirmTelegram;
