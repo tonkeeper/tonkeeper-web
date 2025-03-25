@@ -176,7 +176,8 @@ export const getDeviceInfo = (
                 extraCurrencySupported: true
             },
             {
-                name: 'SignData'
+                name: 'SignData',
+                types: ['text', 'binary', 'cell']
             }
         ]
     };
