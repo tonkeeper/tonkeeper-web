@@ -17,7 +17,7 @@ export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
     return (
         <ActionsRow>
             {!isTestnet && <BuyAction />}
-            {!isReadOnly && <SendAction asset="TON" />}
+            {!isReadOnly && <SendAction />}
             <ReceiveAction />
             <HideOnReview>
                 {!isTestnet && !isReadOnly && <SwapAction fromAsset={TON_ASSET} />}

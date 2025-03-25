@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-    ConnectItemReply,
     DAppManifest,
-    SendTransactionAppRequest
+    RpcMethod,
+    SendTransactionAppRequest,
+    TonConnectEventPayload,
+    WalletResponse
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     parseTonTransferWithAddress,
+    parseTronTransferWithAddress,
     seeIfBringToFrontLink
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
@@ -15,7 +18,10 @@ import {
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import {
+    AccountConnection,
+    TonConnectParams
+} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -38,9 +44,8 @@ export const useGetConnectInfo = () => {
                 return null;
             }
 
-            const transfer = parseTonTransferWithAddress({ url });
-
-            if (transfer) {
+            const tonTransfer = parseTonTransferWithAddress({ url });
+            if (tonTransfer) {
                 sdk.uiEvents.emit('copy', {
                     method: 'copy',
                     id: Date.now(),
@@ -50,7 +55,23 @@ export const useGetConnectInfo = () => {
                 sdk.uiEvents.emit('transfer', {
                     method: 'transfer',
                     id: Date.now(),
-                    params: { chain: BLOCKCHAIN_NAME.TON, ...transfer, from: 'qr-code' }
+                    params: { chain: BLOCKCHAIN_NAME.TON, ...tonTransfer, from: 'qr-code' }
+                });
+                return null;
+            }
+
+            const tronTransfer = parseTronTransferWithAddress({ url });
+            if (tronTransfer) {
+                sdk.uiEvents.emit('copy', {
+                    method: 'copy',
+                    id: Date.now(),
+                    params: t('loading')
+                });
+
+                sdk.uiEvents.emit('transfer', {
+                    method: 'transfer',
+                    id: Date.now(),
+                    params: { chain: BLOCKCHAIN_NAME.TRON, ...tronTransfer, from: 'qr-code' }
                 });
                 return null;
             }
@@ -81,7 +102,7 @@ export const useGetConnectInfo = () => {
 export interface AppConnectionProps {
     params: TonConnectParams;
     result: {
-        replyItems: ConnectItemReply[];
+        replyItems: TonConnectEventPayload;
         manifest: DAppManifest;
         account: Account;
         walletId: WalletId;
@@ -100,7 +121,7 @@ export const useResponseConnectionMutation = () => {
                 walletId: result.walletId,
                 manifest: result.manifest,
                 params,
-                replyItems: result.replyItems,
+                replyItems: result.replyItems.items,
                 appVersion: sdk.version
             });
 
@@ -125,24 +146,16 @@ export const useResponseConnectionMutation = () => {
 };
 
 export interface ResponseSendProps {
-    request: SendTransactionAppRequest;
-    boc?: string;
+    connection: AccountConnection;
+    response: WalletResponse<RpcMethod>;
 }
 
-export const useResponseSendMutation = () => {
-    return useMutation<undefined, Error, ResponseSendProps>(
-        async ({ request: { connection, id }, boc }) => {
-            const response = boc
-                ? sendTransactionSuccessResponse(id, boc)
-                : sendTransactionErrorResponse(id);
-
-            await sendEventToBridge({
-                response,
-                sessionKeyPair: connection.sessionKeyPair,
-                clientSessionId: connection.clientSessionId
-            });
-
-            return undefined;
-        }
-    );
+export const useTonConnectResponseMutation = () => {
+    return useMutation<void, Error, ResponseSendProps>(async ({ connection, response }) => {
+        return await sendEventToBridge({
+            response,
+            sessionKeyPair: connection.sessionKeyPair,
+            clientSessionId: connection.clientSessionId
+        });
+    });
 };

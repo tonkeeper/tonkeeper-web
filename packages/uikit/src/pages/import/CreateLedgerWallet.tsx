@@ -53,8 +53,8 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     const { t } = useTranslation();
     const navigate = useNavigate();
     const sdk = useAppSdk();
-    const back = useCallback(() => navigate(AppRoute.home), [navigate]);
-    useNativeBackButton(sdk, back);
+    const navigateHome = useCallback(() => navigate(AppRoute.home), [navigate]);
+    useNativeBackButton(sdk, navigateHome);
     const [moveNext, setMoveNext] = useState(false);
 
     const {
@@ -82,13 +82,13 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         }
     }, [tonTransport]);
 
-    const { navigateHome } = useContext(AddWalletContext);
-    useSetNotificationOnBack(navigateHome);
+    const { navigateHome: navigateBackNotification } = useContext(AddWalletContext);
+    useSetNotificationOnBack(navigateBackNotification);
 
     if (moveNext) {
         return (
             <ChooseLedgerAccounts
-                onCancel={back}
+                onCancel={afterCompleted}
                 tonTransport={tonTransport!}
                 afterCompleted={afterCompleted}
             />
@@ -108,7 +108,7 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
             <H2Styled>{t('ledger_connect_header')}</H2Styled>
             <LedgerConnectionSteps currentStep={currentStep} />
             <ButtonsBlock>
-                <Button secondary onClick={back}>
+                <Button secondary onClick={afterCompleted}>
                     {t('cancel')}
                 </Button>
                 <Button

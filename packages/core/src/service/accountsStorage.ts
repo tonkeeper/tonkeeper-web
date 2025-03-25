@@ -177,6 +177,16 @@ export class AccountsStorage {
         return { name, emoji };
     }
 
+    async getNewMultisigAccountNameAndEmoji(accountId: AccountId) {
+        const existingAccounts = await this.getAccounts();
+        const existingAccount = existingAccounts.find(a => a.id === accountId);
+        const name =
+            existingAccount?.name ||
+            'Multisig ' + (existingAccounts.filter(a => a.type === 'ton-multisig').length + 1);
+        const emoji = existingAccount?.emoji || getFallbackAccountEmoji(accountId);
+        return { name, emoji };
+    }
+
     private migrateToActiveAccountIdState = async (): Promise<WalletId | null> => {
         const state = await this.storage.get<DeprecatedAccountState>(AppKey.DEPRECATED_ACCOUNT);
         if (!state || !state.activePublicKey) {
@@ -204,12 +214,11 @@ export class AccountsStorage {
                 if ((account.auth as unknown as { encryptedMnemonic: string }).encryptedMnemonic) {
                     const auth: AuthPassword = {
                         kind: account.auth.kind,
-                        encryptedSecret: (
-                            account.auth as unknown as { encryptedMnemonic: string }
-                        ).encryptedMnemonic
+                        encryptedSecret: (account.auth as unknown as { encryptedMnemonic: string })
+                            .encryptedMnemonic
                     };
                     (account.auth as unknown as AuthPassword) = auth;
-                    
+
                     needUpdate = true;
                 }
             }

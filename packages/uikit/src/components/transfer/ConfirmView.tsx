@@ -19,18 +19,18 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent, useAssetImage } from '../../state/asset';
-import { CheckmarkCircleIcon, ChevronLeftIcon, ExclamationMarkCircleIcon } from '../Icon';
+import { CheckmarkCircleIcon, ExclamationMarkCircleIcon } from '../Icon';
 import { Gap } from '../Layout';
 import { ListBlock } from '../List';
 import {
     FullHeightBlockResponsive,
+    NotificationBackButton,
     NotificationCancelButton,
     NotificationTitleBlock
 } from '../Notification';
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { RoundedButtonResponsive } from '../fields/RoundedButton';
 import { Image, ImageMock, Info, SendingTitle, Title } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
@@ -41,6 +41,7 @@ import {
     SenderTypeUserAvailable
 } from '../../hooks/blockchain/useSender';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
+import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -228,13 +229,7 @@ export const ConfirmViewTitle: FC<PropsWithChildren> = () => {
     const { onClose, onBack } = useConfirmViewContext();
     return (
         <NotificationTitleBlock>
-            {onBack ? (
-                <RoundedButtonResponsive onClick={onBack}>
-                    <ChevronLeftIcon />
-                </RoundedButtonResponsive>
-            ) : (
-                <div />
-            )}
+            {onBack ? <NotificationBackButton onBack={onBack} /> : <div />}
             <NotificationCancelButton handleClose={() => onClose()} />
         </NotificationTitleBlock>
     );
@@ -383,13 +378,21 @@ export const ConfirmViewButtons: FC<{
     }
 
     if (error && !(error instanceof UserCancelledError)) {
-        let errorText =
-            error instanceof TxConfirmationCustomError ? error.message : t('send_publish_tx_error');
-        if (error instanceof NotEnoughBalanceError) {
-            errorText = t('confirm_error_insufficient_balance', {
-                balance: error.balance.stringAssetRelativeAmount,
-                required: error.requiredBalance.stringAssetRelativeAmount
-            });
+        let errorText;
+
+        switch (true) {
+            case error instanceof TxConfirmationCustomError:
+                errorText = error.message;
+                break;
+            case error instanceof NotEnoughBalanceError:
+                errorText = t('confirm_error_insufficient_balance', {
+                    balance: (error as NotEnoughBalanceError).balance.stringAssetRelativeAmount,
+                    required: (error as NotEnoughBalanceError).requiredBalance
+                        .stringAssetRelativeAmount
+                });
+                break;
+            case error instanceof NotEnoughBatteryBalanceError:
+                errorText = t('confirm_error_insufficient_battery_balance');
         }
 
         return (

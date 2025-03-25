@@ -424,7 +424,7 @@
   "tron_top_up_trx_title": "TRX is required for USD₮ TRC20",
   "try_again": "Try Again",
   "two_fa_confirm_tg_cannot_access_tg": "Can’t access your Telegram account?",
-  "two_fa_confirm_tg_description": "Go to the @tonkeeper_2fa_bot and tap «Confirm» to complete the transaction.",
+  "two_fa_confirm_tg_description": "Go to the @tonkeeper and tap «Confirm» to complete the transaction.",
   "two_fa_confirm_tg_title": "Confirm Transaction in Telegram",
   "two_fa_long": "Two-Factor Authentication",
   "two_fa_recovery_cancelled_toast": "Recovery cancelled. Now transfer your funds to a new wallet for security. ",

@@ -53,6 +53,8 @@ import {
   useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
+import { hexToRGBA } from '../../libs/css';
+import { Badge } from '../../components/shared/Badge';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -67,7 +69,7 @@ const SettingsListItem = styled.div`
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
     &:hover {
-        background-color: ${p => p.theme.backgroundContentTint};
+        background-color: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.7)};
     }
 
     > svg {
@@ -192,7 +194,10 @@ export const DesktopWalletSettingsPage = () => {
                         <SettingsListItem>
                             <LockIcon />
                             <SettingsListText>
-                                <Label2>{t('two_fa_long')}</Label2>
+                                <LabelWithBadge>
+                                    <Label2>{t('two_fa_long')}</Label2>
+                                    <Badge color="accentOrange">Beta</Badge>
+                                </LabelWithBadge>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>

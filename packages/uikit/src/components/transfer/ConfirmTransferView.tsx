@@ -17,7 +17,6 @@ import { useAssetWeiBalance } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import BigNumber from 'bignumber.js';
 import { RatesApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext } from '../../hooks/appContext';
 import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useQuery } from '@tanstack/react-query';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -61,12 +60,6 @@ export const ConfirmTransferView: FC<
 
     const { data: availableSendersChoices } = useAvailableSendersChoices(operationType);
 
-    useEffect(() => {
-        if (availableSendersChoices) {
-            onSenderTypeChange(availableSendersChoices[0].type);
-        }
-    }, [availableSendersChoices]);
-
     const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>();
 
     const estimation = useEstimateTransfer({
@@ -82,6 +75,16 @@ export const ConfirmTransferView: FC<
         estimation: estimation.data!,
         senderType: selectedSenderType!
     });
+
+    useEffect(() => {
+        if (!mutation.isIdle) {
+            return;
+        }
+
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [JSON.stringify(availableSendersChoices), mutation.isIdle]);
 
     const assetAddress = isTonAsset(assetAmount.asset)
         ? tonAssetAddressToString((assetAmount.asset as TonAsset).address)

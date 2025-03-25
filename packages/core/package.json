@@ -11,7 +11,7 @@
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
         "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUOCGQXJBM2BFNOB6XREZ2ZZZCA' --output ./src/tonConsoleApi",
         "generate:swapsApi": "rm -r ./src/swapsApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/swaps-backend/master/swagger.yaml?token=GHSAT0AAAAAACJYQUODBKR67AB7WULZBFWEZSUUGFQ' --output ./src/swapsApi",
-        "generate:batteryApi": "rm -fr ./src/batteryApi && docker build -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
+        "generate:batteryApi": "rm -fr ./src/batteryApi && docker build --build-arg GITHUB_TOKEN=GHSAT0AAAAAACJYQUOCYBZTNPODOJC5BLIOZ6TBVWA -f resource/Dockerfile.batteryApi . -t batteryapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local batteryapi",
         "generate:2faApi": "rm -fr src/2faApi && docker build -f resource/Dockerfile.2faApi . -t 2faapi && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local 2faapi",
         "build:pkg": "yarn build"
     },
@@ -32,6 +32,7 @@
         "@ton/ton": "^15.1.0",
         "bignumber.js": "^9.1.1",
         "bip39": "^3.1.0",
+        "crc-32": "^1.2.2",
         "ethers": "^6.13.4",
         "query-string": "^8.1.0",
         "tronweb": "^6.0.0",

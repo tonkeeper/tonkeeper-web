@@ -57,6 +57,8 @@ import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
+import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
+import { RedirectFromDesktopSettings } from "@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings";
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -283,6 +285,7 @@ export const Content: FC<{
     useAppWidth();
     useTrackLocation();
     useDebuggingTools();
+    useRealtimeUpdatesInvalidation();
 
     if (lock) {
         return (
@@ -322,11 +325,14 @@ export const Content: FC<{
                     </Suspense>
                 </Route>
                 <Route
-                    path={AppRoute.settings}
+                    path={any(AppRoute.settings)}
                 >
                     <Suspense fallback={<SettingsSkeletonPage />}>
                         <Settings />
                     </Suspense>
+                </Route>
+                <Route path={any(AppRoute.walletSettings)}>
+                  <RedirectFromDesktopSettings />
                 </Route>
                 <Route path={`${AppRoute.coins}/:name`}>
                     <Suspense fallback={<CoinSkeletonPage />}>

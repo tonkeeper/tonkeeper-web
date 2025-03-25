@@ -80,6 +80,7 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/manage-multisig-wallets/DesktopManageMultisigs';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
+import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -360,6 +361,7 @@ export const Content: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+    useRealtimeUpdatesInvalidation();
 
     if (lock) {
         return (

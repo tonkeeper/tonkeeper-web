@@ -14,6 +14,7 @@ import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicS
 import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
 import { useActiveConfig } from '../../state/wallet';
 import { hexToRGBA } from '../../libs/css';
+import { handleSubmit } from '../../libs/form';
 
 const Block = styled.div`
     display: flex;
@@ -142,11 +143,20 @@ const LinkStyled = styled(Body3)`
     cursor: pointer;
 `;
 
+const H2Label2ResponsiveStyled = styled(H2Label2Responsive)`
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            padding: 0 40px;
+        `}
+`;
+
 export const WordsGridAndHeaders: FC<{
     mnemonic: string[];
     type?: 'standard' | 'mam' | 'tron';
     allowCopy?: boolean;
-}> = ({ mnemonic, type, allowCopy }) => {
+    descriptionDown?: boolean;
+}> = ({ mnemonic, type, allowCopy, descriptionDown }) => {
     const { t } = useTranslation();
     const config = useActiveConfig();
     const sdk = useAppSdk();
@@ -155,7 +165,7 @@ export const WordsGridAndHeaders: FC<{
     return (
         <>
             <HeadingBlock>
-                <H2Label2Responsive>
+                <H2Label2ResponsiveStyled>
                     {t(
                         type === 'mam'
                             ? 'secret_words_account_title'
@@ -163,10 +173,16 @@ export const WordsGridAndHeaders: FC<{
                             ? 'export_trc_20_wallet'
                             : 'secret_words_title'
                     )}
-                </H2Label2Responsive>
-                <Body>
-                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
-                </Body>
+                </H2Label2ResponsiveStyled>
+                {!descriptionDown && (
+                    <Body>
+                        {t(
+                            mnemonic.length === 12
+                                ? 'secret_words_caption_12'
+                                : 'secret_words_caption'
+                        )}
+                    </Body>
+                )}
             </HeadingBlock>
 
             {type === 'mam' && (
@@ -199,6 +215,12 @@ export const WordsGridAndHeaders: FC<{
                     </Body1>
                 ))}
             </WorldsGridStyled>
+
+            {descriptionDown && (
+                <Body>
+                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
+                </Body>
+            )}
 
             {allowCopy && (
                 <Button
@@ -606,7 +628,7 @@ export const ImportWords: FC<{
     };
 
     return (
-        <>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('import_wallet_title_web')}</H2Label2Responsive>
@@ -657,11 +679,12 @@ export const ImportWords: FC<{
                     loading={isLoading}
                     onClick={onSubmit}
                     bottom={standalone}
+                    type="submit"
                 >
                     {t('continue')}
                 </ButtonResponsiveSize>
             </BottomButtonBlock>
-        </>
+        </form>
     );
 };
 

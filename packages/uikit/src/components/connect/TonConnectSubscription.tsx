@@ -1,5 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
-import { TonConnectAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
+import {
+    TonConnectAppRequest,
+    TonConnectAppRequestPayload
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     replyBadRequestResponse,
     replyDisconnectResponse
@@ -14,12 +17,9 @@ import {
     useDisconnectTonConnectApp,
     useTonConnectLastEventId
 } from '../../state/tonConnect';
-import { TonTransactionNotification } from './TonTransactionNotification';
-import { useResponseSendMutation } from './connectHook';
-
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
 import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
-import { SendTransactionAppRequest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonConnectRequestNotification } from './TonConnectRequestNotification';
 
 const useUnSupportMethodMutation = () => {
     return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
@@ -28,7 +28,7 @@ const useUnSupportMethodMutation = () => {
 const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
 
 const TonConnectSubscription = () => {
-    const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
+    const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
@@ -37,12 +37,28 @@ const TonConnectSubscription = () => {
 
     const { mutateAsync: disconnect } = useDisconnectTonConnectApp();
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
-    const { mutateAsync: responseSendAsync } = useResponseSendMutation();
 
     useSendNotificationAnalytics(request?.connection?.manifest);
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
 
     useEffect(() => {
+        const openNotification = (clientSessionId: string, value: TonConnectAppRequestPayload) => {
+            const walletToActivate = appConnections?.find(i =>
+                i.connections.some(c => c.clientSessionId === clientSessionId)
+            );
+
+            if (walletToActivate) {
+                setActiveWallet(walletToActivate.wallet.rawAddress).then(() =>
+                    setTimeout(() => {
+                        setRequest(value);
+                    }, 100)
+                );
+            } else {
+                setTimeout(() => {
+                    setRequest(value);
+                }, 100);
+            }
+        };
         const handleMessage = (params: TonConnectAppRequest) => {
             switch (params.request.method) {
                 case 'disconnect': {
@@ -52,30 +68,23 @@ const TonConnectSubscription = () => {
                 }
                 case 'sendTransaction': {
                     setRequest(undefined);
-                    const value = {
+                    const value: TonConnectAppRequestPayload = {
                         connection: params.connection,
                         id: params.request.id,
+                        kind: 'sendTransaction',
                         payload: JSON.parse(params.request.params[0])
                     };
-                    const walletToActivate = appConnections?.find(i =>
-                        i.connections.some(
-                            c => c.clientSessionId === params.connection.clientSessionId
-                        )
-                    );
-
-                    if (walletToActivate) {
-                        setActiveWallet(walletToActivate.wallet.rawAddress).then(() =>
-                            setTimeout(() => {
-                                setRequest(value);
-                            }, 100)
-                        );
-                    } else {
-                        setTimeout(() => {
-                            setRequest(value);
-                        }, 100);
-                    }
-
-                    return;
+                    return openNotification(params.connection.clientSessionId, value);
+                }
+                case 'signData': {
+                    setRequest(undefined);
+                    const value: TonConnectAppRequestPayload = {
+                        connection: params.connection,
+                        id: params.request.id,
+                        kind: 'signData',
+                        payload: params.request.params
+                    };
+                    return openNotification(params.connection.clientSessionId, value);
                 }
                 default: {
                     return badRequestResponse(params);
@@ -114,22 +123,15 @@ const TonConnectSubscription = () => {
         };
     }, [sdk, appConnections, lastEventId, disconnect, setRequest, badRequestResponse]);
 
-    const handleClose = useCallback(
-        async (boc?: string) => {
-            if (!request) return;
-            try {
-                await responseSendAsync({ request, boc });
-            } finally {
-                setRequest(undefined);
-            }
+    const handleClose = useCallback(() => {
+        if (!request) return;
+        setRequest(undefined);
 
-            sendBroadcastMessage(
-                BROADCAST_TAG,
-                JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
-            );
-        },
-        [request, responseSendAsync, setRequest]
-    );
+        sendBroadcastMessage(
+            BROADCAST_TAG,
+            JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
+        );
+    }, [request, setRequest]);
 
     useEffect(() => {
         if (!request) {
@@ -160,14 +162,7 @@ const TonConnectSubscription = () => {
         });
     }, []);
 
-    return (
-        <>
-            <TonTransactionNotification
-                params={request?.payload ?? null}
-                handleClose={handleClose}
-            />
-        </>
-    );
+    return <TonConnectRequestNotification request={request} handleClose={handleClose} />;
 };
 
 export default TonConnectSubscription;

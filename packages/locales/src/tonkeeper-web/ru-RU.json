@@ -405,7 +405,7 @@
   "tron_top_up_trx_title": "TRX требуется для операций с USD₮ TRC20",
   "try_again": "Повторить",
   "two_fa_confirm_tg_cannot_access_tg": "Не можете получить доступ к своему Telegram аккаунту?",
-  "two_fa_confirm_tg_description": "Перейдите в @tonkeeper_2fa_bot и нажмите «Подтвердить», чтобы завершить транзакцию.",
+  "two_fa_confirm_tg_description": "Перейдите в @tonkeeper и нажмите «Подтвердить», чтобы завершить транзакцию.",
   "two_fa_confirm_tg_title": "Подтвердите транзакцию в Telegram",
   "two_fa_long": "Двухфакторная аутентификация",
   "two_fa_recovery_cancelled_toast": "Восстановление отменено. Теперь переведите свои средства в новый кошелек для безопасности",

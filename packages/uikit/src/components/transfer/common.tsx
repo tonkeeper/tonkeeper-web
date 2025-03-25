@@ -1,15 +1,22 @@
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { tokenToTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { TonTransferParams } from '@tonkeeper/core/dist/service/deeplinkingService';
+import {
+    RecipientData,
+    TonRecipientData,
+    TronRecipientData
+} from '@tonkeeper/core/dist/entries/send';
+import {
+    TonTransferParams,
+    TronTransferParams
+} from '@tonkeeper/core/dist/service/deeplinkingService';
 import { Account, JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon } from '../Icon';
-import { NotificationCancelButton, NotificationTitleBlock } from '../Notification';
+import { NotificationCancelButton, NotificationTitleBlock, NotificationBackButton } from '../Notification';
 import { Body1, H3Label2Responsive } from '../Text';
 import { ButtonMock, RoundedButtonResponsive } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
@@ -19,6 +26,7 @@ import { useIsActiveWalletLedger } from '../../state/ledger';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { formatAddress, seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
+import { ResponseError } from '@tonkeeper/core/dist/2faApi';
 
 export const duration = 300;
 export const timingFunction = 'ease-in-out';
@@ -300,13 +308,7 @@ export const RecipientHeaderBlock: FC<{
 }> = ({ title, onClose, onBack }) => {
     return (
         <NotificationTitleBlock>
-            {onBack ? (
-                <RoundedButtonResponsive onClick={onBack}>
-                    <ChevronLeftIcon />
-                </RoundedButtonResponsive>
-            ) : (
-                <ButtonMock />
-            )}
+            {onBack ? <NotificationBackButton onBack={onBack} /> : <ButtonMock />}
             <H3Label2Responsive>{title}</H3Label2Responsive>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
@@ -324,9 +326,7 @@ export const AmountHeaderBlock: AmountHeaderBlockComponent = ({ onBack, onClose,
     const { t } = useTranslation();
     return (
         <NotificationTitleBlock>
-            <RoundedButtonResponsive onClick={onBack}>
-                <ChevronLeftIcon />
-            </RoundedButtonResponsive>
+            <NotificationBackButton onBack={onBack} />
             <Center>
                 <Title>{t('txActions_amount')}</Title>
                 {children}
@@ -378,15 +378,22 @@ export const notifyError = async (sdk: IAppSdk, t: (value: string) => string, er
         sdk.alert(t('send_sending_wrong_time_description'));
     }
 
+    if (error instanceof ResponseError) {
+        const body = await error.response.json();
+        if ('error' in body) {
+            return sdk.topMessage(body.error);
+        }
+    }
+
     throw error;
 };
 
 export interface InitTransferData {
-    initRecipient?: TonRecipientData;
+    initRecipient?: RecipientData;
     initAmountState?: Partial<AmountState>;
 }
 
-export const makeTransferInitData = (
+export const makeTonTransferInitData = (
     tonTransfer: TonTransferParams,
     fromAccount: Account,
     toAccount: Account,
@@ -411,6 +418,27 @@ export const makeTransferInitData = (
     return {
         initRecipient,
         initAmountState
+    };
+};
+
+export const makeTronTransferInitData = (tronTransfer: TronTransferParams): InitTransferData => {
+    if (!tronTransfer.address) {
+        return {};
+    }
+    const initRecipient: TronRecipientData = {
+        address: {
+            blockchain: BLOCKCHAIN_NAME.TRON,
+            address: tronTransfer.address
+        },
+        done: true
+    };
+
+    // TODO tron: is it safe to parse and paste amount?
+    // TODO tron: amount asset is not specified, do user might be confused transferring usdt instead of TRX
+    // const initAmountState = makeTransferInitAmountState(tonTransfer, fromAccount, jettons);
+
+    return {
+        initRecipient
     };
 };
 

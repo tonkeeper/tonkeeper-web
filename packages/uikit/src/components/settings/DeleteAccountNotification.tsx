@@ -48,9 +48,9 @@ export const DeleteNotificationContent: FC<{
     const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
-        await mutateAsync(accountId);
         onClose();
         navigate(AppRoute.home);
+        await mutateAsync(accountId);
     };
 
     return (

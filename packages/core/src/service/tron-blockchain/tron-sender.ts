@@ -8,6 +8,8 @@ import { TronWallet } from '../../entries/tron/tron-wallet';
 import { TronAddressUtils } from '@ton-keychain/trx';
 import { TronWeb } from 'tronweb';
 import { TronEstimation } from '../../entries/send';
+import { errorMessage } from '../../utils/types';
+import { NotEnoughBatteryBalanceError } from '../../errors/NotEnoughBatteryBalanceError';
 const AbiCoder = ethers.AbiCoder;
 
 const toHexAddress = (base58: string) => {
@@ -56,9 +58,21 @@ export class TronSender {
         );
 
         const signedTx = await this.tronSigner(transactionExtended);
-        await this.tronApi.sendTransaction(signedTx, this.walletInfo.address, resources, {
-            xTonConnectAuth: this.xTonConnectAuth
-        });
+
+        try {
+            await this.tronApi.sendTransaction(signedTx, this.walletInfo.address, resources, {
+                xTonConnectAuth: this.xTonConnectAuth
+            });
+        } catch (e) {
+            if (e && typeof e === 'object' && 'response' in e && e.response instanceof Response) {
+                const message = await e.response.text();
+                if (message.includes('Not enough balance')) {
+                    throw new NotEnoughBatteryBalanceError(errorMessage(e)!);
+                }
+            }
+
+            throw e;
+        }
     }
 
     async estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation> {

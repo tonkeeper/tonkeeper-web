@@ -12,9 +12,15 @@ import { DesktopHistory } from '../../components/desktop/history/DesktopHistory'
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig, useActiveWallet } from '../../state/wallet';
+import { Body2, Label2 } from '../../components/Text';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { LinkOutIcon, SpinnerRing } from '../../components/Icon';
-import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
+import {
+    defaultHistoryFilters,
+    useFetchFilteredActivity,
+    useHistoryFilters,
+    useScrollMonitor
+} from '../../state/activity';
 import {
     AssetHistoryFilter,
     OtherHistoryFilters
@@ -25,6 +31,7 @@ import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv
 import { Body2 } from '../../components/Text';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
+import { Button } from '../../components/fields/Button';
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     ${p =>
@@ -79,6 +86,23 @@ const LoaderContainer = styled.div`
     > * {
         transform: scale(1.5);
     }
+`;
+
+const ClearFiltersContent = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+`;
+
+const EmptyHistoryContainer = styled.div`
+    height: calc(100% - 53px);
+`;
+
+const Body2Secondary = styled(Body2)`
+    color: ${p => p.theme.textSecondary};
 `;
 
 export const DesktopHistoryPage = () => {
@@ -138,6 +162,14 @@ const DesktopHistoryPageContent: FC = () => {
         setMonitorRef(el);
     }, []);
 
+
+  const {
+    asset: assetFilter,
+    filterSpam,
+    onlyInitiator: onlyInitiatorFilter,
+    setFilters
+  } = useHistoryFilters();
+
     const onOpenExplorer = () =>
         config.accountExplorer
             ? sdk.openPage(config.accountExplorer.replace('%s', formatAddress(wallet.rawAddress)))
@@ -195,6 +227,37 @@ const DesktopHistoryPageContent: FC = () => {
     }
 
     if (activity?.length === 0) {
+        if (
+            assetFilter !== defaultHistoryFilters.asset ||
+            onlyInitiatorFilter !== defaultHistoryFilters.onlyInitiator ||
+            filterSpam !== defaultHistoryFilters.filterSpam
+        ) {
+            return (
+                <HistoryPageWrapper>
+                    <HistoryHeaderContainer borderBottom>
+                        <Label2>{t('page_header_history')}</Label2>
+                        <ExplorerButton onClick={onOpenExplorer}>
+                            <LinkOutIcon color="currentColor" />
+                        </ExplorerButton>
+                        <FiltersWrapper>
+                            <AssetHistoryFilter />
+                            <OtherHistoryFilters />
+                        </FiltersWrapper>
+                    </HistoryHeaderContainer>
+                    <EmptyHistoryContainer>
+                        <ClearFiltersContent>
+                            <Label2>{t('activity_empty_reset_filters_title')}</Label2>
+                            <Body2Secondary>
+                                {t('activity_empty_reset_filters_description')}
+                            </Body2Secondary>
+                            <Button secondary onClick={() => setFilters(defaultHistoryFilters)}>
+                                {t('activity_empty_reset_filters_button')}
+                            </Button>
+                        </ClearFiltersContent>
+                    </EmptyHistoryContainer>
+                </HistoryPageWrapper>
+            );
+        }
         return (
             <Suspense fallback={<ActivitySkeletonPage />}>
                 <DesktopViewPageLayoutStyled>

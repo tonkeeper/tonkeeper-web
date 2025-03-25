@@ -42,6 +42,74 @@ import { TronWeb } from 'tronweb';
 import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
 
+export const signDataOver = ({
+    sdk,
+    accountId,
+    checkTouchId,
+    wallet,
+    t
+}: {
+    sdk: IAppSdk;
+    accountId: AccountId;
+    wallet?: TonWalletStandard;
+    t: (text: string) => string;
+    checkTouchId: () => Promise<void>;
+}) => {
+    return async (payload: Uint8Array) => {
+        const account = await accountsStorage(sdk.storage).getAccount(accountId);
+
+        if (!account) {
+            throw new Error("Can't use sign data over non standard ton wallet");
+        }
+
+        switch (account.type) {
+            case 'ton-only': {
+                throw new TxConfirmationCustomError(
+                    'Signer linked by QR is not support sign data.'
+                );
+            }
+            case 'ledger': {
+                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+            }
+            case 'keystone': {
+                throw new TxConfirmationCustomError("Can't sign data over Keystone wallet");
+            }
+            case 'testnet':
+            case 'mnemonic': {
+                const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+                if (secret.type !== 'mnemonic') {
+                    throw new Error('Unexpected secret type');
+                }
+                const keyPair = await mnemonicToKeypair(secret.mnemonic, account.mnemonicType);
+                return nacl.sign.detached(payload, new Uint8Array(keyPair.secretKey));
+            }
+            case 'mam': {
+                const w = wallet ?? account.activeTonWallet;
+                const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id, checkTouchId);
+                const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
+                return nacl.sign.detached(payload, new Uint8Array(keyPair.secretKey));
+            }
+            case 'sk': {
+                const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+                if (secret.type !== 'sk') {
+                    throw new Error('Unexpected secret type');
+                }
+                const keyPair = keyPairFromSecretKey(Buffer.from(secret.sk, 'hex'));
+                return nacl.sign.detached(payload, new Uint8Array(keyPair.secretKey));
+            }
+            case 'watch-only': {
+                throw new TxConfirmationCustomError("Can't sign data over watch-only wallet");
+            }
+            case 'ton-multisig': {
+                throw new TxConfirmationCustomError("Can't sign data over multisig wallet");
+            }
+            default: {
+                assertUnreachable(account);
+            }
+        }
+    };
+};
+
 export const signTonConnectOver = ({
     sdk,
     accountId,

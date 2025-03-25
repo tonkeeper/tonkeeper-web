@@ -122,7 +122,7 @@ const useNftTransferEstimation = (
 const useSendNft = (
     recipient: TonRecipientData,
     nftItem: NftItem,
-    fee: TransactionFee | undefined,
+    estimation: TonEstimation | undefined,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
         selectedSenderType: SenderTypeUserAvailable;
@@ -142,10 +142,10 @@ const useSendNft = (
             return false;
         }
 
-        if (!fee) return false;
+        if (!estimation) return false;
 
-        if (fee.type !== 'ton-asset' || fee.extra.asset.id !== TON_ASSET.id) {
-            throw new Error(`Unexpected fee ${fee}`);
+        if (estimation.fee.type === 'ton-asset' && estimation.fee.extra.asset.id !== TON_ASSET.id) {
+            throw new Error(`Unexpected fee ${estimation.fee}`);
         }
 
         try {
@@ -172,7 +172,7 @@ const useSendNft = (
 
             const nftEncoder = new NFTEncoder(account.activeTonWallet.rawAddress);
             const nftTransferAmountWei = new BigNumber(NFTEncoder.nftTransferBase.toString()).plus(
-                fee.extra.weiAmount
+                Math.abs(estimation.event?.extra ?? 0)
             );
             const nftTransferMsg = nftEncoder.encodeNftTransfer({
                 nftAddress: nftItem.address,
@@ -227,19 +227,24 @@ export const ConfirmNftView: FC<{
     const [selectedSenderType, onSenderTypeChange] = useState<
         SenderTypeUserAvailable | undefined
     >();
+
+    const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
+    const { mutateAsync, isLoading, error, reset, isIdle } = useSendNft(
+        recipient,
+        nftItem,
+        estimation.data,
+        { multisigTTL, selectedSenderType: selectedSenderType! }
+    );
+
     useEffect(() => {
+        if (!isIdle) {
+            return;
+        }
+
         if (availableSendersChoices) {
             onSenderTypeChange(availableSendersChoices[0].type);
         }
-    }, [availableSendersChoices]);
-
-    const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
-    const { mutateAsync, isLoading, error, reset } = useSendNft(
-        recipient,
-        nftItem,
-        estimation.data?.fee,
-        { multisigTTL, selectedSenderType: selectedSenderType! }
-    );
+    }, [JSON.stringify(availableSendersChoices), isIdle]);
 
     const image = nftItem.previews?.find(item => item.resolution === '100x100');
 

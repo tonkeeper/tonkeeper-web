@@ -157,8 +157,7 @@ const ListItemElementInGroup = styled(ListItemElement)`
 `;
 
 const ListBlockStyled = styled(ListBlock)`
-    overflow: hidden;
-    & > *:nth-child(3) > div {
+    & > *:first-child > div {
         border-top: none !important;
 
         > div {

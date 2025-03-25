@@ -1,11 +1,13 @@
-import { CONNECT_EVENT_ERROR_CODES } from './tonConnect';
+import { CONNECT_EVENT_ERROR_CODES, SIGN_DATA_ERROR_CODES } from './tonConnect';
 
 export class TonConnectError extends Error {
     code: number;
 
     constructor(
         message: string,
-        code: CONNECT_EVENT_ERROR_CODES = CONNECT_EVENT_ERROR_CODES.UNKNOWN_ERROR
+        code:
+            | CONNECT_EVENT_ERROR_CODES
+            | SIGN_DATA_ERROR_CODES = CONNECT_EVENT_ERROR_CODES.UNKNOWN_ERROR
     ) {
         super(message);
         this.code = code;

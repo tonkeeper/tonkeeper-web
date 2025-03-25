@@ -59,42 +59,6 @@ const CookieSettings = () => {
     return <SettingsList items={items} />;
 };
 
-const TextAndBadge = styled.div`
-    display: flex;
-    align-items: center;
-    gap: 6px;
-`;
-
-const EnableTwoFASettings = () => {
-    const { mutate: mutateSettings } = useMutateDevSettings();
-    const { data: devSettings } = useDevSettings();
-
-    return null; // TODO force disable 2fa on frontend. SC must be improved
-
-    const config = useActiveConfig();
-    if (config.flags?.disable_2fa) {
-        return null;
-    }
-
-    return (
-        <ListBlockDesktopAdaptive>
-            <ListItem hover={false}>
-                <ListItemPayload>
-                    <TextAndBadge>
-                        <Label1>Enable 2FA</Label1>
-                        <Badge color="textSecondary">Experimental</Badge>
-                    </TextAndBadge>
-                    <Switch
-                        disabled={!devSettings}
-                        checked={!!devSettings?.twoFAEnabled}
-                        onChange={checked => mutateSettings({ twoFAEnabled: checked })}
-                    />
-                </ListItemPayload>
-            </ListItem>
-        </ListBlockDesktopAdaptive>
-    );
-};
-
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const navigate = useNavigate();
@@ -160,7 +124,6 @@ export const DevSettings = React.memo(() => {
         <>
             <SubHeader title="Dev Menu" />
             <InnerBody>
-                <EnableTwoFASettings />
                 <CookieSettings />
                 <AddAccountBySK />
             </InnerBody>

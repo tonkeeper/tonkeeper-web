@@ -44,10 +44,11 @@ import {
     InitTransferData,
     MainButton,
     makeTransferInitAmountState,
-    makeTransferInitData,
+    makeTonTransferInitData,
     RecipientHeaderBlock,
     TransferViewHeaderBlock,
-    Wrapper
+    Wrapper,
+    makeTronTransferInitData
 } from './common';
 import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -434,7 +435,7 @@ const NotificationStyled = styled(Notification)`
 const SendActionNotification = () => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
-    const [tonTransfer, setTonTransfer] = useState<InitTransferData | undefined>(undefined);
+    const [transferParams, setTransferParams] = useState<InitTransferData | undefined>(undefined);
     const { data: jettons } = useJettonList();
     const wallet = useActiveWallet();
 
@@ -454,6 +455,7 @@ const SendActionNotification = () => {
             setChain(options.params.chain);
 
             if (transfer.chain === BLOCKCHAIN_NAME.TRON) {
+                setTransferParams(makeTronTransferInitData(transfer));
                 setOpen(true);
                 track('send_open', { from: transfer.from });
                 return;
@@ -462,13 +464,13 @@ const SendActionNotification = () => {
             getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
                 if (transfer.address && seeIfValidTonAddress(transfer.address)) {
                     getAccountAsync({ address: transfer.address }).then(toAccount => {
-                        setTonTransfer(
-                            makeTransferInitData(transfer, fromAccount, toAccount, jettons)
+                        setTransferParams(
+                            makeTonTransferInitData(transfer, fromAccount, toAccount, jettons)
                         );
                         setOpen(true);
                     });
                 } else {
-                    setTonTransfer({
+                    setTransferParams({
                         initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
                     });
                     setOpen(true);
@@ -485,7 +487,7 @@ const SendActionNotification = () => {
     }, [jettons, track]);
 
     const onClose = useCallback(() => {
-        setTonTransfer(undefined);
+        setTransferParams(undefined);
         setOpen(false);
     }, []);
 
@@ -494,11 +496,11 @@ const SendActionNotification = () => {
             <SendContent
                 onClose={onClose}
                 chain={chain}
-                initAmountState={tonTransfer?.initAmountState}
-                initRecipient={tonTransfer?.initRecipient}
+                initAmountState={transferParams?.initAmountState}
+                initRecipient={transferParams?.initRecipient}
             />
         );
-    }, [open, tonTransfer, chain]);
+    }, [open, transferParams, chain]);
 
     return (
         <NotificationStyled
