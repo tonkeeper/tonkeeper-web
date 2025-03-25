@@ -1,5 +1,5 @@
 import { createModalControl } from './createModalControl';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useTwoFAServiceConfig, useTwoFAWalletConfigMayBeOfMultisigHost } from '../../state/two-fa';
 import styled from 'styled-components';
 import { Notification } from '../Notification';
