@@ -40,7 +40,11 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { getMultisigSignerInfo } from '../../state/multisig';
 import { GaslessConfig, Multisig } from '@tonkeeper/core/dist/tonApiV2';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { isStandardTonWallet, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    isStandardTonWallet,
+    TonWalletStandard,
+    WalletVersion
+} from '@tonkeeper/core/dist/entries/wallet';
 import { useGaslessConfig } from '../../state/gasless';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -224,6 +228,19 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 account.activeTonWallet
             );
 
+            let externalSenderEstimationError = false;
+            try {
+                const externalSender = new WalletMessageSender(
+                    api,
+                    account.activeTonWallet as TonWalletStandard,
+                    estimationSigner
+                );
+
+                await tonConnectService.estimate(externalSender, payload);
+            } catch (e) {
+                externalSenderEstimationError = true;
+            }
+
             if (
                 !batteryEnableConfig.disableOperations &&
                 batteryAuthToken &&
@@ -272,7 +289,11 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                     try {
                         await tonConnectService.estimate(gaslessSender, payload);
 
-                        choices.push({ type: 'gasless', asset });
+                        if (externalSenderEstimationError) {
+                            choices.unshift({ type: 'gasless', asset });
+                        } else {
+                            choices.push({ type: 'gasless', asset });
+                        }
                     } catch (e) {
                         console.error(e);
                     }
@@ -282,7 +303,8 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             return choices;
         },
         {
-            enabled: batteryAuthToken !== undefined && jettons !== undefined
+            enabled: batteryAuthToken !== undefined && jettons !== undefined,
+            keepPreviousData: true
         }
     );
 };

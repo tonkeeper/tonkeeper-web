@@ -198,7 +198,9 @@ const ConnectContent: FC<{
         }
 
         if (selectedSenderType === 'gasless') {
-            return availableSendersChoices!.find(s => s.type === 'gasless')!;
+            return (
+                availableSendersChoices?.find(s => s.type === 'gasless') || EXTERNAL_SENDER_CHOICE
+            );
         }
 
         throw new Error('Unexpected sender choice');

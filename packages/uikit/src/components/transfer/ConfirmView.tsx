@@ -393,6 +393,9 @@ export const ConfirmViewButtons: FC<{
                 break;
             case error instanceof NotEnoughBatteryBalanceError:
                 errorText = t('confirm_error_insufficient_battery_balance');
+                break;
+            default:
+                errorText = t('send_publish_tx_error');
         }
 
         return (
