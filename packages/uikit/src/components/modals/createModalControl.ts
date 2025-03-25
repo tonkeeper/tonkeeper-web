@@ -25,7 +25,7 @@ export const createModalControl = <T = object>() => {
                 onClose: useCallback(() => {
                     setIsOpen(false);
                     controller.abort('Modal Closed');
-                    setTimeout(() => setController(new AbortController()), 1000);
+                    setTimeout(() => setController(new AbortController()), 2000);
                 }, [setIsOpen, setController]),
                 controller
             };
