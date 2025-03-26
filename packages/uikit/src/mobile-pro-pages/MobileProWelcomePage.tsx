@@ -5,7 +5,6 @@ import { useAddWalletNotification } from '../components/modals/AddWalletNotifica
 
 const Container = styled.div`
     height: 100%;
-    padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     display: flex;
     flex-direction: column;
@@ -34,6 +33,8 @@ const ButtonsContainer = styled.div`
     gap: 16px;
     width: 100%;
     padding: 16px 32px 32px;
+    flex: 1;
+    justify-content: flex-end;
 `;
 
 export const MobileProWelcomePage = () => {
@@ -73,6 +74,7 @@ const Icon = styled.div`
     display: flex;
     align-items: flex-end;
     justify-content: center;
+    padding-top: env(safe-area-inset-top);
 
     &::after {
         content: '';
