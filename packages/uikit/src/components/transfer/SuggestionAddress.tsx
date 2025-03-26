@@ -30,7 +30,7 @@ export const SuggestionAddress: FC<{ item: Suggestion }> = ({ item }) => {
             <ListItem
                 onClick={e => {
                     e.stopPropagation();
-                    sdk.copyToClipboard(address, t('address_copied'));
+                    sdk.copyToClipboard(address);
                 }}
             >
                 <ListItemPayload>

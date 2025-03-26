@@ -430,7 +430,7 @@
   "two_fa_settings_set_up_tg_step_description": "Подтвердите соединение в Telegram ",
   "two_fa_settings_tg_recovery_button": "Привязать новый аккаунт",
   "two_fa_settings_tg_recovery_text": "Не можете получить доступ к своему Telegram аккаунту? Привязка нового аккаунта займет 14 дней.",
-  "two_fa_settings_warning_balance_required": "Для установки или удаления расширения требуется 0.5 TON.",
+  "two_fa_settings_warning_balance_required": "Для установки или удаления расширения требуется 0.15 TON.",
   "two_fa_settings_warning_battery_gasless": "Батарейка Tonkeeper и безгазовые транзакции не работают с двухфакторной аутентификацией.",
   "two_fa_settings_warning_can_not_recover": "2FA не поможет восстановить вашу секретную фразу.",
   "two_fa_settings_warning_wallet_will_stop": "Этот же кошелек перестанет работать на других ваших устройствах.",

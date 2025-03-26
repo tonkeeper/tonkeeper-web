@@ -431,8 +431,11 @@ export const useGetSender = () => {
     const twoFaApi = useTwoFAApi();
 
     const { data: twoFAConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
-    const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
-        useConfirmTwoFANotification();
+    const {
+        controller: controllerTwoFa,
+        onOpen: openTwoFaConfirmTelegram,
+        onClose: closeTwoFaConfirmTelegram
+    } = useConfirmTwoFANotification();
     const twoFAServiceConfig = useTwoFAServiceConfig();
     const batteryUnitTonRate = useBatteryUnitTonRate();
 
@@ -480,6 +483,7 @@ export const useGetSender = () => {
                         signer,
                         twoFAConfig.pluginAddress,
                         {
+                            controllerTwoFa,
                             openConfirmModal: () => {
                                 openTwoFaConfirmTelegram();
                                 return closeTwoFaConfirmTelegram;
@@ -524,6 +528,7 @@ export const useGetSender = () => {
                         signer,
                         twoFAConfig.pluginAddress,
                         {
+                            controllerTwoFa,
                             openConfirmModal: () => {
                                 openTwoFaConfirmTelegram();
                                 return closeTwoFaConfirmTelegram;
@@ -561,6 +566,7 @@ export const useGetSender = () => {
                     signer,
                     twoFAConfig.pluginAddress,
                     {
+                        controllerTwoFa,
                         openConfirmModal: () => {
                             openTwoFaConfirmTelegram();
                             return closeTwoFaConfirmTelegram;
