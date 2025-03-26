@@ -201,7 +201,12 @@ export const AddWalletNotificationControlled = () => {
 
     return (
         <AddWalletContext.Provider value={{ navigateHome }}>
-            <NotificationStyled isOpen={isOpen} handleClose={onCloseCallback} mWidth={'750px'}>
+            <NotificationStyled
+                isOpen={isOpen}
+                handleClose={onCloseCallback}
+                mWidth={'750px'}
+                mobileFullScreen
+            >
                 {Content}
             </NotificationStyled>
         </AddWalletContext.Provider>
