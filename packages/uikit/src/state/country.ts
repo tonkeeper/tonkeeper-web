@@ -17,7 +17,7 @@ export enum CountryFeature {
 }
 
 export enum RegulatoryState {
-    UK = 'UK'
+    UK = 'UK',
     GB = 'GB'
 }
 
