@@ -20,11 +20,9 @@ function shuffle<T>(array: T[]) {
 
 export function useRecommendations() {
     const { tonendpoint } = useAppContext();
-    const country = useUserCountry();
-    const lang = country.data || 'en';
 
-    return useQuery<Recommendations, Error>([QueryKey.featuredRecommendations, lang], async () => {
-        const data: Recommendations = await tonendpoint.getAppsPopular(lang);
+    return useQuery<Recommendations, Error>([QueryKey.featuredRecommendations], async () => {
+        const data: Recommendations = await tonendpoint.getAppsPopular();
         // TODO: Remove mobile hack
         data.categories = data.categories.filter(item => item.id !== 'featured');
 

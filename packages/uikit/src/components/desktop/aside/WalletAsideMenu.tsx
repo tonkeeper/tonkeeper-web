@@ -31,6 +31,8 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
+import { HideForRegulatoryState } from '../../HideForState';
+import { CountryFeature } from '../../../state/country';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -128,16 +130,18 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                {!isReadOnly && !isTestnet && (
-                    <NavLink to={AppRoute.swap}>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive}>
-                                <SwapIconStyled />
-                                <Label2>{t('wallet_swap')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
-                )}
+                <HideForRegulatoryState feature={CountryFeature.swap}>
+                    {!isReadOnly && !isTestnet && (
+                        <NavLink to={AppRoute.swap}>
+                            {({ isActive }) => (
+                                <AsideMenuItemStyled isSelected={isActive}>
+                                    <SwapIconStyled />
+                                    <Label2>{t('wallet_swap')}</Label2>
+                                </AsideMenuItemStyled>
+                            )}
+                        </NavLink>
+                    )}
+                </HideForRegulatoryState>
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
                     <NavLink to={AppRoute.multisigWallets}>
