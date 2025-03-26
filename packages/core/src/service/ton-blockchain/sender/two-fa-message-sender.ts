@@ -42,6 +42,7 @@ export class TwoFAMessageSender implements ISender {
         private readonly signer: CellSigner,
         private readonly pluginAddress: string,
         private readonly options: {
+            controllerTwoFa?: AbortController;
             openConfirmModal?: () => CloseConfirmModalCallback;
             confirmMessageTGTtlSeconds?: number;
         } = {}
@@ -324,6 +325,10 @@ export class TwoFAMessageSender implements ISender {
     }
 
     private async bocByMsgId(msgId: string, attempt = 0): Promise<string> {
+        if (this.options.controllerTwoFa?.signal.aborted) {
+            throw new Error('Message published. Please confirm it on second factor');
+        }
+
         if (lastSearchingMessageId !== msgId) {
             throw new Error('Message has been replaced with a new one. Stop searching for it');
         }

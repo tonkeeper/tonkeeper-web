@@ -21,8 +21,11 @@ export const useEstimateDeployMultisig = () => {
 
     const queryClient = useQueryClient();
     const twoFaApi = useTwoFAApi();
-    const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
-        useConfirmTwoFANotification();
+    const {
+        controller: controllerTwoFa,
+        onOpen: openTwoFaConfirmTelegram,
+        onClose: closeTwoFaConfirmTelegram
+    } = useConfirmTwoFANotification();
     const twoFAServiceConfig = useTwoFAServiceConfig();
 
     return useMutation<
@@ -56,6 +59,7 @@ export const useEstimateDeployMultisig = () => {
                 estimationSigner,
                 twoFaConfig.pluginAddress,
                 {
+                    controllerTwoFa,
                     openConfirmModal: () => {
                         openTwoFaConfirmTelegram();
                         return closeTwoFaConfirmTelegram;

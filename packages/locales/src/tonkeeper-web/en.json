@@ -449,7 +449,7 @@
   "two_fa_settings_set_up_tg_step_description": "Confirm your connection in your Telegram ",
   "two_fa_settings_tg_recovery_button": "Link new account",
   "two_fa_settings_tg_recovery_text": "Can’t access your Telegram account? Linking a new account will take 14 days.",
-  "two_fa_settings_warning_balance_required": "0.5 TON is required to install or uninstall 2FA.",
+  "two_fa_settings_warning_balance_required": "0.15 TON is required to install or uninstall 2FA.",
   "two_fa_settings_warning_battery_gasless": "Battery mode and gasless transactions are not compatible with 2FA.",
   "two_fa_settings_warning_can_not_recover": "2FA can't recover your secret phrase.",
   "two_fa_settings_warning_wallet_will_stop": "The same wallet will stop working on your other devices.",

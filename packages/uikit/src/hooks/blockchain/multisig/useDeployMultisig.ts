@@ -58,8 +58,11 @@ export const useDeployMultisig = (
         walletId: accountAndWallet?.wallet.id
     });
     const twoFaApi = useTwoFAApi();
-    const { onOpen: openTwoFaConfirmTelegram, onClose: closeTwoFaConfirmTelegram } =
-        useConfirmTwoFANotification();
+    const {
+        controller: controllerTwoFa,
+        onOpen: openTwoFaConfirmTelegram,
+        onClose: closeTwoFaConfirmTelegram
+    } = useConfirmTwoFANotification();
     const twoFAServiceConfig = useTwoFAServiceConfig();
 
     return useMutation<string | undefined, Error>(async () => {
@@ -106,6 +109,7 @@ export const useDeployMultisig = (
                     signer,
                     twoFaConfig.pluginAddress,
                     {
+                        controllerTwoFa,
                         openConfirmModal: () => {
                             openTwoFaConfirmTelegram();
                             return closeTwoFaConfirmTelegram;

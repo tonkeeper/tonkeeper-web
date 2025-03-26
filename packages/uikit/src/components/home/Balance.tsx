@@ -277,7 +277,7 @@ const AddressSingleChain = () => {
     const address = formatAddress(account.activeTonWallet.rawAddress, network);
 
     return (
-        <Body onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+        <Body onClick={() => sdk.copyToClipboard(address)}>
             {toShortValue(address)}
             <AccountAndWalletBadgesGroupStyled
                 account={account}

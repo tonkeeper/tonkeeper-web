@@ -46,6 +46,8 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { fallbackRenderOver } from '../../components/Error';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -82,7 +84,9 @@ export const DesktopManageMultisigsPage = () => {
                     }
                 />
             </DesktopViewHeader>
-            <DesktopManageMultisigsPageBody />
+            <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display multisigs')}>
+                <DesktopManageMultisigsPageBody />
+            </ErrorBoundary>
         </DesktopViewPageLayoutStyled>
     );
 };
@@ -148,7 +152,9 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
     const multisigAccounts = useMemo(() => {
         const allWallets = accounts.flatMap(a => a.activeTonWallet).map(w => w.rawAddress);
         return multisigs.map(m => {
-            const existingAccount = accounts.find(a => a.id === m.address) as AccountTonMultisig;
+            const existingAccount = accounts.find(a => a.id === m.address) as
+                | AccountTonMultisig
+                | undefined;
             const name =
                 existingAccount?.name || 'Multisig ' + toShortValue(formatAddress(m.address));
             const emoji =
@@ -160,7 +166,9 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
                 name,
                 emoji,
                 isAdded: !!existingAccount,
-                isPinned: existingAccount?.isPinnedForWallet(selectedHostWalletId),
+                isPinned: existingAccount
+                    ? existingAccount.isPinnedForWallet(selectedHostWalletId)
+                    : false,
                 balance: m.balance,
                 hostWallets: m.signers.filter(s => allWallets.includes(s))
             };
