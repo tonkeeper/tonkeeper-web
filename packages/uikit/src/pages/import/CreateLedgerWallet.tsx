@@ -26,7 +26,7 @@ import {
 } from '../../components/Notification';
 import { LedgerConnectionSteps } from '../../components/ledger/LedgerConnectionSteps';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
-import { useNavigate } from "../../hooks/router/useNavigate";
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const ConnectLedgerWrapper = styled.div`
     display: flex;
@@ -199,11 +199,13 @@ const ChooseLedgerAccounts: FC<{
 
     const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
     const onCloseInterceptor = useMemo<OnCloseInterceptor>(() => {
-        return closeModal => {
+        return (closeModal, cancelCloseHandle) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeModal();
+                    } else {
+                        cancelCloseHandle();
                     }
                 }
             });

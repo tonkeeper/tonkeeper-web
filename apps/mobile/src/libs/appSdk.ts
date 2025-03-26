@@ -94,9 +94,13 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     targetEnv = CAPACITOR_APPLICATION_ID;
 
-    hapticNotification = (type: 'success' | 'error' | 'impact_medium') => {
+    hapticNotification = (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => {
         if (type === 'impact_medium') {
             return Haptics.impact({ style: ImpactStyle.Medium });
+        }
+
+        if (type === 'impact_light') {
+            return Haptics.impact({ style: ImpactStyle.Light });
         }
 
         return Haptics.notification({

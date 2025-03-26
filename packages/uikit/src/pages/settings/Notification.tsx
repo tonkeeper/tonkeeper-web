@@ -9,7 +9,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { signTonConnectOver } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
+import { useSecurityCheck } from '../../state/password';
 import {
     useActiveAccount,
     useActiveApi,
@@ -43,7 +43,7 @@ const useToggleSubscribe = () => {
     const sdk = useAppSdk();
     const account = useActiveAccount();
     const client = useQueryClient();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
     const api = useActiveApi();
     const network = useActiveTonNetwork();
 
@@ -58,7 +58,7 @@ const useToggleSubscribe = () => {
                 await notifications.subscribe(
                     api,
                     wallet,
-                    signTonConnectOver({ sdk, accountId: account.id, t, checkTouchId })
+                    signTonConnectOver({ sdk, accountId: account.id, t, securityCheck })
                 );
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);

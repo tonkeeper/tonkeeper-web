@@ -7,7 +7,7 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
-import { useCheckTouchId } from '../../../state/password';
+import { useSecurityCheck } from '../../../state/password';
 import { useTranslation } from '../../translation';
 import { anyOfKeysParts, QueryKey } from '../../../libs/queryKey';
 import { AccountsApi, Multisig, MultisigApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -48,7 +48,7 @@ export const useDeployMultisig = (
     const client = useQueryClient();
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
     const notifyError = useNotifyErrorHandle();
     const rawTransactionService = useTonRawTransactionService();
 
@@ -84,7 +84,7 @@ export const useDeployMultisig = (
                 throw new TxConfirmationCustomError(t('create_multisig_error_already_deployed'));
             }
 
-            const signer = await getSigner(sdk, accountAndWallet.account.id, checkTouchId, {
+            const signer = await getSigner(sdk, accountAndWallet.account.id, securityCheck, {
                 walletId: accountAndWallet.wallet.id
             }).catch(e => {
                 console.error(e);

@@ -8,6 +8,8 @@ import { Input } from '../fields/Input';
 import { Notification, NotificationBlock } from '../Notification';
 import { usePasswordStorage } from '../../hooks/useStorage';
 import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
+import { useMutateSecuritySettings, useSecuritySettings } from '../../state/password';
+import { hashAdditionalSecurityPassword } from '../../state/global-preferences';
 
 const Block = styled.div`
     display: flex;
@@ -21,12 +23,37 @@ const useUpdatePassword = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const passwordStorage = usePasswordStorage();
+    const securitySettings = useSecuritySettings();
+    const { mutateAsync: mutateSecuritySettings } = useMutateSecuritySettings();
+
+    const isCorrectPassword = async (password: string) => {
+        if (securitySettings.additionalPasswordHash) {
+            return (
+                (await hashAdditionalSecurityPassword(password)) ===
+                securitySettings.additionalPasswordHash
+            );
+        }
+
+        return passwordStorage.isPasswordValid(password);
+    };
+
+    const saveNewPassword = async (oldPassword: string, newPassword: string) => {
+        if (securitySettings.additionalPasswordHash) {
+            const newPasswordHash = await hashAdditionalSecurityPassword(newPassword);
+            return mutateSecuritySettings({
+                additionalPasswordHash: newPasswordHash
+            });
+        }
+
+        return passwordStorage.updatePassword(oldPassword, newPassword);
+    };
+
     return useMutation<
         'invalid-old' | 'invalid-confirm' | 'invalid-password' | undefined,
         Error,
         { old: string; password: string; confirm: string }
     >(async ({ old, password, confirm }) => {
-        const isValidOld = await passwordStorage.isPasswordValid(old);
+        const isValidOld = await isCorrectPassword(old);
         if (!isValidOld) {
             return 'invalid-old';
         }
@@ -38,7 +65,7 @@ const useUpdatePassword = () => {
             return 'invalid-confirm';
         }
 
-        await passwordStorage.updatePassword(old, password);
+        await saveNewPassword(old, password);
 
         sdk.uiEvents.emit('copy', {
             method: 'copy',

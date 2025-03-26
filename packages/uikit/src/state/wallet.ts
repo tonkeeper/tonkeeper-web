@@ -61,7 +61,7 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
-import { useCheckTouchId } from './password';
+import { useMutateSecuritySettings, useSecurityCheck } from './password';
 import {
     encryptWalletSecret,
     seeIfMnemonicValid,
@@ -223,7 +223,7 @@ export const useCreateMAMAccountDerivation = () => {
     const sdk = useAppSdk();
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -232,7 +232,7 @@ export const useCreateMAMAccountDerivation = () => {
         }
         const newDerivationIndex = account.lastAddedIndex + 1;
 
-        const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+        const secret = await getAccountSecret(sdk, accountId, securityCheck);
         if (secret.type !== 'mnemonic') {
             throw new Error('Unexpected secret type');
         }
@@ -844,6 +844,7 @@ export const useMutateLogOut = () => {
     const deleteFolder = useDeleteFolder();
     const accounts = useAccountsState();
     const { mutateAsync: removeAccountTwoFA } = useRemoveAccountTwoFAData();
+    const { mutateAsync: setSecuritySettings } = useMutateSecuritySettings();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
@@ -865,7 +866,12 @@ export const useMutateLogOut = () => {
             )
             .map(acc => acc.id);
 
-        await storage.removeAccountsFromState([accountId, ...multisigs]);
+        const newAccounts = await storage.removeAccountsFromState([accountId, ...multisigs]);
+
+        if (newAccounts.length === 0) {
+            await setSecuritySettings(null);
+        }
+
         await removeAccountTwoFA(accountId);
         await client.invalidateQueries([QueryKey.account]);
         await client.invalidateQueries([QueryKey.pro]);

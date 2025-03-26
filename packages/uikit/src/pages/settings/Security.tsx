@@ -22,8 +22,9 @@ import {
     useCanPromptTouchId,
     useLookScreen,
     useMutateLookScreen,
+    useMutateSecuritySettings,
     useMutateTouchId,
-    useTouchIdEnabled
+    useSecuritySettings
 } from '../../state/password';
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 import styled from 'styled-components';
@@ -34,6 +35,12 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useAppTargetEnv } from '../../hooks/appSdk';
+import { CreatePasswordNotification } from '../../components/create/CreatePassword';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { hashAdditionalSecurityPassword } from '../../state/global-preferences';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { MobileProChangePinNotification } from '../../components/mobile-pro/pin/MobileProChangePin';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -66,11 +73,11 @@ const Label1Capitalised = styled(Label1)`
 const TouchIdSwitch = () => {
     const { t } = useTranslation();
     const { data: canPrompt } = useCanPromptTouchId();
+    const securitySettings = useSecuritySettings();
 
-    const { data: touchIdEnabled } = useTouchIdEnabled();
     const { mutate } = useMutateTouchId();
 
-    if (!canPrompt) {
+    if (!canPrompt || !securitySettings.additionalPasswordHash) {
         return null;
     }
 
@@ -79,18 +86,37 @@ const TouchIdSwitch = () => {
             <ListItem hover={false}>
                 <ListItemPayload>
                     <Label1Capitalised>{t('biometry_default')}</Label1Capitalised>
-                    <Switch checked={!!touchIdEnabled} onChange={mutate} />
+                    <Switch checked={!!securitySettings.biometrics} onChange={mutate} />
                 </ListItemPayload>
             </ListItem>
         </ListBlockDesktopAdaptive>
     );
 };
 
-const ChangePassword = () => {
+const Password = () => {
+    const env = useAppTargetEnv();
+
+    switch (env) {
+        case 'desktop':
+        case 'tablet':
+            return <DesktopAndTabletProPassword />;
+        case 'mobile':
+            return <MobileProPassword />;
+        case 'extension':
+        case 'web':
+        case 'twa':
+            return <WebPassword />;
+        case 'swap_widget_web':
+            return null;
+        default:
+            assertUnreachable(env);
+    }
+};
+
+const WebPassword = () => {
     const { t } = useTranslation();
     const [isOpen, setOpen] = useState(false);
 
-    const isPasswordSet = useIsPasswordSet();
     const items = useMemo(() => {
         const i: SettingsItem[] = [
             {
@@ -102,16 +128,76 @@ const ChangePassword = () => {
         return i;
     }, []);
 
-    if (isPasswordSet) {
-        return (
-            <>
-                <SettingsList items={items} />
-                <ChangePasswordNotification isOpen={isOpen} handleClose={() => setOpen(false)} />
-            </>
-        );
-    } else {
-        return <></>;
-    }
+    return (
+        <>
+            <SettingsList items={items} />
+            <ChangePasswordNotification isOpen={isOpen} handleClose={() => setOpen(false)} />
+        </>
+    );
+};
+
+/**
+ * Pin is always set here
+ */
+const MobileProPassword = () => {
+    const { t } = useTranslation();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    return (
+        <>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false} onClick={onOpen}>
+                    <ListItemPayload>
+                        <Label1Capitalised>{t('security_change_passcode')}</Label1Capitalised>
+                        <LockIcon />
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+            <MobileProChangePinNotification isOpen={isOpen} onClose={onClose} />
+        </>
+    );
+};
+
+/**
+ * Password can be not set here
+ */
+const DesktopAndTabletProPassword = () => {
+    const { t } = useTranslation();
+
+    const securitySettings = useSecuritySettings();
+    const { mutate } = useMutateSecuritySettings();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+
+    return (
+        <>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false} onClick={onOpen}>
+                    <ListItemPayload>
+                        <Label1Capitalised>
+                            {securitySettings.additionalPasswordHash
+                                ? t('Change_password')
+                                : t('set_up_password')}
+                        </Label1Capitalised>
+                        <LockIcon />
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+            {securitySettings.additionalPasswordHash ? (
+                <ChangePasswordNotification isOpen={isOpen} handleClose={onClose} />
+            ) : (
+                <CreatePasswordNotification
+                    isOpen={isOpen}
+                    handleClose={password => {
+                        if (password) {
+                            hashAdditionalSecurityPassword(password).then(additionalPasswordHash =>
+                                mutate({ additionalPasswordHash })
+                            );
+                        }
+                        onClose();
+                    }}
+                />
+            )}
+        </>
+    );
 };
 
 const ShowPhrases = () => {
@@ -165,7 +251,7 @@ export const SecuritySettings = () => {
                 </ForTargetEnv>
                 <LockSwitch />
                 <TouchIdSwitch />
-                <ChangePassword />
+                <Password />
                 <ShowPhrases />
             </DesktopWrapper>
         );
@@ -177,7 +263,7 @@ export const SecuritySettings = () => {
             <InnerBody>
                 <LockSwitch />
                 <TouchIdSwitch />
-                <ChangePassword />
+                <Password />
                 <ShowPhrases />
             </InnerBody>
         </>

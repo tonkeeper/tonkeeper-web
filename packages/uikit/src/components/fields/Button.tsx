@@ -121,13 +121,13 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
         switch (props.size) {
             case 'large':
                 return css`
-                    border-radius: ${props.theme.displayType === 'full-width'
+                    border-radius: ${props.theme.proDisplayType === 'desktop'
                         ? props.theme.corner2xSmall
                         : props.theme.cornerSmall};
                 `;
             default:
                 return css`
-                    border-radius: ${props.theme.displayType === 'full-width'
+                    border-radius: ${props.theme.proDisplayType === 'desktop'
                         ? props.theme.corner2xSmall
                         : props.theme.cornerLarge};
                 `;

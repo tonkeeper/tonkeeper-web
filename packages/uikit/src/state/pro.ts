@@ -27,7 +27,7 @@ import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
-import { useCheckTouchId } from './password';
+import { useSecurityCheck } from './password';
 import {
     getAccountByWalletById,
     getWalletById,
@@ -92,7 +92,7 @@ export const useSelectWalletForProMutation = () => {
     const client = useQueryClient();
     const api = useActiveApi();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
     const accountsStorage = useAccountsStorage();
     const authService = useProAuthTokenService();
 
@@ -118,7 +118,7 @@ export const useSelectWalletForProMutation = () => {
             authService,
             api,
             wallet,
-            signTonConnectOver({ sdk, accountId: account.id, wallet, t, checkTouchId })
+            signTonConnectOver({ sdk, accountId: account.id, wallet, t, securityCheck })
         );
 
         await client.invalidateQueries([QueryKey.pro]);

@@ -3,7 +3,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useActiveAccount, useActiveApi } from '../state/wallet';
 import { useTranslation } from './translation';
 import { useAppSdk } from './appSdk';
-import { useCheckTouchId } from '../state/password';
+import { useSecurityCheck } from '../state/password';
 import { useMutation } from '@tanstack/react-query';
 import {
     createTonProofItem,
@@ -29,7 +29,7 @@ export const useSignTonProof = () => {
     const account = useActiveAccount();
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<
         Omit<ReturnType<typeof createTonProofItem>, 'stateInit'> & { stateInit: string },
@@ -54,7 +54,7 @@ export const useSignTonProof = () => {
                 accountId: account.id,
                 wallet: account.activeTonWallet,
                 t,
-                checkTouchId
+                securityCheck
             })(proofPayload.bufferToSign),
             proofPayload,
             stateInit

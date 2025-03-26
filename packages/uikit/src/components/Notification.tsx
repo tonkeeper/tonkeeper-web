@@ -430,7 +430,9 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
     });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
-export type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
+export type OnCloseInterceptor =
+    | ((closeHandle: () => void, cancelCloseHandle: () => void) => void)
+    | undefined;
 
 const allNotificationsControl$ = {
     closeHandlers: new Set<() => void>()
@@ -488,7 +490,46 @@ export const NotificationIonic: FC<{
         if (!onCloseInterceptor) {
             handleClose();
         } else {
-            onCloseInterceptor(handleClose);
+            onCloseInterceptor(handleClose, () => {});
+        }
+    }, [handleClose, onCloseInterceptor]);
+
+    /**
+     * Prevent Ionic bug -- touching modal background calls canDismiss twice
+     */
+    const canDismissAnswerCache = useRef<{ timestamp: number; answer: boolean } | undefined>();
+
+    const canDismiss = useMemo(() => {
+        if (!onCloseInterceptor) {
+            return true;
+        } else {
+            return () => {
+                if (
+                    canDismissAnswerCache.current &&
+                    Date.now() - canDismissAnswerCache.current.timestamp <= 600
+                ) {
+                    return Promise.resolve(canDismissAnswerCache.current.answer);
+                }
+
+                return new Promise<boolean>(r =>
+                    onCloseInterceptor(
+                        () => {
+                            canDismissAnswerCache.current = {
+                                timestamp: Date.now(),
+                                answer: true
+                            };
+                            r(true);
+                        },
+                        () => {
+                            canDismissAnswerCache.current = {
+                                timestamp: Date.now(),
+                                answer: false
+                            };
+                            r(false);
+                        }
+                    )
+                );
+            };
         }
     }, [handleClose, onCloseInterceptor]);
 
@@ -523,7 +564,8 @@ export const NotificationIonic: FC<{
         >
             <IonModal
                 isOpen={isOpen}
-                onDidDismiss={onClose}
+                onWillDismiss={onClose}
+                canDismiss={canDismiss}
                 initialBreakpoint={1}
                 breakpoints={[0, 1]}
                 handle={false}
@@ -592,7 +634,7 @@ export const NotificationDesktopAndWeb: FC<{
         if (!onCloseInterceptor) {
             handleClose();
         } else {
-            onCloseInterceptor(handleClose);
+            onCloseInterceptor(handleClose, () => {});
         }
     }, [handleClose, onCloseInterceptor]);
     const [entered, setEntered] = useState(false);

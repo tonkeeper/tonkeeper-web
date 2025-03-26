@@ -138,7 +138,7 @@ export const MultisigConfigForm: FC<{
     );
 
     const onNotificationCloseInterceptor = useCallback(
-        (closeHandle: () => void) => {
+        (closeHandle: () => void, cancelCloseHandle: () => void) => {
             if (!isDirty) {
                 closeHandle();
             } else {
@@ -146,6 +146,8 @@ export const MultisigConfigForm: FC<{
                     onClose: discard => {
                         if (discard) {
                             closeHandle();
+                        } else {
+                            cancelCloseHandle();
                         }
                     }
                 });

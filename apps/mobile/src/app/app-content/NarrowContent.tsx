@@ -5,14 +5,12 @@ import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useAppWidth } from '../../libs/hooks';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import {
     AppProRoute,
     AppRoute,
     SettingsRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
-import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
@@ -24,7 +22,6 @@ import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import styled, { createGlobalStyle } from 'styled-components';
-import { Container } from '@tonkeeper/uikit';
 import { BackgroundElements, usePrefetch } from './common';
 import './ionic-styles';
 import { IonContent, IonMenu, IonModal, IonRouterOutlet } from '@ionic/react';
@@ -62,10 +59,10 @@ import { IonReactMemoryRouter } from '@ionic/react-router';
 import { createIsolatedMemoryHistory } from '../../libs/isolated-memory-history';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { useAllChainsAssetsWithPrice } from '@tonkeeper/uikit/dist/state/home';
-
-const FullSizeWrapper = styled(Container)`
-    max-width: 800px;
-`;
+import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProWelcomePage';
+import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
+import { useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
+import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -93,13 +90,6 @@ const WalletLayoutBody = styled.div`
     display: flex;
 `;
 
-const FullSizeWrapperBounded = styled(FullSizeWrapper)`
-    max-height: 100%;
-    overflow: auto;
-
-    justify-content: center;
-`;
-
 export const NarrowContent: FC<{
     activeAccount?: Account | null;
     lock: boolean;
@@ -115,48 +105,56 @@ export const NarrowContent: FC<{
 const NarrowContentBody: FC<{
     activeAccount?: Account | null;
     lock: boolean;
-}> = ({ activeAccount, lock }) => {
-    const location = useLocation();
+}> = ({ activeAccount }) => {
     useWindowsScroll();
     useAppWidth();
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+    const { additionalPasswordHash } = useSecuritySettings();
+    const accountQuery = useActiveAccountQuery();
+
+    /* if (lock) {
+        return (
+            <FullSizeWrapper>
+                <Unlock />
+            </FullSizeWrapper>
+        );
+    }*/
+
+    if (!activeAccount || !additionalPasswordHash || !accountQuery.data) {
+        return <NarrowContentInitialPages accountIsCreated={!!activeAccount} />;
+    }
+
+    return <NarrowContentAppRouting />;
+};
+
+const NarrowContentInitialPages: FC<{
+    accountIsCreated: boolean;
+}> = ({ accountIsCreated }) => {
+    useEffect(() => {
+        SplashScreen.hide();
+    }, []);
+
+    if (!accountIsCreated) {
+        return <MobileProWelcomePage />;
+    }
+
+    return <MobileProCreatePasswordPage />;
+};
+
+const NarrowContentAppRouting = () => {
+    const location = useLocation();
+
     const { assets } = useAllChainsAssetsWithPrice();
     const isSplashHidden = useRef(false);
-
     const isReady = assets !== undefined;
-
     useEffect(() => {
         if (isReady && !isSplashHidden.current) {
             isSplashHidden.current = true;
             SplashScreen.hide();
         }
     }, [isReady]);
-
-    if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
-    }
-
-    if (!activeAccount || location.pathname?.startsWith(AppRoute.import)) {
-        return (
-            <FullSizeWrapperBounded className="full-size-wrapper">
-                <InitializeContainer fullHeight={false}>
-                    <Initialize />
-                </InitializeContainer>
-            </FullSizeWrapperBounded>
-        );
-    }
-
-    return <NarrowContentAppRouting />;
-};
-
-const NarrowContentAppRouting = () => {
-    const location = useLocation();
 
     return (
         <WideLayout>

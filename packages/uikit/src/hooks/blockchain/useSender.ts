@@ -58,7 +58,7 @@ import { useConfirmTwoFANotification } from '../../components/modals/ConfirmTwoF
 import { useTronApi } from '../../state/tron/tron';
 import { TronSender } from '@tonkeeper/core/dist/service/tron-blockchain/tron-sender';
 import { useAppSdk } from '../appSdk';
-import { useCheckTouchId } from '../../state/password';
+import { useSecurityCheck } from '../../state/password';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { QueryKey } from '../../libs/queryKey';
@@ -666,12 +666,12 @@ export const useGetTronSender = () => {
     const sdk = useAppSdk();
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
     const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
     const { data: authToken } = useBatteryAuthToken();
 
     return useCallback(async () => {
-        const signer = getTronSigner(sdk, tronApi, activeAccount, checkTouchId);
+        const signer = getTronSigner(sdk, tronApi, activeAccount, securityCheck);
 
         if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
             throw new Error('Tron is not enabled for the active wallet');
@@ -680,7 +680,7 @@ export const useGetTronSender = () => {
         const token = authToken ?? (await requestToken());
 
         return new TronSender(tronApi, activeAccount.activeTronWallet, signer, token);
-    }, [tronApi, activeAccount, checkTouchId]);
+    }, [tronApi, activeAccount, securityCheck]);
 };
 
 export const useGetTronEstimationSender = () => {

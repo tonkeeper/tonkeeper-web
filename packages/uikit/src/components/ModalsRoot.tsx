@@ -11,6 +11,8 @@ import { DeleteAccountNotificationControlled } from './modals/DeleteAccountNotif
 import { ManageFolderNotificationControlled } from './modals/ManageFolderNotificationControlled';
 import { ConfirmTwoFANotificationControlled } from './modals/ConfirmTwoFANotificationControlled';
 import { BuyNotificationControlled } from './modals/BuyNotificationControlled';
+import { PromptMobileProPinNotificationControlled } from './modals/PromptMobileProPin';
+import { CheckDesktopPasswordControlled } from './modals/PromptDesktopPassword';
 
 export const ModalsRoot = () => {
     return (
@@ -28,6 +30,8 @@ export const ModalsRoot = () => {
             <ManageFolderNotificationControlled />
             <ConfirmTwoFANotificationControlled />
             <BuyNotificationControlled />
+            <PromptMobileProPinNotificationControlled />
+            <CheckDesktopPasswordControlled />
         </>
     );
 };

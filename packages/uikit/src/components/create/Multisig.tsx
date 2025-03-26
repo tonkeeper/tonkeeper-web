@@ -152,11 +152,13 @@ const CreateMultisigAwaitDeployPage: FC<{
     );
 
     const onNotificationCloseInterceptor = useCallback(
-        (closeHandler: () => void) => {
+        (closeHandler: () => void, cancelCloseHandler: () => void) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeHandler();
+                    } else {
+                        cancelCloseHandler();
                     }
                 }
             });

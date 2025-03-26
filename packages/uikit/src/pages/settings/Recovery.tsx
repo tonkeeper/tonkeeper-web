@@ -12,7 +12,7 @@ import { BackButtonBlock } from '../../components/BackButton';
 import { WordsGridAndHeaders } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
 import { getAccountSecret, getMAMWalletMnemonic } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
+import { useSecurityCheck } from '../../state/password';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
 import { Body2Class, H2Label2Responsive } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
@@ -53,7 +53,7 @@ export const Recovery = () => {
 const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId) => {
     const [secret, setSecret] = useState<AccountSecret | undefined>(undefined);
     const sdk = useAppSdk();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     useEffect(() => {
         (async () => {
@@ -62,10 +62,15 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 if (walletId !== undefined) {
                     _secret = {
                         type: 'mnemonic' as const,
-                        mnemonic: await getMAMWalletMnemonic(sdk, accountId, walletId, checkTouchId)
+                        mnemonic: await getMAMWalletMnemonic(
+                            sdk,
+                            accountId,
+                            walletId,
+                            securityCheck
+                        )
                     };
                 } else {
-                    _secret = await getAccountSecret(sdk, accountId, checkTouchId);
+                    _secret = await getAccountSecret(sdk, accountId, securityCheck);
                 }
                 setSecret(_secret);
             } catch (e) {
@@ -73,7 +78,7 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 onBack();
             }
         })();
-    }, [onBack, accountId, checkTouchId, walletId]);
+    }, [onBack, accountId, securityCheck, walletId]);
 
     return secret;
 };

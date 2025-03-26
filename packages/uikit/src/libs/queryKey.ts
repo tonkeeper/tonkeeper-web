@@ -9,7 +9,6 @@ export enum QueryKey {
     walletConfig = 'wallet_config',
     accountConfig = 'accountConfig',
     lock = 'lock',
-    touchId = 'touchId',
     canPromptTouchId = 'canPromptTouchId',
     country = 'country',
     password = 'password',

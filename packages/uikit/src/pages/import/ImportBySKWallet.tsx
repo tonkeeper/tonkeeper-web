@@ -71,11 +71,13 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
             return undefined;
         }
 
-        return closeModal => {
+        return (closeModal, cancelClose) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeModal();
+                    } else {
+                        cancelClose();
                     }
                 }
             });

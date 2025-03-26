@@ -71,7 +71,7 @@ export class TwaAppSdk extends BaseApp {
         }
     };
 
-    hapticNotification = (type: 'success' | 'error' | 'impact_medium') => {
+    hapticNotification = (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => {
         if (type === 'success' || type === 'error') {
             this.hapticFeedback.notificationOccurred(type);
         }

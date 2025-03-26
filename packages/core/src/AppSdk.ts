@@ -121,7 +121,7 @@ export interface IAppSdk {
 
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
-    hapticNotification: (type: 'success' | 'error' | 'impact_medium') => void;
+    hapticNotification: (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => void;
 
     notifications?: NotificationService;
     targetEnv: TargetEnv;
@@ -176,7 +176,7 @@ export abstract class BaseApp implements IAppSdk {
 
     twaExpand = () => {};
 
-    hapticNotification = (_: 'success' | 'error' | 'impact_medium') => {};
+    hapticNotification = (_: 'success' | 'error' | 'impact_medium' | 'impact_light') => {};
 
     version = '0.0.0';
 

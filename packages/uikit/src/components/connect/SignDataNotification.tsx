@@ -21,7 +21,7 @@ import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCusto
 import { useAppSdk } from '../../hooks/appSdk';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { signDataOver } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
+import { useSecurityCheck } from '../../state/password';
 import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
 import { Cell } from '@ton/core';
@@ -31,7 +31,7 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const api = useActiveApi();
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<SignDataResponse, Error>(async () => {
         const domain = new URL(origin).host;
@@ -47,7 +47,7 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
             address: activeAccount.activeTonWallet.rawAddress,
             timestamp
         });
-        const singer = signDataOver({ sdk, accountId: activeAccount.id, t, checkTouchId });
+        const singer = signDataOver({ sdk, accountId: activeAccount.id, t, securityCheck });
 
         const signature = await singer(payloadToSign);
 

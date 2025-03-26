@@ -150,11 +150,13 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
             return undefined;
         }
 
-        return closeModal => {
+        return (closeModal, cancelClose) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeModal();
+                    } else {
+                        cancelClose();
                     }
                 }
             });
