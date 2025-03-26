@@ -18,6 +18,7 @@ export enum CountryFeature {
 
 export enum RegulatoryState {
     UK = 'UK'
+    GB = 'GB'
 }
 
 export const seeIfFeatureAvailable = (
@@ -28,6 +29,7 @@ export const seeIfFeatureAvailable = (
         if (!state) return false; // Till loading
 
         switch (state) {
+            case RegulatoryState.GB:
             case RegulatoryState.UK: {
                 switch (feature) {
                     case CountryFeature.swap:
