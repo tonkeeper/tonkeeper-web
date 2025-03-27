@@ -28,6 +28,18 @@ import {
  */
 export interface GaslessEstimateRequest {
     /**
+     * TONAPI verifies that the account has enough jettons to pay the commission and make a transfer.
+     * @type {boolean}
+     * @memberof GaslessEstimateRequest
+     */
+    throwErrorIfNotEnoughJettons?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof GaslessEstimateRequest
+     */
+    returnEmulation?: boolean;
+    /**
      * 
      * @type {boolean}
      * @memberof GaslessEstimateRequest
@@ -73,6 +85,7 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'throwErrorIfNotEnoughJettons': json['throw_error_if_not_enough_jettons'] == null ? undefined : json['throw_error_if_not_enough_jettons'],
         'returnEmulation': json['return_emulation'] == null ? undefined : json['return_emulation'],
         'walletAddress': json['wallet_address'],
         'walletPublicKey': json['wallet_public_key'],
@@ -91,6 +104,7 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
 
     return {
         
+        'throw_error_if_not_enough_jettons': value['throwErrorIfNotEnoughJettons'],
         'return_emulation': value['returnEmulation'],
         'wallet_address': value['walletAddress'],
         'wallet_public_key': value['walletPublicKey'],
