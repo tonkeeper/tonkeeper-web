@@ -25,6 +25,12 @@ export interface EnterpriseEstimate200Response {
      * @memberof EnterpriseEstimate200Response
      */
     estimatedUpfrontPayment: string;
+    /**
+     * base64 encoded emulation results. The exact type can be taken from /v2/wallet/emulate (TONAPI).
+     * @type {string}
+     * @memberof EnterpriseEstimate200Response
+     */
+    emulation?: string;
 }
 
 /**
@@ -46,6 +52,7 @@ export function EnterpriseEstimate200ResponseFromJSONTyped(json: any, ignoreDisc
     return {
         
         'estimatedUpfrontPayment': json['estimated_upfront_payment'],
+        'emulation': json['emulation'] == null ? undefined : json['emulation'],
     };
 }
 
@@ -61,6 +68,7 @@ export function EnterpriseEstimate200ResponseFromJSONTyped(json: any, ignoreDisc
     return {
         
         'estimated_upfront_payment': value['estimatedUpfrontPayment'],
+        'emulation': value['emulation'],
     };
 }
 

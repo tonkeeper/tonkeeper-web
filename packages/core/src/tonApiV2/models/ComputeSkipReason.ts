@@ -20,7 +20,8 @@
 export const ComputeSkipReason = {
     NoState: 'cskip_no_state',
     BadState: 'cskip_bad_state',
-    NoGas: 'cskip_no_gas'
+    NoGas: 'cskip_no_gas',
+    Suspended: 'cskip_suspended'
 } as const;
 export type ComputeSkipReason = typeof ComputeSkipReason[keyof typeof ComputeSkipReason];
 
