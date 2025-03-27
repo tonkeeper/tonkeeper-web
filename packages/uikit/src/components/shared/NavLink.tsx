@@ -11,6 +11,7 @@ interface CustomNavLinkProps {
     exact?: boolean;
     end?: boolean;
     replace?: boolean;
+    disableMobileAnimation?: boolean;
 }
 
 export const NavLink: React.FC<CustomNavLinkProps> = ({
@@ -20,7 +21,8 @@ export const NavLink: React.FC<CustomNavLinkProps> = ({
     activeClassName = 'active',
     exact = false,
     end = false,
-    replace
+    replace,
+    disableMobileAnimation
 }) => {
     const location = useLocation();
 
@@ -32,7 +34,7 @@ export const NavLink: React.FC<CustomNavLinkProps> = ({
         return (
             <div
                 className={`${className} ${isActive ? activeClassName : ''}`}
-                onClick={() => navigate(to, { replace })}
+                onClick={() => navigate(to, { replace, disableMobileAnimation })}
             >
                 {children({ isActive })}
             </div>

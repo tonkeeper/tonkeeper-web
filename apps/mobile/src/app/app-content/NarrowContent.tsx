@@ -63,6 +63,8 @@ import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/Mob
 import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
 import { useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
 import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
+import { useAtom } from '@tonkeeper/uikit/dist/libs/atom';
+import { ionRouterAnimation$ } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -156,6 +158,8 @@ const NarrowContentAppRouting = () => {
         }
     }, [isReady]);
 
+    const [animated] = useAtom(ionRouterAnimation$);
+
     return (
         <WideLayout>
             <WideContent id="main-id--">
@@ -166,7 +170,7 @@ const NarrowContentAppRouting = () => {
                     <MobileProWalletMenu />
                     <WalletLayoutBody>
                         {/* Ionic doesn't support nested routing well */}
-                        <IonRouterOutlet id="main-content">
+                        <IonRouterOutlet id="main-content" animated={animated}>
                             <Route path={AppProRoute.dashboard} component={DashboardPage} />
                             <Route path={AppRoute.browser} component={DesktopBrowser} />
                             <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />

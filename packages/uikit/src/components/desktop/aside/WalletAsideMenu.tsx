@@ -157,7 +157,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 </HideOnReview>
                 <GroupsGap />
-                <NavLink to={AppRoute.home} end>
+                <NavLink to={AppRoute.home} end disableMobileAnimation>
                     {() => (
                         <AsideMenuItemStyled isSelected={location.pathname === AppRoute.home}>
                             <HouseIcon />
@@ -165,7 +165,7 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NavLink to={AppRoute.coins} end>
+                <NavLink to={AppRoute.coins} end disableMobileAnimation>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
                             <CoinsIcon />
@@ -184,7 +184,7 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             </NotForTargetEnv>
-            <NavLink to={AppRoute.activity}>
+            <NavLink to={AppRoute.activity} disableMobileAnimation>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <ClockSmoothIcon />
@@ -194,7 +194,7 @@ export const WalletAsideMenu = () => {
             </NavLink>
 
             <HideOnReview>
-                <NavLink to={AppRoute.purchases}>
+                <NavLink to={AppRoute.purchases} disableMobileAnimation>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
                             <SaleBadgeIcon />
@@ -202,7 +202,7 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NavLink to={AppRoute.dns}>
+                <NavLink to={AppRoute.dns} disableMobileAnimation>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
                             <SparkIcon />
@@ -211,7 +211,7 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
                 {!isReadOnly && !isTestnet && (
-                    <NavLink to={AppRoute.swap}>
+                    <NavLink to={AppRoute.swap} disableMobileAnimation>
                         {({ isActive }) => (
                             <AsideMenuItemStyled isSelected={isActive}>
                                 <SwapIconStyled />
@@ -222,7 +222,7 @@ export const WalletAsideMenu = () => {
                 )}
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
-                    <NavLink to={AppRoute.multisigWallets}>
+                    <NavLink to={AppRoute.multisigWallets} disableMobileAnimation>
                         {({ isActive }) => (
                             <AsideMenuItemStyled isSelected={isActive}>
                                 <ListIcon />
@@ -233,7 +233,7 @@ export const WalletAsideMenu = () => {
                 )}
                 {canUseBattery && <BatterySettingsListItem />}
             </HideOnReview>
-            <NavLink to={AppRoute.walletSettings} end>
+            <NavLink to={AppRoute.walletSettings} end disableMobileAnimation>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
@@ -281,7 +281,7 @@ const BatterySettingsListItem = () => {
     const { data: batteryBalance } = useBatteryBalance();
 
     return (
-        <NavLink to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+        <NavLink to={AppRoute.walletSettings + WalletSettingsRoute.battery} disableMobileAnimation>
             {({ isActive }) => (
                 <AsideMenuItemStyled isSelected={isActive}>
                     <BatteryIcon />

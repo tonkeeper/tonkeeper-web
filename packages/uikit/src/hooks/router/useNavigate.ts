@@ -2,15 +2,20 @@ import { useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useShouldReplaceNav } from './useShouldReplaceNav';
 import { useIonRouter } from '@ionic/react';
+import { atom } from '../../libs/atom';
+
+export const ionRouterAnimation$ = atom(true);
 
 export const useNavigate = () => {
     const history = useHistory();
     const location = useLocation();
     const replaceNavigate = useShouldReplaceNav();
     const ionRouter = useIonRouter();
-
     return useCallback(
-        (path: string | -1, options: { relative?: 'path'; replace?: boolean } = {}) => {
+        (
+            path: string | -1,
+            options: { relative?: 'path'; replace?: boolean; disableMobileAnimation?: boolean } = {}
+        ) => {
             if (typeof path === 'string' && path.startsWith('.')) {
                 options.relative = 'path';
                 path = path.slice(1);
@@ -44,10 +49,26 @@ export const useNavigate = () => {
                         }
                     }
 
-                    if (shouldReplace) {
-                        ionRouter.push(finalPath, isStepBack ? 'back' : 'forward', 'replace');
+                    const executeIonNavigation = () => {
+                        if (shouldReplace) {
+                            ionRouter.push(finalPath, isStepBack ? 'back' : 'forward', 'replace');
+                        } else {
+                            ionRouter.push(finalPath, isStepBack ? 'back' : 'forward', 'push');
+                        }
+                    };
+
+                    if (options.disableMobileAnimation) {
+                        ionRouterAnimation$.next(false);
+
+                        setTimeout(() => {
+                            executeIonNavigation();
+
+                            setTimeout(() => {
+                                ionRouterAnimation$.next(true);
+                            }, 100);
+                        }, 100);
                     } else {
-                        ionRouter.push(finalPath, isStepBack ? 'back' : 'forward', 'push');
+                        executeIonNavigation();
                     }
                 } else {
                     if (options.replace) {
