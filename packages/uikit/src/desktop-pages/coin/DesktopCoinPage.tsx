@@ -40,6 +40,8 @@ import { useSendTransferNotification } from '../../components/modals/useSendTran
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useBatteryBalance } from '../../state/battery';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
+import { HideForRegulatoryState } from '../../components/HideForState';
+import { CountryFeature } from '../../state/country';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -150,12 +152,15 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     {t('wallet_receive')}
                 </ButtonStyled>
                 <HideOnReview>
-                    {swapAsset && (
-                        <ButtonStyled size="small" onClick={onSwap}>
-                            <SwapIcon />
-                            {t('wallet_swap')}
-                        </ButtonStyled>
-                    )}
+                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                        {swapAsset && (
+                            <ButtonStyled size="small" onClick={onSwap}>
+                                <SwapIcon />
+                                {t('wallet_swap')}
+                            </ButtonStyled>
+                        )}
+                    </HideForRegulatoryState>
+
                     {canBuy && (
                         <ButtonStyled size="small" onClick={onOpen}>
                             <PlusIcon />

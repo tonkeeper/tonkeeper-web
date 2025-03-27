@@ -5,7 +5,6 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { relative, SettingsRoute } from '../../libs/routes';
 import { MessageIcon, NotificationIcon } from '../Icon';
-import { LocalizationIcon } from './SettingsIcons';
 import { SettingsItem, SettingsList } from './SettingsList';
 
 export const ThemeSettings = () => {
@@ -38,12 +37,6 @@ export const ThemeSettings = () => {
                 action: () => navigate(relative(SettingsRoute.localization))
             });
         }
-
-        items.push({
-            name: t('country'),
-            icon: <LocalizationIcon />,
-            action: () => navigate(relative(SettingsRoute.country))
-        });
         return items;
     }, [t, i18n.enable, navigate, fiat]);
 
