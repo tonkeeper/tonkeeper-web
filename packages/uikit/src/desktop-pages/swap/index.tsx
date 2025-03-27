@@ -14,6 +14,8 @@ import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefres
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { HideForRegulatoryState } from '../../components/HideForState';
+import { CountryFeature } from '../../state/country';
 
 const SwapPageWrapper = styled.div`
     overflow-y: auto;
@@ -75,9 +77,11 @@ const DesktopSwapPageContent = () => {
 export const DesktopSwapPage = () => {
     return (
         <HideOnReview>
-            <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
-                <DesktopSwapPageContent />
-            </ErrorBoundary>
+            <HideForRegulatoryState feature={CountryFeature.swap}>
+                <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
+                    <DesktopSwapPageContent />
+                </ErrorBoundary>
+            </HideForRegulatoryState>
         </HideOnReview>
     );
 };

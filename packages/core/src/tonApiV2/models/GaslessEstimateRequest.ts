@@ -41,6 +41,12 @@ export interface GaslessEstimateRequest {
     returnEmulation?: boolean;
     /**
      * 
+     * @type {boolean}
+     * @memberof GaslessEstimateRequest
+     */
+    returnEmulation?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof GaslessEstimateRequest
      */
