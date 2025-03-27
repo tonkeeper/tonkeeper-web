@@ -164,6 +164,7 @@ models/GetStorageProviders200Response.ts
 models/GetTonConnectPayload200Response.ts
 models/ImagePreview.ts
 models/InitStateRaw.ts
+models/InlineObject.ts
 models/JettonBalance.ts
 models/JettonBalanceLock.ts
 models/JettonBridgeParams.ts

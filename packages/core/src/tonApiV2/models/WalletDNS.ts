@@ -97,11 +97,11 @@ export function WalletDNSFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function WalletDNSToJSON(json: any): WalletDNS {
-      return WalletDNSToJSONTyped(json, false);
-  }
+export function WalletDNSToJSON(json: any): WalletDNS {
+    return WalletDNSToJSONTyped(json, false);
+}
 
-  export function WalletDNSToJSONTyped(value?: WalletDNS | null, ignoreDiscriminator: boolean = false): any {
+export function WalletDNSToJSONTyped(value?: WalletDNS | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -49,11 +49,11 @@ export function GetChartRates200ResponseFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function GetChartRates200ResponseToJSON(json: any): GetChartRates200Response {
-      return GetChartRates200ResponseToJSONTyped(json, false);
-  }
+export function GetChartRates200ResponseToJSON(json: any): GetChartRates200Response {
+    return GetChartRates200ResponseToJSONTyped(json, false);
+}
 
-  export function GetChartRates200ResponseToJSONTyped(value?: GetChartRates200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetChartRates200ResponseToJSONTyped(value?: GetChartRates200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -65,11 +65,11 @@ export function DecodedMessageExtInMsgDecodedWalletV5FromJSONTyped(json: any, ig
     };
 }
 
-  export function DecodedMessageExtInMsgDecodedWalletV5ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV5 {
-      return DecodedMessageExtInMsgDecodedWalletV5ToJSONTyped(json, false);
-  }
+export function DecodedMessageExtInMsgDecodedWalletV5ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV5 {
+    return DecodedMessageExtInMsgDecodedWalletV5ToJSONTyped(json, false);
+}
 
-  export function DecodedMessageExtInMsgDecodedWalletV5ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV5 | null, ignoreDiscriminator: boolean = false): any {
+export function DecodedMessageExtInMsgDecodedWalletV5ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV5 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

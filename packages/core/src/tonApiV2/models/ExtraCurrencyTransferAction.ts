@@ -109,11 +109,11 @@ export function ExtraCurrencyTransferActionFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function ExtraCurrencyTransferActionToJSON(json: any): ExtraCurrencyTransferAction {
-      return ExtraCurrencyTransferActionToJSONTyped(json, false);
-  }
+export function ExtraCurrencyTransferActionToJSON(json: any): ExtraCurrencyTransferAction {
+    return ExtraCurrencyTransferActionToJSONTyped(json, false);
+}
 
-  export function ExtraCurrencyTransferActionToJSONTyped(value?: ExtraCurrencyTransferAction | null, ignoreDiscriminator: boolean = false): any {
+export function ExtraCurrencyTransferActionToJSONTyped(value?: ExtraCurrencyTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

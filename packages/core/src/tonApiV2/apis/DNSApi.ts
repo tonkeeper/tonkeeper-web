@@ -19,6 +19,7 @@ import type {
   DnsRecord,
   DomainBids,
   DomainInfo,
+  InlineObject,
 } from '../models/index';
 import {
     AuctionsFromJSON,
@@ -29,6 +30,8 @@ import {
     DomainBidsToJSON,
     DomainInfoFromJSON,
     DomainInfoToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
 } from '../models/index';
 
 export interface DnsResolveRequest {

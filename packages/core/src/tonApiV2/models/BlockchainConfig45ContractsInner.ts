@@ -57,11 +57,11 @@ export function BlockchainConfig45ContractsInnerFromJSONTyped(json: any, ignoreD
     };
 }
 
-  export function BlockchainConfig45ContractsInnerToJSON(json: any): BlockchainConfig45ContractsInner {
-      return BlockchainConfig45ContractsInnerToJSONTyped(json, false);
-  }
+export function BlockchainConfig45ContractsInnerToJSON(json: any): BlockchainConfig45ContractsInner {
+    return BlockchainConfig45ContractsInnerToJSONTyped(json, false);
+}
 
-  export function BlockchainConfig45ContractsInnerToJSONTyped(value?: BlockchainConfig45ContractsInner | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainConfig45ContractsInnerToJSONTyped(value?: BlockchainConfig45ContractsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

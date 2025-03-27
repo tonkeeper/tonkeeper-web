@@ -128,11 +128,11 @@ export function BlockValueFlowFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function BlockValueFlowToJSON(json: any): BlockValueFlow {
-      return BlockValueFlowToJSONTyped(json, false);
-  }
+export function BlockValueFlowToJSON(json: any): BlockValueFlow {
+    return BlockValueFlowToJSONTyped(json, false);
+}
 
-  export function BlockValueFlowToJSONTyped(value?: BlockValueFlow | null, ignoreDiscriminator: boolean = false): any {
+export function BlockValueFlowToJSONTyped(value?: BlockValueFlow | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

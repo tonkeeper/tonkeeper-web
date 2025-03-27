@@ -120,11 +120,11 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function AccountEventToJSON(json: any): AccountEvent {
-      return AccountEventToJSONTyped(json, false);
-  }
+export function AccountEventToJSON(json: any): AccountEvent {
+    return AccountEventToJSONTyped(json, false);
+}
 
-  export function AccountEventToJSONTyped(value?: AccountEvent | null, ignoreDiscriminator: boolean = false): any {
+export function AccountEventToJSONTyped(value?: AccountEvent | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

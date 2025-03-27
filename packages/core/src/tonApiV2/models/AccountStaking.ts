@@ -57,11 +57,11 @@ export function AccountStakingFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function AccountStakingToJSON(json: any): AccountStaking {
-      return AccountStakingToJSONTyped(json, false);
-  }
+export function AccountStakingToJSON(json: any): AccountStaking {
+    return AccountStakingToJSONTyped(json, false);
+}
 
-  export function AccountStakingToJSONTyped(value?: AccountStaking | null, ignoreDiscriminator: boolean = false): any {
+export function AccountStakingToJSONTyped(value?: AccountStaking | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

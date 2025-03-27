@@ -57,11 +57,11 @@ export function JettonsFromJSONTyped(json: any, ignoreDiscriminator: boolean): J
     };
 }
 
-  export function JettonsToJSON(json: any): Jettons {
-      return JettonsToJSONTyped(json, false);
-  }
+export function JettonsToJSON(json: any): Jettons {
+    return JettonsToJSONTyped(json, false);
+}
 
-  export function JettonsToJSONTyped(value?: Jettons | null, ignoreDiscriminator: boolean = false): any {
+export function JettonsToJSONTyped(value?: Jettons | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

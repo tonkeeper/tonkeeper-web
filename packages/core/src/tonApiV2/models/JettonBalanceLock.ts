@@ -57,11 +57,11 @@ export function JettonBalanceLockFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function JettonBalanceLockToJSON(json: any): JettonBalanceLock {
-      return JettonBalanceLockToJSONTyped(json, false);
-  }
+export function JettonBalanceLockToJSON(json: any): JettonBalanceLock {
+    return JettonBalanceLockToJSONTyped(json, false);
+}
 
-  export function JettonBalanceLockToJSONTyped(value?: JettonBalanceLock | null, ignoreDiscriminator: boolean = false): any {
+export function JettonBalanceLockToJSONTyped(value?: JettonBalanceLock | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

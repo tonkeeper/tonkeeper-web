@@ -78,11 +78,11 @@ export function DnsRecordFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function DnsRecordToJSON(json: any): DnsRecord {
-      return DnsRecordToJSONTyped(json, false);
-  }
+export function DnsRecordToJSON(json: any): DnsRecord {
+    return DnsRecordToJSONTyped(json, false);
+}
 
-  export function DnsRecordToJSONTyped(value?: DnsRecord | null, ignoreDiscriminator: boolean = false): any {
+export function DnsRecordToJSONTyped(value?: DnsRecord | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

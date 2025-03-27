@@ -65,11 +65,11 @@ export function ServiceStatusFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function ServiceStatusToJSON(json: any): ServiceStatus {
-      return ServiceStatusToJSONTyped(json, false);
-  }
+export function ServiceStatusToJSON(json: any): ServiceStatus {
+    return ServiceStatusToJSONTyped(json, false);
+}
 
-  export function ServiceStatusToJSONTyped(value?: ServiceStatus | null, ignoreDiscriminator: boolean = false): any {
+export function ServiceStatusToJSONTyped(value?: ServiceStatus | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

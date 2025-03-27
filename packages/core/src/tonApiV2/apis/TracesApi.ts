@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
+  InlineObject,
   Trace,
 } from '../models/index';
 import {
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     TraceFromJSON,
     TraceToJSON,
 } from '../models/index';

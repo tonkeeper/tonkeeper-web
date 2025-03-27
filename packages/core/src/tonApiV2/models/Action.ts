@@ -385,11 +385,11 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
     };
 }
 
-  export function ActionToJSON(json: any): Action {
-      return ActionToJSONTyped(json, false);
-  }
+export function ActionToJSON(json: any): Action {
+    return ActionToJSONTyped(json, false);
+}
 
-  export function ActionToJSONTyped(value?: Action | null, ignoreDiscriminator: boolean = false): any {
+export function ActionToJSONTyped(value?: Action | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

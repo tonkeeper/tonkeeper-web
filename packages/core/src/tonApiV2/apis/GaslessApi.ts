@@ -19,6 +19,7 @@ import type {
   GaslessEstimateRequest,
   GaslessSendRequest,
   GaslessTx,
+  InlineObject,
   SignRawParams,
 } from '../models/index';
 import {
@@ -30,6 +31,8 @@ import {
     GaslessSendRequestToJSON,
     GaslessTxFromJSON,
     GaslessTxToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     SignRawParamsFromJSON,
     SignRawParamsToJSON,
 } from '../models/index';

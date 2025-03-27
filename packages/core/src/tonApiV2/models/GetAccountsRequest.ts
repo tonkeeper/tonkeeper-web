@@ -49,11 +49,11 @@ export function GetAccountsRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function GetAccountsRequestToJSON(json: any): GetAccountsRequest {
-      return GetAccountsRequestToJSONTyped(json, false);
-  }
+export function GetAccountsRequestToJSON(json: any): GetAccountsRequest {
+    return GetAccountsRequestToJSONTyped(json, false);
+}
 
-  export function GetAccountsRequestToJSONTyped(value?: GetAccountsRequest | null, ignoreDiscriminator: boolean = false): any {
+export function GetAccountsRequestToJSONTyped(value?: GetAccountsRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

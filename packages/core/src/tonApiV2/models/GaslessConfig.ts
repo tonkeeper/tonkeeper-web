@@ -65,11 +65,11 @@ export function GaslessConfigFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function GaslessConfigToJSON(json: any): GaslessConfig {
-      return GaslessConfigToJSONTyped(json, false);
-  }
+export function GaslessConfigToJSON(json: any): GaslessConfig {
+    return GaslessConfigToJSONTyped(json, false);
+}
 
-  export function GaslessConfigToJSONTyped(value?: GaslessConfig | null, ignoreDiscriminator: boolean = false): any {
+export function GaslessConfigToJSONTyped(value?: GaslessConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

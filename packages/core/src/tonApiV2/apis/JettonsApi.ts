@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   Event,
   GetAccountsRequest,
+  InlineObject,
   JettonHolders,
   JettonInfo,
   JettonTransferPayload,
@@ -27,6 +28,8 @@ import {
     EventToJSON,
     GetAccountsRequestFromJSON,
     GetAccountsRequestToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     JettonHoldersFromJSON,
     JettonHoldersToJSON,
     JettonInfoFromJSON,

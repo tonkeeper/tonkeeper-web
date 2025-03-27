@@ -81,11 +81,11 @@ export function GetRawShardInfo200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function GetRawShardInfo200ResponseToJSON(json: any): GetRawShardInfo200Response {
-      return GetRawShardInfo200ResponseToJSONTyped(json, false);
-  }
+export function GetRawShardInfo200ResponseToJSON(json: any): GetRawShardInfo200Response {
+    return GetRawShardInfo200ResponseToJSONTyped(json, false);
+}
 
-  export function GetRawShardInfo200ResponseToJSONTyped(value?: GetRawShardInfo200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetRawShardInfo200ResponseToJSONTyped(value?: GetRawShardInfo200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

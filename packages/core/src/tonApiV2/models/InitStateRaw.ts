@@ -65,11 +65,11 @@ export function InitStateRawFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function InitStateRawToJSON(json: any): InitStateRaw {
-      return InitStateRawToJSONTyped(json, false);
-  }
+export function InitStateRawToJSON(json: any): InitStateRaw {
+    return InitStateRawToJSONTyped(json, false);
+}
 
-  export function InitStateRawToJSONTyped(value?: InitStateRaw | null, ignoreDiscriminator: boolean = false): any {
+export function InitStateRawToJSONTyped(value?: InitStateRaw | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

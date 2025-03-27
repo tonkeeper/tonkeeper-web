@@ -71,11 +71,11 @@ export function DomainInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function DomainInfoToJSON(json: any): DomainInfo {
-      return DomainInfoToJSONTyped(json, false);
-  }
+export function DomainInfoToJSON(json: any): DomainInfo {
+    return DomainInfoToJSONTyped(json, false);
+}
 
-  export function DomainInfoToJSONTyped(value?: DomainInfo | null, ignoreDiscriminator: boolean = false): any {
+export function DomainInfoToJSONTyped(value?: DomainInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

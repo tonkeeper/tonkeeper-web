@@ -57,11 +57,11 @@ export function TraceIDsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-  export function TraceIDsToJSON(json: any): TraceIDs {
-      return TraceIDsToJSONTyped(json, false);
-  }
+export function TraceIDsToJSON(json: any): TraceIDs {
+    return TraceIDsToJSONTyped(json, false);
+}
 
-  export function TraceIDsToJSONTyped(value?: TraceIDs | null, ignoreDiscriminator: boolean = false): any {
+export function TraceIDsToJSONTyped(value?: TraceIDs | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

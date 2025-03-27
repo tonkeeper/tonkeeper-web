@@ -18,6 +18,7 @@ import type {
   GetChartRates200Response,
   GetMarketsRates200Response,
   GetRates200Response,
+  InlineObject,
 } from '../models/index';
 import {
     GetChartRates200ResponseFromJSON,
@@ -26,6 +27,8 @@ import {
     GetMarketsRates200ResponseToJSON,
     GetRates200ResponseFromJSON,
     GetRates200ResponseToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
 } from '../models/index';
 
 export interface GetChartRatesRequest {
