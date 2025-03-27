@@ -10,7 +10,6 @@ import React, {
     useCallback,
     useContext,
     useEffect,
-    useLayoutEffect,
     useMemo,
     useRef,
     useState
@@ -31,8 +30,7 @@ import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { IonContent, IonModal } from '@ionic/react';
 import { cn } from '../libs/css';
-
-const emptyFn = () => {};
+import { useKeyboardState } from '@ionic/react-hooks/keyboard';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -227,13 +225,22 @@ const TitleRow = styled.div`
         `}
 `;
 
-const FooterWrapper = styled.div`
+const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
             position: sticky;
             bottom: 0;
             z-index: 100;
+            ${p.$keyboardShift
+                ? css`
+                      transform: translateY(${-p.$keyboardShift}px);
+                  `
+                : css`
+                      transform: translateY(calc(-1 * env(safe-area-inset-bottom)));
+                  `}
+
+            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.9);
 
             &:empty {
                 padding-bottom: 1rem;
@@ -534,7 +541,6 @@ export const NotificationIonic: FC<{
 
     const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
     const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
-    const [noFooterGap, setNoFooterGap] = useState<number[]>([]);
 
     const Child = useMemo(() => {
         return children((afterClose?: () => void) => {
@@ -551,14 +557,15 @@ export const NotificationIonic: FC<{
         return AnimateHeightChange;
     }, [disableHeightAnimation, mobileFullScreen]);
 
+    const { keyboardHeight } = useKeyboardState();
+
     return (
         <NotificationContext.Provider
             value={{
                 footerElement,
                 headerElement,
                 setOnBack,
-                setOnCloseInterceptor,
-                setNoFooterGap
+                setOnCloseInterceptor
             }}
         >
             <IonModal
@@ -585,8 +592,10 @@ export const NotificationIonic: FC<{
                             )}
                         </HeaderWrapper>
                         {Child}
-                        {!noFooterGap.length && <Gap />}
-                        <FooterWrapper ref={setFooterElement}>{footer}</FooterWrapper>
+                        <Gap />
+                        <FooterWrapper ref={setFooterElement} $keyboardShift={keyboardHeight}>
+                            {footer}
+                        </FooterWrapper>
                     </HeightAnimation>
                 </IonicModalContentStyled>
             </IonModal>
@@ -605,6 +614,8 @@ const IonicModalContentStyled = styled(IonContent)`
         display: flex;
         flex-direction: column;
         min-height: 100%;
+
+        overscroll-behavior-y: none;
     }
 
     &::part(background) {
@@ -742,8 +753,7 @@ export const NotificationDesktopAndWeb: FC<{
                 footerElement,
                 headerElement,
                 setOnBack,
-                setOnCloseInterceptor,
-                setNoFooterGap: emptyFn
+                setOnCloseInterceptor
             }}
         >
             <ReactPortal wrapperId="react-portal-modal-container">
@@ -844,42 +854,17 @@ export const NotificationHeaderStyled = styled.div`
         `}
 `;
 
-export const useMPNotificationNoFooterGap = () => {
-    const isMobile = useAppTargetEnv() === 'mobile';
-    const { setNoFooterGap } = useContext(NotificationContext);
-    const id = useRef(Date.now());
+export const NotificationFooter = forwardRef<HTMLDivElement, { children: ReactNode }>(
+    ({ children }, ref) => {
+        const isFullWidth = useIsFullWidthMode();
 
-    useLayoutEffect(() => {
-        if (isMobile) {
-            setNoFooterGap(s => s.concat(id.current));
-
-            return () => setNoFooterGap(s => s.filter(i => i !== id.current));
+        if (!isFullWidth) {
+            return <>{children}</>;
         }
-    }, [isMobile]);
-};
 
-const MPNotificationNoFooterGap = () => {
-    useMPNotificationNoFooterGap();
-    return null;
-};
-
-export const NotificationFooter = forwardRef<
-    HTMLDivElement,
-    { children: ReactNode; mpNoFooterGap?: boolean }
->(({ children, mpNoFooterGap }, ref) => {
-    const isFullWidth = useIsFullWidthMode();
-
-    if (!isFullWidth) {
-        return <>{children}</>;
+        return <NotificationFooterStyled ref={ref}>{children}</NotificationFooterStyled>;
     }
-
-    return (
-        <NotificationFooterStyled ref={ref}>
-            {mpNoFooterGap && <MPNotificationNoFooterGap />}
-            {children}
-        </NotificationFooterStyled>
-    );
-});
+);
 
 export const NotificationHeader: FC<{ children: ReactNode; className?: string }> = forwardRef<
     HTMLDivElement,
@@ -916,20 +901,11 @@ export const NotificationContext = createContext<{
     headerElement: Element | null;
     setOnBack: (callback: (() => void) | undefined) => void;
     setOnCloseInterceptor: (interceptor: OnCloseInterceptor) => void;
-
-    /**
-     * need to consider all "no footer gap requests" because in chained multiscreen modals new screen effect may
-     * fire earlier than prev screen effect clear
-     * noFooterGap: boolean = noFooterGapState.length !== 0
-     * @param setter
-     */
-    setNoFooterGap: (setter: (cur: number[]) => number[]) => void;
 }>({
     footerElement: null,
     headerElement: null,
     setOnBack: () => {},
-    setOnCloseInterceptor: () => {},
-    setNoFooterGap: () => {}
+    setOnCloseInterceptor: () => {}
 });
 
 export const NotificationFooterPortal: FC<{ children: ReactNode }> = ({ children }) => {

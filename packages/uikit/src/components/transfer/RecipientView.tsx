@@ -336,7 +336,7 @@ export const RecipientView: FC<{
 
             {!shouldHideHeaderAndFooter && (
                 <NotificationFooterPortal>
-                    <NotificationFooter mpNoFooterGap>
+                    <NotificationFooter>
                         <MainButton
                             isLoading={isFetching || isDnsFetching}
                             onClick={handleSubmit}

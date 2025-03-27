@@ -4181,6 +4181,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ionic/react-hooks@npm:^0.0.8":
+  version: 0.0.8
+  resolution: "@ionic/react-hooks@npm:0.0.8"
+  peerDependencies:
+    "@capacitor/core": ~1.3.0
+    react: ^16.8.6
+  checksum: 10/ca17f7873fbfa4d16366702874fc659e3d5b884e7c0cfde8614c16a258fab2963e260bd873520e39658205c80a51c0d5897153580eff0c140d3e364a83aba1a3
+  languageName: node
+  linkType: hard
+
 "@ionic/react-router@npm:^8.4.2":
   version: 8.4.2
   resolution: "@ionic/react-router@npm:8.4.2"
@@ -7727,6 +7737,7 @@ __metadata:
     "@babel/core": "npm:^7.20.5"
     "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch"
     "@ionic/react": "npm:^8.4.2"
+    "@ionic/react-hooks": "npm:^0.0.8"
     "@keystonehq/keystone-sdk": "npm:0.7.2"
     "@ngraveio/bc-ur": "npm:^1.1.13"
     "@storybook/addon-actions": "npm:^6.5.14"

@@ -278,7 +278,7 @@ const AmountViewContent: FC<{
 
             {!shouldHideHeaderAndFooter && (
                 <NotificationFooterPortal>
-                    <NotificationFooter mpNoFooterGap>
+                    <NotificationFooter>
                         <MainButton
                             ref={refButton}
                             isDisabled={!isValid}

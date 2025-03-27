@@ -128,7 +128,12 @@ export const MobileProHomePage = () => {
                                 <Divider />
                             </>
                         )}
-                        {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+                        {isMultisig && !isTestnet && (
+                            <>
+                                <MultisigOrdersMenuItem />
+                                <Divider />
+                            </>
+                        )}
                         {showMultisigs && !isTestnet && (
                             <>
                                 <MenuItem to={AppRoute.multisigWallets}>
@@ -158,11 +163,6 @@ export const MobileProHomePage = () => {
     );
 };
 
-const BadgeStyled = styled(RoundedBadge)`
-    margin-left: auto;
-    margin-right: -40px;
-`;
-
 const MultisigOrdersMenuItem = () => {
     const ordersNumber = useUnviewedAccountOrdersNumber();
     const { t } = useTranslation();
@@ -171,7 +171,7 @@ const MultisigOrdersMenuItem = () => {
         <MenuItem to={AppRoute.multisigOrders}>
             <InboxIcon />
             <Label2>{t('wallet_aside_orders')}</Label2>
-            {!!ordersNumber && <BadgeStyled>{ordersNumber}</BadgeStyled>}
+            {!!ordersNumber && <RoundedBadge>{ordersNumber}</RoundedBadge>}
             <ChevronRightIcon />
         </MenuItem>
     );
