@@ -32,6 +32,10 @@ const CategoriesWrapper = styled(DesktopViewPageLayout)`
     padding-bottom: 0.5rem;
     overflow: auto;
     height: 100%;
+
+    &::after {
+        display: none;
+    }
 `;
 
 export const DesktopBrowserRecommendationsPage: FC = () => {

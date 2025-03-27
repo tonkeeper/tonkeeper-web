@@ -265,7 +265,7 @@ export const Loader: FC = () => {
         <AmplitudeAnalyticsContext.Provider value={tracker}>
             <AppContext.Provider value={context}>
                 <Content activeAccount={activeAccount} lock={lock} />
-                <CopyNotification hideSimpleCopyNotifications />
+                <CopyNotification />
                 <QrScanner />
                 <ModalsRoot />
             </AppContext.Provider>

@@ -83,6 +83,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     copyToClipboard = async (value: string, notification?: string) => {
         await Clipboard.write({ string: value });
+        await this.hapticNotification('success');
         this.topMessage(notification);
     };
 

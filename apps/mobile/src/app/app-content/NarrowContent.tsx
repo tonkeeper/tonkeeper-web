@@ -65,6 +65,7 @@ import { useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
 import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/atom';
 import { ionRouterAnimation$ } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -252,7 +253,17 @@ const NarrowContentAppRouting = () => {
                             {/* Wallet settings */}
                         </IonRouterOutlet>
                     </WalletLayoutBody>
-                    {shouldDisplayFooter(location.pathname) && <MobileProFooter />}
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={shouldDisplayFooter(location.pathname).toString()}
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 50, opacity: 0 }}
+                            transition={{ duration: 0.1, ease: 'easeOut' }}
+                        >
+                            {shouldDisplayFooter(location.pathname) && <MobileProFooter />}
+                        </motion.div>
+                    </AnimatePresence>
                 </WalletLayout>
                 <PreferencesModal />
             </WideContent>
@@ -262,7 +273,7 @@ const NarrowContentAppRouting = () => {
 };
 
 const shouldDisplayFooter = (loc: string) => {
-    return loc !== AppProRoute.dashboard && !loc.startsWith(AppRoute.browser);
+    return loc !== AppProRoute.dashboard && !loc?.startsWith(AppRoute.browser);
 };
 
 const NavigateToRecovery = () => {

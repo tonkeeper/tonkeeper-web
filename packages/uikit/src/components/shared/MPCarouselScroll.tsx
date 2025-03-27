@@ -66,7 +66,7 @@ export const MPCarouselScroll: FC<PropsWithChildren> = ({ children }) => {
         <div
             ref={scrollRef}
             style={{
-                overflow: 'hidden',
+                overflowX: 'hidden',
                 whiteSpace: 'nowrap',
                 display: 'flex',
                 scrollBehavior: 'smooth',

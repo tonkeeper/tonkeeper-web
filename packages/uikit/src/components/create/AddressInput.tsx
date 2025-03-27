@@ -8,6 +8,7 @@ import { TonRecipientInput } from '../fields/TonRecipientInput';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { Address } from '@ton/core';
 import { useMobileModalFullScreenStretcher } from '../../hooks/useElementHeight';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Block = styled.div`
     display: flex;
@@ -48,7 +49,7 @@ export const AddressInput: FC<{
 
     return (
         <>
-            <CenterContainer className={className} ref={containerRef}>
+            <CenterContainer className={className} ref={containerRef} $mobileFitContent>
                 <Block>
                     <div>
                         <H2Label2Responsive>{t('add_watch_only_title')}</H2Label2Responsive>
@@ -61,16 +62,22 @@ export const AddressInput: FC<{
                         onIsLoadingChange={setDataIsLoading}
                         placeholder={t('wallet_address')}
                     />
-                    <ButtonResponsiveSize
-                        fullWidth
-                        primary
-                        marginTop
-                        loading={isLoading || isDataLoading}
-                        disabled={error || !recipient}
-                        onClick={() => afterInput(Address.parse(recipient!.address).toRawString())}
-                    >
-                        {t('continue')}
-                    </ButtonResponsiveSize>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonResponsiveSize
+                                fullWidth
+                                primary
+                                marginTop
+                                loading={isLoading || isDataLoading}
+                                disabled={error || !recipient}
+                                onClick={() =>
+                                    afterInput(Address.parse(recipient!.address).toRawString())
+                                }
+                            >
+                                {t('continue')}
+                            </ButtonResponsiveSize>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 </Block>
             </CenterContainer>
             {stretcher}

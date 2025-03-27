@@ -7657,6 +7657,7 @@ __metadata:
     copy-to-clipboard: "npm:^3.3.3"
     crypto-browserify: "npm:^3.12.0"
     eventsource: "npm:^2.0.2"
+    framer-motion: "npm:^11.3.28"
     i18next: "npm:^23.7.7"
     react: "npm:18.2.0"
     react-dom: "npm:18.2.0"

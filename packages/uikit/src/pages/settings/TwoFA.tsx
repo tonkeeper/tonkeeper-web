@@ -3,9 +3,10 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2, Body3Class, Label2 } from '../../components/Text';
 import {
-    DesktopViewHeader, DesktopViewHeaderContent,
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
-} from "../../components/desktop/DesktopViewLayout";
+} from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
 import { ExclamationMarkTriangleIcon, SpinnerRing } from '../../components/Icon';
@@ -116,6 +117,10 @@ const TextHeadingBlock = styled.div`
     }
 `;
 
+const WarningBlockWrapper = styled.div`
+    padding: 0 16px;
+`;
+
 const WarningBlock = styled.div`
     background: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
     color: ${p => p.theme.accentOrange};
@@ -184,15 +189,17 @@ const TwoFANotSetContent = () => {
                 </TextHeadingBlock>
             </ContentWrapper>
             <TwoFASetUpStyled />
-            <WarningBlock>
-                <WarningBlockText>
-                    <li>{t('two_fa_settings_warning_can_not_recover')}</li>
-                    <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
-                    <li>{t('two_fa_settings_warning_balance_required')}</li>
-                    <li>{t('two_fa_settings_warning_battery_gasless')}</li>
-                </WarningBlockText>
-                <ExclamationMarkTriangleIconStyled />
-            </WarningBlock>
+            <WarningBlockWrapper>
+                <WarningBlock>
+                    <WarningBlockText>
+                        <li>{t('two_fa_settings_warning_can_not_recover')}</li>
+                        <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
+                        <li>{t('two_fa_settings_warning_balance_required')}</li>
+                        <li>{t('two_fa_settings_warning_battery_gasless')}</li>
+                    </WarningBlockText>
+                    <ExclamationMarkTriangleIconStyled />
+                </WarningBlock>
+            </WarningBlockWrapper>
         </div>
     );
 };
@@ -269,15 +276,17 @@ const TwoFAActiveContent = () => {
                     </Button>
                 </ActionButtonsContainer>
             </ContentWrapper>
-            <WarningBlock>
-                <WarningBlockText>
-                    <li>{t('two_fa_settings_warning_can_not_recover')}</li>
-                    <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
-                    <li>{t('two_fa_settings_warning_balance_required')}</li>
-                    <li>{t('two_fa_settings_warning_battery_gasless')}</li>
-                </WarningBlockText>
-                <ExclamationMarkTriangleIconStyled />
-            </WarningBlock>
+            <WarningBlockWrapper>
+                <WarningBlock>
+                    <WarningBlockText>
+                        <li>{t('two_fa_settings_warning_can_not_recover')}</li>
+                        <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
+                        <li>{t('two_fa_settings_warning_balance_required')}</li>
+                        <li>{t('two_fa_settings_warning_battery_gasless')}</li>
+                    </WarningBlockText>
+                    <ExclamationMarkTriangleIconStyled />
+                </WarningBlock>
+            </WarningBlockWrapper>
             <DisableTwoFAConfirmNotification
                 isOpen={isOpenDisconnect}
                 onClose={onClickCloseDisconnect}

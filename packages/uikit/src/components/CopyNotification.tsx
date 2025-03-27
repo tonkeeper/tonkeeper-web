@@ -15,7 +15,7 @@ const Message = styled.div`
     transition: all 0.1s ease-in-out;
 
     &.enter-done {
-        top: 16px;
+        top: calc(16px + env(safe-area-inset-top));
         opacity: 1;
         pointer-events: auto;
         transform: scale(1);

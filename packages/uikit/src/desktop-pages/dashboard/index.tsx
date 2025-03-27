@@ -33,6 +33,10 @@ const PageWrapper = styled(DesktopViewPageLayout)`
     flex-direction: column;
     justify-content: space-between;
 
+    &::after {
+        display: none;
+    }
+
     ${p =>
         p.theme.proDisplayType === 'mobile' &&
         css`

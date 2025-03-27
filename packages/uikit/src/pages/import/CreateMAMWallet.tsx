@@ -21,13 +21,15 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import {
+    NotificationFooter,
+    NotificationFooterPortal,
     OnCloseInterceptor,
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
-import { useIsTronEnabledGlobally } from "../../state/tron/tron";
+import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
@@ -175,20 +177,23 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     if (!infoPagePassed) {
         return (
             <IconPage
-                logOut
                 icon={<WriteLottieIcon />}
                 title={t('create_wallet_title')}
                 description={t('create_wallet_caption')}
                 button={
-                    <Button
-                        size="large"
-                        fullWidth
-                        primary
-                        marginTop
-                        onClick={() => setInfoPagePassed(true)}
-                    >
-                        {t('continue')}
-                    </Button>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <Button
+                                size="large"
+                                fullWidth
+                                primary
+                                marginTop
+                                onClick={() => setInfoPagePassed(true)}
+                            >
+                                {t('continue')}
+                            </Button>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 }
             />
         );

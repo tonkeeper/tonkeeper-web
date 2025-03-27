@@ -363,7 +363,13 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <DividerStyled isHidden={!closeBottom} />
                     </NotForTargetEnv>
                     <AsideMenuBottomContent>
-                        <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
+                        <AsideMenuItem
+                            isSelected={false}
+                            onClick={() => {
+                                menuController.close();
+                                addWallet();
+                            }}
+                        >
                             <IconWrapper>
                                 <PlusIcon />
                             </IconWrapper>

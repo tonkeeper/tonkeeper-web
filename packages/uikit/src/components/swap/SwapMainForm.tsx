@@ -20,7 +20,7 @@ import { SwapFromField } from './SwapFromField';
 import { SwapProviders } from './SwapProviders';
 import { SwapToField } from './SwapToField';
 import { SwapTokensListNotification } from './tokens-list/SwapTokensListNotification';
-import { useNavigate } from "../../hooks/router/useNavigate";
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const MainFormWrapper = styled.div`
     display: flex;
@@ -92,7 +92,11 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
             </SwapFromField>
             <SwapToField />
             {theme.displayType === 'compact' && <SwapProviders />}
-            <SwapButton onClick={onConfirm} isEncodingProcess={isLoading || !!modalParams} />
+            <SwapButton
+                onClick={onConfirm}
+                isEncodingProcess={isLoading || !!modalParams}
+                size={theme.proDisplayType === 'desktop' ? 'medium' : 'large'}
+            />
             <TonTransactionNotification
                 handleClose={onCloseConfirmModal}
                 params={modalParams}
