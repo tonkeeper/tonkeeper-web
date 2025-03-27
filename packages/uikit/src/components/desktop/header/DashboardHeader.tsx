@@ -17,10 +17,10 @@ import {
     useDashboardColumnsForm
 } from '../../../state/dashboard/useDashboardColumns';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useAppPlatform } from '../../../hooks/appContext';
 import { DesktopViewHeader, DesktopViewHeaderContent } from '../DesktopViewLayout';
 import { useUserFiat } from '../../../state/fiat';
 import { formatFiatCurrency } from '../../../hooks/balance';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -56,7 +56,7 @@ const DesktopDashboardHeaderPayload = () => {
         return arrayToCsvString([columnsRow, ...dataRows]);
     }, [data, columns, selectedColumns]);
 
-    const platform = useAppPlatform();
+    const platform = useAppTargetEnv();
 
     return (
         <DesktopHeaderContainer>

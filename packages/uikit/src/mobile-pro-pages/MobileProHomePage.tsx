@@ -172,6 +172,7 @@ const MultisigOrdersMenuItem = () => {
             <InboxIcon />
             <Label2>{t('wallet_aside_orders')}</Label2>
             {!!ordersNumber && <BadgeStyled>{ordersNumber}</BadgeStyled>}
+            <ChevronRightIcon />
         </MenuItem>
     );
 };

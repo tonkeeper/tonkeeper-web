@@ -35,6 +35,9 @@ export const DesktopAssetStylesOverride = css`
 
 const TonAssetStyled = styled(TonAsset)`
     margin: 0 -16px;
+    > * {
+        padding-top: 8px !important;
+    }
 
     ${DesktopAssetStylesOverride}
 `;

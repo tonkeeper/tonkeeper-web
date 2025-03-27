@@ -20,8 +20,8 @@ import {
 import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext, useAppPlatform } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
@@ -46,11 +46,11 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const appPlatform = useAppPlatform();
+    const appPlatform = useAppTargetEnv();
     const storage = useAppSdk().storage;
 
     return useMemo(() => {
-        if (appPlatform === 'tablet') {
+        if (appPlatform === 'tablet' || appPlatform === 'mobile') {
             return {
                 async attachToken() {
                     const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);

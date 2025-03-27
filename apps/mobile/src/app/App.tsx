@@ -166,7 +166,7 @@ const ThemeAndContent = () => {
     return (
         <UserThemeProvider
             displayType="full-width"
-            isPro={data?.valid}
+            isPro={CAPACITOR_APPLICATION_ID === 'mobile'}
             isProSupported
             proDisplayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'mobile' : 'desktop'}
         >

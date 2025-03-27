@@ -29,7 +29,6 @@ import ReactPortal from './ReactPortal';
 import { H2, H3Label2Responsive, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
-import { useAppPlatform } from '../hooks/appContext';
 import { IonContent, IonModal } from '@ionic/react';
 import { cn } from '../libs/css';
 
@@ -735,7 +734,7 @@ export const NotificationDesktopAndWeb: FC<{
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
-    const isInWidget = useAppPlatform() === 'swap_widget_web';
+    const isInWidget = useAppTargetEnv() === 'swap_widget_web';
 
     return (
         <NotificationContext.Provider

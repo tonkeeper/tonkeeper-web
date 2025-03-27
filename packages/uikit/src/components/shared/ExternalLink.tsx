@@ -1,6 +1,5 @@
 import { FC, MouseEventHandler, PropsWithChildren } from 'react';
-import { useAppPlatform } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import styled from 'styled-components';
 
 const AStyled = styled.a<{ $contents?: boolean }>`
@@ -27,7 +26,7 @@ export const ExternalLink: FC<
         contents?: boolean;
     }>
 > = ({ className, href, onClick, children, contents }) => {
-    const platform = useAppPlatform();
+    const platform = useAppTargetEnv();
     const sdk = useAppSdk();
 
     if (platform === 'web' || platform === 'swap_widget_web') {
