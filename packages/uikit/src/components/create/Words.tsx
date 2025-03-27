@@ -15,6 +15,7 @@ import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
 import { useActiveConfig } from '../../state/wallet';
 import { hexToRGBA } from '../../libs/css';
 import { handleSubmit } from '../../libs/form';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Block = styled.div`
     display: flex;
@@ -252,9 +253,13 @@ export const Words: FC<{
         <CenterContainer>
             <WordsGridAndHeaders mnemonic={mnemonic} type={showMamInfo ? 'mam' : 'standard'} />
 
-            <ButtonResponsiveSize fullWidth primary marginTop onClick={onCheck}>
-                {t('continue')}
-            </ButtonResponsiveSize>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonResponsiveSize fullWidth primary marginTop onClick={onCheck}>
+                        {t('continue')}
+                    </ButtonResponsiveSize>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </CenterContainer>
     );
 };
@@ -454,7 +459,7 @@ export const Check: FC<{
         three.toLowerCase().trim() === mnemonic[test3 - 1];
 
     return (
-        <CenterContainer>
+        <CenterContainer $mobileFitContent>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('check_words_title')}</H2Label2Responsive>
@@ -488,18 +493,20 @@ export const Check: FC<{
                     focusNext={() => (isValid ? onConfirm() : undefined)}
                 />
             </BlockSmallGap>
-            <BottomButtonBlock>
-                <ButtonResponsiveSize
-                    tabIndex={4}
-                    fullWidth
-                    primary
-                    loading={isLoading}
-                    disabled={!isValid}
-                    onClick={onConfirm}
-                >
-                    {t('continue')}
-                </ButtonResponsiveSize>
-            </BottomButtonBlock>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonResponsiveSize
+                        tabIndex={4}
+                        fullWidth
+                        primary
+                        loading={isLoading}
+                        disabled={!isValid}
+                        onClick={onConfirm}
+                    >
+                        {t('continue')}
+                    </ButtonResponsiveSize>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </CenterContainer>
     );
 };

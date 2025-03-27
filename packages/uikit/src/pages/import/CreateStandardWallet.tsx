@@ -17,10 +17,11 @@ import { Subscribe } from './Subscribe';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
 import {
+    NotificationFooter, NotificationFooterPortal,
     OnCloseInterceptor,
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
-} from '../../components/Notification';
+} from "../../components/Notification";
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
@@ -145,14 +146,18 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
                 title={t('create_wallet_title')}
                 description={t('create_wallet_caption')}
                 button={
-                    <ButtonResponsiveSize
-                        fullWidth
-                        primary
-                        marginTop
-                        onClick={() => setInfoPagePassed(true)}
-                    >
-                        {t('continue')}
-                    </ButtonResponsiveSize>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonResponsiveSize
+                                fullWidth
+                                primary
+                                marginTop
+                                onClick={() => setInfoPagePassed(true)}
+                            >
+                                {t('continue')}
+                            </ButtonResponsiveSize>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 }
             />
         );

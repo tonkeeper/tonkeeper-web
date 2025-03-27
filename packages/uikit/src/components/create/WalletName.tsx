@@ -8,6 +8,7 @@ import { Input } from '../fields/Input';
 import { EmojisList } from '../shared/emoji/EmojisList';
 import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { useMobileModalFullScreenStretcher } from '../../hooks/useElementHeight';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Block = styled.form`
     display: flex;
@@ -60,7 +61,7 @@ export const UpdateWalletName: FC<{
 
     return (
         <>
-            <CenterContainer ref={containerRef}>
+            <CenterContainer ref={containerRef} $mobileFitContent>
                 <Block onSubmit={onSubmit}>
                     <div>
                         <H2Label2Responsive>{t('Name_your_wallet')}</H2Label2Responsive>
@@ -78,16 +79,20 @@ export const UpdateWalletName: FC<{
                     />
                     <EmojisList keepShortListForMS={500} onClick={setEmoji} />
 
-                    <ButtonResponsiveSize
-                        fullWidth
-                        marginTop
-                        primary
-                        disabled={!isValid}
-                        type="submit"
-                        loading={isLoading}
-                    >
-                        {buttonText ?? t('add_edit_favorite_save')}
-                    </ButtonResponsiveSize>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonResponsiveSize
+                                fullWidth
+                                primary
+                                disabled={!isValid}
+                                type="submit"
+                                loading={isLoading}
+                                onClick={() => submitHandler({ name, emoji })}
+                            >
+                                {buttonText ?? t('add_edit_favorite_save')}
+                            </ButtonResponsiveSize>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 </Block>
             </CenterContainer>
             {stretcher}
