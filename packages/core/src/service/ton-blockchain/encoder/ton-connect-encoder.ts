@@ -1,4 +1,4 @@
-import { Address, Cell, internal, SendMode } from '@ton/core';
+import { Address, Cell, SendMode } from '@ton/core';
 import { tonConnectAddressIsBounceable, toStateInit } from '../utils';
 import { APIConfig } from '../../../entries/apis';
 import { WalletOutgoingMessage } from './types';
@@ -26,7 +26,7 @@ export class TonConnectEncoder extends EncoderBase {
                 );
             }
 
-            messages = transfer.messagesVariants[transfer.variant]!;
+            messages = transfer.messagesVariants[transfer.variant]!.messages;
         }
 
         return {

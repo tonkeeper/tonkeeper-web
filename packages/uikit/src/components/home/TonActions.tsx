@@ -9,6 +9,8 @@ import { ReceiveAction } from './ReceiveAction';
 import { SwapAction } from './SwapAction';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../ios/HideOnReview';
+import { HideForRegulatoryState } from '../HideForState';
+import { CountryFeature } from '../../state/country';
 
 export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -20,7 +22,9 @@ export const HomeActions: FC<{ chain?: BLOCKCHAIN_NAME }> = () => {
             {!isReadOnly && <SendAction />}
             <ReceiveAction />
             <HideOnReview>
-                {!isTestnet && !isReadOnly && <SwapAction fromAsset={TON_ASSET} />}
+                <HideForRegulatoryState feature={CountryFeature.swap}>
+                    {!isTestnet && !isReadOnly && <SwapAction fromAsset={TON_ASSET} />}
+                </HideForRegulatoryState>
             </HideOnReview>
             {/* <SellAction sell={sell} /> */}
         </ActionsRow>

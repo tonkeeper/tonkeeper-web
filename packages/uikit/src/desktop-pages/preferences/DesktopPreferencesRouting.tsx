@@ -7,7 +7,6 @@ import { UserTheme } from '../../pages/settings/Theme';
 import { DevSettings } from '../../pages/settings/Dev';
 import { FiatCurrency } from '../../pages/settings/FiatCurrency';
 import { Notifications } from '../../pages/settings/Notification';
-import { CountrySettings } from '../../pages/settings/Country';
 import styled from 'styled-components';
 import { SecuritySettings } from '../../pages/settings/Security';
 import { DesktopManageAccountsPage } from '../settings/DesktopManageWalletsSettings';
@@ -57,7 +56,6 @@ export const DesktopPreferencesRouting = () => {
                     element={<Navigate to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} />}
                 />
                 <Route path={SettingsRoute.security} element={<SecuritySettings />} />
-                <Route path={SettingsRoute.country} element={<CountrySettings />} />
                 <Route path={SettingsRoute.pro} element={<ProSettings />} />
                 <Route path="*" element={<Navigate to={'.' + SettingsRoute.account} replace />} />
             </Route>

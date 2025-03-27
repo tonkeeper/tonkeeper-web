@@ -10,7 +10,6 @@ import {
     ExitIcon,
     GlobeIcon,
     LockIcon,
-    PlaceIcon,
     SlidersIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
@@ -20,10 +19,8 @@ import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
-import React from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { capitalize, getCountryName, getLanguageName } from '../../../libs/common';
-import { useCountrySetting } from '../../../state/country';
+import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { availableThemes, useUserUIPreferences } from '../../../state/theme';
@@ -87,8 +84,6 @@ export const PreferencesAsideMenu = () => {
     const sdk = useAppSdk();
     const config = useActiveConfig();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { data: countryData } = useCountrySetting();
-    const country = countryData === null ? t('auto') : countryData;
     const { data: proState } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
@@ -167,23 +162,6 @@ export const PreferencesAsideMenu = () => {
                             <AsideMenuItemLargeBody>
                                 <Label2>{t('settings_primary_currency')}</Label2>
                                 <Body3>{fiat}</Body3>
-                            </AsideMenuItemLargeBody>
-                        </AsideMenuItemLarge>
-                    )}
-                </NavLink>
-                <NavLink to={AppRoute.settings + SettingsRoute.country}>
-                    {({ isActive }) => (
-                        <AsideMenuItemLarge isSelected={isActive}>
-                            <PlaceIcon />
-                            <AsideMenuItemLargeBody>
-                                <Label2>{t('country')}</Label2>
-                                <Body3>
-                                    {!country ? (
-                                        <Skeleton width="60px" height="14px" margin="3px 0" />
-                                    ) : (
-                                        getCountryName(i18n.language, country)
-                                    )}
-                                </Body3>
                             </AsideMenuItemLargeBody>
                         </AsideMenuItemLarge>
                     )}

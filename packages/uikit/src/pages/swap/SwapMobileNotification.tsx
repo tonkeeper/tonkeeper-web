@@ -9,21 +9,25 @@ import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSetti
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { HideForRegulatoryState } from '../../components/HideForState';
+import { CountryFeature } from '../../state/country';
 
 const SwapMobileNotification = () => {
     const [isOpen, setIsOpen] = useSwapMobileNotification();
 
     return (
         <HideOnReview>
-            <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swap page')}>
-                <Notification
-                    isOpen={isOpen}
-                    handleClose={() => setIsOpen(false)}
-                    title={<NotificationHeader />}
-                >
-                    {() => <NotificationContent />}
-                </Notification>
-            </ErrorBoundary>
+            <HideForRegulatoryState feature={CountryFeature.swap}>
+                <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swap page')}>
+                    <Notification
+                        isOpen={isOpen}
+                        handleClose={() => setIsOpen(false)}
+                        title={<NotificationHeader />}
+                    >
+                        {() => <NotificationContent />}
+                    </Notification>
+                </ErrorBoundary>
+            </HideForRegulatoryState>
         </HideOnReview>
     );
 };
