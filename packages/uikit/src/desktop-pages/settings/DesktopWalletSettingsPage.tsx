@@ -52,6 +52,7 @@ import {
 } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
 import { hexToRGBA } from '../../libs/css';
+import { Badge } from '../../components/shared/Badge';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -191,7 +192,10 @@ export const DesktopWalletSettingsPage = () => {
                         <SettingsListItem>
                             <LockIcon />
                             <SettingsListText>
-                                <Label2>{t('two_fa_long')}</Label2>
+                                <LabelWithBadge>
+                                    <Label2>{t('two_fa_long')}</Label2>
+                                    <Badge color="accentOrange">Beta</Badge>
+                                </LabelWithBadge>
                             </SettingsListText>
                         </SettingsListItem>
                     </LinkStyled>

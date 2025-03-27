@@ -1037,10 +1037,12 @@ export const useActiveAccountConfig = () => {
 };
 
 export const useMutateActiveAccountConfig = () => {
-    const account = useActiveAccount();
+    const { data: account } = useActiveAccountQuery();
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, Partial<AccountConfig>>(async newConfig => {
+        if (!account) return;
+
         const config = await getAccountConfig(sdk, account.id);
 
         await setAccountConfig(sdk.storage, account.id, {

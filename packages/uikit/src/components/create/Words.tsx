@@ -645,13 +645,13 @@ export const ImportWords: FC<{
                 <ToggleButtonStyled>
                     <ToggleButtonItem
                         active={wordsNumber === 24}
-                        onClick={() => setWordsNumber(24)}
+                        onClick={handleSubmit(() => setWordsNumber(24))}
                     >
                         <Label2>{t('import_wallet_24_words')}</Label2>
                     </ToggleButtonItem>
                     <ToggleButtonItem
                         active={wordsNumber === 12}
-                        onClick={() => setWordsNumber(12)}
+                        onClick={handleSubmit(() => setWordsNumber(12))}
                     >
                         <Label2>{t('import_wallet_12_words')}</Label2>
                     </ToggleButtonItem>

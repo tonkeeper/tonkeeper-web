@@ -220,8 +220,11 @@ export enum SIGN_DATA_ERROR_CODES {
     METHOD_NOT_SUPPORTED = 400
 }
 
+export declare type SignDataType = 'text' | 'binary' | 'cell';
+
 export type SignDataFeature = {
     name: 'SignData';
+    types: SignDataType[];
 };
 
 export interface SignDataRpcRequest {

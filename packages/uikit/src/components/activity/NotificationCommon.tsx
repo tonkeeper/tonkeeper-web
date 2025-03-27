@@ -150,7 +150,7 @@ export const ActionRecipientAddress: FC<{ address: string; name?: string; label?
     const sdk = useAppSdk();
 
     return (
-        <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+        <ListItem onClick={() => sdk.copyToClipboard(address)}>
             <ListItemPayload>
                 <Label>
                     {label ??
@@ -212,7 +212,7 @@ export const ActionSenderAddress: FC<{ address: string; name?: string }> = ({ ad
     const sdk = useAppSdk();
 
     return (
-        <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+        <ListItem onClick={() => sdk.copyToClipboard(address)}>
             <ListItemPayload>
                 <Label>{name ? t('transaction_sender_address') : t('transaction_sender')}</Label>
                 <Label1>{toShortValue(address)}</Label1>
@@ -263,7 +263,7 @@ export const ActionBeneficiaryDetails: FC<{ beneficiary: AccountAddress }> = ({ 
                     </ListItemPayload>
                 </ListItem>
             )}
-            <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+            <ListItem onClick={() => sdk.copyToClipboard(address)}>
                 <ListItemPayload>
                     <Label>
                         {beneficiary.name
@@ -297,7 +297,7 @@ export const ActionDeployerAddress: FC<{ address?: string }> = ({ address }) => 
     if (!address) return <></>;
 
     return (
-        <ListItem onClick={() => sdk.copyToClipboard(address, t('address_copied'))}>
+        <ListItem onClick={() => sdk.copyToClipboard(address)}>
             <ListItemPayload>
                 <Label>{t('add_edit_favorite_address_label')}</Label>
                 <Label1>{toShortValue(address)}</Label1>

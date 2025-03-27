@@ -384,6 +384,9 @@ export const ConfirmViewButtons: FC<{
             case error instanceof TxConfirmationCustomError:
                 errorText = error.message;
                 break;
+            case error instanceof Error:
+                errorText = error.message;
+                break;
             case error instanceof NotEnoughBalanceError:
                 errorText = t('confirm_error_insufficient_balance', {
                     balance: (error as NotEnoughBalanceError).balance.stringAssetRelativeAmount,

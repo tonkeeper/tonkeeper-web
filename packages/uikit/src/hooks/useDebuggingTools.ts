@@ -51,8 +51,8 @@ export const useDebuggingTools = () => {
                     const signature = await signer(dataToSign);
 
                     const body = beginCell()
-                        .storeBuffer(signature)
                         .storeSlice(dataToSign.beginParse())
+                        .storeBuffer(signature)
                         .endCell();
 
                     const ext = beginCell()
