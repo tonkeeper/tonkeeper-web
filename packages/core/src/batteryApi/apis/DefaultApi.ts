@@ -155,6 +155,8 @@ export interface EnterpriseEstimateOperationRequest {
     xEnterpriseAuth: string;
     walletId: string;
     enterpriseEstimateRequest: EnterpriseEstimateRequest;
+    acceptLanguage?: string;
+    emulate?: boolean;
 }
 
 export interface EnterpriseGetMessageRequest {
@@ -354,6 +356,8 @@ export interface DefaultApiInterface {
      * @param {string} xEnterpriseAuth 
      * @param {string} walletId 
      * @param {EnterpriseEstimateRequest} enterpriseEstimateRequest bag-of-cells serialized to base64
+     * @param {string} [acceptLanguage] 
+     * @param {boolean} [emulate] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -962,12 +966,20 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         const queryParameters: any = {};
 
+        if (requestParameters['emulate'] != null) {
+            queryParameters['emulate'] = requestParameters['emulate'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
 
         if (requestParameters['xEnterpriseAuth'] != null) {
             headerParameters['X-Enterprise-Auth'] = String(requestParameters['xEnterpriseAuth']);
+        }
+
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
         }
 
         const response = await this.request({

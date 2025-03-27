@@ -104,6 +104,16 @@ export interface GetAccountEventsRequest {
     endDate?: number;
 }
 
+export interface GetAccountExtraCurrencyHistoryByIDRequest {
+    accountId: string;
+    id: number;
+    limit: number;
+    acceptLanguage?: string;
+    beforeLt?: number;
+    startDate?: number;
+    endDate?: number;
+}
+
 export interface GetAccountJettonBalanceRequest {
     accountId: string;
     jettonId: string;
@@ -278,6 +288,26 @@ export interface AccountsApiInterface {
      * Get events for an account. Each event is built on top of a trace which is a series of transactions caused by one inbound message. TonAPI looks for known patterns inside the trace and splits the trace into actions, where a single action represents a meaningful high-level operation like a Jetton Transfer or an NFT Purchase. Actions are expected to be shown to users. It is advised not to build any logic on top of actions because actions can be changed at any time.
      */
     getAccountEvents(requestParameters: GetAccountEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
+
+    /**
+     * Get the transfer history of extra currencies for an account.
+     * @param {string} accountId account ID
+     * @param {number} id extra currency id
+     * @param {number} limit 
+     * @param {string} [acceptLanguage] 
+     * @param {number} [beforeLt] omit this parameter to get last events
+     * @param {number} [startDate] 
+     * @param {number} [endDate] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApiInterface
+     */
+    getAccountExtraCurrencyHistoryByIDRaw(requestParameters: GetAccountExtraCurrencyHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>>;
+
+    /**
+     * Get the transfer history of extra currencies for an account.
+     */
+    getAccountExtraCurrencyHistoryByID(requestParameters: GetAccountExtraCurrencyHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
 
     /**
      * Get Jetton balance by owner address
@@ -748,6 +778,73 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      */
     async getAccountEvents(requestParameters: GetAccountEventsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents> {
         const response = await this.getAccountEventsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the transfer history of extra currencies for an account.
+     */
+    async getAccountExtraCurrencyHistoryByIDRaw(requestParameters: GetAccountExtraCurrencyHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getAccountExtraCurrencyHistoryByID().'
+            );
+        }
+
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getAccountExtraCurrencyHistoryByID().'
+            );
+        }
+
+        if (requestParameters['limit'] == null) {
+            throw new runtime.RequiredError(
+                'limit',
+                'Required parameter "limit" was null or undefined when calling getAccountExtraCurrencyHistoryByID().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
+        }
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
+        }
+
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['acceptLanguage'] != null) {
+            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
+        }
+
+        const response = await this.request({
+            path: `/v2/accounts/{account_id}/extra-currency/{id}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the transfer history of extra currencies for an account.
+     */
+    async getAccountExtraCurrencyHistoryByID(requestParameters: GetAccountExtraCurrencyHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents> {
+        const response = await this.getAccountExtraCurrencyHistoryByIDRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
