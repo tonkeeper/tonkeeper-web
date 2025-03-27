@@ -111,7 +111,8 @@ export class GaslessMessageSender implements ISender {
                         boc: messageToEstimate.toBoc().toString('hex')
                     }
                 ],
-                returnEmulation: true
+                returnEmulation: true,
+                throwErrorIfNotEnoughJettons: true
             },
             acceptLanguage: 'en'
         });
