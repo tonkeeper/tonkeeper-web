@@ -53,7 +53,6 @@ import { UserTheme } from '@tonkeeper/uikit/dist/pages/settings/Theme';
 import { DevSettings } from '@tonkeeper/uikit/dist/pages/settings/Dev';
 import { FiatCurrency } from '@tonkeeper/uikit/dist/pages/settings/FiatCurrency';
 import { SecuritySettings } from '@tonkeeper/uikit/dist/pages/settings/Security';
-import { CountrySettings } from '@tonkeeper/uikit/dist/pages/settings/Country';
 import { ProSettings } from '@tonkeeper/uikit/dist/components/settings/ProSettings';
 import { IonReactMemoryRouter } from '@ionic/react-router';
 import { createIsolatedMemoryHistory } from '../../libs/isolated-memory-history';
@@ -361,10 +360,6 @@ const PreferencesModal = () => {
                         <Route
                             path={AppRoute.settings + SettingsRoute.security}
                             component={SecuritySettings}
-                        />
-                        <Route
-                            path={AppRoute.settings + SettingsRoute.country}
-                            component={CountrySettings}
                         />
                         <Route
                             path={AppRoute.settings + SettingsRoute.pro}
