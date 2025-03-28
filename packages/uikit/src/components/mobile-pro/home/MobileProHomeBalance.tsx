@@ -101,7 +101,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
 
     return (
         <Wrapper className={className}>
-            {isLoading ? <Skeleton width="100px" height="36px" /> : content}
+            {isLoading ? <Skeleton width="100px" height="36px" margin="18px 0" /> : content}
         </Wrapper>
     );
 };
