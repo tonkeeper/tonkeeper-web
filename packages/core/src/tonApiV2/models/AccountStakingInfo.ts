@@ -81,11 +81,11 @@ export function AccountStakingInfoFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function AccountStakingInfoToJSON(json: any): AccountStakingInfo {
-      return AccountStakingInfoToJSONTyped(json, false);
-  }
+export function AccountStakingInfoToJSON(json: any): AccountStakingInfo {
+    return AccountStakingInfoToJSONTyped(json, false);
+}
 
-  export function AccountStakingInfoToJSONTyped(value?: AccountStakingInfo | null, ignoreDiscriminator: boolean = false): any {
+export function AccountStakingInfoToJSONTyped(value?: AccountStakingInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -65,11 +65,11 @@ export function GetRawTransactions200ResponseFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function GetRawTransactions200ResponseToJSON(json: any): GetRawTransactions200Response {
-      return GetRawTransactions200ResponseToJSONTyped(json, false);
-  }
+export function GetRawTransactions200ResponseToJSON(json: any): GetRawTransactions200Response {
+    return GetRawTransactions200ResponseToJSONTyped(json, false);
+}
 
-  export function GetRawTransactions200ResponseToJSONTyped(value?: GetRawTransactions200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetRawTransactions200ResponseToJSONTyped(value?: GetRawTransactions200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

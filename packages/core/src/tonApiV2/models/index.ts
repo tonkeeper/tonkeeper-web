@@ -145,6 +145,7 @@ export * from './GetStorageProviders200Response';
 export * from './GetTonConnectPayload200Response';
 export * from './ImagePreview';
 export * from './InitStateRaw';
+export * from './InlineObject';
 export * from './JettonBalance';
 export * from './JettonBalanceLock';
 export * from './JettonBridgeParams';

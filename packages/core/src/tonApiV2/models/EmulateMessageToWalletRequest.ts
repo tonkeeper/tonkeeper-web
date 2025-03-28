@@ -64,11 +64,11 @@ export function EmulateMessageToWalletRequestFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function EmulateMessageToWalletRequestToJSON(json: any): EmulateMessageToWalletRequest {
-      return EmulateMessageToWalletRequestToJSONTyped(json, false);
-  }
+export function EmulateMessageToWalletRequestToJSON(json: any): EmulateMessageToWalletRequest {
+    return EmulateMessageToWalletRequestToJSONTyped(json, false);
+}
 
-  export function EmulateMessageToWalletRequestToJSONTyped(value?: EmulateMessageToWalletRequest | null, ignoreDiscriminator: boolean = false): any {
+export function EmulateMessageToWalletRequestToJSONTyped(value?: EmulateMessageToWalletRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

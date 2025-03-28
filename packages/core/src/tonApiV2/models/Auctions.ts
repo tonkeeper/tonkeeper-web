@@ -65,11 +65,11 @@ export function AuctionsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-  export function AuctionsToJSON(json: any): Auctions {
-      return AuctionsToJSONTyped(json, false);
-  }
+export function AuctionsToJSON(json: any): Auctions {
+    return AuctionsToJSONTyped(json, false);
+}
 
-  export function AuctionsToJSONTyped(value?: Auctions | null, ignoreDiscriminator: boolean = false): any {
+export function AuctionsToJSONTyped(value?: Auctions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

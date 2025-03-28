@@ -56,11 +56,11 @@ export function EmulateMessageToWalletRequestParamsInnerFromJSONTyped(json: any,
     };
 }
 
-  export function EmulateMessageToWalletRequestParamsInnerToJSON(json: any): EmulateMessageToWalletRequestParamsInner {
-      return EmulateMessageToWalletRequestParamsInnerToJSONTyped(json, false);
-  }
+export function EmulateMessageToWalletRequestParamsInnerToJSON(json: any): EmulateMessageToWalletRequestParamsInner {
+    return EmulateMessageToWalletRequestParamsInnerToJSONTyped(json, false);
+}
 
-  export function EmulateMessageToWalletRequestParamsInnerToJSONTyped(value?: EmulateMessageToWalletRequestParamsInner | null, ignoreDiscriminator: boolean = false): any {
+export function EmulateMessageToWalletRequestParamsInnerToJSONTyped(value?: EmulateMessageToWalletRequestParamsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

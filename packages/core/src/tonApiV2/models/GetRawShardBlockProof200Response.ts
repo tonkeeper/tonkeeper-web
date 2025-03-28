@@ -72,11 +72,11 @@ export function GetRawShardBlockProof200ResponseFromJSONTyped(json: any, ignoreD
     };
 }
 
-  export function GetRawShardBlockProof200ResponseToJSON(json: any): GetRawShardBlockProof200Response {
-      return GetRawShardBlockProof200ResponseToJSONTyped(json, false);
-  }
+export function GetRawShardBlockProof200ResponseToJSON(json: any): GetRawShardBlockProof200Response {
+    return GetRawShardBlockProof200ResponseToJSONTyped(json, false);
+}
 
-  export function GetRawShardBlockProof200ResponseToJSONTyped(value?: GetRawShardBlockProof200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetRawShardBlockProof200ResponseToJSONTyped(value?: GetRawShardBlockProof200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

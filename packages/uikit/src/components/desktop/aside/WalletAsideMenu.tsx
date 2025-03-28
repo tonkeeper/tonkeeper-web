@@ -42,6 +42,8 @@ import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
 import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
+import { HideForRegulatoryState } from '../../HideForState';
+import { CountryFeature } from '../../../state/country';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -210,6 +212,7 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
+              <HideForRegulatoryState feature={CountryFeature.swap}>
                 {!isReadOnly && !isTestnet && (
                     <NavLink to={AppRoute.swap} disableMobileAnimation>
                         {({ isActive }) => (

@@ -20,6 +20,7 @@ import type {
   EmulateMessageToWalletRequest,
   Event,
   GaslessEstimateRequestMessagesInner,
+  InlineObject,
   MessageConsequences,
   Trace,
 } from '../models/index';
@@ -34,6 +35,8 @@ import {
     EventToJSON,
     GaslessEstimateRequestMessagesInnerFromJSON,
     GaslessEstimateRequestMessagesInnerToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     MessageConsequencesFromJSON,
     MessageConsequencesToJSON,
     TraceFromJSON,

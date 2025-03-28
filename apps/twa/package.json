@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/twa",
-    "version": "3.30.1",
+    "version": "3.30.2",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Your telegram mini app wallet on The Open Network",
     "dependencies": {

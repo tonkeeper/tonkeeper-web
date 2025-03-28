@@ -20,6 +20,8 @@ import { Navigate } from '../../components/shared/Navigate';
 import { NotForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
+import { HideForRegulatoryState } from '../../components/HideForState';
+import { CountryFeature } from '../../state/country';
 
 const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
@@ -93,9 +95,11 @@ const DesktopSwapPageContent = () => {
 export const DesktopSwapPage = () => {
     return (
         <HideOnReview>
-            <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
-                <DesktopSwapPageContent />
-            </ErrorBoundary>
+            <HideForRegulatoryState feature={CountryFeature.swap}>
+                <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
+                    <DesktopSwapPageContent />
+                </ErrorBoundary>
+            </HideForRegulatoryState>
         </HideOnReview>
     );
 };

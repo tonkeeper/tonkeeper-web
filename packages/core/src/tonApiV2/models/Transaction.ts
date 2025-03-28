@@ -299,11 +299,11 @@ export function TransactionFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function TransactionToJSON(json: any): Transaction {
-      return TransactionToJSONTyped(json, false);
-  }
+export function TransactionToJSON(json: any): Transaction {
+    return TransactionToJSONTyped(json, false);
+}
 
-  export function TransactionToJSONTyped(value?: Transaction | null, ignoreDiscriminator: boolean = false): any {
+export function TransactionToJSONTyped(value?: Transaction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

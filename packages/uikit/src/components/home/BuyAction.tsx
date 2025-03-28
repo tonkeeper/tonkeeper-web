@@ -19,7 +19,7 @@ import {
     NotificationTitleBlock
 } from '../Notification';
 import { H3, Label2 } from '../Text';
-import { CommonCountryButton } from '../fields/RoundedButton';
+import { CommonCountryBadge } from '../fields/RoundedButton';
 import { Action } from './Actions';
 import { BuyItemNotification } from './BuyItemNotification';
 import { BuyIcon, SellIcon } from './HomeIcons';
@@ -50,7 +50,6 @@ const ActionNotification: FC<{
     kind: 'buy' | 'sell';
     handleClose: () => void;
 }> = ({ item, kind, handleClose }) => {
-    const navigate = useNavigate();
     const sdk = useAppSdk();
 
     const { data: country } = useUserCountry();
@@ -62,10 +61,7 @@ const ActionNotification: FC<{
             <NotificationHeaderPortal>
                 <NotificationHeader>
                     <NotificationTitleBlock>
-                        <CommonCountryButton
-                            country={country}
-                            onClick={() => navigate(AppRoute.settings + SettingsRoute.country)}
-                        />
+                        <CommonCountryBadge country={country} />
                         <H3>{item.title}</H3>
                         <NotificationCancelButton handleClose={handleClose} />
                     </NotificationTitleBlock>

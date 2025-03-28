@@ -57,11 +57,11 @@ export function FoundAccountsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function FoundAccountsToJSON(json: any): FoundAccounts {
-      return FoundAccountsToJSONTyped(json, false);
-  }
+export function FoundAccountsToJSON(json: any): FoundAccounts {
+    return FoundAccountsToJSONTyped(json, false);
+}
 
-  export function FoundAccountsToJSONTyped(value?: FoundAccounts | null, ignoreDiscriminator: boolean = false): any {
+export function FoundAccountsToJSONTyped(value?: FoundAccounts | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

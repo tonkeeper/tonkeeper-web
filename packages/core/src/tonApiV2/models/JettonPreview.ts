@@ -114,11 +114,11 @@ export function JettonPreviewFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function JettonPreviewToJSON(json: any): JettonPreview {
-      return JettonPreviewToJSONTyped(json, false);
-  }
+export function JettonPreviewToJSON(json: any): JettonPreview {
+    return JettonPreviewToJSONTyped(json, false);
+}
 
-  export function JettonPreviewToJSONTyped(value?: JettonPreview | null, ignoreDiscriminator: boolean = false): any {
+export function JettonPreviewToJSONTyped(value?: JettonPreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

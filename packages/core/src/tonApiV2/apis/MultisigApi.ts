@@ -15,9 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
+  InlineObject,
   Multisig,
 } from '../models/index';
 import {
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     MultisigFromJSON,
     MultisigToJSON,
 } from '../models/index';

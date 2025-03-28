@@ -115,11 +115,11 @@ export function AuctionBidActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function AuctionBidActionToJSON(json: any): AuctionBidAction {
-      return AuctionBidActionToJSONTyped(json, false);
-  }
+export function AuctionBidActionToJSON(json: any): AuctionBidAction {
+    return AuctionBidActionToJSONTyped(json, false);
+}
 
-  export function AuctionBidActionToJSONTyped(value?: AuctionBidAction | null, ignoreDiscriminator: boolean = false): any {
+export function AuctionBidActionToJSONTyped(value?: AuctionBidAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

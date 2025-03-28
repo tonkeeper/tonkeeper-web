@@ -18,10 +18,10 @@
  * @export
  */
 export const ComputeSkipReason = {
-    NoState: 'cskip_no_state',
-    BadState: 'cskip_bad_state',
-    NoGas: 'cskip_no_gas',
-    Suspended: 'cskip_suspended'
+    CskipNoState: 'cskip_no_state',
+    CskipBadState: 'cskip_bad_state',
+    CskipNoGas: 'cskip_no_gas',
+    CskipSuspended: 'cskip_suspended'
 } as const;
 export type ComputeSkipReason = typeof ComputeSkipReason[keyof typeof ComputeSkipReason];
 

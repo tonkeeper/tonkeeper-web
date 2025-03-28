@@ -89,11 +89,11 @@ export function ValueFlowJettonsInnerFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function ValueFlowJettonsInnerToJSON(json: any): ValueFlowJettonsInner {
-      return ValueFlowJettonsInnerToJSONTyped(json, false);
-  }
+export function ValueFlowJettonsInnerToJSON(json: any): ValueFlowJettonsInner {
+    return ValueFlowJettonsInnerToJSONTyped(json, false);
+}
 
-  export function ValueFlowJettonsInnerToJSONTyped(value?: ValueFlowJettonsInner | null, ignoreDiscriminator: boolean = false): any {
+export function ValueFlowJettonsInnerToJSONTyped(value?: ValueFlowJettonsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

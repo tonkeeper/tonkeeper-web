@@ -81,11 +81,11 @@ export function SourceFileFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function SourceFileToJSON(json: any): SourceFile {
-      return SourceFileToJSONTyped(json, false);
-  }
+export function SourceFileToJSON(json: any): SourceFile {
+    return SourceFileToJSONTyped(json, false);
+}
 
-  export function SourceFileToJSONTyped(value?: SourceFile | null, ignoreDiscriminator: boolean = false): any {
+export function SourceFileToJSONTyped(value?: SourceFile | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

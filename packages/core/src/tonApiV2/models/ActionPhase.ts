@@ -96,11 +96,11 @@ export function ActionPhaseFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function ActionPhaseToJSON(json: any): ActionPhase {
-      return ActionPhaseToJSONTyped(json, false);
-  }
+export function ActionPhaseToJSON(json: any): ActionPhase {
+    return ActionPhaseToJSONTyped(json, false);
+}
 
-  export function ActionPhaseToJSONTyped(value?: ActionPhase | null, ignoreDiscriminator: boolean = false): any {
+export function ActionPhaseToJSONTyped(value?: ActionPhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

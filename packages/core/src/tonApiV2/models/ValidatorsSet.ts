@@ -96,11 +96,11 @@ export function ValidatorsSetFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function ValidatorsSetToJSON(json: any): ValidatorsSet {
-      return ValidatorsSetToJSONTyped(json, false);
-  }
+export function ValidatorsSetToJSON(json: any): ValidatorsSet {
+    return ValidatorsSetToJSONTyped(json, false);
+}
 
-  export function ValidatorsSetToJSONTyped(value?: ValidatorsSet | null, ignoreDiscriminator: boolean = false): any {
+export function ValidatorsSetToJSONTyped(value?: ValidatorsSet | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -162,11 +162,11 @@ export function AccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): A
     };
 }
 
-  export function AccountToJSON(json: any): Account {
-      return AccountToJSONTyped(json, false);
-  }
+export function AccountToJSON(json: any): Account {
+    return AccountToJSONTyped(json, false);
+}
 
-  export function AccountToJSONTyped(value?: Account | null, ignoreDiscriminator: boolean = false): any {
+export function AccountToJSONTyped(value?: Account | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

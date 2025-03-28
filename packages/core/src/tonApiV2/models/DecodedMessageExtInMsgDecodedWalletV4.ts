@@ -89,11 +89,11 @@ export function DecodedMessageExtInMsgDecodedWalletV4FromJSONTyped(json: any, ig
     };
 }
 
-  export function DecodedMessageExtInMsgDecodedWalletV4ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV4 {
-      return DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped(json, false);
-  }
+export function DecodedMessageExtInMsgDecodedWalletV4ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV4 {
+    return DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped(json, false);
+}
 
-  export function DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV4 | null, ignoreDiscriminator: boolean = false): any {
+export function DecodedMessageExtInMsgDecodedWalletV4ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV4 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

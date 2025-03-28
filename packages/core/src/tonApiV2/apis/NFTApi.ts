@@ -17,6 +17,7 @@ import * as runtime from '../runtime';
 import type {
   AccountEvents,
   GetAccountsRequest,
+  InlineObject,
   NftCollection,
   NftCollections,
   NftItem,
@@ -27,6 +28,8 @@ import {
     AccountEventsToJSON,
     GetAccountsRequestFromJSON,
     GetAccountsRequestToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     NftCollectionFromJSON,
     NftCollectionToJSON,
     NftCollectionsFromJSON,

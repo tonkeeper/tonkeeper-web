@@ -147,11 +147,11 @@ export function BlockchainRawAccountFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function BlockchainRawAccountToJSON(json: any): BlockchainRawAccount {
-      return BlockchainRawAccountToJSONTyped(json, false);
-  }
+export function BlockchainRawAccountToJSON(json: any): BlockchainRawAccount {
+    return BlockchainRawAccountToJSONTyped(json, false);
+}
 
-  export function BlockchainRawAccountToJSONTyped(value?: BlockchainRawAccount | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainRawAccountToJSONTyped(value?: BlockchainRawAccount | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
