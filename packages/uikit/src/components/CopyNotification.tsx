@@ -9,22 +9,22 @@ import { Label2 } from './Text';
 const Message = styled.div`
     position: fixed;
     z-index: 20;
-    top: -30px;
+    top: env(safe-area-inset-top);
     left: 50%;
+    transform: translateY(${p => (p.theme.proDisplayType === 'mobile' ? '0' : '-30px')}) scale(0.8);
 
     transition: all 0.1s ease-in-out;
 
     &.enter-done {
-        top: calc(16px + env(safe-area-inset-top));
         opacity: 1;
         pointer-events: auto;
-        transform: scale(1);
+        transform: translateY(16px) scale(1);
     }
 
     &.exit {
-        top: -30px;
         opacity: 0;
-        transform: scale(0.8);
+        transform: translateY(${p => (p.theme.proDisplayType === 'mobile' ? '0' : '-30px')})
+            scale(0.8);
     }
 `;
 
