@@ -26,6 +26,8 @@ import {
     FullHeightBlockResponsive,
     NotificationBackButton,
     NotificationCancelButton,
+    NotificationFooter,
+    NotificationFooterPortal,
     NotificationTitleBlock
 } from '../Notification';
 import { Label2 } from '../Text';
@@ -135,7 +137,11 @@ export function ConfirmView<T extends Asset = Asset>({
     let additionalDetails = <ConfirmViewAdditionalBottomSlot />;
     let buttons = (
         <ConfirmViewButtonsSlot>
-            <ConfirmViewButtons MainButton={ConfirmMainButton} />
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ConfirmViewButtons MainButton={ConfirmMainButton} />
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </ConfirmViewButtonsSlot>
     );
 

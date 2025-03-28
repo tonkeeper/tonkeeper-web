@@ -15,6 +15,7 @@ import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
 import { useActiveConfig } from '../../state/wallet';
 import { hexToRGBA } from '../../libs/css';
 import { handleSubmit } from '../../libs/form';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Block = styled.div`
     display: flex;
@@ -252,9 +253,13 @@ export const Words: FC<{
         <CenterContainer>
             <WordsGridAndHeaders mnemonic={mnemonic} type={showMamInfo ? 'mam' : 'standard'} />
 
-            <ButtonResponsiveSize fullWidth primary marginTop onClick={onCheck}>
-                {t('continue')}
-            </ButtonResponsiveSize>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonResponsiveSize fullWidth primary marginTop onClick={onCheck}>
+                        {t('continue')}
+                    </ButtonResponsiveSize>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </CenterContainer>
     );
 };
@@ -454,7 +459,7 @@ export const Check: FC<{
         three.toLowerCase().trim() === mnemonic[test3 - 1];
 
     return (
-        <CenterContainer>
+        <CenterContainer $mobileFitContent>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('check_words_title')}</H2Label2Responsive>
@@ -488,18 +493,20 @@ export const Check: FC<{
                     focusNext={() => (isValid ? onConfirm() : undefined)}
                 />
             </BlockSmallGap>
-            <BottomButtonBlock>
-                <ButtonResponsiveSize
-                    tabIndex={4}
-                    fullWidth
-                    primary
-                    loading={isLoading}
-                    disabled={!isValid}
-                    onClick={onConfirm}
-                >
-                    {t('continue')}
-                </ButtonResponsiveSize>
-            </BottomButtonBlock>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonResponsiveSize
+                        tabIndex={4}
+                        fullWidth
+                        primary
+                        loading={isLoading}
+                        disabled={!isValid}
+                        onClick={onConfirm}
+                    >
+                        {t('continue')}
+                    </ButtonResponsiveSize>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </CenterContainer>
     );
 };
@@ -672,18 +679,20 @@ export const ImportWords: FC<{
                     ))}
                 </Inputs>
             </Block>
-            <BottomButtonBlock>
-                <ButtonResponsiveSize
-                    fullWidth
-                    primary
-                    loading={isLoading}
-                    onClick={onSubmit}
-                    bottom={standalone}
-                    type="submit"
-                >
-                    {t('continue')}
-                </ButtonResponsiveSize>
-            </BottomButtonBlock>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonResponsiveSize
+                        fullWidth
+                        primary
+                        loading={isLoading}
+                        onClick={onSubmit}
+                        bottom={standalone}
+                        type="submit"
+                    >
+                        {t('continue')}
+                    </ButtonResponsiveSize>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </form>
     );
 };
@@ -703,22 +712,24 @@ export const SelectMnemonicType: FC<{
                 <H2Label2Responsive>{t('import_chose_mnemonic_type_title')}</H2Label2Responsive>
                 <Body>{t('import_chose_mnemonic_type_description')}</Body>
             </Block>
-            <BottomButtonBlock>
-                {isLoading ? (
-                    <ButtonResponsiveSize fullWidth secondary loading />
-                ) : (
-                    availableTypes.map(type => (
-                        <ButtonResponsiveSize
-                            key={type}
-                            fullWidth
-                            secondary
-                            onClick={() => onSelect(type)}
-                        >
-                            {t(`import_chose_mnemonic_option_${type}`)}
-                        </ButtonResponsiveSize>
-                    ))
-                )}
-            </BottomButtonBlock>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    {isLoading ? (
+                        <ButtonResponsiveSize fullWidth secondary loading />
+                    ) : (
+                        availableTypes.map(type => (
+                            <ButtonResponsiveSize
+                                key={type}
+                                fullWidth
+                                secondary
+                                onClick={() => onSelect(type)}
+                            >
+                                {t(`import_chose_mnemonic_option_${type}`)}
+                            </ButtonResponsiveSize>
+                        ))
+                    )}
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </>
     );
 };

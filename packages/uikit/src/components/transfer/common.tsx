@@ -16,11 +16,11 @@ import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import {
-    NotificationBackButton,
     NotificationCancelButton,
-    NotificationTitleBlock
+    NotificationTitleBlock,
+    NotificationBackButton
 } from '../Notification';
-import { Body1, H3 } from '../Text';
+import { Body1, H3Label2Responsive } from '../Text';
 import { ButtonMock } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
@@ -73,7 +73,6 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
 
 export const Wrapper = styled.div<{ standalone: boolean; extension: boolean; fullWidth?: boolean }>`
     position: relative;
-    overflow: hidden;
     background-color: ${props => props.theme.backgroundPage};
 
     ${props =>
@@ -298,7 +297,7 @@ export const TransferViewHeaderBlock: FC<{ title: string; onClose: () => void }>
     return (
         <NotificationTitleBlock>
             <ButtonMock />
-            <H3>{title}</H3>
+            <H3Label2Responsive>{title}</H3Label2Responsive>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
     );
@@ -312,7 +311,7 @@ export const RecipientHeaderBlock: FC<{
     return (
         <NotificationTitleBlock>
             {onBack ? <NotificationBackButton onBack={onBack} /> : <ButtonMock />}
-            <H3>{title}</H3>
+            <H3Label2Responsive>{title}</H3Label2Responsive>
             <NotificationCancelButton handleClose={onClose} />
         </NotificationTitleBlock>
     );

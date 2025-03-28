@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { hexToRGBA } from '../../../../libs/css';
 import { useTranslation } from '../../../../hooks/translation';
 import { ArrowDownIcon, ArrowUpIcon, XMarkCircleIcon } from '../../../Icon';
@@ -7,9 +7,9 @@ import { Body2, Body2Class } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
 import { HistoryGridCell, HistoryGridCellFillRow } from './HistoryGrid';
-import { useActiveTonNetwork, useActiveWallet } from '../../../../state/wallet';
+import { useActiveTonNetwork } from '../../../../state/wallet';
 
-export const HistoryCellAction = styled(HistoryGridCell)`
+export const HistoryCellAction = styled(HistoryGridCell).attrs({ className: 'grid-area-action' })`
     display: flex;
     gap: 6px;
     height: 20px;
@@ -90,7 +90,9 @@ export const HistoryBadgeScam = () => {
     return <HistoryBadge color="accentOrange">{t('transactions_spam')}</HistoryBadge>;
 };
 
-const HistoryCellAccountStyled = styled(HistoryGridCell)`
+const HistoryCellAccountStyled = styled(HistoryGridCell).attrs({
+    className: 'grid-area-account'
+})`
     ${Body2Class};
 
     color: ${p => p.theme.textSecondary};
@@ -119,11 +121,20 @@ export const HistoryCellAccount: FC<{
     );
 };
 
-const HistoryCellCommentStyled = styled(Body2)`
+const HistoryCellCommentStyled = styled(Body2).attrs({ className: 'grid-area-comment' })`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 40px;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding: 6px 10px;
+            background: ${p.theme.backgroundContent};
+            border-radius: ${p.theme.corner2xSmall};
+            width: fit-content;
+        `}
 `;
 
 export const HistoryCellComment: FC<{ comment?: string; isScam?: boolean; className?: string }> = ({
@@ -132,7 +143,7 @@ export const HistoryCellComment: FC<{ comment?: string; isScam?: boolean; classN
     className
 }) => {
     if (!comment || isScam) {
-        return <div />;
+        return <div className="grid-area-comment" />;
     }
     return <HistoryCellCommentStyled className={className}>{comment}</HistoryCellCommentStyled>;
 };
@@ -141,7 +152,9 @@ export const HistoryCellCommentSecondary = styled(HistoryCellComment)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const HistoryCellAmountStyled = styled(Body2)<{ color?: string }>`
+const HistoryCellAmountStyled = styled(Body2).attrs({ className: 'grid-area-amount' })<{
+    color?: string;
+}>`
     color: ${p => (p.color ? p.theme[p.color] : p.theme.textPrimary)};
     overflow: hidden;
     text-overflow: ellipsis;
@@ -177,7 +190,9 @@ export const HistoryCellAmount: FC<{
     );
 };
 
-export const HistoryCellAmountText = styled(HistoryGridCell)`
+export const HistoryCellAmountText = styled(HistoryGridCell).attrs({
+    className: 'grid-area-amount'
+})`
     ${Body2Class};
     color: ${p => p.theme.textTertiary};
 `;
@@ -186,6 +201,12 @@ export const ActionRow = styled(HistoryGridCell)`
     display: grid;
     gap: 0.5rem;
     grid-template-columns: 1fr max-content;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            display: contents;
+        `}
 `;
 
 export const ErrorRow: FC<{ children?: ReactNode }> = ({ children }) => {

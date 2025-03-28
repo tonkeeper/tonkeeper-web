@@ -19,6 +19,7 @@ import {
 } from '../../../state/wallet';
 import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
+import { NotForTargetEnv } from '../../shared/TargetEnv';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -178,15 +179,19 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
 
     return (
         <Container className={className} ref={containerRef}>
-            <Divider />
+            <NotForTargetEnv env="mobile">
+                <Divider />
+            </NotForTargetEnv>
             <BlockWrapper>
                 {button}
-                <IconButtonTransparentBackground
-                    onClick={onRefresh}
-                    disabled={isInvalidating || isInvalidatingGlobalQueries}
-                >
-                    <RefreshIconRotating rotate={rotate} />
-                </IconButtonTransparentBackground>
+                <NotForTargetEnv env="mobile">
+                    <IconButtonTransparentBackground
+                        onClick={onRefresh}
+                        disabled={isInvalidating || isInvalidatingGlobalQueries}
+                    >
+                        <RefreshIconRotating rotate={rotate} />
+                    </IconButtonTransparentBackground>
+                </NotForTargetEnv>
             </BlockWrapper>
         </Container>
     );

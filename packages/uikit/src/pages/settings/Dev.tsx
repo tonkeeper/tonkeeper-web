@@ -6,12 +6,20 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { ListBlock, ListItemElement } from '../../components/List';
 import styled from 'styled-components';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { useDisclosure } from '../../hooks/useDisclosure';
-import { Notification } from '../../components/Notification';
-import { ImportBySKWallet } from '../import/ImportBySKWallet';
+import { useNavigate } from '../../hooks/router/useNavigate';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
-import { useNavigate } from 'react-router-dom';
+import { ImportBySKWallet } from '../import/ImportBySKWallet';
+import { Notification } from '../../components/Notification';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -73,7 +81,33 @@ const AddAccountBySK = () => {
     );
 };
 
+const DesktopWrapper = styled(DesktopViewPageLayout)`
+    ${ListBlock} {
+        margin-bottom: 0;
+    }
+
+    ${ListItemElement} {
+        min-height: 56px;
+    }
+`;
+
 export const DevSettings = React.memo(() => {
+    const isProDisplay = useIsFullWidthMode();
+
+    if (isProDisplay) {
+        return (
+            <DesktopWrapper>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title="Dev Menu" />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <CookieSettings />
+                <AddAccountBySK />
+            </DesktopWrapper>
+        );
+    }
+
     return (
         <>
             <SubHeader title="Dev Menu" />

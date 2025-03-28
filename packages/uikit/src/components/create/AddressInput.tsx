@@ -7,6 +7,8 @@ import { ButtonResponsiveSize } from '../fields/Button';
 import { TonRecipientInput } from '../fields/TonRecipientInput';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 import { Address } from '@ton/core';
+import { useMobileModalFullScreenStretcher } from '../../hooks/useElementHeight';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Block = styled.div`
     display: flex;
@@ -27,6 +29,7 @@ export const AddressInput: FC<{
     onIsDirtyChange?: (isDirty: boolean) => void;
 }> = ({ afterInput, isLoading, className, onIsDirtyChange }) => {
     const { t } = useTranslation();
+    const { ref: containerRef, stretcher } = useMobileModalFullScreenStretcher();
 
     const ref = useRef<HTMLInputElement>(null);
 
@@ -45,30 +48,39 @@ export const AddressInput: FC<{
     }, [ref]);
 
     return (
-        <CenterContainer className={className}>
-            <Block>
-                <div>
-                    <H2Label2Responsive>{t('add_watch_only_title')}</H2Label2Responsive>
-                    <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
-                </div>
-                <TonRecipientInput
-                    ref={ref}
-                    onChange={setRecipient}
-                    onIsErroredChange={setError}
-                    onIsLoadingChange={setDataIsLoading}
-                    placeholder={t('wallet_address')}
-                />
-                <ButtonResponsiveSize
-                    fullWidth
-                    primary
-                    marginTop
-                    loading={isLoading || isDataLoading}
-                    disabled={error || !recipient}
-                    onClick={() => afterInput(Address.parse(recipient!.address).toRawString())}
-                >
-                    {t('continue')}
-                </ButtonResponsiveSize>
-            </Block>
-        </CenterContainer>
+        <>
+            <CenterContainer className={className} ref={containerRef} $mobileFitContent>
+                <Block>
+                    <div>
+                        <H2Label2Responsive>{t('add_watch_only_title')}</H2Label2Responsive>
+                        <Body>{t('add_wallet_modal_watch_only_subtitle')}</Body>
+                    </div>
+                    <TonRecipientInput
+                        ref={ref}
+                        onChange={setRecipient}
+                        onIsErroredChange={setError}
+                        onIsLoadingChange={setDataIsLoading}
+                        placeholder={t('wallet_address')}
+                    />
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonResponsiveSize
+                                fullWidth
+                                primary
+                                marginTop
+                                loading={isLoading || isDataLoading}
+                                disabled={error || !recipient}
+                                onClick={() =>
+                                    afterInput(Address.parse(recipient!.address).toRawString())
+                                }
+                            >
+                                {t('continue')}
+                            </ButtonResponsiveSize>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
+                </Block>
+            </CenterContainer>
+            {stretcher}
+        </>
     );
 };

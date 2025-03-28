@@ -1,11 +1,11 @@
 import React, { FC, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, relative } from '../../libs/routes';
 import { TonkeeperIcon } from '../Icon';
 import { Body3, Label2 } from '../Text';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const Block = styled.div`
     user-select: none;

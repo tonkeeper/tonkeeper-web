@@ -4,8 +4,8 @@ import { SwapMainForm } from '@tonkeeper/uikit/dist/components/swap/SwapMainForm
 import { SwapSettingsNotification } from '@tonkeeper/uikit/dist/components/swap/SwapSettingsNotification';
 import { useSwapMobileNotification } from '@tonkeeper/uikit/dist/state/swap/useSwapMobileNotification';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate"
 
 const Wrapper = styled(InnerBody)`
     padding: 0 16px;

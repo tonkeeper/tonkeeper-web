@@ -8,10 +8,12 @@ function createWrapperAndAppendToBody(wrapperId: string) {
     return wrapperElement;
 }
 
-const ReactPortal: FC<PropsWithChildren<{ wrapperId?: string }>> = ({
-    children,
-    wrapperId = 'react-portal-wrapper'
-}) => {
+const ReactPortal: FC<
+    PropsWithChildren<{
+        wrapperId?: string;
+        position?: 'first' | 'last';
+    }>
+> = ({ children, wrapperId = 'react-portal-wrapper', position = 'last' }) => {
     const [wrapperElement, setWrapperElement] = useState<HTMLElement | null>(null);
 
     useLayoutEffect(() => {
@@ -33,8 +35,15 @@ const ReactPortal: FC<PropsWithChildren<{ wrapperId?: string }>> = ({
         };
     }, [wrapperId]);
 
-    // wrapperElement state will be null on very first render.
-    if (wrapperElement === null) return null;
+    useLayoutEffect(() => {
+        if (!wrapperElement) return;
+
+        if (position === 'first') {
+            wrapperElement.prepend(wrapperElement.lastElementChild as Node);
+        }
+    }, [wrapperElement, position]);
+
+    if (!wrapperElement) return null;
 
     return createPortal(children, wrapperElement);
 };

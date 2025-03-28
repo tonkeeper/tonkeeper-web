@@ -10,7 +10,7 @@ import { ProNotification } from '../../pro/ProNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { ProDashboardIcon, ProMultisendIcon } from './Icons';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useAppPlatform } from '../../../hooks/appContext';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 const NotificationStyled = styled(Notification)`
     max-width: 768px;
@@ -173,10 +173,10 @@ const ButtonsBlock: FC<{ className?: string; onBuy: () => void; onTrial?: () => 
     onTrial
 }) => {
     const { t } = useTranslation();
-    const appPlatform = useAppPlatform();
+    const appPlatform = useAppTargetEnv();
     return (
         <ButtonsContainer className={className}>
-            {onTrial && appPlatform !== 'tablet' && (
+            {onTrial && appPlatform !== 'tablet' && appPlatform !== 'mobile' && (
                 <Button secondary onClick={onTrial}>
                     {t('pro_banner_start_trial')}
                 </Button>

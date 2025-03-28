@@ -1,5 +1,4 @@
-import React, { forwardRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { FC, forwardRef } from 'react';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useUSDTRate } from '../../state/rates';
 import { ListItem } from '../List';
@@ -8,6 +7,8 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import styled from 'styled-components';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const TokenLogoNotRounded = styled(TokenLogo)`
     border-radius: unset;
@@ -27,7 +28,9 @@ export const TronAssetComponent = forwardRef<
 
     return (
         <ListItem
-            onClick={() => navigate(AppRoute.coins + '/' + assetAmount.asset.id)}
+            onClick={() =>
+                navigate(AppRoute.coins + '/' + assetAmount.asset.id, { replace: false })
+            }
             className={className}
             ref={ref}
         >

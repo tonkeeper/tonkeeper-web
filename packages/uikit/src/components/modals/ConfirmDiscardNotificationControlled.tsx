@@ -1,10 +1,10 @@
-import { Notification } from '../Notification';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { useCallback } from 'react';
 import { useAtom } from '../../libs/atom';
 import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../Text';
-import { Button } from '../fields/Button';
+import { ButtonResponsiveSize } from '../fields/Button';
 import { useTranslation } from '../../hooks/translation';
 
 const { hook, paramsControl } = createModalControl<{
@@ -67,12 +67,18 @@ export const ConfirmDiscardNotificationControlled = () => {
                 <ContentContainer>
                     <Label2>{t('confirm_discard_title')}</Label2>
                     <Body2>{t('confirm_discard_description')}</Body2>
-                    <ButtonsContainer>
-                        <Button primary onClick={onContinue}>
-                            {t('confirm_discard_btn_continue_editing')}
-                        </Button>
-                        <Button onClick={onDiscard}>{t('confirm_discard_btn_discard')}</Button>
-                    </ButtonsContainer>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonsContainer>
+                                <ButtonResponsiveSize primary onClick={onContinue}>
+                                    {t('confirm_discard_btn_continue_editing')}
+                                </ButtonResponsiveSize>
+                                <ButtonResponsiveSize onClick={onDiscard}>
+                                    {t('confirm_discard_btn_discard')}
+                                </ButtonResponsiveSize>
+                            </ButtonsContainer>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 </ContentContainer>
             )}
         </NotificationStyled>

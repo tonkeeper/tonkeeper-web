@@ -32,7 +32,6 @@ import { AddWalletContext } from './AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAppSdk } from '../../hooks/appSdk';
 import { MultisigConfigForm, MultisigUseForm } from '../multisig/MultisigConfigForm';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import {
     MultisigConfig,
@@ -41,6 +40,7 @@ import {
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -152,11 +152,13 @@ const CreateMultisigAwaitDeployPage: FC<{
     );
 
     const onNotificationCloseInterceptor = useCallback(
-        (closeHandler: () => void) => {
+        (closeHandler: () => void, cancelCloseHandler: () => void) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeHandler();
+                    } else {
+                        cancelCloseHandler();
                     }
                 }
             });

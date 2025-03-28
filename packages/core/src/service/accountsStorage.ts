@@ -158,6 +158,8 @@ export class AccountsStorage {
         if (activeAccountId !== null && ids.includes(activeAccountId)) {
             await this.setActiveAccountId(newState[0]?.id || null);
         }
+
+        return newState;
     };
 
     removeAccountFromState = async (id: AccountId) => {

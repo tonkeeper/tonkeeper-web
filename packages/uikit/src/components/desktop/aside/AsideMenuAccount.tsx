@@ -39,9 +39,9 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;

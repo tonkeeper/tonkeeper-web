@@ -400,11 +400,13 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
             return undefined;
         }
 
-        return closeModal => {
+        return (closeModal, cancelClose) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeModal();
+                    } else {
+                        cancelClose();
                     }
                 }
             });

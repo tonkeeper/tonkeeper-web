@@ -2,7 +2,6 @@ import React, { ComponentProps, FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { SpinnerIcon } from '../Icon';
 import { Body2Class } from '../Text';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 export interface ButtonProps {
     loading?: boolean;
@@ -121,13 +120,13 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
         switch (props.size) {
             case 'large':
                 return css`
-                    border-radius: ${props.theme.displayType === 'full-width'
+                    border-radius: ${props.theme.proDisplayType === 'desktop'
                         ? props.theme.corner2xSmall
                         : props.theme.cornerSmall};
                 `;
             default:
                 return css`
-                    border-radius: ${props.theme.displayType === 'full-width'
+                    border-radius: ${props.theme.proDisplayType === 'desktop'
                         ? props.theme.corner2xSmall
                         : props.theme.cornerLarge};
                 `;
@@ -266,7 +265,7 @@ export const Button: FC<
 };
 
 export const ButtonResponsiveSize: FC<Omit<ComponentProps<typeof Button>, 'size'>> = props => {
-    const isFullWidth = useIsFullWidthMode();
+    const theme = useTheme();
 
-    return <Button {...props} size={isFullWidth ? 'small' : 'large'} />;
+    return <Button {...props} size={theme.proDisplayType === 'desktop' ? 'small' : 'large'} />;
 };

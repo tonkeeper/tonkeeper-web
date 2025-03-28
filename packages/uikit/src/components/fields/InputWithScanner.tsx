@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ScanIcon, XmarkIcon } from '../Icon';
 import { InputBlock, Label } from './Input';
 import { TextareaAutosize } from './TextareaAutosize';
+import { mergeRefs } from '../../libs/common';
 
 export interface IInputWithScanner {
     value: string;
@@ -14,6 +15,7 @@ export interface IInputWithScanner {
     isValid?: boolean;
     label?: string;
     disabled?: boolean;
+    autoFocusTimeout?: number;
 }
 
 const ClearBlock = styled.div`
@@ -42,7 +44,7 @@ const ScanBlock = styled.div`
 `;
 
 export const InputWithScanner = React.forwardRef<HTMLTextAreaElement, IInputWithScanner>(
-    ({ value, onChange, isValid = true, label, disabled, onScan, onSubmit }, ref) => {
+    ({ value, onChange, isValid = true, label, disabled, onScan, onSubmit, autoFocusTimeout }, ref) => {
         const [focus, setFocus] = useState(false);
         const [scanId, setScanId] = useState<number | undefined>(undefined);
         const sdk = useAppSdk();
@@ -85,11 +87,19 @@ export const InputWithScanner = React.forwardRef<HTMLTextAreaElement, IInputWith
             };
         }, [sdk, scanId, onScan]);
 
+        const innerRef = useRef<HTMLTextAreaElement>(null);
+
+        useEffect(() => {
+            if (autoFocusTimeout) {
+                setTimeout(() => innerRef.current?.focus(), autoFocusTimeout);
+            }
+        }, [autoFocusTimeout]);
+
         return (
             <InputBlock focus={focus} valid={isValid} scanner>
                 <TextareaAutosize
                     onSubmit={onSubmit}
-                    ref={ref}
+                    ref={mergeRefs(ref, innerRef)}
                     disabled={disabled}
                     value={value}
                     onChange={e => onChange && onChange(e.target.value)}

@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountBySignerQr } from '@tonkeeper/core/dist/service/walletService';
-import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useAccountsStorage } from '../hooks/useStorage';
+import { useNavigate } from '../hooks/router/useNavigate';
 
 export const usePairSignerMutation = () => {
     const sdk = useAppSdk();

@@ -1,18 +1,21 @@
 import { FC, MouseEventHandler, PropsWithChildren } from 'react';
-import { useAppPlatform } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import styled from 'styled-components';
 
-const AStyled = styled.a`
+const AStyled = styled.a<{ $contents?: boolean }>`
     text-decoration: unset;
     cursor: pointer;
+
+    ${p => p.$contents && 'display: contents'};
 `;
 
-const ButtonStyled = styled.button`
+const ButtonStyled = styled.button<{ $contents?: boolean }>`
     border: none;
     outline: none;
     background: transparent;
     cursor: pointer;
+
+    ${p => p.$contents && 'display: contents'};
 `;
 
 export const ExternalLink: FC<
@@ -20,9 +23,10 @@ export const ExternalLink: FC<
         className?: string;
         href: string;
         onClick?: MouseEventHandler;
+        contents?: boolean;
     }>
-> = ({ className, href, onClick, children }) => {
-    const platform = useAppPlatform();
+> = ({ className, href, onClick, children, contents }) => {
+    const platform = useAppTargetEnv();
     const sdk = useAppSdk();
 
     if (platform === 'web' || platform === 'swap_widget_web') {
@@ -33,6 +37,7 @@ export const ExternalLink: FC<
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => onClick?.(e)}
+                $contents={contents}
             >
                 {children}
             </AStyled>
@@ -46,6 +51,7 @@ export const ExternalLink: FC<
                 sdk.openPage(href);
             }}
             className={className}
+            $contents={contents}
         >
             {children}
         </ButtonStyled>

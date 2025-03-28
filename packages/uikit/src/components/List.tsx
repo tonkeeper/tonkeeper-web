@@ -12,6 +12,7 @@ import React, {
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../hooks/appContext';
 import { mergeRefs } from '../libs/common';
+import { useAppTargetEnv } from '../hooks/appSdk';
 
 const ListBlockContext = createContext({ isDesktopAdaptive: false });
 
@@ -232,6 +233,10 @@ export const ListItem = forwardRef<
         }
     }, [ref.current, selection, setHover]);
     const { isDesktopAdaptive } = useContext(ListBlockContext);
+    const env = useAppTargetEnv();
+    if (env === 'mobile') {
+        hover = false;
+    }
 
     return (
         <ListItemElement
