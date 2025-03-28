@@ -463,6 +463,7 @@ export const Notification: FC<{
     className?: string;
     disableHeightAnimation?: boolean;
     mobileFullScreen?: boolean;
+    afterClose?: () => void;
 }> = props => {
     const targetEnv = useAppTargetEnv();
 
@@ -483,6 +484,7 @@ export const NotificationIonic: FC<{
     className?: string;
     disableHeightAnimation?: boolean;
     mobileFullScreen?: boolean;
+    afterClose?: () => void;
 }> = ({
     children,
     isOpen,
@@ -492,7 +494,8 @@ export const NotificationIonic: FC<{
     footer,
     className,
     disableHeightAnimation,
-    mobileFullScreen
+    mobileFullScreen,
+    afterClose
 }) => {
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -510,7 +513,7 @@ export const NotificationIonic: FC<{
     const canDismissAnswerCache = useRef<{ timestamp: number; answer: boolean } | undefined>();
 
     const canDismiss = useMemo(() => {
-        if (!onCloseInterceptor) {
+        if (!onCloseInterceptor || !isOpen) {
             return true;
         } else {
             return () => {
@@ -541,14 +544,20 @@ export const NotificationIonic: FC<{
                 );
             };
         }
-    }, [handleClose, onCloseInterceptor]);
+    }, [handleClose, onCloseInterceptor, isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            canDismissAnswerCache.current = undefined;
+        }
+    }, [isOpen]);
 
     const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
     const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
 
     const Child = useMemo(() => {
-        return children((afterClose?: () => void) => {
-            setTimeout(() => afterClose && afterClose(), 100);
+        return children((_afterClose?: () => void) => {
+            setTimeout(() => _afterClose && _afterClose(), 100);
             onClose();
         });
     }, [isOpen, children, onClose]);
@@ -574,7 +583,8 @@ export const NotificationIonic: FC<{
         >
             <IonModal
                 isOpen={isOpen}
-                onWillDismiss={onClose}
+                onWillDismiss={handleClose}
+                onDidDismiss={afterClose}
                 canDismiss={canDismiss}
                 initialBreakpoint={1}
                 breakpoints={[0, 1]}
@@ -641,16 +651,34 @@ export const NotificationDesktopAndWeb: FC<{
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
-}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
+    afterClose?: () => void;
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    backShadow,
+    handleClose,
+    title,
+    footer,
+    className,
+    afterClose
+}) => {
     const animationTime = 200;
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
     const onClose = useCallback(() => {
         if (!onCloseInterceptor) {
             handleClose();
+            setTimeout(() => afterClose && afterClose(), animationTime);
         } else {
-            onCloseInterceptor(handleClose, () => {});
+            onCloseInterceptor(
+                () => {
+                    handleClose();
+                    setTimeout(() => afterClose && afterClose(), animationTime);
+                },
+                () => {}
+            );
         }
-    }, [handleClose, onCloseInterceptor]);
+    }, [handleClose, onCloseInterceptor, afterClose]);
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
     const { displayType } = useTheme();
@@ -679,8 +707,8 @@ export const NotificationDesktopAndWeb: FC<{
     }, [onClose]);
 
     const Child = useMemo(() => {
-        return children((afterClose?: () => void) => {
-            setTimeout(() => afterClose && afterClose(), animationTime);
+        return children((_afterClose?: () => void) => {
+            setTimeout(() => _afterClose && _afterClose(), animationTime);
             onClose();
         });
     }, [open, children, onClose]);

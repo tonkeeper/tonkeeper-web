@@ -98,7 +98,7 @@ const Icon = styled.div`
 const LightsIcon = () => {
     return (
         <svg
-            width="390"
+            width="490"
             height="406"
             viewBox="0 0 390 406"
             fill="none"

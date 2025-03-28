@@ -115,13 +115,19 @@ export const AddWalletNotificationControlled = () => {
         if (!isOpen) {
             return;
         }
+
+        setSelectedMethod(params?.walletType);
+    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
         if (params?.walletType === 'multisig' && !proState?.subscription.valid) {
             onClose();
             openBuyPro();
             return;
         }
-
-        setSelectedMethod(params?.walletType);
     }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
 
     const sdk = useAppSdk();
@@ -129,7 +135,6 @@ export const AddWalletNotificationControlled = () => {
     const onCloseCallback = useCallback(() => {
         closeExtensionTab(sdk);
         onClose();
-        setTimeout(() => setSelectedMethod(undefined), 600);
     }, [onClose, setSelectedMethod, sdk]);
 
     const onSelect = useMemo(() => {
@@ -191,12 +196,12 @@ export const AddWalletNotificationControlled = () => {
 
     const navigateHome = useMemo(
         () =>
-            selectedMethod
+            !params?.walletType
                 ? () => {
                       setSelectedMethod(undefined);
                   }
                 : undefined,
-        [selectedMethod]
+        [params?.walletType]
     );
 
     return (
@@ -206,6 +211,9 @@ export const AddWalletNotificationControlled = () => {
                 handleClose={onCloseCallback}
                 mWidth={'750px'}
                 mobileFullScreen
+                afterClose={() => {
+                    setSelectedMethod(undefined);
+                }}
             >
                 {Content}
             </NotificationStyled>
