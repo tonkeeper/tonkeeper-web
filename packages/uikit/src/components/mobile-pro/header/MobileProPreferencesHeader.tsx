@@ -11,7 +11,6 @@ const translationKeys = {
     [SettingsRoute.dev]: 'Dev Menu',
     [SettingsRoute.fiat]: 'settings_primary_currency',
     [SettingsRoute.security]: 'settings_security',
-    [SettingsRoute.country]: 'country',
     [SettingsRoute.pro]: 'tonkeeper_pro'
 };
 

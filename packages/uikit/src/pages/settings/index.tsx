@@ -5,7 +5,6 @@ import { ProSettings } from '../../components/settings/ProSettings';
 import { SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
-import { CountrySettings } from './Country';
 import { DevSettings } from './Dev';
 import { FiatCurrency } from './FiatCurrency';
 import { JettonsSettings } from './Jettons';
@@ -40,7 +39,6 @@ const SettingsRouter = () => {
             <Route path={path + SettingsRoute.jettons} component={JettonsSettings} />
             <Route path={path + SettingsRoute.nft} component={NFTSettings} />
             <Route path={path + SettingsRoute.security} component={SecuritySettings} />
-            <Route path={path + SettingsRoute.country} component={CountrySettings} />
             <Route path={path + SettingsRoute.pro} component={ProSettings} />
             <Route
                 path={path + WalletSettingsRoute.connectedApps}

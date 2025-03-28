@@ -212,17 +212,18 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-              <HideForRegulatoryState feature={CountryFeature.swap}>
-                {!isReadOnly && !isTestnet && (
-                    <NavLink to={AppRoute.swap} disableMobileAnimation>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive}>
-                                <SwapIconStyled />
-                                <Label2>{t('wallet_swap')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
-                )}
+                <HideForRegulatoryState feature={CountryFeature.swap}>
+                    {!isReadOnly && !isTestnet && (
+                        <NavLink to={AppRoute.swap} disableMobileAnimation>
+                            {({ isActive }) => (
+                                <AsideMenuItemStyled isSelected={isActive}>
+                                    <SwapIconStyled />
+                                    <Label2>{t('wallet_swap')}</Label2>
+                                </AsideMenuItemStyled>
+                            )}
+                        </NavLink>
+                    )}
+                </HideForRegulatoryState>
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
                     <NavLink to={AppRoute.multisigWallets} disableMobileAnimation>
