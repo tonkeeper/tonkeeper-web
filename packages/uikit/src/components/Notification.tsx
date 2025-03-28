@@ -229,7 +229,7 @@ const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            padding-bottom: calc(max(env(safe-area-inset-bottom) - 16px, 0));
+            padding-bottom: max(calc(env(safe-area-inset-bottom) - 16px), 0px);
             background-color: ${p.theme.backgroundPage};
             position: sticky;
             bottom: 0;
@@ -237,7 +237,7 @@ const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
             ${p.$keyboardShift
                 ? css`
                       transform: translateY(
-                          calc(${-p.$keyboardShift}px + env(safe-area-inset-bottom))
+                          calc(${-p.$keyboardShift}px + env(safe-area-inset-bottom) - 16px)
                       );
                   `
                 : css`

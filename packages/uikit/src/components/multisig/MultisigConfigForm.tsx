@@ -4,6 +4,7 @@ import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificat
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import {
+    NotificationFooter,
     NotificationFooterPortal,
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
@@ -14,7 +15,7 @@ import {
     AsyncValidatorsStateProvider,
     useAsyncValidator
 } from '../../hooks/useAsyncValidator';
-import { Button } from '../fields/Button';
+import { Button, ButtonResponsiveSize } from '../fields/Button';
 import styled from 'styled-components';
 import { Body2, Body3, Body3Class, Label2 } from '../Text';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -194,8 +195,8 @@ export const MultisigConfigForm: FC<{
             </FormProvider>
             {formId === undefined && (
                 <NotificationFooterPortal>
-                    <SubmitButtonContainer>
-                        <Button
+                    <NotificationFooter>
+                        <ButtonResponsiveSize
                             primary
                             type="submit"
                             fullWidth
@@ -204,8 +205,8 @@ export const MultisigConfigForm: FC<{
                             disabled={formState !== 'succeed'}
                         >
                             {t('create_multisig_create_wallet')}
-                        </Button>
-                    </SubmitButtonContainer>
+                        </ButtonResponsiveSize>
+                    </NotificationFooter>
                 </NotificationFooterPortal>
             )}
         </FormWrapper>

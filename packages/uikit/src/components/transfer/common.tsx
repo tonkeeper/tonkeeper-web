@@ -15,10 +15,13 @@ import React, { FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { ChevronLeftIcon } from '../Icon';
-import { NotificationCancelButton, NotificationTitleBlock, NotificationBackButton } from '../Notification';
+import {
+    NotificationCancelButton,
+    NotificationTitleBlock,
+    NotificationBackButton
+} from '../Notification';
 import { Body1, H3Label2Responsive } from '../Text';
-import { ButtonMock, RoundedButtonResponsive } from '../fields/RoundedButton';
+import { ButtonMock } from '../fields/RoundedButton';
 import { Button } from '../fields/Button';
 import { Center, Title } from './amountView/AmountViewUI';
 import { AmountState } from './amountView/amountState';
@@ -70,7 +73,6 @@ const ButtonBlockElement = styled.div<{ standalone: boolean }>`
 
 export const Wrapper = styled.div<{ standalone: boolean; extension: boolean; fullWidth?: boolean }>`
     position: relative;
-    overflow: hidden;
     background-color: ${props => props.theme.backgroundPage};
 
     ${props =>

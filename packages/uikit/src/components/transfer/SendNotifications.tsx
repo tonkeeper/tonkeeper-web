@@ -365,17 +365,17 @@ const SendContent: FC<{
                                         isMax={amountViewState!.isMax!}
                                         ttl={multisigTimeout!}
                                     >
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewTitleSlot>
+                                        <ConfirmViewTitleSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationHeaderPortal>
                                                     <NotificationHeader>
                                                         <ConfirmViewTitle />
                                                     </NotificationHeader>
                                                 </NotificationHeaderPortal>
-                                            </ConfirmViewTitleSlot>
-                                        )}
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewButtonsSlot>
+                                            )}
+                                        </ConfirmViewTitleSlot>
+                                        <ConfirmViewButtonsSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationFooterPortal>
                                                     <NotificationFooter>
                                                         <ConfirmViewButtons
@@ -383,8 +383,8 @@ const SendContent: FC<{
                                                         />
                                                     </NotificationFooter>
                                                 </NotificationFooterPortal>
-                                            </ConfirmViewButtonsSlot>
-                                        )}
+                                            )}
+                                        </ConfirmViewButtonsSlot>
                                     </ConfirmMultisigNewTransferView>
                                 ) : (
                                     <ConfirmTransferView
@@ -394,17 +394,17 @@ const SendContent: FC<{
                                         assetAmount={assetAmount!}
                                         isMax={amountViewState!.isMax!}
                                     >
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewTitleSlot>
+                                        <ConfirmViewTitleSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationHeaderPortal>
                                                     <NotificationHeader>
                                                         <ConfirmViewTitle />
                                                     </NotificationHeader>
                                                 </NotificationHeaderPortal>
-                                            </ConfirmViewTitleSlot>
-                                        )}
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewButtonsSlot>
+                                            )}
+                                        </ConfirmViewTitleSlot>
+                                        <ConfirmViewButtonsSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationFooterPortal>
                                                     <NotificationFooter>
                                                         <ConfirmViewButtons
@@ -412,8 +412,8 @@ const SendContent: FC<{
                                                         />
                                                     </NotificationFooter>
                                                 </NotificationFooterPortal>
-                                            </ConfirmViewButtonsSlot>
-                                        )}
+                                            )}
+                                        </ConfirmViewButtonsSlot>
                                     </ConfirmTransferView>
                                 ))}
                         </div>
