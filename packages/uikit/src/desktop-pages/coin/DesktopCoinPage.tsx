@@ -84,6 +84,13 @@ const HeaderButtonsContainer = styled.div`
     padding-bottom: 1rem;
     display: flex;
     gap: 0.5rem;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        `}
 `;
 
 const ButtonStyled = styled(Button)`
