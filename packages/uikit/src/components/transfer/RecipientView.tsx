@@ -204,15 +204,6 @@ export const RecipientView: FC<{
         return true;
     }, [toAccount, comment, isLedger]);
 
-    useEffect(() => {
-        if (sdk.isIOs()) {
-            return;
-        }
-        if (ref.current) {
-            ref.current.focus();
-        }
-    }, [ref.current]);
-
     const formatted = useMemo(() => {
         if ('isFavorite' in recipient) {
             if (recipient.blockchain === BLOCKCHAIN_NAME.TRON) {

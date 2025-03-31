@@ -403,12 +403,12 @@ export const TonTransactionNotification: FC<{
                 <MultisigOrderFormView
                     onSubmit={form => setMultisigTTL(form.lifetime)}
                     MainButton={MainButton}
-                    Header={() => (
+                    header={
                         <TransferViewHeaderBlock
                             title={t('multisig_create_order_title')}
                             onClose={onClose}
                         />
-                    )}
+                    }
                     isAnimationProcess={false}
                 />
             );

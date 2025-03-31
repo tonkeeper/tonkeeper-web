@@ -114,12 +114,12 @@ const SendContent: FC<{ nftItem: NftItem; onClose: () => void }> = ({ nftItem, o
                                         setView('recipient');
                                     }}
                                     isAnimationProcess={status === 'exiting'}
-                                    Header={() => (
+                                    header={
                                         <TransferViewHeaderBlock
                                             title={t('multisig_create_order_title')}
                                             onClose={onClose}
                                         />
-                                    )}
+                                    }
                                     MainButton={MainButton}
                                 />
                             )}

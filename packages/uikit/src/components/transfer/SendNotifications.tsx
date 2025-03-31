@@ -46,9 +46,9 @@ import {
     makeTransferInitAmountState,
     makeTonTransferInitData,
     RecipientHeaderBlock,
-    TransferViewHeaderBlock,
     Wrapper,
-    makeTronTransferInitData
+    makeTronTransferInitData,
+    TransferViewHeaderBlock
 } from './common';
 import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -303,12 +303,12 @@ const SendContent: FC<{
                                         setView('recipient');
                                     }}
                                     isAnimationProcess={status === 'exiting'}
-                                    Header={() => (
+                                    header={
                                         <TransferViewHeaderBlock
                                             title={t('multisig_create_order_title')}
                                             onClose={onClose}
                                         />
-                                    )}
+                                    }
                                     MainButton={MainButton}
                                 />
                             )}

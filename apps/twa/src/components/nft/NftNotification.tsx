@@ -163,6 +163,7 @@ const Content: FC<{ nftItem: NFT; handleClose: () => void }> = ({ nftItem, handl
                                     <ConfirmViewButtons MainButton={ConfirmTwaMainButton} />
                                 }
                                 headerBlock={<RecipientTwaHeaderBlock onClose={backToRecipient} />}
+                                isAnimationProcess={false}
                             />
                         )}
                     </div>
