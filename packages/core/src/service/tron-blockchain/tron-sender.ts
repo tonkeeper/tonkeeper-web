@@ -6,7 +6,6 @@ import { TronAsset } from '../../entries/crypto/asset/tron-asset';
 import { TronSigner } from '../../entries/signer';
 import { TronWallet } from '../../entries/tron/tron-wallet';
 import { TronAddressUtils } from '@ton-keychain/trx';
-import { TronWeb } from 'tronweb';
 import { TronEstimation } from '../../entries/send';
 import { errorMessage } from '../../utils/types';
 import { NotEnoughBatteryBalanceError } from '../../errors/NotEnoughBatteryBalanceError';
@@ -31,6 +30,7 @@ export class TronSender {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
+        const { TronWeb } = await import('tronweb');
         const tronWeb = new TronWeb({
             fullHost: this.tronApi.tronGridBaseUrl,
             privateKey: undefined

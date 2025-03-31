@@ -6,7 +6,6 @@ import {
 } from '@ton/crypto';
 import { MnemonicType } from '../entries/password';
 import { decrypt, encrypt } from './cryptoService';
-import { mnemonicToSeed, validateMnemonic as validBip39Mnemonic } from 'bip39';
 import { deriveED25519Path } from './ed25519';
 import { assertUnreachable } from '../utils/types';
 import { AccountSecret } from '../entries/account';
@@ -94,18 +93,20 @@ export const validateMnemonicStandardOrBip39Ton = async (mnemonic: string[]) => 
         return true;
     }
 
-    if (validBip39Mnemonic(mnemonic.join(' '))) {
+    if (await validateBip39Mnemonic(mnemonic)) {
         return true;
     }
 
     return false;
 };
 
-export const validateBip39Mnemonic = (mnemonic: string[]) => {
+export const validateBip39Mnemonic = async (mnemonic: string[]) => {
+    const { validateMnemonic: validBip39Mnemonic } = await import('bip39');
     return validBip39Mnemonic(mnemonic.join(' '));
 };
 
 async function bip39ToPrivateKey(mnemonic: string[]) {
+    const { mnemonicToSeed } = await import('bip39');
     const seed = await mnemonicToSeed(mnemonic.join(' '));
     const TON_DERIVATION_PATH = "m/44'/607'/0'";
     const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
@@ -137,7 +138,7 @@ export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: Mnemo
         return mnemonicToPrivateKey(mnemonic);
     }
 
-    if (validBip39Mnemonic(mnemonic.join(' '))) {
+    if (await validateBip39Mnemonic(mnemonic)) {
         return bip39ToPrivateKey(mnemonic);
     }
 

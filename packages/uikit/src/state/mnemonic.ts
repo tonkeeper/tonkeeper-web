@@ -38,7 +38,6 @@ import { useCallback } from 'react';
 import { useActiveAccount } from './wallet';
 import { useCheckTouchId } from './password';
 import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
-import { TronWeb } from 'tronweb';
 import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
 
@@ -387,7 +386,7 @@ export const getTronSigner = (
                         checkTouchId
                     );
                     const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');
-
+                    const { TronWeb } = await import('tronweb');
                     const tronWeb = new TronWeb({
                         fullHost: tronApi.tronGridBaseUrl,
                         privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
@@ -407,7 +406,7 @@ export const getTronSigner = (
                         tonMnemonic,
                         account.mnemonicType
                     );
-
+                    const { TronWeb } = await import('tronweb');
                     const tronWeb = new TronWeb({
                         fullHost: tronApi.tronGridBaseUrl,
                         privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
