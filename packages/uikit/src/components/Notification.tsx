@@ -572,6 +572,8 @@ export const NotificationIonic: FC<{
 
     const { keyboardHeight } = useKeyboardState();
 
+    const contentRef = useRef<HTMLDivElement>(null);
+
     return (
         <NotificationContext.Provider
             value={{
@@ -593,8 +595,16 @@ export const NotificationIonic: FC<{
             >
                 <IonicModalContentStyled>
                     <HeightAnimation>
-                        <HeaderWrapper ref={setHeaderElement}>
-                            {(title || !hideButton) && (
+                        <HeaderWrapper ref={setHeaderElement} />
+
+                        {/**
+                         We use createPortal here and with Child as well due to React and Ionic events binding bug.
+                         Otherwise, events binding will not work sometimes with react 18.2.0 and ionic 8.4.2
+                         https://github.com/ionic-team/ionic-framework/issues/28819
+                         */}
+                        {(title || !hideButton) &&
+                            !!headerElement &&
+                            createPortal(
                                 <NotificationHeader className="dialog-header">
                                     <NotificationTitleRow
                                         onBack={onBack}
@@ -602,10 +612,13 @@ export const NotificationIonic: FC<{
                                     >
                                         {title}
                                     </NotificationTitleRow>
-                                </NotificationHeader>
+                                </NotificationHeader>,
+                                headerElement
                             )}
-                        </HeaderWrapper>
-                        {Child}
+
+                        <div ref={contentRef} />
+                        {!!contentRef.current && createPortal(Child, contentRef.current)}
+
                         <Gap />
                         <FooterWrapper ref={setFooterElement} $keyboardShift={keyboardHeight}>
                             {footer}
