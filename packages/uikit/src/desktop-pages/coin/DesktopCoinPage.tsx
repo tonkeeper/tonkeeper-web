@@ -50,6 +50,7 @@ import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
 import { HideForRegulatoryState } from '../../components/HideForState';
 import { CountryFeature } from '../../state/country';
+import { Redirect } from 'react-router-dom';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -349,7 +350,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     const [assets] = useAssets();
     const assetSymbol = useMemo(() => {
         if (!assets) {
-            return undefined;
+            return null;
         }
         if (token === CryptoCurrency.TON) {
             return t('Toncoin');
@@ -367,6 +368,10 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     const tonviewer = mainnetConfig.accountExplorer
         ? new URL(mainnetConfig.accountExplorer).origin
         : 'https://tonviewer.com';
+
+    if (assetSymbol === undefined) {
+        return <Redirect to={AppRoute.home} />;
+    }
 
     return (
         <DesktopViewPageLayout
