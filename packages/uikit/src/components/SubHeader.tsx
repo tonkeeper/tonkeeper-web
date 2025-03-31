@@ -77,6 +77,8 @@ const Title = styled(H3)`
     margin-top: 1px;
     margin-bottom: 2px;
     min-height: 28px;
+    text-align: center;
+    padding: 0 36px;
 `;
 
 const SubHeaderBackButton = () => {

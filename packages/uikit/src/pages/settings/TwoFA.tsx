@@ -139,6 +139,11 @@ const WarningBlockText = styled.ul`
 
 const TwoFASetUpStyled = styled(TwoFASetUp)`
     margin: 16px auto 84px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 16px;
+    }
 `;
 
 const TwoFAPageContent: FC = () => {
@@ -202,6 +207,10 @@ const ActionButtonsContainer = styled.div`
     justify-content: center;
     margin: 0 auto 84px;
     gap: 8px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
 `;
 
 const TwoFAActiveContent = () => {
