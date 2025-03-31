@@ -127,6 +127,20 @@ const ContainerStyled = styled(Container)<{ status: TransitionStatus }>`
     opacity: ${p => (p.status === 'entering' || p.status === 'entered' ? 1 : 0)};
 `;
 
+let pointerEventsBlockings: number[] = [];
+const blockPointerEvents = () => {
+    const id = Date.now();
+    pointerEventsBlockings.push(id);
+    document.getElementById('root')?.classList.add('pointer-events-none');
+    return id;
+};
+const unblockPointerEvents = (id: number) => {
+    pointerEventsBlockings = pointerEventsBlockings.filter(i => i !== id);
+    if (pointerEventsBlockings.length === 0) {
+        document.getElementById('root')?.classList.remove('pointer-events-none');
+    }
+};
+
 export const DropDown = ({
     children,
     payload,
@@ -138,6 +152,13 @@ export const DropDown = ({
     portal
 }: DropDownProps) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && portal) {
+            const id = blockPointerEvents();
+            return () => unblockPointerEvents(id);
+        }
+    }, [isOpen, portal]);
 
     const toggling = () => {
         if (!disabled) {
