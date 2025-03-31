@@ -1,13 +1,11 @@
 import { beginCell, storeStateInit } from '@ton/core';
 import { Network } from '../../entries/network';
 import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
-import {
-    WalletContractV3R1,
-    WalletContractV3R2,
-    WalletContractV4,
-    WalletContractV5Beta,
-    WalletContractV5R1
-} from '@ton/ton';
+import { WalletContractV3R1 } from '@ton/ton/dist/wallets/WalletContractV3R1';
+import { WalletContractV3R2 } from '@ton/ton/dist/wallets/WalletContractV3R2';
+import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
+import { WalletContractV5Beta } from '@ton/ton/dist/wallets/WalletContractV5Beta';
+import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 
 export const walletContractFromState = (wallet: TonWalletStandard) => {
     const publicKey = Buffer.from(wallet.publicKey, 'hex');
