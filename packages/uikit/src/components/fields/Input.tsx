@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { XmarkIcon } from '../Icon';
 import { Body2 } from '../Text';
@@ -207,7 +207,7 @@ export interface InputProps {
     className?: string;
     size?: 'small' | 'medium';
     id: string;
-    autoFocus?: boolean;
+    autoFocus?: number | boolean | 'notification';
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -242,12 +242,21 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             onChange?.('');
         };
 
-        const focusRef = (el: HTMLInputElement | null) => {
-            if (el && !focused.current && autoFocus) {
-                setTimeout(() => el.focus(), 30);
+        const el = useRef<HTMLInputElement>(null);
+
+        useEffect(() => {
+            if (el.current && !focused.current && autoFocus) {
+                setTimeout(
+                    () => el.current?.focus(),
+                    typeof autoFocus === 'number'
+                        ? autoFocus
+                        : autoFocus === 'notification'
+                        ? 200
+                        : 30
+                );
                 focused.current = true;
             }
-        };
+        }, [autoFocus]);
 
         return (
             <OuterBlock className={className}>
@@ -260,7 +269,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 >
                     <InputField
                         id={id}
-                        ref={mergeRefs(ref, focusRef)}
+                        ref={mergeRefs(ref, el)}
                         disabled={disabled}
                         type={type}
                         value={value}
@@ -272,7 +281,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         onBlur={() => setFocus(false)}
                         size={size}
                         placeholder={size === 'small' ? label : undefined}
-                        autoFocus={autoFocus}
+                        autoFocus={!!autoFocus}
                     />
                     {label && size !== 'small' && (
                         <Label active={value !== ''} htmlFor={id}>

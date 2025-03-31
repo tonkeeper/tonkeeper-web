@@ -23,7 +23,7 @@ export const SwapSearchInput = forwardRef<
             clearButton
             className={className}
             size="small"
-            autoFocus={targetEnv !== 'swap_widget_web'}
+            autoFocus={targetEnv === 'swap_widget_web' ? false : 'notification'}
         />
     );
 });

@@ -67,7 +67,7 @@ export const RenameWalletContent: FC<{
                 label={t('Wallet_name')}
                 rightElement={emoji ? <WalletEmoji emoji={emoji} /> : null}
                 marginRight="36px"
-                autoFocus
+                autoFocus="notification"
             />
             <EmojisList keepShortListForMS={animationTime} onClick={setEmoji} />
 

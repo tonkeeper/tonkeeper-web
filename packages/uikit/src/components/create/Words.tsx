@@ -2,7 +2,7 @@ import { wordlist } from '@ton/crypto/dist/mnemonic/wordlist';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
@@ -555,6 +555,7 @@ export const ImportWords: FC<{
     const sdk = useAppSdk();
     const { standalone } = useAppContext();
     const ref = useRef<HTMLDivElement>(null);
+    const env = useAppTargetEnv();
 
     const { t } = useTranslation();
 
@@ -686,7 +687,7 @@ export const ImportWords: FC<{
                         primary
                         loading={isLoading}
                         onClick={onSubmit}
-                        bottom={standalone}
+                        bottom={standalone && env !== 'mobile'}
                         type="submit"
                     >
                         {t('continue')}
