@@ -47,6 +47,7 @@ export const SwapTokensListNotification: FC = () => {
                 handleClose={() => onClose(undefined)}
                 title={t('swap_tokens')}
                 footer={<div />}
+                mobileFullScreen
             >
                 {() => <SwapTokensListContent onSelect={onClose} />}
             </NotificationStyled>
@@ -60,9 +61,13 @@ const SwapSearchInputStyled = styled(SwapSearchInput)`
 
 const SwapTokensListContentWrapper = styled.div`
     ${p =>
-        p.theme.displayType === 'full-width'
+        p.theme.proDisplayType === 'desktop'
             ? css`
                   height: 580px;
+              `
+            : p.theme.proDisplayType === 'mobile'
+            ? css`
+                  height: calc(var(--app-height) - env(safe-area-inset-bottom));
               `
             : css`
                   height: calc(var(--app-height) - 8rem);

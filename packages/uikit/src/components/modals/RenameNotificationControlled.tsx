@@ -35,7 +35,7 @@ export const RenameNotificationControlled = () => {
     }, [onClose, params?.derivationIndex, account]);
 
     return (
-        <Notification isOpen={isOpen} handleClose={onClose} title={t('Rename')}>
+        <Notification isOpen={isOpen} handleClose={onClose} title={t('Rename')} mobileFullScreen>
             {Content}
         </Notification>
     );
