@@ -10,6 +10,8 @@ import { useWalletTotalBalance } from '../../../state/asset';
 import { useUserFiat } from '../../../state/fiat';
 import { Skeleton } from '../../shared/Skeleton';
 import { formatFiatCurrency } from '../../../hooks/balance';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { AppRoute } from '../../../libs/routes';
 
 const footerHeight = '64px';
 
@@ -62,6 +64,7 @@ export const MobileProFooter = () => {
     const account = useActiveAccount();
     const leftMenuController = useMenuController('aside-nav');
     const rightMenuController = useMenuController('wallet-nav');
+    const navigate = useNavigate();
 
     const { data: balance, isLoading } = useWalletTotalBalance();
     const fiat = useUserFiat();
@@ -76,7 +79,7 @@ export const MobileProFooter = () => {
                         {t('pro_mobile_footer_left_tab_button')}
                     </TabButton>
                     <AccountMenuWrapper>
-                        <AccountMenuLine1 onClick={() => leftMenuController.open()}>
+                        <AccountMenuLine1 onClick={() => navigate(AppRoute.home)}>
                             <WalletEmoji emoji={emoji} emojiSize="14px" containerSize="14px" />
                             <Label2>{name}</Label2>
                         </AccountMenuLine1>

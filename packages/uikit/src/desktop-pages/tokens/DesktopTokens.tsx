@@ -48,6 +48,15 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
 
 const TokensPageBody = styled.div`
     padding: 0 1rem 1rem;
+    position: relative;
+    ${p =>
+        p.theme.proDisplayType === 'mobile'
+            ? css`
+                  overflow-x: hidden;
+                  overflow-y: auto;
+                  padding-bottom: 0;
+              `
+            : 'overflow: hidden'};
 
     .highlight-asset {
         background-color: ${p => p.theme.backgroundContentTint};
@@ -101,7 +110,9 @@ const DesktopTokensPayload = () => {
     const { mutate } = useMutateUserUIPreferences();
     const [showChart, setShowChart] = useState(true);
     const tonRef = useRef<HTMLDivElement | null>(null);
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const desktopContainerRef = useRef<HTMLDivElement | null>(null);
+    const mobileContainerRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = useAppTargetEnv() === 'mobile' ? mobileContainerRef : desktopContainerRef;
 
     useLayoutEffect(() => {
         if (uiPreferences?.showTokensChart !== undefined) {
@@ -154,7 +165,7 @@ const DesktopTokensPayload = () => {
     );
 
     return (
-        <DesktopViewPageLayout ref={containerRef}>
+        <DesktopViewPageLayout ref={desktopContainerRef}>
             <DesktopViewHeader borderBottom>
                 <DesktopViewHeaderContent
                     title={t('jettons_list_title')}
@@ -183,10 +194,9 @@ const DesktopTokensPayload = () => {
             <PullToRefresh invalidate={allChainsAssetsKeys} />
             <TokensPageBody
                 style={{
-                    height: `${rowVirtualizer.getTotalSize()}px`,
-                    position: 'relative',
-                    overflow: 'hidden'
+                    height: `${rowVirtualizer.getTotalSize()}px`
                 }}
+                ref={mobileContainerRef}
             >
                 {tonAssetAmount && assets && distribution && uiPreferences && (
                     <>

@@ -70,10 +70,6 @@ const SwapIconStyled = styled(SwapIcon)`
 
 const mobileProHomePageId = 'mobile-pro-home-page';
 
-const FooterGap = styled.div`
-    height: 82px;
-`;
-
 const MainPageStyles = createGlobalStyle`
 
     #${mobileProHomePageId} {
@@ -157,7 +153,6 @@ export const MobileProHomePage = () => {
                         <ChevronRightIcon />
                     </MenuItem>
                 </MenuWrapper>
-                <FooterGap />
             </DesktopViewPageLayout>
         </>
     );
