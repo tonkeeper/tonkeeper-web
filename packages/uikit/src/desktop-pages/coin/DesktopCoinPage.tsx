@@ -126,7 +126,7 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
 
     const onSwap = () => {
         setSwapFromAsset(swapAsset!);
-        navigate(AppRoute.swap);
+        navigate(AppRoute.swap, { replace: false });
     };
 
     const sdk = useAppSdk();

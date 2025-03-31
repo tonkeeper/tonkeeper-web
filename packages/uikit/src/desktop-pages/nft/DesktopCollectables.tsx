@@ -152,6 +152,7 @@ export const DesktopCollectablesContent = () => {
                             <DesktopViewHeaderContent.RightItem closeDropDownOnClick>
                                 <ExplorerLinkStyled
                                     to={AppRoute.walletSettings + WalletSettingsRoute.nft}
+                                    replace={false}
                                 >
                                     <SlidersIcon />
                                     <ForTargetEnv env="mobile">{t('settings_title')}</ForTargetEnv>
