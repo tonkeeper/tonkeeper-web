@@ -112,7 +112,8 @@ const DesktopTokensPayload = () => {
     const tonRef = useRef<HTMLDivElement | null>(null);
     const desktopContainerRef = useRef<HTMLDivElement | null>(null);
     const mobileContainerRef = useRef<HTMLDivElement | null>(null);
-    const containerRef = useAppTargetEnv() === 'mobile' ? mobileContainerRef : desktopContainerRef;
+    const env = useAppTargetEnv();
+    const containerRef = env === 'mobile' ? mobileContainerRef : desktopContainerRef;
 
     useLayoutEffect(() => {
         if (uiPreferences?.showTokensChart !== undefined) {
@@ -127,7 +128,6 @@ const DesktopTokensPayload = () => {
         setShowChart(!showChart);
     };
 
-    const env = useAppTargetEnv();
     const itemSize = env === 'mobile' ? 61 : 77;
     const chartSize = env === 'mobile' ? 388 : 192;
 
@@ -146,6 +146,9 @@ const DesktopTokensPayload = () => {
 
     const onTokenClick = useCallback(
         (address: string) => {
+            if (env === 'mobile') {
+                return;
+            }
             if (isTonAddress(address) && tonRef.current) {
                 return rowVirtualizer.scrollToOffset(tonRef.current.offsetTop);
             }
@@ -161,7 +164,7 @@ const DesktopTokensPayload = () => {
                 );
             }
         },
-        [assets, rowVirtualizer, rowVirtualizer.elementsCache]
+        [assets, rowVirtualizer, rowVirtualizer.elementsCache, env]
     );
 
     return (
