@@ -440,6 +440,10 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
     });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
+const NotificationContentPortalRoot = styled.div`
+    display: contents;
+`;
+
 export type OnCloseInterceptor =
     | ((closeHandle: () => void, cancelCloseHandle: () => void) => void)
     | undefined;
@@ -616,7 +620,7 @@ export const NotificationIonic: FC<{
                                 headerElement
                             )}
 
-                        <div ref={contentRef} />
+                        <NotificationContentPortalRoot ref={contentRef} />
                         {!!contentRef.current && createPortal(Child, contentRef.current)}
 
                         <Gap />
