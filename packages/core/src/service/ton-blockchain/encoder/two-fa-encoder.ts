@@ -11,7 +11,7 @@ import {
 import { APIConfig } from '../../../entries/apis';
 import { BlockchainApi } from '../../../tonApiV2';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
-import { Builder } from '@ton/ton';
+import { Builder } from '@ton/core';
 import { getServerTime, getTTL } from '../utils';
 
 export class TwoFAEncoder {

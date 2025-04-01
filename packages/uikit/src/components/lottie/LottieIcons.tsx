@@ -1,60 +1,43 @@
-import React, { FC } from 'react';
-import Lottie from 'react-lottie';
-import animationCheckData from './Check.json';
-import animationConfettiData from './Confetti.json';
-import animationGearData from './Gear.json';
-import animationWriteData from './Write.json';
+import React, { FC, Suspense } from 'react';
 
-const defaultCheckOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationCheckData,
-    rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice'
-    }
+const Check = React.lazy(() => import('./Check'));
+const Gear = React.lazy(() => import('./Gear'));
+const Write = React.lazy(() => import('./Write'));
+const Confetti = React.lazy(() => import('./Confetti'));
+
+const Fallback = () => {
+    return <div style={{ width: '160px', height: '160px' }}></div>;
 };
-
 export const CheckLottieIcon = () => {
-    return <Lottie options={defaultCheckOptions} height={160} width={160} />;
-};
-
-const defaultGearOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationGearData,
-    rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice'
-    }
+    return (
+        <Suspense fallback={<Fallback />}>
+            <Check />
+        </Suspense>
+    );
 };
 
 export const GearLottieIcon = () => {
-    return <Lottie options={defaultGearOptions} height={160} width={160} />;
-};
-
-const defaultWriteOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationWriteData,
-    rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice'
-    }
+    return (
+        <Suspense fallback={<Fallback />}>
+            <Gear />
+        </Suspense>
+    );
 };
 
 export const WriteLottieIcon = () => {
-    return <Lottie options={defaultWriteOptions} height={160} width={160} />;
-};
-
-const defaultConfettiOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationConfettiData,
-    rendererSettings: {
-        preserveAspectRatio: 'xMidYMid slice'
-    }
+    return (
+        <Suspense fallback={<Fallback />}>
+            <Write />
+        </Suspense>
+    );
 };
 
 export const ConfettiLottieIcon: FC<{ width: number; height: number }> = ({ width, height }) => {
-    return <Lottie options={defaultConfettiOptions} height={height} width={width} />;
+    return (
+        <Suspense>
+            <Confetti width={width} height={height} />
+        </Suspense>
+    );
 };
 
 export const NotificationIcon = () => {

@@ -3,7 +3,7 @@ import { walletContractFromState, walletStateInitFromState } from '../../wallet/
 import { getServerTime, getTTL, getWalletSeqNo } from '../utils';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { isW5Version, TonWalletStandard } from '../../../entries/wallet';
-import { WalletContractV5R1 } from '@ton/ton';
+import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
