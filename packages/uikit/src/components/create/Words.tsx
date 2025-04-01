@@ -680,20 +680,16 @@ export const ImportWords: FC<{
                     ))}
                 </Inputs>
             </Block>
-            <NotificationFooterPortal>
-                <NotificationFooter>
-                    <ButtonResponsiveSize
-                        fullWidth
-                        primary
-                        loading={isLoading}
-                        onClick={onSubmit}
-                        bottom={standalone && env !== 'mobile'}
-                        type="submit"
-                    >
-                        {t('continue')}
-                    </ButtonResponsiveSize>
-                </NotificationFooter>
-            </NotificationFooterPortal>
+            <ButtonResponsiveSize
+                fullWidth
+                primary
+                loading={isLoading}
+                onClick={onSubmit}
+                type="submit"
+                marginTop
+            >
+                {t('continue')}
+            </ButtonResponsiveSize>
         </form>
     );
 };
