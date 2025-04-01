@@ -136,6 +136,26 @@ const WebPassword = () => {
     );
 };
 
+const LockSwitchAdditionalSecurityPassword = () => {
+    const { data } = useLookScreen();
+    const { mutate: toggleLock } = useMutateLookScreen();
+    const { t } = useTranslation();
+    const securitySettings = useSecuritySettings();
+
+    if (!securitySettings.additionalPasswordHash) {
+        return null;
+    }
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label1>{t('Lock_screen')}</Label1>
+                <Switch checked={!!data} onChange={toggleLock} />
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
 /**
  * Pin is always set here
  */
@@ -151,6 +171,7 @@ const MobileProPassword = () => {
                         <LockIcon />
                     </ListItemPayload>
                 </ListItem>
+                <LockSwitchAdditionalSecurityPassword />
             </ListBlockDesktopAdaptive>
             <MobileProChangePinNotification isOpen={isOpen} onClose={onClose} />
         </>
@@ -180,6 +201,7 @@ const DesktopAndTabletProPassword = () => {
                         <LockIcon />
                     </ListItemPayload>
                 </ListItem>
+                <LockSwitchAdditionalSecurityPassword />
             </ListBlockDesktopAdaptive>
             {securitySettings.additionalPasswordHash ? (
                 <ChangePasswordNotification isOpen={isOpen} handleClose={onClose} />

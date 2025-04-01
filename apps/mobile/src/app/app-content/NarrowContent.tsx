@@ -65,6 +65,10 @@ import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/atom';
 import { ionRouterAnimation$ } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { AnimatePresence, motion } from 'framer-motion';
+import { MobileProPin } from '@tonkeeper/uikit/dist/components/mobile-pro/pin/MobileProPin';
+import { useTranslation } from 'react-i18next';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { hashAdditionalSecurityPassword } from '@tonkeeper/uikit/dist/state/global-preferences';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -107,7 +111,7 @@ export const NarrowContent: FC<{
 const NarrowContentBody: FC<{
     activeAccount?: Account | null;
     lock: boolean;
-}> = ({ activeAccount }) => {
+}> = ({ activeAccount, lock }) => {
     useWindowsScroll();
     useAppWidth();
     useTrackLocation();
@@ -115,14 +119,28 @@ const NarrowContentBody: FC<{
     useDebuggingTools();
     const { additionalPasswordHash } = useSecuritySettings();
     const accountQuery = useActiveAccountQuery();
+    const { t } = useTranslation();
+    const securitySettings = useSecuritySettings();
+    const sdk = useAppSdk();
 
-    /* if (lock) {
+    if (lock) {
         return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
+            <MobileProPin
+                title={t('enter_password')}
+                onSubmit={async v => {
+                    const hash = await hashAdditionalSecurityPassword(v);
+                    if (hash === securitySettings.additionalPasswordHash) {
+                        setTimeout(() => {
+                            sdk.uiEvents.emit('unlock');
+                        }, 200);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }}
+            />
         );
-    }*/
+    }
 
     if (!activeAccount || !additionalPasswordHash || !accountQuery.data) {
         return <NarrowContentInitialPages accountIsCreated={!!activeAccount} />;
