@@ -82,7 +82,7 @@ export const useSecurityCheck = () => {
     return securitySettings.biometrics ? checkTouchId : checkPassword;
 };
 
-const useCheckTouchId = () => {
+export const useCheckTouchId = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     return useMutation(async () => {

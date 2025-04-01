@@ -138,14 +138,15 @@ export const MobileProPin: FC<{
     title: string;
     onSubmit: (val: string) => Promise<boolean | undefined> | void;
     onBack?: () => void;
-}> = ({ className, onSubmit, title, onBack }) => {
+    validated?: 'success' | 'error' | undefined;
+}> = ({ className, onSubmit, title, onBack, validated: externalValidated }) => {
     const [pin, setPin] = useState<string>('');
     const maxLength = 4;
     const [validationResult, setValidationResult] = useState<'success' | 'error' | undefined>();
     const sdk = useAppSdk();
 
     const handleNumberClick = (number: string) => {
-        if (pin.length >= maxLength) {
+        if (pin.length >= maxLength || externalValidated) {
             return;
         }
 
@@ -169,7 +170,7 @@ export const MobileProPin: FC<{
     };
 
     const handleDelete = () => {
-        if (pin.length !== 4) {
+        if (pin.length !== 4 && !externalValidated) {
             sdk.hapticNotification('impact_light');
             setPin(prev => prev.slice(0, -1));
         }
@@ -192,7 +193,9 @@ export const MobileProPin: FC<{
                             <Dot
                                 key={index}
                                 $type={
-                                    validationResult
+                                    externalValidated
+                                        ? externalValidated
+                                        : validationResult
                                         ? validationResult
                                         : index < pin.length
                                         ? 'active'
@@ -216,7 +219,10 @@ export const MobileProPin: FC<{
                 <TouchAnimation onClick={() => handleNumberClick('0')}>
                     <KeyButton>0</KeyButton>
                 </TouchAnimation>
-                <TouchAnimation onClick={handleDelete} isDisabled={pin.length === 4}>
+                <TouchAnimation
+                    onClick={handleDelete}
+                    isDisabled={pin.length === 4 || !!externalValidated}
+                >
                     <DeleteButton>
                         <DeleteIcon />
                     </DeleteButton>

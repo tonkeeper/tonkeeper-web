@@ -60,7 +60,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { useAllChainsAssetsWithPrice } from '@tonkeeper/uikit/dist/state/home';
 import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProWelcomePage';
 import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
-import { useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
+import { useCheckTouchId, useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
 import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/atom';
 import { ionRouterAnimation$ } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
@@ -119,27 +119,9 @@ const NarrowContentBody: FC<{
     useDebuggingTools();
     const { additionalPasswordHash } = useSecuritySettings();
     const accountQuery = useActiveAccountQuery();
-    const { t } = useTranslation();
-    const securitySettings = useSecuritySettings();
-    const sdk = useAppSdk();
 
     if (lock) {
-        return (
-            <MobileProPin
-                title={t('enter_password')}
-                onSubmit={async v => {
-                    const hash = await hashAdditionalSecurityPassword(v);
-                    if (hash === securitySettings.additionalPasswordHash) {
-                        setTimeout(() => {
-                            sdk.uiEvents.emit('unlock');
-                        }, 200);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }}
-            />
-        );
+        return <NarrowContentInitialPagesLock />;
     }
 
     if (!activeAccount || !additionalPasswordHash || !accountQuery.data) {
@@ -147,6 +129,54 @@ const NarrowContentBody: FC<{
     }
 
     return <NarrowContentAppRouting />;
+};
+
+const MobileProPinStyled = styled(MobileProPin)`
+    padding-bottom: env(safe-area-inset-bottom);
+`;
+
+const NarrowContentInitialPagesLock = () => {
+    const { t } = useTranslation();
+    const securitySettings = useSecuritySettings();
+    const sdk = useAppSdk();
+    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const [faceIdValidation, setFaceIdValidation] = useState<'success' | 'error' | undefined>();
+
+    useEffect(() => {
+        SplashScreen.hide();
+    }, []);
+
+    useEffect(() => {
+        if (securitySettings.biometrics) {
+            checkTouchId()
+                .then(() => {
+                    setFaceIdValidation('success');
+                    setTimeout(() => sdk.uiEvents.emit('unlock'), 200);
+                })
+                .catch(() => {
+                    setFaceIdValidation('error');
+                    setTimeout(() => setFaceIdValidation(undefined), 200);
+                });
+        }
+    }, [securitySettings.biometrics]);
+
+    return (
+        <MobileProPinStyled
+            title={t('enter_password')}
+            validated={faceIdValidation}
+            onSubmit={async v => {
+                const hash = await hashAdditionalSecurityPassword(v);
+                if (hash === securitySettings.additionalPasswordHash) {
+                    setTimeout(() => {
+                        sdk.uiEvents.emit('unlock');
+                    }, 200);
+                    return true;
+                } else {
+                    return false;
+                }
+            }}
+        />
+    );
 };
 
 const NarrowContentInitialPages: FC<{
