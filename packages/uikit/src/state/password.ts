@@ -79,7 +79,15 @@ export const useSecurityCheck = () => {
     const checkPassword = useCheckAdditionalSecurityPassword();
     const checkTouchId = useCheckTouchId();
 
-    return securitySettings.biometrics ? checkTouchId : checkPassword;
+    const checkTouchIdWithFallback = useMutation(async () => {
+        try {
+            await checkTouchId.mutateAsync();
+        } catch (e) {
+            await checkPassword.mutateAsync();
+        }
+    });
+
+    return securitySettings.biometrics ? checkTouchIdWithFallback : checkPassword;
 };
 
 export const useCheckTouchId = () => {
