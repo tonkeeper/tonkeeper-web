@@ -42,7 +42,7 @@ export const RecoveryNotificationControlled = () => {
     }, [account, params?.walletId, onClose]);
 
     return (
-        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+        <NotificationStyled isOpen={isOpen} handleClose={onClose} mobileFullScreen>
             {Content}
         </NotificationStyled>
     );
