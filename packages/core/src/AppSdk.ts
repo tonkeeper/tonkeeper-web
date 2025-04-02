@@ -127,6 +127,7 @@ export interface IAppSdk {
     targetEnv: TargetEnv;
 
     storeUrl?: string;
+    reloadApp: () => void;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -179,6 +180,10 @@ export abstract class BaseApp implements IAppSdk {
     hapticNotification = (_: 'success' | 'error' | 'impact_medium' | 'impact_light') => {};
 
     version = '0.0.0';
+
+    reloadApp = () => {
+        window.location.reload();
+    };
 
     abstract targetEnv: TargetEnv;
 }

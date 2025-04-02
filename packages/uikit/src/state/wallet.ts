@@ -818,17 +818,21 @@ export const useMutateDeleteAll = () => {
     const storage = useAccountsStorage();
 
     return useMutation<void, Error, void>(async () => {
-        const { notifications } = sdk;
-        if (notifications) {
-            try {
-                await notifications.unsubscribe();
-            } catch (e) {
-                console.error(e);
+        try {
+            const { notifications } = sdk;
+            if (notifications) {
+                try {
+                    await notifications.unsubscribe();
+                } catch (e) {
+                    console.error(e);
+                }
             }
-        }
 
-        await storage.clearAccountFromState();
-        await sdk.storage.clear();
+            await storage.clearAccountFromState();
+            await sdk.storage.clear();
+        } finally {
+            sdk.reloadApp();
+        }
     });
 };
 
@@ -845,6 +849,7 @@ export const useMutateLogOut = () => {
     const accounts = useAccountsState();
     const { mutateAsync: removeAccountTwoFA } = useRemoveAccountTwoFAData();
     const { mutateAsync: setSecuritySettings } = useMutateSecuritySettings();
+    const sdk = useAppSdk();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
@@ -872,11 +877,17 @@ export const useMutateLogOut = () => {
             await setSecuritySettings(null);
         }
 
-        await removeAccountTwoFA(accountId);
-        await client.invalidateQueries([QueryKey.account]);
-        await client.invalidateQueries([QueryKey.pro]);
-        if (folder) {
-            await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
+        try {
+            await removeAccountTwoFA(accountId);
+            await client.invalidateQueries([QueryKey.account]);
+            await client.invalidateQueries([QueryKey.pro]);
+            if (folder) {
+                await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
+            }
+        } finally {
+            if (newAccounts.length === 0) {
+                sdk.reloadApp();
+            }
         }
     });
 };

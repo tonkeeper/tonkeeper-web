@@ -66,4 +66,8 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
     version = packageJson.version ?? 'Unknown';
 
     targetEnv = 'desktop' as const;
+
+    reloadApp = () => {
+        window.location.href = window.location.href;
+    };
 }
