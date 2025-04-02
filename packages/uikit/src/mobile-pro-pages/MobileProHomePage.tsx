@@ -59,7 +59,7 @@ const Divider = styled.div`
 `;
 
 const MenuWrapper = styled.div`
-    margin: 0 8px 16px;
+    margin: 0 8px 36px;
     border-radius: ${p => p.theme.corner2xSmall};
     background-color: ${p => p.theme.backgroundContent};
 `;
@@ -76,6 +76,16 @@ const MainPageStyles = createGlobalStyle`
         padding-top: env(safe-area-inset-top);
     }`;
 
+const SafeAreaCover = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    background: ${p => p.theme.backgroundPage};
+    z-index: 102;
+`;
+
 export const MobileProHomePage = () => {
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -90,6 +100,7 @@ export const MobileProHomePage = () => {
         <>
             <MainPageStyles />
             <DesktopViewPageLayout id={mobileProHomePageId}>
+                <SafeAreaCover />
                 <PullToRefresh invalidate={account.id} />
                 <MobileProHomeBalance />
                 <MobileProHomeActionsStyled />

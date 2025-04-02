@@ -177,12 +177,13 @@ const BackButtonStyled = styled(DesktopBackButton)`
     height: 2rem;
 `;
 
-export const DesktopViewHeader: FC<{
-    children: ReactNode;
-    backButton?: boolean | ReactNode;
-    className?: string;
-    borderBottom?: boolean;
-}> = ({ children, backButton, borderBottom, className }) => {
+export const DesktopViewHeader: FC<
+    PropsWithChildren<{
+        backButton?: boolean | ReactNode;
+        className?: string;
+        borderBottom?: boolean;
+    }>
+> = ({ children, backButton, borderBottom, className }) => {
     const portalId = useContext(DesktopViewPageLayoutContext);
 
     if (portalId !== undefined) {
