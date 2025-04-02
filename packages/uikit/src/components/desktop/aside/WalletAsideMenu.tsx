@@ -19,6 +19,7 @@ import {
     ListIcon,
     PlusIconSmall,
     SaleBadgeIcon,
+    ScanIcon16,
     SettingsSmoothIcon,
     SparkIcon,
     SwapIcon
@@ -44,6 +45,7 @@ import { useMenuController } from '../../../hooks/ionic';
 import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
 import { HideForRegulatoryState } from '../../HideForState';
 import { CountryFeature } from '../../../state/country';
+import { useSmartScanner } from '../../../hooks/useSmartScanner';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -119,12 +121,22 @@ export const WalletAsideMenu = () => {
     }, [location]);
 
     const highlightTron = useHighlightTronFeatureForActiveWallet();
+    const { onScan, NotificationComponent } = useSmartScanner();
+    const withCloseMenu = (callback: (e: React.MouseEvent<HTMLDivElement>) => void) => {
+        return (e: React.MouseEvent<HTMLDivElement>) => {
+            menuController.close();
+            callback(e);
+        };
+    };
 
     return (
         <WalletAsideContainer>
             <ForTargetEnv env="mobile">
                 {!isReadOnly && (
-                    <AsideMenuItemStyled isSelected={false} onClick={() => sendTransfer()}>
+                    <AsideMenuItemStyled
+                        isSelected={false}
+                        onClick={withCloseMenu(() => sendTransfer())}
+                    >
                         <ArrowUpIcon />
                         <Label2>{t('wallet_send')}</Label2>
                     </AsideMenuItemStyled>
@@ -142,18 +154,23 @@ export const WalletAsideMenu = () => {
                 </HideOnReview>*/}
                 <AsideMenuItemStyled
                     isSelected={false}
-                    onClick={() => {
+                    onClick={withCloseMenu(() => {
                         sdk.uiEvents.emit('receive', {
                             method: 'receive',
                             params: {}
                         });
-                    }}
+                    })}
                 >
                     <ArrowDownIcon />
                     <Label2>{t('wallet_receive')}</Label2>
                 </AsideMenuItemStyled>
+                <AsideMenuItemStyled isSelected={false} onClick={withCloseMenu(onScan)}>
+                    <ScanIcon16 />
+                    <Label2>{t('wallet_scan_btn')}</Label2>
+                </AsideMenuItemStyled>
                 <HideOnReview>
-                    <AsideMenuItemStyled isSelected={false} onClick={onBuy}>
+                    <SwapItem />
+                    <AsideMenuItemStyled isSelected={false} onClick={withCloseMenu(onBuy)}>
                         <PlusIconSmall />
                         <Label2>{t('wallet_buy')}</Label2>
                     </AsideMenuItemStyled>
@@ -175,6 +192,7 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
+                {NotificationComponent}
             </ForTargetEnv>
             <NotForTargetEnv env="mobile">
                 <NavLink to={AppRoute.home} end>
@@ -212,18 +230,9 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <HideForRegulatoryState feature={CountryFeature.swap}>
-                    {!isReadOnly && !isTestnet && (
-                        <NavLink to={AppRoute.swap} disableMobileAnimation>
-                            {({ isActive }) => (
-                                <AsideMenuItemStyled isSelected={isActive}>
-                                    <SwapIconStyled />
-                                    <Label2>{t('wallet_swap')}</Label2>
-                                </AsideMenuItemStyled>
-                            )}
-                        </NavLink>
-                    )}
-                </HideForRegulatoryState>
+                <NotForTargetEnv env="mobile">
+                    <SwapItem />
+                </NotForTargetEnv>
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
                     <NavLink to={AppRoute.multisigWallets} disableMobileAnimation>
@@ -254,6 +263,27 @@ const BadgeStyled = styled(RoundedBadge)`
     margin-left: auto;
     margin-right: -40px;
 `;
+
+const SwapItem = () => {
+    const isReadOnly = useIsActiveWalletWatchOnly();
+    const { t } = useTranslation();
+    const isTestnet = useActiveTonNetwork() === Network.TESTNET;
+
+    return (
+        <HideForRegulatoryState feature={CountryFeature.swap}>
+            {!isReadOnly && !isTestnet && (
+                <NavLink to={AppRoute.swap} disableMobileAnimation>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SwapIconStyled />
+                            <Label2>{t('wallet_swap')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            )}
+        </HideForRegulatoryState>
+    );
+};
 
 const MultisigOrdersMenuItem = () => {
     const ordersNumber = useUnviewedAccountOrdersNumber();
