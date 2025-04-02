@@ -155,6 +155,7 @@ export const DesktopManageAccountsPage = () => {
                             <DesktopViewHeaderContent.RightItem
                                 onClick={() => manageFolders()}
                                 asDesktopButton
+                                closeDropDownOnClick
                             >
                                 <ForTargetEnv env="mobile">
                                     <PlusIconSmall />

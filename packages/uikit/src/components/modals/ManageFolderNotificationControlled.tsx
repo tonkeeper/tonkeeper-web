@@ -1,4 +1,4 @@
-import { Notification, NotificationFooterPortal } from '../Notification';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from '../../hooks/translation';
@@ -12,7 +12,7 @@ import { Body3, Label2, NoSelectText, TextEllipsis } from '../Text';
 import { AccountBadge } from '../account/AccountBadge';
 import { Checkbox } from '../fields/Checkbox';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
-import { Button } from '../fields/Button';
+import { ButtonResponsiveSize } from '../fields/Button';
 import { Input } from '../fields/Input';
 import {
     AccountsFolder,
@@ -46,6 +46,7 @@ export const ManageFolderNotificationControlled = () => {
             title={t(
                 params?.folderId !== undefined ? 'accounts_manage_folder' : 'accounts_new_folder'
             )}
+            mobileFullScreen
         >
             {Content}
         </Notification>
@@ -87,7 +88,6 @@ const Body3Secondary = styled(Body3)`
 const ButtonsContainer = styled.div`
     display: flex;
     gap: 0.5rem;
-    padding: 1rem 0;
 
     > * {
         flex: 1;
@@ -210,14 +210,16 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
                 )}
             </ListBlockDesktopAdaptiveStyled>
             <NotificationFooterPortal>
-                <ButtonsContainer>
-                    <Button secondary onClick={onClose}>
-                        {t('cancel')}
-                    </Button>
-                    <Button primary disabled={!canSave} onClick={onSave}>
-                        {t('save')}
-                    </Button>
-                </ButtonsContainer>
+                <NotificationFooter>
+                    <ButtonsContainer>
+                        <ButtonResponsiveSize secondary onClick={onClose}>
+                            {t('cancel')}
+                        </ButtonResponsiveSize>
+                        <ButtonResponsiveSize primary disabled={!canSave} onClick={onSave}>
+                            {t('save')}
+                        </ButtonResponsiveSize>
+                    </ButtonsContainer>
+                </NotificationFooter>
             </NotificationFooterPortal>
         </ModalContentWrapper>
     );
