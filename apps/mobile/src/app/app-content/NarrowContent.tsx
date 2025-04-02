@@ -361,6 +361,15 @@ const PreferencesModal = () => {
         return () => unblock();
     }, [history]);
 
+    useEffect(() => {
+        settingsHistory.current.listen(location => {
+            if (!location.pathname.startsWith(AppRoute.settings)) {
+                onClose();
+                history.push(location.pathname);
+            }
+        });
+    }, [history]);
+
     const onClose = () => {
         setSettingsOpen(false);
         settingsHistory.current.push(AppRoute.settings);

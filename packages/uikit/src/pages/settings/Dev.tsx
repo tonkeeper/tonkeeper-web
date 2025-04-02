@@ -66,7 +66,7 @@ const AddAccountBySK = () => {
         <>
             <SettingsList items={items} />
             <AddWalletContext.Provider value={{ navigateHome: onClose }}>
-                <Notification isOpen={isOpen} handleClose={onClose}>
+                <Notification isOpen={isOpen} handleClose={onClose} mobileFullScreen>
                     {() => (
                         <ImportBySKWallet
                             afterCompleted={() => {
