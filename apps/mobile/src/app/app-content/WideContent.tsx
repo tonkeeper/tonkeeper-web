@@ -35,6 +35,7 @@ import { BackgroundElements, usePrefetch } from './common';
 import { PullToRefresh } from '../components/PullToRefresh';
 import { useQueryClient } from '@tanstack/react-query';
 import { SplashScreen } from '@capacitor/splash-screen';
+import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -109,6 +110,7 @@ export const WideContent: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+    useRealtimeUpdatesInvalidation();
 
     useEffect(() => {
         SplashScreen.hide();

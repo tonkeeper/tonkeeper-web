@@ -69,6 +69,7 @@ import { MobileProPin } from '@tonkeeper/uikit/dist/components/mobile-pro/pin/Mo
 import { useTranslation } from 'react-i18next';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { hashAdditionalSecurityPassword } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { useRealtimeUpdatesInvalidation } from "@tonkeeper/uikit/dist/hooks/realtime";
 
 const WideLayout = styled.div`
     width: 100%;
@@ -117,6 +118,8 @@ const NarrowContentBody: FC<{
     useTrackLocation();
     usePrefetch();
     useDebuggingTools();
+    useRealtimeUpdatesInvalidation();
+
     const { additionalPasswordHash } = useSecuritySettings();
     const accountQuery = useActiveAccountQuery();
 
