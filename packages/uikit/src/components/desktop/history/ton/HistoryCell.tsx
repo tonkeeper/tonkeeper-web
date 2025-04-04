@@ -134,6 +134,12 @@ const HistoryCellCommentStyled = styled(Body2).attrs({ className: 'grid-area-com
             background: ${p.theme.backgroundContent};
             border-radius: ${p.theme.corner2xSmall};
             width: fit-content;
+            word-break: break-word;
+            white-space: break-spaces;
+            max-height: 58px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
         `}
 `;
 
