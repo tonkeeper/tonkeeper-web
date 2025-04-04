@@ -36,6 +36,10 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
         border-top: none !important;
         padding: 8px 16px 8px 0 !important;
     }
+
+    .coin-label {
+        background: ${props => props.theme.backgroundContentAttention} !important;
+    }
 `;
 
 const Divider = styled.div`

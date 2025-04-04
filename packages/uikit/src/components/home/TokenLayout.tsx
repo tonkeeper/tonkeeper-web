@@ -107,7 +107,7 @@ export const TokenLayout: FC<{
             <FirstLine>
                 <CoinName>
                     {symbol ?? name}
-                    {label ? <CoinLabel>{label}</CoinLabel> : null}
+                    {label ? <CoinLabel className="coin-label">{label}</CoinLabel> : null}
                 </CoinName>
                 <Symbol></Symbol>
                 <Label1>{balance}</Label1>
