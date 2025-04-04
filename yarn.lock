@@ -2367,6 +2367,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/network@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@capacitor/network@npm:7.0.0"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/a7cf75c7ebdfc5cb3cc6015bc9293a8a9189c552e2532d8654cb7e82b57d39441a5b0eed8d2130fddcbba92eb2a568291cb52db174434d12d0de4944a36b763d
+  languageName: node
+  linkType: hard
+
 "@capacitor/preferences@npm:^6.0.2":
   version: 6.0.3
   resolution: "@capacitor/preferences@npm:6.0.3"
@@ -7638,6 +7647,7 @@ __metadata:
     "@capacitor/device": "npm:^6.0.2"
     "@capacitor/haptics": "npm:^6.0.2"
     "@capacitor/ios": "npm:^6.1.2"
+    "@capacitor/network": "npm:^7.0.0"
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/push-notifications": "npm:^6.0.3"
     "@capacitor/splash-screen": "npm:latest"

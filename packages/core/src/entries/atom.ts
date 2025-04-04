@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useState } from 'react';
-
 export class Subject<T> {
     private subscribers: ((value: T) => void)[] = [];
 
@@ -46,25 +44,4 @@ export class Atom<T> {
 export const atom = <T>(value: T): Atom<T> => new Atom<T>(value);
 export const subject = <T>(): Subject<T> => new Subject<T>();
 
-export function useAtom<T>(a: Atom<T>): [T, (value: T | ((prev: T) => T)) => void] {
-    const [value, setValue] = useState(a.value);
-
-    useEffect(() => {
-        setValue(a.value);
-        return a.subscribe(v => {
-            setValue(v);
-        });
-    }, [a]);
-
-    const next = useCallback(
-        (newValue: T | ((prev: T) => T)) => {
-            if (typeof newValue === 'function') {
-                newValue = (newValue as (prev: T) => T)(a.value);
-            }
-            a.next(newValue);
-        },
-        [a]
-    );
-
-    return [value, next];
-}
+export type ReadonlyAtom<T> = Omit<Atom<T>, 'next'>;

@@ -1,5 +1,5 @@
 import { Notification } from '../Notification';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useTranslation } from '../../hooks/translation';
 import { createModalControl } from './createModalControl';
 import { MobileProPin } from '../mobile-pro/pin/MobileProPin';

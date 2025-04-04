@@ -342,6 +342,7 @@
   "settings_mam_indexes": "Кошельки",
   "settings_mam_number_wallets": "%{number} кошельков",
   "settings_multisig_settings": "Настройки мультисиг-кошелька",
+  "set_up_password": "Установить пароль",
   "show": "Показать",
   "show_all": "Показать все",
   "sk_input_label": "Закрытый ключ в hex формате без префикса 0x. Длина 64 или 128 символов",
@@ -460,5 +461,6 @@
   "Wallet_name": "Имя кошелька",
   "wallet_sell": "Продать",
   "wallet_version_and_tokens": ", токены",
+  "web_no_connection": "Нет сети",
   "Window": "Окно"
 }

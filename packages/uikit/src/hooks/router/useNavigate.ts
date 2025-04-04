@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useShouldReplaceNav } from './useShouldReplaceNav';
 import { useIonRouter } from '@ionic/react';
-import { atom } from '../../libs/atom';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 export const ionRouterAnimation$ = atom(true);
 

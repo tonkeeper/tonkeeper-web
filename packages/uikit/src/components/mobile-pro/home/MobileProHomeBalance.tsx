@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { Skeleton } from '../../shared/Skeleton';
-import { Body2, Body3 } from '../../Text';
+import { Body2, Body3, Label2 } from '../../Text';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { useUserFiat } from '../../../state/fiat';
@@ -13,6 +13,7 @@ import { AddressMultiChain } from '../../home/Balance';
 import { ChevronDownIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
+import { useInternetConnection } from '../../../hooks/useInternetConnection';
 
 const Wrapper = styled.div`
     padding: 20px 24px 16px;
@@ -49,6 +50,10 @@ const Body2Secondary = styled(Body2)`
     color: ${p => p.theme.textSecondary};
 `;
 
+const Label2Orange = styled(Label2)`
+    color: ${p => p.theme.accentOrange};
+`;
+
 const ChevronDownIconSecondary = styled(ChevronDownIcon)`
     color: ${p => p.theme.iconSecondary};
 `;
@@ -64,10 +69,11 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     const isTronEnabled = useIsTronEnabledForActiveWallet();
     const { t } = useTranslation();
     const sdk = useAppSdk();
+    const { isConnected } = useInternetConnection();
 
     let content;
 
-    if (isTronEnabled) {
+    if (isTronEnabled && isConnected) {
         content = (
             <AddressMultiChain top="80px">
                 <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
@@ -85,16 +91,20 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     } else {
         const userFriendlyAddress = formatAddress(activeAccount.activeTonWallet.rawAddress);
         content = (
-            <ClickWrapper onClick={() => sdk.copyToClipboard(userFriendlyAddress)}>
+            <ClickWrapper onClick={() => isConnected && sdk.copyToClipboard(userFriendlyAddress)}>
                 <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>{' '}
-                <AddressAndBadgesWrapper>
-                    <AddressText>{toShortValue(userFriendlyAddress)}</AddressText>
-                    <AccountAndWalletBadgesGroup
-                        account={activeAccount}
-                        walletId={activeAccount.activeTonWallet.id}
-                        size="s"
-                    />
-                </AddressAndBadgesWrapper>
+                {isConnected ? (
+                    <AddressAndBadgesWrapper>
+                        <AddressText>{toShortValue(userFriendlyAddress)}</AddressText>
+                        <AccountAndWalletBadgesGroup
+                            account={activeAccount}
+                            walletId={activeAccount.activeTonWallet.id}
+                            size="s"
+                        />
+                    </AddressAndBadgesWrapper>
+                ) : (
+                    <Label2Orange>{t('web_no_connection')}</Label2Orange>
+                )}
             </ClickWrapper>
         );
     }

@@ -8,6 +8,7 @@ import { TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
+import { atom, ReadonlyAtom } from './entries/atom';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -94,6 +95,11 @@ export interface NotificationService {
     subscribed: (address: string) => Promise<boolean>;
 }
 
+export interface InternetConnectionService {
+    isOnline: ReadonlyAtom<boolean>;
+    retry: () => Promise<boolean>;
+}
+
 export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
@@ -128,6 +134,7 @@ export interface IAppSdk {
 
     storeUrl?: string;
     reloadApp: () => void;
+    connectionService: InternetConnectionService;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -185,7 +192,28 @@ export abstract class BaseApp implements IAppSdk {
         window.location.reload();
     };
 
+    connectionService: InternetConnectionService = new WebConnectionService();
+
     abstract targetEnv: TargetEnv;
+}
+
+class WebConnectionService implements InternetConnectionService {
+    isOnline = atom(this.checkIsOnline());
+
+    constructor() {
+        window.addEventListener('online', () => this.isOnline.next(true));
+        window.addEventListener('offline', () => this.isOnline.next(false));
+    }
+
+    private checkIsOnline() {
+        return window.navigator.onLine;
+    }
+
+    public async retry() {
+        const isOnline = this.checkIsOnline();
+        this.isOnline.next(isOnline);
+        return isOnline;
+    }
 }
 
 export class MockAppSdk extends BaseApp {

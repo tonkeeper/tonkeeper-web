@@ -8,7 +8,7 @@ import { useTranslation } from '../../hooks/translation';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 import { useProState } from '../../state/pro';
 import { CreateStandardWallet } from '../../pages/import/CreateStandardWallet';

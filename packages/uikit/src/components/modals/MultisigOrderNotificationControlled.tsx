@@ -7,7 +7,7 @@ import {
 import { createModalControl } from './createModalControl';
 import React, { FC, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from '../../hooks/translation';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useAppSdk } from '../../hooks/appSdk';
 import { EmulationList } from '../connect/EstimationLayout';
 import { Label2 } from '../Text';

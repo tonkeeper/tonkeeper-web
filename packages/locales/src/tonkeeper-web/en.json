@@ -353,6 +353,7 @@
   "settings_mam_indexes": "Wallets",
   "settings_mam_number_wallets": "%{number} wallets",
   "settings_multisig_settings": "Multisig Settings",
+  "set_up_password": "Set Up  Password",
   "show": "Show",
   "show_all": "Show All",
   "signData": "Sign Data",
@@ -479,5 +480,6 @@
   "Wallet_name": "Wallet name",
   "wallet_sell": "Sell",
   "wallet_version_and_tokens": ", tokens",
+  "web_no_connection": "No Internet Connection",
   "Window": "Window"
 }

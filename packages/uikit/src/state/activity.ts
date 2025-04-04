@@ -7,7 +7,7 @@ import {
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvent, AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { atom, useAtom } from '../libs/atom';
+import { useAtom } from '../libs/useAtom';
 import { QueryKey } from '../libs/queryKey';
 import { useGlobalPreferences, useMutateGlobalPreferences } from './global-preferences';
 import { seeIfExtraCurrencyTransfer, seeIfTonTransfer } from './ton/tonActivity';
@@ -21,6 +21,7 @@ import { TronApi, TronHistoryItem } from '@tonkeeper/core/dist/tronApi';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useBatteryAuthToken } from './battery';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);

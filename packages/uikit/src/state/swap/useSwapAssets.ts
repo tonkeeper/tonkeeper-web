@@ -17,13 +17,14 @@ import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
-import { atom, useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { QueryKey } from '../../libs/queryKey';
 import { useAssets } from '../home';
 import { useJettonList } from '../jetton';
 import { useRate } from '../rates';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useActiveApi } from '../wallet';
+import { atom } from "@tonkeeper/core/dist/entries/atom";
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();

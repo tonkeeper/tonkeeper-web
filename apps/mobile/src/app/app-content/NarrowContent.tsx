@@ -62,7 +62,7 @@ import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/Mob
 import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
 import { useCheckTouchId, useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
 import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
-import { useAtom } from '@tonkeeper/uikit/dist/libs/atom';
+import { useAtom } from '@tonkeeper/uikit/dist/libs/useAtom';
 import { ionRouterAnimation$ } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MobileProPin } from '@tonkeeper/uikit/dist/components/mobile-pro/pin/MobileProPin';

@@ -1,6 +1,6 @@
 import { Notification } from '../../Notification';
 import { FC, Ref, useCallback, useEffect, useRef } from 'react';
-import { atom, useAtom } from '../../../libs/atom';
+import { useAtom } from '../../../libs/useAtom';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { css, styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
@@ -11,6 +11,7 @@ import {
 } from '../../../state/swap/useSwapAssets';
 import { SpinnerIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
+import { atom } from "@tonkeeper/core/dist/entries/atom";
 
 const swapTokensListOpened$ = atom<{ onClose: (token: TonAsset | undefined) => void } | undefined>(
     undefined

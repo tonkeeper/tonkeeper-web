@@ -1,6 +1,7 @@
 import { WalletAsideMenu } from '../desktop/aside/WalletAsideMenu';
-import { atom, useAtom } from '../../libs/atom';
 import { IonMenu } from '@ionic/react';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { useAtom } from '../../libs/useAtom';
 
 const isProWalletMenuOpen$ = atom(false);
 

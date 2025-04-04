@@ -2,7 +2,7 @@ import { Notification, NotificationFooter, NotificationFooterPortal } from '../N
 import { createModalControl } from './createModalControl';
 import React, { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from '../../hooks/translation';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useGlobalPreferences } from '../../state/global-preferences';
 import { useAccountsState } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../List';

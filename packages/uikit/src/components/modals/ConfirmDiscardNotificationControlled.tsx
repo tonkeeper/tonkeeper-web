@@ -1,7 +1,7 @@
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { useCallback } from 'react';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';

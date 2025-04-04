@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { atom, useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useCallback } from 'react';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 export const createModalControl = <T = object>() => {
     const paramsControl = atom<T | undefined>(undefined);

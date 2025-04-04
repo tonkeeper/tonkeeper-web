@@ -2,6 +2,7 @@ import {
     BaseApp,
     CookieService,
     IAppSdk,
+    InternetConnectionService,
     KeychainPassword,
     NotificationService,
     TouchId
@@ -14,6 +15,8 @@ import { Biometric, SecureStorage } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { Network } from '@capacitor/network';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -108,9 +111,29 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
             type: type === 'success' ? NotificationType.Success : NotificationType.Error
         });
     };
+
+    connectionService = new CapacitorConnectionService();
 }
 
 export const getCapacitorDeviceOS = async () => {
     const info = await Device.getInfo();
     return info.platform;
 };
+
+class CapacitorConnectionService implements InternetConnectionService {
+    isOnline = atom(true);
+
+    constructor() {
+        Network.getStatus().then(v => this.isOnline.next(v.connected));
+
+        Network.addListener('networkStatusChange', status => {
+            this.isOnline.next(status.connected);
+        });
+    }
+
+    public async retry() {
+        const status = await Network.getStatus();
+        this.isOnline.next(status.connected);
+        return status.connected;
+    }
+}
