@@ -1,5 +1,5 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useId, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import { useMutateRenameAccount, useMutateRenameAccountDerivation } from '../../../state/wallet';
 import {
@@ -20,6 +20,7 @@ export const RenameWalletContent: FC<{
     onClose: () => void;
 }> = ({ animationTime, account, derivationIndex, onClose }) => {
     const { t } = useTranslation();
+    const id = useId();
 
     const {
         mutateAsync: renameAccount,
@@ -58,7 +59,7 @@ export const RenameWalletContent: FC<{
     };
 
     return (
-        <NotificationBlock onSubmit={onSubmit}>
+        <NotificationBlock onSubmit={onSubmit} id={id}>
             <Input
                 id="wallet-name"
                 value={name}
@@ -74,6 +75,7 @@ export const RenameWalletContent: FC<{
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <Button
+                        form={id}
                         size="large"
                         fullWidth
                         primary
