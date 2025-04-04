@@ -74,6 +74,7 @@ export const DesktopManageMultisigsPage = () => {
                             <DesktopViewHeaderContent.RightItem
                                 onClick={() => addWallet({ walletType: 'multisig' })}
                                 asDesktopButton
+                                closeDropDownOnClick
                             >
                                 <ForTargetEnv env="mobile">
                                     <PlusIconSmall />

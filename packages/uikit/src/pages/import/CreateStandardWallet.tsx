@@ -17,11 +17,12 @@ import { Subscribe } from './Subscribe';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
 import {
-    NotificationFooter, NotificationFooterPortal,
+    NotificationFooter,
+    NotificationFooterPortal,
     OnCloseInterceptor,
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
-} from "../../components/Notification";
+} from '../../components/Notification';
 import { useConfirmDiscardNotification } from '../../components/modals/ConfirmDiscardNotificationControlled';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
