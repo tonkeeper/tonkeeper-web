@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js';
 import { FC, RefCallback, useEffect, useMemo, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
-import { Body2, Label2, Num3 } from '../../components/Text';
+import { Body2, Body3, Label2, Num3 } from '../../components/Text';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent,
@@ -51,6 +51,7 @@ import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
 import { HideForRegulatoryState } from '../../components/HideForState';
 import { CountryFeature } from '../../state/country';
 import { Redirect } from 'react-router-dom';
+import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -348,19 +349,27 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     const fetchRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
 
     const [assets] = useAssets();
-    const assetSymbol = useMemo(() => {
+    const asset = useMemo(() => {
         if (!assets) {
             return null;
         }
         if (token === CryptoCurrency.TON) {
-            return t('Toncoin');
+            return { assetSymbol: 'Toncoin', isUnverified: false };
         }
 
         if (seeIfValidTonAddress(decodeURIComponent(token))) {
-            return assets.ton.jettons.balances.find(b => eqAddresses(b.jetton.address, token))
-                ?.jetton.symbol;
+            const item = assets.ton.jettons.balances.find(b =>
+                eqAddresses(b.jetton.address, token)
+            );
+            if (!item) {
+                return undefined;
+            }
+            return {
+                assetSymbol: item.jetton.symbol,
+                isUnverified: item.jetton.verification !== JettonVerificationType.Whitelist
+            };
         } else {
-            return token;
+            return undefined;
         }
     }, [assets, t, token]);
 
@@ -369,7 +378,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         ? new URL(mainnetConfig.accountExplorer).origin
         : 'https://tonviewer.com';
 
-    if (assetSymbol === undefined) {
+    if (asset === undefined) {
         return <Redirect to={AppRoute.home} />;
     }
 
@@ -379,7 +388,16 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         >
             <DesktopViewHeader backButton borderBottom>
                 <DesktopViewHeaderContent
-                    title={assetSymbol || 'Unknown asset'}
+                    title={
+                        !!asset && !asset.isUnverified ? (
+                            asset.assetSymbol
+                        ) : (
+                            <AssetTitle>
+                                <Label2>{asset?.assetSymbol}</Label2>
+                                <Body3>{t('approval_unverified_token')}</Body3>
+                            </AssetTitle>
+                        )
+                    }
                     right={
                         <DesktopViewHeaderContent.Right>
                             <DesktopViewHeaderContent.RightItem>
@@ -418,6 +436,23 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
         </DesktopViewPageLayout>
     );
 };
+
+const AssetTitle = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ${Body3} {
+        color: ${p => p.theme.accentOrange};
+    }
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            flex-direction: row;
+            gap: 12px;
+        `}
+`;
 
 export const TronUSDTPage = () => {
     const { t } = useTranslation();

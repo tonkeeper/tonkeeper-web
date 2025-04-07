@@ -14,7 +14,7 @@ import { ColumnText } from '../../components/Layout';
 import { ListBlock, ListItemElement, ListItemPayload } from '../../components/List';
 import { SkeletonListWithImages } from '../../components/Skeleton';
 import { SubHeader } from '../../components/SubHeader';
-import { H3 } from '../../components/Text';
+import { Body3, H3 } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useJettonRawList,
@@ -36,6 +36,8 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -68,6 +70,15 @@ const RadioWrapper = styled.span`
     cursor: pointer;
 `;
 
+const TextWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Body3Orange = styled(Body3)`
+    color: ${p => p.theme.accentOrange};
+`;
+
 const SampleJettonRow: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
     jetton,
     config
@@ -94,10 +105,16 @@ const SampleJettonRow: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
                     src={jetton.asset.image}
                     $noCorners={jetton.asset.id === TRON_USDT_ASSET.id}
                 />
-                <ColumnText
-                    text={jetton.asset.name ?? t('Unknown_COIN')}
-                    secondary={jetton.stringAssetRelativeAmount}
-                />
+                <TextWrapper>
+                    <ColumnText
+                        text={jetton.asset.name ?? t('Unknown_COIN')}
+                        secondary={jetton.stringAssetRelativeAmount}
+                    />
+                    {isTonAsset(jetton.asset) &&
+                        jetton.asset.verification !== JettonVerificationType.Whitelist && (
+                            <Body3Orange>{t('approval_unverified_token')}</Body3Orange>
+                        )}
+                </TextWrapper>
             </Row>
             <Row>
                 {visible && (

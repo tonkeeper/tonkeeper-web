@@ -114,7 +114,7 @@ export const TokenLayout: FC<{
             </FirstLine>
             <SecondLine>
                 <Secondary>
-                    {verification === 'none' ? (
+                    {verification && verification !== 'whitelist' ? (
                         <Unverified>{t('approval_unverified_token')}</Unverified>
                     ) : (
                         <>
