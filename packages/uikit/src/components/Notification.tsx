@@ -234,21 +234,29 @@ const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
             position: sticky;
             bottom: 0;
             z-index: 100;
-            ${p.$keyboardShift
-                ? css`
-                      transform: translateY(
-                          calc(${-p.$keyboardShift}px + env(safe-area-inset-bottom) - 16px)
-                      );
-                  `
-                : css`
-                      transform: translateY(0);
-                  `}
+            ${
+                p.$keyboardShift
+                    ? css`
+                          transform: translateY(
+                              calc(${-p.$keyboardShift}px + env(safe-area-inset-bottom) - 16px)
+                          );
+                      `
+                    : css`
+                          transform: translateY(0);
+                      `
+            }
 
             transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.9);
 
-            &:empty {
-                padding-bottom: 1rem;
+            ${
+                p.theme.proDisplayType === 'desktop' &&
+                css`
+                    &:empty {
+                        padding-bottom: 1rem;
+                    }
+                `
             }
+        }
         `}
 `;
 
