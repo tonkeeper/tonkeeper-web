@@ -282,7 +282,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                     mnemonic: m,
                     selectAccount: true
                 });
-                setCreatedAccount(newAccountMam);
+                setCreatedAccount(newAccountMam.account);
             }
             setSelectedMnemonicType(typeToSet);
         } else if (availableOptions.length === 1) {
@@ -308,7 +308,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 mnemonic: m,
                 selectAccount: true
             });
-            setCreatedAccount(newAccountMam);
+            setCreatedAccount(newAccountMam.account);
         }
 
         setSelectedMnemonicType(mnemonicType);

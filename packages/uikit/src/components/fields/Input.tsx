@@ -251,7 +251,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     typeof autoFocus === 'number'
                         ? autoFocus
                         : autoFocus === 'notification'
-                        ? 200
+                        ? 400
                         : 30
                 );
                 focused.current = true;

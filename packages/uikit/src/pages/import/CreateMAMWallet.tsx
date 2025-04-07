@@ -30,6 +30,8 @@ import {
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
+import { Subscribe } from './Subscribe';
+import { useAppSdk } from '../../hooks/appSdk';
 
 export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const { t } = useTranslation();
@@ -41,7 +43,9 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
         useMutateRenameAccountDerivations();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
-    const [createdAccount, setCreatedAccount] = useState<Account | undefined>(undefined);
+    const [createdAccount, setCreatedAccount] = useState<
+        { account: Account; childrenMnemonics: string[][] } | undefined
+    >(undefined);
 
     const [creatingAnimationPassed, setCreatingAnimationPassed] = useState(false);
     const [infoPagePassed, setInfoPagePassed] = useState(false);
@@ -52,6 +56,8 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     const [wordsShown, setWordsShown] = useState(false);
     const { mutate: mutateActiveAccountConfig } = useMutateActiveAccountConfig();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const sdk = useAppSdk();
+    const [notificationsSubscribePagePassed, setPassNotification] = useState(false);
 
     const onSelectNetworks = ({ tron }: { tron: boolean }) => {
         if (tron !== (defaultAccountConfig.enableTron && isTronEnabledGlobally)) {
@@ -70,21 +76,24 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     }, [infoPagePassed]);
 
     const onRename = async (form: { name: string; emoji: string }) => {
-        const derivationIndexes = (createdAccount as AccountMAM).allAvailableDerivations.map(
-            d => d.index
-        );
+        const derivationIndexes = (
+            createdAccount!.account as AccountMAM
+        ).allAvailableDerivations.map(d => d.index);
         await renameAccount({
-            id: createdAccount!.id,
+            id: createdAccount!.account.id,
             ...form
         });
         const newAcc = await renameDerivations({
-            id: createdAccount!.id,
+            id: createdAccount!.account.id,
             derivationIndexes,
             emoji: form.emoji
         });
 
         setEditNamePagePassed(true);
-        setCreatedAccount(newAcc);
+        setCreatedAccount({
+            account: newAcc,
+            childrenMnemonics: createdAccount!.childrenMnemonics
+        });
     };
 
     useEffect(() => {
@@ -222,9 +231,9 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
     if (!editNamePagePassed) {
         return (
             <UpdateWalletName
-                name={createdAccount.name}
+                name={createdAccount.account.name}
                 submitHandler={onRename}
-                walletEmoji={createdAccount.emoji}
+                walletEmoji={createdAccount.account.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
                 buttonText={t('continue')}
             />
@@ -233,6 +242,17 @@ export const CreateMAMWallet: FC<{ afterCompleted: () => void }> = ({ afterCompl
 
     if (!selectNetworksPassed) {
         return <SelectWalletNetworks onContinue={onSelectNetworks} />;
+    }
+
+    if (sdk.notifications && !notificationsSubscribePagePassed) {
+        return (
+            <Subscribe
+                mnemonicType="ton"
+                wallet={createdAccount.account.activeTonWallet}
+                mnemonic={createdAccount.childrenMnemonics[0]}
+                onDone={() => setPassNotification(true)}
+            />
+        );
     }
 
     return <FinalView afterCompleted={afterCompleted} />;

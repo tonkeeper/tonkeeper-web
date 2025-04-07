@@ -682,7 +682,7 @@ export const useCreateAccountMAM = () => {
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
 
     return useMutation<
-        AccountMAM,
+        { account: AccountMAM; childrenMnemonics: string[][] },
         Error,
         {
             mnemonic: string[];
@@ -697,6 +697,11 @@ export const useCreateAccountMAM = () => {
         };
 
         const isTronEnabled = defaultAccountConfig.enableTron && isTronEnabledGlobally;
+
+        const rootAccount = await TonKeychainRoot.fromMnemonic(mnemonic);
+        const childrenMnemonics: string[][] = (
+            await Promise.all((selectedDerivations || []).map(i => rootAccount.getTonAccount(i)))
+        ).map(a => a.mnemonics);
 
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
@@ -716,7 +721,7 @@ export const useCreateAccountMAM = () => {
             if (selectAccount) {
                 await selectAccountMutation(account.id);
             }
-            return account;
+            return { account, childrenMnemonics };
         }
 
         if (!password) {
@@ -736,7 +741,7 @@ export const useCreateAccountMAM = () => {
         if (selectAccount) {
             await selectAccountMutation(account.id);
         }
-        return account;
+        return { account, childrenMnemonics };
     });
 };
 

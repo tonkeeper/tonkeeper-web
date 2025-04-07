@@ -17,7 +17,7 @@ import {
 import { useLocation } from 'react-router-dom';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
-import { useAppSdk } from '../../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
 import React, { FC } from 'react';
@@ -97,6 +97,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const wallets = useAccountsState();
 
     const showSecurityPage = useShouldShowSecurityPage();
+    const env = useAppTargetEnv();
 
     return (
         <PreferencesAsideContainer className={className}>
@@ -129,7 +130,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         )}
                     </NavLink>
                 </HideOnReview>
-                {proState?.subscription.valid && (
+                {(proState?.subscription.valid || env === 'mobile') && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (
                             <AsideMenuItemLarge isSelected={isActive}>
