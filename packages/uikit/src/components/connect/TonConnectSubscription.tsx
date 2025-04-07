@@ -82,7 +82,7 @@ const TonConnectSubscription = () => {
                         connection: params.connection,
                         id: params.request.id,
                         kind: 'signData',
-                        payload: params.request.params
+                        payload: JSON.parse(params.request.params[0])
                     };
                     return openNotification(params.connection.clientSessionId, value);
                 }

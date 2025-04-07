@@ -12,7 +12,7 @@ import {
 /**
  * Creates hash for text or binary payload.
  * Message format:
- * message = "sign-data/" || workchain || address_hash || domain_len || domain || timestamp || payload
+ * message = 0xffff ++ "ton-connect/sign-data/" ++ workchain ++ address_hash ++ domain_len ++ domain ++ timestamp ++ payload
  * finalMessage = 0xffff || "ton-connect" || sha256(message)
  */
 export function createTextBinaryHash(
@@ -44,9 +44,9 @@ export function createTextBinaryHash(
     const payloadLenBuffer = Buffer.alloc(4);
     payloadLenBuffer.writeUInt32BE(payloadBuffer.length);
 
-    // Build message
     const message = Buffer.concat([
-        Buffer.from('sign-data/'),
+        Buffer.from([0xff, 0xff]),
+        Buffer.from('ton-connect/sign-data/'),
         wcBuffer,
         parsedAddr.hash,
         domainLenBuffer,
@@ -57,17 +57,7 @@ export function createTextBinaryHash(
         payloadBuffer
     ]);
 
-    // Hash message
-    const messageHash = crypto.createHash('sha256').update(message).digest();
-
-    // Create final message with prefix
-    const finalMessage = Buffer.concat([
-        Buffer.from([0xff, 0xff]),
-        Buffer.from('ton-connect'),
-        messageHash
-    ]);
-
-    return crypto.createHash('sha256').update(finalMessage).digest();
+    return crypto.createHash('sha256').update(message).digest();
 }
 
 /**

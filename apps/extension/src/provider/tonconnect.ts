@@ -10,7 +10,6 @@ import {
     TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonProvider } from '../provider/index';
-import { typeOf } from 'react-is';
 
 const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
     return {
@@ -171,7 +170,7 @@ export class TonConnect implements TonConnectBridge {
         try {
             const payload = Array.isArray(message.params)
                 ? message.params.map(item => JSON.parse(item))
-                : message.params;
+                : JSON.parse(message.params);
 
             const result = await this.provider.send<string>(
                 `tonConnect_${message.method}`,
