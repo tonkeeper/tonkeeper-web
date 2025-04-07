@@ -6,7 +6,7 @@ import { useWalletTotalBalance } from '../../../state/asset';
 import { useUserFiat } from '../../../state/fiat';
 import React, { FC } from 'react';
 import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
-import { useActiveAccount } from '../../../state/wallet';
+import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useIsTronEnabledForActiveWallet } from '../../../state/tron/tron';
 import { AddressMultiChain } from '../../home/Balance';
@@ -70,6 +70,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { isConnected } = useInternetConnection();
+    const network = useActiveTonNetwork();
 
     let content;
 
@@ -89,7 +90,10 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
             </AddressMultiChain>
         );
     } else {
-        const userFriendlyAddress = formatAddress(activeAccount.activeTonWallet.rawAddress);
+        const userFriendlyAddress = formatAddress(
+            activeAccount.activeTonWallet.rawAddress,
+            network
+        );
         content = (
             <ClickWrapper onClick={() => isConnected && sdk.copyToClipboard(userFriendlyAddress)}>
                 <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>{' '}
