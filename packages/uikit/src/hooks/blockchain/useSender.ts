@@ -51,7 +51,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
 import { useAssets } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
-import { toNano } from '@ton/core';
+import { Address, toNano } from '@ton/core';
 import {
     useTwoFAWalletConfigMayBeOfMultisigHost,
     useTwoFAApi,
@@ -68,6 +68,7 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { QueryKey } from '../../libs/queryKey';
 import { useJettonList } from '../../state/jetton';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -268,8 +269,15 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 }
             }
 
-            if (payload.messagesVariants?.gasless && isStandardTonWallet(account.activeTonWallet)) {
-                const assetAddress = payload.messagesVariants.gasless.options?.asset;
+            if (
+                payload.messagesVariants?.gasless &&
+                isStandardTonWallet(account.activeTonWallet) &&
+                payload.messagesVariants.gasless.options?.asset &&
+                seeIfValidTonAddress(payload.messagesVariants.gasless.options?.asset)
+            ) {
+                const assetAddress = Address.parse(
+                    payload.messagesVariants.gasless.options?.asset
+                ).toRawString();
                 if (
                     assetAddress &&
                     gaslessConfig.gasJettons.some(j => j.masterId === assetAddress) &&

@@ -1,10 +1,16 @@
 import { Address, beginCell, Cell, toNano, internal, SendMode } from '@ton/core';
 import { getTonkeeperQueryId, StateInit, toStateInit } from '../utils';
 import { APIConfig } from '../../../entries/apis';
-import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
-import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
+import { tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
 import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
 import { AccountsApi, JettonBalance, JettonsApi } from '../../../tonApiV2';
+
+type AssetAmountSimple = {
+    asset: {
+        address: Address;
+    };
+    stringWeiAmount: string;
+};
 
 export class JettonEncoder {
     static jettonTransferAmount = toNano(0.05);
@@ -38,13 +44,13 @@ export class JettonEncoder {
         transfer:
             | {
                   to: string;
-                  amount: AssetAmount<TonAsset>;
+                  amount: AssetAmountSimple;
                   payload?: MessagePayloadParam;
                   responseAddress?: string;
               }
             | {
                   to: string;
-                  amount: AssetAmount<TonAsset>;
+                  amount: AssetAmountSimple;
                   payload?: MessagePayloadParam;
                   responseAddress?: string;
               }[]
@@ -108,7 +114,7 @@ export class JettonEncoder {
         responseAddress
     }: {
         to: string;
-        amount: AssetAmount<TonAsset>;
+        amount: AssetAmountSimple;
         payload?: MessagePayloadParam;
         responseAddress?: string;
     }): Promise<WalletOutgoingMessage> => {
@@ -147,7 +153,7 @@ export class JettonEncoder {
     private encodeMultiTransfer = async (
         transfers: {
             to: string;
-            amount: AssetAmount<TonAsset>;
+            amount: AssetAmountSimple;
             payload?: MessagePayloadParam;
             responseAddress?: string;
         }[]
