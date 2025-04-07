@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import React from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
@@ -26,7 +26,7 @@ import { RoundedBadge } from '../components/shared/Badge';
 import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
 import { HideOnReview } from '../components/ios/HideOnReview';
 import { PullToRefresh } from '../components/mobile-pro/PullToRefresh';
-import { DesktopViewPageLayout } from '../components/desktop/DesktopViewLayout';
+import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/DesktopViewLayout';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -70,20 +70,10 @@ const SwapIconStyled = styled(SwapIcon)`
 
 const mobileProHomePageId = 'mobile-pro-home-page';
 
-const MainPageStyles = createGlobalStyle`
-
-    #${mobileProHomePageId} {
-        padding-top: env(safe-area-inset-top);
-    }`;
-
-const SafeAreaCover = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: env(safe-area-inset-top);
-    background: ${p => p.theme.backgroundPage};
-    z-index: 102;
+const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
+    ion-toolbar {
+        height: 0;
+    }
 `;
 
 export const MobileProHomePage = () => {
@@ -97,75 +87,72 @@ export const MobileProHomePage = () => {
     const canUseBattery = useCanUseBattery();
 
     return (
-        <>
-            <MainPageStyles />
-            <DesktopViewPageLayout id={mobileProHomePageId}>
-                <SafeAreaCover />
-                <PullToRefresh invalidate={account.id} />
-                <MobileProHomeBalance />
-                <MobileProHomeActionsStyled />
-                <MobileProHomeWidgetTokensStyled />
-                <MenuWrapper>
-                    <MenuItem to={AppRoute.activity}>
-                        <ClockSmoothIcon />
-                        <Label2>{t('wallet_aside_history')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
-                    <MenuItem to={AppRoute.purchases}>
-                        <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
-                    <MenuItem to={AppRoute.dns}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
-                    <HideOnReview>
-                        {!isReadOnly && !isTestnet && (
-                            <>
-                                <MenuItem to={AppRoute.swap}>
-                                    <SwapIconStyled />
-                                    <Label2>{t('wallet_swap')}</Label2>
-                                    <ChevronRightIcon />
-                                </MenuItem>
-                                <Divider />
-                            </>
-                        )}
-                        {isMultisig && !isTestnet && (
-                            <>
-                                <MultisigOrdersMenuItem />
-                                <Divider />
-                            </>
-                        )}
-                        {showMultisigs && !isTestnet && (
-                            <>
-                                <MenuItem to={AppRoute.multisigWallets}>
-                                    <ListIcon />
-                                    <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                                    <ChevronRightIcon />
-                                </MenuItem>
-                                <Divider />
-                            </>
-                        )}
-                        {canUseBattery && (
-                            <>
-                                <BatterySettingsListItem />
-                                <Divider />
-                            </>
-                        )}
-                    </HideOnReview>
-                    <MenuItem to={AppRoute.walletSettings}>
-                        <SettingsSmoothIcon />
-                        <Label2>{t('wallet_aside_settings')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                </MenuWrapper>
-            </DesktopViewPageLayout>
-        </>
+        <DesktopViewPageLayout id={mobileProHomePageId}>
+            <DesktopViewHeaderStyled mobileTranslucent={false} />
+            <PullToRefresh invalidate={account.id} />
+            <MobileProHomeBalance />
+            <MobileProHomeActionsStyled />
+            <MobileProHomeWidgetTokensStyled />
+            <MenuWrapper>
+                <MenuItem to={AppRoute.activity}>
+                    <ClockSmoothIcon />
+                    <Label2>{t('wallet_aside_history')}</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
+                <Divider />
+                <MenuItem to={AppRoute.purchases}>
+                    <SaleBadgeIcon />
+                    <Label2>{t('wallet_aside_collectibles')}</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
+                <Divider />
+                <MenuItem to={AppRoute.dns}>
+                    <SparkIcon />
+                    <Label2>{t('wallet_aside_domains')}</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
+                <Divider />
+                <HideOnReview>
+                    {!isReadOnly && !isTestnet && (
+                        <>
+                            <MenuItem to={AppRoute.swap}>
+                                <SwapIconStyled />
+                                <Label2>{t('wallet_swap')}</Label2>
+                                <ChevronRightIcon />
+                            </MenuItem>
+                            <Divider />
+                        </>
+                    )}
+                    {isMultisig && !isTestnet && (
+                        <>
+                            <MultisigOrdersMenuItem />
+                            <Divider />
+                        </>
+                    )}
+                    {showMultisigs && !isTestnet && (
+                        <>
+                            <MenuItem to={AppRoute.multisigWallets}>
+                                <ListIcon />
+                                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                                <ChevronRightIcon />
+                            </MenuItem>
+                            <Divider />
+                        </>
+                    )}
+                    {canUseBattery && (
+                        <>
+                            <BatterySettingsListItem />
+                            <Divider />
+                        </>
+                    )}
+                </HideOnReview>
+                <MenuItem to={AppRoute.walletSettings}>
+                    <SettingsSmoothIcon />
+                    <Label2>{t('wallet_aside_settings')}</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
+            </MenuWrapper>
+        </DesktopViewPageLayout>
     );
 };
 

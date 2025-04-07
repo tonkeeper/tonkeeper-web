@@ -182,14 +182,15 @@ export const DesktopViewHeader: FC<
         backButton?: boolean | ReactNode;
         className?: string;
         borderBottom?: boolean;
+        mobileTranslucent?: boolean;
     }>
-> = ({ children, backButton, borderBottom, className }) => {
+> = ({ children, backButton, borderBottom, className, mobileTranslucent = true }) => {
     const portalId = useContext(DesktopViewPageLayoutContext);
 
     if (portalId !== undefined) {
         return (
             <ReactPortal wrapperId={portalId} position="first">
-                <IonHeader translucent={true}>
+                <IonHeader translucent={mobileTranslucent} className={className}>
                     <IonToolbar>
                         {backButton !== false && (
                             <IonButtons slot="start">
