@@ -1,17 +1,14 @@
 import { Notification } from '../../Notification';
-import { FC, Ref, useCallback, useEffect, useRef } from 'react';
+import { FC, useCallback } from 'react';
 import { useAtom } from '../../../libs/useAtom';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { css, styled } from 'styled-components';
 import { SwapSearchInput } from './SwapSearchInput';
 import { SwapTokensList } from './SwapTokensList';
-import {
-    useSwapTokensFilter,
-    useWalletFilteredSwapAssets
-} from '../../../state/swap/useSwapAssets';
+import { useWalletFilteredSwapAssets } from '../../../state/swap/useSwapAssets';
 import { SpinnerIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
-import { atom } from "@tonkeeper/core/dist/entries/atom";
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 const swapTokensListOpened$ = atom<{ onClose: (token: TonAsset | undefined) => void } | undefined>(
     undefined
@@ -93,20 +90,10 @@ const SwapTokensListContent: FC<{ onSelect: (token: TonAsset | undefined) => voi
     onSelect
 }) => {
     const walletSwapAssets = useWalletFilteredSwapAssets();
-    const inputRef = useRef<HTMLInputElement | undefined>();
-    const [_, setFilter] = useSwapTokensFilter();
-
-    useEffect(() => {
-        setTimeout(() => inputRef?.current?.focus(), 100);
-        return () => setFilter('');
-    }, []);
 
     return (
         <SwapTokensListContentWrapper>
-            <SwapSearchInputStyled
-                ref={inputRef as Ref<HTMLInputElement> | undefined}
-                isDisabled={!walletSwapAssets}
-            />
+            <SwapSearchInputStyled isDisabled={!walletSwapAssets} />
             <Divider />
             {walletSwapAssets ? (
                 <SwapTokensList onSelect={onSelect} walletSwapAssets={walletSwapAssets} />
