@@ -65,11 +65,11 @@ export function DecodedRawMessageFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function DecodedRawMessageToJSON(json: any): DecodedRawMessage {
-      return DecodedRawMessageToJSONTyped(json, false);
-  }
+export function DecodedRawMessageToJSON(json: any): DecodedRawMessage {
+    return DecodedRawMessageToJSONTyped(json, false);
+}
 
-  export function DecodedRawMessageToJSONTyped(value?: DecodedRawMessage | null, ignoreDiscriminator: boolean = false): any {
+export function DecodedRawMessageToJSONTyped(value?: DecodedRawMessage | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

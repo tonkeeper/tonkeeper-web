@@ -4,10 +4,11 @@ import { externalMessage, getServerTime, getTTL, getWalletSeqNo, toStateInit } f
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { TonWalletStandard } from '../../../entries/wallet';
-import { SendMode, WalletContractV5R1 } from '@ton/ton';
+import { SendMode } from '@ton/core';
+import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import { ISender } from './ISender';
 import { beginCell, Cell, internal, storeMessageRelaxed } from '@ton/core';
-import { GaslessApi } from '../../../tonApiV2';
+import { AccountEvent, GaslessApi } from '../../../tonApiV2';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 
@@ -67,7 +68,8 @@ export class GaslessMessageSender implements ISender {
                     asset: this.gaslessConfig.payWithAsset,
                     weiAmount: params.commission
                 })
-            }
+            },
+            event: this.hideGaslessFeeCallFromEstimation(params.emulation)?.event
         };
     }
 
@@ -109,8 +111,39 @@ export class GaslessMessageSender implements ISender {
                     {
                         boc: messageToEstimate.toBoc().toString('hex')
                     }
-                ]
-            }
+                ],
+                returnEmulation: true,
+                throwErrorIfNotEnoughJettons: true
+            },
+            acceptLanguage: 'en'
         });
+    }
+
+    private hideGaslessFeeCallFromEstimation(estimation: { event: AccountEvent } | undefined) {
+        if (!estimation) {
+            return undefined;
+        }
+
+        const actions = estimation.event.actions;
+
+        if (actions.length >= 2) {
+            const action = actions[0];
+            if (
+                action.type === 'JettonTransfer' &&
+                'jettonTransfer' in action &&
+                action.jettonTransfer
+            ) {
+                const eventInfo = action.jettonTransfer as {
+                    recipient: {
+                        name: string;
+                    };
+                };
+                if (eventInfo.recipient.name.toLowerCase() === 'tonkeeper battery') {
+                    actions.shift();
+                }
+            }
+        }
+
+        return { ...estimation, event: { ...estimation.event, actions } };
     }
 }

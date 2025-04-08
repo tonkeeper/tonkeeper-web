@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
     DAppManifest,
+    RpcMethod,
     SendTransactionAppRequest,
-    TonConnectEventPayload
+    TonConnectEventPayload,
+    WalletResponse
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     parseTonTransferWithAddress,
@@ -16,7 +18,10 @@ import {
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import {
+    AccountConnection,
+    TonConnectParams
+} from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -141,24 +146,16 @@ export const useResponseConnectionMutation = () => {
 };
 
 export interface ResponseSendProps {
-    request: SendTransactionAppRequest;
-    boc?: string;
+    connection: AccountConnection;
+    response: WalletResponse<RpcMethod>;
 }
 
-export const useResponseSendMutation = () => {
-    return useMutation<undefined, Error, ResponseSendProps>(
-        async ({ request: { connection, id }, boc }) => {
-            const response = boc
-                ? sendTransactionSuccessResponse(id, boc)
-                : sendTransactionErrorResponse(id);
-
-            await sendEventToBridge({
-                response,
-                sessionKeyPair: connection.sessionKeyPair,
-                clientSessionId: connection.clientSessionId
-            });
-
-            return undefined;
-        }
-    );
+export const useTonConnectResponseMutation = () => {
+    return useMutation<void, Error, ResponseSendProps>(async ({ connection, response }) => {
+        return await sendEventToBridge({
+            response,
+            sessionKeyPair: connection.sessionKeyPair,
+            clientSessionId: connection.clientSessionId
+        });
+    });
 };

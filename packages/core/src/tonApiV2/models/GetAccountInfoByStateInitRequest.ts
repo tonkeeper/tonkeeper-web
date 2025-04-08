@@ -49,11 +49,11 @@ export function GetAccountInfoByStateInitRequestFromJSONTyped(json: any, ignoreD
     };
 }
 
-  export function GetAccountInfoByStateInitRequestToJSON(json: any): GetAccountInfoByStateInitRequest {
-      return GetAccountInfoByStateInitRequestToJSONTyped(json, false);
-  }
+export function GetAccountInfoByStateInitRequestToJSON(json: any): GetAccountInfoByStateInitRequest {
+    return GetAccountInfoByStateInitRequestToJSONTyped(json, false);
+}
 
-  export function GetAccountInfoByStateInitRequestToJSONTyped(value?: GetAccountInfoByStateInitRequest | null, ignoreDiscriminator: boolean = false): any {
+export function GetAccountInfoByStateInitRequestToJSONTyped(value?: GetAccountInfoByStateInitRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

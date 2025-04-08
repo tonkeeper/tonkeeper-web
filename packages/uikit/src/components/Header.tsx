@@ -437,18 +437,15 @@ const CountryButton = styled.button`
 export const BrowserHeader = () => {
     const { t } = useTranslation();
     const { data: country, isLoading: isCountryLoading } = useUserCountry();
-
     return (
         <Block second>
             <H1>{t('browser_title')}</H1>
             {isCountryLoading ? (
                 <SkeletonCountry width="50px" size="large" />
             ) : (
-                <Link to={AppRoute.settings + SettingsRoute.country}>
-                    <CountryButton>
-                        <Label2>{country || '🌎'}</Label2>
-                    </CountryButton>
-                </Link>
+                <CountryButton>
+                    <Label2>{country || '🌎'}</Label2>
+                </CountryButton>
             )}
         </Block>
     );

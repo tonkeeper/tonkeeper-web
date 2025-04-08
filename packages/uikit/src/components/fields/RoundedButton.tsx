@@ -31,15 +31,10 @@ export const CountryIcon: FC<{ country: string }> = ({ country }) => {
     );
 };
 
-export const CommonCountryButton: FC<{
+export const CommonCountryBadge: FC<{
     country: string | undefined | null;
-    onClick: () => void;
-}> = ({ country, onClick }) => {
-    return (
-        <RoundedButton onClick={onClick}>
-            {country ? <CountryIcon country={country} /> : <GlobIcon />}
-        </RoundedButton>
-    );
+}> = ({ country }) => {
+    return country ? <CountryIcon country={country} /> : <GlobIcon />;
 };
 
 export const RoundedButton = styled(ButtonMock)`

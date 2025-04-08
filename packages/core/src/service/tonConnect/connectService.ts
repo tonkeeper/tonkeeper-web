@@ -106,11 +106,19 @@ export const getManifest = async (request: ConnectRequest) => {
 
     const manifest: DAppManifest = await response.json();
 
-    const isValid =
+    let isValid =
         manifest &&
         typeof manifest.url === 'string' &&
         typeof manifest.name === 'string' &&
         typeof manifest.iconUrl === 'string';
+
+    try {
+        if (!new URL(manifest.url).hostname.includes('.')) {
+            isValid = false;
+        }
+    } catch {
+        isValid = false;
+    }
 
     if (!isValid) {
         throw new Error('Manifest is not valid');
@@ -166,6 +174,10 @@ export const getDeviceInfo = (
                 name: 'SendTransaction',
                 maxMessages: maxMessages,
                 extraCurrencySupported: true
+            },
+            {
+                name: 'SignData',
+                types: ['text', 'binary', 'cell']
             }
         ]
     };
@@ -321,7 +333,7 @@ export const tonConnectProofPayload = (
     const timestampBuffer = Buffer.allocUnsafe(8);
     timestampBuffer.writeBigInt64LE(BigInt(timestamp));
 
-    const domain = new URL(origin).host;
+    const domain = origin.includes('://') ? new URL(origin).host : origin;
     const domainBuffer = Buffer.from(domain);
 
     const domainLengthBuffer = Buffer.allocUnsafe(4);

@@ -80,11 +80,11 @@ export function JettonQuantityFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function JettonQuantityToJSON(json: any): JettonQuantity {
-      return JettonQuantityToJSONTyped(json, false);
-  }
+export function JettonQuantityToJSON(json: any): JettonQuantity {
+    return JettonQuantityToJSONTyped(json, false);
+}
 
-  export function JettonQuantityToJSONTyped(value?: JettonQuantity | null, ignoreDiscriminator: boolean = false): any {
+export function JettonQuantityToJSONTyped(value?: JettonQuantity | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

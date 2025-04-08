@@ -49,11 +49,11 @@ export function GaslessConfigGasJettonsInnerFromJSONTyped(json: any, ignoreDiscr
     };
 }
 
-  export function GaslessConfigGasJettonsInnerToJSON(json: any): GaslessConfigGasJettonsInner {
-      return GaslessConfigGasJettonsInnerToJSONTyped(json, false);
-  }
+export function GaslessConfigGasJettonsInnerToJSON(json: any): GaslessConfigGasJettonsInner {
+    return GaslessConfigGasJettonsInnerToJSONTyped(json, false);
+}
 
-  export function GaslessConfigGasJettonsInnerToJSONTyped(value?: GaslessConfigGasJettonsInner | null, ignoreDiscriminator: boolean = false): any {
+export function GaslessConfigGasJettonsInnerToJSONTyped(value?: GaslessConfigGasJettonsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -64,11 +64,11 @@ export function BlockchainConfig5FromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function BlockchainConfig5ToJSON(json: any): BlockchainConfig5 {
-      return BlockchainConfig5ToJSONTyped(json, false);
-  }
+export function BlockchainConfig5ToJSON(json: any): BlockchainConfig5 {
+    return BlockchainConfig5ToJSONTyped(json, false);
+}
 
-  export function BlockchainConfig5ToJSONTyped(value?: BlockchainConfig5 | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainConfig5ToJSONTyped(value?: BlockchainConfig5 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

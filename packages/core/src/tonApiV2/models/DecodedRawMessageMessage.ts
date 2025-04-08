@@ -70,11 +70,11 @@ export function DecodedRawMessageMessageFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function DecodedRawMessageMessageToJSON(json: any): DecodedRawMessageMessage {
-      return DecodedRawMessageMessageToJSONTyped(json, false);
-  }
+export function DecodedRawMessageMessageToJSON(json: any): DecodedRawMessageMessage {
+    return DecodedRawMessageMessageToJSONTyped(json, false);
+}
 
-  export function DecodedRawMessageMessageToJSONTyped(value?: DecodedRawMessageMessage | null, ignoreDiscriminator: boolean = false): any {
+export function DecodedRawMessageMessageToJSONTyped(value?: DecodedRawMessageMessage | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

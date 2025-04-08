@@ -57,11 +57,11 @@ export function DnsExpiringFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function DnsExpiringToJSON(json: any): DnsExpiring {
-      return DnsExpiringToJSONTyped(json, false);
-  }
+export function DnsExpiringToJSON(json: any): DnsExpiring {
+    return DnsExpiringToJSONTyped(json, false);
+}
 
-  export function DnsExpiringToJSONTyped(value?: DnsExpiring | null, ignoreDiscriminator: boolean = false): any {
+export function DnsExpiringToJSONTyped(value?: DnsExpiring | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -57,11 +57,11 @@ export function MethodFromJSONTyped(json: any, ignoreDiscriminator: boolean): Me
     };
 }
 
-  export function MethodToJSON(json: any): Method {
-      return MethodToJSONTyped(json, false);
-  }
+export function MethodToJSON(json: any): Method {
+    return MethodToJSONTyped(json, false);
+}
 
-  export function MethodToJSONTyped(value?: Method | null, ignoreDiscriminator: boolean = false): any {
+export function MethodToJSONTyped(value?: Method | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

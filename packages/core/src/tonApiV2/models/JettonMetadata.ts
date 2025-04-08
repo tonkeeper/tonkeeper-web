@@ -115,11 +115,11 @@ export function JettonMetadataFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function JettonMetadataToJSON(json: any): JettonMetadata {
-      return JettonMetadataToJSONTyped(json, false);
-  }
+export function JettonMetadataToJSON(json: any): JettonMetadata {
+    return JettonMetadataToJSONTyped(json, false);
+}
 
-  export function JettonMetadataToJSONTyped(value?: JettonMetadata | null, ignoreDiscriminator: boolean = false): any {
+export function JettonMetadataToJSONTyped(value?: JettonMetadata | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -2,6 +2,8 @@ import {
     CONNECT_EVENT_ERROR_CODES,
     ConnectRequest,
     DeviceInfo,
+    SIGN_DATA_ERROR_CODES,
+    SignDataRequestPayload,
     TonConnectAccount,
     TonConnectEventPayload,
     TonConnectTransactionPayload
@@ -150,6 +152,51 @@ export const tonConnectTransaction = async (
     await cancelOpenedNotification();
     memoryStore.addNotification({
         kind: 'tonConnectSend',
+        id,
+        logo: await getActiveTabLogo(),
+        origin,
+        data
+    });
+
+    try {
+        const popupId = await openNotificationPopUp();
+        const result = await waitApprove<string>(id, popupId);
+        return result;
+    } finally {
+        memoryStore.removeNotification(id);
+    }
+};
+
+export const tonConnectSignData = async (
+    id: number,
+    origin: string,
+    data: SignDataRequestPayload
+) => {
+    const connection = await getDappConnection(storage, origin);
+
+    if (!connection) {
+        throw new TonConnectError(
+            "dApp don't have an access to wallet",
+            SIGN_DATA_ERROR_CODES.BAD_REQUEST_ERROR
+        );
+    }
+
+    const accounts = await accountsStorage(storage).getAccounts();
+    const accToActivate = accounts.find(a =>
+        a.allTonWallets.some(w => w.id === connection.wallet.rawAddress)
+    );
+
+    if (accToActivate) {
+        accToActivate.setActiveTonWallet(connection.wallet.rawAddress);
+        await accountsStorage(storage).updateAccountInState(accToActivate);
+        await accountsStorage(storage).setActiveAccountId(accToActivate.id);
+    }
+
+    await delay(200);
+
+    await cancelOpenedNotification();
+    memoryStore.addNotification({
+        kind: 'tonConnectSign',
         id,
         logo: await getActiveTabLogo(),
         origin,

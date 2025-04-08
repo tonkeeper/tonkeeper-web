@@ -90,11 +90,11 @@ export function WithdrawStakeActionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function WithdrawStakeActionToJSON(json: any): WithdrawStakeAction {
-      return WithdrawStakeActionToJSONTyped(json, false);
-  }
+export function WithdrawStakeActionToJSON(json: any): WithdrawStakeAction {
+    return WithdrawStakeActionToJSONTyped(json, false);
+}
 
-  export function WithdrawStakeActionToJSONTyped(value?: WithdrawStakeAction | null, ignoreDiscriminator: boolean = false): any {
+export function WithdrawStakeActionToJSONTyped(value?: WithdrawStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

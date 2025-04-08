@@ -87,11 +87,11 @@ export function MessageConsequencesFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function MessageConsequencesToJSON(json: any): MessageConsequences {
-      return MessageConsequencesToJSONTyped(json, false);
-  }
+export function MessageConsequencesToJSON(json: any): MessageConsequences {
+    return MessageConsequencesToJSONTyped(json, false);
+}
 
-  export function MessageConsequencesToJSONTyped(value?: MessageConsequences | null, ignoreDiscriminator: boolean = false): any {
+export function MessageConsequencesToJSONTyped(value?: MessageConsequences | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -42,7 +42,6 @@ export enum SettingsRoute {
     nft = '/nft',
     security = '/security',
     subscriptions = '/subscriptions',
-    country = '/country',
     pro = '/pro',
     twoFa = '/two-fa'
 }

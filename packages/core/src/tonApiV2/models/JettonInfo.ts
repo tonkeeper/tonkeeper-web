@@ -83,12 +83,6 @@ export interface JettonInfo {
      * @memberof JettonInfo
      */
     holdersCount: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof JettonInfo
-     */
-    score?: number;
 }
 
 
@@ -123,15 +117,14 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'preview': json['preview'],
         'verification': JettonVerificationTypeFromJSON(json['verification']),
         'holdersCount': json['holders_count'],
-        'score': json['score'] == null ? undefined : json['score'],
     };
 }
 
-  export function JettonInfoToJSON(json: any): JettonInfo {
-      return JettonInfoToJSONTyped(json, false);
-  }
+export function JettonInfoToJSON(json: any): JettonInfo {
+    return JettonInfoToJSONTyped(json, false);
+}
 
-  export function JettonInfoToJSONTyped(value?: JettonInfo | null, ignoreDiscriminator: boolean = false): any {
+export function JettonInfoToJSONTyped(value?: JettonInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -145,7 +138,6 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'preview': value['preview'],
         'verification': JettonVerificationTypeToJSON(value['verification']),
         'holders_count': value['holdersCount'],
-        'score': value['score'],
     };
 }
 

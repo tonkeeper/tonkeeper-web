@@ -80,11 +80,11 @@ export function MethodExecutionResultFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function MethodExecutionResultToJSON(json: any): MethodExecutionResult {
-      return MethodExecutionResultToJSONTyped(json, false);
-  }
+export function MethodExecutionResultToJSON(json: any): MethodExecutionResult {
+    return MethodExecutionResultToJSONTyped(json, false);
+}
 
-  export function MethodExecutionResultToJSONTyped(value?: MethodExecutionResult | null, ignoreDiscriminator: boolean = false): any {
+export function MethodExecutionResultToJSONTyped(value?: MethodExecutionResult | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

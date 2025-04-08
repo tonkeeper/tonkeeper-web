@@ -57,11 +57,11 @@ export function GetMarketsRates200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function GetMarketsRates200ResponseToJSON(json: any): GetMarketsRates200Response {
-      return GetMarketsRates200ResponseToJSONTyped(json, false);
-  }
+export function GetMarketsRates200ResponseToJSON(json: any): GetMarketsRates200Response {
+    return GetMarketsRates200ResponseToJSONTyped(json, false);
+}
 
-  export function GetMarketsRates200ResponseToJSONTyped(value?: GetMarketsRates200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetMarketsRates200ResponseToJSONTyped(value?: GetMarketsRates200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

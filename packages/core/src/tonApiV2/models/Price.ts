@@ -57,11 +57,11 @@ export function PriceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Pri
     };
 }
 
-  export function PriceToJSON(json: any): Price {
-      return PriceToJSONTyped(json, false);
-  }
+export function PriceToJSON(json: any): Price {
+    return PriceToJSONTyped(json, false);
+}
 
-  export function PriceToJSONTyped(value?: Price | null, ignoreDiscriminator: boolean = false): any {
+export function PriceToJSONTyped(value?: Price | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

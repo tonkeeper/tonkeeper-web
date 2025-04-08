@@ -57,11 +57,11 @@ export function MultisigsFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function MultisigsToJSON(json: any): Multisigs {
-      return MultisigsToJSONTyped(json, false);
-  }
+export function MultisigsToJSON(json: any): Multisigs {
+    return MultisigsToJSONTyped(json, false);
+}
 
-  export function MultisigsToJSONTyped(value?: Multisigs | null, ignoreDiscriminator: boolean = false): any {
+export function MultisigsToJSONTyped(value?: Multisigs | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

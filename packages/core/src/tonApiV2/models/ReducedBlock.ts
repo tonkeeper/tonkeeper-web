@@ -104,11 +104,11 @@ export function ReducedBlockFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function ReducedBlockToJSON(json: any): ReducedBlock {
-      return ReducedBlockToJSONTyped(json, false);
-  }
+export function ReducedBlockToJSON(json: any): ReducedBlock {
+    return ReducedBlockToJSONTyped(json, false);
+}
 
-  export function ReducedBlockToJSONTyped(value?: ReducedBlock | null, ignoreDiscriminator: boolean = false): any {
+export function ReducedBlockToJSONTyped(value?: ReducedBlock | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

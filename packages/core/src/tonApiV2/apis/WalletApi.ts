@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   Accounts,
+  InlineObject,
   Seqno,
   TonConnectProof200Response,
   TonConnectProofRequest,
@@ -23,6 +24,8 @@ import type {
 import {
     AccountsFromJSON,
     AccountsToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     SeqnoFromJSON,
     SeqnoToJSON,
     TonConnectProof200ResponseFromJSON,

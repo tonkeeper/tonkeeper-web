@@ -55,8 +55,6 @@ export * from './IOSBatteryPurchaseStatus';
 export * from './IOSBatteryPurchaseStatusTransactionsInner';
 export * from './IOSBatteryPurchaseStatusTransactionsInnerError';
 export * from './ImagePreview';
-export * from './InscriptionMintAction';
-export * from './InscriptionTransferAction';
 export * from './IosBatteryPurchaseRequest';
 export * from './IosBatteryPurchaseRequestTransactionsInner';
 export * from './JettonBurnAction';

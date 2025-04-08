@@ -69,9 +69,12 @@ export const CopyNotification: FC<{ hideSimpleCopyNotifications?: boolean }> = R
 
                 setText(options.params ?? t('copied'));
                 setOpen(true);
-                timer = setTimeout(() => {
-                    setOpen(false);
-                }, 2000);
+                timer = setTimeout(
+                    () => {
+                        setOpen(false);
+                    },
+                    options.params ? 5000 : 2000
+                );
             };
             sdk.uiEvents.on('copy', handler);
             return () => {

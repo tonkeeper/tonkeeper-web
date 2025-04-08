@@ -49,11 +49,11 @@ export function RawBlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function RawBlockchainConfigToJSON(json: any): RawBlockchainConfig {
-      return RawBlockchainConfigToJSONTyped(json, false);
-  }
+export function RawBlockchainConfigToJSON(json: any): RawBlockchainConfig {
+    return RawBlockchainConfigToJSONTyped(json, false);
+}
 
-  export function RawBlockchainConfigToJSONTyped(value?: RawBlockchainConfig | null, ignoreDiscriminator: boolean = false): any {
+export function RawBlockchainConfigToJSONTyped(value?: RawBlockchainConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

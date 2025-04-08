@@ -57,11 +57,11 @@ export function BlockchainConfig21FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function BlockchainConfig21ToJSON(json: any): BlockchainConfig21 {
-      return BlockchainConfig21ToJSONTyped(json, false);
-  }
+export function BlockchainConfig21ToJSON(json: any): BlockchainConfig21 {
+    return BlockchainConfig21ToJSONTyped(json, false);
+}
 
-  export function BlockchainConfig21ToJSONTyped(value?: BlockchainConfig21 | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainConfig21ToJSONTyped(value?: BlockchainConfig21 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

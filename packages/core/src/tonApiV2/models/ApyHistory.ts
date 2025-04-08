@@ -57,11 +57,11 @@ export function ApyHistoryFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function ApyHistoryToJSON(json: any): ApyHistory {
-      return ApyHistoryToJSONTyped(json, false);
-  }
+export function ApyHistoryToJSON(json: any): ApyHistory {
+    return ApyHistoryToJSONTyped(json, false);
+}
 
-  export function ApyHistoryToJSONTyped(value?: ApyHistory | null, ignoreDiscriminator: boolean = false): any {
+export function ApyHistoryToJSONTyped(value?: ApyHistory | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -157,6 +157,10 @@ const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
     background-color: transparent;
     width: 100%;
     margin-top: -24px;
+
+    > * {
+        border-top: none !important;
+    }
 `;
 
 const ConnectContent: FC<{
@@ -169,15 +173,20 @@ const ConnectContent: FC<{
 
     const { t } = useTranslation();
 
-    const { data: availableSendersChoices } = useTonConnectAvailableSendersChoices(params);
+    const { data: availableSendersChoices, isLoading: isChoicesLoading } =
+        useTonConnectAvailableSendersChoices(params);
     const [selectedSenderType, onSenderTypeChange] = useState<SenderChoiceUserAvailable['type']>(
         EXTERNAL_SENDER_CHOICE.type
     );
     useEffect(() => {
-        if (availableSendersChoices && availableSendersChoices[0]) {
+        if (
+            availableSendersChoices &&
+            availableSendersChoices[0] &&
+            availableSendersChoices[0].type !== selectedSenderType
+        ) {
             onSenderTypeChange(availableSendersChoices[0].type);
         }
-    }, [availableSendersChoices]);
+    }, [JSON.stringify(availableSendersChoices)]);
 
     const senderChoice: SenderChoice = useMemo(() => {
         if (selectedSenderType === BATTERY_SENDER_CHOICE.type) {
@@ -188,15 +197,21 @@ const ConnectContent: FC<{
             return EXTERNAL_SENDER_CHOICE;
         }
 
+        if (selectedSenderType === 'gasless') {
+            return (
+                availableSendersChoices?.find(s => s.type === 'gasless') || EXTERNAL_SENDER_CHOICE
+            );
+        }
+
         throw new Error('Unexpected sender choice');
-    }, [selectedSenderType]);
+    }, [selectedSenderType, availableSendersChoices]);
 
     const {
         data: estimate,
         isLoading: isEstimating,
         isError,
         error
-    } = useEstimation(params, senderChoice, { multisigTTL });
+    } = useEstimation(params, senderChoice, { multisigTTL, paramsLoading: isChoicesLoading });
     const {
         mutateAsync,
         isLoading,
@@ -300,7 +315,7 @@ const ConnectContent: FC<{
 const useEstimation = (
     params: TonConnectTransactionPayload,
     senderChoice: SenderChoice,
-    options: { multisigTTL?: MultisigOrderLifetimeMinutes }
+    options: { multisigTTL?: MultisigOrderLifetimeMinutes; paramsLoading?: boolean }
 ) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
@@ -337,7 +352,7 @@ const useEstimation = (
 
             return result;
         },
-        { enabled: !!getSender }
+        { enabled: !!getSender && options?.paramsLoading !== true }
     );
 };
 

@@ -89,11 +89,11 @@ export function StorageProviderFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function StorageProviderToJSON(json: any): StorageProvider {
-      return StorageProviderToJSONTyped(json, false);
-  }
+export function StorageProviderToJSON(json: any): StorageProvider {
+    return StorageProviderToJSONTyped(json, false);
+}
 
-  export function StorageProviderToJSONTyped(value?: StorageProvider | null, ignoreDiscriminator: boolean = false): any {
+export function StorageProviderToJSONTyped(value?: StorageProvider | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

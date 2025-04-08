@@ -57,11 +57,11 @@ export function GetRates200ResponseFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function GetRates200ResponseToJSON(json: any): GetRates200Response {
-      return GetRates200ResponseToJSONTyped(json, false);
-  }
+export function GetRates200ResponseToJSON(json: any): GetRates200Response {
+    return GetRates200ResponseToJSONTyped(json, false);
+}
 
-  export function GetRates200ResponseToJSONTyped(value?: GetRates200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetRates200ResponseToJSONTyped(value?: GetRates200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

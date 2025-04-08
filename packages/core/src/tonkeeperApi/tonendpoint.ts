@@ -99,6 +99,11 @@ export interface TonendpointConfig {
     tron_api_url?: string;
 }
 
+interface CountryIP {
+    ip: string;
+    country: string;
+}
+
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';
 
 export const defaultTonendpointConfig: TonendpointConfig = {
@@ -179,6 +184,14 @@ export class Tonendpoint {
         return response.json();
     };
 
+    country = async (): Promise<CountryIP> => {
+        const response = await this.fetchApi(`https://boot.tonkeeper.com/my/ip`, {
+            method: 'GET'
+        });
+
+        return response.json();
+    };
+
     GET = async <Data>(
         path: string,
         rewriteParams?: Partial<BootParams>,
@@ -199,12 +212,12 @@ export class Tonendpoint {
         return result.data;
     };
 
-    getFiatMethods = (countryCode?: string | null | undefined): Promise<TonendpoinFiatMethods> => {
-        return this.GET('/fiat/methods', { countryCode });
+    getFiatMethods = (): Promise<TonendpoinFiatMethods> => {
+        return this.GET('/fiat/methods');
     };
 
-    getAppsPopular = (countryCode?: string | null | undefined): Promise<Recommendations> => {
-        return this.GET('/apps/popular', { countryCode }, { track: this.getTrack() });
+    getAppsPopular = (): Promise<Recommendations> => {
+        return this.GET('/apps/popular', {}, { track: this.getTrack() });
     };
 
     getTrack = (): DAppTrack => {

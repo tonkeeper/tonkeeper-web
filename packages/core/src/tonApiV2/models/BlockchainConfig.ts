@@ -573,11 +573,11 @@ export function BlockchainConfigFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function BlockchainConfigToJSON(json: any): BlockchainConfig {
-      return BlockchainConfigToJSONTyped(json, false);
-  }
+export function BlockchainConfigToJSON(json: any): BlockchainConfig {
+    return BlockchainConfigToJSONTyped(json, false);
+}
 
-  export function BlockchainConfigToJSONTyped(value?: BlockchainConfig | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainConfigToJSONTyped(value?: BlockchainConfig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

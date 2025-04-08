@@ -49,11 +49,11 @@ export function DomainNamesFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function DomainNamesToJSON(json: any): DomainNames {
-      return DomainNamesToJSONTyped(json, false);
-  }
+export function DomainNamesToJSON(json: any): DomainNames {
+    return DomainNamesToJSONTyped(json, false);
+}
 
-  export function DomainNamesToJSONTyped(value?: DomainNames | null, ignoreDiscriminator: boolean = false): any {
+export function DomainNamesToJSONTyped(value?: DomainNames | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

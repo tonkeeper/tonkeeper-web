@@ -65,11 +65,11 @@ export function AccountEventsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function AccountEventsToJSON(json: any): AccountEvents {
-      return AccountEventsToJSONTyped(json, false);
-  }
+export function AccountEventsToJSON(json: any): AccountEvents {
+    return AccountEventsToJSONTyped(json, false);
+}
 
-  export function AccountEventsToJSONTyped(value?: AccountEvents | null, ignoreDiscriminator: boolean = false): any {
+export function AccountEventsToJSONTyped(value?: AccountEvents | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
