@@ -54,6 +54,7 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
 const TokensPageBody = styled.div`
     padding: 0 1rem 1rem;
     position: relative;
+    height: 100%;
     ${p =>
         p.theme.proDisplayType === 'mobile'
             ? css`
