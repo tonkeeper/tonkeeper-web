@@ -155,7 +155,8 @@ export const tonConnectTransaction = async (
         id,
         logo: await getActiveTabLogo(),
         origin,
-        data
+        data,
+        manifest: connection.connection.manifest
     });
 
     try {
@@ -200,7 +201,8 @@ export const tonConnectSignData = async (
         id,
         logo: await getActiveTabLogo(),
         origin,
-        data
+        data,
+        manifest: connection.connection.manifest
     });
 
     try {
