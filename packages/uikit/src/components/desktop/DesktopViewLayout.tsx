@@ -84,7 +84,7 @@ export const DesktopViewPageLayout = forwardRef<
                 }
             });
         }
-    }, []);
+    }, [ref]);
 
     if (platform === 'mobile') {
         return (
