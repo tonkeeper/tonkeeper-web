@@ -1,6 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import styled, { css } from 'styled-components';
 import { fallbackRenderOver } from '../../components/Error';
@@ -54,15 +54,11 @@ const AnyChainAssetStyled = styled(AnyChainAsset)`
 const TokensPageBody = styled.div`
     padding: 0 1rem 1rem;
     position: relative;
-    height: 100%;
     ${p =>
-        p.theme.proDisplayType === 'mobile'
-            ? css`
-                  overflow-x: hidden;
-                  overflow-y: auto;
-                  padding-bottom: 0;
-              `
-            : 'overflow: hidden'};
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding-bottom: 0;
+        `};
 
     .highlight-asset {
         background-color: ${p => p.theme.backgroundContentTint};
@@ -116,10 +112,8 @@ const DesktopTokensPayload = () => {
     const { mutate } = useMutateUserUIPreferences();
     const [showChart, setShowChart] = useState(true);
     const tonRef = useRef<HTMLDivElement | null>(null);
-    const desktopContainerRef = useRef<HTMLDivElement | null>(null);
-    const mobileContainerRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
     const env = useAppTargetEnv();
-    const containerRef = env === 'mobile' ? mobileContainerRef : desktopContainerRef;
 
     useLayoutEffect(() => {
         if (uiPreferences?.showTokensChart !== undefined) {
@@ -173,8 +167,15 @@ const DesktopTokensPayload = () => {
         [assets, rowVirtualizer, rowVirtualizer.elementsCache, env]
     );
 
+    /**
+     * Cover Ionic virtualisation bug
+     */
+    useEffect(() => {
+        rowVirtualizer.measure();
+    }, []);
+
     return (
-        <DesktopViewPageLayout ref={desktopContainerRef}>
+        <DesktopViewPageLayout ref={containerRef}>
             <DesktopViewHeader borderBottom>
                 <DesktopViewHeaderContent
                     title={t('jettons_list_title')}
@@ -205,7 +206,6 @@ const DesktopTokensPayload = () => {
                 style={{
                     height: `${rowVirtualizer.getTotalSize()}px`
                 }}
-                ref={mobileContainerRef}
             >
                 {tonAssetAmount && assets && distribution && uiPreferences && (
                     <>
