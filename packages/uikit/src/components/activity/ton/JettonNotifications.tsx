@@ -27,6 +27,7 @@ import {
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 import { useActiveWallet } from '../../../state/wallet';
+import { sanitizeJetton } from '../../../libs/common';
 
 const JettonTransferActionContent: FC<{
     jettonTransfer: JettonTransferAction;
@@ -34,7 +35,7 @@ const JettonTransferActionContent: FC<{
     event: AccountEvent;
     isScam: boolean;
     status?: ActionStatusEnum;
-}> = ({ jettonTransfer, timestamp, event, isScam, status }) => {
+}> = ({ jettonTransfer, timestamp, event, isScam: isScamEvent, status }) => {
     const wallet = useActiveWallet();
     const { data } = useRate(Address.parse(jettonTransfer.jetton.address).toString());
     const { fiatAmount } = useFormatFiat(
@@ -43,14 +44,15 @@ const JettonTransferActionContent: FC<{
     );
     const blacklist = jettonTransfer.jetton.verification === 'blacklist';
     const kind = jettonTransfer.sender?.address === wallet.rawAddress ? 'send' : 'received';
+    const isScam = isScamEvent || blacklist;
 
     return (
         <ActionDetailsBlock event={event}>
             <ActivityDetailsHeader
-                isScam={isScam || blacklist}
+                isScam={isScam}
                 amount={jettonTransfer.amount}
                 decimals={jettonTransfer.jetton.decimals}
-                symbol={jettonTransfer.jetton.symbol}
+                symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind={kind}
@@ -172,12 +174,13 @@ const JettonMintActionContent: FC<{
     event: AccountEvent;
     isScam: boolean;
     status?: ActionStatusEnum;
-}> = ({ jettonMint, timestamp, event, isScam, status }) => {
+}> = ({ jettonMint, timestamp, event, isScam: isScamEvent, status }) => {
     const { data } = useRate(Address.parse(jettonMint.jetton.address).toString());
     const { fiatAmount } = useFormatFiat(
         data,
         formatDecimals(jettonMint.amount, jettonMint.jetton.decimals)
     );
+    const isScam = isScamEvent || jettonMint.jetton.verification === 'blacklist';
 
     return (
         <ActionDetailsBlock event={event}>
@@ -185,7 +188,7 @@ const JettonMintActionContent: FC<{
                 isScam={isScam}
                 amount={jettonMint.amount}
                 decimals={jettonMint.jetton.decimals}
-                symbol={jettonMint.jetton.symbol}
+                symbol={sanitizeJetton(jettonMint.jetton.symbol, isScam)}
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind="received"

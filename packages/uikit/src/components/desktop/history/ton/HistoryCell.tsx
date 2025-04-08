@@ -8,6 +8,7 @@ import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
 import { HistoryGridCell, HistoryGridCellFillRow } from './HistoryGrid';
 import { useActiveTonNetwork } from '../../../../state/wallet';
+import { sanitizeJetton } from '../../../../libs/common';
 
 export const HistoryCellAction = styled(HistoryGridCell).attrs({ className: 'grid-area-action' })`
     display: flex;
@@ -191,7 +192,7 @@ export const HistoryCellAmount: FC<{
     return (
         <HistoryCellAmountStyled color={finalColor}>
             {isNegative ? '−' : '+'}&nbsp;
-            {format(amount, decimals)}&nbsp;{symbol}
+            {format(amount, decimals)}&nbsp;{sanitizeJetton(symbol, isSpam)}
         </HistoryCellAmountStyled>
     );
 };

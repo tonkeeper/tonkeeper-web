@@ -373,7 +373,7 @@ async function fetchTonActivity({
     }
 
     if (filterSpam) {
-        tonActivity.events = tonActivity.events.filter(event => !event.isScam);
+        tonActivity.events = tonActivity.events.filter(e => !isScamEvent(e));
     }
 
     if (twoFaPluginAddress) {
@@ -390,6 +390,22 @@ async function fetchTonActivity({
     }
 
     return tonActivity;
+}
+
+function isScamEvent(e: AccountEvent): boolean {
+    if (
+        e.actions.some(
+            a =>
+                a.jettonTransfer?.jetton.verification === 'blacklist' ||
+                a.jettonMint?.jetton.verification === 'blacklist' ||
+                a.jettonSwap?.jettonMasterIn?.verification === 'blacklist' ||
+                a.jettonSwap?.jettonMasterOut?.verification === 'blacklist'
+        )
+    ) {
+        return true;
+    }
+
+    return e.isScam;
 }
 
 export type CategorizedActivityItemSingle = {

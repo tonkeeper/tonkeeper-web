@@ -82,6 +82,7 @@ const UnverifiedNftComment = styled(Body2)`
 `;
 
 const SpamNftPlaceholder = styled(Body2)`
+    text-align: right;
     color: ${p => p.theme.textTertiary};
 `;
 
