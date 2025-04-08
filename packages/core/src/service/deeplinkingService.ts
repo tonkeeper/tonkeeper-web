@@ -201,9 +201,9 @@ export async function parseTonTransaction(
             };
         }
 
-        const stateInit = undefined;
+        let stateInit = undefined;
         if (data.query.init && typeof data.query.init === 'string') {
-            payload = data.query.init;
+            stateInit = data.query.init;
         }
 
         const params = {
