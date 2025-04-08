@@ -3,7 +3,6 @@ import {
     DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Body2Class } from '../../components/Text';
 import { ConnectedAppsList } from '../../components/connected-apps/ConnectedAppsList';
 import { styled } from 'styled-components';
 import {
@@ -20,23 +19,8 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
 `;
 
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
-    padding-right: 0;
-`;
-
 const ConnectedAppsListStyled = styled(ConnectedAppsList)`
     flex: 1;
-`;
-
-const DisconnectAllButton = styled.button`
-    border: none;
-    outline: none;
-    background: transparent;
-
-    color: ${p => p.theme.accentBlue};
-    padding: 4px 15px;
-    ${Body2Class};
-    margin-left: auto;
 `;
 
 export const DesktopConnectedAppsSettings = () => {
@@ -56,18 +40,24 @@ export const DesktopConnectedAppsSettings = () => {
 
     return (
         <DesktopViewPageLayoutStyled>
-            <DesktopViewHeaderStyled backButton>
+            <DesktopViewHeader backButton>
                 <DesktopViewHeaderContent
                     title={t('settings_connected_apps')}
                     right={
-                        showDisconnectAll && (
-                            <DisconnectAllButton onClick={onOpen}>
-                                {t('disconnect_all_apps')}
-                            </DisconnectAllButton>
+                        (showDisconnectAll || true) && (
+                            <DesktopViewHeaderContent.Right>
+                                <DesktopViewHeaderContent.RightItem
+                                    asDesktopButton
+                                    onClick={onOpen}
+                                    closeDropDownOnClick
+                                >
+                                    {t('disconnect_all_apps')}
+                                </DesktopViewHeaderContent.RightItem>
+                            </DesktopViewHeaderContent.Right>
                         )
                     }
                 />
-            </DesktopViewHeaderStyled>
+            </DesktopViewHeader>
             <ConnectedAppsListStyled />
             <ConfirmDisconnectNotification
                 isOpen={isOpen}
