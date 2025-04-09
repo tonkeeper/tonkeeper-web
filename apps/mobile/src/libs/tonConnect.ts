@@ -3,22 +3,24 @@ import { CapacitorStorage } from './storage';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { App } from '@capacitor/app';
+import { isSignerLink } from '@tonkeeper/uikit/dist/state/signer';
 
 export const tonConnectSSE = new TonConnectSSE({
-  storage: new CapacitorStorage(),
-  listeners: {
-    onDisconnect: connection => {
-      onDisconnectListeners.forEach(listener => listener(connection));
-    },
-    onRequest: params => {
-      onTonConnectRequestListeners.forEach(listener => listener(params));
+    storage: new CapacitorStorage(),
+    listeners: {
+        onDisconnect: connection => {
+            onDisconnectListeners.forEach(listener => listener(connection));
+        },
+        onRequest: params => {
+            onTonConnectRequestListeners.forEach(listener => listener(params));
+        }
     }
-  }
 });
 
 let onTonOrTonConnectUrlOpened: ((url: string) => void)[] = [];
 let onDisconnectListeners: ((connection: AccountConnection) => void)[] = [];
 let onTonConnectRequestListeners: ((value: TonConnectAppRequestPayload) => void)[] = [];
+let onSignerUrlOpened: ((url: string) => void)[] = [];
 
 export const subscribeToTonConnectDisconnect = (
     listener: (connection: AccountConnection) => void
@@ -45,10 +47,21 @@ export const subscribeToTonOrTonConnectUrlOpened = (listener: (url: string) => v
     };
 };
 
+export const subscribeToSignerUrlOpened = (listener: (url: string) => void) => {
+    onSignerUrlOpened.push(listener);
+    return () => {
+        onSignerUrlOpened = onSignerUrlOpened.filter(l => l !== listener);
+    };
+};
+
 App.addListener('appUrlOpen', ({ url }) => {
     if (url) {
         console.info('Received URL:', url);
-        onTonOrTonConnectUrlOpened.forEach(listener => listener(url));
+        if (isSignerLink(url)) {
+            onSignerUrlOpened.forEach(listener => listener(url));
+        } else {
+            onTonOrTonConnectUrlOpened.forEach(listener => listener(url));
+        }
     }
 });
 

@@ -6,11 +6,29 @@ import {
     useGetConnectInfo
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
-import { subscribeToTonOrTonConnectUrlOpened, tonConnectSSE } from '../../libs/tonConnect';
+import {
+    subscribeToSignerUrlOpened,
+    subscribeToTonOrTonConnectUrlOpened,
+    tonConnectSSE
+} from '../../libs/tonConnect';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useParseAndAddSigner } from '@tonkeeper/uikit/dist/state/wallet';
+import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
+
+export const useMobileProPairSignerSubscription = () => {
+    const { mutateAsync } = useParseAndAddSigner();
+    const { onOpen } = useRenameNotification();
+    useEffect(() => {
+        return subscribeToSignerUrlOpened(link => {
+            mutateAsync({ link, source: 'deeplink' }).then(acc => onOpen({ accountId: acc.id }));
+        });
+    }, []);
+};
 
 export const DeepLinkSubscription = () => {
+    useMobileProPairSignerSubscription();
+
     const [params, setParams] = useState<TonConnectParams | null>(null);
 
     const { mutateAsync, reset } = useGetConnectInfo();

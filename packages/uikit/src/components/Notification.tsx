@@ -248,14 +248,10 @@ const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
 
             transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.9);
 
-            ${
-                p.theme.proDisplayType === 'desktop' &&
-                css`
-                    &:empty {
-                        padding-bottom: 1rem;
-                    }
-                `
+            &:empty {
+                padding-bottom: ${p => (p.theme.proDisplayType === 'desktop' ? '1rem' : '0')};
             }
+            
         }
         `}
 `;

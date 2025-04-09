@@ -9,6 +9,7 @@ import {
     AccountsState,
     AccountTonMnemonic,
     AccountTonMultisig,
+    AccountTonOnly,
     AccountTonSK,
     AccountTonTestnet,
     AccountTonWatchOnly,
@@ -39,6 +40,7 @@ import {
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import {
+    accountBySignerLink,
     createMAMAccountByMnemonic,
     createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
@@ -50,6 +52,7 @@ import {
     getTonWalletStandard,
     getWalletAddress,
     mamAccountToMamAccountWithTron,
+    parseSignerLink,
     standardTonAccountToAccountWithTron,
     tronWalletByTonMnemonic
 } from '@tonkeeper/core/dist/service/walletService';
@@ -73,6 +76,9 @@ import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { useIsTronEnabledGlobally } from './tron/tron';
+import { useNavigate } from '../hooks/router/useNavigate';
+import { AppRoute } from '../libs/routes';
+import { isSignerLink } from './signer';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -742,6 +748,60 @@ export const useCreateAccountMAM = () => {
             await selectAccountMutation(account.id);
         }
         return { account, childrenMnemonics };
+    });
+};
+
+export const useParseAndAddSigner = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync } = useAddSignerWallet();
+    return useMutation<AccountTonOnly, Error, { link: string; source: 'qr' | 'deeplink' }>(
+        async ({ link, source }) => {
+            try {
+                if (source === 'qr' && !isSignerLink(link)) {
+                    throw new Error('Unexpected QR code');
+                }
+
+                const parsed = parseSignerLink(link);
+                return await mutateAsync({ ...parsed, source });
+            } catch (e) {
+                if (e instanceof Error) sdk.alert(e.message);
+                throw e;
+            }
+        }
+    );
+};
+
+export const useAddSignerWallet = () => {
+    const sdk = useAppSdk();
+    const accountsStorage = useAccountsStorage();
+    const client = useQueryClient();
+    const context = useAppContext();
+    const navigate = useNavigate();
+
+    return useMutation<
+        AccountTonOnly,
+        Error,
+        { publicKey: string | null; name: string | null; source: 'qr' | 'deeplink' }
+    >(async ({ publicKey, name, source }) => {
+        if (publicKey === null) {
+            sdk.topMessage('Missing public key');
+            navigate(AppRoute.home);
+            throw new Error('Missing public key');
+        }
+
+        const newAccount = await accountBySignerLink(
+            context,
+            Network.MAINNET,
+            sdk.storage,
+            publicKey,
+            name,
+            source === 'deeplink' ? 'signer-deeplink' : 'signer'
+        );
+        await accountsStorage.addAccountToState(newAccount);
+        await accountsStorage.setActiveAccountId(newAccount.id);
+        await client.invalidateQueries([QueryKey.account]);
+        navigate(AppRoute.home);
+        return newAccount;
     });
 };
 
