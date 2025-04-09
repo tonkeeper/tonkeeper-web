@@ -59,7 +59,7 @@ const Divider = styled.div`
 `;
 
 const MenuWrapper = styled.div`
-    margin: 0 8px 36px;
+    margin: 0 8px;
     border-radius: ${p => p.theme.corner2xSmall};
     background-color: ${p => p.theme.backgroundContent};
 `;

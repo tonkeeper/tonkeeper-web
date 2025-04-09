@@ -55,7 +55,7 @@ const DesktopViewPageLayoutSimpleIonic = styled.div<{ $mobileContentPaddingTop?:
         position: relative;
         display: block;
         content: '';
-        height: 72px;
+        height: calc(64px + 8px + env(safe-area-inset-bottom));
         background: transparent;
     }
 `;
