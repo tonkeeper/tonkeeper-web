@@ -74,6 +74,9 @@ export const toErrorMessage = (e: unknown) => {
     return 'Unknown error';
 };
 
-export function sanitizeJetton(name: string, isScam: boolean | undefined) {
+export function sanitizeJetton(name: string | undefined, isScam: boolean | undefined) {
+    if (!name) {
+        return '';
+    }
     return isScam ? 'FAKE' : name;
 }

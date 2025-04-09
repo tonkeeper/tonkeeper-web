@@ -228,7 +228,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
     };
 
     return (
-        <ListBlockDesktopAdaptive>
+        <ListBlockDesktopAdaptive margin={false}>
             {multisigAccounts.map(item => (
                 <ListItem hover={false} key={item.address}>
                     <ListItemPayload>

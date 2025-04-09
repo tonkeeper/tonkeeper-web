@@ -107,9 +107,13 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
             result.push(`${format(jettonSwap.tonIn)} ${CryptoCurrency.TON}`);
         } else {
             result.push(
-                `${format(jettonSwap.amountIn, jettonSwap.jettonMasterIn?.decimals)} ${
-                    jettonSwap.jettonMasterIn?.symbol
-                }`
+                `${format(
+                    jettonSwap.amountIn,
+                    jettonSwap.jettonMasterIn?.decimals
+                )} ${sanitizeJetton(
+                    jettonSwap.jettonMasterIn?.symbol,
+                    jettonSwap.jettonMasterOut?.verification === 'blacklist'
+                )}`
             );
         }
 
@@ -117,9 +121,13 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
             result.push(`${format(jettonSwap.tonOut)} ${CryptoCurrency.TON}`);
         } else {
             result.push(
-                `${format(jettonSwap.amountOut, jettonSwap.jettonMasterOut?.decimals)} ${
-                    jettonSwap.jettonMasterOut?.symbol
-                }`
+                `${format(
+                    jettonSwap.amountOut,
+                    jettonSwap.jettonMasterOut?.decimals
+                )} ${sanitizeJetton(
+                    jettonSwap.jettonMasterOut?.symbol,
+                    jettonSwap.jettonMasterOut?.verification === 'blacklist'
+                )}`
             );
         }
         return result;

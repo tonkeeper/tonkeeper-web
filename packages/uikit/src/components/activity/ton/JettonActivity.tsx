@@ -43,7 +43,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
         return (
             <SendActivityAction
                 amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-                symbol={jettonTransfer.jetton.symbol}
+                symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
                 recipient={
                     jettonTransfer.recipient?.name ??
                     toShortValue(
@@ -64,7 +64,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
     return (
         <ReceiveActivityAction
             amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-            symbol={jettonTransfer.jetton.symbol}
+            symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
             sender={
                 jettonTransfer.sender?.name ??
                 toShortValue(
