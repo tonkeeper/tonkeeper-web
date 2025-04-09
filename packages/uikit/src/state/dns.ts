@@ -5,9 +5,10 @@ import { useQuery } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfInvalidDns } from '../components/transfer/RecipientView';
+import { useActiveApi } from './wallet';
 
 export const useResolveDns = (value: string) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
 
     const [name, setName] = useState('');
 

@@ -11,7 +11,7 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useMutateActiveTonWallet } from '../../../state/wallet';
+import { useActiveWallet, useMutateActiveTonWallet } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -30,6 +30,7 @@ import { AsideMenuAccount } from './AsideMenuAccount';
 import { AsideMenuFolder } from './AsideMenuFolder';
 
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -106,7 +107,7 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
     cursor: pointer !important;
     border-radius: ${p => p.theme.corner2xSmall};
     overflow: hidden;
-    transition: background-color 0.15s ease-in-out;
+    transition: background-color 0.1s ease-in-out;
     ${p =>
         p.$isDragging &&
         css`
@@ -124,26 +125,41 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
         `}
 `;
 
+const shouldNavigateHome = (pathname: string) => {
+    const navigateHomeFromRoutes = [
+        AppProRoute.dashboard,
+        AppRoute.settings,
+        AppRoute.browser,
+        AppRoute.accountSettings
+    ];
+    return navigateHomeFromRoutes.some(path => pathname.startsWith(path));
+};
+
 export const AsideMenuDNDItem = forwardRef<
     HTMLDivElement,
     {
         item: Account | AccountsFolder;
-        mightBeHighlighted: boolean;
         isDragging: boolean;
     } & DraggableProvidedDraggableProps
->(({ item, mightBeHighlighted, isDragging, ...rest }, fRef) => {
+>(({ item, isDragging, ...rest }, fRef) => {
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
     const navigate = useNavigate();
     const location = useLocation();
 
+    const activeRoute = useAsideActiveRoute();
+    const [optimisticActiveRoute, setOptimisticActiveRoute] = useState(activeRoute);
+    useEffect(() => {
+        setOptimisticActiveRoute(activeRoute);
+    }, [activeRoute]);
+
+    const activeWalletId = useActiveWallet().id;
+    const [optimisticWalletId, setOptimisticWalletId] = useState(activeWalletId);
+    useEffect(() => {
+        setOptimisticWalletId(activeWalletId);
+    }, [activeWalletId]);
+
     const handleNavigateHome = useCallback(() => {
-        const navigateHomeFromRoutes = [
-            AppProRoute.dashboard,
-            AppRoute.settings,
-            AppRoute.browser,
-            AppRoute.accountSettings
-        ];
-        if (navigateHomeFromRoutes.some(path => location.pathname.startsWith(path))) {
+        if (shouldNavigateHome(location.pathname)) {
             return navigate(AppRoute.home);
         } else {
             scrollToTop();
@@ -151,8 +167,14 @@ export const AsideMenuDNDItem = forwardRef<
     }, [location.pathname]);
 
     const onClickWallet = useCallback(
-        (walletId: WalletId) => setActiveWallet(walletId).then(handleNavigateHome),
-        [setActiveWallet, handleNavigateHome]
+        (walletId: WalletId) => {
+            if (shouldNavigateHome(location.pathname)) {
+                setOptimisticActiveRoute(undefined);
+            }
+            setOptimisticWalletId(walletId);
+            setActiveWallet(walletId).then(handleNavigateHome);
+        },
+        [setActiveWallet, handleNavigateHome, location.pathname]
     );
 
     if (!item) {
@@ -165,13 +187,15 @@ export const AsideMenuDNDItem = forwardRef<
                 <AsideMenuFolder
                     folder={item}
                     onClickWallet={onClickWallet}
-                    accountMightBeHighlighted={mightBeHighlighted}
+                    accountMightBeHighlighted={!isDragging && !optimisticActiveRoute}
+                    selectedWalletId={optimisticWalletId}
                 />
             ) : (
                 <AsideMenuAccount
                     account={item}
-                    mightBeHighlighted={mightBeHighlighted}
+                    mightBeHighlighted={!isDragging && !optimisticActiveRoute}
                     onClickWallet={onClickWallet}
+                    selectedWalletId={optimisticWalletId}
                 />
             )}
         </DraggingBlock>
@@ -180,8 +204,7 @@ export const AsideMenuDNDItem = forwardRef<
 
 const AccountDNDBlock: FC<{
     items: (Account | AccountsFolder)[];
-    activeRoute: string | undefined;
-}> = ({ activeRoute, items }) => {
+}> = ({ items }) => {
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
     return (
@@ -206,7 +229,6 @@ const AccountDNDBlock: FC<{
                                         <AsideMenuDNDItem
                                             ref={p.innerRef}
                                             item={account}
-                                            mightBeHighlighted={!activeRoute}
                                             isDragging={snapshot.isDragging}
                                             {...p.draggableProps}
                                             {...p.dragHandleProps}
@@ -299,16 +321,18 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_dashboard')}</Label2>
                         </AsideMenuItem>
                     )}
-                    <AsideMenuItem
-                        onClick={() => handleNavigateClick(AppRoute.browser)}
-                        isSelected={activeRoute === AppRoute.browser}
-                    >
-                        <IconWrapper>
-                            <GlobeIcon />
-                        </IconWrapper>
-                        <Label2>{t('aside_discover')}</Label2>
-                    </AsideMenuItem>
-                    <AccountDNDBlock items={items} activeRoute={activeRoute} />
+                    <HideOnReview>
+                        <AsideMenuItem
+                            onClick={() => handleNavigateClick(AppRoute.browser)}
+                            isSelected={activeRoute === AppRoute.browser}
+                        >
+                            <IconWrapper>
+                                <GlobeIcon />
+                            </IconWrapper>
+                            <Label2>{t('aside_discover')}</Label2>
+                        </AsideMenuItem>
+                    </HideOnReview>
+                    <AccountDNDBlock items={items} />
                 </ScrollContainer>
                 <AsideMenuBottom>
                     <DividerStyled isHidden={!closeBottom} />
@@ -329,9 +353,13 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_settings')}</Label2>
                         </AsideMenuItem>
                     </AsideMenuBottomContent>
-                    <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
-                        <SubscriptionInfoBlock />
-                    </ErrorBoundary>
+                    <HideOnReview>
+                        <ErrorBoundary
+                            fallbackRender={fallbackRenderOver('Failed to load Pro State')}
+                        >
+                            <SubscriptionInfoBlock />
+                        </ErrorBoundary>
+                    </HideOnReview>
                 </AsideMenuBottom>
             </AsideContentContainer>
             <AsideResizeHandle

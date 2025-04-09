@@ -7,6 +7,7 @@ import { useTranslation } from '../../hooks/translation';
 import { signTonConnectMnemonicOver } from '../../state/mnemonic';
 import { useSubscribeMutation } from '../../state/subscribe';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 export const Subscribe: FC<{
     wallet: TonContract;
@@ -20,9 +21,12 @@ export const Subscribe: FC<{
         signTonConnectMnemonicOver(mnemonic, mnemonicType),
         onDone
     );
+
+    const isFullWidthMode = useIsFullWidthMode();
+
     return (
         <IconPage
-            skip={onDone}
+            skip={isFullWidthMode ? undefined : onDone}
             icon={<NotificationIcon />}
             title={t('reminder_notifications_title')}
             description={t('reminder_notifications_caption')}

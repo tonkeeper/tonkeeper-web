@@ -17,11 +17,11 @@ const Text = styled.div`
     flex-grow: 1;
 `;
 
-const Image = styled.img`
+const Image = styled.img<{ $noCorners?: boolean }>`
     width: 64px;
     height: 64px;
     flex-shrink: 0;
-    border-radius: 100%;
+    border-radius: ${p => (p.$noCorners ? '0' : '100%')};
 `;
 
 interface CoinProps {
@@ -30,6 +30,7 @@ interface CoinProps {
     price?: string;
     image?: string;
     description?: string;
+    imageNoCorners?: boolean;
 }
 
 export const CoinInfoSkeleton = () => {
@@ -52,7 +53,7 @@ const Title = styled(H2)`
     margin-bottom: 2px;
 `;
 
-export const CoinInfo: FC<CoinProps> = ({ amount, symbol, price, image }) => {
+export const CoinInfo: FC<CoinProps> = ({ amount, symbol, price, image, imageNoCorners }) => {
     return (
         <Block>
             <Text>
@@ -61,7 +62,11 @@ export const CoinInfo: FC<CoinProps> = ({ amount, symbol, price, image }) => {
                 </Title>
                 {price && <Body open>{price}</Body>}
             </Text>
-            {image ? <Image src={image} /> : <SkeletonImage width="64px" />}
+            {image ? (
+                <Image src={image} $noCorners={imageNoCorners} />
+            ) : (
+                <SkeletonImage width="64px" />
+            )}
         </Block>
     );
 };

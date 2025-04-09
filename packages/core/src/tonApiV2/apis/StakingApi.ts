@@ -19,7 +19,7 @@ import type {
   GetStakingPoolHistory200Response,
   GetStakingPoolInfo200Response,
   GetStakingPools200Response,
-  StatusDefaultResponse,
+  InlineObject,
 } from '../models/index';
 import {
     AccountStakingFromJSON,
@@ -30,8 +30,8 @@ import {
     GetStakingPoolInfo200ResponseToJSON,
     GetStakingPools200ResponseFromJSON,
     GetStakingPools200ResponseToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
 } from '../models/index';
 
 export interface GetAccountNominatorsPoolsRequest {

@@ -5,7 +5,6 @@ import { ProSettings } from '../../components/settings/ProSettings';
 import { SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
-import { CountrySettings } from './Country';
 import { DevSettings } from './Dev';
 import { FiatCurrency } from './FiatCurrency';
 import { JettonsSettings } from './Jettons';
@@ -20,6 +19,8 @@ import { SecuritySettings } from './Security';
 import { Settings } from './Settings';
 import { WalletVersionPage } from './Version';
 import { BatteryPage } from './Battery';
+import { TwoFAPage } from './TwoFA';
+import { ChainsPage } from './Chains';
 
 const SettingsRouter = () => {
     return (
@@ -39,11 +40,12 @@ const SettingsRouter = () => {
             <Route path={SettingsRoute.jettons} element={<JettonsSettings />} />
             <Route path={SettingsRoute.nft} element={<NFTSettings />} />
             <Route path={SettingsRoute.security} element={<SecuritySettings />} />
-            <Route path={SettingsRoute.country} element={<CountrySettings />} />
             <Route path={SettingsRoute.pro} element={<ProSettings />} />
             <Route path={WalletSettingsRoute.connectedApps} element={<ConnectedAppsSettings />} />
             <Route path={WalletSettingsRoute.derivations} element={<MAMIndexesPage />} />
             <Route path={WalletSettingsRoute.battery} element={<BatteryPage />} />
+            <Route path={WalletSettingsRoute.twoFa} element={<TwoFAPage />} />
+            <Route path={WalletSettingsRoute.chains} element={<ChainsPage />} />
             <Route
                 path="*"
                 element={

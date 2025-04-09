@@ -80,7 +80,7 @@ export interface NftItem {
      */
     collection?: NftItemCollection;
     /**
-     * 
+     * Collection master contract confirmed that this item is part of collection
      * @type {boolean}
      * @memberof NftItem
      */
@@ -135,8 +135,7 @@ export interface NftItem {
  */
 export const NftItemApprovedByEnum = {
     Getgems: 'getgems',
-    Tonkeeper: 'tonkeeper',
-    TonDiamonds: 'ton.diamonds'
+    Tonkeeper: 'tonkeeper'
 } as const;
 export type NftItemApprovedByEnum = typeof NftItemApprovedByEnum[keyof typeof NftItemApprovedByEnum];
 
@@ -179,11 +178,11 @@ export function NftItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): N
     };
 }
 
-  export function NftItemToJSON(json: any): NftItem {
-      return NftItemToJSONTyped(json, false);
-  }
+export function NftItemToJSON(json: any): NftItem {
+    return NftItemToJSONTyped(json, false);
+}
 
-  export function NftItemToJSONTyped(value?: NftItem | null, ignoreDiscriminator: boolean = false): any {
+export function NftItemToJSONTyped(value?: NftItem | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

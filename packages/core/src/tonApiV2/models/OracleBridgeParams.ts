@@ -81,11 +81,11 @@ export function OracleBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function OracleBridgeParamsToJSON(json: any): OracleBridgeParams {
-      return OracleBridgeParamsToJSONTyped(json, false);
-  }
+export function OracleBridgeParamsToJSON(json: any): OracleBridgeParams {
+    return OracleBridgeParamsToJSONTyped(json, false);
+}
 
-  export function OracleBridgeParamsToJSONTyped(value?: OracleBridgeParams | null, ignoreDiscriminator: boolean = false): any {
+export function OracleBridgeParamsToJSONTyped(value?: OracleBridgeParams | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

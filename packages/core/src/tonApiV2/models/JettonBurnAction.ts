@@ -88,11 +88,11 @@ export function JettonBurnActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function JettonBurnActionToJSON(json: any): JettonBurnAction {
-      return JettonBurnActionToJSONTyped(json, false);
-  }
+export function JettonBurnActionToJSON(json: any): JettonBurnAction {
+    return JettonBurnActionToJSONTyped(json, false);
+}
 
-  export function JettonBurnActionToJSONTyped(value?: JettonBurnAction | null, ignoreDiscriminator: boolean = false): any {
+export function JettonBurnActionToJSONTyped(value?: JettonBurnAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

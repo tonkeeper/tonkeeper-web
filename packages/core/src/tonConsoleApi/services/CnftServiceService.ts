@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -8,11 +8,11 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 export class CnftServiceService {
     /**
-     * Compress NFT config
+     * Get cNFT config
      * @returns any Compress NFT config
      * @throws ApiError
      */
-    public static cnftConfig(): CancelablePromise<{
+    public static getCNftConfig(): CancelablePromise<{
         price_per_nft: number;
     }> {
         return __request(OpenAPI, {
@@ -27,16 +27,16 @@ export class CnftServiceService {
         });
     }
     /**
-     * Get info about compress collection account
+     * Get info about cNFT collection account
      * @param account Account
      * @returns CnftCollection Compress NFT collection
      * @throws ApiError
      */
-    public static getInfoCnftCollectionAccount(
+    public static getInfoCNftCollectionAccount(
         account: string,
     ): CancelablePromise<CnftCollection> {
         return __request(OpenAPI, {
-            method: 'POST',
+            method: 'GET',
             url: '/api/v1/services/cnft/collection/{account}',
             path: {
                 'account': account,
@@ -50,13 +50,13 @@ export class CnftServiceService {
         });
     }
     /**
-     * Indexing compress NFTs
+     * Indexing cNFTs
      * @param projectId Project ID
      * @param requestBody Data that is expected
      * @returns CnftCollection Compress NFT collection
      * @throws ApiError
      */
-    public static indexingCnftCollection(
+    public static indexingCNftCollection(
         projectId: number,
         requestBody?: {
             account: string;
@@ -80,19 +80,19 @@ export class CnftServiceService {
         });
     }
     /**
-     * Get paid compress NFT collections
+     * Get paid cNFT collections
      * @param projectId Project ID
-     * @returns any Paid compress NFT collections
+     * @returns any cNFT collections
      * @throws ApiError
      */
-    public static cnftPaidCollections(
+    public static getPaidCNftCollections(
         projectId: number,
     ): CancelablePromise<{
         items: Array<CnftCollection>;
     }> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/services/cnft/paid/collections',
+            url: '/api/v1/services/cnft/paid',
             query: {
                 'project_id': projectId,
             },

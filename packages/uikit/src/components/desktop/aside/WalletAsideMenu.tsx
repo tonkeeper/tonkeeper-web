@@ -3,7 +3,11 @@ import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useActiveAccount, useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import {
+    useActiveAccount,
+    useActiveTonNetwork,
+    useIsActiveWalletWatchOnly
+} from '../../../state/wallet';
 import {
     BatteryIcon,
     ClockSmoothIcon,
@@ -23,7 +27,12 @@ import {
 } from '../../../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { HideOnReview } from '../../ios/HideOnReview';
+import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
+import { HideForRegulatoryState } from '../../HideForState';
+import { CountryFeature } from '../../../state/country';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -45,6 +54,7 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
     padding-right: 50px;
     height: unset;
+    position: relative;
 
     > svg {
         color: ${p => p.theme.iconSecondary};
@@ -55,6 +65,16 @@ const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
 `;
 
+const HighlightedIcon = styled.div`
+    width: 8px;
+    height: 8px;
+    background-color: ${p => p.theme.accentRed};
+    border-radius: ${p => p.theme.cornerFull};
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 4px);
+`;
+
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
@@ -62,12 +82,17 @@ export const WalletAsideMenu = () => {
     const isMultisig = useIsActiveAccountMultisig();
     const account = useActiveAccount();
     const showMultisigs = isAccountCanManageMultisigs(account);
+    const network = useActiveTonNetwork();
+
+    const isTestnet = network === Network.TESTNET;
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
     const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
     const canUseBattery =
         (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+
+    const highlightTron = useHighlightTronFeatureForActiveWallet();
 
     return (
         <WalletAsideContainer>
@@ -87,6 +112,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
+
             <NavLink to={AppRoute.purchases}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
@@ -95,41 +121,46 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.dns}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                    </AsideMenuItemStyled>
+            <HideOnReview>
+                <NavLink to={AppRoute.dns}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                <HideForRegulatoryState feature={CountryFeature.swap}>
+                    {!isReadOnly && !isTestnet && (
+                        <NavLink to={AppRoute.swap}>
+                            {({ isActive }) => (
+                                <AsideMenuItemStyled isSelected={isActive}>
+                                    <SwapIconStyled />
+                                    <Label2>{t('wallet_swap')}</Label2>
+                                </AsideMenuItemStyled>
+                            )}
+                        </NavLink>
+                    )}
+                </HideForRegulatoryState>
+                {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
+                {showMultisigs && !isTestnet && (
+                    <NavLink to={AppRoute.multisigWallets}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <ListIcon />
+                                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
                 )}
-            </NavLink>
-            {!isReadOnly && (
-                <NavLink to={AppRoute.swap}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <SwapIconStyled />
-                            <Label2>{t('wallet_swap')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
-            {isMultisig && <MultisigOrdersMenuItem />}
-            {showMultisigs && (
-                <NavLink to={AppRoute.multisigWallets}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <ListIcon />
-                            <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            )}
-            {canUseBattery && <BatterySettingsListItem />}
+                {canUseBattery && <BatterySettingsListItem />}
+            </HideOnReview>
             <NavLink to={AppRoute.walletSettings} end>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
+                        {highlightTron && <HighlightedIcon />}
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

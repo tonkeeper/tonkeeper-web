@@ -9,12 +9,17 @@ import { Skeleton } from '../shared/Skeleton';
 import { SwapTransactionInfo } from './SwapTransactionInfo';
 import { SwapRate } from './SwapRate';
 import { useTranslation } from '../../hooks/translation';
+import { FC } from 'react';
 
 const FiledContainerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
     border-radius: ${p =>
         p.theme.displayType === 'full-width' ? p.theme.corner2xSmall : p.theme.cornerSmall};
     padding: 6px 12px;
+
+    &:empty {
+        display: none;
+    }
 `;
 
 const FiledHeader = styled.div`
@@ -73,7 +78,7 @@ const Num2Tertiary = styled(Num2)`
     color: ${p => p.theme.textTertiary};
 `;
 
-export const SwapToField = () => {
+export const SwapToField: FC<{ separateInfo?: boolean }> = ({ separateInfo }) => {
     const { t } = useTranslation();
     const [toAsset, setToAsset] = useSwapToAsset();
     const { isFetching } = useCalculatedSwap();
@@ -81,28 +86,38 @@ export const SwapToField = () => {
     const [selectedSwap] = useSelectedSwap();
 
     return (
-        <FiledContainerStyled>
-            <FiledHeader>
-                <Body3>{t('swap_receive')}</Body3>
-                <SwapToAmountBalance />
-            </FiledHeader>
-            <FieldBody>
-                <SwapTokenSelectStyled token={toAsset} onTokenChange={setToAsset} />
-                <ToAmountField>
-                    {!selectedSwap?.trade && isFetching ? (
-                        <Skeleton width="100px" height="28px" margin="4px 0" />
-                    ) : selectedSwap?.trade ? (
-                        <Num2>{selectedSwap.trade.to.stringRelativeAmount}</Num2>
-                    ) : (
-                        <Num2Tertiary>0</Num2Tertiary>
-                    )}
-                </ToAmountField>
-            </FieldBody>
-            <FieldFooter>
-                <SwapRate />
-                <SwapAmountFiat amount={selectedSwap?.trade?.to.relativeAmount} asset={toAsset} />
-            </FieldFooter>
-            <SwapTransactionInfo />
-        </FiledContainerStyled>
+        <>
+            <FiledContainerStyled>
+                <FiledHeader>
+                    <Body3>{t('swap_receive')}</Body3>
+                    <SwapToAmountBalance />
+                </FiledHeader>
+                <FieldBody>
+                    <SwapTokenSelectStyled token={toAsset} onTokenChange={setToAsset} />
+                    <ToAmountField>
+                        {!selectedSwap?.trade && isFetching ? (
+                            <Skeleton width="100px" height="28px" margin="4px 0" />
+                        ) : selectedSwap?.trade ? (
+                            <Num2>{selectedSwap.trade.to.stringRelativeAmount}</Num2>
+                        ) : (
+                            <Num2Tertiary>0</Num2Tertiary>
+                        )}
+                    </ToAmountField>
+                </FieldBody>
+                <FieldFooter>
+                    <SwapRate />
+                    <SwapAmountFiat
+                        amount={selectedSwap?.trade?.to.relativeAmount}
+                        asset={toAsset}
+                    />
+                </FieldFooter>
+                {!separateInfo && <SwapTransactionInfo />}
+            </FiledContainerStyled>
+            {separateInfo && (
+                <FiledContainerStyled>
+                    <SwapTransactionInfo />
+                </FiledContainerStyled>
+            )}
+        </>
     );
 };

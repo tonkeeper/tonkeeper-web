@@ -1,5 +1,5 @@
-import { IAppSdk, MockAppSdk } from "@tonkeeper/core/dist/AppSdk";
-import React, { useContext } from "react";
+import { IAppSdk, MockAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import React, { useContext } from 'react';
 
 export const AppSdkContext = React.createContext<IAppSdk>(new MockAppSdk());
 

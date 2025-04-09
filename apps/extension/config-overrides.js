@@ -9,7 +9,8 @@ module.exports = function override(config, env) {
         ...config.resolve.fallback,
         buffer: require.resolve('buffer'),
         crypto: require.resolve('crypto-browserify'),
-        stream: require.resolve('stream-browserify')
+        stream: require.resolve('stream-browserify'),
+        'process/browser': require.resolve('process/browser')
     };
 
     config.resolve.alias = {
@@ -30,6 +31,12 @@ module.exports = function override(config, env) {
     };
 
     config.resolve.extensions = [...config.resolve.extensions, '.ts', '.js'];
+
+    config.module.rules[1].oneOf.splice(2, 0, {
+        test: /\.cjs$/,
+        type: 'javascript/auto'
+    });
+
     config.plugins = [
         ...config.plugins,
         new webpack.ProvidePlugin({

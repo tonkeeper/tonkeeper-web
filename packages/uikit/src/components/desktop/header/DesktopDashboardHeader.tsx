@@ -16,6 +16,8 @@ import {
     useDashboardColumns,
     useDashboardColumnsForm
 } from '../../../state/dashboard/useDashboardColumns';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useAppPlatform } from '../../../hooks/appContext';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -32,7 +34,7 @@ const DesktopRightPart = styled.div`
 `;
 
 const DesktopDashboardHeaderPayload = () => {
-    const { data: balance, isLoading } = useAllWalletsTotalBalance();
+    const { data: balance, isLoading } = useAllWalletsTotalBalance(Network.MAINNET);
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data } = useDashboardData();
@@ -51,21 +53,29 @@ const DesktopDashboardHeaderPayload = () => {
         return arrayToCsvString([columnsRow, ...dataRows]);
     }, [data, columns, selectedColumns]);
 
+    const platform = useAppPlatform();
+
     return (
         <DesktopHeaderContainer>
-            <DesktopHeaderBalance isLoading={isLoading} balance={balance} />
+            <DesktopHeaderBalance
+                isLoading={isLoading}
+                balance={balance}
+                network={Network.MAINNET}
+            />
             <DesktopRightPart>
                 <ButtonsContainer>
-                    <Button
-                        size="small"
-                        as="a"
-                        href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent || '')}
-                        download={'tonkeeper-wallets' + '.csv'}
-                        loading={!downloadContent}
-                    >
-                        <ExportIcon />
-                        {t('export_dot_csv')}
-                    </Button>
+                    {platform !== 'tablet' && (
+                        <Button
+                            size="small"
+                            as="a"
+                            href={encodeURI('data:text/csv;charset=utf-8,' + downloadContent || '')}
+                            download={'tonkeeper-wallets' + '.csv'}
+                            loading={!downloadContent}
+                        >
+                            <ExportIcon />
+                            {t('export_dot_csv')}
+                        </Button>
+                    )}
                     <Button size="small" onClick={onOpen}>
                         <SlidersIcon />
                         {t('Manage')}

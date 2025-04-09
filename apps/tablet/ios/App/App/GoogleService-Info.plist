@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyCpV-zBAgyo22ua1DEZtER8PgUg862hK-c</string>
+	<key>GCM_SENDER_ID</key>
+	<string>695609596302</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.tonapps.tonkeeperpro</string>
+	<key>PROJECT_ID</key>
+	<string>tonkeeper-3b1dc</string>
+	<key>STORAGE_BUCKET</key>
+	<string>tonkeeper-3b1dc.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:695609596302:ios:54607bbb498c208809acdf</string>
+</dict>
+</plist>

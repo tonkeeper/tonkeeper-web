@@ -42,8 +42,8 @@ export enum SettingsRoute {
     nft = '/nft',
     security = '/security',
     subscriptions = '/subscriptions',
-    country = '/country',
-    pro = '/pro'
+    pro = '/pro',
+    twoFa = '/two-fa'
 }
 
 export enum WalletSettingsRoute {
@@ -56,7 +56,10 @@ export enum WalletSettingsRoute {
     nft = '/nft',
     connectedApps = '/connected-apps',
     derivations = '/derivations',
-    battery = '/battery'
+    battery = '/battery',
+    chains = '/chains',
+    twoFa = '/two-fa',
+    notification = '/notification'
 }
 
 export enum BrowserRoute {

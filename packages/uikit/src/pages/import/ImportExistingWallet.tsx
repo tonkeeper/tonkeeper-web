@@ -6,13 +6,12 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
-    useActiveTonNetwork,
     useCreateAccountMAM,
     useCreateAccountMnemonic,
     useMutateRenameAccount,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
-import { ChoseWalletVersions } from '../../components/create/ChoseWalletVersions';
+import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
 import {
     AccountMAM,
     AccountTonMnemonic,
@@ -43,13 +42,17 @@ import {
     validateBip39Mnemonic
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useIsTronEnabledGlobally } from '../../state/tron/tron';
+import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
+import { useTranslation } from '../../hooks/translation';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
-    const network = useActiveTonNetwork();
     const fiat = useUserFiat();
     const sdk = useAppSdk();
     const accounts = useAccountsState();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMutation<
         {
@@ -91,8 +94,8 @@ const useProcessMnemonic = () => {
             } else {
                 const wallets = await getMAMAccountWalletsInfo({
                     account: possibleMAMAccount,
-                    network,
-                    api: context.api,
+                    network: Network.MAINNET,
+                    appContext: context,
                     fiat,
                     walletVersion: context.defaultWalletVersion
                 });
@@ -123,7 +126,8 @@ const useProcessMnemonic = () => {
                         WalletVersion.V4R2,
                         WalletVersion.V3R2,
                         WalletVersion.V3R1
-                    ]
+                    ],
+                    generateTronWallet: isTronEnabled
                 }
             );
 
@@ -144,8 +148,8 @@ const useProcessMnemonic = () => {
                 const publicKey = keyPair.publicKey.toString('hex');
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
-                    network,
-                    api: context.api,
+                    network: Network.MAINNET,
+                    appContext: context,
                     fiat
                 });
                 if (versions.some(v => v.tonBalance || v.hasJettons)) {
@@ -154,7 +158,7 @@ const useProcessMnemonic = () => {
             }
         }
 
-        const isValidBip39 = validateBip39Mnemonic(mnemonic);
+        const isValidBip39 = await validateBip39Mnemonic(mnemonic);
         if (isValidBip39) {
             const possibleStadnardAccount = await createStandardTonAccountByMnemonic(
                 context,
@@ -171,7 +175,8 @@ const useProcessMnemonic = () => {
                         WalletVersion.V4R2,
                         WalletVersion.V3R2,
                         WalletVersion.V3R1
-                    ]
+                    ],
+                    generateTronWallet: isTronEnabled
                 }
             );
 
@@ -188,8 +193,8 @@ const useProcessMnemonic = () => {
                 const publicKey = keyPair.publicKey.toString('hex');
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
-                    network,
-                    api: context.api,
+                    network: Network.MAINNET,
+                    appContext: context,
                     fiat
                 });
                 if (versions.some(v => v.tonBalance || v.hasJettons)) {
@@ -208,7 +213,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
     }
 
     if (mnemonic.length === 12) {
-        if (validateBip39Mnemonic(mnemonic)) {
+        if (await validateBip39Mnemonic(mnemonic)) {
             return 'bip39';
         }
 
@@ -219,7 +224,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
         return 'tonKeychain';
     }
 
-    if (validateBip39Mnemonic(mnemonic)) {
+    if (await validateBip39Mnemonic(mnemonic)) {
         return 'bip39';
     }
 
@@ -228,6 +233,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
 
 export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
     const sdk = useAppSdk();
+    const { t } = useTranslation();
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [createdAccount, setCreatedAccount] = useState<
@@ -242,6 +248,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     >();
 
     const [editNamePagePassed, setEditNamePagePassed] = useState(false);
+    const [selectNetworksPassed, setSelectNetworksPassed] = useState(false);
     const [notificationsSubscribePagePassed, setNotificationsSubscribePagePassed] = useState(false);
     const { mutateAsync: renameAccount, isLoading: renameAccountLoading } =
         useMutateRenameAccount<AccountTonMnemonic>();
@@ -257,6 +264,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         isLoading: isProcessMnemonic,
         data: processedMnemonicResult
     } = useProcessMnemonic();
+
     const availableMnemonicTypes = Object.entries(processedMnemonicResult || {})
         .filter(([_, v]) => v !== undefined)
         .map(v => v[0] as ImportMnemonicType);
@@ -365,6 +373,10 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
             };
         }
 
+        if (editNamePagePassed && !selectNetworksPassed) {
+            return () => setEditNamePagePassed(false);
+        }
+
         return undefined;
     }, [
         mnemonic,
@@ -373,7 +385,9 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         existingAccountAndWallet,
         isMnemonicFormDirty,
         selectedMnemonicType,
-        isCreatingMam
+        isCreatingMam,
+        editNamePagePassed,
+        selectNetworksPassed
     ]);
     useSetNotificationOnBack(onBack);
 
@@ -426,7 +440,8 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     if (!createdAccount) {
         return (
-            <ChoseWalletVersions
+            <ChoseWalletVersionsByMnemonic
+                network={Network.MAINNET}
                 mnemonic={mnemonic}
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 onSubmit={versions => {
@@ -460,8 +475,13 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 submitHandler={onRename}
                 walletEmoji={createdAccount.emoji}
                 isLoading={renameAccountLoading || renameDerivationsLoading}
+                buttonText={t('continue')}
             />
         );
+    }
+
+    if (!selectNetworksPassed) {
+        return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
     if (

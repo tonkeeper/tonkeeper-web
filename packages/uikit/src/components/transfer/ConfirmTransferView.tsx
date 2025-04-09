@@ -17,10 +17,10 @@ import { useAssetWeiBalance } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
 import BigNumber from 'bignumber.js';
 import { RatesApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext } from '../../hooks/appContext';
 import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useQuery } from '@tanstack/react-query';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useActiveApi } from '../../state/wallet';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -45,7 +45,7 @@ export const ConfirmTransferView: FC<
         fitContent?: boolean;
     }>
 > = ({ isMax, assetAmount, ...rest }) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const operationType = useMemo(() => {
         return {
             type: 'transfer',
@@ -59,12 +59,6 @@ export const ConfirmTransferView: FC<
     const [assetAmountPatched, setAssetAmountPatched] = useState<AssetAmount>(assetAmount);
 
     const { data: availableSendersChoices } = useAvailableSendersChoices(operationType);
-
-    useEffect(() => {
-        if (availableSendersChoices) {
-            onSenderTypeChange(availableSendersChoices[0].type);
-        }
-    }, [availableSendersChoices]);
 
     const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>();
 
@@ -81,6 +75,16 @@ export const ConfirmTransferView: FC<
         estimation: estimation.data!,
         senderType: selectedSenderType!
     });
+
+    useEffect(() => {
+        if (!mutation.isIdle) {
+            return;
+        }
+
+        if (availableSendersChoices) {
+            onSenderTypeChange(availableSendersChoices[0].type);
+        }
+    }, [JSON.stringify(availableSendersChoices), mutation.isIdle]);
 
     const assetAddress = isTonAsset(assetAmount.asset)
         ? tonAssetAddressToString((assetAmount.asset as TonAsset).address)

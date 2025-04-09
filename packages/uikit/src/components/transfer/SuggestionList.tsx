@@ -14,7 +14,6 @@ import {
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
 import styled from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
@@ -25,7 +24,7 @@ import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { SkeletonListWithImages } from '../Skeleton';
 import { Label1 } from '../Text';
 import { useSuggestionAddress } from './SuggestionAddress';
-import { useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
+import { useActiveApi, useActiveStandardTonWallet, useActiveWallet } from '../../state/wallet';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 
 const Label = styled(Label1)`
@@ -37,7 +36,7 @@ const Label = styled(Label1)`
 
 const useLatestSuggestion = (acceptBlockchains?: BLOCKCHAIN_NAME[]) => {
     const sdk = useAppSdk();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const wallet = useActiveWallet();
 
     return useQuery(
@@ -236,6 +235,10 @@ export const SuggestionList: FC<{
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data } = useLatestSuggestion(acceptBlockchains);
+
+    if (acceptBlockchains?.length === 1 && acceptBlockchains?.[0] === BLOCKCHAIN_NAME.TRON) {
+        return null;
+    }
 
     if (!data) {
         return (

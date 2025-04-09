@@ -19,7 +19,7 @@ import type {
   DnsRecord,
   DomainBids,
   DomainInfo,
-  StatusDefaultResponse,
+  InlineObject,
 } from '../models/index';
 import {
     AuctionsFromJSON,
@@ -30,8 +30,8 @@ import {
     DomainBidsToJSON,
     DomainInfoFromJSON,
     DomainInfoToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
 } from '../models/index';
 
 export interface DnsResolveRequest {

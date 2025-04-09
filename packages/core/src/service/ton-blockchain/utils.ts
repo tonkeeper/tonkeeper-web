@@ -18,6 +18,7 @@ import {
     tonAssetAddressToString
 } from '../../entries/crypto/asset/ton-asset';
 import { formatAddress } from '../../utils/common';
+import { TonEstimation } from '../../entries/send';
 
 export const estimationSigner = async (message: Cell): Promise<Buffer> => {
     return sign(message.hash(), Buffer.alloc(64));
@@ -43,7 +44,9 @@ export const assertMessagesNumberSupported = (
     }
 };
 
-export const zeroFee = { extra: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 }) };
+export const zeroFeeEstimation: TonEstimation = {
+    fee: { type: 'ton-asset' as const, extra: new AssetAmount({ asset: TON_ASSET, weiAmount: 0 }) }
+};
 
 export type StateInit = ReturnType<typeof toStateInit>;
 

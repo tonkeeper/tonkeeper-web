@@ -286,11 +286,11 @@ export function BlockchainBlockFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function BlockchainBlockToJSON(json: any): BlockchainBlock {
-      return BlockchainBlockToJSONTyped(json, false);
-  }
+export function BlockchainBlockToJSON(json: any): BlockchainBlock {
+    return BlockchainBlockToJSONTyped(json, false);
+}
 
-  export function BlockchainBlockToJSONTyped(value?: BlockchainBlock | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainBlockToJSONTyped(value?: BlockchainBlock | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

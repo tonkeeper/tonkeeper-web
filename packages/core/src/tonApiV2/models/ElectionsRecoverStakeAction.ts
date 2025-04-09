@@ -65,11 +65,11 @@ export function ElectionsRecoverStakeActionFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function ElectionsRecoverStakeActionToJSON(json: any): ElectionsRecoverStakeAction {
-      return ElectionsRecoverStakeActionToJSONTyped(json, false);
-  }
+export function ElectionsRecoverStakeActionToJSON(json: any): ElectionsRecoverStakeAction {
+    return ElectionsRecoverStakeActionToJSONTyped(json, false);
+}
 
-  export function ElectionsRecoverStakeActionToJSONTyped(value?: ElectionsRecoverStakeAction | null, ignoreDiscriminator: boolean = false): any {
+export function ElectionsRecoverStakeActionToJSONTyped(value?: ElectionsRecoverStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

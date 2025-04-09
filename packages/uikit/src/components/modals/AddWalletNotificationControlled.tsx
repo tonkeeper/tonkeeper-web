@@ -20,6 +20,7 @@ import { CreateKeystoneWallet } from '../../pages/import/CreateKeystoneWallet';
 import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -164,6 +165,9 @@ export const AddWalletNotificationControlled = () => {
             case 'create-mam': {
                 return <CreateMAMWallet afterCompleted={onCloseCallback} />;
             }
+            case 'testnet': {
+                return <ImportTestnetWallet afterCompleted={onCloseCallback} />;
+            }
             case 'import': {
                 return <ImportExistingWallet afterCompleted={onCloseCallback} />;
             }
@@ -187,12 +191,12 @@ export const AddWalletNotificationControlled = () => {
 
     const navigateHome = useMemo(
         () =>
-            !params?.walletType
+            selectedMethod
                 ? () => {
                       setSelectedMethod(undefined);
                   }
                 : undefined,
-        [params?.walletType]
+        [selectedMethod]
     );
 
     return (

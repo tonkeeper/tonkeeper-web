@@ -1,6 +1,9 @@
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { TronWalletState } from '@tonkeeper/core/dist/entries/wallet';
-import { formatAddress, formatTransferUrl } from '@tonkeeper/core/dist/utils/common';
+import {
+    formatAddress,
+    formatTransferUrl,
+    seeIfValidTonAddress
+} from '@tonkeeper/core/dist/utils/common';
 import { FC, useRef, useState } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
@@ -8,7 +11,6 @@ import styled, { css } from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useTronWalletState } from '../../state/tron/tron';
 import { CopyIcon } from '../Icon';
 import {
     FullHeightBlockResponsive,
@@ -27,9 +29,15 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../state/wallet';
 import { AccountBadge } from '../account/AccountBadge';
-import { useAssetImage } from '../../state/asset';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useTonAssetImage } from '../../state/asset';
+import {
+    TON_ASSET,
+    TRON_TRX_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Address } from '@ton/core';
+import { Tabs } from '../Tabs';
+import { useActiveTronWallet, useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -141,7 +149,7 @@ const CopyButton: FC<{ address: string }> = ({ address }) => {
                 secondary
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(address, t('address_copied'));
+                    sdk.copyToClipboard(address);
                 }}
             >
                 <CopyIcon />
@@ -159,7 +167,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
 
-    const assetImage = useAssetImage({
+    const assetImage = useTonAssetImage({
         blockchain: BLOCKCHAIN_NAME.TON,
         address: jetton ? Address.parse(jetton) : TON_ASSET.address
     });
@@ -172,7 +180,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                 extension={extension}
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(address, t('address_copied'));
+                    sdk.copyToClipboard(address);
                 }}
             >
                 {isWatchOnly && <WatchOnlyBadge accountType="watch-only" />}
@@ -199,26 +207,46 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
     );
 };
 
-const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
+const ReceiveTron: FC<{ token: string }> = ({ token }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { extension } = useAppContext();
+    const tronWallet = useActiveTronWallet();
+
+    const asset = token === TRON_USDT_ASSET.id ? TRON_USDT_ASSET : TRON_TRX_ASSET;
+
+    let translations;
+    if (token === TRON_USDT_ASSET.id) {
+        translations = {
+            title: t('receive_trc20'),
+            description: t('receive_trc20_description')
+        };
+    } else {
+        translations = {
+            title: t('receive_trx'),
+            description: t('receive_trx_description')
+        };
+    }
+
+    if (!tronWallet) {
+        return null;
+    }
 
     return (
         <NotificationBlock>
-            <HeaderBlock title={t('receive_trc20')} description={t('receive_trc20_description')} />
+            <HeaderBlock {...translations} />
             <Background
                 extension={extension}
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(tron.walletAddress, t('address_copied'));
+                    sdk.copyToClipboard(tronWallet.address);
                 }}
             >
                 <QrWrapper>
                     <QRCode
                         size={400}
-                        value={tron.walletAddress}
-                        logoImage="https://wallet-dev.tonkeeper.com/img/usdt.svg"
+                        value={tronWallet.address}
+                        logoImage={asset.image}
                         logoPadding={8}
                         qrStyle="dots"
                         eyeRadius={{
@@ -227,12 +255,28 @@ const ReceiveTron: FC<{ tron: TronWalletState }> = ({ tron }) => {
                         }}
                     />
                 </QrWrapper>
-                <AddressText extension={extension}>{tron.walletAddress}</AddressText>
+                <AddressText extension={extension}>{tronWallet.address}</AddressText>
             </Background>
-            <CopyButton address={tron.walletAddress} />
+            <CopyButton address={tronWallet.address} />
         </NotificationBlock>
     );
 };
+
+const TabsStyled = styled(Tabs)`
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+`;
+
+const NotificationTitleRowStyled = styled(NotificationTitleRow)`
+    position: relative;
+`;
+
+const tabsValues = [
+    { id: BLOCKCHAIN_NAME.TON, name: 'Ton' },
+    { id: BLOCKCHAIN_NAME.TRON, name: 'Tron' }
+];
 
 export const ReceiveContent: FC<{
     chain?: BLOCKCHAIN_NAME;
@@ -240,29 +284,30 @@ export const ReceiveContent: FC<{
     handleClose?: () => void;
 }> = ({ chain = BLOCKCHAIN_NAME.TON, jetton, handleClose }) => {
     const { standalone } = useAppContext();
-    const [active] = useState(chain);
-    const { data: tron } = useTronWalletState(active === BLOCKCHAIN_NAME.TRON);
+    const [active, setActive] = useState(chain);
     const tonRef = useRef<HTMLDivElement>(null);
     const tronRef = useRef<HTMLDivElement>(null);
 
-    const isTon = active === BLOCKCHAIN_NAME.TON || !tron;
+    const isTon = active === BLOCKCHAIN_NAME.TON;
     const nodeRef = isTon ? tonRef : tronRef;
-    const state = isTon ? 'ton' : 'tron';
+
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
 
     return (
         <FullHeightBlockResponsive standalone={standalone}>
             <NotificationHeaderPortal>
                 <NotificationHeader>
-                    <NotificationTitleRow handleClose={handleClose} center>
-                        {/* TODO: ENABLE TRON */}
-                        {/* <Tabs active={active} setActive={setActive} values={values} /> */}
-                    </NotificationTitleRow>
+                    <NotificationTitleRowStyled handleClose={handleClose} center>
+                        {!jetton && isTronEnabled && (
+                            <TabsStyled active={active} setActive={setActive} values={tabsValues} />
+                        )}
+                    </NotificationTitleRowStyled>
                 </NotificationHeader>
             </NotificationHeaderPortal>
             <Wrapper standalone={false} extension fullWidth>
                 <TransitionGroup childFactory={childFactoryCreator(!isTon)}>
                     <CSSTransition
-                        key={state}
+                        key={isTon ? 'ton' : 'tron'}
                         nodeRef={nodeRef}
                         classNames="right-to-left"
                         addEndListener={done => {
@@ -273,14 +318,13 @@ export const ReceiveContent: FC<{
                             {isTon ? (
                                 <ReceiveTon
                                     jetton={
-                                        jetton?.toLowerCase() ===
-                                        TON_ASSET.address.toString().toLowerCase()
-                                            ? undefined
-                                            : jetton
+                                        jetton && seeIfValidTonAddress(jetton) ? jetton : undefined
                                     }
                                 />
                             ) : (
-                                <ReceiveTron tron={tron} />
+                                !!isTronEnabled && (
+                                    <ReceiveTron token={jetton || TRON_USDT_ASSET.id} />
+                                )
                             )}
                         </div>
                     </CSSTransition>

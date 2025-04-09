@@ -56,11 +56,11 @@ export function TonConnectProofRequestProofDomainFromJSONTyped(json: any, ignore
     };
 }
 
-  export function TonConnectProofRequestProofDomainToJSON(json: any): TonConnectProofRequestProofDomain {
-      return TonConnectProofRequestProofDomainToJSONTyped(json, false);
-  }
+export function TonConnectProofRequestProofDomainToJSON(json: any): TonConnectProofRequestProofDomain {
+    return TonConnectProofRequestProofDomainToJSONTyped(json, false);
+}
 
-  export function TonConnectProofRequestProofDomainToJSONTyped(value?: TonConnectProofRequestProofDomain | null, ignoreDiscriminator: boolean = false): any {
+export function TonConnectProofRequestProofDomainToJSONTyped(value?: TonConnectProofRequestProofDomain | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

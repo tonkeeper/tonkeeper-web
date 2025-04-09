@@ -1,8 +1,11 @@
-name: Tonkeeper CD
+name: CD
 on:
     push:
         tags:
             - v*
+permissions:
+    contents: write
+
 env:
     node-version: 20.11.1
 
@@ -38,7 +41,7 @@ jobs:
             REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
             REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
             REACT_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
-            GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             DEBUG: electron*
 
         steps:
@@ -88,6 +91,9 @@ jobs:
               if: always() && runner.os == 'macOS'
               run: |
                   rm ${{ github.workspace }}/AuthKey.p8
+    ipad-build:
+        uses: ./.github/workflows/ipad-build.yaml
+        secrets: inherit
 
     web-build:
         uses: ./.github/workflows/web-build.yaml
@@ -95,13 +101,19 @@ jobs:
             environment: 'main'
         secrets: inherit
 
-    web-tests:
-        needs: web-build
-        uses: ./.github/workflows/web-tests.yaml
+    swap-widget-build:
+        uses: ./.github/workflows/swap-widget-build.yaml
         with:
-            base-url: 'https://wallet.tonkeeper.com'
-            transaction: true
+            environment: 'main'
         secrets: inherit
+
+    # web-tests:
+    #     needs: web-build
+    #     uses: ./.github/workflows/web-tests.yaml
+    #     with:
+    #         base-url: 'https://wallet.tonkeeper.com'
+    #         transaction: true
+    #     secrets: inherit
 
     extension-build:
         name: extension-build
@@ -141,7 +153,6 @@ jobs:
                   name: 'Tonkeeper ${{ github.ref_name }}'
                   draft: true
                   generate_release_notes: true
-                  token: ${{ secrets.GH_TOKEN }}
                   files: |
                       ${{ github.workspace }}/apps/extension/dist/tonkeeper_chrome_${{
                           github.ref_name }}.zip

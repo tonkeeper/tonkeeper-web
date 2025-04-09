@@ -45,7 +45,7 @@ export const AsideHeaderAccount: FC<{ width: number }> = ({ width }) => {
     const account = useActiveAccount();
 
     if (account.type !== 'mam') {
-        return null;
+        return <HeaderContainer width={width} />;
     }
 
     return (

@@ -10,12 +10,13 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { TokensPieChart } from '../../components/desktop/tokens/TokensPieChart';
-import { JettonAsset, TonAsset } from '../../components/home/Jettons';
+import { AnyChainAsset, TonAsset } from '../../components/home/Jettons';
 import { useTranslation } from '../../hooks/translation';
-import { useAssets } from '../../state/home';
+import { useAllChainsAssets } from '../../state/home';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../state/theme';
 
 import { useAssetsDistribution } from '../../state/asset';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 const DesktopAssetStylesOverride = css`
     background-color: transparent;
@@ -33,7 +34,7 @@ const TonAssetStyled = styled(TonAsset)`
     ${DesktopAssetStylesOverride}
 `;
 
-const JettonAssetStyled = styled(JettonAsset)`
+const AnyChainAssetStyled = styled(AnyChainAsset)`
     ${DesktopAssetStylesOverride}
 `;
 
@@ -73,7 +74,13 @@ const Divider = styled.div`
 const itemSize = 77;
 
 const DesktopTokensPayload = () => {
-    const [assets] = useAssets();
+    const { assets: allAssets } = useAllChainsAssets() ?? [];
+    const [tonAssetAmount, assets] = useMemo(() => {
+        return [
+            allAssets?.find(item => item.asset.id === TON_ASSET.id),
+            allAssets?.filter(item => item.asset.id !== TON_ASSET.id)
+        ];
+    }, [allAssets]);
     const { t } = useTranslation();
     const { data: distribution } = useAssetsDistribution();
     const { data: uiPreferences } = useUserUIPreferences();
@@ -95,16 +102,15 @@ const DesktopTokensPayload = () => {
         setShowChart(!showChart);
     };
 
-    const sortedAssets = useMemo(() => {
-        return assets?.ton?.jettons?.balances ?? [];
-    }, [assets]);
+    const virtualScrollPaddingBase = itemSize; // TON LINE
 
     const rowVirtualizer = useVirtualizer({
-        count: sortedAssets.length,
+        count: assets?.length ?? 0,
         getScrollElement: () => containerRef.current,
         estimateSize: () => itemSize,
-        getItemKey: index => sortedAssets[index].jetton.address,
-        paddingStart: canShowChart && showChart ? 192 + itemSize : itemSize
+        getItemKey: index => assets![index].asset.id,
+        paddingStart:
+            canShowChart && showChart ? 192 + virtualScrollPaddingBase : virtualScrollPaddingBase
     });
 
     const onTokenClick = useCallback(
@@ -117,14 +123,14 @@ const DesktopTokensPayload = () => {
                 return rowVirtualizer.scrollToOffset(containerRef.current!.scrollHeight);
             }
 
-            const index = sortedAssets.findIndex(item => item.jetton.address === address);
+            const index = assets!.findIndex(item => item.asset.address === address);
             if (index !== undefined) {
                 rowVirtualizer.scrollToOffset(
                     (tonRef.current?.offsetTop ?? 0) + (index + 1) * itemSize
                 );
             }
         },
-        [sortedAssets, rowVirtualizer, rowVirtualizer.elementsCache]
+        [assets, rowVirtualizer, rowVirtualizer.elementsCache]
     );
 
     return (
@@ -150,7 +156,7 @@ const DesktopTokensPayload = () => {
                     overflow: 'hidden'
                 }}
             >
-                {sortedAssets && assets && distribution && uiPreferences && (
+                {tonAssetAmount && assets && distribution && uiPreferences && (
                     <>
                         {canShowChart && showChart && (
                             <ErrorBoundary
@@ -163,7 +169,7 @@ const DesktopTokensPayload = () => {
                                 <Divider />
                             </ErrorBoundary>
                         )}
-                        <TonAssetStyled ref={tonRef} info={assets.ton.info} />
+                        <TonAssetStyled ref={tonRef} balance={tonAssetAmount} />
                         <Divider />
                         {rowVirtualizer.getVirtualItems().map(virtualRow => (
                             <div
@@ -182,7 +188,7 @@ const DesktopTokensPayload = () => {
                                         'Failed to display tokens list'
                                     )}
                                 >
-                                    <JettonAssetStyled jetton={sortedAssets[virtualRow.index]} />
+                                    <AnyChainAssetStyled balance={assets[virtualRow.index]} />
                                     <Divider />
                                 </ErrorBoundary>
                             </div>

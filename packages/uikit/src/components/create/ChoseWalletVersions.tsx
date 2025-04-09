@@ -20,8 +20,11 @@ import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { mayBeCreateAccountId } from '@tonkeeper/core/dist/service/walletService';
+import { handleSubmit } from '../../libs/form';
 
-const Wrapper = styled.div`
+const Wrapper = styled.form`
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -64,32 +67,50 @@ const SubmitBlock = styled.div`
     width: 100%;
 `;
 
-export const ChoseWalletVersions: FC<{
+export const ChoseWalletVersionsByMnemonic: FC<{
     mnemonic: string[];
     mnemonicType: MnemonicType;
+    network: Network;
     onSubmit: (versions: WalletVersion[]) => void;
     isLoading?: boolean;
-}> = ({ mnemonic, onSubmit, isLoading, mnemonicType }) => {
-    const { t } = useTranslation();
-    const sdk = useAppSdk();
-    const { defaultWalletVersion } = useAppContext();
-
+}> = ({ mnemonic, onSubmit, network, isLoading, mnemonicType }) => {
     const [publicKey, setPublicKey] = useState<string | undefined>(undefined);
-    const { data: wallets } = useStandardTonWalletVersions(publicKey);
-    const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
-    const accountState = useAccountState(publicKey);
-
-    useEffect(() => {
-        if (sdk.isIOs()) {
-            hideIosKeyboard();
-        }
-    }, []);
 
     useEffect(() => {
         mnemonicToKeypair(mnemonic, mnemonicType).then(keypair =>
             setPublicKey(keypair.publicKey.toString('hex'))
         );
     }, [mnemonic]);
+
+    return (
+        <ChoseWalletVersions
+            network={network}
+            publicKey={publicKey}
+            onSubmit={onSubmit}
+            isLoading={isLoading}
+        />
+    );
+};
+
+export const ChoseWalletVersions: FC<{
+    publicKey: string | undefined;
+    network: Network;
+    onSubmit: (versions: WalletVersion[]) => void;
+    isLoading?: boolean;
+}> = ({ publicKey, onSubmit, network, isLoading }) => {
+    const { t } = useTranslation();
+    const sdk = useAppSdk();
+    const { defaultWalletVersion } = useAppContext();
+
+    const { data: wallets } = useStandardTonWalletVersions(network, publicKey);
+    const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
+    const accountState = useAccountState(mayBeCreateAccountId(network, publicKey));
+
+    useEffect(() => {
+        if (sdk.isIOs()) {
+            hideIosKeyboard();
+        }
+    }, []);
 
     useLayoutEffect(() => {
         if (wallets) {
@@ -121,7 +142,7 @@ export const ChoseWalletVersions: FC<{
     };
 
     return (
-        <Wrapper>
+        <Wrapper onSubmit={handleSubmit(onSelect)}>
             <H2Label2Responsive>{t('choose_wallets_title')}</H2Label2Responsive>
             <Body>{t('choose_wallets_subtitle')}</Body>
             {!wallets ? (
@@ -135,7 +156,7 @@ export const ChoseWalletVersions: FC<{
                                     <TextContainer>
                                         <Label1>{walletVersionText(wallet.version)}</Label1>
                                         <Body2Secondary>
-                                            {toShortValue(formatAddress(wallet.address))}
+                                            {toShortValue(formatAddress(wallet.address, network))}
                                             &nbsp;·&nbsp;
                                             {toFormattedTonBalance(wallet.tonBalance)}&nbsp;TON
                                             {wallet.hasJettons && t('wallet_version_and_tokens')}
@@ -158,6 +179,8 @@ export const ChoseWalletVersions: FC<{
                             disabled={!checkedVersions.length}
                             onClick={onSelect}
                             loading={isLoading}
+                            type="submit"
+                            autoFocus
                         >
                             {t('continue')}
                         </ButtonResponsiveSize>

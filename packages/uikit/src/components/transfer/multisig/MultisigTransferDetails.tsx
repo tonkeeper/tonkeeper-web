@@ -7,6 +7,7 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { MultisigOrderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useActiveConfig } from '../../../state/wallet';
 
 const MultisigDetailsBlock = styled.div`
     width: 100%;
@@ -48,7 +49,7 @@ export const MultisigTransferDetails: FC<{
 }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
 
     const onOpenTonviewer = (address: string) => {
         const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';

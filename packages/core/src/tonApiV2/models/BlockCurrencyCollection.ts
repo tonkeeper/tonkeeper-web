@@ -65,11 +65,11 @@ export function BlockCurrencyCollectionFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function BlockCurrencyCollectionToJSON(json: any): BlockCurrencyCollection {
-      return BlockCurrencyCollectionToJSONTyped(json, false);
-  }
+export function BlockCurrencyCollectionToJSON(json: any): BlockCurrencyCollection {
+    return BlockCurrencyCollectionToJSONTyped(json, false);
+}
 
-  export function BlockCurrencyCollectionToJSONTyped(value?: BlockCurrencyCollection | null, ignoreDiscriminator: boolean = false): any {
+export function BlockCurrencyCollectionToJSONTyped(value?: BlockCurrencyCollection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

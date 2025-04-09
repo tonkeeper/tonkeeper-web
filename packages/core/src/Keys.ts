@@ -15,6 +15,7 @@ export enum AppKey {
     ACCOUNTS = 'accounts',
     ACTIVE_ACCOUNT_ID = 'active_account_id',
     WALLET_CONFIG = 'wallet_config',
+    ACCOUNT_CONFIG = 'account_config',
     GLOBAL_PREFERENCES_CONFIG = 'global_preferences_config',
     MULTISIG_VIEWED_ORDERS = 'viewed_multisig_orders',
 
@@ -40,10 +41,15 @@ export enum AppKey {
     USER_ID = 'user_id',
     PRO = 'pro_state',
     PRO_BACKUP = 'pro_backup',
+    PRO_AUTH_TOKEN = 'pro_auth_token',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
     SWAP_OPTIONS = 'swap_options',
 
-    BATTERY_AUTH_TOKEN = 'battery_auth_token'
+    BATTERY_AUTH_TOKEN = 'battery_auth_token',
+
+    TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config',
+
+    NOTIFICATIONS = 'notifications'
 }

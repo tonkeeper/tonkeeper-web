@@ -13,7 +13,7 @@
   "nftTransferAction": "Переказ NFT",
   "poolImplementationDescription": "Мінімальний депозит {{.Deposit}} ТОН",
   "smartContractExecMessage": "Виконання смарт-контракту",
-  "subscriptionAction": "Оплата пыдписки {{.Value}}",
+  "subscriptionAction": "Оплата підписки {{.Value}}",
   "tonTransferAction": "Переказ {{.Value}}",
   "withdrawStakeAction": "Вивід {{.Value}} з пулу стейкінгу",
   "withdrawStakeRequestAction": "Запит на вивід {{.Value}} з пулу стейкінгу"

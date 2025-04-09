@@ -45,7 +45,7 @@ export const MultisigOrderFormView: FC<{
     const isFullWidth = useIsFullWidthMode();
     const { standalone } = useAppContext();
     const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
-    const [lifetime, lifetimeTime] = useState<MultisigOrderLifetimeMinutes>('720');
+    const [lifetime, lifetimeTime] = useState<MultisigOrderLifetimeMinutes>('1440');
     const { t } = useTranslation();
 
     const handleSubmit = () => {

@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
+  InlineObject,
   Multisig,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     MultisigFromJSON,
     MultisigToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetMultisigAccountRequest {

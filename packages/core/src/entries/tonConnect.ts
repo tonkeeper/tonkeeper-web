@@ -13,12 +13,24 @@ export enum TON_CONNECT_MSG_VARIANTS_ID {
     GASLESS = 'gasless'
 }
 
+export interface BatteryMessagesVariant {
+    messages: TonConnectTransactionPayloadMessage[];
+}
+
+export interface GaslessMessagesVariant {
+    messages: TonConnectTransactionPayloadMessage[];
+    options: {
+        asset: string;
+    };
+}
+
 export interface TonConnectTransactionPayload {
     valid_until: number; // 1658253458;
     messages: TonConnectTransactionPayloadMessage[];
-    messagesVariants?: Partial<
-        Record<TON_CONNECT_MSG_VARIANTS_ID, TonConnectTransactionPayloadMessage[]>
-    >;
+    messagesVariants?: {
+        [TON_CONNECT_MSG_VARIANTS_ID.BATTERY]?: BatteryMessagesVariant;
+        [TON_CONNECT_MSG_VARIANTS_ID.GASLESS]?: GaslessMessagesVariant;
+    };
 }
 
 export interface TonConnectTransactionPayloadMessage {
@@ -26,6 +38,9 @@ export interface TonConnectTransactionPayloadMessage {
     amount: string | number;
     payload?: string; // base64 cell
     stateInit?: string; // base64 cell
+    extra_currency?: {
+        [k: number]: string;
+    };
 }
 
 export type TonConnectAccount = {
@@ -59,13 +74,15 @@ export interface ConnectEventError {
     };
 }
 
+export interface TonConnectEventPayload {
+    items: ConnectItemReply[];
+    device: DeviceInfo;
+}
+
 export interface ConnectEventSuccess {
     event: 'connect';
     id: number;
-    payload: {
-        items: ConnectItemReply[];
-        device: DeviceInfo;
-    };
+    payload: TonConnectEventPayload;
 }
 
 export type ConnectItem = TonAddressItem | TonProofItem;
@@ -169,6 +186,7 @@ export enum SEND_TRANSACTION_ERROR_CODES {
 export type SendTransactionFeature = {
     name: 'SendTransaction';
     maxMessages: number;
+    extraCurrencySupported?: boolean;
 };
 
 export type SendTransactionFeatureDeprecated = 'SendTransaction';
@@ -202,38 +220,58 @@ export enum SIGN_DATA_ERROR_CODES {
     METHOD_NOT_SUPPORTED = 400
 }
 
+export declare type SignDataType = 'text' | 'binary' | 'cell';
+
 export type SignDataFeature = {
     name: 'SignData';
+    types: SignDataType[];
 };
 
 export interface SignDataRpcRequest {
-    method: 'signData';
-    params: [
-        {
-            schema_crc: number;
-            cell: string;
-        }
-    ];
     id: string;
+    method: 'signData';
+    params: SignDataRequestPayload;
 }
+
+export type SignDataRequestPayload = SignDataRequestPayloadKind;
+
+type SignDataRequestPayloadKind =
+    | SignDataRequestPayloadText
+    | SignDataRequestPayloadBinary
+    | SignDataRequestPayloadCell;
+
+export type SignDataRequestPayloadText = {
+    type: 'text';
+    text: string; // arbitrary UTF-8 string
+};
+export type SignDataRequestPayloadBinary = {
+    type: 'binary';
+    bytes: string; // base64 (not url safe) encoded bytes array
+};
+export type SignDataRequestPayloadCell = {
+    type: 'cell';
+    schema: string; // TL-B scheme of the cell payload
+    cell: string; // base64 (not url safe) encoded cell
+};
 
 export type SignDataRpcResponse = SignDataRpcResponseSuccess | SignDataRpcResponseError;
 
 export interface SignDataRpcResponseError extends WalletResponseTemplateError {
-    error: {
-        code: SIGN_DATA_ERROR_CODES;
-        message: string;
-        data?: unknown;
-    };
+    error: { code: SIGN_DATA_ERROR_CODES; message: string };
     id: string;
+}
+
+export interface SignDataResponse {
+    signature: string; // base64 encoded signature
+    address: string; // wallet address
+    timestamp: number; // UNIX timestamp in seconds (UTC) at the moment on creating the signature.
+    domain: string; // app domain name (as url part, without encoding)
+    payload: SignDataRequestPayload; // payload that was signed
 }
 
 export interface SignDataRpcResponseSuccess {
     id: string;
-    result: {
-        signature: string;
-        timestamp: string;
-    };
+    result: SignDataResponse;
 }
 
 export interface TonAddressItem {
@@ -306,3 +344,19 @@ export interface TonConnectMessageRequest {
     from: string;
     connection: AccountConnection;
 }
+
+export interface SendTransactionAppRequest {
+    id: string;
+    connection: AccountConnection;
+    kind: 'sendTransaction';
+    payload: TonConnectTransactionPayload;
+}
+
+export interface SignDatAppRequest {
+    id: string;
+    connection: AccountConnection;
+    kind: 'signData';
+    payload: SignDataRequestPayload;
+}
+
+export type TonConnectAppRequestPayload = SendTransactionAppRequest | SignDatAppRequest;

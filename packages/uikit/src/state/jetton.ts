@@ -17,17 +17,16 @@ import BigNumber from 'bignumber.js';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
-import { useActiveTonNetwork, useActiveWallet } from './wallet';
+import { useActiveApi, useActiveTonNetwork, useActiveWallet } from './wallet';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useActiveWallet();
-    const {
-        api: { tonApiV2 }
-    } = useAppContext();
+    const api = useActiveApi();
+
     return useQuery<JettonInfo, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.info, jettonAddress],
         async () => {
-            const result = await new JettonsApi(tonApiV2).getJettonInfo({
+            const result = await new JettonsApi(api.tonApiV2).getJettonInfo({
                 accountId: jettonAddress
             });
             return result;
@@ -59,7 +58,8 @@ const compareTokensOver = (fiat: FiatCurrencies) => {
 export const useJettonRawList = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
-    const { api, fiat } = useAppContext();
+    const { fiat } = useAppContext();
+    const api = useActiveApi();
 
     return useQuery<JettonsBalances, Error>(
         [wallet.id, JettonKey.raw, QueryKey.jettons, fiat, network],
@@ -78,7 +78,9 @@ export const useJettonRawList = () => {
 export const useJettonList = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
-    const { api, fiat } = useAppContext();
+    const { fiat } = useAppContext();
+    const api = useActiveApi();
+
     const sdk = useAppSdk();
 
     return useQuery<JettonsBalances, Error>(
@@ -114,7 +116,7 @@ export const useJettonList = () => {
 
 export const useJettonBalance = (jettonAddress: string) => {
     const wallet = useActiveWallet();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useQuery<JettonBalance, Error>(
         [wallet.id, QueryKey.jettons, JettonKey.balance, jettonAddress],
         async () => {
@@ -134,11 +136,11 @@ export const useTogglePinJettonMutation = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
 
-    return useMutation<void, Error, { config: TonWalletConfig; jetton: JettonBalance }>(
-        async ({ config, jetton }) => {
-            const pinnedTokens = config.pinnedTokens.includes(jetton.jetton.address)
-                ? config.pinnedTokens.filter(item => item !== jetton.jetton.address)
-                : config.pinnedTokens.concat([jetton.jetton.address]);
+    return useMutation<void, Error, { config: TonWalletConfig; jettonAddress: string }>(
+        async ({ config, jettonAddress }) => {
+            const pinnedTokens = config.pinnedTokens.includes(jettonAddress)
+                ? config.pinnedTokens.filter(item => item !== jettonAddress)
+                : config.pinnedTokens.concat([jettonAddress]);
 
             const newConfig = {
                 ...config,
@@ -177,23 +179,19 @@ export const useToggleHideJettonMutation = () => {
     const wallet = useActiveWallet();
     const network = useActiveTonNetwork();
 
-    return useMutation<void, Error, { config: TonWalletConfig; jetton: JettonBalance }>(
-        async ({ config, jetton }) => {
+    return useMutation<void, Error, { config: TonWalletConfig; jettonAddress: string }>(
+        async ({ config, jettonAddress }) => {
             let newConfig: TonWalletConfig;
 
-            if (config.hiddenTokens.includes(jetton.jetton.address)) {
-                const hiddenTokens = config.hiddenTokens.filter(
-                    item => item !== jetton.jetton.address
-                );
+            if (config.hiddenTokens.includes(jettonAddress)) {
+                const hiddenTokens = config.hiddenTokens.filter(item => item !== jettonAddress);
                 newConfig = {
                     ...config,
                     hiddenTokens
                 };
             } else {
-                const hiddenTokens = config.hiddenTokens.concat([jetton.jetton.address]);
-                const pinnedTokens = config.pinnedTokens.filter(
-                    item => item !== jetton.jetton.address
-                );
+                const hiddenTokens = config.hiddenTokens.concat([jettonAddress]);
+                const pinnedTokens = config.pinnedTokens.filter(item => item !== jettonAddress);
                 newConfig = {
                     ...config,
                     hiddenTokens,

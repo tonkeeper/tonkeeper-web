@@ -57,11 +57,11 @@ export function SubscriptionsFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function SubscriptionsToJSON(json: any): Subscriptions {
-      return SubscriptionsToJSONTyped(json, false);
-  }
+export function SubscriptionsToJSON(json: any): Subscriptions {
+    return SubscriptionsToJSONTyped(json, false);
+}
 
-  export function SubscriptionsToJSONTyped(value?: Subscriptions | null, ignoreDiscriminator: boolean = false): any {
+export function SubscriptionsToJSONTyped(value?: Subscriptions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

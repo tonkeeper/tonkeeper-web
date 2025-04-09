@@ -112,11 +112,11 @@ export function EventFromJSONTyped(json: any, ignoreDiscriminator: boolean): Eve
     };
 }
 
-  export function EventToJSON(json: any): Event {
-      return EventToJSONTyped(json, false);
-  }
+export function EventToJSON(json: any): Event {
+    return EventToJSONTyped(json, false);
+}
 
-  export function EventToJSONTyped(value?: Event | null, ignoreDiscriminator: boolean = false): any {
+export function EventToJSONTyped(value?: Event | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

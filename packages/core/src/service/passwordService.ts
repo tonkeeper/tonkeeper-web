@@ -1,9 +1,8 @@
 import { IStorage } from '../Storage';
-import { AccountTonMnemonic } from '../entries/account';
+import { AccountTonMnemonic, isMnemonicAndPassword } from '../entries/account';
 import { AuthPassword } from '../entries/password';
 import { AccountsStorage } from './accountsStorage';
-import { decrypt, encrypt } from './cryptoService';
-import { decryptWalletMnemonic, seeIfMnemonicValid } from './mnemonicService';
+import { decryptWalletSecret, encryptWalletSecret } from './mnemonicService';
 
 export class PasswordStorage {
     private readonly accountsStorage: AccountsStorage;
@@ -24,10 +23,8 @@ export class PasswordStorage {
                 throw new Error('None wallet has a password auth');
             }
 
-            const mnemonic = (
-                await decrypt((accToCheck.auth as AuthPassword).encryptedMnemonic, password)
-            ).split(' ');
-            return await seeIfMnemonicValid(mnemonic);
+            await decryptWalletSecret((accToCheck.auth as AuthPassword).encryptedSecret, password);
+            return true;
         } catch (e) {
             console.error(e);
             return false;
@@ -46,12 +43,12 @@ export class PasswordStorage {
 
         const updatedAccounts = await Promise.all(
             accounts.map(async acc => {
-                const mnemonic = await decryptWalletMnemonic(
-                    acc as { auth: AuthPassword },
+                const accountSecret = await decryptWalletSecret(
+                    (acc.auth as AuthPassword).encryptedSecret,
                     oldPassword
                 );
-                (acc.auth as AuthPassword).encryptedMnemonic = await encrypt(
-                    mnemonic.join(' '),
+                (acc.auth as AuthPassword).encryptedSecret = await encryptWalletSecret(
+                    accountSecret,
                     newPassword
                 );
                 return acc.clone();
@@ -64,7 +61,7 @@ export class PasswordStorage {
     private async getPasswordAuthAccounts(): Promise<AccountTonMnemonic[]> {
         const accounts = await this.accountsStorage.getAccounts();
         return accounts.filter(
-            a => (a.type === 'mnemonic' || a.type === 'mam') && a.auth.kind === 'password'
+            a => isMnemonicAndPassword(a) && a.auth.kind === 'password'
         ) as AccountTonMnemonic[];
     }
 }

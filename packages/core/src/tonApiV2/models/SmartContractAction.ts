@@ -102,11 +102,11 @@ export function SmartContractActionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function SmartContractActionToJSON(json: any): SmartContractAction {
-      return SmartContractActionToJSONTyped(json, false);
-  }
+export function SmartContractActionToJSON(json: any): SmartContractAction {
+    return SmartContractActionToJSONTyped(json, false);
+}
 
-  export function SmartContractActionToJSONTyped(value?: SmartContractAction | null, ignoreDiscriminator: boolean = false): any {
+export function SmartContractActionToJSONTyped(value?: SmartContractAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

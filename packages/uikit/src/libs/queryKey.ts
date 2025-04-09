@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import { InvalidateQueryFilters } from '@tanstack/react-query';
 
 export enum QueryKey {
@@ -5,6 +7,7 @@ export enum QueryKey {
     wallet = 'wallet',
     wallets = 'wallets',
     walletConfig = 'wallet_config',
+    accountConfig = 'accountConfig',
     lock = 'lock',
     touchId = 'touchId',
     canPromptTouchId = 'canPromptTouchId',
@@ -32,10 +35,11 @@ export enum QueryKey {
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',
     subscribed = 'subscribed',
+    globalSubscribed = 'globalSubscribed',
     featuredRecommendations = 'recommendations',
     experimental = 'experimental',
 
-    tron = 'tron',
+    tronAssets = 'tronAssets',
     rate = 'rate',
     total = 'total',
     distribution = 'distribution',
@@ -65,7 +69,12 @@ export enum QueryKey {
     batteryBalance = 'batteryBalance',
     estimateBatteryPurchase = 'estimateBatteryPurchase',
 
-    gaslessConfig = 'gaslessConfig'
+    gaslessConfig = 'gaslessConfig',
+
+    twoFAWalletConfig = 'twoFAWalletConfig',
+    twoFAActivationProcess = 'twoFAActivationProcess',
+    twoFARemovingProcess = 'twoFARemovingProcess',
+    twoFACancellRecoveryProcess = 'twoFARemovingProcess'
 }
 
 export enum JettonKey {

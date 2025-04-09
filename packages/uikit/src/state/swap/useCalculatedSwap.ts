@@ -6,7 +6,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import type { SwapService } from '@tonkeeper/core/dist/swapsApi';
-import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
+import { AccountsApi, JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
@@ -26,6 +26,8 @@ import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { atom, useAtom } from '../../libs/atom';
 import { useSwapsConfig } from './useSwapsConfig';
+import { useActiveApi } from '../wallet';
+import { add } from '@amplitude/analytics-browser';
 
 export type BasicCalculatedTrade = {
     from: AssetAmount<TonAsset>;
@@ -70,7 +72,7 @@ const fetchedSwaps$ = atom<CalculatedSwap[]>([]);
 let calculationId = 0;
 
 export function useCalculatedSwap() {
-    const { api } = useAppContext();
+    const api = useActiveApi();
 
     const [fetchedSwaps, setFetchedSwaps] = useAtom(fetchedSwaps$);
     const [fromAsset] = useSwapFromAsset();
@@ -182,7 +184,7 @@ export function useCalculatedSwap() {
 }
 
 const toTradeAssetId = (address: TonAssetAddress) => {
-    return isTon(address) ? 'ton' : address.toRawString();
+    return isTon(address) ? 'ton' : Address.isAddress(address) ? address.toRawString() : address;
 };
 
 const fromTradeAssetId = (address: string): TonAssetAddress => {
@@ -300,19 +302,23 @@ const getAsset = async (api: APIConfig, address: TonAssetAddress): Promise<TonAs
         return swapAssetsCache.get(address)!;
     }
 
-    const tonapi = new JettonsApi(api.tonApiV2);
-    const p = tonapi.getJettonInfo({ accountId: address.toRawString() }).then(
-        response =>
-            ({
-                symbol: response.metadata.symbol,
-                decimals: Number(response.metadata.decimals),
-                name: response.metadata.name,
-                blockchain: BLOCKCHAIN_NAME.TON,
-                address,
-                id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-                image: response.metadata.image
-            } as const)
-    );
-    swapAssetsCache.set(address, p);
-    return p;
+    if (Address.isAddress(address)) {
+        const tonapi = new JettonsApi(api.tonApiV2);
+        const p = tonapi.getJettonInfo({ accountId: address.toRawString() }).then(
+            response =>
+                ({
+                    symbol: response.metadata.symbol,
+                    decimals: Number(response.metadata.decimals),
+                    name: response.metadata.name,
+                    blockchain: BLOCKCHAIN_NAME.TON,
+                    address,
+                    id: packAssetId(BLOCKCHAIN_NAME.TON, address),
+                    image: response.preview
+                } as const)
+        );
+        swapAssetsCache.set(address, p);
+        return p;
+    } else {
+        throw new Error('Unable to get asset info for extra currency.');
+    }
 };

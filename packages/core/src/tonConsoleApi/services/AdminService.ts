@@ -1,8 +1,9 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { Ok } from '../models/Ok';
+import type { TonSiteReduced } from '../models/TonSiteReduced';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -84,6 +85,26 @@ export class AdminService {
             url: '/api/v1/admin/messages/charge',
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`,
+            },
+        });
+    }
+    /**
+     * Private method: Get sites
+     * Private method
+     * @returns any Ton Sites reduced
+     * @throws ApiError
+     */
+    public static adminGetTonSites(): CancelablePromise<{
+        items: Array<TonSiteReduced>;
+    }> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/admin/sites',
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,

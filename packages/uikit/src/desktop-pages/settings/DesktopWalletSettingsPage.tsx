@@ -6,6 +6,8 @@ import {
     CoinsIcon,
     ExitIcon,
     KeyIcon,
+    LockIcon,
+    NotificationOutlineIcon,
     SaleBadgeIcon,
     SwitchIcon,
     UnpinIconOutline
@@ -32,13 +34,25 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
-import { WalletIndexBadge } from '../../components/account/AccountBadge';
+import { AssetBlockchainBadge, WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     useActiveMultisigAccountHost,
     useIsActiveAccountMultisig,
     useMultisigTogglePinForWallet
 } from '../../state/multisig';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
+import React from 'react';
+import { useAppSdk } from '../../hooks/appSdk';
+import { useCanViewTwoFA } from '../../state/two-fa';
+import {
+    useAutoMarkTronFeatureAsSeen,
+    useCanUseTronForActiveWallet,
+    useIsTronEnabledForActiveWallet,
+    useToggleIsTronEnabledForActiveWallet
+} from '../../state/tron/tron';
+import { Switch } from '../../components/fields/Switch';
+import { hexToRGBA } from '../../libs/css';
+import { Badge } from '../../components/shared/Badge';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -53,7 +67,7 @@ const SettingsListItem = styled.div`
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
     &:hover {
-        background-color: ${p => p.theme.backgroundContentTint};
+        background-color: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.7)};
     }
 
     > svg {
@@ -78,6 +92,18 @@ const LinkStyled = styled(Link)`
 const Body3Row = styled(Body3)`
     display: flex;
     align-items: center;
+    gap: 6px;
+`;
+
+const SwitchStyled = styled(Switch)`
+    margin-left: auto;
+    flex-shrink: 0;
+`;
+
+const LabelWithBadge = styled(Label2)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
 `;
 
 export const DesktopWalletSettingsPage = () => {
@@ -108,6 +134,15 @@ export const DesktopWalletSettingsPage = () => {
         }).then(() => navigate(AppRoute.home));
     };
 
+    const canViewTwoFA = useCanViewTwoFA();
+
+    const notificationsAvailable = useAppSdk().notifications !== undefined;
+
+    useAutoMarkTronFeatureAsSeen();
+    const canUseTron = useCanUseTronForActiveWallet();
+    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const { mutate: onToggleTron } = useToggleIsTronEnabledForActiveWallet();
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
@@ -134,7 +169,9 @@ export const DesktopWalletSettingsPage = () => {
             </SettingsListBlock>
             <DesktopViewDivider />
             <SettingsListBlock>
-                {account.type === 'mnemonic' && (
+                {(account.type === 'mnemonic' ||
+                    account.type === 'testnet' ||
+                    account.type === 'sk') && (
                     <SettingsListItem onClick={() => recovery({ accountId: account.id })}>
                         <KeyIcon />
                         <Label2>{t('settings_backup_seed')}</Label2>
@@ -149,6 +186,19 @@ export const DesktopWalletSettingsPage = () => {
                         <KeyIcon />
                         <Label2>{t('settings_backup_wallet')}</Label2>
                     </SettingsListItem>
+                )}
+                {canViewTwoFA && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}>
+                        <SettingsListItem>
+                            <LockIcon />
+                            <SettingsListText>
+                                <LabelWithBadge>
+                                    <Label2>{t('two_fa_long')}</Label2>
+                                    <Badge color="accentOrange">Beta</Badge>
+                                </LabelWithBadge>
+                            </SettingsListText>
+                        </SettingsListItem>
+                    </LinkStyled>
                 )}
                 {canChangeVersion && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.version}>
@@ -186,6 +236,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_collectibles_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
+                {notificationsAvailable && (
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.notification}>
+                        <SettingsListItem>
+                            <NotificationOutlineIcon />
+                            <Label2>{t('settings_notifications')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                )}
                 {!isReadOnly && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.connectedApps}>
                         <SettingsListItem>
@@ -195,6 +253,23 @@ export const DesktopWalletSettingsPage = () => {
                     </LinkStyled>
                 )}
             </SettingsListBlock>
+            {canUseTron && (
+                <>
+                    <DesktopViewDivider />
+                    <SettingsListBlock>
+                        <SettingsListItem onClick={() => onToggleTron()}>
+                            <CoinsIcon />
+                            <SettingsListText>
+                                <LabelWithBadge>
+                                    USD₮<AssetBlockchainBadge>TRC20</AssetBlockchainBadge>
+                                </LabelWithBadge>
+                                <Body3>{t('settings_enable_tron_description')}</Body3>
+                            </SettingsListText>
+                            <SwitchStyled checked={!!isTronEnabled} />
+                        </SettingsListItem>
+                    </SettingsListBlock>
+                </>
+            )}
             <>
                 {isMultisig ? (
                     <>

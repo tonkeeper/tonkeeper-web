@@ -1,8 +1,4 @@
-import {
-    useResponseSendMutation,
-    SendTransactionAppRequest
-} from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
+import { TonConnectRequestNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectRequestNotification';
 import { useSendNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useCallback, useEffect, useState } from 'react';
 import {
@@ -10,18 +6,30 @@ import {
     useDisconnectTonConnectApp
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { sendBackground } from '../../libs/backgroudService';
+import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const TonConnectSubscription = () => {
-    const [request, setRequest] = useState<SendTransactionAppRequest | undefined>(undefined);
+    const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
 
-    const { mutateAsync: responseSendAsync } = useResponseSendMutation();
     const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
+
+    const queryClient = useQueryClient();
+
+    const onTransaction = useCallback(
+        async (request: TonConnectAppRequestPayload) => {
+            await queryClient.invalidateQueries([QueryKey.account]);
+            setRequest(request);
+        },
+        [setRequest]
+    );
 
     useSendNotificationAnalytics(request?.connection?.manifest);
 
     useEffect(() => {
-        window.backgroundApi.onTonConnectTransaction(setRequest);
-    }, [setRequest]);
+        window.backgroundApi.onTonConnectRequest(onTransaction);
+    }, [onTransaction]);
 
     useEffect(() => {
         window.backgroundApi.onTonConnectDisconnect(disconnect);
@@ -35,19 +43,9 @@ export const TonConnectSubscription = () => {
         });
     }, []);
 
-    const handleClose = useCallback(
-        async (boc?: string) => {
-            if (!request) return;
-            try {
-                await responseSendAsync({ request, boc });
-            } finally {
-                setRequest(undefined);
-            }
-        },
-        [request, responseSendAsync, setRequest]
-    );
+    const handleClose = useCallback(() => {
+        setRequest(undefined);
+    }, [setRequest]);
 
-    return (
-        <TonTransactionNotification params={request?.payload ?? null} handleClose={handleClose} />
-    );
+    return <TonConnectRequestNotification request={request} handleClose={handleClose} />;
 };

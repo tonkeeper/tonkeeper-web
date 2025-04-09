@@ -36,11 +36,21 @@ export const useTonendpoint = (options: {
     }, [options.targetEnv, options.build, options.network, options.lang, options.platform]);
 };
 
+export interface ServerConfig {
+    mainnetConfig: TonendpointConfig;
+    testnetConfig: TonendpointConfig;
+}
+
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
-    return useQuery<TonendpointConfig, Error>(
+    return useQuery<ServerConfig, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpoint],
         async () => {
-            return getServerConfig(tonendpoint);
+            const country = await tonendpoint.country();
+            tonendpoint.setCountryCode(country.country);
+            return {
+                mainnetConfig: await getServerConfig(tonendpoint, Network.MAINNET),
+                testnetConfig: await getServerConfig(tonendpoint, Network.TESTNET)
+            };
         }
     );
 };
@@ -49,14 +59,15 @@ export const DefaultRefetchInterval = 60000; // 60 sec
 
 export const useTonendpointBuyMethods = () => {
     const { tonendpoint } = useAppContext();
-    const { data: countryCode } = useUserCountry();
     return useQuery<TonendpoinFiatCategory, Error>(
-        [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang, countryCode],
+        [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang],
         async () => {
-            const methods = await tonendpoint.getFiatMethods(countryCode);
+            const methods = await tonendpoint.getFiatMethods();
             const buy = methods.categories[0];
 
-            const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
+            const layout = methods.layoutByCountry.find(
+                item => item.countryCode === tonendpoint.params.countryCode
+            );
 
             const buildMethods = (acc: TonendpoinFiatItem[], id: string) => {
                 const method = buy.items.find(item => item.id === id);
@@ -78,9 +89,10 @@ export const useTonendpointBuyMethods = () => {
 
 export const useCreateMercuryoProUrl = () => {
     const { tonendpoint } = useAppContext();
-    const { data } = useTonenpointConfig(tonendpoint);
+    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     return useMutation<string, Error, string>(async baseUrl => {
+        const data = serverConfig?.mainnetConfig;
         try {
             if (!data?.mercuryo_otc_id) {
                 throw new Error('Missing mercuryo get otc url');

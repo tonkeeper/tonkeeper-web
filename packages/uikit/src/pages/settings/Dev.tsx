@@ -1,14 +1,17 @@
-import { Network, switchNetwork } from '@tonkeeper/core/dist/entries/network';
 import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useTranslation } from '../../hooks/translation';
-import { useActiveWallet } from '../../state/wallet';
-import { useDevSettings, useMutateDevSettings } from '../../state/dev';
 import { useAppSdk } from '../../hooks/appSdk';
-import { CloseIcon, SpinnerIcon } from '../../components/Icon';
+import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import styled from 'styled-components';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { Notification } from '../../components/Notification';
+import { ImportBySKWallet } from '../import/ImportBySKWallet';
+import { AddWalletContext } from '../../components/create/AddWalletContext';
+import { useNavigate } from 'react-router-dom';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -16,6 +19,7 @@ const CookieSettings = () => {
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
+        await sdk.storage.set(AppKey.PRO_AUTH_TOKEN, null);
         await client.invalidateQueries();
     });
 
@@ -36,34 +40,49 @@ const CookieSettings = () => {
     return <SettingsList items={items} />;
 };
 
-export const DevSettings = React.memo(() => {
-    const { t } = useTranslation();
-
-    const wallet = useActiveWallet();
-    const { mutate: mutateDevSettings } = useMutateDevSettings();
-    const { data: devSettings } = useDevSettings();
+const AddAccountBySK = () => {
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const navigate = useNavigate();
 
     const items = useMemo<SettingsItem[]>(() => {
-        const network = devSettings?.tonNetwork ?? Network.MAINNET;
         return [
             {
-                name: t('settings_network_alert_title'),
-                icon: network === Network.MAINNET ? 'Mainnet' : 'Testnet',
-                action: () => mutateDevSettings({ tonNetwork: switchNetwork(network) })
+                name: 'Add account with private key',
+                icon: <PlusIcon />,
+                action: () => onOpen()
             }
         ];
-    }, [t, wallet, devSettings]);
+    }, [onOpen]);
 
+    return (
+        <>
+            <SettingsList items={items} />
+            <AddWalletContext.Provider value={{ navigateHome: onClose }}>
+                <Notification isOpen={isOpen} handleClose={onClose}>
+                    {() => (
+                        <ImportBySKWallet
+                            afterCompleted={() => {
+                                onClose();
+                                navigate('/');
+                            }}
+                        />
+                    )}
+                </Notification>
+            </AddWalletContext.Provider>
+        </>
+    );
+};
+
+export const DevSettings = React.memo(() => {
     return (
         <>
             <SubHeader title="Dev Menu" />
             <InnerBody>
-                <SettingsList items={items} />
                 <CookieSettings />
-                {/* TODO: ENABLE TRON */}
-                {/* <SettingsList items={items2} /> */}
+                <AddAccountBySK />
             </InnerBody>
         </>
     );
 });
+
 DevSettings.displayName = 'DevSettings';

@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { useAppContext } from '../hooks/appContext';
 import {
     AccountsApi,
     BlockchainApi,
@@ -9,7 +8,7 @@ import {
     MultisigOrder,
     Multisigs
 } from '@tonkeeper/core/dist/tonApiV2';
-import { useAccountsState, useActiveAccount, useActiveAccountQuery } from './wallet';
+import { useAccountsState, useActiveAccount, useActiveAccountQuery, useActiveApi } from './wallet';
 import { isStandardTonWallet, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useRef } from 'react';
 import { useCountdown } from '../hooks/useCountDown';
@@ -26,7 +25,7 @@ import { Cell, Dictionary } from '@ton/core';
 import { orderStatus } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder/multisig-utils';
 
 export const useMultisigWalletInfo = (walletAddressRaw: string) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useQuery([QueryKey.multisigWallet, walletAddressRaw], async () => {
         const multisigApi = new MultisigApi(api.tonApiV2);
         return multisigApi.getMultisigAccount({ accountId: walletAddressRaw });
@@ -45,7 +44,7 @@ export const useActiveMultisigWalletInfo = () => {
 
 export const useCheckMultisigsSigners = () => {
     const accounts = useAccountsState();
-    const { api } = useAppContext();
+    const api = useActiveApi();
     const accountsStorage = useAccountsStorage();
     const queryClient = useQueryClient();
 
@@ -111,7 +110,7 @@ export const useActiveWalletMultisigWallets = () => {
 export type MultisigInfo = Multisig & { balance: number };
 
 export const useWalletMultisigWallets = (walletAddressRaw: string) => {
-    const { api } = useAppContext();
+    const api = useActiveApi();
     return useQuery([walletAddressRaw, QueryKey.multisigWallets, api], async () => {
         let response: Multisigs;
         try {
@@ -166,7 +165,7 @@ export const useOrderInfo = (order: MultisigOrder) => {
 };
 
 export const useOrderSignedBy = (orderAddress: string) => {
-    const api = useAppContext().api;
+    const api = useActiveApi();
     return useQuery([QueryKey.multisigWallet, QueryKey.multisigOrder, orderAddress], async () => {
         const result = await new BlockchainApi(api.tonApiV2).execGetMethodForBlockchainAccount({
             accountId: orderAddress,

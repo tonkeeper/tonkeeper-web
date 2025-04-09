@@ -44,7 +44,7 @@ export interface JettonMetadata {
      */
     decimals: string;
     /**
-     * 
+     * this field currently returns a cached image URL (e.g., "https://cache.tonapi.io/images/jetton.jpg"). In the future, this will be replaced with the original URL from the metadata. The cached image is already available in the `preview` field of `JettonInfo` and will remain there.
      * @type {string}
      * @memberof JettonMetadata
      */
@@ -115,11 +115,11 @@ export function JettonMetadataFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function JettonMetadataToJSON(json: any): JettonMetadata {
-      return JettonMetadataToJSONTyped(json, false);
-  }
+export function JettonMetadataToJSON(json: any): JettonMetadata {
+    return JettonMetadataToJSONTyped(json, false);
+}
 
-  export function JettonMetadataToJSONTyped(value?: JettonMetadata | null, ignoreDiscriminator: boolean = false): any {
+export function JettonMetadataToJSONTyped(value?: JettonMetadata | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

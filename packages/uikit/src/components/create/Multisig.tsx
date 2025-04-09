@@ -4,7 +4,7 @@ import { Body1, Body2, Body2Class, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { Button } from '../fields/Button';
 import { SpinnerRing } from '../Icon';
-import { useAccountsState, useCreateAccountTonMultisig } from '../../state/wallet';
+import { useAccountsState, useActiveConfig, useCreateAccountTonMultisig } from '../../state/wallet';
 import { AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -27,7 +27,6 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 
 import { Address } from '@ton/core';
 
-import { useAppContext } from '../../hooks/appContext';
 import { RenameWalletContent } from '../settings/wallet-name/WalletNameNotification';
 import { AddWalletContext } from './AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
@@ -134,7 +133,7 @@ const CreateMultisigAwaitDeployPage: FC<{
     const [showHelpButton, setShowHelpButton] = useState(false);
     const { navigateHome } = useContext(AddWalletContext);
     const { onOpen: openConfirmDiscard } = useConfirmDiscardNotification();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
 
     const onNotificationBack = useMemo(
@@ -175,7 +174,8 @@ const CreateMultisigAwaitDeployPage: FC<{
                 addAccount({
                     address: multisigAddress,
                     hostWallets,
-                    selectedHostWalletId: deployerWalletId
+                    selectedHostWalletId: deployerWalletId,
+                    pinToWallet: deployerWalletId
                 })
             )
             .then(onDone);
@@ -244,7 +244,7 @@ const CreateMultisigFormPage: FC<{
             allowArbitrarySeqno: false
         };
         const result = await estimateDeploy({ multisigConfig, fromWallet });
-        setDeployArgs({ multisigConfig, fromWallet, feeWei: result?.extra.weiAmount });
+        setDeployArgs({ multisigConfig, fromWallet, fee: result?.fee });
     };
 
     const mutateAsync = useCallback(async () => {

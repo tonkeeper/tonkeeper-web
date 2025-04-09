@@ -30,9 +30,9 @@ import type {
   GetRawShardInfo200Response,
   GetRawTime200Response,
   GetRawTransactions200Response,
+  InlineObject,
   SendRawMessage200Response,
   SendRawMessageRequest,
-  StatusDefaultResponse,
 } from '../models/index';
 import {
     GetAllRawShardsInfo200ResponseFromJSON,
@@ -65,12 +65,12 @@ import {
     GetRawTime200ResponseToJSON,
     GetRawTransactions200ResponseFromJSON,
     GetRawTransactions200ResponseToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
     SendRawMessage200ResponseFromJSON,
     SendRawMessage200ResponseToJSON,
     SendRawMessageRequestFromJSON,
     SendRawMessageRequestToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetAllRawShardsInfoRequest {

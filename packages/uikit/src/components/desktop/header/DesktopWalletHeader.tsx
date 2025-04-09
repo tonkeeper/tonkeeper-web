@@ -5,17 +5,27 @@ import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { usePreFetchRates } from '../../../state/rates';
 import { useTonendpointBuyMethods } from '../../../state/tonendpoint';
-import { useActiveWallet, useIsActiveWalletWatchOnly } from '../../../state/wallet';
+import {
+    useActiveTonNetwork,
+    useActiveWallet,
+    useIsActiveWalletWatchOnly
+} from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
+import { ArrowDownIcon, ArrowUpIcon, ExclamationMarkTriangleIcon, PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
 import { Link } from 'react-router-dom';
-import { AppProRoute } from '../../../libs/routes';
+import { AppProRoute, AppRoute, WalletSettingsRoute } from '../../../libs/routes';
 import { BuyNotification } from '../../home/BuyAction';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { Network } from '@tonkeeper/core/dist/entries/network';
+import { HideOnReview } from '../../ios/HideOnReview';
+import { BorderSmallResponsive } from '../../shared/Styles';
+import { hexToRGBA } from '../../../libs/css';
+import { Label2 } from '../../Text';
+import { useTwoFAWalletConfig } from '../../../state/two-fa';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -31,6 +41,12 @@ const DesktopRightPart = styled.div`
     display: flex;
 `;
 
+const DesktopLeftPart = styled.div`
+    display: flex;
+    gap: 16px;
+    align-items: center;
+`;
+
 const ButtonStyled = styled(Button)`
     display: flex;
     gap: 6px;
@@ -44,6 +60,24 @@ const LinkStyled = styled(Link)`
     text-decoration: unset;
 `;
 
+const TwoFARecoveryStarted = styled(Link)`
+    text-decoration: unset;
+    box-sizing: border-box;
+    min-height: 36px;
+    ${BorderSmallResponsive};
+    background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
+    color: ${p => p.theme.accentOrange};
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    transition: background-color 0.1s ease-in;
+
+    &:hover {
+        background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.2)};
+    }
+`;
+
 const DesktopWalletHeaderPayload = () => {
     usePreFetchRates();
     const { data: balance, isLoading } = useWalletTotalBalance();
@@ -54,10 +88,20 @@ const DesktopWalletHeaderPayload = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
     const activeWallet = useActiveWallet();
     const { onOpen: sendTransfer } = useSendTransferNotification();
+    const network = useActiveTonNetwork();
+    const { data: twoFAConfig } = useTwoFAWalletConfig();
 
     return (
         <DesktopHeaderContainer>
-            <DesktopHeaderBalance isLoading={isLoading} balance={balance} />
+            <DesktopLeftPart>
+                <DesktopHeaderBalance isLoading={isLoading} balance={balance} network={network} />
+                {twoFAConfig?.status === 'disabling' && (
+                    <TwoFARecoveryStarted to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}>
+                        <ExclamationMarkTriangleIcon />
+                        <Label2>{t('wallet_2fa_recovery_started')}</Label2>
+                    </TwoFARecoveryStarted>
+                )}
+            </DesktopLeftPart>
             <DesktopRightPart>
                 <ButtonsContainer>
                     {!isReadOnly && (
@@ -66,14 +110,16 @@ const DesktopWalletHeaderPayload = () => {
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
-                        <LinkStyled to={AppProRoute.multiSend}>
-                            <ButtonStyled size="small">
-                                <ArrowUpIcon />
-                                {t('wallet_multi_send')}
-                            </ButtonStyled>
-                        </LinkStyled>
-                    )}
+                    <HideOnReview>
+                        {!isReadOnly && isStandardTonWallet(activeWallet) && (
+                            <LinkStyled to={AppProRoute.multiSend}>
+                                <ButtonStyled size="small">
+                                    <ArrowUpIcon />
+                                    {t('wallet_multi_send')}
+                                </ButtonStyled>
+                            </LinkStyled>
+                        )}
+                    </HideOnReview>
                     <ButtonStyled
                         size="small"
                         onClick={() => {
@@ -86,12 +132,17 @@ const DesktopWalletHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                    <ButtonStyled size="small" onClick={onOpen}>
-                        <PlusIconSmall />
-                        {t('wallet_buy')}
-                    </ButtonStyled>
+                    <HideOnReview>
+                        {network !== Network.TESTNET && (
+                            <ButtonStyled size="small" onClick={onOpen}>
+                                <PlusIconSmall />
+                                {t('wallet_buy')}
+                            </ButtonStyled>
+                        )}
+                    </HideOnReview>
                 </ButtonsContainer>
             </DesktopRightPart>
+
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </DesktopHeaderContainer>
     );

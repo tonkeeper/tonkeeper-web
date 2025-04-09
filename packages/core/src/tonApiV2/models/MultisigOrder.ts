@@ -129,11 +129,11 @@ export function MultisigOrderFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function MultisigOrderToJSON(json: any): MultisigOrder {
-      return MultisigOrderToJSONTyped(json, false);
-  }
+export function MultisigOrderToJSON(json: any): MultisigOrder {
+    return MultisigOrderToJSONTyped(json, false);
+}
 
-  export function MultisigOrderToJSONTyped(value?: MultisigOrder | null, ignoreDiscriminator: boolean = false): any {
+export function MultisigOrderToJSONTyped(value?: MultisigOrder | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

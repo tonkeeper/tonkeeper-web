@@ -88,11 +88,11 @@ export function TonConnectProofRequestProofFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function TonConnectProofRequestProofToJSON(json: any): TonConnectProofRequestProof {
-      return TonConnectProofRequestProofToJSONTyped(json, false);
-  }
+export function TonConnectProofRequestProofToJSON(json: any): TonConnectProofRequestProof {
+    return TonConnectProofRequestProofToJSONTyped(json, false);
+}
 
-  export function TonConnectProofRequestProofToJSONTyped(value?: TonConnectProofRequestProof | null, ignoreDiscriminator: boolean = false): any {
+export function TonConnectProofRequestProofToJSONTyped(value?: TonConnectProofRequestProof | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

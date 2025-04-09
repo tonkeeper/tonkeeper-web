@@ -7,13 +7,15 @@ import {
     Tonendpoint,
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import { Configuration as TronConfiguration } from '@tonkeeper/core/dist/tronApi';
 import React, { useContext } from 'react';
 
 export interface IAppContext {
-    api: APIConfig;
+    mainnetApi: APIConfig;
+    testnetApi: APIConfig;
+
     fiat: FiatCurrencies;
-    config: TonendpointConfig;
+    mainnetConfig: TonendpointConfig;
+    testnetConfig: TonendpointConfig;
     tonendpoint: Tonendpoint;
     standalone: boolean;
     extension: boolean;
@@ -29,19 +31,23 @@ export interface IAppContext {
     hideBrowser?: boolean;
     browserLength?: number;
     env?: {
-        tgAuthBotId: string;
-        stonfiReferralAddress: string;
+        tgAuthBotId?: string;
+        stonfiReferralAddress?: string;
+        tronApiKey?: string;
     };
     defaultWalletVersion: WalletVersion;
 }
 
 export const AppContext = React.createContext<IAppContext>({
-    api: {
-        tonApiV2: new ConfigurationV2(),
-        tronApi: new TronConfiguration()
+    mainnetApi: {
+        tonApiV2: new ConfigurationV2()
+    },
+    testnetApi: {
+        tonApiV2: new ConfigurationV2()
     },
     fiat: FiatCurrencies.USD,
-    config: defaultTonendpointConfig,
+    mainnetConfig: defaultTonendpointConfig,
+    testnetConfig: defaultTonendpointConfig,
     tonendpoint: new Tonendpoint({ targetEnv: 'web' }, {}),
     standalone: false,
     extension: false,
@@ -56,3 +62,8 @@ export const useAppContext = () => {
 };
 
 export const AppSelectionContext = React.createContext<EventTarget | null>(null);
+
+export const useAppPlatform = () => {
+    const { tonendpoint } = useAppContext();
+    return tonendpoint.targetEnv;
+};

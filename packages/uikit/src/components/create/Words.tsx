@@ -7,11 +7,14 @@ import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
 import { Body1, Body2, Body2Class, Body3, H2Label2Responsive, Label2 } from '../Text';
-import { ButtonResponsiveSize } from '../fields/Button';
+import { Button, ButtonResponsiveSize } from '../fields/Button';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { ExclamationMarkCircleIcon } from '../Icon';
 import { validateMnemonicTonOrMAM } from '@tonkeeper/core/dist/service/mnemonicService';
 import { ToggleButton, ToggleButtonItem } from '../shared/ToggleButton';
+import { useActiveConfig } from '../../state/wallet';
+import { hexToRGBA } from '../../libs/css';
+import { handleSubmit } from '../../libs/form';
 
 const Block = styled.div`
     display: flex;
@@ -110,8 +113,21 @@ const MamAccountCallout = styled.div`
     margin-bottom: 24px;
 `;
 
+const TronAccountCallout = styled.div`
+    background: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
+    ${BorderSmallResponsive};
+    padding: 8px 12px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+`;
+
 const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
+`;
+
+const Body3Orange = styled(Body3)`
+    color: ${p => p.theme.accentOrange};
 `;
 
 const ExclamationMarkCircleIconStyled = styled(ExclamationMarkCircleIcon)`
@@ -127,26 +143,49 @@ const LinkStyled = styled(Body3)`
     cursor: pointer;
 `;
 
-export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean }> = ({
-    mnemonic,
-    showMamInfo
-}) => {
+const H2Label2ResponsiveStyled = styled(H2Label2Responsive)`
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            padding: 0 40px;
+        `}
+`;
+
+export const WordsGridAndHeaders: FC<{
+    mnemonic: string[];
+    type?: 'standard' | 'mam' | 'tron';
+    allowCopy?: boolean;
+    descriptionDown?: boolean;
+}> = ({ mnemonic, type, allowCopy, descriptionDown }) => {
     const { t } = useTranslation();
-    const { config } = useAppContext();
+    const config = useActiveConfig();
     const sdk = useAppSdk();
+    type ??= 'standard';
 
     return (
         <>
             <HeadingBlock>
-                <H2Label2Responsive>
-                    {t(showMamInfo ? 'secret_words_account_title' : 'secret_words_title')}
-                </H2Label2Responsive>
-                <Body>
-                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
-                </Body>
+                <H2Label2ResponsiveStyled>
+                    {t(
+                        type === 'mam'
+                            ? 'secret_words_account_title'
+                            : type === 'tron'
+                            ? 'export_trc_20_wallet'
+                            : 'secret_words_title'
+                    )}
+                </H2Label2ResponsiveStyled>
+                {!descriptionDown && (
+                    <Body>
+                        {t(
+                            mnemonic.length === 12
+                                ? 'secret_words_caption_12'
+                                : 'secret_words_caption'
+                        )}
+                    </Body>
+                )}
             </HeadingBlock>
 
-            {showMamInfo && (
+            {type === 'mam' && (
                 <MamAccountCallout>
                     <div>
                         <Body3Secondary>{t('mam_account_explanation') + ' '}</Body3Secondary>
@@ -160,6 +199,15 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                 </MamAccountCallout>
             )}
 
+            {type === 'tron' && (
+                <TronAccountCallout>
+                    <div>
+                        <Body3Orange>{t('tron_account_export_warning_explanation')}</Body3Orange>
+                    </div>
+                    <ExclamationMarkCircleIconStyled />
+                </TronAccountCallout>
+            )}
+
             <WorldsGridStyled wordsNumber={mnemonic.length as 12 | 24}>
                 {mnemonic.map((world, index) => (
                     <Body1 key={index}>
@@ -167,6 +215,21 @@ export const WordsGridAndHeaders: FC<{ mnemonic: string[]; showMamInfo?: boolean
                     </Body1>
                 ))}
             </WorldsGridStyled>
+
+            {descriptionDown && (
+                <Body>
+                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
+                </Body>
+            )}
+
+            {allowCopy && (
+                <Button
+                    onClick={() => sdk.copyToClipboard(mnemonic.join(' '), t('copied'))}
+                    marginTop
+                >
+                    {t('recovery_phrase_copy_button')}
+                </Button>
+            )}
         </>
     );
 };
@@ -187,7 +250,7 @@ export const Words: FC<{
 
     return (
         <CenterContainer>
-            <WordsGridAndHeaders mnemonic={mnemonic} showMamInfo={showMamInfo} />
+            <WordsGridAndHeaders mnemonic={mnemonic} type={showMamInfo ? 'mam' : 'standard'} />
 
             <ButtonResponsiveSize fullWidth primary marginTop onClick={onCheck}>
                 {t('continue')}
@@ -479,7 +542,8 @@ export const ImportWords: FC<{
     isLoading?: boolean;
     onMnemonic: (mnemonic: string[]) => void;
     onIsDirtyChange?: (isDirty: boolean) => void;
-}> = ({ isLoading, onIsDirtyChange, onMnemonic }) => {
+    enableShortMnemonic?: boolean;
+}> = ({ isLoading, onIsDirtyChange, onMnemonic, enableShortMnemonic = true }) => {
     const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const sdk = useAppSdk();
     const { standalone } = useAppContext();
@@ -564,7 +628,7 @@ export const ImportWords: FC<{
     };
 
     return (
-        <>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('import_wallet_title_web')}</H2Label2Responsive>
@@ -577,14 +641,22 @@ export const ImportWords: FC<{
                     </Body>
                 </div>
             </Block>
-            <ToggleButtonStyled>
-                <ToggleButtonItem active={wordsNumber === 24} onClick={() => setWordsNumber(24)}>
-                    <Label2>{t('import_wallet_24_words')}</Label2>
-                </ToggleButtonItem>
-                <ToggleButtonItem active={wordsNumber === 12} onClick={() => setWordsNumber(12)}>
-                    <Label2>{t('import_wallet_12_words')}</Label2>
-                </ToggleButtonItem>
-            </ToggleButtonStyled>
+            {enableShortMnemonic && (
+                <ToggleButtonStyled>
+                    <ToggleButtonItem
+                        active={wordsNumber === 24}
+                        onClick={handleSubmit(() => setWordsNumber(24))}
+                    >
+                        <Label2>{t('import_wallet_24_words')}</Label2>
+                    </ToggleButtonItem>
+                    <ToggleButtonItem
+                        active={wordsNumber === 12}
+                        onClick={handleSubmit(() => setWordsNumber(12))}
+                    >
+                        <Label2>{t('import_wallet_12_words')}</Label2>
+                    </ToggleButtonItem>
+                </ToggleButtonStyled>
+            )}
             <Block>
                 <Inputs ref={ref} wordsNumber={wordsNumber}>
                     {mnemonic.slice(0, wordsNumber).map((item, index) => (
@@ -607,11 +679,12 @@ export const ImportWords: FC<{
                     loading={isLoading}
                     onClick={onSubmit}
                     bottom={standalone}
+                    type="submit"
                 >
                     {t('continue')}
                 </ButtonResponsiveSize>
             </BottomButtonBlock>
-        </>
+        </form>
     );
 };
 

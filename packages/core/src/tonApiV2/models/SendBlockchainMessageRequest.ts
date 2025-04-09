@@ -31,6 +31,12 @@ export interface SendBlockchainMessageRequest {
      * @memberof SendBlockchainMessageRequest
      */
     batch?: Array<string>;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SendBlockchainMessageRequest
+     */
+    meta?: { [key: string]: string; };
 }
 
 /**
@@ -52,14 +58,15 @@ export function SendBlockchainMessageRequestFromJSONTyped(json: any, ignoreDiscr
         
         'boc': json['boc'] == null ? undefined : json['boc'],
         'batch': json['batch'] == null ? undefined : json['batch'],
+        'meta': json['meta'] == null ? undefined : json['meta'],
     };
 }
 
-  export function SendBlockchainMessageRequestToJSON(json: any): SendBlockchainMessageRequest {
-      return SendBlockchainMessageRequestToJSONTyped(json, false);
-  }
+export function SendBlockchainMessageRequestToJSON(json: any): SendBlockchainMessageRequest {
+    return SendBlockchainMessageRequestToJSONTyped(json, false);
+}
 
-  export function SendBlockchainMessageRequestToJSONTyped(value?: SendBlockchainMessageRequest | null, ignoreDiscriminator: boolean = false): any {
+export function SendBlockchainMessageRequestToJSONTyped(value?: SendBlockchainMessageRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -68,6 +75,7 @@ export function SendBlockchainMessageRequestFromJSONTyped(json: any, ignoreDiscr
         
         'boc': value['boc'],
         'batch': value['batch'],
+        'meta': value['meta'],
     };
 }
 

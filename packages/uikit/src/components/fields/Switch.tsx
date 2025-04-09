@@ -5,6 +5,7 @@ export interface SwitchProps {
     checked: boolean;
     onChange?: (checked: boolean) => void;
     disabled?: boolean;
+    className?: string;
 }
 
 const Wrapper = styled.div<{ disabled?: boolean }>`
@@ -14,15 +15,14 @@ const Wrapper = styled.div<{ disabled?: boolean }>`
     display: inline-block;
     vertical-align: middle;
     text-align: left;
-
     cursor: pointer;
-
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
     ${props =>
-        props.disabled
-            ? css`
-                  opacity: 0.48;
-              `
-            : undefined}
+        props.disabled &&
+        css`
+            opacity: 0.48;
+        `}
 `;
 
 const Label = styled.div`
@@ -32,12 +32,14 @@ const Label = styled.div`
     border: 0 solid ${props => props.theme.textPrimary};
     border-radius: 20px;
     margin: 0;
+    box-sizing: border-box;
 `;
 
 const Inner = styled.span<{ checked?: boolean; active: boolean }>`
     display: block;
     width: 200%;
     margin-left: -100%;
+    will-change: margin;
     ${props =>
         props.active &&
         css`
@@ -45,7 +47,7 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
         `}
 
     &:before,
-  &:after {
+    &:after {
         display: block;
         float: left;
         width: 50%;
@@ -53,13 +55,12 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
         padding: 0;
         line-height: 32px;
         font-size: 14px;
-        color: white;
         font-weight: bold;
         box-sizing: border-box;
     }
 
     &:before {
-        content: attr(data-yes);
+        content: '';
         text-transform: uppercase;
         padding-left: 10px;
         background-color: ${props => props.theme.buttonPrimaryBackground};
@@ -67,7 +68,7 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
     }
 
     &:after {
-        content: attr(data-no);
+        content: '';
         text-transform: uppercase;
         padding-right: 10px;
         background-color: ${props => props.theme.backgroundContentTint};
@@ -76,11 +77,10 @@ const Inner = styled.span<{ checked?: boolean; active: boolean }>`
     }
 
     ${props =>
-        props.checked
-            ? css`
-                  margin-left: 0;
-              `
-            : undefined}
+        props.checked &&
+        css`
+            margin-left: 0;
+        `}
 `;
 
 const Outer = styled.span<{ checked?: boolean; active: boolean }>`
@@ -92,37 +92,30 @@ const Outer = styled.span<{ checked?: boolean; active: boolean }>`
     position: absolute;
     top: 0;
     bottom: 0;
-    right: 18px;
-    border: 0 solid ${props => props.theme.textPrimary};
+    transform: translateX(${props => (props.checked ? '19px' : '0')});
     border-radius: 20px;
+    will-change: transform;
     ${props =>
         props.active &&
         css`
-            transition: all 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out;
         `}
-
-    ${props =>
-        props.checked
-            ? css`
-                  right: 0px;
-              `
-            : undefined}
 `;
 
 const useActive = () => {
     const [active, setActive] = useState(false);
     useEffect(() => {
-        const timeout = setTimeout(() => setActive(true), 100);
-        return () => {
-            clearTimeout(timeout);
-        };
+        const timeout = setTimeout(() => setActive(true), 0);
+        return () => clearTimeout(timeout);
     }, []);
     return active;
 };
-export const Switch: FC<SwitchProps> = React.memo(({ checked, onChange, disabled }) => {
+
+export const Switch: FC<SwitchProps> = React.memo(({ checked, onChange, disabled, className }) => {
     const active = useActive();
     return (
         <Wrapper
+            className={className}
             disabled={disabled}
             onClick={e => {
                 if (!disabled && onChange) {

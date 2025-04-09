@@ -1,14 +1,15 @@
 import { walletContractFromState } from '../../wallet/contractService';
-import { WalletContractV5R1 } from '@ton/ton';
+import { WalletContractV5R1 } from '@ton/ton/dist/wallets/WalletContractV5R1';
 import { CellSigner } from '../../../entries/signer';
 import { WalletOutgoingMessage } from '../encoder/types';
 import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
 import { APIConfig } from '../../../entries/apis';
 import { ISender } from './ISender';
 import { externalMessage, getServerTime, getWalletSeqNo } from '../utils';
+import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
+import BigNumber from 'bignumber.js';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { Configuration, DefaultApi, EmulationApi } from '../../../batteryApi';
 
 export class BatteryMessageSender implements ISender {
     constructor(
@@ -16,13 +17,13 @@ export class BatteryMessageSender implements ISender {
             messageTtl: number;
             excessAddress: string;
             authToken: string;
+            batteryUnitTonRate: BigNumber;
         },
         private api: {
             tonApi: APIConfig;
             batteryApi: Configuration;
         },
         private readonly wallet: TonWalletStandard,
-
         private readonly signer: CellSigner
     ) {}
 
@@ -53,8 +54,19 @@ export class BatteryMessageSender implements ISender {
             }
         });
 
+        const extra = new AssetAmount({
+            asset: TON_ASSET,
+            weiAmount: Math.abs(result.event.extra)
+        });
+
         return {
-            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: result.event.extra * -1 }),
+            fee: {
+                type: 'battery' as const,
+                charges: extra.relativeAmount
+                    .div(this.batteryConfig.batteryUnitTonRate)
+                    .integerValue(BigNumber.ROUND_UP)
+                    .toNumber()
+            },
             event: result.event
         };
     }

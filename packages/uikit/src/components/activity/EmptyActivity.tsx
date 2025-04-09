@@ -7,9 +7,9 @@ import { Body2, Label2 } from '../Text';
 import { BuyNotification } from '../home/BuyAction';
 import { Button } from '../fields/Button';
 import { ArrowDownIcon, PlusIcon } from '../Icon';
+import { HideOnReview } from '../ios/HideOnReview';
 
 const EmptyBody = styled.div`
-    margin-top: -64px;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -51,10 +51,12 @@ const EmptyActivity = () => {
             <Label2>{t('activity_empty_transaction_title')}</Label2>
             <BodyText>{t('activity_empty_transaction_caption')}</BodyText>
             <ButtonRow>
-                <ButtonStyled size="small" onClick={() => setOpenBuy(true)}>
-                    <PlusIcon />
-                    {t('exchange_title')}
-                </ButtonStyled>
+                <HideOnReview>
+                    <ButtonStyled size="small" onClick={() => setOpenBuy(true)}>
+                        <PlusIcon />
+                        {t('exchange_title')}
+                    </ButtonStyled>
+                </HideOnReview>
                 <ButtonStyled
                     size="small"
                     onClick={() => sdk.uiEvents.emit('receive', { method: 'receive', params: {} })}

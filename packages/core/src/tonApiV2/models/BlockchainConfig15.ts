@@ -73,11 +73,11 @@ export function BlockchainConfig15FromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function BlockchainConfig15ToJSON(json: any): BlockchainConfig15 {
-      return BlockchainConfig15ToJSONTyped(json, false);
-  }
+export function BlockchainConfig15ToJSON(json: any): BlockchainConfig15 {
+    return BlockchainConfig15ToJSONTyped(json, false);
+}
 
-  export function BlockchainConfig15ToJSONTyped(value?: BlockchainConfig15 | null, ignoreDiscriminator: boolean = false): any {
+export function BlockchainConfig15ToJSONTyped(value?: BlockchainConfig15 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

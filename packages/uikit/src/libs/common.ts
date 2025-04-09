@@ -62,3 +62,14 @@ export const getCountryName = (language: string, country: string) => {
         return country;
     }
 };
+
+export const toErrorMessage = (e: unknown) => {
+    if (e && typeof e === 'object' && 'message' in e && typeof e.message === 'string') {
+        return e.message;
+    } else if (e && typeof e === 'string') {
+        return e;
+    }
+
+    console.error(e);
+    return 'Unknown error';
+};

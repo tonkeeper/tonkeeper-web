@@ -88,11 +88,11 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
     };
 }
 
-  export function RiskToJSON(json: any): Risk {
-      return RiskToJSONTyped(json, false);
-  }
+export function RiskToJSON(json: any): Risk {
+    return RiskToJSONTyped(json, false);
+}
 
-  export function RiskToJSONTyped(value?: Risk | null, ignoreDiscriminator: boolean = false): any {
+export function RiskToJSONTyped(value?: Risk | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

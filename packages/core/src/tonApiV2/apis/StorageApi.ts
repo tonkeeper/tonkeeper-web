@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   GetStorageProviders200Response,
-  StatusDefaultResponse,
+  InlineObject,
 } from '../models/index';
 import {
     GetStorageProviders200ResponseFromJSON,
     GetStorageProviders200ResponseToJSON,
-    StatusDefaultResponseFromJSON,
-    StatusDefaultResponseToJSON,
+    InlineObjectFromJSON,
+    InlineObjectToJSON,
 } from '../models/index';
 
 /**

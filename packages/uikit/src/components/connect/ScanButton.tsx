@@ -1,4 +1,4 @@
-import { ConnectItemReply, DAppManifest } from '@tonkeeper/core/dist/entries/tonConnect';
+import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -7,6 +7,8 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { ScanIcon } from '../Icon';
 import { TonConnectNotification } from './TonConnectNotification';
 import { useResponseConnectionMutation, useGetConnectInfo } from './connectHook';
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 const ScanBlock = styled.div`
     position: absolute;
@@ -32,11 +34,18 @@ export const ScanButton = () => {
         [setParams, mutateAsync]
     );
 
-    const handlerClose = async (replyItems?: ConnectItemReply[], manifest?: DAppManifest) => {
+    const handlerClose = async (
+        result: {
+            replyItems: TonConnectEventPayload;
+            manifest: DAppManifest;
+            account: Account;
+            walletId: WalletId;
+        } | null
+    ) => {
         if (!params) return;
         responseReset();
         try {
-            await responseConnectionAsync({ params, replyItems, manifest });
+            await responseConnectionAsync({ params, result });
         } finally {
             setParams(null);
         }

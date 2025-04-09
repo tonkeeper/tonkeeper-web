@@ -16,23 +16,25 @@ import {
     AccountTonMultisig,
     AccountTonOnly,
     AccountTonWatchOnly,
-    Account
-} from '@tonkeeper/core/dist/entries/account';
+    Account,
+    getNetworkByAccount,
+    AccountTonTestnet, AccountTonSK
+} from "@tonkeeper/core/dist/entries/account";
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import {
-    useAccountsState,
-    useActiveAccount,
-    useActiveTonNetwork,
-    useMutateActiveAccount
-} from '../../../state/wallet';
+import { useAccountsState, useMutateActiveAccount } from '../../../state/wallet';
 import {
     useMultisigsOfAccountToDisplay,
     useMutateMultisigSelectedHostWallet
 } from '../../../state/multisig';
-import { AccountBadge, WalletIndexBadge, WalletVersionBadge } from '../../account/AccountBadge';
+import {
+    AccountBadge,
+    NetworkBadge,
+    WalletIndexBadge,
+    WalletVersionBadge
+} from '../../account/AccountBadge';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
@@ -52,7 +54,11 @@ const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: 
 `;
 
 const AsideMenuSubItemContainer = styled.div`
-    padding-left: 16px;
+    padding-left: 26px;
+`;
+
+const NetworkBadgeStyled = styled(NetworkBadge)`
+    margin-left: -4px;
 `;
 
 const AccountBadgeStyled = styled(AccountBadge)`
@@ -119,13 +125,14 @@ const AsideMultisigItem = forwardRef<
 });
 
 export const AsideMenuAccountMnemonic: FC<{
-    account: AccountTonMnemonic;
-    isSelected: boolean;
+    account: AccountTonMnemonic | AccountTonTestnet | AccountTonSK;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ account, isSelected, onClickWallet }) => {
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
@@ -133,7 +140,11 @@ export const AsideMenuAccountMnemonic: FC<{
     return (
         <>
             <AsideMenuItem
-                isSelected={isSelected && sortedWallets.length === 1}
+                isSelected={
+                    mightBeHighlighted &&
+                    sortedWallets.length === 1 &&
+                    selectedWalletId === sortedWallets[0].id
+                }
                 onClick={() => onClickWallet(sortedWallets[0].id)}
                 ref={ref}
             >
@@ -141,6 +152,8 @@ export const AsideMenuAccountMnemonic: FC<{
                     <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 )}
                 <Label2>{account.name}</Label2>
+                <NetworkBadgeStyled network={network} size="s" />
+
                 <GearIconButtonStyled
                     onClick={e => {
                         e.preventDefault();
@@ -162,7 +175,7 @@ export const AsideMenuAccountMnemonic: FC<{
                 sortedWallets.map(wallet => (
                     <AsideMenuSubItemContainer key={wallet.id}>
                         <AsideMenuItem
-                            isSelected={isSelected && account.activeTonWallet.id === wallet.id}
+                            isSelected={mightBeHighlighted && selectedWalletId === wallet.id}
                             onClick={() => onClickWallet(wallet.id)}
                         >
                             <Label2>
@@ -182,19 +195,24 @@ export const AsideMenuAccountMnemonic: FC<{
 
 export const AsideMenuAccountLedger: FC<{
     account: AccountLedger;
-    isSelected: boolean;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ account, isSelected, onClickWallet }) => {
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
     return (
         <>
             <AsideMenuItem
-                isSelected={isSelected && sortedDerivations.length === 1}
+                isSelected={
+                    mightBeHighlighted &&
+                    sortedDerivations.length === 1 &&
+                    selectedWalletId === sortedDerivations[0].activeTonWalletId
+                }
                 onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
                 ref={ref}
             >
@@ -234,7 +252,8 @@ export const AsideMenuAccountLedger: FC<{
                         <AsideMenuSubItemContainer key={derivation.index}>
                             <AsideMenuItem
                                 isSelected={
-                                    isSelected && account.activeDerivationIndex === derivation.index
+                                    mightBeHighlighted &&
+                                    selectedWalletId === derivation.activeTonWalletId
                                 }
                                 onClick={() => onClickWallet(derivation.activeTonWalletId)}
                             >
@@ -258,19 +277,24 @@ export const AsideMenuAccountLedger: FC<{
 
 export const AsideMenuAccountTonOnly: FC<{
     account: AccountTonOnly;
-    isSelected: boolean;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ account, isSelected, onClickWallet }) => {
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
-    const network = useActiveTonNetwork();
+    const network = getNetworkByAccount(account);
 
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
     const sortedWallets = account.tonWallets.slice().sort(sortWalletsByVersion);
     return (
         <>
             <AsideMenuItem
-                isSelected={isSelected && sortedWallets.length === 1}
+                isSelected={
+                    mightBeHighlighted &&
+                    sortedWallets.length === 1 &&
+                    selectedWalletId === account.activeTonWallet.id
+                }
                 onClick={() => onClickWallet(account.activeTonWallet.id)}
                 ref={ref}
             >
@@ -300,7 +324,7 @@ export const AsideMenuAccountTonOnly: FC<{
                 sortedWallets.map(wallet => (
                     <AsideMenuSubItemContainer key={wallet.id}>
                         <AsideMenuItem
-                            isSelected={isSelected && account.activeTonWallet.id === wallet.id}
+                            isSelected={mightBeHighlighted && selectedWalletId === wallet.id}
                             onClick={() => onClickWallet(wallet.id)}
                         >
                             <Label2>
@@ -320,14 +344,15 @@ export const AsideMenuAccountTonOnly: FC<{
 
 export const AsideMenuAccountKeystone: FC<{
     account: AccountKeystone;
-    isSelected: boolean;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ account, isSelected, onClickWallet }) => {
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const shouldShowIcon = useAccountsState().length > 1;
 
     return (
         <AsideMenuItem
-            isSelected={isSelected}
+            isSelected={mightBeHighlighted && selectedWalletId === account.activeTonWallet.id}
             onClick={() => onClickWallet(account.activeTonWallet.id)}
         >
             {shouldShowIcon && (
@@ -341,14 +366,15 @@ export const AsideMenuAccountKeystone: FC<{
 
 export const AsideMenuAccountWatchOnly: FC<{
     account: AccountTonWatchOnly;
-    isSelected: boolean;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ account, isSelected, onClickWallet }) => {
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const shouldShowIcon = useAccountsState().length > 1;
 
     return (
         <AsideMenuItem
-            isSelected={isSelected}
+            isSelected={mightBeHighlighted && selectedWalletId === account.activeTonWallet.id}
             onClick={() => onClickWallet(account.activeTonWallet.id)}
         >
             {shouldShowIcon && (
@@ -362,30 +388,32 @@ export const AsideMenuAccountWatchOnly: FC<{
 
 export const AsideMenuAccountMAM: FC<{
     account: AccountMAM;
-    isSelected: boolean;
+    mightBeHighlighted: boolean;
+    selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
-}> = ({ account, isSelected, onClickWallet }) => {
+}> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const shouldShowIcon = useAccountsState().length > 1;
 
+    const network = getNetworkByAccount(account);
     const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
 
     const location = useAsideActiveRoute();
-    const activeAccount = useActiveAccount();
     const navigate = useNavigate();
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
 
     const onClickAccount = async () => {
-        await setActiveAccount(account.id);
         navigate(AppRoute.accountSettings);
+        await setActiveAccount(account.id);
     };
 
     return (
         <>
             <AsideMenuItem
                 isSelected={
-                    location === AppRoute.accountSettings && activeAccount.id === account.id
+                    location === AppRoute.accountSettings &&
+                    account.allTonWallets.some(w => w.id === selectedWalletId)
                 }
                 onClick={onClickAccount}
                 ref={ref}
@@ -394,6 +422,7 @@ export const AsideMenuAccountMAM: FC<{
                     <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 )}
                 <Label2>{account.name}</Label2>
+                <NetworkBadgeStyled network={network} size="s" />
                 <AccountBadgeStyled accountType={account.type} size="s" />
 
                 <GearIconButtonStyled
@@ -412,7 +441,8 @@ export const AsideMenuAccountMAM: FC<{
                     <AsideMenuSubItemContainer key={derivation.index}>
                         <AsideMenuItem
                             isSelected={
-                                isSelected && account.activeDerivationIndex === derivation.index
+                                mightBeHighlighted &&
+                                selectedWalletId === derivation.activeTonWalletId
                             }
                             onClick={() => onClickWallet(derivation.activeTonWalletId)}
                         >
@@ -447,24 +477,23 @@ export const AsideMenuAccount: FC<{
     account: Account;
     mightBeHighlighted: boolean;
     onClickWallet: (walletId: WalletId) => void;
+    selectedWalletId: WalletId;
 }> = ({ account, ...rest }) => {
-    const activeAccount = useActiveAccount();
-    const isSelected = rest.mightBeHighlighted && activeAccount.id === account.id;
     switch (account.type) {
         case 'mnemonic':
-            return <AsideMenuAccountMnemonic account={account} isSelected={isSelected} {...rest} />;
+        case 'testnet':
+        case 'sk':
+            return <AsideMenuAccountMnemonic account={account} {...rest} />;
         case 'ledger':
-            return <AsideMenuAccountLedger account={account} isSelected={isSelected} {...rest} />;
+            return <AsideMenuAccountLedger account={account} {...rest} />;
         case 'ton-only':
-            return <AsideMenuAccountTonOnly account={account} isSelected={isSelected} {...rest} />;
+            return <AsideMenuAccountTonOnly account={account} {...rest} />;
         case 'keystone':
-            return <AsideMenuAccountKeystone account={account} isSelected={isSelected} {...rest} />;
+            return <AsideMenuAccountKeystone account={account} {...rest} />;
         case 'watch-only':
-            return (
-                <AsideMenuAccountWatchOnly account={account} isSelected={isSelected} {...rest} />
-            );
+            return <AsideMenuAccountWatchOnly account={account} {...rest} />;
         case 'mam':
-            return <AsideMenuAccountMAM account={account} isSelected={isSelected} {...rest} />;
+            return <AsideMenuAccountMAM account={account} {...rest} />;
         case 'ton-multisig':
             return <AsideMenuAccountMultisig />;
         default:

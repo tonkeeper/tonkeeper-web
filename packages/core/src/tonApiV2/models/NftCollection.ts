@@ -84,8 +84,7 @@ export interface NftCollection {
  */
 export const NftCollectionApprovedByEnum = {
     Getgems: 'getgems',
-    Tonkeeper: 'tonkeeper',
-    TonDiamonds: 'ton.diamonds'
+    Tonkeeper: 'tonkeeper'
 } as const;
 export type NftCollectionApprovedByEnum = typeof NftCollectionApprovedByEnum[keyof typeof NftCollectionApprovedByEnum];
 
@@ -121,11 +120,11 @@ export function NftCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function NftCollectionToJSON(json: any): NftCollection {
-      return NftCollectionToJSONTyped(json, false);
-  }
+export function NftCollectionToJSON(json: any): NftCollection {
+    return NftCollectionToJSONTyped(json, false);
+}
 
-  export function NftCollectionToJSONTyped(value?: NftCollection | null, ignoreDiscriminator: boolean = false): any {
+export function NftCollectionToJSONTyped(value?: NftCollection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

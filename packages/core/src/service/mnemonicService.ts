@@ -4,19 +4,69 @@ import {
     mnemonicToPrivateKey,
     mnemonicValidate as validateStandardTonMnemonic
 } from '@ton/crypto';
-import { AuthPassword, MnemonicType } from '../entries/password';
-import { decrypt } from './cryptoService';
-import { mnemonicToSeed, validateMnemonic as validBip39Mnemonic } from 'bip39';
+import { MnemonicType } from '../entries/password';
+import { decrypt, encrypt } from './cryptoService';
 import { deriveED25519Path } from './ed25519';
 import { assertUnreachable } from '../utils/types';
+import { AccountSecret } from '../entries/account';
 
-export const decryptWalletMnemonic = async (state: { auth: AuthPassword }, password: string) => {
-    const mnemonic = (await decrypt(state.auth.encryptedMnemonic, password)).split(' ');
-    const isValid = await seeIfMnemonicValid(mnemonic);
-    if (!isValid) {
-        throw new Error('Wallet mnemonic not valid');
+export const decryptWalletSecret = async (
+    encryptedSecret: string,
+    password: string
+): Promise<AccountSecret> => {
+    const secret = await decrypt(encryptedSecret, password);
+    return walletSecretFromString(secret);
+};
+
+export const walletSecretFromString = async (secret: string): Promise<AccountSecret> => {
+    const isValidMnemonic = await seeIfMnemonicValid(secret.split(' '));
+    if (isValidMnemonic) {
+        return {
+            type: 'mnemonic',
+            mnemonic: secret.split(' ')
+        };
     }
-    return mnemonic;
+
+    if (isValidSK(secret)) {
+        return {
+            type: 'sk',
+            sk: secret
+        };
+    }
+
+    throw new Error('Wallet secret not valid');
+};
+
+export const walletSecretToString = (secret: AccountSecret): string => {
+    if (secret.type === 'mnemonic') {
+        return secret.mnemonic.join(' ');
+    }
+
+    if (secret.type === 'sk') {
+        return secret.sk;
+    }
+
+    assertUnreachable(secret);
+};
+
+export const encryptWalletSecret = async (
+    secret: AccountSecret,
+    password: string
+): Promise<string> => {
+    const stringSecret = walletSecretToString(secret);
+    return encrypt(stringSecret, password);
+};
+
+export const isValidSK = (sk: string) => {
+    return /^[0-9a-fA-F]{128}$/.test(sk);
+};
+
+export const isValidSeed = (seed: string) => {
+    return /^[0-9a-fA-F]{64}$/.test(seed);
+};
+
+export const isValidSKOrSeed = (sk: string) => {
+    return isValidSK(sk) || isValidSeed(sk);
 };
 
 export const seeIfMnemonicValid = async (mnemonic: string[]) => {
@@ -43,18 +93,20 @@ export const validateMnemonicStandardOrBip39Ton = async (mnemonic: string[]) => 
         return true;
     }
 
-    if (validBip39Mnemonic(mnemonic.join(' '))) {
+    if (await validateBip39Mnemonic(mnemonic)) {
         return true;
     }
 
     return false;
 };
 
-export const validateBip39Mnemonic = (mnemonic: string[]) => {
+export const validateBip39Mnemonic = async (mnemonic: string[]) => {
+    const { validateMnemonic: validBip39Mnemonic } = await import('bip39');
     return validBip39Mnemonic(mnemonic.join(' '));
 };
 
 async function bip39ToPrivateKey(mnemonic: string[]) {
+    const { mnemonicToSeed } = await import('bip39');
     const seed = await mnemonicToSeed(mnemonic.join(' '));
     const TON_DERIVATION_PATH = "m/44'/607'/0'";
     const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
@@ -86,7 +138,7 @@ export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: Mnemo
         return mnemonicToPrivateKey(mnemonic);
     }
 
-    if (validBip39Mnemonic(mnemonic.join(' '))) {
+    if (await validateBip39Mnemonic(mnemonic)) {
         return bip39ToPrivateKey(mnemonic);
     }
 

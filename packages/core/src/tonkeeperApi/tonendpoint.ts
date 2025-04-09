@@ -5,7 +5,7 @@ import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop';
+    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet' | 'swap_widget_web';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -80,6 +80,28 @@ export interface TonendpointConfig {
     battery_beta?: boolean;
     disable_battery?: boolean;
     disable_battery_send?: boolean;
+    battery_packages?: {
+        value: number;
+        image: string;
+    }[];
+
+    /**
+     * "secret" flag name to determine if the app is on ios review
+     */
+    tablet_enable_additional_security?: boolean;
+
+    '2fa_public_key'?: string;
+    '2fa_api_url'?: string;
+    '2fa_tg_confirm_send_message_ttl_seconds'?: number;
+    '2fa_tg_linked_ttl_seconds'?: number;
+    '2fa_bot_url'?: string;
+
+    tron_api_url?: string;
+}
+
+interface CountryIP {
+    ip: string;
+    country: string;
 }
 
 const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';
@@ -151,13 +173,21 @@ export class Tonendpoint {
         return params.toString();
     };
 
-    boot = async (): Promise<TonendpointConfig> => {
+    boot = async (network: Network): Promise<TonendpointConfig> => {
         const response = await this.fetchApi(
-            `https://boot.tonkeeper.com/keys?${this.toSearchParams()}`,
+            `https://boot.tonkeeper.com/keys?${this.toSearchParams({ network })}`,
             {
                 method: 'GET'
             }
         );
+
+        return response.json();
+    };
+
+    country = async (): Promise<CountryIP> => {
+        const response = await this.fetchApi(`https://boot.tonkeeper.com/my/ip`, {
+            method: 'GET'
+        });
 
         return response.json();
     };
@@ -182,12 +212,12 @@ export class Tonendpoint {
         return result.data;
     };
 
-    getFiatMethods = (countryCode?: string | null | undefined): Promise<TonendpoinFiatMethods> => {
-        return this.GET('/fiat/methods', { countryCode });
+    getFiatMethods = (): Promise<TonendpoinFiatMethods> => {
+        return this.GET('/fiat/methods');
     };
 
-    getAppsPopular = (countryCode?: string | null | undefined): Promise<Recommendations> => {
-        return this.GET('/apps/popular', { countryCode }, { track: this.getTrack() });
+    getAppsPopular = (): Promise<Recommendations> => {
+        return this.GET('/apps/popular', {}, { track: this.getTrack() });
     };
 
     getTrack = (): DAppTrack => {
@@ -204,8 +234,11 @@ export class Tonendpoint {
     };
 }
 
-export const getServerConfig = async (tonendpoint: Tonendpoint): Promise<TonendpointConfig> => {
-    const result = await tonendpoint.boot();
+export const getServerConfig = async (
+    tonendpoint: Tonendpoint,
+    network: Network
+): Promise<TonendpointConfig> => {
+    const result = await tonendpoint.boot(network);
 
     return {
         flags: {},

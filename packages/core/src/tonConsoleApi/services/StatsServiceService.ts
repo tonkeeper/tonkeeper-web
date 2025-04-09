@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -46,6 +46,7 @@ export class StatsServiceService {
         chain?: Chain,
         requestBody?: {
             project_id: number;
+            name?: string;
             query?: string;
             gpt_message?: string;
             /**
@@ -81,6 +82,7 @@ export class StatsServiceService {
         chain?: Chain,
         requestBody?: {
             project_id: number;
+            name?: string;
             query?: string;
             gpt_message?: string;
             /**
@@ -140,10 +142,11 @@ export class StatsServiceService {
         id: string,
         projectId: number,
         requestBody?: {
+            name?: string;
             /**
              * cyclic execution of requests
              */
-            repeat_interval: number;
+            repeat_interval?: number;
         },
     ): CancelablePromise<StatsQuery> {
         return __request(OpenAPI, {
@@ -172,6 +175,7 @@ export class StatsServiceService {
      * @param limit Limit
      * @param type
      * @param isRepetitive
+     * @param chain chain
      * @returns any History of queries
      * @throws ApiError
      */
@@ -181,6 +185,7 @@ export class StatsServiceService {
         limit: number = 100,
         type?: Array<StatsQueryType>,
         isRepetitive?: boolean,
+        chain?: Chain,
     ): CancelablePromise<{
         count: number;
         items: Array<StatsQueryResult>;
@@ -194,6 +199,7 @@ export class StatsServiceService {
                 'limit': limit,
                 'type': type,
                 'is_repetitive': isRepetitive,
+                'chain': chain,
             },
             errors: {
                 400: `Something went wrong on client side`,

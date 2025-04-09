@@ -57,11 +57,11 @@ export function TransactionsFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function TransactionsToJSON(json: any): Transactions {
-      return TransactionsToJSONTyped(json, false);
-  }
+export function TransactionsToJSON(json: any): Transactions {
+    return TransactionsToJSONTyped(json, false);
+}
 
-  export function TransactionsToJSONTyped(value?: Transactions | null, ignoreDiscriminator: boolean = false): any {
+export function TransactionsToJSONTyped(value?: Transactions | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
