@@ -189,7 +189,7 @@
     "continue_button": "Continue",
     "p1": "Never enter your recovery phrase any other place than Tonkeeper to access your wallet.",
     "p2": "Tonkeeper Support never asks for a recovery phrase.",
-    "p3": "Everybody with your recovery phrase can access your wallet.",
+    "p3": "Anyone with your recovery phrase can use your wallet.",
     "title": "Attention"
   },
   "balances_setup_wallet": "Set up wallet",
