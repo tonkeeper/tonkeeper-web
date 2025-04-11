@@ -14,6 +14,10 @@ import { ChevronDownIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useInternetConnection } from '../../../hooks/useInternetConnection';
+import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
+import { useBatteryBalance } from '../../../state/battery';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { BatteryBalanceIcon } from '../../settings/battery/BatteryInfoHeading';
 
 const Wrapper = styled.div`
     padding: 20px 24px 16px;
@@ -62,6 +66,12 @@ const ClickWrapper = styled.div`
     display: contents;
 `;
 
+const Row = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
 export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) => {
     const { data: balance, isLoading } = useWalletTotalBalance();
     const fiat = useUserFiat();
@@ -71,13 +81,26 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     const sdk = useAppSdk();
     const { isConnected } = useInternetConnection();
     const network = useActiveTonNetwork();
+    const { data: batteryBalance } = useBatteryBalance();
+    const navigate = useNavigate();
 
     let content;
 
     if (isTronEnabled && isConnected) {
         content = (
             <AddressMultiChain top="80px">
-                <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
+                <Row>
+                    <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
+                    {batteryBalance?.batteryUnitsBalance.gt(0) && (
+                        <BatteryBalanceIcon
+                            onClick={e => {
+                                e.stopPropagation();
+                                navigate(AppRoute.walletSettings + WalletSettingsRoute.battery);
+                            }}
+                            balance={batteryBalance}
+                        />
+                    )}
+                </Row>
                 <AddressAndBadgesWrapper>
                     <Body2Secondary>{t('multichain')}</Body2Secondary>
                     <AccountAndWalletBadgesGroup
@@ -96,7 +119,18 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
         );
         content = (
             <ClickWrapper onClick={() => isConnected && sdk.copyToClipboard(userFriendlyAddress)}>
-                <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>{' '}
+                <Row>
+                    <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
+                    {batteryBalance?.batteryUnitsBalance.gt(0) && (
+                        <BatteryBalanceIcon
+                            onClick={e => {
+                                e.stopPropagation();
+                                navigate(AppRoute.walletSettings + WalletSettingsRoute.battery);
+                            }}
+                            balance={batteryBalance}
+                        />
+                    )}
+                </Row>
                 {isConnected ? (
                     <AddressAndBadgesWrapper>
                         <AddressText>{toShortValue(userFriendlyAddress)}</AddressText>
