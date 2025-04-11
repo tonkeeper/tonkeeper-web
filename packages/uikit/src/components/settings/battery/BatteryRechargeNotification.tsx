@@ -44,6 +44,7 @@ export const BatteryRechargeNotification: FC<{
             isOpen={isOpen}
             handleClose={onClose}
             title={t('battery_recharge_by_crypto_title')}
+            mobileFullScreen
         >
             {() =>
                 !!preselectedAsset && (
