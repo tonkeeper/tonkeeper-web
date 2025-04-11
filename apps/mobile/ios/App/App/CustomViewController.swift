@@ -15,10 +15,11 @@ class CustomViewController: CAPBridgeViewController {
 
         // Do any additional setup after loading the view.
     }
-    
+
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(BiometricPlugin())
         bridge?.registerPluginInstance(SecureStoragePlugin())
+        bridge?.registerPluginInstance(BluetoothPlugin())
     }
 
     /*

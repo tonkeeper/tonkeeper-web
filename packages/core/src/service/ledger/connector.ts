@@ -1,17 +1,28 @@
 import { TonTransport } from '@ton-community/ton-ledger';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import TransportWebUSB from '@ledgerhq/hw-transport-webusb';
+import TransportWebBLE from '@ledgerhq/hw-transport-web-ble';
 import type Transport from '@ledgerhq/hw-transport';
 import { getLedgerAccountPathByIndex } from './utils';
+import { assertUnreachable } from '../../utils/types';
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const withDeadline = <T>(p: Promise<T>, ms: number): Promise<T> =>
-    Promise.race([
-        p,
-        new Promise((_, reject) => setTimeout(() => reject('Timeout exceeded'), ms))
-    ]) as Promise<T>;
+const withDeadline = <T>(p: Promise<T>, ms: number): Promise<T> => {
+    return new Promise<T>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+            reject(new Error('Timeout exceeded'));
+        }, ms);
 
+        p.then(result => {
+            clearTimeout(timeoutId);
+            resolve(result);
+        }).catch(err => {
+            clearTimeout(timeoutId);
+            reject(err);
+        });
+    });
+};
 export type LedgerTonTransport = TonTransport;
 export type LedgerTransaction = Parameters<TonTransport['signTransaction']>[1];
 export type LedgerTonProofRequest = {
@@ -30,31 +41,35 @@ export type LedgerTonProofResponse = {
     hash: Buffer;
 };
 
-export const connectLedger = async () => {
+export const connectLedger = async (transportType: 'wire' | 'bluetooth') => {
     let transport: Transport;
-    if (await TransportWebHID.isSupported()) {
-        transport = await connectWebHID();
-    } else if (await TransportWebUSB.isSupported()) {
-        transport = await connectWebUSB();
+
+    if (transportType === 'wire') {
+        if (await TransportWebHID.isSupported()) {
+            transport = await connectWebHID();
+        } else if (await TransportWebUSB.isSupported()) {
+            transport = await connectWebUSB();
+        } else {
+            throw new Error('Ledger is not supported');
+        }
+    } else if (transportType === 'bluetooth') {
+        if (await TransportWebBLE.isSupported()) {
+            transport = await connectWebBLE();
+        } else {
+            throw new Error('Ledger is not supported');
+        }
     } else {
-        throw new Error('Ledger is not supported');
+        assertUnreachable(transportType);
     }
 
     return new TonTransport(transport);
 };
 
-export const reconnect = async (tonTransport?: TonTransport | null) => {
-    if (await tonTransport?.isAppOpen()) {
-        return tonTransport!;
-    }
-
-    const transport = await connectLedger();
-    await waitLedgerTonAppReady(transport);
-    return transport;
-};
+const openTonAppTimeout = 30000;
+const openTonAppRetryEvery = 100;
 
 const isLedgerTonAppReady = async (tonTransport: TonTransport) => {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < Math.ceil(openTonAppTimeout / openTonAppRetryEvery); i++) {
         try {
             const isTonOpen = await tonTransport.isAppOpen();
 
@@ -69,14 +84,14 @@ const isLedgerTonAppReady = async (tonTransport: TonTransport) => {
             console.error(err);
         }
 
-        await wait(100);
+        await wait(openTonAppRetryEvery);
     }
 
     return false;
 };
 
 export const waitLedgerTonAppReady = (tonTransport: TonTransport) => {
-    return withDeadline(isLedgerTonAppReady(tonTransport), 15000);
+    return withDeadline(isLedgerTonAppReady(tonTransport), openTonAppTimeout);
 };
 
 export const isTransportReady = (tonTransport: TonTransport) => {
@@ -121,4 +136,18 @@ async function connectWebUSB() {
     }
 
     throw new Error('Failed to connect to Ledger with USB');
+}
+
+async function connectWebBLE() {
+    for (let i = 0; i < 10; i++) {
+        try {
+            return await TransportWebBLE.create();
+        } catch (err) {
+            console.error(err);
+            await wait(100);
+            continue;
+        }
+    }
+
+    throw new Error('Failed to connect to Ledger with Bluetooth');
 }

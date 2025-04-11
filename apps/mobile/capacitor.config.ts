@@ -14,7 +14,8 @@ const config: CapacitorConfig = {
         },
         CapacitorCookies: {
             enabled: true
-        }
+        },
+        BluetoothPlugin: {}
     },
     server
 };

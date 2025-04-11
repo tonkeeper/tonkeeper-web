@@ -19,6 +19,7 @@
 		B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */; };
 		B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */; };
 		B3E0A8272D03497E0089241A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B3E0A8262D03497E0089241A /* GoogleService-Info.plist */; };
+		B3E8AE6E2DA6A6E200F3344E /* BluetoothPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E8AE6D2DA6A6E200F3344E /* BluetoothPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		B3CCE8EB2CFDE9B40083D875 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		B3E0A8262D03497E0089241A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B3E0A8282D034A140089241A /* AppRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppRelease.entitlements; sourceTree = "<group>"; };
+		B3E8AE6D2DA6A6E200F3344E /* BluetoothPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPlugin.swift; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -97,6 +99,7 @@
 				B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */,
 				B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */,
 				B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */,
+				B3E8AE6D2DA6A6E200F3344E /* BluetoothPlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -230,6 +233,7 @@
 				B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */,
+				B3E8AE6E2DA6A6E200F3344E /* BluetoothPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

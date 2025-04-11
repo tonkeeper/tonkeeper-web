@@ -8,7 +8,7 @@ import {
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
 import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useNavigate } from '../hooks/router/useNavigate';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
@@ -31,6 +31,8 @@ const _tonTransport: LedgerTonTransport | null = null;
 export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T => {
     // device might be connected, but mutation still pending if user didn't open Ton App on Ledger device
     const [_isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
+
+    const env = useAppTargetEnv();
     const mutation = useMutation<LedgerTonTransport, Error>(async () => {
         setIsDeviceConnected(false);
 
@@ -38,7 +40,9 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
         if (_tonTransport && isTransportReady(_tonTransport)) {
             transport = _tonTransport;
         } else {
-            transport = await connectLedger();
+            transport = await connectLedger(
+                env === 'mobile' || env === 'tablet' ? 'bluetooth' : 'wire'
+            );
         }
 
         setIsDeviceConnected(true);
