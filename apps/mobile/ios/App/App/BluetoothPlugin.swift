@@ -19,7 +19,7 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
         CAPPluginMethod(name: "reset", returnType: CAPPluginReturnPromise)
     ]
 
-    private var centralManager: CBCentralManager!
+    private var centralManager: CBCentralManager?
     private var discoveredPeripherals: [String: CBPeripheral] = [:]
     private var callReferences: [String: CAPPluginCall] = [:]
     private var serviceCache: [String: [CBService]] = [:]
@@ -27,25 +27,31 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
     private var connectionTimeouts: [String: Timer] = [:]
     private var isScanning: Bool = false
 
-    override public func load() {
-        print("BluetoothPlugin: Initializing CBCentralManager")
-        centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true])
+    private func initializeCentralManagerIfNeeded() {
+        if centralManager == nil {
+            centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionShowPowerAlertKey: true])
+        }
     }
 
     @objc func getAvailability(_ call: CAPPluginCall) {
-        let isAvailable = centralManager.state != .unsupported && centralManager.state != .unauthorized
+        initializeCentralManagerIfNeeded()
+        guard let central = centralManager else {
+            call.reject("Bluetooth manager not initialized")
+            return
+        }
+        let isAvailable = central.state != .unsupported && central.state != .unauthorized
         call.resolve(["available": isAvailable])
     }
 
     @objc func reset(_ call: CAPPluginCall) {
         print("BluetoothPlugin: Resetting plugin state")
         if isScanning {
-            centralManager.stopScan()
+            centralManager?.stopScan()
             isScanning = false
         }
         for peripheral in discoveredPeripherals.values {
             if peripheral.state != .disconnected {
-                centralManager.cancelPeripheralConnection(peripheral)
+                centralManager?.cancelPeripheralConnection(peripheral)
             }
         }
         discoveredPeripherals.removeAll()
@@ -58,30 +64,39 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
     }
 
     @objc func requestDevice(_ call: CAPPluginCall) {
-        guard centralManager.state == .poweredOn else {
+        initializeCentralManagerIfNeeded()
+        guard let central = centralManager else {
+            call.reject("Bluetooth manager not initialized")
+            return
+        }
+        guard central.state == .poweredOn else {
             call.reject("Bluetooth is not powered on")
             return
         }
 
         if isScanning {
-            centralManager.stopScan()
+            central.stopScan()
             isScanning = false
         }
         for peripheral in discoveredPeripherals.values {
             if peripheral.state != .disconnected {
                 print("BluetoothPlugin: Disconnecting lingering peripheral: \(peripheral.identifier.uuidString)")
-                centralManager.cancelPeripheralConnection(peripheral)
+                central.cancelPeripheralConnection(peripheral)
             }
         }
 
         let services = call.getArray("services", String.self)?.compactMap { CBUUID(string: $0) } ?? []
         print("BluetoothPlugin: Scanning for peripherals with services: \(services.map { $0.uuidString })")
         callReferences[call.callbackId] = call
-        centralManager.scanForPeripherals(withServices: services, options: nil)
+        central.scanForPeripherals(withServices: services, options: nil)
         isScanning = true
     }
 
     @objc func connect(_ call: CAPPluginCall) {
+        guard let central = centralManager else {
+            call.reject("Bluetooth manager not initialized")
+            return
+        }
         guard let deviceId = call.getString("deviceId"),
               let peripheral = discoveredPeripherals[deviceId] else {
             print("BluetoothPlugin: Device not found for deviceId: \(call.getString("deviceId") ?? "nil")")
@@ -92,12 +107,12 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
         print("BluetoothPlugin: Connecting to peripheral: \(deviceId)")
         callReferences[call.callbackId] = call
         peripheral.delegate = self
-        centralManager.connect(peripheral, options: nil)
+        central.connect(peripheral, options: nil)
 
         let timeout = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: false) { [weak self] _ in
             guard let self = self, let call = self.callReferences[call.callbackId] else { return }
             print("BluetoothPlugin: Connection timeout for peripheral: \(deviceId)")
-            self.centralManager.cancelPeripheralConnection(peripheral)
+            self.centralManager?.cancelPeripheralConnection(peripheral)
             call.reject("Connection timed out")
             self.callReferences.removeValue(forKey: call.callbackId)
             self.connectionTimeouts.removeValue(forKey: call.callbackId)
@@ -106,6 +121,10 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
     }
 
     @objc func disconnect(_ call: CAPPluginCall) {
+        guard let central = centralManager else {
+            call.reject("Bluetooth manager not initialized")
+            return
+        }
         guard let deviceId = call.getString("deviceId"),
               let peripheral = discoveredPeripherals[deviceId] else {
             print("BluetoothPlugin: Device not found for deviceId: \(call.getString("deviceId") ?? "nil")")
@@ -114,7 +133,7 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
         }
 
         print("BluetoothPlugin: Disconnecting peripheral: \(deviceId)")
-        centralManager.cancelPeripheralConnection(peripheral)
+        central.cancelPeripheralConnection(peripheral)
         serviceCache.removeValue(forKey: deviceId)
         characteristicCache = characteristicCache.filter { !$0.key.contains(deviceId) }
         call.resolve()
@@ -271,7 +290,7 @@ public class BluetoothPlugin: CAPPlugin, CAPBridgedPlugin, CBCentralManagerDeleg
                 ]
             ])
             callReferences.removeValue(forKey: call.callbackId)
-            centralManager.stopScan()
+            central.stopScan()
             isScanning = false
         }
     }

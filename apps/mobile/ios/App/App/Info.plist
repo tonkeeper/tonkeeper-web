@@ -88,7 +88,9 @@
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
     <string>We need Bluetooth access to connect to hardware wallets</string>
-    <key>NSBluetoothPeripheralUsageDescription</key>
-    <string>We need Bluetooth access to connect to hardware wallets</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>bluetooth-central</string>
+    </array>
 </dict>
 </plist>
