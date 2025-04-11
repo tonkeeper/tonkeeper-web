@@ -24,7 +24,6 @@ import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveTonNetwork } from '../../state/wallet';
 import {
     Account,
     AccountKeystone,
@@ -72,6 +71,7 @@ import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { cardModalSwipe } from '../../hooks/ionic';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -363,7 +363,6 @@ const AccountMnemonicRow: FC<{
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
-    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete, onRecovery } = useAccountOptions();
 
@@ -410,7 +409,14 @@ const AccountMnemonicRow: FC<{
                         <Row $tabLevel={tabLevel + 1}>
                             <DragHandleMock />
                             <Label2Styled>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                {toShortValue(
+                                    formatAddress(
+                                        wallet.rawAddress,
+                                        account.type === 'testnet'
+                                            ? Network.TESTNET
+                                            : Network.MAINNET
+                                    )
+                                )}
                             </Label2Styled>
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </Row>
@@ -426,7 +432,6 @@ const AccountLedgerRow: FC<{
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
-    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
 
@@ -469,7 +474,7 @@ const AccountLedgerRow: FC<{
                         <Row key={derivation.index} $tabLevel={tabLevel + 1}>
                             <DragHandleMock />
                             <Label2Styled>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                {toShortValue(formatAddress(wallet.rawAddress, Network.MAINNET))}
                             </Label2Styled>
                             <WalletIndexBadgeStyled size="s">
                                 {'#' + (derivation.index + 1)}
@@ -486,7 +491,6 @@ const AccountTonOnlyRow: FC<{
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
-    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
 
@@ -528,7 +532,7 @@ const AccountTonOnlyRow: FC<{
                         <Row $tabLevel={tabLevel}>
                             <DragHandleMock />
                             <Label2Styled>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                {toShortValue(formatAddress(wallet.rawAddress, Network.MAINNET))}
                             </Label2Styled>
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </Row>
