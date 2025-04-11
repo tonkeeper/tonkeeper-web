@@ -2,7 +2,9 @@ import { FC, forwardRef, Fragment, ReactNode } from 'react';
 import {
     DragDropContext,
     Draggable,
+    DraggableProvided,
     DraggableProvidedDragHandleProps,
+    DraggableStateSnapshot,
     Droppable
 } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
@@ -68,6 +70,8 @@ import {
 } from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useAppTargetEnv } from '../../hooks/appSdk';
+import { cardModalSwipe } from '../../hooks/ionic';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -145,6 +149,29 @@ export const DesktopManageAccountsPage = () => {
     const items = useSideBarItems();
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
+    const env = useAppTargetEnv();
+
+    const patchDragItemStyle = (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
+        const transform = provided.draggableProps.style?.transform;
+        if (env === 'mobile') {
+            const shiftY = transform ? parseFloat(transform.split(',')[1]) : 0;
+            if (snapshot.isDragging) {
+                provided.draggableProps.style!.transform = 'translate(0px,' + (shiftY - 40) + 'px)';
+            } else if (transform) {
+                provided.draggableProps.style!.transform = 'translate(0px,' + shiftY + 'px)';
+            }
+        } else {
+            if (transform) {
+                try {
+                    const tr = transform.split(',')[1];
+                    provided.draggableProps.style!.transform = 'translate(0px,' + tr;
+                } catch (_) {
+                    //
+                }
+            }
+        }
+    };
+
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
@@ -166,7 +193,13 @@ export const DesktopManageAccountsPage = () => {
                     }
                 />
             </DesktopViewHeader>
-            <DragDropContext onDragEnd={handleDrop}>
+            <DragDropContext
+                onDragEnd={(...args) => {
+                    handleDrop(...args);
+                    cardModalSwipe.unlock();
+                }}
+                onBeforeDragStart={cardModalSwipe.lock}
+            >
                 <Droppable droppableId="settings_wallets" type="all_items">
                     {provided => (
                         <ListBlockDesktopAdaptive
@@ -177,16 +210,7 @@ export const DesktopManageAccountsPage = () => {
                             {itemsOptimistic.map((item, index) => (
                                 <Draggable key={item.id} draggableId={item.id} index={index}>
                                     {(p, snapshot) => {
-                                        const transform = p.draggableProps.style?.transform;
-                                        if (transform) {
-                                            try {
-                                                const tr = transform.split(',')[1];
-                                                p.draggableProps.style!.transform =
-                                                    'translate(0px,' + tr;
-                                            } catch (_) {
-                                                //
-                                            }
-                                        }
+                                        patchDragItemStyle(p, snapshot);
 
                                         return (
                                             <ListItemStyled

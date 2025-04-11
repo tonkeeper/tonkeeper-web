@@ -93,4 +93,9 @@ export const IonicOverride = css`
     .footer-translucent-ios ion-toolbar {
         --opacity: 0.64;
     }
+
+    .locked-transform {
+        --fixed-transform: none;
+        transform: var(--fixed-transform) !important;
+    }
 `;
