@@ -28,11 +28,16 @@ type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
 
 const _tonTransport: LedgerTonTransport | null = null;
 
+export const useLedgerConnectionType = () => {
+    const env = useAppTargetEnv();
+    return env === 'mobile' || env === 'tablet' ? 'bluetooth' : 'wire';
+};
+
 export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T => {
     // device might be connected, but mutation still pending if user didn't open Ton App on Ledger device
     const [_isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
 
-    const env = useAppTargetEnv();
+    const connectionType = useLedgerConnectionType();
     const mutation = useMutation<LedgerTonTransport, Error>(async () => {
         setIsDeviceConnected(false);
 
@@ -40,9 +45,7 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
         if (_tonTransport && isTransportReady(_tonTransport)) {
             transport = _tonTransport;
         } else {
-            transport = await connectLedger(
-                env === 'mobile' || env === 'tablet' ? 'bluetooth' : 'wire'
-            );
+            transport = await connectLedger(connectionType);
         }
 
         setIsDeviceConnected(true);
