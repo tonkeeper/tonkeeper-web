@@ -270,9 +270,13 @@ const EmptyMultisigsPageWrapper = styled.div`
 `;
 
 const EmptyMultisigsPageContent = styled.div`
+    padding: 0 16px;
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 
     > ${Label2} {
         margin-bottom: 4px;
