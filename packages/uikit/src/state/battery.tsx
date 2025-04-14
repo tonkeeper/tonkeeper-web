@@ -25,6 +25,7 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useTwoFAWalletConfig } from './two-fa';
 import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 export const useCanUseBattery = () => {
     const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
@@ -131,17 +132,25 @@ export const useRequestBatteryAuthToken = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation(async () => {
-        if (account.type !== 'mnemonic' && account.type !== 'mam') {
-            throw new Error('Invalid account type');
+    return useMutation<
+        string,
+        Error,
+        { signer?: (b: Buffer) => Promise<Uint8Array | Buffer>; wallet?: TonWalletStandard } | void
+    >(async args => {
+        let wallet = args?.wallet;
+        if (!wallet) {
+            if (account.type !== 'mnemonic' && account.type !== 'mam') {
+                throw new Error('Invalid account type');
+            }
+            wallet = account.activeTonWallet;
         }
         const { payload } = await new ConnectApi(batteryApi).getTonConnectPayload();
         const origin = batteryApi.basePath;
 
-        const proof = await signTonProof({ payload, origin });
+        const proof = await signTonProof({ payload, origin, signer: args?.signer, wallet });
         const res = await new WalletApi(batteryApi).tonConnectProof({
             tonConnectProofRequest: {
-                address: account.activeTonWallet.rawAddress,
+                address: wallet.rawAddress,
                 proof: {
                     timestamp: proof.timestamp,
                     domain: {
@@ -155,7 +164,7 @@ export const useRequestBatteryAuthToken = () => {
             }
         });
 
-        await sdk.storage.set(tokenStorageKey(account.activeTonWallet.publicKey), {
+        await sdk.storage.set(tokenStorageKey(wallet.publicKey), {
             token: res.token
         });
         await client.invalidateQueries([QueryKey.batteryAuthToken]);
@@ -164,6 +173,23 @@ export const useRequestBatteryAuthToken = () => {
 };
 
 const tokenStorageKey = (publicKey: string) => `${AppKey.BATTERY_AUTH_TOKEN}_${publicKey}`;
+
+export const useRemoveBatteryAuthToken = () => {
+    const account = useActiveAccount();
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation(async () => {
+        const tonWallets = account.allTonWallets;
+        for (const wallet of tonWallets) {
+            if (isStandardTonWallet(wallet)) {
+                await sdk.storage.delete(tokenStorageKey(wallet.publicKey));
+            }
+        }
+
+        await client.invalidateQueries([QueryKey.batteryAuthToken]);
+    });
+};
 
 export const useProvideBatteryAuth = () => {
     const tokenQuery = useBatteryAuthToken();
