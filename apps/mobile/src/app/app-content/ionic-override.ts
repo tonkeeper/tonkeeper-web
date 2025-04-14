@@ -4,6 +4,8 @@ import { Label1Class, Label2Class } from '@tonkeeper/uikit';
 export const IonicOverride = css`
     :root {
         --ion-modal-default-height: calc(100% - (env(safe-area-inset-top) + 10px));
+        --footer-base-height: calc(64px + env(safe-area-inset-bottom, 0px));
+        --footer-full-height: calc(var(--footer-base-height) + env(safe-area-inset-bottom, 0px));
     }
 
     ion-content {
@@ -36,11 +38,12 @@ export const IonicOverride = css`
     ion-menu {
         --width: 256px;
         outline: none;
+        height: calc(100% - var(--footer-full-height) + 1px);
 
         &::part(container) {
             padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-            background-color: ${p => p.theme.backgroundContent};
+            padding-bottom: 0;
+            background-color: ${p => p.theme.backgroundPage};
             box-sizing: border-box;
         }
     }

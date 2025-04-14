@@ -18,8 +18,9 @@ import {
     AccountTonWatchOnly,
     Account,
     getNetworkByAccount,
-    AccountTonTestnet, AccountTonSK
-} from "@tonkeeper/core/dist/entries/account";
+    AccountTonTestnet,
+    AccountTonSK
+} from '@tonkeeper/core/dist/entries/account';
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
