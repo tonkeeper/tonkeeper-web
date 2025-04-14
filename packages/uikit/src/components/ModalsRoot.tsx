@@ -13,6 +13,7 @@ import { ConfirmTwoFANotificationControlled } from './modals/ConfirmTwoFANotific
 import { BuyNotificationControlled } from './modals/BuyNotificationControlled';
 import { PromptMobileProPinNotificationControlled } from './modals/PromptMobileProPin';
 import { CheckDesktopPasswordControlled } from './modals/PromptDesktopPassword';
+import { TonTransactionNotificationControlled } from './modals/TonTransactionNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -32,6 +33,7 @@ export const ModalsRoot = () => {
             <BuyNotificationControlled />
             <PromptMobileProPinNotificationControlled />
             <CheckDesktopPasswordControlled />
+            <TonTransactionNotificationControlled />
         </>
     );
 };

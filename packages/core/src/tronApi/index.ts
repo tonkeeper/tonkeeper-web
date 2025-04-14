@@ -1,6 +1,5 @@
 import BigNumber from 'bignumber.js';
 import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
-import { TronWeb } from 'tronweb';
 import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
@@ -278,6 +277,7 @@ export class TronApi {
                     type: 'Function'
                 }
             ];
+            const { TronWeb } = await import('tronweb');
             const contract = new TronWeb({ fullHost: this.tronGridBaseUrl }).contract(
                 abi,
                 TRON_USDT_ASSET.address

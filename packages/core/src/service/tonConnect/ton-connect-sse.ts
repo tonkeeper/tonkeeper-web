@@ -7,11 +7,7 @@ import { isStandardTonWallet, WalletId } from '../../entries/wallet';
 import { getLastEventId, subscribeTonConnect } from './httpBridge';
 import { accountsStorage } from '../accountsStorage';
 import { IStorage } from '../../Storage';
-import {
-    SendTransactionAppRequest,
-    TonConnectAppRequest,
-    TonConnectAppRequestPayload
-} from '../../entries/tonConnect';
+import { TonConnectAppRequest, TonConnectAppRequestPayload } from '../../entries/tonConnect';
 import { getWalletById } from '../../entries/account';
 import { replyBadRequestResponse, replyDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
@@ -154,6 +150,7 @@ export class TonConnectSSE {
             await delay(500);
         }
     };
+
     private handleMessage = async (params: TonConnectAppRequest) => {
         switch (params.request.method) {
             case 'disconnect': {
@@ -174,7 +171,7 @@ export class TonConnectSSE {
                     connection: params.connection,
                     id: params.request.id,
                     kind: 'signData',
-                    payload: params.request.params
+                    payload: JSON.parse(params.request.params[0])
                 };
                 await this.selectWallet(params.connection.clientSessionId);
                 return this.listeners.onRequest(value);

@@ -149,7 +149,7 @@ const CopyButton: FC<{ address: string }> = ({ address }) => {
                 secondary
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(address);
+                    sdk.copyToClipboard(address, t('copied'));
                 }}
             >
                 <CopyIcon />
@@ -180,7 +180,7 @@ const ReceiveTon: FC<{ jetton?: string }> = ({ jetton }) => {
                 extension={extension}
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(address);
+                    sdk.copyToClipboard(address, t('copied'));
                 }}
             >
                 {isWatchOnly && <WatchOnlyBadge accountType="watch-only" />}
@@ -239,7 +239,7 @@ const ReceiveTron: FC<{ token: string }> = ({ token }) => {
                 extension={extension}
                 onClick={e => {
                     e.preventDefault();
-                    sdk.copyToClipboard(tronWallet.address);
+                    sdk.copyToClipboard(tronWallet.address, t('copied'));
                 }}
             >
                 <QrWrapper>

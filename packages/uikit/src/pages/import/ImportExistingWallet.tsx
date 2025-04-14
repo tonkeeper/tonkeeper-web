@@ -158,7 +158,7 @@ const useProcessMnemonic = () => {
             }
         }
 
-        const isValidBip39 = validateBip39Mnemonic(mnemonic);
+        const isValidBip39 = await validateBip39Mnemonic(mnemonic);
         if (isValidBip39) {
             const possibleStadnardAccount = await createStandardTonAccountByMnemonic(
                 context,
@@ -213,7 +213,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
     }
 
     if (mnemonic.length === 12) {
-        if (validateBip39Mnemonic(mnemonic)) {
+        if (await validateBip39Mnemonic(mnemonic)) {
             return 'bip39';
         }
 
@@ -224,7 +224,7 @@ const getMnemonicTypeFallback = async (mnemonic: string[]) => {
         return 'tonKeychain';
     }
 
-    if (validateBip39Mnemonic(mnemonic)) {
+    if (await validateBip39Mnemonic(mnemonic)) {
         return 'bip39';
     }
 
