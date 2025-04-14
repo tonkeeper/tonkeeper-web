@@ -74,6 +74,7 @@
   "confirm_discard_description": "У вас есть не сохраненные изменения. Если вы закроете это окно, ваш прогресс будет потерян. Вы хотите продолжить?",
   "confirm_discard_title": "Вы уверены, что хотите выйти?",
   "confirm_error_insufficient_balance": "Баланса кошелька {balance} недостаточно. Требуемый минимальный баланс: {required}.",
+  "confirm_error_insufficient_balance_light": "Недостаточно средств",
   "confirm_error_insufficient_battery_balance": "Недостаточный баланс Tonkeeper Battery",
   "confirm_modal_transfer": "Перевод",
   "ConfirmPassword": "Введите пароль ещё раз",

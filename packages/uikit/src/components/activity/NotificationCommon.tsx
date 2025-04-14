@@ -456,7 +456,7 @@ export const ActionFeeDetailsUniversal: FC<{
                 {fee ? (
                     <ActionFeeDetailsUniversalValue fee={fee} />
                 ) : fee === null ? (
-                    <></>
+                    <>—</>
                 ) : (
                     <SpinnerIcon />
                 )}

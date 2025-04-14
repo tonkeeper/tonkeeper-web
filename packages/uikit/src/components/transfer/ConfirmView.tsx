@@ -56,6 +56,7 @@ type ConfirmViewContextValue = {
     assetAmount: AssetAmount;
     estimation: {
         data: Pick<Estimation, 'fee'> | undefined;
+        error?: unknown;
         isLoading: boolean;
     };
     formState: {
@@ -321,7 +322,7 @@ export const ConfirmViewDetailsFee: FC<{
 
     return (
         <ActionFeeDetailsUniversal
-            fee={estimation.isLoading ? undefined : estimation.data?.fee}
+            fee={estimation.isLoading ? undefined : estimation.error ? null : estimation.data?.fee}
             onSenderTypeChange={onSenderTypeChange}
             availableSendersChoices={availableSendersChoices}
             selectedSenderType={selectedSenderType}
@@ -359,7 +360,7 @@ export const ConfirmViewButtons: FC<{
 
     const {
         formState: { done, error, isLoading },
-        estimation: { isLoading: estimationLoading },
+        estimation: { isLoading: estimationLoading, data: estimation },
         onClose,
         handleSubmit
     } = useConfirmViewContext();
@@ -395,21 +396,21 @@ export const ConfirmViewButtons: FC<{
             case error instanceof TxConfirmationCustomError:
                 errorText = error.message;
                 break;
-            case error instanceof Error:
-                errorText = error.message;
-                break;
             case error instanceof NotEnoughBalanceError:
-                errorText = t('confirm_error_insufficient_balance', {
-                    balance: (error as NotEnoughBalanceError).balance.stringAssetRelativeAmount,
-                    required: (error as NotEnoughBalanceError).requiredBalance
-                        .stringAssetRelativeAmount
-                });
+                errorText = t('confirm_error_insufficient_balance_light');
                 break;
             case error instanceof NotEnoughBatteryBalanceError:
                 errorText = t('confirm_error_insufficient_battery_balance');
                 break;
+            case error instanceof Error && error.message !== 'Response returned an error code':
+                errorText = error.message;
+                break;
             default:
-                errorText = t('send_publish_tx_error');
+                if (!estimation) {
+                    errorText = t('send_fee_estimation_error');
+                } else {
+                    errorText = t('send_publish_tx_error');
+                }
         }
 
         return (
