@@ -242,7 +242,7 @@ export const RecoveryContent: FC<{
             <Wrapper>
                 {isPage && <BackButtonBlockStyled onClick={onBack} />}
                 <WordsGridAndHeaders
-                    descriptionDown={isPage}
+                    descriptionDown={isPage || window.innerHeight < 800}
                     mnemonic={mnemonicToShow!}
                     type={wordsType}
                     allowCopy

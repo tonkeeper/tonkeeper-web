@@ -163,6 +163,20 @@ export const WordsGridAndHeaders: FC<{
     const sdk = useAppSdk();
     type ??= 'standard';
 
+    const MamNotice = type === 'mam' && (
+        <MamAccountCallout>
+            <div>
+                <Body3Secondary>{t('mam_account_explanation') + ' '}</Body3Secondary>
+                {!!config.mam_learn_more_url && (
+                    <LinkStyled onClick={() => sdk.openPage(config.mam_learn_more_url!)}>
+                        {t('learn_more')}
+                    </LinkStyled>
+                )}
+            </div>
+            <ExclamationMarkCircleIconStyled />
+        </MamAccountCallout>
+    );
+
     return (
         <>
             <HeadingBlock>
@@ -186,19 +200,7 @@ export const WordsGridAndHeaders: FC<{
                 )}
             </HeadingBlock>
 
-            {type === 'mam' && (
-                <MamAccountCallout>
-                    <div>
-                        <Body3Secondary>{t('mam_account_explanation') + ' '}</Body3Secondary>
-                        {!!config.mam_learn_more_url && (
-                            <LinkStyled onClick={() => sdk.openPage(config.mam_learn_more_url!)}>
-                                {t('learn_more')}
-                            </LinkStyled>
-                        )}
-                    </div>
-                    <ExclamationMarkCircleIconStyled />
-                </MamAccountCallout>
-            )}
+            {!descriptionDown && MamNotice}
 
             {type === 'tron' && (
                 <TronAccountCallout>
@@ -218,9 +220,16 @@ export const WordsGridAndHeaders: FC<{
             </WorldsGridStyled>
 
             {descriptionDown && (
-                <Body>
-                    {t(mnemonic.length === 12 ? 'secret_words_caption_12' : 'secret_words_caption')}
-                </Body>
+                <>
+                    {MamNotice}
+                    <Body>
+                        {t(
+                            mnemonic.length === 12
+                                ? 'secret_words_caption_12'
+                                : 'secret_words_caption'
+                        )}
+                    </Body>
+                </>
             )}
 
             {allowCopy && (
