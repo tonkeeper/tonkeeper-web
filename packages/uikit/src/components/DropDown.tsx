@@ -4,7 +4,6 @@ import React, {
     forwardRef,
     Fragment,
     PropsWithChildren,
-    useCallback,
     useEffect,
     useMemo,
     useRef,
@@ -65,16 +64,21 @@ export const DropDownListPayload = styled.div`
     white-space: nowrap;
 `;
 
-function useOutsideAlerter(ref: React.RefObject<Node>, onClick: (e: MouseEvent) => void) {
+function useOutsideAlerter(
+    ref: React.RefObject<Node>,
+    onClick: (e: MouseEvent | TouchEvent) => void
+) {
     useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
+        function handleClickOutside(event: MouseEvent | TouchEvent) {
             if (ref.current && !ref.current.contains(event.target as Node)) {
                 onClick(event);
             }
         }
         document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
         };
     }, [ref, onClick]);
 }
@@ -86,21 +90,11 @@ const Container = forwardRef<
         children: React.ReactNode;
         center?: boolean;
         className?: string;
-        hostRef?: React.RefObject<HTMLDivElement>;
     }
->(({ onClose, children, center, className, hostRef }, ref) => {
+>(({ onClose, children, center, className }, ref) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    const onClick = useCallback(
-        (e: MouseEvent) => {
-            if (!hostRef?.current || !hostRef.current.contains(e.target as Node)) {
-                onClose();
-            }
-        },
-        [onClose]
-    );
-
-    useOutsideAlerter(wrapperRef, onClick);
+    useOutsideAlerter(wrapperRef, onClose);
     return (
         <DropDownListContainer
             ref={mergeRefs(wrapperRef, ref)}
@@ -156,7 +150,7 @@ export const DropDown = ({
     useEffect(() => {
         if (isOpen && portal) {
             const id = blockPointerEvents();
-            return () => unblockPointerEvents(id);
+            return () => void setTimeout(() => unblockPointerEvents(id), 150);
         }
     }, [isOpen, portal]);
 
@@ -229,10 +223,9 @@ export const DropDown = ({
                 >
                     {status => (
                         <ContainerStyled
-                            onClose={toggling}
+                            onClose={() => setIsOpen(false)}
                             center={center}
                             className={containerClassName}
-                            hostRef={hostRef}
                             status={status}
                             ref={containerRef}
                         >
