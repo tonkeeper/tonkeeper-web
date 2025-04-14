@@ -203,24 +203,25 @@ export const RecoveryContent: FC<{
         );
     }
 
-    const hasTronWallet =
-        account &&
-        isAccountTronCompatible(account) &&
-        !!account.activeTronWallet &&
-        !isAccountBip39(account);
-
-    const onShowTron = async () => {
-        const tronMnemonic = await tonMnemonicToTronMnemonic(mnemonicBySecret(secret)!);
-        setMnemonicToShow(tronMnemonic);
-        setIsExportingTrc20(true);
-    };
-
     const wordsType =
         account?.type === 'mam' && walletId === undefined
             ? 'mam'
             : isExportingTRC20
             ? 'tron'
             : 'standard';
+
+    const hasTronWallet =
+        account &&
+        isAccountTronCompatible(account) &&
+        !!account.activeTronWallet &&
+        !isAccountBip39(account) &&
+        wordsType !== 'mam';
+
+    const onShowTron = async () => {
+        const tronMnemonic = await tonMnemonicToTronMnemonic(mnemonicBySecret(secret)!);
+        setMnemonicToShow(tronMnemonic);
+        setIsExportingTrc20(true);
+    };
 
     if (secret?.type === 'sk') {
         return (
