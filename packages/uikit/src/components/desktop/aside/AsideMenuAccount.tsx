@@ -43,6 +43,7 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useMenuController } from '../../../hooks/ionic';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;
@@ -403,10 +404,12 @@ export const AsideMenuAccountMAM: FC<{
     const location = useAsideActiveRoute();
     const navigate = useNavigate();
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
+    const menuController = useMenuController('aside-nav');
 
     const onClickAccount = async () => {
         navigate(AppRoute.accountSettings);
         await setActiveAccount(account.id);
+        menuController.close();
     };
 
     return (
