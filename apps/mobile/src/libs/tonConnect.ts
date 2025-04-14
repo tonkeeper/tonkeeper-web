@@ -4,63 +4,56 @@ import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/conne
 import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { App } from '@capacitor/app';
 import { isSignerLink } from '@tonkeeper/uikit/dist/state/signer';
+import { atom, subject } from '@tonkeeper/core/dist/entries/atom';
+
+const tonConnectDisconnect$ = subject<AccountConnection>();
+const tonConnectRequest$ = subject<TonConnectAppRequestPayload>();
 
 export const tonConnectSSE = new TonConnectSSE({
     storage: new CapacitorStorage(),
     listeners: {
-        onDisconnect: connection => {
-            onDisconnectListeners.forEach(listener => listener(connection));
-        },
-        onRequest: params => {
-            onTonConnectRequestListeners.forEach(listener => listener(params));
-        }
+        onDisconnect: connection => tonConnectDisconnect$.next(connection),
+        onRequest: params => tonConnectRequest$.next(params)
     }
 });
-
-let onTonOrTonConnectUrlOpened: ((url: string) => void)[] = [];
-let onDisconnectListeners: ((connection: AccountConnection) => void)[] = [];
-let onTonConnectRequestListeners: ((value: TonConnectAppRequestPayload) => void)[] = [];
-let onSignerUrlOpened: ((url: string) => void)[] = [];
-
 export const subscribeToTonConnectDisconnect = (
     listener: (connection: AccountConnection) => void
 ) => {
-    onDisconnectListeners.push(listener);
-    return () => {
-        onDisconnectListeners = onDisconnectListeners.filter(l => l !== listener);
-    };
+    return tonConnectDisconnect$.subscribe(listener);
 };
 
 export const subscribeToTonConnectRequestTransaction = (
     listener: (value: TonConnectAppRequestPayload) => void
 ) => {
-    onTonConnectRequestListeners.push(listener);
-    return () => {
-        onTonConnectRequestListeners = onTonConnectRequestListeners.filter(l => l !== listener);
-    };
+    return tonConnectRequest$.subscribe(listener);
 };
 
+const tonLink$ = atom<string | undefined>(undefined);
+const signerLink$ = atom<string | undefined>(undefined);
+const filterNotEmpty = (callback: (value: string) => void) => (val: string | undefined) =>
+    val !== undefined && callback(val);
+
 export const subscribeToTonOrTonConnectUrlOpened = (listener: (url: string) => void) => {
-    onTonOrTonConnectUrlOpened.push(listener);
-    return () => {
-        onTonOrTonConnectUrlOpened = onTonOrTonConnectUrlOpened.filter(l => l !== listener);
-    };
+    if (tonLink$.value !== undefined) {
+        listener(tonLink$.value);
+    }
+    return tonLink$.subscribe(filterNotEmpty(listener));
 };
 
 export const subscribeToSignerUrlOpened = (listener: (url: string) => void) => {
-    onSignerUrlOpened.push(listener);
-    return () => {
-        onSignerUrlOpened = onSignerUrlOpened.filter(l => l !== listener);
-    };
+    if (signerLink$.value !== undefined) {
+        listener(signerLink$.value);
+    }
+    return signerLink$.subscribe(filterNotEmpty(listener));
 };
 
 App.addListener('appUrlOpen', ({ url }) => {
     if (url) {
         console.info('Received URL:', url);
         if (isSignerLink(url)) {
-            onSignerUrlOpened.forEach(listener => listener(url));
+            signerLink$.next(url);
         } else {
-            onTonOrTonConnectUrlOpened.forEach(listener => listener(url));
+            tonLink$.next(url);
         }
     }
 });
