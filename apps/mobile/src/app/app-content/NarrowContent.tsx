@@ -216,7 +216,7 @@ const NarrowContentAppRouting = () => {
             <WideContent id="main-id--">
                 <WalletLayout $gradient={location.pathname === AppRoute.home}>
                     <WalletLayoutBody>
-                        <IonMenu menuId="aside-nav" contentId="main-content" type="push">
+                        <IonMenu menuId="aside-nav" contentId="main-content" type="overlay">
                             <AsideMenu />
                         </IonMenu>
                         <MobileProWalletMenu />

@@ -15,7 +15,7 @@ export const MobileProWalletMenu = () => {
             menuId="wallet-nav"
             contentId="main-content"
             side="end"
-            type="push"
+            type="overlay"
             onIonDidClose={() => setIsOpen(false)}
             onIonWillOpen={() => setIsOpen(true)}
         >
