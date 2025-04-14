@@ -44,6 +44,7 @@ const FirstLineContainer = styled.div`
     display: flex;
     gap: 6px;
     align-items: center;
+    word-break: break-word;
 `;
 
 const TextContainer = styled.span`

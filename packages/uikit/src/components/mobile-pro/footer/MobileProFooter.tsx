@@ -25,6 +25,12 @@ const AccountMenuLine1 = styled.div`
     display: flex;
     gap: 4px;
     align-items: center;
+
+    > * {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
 `;
 
 const AccountMenuLine2 = styled.div`
@@ -32,12 +38,13 @@ const AccountMenuLine2 = styled.div`
     gap: 4px;
     align-items: center;
     width: fit-content;
+    margin: 0 auto;
 `;
 
 const AccountMenuWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: center;
+    overflow: hidden;
 `;
 
 const IonToolbarStyled = styled(IonToolbar)`

@@ -119,6 +119,7 @@ const DesktopManageMultisigsPageBody = () => {
 const TextContainer = styled.div`
     display: flex;
     flex-direction: column;
+    word-break: break-word;
 
     > ${Body3} {
         color: ${p => p.theme.textSecondary};
