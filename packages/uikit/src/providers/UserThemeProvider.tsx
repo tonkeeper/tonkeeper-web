@@ -1,6 +1,10 @@
 import { FC, PropsWithChildren, useEffect, useMemo } from 'react';
 import { DefaultTheme, ThemeProvider } from 'styled-components';
-import { availableThemes, useMutateUserUIPreferences, useUserUIPreferences } from '../state/theme';
+import {
+    useAvailableThemes,
+    useMutateUserUIPreferences,
+    useUserUIPreferences
+} from '../state/theme';
 import { usePrevious } from '../hooks/usePrevious';
 import { getUserOS } from '../libs/web';
 export const UserThemeProvider: FC<
@@ -15,6 +19,7 @@ export const UserThemeProvider: FC<
     const { data: uiPreferences, isFetched: isUIPreferencesLoaded } = useUserUIPreferences();
     const { mutateAsync } = useMutateUserUIPreferences();
     const isProPrev = usePrevious(isPro);
+    const availableThemes = useAvailableThemes();
 
     const [currentTheme, currentThemeName] = useMemo(() => {
         let themeName = uiPreferences?.theme;
@@ -61,7 +66,15 @@ export const UserThemeProvider: FC<
         }
 
         return [theme, themeName];
-    }, [uiPreferences?.theme, displayType, isPro, isProPrev, isInsideTonkeeper, proDisplayType]);
+    }, [
+        uiPreferences?.theme,
+        displayType,
+        isPro,
+        isProPrev,
+        isInsideTonkeeper,
+        proDisplayType,
+        availableThemes
+    ]);
 
     useEffect(() => {
         if (currentTheme && uiPreferences && currentThemeName !== uiPreferences.theme) {

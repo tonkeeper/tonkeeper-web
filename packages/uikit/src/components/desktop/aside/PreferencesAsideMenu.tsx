@@ -25,7 +25,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
-import { availableThemes, useUserUIPreferences } from '../../../state/theme';
+import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
@@ -98,6 +98,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
 
     const showSecurityPage = useShouldShowSecurityPage();
     const env = useAppTargetEnv();
+    const availableThemes = useAvailableThemes();
 
     return (
         <PreferencesAsideContainer className={className}>

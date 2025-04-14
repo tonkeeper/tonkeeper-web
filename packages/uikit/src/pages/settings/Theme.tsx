@@ -5,7 +5,7 @@ import { SettingsItem, SettingsList } from '../../components/settings/SettingsLi
 import { SubHeader } from '../../components/SubHeader';
 import { useTranslation } from '../../hooks/translation';
 import {
-    availableThemes,
+    useAvailableThemes,
     useMutateUserUIPreferences,
     useUserUIPreferences
 } from '../../state/theme';
@@ -24,6 +24,7 @@ export const UserTheme = () => {
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutateAsync } = useMutateUserUIPreferences();
     const isProDisplay = useIsFullWidthMode();
+    const availableThemes = useAvailableThemes();
 
     const items: SettingsItem[] = Object.keys(availableThemes).map(name => ({
         name: capitalize(name),
