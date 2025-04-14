@@ -94,7 +94,10 @@ export const BatteryPageLayout: FC = () => {
                         right={
                             data?.batteryUnitsBalance.gt(0) && (
                                 <DesktopViewHeaderContent.Right>
-                                    <DesktopViewHeaderContent.RightItem onClick={onOpen}>
+                                    <DesktopViewHeaderContent.RightItem
+                                        onClick={onOpen}
+                                        closeDropDownOnClick
+                                    >
                                         <ForTargetEnv env="mobile">
                                             <GearIconEmpty />
                                             {t('settings_title')}

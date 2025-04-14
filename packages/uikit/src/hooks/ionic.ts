@@ -1,22 +1,32 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export const useMenuController = (type: 'aside-nav' | 'wallet-nav') => {
+    const getMenu = () =>
+        document.querySelector(`ion-menu[menu-id="${type}"]`) as HTMLIonMenuElement | null;
+
+    useEffect(() => {
+        const menu = getMenu();
+
+        const onMenuOpened = () => setIsOpen(true);
+        const onMenuClosed = () => setIsOpen(false);
+
+        menu?.addEventListener('ionWillOpen', onMenuOpened);
+        menu?.addEventListener('ionWillClose', onMenuClosed);
+        return () => {
+            menu?.removeEventListener('ionWillOpen', onMenuOpened);
+            menu?.removeEventListener('ionWillClose', onMenuClosed);
+        };
+    }, []);
+
+    const [isOpen, setIsOpen] = useState(!!getMenu()?.classList.contains('show-menu'));
+
     return useMemo(() => {
         return {
-            open: () => {
-                const menu = document.querySelector(
-                    `ion-menu[menu-id="${type}"]`
-                ) as HTMLIonMenuElement | null;
-                return menu?.open();
-            },
-            close: () => {
-                const menu = document.querySelector(
-                    `ion-menu[menu-id="${type}"]`
-                ) as HTMLIonMenuElement | null;
-                return menu?.close();
-            }
+            open: () => getMenu()?.open(),
+            close: () => getMenu()?.close(),
+            isOpen
         };
-    }, [type]);
+    }, [type, isOpen]);
 };
 
 const getDialog = () => {

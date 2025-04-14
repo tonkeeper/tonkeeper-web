@@ -68,7 +68,8 @@ const AsideContentContainer = styled.div`
     box-sizing: border-box;
     height: calc(100% - 69px);
 
-    background: ${p => p.theme.backgroundContent};
+    background: ${p =>
+        p.theme.proDisplayType === 'desktop' ? p.theme.backgroundContent : p.theme.backgroundPage};
     display: flex;
     flex-direction: column;
     padding: 0 0.5rem 0;
@@ -103,7 +104,8 @@ const AsideMenuBottom = styled.div`
     flex-direction: column;
     justify-content: flex-end;
 
-    background: ${p => p.theme.backgroundContent};
+    background: ${p =>
+        p.theme.proDisplayType === 'desktop' ? p.theme.backgroundContent : p.theme.backgroundPage};
     padding-bottom: 0.5rem;
 `;
 
@@ -129,14 +131,18 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
         css`
             pointer-events: auto !important;
             cursor: grabbing !important;
-            background-color: ${p.theme.backgroundContentTint};
+            background: ${p.theme.proDisplayType === 'desktop'
+                ? p.theme.backgroundContentTint
+                : p.theme.backgroundContent};
 
             * {
                 pointer-events: none;
             }
 
             div {
-                background-color: ${p.theme.backgroundContentTint};
+                background: ${p.theme.proDisplayType === 'desktop'
+                    ? p.theme.backgroundContentTint
+                    : p.theme.backgroundContent};
             }
         `}
 `;

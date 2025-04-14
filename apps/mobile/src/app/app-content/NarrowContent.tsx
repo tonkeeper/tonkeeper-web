@@ -215,11 +215,11 @@ const NarrowContentAppRouting = () => {
         <WideLayout>
             <WideContent id="main-id--">
                 <WalletLayout $gradient={location.pathname === AppRoute.home}>
-                    <IonMenu menuId="aside-nav" contentId="main-content" type="push">
-                        <AsideMenu />
-                    </IonMenu>
-                    <MobileProWalletMenu />
                     <WalletLayoutBody>
+                        <IonMenu menuId="aside-nav" contentId="main-content" type="push">
+                            <AsideMenu />
+                        </IonMenu>
+                        <MobileProWalletMenu />
                         {/* Ionic doesn't support nested routing well */}
                         <IonRouterOutlet id="main-content" animated={animated}>
                             <Route path={AppProRoute.dashboard} component={DashboardPage} />
@@ -334,6 +334,12 @@ const NavigateToRecovery = () => {
     return <Navigate to={{ pathname: newPath, search: location.search }} replace={true} />;
 };
 
+const IonModalStyled = styled(IonModal)`
+    &::part(container) {
+        background-color: ${p => p.theme.backgroundContent};
+    }
+`;
+
 const PreferencesModal = () => {
     const [presentingElement, setPresentingElement] = useState<HTMLElement | null>(null);
 
@@ -379,7 +385,7 @@ const PreferencesModal = () => {
     };
 
     return (
-        <IonModal
+        <IonModalStyled
             presentingElement={presentingElement!}
             isOpen={isSettingsOpen}
             onDidDismiss={onClose}
@@ -441,7 +447,7 @@ const PreferencesModal = () => {
                     </IonRouterOutlet>
                 </IonReactMemoryRouter>
             </IonContent>
-        </IonModal>
+        </IonModalStyled>
     );
 };
 

@@ -49,7 +49,10 @@ import { useSmartScanner } from '../../../hooks/useSmartScanner';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
-    background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
+    background: ${p =>
+        p.theme.proDisplayType === 'desktop'
+            ? hexToRGBA(p.theme.backgroundContent, 0.56)
+            : p.theme.backgroundPage};
 
     > a {
         text-decoration: unset;
@@ -69,7 +72,12 @@ const WalletAsideContainer = styled.div`
 `;
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
-    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
+    background: ${p =>
+        p.isSelected
+            ? p.theme.proDisplayType === 'desktop'
+                ? p.theme.backgroundContentTint
+                : p.theme.backgroundContent
+            : 'unset'};
     padding-right: 50px;
     height: unset;
     position: relative;
