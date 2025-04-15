@@ -78,9 +78,23 @@ export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
+    const env = useAppTargetEnv();
 
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(authService, sdk.storage);
+        let state: ProState;
+
+        if (env === 'mobile') {
+            state = {
+                authorizedWallet: null,
+                subscription: {
+                    isFree: true,
+                    valid: true,
+                    isTrial: false
+                }
+            };
+        } else {
+            state = await getProState(authService, sdk.storage);
+        }
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;

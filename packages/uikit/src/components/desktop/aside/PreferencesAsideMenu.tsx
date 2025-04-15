@@ -31,7 +31,7 @@ import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv } from '../../shared/TargetEnv';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -121,16 +121,18 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         )}
                     </NavLink>
                 )}
-                <HideOnReview>
-                    <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive}>
-                                <TonkeeperSkeletIcon />
-                                <Label2>{t('tonkeeper_pro')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
-                </HideOnReview>
+                <NotForTargetEnv env="mobile">
+                    <HideOnReview>
+                        <NavLink to={AppRoute.settings + SettingsRoute.pro}>
+                            {({ isActive }) => (
+                                <AsideMenuItemStyled isSelected={isActive}>
+                                    <TonkeeperSkeletIcon />
+                                    <Label2>{t('tonkeeper_pro')}</Label2>
+                                </AsideMenuItemStyled>
+                            )}
+                        </NavLink>
+                    </HideOnReview>
+                </NotForTargetEnv>
                 {(proState?.subscription.valid || env === 'mobile') && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (

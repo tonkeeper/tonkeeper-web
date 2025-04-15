@@ -32,7 +32,13 @@ export interface ProSubscriptionTrial {
     usedTrial: true;
 }
 
-export type ProSubscriptionValid = ProSubscriptionPaid | ProSubscriptionTrial;
+export interface ProSubscriptionFree {
+    valid: true;
+    isTrial: false;
+    isFree: true;
+}
+
+export type ProSubscriptionValid = ProSubscriptionPaid | ProSubscriptionTrial | ProSubscriptionFree;
 
 export interface ProSubscriptionInvalid {
     valid: false;
@@ -56,4 +62,10 @@ export function isPaidSubscription(
     subscription: ProSubscription
 ): subscription is ProSubscriptionPaid {
     return subscription.valid && !subscription.isTrial;
+}
+
+export function isFreeSubscription(
+    subscription: ProSubscription
+): subscription is ProSubscriptionFree {
+    return subscription.valid && 'isFree' in subscription && subscription.isFree;
 }

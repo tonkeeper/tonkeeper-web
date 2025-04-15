@@ -11,6 +11,7 @@ import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { ProDashboardIcon, ProMultisendIcon } from './Icons';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const NotificationStyled = styled(Notification)`
     max-width: 768px;
@@ -122,6 +123,10 @@ export const ProFeaturesNotificationContent: FC<{ onClose: () => void }> = ({ on
             onClose();
         }
     };
+
+    if (isFreeSubscription(data.subscription)) {
+        return null;
+    }
 
     return (
         <ContentWrapper>

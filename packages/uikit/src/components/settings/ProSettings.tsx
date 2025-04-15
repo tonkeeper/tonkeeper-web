@@ -57,6 +57,7 @@ import {
     DesktopViewPageLayout
 } from '../desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../shared/TargetEnv';
+import { useAppTargetEnv } from '../../hooks/appSdk';
 
 const Block = styled.div`
     display: flex;
@@ -458,6 +459,12 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 };
 
 export const ProSettings: FC = () => {
+    const env = useAppTargetEnv();
+
+    if (env === 'mobile') {
+        return null;
+    }
+
     return (
         <HideOnReview>
             <ProSettingsResponsive />
