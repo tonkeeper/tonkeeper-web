@@ -9,11 +9,7 @@ import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
 import { hexToRGBA } from '../../../libs/css';
-import {
-    useActiveAccount,
-    useActiveTonNetwork,
-    useIsActiveWalletWatchOnly
-} from '../../../state/wallet';
+import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../ios/HideOnReview';
 
@@ -123,7 +119,6 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
     const sdk = useAppSdk();
     const { onOpen: onBuy } = useBuyNotification();
     const { onScan, NotificationComponent } = useSmartScanner();
-    const activeAccount = useActiveAccount();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
