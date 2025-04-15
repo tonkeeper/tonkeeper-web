@@ -15,7 +15,6 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../../state/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { HideOnReview } from '../../ios/HideOnReview';
 
 const Grid = styled.div`
@@ -128,7 +127,6 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
 
     const isReadOnly = useIsActiveWalletWatchOnly();
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
-    const isStandardTon = isAccountTonWalletStandard(activeAccount);
 
     return (
         <Grid className={className}>
@@ -167,7 +165,7 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
                 </HorizontalDivider>
                 <ActionCell
                     onClick={() => navigate(AppRoute.swap)}
-                    $disabled={isReadOnly || !isStandardTon || isTestnet}
+                    $disabled={isReadOnly || isTestnet}
                 >
                     <SwapIcon />
                     <Label2>{t('wallet_swap')}</Label2>
