@@ -1,7 +1,7 @@
 export function getWindow() {
-  if (typeof window !== 'undefined') {
-    return window;
-  }
+    if (typeof window !== 'undefined') {
+        return window;
+    }
 
-  return undefined;
+    return undefined;
 }

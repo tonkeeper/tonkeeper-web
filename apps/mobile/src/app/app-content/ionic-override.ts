@@ -4,7 +4,7 @@ import { Label1Class, Label2Class } from '@tonkeeper/uikit';
 export const IonicOverride = css`
     :root {
         --ion-modal-default-height: calc(100% - (env(safe-area-inset-top) + 10px));
-        --footer-base-height: calc(64px + env(safe-area-inset-bottom, 0px));
+        --footer-base-height: 64px;
         --footer-full-height: calc(var(--footer-base-height) + env(safe-area-inset-bottom, 0px));
     }
 

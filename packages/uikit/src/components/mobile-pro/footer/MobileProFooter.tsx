@@ -135,7 +135,8 @@ const TabButton = styled.div`
     padding: 0 16px;
     ${Label2Class};
     height: 100%;
-    align-content: center;
+    display: flex;
+    align-items: center;
 `;
 
 const _LeftTabIcon: FC<{ className?: string }> = ({ className }) => {
