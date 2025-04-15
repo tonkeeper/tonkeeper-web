@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import type { RechargeMethods } from '@tonkeeper/core/dist/batteryApi/models/RechargeMethods';
 
-import { useActiveAccount, useActiveConfig, useActiveTonNetwork } from './wallet';
+import {
+    useActiveAccount,
+    useActiveAccountQuery,
+    useActiveConfig,
+    useActiveTonNetwork
+} from './wallet';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
@@ -126,7 +131,7 @@ export const useBatteryAuthToken = () => {
 };
 
 export const useRequestBatteryAuthToken = () => {
-    const account = useActiveAccount();
+    const { data: account } = useActiveAccountQuery();
     const { mutateAsync: signTonProof } = useSignTonProof();
     const batteryApi = useBatteryApi();
     const sdk = useAppSdk();
@@ -139,7 +144,7 @@ export const useRequestBatteryAuthToken = () => {
     >(async args => {
         let wallet = args?.wallet;
         if (!wallet) {
-            if (account.type !== 'mnemonic' && account.type !== 'mam') {
+            if (account?.type !== 'mnemonic' && account?.type !== 'mam') {
                 throw new Error('Invalid account type');
             }
             wallet = account.activeTonWallet;

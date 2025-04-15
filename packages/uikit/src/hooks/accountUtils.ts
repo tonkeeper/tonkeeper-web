@@ -1,6 +1,6 @@
 import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { useActiveAccount, useActiveApi } from '../state/wallet';
+import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
 import { useTranslation } from './translation';
 import { useAppSdk } from './appSdk';
 import { useSecurityCheck } from '../state/password';
@@ -37,7 +37,7 @@ export const tonProofSignerByTonMnemonic = (mnemonic: string[], type: 'ton' | 'b
 
 export const useSignTonProof = () => {
     const api = useActiveApi();
-    const account = useActiveAccount();
+    const { data: account } = useActiveAccountQuery();
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { mutateAsync: securityCheck } = useSecurityCheck();
@@ -56,7 +56,7 @@ export const useSignTonProof = () => {
     >(async ({ origin, payload, signer, wallet: providedWallet }) => {
         let wallet = providedWallet;
         if (!wallet) {
-            if (!isAccountTonWalletStandard(account)) {
+            if (!account || !isAccountTonWalletStandard(account)) {
                 throw new Error('Invalid account type');
             }
 
@@ -71,7 +71,7 @@ export const useSignTonProof = () => {
             signer ??
             signTonConnectOver({
                 sdk,
-                accountId: account.id,
+                accountId: account!.id,
                 wallet,
                 t,
                 securityCheck

@@ -37,7 +37,7 @@ export const mobileProTheme: DefaultTheme = {
 
     buttonTertiaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
     buttonSecondaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
-    buttonPrimaryForegroundDisabled: 'rgba(0, 0, 0, 0.48)',
+    buttonPrimaryForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
     buttonWarnForegroundDisabled: 'rgba(256, 256, 256, 0.48)',
 
     buttonPrimaryBackgroundHighlighted: 'rgba(91, 184, 246, 1)',
