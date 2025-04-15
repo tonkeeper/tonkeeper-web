@@ -3,12 +3,7 @@ import { AddWalletContext } from '../create/AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
-import {
-    NotificationFooter,
-    NotificationFooterPortal,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../Notification';
+import { useSetNotificationOnBack, useSetNotificationOnCloseInterceptor } from '../Notification';
 import { useTranslation } from '../../hooks/translation';
 import {
     AsyncValidationState,
@@ -194,20 +189,16 @@ export const MultisigConfigForm: FC<{
                 </AsyncValidatorsStateProvider>
             </FormProvider>
             {formId === undefined && (
-                <NotificationFooterPortal>
-                    <NotificationFooter>
-                        <ButtonResponsiveSize
-                            primary
-                            type="submit"
-                            fullWidth
-                            form={formIdToSet}
-                            loading={formState === 'validating'}
-                            disabled={formState !== 'succeed'}
-                        >
-                            {t('create_multisig_create_wallet')}
-                        </ButtonResponsiveSize>
-                    </NotificationFooter>
-                </NotificationFooterPortal>
+                <ButtonResponsiveSize
+                    primary
+                    type="submit"
+                    fullWidth
+                    form={formIdToSet}
+                    loading={formState === 'validating'}
+                    disabled={formState !== 'succeed'}
+                >
+                    {t('create_multisig_create_wallet')}
+                </ButtonResponsiveSize>
             )}
         </FormWrapper>
     );
