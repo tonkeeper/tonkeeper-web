@@ -2285,6 +2285,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/browser@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "@capacitor/browser@npm:7.0.1"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/0d15b5e94f7c753f4fc0c1a4c719ad4af67b31aac458a5dc0919cb80024a92813b7e84b8fddc21301b0c64e19b3568202f484265a40454c1e1560884d2415beb
+  languageName: node
+  linkType: hard
+
 "@capacitor/camera@npm:latest":
   version: 6.1.1
   resolution: "@capacitor/camera@npm:6.1.1"
@@ -7685,6 +7694,7 @@ __metadata:
   resolution: "@tonkeeper/mobile@workspace:apps/mobile"
   dependencies:
     "@capacitor/app": "npm:^6.0.1"
+    "@capacitor/browser": "npm:^7.0.1"
     "@capacitor/camera": "npm:latest"
     "@capacitor/cli": "npm:latest"
     "@capacitor/clipboard": "npm:^6.0.1"

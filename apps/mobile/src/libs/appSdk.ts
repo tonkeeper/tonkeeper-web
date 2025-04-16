@@ -10,13 +10,13 @@ import {
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
-import { getWindow } from './utils';
 import { Biometric, SecureStorage } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { Network } from '@capacitor/network';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { Browser } from '@capacitor/browser';
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -91,7 +91,18 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     };
 
     openPage = async (url: string) => {
-        getWindow()?.open(url, '_blank', 'noreferrer,noopener');
+        if (!url.startsWith('https://') && !url.startsWith('http://')) {
+            try {
+                /* way to open in deeplinks on ios */
+
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                window.location = url as any;
+            } catch (e) {
+                console.error(e);
+            }
+        } else {
+            await Browser.open({ url });
+        }
     };
 
     version = packageJson.version ?? 'Unknown';
@@ -113,6 +124,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     };
 
     connectionService = new CapacitorConnectionService();
+
+    signerReturnUrl = 'tonkeeper://'; // TODO replace with 'tonkeeper-pro://'; once signer is fixed
 }
 
 export const getCapacitorDeviceOS = async () => {

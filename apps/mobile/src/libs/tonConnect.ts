@@ -8,6 +8,9 @@ import { atom, subject } from '@tonkeeper/core/dist/entries/atom';
 
 const tonConnectDisconnect$ = subject<AccountConnection>();
 const tonConnectRequest$ = subject<TonConnectAppRequestPayload>();
+const signerResponse$ = subject<{
+    signatureHex: string;
+}>();
 
 export const tonConnectSSE = new TonConnectSSE({
     storage: new CapacitorStorage(),
@@ -26,6 +29,10 @@ export const subscribeToTonConnectRequestTransaction = (
     listener: (value: TonConnectAppRequestPayload) => void
 ) => {
     return tonConnectRequest$.subscribe(listener);
+};
+
+export const subscribeToSignerResponse = (listener: (value: { signatureHex: string }) => void) => {
+    return signerResponse$.subscribe(listener);
 };
 
 const tonLink$ = atom<string | undefined>(undefined);
@@ -50,8 +57,19 @@ export const subscribeToSignerUrlOpened = (listener: (url: string) => void) => {
 App.addListener('appUrlOpen', ({ url }) => {
     if (url) {
         console.info('Received URL:', url);
+
+        let signerSignResponse = undefined;
+        try {
+            const u = new URL(url);
+            signerSignResponse = u.searchParams.get('sign');
+        } catch {
+            /* */
+        }
+
         if (isSignerLink(url)) {
             signerLink$.next(url);
+        } else if (signerSignResponse) {
+            signerResponse$.next({ signatureHex: signerSignResponse });
         } else {
             tonLink$.next(url);
         }

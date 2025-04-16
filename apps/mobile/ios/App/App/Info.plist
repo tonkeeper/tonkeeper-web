@@ -25,11 +25,17 @@
 			<array>
 				<string>tonkeeper</string>
 				<string>tonkeeper-tc</string>
+				<string>tonkeeper-pro</string>
 				<string>tc</string>
 				<string>ton</string>
 			</array>
 		</dict>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>tonsign</string>
+        <string>tonkeeper</string>
+    </array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

@@ -25,8 +25,8 @@ import {
     walletSecretFromString
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import {
-    parseSignerSignature,
-    storeTransactionAndCreateDeepLink
+    createSignerTxDeepLink,
+    parseSignerSignature
 } from '@tonkeeper/core/dist/service/signerService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
@@ -40,6 +40,7 @@ import { useSecurityCheck } from './password';
 import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
 import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 export const signDataOver = ({
     sdk,
@@ -260,23 +261,47 @@ export const getSigner = async (
                 }
 
                 if (account.auth.kind === 'signer-deeplink') {
-                    const callback = async (message: Cell) => {
-                        const deeplink = await storeTransactionAndCreateDeepLink(
-                            sdk,
-                            (wallet as TonWalletStandard).publicKey,
-                            (wallet as TonWalletStandard).version,
-                            message.toBoc({ idx: false }).toString('base64')
-                        );
+                    if (sdk.targetEnv === 'web') {
+                        const callback = async (message: Cell) => {
+                            const messageBase64 = message.toBoc({ idx: false }).toString('base64');
+                            await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
 
-                        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                        window.location = deeplink as any;
+                            const deeplink = await createSignerTxDeepLink(
+                                sdk,
+                                (wallet as TonWalletStandard).publicKey,
+                                (wallet as TonWalletStandard).version,
+                                messageBase64
+                            );
 
-                        await delay(2000);
+                            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                            window.location = deeplink as any;
 
-                        throw new Error('Navigate to deeplink');
-                    };
-                    callback.type = 'cell' as const;
-                    return callback as CellSigner;
+                            await delay(2000);
+
+                            throw new Error('Navigate to deeplink');
+                        };
+                        callback.type = 'cell' as const;
+                        return callback as CellSigner;
+                    } else {
+                        const callback = async (message: Cell) => {
+                            const deeplink = await createSignerTxDeepLink(
+                                sdk,
+                                (wallet as TonWalletStandard).publicKey,
+                                (wallet as TonWalletStandard).version,
+                                message.toBoc({ idx: false }).toString('base64')
+                            );
+
+                            sdk.openPage(deeplink);
+
+                            return new Promise<Buffer>(res => {
+                                sdk.uiEvents.once('signerTxResponse', options => {
+                                    res(Buffer.from(options.params.signatureHex, 'hex'));
+                                });
+                            });
+                        };
+                        callback.type = 'cell' as const;
+                        return callback;
+                    }
                 }
 
                 return assertUnreachable(account.auth);

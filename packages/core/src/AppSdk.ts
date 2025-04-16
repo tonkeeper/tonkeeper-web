@@ -58,6 +58,9 @@ export interface UIEvents {
     editSuggestion: FavoriteSuggestion;
     response: any;
     toast: string;
+    signerTxResponse: {
+        signatureHex: string;
+    };
 }
 
 export interface NativeBackButton {
@@ -135,6 +138,8 @@ export interface IAppSdk {
     storeUrl?: string;
     reloadApp: () => void;
     connectionService: InternetConnectionService;
+
+    signerReturnUrl?: string;
 }
 
 export abstract class BaseApp implements IAppSdk {

@@ -214,6 +214,7 @@ export const AddWalletNotificationControlled = () => {
                 afterClose={() => {
                     setSelectedMethod(undefined);
                 }}
+                tag={`add-wallet-${selectedMethod}`}
             >
                 {Content}
             </NotificationStyled>

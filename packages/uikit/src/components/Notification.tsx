@@ -450,13 +450,36 @@ export type OnCloseInterceptor =
     | ((closeHandle: () => void, cancelCloseHandle: () => void) => void)
     | undefined;
 
-const allNotificationsControl$ = {
-    closeHandlers: new Set<() => void>()
+const notificationsControl$ = {
+    untaggedCloseHandlers: new Set<() => void>(),
+    taggedCloseHandlers: new Map<string, () => void>()
 };
 
 export function closeAllNotifications() {
-    allNotificationsControl$.closeHandlers.forEach(handler => handler());
+    notificationsControl$.untaggedCloseHandlers.forEach(handler => handler());
+    [...notificationsControl$.taggedCloseHandlers.values()].forEach(handler => handler());
 }
+
+export function closeNotification(tag: string) {
+    notificationsControl$.taggedCloseHandlers.get(tag)?.();
+}
+
+const useConnectNotificationCloseControl = (tag: string | undefined, handleClose: () => void) => {
+    useEffect(() => {
+        if (tag) {
+            notificationsControl$.taggedCloseHandlers.set(tag, handleClose);
+            return () => {
+                notificationsControl$.taggedCloseHandlers.delete(tag);
+            };
+        }
+
+        notificationsControl$.untaggedCloseHandlers.add(handleClose);
+
+        return () => {
+            notificationsControl$.untaggedCloseHandlers.delete(handleClose);
+        };
+    }, [tag, handleClose]);
+};
 
 export const Notification: FC<{
     isOpen: boolean;
@@ -470,6 +493,7 @@ export const Notification: FC<{
     disableHeightAnimation?: boolean;
     mobileFullScreen?: boolean;
     afterClose?: () => void;
+    tag?: string;
 }> = props => {
     const targetEnv = useAppTargetEnv();
 
@@ -491,6 +515,7 @@ export const NotificationIonic: FC<{
     disableHeightAnimation?: boolean;
     mobileFullScreen?: boolean;
     afterClose?: () => void;
+    tag?: string;
 }> = ({
     children,
     isOpen,
@@ -501,7 +526,8 @@ export const NotificationIonic: FC<{
     className,
     disableHeightAnimation,
     mobileFullScreen,
-    afterClose
+    afterClose,
+    tag
 }) => {
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -513,13 +539,7 @@ export const NotificationIonic: FC<{
         }
     }, [handleClose, onCloseInterceptor]);
 
-    useEffect(() => {
-        allNotificationsControl$.closeHandlers.add(handleClose);
-
-        return () => {
-            allNotificationsControl$.closeHandlers.delete(handleClose);
-        };
-    }, [handleClose]);
+    useConnectNotificationCloseControl(tag, handleClose);
 
     /**
      * Prevent Ionic bug -- touching modal background calls canDismiss twice
@@ -679,6 +699,7 @@ export const NotificationDesktopAndWeb: FC<{
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
     afterClose?: () => void;
+    tag?: string;
 }> = ({
     children,
     isOpen,
@@ -688,7 +709,8 @@ export const NotificationDesktopAndWeb: FC<{
     title,
     footer,
     className,
-    afterClose
+    afterClose,
+    tag
 }) => {
     const animationTime = 200;
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -714,13 +736,7 @@ export const NotificationDesktopAndWeb: FC<{
         setTimeout(() => setOpen(isOpen));
     }, [isOpen]);
 
-    useEffect(() => {
-        allNotificationsControl$.closeHandlers.add(handleClose);
-
-        return () => {
-            allNotificationsControl$.closeHandlers.delete(handleClose);
-        };
-    }, [handleClose]);
+    useConnectNotificationCloseControl(tag, handleClose);
 
     const sdk = useAppSdk();
     const nodeRef = useRef<HTMLDivElement>(null);
