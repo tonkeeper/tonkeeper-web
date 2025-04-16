@@ -513,6 +513,14 @@ export const NotificationIonic: FC<{
         }
     }, [handleClose, onCloseInterceptor]);
 
+    useEffect(() => {
+        allNotificationsControl$.closeHandlers.add(handleClose);
+
+        return () => {
+            allNotificationsControl$.closeHandlers.delete(handleClose);
+        };
+    }, [handleClose]);
+
     /**
      * Prevent Ionic bug -- touching modal background calls canDismiss twice
      */

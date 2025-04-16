@@ -54,6 +54,7 @@ export const TwoFAPage = () => {
 const ContentWrapper = styled.div`
     max-width: 468px;
     margin: 0 auto;
+    padding: 0 16px;
 `;
 
 const SpinnerWrapper = styled.div`

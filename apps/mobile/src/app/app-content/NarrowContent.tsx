@@ -1,6 +1,6 @@
 import { ComponentProps, FC, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Redirect, Route, useHistory, useLocation } from 'react-router-dom';
+import { Route, useHistory, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useAppWidth } from '../../libs/hooks';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
@@ -63,7 +63,7 @@ import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pa
 import { useCheckTouchId, useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
 import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/useAtom';
-import { ionRouterAnimation$ } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
+import { ionRouterAnimation$, useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { AnimatePresence, motion } from 'framer-motion';
 import { MobileProPin } from '@tonkeeper/uikit/dist/components/mobile-pro/pin/MobileProPin';
 import { useTranslation } from 'react-i18next';
@@ -340,6 +340,12 @@ const IonModalStyled = styled(IonModal)`
     }
 `;
 
+const routesToRedirectToWalletsSettings = [
+    AppRoute.settings + WalletSettingsRoute.version,
+    AppRoute.settings + WalletSettingsRoute.twoFa,
+    AppRoute.settings + WalletSettingsRoute.jettons
+];
+
 const PreferencesModal = () => {
     const [presentingElement, setPresentingElement] = useState<HTMLElement | null>(null);
 
@@ -354,9 +360,23 @@ const PreferencesModal = () => {
     }, []);
 
     const history = useHistory();
+    const navigate = useNavigate();
     const [isSettingsOpen, setSettingsOpen] = useState(false);
     useEffect(() => {
         const unblock = history.block(location => {
+            const matchingRedirectionRoute = routesToRedirectToWalletsSettings.find(r =>
+                location.pathname?.startsWith(r)
+            );
+
+            if (matchingRedirectionRoute) {
+                const newPath = location.pathname.replace(
+                    AppRoute.settings,
+                    AppRoute.walletSettings
+                );
+                navigate(newPath, { disableMobileAnimation: true });
+                return false;
+            }
+
             if (location.pathname?.startsWith(AppRoute.settings)) {
                 setSettingsOpen(true);
                 if (location.pathname !== AppRoute.settings) {
@@ -368,7 +388,7 @@ const PreferencesModal = () => {
         });
 
         return () => unblock();
-    }, [history]);
+    }, [history, navigate]);
 
     useEffect(() => {
         settingsHistory.current.listen(location => {
@@ -435,15 +455,6 @@ const PreferencesModal = () => {
                             path={AppRoute.settings + SettingsRoute.recovery}
                             component={NavigateToRecovery}
                         />
-                        <Route path={AppRoute.settings + SettingsRoute.version}>
-                            <Redirect to={AppRoute.walletSettings + WalletSettingsRoute.version} />
-                        </Route>
-                        <Route path={AppRoute.settings + SettingsRoute.jettons}>
-                            <Redirect to={AppRoute.walletSettings + WalletSettingsRoute.jettons} />
-                        </Route>
-                        <Route path={AppRoute.settings + SettingsRoute.twoFa}>
-                            <Redirect to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} />
-                        </Route>
                     </IonRouterOutlet>
                 </IonReactMemoryRouter>
             </IonContent>
