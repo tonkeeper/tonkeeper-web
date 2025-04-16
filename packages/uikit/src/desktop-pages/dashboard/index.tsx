@@ -1,4 +1,4 @@
-import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isFreeSubscription, isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
@@ -13,6 +13,9 @@ import { HideOnReview } from '../../components/ios/HideOnReview';
 import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
 import { MPCarouselScroll } from '../../components/shared/MPCarouselScroll';
+import { useAppTargetEnv } from '../../hooks/appSdk';
+import { Navigate } from '../../components/shared/Navigate';
+import { AppRoute } from '../../libs/routes';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -46,7 +49,13 @@ const PageWrapper = styled(DesktopViewPageLayout)`
 
 const DashboardPage: FC = () => {
     const { data } = useProState();
-    const shouldShowProBanner = data && !isPaidSubscription(data.subscription);
+    const shouldShowProBanner =
+        data && !isPaidSubscription(data.subscription) && !isFreeSubscription(data.subscription);
+
+    const env = useAppTargetEnv();
+    if (env === 'mobile') {
+        return <Navigate to={AppRoute.home} />;
+    }
 
     return (
         <>

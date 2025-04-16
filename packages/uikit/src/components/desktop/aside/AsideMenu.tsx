@@ -342,15 +342,17 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
             </NotForTargetEnv>
             <AsideContentContainer className={className}>
                 <ScrollContainer ref={ref}>
-                    {proFeatures && (
-                        <AsideMenuItem
-                            isSelected={activeRoute === AppProRoute.dashboard}
-                            onClick={() => handleNavigateClick(AppProRoute.dashboard)}
-                        >
-                            <StatsIcon />
-                            <Label2>{t('aside_dashboard')}</Label2>
-                        </AsideMenuItem>
-                    )}
+                    <NotForTargetEnv env="mobile">
+                        {proFeatures && (
+                            <AsideMenuItem
+                                isSelected={activeRoute === AppProRoute.dashboard}
+                                onClick={() => handleNavigateClick(AppProRoute.dashboard)}
+                            >
+                                <StatsIcon />
+                                <Label2>{t('aside_dashboard')}</Label2>
+                            </AsideMenuItem>
+                        )}
+                    </NotForTargetEnv>
                     <HideOnReview>
                         <AsideMenuItem
                             onClick={() => handleNavigateClick(AppRoute.browser)}

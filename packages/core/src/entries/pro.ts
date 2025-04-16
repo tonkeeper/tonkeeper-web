@@ -65,7 +65,7 @@ export function isPaidSubscription(
 }
 
 export function isFreeSubscription(
-    subscription: ProSubscription
+    subscription: ProSubscription | undefined
 ): subscription is ProSubscriptionFree {
-    return subscription.valid && 'isFree' in subscription && subscription.isFree;
+    return !!subscription && subscription.valid && 'isFree' in subscription && subscription.isFree;
 }

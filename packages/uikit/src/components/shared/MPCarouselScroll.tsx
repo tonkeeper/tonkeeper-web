@@ -32,11 +32,13 @@ export const MPCarouselScroll: FC<PropsWithChildren> = ({ children }) => {
                     if (diff > 0) {
                         slider.scrollTo({
                             left: slider.scrollLeft + screenWidth,
+                            top: slider.scrollTop,
                             behavior: 'smooth'
                         });
                     } else {
                         slider.scrollTo({
                             left: slider.scrollLeft - screenWidth,
+                            top: slider.scrollTop,
                             behavior: 'smooth'
                         });
                     }

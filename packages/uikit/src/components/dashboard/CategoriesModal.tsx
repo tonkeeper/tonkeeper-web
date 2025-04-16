@@ -19,6 +19,7 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../ios/HideOnReview';
+import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const HeaderStyled = styled.div`
     width: 100%;
@@ -33,19 +34,30 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
 }) => {
     const { t } = useTranslation();
     const [_, { mutate, isLoading }] = useDashboardColumnsForm();
-    const { data } = useDashboardColumnsAsForm();
     const [categoriesForm, setCategoriesForm] = useState<DashboardColumnsForm>([]);
 
-    useEffect(() => {
-        if (data) {
-            setCategoriesForm(data);
+    const { data: pro } = useProState();
+    const isFreePro = isFreeSubscription(pro?.subscription);
+
+    const { data } = useDashboardColumnsAsForm();
+    const categories = useMemo(() => {
+        if (isFreePro) {
+            return data?.filter(i => !i.onlyPro);
         }
-    }, [data]);
+
+        return data;
+    }, [data, isFreePro]);
+
+    useEffect(() => {
+        if (categories) {
+            setCategoriesForm(categories);
+        }
+    }, [categories]);
 
     const child = useCallback(
         () => (
             <CategoriesModalContent
-                categories={data || []}
+                categories={categories || []}
                 categoriesForm={categoriesForm}
                 setCategoriesForm={setCategoriesForm}
             />
@@ -62,8 +74,8 @@ export const CategoriesModal: FC<{ isOpen: boolean; onClose: () => void }> = ({
     };
 
     const formHasChanged = useMemo(() => {
-        return JSON.stringify(data) !== JSON.stringify(categoriesForm);
-    }, [categoriesForm, data]);
+        return JSON.stringify(categories) !== JSON.stringify(categoriesForm);
+    }, [categoriesForm, categories]);
 
     return (
         <Notification

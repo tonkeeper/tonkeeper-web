@@ -18,6 +18,8 @@ import {
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
 import { HideOnReview } from '../ios/HideOnReview';
+import { useProState } from '../../state/pro';
+import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const AddMethod = styled.button`
     display: flex;
@@ -109,6 +111,8 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
         acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
     );
 
+    const { data: pro } = useProState();
+
     return (
         <AddMethodsWrapper>
             <AddMethodsGroup>
@@ -175,7 +179,9 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                                 <AddMethodLabel>
                                     {t('add_wallet_new_multisig_title')}{' '}
                                     <HideOnReview>
-                                        <Badge color="accentBlue">PRO</Badge>
+                                        {!isFreeSubscription(pro?.subscription) && (
+                                            <Badge color="accentBlue">PRO</Badge>
+                                        )}
                                     </HideOnReview>
                                 </AddMethodLabel>
                                 <AddMethodDescription>
