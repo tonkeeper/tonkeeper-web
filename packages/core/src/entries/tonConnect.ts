@@ -230,7 +230,7 @@ export type SignDataFeature = {
 export interface SignDataRpcRequest {
     id: string;
     method: 'signData';
-    params: SignDataRequestPayload;
+    params: [string];
 }
 
 export type SignDataRequestPayload = SignDataRequestPayloadKind;

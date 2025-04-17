@@ -140,7 +140,9 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                         <ButtonRow>
                             <Button
                                 size="small"
-                                onClick={handleSubmit(() => sdk.copyToClipboard(params.text))}
+                                onClick={handleSubmit(() =>
+                                    sdk.copyToClipboard(params.text, t('copied'))
+                                )}
                             >
                                 {t('receiveModal_copy')}
                             </Button>

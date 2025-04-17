@@ -73,7 +73,7 @@ export const CopyNotification: FC<{ hideSimpleCopyNotifications?: boolean }> = R
                     () => {
                         setOpen(false);
                     },
-                    options.params ? 5000 : 2000
+                    options.params && options.params !== t('copied') ? 5000 : 2000
                 );
             };
             sdk.uiEvents.on('copy', handler);

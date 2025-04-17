@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { BaseRecipient, DnsRecipient, RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { Suggestion } from '@tonkeeper/core/dist/entries/suggestion';
 import { Account, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import {
     formatAddress,
@@ -31,7 +30,6 @@ import { Body2 } from '../Text';
 import { TextArea } from '../fields/Input';
 import { InputWithScanner } from '../fields/InputWithScanner';
 import { ShowAddress, useShowAddress } from './ShowAddress';
-import { SuggestionList } from './SuggestionList';
 import { useResolveDns } from '../../state/dns';
 
 const Warning = styled(Body2)`
@@ -269,14 +267,6 @@ export const RecipientView: FC<{
         handleSubmit();
     };
 
-    const onSelect = async (item: Suggestion) => {
-        if (item.blockchain === BLOCKCHAIN_NAME.TON) {
-            item.address = formatAddress(item.address, network);
-        }
-        setAddress(item);
-        ref.current?.focus();
-    };
-
     return (
         <FullHeightBlock
             onSubmit={onSubmit}
@@ -318,12 +308,6 @@ export const RecipientView: FC<{
             {toAccount && toAccount.memoRequired && (
                 <Warning>{t('send_screen_steps_comfirm_comment_required_text')}</Warning>
             )}
-
-            <SuggestionList
-                onSelect={onSelect}
-                disabled={isExternalLoading}
-                acceptBlockchains={acceptBlockchains}
-            />
 
             <Gap />
 
