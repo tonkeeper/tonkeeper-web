@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Body1, H2 } from '../components/Text';
 import { Button } from '../components/fields/Button';
 import { useAddWalletNotification } from '../components/modals/AddWalletNotificationControlled';
+import { useTranslation } from '../hooks/translation';
 
 const Container = styled.div`
     height: 100%;
@@ -24,6 +25,9 @@ const Content = styled.div`
         color: ${p => p.theme.textSecondary};
         margin-top: 4px;
         margin-bottom: 32px;
+        padding: 0 32px;
+        text-wrap: balance;
+        text-align: center;
     }
 `;
 
@@ -39,6 +43,7 @@ const ButtonsContainer = styled.div`
 
 export const MobileProWelcomePage = () => {
     const { onOpen } = useAddWalletNotification();
+    const { t } = useTranslation();
     return (
         <Container>
             <Icon>
@@ -47,20 +52,20 @@ export const MobileProWelcomePage = () => {
             </Icon>
             <Content>
                 <H2>Tonkeeper Pro</H2>
-                <Body1>Create a new wallet or add an existing one</Body1>
+                <Body1>{t('pro_mobile_welcome_screen_title')}</Body1>
                 <ButtonsContainer>
                     <Button
                         size="large"
                         primary
                         onClick={() => onOpen({ walletType: 'create-standard' })}
                     >
-                        Create New Wallet
+                        {t('start_screen_create_wallet_button')}
                     </Button>
                     <Button size="large" secondary onClick={() => onOpen({ walletType: 'import' })}>
-                        Import Existing Wallet
+                        {t('start_screen_import_wallet_button')}
                     </Button>
                     <Button size="large" secondary onClick={() => onOpen()}>
-                        Other Options
+                        {t('add_wallet_group_other_options')}
                     </Button>
                 </ButtonsContainer>
             </Content>
