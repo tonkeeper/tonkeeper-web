@@ -11,6 +11,10 @@ export type IEventEmitter<T> = {
         eventName: `${Key}`,
         params?: { method: `${Key}`; id?: number; params: T[Key] }
     ): void;
+    once<Key extends string & keyof T>(
+        method: `${Key}`,
+        callback: (options: { method: `${Key}`; id?: number; params: T[Key] }) => void
+    ): void;
 };
 
 /*eslint-disable @typescript-eslint/no-explicit-any*/
@@ -34,5 +38,13 @@ export class EventEmitter {
         if (cbs) {
             cbs.forEach(cb => cb(data));
         }
+    }
+
+    once(event: string, cb: (...args: any[]) => void) {
+        const wrapper = (...args: any[]) => {
+            cb(...args);
+            this.off(event, wrapper);
+        };
+        this.on(event, wrapper);
     }
 }

@@ -48,16 +48,19 @@ export const createTransferQr = (publicKey: string, version: WalletVersion, boc:
     return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}&v=${walletVersionText(version)}`;
 };
 
-export const storeTransactionAndCreateDeepLink = async (
+export const createSignerTxDeepLink = async (
     sdk: IAppSdk,
     publicKey: string,
     version: WalletVersion,
     messageBase64: string
 ) => {
-    await sdk.storage.set(AppKey.SIGNER_MESSAGE, messageBase64);
-
     const body = Buffer.from(messageBase64, 'base64').toString('hex');
-    const back = encodeURIComponent('https://wallet.tonkeeper.com/');
+
+    if (!sdk.signerReturnUrl) {
+        throw new Error('App does not support signer deeplinks');
+    }
+
+    const back = encodeURIComponent(sdk.signerReturnUrl);
     return `tonsign://v1/?network=ton&pk=${publicKey}&body=${body}&v=${walletVersionText(
         version
     )}&return=${back}`;

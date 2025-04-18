@@ -12,6 +12,7 @@ import { Body3 } from '../../Text';
 import { useAssetWeiBalance } from '../../../state/home';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useTranslation } from '../../../hooks/translation';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 const ContentWrapper = styled.div<{ $isShown: boolean }>`
     display: ${p => (p.$isShown ? 'flex' : 'none')};
@@ -100,10 +101,11 @@ export const BatteryCustomAmountInput: FC<{
     }, [selectedAssetAmount, error]);
 
     const ref = useRef<HTMLInputElement>(null);
+    const env = useAppTargetEnv();
 
     useEffect(() => {
-        if (ref.current && !hidden) {
-            ref.current.focus();
+        if (!hidden) {
+            setTimeout(() => ref.current?.focus(), env === 'mobile' || env === 'tablet' ? 400 : 30);
         }
     }, [hidden]);
 

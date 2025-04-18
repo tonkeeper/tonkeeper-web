@@ -46,9 +46,9 @@ import {
     makeTransferInitAmountState,
     makeTonTransferInitData,
     RecipientHeaderBlock,
-    TransferViewHeaderBlock,
     Wrapper,
-    makeTronTransferInitData
+    makeTronTransferInitData,
+    TransferViewHeaderBlock
 } from './common';
 import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -58,6 +58,7 @@ import { useAnalyticsTrack } from '../../hooks/amplitude';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveWallet } from '../../state/wallet';
+import styled, { css } from 'styled-components';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -302,12 +303,12 @@ const SendContent: FC<{
                                         setView('recipient');
                                     }}
                                     isAnimationProcess={status === 'exiting'}
-                                    Header={() => (
+                                    header={
                                         <TransferViewHeaderBlock
                                             title={t('multisig_create_order_title')}
                                             onClose={onClose}
                                         />
-                                    )}
+                                    }
                                     MainButton={MainButton}
                                 />
                             )}
@@ -364,17 +365,17 @@ const SendContent: FC<{
                                         isMax={amountViewState!.isMax!}
                                         ttl={multisigTimeout!}
                                     >
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewTitleSlot>
+                                        <ConfirmViewTitleSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationHeaderPortal>
                                                     <NotificationHeader>
                                                         <ConfirmViewTitle />
                                                     </NotificationHeader>
                                                 </NotificationHeaderPortal>
-                                            </ConfirmViewTitleSlot>
-                                        )}
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewButtonsSlot>
+                                            )}
+                                        </ConfirmViewTitleSlot>
+                                        <ConfirmViewButtonsSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationFooterPortal>
                                                     <NotificationFooter>
                                                         <ConfirmViewButtons
@@ -382,8 +383,8 @@ const SendContent: FC<{
                                                         />
                                                     </NotificationFooter>
                                                 </NotificationFooterPortal>
-                                            </ConfirmViewButtonsSlot>
-                                        )}
+                                            )}
+                                        </ConfirmViewButtonsSlot>
                                     </ConfirmMultisigNewTransferView>
                                 ) : (
                                     <ConfirmTransferView
@@ -393,17 +394,17 @@ const SendContent: FC<{
                                         assetAmount={assetAmount!}
                                         isMax={amountViewState!.isMax!}
                                     >
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewTitleSlot>
+                                        <ConfirmViewTitleSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationHeaderPortal>
                                                     <NotificationHeader>
                                                         <ConfirmViewTitle />
                                                     </NotificationHeader>
                                                 </NotificationHeaderPortal>
-                                            </ConfirmViewTitleSlot>
-                                        )}
-                                        {status !== 'exiting' && isFullWidth && (
-                                            <ConfirmViewButtonsSlot>
+                                            )}
+                                        </ConfirmViewTitleSlot>
+                                        <ConfirmViewButtonsSlot>
+                                            {status !== 'exiting' && (
                                                 <NotificationFooterPortal>
                                                     <NotificationFooter>
                                                         <ConfirmViewButtons
@@ -411,8 +412,8 @@ const SendContent: FC<{
                                                         />
                                                     </NotificationFooter>
                                                 </NotificationFooterPortal>
-                                            </ConfirmViewButtonsSlot>
-                                        )}
+                                            )}
+                                        </ConfirmViewButtonsSlot>
                                     </ConfirmTransferView>
                                 ))}
                         </div>
@@ -422,6 +423,14 @@ const SendContent: FC<{
         </Wrapper>
     );
 };
+
+const NotificationStyled = styled(Notification)`
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            --height: calc(100% - (env(safe-area-inset-top) + 10px));
+        `}
+`;
 
 const SendActionNotification = () => {
     const [open, setOpen] = useState(false);
@@ -483,7 +492,6 @@ const SendActionNotification = () => {
     }, []);
 
     const Content = useCallback(() => {
-        if (!open) return undefined;
         return (
             <SendContent
                 onClose={onClose}
@@ -495,9 +503,16 @@ const SendActionNotification = () => {
     }, [open, transferParams, chain]);
 
     return (
-        <Notification isOpen={open} handleClose={onClose} hideButton backShadow footer={<></>}>
+        <NotificationStyled
+            isOpen={open}
+            handleClose={onClose}
+            hideButton
+            backShadow
+            footer={<></>}
+            mobileFullScreen
+        >
             {Content}
-        </Notification>
+        </NotificationStyled>
     );
 };
 

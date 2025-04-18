@@ -34,6 +34,7 @@ const NftNotification = () => {
             hideButton
             handleClose={handleClose}
             backShadow
+            mobileFullScreen
         >
             {Content}
         </Notification>

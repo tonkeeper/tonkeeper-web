@@ -109,7 +109,7 @@ export const WithdrawRequestStakeDesktopAction: FC<{
                         isFailed={action.status === 'failed'}
                     />
                 ) : (
-                    <HistoryGridCell />
+                    <HistoryGridCell className="grid-area-amount" />
                 )}
             </ActionRow>
         </>

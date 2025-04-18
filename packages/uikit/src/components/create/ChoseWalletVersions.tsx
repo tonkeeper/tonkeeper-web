@@ -23,6 +23,7 @@ import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { mayBeCreateAccountId } from '@tonkeeper/core/dist/service/walletService';
 import { handleSubmit } from '../../libs/form';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Wrapper = styled.form`
     flex: 1;
@@ -172,19 +173,21 @@ export const ChoseWalletVersions: FC<{
                             </ListItem>
                         ))}
                     </ListBlockStyled>
-                    <SubmitBlock>
-                        <ButtonResponsiveSize
-                            fullWidth
-                            primary
-                            disabled={!checkedVersions.length}
-                            onClick={onSelect}
-                            loading={isLoading}
-                            type="submit"
-                            autoFocus
-                        >
-                            {t('continue')}
-                        </ButtonResponsiveSize>
-                    </SubmitBlock>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonResponsiveSize
+                                fullWidth
+                                primary
+                                disabled={!checkedVersions.length}
+                                onClick={onSelect}
+                                loading={isLoading}
+                                type="submit"
+                                autoFocus
+                            >
+                                {t('continue')}
+                            </ButtonResponsiveSize>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 </>
             )}
         </Wrapper>

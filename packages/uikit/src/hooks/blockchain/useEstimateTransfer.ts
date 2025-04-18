@@ -108,7 +108,8 @@ export function useEstimateTransfer({
         {
             refetchInterval: DefaultRefetchInterval,
             refetchOnMount: 'always',
-            enabled: !!getSender && senderChoice !== undefined
+            enabled: !!getSender && senderChoice !== undefined,
+            retry: 2
         }
     );
 }

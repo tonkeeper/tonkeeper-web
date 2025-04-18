@@ -1,6 +1,6 @@
 import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useLayoutEffect, useRef } from 'react';
+import React, { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { PencilIcon } from '../../components/Icon';
@@ -20,13 +20,13 @@ import {
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
 import { toFormattedTonBalance } from '../../hooks/balance';
 import { Button } from '../../components/fields/Button';
-import { Navigate, useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
 import { SkeletonListDesktopAdaptive } from '../../components/Skeleton';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { WalletIndexBadge } from '../../components/account/AccountBadge';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
@@ -37,11 +37,14 @@ import { usePrevious } from '../../hooks/usePrevious';
 import { scrollToContainersBottom } from '../../libs/web';
 import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const FirstLineContainer = styled.div`
     display: flex;
     gap: 6px;
     align-items: center;
+    word-break: break-word;
 `;
 
 const TextContainer = styled.span`
@@ -73,7 +76,7 @@ export const MAMIndexesPage = () => {
         return (
             <DesktopViewPageLayout>
                 <DesktopViewHeader backButton>
-                    <Label2>{t('settings_mam_indexes')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_mam_indexes')} />
                 </DesktopViewHeader>
                 <MAMIndexesPageContentStyled
                     buttonWrapperClassName="mam-page-sticky-button-wrapper"

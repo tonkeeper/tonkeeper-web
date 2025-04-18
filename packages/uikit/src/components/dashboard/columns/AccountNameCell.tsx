@@ -4,8 +4,8 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { AccountAndWalletInfo } from '../../account/AccountAndWalletInfo';
 import styled from 'styled-components';
 import { useMutateActiveTonWallet } from '../../../state/wallet';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
+import { useNavigate } from "../../../hooks/router/useNavigate";
 
 const AccountAndWalletInfoStyled = styled(AccountAndWalletInfo)`
     cursor: pointer;

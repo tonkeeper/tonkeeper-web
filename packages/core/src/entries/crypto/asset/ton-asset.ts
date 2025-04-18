@@ -1,5 +1,11 @@
 import { Address } from '@ton/core';
-import { Account, ExtraCurrency, JettonBalance, JettonsBalances } from '../../../tonApiV2';
+import {
+    Account,
+    ExtraCurrency,
+    JettonBalance,
+    JettonsBalances,
+    JettonVerificationType
+} from '../../../tonApiV2';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
 import { TON_ASSET } from './constants';
@@ -29,7 +35,8 @@ export interface TonJettonAsset {
 
 export type TonAssetIdentification = TonMainAsset | TonExtraCurrencyAsset | TonJettonAsset;
 
-export type TonAsset = BasicAsset & TonAssetIdentification;
+export type TonAsset = BasicAsset &
+    TonAssetIdentification & { verification: JettonVerificationType };
 
 export function tonAssetAddressToString(address: TonAsset['address']): string {
     return typeof address === 'string' ? address : address.toRawString();
@@ -51,7 +58,8 @@ export function extraBalanceToTonAsset(extraBalance: ExtraCurrency): TonAsset {
         decimals: extraBalance.preview.decimals,
         address: extraBalance.preview.symbol,
         blockchain: BLOCKCHAIN_NAME.TON,
-        image: extraBalance.preview.image
+        image: extraBalance.preview.image,
+        verification: JettonVerificationType.None
     };
 }
 
@@ -95,7 +103,8 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         blockchain: BLOCKCHAIN_NAME.TON,
         address: Address.parseRaw(address),
         id: packAssetId(BLOCKCHAIN_NAME.TON, address),
-        image: jetton.jetton.image
+        image: jetton.jetton.image,
+        verification: jetton.jetton.verification
     };
 }
 
@@ -107,7 +116,8 @@ export function jettonToTonAssetAmount(jetton: JettonBalance): AssetAmount<TonAs
         blockchain: BLOCKCHAIN_NAME.TON,
         address: Address.parseRaw(jetton.jetton.address),
         id: packAssetId(BLOCKCHAIN_NAME.TON, jetton.jetton.address),
-        image: jetton.jetton.image
+        image: jetton.jetton.image,
+        verification: jetton.jetton.verification
     };
 
     return new AssetAmount({ weiAmount: jetton.balance, asset, image: jetton.jetton.image });

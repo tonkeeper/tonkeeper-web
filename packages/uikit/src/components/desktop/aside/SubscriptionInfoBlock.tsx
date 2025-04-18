@@ -1,4 +1,5 @@
 import {
+    isFreeSubscription,
     isTrialSubscription,
     isValidSubscription,
     ProState
@@ -19,6 +20,8 @@ import {
 } from '../../../state/wallet';
 import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
+import { NotForTargetEnv } from '../../shared/TargetEnv';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -49,7 +52,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isValidSubscription(subscription)) {
+    if (isValidSubscription(subscription) && !isFreeSubscription(subscription)) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
@@ -137,6 +140,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
+    const env = useAppTargetEnv();
 
     const onRefresh = () => {
         if (rotate) {
@@ -176,17 +180,30 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         }
     }
 
+    if (env === 'mobile') {
+        if (!data) {
+            return null;
+        }
+        if (isFreeSubscription(data.subscription)) {
+            return null;
+        }
+    }
+
     return (
         <Container className={className} ref={containerRef}>
-            <Divider />
+            <NotForTargetEnv env="mobile">
+                <Divider />
+            </NotForTargetEnv>
             <BlockWrapper>
                 {button}
-                <IconButtonTransparentBackground
-                    onClick={onRefresh}
-                    disabled={isInvalidating || isInvalidatingGlobalQueries}
-                >
-                    <RefreshIconRotating rotate={rotate} />
-                </IconButtonTransparentBackground>
+                <NotForTargetEnv env="mobile">
+                    <IconButtonTransparentBackground
+                        onClick={onRefresh}
+                        disabled={isInvalidating || isInvalidatingGlobalQueries}
+                    >
+                        <RefreshIconRotating rotate={rotate} />
+                    </IconButtonTransparentBackground>
+                </NotForTargetEnv>
             </BlockWrapper>
         </Container>
     );

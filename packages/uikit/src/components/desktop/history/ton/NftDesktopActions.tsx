@@ -19,7 +19,12 @@ import { useFormatCoinValue } from '../../../../hooks/balance';
 import { ChevronRightIcon, CoinsIcon } from '../../../Icon';
 import { useTranslation } from '../../../../hooks/translation';
 import { ContractDeployIcon } from '../../../activity/ActivityIcons';
-import { useIsSpamNft, useIsUnverifiedNft, useNftCollectionData, useNftItemData } from "../../../../state/nft";
+import {
+    useIsSpamNft,
+    useIsUnverifiedNft,
+    useNftCollectionData,
+    useNftItemData
+} from '../../../../state/nft';
 
 const NftImage = styled.img<{ isUnverified?: boolean }>`
     width: 20px;
@@ -52,7 +57,7 @@ const NftTitle = styled(Body2)<{ isFailed: boolean; isUnverified?: boolean }>`
         `};
 `;
 
-const NftContainer = styled.div`
+const NftContainer = styled.div.attrs({ className: 'grid-area-amount' })`
     display: flex;
     gap: 0.5rem;
 `;
@@ -77,6 +82,7 @@ const UnverifiedNftComment = styled(Body2)`
 `;
 
 const SpamNftPlaceholder = styled(Body2)`
+    text-align: right;
     color: ${p => p.theme.textTertiary};
 `;
 
@@ -88,7 +94,7 @@ const HistoryCellNft: FC<{
     const { data } = useNftItemData(nftAddress);
 
     if (!data) {
-        return <Skeleton width="100px" height="20px" />;
+        return <Skeleton width="100px" height="20px" className="grid-area-amount" />;
     }
 
     const preview = data?.previews?.find(item => item.resolution === '100x100');

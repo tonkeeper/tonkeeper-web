@@ -21,8 +21,8 @@ const HeaderContainer = styled(AsideHeaderContainer)`
     display: flex;
     gap: 10px;
     align-items: center;
-    justify-content: space-between;
     cursor: pointer;
+    justify-content: space-between;
 `;
 
 const TextContainer = styled.div`

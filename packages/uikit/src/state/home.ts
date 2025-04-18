@@ -20,6 +20,9 @@ import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-ass
 import { useTronBalances } from './tron/tron';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
+import { QueryKey } from '../libs/queryKey';
+import { useUserFiat } from './fiat';
+import { useUSDTRate } from './rates';
 
 export const useAssets = () => {
     const wallet = useActiveWallet();
@@ -40,54 +43,92 @@ export const useAssets = () => {
     return [assets, error, isJettonLoading || isAccountLoading, jettonError] as const;
 };
 
+export const allChainsAssetsKeys = [QueryKey.jettons, QueryKey.tronAssets, QueryKey.info];
+
 export const useAllChainsAssets = () => {
+    const data = useAllChainsAssetsWithPrice();
+
+    return useMemo(() => {
+        return { ...data, assets: data.assets?.map(i => i.assetAmount) };
+    }, [data]);
+};
+
+export const useAllChainsAssetsWithPrice = () => {
     const [assets, error, _, jettonError] = useAssets();
     const { data: config } = useActiveTonWalletConfig();
+    const fiat = useUserFiat();
+    const { data: usdtRate } = useUSDTRate();
 
-    return useMemo<{ assets: AssetAmount[] | undefined; error: Error | undefined }>(() => {
-        if (!assets || !config) return { assets: undefined, error: undefined };
+    return useMemo<{
+        assets: { assetAmount: AssetAmount; price?: BigNumber; isPinned?: boolean }[] | undefined;
+        error: Error | undefined;
+    }>(() => {
+        if (!assets || !config || !usdtRate) return { assets: undefined, error: undefined };
 
-        const result: AssetAmount[] = [
-            new AssetAmount({ asset: TON_ASSET, weiAmount: assets.ton.info.balance })
+        const result: { assetAmount: AssetAmount; price?: BigNumber; isPinned?: boolean }[] = [
+            {
+                assetAmount: new AssetAmount({
+                    asset: TON_ASSET,
+                    weiAmount: assets.ton.info.balance
+                })
+            }
         ];
 
         if (assets.ton.info.extraBalance) {
-            for (let extra of assets.ton.info.extraBalance) {
+            for (const extra of assets.ton.info.extraBalance) {
                 const asset = new AssetAmount<TonAsset>({
                     weiAmount: new BigNumber(extra.amount),
                     asset: extraBalanceToTonAsset(extra)
                 });
-                result.push(asset);
+                result.push({ assetAmount: asset });
             }
         }
 
         config.pinnedTokens.forEach(p => {
             if (p === TRON_USDT_ASSET.address && assets.tron) {
-                result.push(assets.tron.usdt);
+                result.push({
+                    assetAmount: assets.tron.usdt,
+                    isPinned: true,
+                    price: new BigNumber(usdtRate.prices)
+                });
             } else {
                 const jetton = assets.ton.jettons.balances.find(i => i.jetton.address === p);
                 if (jetton) {
-                    result.push(jettonToTonAssetAmount(jetton));
+                    result.push({
+                        assetAmount: jettonToTonAssetAmount(jetton),
+                        isPinned: true,
+                        price: new BigNumber(
+                            jetton.price?.prices ? jetton.price.prices[fiat] ?? 0 : 0
+                        )
+                    });
                 }
             }
         });
 
         if (
             assets.tron &&
-            !result.some(i => i.asset.id === TRON_USDT_ASSET.id) &&
+            !result.some(i => i.assetAmount.asset.id === TRON_USDT_ASSET.id) &&
             !config.hiddenTokens.includes(TRON_USDT_ASSET.address)
         ) {
-            result.push(assets.tron.usdt);
+            result.push({
+                assetAmount: assets.tron.usdt,
+                isPinned: false,
+                price: new BigNumber(usdtRate.prices)
+            });
         }
 
         assets.ton.jettons.balances
             .filter(b => !config.pinnedTokens.includes(b.jetton.address))
             .forEach(b => {
-                result.push(jettonToTonAssetAmount(b));
+                result.push({
+                    assetAmount: jettonToTonAssetAmount(b),
+                    isPinned: false,
+                    price: new BigNumber(b.price?.prices ? b.price.prices[fiat] ?? 0 : 0)
+                });
             });
 
         return { assets: result, error: error ?? jettonError ?? undefined };
-    }, [assets, error, jettonError, config]);
+    }, [assets, error, jettonError, config, fiat]);
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

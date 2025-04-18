@@ -37,13 +37,13 @@ import {
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
+import { BrowserRouter } from "react-router-dom";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -61,7 +61,9 @@ const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
 export const App: FC = () => {
-    return <RouterProvider router={router} />;
+    return <BrowserRouter>
+        <Providers />
+    </BrowserRouter>
 };
 
 const Providers: FC<PropsWithChildren> = () => {
@@ -101,8 +103,10 @@ const Providers: FC<PropsWithChildren> = () => {
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
+    const isMobile = useLayout();
+
     return (
-        <UserThemeProvider isPro={data?.valid} isProSupported>
+        <UserThemeProvider isPro={data?.valid} isProSupported proDisplayType="desktop" displayType={isMobile ? 'compact' : 'full-width'}>
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
@@ -115,13 +119,6 @@ const ThemeAndContent = () => {
         </UserThemeProvider>
     );
 };
-
-const router = createBrowserRouter([
-    {
-        path: '/*',
-        element: <Providers />
-    }
-]);
 
 const Loader: FC = () => {
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();

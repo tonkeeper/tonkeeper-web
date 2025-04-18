@@ -24,7 +24,7 @@ import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
 
 const NotificationStyled = styled(Notification)`
     ${p =>
-        p.theme.displayType === 'full-width' &&
+        p.theme.proDisplayType === 'desktop' &&
         css`
             max-width: 400px;
         `}
@@ -44,6 +44,7 @@ export const BatteryRechargeNotification: FC<{
             isOpen={isOpen}
             handleClose={onClose}
             title={t('battery_recharge_by_crypto_title')}
+            mobileFullScreen
         >
             {() =>
                 !!preselectedAsset && (

@@ -1,10 +1,11 @@
-import { atom, useAtom } from '../../libs/atom';
 import { useCallback } from 'react';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
 import { swapFromAsset$, swapToAsset$ } from './useSwapForm';
 import { useAppContext } from '../../hooks/appContext';
 import { generateStonfiSwapLink } from '../stonfi';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { useAtom } from '../../libs/useAtom';
 
 const swapMobileNotificationOpen$ = atom(false);
 export const useSwapMobileNotification = () => {

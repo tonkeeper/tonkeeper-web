@@ -19,6 +19,7 @@ import {
 import { toDexName } from '../NotificationCommon';
 import { useSwapValue } from './JettonNotifications';
 import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
+import { sanitizeJetton } from '../../../libs/common';
 
 export interface JettonActionProps {
     action: Action;
@@ -42,7 +43,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
         return (
             <SendActivityAction
                 amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-                symbol={jettonTransfer.jetton.symbol}
+                symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
                 recipient={
                     jettonTransfer.recipient?.name ??
                     toShortValue(
@@ -63,7 +64,7 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
     return (
         <ReceiveActivityAction
             amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-            symbol={jettonTransfer.jetton.symbol}
+            symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
             sender={
                 jettonTransfer.sender?.name ??
                 toShortValue(
@@ -155,6 +156,9 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
     if (!jettonMint) {
         return <ErrorAction />;
     }
+
+    const isScam = jettonMint.jetton.verification === 'blacklist';
+
     return (
         <ListItemGrid>
             <ActivityIcon status={action.status}>
@@ -163,10 +167,11 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
             <ColumnLayout
                 title={t('transaction_type_mint')}
                 amount={<>+&thinsp;{format(jettonMint.amount, jettonMint.jetton.decimals)}</>}
-                entry={jettonMint.jetton.symbol}
+                entry={sanitizeJetton(jettonMint.jetton.symbol, isScam)}
                 address={toShortValue(formatAddress(jettonMint.jetton.address, network, true))}
                 date={date}
-                green
+                green={!isScam}
+                isScam={isScam}
             />
             <FailedNote status={action.status} />
         </ListItemGrid>

@@ -37,6 +37,7 @@ import {
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -455,7 +456,7 @@ export const ActionFeeDetailsUniversal: FC<{
                 {fee ? (
                     <ActionFeeDetailsUniversalValue fee={fee} />
                 ) : fee === null ? (
-                    <></>
+                    <>—</>
                 ) : (
                     <SpinnerIcon />
                 )}
@@ -581,6 +582,7 @@ const Block = styled.div`
     gap: 2rem;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 2rem;
 `;
 
 export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> = ({
@@ -606,9 +608,17 @@ export const CommonActionDetailsBlock: FC<PropsWithChildren<{ eventId: string; u
     return (
         <Block>
             {children}
-            <Button size="large" fullWidth onClick={() => sdk.openPage(url.replace('%s', eventId))}>
-                {t('nft_view_in_explorer')}
-            </Button>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <Button
+                        size="large"
+                        fullWidth
+                        onClick={() => sdk.openPage(url.replace('%s', eventId))}
+                    >
+                        {t('nft_view_in_explorer')}
+                    </Button>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </Block>
     );
 };

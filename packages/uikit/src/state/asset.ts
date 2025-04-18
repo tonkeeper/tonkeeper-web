@@ -64,7 +64,7 @@ export function useUserAssetBalance<
             data = extra?.amount || '0';
         }
         if (isBasicAsset(asset)) {
-            data = new AssetAmount<TonAsset>({ asset, weiAmount: data });
+            data = new AssetAmount<TonAsset>({ asset: asset as TonAsset, weiAmount: data });
         }
     } else {
         isLoading = tronBalances.isLoading;

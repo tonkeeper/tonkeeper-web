@@ -2,7 +2,7 @@ import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { RecoveryContent } from '../../pages/settings/Recovery';
 import { useAccountState } from '../../state/wallet';
 import { Notification } from '../Notification';
@@ -42,7 +42,7 @@ export const RecoveryNotificationControlled = () => {
     }, [account, params?.walletId, onClose]);
 
     return (
-        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+        <NotificationStyled isOpen={isOpen} handleClose={onClose} mobileFullScreen>
             {Content}
         </NotificationStyled>
     );

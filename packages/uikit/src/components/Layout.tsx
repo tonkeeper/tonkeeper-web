@@ -22,10 +22,17 @@ const Body = styled(Body2)`
     color: ${props => props.theme.textSecondary};
 `;
 
-export const CenterContainer = styled.div`
+export const CenterContainer = styled.div<{ $mobileFitContent?: boolean }>`
     display: flex;
     flex-direction: column;
     justify-content: center;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        !p.$mobileFitContent &&
+        css`
+            height: 100%;
+        `}
 `;
 
 export const IconPage: FC<{

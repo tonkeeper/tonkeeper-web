@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Body1, H3 } from '../Text';
+import { Body1, Body2, H3 } from '../Text';
 
 export const Info = styled.div`
     display: flex;
@@ -31,4 +31,8 @@ export const SendingTitle = styled(Body1)`
 export const Title = styled(H3)`
     user-select: none;
     text-align: center;
+`;
+
+export const UnverifiedTokenLabel = styled(Body2)`
+    color: ${p => p.theme.accentOrange};
 `;

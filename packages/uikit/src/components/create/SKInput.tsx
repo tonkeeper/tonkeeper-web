@@ -6,6 +6,7 @@ import { H2Label2Responsive } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { TextArea } from '../fields/Input';
 import { isValidSKOrSeed } from '@tonkeeper/core/dist/service/mnemonicService';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Block = styled.div`
     display: flex;
@@ -54,7 +55,7 @@ export const SKInput: FC<{
     };
 
     return (
-        <CenterContainer className={className}>
+        <CenterContainer className={className} $mobileFitContent>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('add_by_sk_title')}</H2Label2Responsive>
@@ -68,16 +69,20 @@ export const SKInput: FC<{
                     label={t('recovery_wallet_secret_key')}
                     helpText={t('sk_input_label')}
                 />
-                <ButtonResponsiveSize
-                    fullWidth
-                    primary
-                    marginTop
-                    loading={isLoading}
-                    disabled={!sk || error}
-                    onClick={() => afterInput(sk!)}
-                >
-                    {t('continue')}
-                </ButtonResponsiveSize>
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ButtonResponsiveSize
+                            fullWidth
+                            primary
+                            marginTop
+                            loading={isLoading}
+                            disabled={!sk || error}
+                            onClick={() => afterInput(sk!)}
+                        >
+                            {t('continue')}
+                        </ButtonResponsiveSize>
+                    </NotificationFooter>
+                </NotificationFooterPortal>
             </Block>
         </CenterContainer>
     );

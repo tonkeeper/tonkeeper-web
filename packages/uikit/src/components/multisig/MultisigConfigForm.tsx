@@ -3,18 +3,14 @@ import { AddWalletContext } from '../create/AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
-import {
-    NotificationFooterPortal,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../Notification';
+import { useSetNotificationOnBack, useSetNotificationOnCloseInterceptor } from '../Notification';
 import { useTranslation } from '../../hooks/translation';
 import {
     AsyncValidationState,
     AsyncValidatorsStateProvider,
     useAsyncValidator
 } from '../../hooks/useAsyncValidator';
-import { Button } from '../fields/Button';
+import { Button, ButtonResponsiveSize } from '../fields/Button';
 import styled from 'styled-components';
 import { Body2, Body3, Body3Class, Label2 } from '../Text';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -138,7 +134,7 @@ export const MultisigConfigForm: FC<{
     );
 
     const onNotificationCloseInterceptor = useCallback(
-        (closeHandle: () => void) => {
+        (closeHandle: () => void, cancelCloseHandle: () => void) => {
             if (!isDirty) {
                 closeHandle();
             } else {
@@ -146,6 +142,8 @@ export const MultisigConfigForm: FC<{
                     onClose: discard => {
                         if (discard) {
                             closeHandle();
+                        } else {
+                            cancelCloseHandle();
                         }
                     }
                 });
@@ -191,20 +189,16 @@ export const MultisigConfigForm: FC<{
                 </AsyncValidatorsStateProvider>
             </FormProvider>
             {formId === undefined && (
-                <NotificationFooterPortal>
-                    <SubmitButtonContainer>
-                        <Button
-                            primary
-                            type="submit"
-                            fullWidth
-                            form={formIdToSet}
-                            loading={formState === 'validating'}
-                            disabled={formState !== 'succeed'}
-                        >
-                            {t('create_multisig_create_wallet')}
-                        </Button>
-                    </SubmitButtonContainer>
-                </NotificationFooterPortal>
+                <ButtonResponsiveSize
+                    primary
+                    type="submit"
+                    fullWidth
+                    form={formIdToSet}
+                    loading={formState === 'validating'}
+                    disabled={formState !== 'succeed'}
+                >
+                    {t('create_multisig_create_wallet')}
+                </ButtonResponsiveSize>
             )}
         </FormWrapper>
     );

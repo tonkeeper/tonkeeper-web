@@ -3,7 +3,7 @@ import {
     TonendpoinFiatItem
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { FC, useCallback, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -25,6 +25,8 @@ import { BuyItemNotification } from './BuyItemNotification';
 import { BuyIcon, SellIcon } from './HomeIcons';
 import { useActiveConfig } from '../../state/wallet';
 import { HideOnReview } from '../ios/HideOnReview';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ items, kind }) => {
     return (

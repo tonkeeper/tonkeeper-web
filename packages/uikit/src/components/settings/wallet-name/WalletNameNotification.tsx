@@ -1,8 +1,13 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import React, { FC, useCallback, useState } from 'react';
+import React, { FC, useCallback, useId, useState } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import { useMutateRenameAccount, useMutateRenameAccountDerivation } from '../../../state/wallet';
-import { Notification, NotificationBlock } from '../../Notification';
+import {
+    Notification,
+    NotificationBlock,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../../Notification';
 import { Button } from '../../fields/Button';
 import { Input } from '../../fields/Input';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
@@ -15,6 +20,7 @@ export const RenameWalletContent: FC<{
     onClose: () => void;
 }> = ({ animationTime, account, derivationIndex, onClose }) => {
     const { t } = useTranslation();
+    const id = useId();
 
     const {
         mutateAsync: renameAccount,
@@ -53,7 +59,7 @@ export const RenameWalletContent: FC<{
     };
 
     return (
-        <NotificationBlock onSubmit={onSubmit}>
+        <NotificationBlock onSubmit={onSubmit} id={id}>
             <Input
                 id="wallet-name"
                 value={name}
@@ -62,19 +68,25 @@ export const RenameWalletContent: FC<{
                 label={t('Wallet_name')}
                 rightElement={emoji ? <WalletEmoji emoji={emoji} /> : null}
                 marginRight="36px"
+                autoFocus="notification"
             />
             <EmojisList keepShortListForMS={animationTime} onClick={setEmoji} />
 
-            <Button
-                size="large"
-                fullWidth
-                primary
-                loading={isLoading}
-                disabled={isLoading}
-                type="submit"
-            >
-                {t('add_edit_favorite_save')}
-            </Button>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <Button
+                        form={id}
+                        size="large"
+                        fullWidth
+                        primary
+                        loading={isLoading}
+                        disabled={isLoading}
+                        type="submit"
+                    >
+                        {t('add_edit_favorite_save')}
+                    </Button>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </NotificationBlock>
     );
 };

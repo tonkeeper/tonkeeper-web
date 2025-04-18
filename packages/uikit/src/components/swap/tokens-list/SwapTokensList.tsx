@@ -7,13 +7,14 @@ import {
     WalletSwapAsset
 } from '../../../state/swap/useSwapAssets';
 import { formatFiatCurrency } from '../../../hooks/balance';
-import { useAppContext, useAppPlatform } from '../../../hooks/appContext';
+import { useAppContext } from '../../../hooks/appContext';
 import { isTon, TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { LinkOutIcon, SpinnerIcon } from '../../Icon';
 import { ConfirmImportNotification } from './ConfirmImportNotification';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../../hooks/translation';
 import { ExternalLink } from '../../shared/ExternalLink';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 const SwapTokensListWrapper = styled.div`
     overflow-y: auto;
@@ -203,7 +204,7 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
 }) => {
     const isZeroBalance = swapAsset.assetAmount.relativeAmount.isZero();
     const { fiat } = useAppContext();
-    const platform = useAppPlatform();
+    const platform = useAppTargetEnv();
 
     let explorerUrl;
     if (isTon(swapAsset.assetAmount.asset.address)) {

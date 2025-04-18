@@ -1,8 +1,9 @@
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Body2, Body2Class, Body3, Label2 } from '../../components/Text';
+import { Body2, Body3, Label2 } from '../../components/Text';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -17,7 +18,7 @@ import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../compo
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { toFormattedTonBalance } from '../../hooks/balance';
-import { PencilIcon, PinIconOutline, UnpinIconOutline } from '../../components/Icon';
+import { PencilIcon, PinIconOutline, PlusIconSmall, UnpinIconOutline } from '../../components/Icon';
 import { Button } from '../../components/fields/Button';
 import {
     useAccountsState,
@@ -29,35 +30,27 @@ import {
 import { styled } from 'styled-components';
 import { Dot } from '../../components/Dot';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { getFallbackAccountEmoji } from '@tonkeeper/core/dist/service/walletService';
 import { Address } from '@ton/core';
 import { AppRoute } from '../../libs/routes';
-import { Navigate, useNavigate } from 'react-router-dom';
 import {
     AccountTonMultisig,
     isAccountCanManageMultisigs
 } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { Navigate } from '../../components/shared/Navigate';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { QueryKey } from '../../libs/queryKey';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { fallbackRenderOver } from '../../components/Error';
 import { ErrorBoundary } from 'react-error-boundary';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
-`;
-
-const NewMultisigButton = styled.button`
-    ${Body2Class};
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-
-    color: ${p => p.theme.textAccent};
-    margin-right: -8px;
-    margin-left: auto;
 `;
 
 export const DesktopManageMultisigsPage = () => {
@@ -74,10 +67,23 @@ export const DesktopManageMultisigsPage = () => {
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
-                <NewMultisigButton onClick={() => addWallet({ walletType: 'multisig' })}>
-                    {t('add_wallet_new_multisig_title')}
-                </NewMultisigButton>
+                <DesktopViewHeaderContent
+                    title={t('wallet_aside_multisig_wallets')}
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem
+                                onClick={() => addWallet({ walletType: 'multisig' })}
+                                asDesktopButton
+                                closeDropDownOnClick
+                            >
+                                <ForTargetEnv env="mobile">
+                                    <PlusIconSmall />
+                                </ForTargetEnv>
+                                {t('add_wallet_new_multisig_title')}
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
             </DesktopViewHeader>
             <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display multisigs')}>
                 <DesktopManageMultisigsPageBody />
@@ -94,15 +100,26 @@ const DesktopManageMultisigsPageBody = () => {
     }
 
     if (!multisigs.length) {
-        return <EmptyMultisigsPage />;
+        return (
+            <>
+                <PullToRefresh invalidate={QueryKey.multisigWallets} />
+                <EmptyMultisigsPage />
+            </>
+        );
     }
 
-    return <ManageExistingMultisigWallets multisigs={multisigs} />;
+    return (
+        <>
+            <PullToRefresh invalidate={QueryKey.multisigWallets} paddingBottom="30px" />
+            <ManageExistingMultisigWallets multisigs={multisigs} />
+        </>
+    );
 };
 
 const TextContainer = styled.div`
     display: flex;
     flex-direction: column;
+    word-break: break-word;
 
     > ${Body3} {
         color: ${p => p.theme.textSecondary};
@@ -212,7 +229,7 @@ export const ManageExistingMultisigWallets: FC<{ multisigs: MultisigInfo[] }> = 
     };
 
     return (
-        <ListBlockDesktopAdaptive>
+        <ListBlockDesktopAdaptive margin={false}>
             {multisigAccounts.map(item => (
                 <ListItem hover={false} key={item.address}>
                     <ListItemPayload>
@@ -254,9 +271,13 @@ const EmptyMultisigsPageWrapper = styled.div`
 `;
 
 const EmptyMultisigsPageContent = styled.div`
+    padding: 0 16px;
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 
     > ${Label2} {
         margin-bottom: 4px;

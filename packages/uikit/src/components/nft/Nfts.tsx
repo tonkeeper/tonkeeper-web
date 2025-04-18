@@ -7,7 +7,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { toDaysLeft } from '../../hooks/dateFormat';
 import { FireBadgeIcon, SaleIcon } from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
-import { useNftDNSExpirationDate } from "../../state/nft";
+import { useNftDNSExpirationDate } from '../../state/nft';
 
 const Grid = styled.div`
     display: grid;
@@ -99,7 +99,8 @@ export const NftItemView: FC<{
     nft: NftItem;
     resolution: string;
     onOpen: (nft: NftItem) => void;
-}> = React.memo(({ nft, resolution, onOpen }) => {
+    hideText?: boolean;
+}> = React.memo(({ nft, resolution, onOpen, hideText }) => {
     const isSale = nft.sale !== undefined;
     const image = nft.previews?.find(item => item.resolution === resolution);
     const { ios } = useAppContext();
@@ -133,10 +134,12 @@ export const NftItemView: FC<{
                     </ExpiringBlock>
                 )}
             </ImageContainer>
-            <Text>
-                <NftHeaderLabel2 nft={nft} />
-                <NftCollectionBody3 nft={nft} />
-            </Text>
+            {!hideText && (
+                <Text>
+                    <NftHeaderLabel2 nft={nft} />
+                    <NftCollectionBody3 nft={nft} />
+                </Text>
+            )}
         </NftBlock>
     );
 });

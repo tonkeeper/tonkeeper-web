@@ -80,6 +80,7 @@ export const RoundedBadge = styled.div`
     padding: 0 4px;
     aspect-ratio: 1 / 1;
     box-sizing: border-box;
+    min-width: 16px;
 
     ${Label3Class};
 `;

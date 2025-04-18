@@ -14,6 +14,12 @@ export const ListItemPayload = styled.div`
     box-sizing: border-box;
     gap: 1rem;
     width: 100%;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding: 0.5rem 1rem 0.5rem 0;
+        `}
 `;
 
 export const TokenLogo = styled.img`
@@ -22,6 +28,13 @@ export const TokenLogo = styled.img`
     border-radius: ${props => props.theme.cornerFull};
 
     pointer-events: none;
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            width: 40px;
+            height: 40px;
+        `}
 `;
 
 const Description = styled.div`
@@ -94,14 +107,14 @@ export const TokenLayout: FC<{
             <FirstLine>
                 <CoinName>
                     {symbol ?? name}
-                    {label ? <CoinLabel>{label}</CoinLabel> : null}
+                    {label ? <CoinLabel className="coin-label">{label}</CoinLabel> : null}
                 </CoinName>
                 <Symbol></Symbol>
                 <Label1>{balance}</Label1>
             </FirstLine>
             <SecondLine>
                 <Secondary>
-                    {verification === 'none' ? (
+                    {verification && verification !== 'whitelist' ? (
                         <Unverified>{t('approval_unverified_token')}</Unverified>
                     ) : (
                         <>
@@ -130,7 +143,7 @@ const DeltaColor = styled.span<{ positive: boolean }>`
 `;
 
 const Delta: FC<{ data: TokenRate | undefined }> = ({ data }) => {
-    if (!data || !data.diff24h || data.diff24h == '0.00%') return null;
+    if (!data || !data.diff24h || data.diff24h === '0.00%') return null;
     const positive = data.diff24h.startsWith('+');
     return <DeltaColor positive={positive}>{data.diff24h}</DeltaColor>;
 };

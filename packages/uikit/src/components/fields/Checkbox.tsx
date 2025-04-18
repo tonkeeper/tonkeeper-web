@@ -53,6 +53,7 @@ const IconBase = styled.div<{ checked: boolean; disabled?: boolean; $borderColor
 `;
 const CheckboxItem = styled(IconBase)<{ $size: 's' | 'm' }>`
     border-radius: 6px;
+    flex-shrink: 0;
 
     ${props =>
         props.$size === 's'

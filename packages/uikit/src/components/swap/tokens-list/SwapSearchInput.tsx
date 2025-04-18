@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import { useSwapTokensFilter } from '../../../state/swap/useSwapAssets';
 import { useTranslation } from '../../../hooks/translation';
 import { Input } from '../../fields/Input';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 export const SwapSearchInput = forwardRef<
     HTMLInputElement,
@@ -9,6 +10,7 @@ export const SwapSearchInput = forwardRef<
 >(({ className, isDisabled }, ref) => {
     const { t } = useTranslation();
     const [value, setValue] = useSwapTokensFilter();
+    const targetEnv = useAppTargetEnv();
 
     return (
         <Input
@@ -21,6 +23,7 @@ export const SwapSearchInput = forwardRef<
             clearButton
             className={className}
             size="small"
+            autoFocus={targetEnv === 'swap_widget_web' ? 100 : 'notification'}
         />
     );
 });

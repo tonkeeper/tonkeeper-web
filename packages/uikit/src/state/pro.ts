@@ -20,14 +20,14 @@ import {
 import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext, useAppPlatform } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
-import { useCheckTouchId } from './password';
+import { useSecurityCheck } from './password';
 import {
     getAccountByWalletById,
     getWalletById,
@@ -46,11 +46,11 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const appPlatform = useAppPlatform();
+    const appPlatform = useAppTargetEnv();
     const storage = useAppSdk().storage;
 
     return useMemo(() => {
-        if (appPlatform === 'tablet') {
+        if (appPlatform === 'tablet' || appPlatform === 'mobile') {
             return {
                 async attachToken() {
                     const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
@@ -78,9 +78,23 @@ export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
+    const env = useAppTargetEnv();
 
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(authService, sdk.storage);
+        let state: ProState;
+
+        if (env === 'mobile') {
+            state = {
+                authorizedWallet: null,
+                subscription: {
+                    isFree: true,
+                    valid: true,
+                    isTrial: false
+                }
+            };
+        } else {
+            state = await getProState(authService, sdk.storage);
+        }
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
@@ -92,7 +106,7 @@ export const useSelectWalletForProMutation = () => {
     const client = useQueryClient();
     const api = useActiveApi();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
     const accountsStorage = useAccountsStorage();
     const authService = useProAuthTokenService();
 
@@ -118,7 +132,7 @@ export const useSelectWalletForProMutation = () => {
             authService,
             api,
             wallet,
-            signTonConnectOver({ sdk, accountId: account.id, wallet, t, checkTouchId })
+            signTonConnectOver({ sdk, accountId: account.id, wallet, t, securityCheck })
         );
 
         await client.invalidateQueries([QueryKey.pro]);

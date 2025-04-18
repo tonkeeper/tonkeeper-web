@@ -24,7 +24,7 @@ export const ConfirmMultisigNewTransferView: FC<
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
     }>
-> = ({ isMax, ttl, ...rest }) => {
+> = ({ isMax, ttl, children, ...rest }) => {
     const { signerWallet } = useActiveMultisigAccountHost();
     const { data: multisigInfo } = useActiveMultisigWalletInfo();
     const estimation = useEstimateNewMultisigTransfer(rest.recipient, rest.assetAmount, isMax);
@@ -38,6 +38,7 @@ export const ConfirmMultisigNewTransferView: FC<
 
     return (
         <ConfirmView estimation={estimation} {...mutation} {...rest}>
+            {children}
             <ConfirmViewAdditionalBottomSlot>
                 {multisigInfo ? (
                     <MultisigTransferDetailsStyled

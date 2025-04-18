@@ -1,11 +1,11 @@
 import { FC, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label2 } from '../../components/Text';
+import { Body2 } from '../../components/Text';
 import { useActiveAccount, useActiveConfig } from '../../state/wallet';
-import { Navigate } from 'react-router-dom';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
@@ -29,6 +29,10 @@ import { BatteryRechargeNotification } from '../../components/settings/battery/B
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppRoute } from '../../libs/routes';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { Navigate } from '../../components/shared/Navigate';
+import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { QueryKey } from '../../libs/queryKey';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();
@@ -63,10 +67,8 @@ const HeadingBlock = styled.div`
     padding: 32px 0;
 `;
 
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)``;
-
 const SettingsButton = styled(IconButtonTransparentBackground)`
-    margin-left: auto;
+    padding-right: 1rem;
 `;
 
 const SettingsButtonMobile = styled(IconButton)`
@@ -86,14 +88,32 @@ export const BatteryPageLayout: FC = () => {
     if (isFullWidth) {
         return (
             <DesktopViewPageLayout>
-                <DesktopViewHeaderStyled borderBottom>
-                    <Label2>{t('battery_title')}</Label2>
-                    {data?.batteryUnitsBalance.gt(0) && (
-                        <SettingsButton onClick={onOpen}>
-                            <GearIconEmpty />
-                        </SettingsButton>
-                    )}
-                </DesktopViewHeaderStyled>
+                <DesktopViewHeader borderBottom>
+                    <DesktopViewHeaderContent
+                        title={t('battery_title')}
+                        right={
+                            data?.batteryUnitsBalance.gt(0) && (
+                                <DesktopViewHeaderContent.Right>
+                                    <DesktopViewHeaderContent.RightItem
+                                        onClick={onOpen}
+                                        closeDropDownOnClick
+                                    >
+                                        <ForTargetEnv env="mobile">
+                                            <GearIconEmpty />
+                                            {t('settings_title')}
+                                        </ForTargetEnv>
+                                        <NotForTargetEnv env="mobile">
+                                            <SettingsButton>
+                                                <GearIconEmpty />
+                                            </SettingsButton>
+                                        </NotForTargetEnv>
+                                    </DesktopViewHeaderContent.RightItem>
+                                </DesktopViewHeaderContent.Right>
+                            )
+                        }
+                    />
+                </DesktopViewHeader>
+                <PullToRefresh invalidate={QueryKey.batteryBalance} />
                 <BatteryPageContent />
                 <BatterySettingsNotification isOpen={isOpen} onClose={onClose} />
             </DesktopViewPageLayout>

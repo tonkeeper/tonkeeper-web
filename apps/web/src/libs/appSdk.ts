@@ -38,4 +38,6 @@ export class BrowserAppSdk extends BaseApp {
     version = packageJson.version ?? 'Unknown';
 
     targetEnv= 'web' as const;
+
+    signerReturnUrl = 'https://wallet.tonkeeper.com/';
 }

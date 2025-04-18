@@ -1,8 +1,8 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
-import { Notification } from './Notification';
-import { Button } from './fields/Button';
+import { Notification, NotificationFooter, NotificationFooterPortal } from './Notification';
+import { ButtonResponsiveSize } from './fields/Button';
 import {
     LedgerTonProofRequest,
     LedgerTonProofResponse,
@@ -134,21 +134,25 @@ export const LedgerContent: FC<{
     return (
         <ConnectLedgerWrapper>
             <LedgerConnectionStepsStyled {...connectionStepsProps} currentStep={currentStep} />
-            <ButtonsBlock>
-                <Button
-                    secondary
-                    onClick={() => onClose(new UserCancelledError('Cancel auth request'))}
-                >
-                    {t('cancel')}
-                </Button>
-                <Button
-                    primary
-                    loading={isLedgerConnecting || !!tonTransport || isCompleted}
-                    onClick={onRetry}
-                >
-                    {t('try_again')}
-                </Button>
-            </ButtonsBlock>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonsBlock>
+                        <ButtonResponsiveSize
+                            secondary
+                            onClick={() => onClose(new UserCancelledError('Cancel auth request'))}
+                        >
+                            {t('cancel')}
+                        </ButtonResponsiveSize>
+                        <ButtonResponsiveSize
+                            primary
+                            loading={isLedgerConnecting || !!tonTransport || isCompleted}
+                            onClick={onRetry}
+                        >
+                            {t('try_again')}
+                        </ButtonResponsiveSize>
+                    </ButtonsBlock>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </ConnectLedgerWrapper>
     );
 };

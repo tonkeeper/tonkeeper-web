@@ -21,7 +21,6 @@ import {
 import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
-import { subject } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { getLedgerTonProofSigner, signTonConnectOver } from './mnemonic';
 import {
@@ -36,12 +35,13 @@ import {
     getNetworkByAccount,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useCheckTouchId } from './password';
+import { useSecurityCheck } from './password';
 import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../hooks/appContext';
+import { subject } from '@tonkeeper/core/dist/entries/atom';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -98,7 +98,7 @@ export const useConnectTonConnectAppMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<
         ConnectItemReply[],
@@ -170,7 +170,7 @@ export const useConnectTonConnectAppMutation = () => {
                         accountId: account.id,
                         wallet,
                         t,
-                        checkTouchId
+                        securityCheck
                     });
                     result.push(
                         await toTonProofItemReply({

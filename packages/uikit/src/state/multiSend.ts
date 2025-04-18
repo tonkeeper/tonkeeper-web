@@ -17,7 +17,6 @@ import { JettonsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { ErrorOption } from 'react-hook-form';
-import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTonRecipientValidator } from '../components/fields/TonRecipientInput';
 import { useActiveApi } from './wallet';
@@ -164,7 +163,8 @@ export const useParseCsvListMutation = () => {
                     name: response.metadata.name,
                     symbol: response.metadata.symbol,
                     decimals: Number(response.metadata.decimals),
-                    id: packAssetId(BLOCKCHAIN_NAME.TON, crypto)
+                    id: packAssetId(BLOCKCHAIN_NAME.TON, crypto),
+                    verification: response.verification
                 };
             }
 

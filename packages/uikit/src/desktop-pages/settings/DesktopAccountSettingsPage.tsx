@@ -1,10 +1,10 @@
-import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
 import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -21,6 +21,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
 import { useMAMIndexesSettingsNotification } from '../../components/modals/MAMIndexesSettingsNotification';
 import { DesktopAccountHeader } from '../../components/desktop/header/DesktopAccountHeader';
+import { Navigate } from '../../components/shared/Navigate';
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
 import { defaultAccountConfig } from '@tonkeeper/core/dist/service/wallet/configService';
@@ -97,7 +98,7 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
             <DesktopAccountHeader />
             <DesktopViewPageLayout>
                 <DesktopViewHeader borderBottom>
-                    <Label2>{t('settings_title')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_title')} />
                 </DesktopViewHeader>
                 <SettingsListBlock>
                     <SettingsListItem onClick={() => rename({ accountId: account.id })}>

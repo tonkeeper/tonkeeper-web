@@ -1,6 +1,5 @@
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes';
@@ -32,6 +31,7 @@ import {
 import { useBatteryEnabledConfig } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();

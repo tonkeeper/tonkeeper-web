@@ -24,7 +24,7 @@ const Activity: FC = () => {
         data: activity
     } = useFetchFilteredActivity();
 
-    useScrollMonitor(ref, 5000, refetch);
+    useScrollMonitor(refetch, 5000, ref);
 
     const isFetchingNextPage = isActivityFetchingNextPage;
 

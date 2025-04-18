@@ -1,6 +1,6 @@
 import React, { FC, useContext, useMemo, useState } from 'react';
 import { UpdateWalletName } from '../../components/create/WalletName';
-import { ImportMnemonicType, ImportWords, SelectMnemonicType } from '../../components/create/Words';
+import { ImportMnemonicType, ImportWords } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
 import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
@@ -9,7 +9,7 @@ import {
     useCreateAccountTestnet,
     useMutateRenameAccount
 } from '../../state/wallet';
-import { ChoseWalletVersions, ChoseWalletVersionsByMnemonic } from "../../components/create/ChoseWalletVersions";
+import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
 import { AccountTonTestnet, getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
 import {
     createStandardTestnetAccountByMnemonic,
@@ -26,7 +26,6 @@ import {
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
 } from '../../components/Notification';
-import { TonKeychainRoot } from '@ton-keychain/core';
 import { useMutation } from '@tanstack/react-query';
 import { useUserFiat } from '../../state/fiat';
 import { mnemonicValidate } from '@ton/crypto';
@@ -203,11 +202,13 @@ export const ImportTestnetWallet: FC<{ afterCompleted: () => void }> = ({ afterC
             return undefined;
         }
 
-        return closeModal => {
+        return (closeModal, cancelClose) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeModal();
+                    } else {
+                        cancelClose();
                     }
                 }
             });

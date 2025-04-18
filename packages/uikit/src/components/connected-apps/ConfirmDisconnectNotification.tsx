@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { styled } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { usePrevious } from '../../hooks/usePrevious';
-import { Notification } from '../Notification';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { Button } from '../fields/Button';
 import { formatDappUrl } from './utils';
 
@@ -49,14 +49,18 @@ export const ConfirmDisconnectNotification: FC<{
             }
         >
             {() => (
-                <ButtonsBlock>
-                    <Button secondary loading={isLoading} onClick={() => onClose(false)}>
-                        {t('cancel')}
-                    </Button>
-                    <Button primary loading={isLoading} onClick={() => onClose(true)}>
-                        {t('disconnect')}
-                    </Button>
-                </ButtonsBlock>
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ButtonsBlock>
+                            <Button secondary loading={isLoading} onClick={() => onClose(false)}>
+                                {t('cancel')}
+                            </Button>
+                            <Button primary loading={isLoading} onClick={() => onClose(true)}>
+                                {t('disconnect')}
+                            </Button>
+                        </ButtonsBlock>
+                    </NotificationFooter>
+                </NotificationFooterPortal>
             )}
         </Notification>
     );

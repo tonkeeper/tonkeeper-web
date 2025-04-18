@@ -1,5 +1,5 @@
 import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
@@ -16,6 +16,7 @@ import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -44,11 +45,12 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
+import { useNavigate } from '../../hooks/router/useNavigate';
 import {
-    useAutoMarkTronFeatureAsSeen,
-    useCanUseTronForActiveWallet,
-    useIsTronEnabledForActiveWallet,
-    useToggleIsTronEnabledForActiveWallet
+  useAutoMarkTronFeatureAsSeen,
+  useCanUseTronForActiveWallet,
+  useIsTronEnabledForActiveWallet,
+  useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
 import { hexToRGBA } from '../../libs/css';
@@ -146,7 +148,7 @@ export const DesktopWalletSettingsPage = () => {
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
-                <Label2>{t('settings_title')}</Label2>
+                <DesktopViewHeaderContent title={t('settings_title')} />
             </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem

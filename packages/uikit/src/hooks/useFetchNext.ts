@@ -1,5 +1,5 @@
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { useEffect } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 export const useFetchNext = (
     hasNextPage: boolean | undefined,
@@ -8,10 +8,11 @@ export const useFetchNext = (
     standalone: boolean,
     ref?: React.RefObject<HTMLDivElement>
 ) => {
+    const [element, setElement] = useState<HTMLDivElement | Window | undefined | null>(
+        standalone ? ref?.current : window
+    );
     useEffect(() => {
         if (!hasNextPage) return;
-
-        const element = standalone ? ref?.current : window;
 
         if (!element) return;
 
@@ -38,5 +39,7 @@ export const useFetchNext = (
         return () => {
             element.removeEventListener('scroll', handler);
         };
-    }, [hasNextPage, standalone, ref]);
+    }, [hasNextPage, standalone, element]);
+
+    return setElement as Dispatch<SetStateAction<HTMLDivElement | null>>;
 };

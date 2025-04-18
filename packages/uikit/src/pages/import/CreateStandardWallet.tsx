@@ -17,6 +17,8 @@ import { Subscribe } from './Subscribe';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useCreateAccountMnemonic, useMutateRenameAccount } from '../../state/wallet';
 import {
+    NotificationFooter,
+    NotificationFooterPortal,
     OnCloseInterceptor,
     useSetNotificationOnBack,
     useSetNotificationOnCloseInterceptor
@@ -116,11 +118,13 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
             return undefined;
         }
 
-        return closeModal => {
+        return (closeModal, cancelClose) => {
             openConfirmDiscard({
                 onClose: discard => {
                     if (discard) {
                         closeModal();
+                    } else {
+                        cancelClose();
                     }
                 }
             });
@@ -143,14 +147,18 @@ export const CreateStandardWallet: FC<{ afterCompleted: () => void }> = ({ after
                 title={t('create_wallet_title')}
                 description={t('create_wallet_caption')}
                 button={
-                    <ButtonResponsiveSize
-                        fullWidth
-                        primary
-                        marginTop
-                        onClick={() => setInfoPagePassed(true)}
-                    >
-                        {t('continue')}
-                    </ButtonResponsiveSize>
+                    <NotificationFooterPortal>
+                        <NotificationFooter>
+                            <ButtonResponsiveSize
+                                fullWidth
+                                primary
+                                marginTop
+                                onClick={() => setInfoPagePassed(true)}
+                            >
+                                {t('continue')}
+                            </ButtonResponsiveSize>
+                        </NotificationFooter>
+                    </NotificationFooterPortal>
                 }
             />
         );

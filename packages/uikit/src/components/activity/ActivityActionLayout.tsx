@@ -21,6 +21,7 @@ import {
     SecondLine,
     SecondaryText
 } from './CommonAction';
+import { sanitizeJetton } from '../../libs/common';
 
 export const SendActivityAction: FC<{
     amount: string;
@@ -87,7 +88,7 @@ export const ReceiveActivityAction: FC<{
                         +&thinsp;{amount}
                     </AmountText>
                     <AmountText isScam={isScam} green>
-                        {symbol}
+                        {sanitizeJetton(symbol, isScam)}
                     </AmountText>
                 </FirstLine>
                 <SecondLine>

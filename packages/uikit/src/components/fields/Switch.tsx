@@ -9,6 +9,7 @@ export interface SwitchProps {
 }
 
 const Wrapper = styled.div<{ disabled?: boolean }>`
+    flex-shrink: 0;
     position: relative;
     margin: -5px 0 -5px 0;
     width: 51px;

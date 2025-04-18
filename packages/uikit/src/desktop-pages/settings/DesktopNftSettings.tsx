@@ -1,8 +1,8 @@
 import {
     DesktopViewHeader,
+  DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Label2 } from '../../components/Text';
 import { styled } from 'styled-components';
 
 import { useTranslation } from '../../hooks/translation';
@@ -18,7 +18,7 @@ export const DesktopNftSettings = () => {
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader backButton>
-                <Label2>{t('settings_collectibles_list')}</Label2>
+                <DesktopViewHeaderContent title={t('settings_collectibles_list')} />
             </DesktopViewHeader>
             <ContentWrapper>
                 <NFTSettingsContent />
