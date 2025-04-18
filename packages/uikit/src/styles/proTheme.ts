@@ -10,7 +10,7 @@ export const proTheme: DefaultTheme = {
     backgroundPage: '#000000',
     backgroundTransparent: 'rgb(0 0 0 / 96%)',
     backgroundContent: '#17171A',
-    backgroundContentTint: '#222224',
+    backgroundContentTint: '#272729',
     backgroundContentAttention: '#2F2F33',
     backgroundOverlayStrong: 'rgba(31, 31, 31, 0.72)',
     backgroundOverlayLight: 'rgba(20, 20, 20, 0.48)',

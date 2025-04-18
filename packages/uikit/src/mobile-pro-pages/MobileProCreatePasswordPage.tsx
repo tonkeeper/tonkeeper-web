@@ -9,7 +9,7 @@ import {
 import { childFactoryCreator, duration } from '../components/transfer/common';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import styled, { useTheme } from 'styled-components';
-import { Body2, H3, Label1 } from "../components/Text";
+import { Body2, H3 } from '../components/Text';
 import { Button } from '../components/fields/Button';
 import { SlideAnimation } from '../components/shared/SlideAnimation';
 import { useTranslation } from '../hooks/translation';
@@ -113,7 +113,7 @@ export const MobileProCreatePasswordPage = () => {
 
 const Wrapper = styled(SlideAnimation)`
     padding-bottom: env(safe-area-inset-bottom);
-    padding-top: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
     box-sizing: border-box;
     height: 100%;
 `;
@@ -278,86 +278,239 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                         d="M32.5 25.6C32.5 21.1113 32.5004 17.7749 32.7163 15.1319C32.9318 12.4948 33.3594 10.5922 34.1894 8.96315C35.6754 6.04664 38.0466 3.67544 40.9631 2.1894C42.5922 1.35935 44.4948 0.931787 47.1319 0.716326C49.7749 0.500389 53.1113 0.5 57.6 0.5H332.4C336.889 0.5 340.225 0.500389 342.868 0.716326C345.505 0.931787 347.408 1.35935 349.037 2.1894C351.953 3.67544 354.325 6.04664 355.811 8.96315C356.641 10.5922 357.068 12.4948 357.284 15.1319C357.5 17.7749 357.5 21.1113 357.5 25.6V300.4C357.5 304.889 357.5 308.225 357.284 310.868C357.068 313.505 356.641 315.408 355.811 317.037C354.325 319.953 351.953 322.325 349.037 323.811C347.408 324.641 345.505 325.068 342.868 325.284C340.225 325.5 336.889 325.5 332.4 325.5H57.6C53.1113 325.5 49.7749 325.5 47.1319 325.284C44.4948 325.068 42.5922 324.641 40.9631 323.811C38.0466 322.325 35.6754 319.953 34.1894 317.037C33.3594 315.408 32.9318 313.505 32.7163 310.868C32.5004 308.225 32.5 304.889 32.5 300.4V25.6Z"
                         stroke={theme.iconTertiary}
                     />
-                    <rect x="296" y="13" width="32" height="8" rx="4" fill="#272729" />
+                    <rect
+                        x="296"
+                        y="13"
+                        width="32"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 292 13)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
-                    <rect x="296" y="29" width="20" height="8" rx="4" fill="#272729" />
-                    <rect x="296" y="45" width="36" height="8" rx="4" fill="#272729" />
-                    <rect x="296" y="61" width="28" height="8" rx="4" fill="#272729" />
-                    <rect x="296" y="77" width="32" height="8" rx="4" fill="#272729" />
-                    <rect x="296" y="93" width="24" height="8" rx="4" fill="#272729" />
+                    <rect
+                        x="296"
+                        y="29"
+                        width="20"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="296"
+                        y="45"
+                        width="36"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="296"
+                        y="61"
+                        width="28"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="296"
+                        y="77"
+                        width="32"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="296"
+                        y="93"
+                        width="24"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 292 29)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 292 45)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 292 61)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 292 77)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 292 93)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
-                    <rect x="45" y="13" width="40" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="29" width="28" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="45" width="36" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="61" width="32" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="77" width="56" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="93" width="28" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="109" width="44" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="125" width="36" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="141" width="28" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="157" width="40" height="8" rx="4" fill="#272729" />
-                    <rect x="45" y="173" width="32" height="8" rx="4" fill="#272729" />
-                    <rect x="57" y="289" width="32" height="8" rx="4" fill="#272729" />
-                    <rect x="57" y="305" width="40" height="8" rx="4" fill="#272729" />
+                    <rect
+                        x="45"
+                        y="13"
+                        width="40"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="29"
+                        width="28"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="45"
+                        width="36"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="61"
+                        width="32"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="77"
+                        width="56"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="93"
+                        width="28"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="109"
+                        width="44"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="125"
+                        width="36"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="141"
+                        width="28"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="157"
+                        width="40"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="45"
+                        y="173"
+                        width="32"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="57"
+                        y="289"
+                        width="32"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
+                    <rect
+                        x="57"
+                        y="305"
+                        width="40"
+                        height="8"
+                        rx="4"
+                        fill={theme.backgroundContentTint}
+                    />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 53 289)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
                     <rect
                         width="8"
                         height="8"
                         rx="4"
                         transform="matrix(-1 0 0 1 53 305)"
-                        fill="#272729"
+                        fill={theme.backgroundContentTint}
                     />
                     <rect x="118.5" y="0.5" width="153" height="325" stroke={theme.iconTertiary} />
                     <g clipPath="url(#clip0_56736_545803)">
-                        <ellipse cx="144" cy="136" rx="8" ry="8" fill="#272729" />
-                        <rect x="158" y="132" width="20" height="8" rx="4" fill="#272729" />
-                        <rect x="224" y="132" width="28" height="8" rx="4" fill="#272729" />
+                        <ellipse
+                            cx="144"
+                            cy="136"
+                            rx="8"
+                            ry="8"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="158"
+                            y="132"
+                            width="20"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="224"
+                            y="132"
+                            width="28"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
                         <rect
                             x="129"
                             y="150"
@@ -366,9 +519,29 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                             fill="white"
                             fillOpacity="0.12"
                         />
-                        <ellipse cx="144" cy="164.5" rx="8" ry="8" fill="#272729" />
-                        <rect x="158" y="161" width="28" height="7" rx="3.5" fill="#272729" />
-                        <rect x="232" y="160.5" width="20" height="8" rx="4" fill="#272729" />
+                        <ellipse
+                            cx="144"
+                            cy="164.5"
+                            rx="8"
+                            ry="8"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="158"
+                            y="161"
+                            width="28"
+                            height="7"
+                            rx="3.5"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="232"
+                            y="160.5"
+                            width="20"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
                         <rect
                             x="129"
                             y="178.5"
@@ -377,9 +550,29 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                             fill="white"
                             fillOpacity="0.12"
                         />
-                        <ellipse cx="144" cy="193" rx="8" ry="8" fill="#272729" />
-                        <rect x="158" y="189" width="24" height="8" rx="4" fill="#272729" />
-                        <rect x="228" y="189" width="24" height="8" rx="4" fill="#272729" />
+                        <ellipse
+                            cx="144"
+                            cy="193"
+                            rx="8"
+                            ry="8"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="158"
+                            y="189"
+                            width="24"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="228"
+                            y="189"
+                            width="24"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
                         <rect
                             x="129"
                             y="207"
@@ -388,9 +581,29 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                             fill="white"
                             fillOpacity="0.12"
                         />
-                        <ellipse cx="144" cy="221.5" rx="8" ry="8" fill="#272729" />
-                        <rect x="158" y="217" width="40" height="8" rx="4" fill="#272729" />
-                        <rect x="232" y="217.5" width="20" height="8" rx="4" fill="#272729" />
+                        <ellipse
+                            cx="144"
+                            cy="221.5"
+                            rx="8"
+                            ry="8"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="158"
+                            y="217"
+                            width="40"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="232"
+                            y="217.5"
+                            width="20"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
                         <rect
                             x="129"
                             y="235.5"
@@ -399,9 +612,29 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                             fill="white"
                             fillOpacity="0.12"
                         />
-                        <ellipse cx="144" cy="250" rx="8" ry="8" fill="#272729" />
-                        <rect x="158" y="246" width="28" height="8" rx="4" fill="#272729" />
-                        <rect x="220" y="246" width="32" height="8" rx="4" fill="#272729" />
+                        <ellipse
+                            cx="144"
+                            cy="250"
+                            rx="8"
+                            ry="8"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="158"
+                            y="246"
+                            width="28"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="220"
+                            y="246"
+                            width="32"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
                         <rect
                             x="129"
                             y="264"
@@ -410,9 +643,29 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                             fill="white"
                             fillOpacity="0.12"
                         />
-                        <ellipse cx="144" cy="278.5" rx="8" ry="8" fill="#272729" />
-                        <rect x="158" y="275" width="32" height="7" rx="3.5" fill="#272729" />
-                        <rect x="236" y="274.5" width="16" height="8" rx="4" fill="#272729" />
+                        <ellipse
+                            cx="144"
+                            cy="278.5"
+                            rx="8"
+                            ry="8"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="158"
+                            y="275"
+                            width="32"
+                            height="7"
+                            rx="3.5"
+                            fill={theme.backgroundContentTint}
+                        />
+                        <rect
+                            x="236"
+                            y="274.5"
+                            width="16"
+                            height="8"
+                            rx="4"
+                            fill={theme.backgroundContentTint}
+                        />
                     </g>
                     <rect
                         x="129.5"
@@ -515,7 +768,14 @@ const TutorialScreen: FC<{ onSubmit: () => void }> = ({ onSubmit }) => {
                             fill={theme.iconPrimary}
                         />
                     </g>
-                    <rect x="175" y="303" width="40" height="12" rx="6" fill="#272729" />
+                    <rect
+                        x="175"
+                        y="303"
+                        width="40"
+                        height="12"
+                        rx="6"
+                        fill={theme.backgroundContentTint}
+                    />
                     <rect
                         x="119"
                         y="301"
