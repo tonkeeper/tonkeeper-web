@@ -18,6 +18,11 @@ import { useParseAndAddSigner } from '@tonkeeper/uikit/dist/state/wallet';
 import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
 import { closeNotification } from '@tonkeeper/uikit/dist/components/Notification';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import {
+    RedirectToTonkeeperMobile,
+    tonkeeperMobileTonConnectDeeplinkScheme,
+    tonkeeperMobileTonDeeplinkScheme
+} from './RedirectToTonkeeperMobile';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -43,6 +48,7 @@ export const DeepLinkSubscription = () => {
     }, []);
 
     const [params, setParams] = useState<TonConnectParams | null>(null);
+    const [tkMobileUrl, setTkMobileUrl] = useState<string | null>(null);
 
     const { mutateAsync, reset } = useGetConnectInfo();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
@@ -56,6 +62,7 @@ export const DeepLinkSubscription = () => {
             walletId: WalletId;
         } | null
     ) => {
+        setTkMobileUrl(null);
         if (!params) return;
         responseReset();
         try {
@@ -69,15 +76,58 @@ export const DeepLinkSubscription = () => {
     useEffect(() => {
         return subscribeToTonOrTonConnectUrlOpened(async (url: string) => {
             reset();
+            setTkMobileUrl(modifyLinkScheme(url));
+            setTimeout(() => setTkMobileUrl(null), 3000);
             setParams(await mutateAsync(url));
         });
     }, []);
 
     return (
-        <TonConnectNotification
-            origin={undefined}
-            params={params?.request ?? null}
-            handleClose={handlerClose}
-        />
+        <>
+            <TonConnectNotification
+                origin={undefined}
+                params={params?.request ?? null}
+                handleClose={handlerClose}
+            />
+            <RedirectToTonkeeperMobile
+                isOpen={!!tkMobileUrl}
+                onClick={confirmed => {
+                    setTkMobileUrl(null);
+                    if (tkMobileUrl && confirmed) {
+                        sdk.openPage(tkMobileUrl);
+                    }
+                }}
+            />
+        </>
     );
+};
+
+const modifyLinkScheme = (link: string) => {
+    try {
+        const [protocol, body] = link.split('://')[0];
+        switch (protocol) {
+            case 'tonkeeper':
+            case 'ton':
+                return `${tonkeeperMobileTonDeeplinkScheme}://${body}`;
+            case 'tonkeeper-tc':
+            case 'tc':
+                return `${tonkeeperMobileTonConnectDeeplinkScheme}://${body}`;
+            case 'https':
+            case 'http': {
+                if (new URL(link).pathname.startsWith('/ton-connect')) {
+                    return `${tonkeeperMobileTonConnectDeeplinkScheme}://${
+                        link.split('ton-connect')[1]
+                    }`;
+                } else if (new URL(link).pathname.startsWith('/transfer')) {
+                    return `${tonkeeperMobileTonDeeplinkScheme}://${link.split('transfer/')[1]}`;
+                }
+                return '';
+            }
+            default:
+                return null;
+        }
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
 };

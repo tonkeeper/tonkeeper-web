@@ -26,6 +26,7 @@
 				<string>tonkeeper</string>
 				<string>tonkeeper-tc</string>
 				<string>tonkeeper-pro</string>
+				<string>tonkeeper-pro-tc</string>
 				<string>tc</string>
 				<string>ton</string>
 			</array>
@@ -35,6 +36,7 @@
     <array>
         <string>tonsign</string>
         <string>tonkeeper</string>
+        <string>tonkeeperx</string>
     </array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>

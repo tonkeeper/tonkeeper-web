@@ -31,9 +31,9 @@ export const TonConnectSubscription = () => {
     useSendNotificationAnalytics(request?.connection?.manifest);
 
     const onTransaction = useCallback(
-        async (request: TonConnectAppRequestPayload) => {
+        async (r: TonConnectAppRequestPayload) => {
             await queryClient.invalidateQueries([QueryKey.account]);
-            setRequest(request);
+            setRequest(r);
         },
         [setRequest]
     );
