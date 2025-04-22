@@ -10,8 +10,8 @@ import React, {
     createContext,
     isValidElement,
     useContext,
-    useEffect,
-    useState
+    useState,
+    useEffect
 } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
@@ -171,6 +171,13 @@ export function ConfirmView<T extends Asset = Asset>({
     const [done, setDone] = useState(false);
 
     const { standalone } = useAppContext();
+    const sdk = useAppSdk();
+
+    useEffect(() => {
+        if (estimation.error) {
+            sdk.hapticNotification('error');
+        }
+    }, [estimation.error]);
 
     const handleSubmit = async () => {
         if (isLoading) return false;
@@ -178,6 +185,7 @@ export function ConfirmView<T extends Asset = Asset>({
         try {
             const isDone = await mutateAsync();
             if (isDone) {
+                sdk.hapticNotification('success');
                 setDone(true);
                 setTimeout(() => {
                     setTimeout(() => client.invalidateQueries(), 100);
@@ -186,6 +194,7 @@ export function ConfirmView<T extends Asset = Asset>({
             }
             return isDone;
         } catch (e) {
+            sdk.hapticNotification('error');
             console.error(e);
             return false;
         }
@@ -356,8 +365,6 @@ export const ConfirmViewButtonsSlot: FC<PropsWithChildren> = ({ children }) => <
 export const ConfirmViewButtons: FC<{
     MainButton: ConfirmMainButtonProps;
 }> = ({ MainButton }) => {
-    const sdk = useAppSdk();
-
     const {
         formState: { done, error, isLoading },
         estimation: { isLoading: estimationLoading, data: estimation },
@@ -367,18 +374,6 @@ export const ConfirmViewButtons: FC<{
     const { t } = useTranslation();
 
     const isValid = !isLoading && !estimationLoading;
-
-    useEffect(() => {
-        if (done) {
-            sdk.hapticNotification('success');
-        }
-    }, [done]);
-
-    useEffect(() => {
-        if (error) {
-            sdk.hapticNotification('error');
-        }
-    }, [error]);
 
     if (done) {
         return (

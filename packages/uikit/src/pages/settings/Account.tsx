@@ -27,6 +27,7 @@ import { useAddWalletNotification } from '../../components/modals/AddWalletNotif
 
 import { useAccountsDNDDrop, useSideBarItems } from '../../state/folders';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const Row = styled.div`
     display: flex;
@@ -169,6 +170,7 @@ const ListBlockStyled = styled(ListBlock)`
 export const Account = () => {
     const { onOpen: addWallet } = useAddWalletNotification();
     const { t } = useTranslation();
+    const sdk = useAppSdk();
 
     const items = useSideBarItems();
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
@@ -187,7 +189,10 @@ export const Account = () => {
         <>
             <SubHeader title={t('Manage_wallets')} />
             <InnerBody>
-                <DragDropContext onDragEnd={handleDrop}>
+                <DragDropContext
+                    onDragEnd={handleDrop}
+                    onDragStart={() => sdk.hapticNotification('impact_medium')}
+                >
                     <Droppable droppableId="wallets">
                         {provided => (
                             <ListBlockStyled {...provided.droppableProps} ref={provided.innerRef}>

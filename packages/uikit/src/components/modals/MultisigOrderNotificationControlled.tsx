@@ -143,6 +143,7 @@ const NotificationContent: FC<{
                 navigate(AppRoute.activity);
             }, 300);
         } catch (e) {
+            sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
             console.error(e);
         }

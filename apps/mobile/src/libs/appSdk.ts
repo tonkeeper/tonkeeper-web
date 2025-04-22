@@ -17,6 +17,23 @@ import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { Network } from '@capacitor/network';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { Browser } from '@capacitor/browser';
+import { App } from '@capacitor/app';
+
+async function waitAppIsActive(): Promise<void> {
+    return new Promise(async r => {
+        const state = await App.getState();
+        if (state.isActive) {
+            r();
+        } else {
+            const unsubscribe = App.addListener('appStateChange', ({ isActive }) => {
+                if (isActive) {
+                    unsubscribe.then(v => v.remove());
+                    setTimeout(r);
+                }
+            });
+        }
+    });
+}
 
 export class KeychainTablet implements KeychainPassword {
     setPassword = async (publicKey: string, mnemonic: string) => {
@@ -109,7 +126,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     targetEnv = CAPACITOR_APPLICATION_ID;
 
-    hapticNotification = (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => {
+    hapticNotification = async (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => {
+        await waitAppIsActive();
         if (type === 'impact_medium') {
             return Haptics.impact({ style: ImpactStyle.Medium });
         }

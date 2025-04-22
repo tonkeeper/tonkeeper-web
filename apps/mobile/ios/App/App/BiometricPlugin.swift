@@ -11,7 +11,7 @@ import Capacitor
         CAPPluginMethod(name: "prompt", returnType: CAPPluginReturnPromise)
     ]
 
-    
+
     @objc func canPrompt(_ call: CAPPluginCall) {
             var isAvailable = false;
             if #available(iOS 11, *) {
@@ -29,7 +29,7 @@ import Capacitor
                     isAvailable = false;
                 }
             }
-        
+
             call.resolve(["isAvailable": isAvailable])
         }
 

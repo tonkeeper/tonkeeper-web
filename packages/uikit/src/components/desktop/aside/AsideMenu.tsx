@@ -34,6 +34,7 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useMenuController } from '../../../hooks/ionic';
+import { useAppSdk } from '../../../hooks/appSdk';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -232,9 +233,13 @@ const AccountDNDBlock: FC<{
     items: (Account | AccountsFolder)[];
 }> = ({ items }) => {
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const sdk = useAppSdk();
 
     return (
-        <DragDropContext onDragEnd={handleDrop}>
+        <DragDropContext
+            onDragEnd={handleDrop}
+            onDragStart={() => sdk.hapticNotification('impact_medium')}
+        >
             <Droppable direction="vertical" droppableId="droppable-1">
                 {provided => (
                     <div {...provided.droppableProps} ref={provided.innerRef}>
