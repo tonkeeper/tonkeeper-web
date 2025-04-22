@@ -4190,12 +4190,12 @@ __metadata:
 
 "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch":
   version: 8.4.2
-  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch::version=8.4.2&hash=1815ca"
+  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch::version=8.4.2&hash=7aef17"
   dependencies:
     "@stencil/core": "npm:4.20.0"
     ionicons: "npm:^7.2.2"
     tslib: "npm:^2.1.0"
-  checksum: 10/2c8331090213ec075a3a3914e0bf6a852dd2b48dfe59dcd16ff535af256e3fc43ffa7eaa640e6cd499fdac3ad8bee399f3be0e2a323aa7c461d38ef9489f23c0
+  checksum: 10/49fb6e3927ebd8e1a55a33ab0c876aedced0828507b640f8f576f94b15d463ee60fcd83f2fead170b401cae312dff0000885f484a898251e5288dbcb37d46c35
   languageName: node
   linkType: hard
 

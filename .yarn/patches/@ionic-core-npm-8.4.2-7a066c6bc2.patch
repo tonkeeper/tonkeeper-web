@@ -7,7 +7,7 @@ index 88ba82f43cd98120200fee821db26ddfc410a44a..46ab4f93a70ef83014ba7ac9c8dfa2f1
       */
      const isAtEdge = (detail) => {
 -        const threshold = 50;
-+        const threshold = win.innerWidth;
++        const threshold = win.innerWidth - 50;
          const { startX } = detail;
          if (rtl) {
              return startX >= win.innerWidth - threshold;
