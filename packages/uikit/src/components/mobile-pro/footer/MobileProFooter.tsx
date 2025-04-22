@@ -98,7 +98,7 @@ export const MobileProFooter = () => {
                     </TabButton>
                     <AccountMenuWrapper>
                         <AccountMenuLine1 onClick={() => navigate(AppRoute.home)}>
-                            <WalletEmoji emoji={emoji} emojiSize="14px" containerSize="14px" />
+                            <WalletEmoji emoji={emoji} emojiSize="14px" containerSize="18px" />
                             <Label2>{name}</Label2>
                         </AccountMenuLine1>
                         <AccountMenuLine2>
