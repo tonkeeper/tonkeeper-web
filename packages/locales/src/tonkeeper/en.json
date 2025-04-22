@@ -958,7 +958,7 @@
       "comment_label": "Comment",
       "comment_label_encrypted": "Encrypted comment",
       "comment_label_required": "Required comment",
-      "comment_required_text": "You must include the note from the exchange for transfer. Without it your funds will be lost. ",
+      "comment_required_text": "When sending, make sure to include the memo or tag from the exchange. Without it, the funds won’t be deposited and may be lost.",
       "details_label": "Details",
       "details_max_balance_label": "Sending max. balance of {currency}",
       "title": "Confirm action",

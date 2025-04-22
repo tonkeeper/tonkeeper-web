@@ -70,7 +70,6 @@ const SendContent: FC<{
     const { standalone, ios, extension } = useAppContext();
     const { t } = useTranslation();
     const { data: filter } = useJettonList();
-    const isFullWidth = useIsFullWidthMode();
     const isActiveAccountMultisig = useIsActiveAccountMultisig();
     const track = useAnalyticsTrack();
 

@@ -975,7 +975,7 @@
       "comment_label": "Комментарий",
       "comment_label_encrypted": "Зашифрованный комментарий",
       "comment_label_required": "Комментарий",
-      "comment_required_text": "Обязательно укажите memo или тег при отправке на биржу. ",
+      "comment_required_text": "При отправке обязательно укажите memo или тег от биржи. Без него средства не поступят и могут быть утеряны.",
       "details_label": "Детали",
       "details_max_balance_label": "Отправка всего баланса {currency}",
       "title": "Подтвердить действие",
