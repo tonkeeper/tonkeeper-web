@@ -469,7 +469,7 @@ export const useCreateAccountTestnet = () => {
                 }
             );
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -589,7 +589,7 @@ export const useCreateAccountMnemonic = () => {
                 }
             );
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -668,7 +668,7 @@ export const useCreateAccountTonSK = () => {
                 versions
             });
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -758,7 +758,7 @@ export const useCreateAccountMAM = () => {
                 generateTronWallet: isTronEnabled
             });
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );

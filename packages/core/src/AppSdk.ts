@@ -70,9 +70,9 @@ export interface NativeBackButton {
     hide(): void;
 }
 
-export interface KeychainPassword {
-    setPassword: (publicKey: string, mnemonic: string) => Promise<void>;
-    getPassword: (publicKey: string) => Promise<string>;
+export interface KeychainService {
+    setData: (key: string, value: string) => Promise<void>;
+    getData: (key: string) => Promise<string>;
 }
 
 export interface TouchId {
@@ -106,7 +106,7 @@ export interface InternetConnectionService {
 export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
-    keychain?: KeychainPassword;
+    keychain?: KeychainService;
     cookie?: CookieService;
     touchId?: TouchId;
 

@@ -3,7 +3,7 @@ import {
     CookieService,
     IAppSdk,
     InternetConnectionService,
-    KeychainPassword,
+    KeychainService,
     NotificationService,
     TouchId
 } from '@tonkeeper/core/dist/AppSdk';
@@ -35,17 +35,17 @@ async function waitAppIsActive(): Promise<void> {
     });
 }
 
-export class KeychainTablet implements KeychainPassword {
-    setPassword = async (publicKey: string, mnemonic: string) => {
+export class KeychainTablet implements KeychainService {
+    setData = async (key: string, value: string) => {
         await SecureStorage.storeData({
-            id: `Wallet-${publicKey}`,
-            data: mnemonic
+            id: `Wallet-${key}`,
+            data: value
         });
     };
 
-    getPassword = async (publicKey: string) => {
+    getData = async (key: string) => {
         const { data } = await SecureStorage.getData({
-            id: `Wallet-${publicKey}`
+            id: `Wallet-${key}`
         });
         return data!;
     };

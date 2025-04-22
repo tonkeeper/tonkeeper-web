@@ -511,7 +511,7 @@ export const getSecretAndPassword = async (
             }
             await securityCheck();
 
-            const secret = await sdk.keychain.getPassword(account.auth.keychainStoreKey);
+            const secret = await sdk.keychain.getData(account.auth.keychainStoreKey);
             return { secret: await walletSecretFromString(secret) };
         }
         default:

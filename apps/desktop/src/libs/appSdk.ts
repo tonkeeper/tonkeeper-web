@@ -1,7 +1,7 @@
 import {
     BaseApp,
     IAppSdk,
-    KeychainPassword,
+    KeychainService,
     TouchId,
     CookieService
 } from '@tonkeeper/core/dist/AppSdk';
@@ -10,12 +10,12 @@ import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 
-export class KeychainDesktop implements KeychainPassword {
-    setPassword = async (publicKey: string, mnemonic: string) => {
-        return sendBackground<void>({ king: 'set-keychain', publicKey, mnemonic });
+export class KeychainDesktop implements KeychainService {
+    setData = async (key: string, data: string) => {
+        return sendBackground<void>({ king: 'set-keychain', publicKey: key, mnemonic: data });
     };
-    getPassword = async (publicKey: string) => {
-        return sendBackground<string>({ king: 'get-keychain', publicKey });
+    getData = async (key: string) => {
+        return sendBackground<string>({ king: 'get-keychain', publicKey: key });
     };
 }
 
