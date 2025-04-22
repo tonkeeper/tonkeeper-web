@@ -4,6 +4,7 @@ import React, {
     forwardRef,
     Fragment,
     PropsWithChildren,
+    useCallback,
     useEffect,
     useMemo,
     useRef,
@@ -90,11 +91,21 @@ const Container = forwardRef<
         children: React.ReactNode;
         center?: boolean;
         className?: string;
+        hostRef?: React.RefObject<HTMLDivElement>;
     }
->(({ onClose, children, center, className }, ref) => {
+>(({ onClose, children, center, className, hostRef }, ref) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    useOutsideAlerter(wrapperRef, onClose);
+    const onClick = useCallback(
+        (e: MouseEvent | TouchEvent) => {
+            if (!hostRef?.current || !hostRef.current.contains(e.target as Node)) {
+                onClose();
+            }
+        },
+        [onClose]
+    );
+
+    useOutsideAlerter(wrapperRef, onClick);
     return (
         <DropDownListContainer
             ref={mergeRefs(wrapperRef, ref)}
@@ -150,7 +161,7 @@ export const DropDown = ({
     useEffect(() => {
         if (isOpen && portal) {
             const id = blockPointerEvents();
-            return () => void setTimeout(() => unblockPointerEvents(id), 150);
+            return () => void setTimeout(() => unblockPointerEvents(id), 250);
         }
     }, [isOpen, portal]);
 
@@ -228,6 +239,7 @@ export const DropDown = ({
                             className={containerClassName}
                             status={status}
                             ref={containerRef}
+                            hostRef={hostRef}
                         >
                             {payload(toggling)}
                         </ContainerStyled>
