@@ -1,16 +1,16 @@
+// eslint-disable-next-line max-classes-per-file
 import {
     BaseApp,
     CookieService,
     IAppSdk,
     InternetConnectionService,
-    KeychainService,
     NotificationService,
-    TouchId
+    BiometryService
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
-import { Biometric, SecureStorage } from './plugins';
+import { Biometric } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
@@ -18,6 +18,7 @@ import { Network } from '@capacitor/network';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
+import { KeychainCapacitor } from './keychain';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -35,29 +36,13 @@ async function waitAppIsActive(): Promise<void> {
     });
 }
 
-export class KeychainTablet implements KeychainService {
-    setData = async (key: string, value: string) => {
-        await SecureStorage.storeData({
-            id: `Wallet-${key}`,
-            data: value
-        });
-    };
-
-    getData = async (key: string) => {
-        const { data } = await SecureStorage.getData({
-            id: `Wallet-${key}`
-        });
-        return data!;
-    };
-}
-
-export class CookieTablet implements CookieService {
+export class CookieCapacitor implements CookieService {
     cleanUp = async () => {
         await CapacitorCookies.clearAllCookies();
     };
 }
 
-export class TouchIdTablet implements TouchId {
+export class BiometryServiceCapacitor implements BiometryService {
     constructor(private alert: (text: string) => void) {}
 
     canPrompt = async () => {
@@ -86,16 +71,16 @@ export const CAPACITOR_APPLICATION_ID: 'mobile' | 'tablet' =
     window.innerWidth <= 550 ? 'mobile' : 'tablet';
 
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
-    keychain = new KeychainTablet();
-
-    cookie = new CookieTablet();
+    cookie = new CookieCapacitor();
 
     /**
      * initialises in the App component when config is fetched
      */
     notifications: NotificationService | undefined = undefined;
 
-    touchId = new TouchIdTablet(this.topMessage.bind(this));
+    biometry = new BiometryServiceCapacitor(this.topMessage.bind(this));
+
+    keychain = new KeychainCapacitor(this.biometry, this.storage);
 
     constructor() {
         super(new CapacitorStorage());

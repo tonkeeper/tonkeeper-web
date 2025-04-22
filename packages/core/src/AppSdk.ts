@@ -70,12 +70,30 @@ export interface NativeBackButton {
     hide(): void;
 }
 
-export interface KeychainService {
-    setData: (key: string, value: string) => Promise<void>;
-    getData: (key: string) => Promise<string>;
+export interface KeychainSecurity {
+    biometry?: boolean;
+    password?: boolean;
 }
 
-export interface TouchId {
+export interface IKeychainService {
+    setData: (key: string, value: string) => Promise<void>;
+    getData: (key: string) => Promise<string>;
+
+    security: ReadonlyAtom<KeychainSecurity | undefined>;
+
+    /**
+     * Do an additional security check e.g. when changing settings
+     * @param type
+     */
+    securityCheck: (type?: 'biometry' | 'password' | 'preferred') => Promise<void>;
+
+    checkPassword: (password: string) => Promise<boolean>;
+    updatePassword: (password: string) => Promise<void>;
+    setBiometry: (enabled: boolean) => Promise<void>;
+    resetSecuritySettings: () => Promise<void>;
+}
+
+export interface BiometryService {
     canPrompt: () => Promise<boolean>;
     prompt: (reason: (lang: string) => string) => Promise<void>;
 }
@@ -106,9 +124,9 @@ export interface InternetConnectionService {
 export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
-    keychain?: KeychainService;
+    keychain?: IKeychainService;
     cookie?: CookieService;
-    touchId?: TouchId;
+    biometry?: BiometryService;
 
     topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;

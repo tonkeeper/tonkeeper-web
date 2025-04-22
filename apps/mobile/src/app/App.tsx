@@ -46,7 +46,7 @@ import { NarrowContent } from './app-content/NarrowContent';
 import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
-import SignerPublishNotification from "@tonkeeper/uikit/dist/pages/signer/PublishNotification";
+import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
 
 setupIonicReact({
     swipeBackEnabled: true,

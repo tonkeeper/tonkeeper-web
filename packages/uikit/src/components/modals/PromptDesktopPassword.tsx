@@ -6,9 +6,11 @@ import React, { useEffect, useState } from 'react';
 import { PasswordUnlock } from '../../pages/home/UnlockNotification';
 import { useAppSdk } from '../../hooks/appSdk';
 
-const { hook, paramsControl } = createModalControl<{
+const { hook, paramsControl, controller } = createModalControl<{
     afterClose: (pin?: string) => void | Promise<boolean | undefined>;
 }>();
+
+export const promptDesktopPasswordController = controller;
 
 export const usePromptDesktopPassword = hook;
 

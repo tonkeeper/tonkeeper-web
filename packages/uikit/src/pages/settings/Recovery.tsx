@@ -12,7 +12,6 @@ import { BackButtonBlock } from '../../components/BackButton';
 import { WordsGridAndHeaders } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
 import { getAccountSecret, getMAMWalletMnemonic } from '../../state/mnemonic';
-import { useSecurityCheck } from '../../state/password';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
 import { Body2Class, H2Label2Responsive } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
@@ -53,7 +52,6 @@ export const Recovery = () => {
 const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId) => {
     const [secret, setSecret] = useState<AccountSecret | undefined>(undefined);
     const sdk = useAppSdk();
-    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     useEffect(() => {
         (async () => {
@@ -62,15 +60,10 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 if (walletId !== undefined) {
                     _secret = {
                         type: 'mnemonic' as const,
-                        mnemonic: await getMAMWalletMnemonic(
-                            sdk,
-                            accountId,
-                            walletId,
-                            securityCheck
-                        )
+                        mnemonic: await getMAMWalletMnemonic(sdk, accountId, walletId)
                     };
                 } else {
-                    _secret = await getAccountSecret(sdk, accountId, securityCheck);
+                    _secret = await getAccountSecret(sdk, accountId);
                 }
                 setSecret(_secret);
             } catch (e) {
@@ -78,7 +71,7 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 onBack();
             }
         })();
-    }, [onBack, accountId, securityCheck, walletId]);
+    }, [onBack, accountId, walletId]);
 
     return secret;
 };

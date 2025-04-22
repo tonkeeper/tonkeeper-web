@@ -8,8 +8,6 @@ import { Input } from '../fields/Input';
 import { Notification, NotificationBlock } from '../Notification';
 import { usePasswordStorage } from '../../hooks/useStorage';
 import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
-import { useMutateSecuritySettings, useSecuritySettings } from '../../state/password';
-import { hashAdditionalSecurityPassword } from '../../state/global-preferences';
 
 const Block = styled.div`
     display: flex;
@@ -23,26 +21,18 @@ const useUpdatePassword = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const passwordStorage = usePasswordStorage();
-    const securitySettings = useSecuritySettings();
-    const { mutateAsync: mutateSecuritySettings } = useMutateSecuritySettings();
 
     const isCorrectPassword = async (password: string) => {
-        if (securitySettings.additionalPasswordHash) {
-            return (
-                (await hashAdditionalSecurityPassword(password)) ===
-                securitySettings.additionalPasswordHash
-            );
+        if (sdk.keychain?.security.value?.password) {
+            return sdk.keychain.checkPassword(password);
         }
 
         return passwordStorage.isPasswordValid(password);
     };
 
     const saveNewPassword = async (oldPassword: string, newPassword: string) => {
-        if (securitySettings.additionalPasswordHash) {
-            const newPasswordHash = await hashAdditionalSecurityPassword(newPassword);
-            return mutateSecuritySettings({
-                additionalPasswordHash: newPasswordHash
-            });
+        if (sdk.keychain?.security.value?.password) {
+            return sdk.keychain.updatePassword(newPassword);
         }
 
         return passwordStorage.updatePassword(oldPassword, newPassword);

@@ -4,9 +4,11 @@ import { useTranslation } from '../../hooks/translation';
 import { createModalControl } from './createModalControl';
 import { MobileProPin } from '../mobile-pro/pin/MobileProPin';
 
-const { hook, paramsControl } = createModalControl<{
+const { hook, paramsControl, controller } = createModalControl<{
     afterClose: (pin?: string) => void | Promise<boolean | undefined>;
 }>();
+
+export const promptMobileProPinController = controller;
 
 export const usePromptMobileProPin = hook;
 

@@ -21,7 +21,6 @@ import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCusto
 import { useAppSdk } from '../../hooks/appSdk';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { signDataOver } from '../../state/mnemonic';
-import { useSecurityCheck } from '../../state/password';
 import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
 import { Cell } from '@ton/core';
@@ -31,7 +30,6 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const api = useActiveApi();
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<SignDataResponse, Error>(async () => {
         const domain = new URL(origin).host;
@@ -47,7 +45,7 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
             address: activeAccount.activeTonWallet.rawAddress,
             timestamp
         });
-        const singer = signDataOver({ sdk, accountId: activeAccount.id, t, securityCheck });
+        const singer = signDataOver({ sdk, accountId: activeAccount.id, t });
 
         const signature = await singer(payloadToSign);
 
@@ -115,7 +113,7 @@ const WarningBody = styled(Body2)`
 `;
 
 const stringNotEmpty = (value: string | undefined): value is string => {
-    return value != '' && value != null;
+    return value !== '' && value != null;
 };
 
 const seeIfValidCell = (value: string | undefined): boolean => {

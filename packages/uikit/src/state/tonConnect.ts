@@ -35,7 +35,6 @@ import {
     getNetworkByAccount,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useSecurityCheck } from './password';
 import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
@@ -98,7 +97,6 @@ export const useConnectTonConnectAppMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { t } = useTranslation();
-    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<
         ConnectItemReply[],
@@ -169,8 +167,7 @@ export const useConnectTonConnectAppMutation = () => {
                         sdk,
                         accountId: account.id,
                         wallet,
-                        t,
-                        securityCheck
+                        t
                     });
                     result.push(
                         await toTonProofItemReply({

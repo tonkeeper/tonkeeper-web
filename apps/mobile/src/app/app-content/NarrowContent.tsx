@@ -60,7 +60,7 @@ import { SplashScreen } from '@capacitor/splash-screen';
 import { useAllChainsAssetsWithPrice } from '@tonkeeper/uikit/dist/state/home';
 import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProWelcomePage';
 import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
-import { useCheckTouchId, useSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
+import { useKeychainSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
 import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/useAtom';
 import { ionRouterAnimation$, useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
@@ -68,7 +68,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { MobileProPin } from '@tonkeeper/uikit/dist/components/mobile-pro/pin/MobileProPin';
 import { useTranslation } from 'react-i18next';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { hashAdditionalSecurityPassword } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 
 const WideLayout = styled.div`
@@ -120,14 +119,14 @@ const NarrowContentBody: FC<{
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
 
-    const { additionalPasswordHash } = useSecuritySettings();
+    const { password } = useKeychainSecuritySettings();
     const accountQuery = useActiveAccountQuery();
 
     if (lock) {
         return <NarrowContentInitialPagesLock />;
     }
 
-    if (!activeAccount || !additionalPasswordHash || !accountQuery.data) {
+    if (!activeAccount || !password || !accountQuery.data) {
         return <NarrowContentInitialPages accountIsCreated={!!activeAccount} />;
     }
 
@@ -140,9 +139,8 @@ const MobileProPinStyled = styled(MobileProPin)`
 
 const NarrowContentInitialPagesLock = () => {
     const { t } = useTranslation();
-    const securitySettings = useSecuritySettings();
+    const { biometry } = useKeychainSecuritySettings();
     const sdk = useAppSdk();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const [faceIdValidation, setFaceIdValidation] = useState<'success' | 'error' | undefined>();
 
     useEffect(() => {
@@ -150,8 +148,9 @@ const NarrowContentInitialPagesLock = () => {
     }, []);
 
     useEffect(() => {
-        if (securitySettings.biometrics) {
-            checkTouchId()
+        if (biometry) {
+            sdk.keychain
+                ?.securityCheck('biometry')
                 .then(() => {
                     setFaceIdValidation('success');
                     setTimeout(() => sdk.uiEvents.emit('unlock'), 200);
@@ -161,15 +160,14 @@ const NarrowContentInitialPagesLock = () => {
                     setTimeout(() => setFaceIdValidation(undefined), 200);
                 });
         }
-    }, [securitySettings.biometrics]);
+    }, [biometry]);
 
     return (
         <MobileProPinStyled
             title={t('enter_password')}
             validated={faceIdValidation}
             onSubmit={async v => {
-                const hash = await hashAdditionalSecurityPassword(v);
-                if (hash === securitySettings.additionalPasswordHash) {
+                if (await sdk.keychain!.checkPassword(v)) {
                     setTimeout(() => {
                         sdk.uiEvents.emit('unlock');
                     }, 200);

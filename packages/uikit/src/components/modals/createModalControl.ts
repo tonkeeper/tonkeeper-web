@@ -31,6 +31,17 @@ export const createModalControl = <T = object>() => {
                 controller
             };
         },
-        paramsControl
+        paramsControl,
+        controller: {
+            open: (p: T = {} as T) => {
+                paramsControl.next(p);
+                isOpenControl.next(true);
+            },
+            close: () => {
+                isOpenControl.next(true);
+                controllerControl.value.abort('Modal Closed');
+                setTimeout(() => controllerControl.next(new AbortController()), 2000);
+            }
+        }
     };
 };

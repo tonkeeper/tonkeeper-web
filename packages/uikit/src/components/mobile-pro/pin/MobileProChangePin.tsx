@@ -1,6 +1,4 @@
 import { FC, useMemo, useRef, useState } from 'react';
-import { useMutateSecuritySettings, useSecuritySettings } from '../../../state/password';
-import { hashAdditionalSecurityPassword } from '../../../state/global-preferences';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { childFactoryCreator, duration } from '../../transfer/common';
 import { MobileProPin } from './MobileProPin';
@@ -8,15 +6,15 @@ import styled from 'styled-components';
 import { SlideAnimation } from '../../shared/SlideAnimation';
 import { useTranslation } from '../../../hooks/translation';
 import { Notification, useSetNotificationOnBack } from '../../Notification';
+import { useAppSdk } from '../../../hooks/appSdk';
 
 export const MobileProChangePin: FC<{ onComplete: () => void }> = ({ onComplete }) => {
     const { t } = useTranslation();
+    const sdk = useAppSdk();
 
-    const currentPinHash = useSecuritySettings().additionalPasswordHash!;
     const [oldPinChecked, setOldPinChecked] = useState(false);
 
     const [pin, setPin] = useState('');
-    const { mutateAsync } = useMutateSecuritySettings();
 
     const oldPinRef = useRef<HTMLDivElement>(null);
     const setPinRef = useRef<HTMLDivElement>(null);
@@ -30,8 +28,7 @@ export const MobileProChangePin: FC<{ onComplete: () => void }> = ({ onComplete 
         }
 
         setTimeout(async () => {
-            const additionalPasswordHash = await hashAdditionalSecurityPassword(pin);
-            await mutateAsync({ additionalPasswordHash });
+            await sdk.keychain?.updatePassword(pin);
             onComplete();
         }, 400);
         setNewPinChecked(true);
@@ -72,8 +69,7 @@ export const MobileProChangePin: FC<{ onComplete: () => void }> = ({ onComplete 
                                 title={t('create_pin_current_title')}
                                 onSubmit={async v => {
                                     setRight(true);
-                                    const hash = await hashAdditionalSecurityPassword(v);
-                                    const isCorrect = hash === currentPinHash;
+                                    const isCorrect = await sdk.keychain!.checkPassword(v);
                                     if (isCorrect) {
                                         setOldPinChecked(true);
                                     }

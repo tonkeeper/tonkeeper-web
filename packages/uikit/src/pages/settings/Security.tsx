@@ -22,9 +22,7 @@ import {
     useCanPromptTouchId,
     useLookScreen,
     useMutateLookScreen,
-    useMutateSecuritySettings,
-    useMutateTouchId,
-    useSecuritySettings
+    useKeychainSecuritySettings
 } from '../../state/password';
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 import styled from 'styled-components';
@@ -35,10 +33,9 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
-import { useAppTargetEnv } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { CreatePasswordNotification } from '../../components/create/CreatePassword';
 import { useDisclosure } from '../../hooks/useDisclosure';
-import { hashAdditionalSecurityPassword } from '../../state/global-preferences';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { MobileProChangePinNotification } from '../../components/mobile-pro/pin/MobileProChangePin';
 
@@ -71,13 +68,17 @@ const Label1Capitalised = styled(Label1)`
 `;
 
 const TouchIdSwitch = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data: canPrompt } = useCanPromptTouchId();
-    const securitySettings = useSecuritySettings();
+    const { password, biometry } = useKeychainSecuritySettings();
 
-    const { mutate } = useMutateTouchId();
+    const onChange = async (value: boolean) => {
+        await sdk.keychain!.securityCheck('password');
+        return sdk.keychain!.setBiometry(value);
+    };
 
-    if (!canPrompt || !securitySettings.additionalPasswordHash) {
+    if (!canPrompt || !password) {
         return null;
     }
 
@@ -86,7 +87,7 @@ const TouchIdSwitch = () => {
             <ListItem hover={false}>
                 <ListItemPayload>
                     <Label1Capitalised>{t('biometry_default')}</Label1Capitalised>
-                    <Switch checked={!!securitySettings.biometrics} onChange={mutate} />
+                    <Switch checked={!!biometry} onChange={onChange} />
                 </ListItemPayload>
             </ListItem>
         </ListBlockDesktopAdaptive>
@@ -140,9 +141,9 @@ const LockSwitchAdditionalSecurityPassword = () => {
     const { data } = useLookScreen();
     const { mutate: toggleLock } = useMutateLookScreen();
     const { t } = useTranslation();
-    const securitySettings = useSecuritySettings();
+    const { password } = useKeychainSecuritySettings();
 
-    if (!securitySettings.additionalPasswordHash) {
+    if (!password) {
         return null;
     }
 
@@ -184,8 +185,8 @@ const MobileProPassword = () => {
 const DesktopAndTabletProPassword = () => {
     const { t } = useTranslation();
 
-    const securitySettings = useSecuritySettings();
-    const { mutate } = useMutateSecuritySettings();
+    const sdk = useAppSdk();
+    const { password: keychainPassword } = useKeychainSecuritySettings();
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     return (
@@ -194,25 +195,21 @@ const DesktopAndTabletProPassword = () => {
                 <ListItem hover={false} onClick={onOpen}>
                     <ListItemPayload>
                         <Label1Capitalised>
-                            {securitySettings.additionalPasswordHash
-                                ? t('Change_password')
-                                : t('set_up_password')}
+                            {keychainPassword ? t('Change_password') : t('set_up_password')}
                         </Label1Capitalised>
                         <LockIcon />
                     </ListItemPayload>
                 </ListItem>
                 <LockSwitchAdditionalSecurityPassword />
             </ListBlockDesktopAdaptive>
-            {securitySettings.additionalPasswordHash ? (
+            {keychainPassword ? (
                 <ChangePasswordNotification isOpen={isOpen} handleClose={onClose} />
             ) : (
                 <CreatePasswordNotification
                     isOpen={isOpen}
                     handleClose={password => {
                         if (password) {
-                            hashAdditionalSecurityPassword(password).then(additionalPasswordHash =>
-                                mutate({ additionalPasswordHash })
-                            );
+                            sdk.keychain!.updatePassword(password);
                         }
                         onClose();
                     }}

@@ -1,11 +1,6 @@
 import { MobileProPin } from '../components/mobile-pro/pin/MobileProPin';
 import { FC, useRef, useState } from 'react';
-import { hashAdditionalSecurityPassword } from '../state/global-preferences';
-import {
-    useCanPromptTouchId,
-    useMutateSecuritySettings,
-    useMutateTouchId
-} from '../state/password';
+import { useCanPromptTouchId } from '../state/password';
 import { childFactoryCreator, duration } from '../components/transfer/common';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 import styled, { useTheme } from 'styled-components';
@@ -13,11 +8,12 @@ import { Body2, H3 } from '../components/Text';
 import { Button } from '../components/fields/Button';
 import { SlideAnimation } from '../components/shared/SlideAnimation';
 import { useTranslation } from '../hooks/translation';
+import { useAppSdk } from '../hooks/appSdk';
 
 export const MobileProCreatePasswordPage = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const [pin, setPin] = useState('');
-    const { mutateAsync } = useMutateSecuritySettings();
     const [pinSaved, setPinSaved] = useState(false);
 
     const { data: canPromptBiometrics } = useCanPromptTouchId();
@@ -27,13 +23,9 @@ export const MobileProCreatePasswordPage = () => {
     const biometricsRef = useRef<HTMLDivElement>(null);
     const [right, setRight] = useState(true);
     const [pinChecked, setPinChecked] = useState(false);
-    const { mutateAsync: mutateTouchId } = useMutateTouchId({ skipPasswordCheck: true });
     const [pinCompleted, setPinCompleted] = useState(false);
 
-    const finish = async () => {
-        const additionalPasswordHash = await hashAdditionalSecurityPassword(pin);
-        mutateAsync({ additionalPasswordHash });
-    };
+    const finish = async () => sdk.keychain!.updatePassword(pin);
 
     const checkPin = (val: string) => {
         if (val !== pin) {
@@ -99,7 +91,9 @@ export const MobileProCreatePasswordPage = () => {
                         {view === 'biometrics' && (
                             <EnableBiometryPage
                                 onSubmit={v =>
-                                    mutateTouchId(v).finally(() => setPinCompleted(true))
+                                    sdk
+                                        .keychain!.setBiometry(v)
+                                        .finally(() => setPinCompleted(true))
                                 }
                             />
                         )}

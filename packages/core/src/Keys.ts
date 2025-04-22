@@ -51,5 +51,7 @@ export enum AppKey {
 
     TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config',
 
-    NOTIFICATIONS = 'notifications'
+    NOTIFICATIONS = 'notifications',
+
+    KEYCHAIN_SETTINGS = 'keychain_settings'
 }

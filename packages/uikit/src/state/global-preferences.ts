@@ -3,7 +3,6 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
 import { AccountsFolderStored } from '@tonkeeper/core/dist/entries/account';
-import { sha256 } from '@ton/crypto';
 
 export interface GlobalPreferences {
     folders: AccountsFolderStored[];
@@ -11,10 +10,6 @@ export interface GlobalPreferences {
     historyFilterSpam: boolean;
     highlightFeatures: {
         tron: boolean;
-    };
-    security: {
-        biometrics?: boolean;
-        additionalPasswordHash?: string;
     };
 }
 
@@ -24,13 +19,7 @@ const defaultGlobalPreferences: GlobalPreferences = {
     historyFilterSpam: false,
     highlightFeatures: {
         tron: true
-    },
-    security: {}
-};
-
-export const hashAdditionalSecurityPassword = async (password: string) => {
-    const buffer = await sha256(password);
-    return buffer.toString('hex');
+    }
 };
 
 export const useGlobalPreferencesQuery = () => {

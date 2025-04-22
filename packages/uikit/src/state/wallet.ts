@@ -64,7 +64,6 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
-import { useMutateSecuritySettings, useSecurityCheck } from './password';
 import {
     encryptWalletSecret,
     seeIfMnemonicValid,
@@ -231,7 +230,6 @@ export const useCreateMAMAccountDerivation = () => {
     const sdk = useAppSdk();
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
-    const { mutateAsync: securityCheck } = useSecurityCheck();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
@@ -241,7 +239,7 @@ export const useCreateMAMAccountDerivation = () => {
         }
         const newDerivationIndex = account.lastAddedIndex + 1;
 
-        const secret = await getAccountSecret(sdk, accountId, securityCheck);
+        const secret = await getAccountSecret(sdk, accountId);
         if (secret.type !== 'mnemonic') {
             throw new Error('Unexpected secret type');
         }
@@ -959,7 +957,6 @@ export const useMutateLogOut = () => {
     const deleteFolder = useDeleteFolder();
     const accounts = useAccountsState();
     const { mutateAsync: removeAccountTwoFA } = useRemoveAccountTwoFAData();
-    const { mutateAsync: setSecuritySettings } = useMutateSecuritySettings();
     const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
     const sdk = useAppSdk();
 
@@ -986,7 +983,7 @@ export const useMutateLogOut = () => {
         const newAccounts = await storage.removeAccountsFromState([accountId, ...multisigs]);
 
         if (newAccounts.length === 0) {
-            await setSecuritySettings(null);
+            await sdk.keychain?.resetSecuritySettings();
         }
 
         try {

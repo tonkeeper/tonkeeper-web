@@ -8,8 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useIsPasswordSet, useMutateDeleteAll, useAccountsState } from '../../state/wallet';
 import { passwordStorage } from '@tonkeeper/core/dist/service/passwordService';
-import { useCheckTouchId, useSecuritySettings } from '../../state/password';
-import { hashAdditionalSecurityPassword } from '../../state/global-preferences';
+import { useKeychainSecuritySettings } from '../../state/password';
 
 const Block = styled.form<{ minHeight?: string }>`
     display: flex;
@@ -43,16 +42,13 @@ const Logo = styled.div`
 const useMutateUnlock = () => {
     const sdk = useAppSdk();
     const isPasswordSet = useIsPasswordSet();
-    const securitySettings = useSecuritySettings();
 
     return useMutation<void, Error, string>(async password => {
         let isValid = false;
         if (isPasswordSet) {
             isValid = await passwordStorage(sdk.storage).isPasswordValid(password);
-        } else if (securitySettings.additionalPasswordHash) {
-            isValid =
-                (await hashAdditionalSecurityPassword(password)) ===
-                securitySettings.additionalPasswordHash;
+        } else if (sdk.keychain?.security.value?.password) {
+            isValid = await sdk.keychain.checkPassword(password);
         } else {
             throw new Error('Unreachable code');
         }
@@ -101,13 +97,11 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
         }
     };
 
-    const securitySettings = useSecuritySettings();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     useEffect(() => {
-        if (securitySettings.biometrics) {
-            checkTouchId().then(() => sdk.uiEvents.emit('unlock'));
+        if (sdk.keychain?.security.value?.biometry) {
+            sdk.keychain.securityCheck('biometry').then(() => sdk.uiEvents.emit('unlock'));
         }
-    }, [securitySettings.biometrics, checkTouchId]);
+    }, []);
 
     return (
         <Block minHeight={minHeight} onSubmit={onSubmit}>
@@ -155,9 +149,9 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
 
 export const Unlock = () => {
     const isPasswordSet = useIsPasswordSet();
-    const security = useSecuritySettings();
+    const { password: keychainPassword } = useKeychainSecuritySettings();
 
-    if (isPasswordSet || security.additionalPasswordHash) {
+    if (isPasswordSet || keychainPassword) {
         return <PasswordUnlock />;
     } else {
         return <div>Unexpected locked state</div>;
