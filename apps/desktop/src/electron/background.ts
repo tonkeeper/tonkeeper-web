@@ -7,6 +7,7 @@ import { tonConnectSSE } from './sseEvetns';
 
 const service = 'tonkeeper.com';
 
+// eslint-disable-next-line complexity
 export const handleBackgroundMessage = async (message: Message): Promise<unknown> => {
     switch (message.king) {
         case 'storage-set':
@@ -29,6 +30,44 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             );
         case 'get-keychain':
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
+        case 'remove-keychain': {
+            const result = await keytar.deletePassword(service, `Wallet-${message.publicKey}`);
+            console.info(`Deleted password for account "${message.publicKey}": Success`);
+            return result;
+        }
+        case 'clear-keychain': {
+            const credentials = await keytar.findCredentials(service);
+
+            if (credentials.length === 0) {
+                return;
+            }
+
+            let failures = 0;
+
+            for (const { account } of credentials) {
+                try {
+                    const deleted = await keytar.deletePassword(service, account);
+                    if (deleted) {
+                        console.info(`Deleted password for account "${account}": Success`);
+                    } else {
+                        failures = failures + 1;
+                        console.info(
+                            `Failed to delete password for account "${account}": Password not found`
+                        );
+                    }
+                } catch (error) {
+                    failures = failures + 1;
+                    console.error(
+                        `Failed to delete password for account "${account}": ${error.message}`
+                    );
+                }
+            }
+
+            if (failures > 0) {
+                throw new Error('Some passwords could not be deleted. Check logs for details.');
+            }
+            return;
+        }
         case 'reconnect':
             return await tonConnectSSE.reconnect();
         case 'ton-connect-send-disconnect':

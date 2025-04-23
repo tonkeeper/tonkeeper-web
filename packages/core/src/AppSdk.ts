@@ -78,6 +78,8 @@ export interface KeychainSecurity {
 export interface IKeychainService {
     setData: (key: string, value: string) => Promise<void>;
     getData: (key: string) => Promise<string>;
+    removeData: (key: string) => Promise<void>;
+    clearStorage: () => Promise<void>;
 
     security: ReadonlyAtom<KeychainSecurity | undefined>;
 

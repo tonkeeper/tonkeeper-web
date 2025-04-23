@@ -940,6 +940,7 @@ export const useMutateDeleteAll = () => {
 
             await storage.clearAccountFromState();
             await sdk.storage.clear();
+            await sdk.keychain?.clearStorage();
         } finally {
             sdk.reloadApp();
         }
@@ -990,6 +991,7 @@ export const useMutateLogOut = () => {
         }
 
         try {
+            await sdk.keychain?.removeData(accountId);
             await removeAccountTwoFA(accountId);
             await removeBatteryAuthToken();
             await client.invalidateQueries([QueryKey.account]);

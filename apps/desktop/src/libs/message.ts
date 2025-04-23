@@ -41,6 +41,15 @@ export interface GetKeychainMessage {
     publicKey: string;
 }
 
+export interface RemoveKeychainMessage {
+    king: 'remove-keychain';
+    publicKey: string;
+}
+
+export interface ClearKeychainMessage {
+    king: 'clear-keychain';
+}
+
 export interface TonConnectMessage {
     king: 'reconnect';
 }
@@ -76,6 +85,8 @@ export type Message =
     | OpenPageMessage
     | SetKeychainMessage
     | GetKeychainMessage
+    | RemoveKeychainMessage
+    | ClearKeychainMessage
     | TonConnectMessage
     | CanPromptTouchIdMessage
     | PromptTouchIdMessage

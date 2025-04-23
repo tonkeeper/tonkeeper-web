@@ -25,6 +25,17 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
         return data!;
     };
 
+    removeData = async (key: string) => {
+        await SecureStorage.removeData({
+            id: `Wallet-${key}`
+        });
+    };
+
+    clearStorage = async () => {
+        await SecureStorage.clearStorage();
+        await this.resetSecuritySettings();
+    };
+
     protected override async promptPassword(
         callback: (pin?: string) => Promise<boolean | undefined>
     ) {

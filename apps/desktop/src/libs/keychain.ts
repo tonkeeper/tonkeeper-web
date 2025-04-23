@@ -19,6 +19,15 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
         return sendBackground<string>({ king: 'get-keychain', publicKey: key });
     };
 
+    removeData = async (key: string) => {
+        return sendBackground<void>({ king: 'remove-keychain', publicKey: key });
+    };
+
+    clearStorage = async () => {
+        await sendBackground<void>({ king: 'clear-keychain' });
+        await this.resetSecuritySettings();
+    };
+
     protected override promptPassword(callback: (pin?: string) => Promise<boolean | undefined>) {
         promptDesktopPasswordController.open({
             afterClose: callback

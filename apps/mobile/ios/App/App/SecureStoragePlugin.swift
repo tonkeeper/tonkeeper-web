@@ -7,7 +7,9 @@ import Security
 
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "storeData", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "getData", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "getData", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "removeData", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "clearStorage", returnType: CAPPluginReturnPromise)
     ]
 
 
@@ -61,6 +63,40 @@ import Security
             ])
         } else {
             call.reject("Error retrieving data: \(status)")
+        }
+    }
+
+    @objc func removeData(_ call: CAPPluginCall) {
+        guard let id = call.getString("id") else {
+            call.reject("Missing required parameter: id")
+            return
+        }
+
+        let keychainQuery: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrAccount: id
+        ]
+
+        let status = SecItemDelete(keychainQuery as CFDictionary)
+
+        if status == errSecSuccess || status == errSecItemNotFound {
+            call.resolve()
+        } else {
+            call.reject("Error removing data: \(status)")
+        }
+    }
+
+    @objc func clearStorage(_ call: CAPPluginCall) {
+        let keychainQuery: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword
+        ]
+
+        let status = SecItemDelete(keychainQuery as CFDictionary)
+
+        if status == errSecSuccess || status == errSecItemNotFound {
+            call.resolve()
+        } else {
+            call.reject("Error clearing storage: \(status)")
         }
     }
 }
