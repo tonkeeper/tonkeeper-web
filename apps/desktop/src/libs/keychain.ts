@@ -19,11 +19,9 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
         return sendBackground<string>({ king: 'get-keychain', publicKey: key });
     };
 
-    protected override async promptPassword() {
-        return new Promise<string | undefined>(resolve => {
-            promptDesktopPasswordController.open({
-                afterClose: resolve
-            });
+    protected override promptPassword(callback: (pin?: string) => Promise<boolean | undefined>) {
+        promptDesktopPasswordController.open({
+            afterClose: callback
         });
     }
 

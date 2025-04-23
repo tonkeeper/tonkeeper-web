@@ -25,11 +25,11 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
         return data!;
     };
 
-    protected override async promptPassword() {
-        return new Promise<string | undefined>(resolve => {
-            promptMobileProPinController.open({
-                afterClose: resolve
-            });
+    protected override async promptPassword(
+        callback: (pin?: string) => Promise<boolean | undefined>
+    ) {
+        promptMobileProPinController.open({
+            afterClose: callback
         });
     }
 

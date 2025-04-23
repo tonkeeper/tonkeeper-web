@@ -96,7 +96,7 @@ export abstract class BaseKeychainService {
         }
 
         return new Promise<void>((resolve, reject) => {
-            this.promptPassword().then(async pin => {
+            this.promptPassword(async pin => {
                 if (!pin) {
                     reject();
                     return false;
@@ -107,7 +107,6 @@ export abstract class BaseKeychainService {
                     resolve();
                     return true;
                 } else {
-                    reject();
                     return false;
                 }
             });
@@ -115,5 +114,7 @@ export abstract class BaseKeychainService {
     }
 
     protected abstract securityCheckTouchId(): Promise<void>;
-    protected abstract promptPassword(): Promise<string | void>;
+    protected abstract promptPassword(
+        callback: (pin?: string) => Promise<boolean | undefined>
+    ): void;
 }
