@@ -6,6 +6,8 @@ import { useAtomValue } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { KeychainSecurity } from '@tonkeeper/core/dist/AppSdk';
 import { useMemo } from 'react';
+import { usePasswordStorage } from '../hooks/useStorage';
+import { getPasswordByNotification } from './mnemonic';
 
 export const useLookScreen = () => {
     const sdk = useAppSdk();
@@ -38,4 +40,19 @@ export const useKeychainSecuritySettings = () => {
 
     const atomValue = useAtomValue(sdk.keychain?.security ?? emptyAtom);
     return useMemo(() => atomValue || {}, [atomValue]);
+};
+
+export const useSecurityCheck = () => {
+    const sdk = useAppSdk();
+    const passwordStorage = usePasswordStorage();
+    return useMutation(async () => {
+        if (sdk.keychain) {
+            return sdk.keychain.securityCheck();
+        }
+
+        if (await passwordStorage.getIsPasswordSet()) {
+            const pw = await getPasswordByNotification(sdk);
+            return passwordStorage.checkPassword(pw);
+        }
+    });
 };

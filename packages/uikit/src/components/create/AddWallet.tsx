@@ -20,6 +20,7 @@ import { ChevronRightIcon } from '../Icon';
 import { HideOnReview } from '../ios/HideOnReview';
 import { useProState } from '../../state/pro';
 import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useSecurityCheck } from '../../state/password';
 
 const AddMethod = styled.button`
     display: flex;
@@ -100,7 +101,7 @@ export const addWalletMethod = [
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
 export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }> = ({
-    onSelect
+    onSelect: onSelectProp
 }) => {
     const { t } = useTranslation();
     const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig } = useAppContext();
@@ -112,6 +113,16 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     );
 
     const { data: pro } = useProState();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
+
+    const onSelect = async (method: AddWalletMethod) => {
+        try {
+            await securityCheck();
+            onSelectProp(method);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     return (
         <AddMethodsWrapper>

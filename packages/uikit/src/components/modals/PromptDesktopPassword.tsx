@@ -53,7 +53,7 @@ export const CheckDesktopPasswordControlled = () => {
                             if (isValid !== false) {
                                 onClose();
                             }
-                            setError(!!isValid);
+                            setError(!isValid);
                             return !!isValid;
                         } else {
                             onClose();

@@ -20,6 +20,7 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
 import { Notification } from '../../components/Notification';
+import { useSecurityCheck } from '../../state/password';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -51,16 +52,20 @@ const CookieSettings = () => {
 const AddAccountBySK = () => {
     const { isOpen, onClose, onOpen } = useDisclosure();
     const navigate = useNavigate();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     const items = useMemo<SettingsItem[]>(() => {
         return [
             {
                 name: 'Add account with private key',
                 icon: <PlusIcon />,
-                action: () => onOpen()
+                action: () =>
+                    securityCheck()
+                        .then(onOpen)
+                        .catch(e => console.error(e))
             }
         ];
-    }, [onOpen]);
+    }, [onOpen, securityCheck]);
 
     return (
         <>

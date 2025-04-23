@@ -80,6 +80,7 @@ import { AppRoute } from '../libs/routes';
 import { isSignerLink } from './signer';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
+import { useSecurityCheck } from './password';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -959,8 +960,10 @@ export const useMutateLogOut = () => {
     const { mutateAsync: removeAccountTwoFA } = useRemoveAccountTwoFAData();
     const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
     const sdk = useAppSdk();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
 
     return useMutation<void, Error, AccountId>(async accountId => {
+        await securityCheck();
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
 
         if (folder) {
