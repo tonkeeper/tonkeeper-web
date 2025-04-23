@@ -38,6 +38,7 @@ import { CreatePasswordNotification } from '../../components/create/CreatePasswo
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { MobileProChangePinNotification } from '../../components/mobile-pro/pin/MobileProChangePin';
+import { CloseIcon } from '../../components/Icon';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -189,6 +190,11 @@ const DesktopAndTabletProPassword = () => {
     const { password: keychainPassword } = useKeychainSecuritySettings();
     const { isOpen, onClose, onOpen } = useDisclosure();
 
+    const onResetPassword = async () => {
+        await sdk.keychain?.securityCheck();
+        await sdk.keychain?.resetSecuritySettings();
+    };
+
     return (
         <>
             <ListBlockDesktopAdaptive>
@@ -201,6 +207,14 @@ const DesktopAndTabletProPassword = () => {
                     </ListItemPayload>
                 </ListItem>
                 <LockSwitchAdditionalSecurityPassword />
+                {keychainPassword && (
+                    <ListItem hover={false} onClick={onResetPassword}>
+                        <ListItemPayload>
+                            <Label1Capitalised>{t('reset_secutiry_settings')}</Label1Capitalised>
+                            <CloseIcon />
+                        </ListItemPayload>
+                    </ListItem>
+                )}
             </ListBlockDesktopAdaptive>
             {keychainPassword ? (
                 <ChangePasswordNotification isOpen={isOpen} handleClose={onClose} />

@@ -333,6 +333,8 @@
   "renew_nft_in_progress": "Domain renew in progress…",
   "renew_nft_renewed": "Domain renewed for 1 year",
   "replace": "Replace",
+  "reset_password": "Reset Password",
+  "reset_secutiry_settings": "Reset Security Settings",
   "reset_tron_cache": "Reset Tron cache",
   "save": "Save",
   "secret_words_account_title": "Your Account Recovery Phrase",

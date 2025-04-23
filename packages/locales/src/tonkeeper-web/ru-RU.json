@@ -322,6 +322,8 @@
   "renew_nft_in_progress": "Выполняется продление домена…",
   "renew_nft_renewed": "Домен продлён на 1 год",
   "replace": "Заменить",
+  "reset_password": "Сбросить пароль",
+  "reset_secutiry_settings": "Сброс настроек безопасности",
   "reset_tron_cache": "Reset Tron cache",
   "save": "Сохранить",
   "secret_words_account_title": "Секретный ключ вашего аккаунта",

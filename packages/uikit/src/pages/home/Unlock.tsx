@@ -8,7 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useIsPasswordSet, useMutateDeleteAll, useAccountsState } from '../../state/wallet';
 import { passwordStorage } from '@tonkeeper/core/dist/service/passwordService';
-import { useKeychainSecuritySettings } from '../../state/password';
+import { useKeychainSecuritySettings, useMutateLookScreen } from '../../state/password';
 
 const Block = styled.form<{ minHeight?: string }>`
     display: flex;
@@ -151,9 +151,19 @@ export const Unlock = () => {
     const isPasswordSet = useIsPasswordSet();
     const { password: keychainPassword } = useKeychainSecuritySettings();
 
+    const { mutate } = useMutateLookScreen();
+    const sdk = useAppSdk();
+
+    useEffect(() => {
+        if (!isPasswordSet && !keychainPassword) {
+            mutate(false);
+            sdk.uiEvents.emit('unlock');
+        }
+    }, [isPasswordSet, keychainPassword, mutate]);
+
     if (isPasswordSet || keychainPassword) {
         return <PasswordUnlock />;
     } else {
-        return <div>Unexpected locked state</div>;
+        return null;
     }
 };
