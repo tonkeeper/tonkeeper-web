@@ -61,7 +61,11 @@ import { useAllChainsAssetsWithPrice } from '@tonkeeper/uikit/dist/state/home';
 import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProWelcomePage';
 import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
 import { useKeychainSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
-import { useActiveAccountQuery, useMutateDeleteAll } from '@tonkeeper/uikit/dist/state/wallet';
+import {
+    useAccountsState,
+    useActiveAccountQuery,
+    useMutateDeleteAll
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/useAtom';
 import { ionRouterAnimation$, useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -174,9 +178,16 @@ const NarrowContentInitialPagesLock = () => {
     }, [biometry]);
 
     const { mutateAsync: mutateLogOut } = useMutateDeleteAll();
+    const accounts = useAccountsState();
+    const hasSeveralAccounts = accounts.length > 1;
     const onLogOut = async () => {
         const confirmed = await sdk.confirm({
-            message: t('logout_on_unlock_many')
+            title: `🚧🚨🚨🚨🚧\n${t(
+                hasSeveralAccounts ? 'settings_reset_alert_title_all' : 'settings_reset_alert_title'
+            )}`,
+            message: t(hasSeveralAccounts ? 'logout_on_unlock_many' : 'logout_on_unlock_one'),
+            cancelButtonTitle: t('cancel'),
+            okButtonTitle: t('settings_reset')
         });
 
         if (confirmed) {
