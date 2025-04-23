@@ -24,7 +24,7 @@ const Wrapper = styled(motion.div)`
 `;
 
 export const tonkeeperMobileTonDeeplinkScheme = 'tonkeeper-mob';
-export const tonkeeperMobileTonConnectDeeplinkScheme = 'tonkeeper-mob-tc';
+export const tonkeeperMobileTonConnectDeeplinkScheme = 'tonkeeper-tc-mob';
 
 const useIsTonkeeperMobileInstalled = () => {
     return useQuery(
