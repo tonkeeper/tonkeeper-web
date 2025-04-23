@@ -161,7 +161,7 @@ export const DropDown = ({
     useEffect(() => {
         if (isOpen && portal) {
             const id = blockPointerEvents();
-            return () => void setTimeout(() => unblockPointerEvents(id), 250);
+            return () => void setTimeout(() => unblockPointerEvents(id), 550);
         }
     }, [isOpen, portal]);
 
