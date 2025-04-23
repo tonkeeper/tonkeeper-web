@@ -52,11 +52,15 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | st
         const clientSessionId = query.id;
         const sessionCrypto = new SessionCrypto();
 
+        const url = new URL(options.url);
+        const isPro = url.protocol.includes('pro') || url.pathname.split('/').includes('pro');
+
         return {
             protocolVersion,
             request,
             clientSessionId,
-            sessionKeyPair: sessionCrypto.stringifyKeypair()
+            sessionKeyPair: sessionCrypto.stringifyKeypair(),
+            appName: isPro ? 'tonkeeper-pro' : 'tonkeeper'
         };
     } catch (e) {
         if (e instanceof Error) {
@@ -68,6 +72,7 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | st
 
 export const getTonConnectParams = async (
     request: ConnectRequest,
+    appName: string,
     protocolVersion?: number,
     clientSessionId?: string
 ): Promise<TonConnectParams> => {
@@ -78,6 +83,7 @@ export const getTonConnectParams = async (
         protocolVersion: protocolVersion ?? 2,
         request,
         clientSessionId: clientSessionId ?? (await getSecureRandomBytes(32)).toString('hex'),
+        appName,
         sessionKeyPair: {
             secretKey: keyPair.secretKey.toString('hex'),
             publicKey: keyPair.publicKey.toString('hex')
@@ -161,11 +167,12 @@ export function getBrowserPlatform(): DeviceInfo['platform'] {
 export const getDeviceInfo = (
     platform: DeviceInfo['platform'],
     appVersion: string,
-    maxMessages: number
+    maxMessages: number,
+    appName: string
 ): DeviceInfo => {
     return {
         platform: platform,
-        appName: 'Tonkeeper',
+        appName: appName,
         appVersion: appVersion,
         maxProtocolVersion: 2,
         features: [
@@ -467,7 +474,12 @@ export const saveWalletTonConnect = async (options: {
         event: 'connect',
         payload: {
             items: options.replyItems,
-            device: getDeviceInfo(getBrowserPlatform(), options.appVersion, maxMessages)
+            device: getDeviceInfo(
+                getBrowserPlatform(),
+                options.appVersion,
+                maxMessages,
+                options.params.appName
+            )
         }
     };
 };

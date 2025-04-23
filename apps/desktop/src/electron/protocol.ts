@@ -4,8 +4,17 @@ import log from 'electron-log/main';
 import { MainWindow } from './mainWindow';
 
 export const setDefaultProtocolClient = () => {
-    const protocols = ['ton', 'tc', 'tonkeeper', 'tonkeeper-tc'];
-    const isDefaultProtocolClient = protocols.every(protocol => app.isDefaultProtocolClient(protocol));
+    const protocols = [
+        'ton',
+        'tc',
+        'tonkeeper',
+        'tonkeeper-tc',
+        'tonkeeper-pro',
+        'tonkeeper-pro-tc'
+    ];
+    const isDefaultProtocolClient = protocols.every(protocol =>
+        app.isDefaultProtocolClient(protocol)
+    );
     if (!isDefaultProtocolClient) {
         protocols.forEach(protocol => app.setAsDefaultProtocolClient(protocol));
     }

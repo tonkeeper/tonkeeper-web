@@ -23,6 +23,7 @@ import {
     tonkeeperMobileTonConnectDeeplinkScheme,
     tonkeeperMobileTonDeeplinkScheme
 } from './RedirectToTonkeeperMobile';
+import { useTonTransactionNotification } from '@tonkeeper/uikit/dist/components/modals/TonTransactionNotificationControlled';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -51,6 +52,8 @@ export const DeepLinkSubscription = () => {
     const [tkMobileUrl, setTkMobileUrl] = useState<string | null>(null);
 
     const { mutateAsync, reset } = useGetConnectInfo();
+    const { onClose: closeTonTransaction } = useTonTransactionNotification();
+
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useResponseConnectionMutation();
 
@@ -86,7 +89,7 @@ export const DeepLinkSubscription = () => {
         <>
             <TonConnectNotification
                 origin={undefined}
-                params={params?.request ?? null}
+                params={params ?? null}
                 handleClose={handlerClose}
             />
             <RedirectToTonkeeperMobile
@@ -94,6 +97,8 @@ export const DeepLinkSubscription = () => {
                 onClick={confirmed => {
                     setTkMobileUrl(null);
                     if (tkMobileUrl && confirmed) {
+                        setParams(null);
+                        closeTonTransaction();
                         sdk.openPage(tkMobileUrl);
                     }
                 }}

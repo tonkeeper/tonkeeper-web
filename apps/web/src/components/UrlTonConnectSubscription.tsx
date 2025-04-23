@@ -52,7 +52,7 @@ export const UrlTonConnectSubscription = () => {
     return (
         <TonConnectNotification
             origin={undefined}
-            params={params?.request ?? null}
+            params={params ?? null}
             handleClose={handlerClose}
         />
     );

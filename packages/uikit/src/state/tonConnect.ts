@@ -107,8 +107,9 @@ export const useConnectTonConnectAppMutation = () => {
             webViewUrl?: string;
             account: Account;
             walletId: WalletId;
+            appName: string;
         }
-    >(async ({ request, manifest, webViewUrl, account, walletId }) => {
+    >(async ({ request, manifest, webViewUrl, account, walletId, appName }) => {
         const selectedIsLedger = account.type === 'ledger';
         const network = getNetworkByAccount(account);
         const api = getContextApiByNetwork(appContext, network);
@@ -118,7 +119,7 @@ export const useConnectTonConnectAppMutation = () => {
             throw new Error('Wallet not found');
         }
 
-        const params = await getTonConnectParams(request);
+        const params = await getTonConnectParams(request, appName);
 
         const result = [] as ConnectItemReply[];
 

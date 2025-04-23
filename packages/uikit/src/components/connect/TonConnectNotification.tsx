@@ -27,6 +27,7 @@ import { SelectDropDown, SelectDropDownHost, SelectField } from '../fields/Selec
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { isStandardTonWallet, WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 const Title = styled(H2)`
     text-align: center;
@@ -82,6 +83,7 @@ const ConnectContent: FC<{
     origin?: string;
     params: ConnectRequest;
     manifest: DAppManifest;
+    appName: string;
     handleClose: (
         result: {
             replyItems: TonConnectEventPayload;
@@ -90,7 +92,7 @@ const ConnectContent: FC<{
             walletId: WalletId;
         } | null
     ) => void;
-}> = ({ params, manifest, origin, handleClose }) => {
+}> = ({ params, manifest, origin, handleClose, appName }) => {
     const activeAccount = useActiveAccount();
     const [selectedAccountAndWallet, setSelectedAccountAndWallet] = useState<{
         account: Account;
@@ -120,6 +122,7 @@ const ConnectContent: FC<{
                 request: params,
                 manifest,
                 webViewUrl: origin,
+                appName,
                 ...selectedAccountAndWallet
             });
 
@@ -139,7 +142,12 @@ const ConnectContent: FC<{
                     handleClose({
                         replyItems: {
                             items: replyItems,
-                            device: getDeviceInfo(getBrowserPlatform(), sdk.version, maxMessages)
+                            device: getDeviceInfo(
+                                getBrowserPlatform(),
+                                sdk.version,
+                                maxMessages,
+                                appName
+                            )
                         },
                         manifest,
                         ...selectedAccountAndWallet
@@ -313,7 +321,7 @@ const useManifest = (params: ConnectRequest | null) => {
 
 export const TonConnectNotification: FC<{
     origin?: string;
-    params: ConnectRequest | null;
+    params: Pick<TonConnectParams, 'request' | 'appName'> | null;
     handleClose: (
         result: {
             replyItems: TonConnectEventPayload;
@@ -323,16 +331,17 @@ export const TonConnectNotification: FC<{
         } | null
     ) => void;
 }> = ({ params, origin, handleClose }) => {
-    const { data: manifest } = useManifest(params);
+    const { data: manifest } = useManifest(params?.request ?? null);
 
     const Content = useCallback(() => {
         if (!params || !manifest) return undefined;
         return (
             <ConnectContent
                 origin={origin}
-                params={params}
+                params={params.request}
                 manifest={manifest}
                 handleClose={handleClose}
+                appName={params.appName}
             />
         );
     }, [origin, params, manifest, handleClose]);

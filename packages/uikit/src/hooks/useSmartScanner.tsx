@@ -5,7 +5,7 @@ import {
     useGetConnectInfo,
     useResponseConnectionMutation
 } from '../components/connect/connectHook';
-import { ConnectItemReply, DAppManifest, TonConnectEventPayload } from "@tonkeeper/core/dist/entries/tonConnect";
+import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useRequestNotificationAnalytics } from './amplitude';
@@ -81,7 +81,7 @@ export const useSmartScanner = () => {
         NotificationComponent: (
             <TonConnectNotification
                 origin={undefined}
-                params={params?.request ?? null}
+                params={params ?? null}
                 handleClose={handlerClose}
             />
         )

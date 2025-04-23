@@ -9,6 +9,7 @@ export interface TonConnectParams {
     request: ConnectRequest;
     clientSessionId: string;
     sessionKeyPair: KeyPair;
+    appName: string;
 }
 
 export interface AccountConnection {
