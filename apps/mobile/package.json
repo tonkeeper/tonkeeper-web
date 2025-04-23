@@ -28,6 +28,7 @@
         "@capacitor/clipboard": "^6.0.1",
         "@capacitor/core": "latest",
         "@capacitor/device": "^6.0.2",
+        "@capacitor/dialog": "^7.0.1",
         "@capacitor/haptics": "^6.0.2",
         "@capacitor/ios": "^6.1.2",
         "@capacitor/network": "^7.0.0",

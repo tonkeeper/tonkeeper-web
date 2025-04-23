@@ -5,7 +5,8 @@ import {
     IAppSdk,
     InternetConnectionService,
     NotificationService,
-    BiometryService
+    BiometryService,
+    ConfirmOptions
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
@@ -19,6 +20,7 @@ import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { KeychainCapacitor } from './keychain';
+import { Dialog } from '@capacitor/dialog';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -106,6 +108,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
             await Browser.open({ url });
         }
     };
+
+    async confirm(options: ConfirmOptions) {
+        const { value } = await Dialog.confirm(options);
+        return value;
+    }
 
     version = packageJson.version ?? 'Unknown';
 

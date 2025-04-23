@@ -61,7 +61,7 @@ import { useAllChainsAssetsWithPrice } from '@tonkeeper/uikit/dist/state/home';
 import { MobileProWelcomePage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProWelcomePage';
 import { MobileProCreatePasswordPage } from '@tonkeeper/uikit/dist/mobile-pro-pages/MobileProCreatePasswordPage';
 import { useKeychainSecuritySettings } from '@tonkeeper/uikit/dist/state/password';
-import { useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveAccountQuery, useMutateDeleteAll } from '@tonkeeper/uikit/dist/state/wallet';
 import { useAtom } from '@tonkeeper/uikit/dist/libs/useAtom';
 import { ionRouterAnimation$, useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -69,6 +69,7 @@ import { MobileProPin } from '@tonkeeper/uikit/dist/components/mobile-pro/pin/Mo
 import { useTranslation } from 'react-i18next';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
+import { Button } from '@tonkeeper/uikit';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -133,8 +134,18 @@ const NarrowContentBody: FC<{
     return <NarrowContentAppRouting />;
 };
 
-const MobileProPinStyled = styled(MobileProPin)`
+const UnlockPageStyled = styled.div`
+    position: relative;
     padding-bottom: env(safe-area-inset-bottom);
+    height: 100%;
+    box-sizing: border-box;
+
+    > button {
+        z-index: 2;
+        position: absolute;
+        top: calc(1rem + env(safe-area-inset-top));
+        right: 1rem;
+    }
 `;
 
 const NarrowContentInitialPagesLock = () => {
@@ -162,21 +173,37 @@ const NarrowContentInitialPagesLock = () => {
         }
     }, [biometry]);
 
+    const { mutateAsync: mutateLogOut } = useMutateDeleteAll();
+    const onLogOut = async () => {
+        const confirmed = await sdk.confirm({
+            message: t('logout_on_unlock_many')
+        });
+
+        if (confirmed) {
+            await mutateLogOut();
+        }
+    };
+
     return (
-        <MobileProPinStyled
-            title={t('enter_password')}
-            validated={faceIdValidation}
-            onSubmit={async v => {
-                if (await sdk.keychain!.checkPassword(v)) {
-                    setTimeout(() => {
-                        sdk.uiEvents.emit('unlock');
-                    }, 200);
-                    return true;
-                } else {
-                    return false;
-                }
-            }}
-        />
+        <UnlockPageStyled>
+            <Button secondary onClick={onLogOut}>
+                {t('settings_reset')}
+            </Button>
+            <MobileProPin
+                title={t('enter_password')}
+                validated={faceIdValidation}
+                onSubmit={async v => {
+                    if (await sdk.keychain!.checkPassword(v)) {
+                        setTimeout(() => {
+                            sdk.uiEvents.emit('unlock');
+                        }, 200);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }}
+            />
+        </UnlockPageStyled>
     );
 };
 

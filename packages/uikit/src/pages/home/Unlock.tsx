@@ -92,9 +92,9 @@ const PasswordUnlock: FC<{ minHeight?: string; logOutConfirmed?: () => void }> =
     };
 
     const onLogOut = async () => {
-        const confirm = await sdk.confirm(
-            t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
-        );
+        const confirm = await sdk.confirm({
+            message: t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
+        });
         if (confirm) {
             logOutConfirmed?.();
             mutateLogOut();

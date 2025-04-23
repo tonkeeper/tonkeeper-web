@@ -144,7 +144,7 @@ export interface IAppSdk {
     uiEvents: IEventEmitter<UIEvents>;
     version: string;
 
-    confirm: (text: string) => Promise<boolean>;
+    confirm: (options: ConfirmOptions) => Promise<boolean>;
     alert: (text: string) => Promise<void>;
     prompt: (message: string, defaultValue?: string) => Promise<string | null>;
 
@@ -160,6 +160,12 @@ export interface IAppSdk {
     connectionService: InternetConnectionService;
 
     signerReturnUrl?: string;
+}
+export interface ConfirmOptions {
+    title?: string;
+    message: string;
+    okButtonTitle?: string;
+    cancelButtonTitle?: string;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -199,7 +205,9 @@ export abstract class BaseApp implements IAppSdk {
 
     isStandalone = () => false;
 
-    confirm = async (text: string) => window.confirm(text);
+    async confirm(options: ConfirmOptions) {
+        return window.confirm(options.message);
+    }
 
     alert = async (text: string) => window.alert(text);
 
