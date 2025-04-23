@@ -30,7 +30,9 @@ const useIsTonkeeperMobileInstalled = () => {
     return useQuery(
         ['isTonkeeperMobileInstalled'],
         async () => {
-            const canOpen = await DeepLink.canOpen({ url: tonkeeperMobileTonDeeplinkScheme });
+            const canOpen = await DeepLink.canOpen({
+                url: `${tonkeeperMobileTonDeeplinkScheme}://`
+            });
             return canOpen.value;
         },
         {

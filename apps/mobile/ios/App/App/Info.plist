@@ -37,6 +37,8 @@
         <string>tonsign</string>
         <string>tonkeeper</string>
         <string>tonkeeperx</string>
+        <string>tonkeeper-mob</string>
+        <string>tonkeeper-mob-tc</string>
     </array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>

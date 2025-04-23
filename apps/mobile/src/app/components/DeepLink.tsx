@@ -18,7 +18,11 @@ import { useParseAndAddSigner } from '@tonkeeper/uikit/dist/state/wallet';
 import { useRenameNotification } from '@tonkeeper/uikit/dist/components/modals/RenameNotificationControlled';
 import { closeNotification } from '@tonkeeper/uikit/dist/components/Notification';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { RedirectToTonkeeperMobile } from './RedirectToTonkeeperMobile';
+import {
+    RedirectToTonkeeperMobile,
+    tonkeeperMobileTonConnectDeeplinkScheme,
+    tonkeeperMobileTonDeeplinkScheme
+} from './RedirectToTonkeeperMobile';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -72,7 +76,7 @@ export const DeepLinkSubscription = () => {
     useEffect(() => {
         return subscribeToTonOrTonConnectUrlOpened(async (url: string) => {
             reset();
-            // setTkMobileUrl(modifyLinkScheme(url)); TODO enable once tk mobile is ready
+            setTkMobileUrl(modifyLinkScheme(url));
             setTimeout(() => setTkMobileUrl(null), 3000);
             setParams(await mutateAsync(url));
         });
@@ -98,10 +102,9 @@ export const DeepLinkSubscription = () => {
     );
 };
 
-/*
 const modifyLinkScheme = (link: string) => {
     try {
-        const [protocol, body] = link.split('://')[0];
+        const [protocol, body] = link.split('://');
         switch (protocol) {
             case 'tonkeeper':
             case 'ton':
@@ -128,4 +131,3 @@ const modifyLinkScheme = (link: string) => {
         return null;
     }
 };
-*/
