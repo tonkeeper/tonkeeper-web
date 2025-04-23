@@ -60,7 +60,10 @@ const useMutateUnlock = () => {
     });
 };
 
-export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
+const PasswordUnlock: FC<{ minHeight?: string; logOutConfirmed?: () => void }> = ({
+    minHeight,
+    logOutConfirmed
+}) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const wallets = useAccountsState();
@@ -93,6 +96,7 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
             t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
         );
         if (confirm) {
+            logOutConfirmed?.();
             mutateLogOut();
         }
     };
@@ -150,19 +154,20 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
 export const Unlock = () => {
     const isPasswordSet = useIsPasswordSet();
     const { password: keychainPassword } = useKeychainSecuritySettings();
+    const canUnlock = useRef(true);
 
     const { mutate } = useMutateLookScreen();
     const sdk = useAppSdk();
 
     useEffect(() => {
-        if (!isPasswordSet && !keychainPassword) {
+        if (!isPasswordSet && !keychainPassword && canUnlock.current) {
             mutate(false);
             sdk.uiEvents.emit('unlock');
         }
     }, [isPasswordSet, keychainPassword, mutate]);
 
     if (isPasswordSet || keychainPassword) {
-        return <PasswordUnlock />;
+        return <PasswordUnlock logOutConfirmed={() => (canUnlock.current = false)} />;
     } else {
         return null;
     }
