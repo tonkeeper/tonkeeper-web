@@ -53,7 +53,7 @@ const tonReConnectResponse = async (origin: string): Promise<TonConnectEventPayl
 
     return {
         items,
-        device: getDeviceInfo(getTonConnectPlatform(os), version, maxMessages)
+        device: getDeviceInfo(getTonConnectPlatform(os), version, maxMessages, 'tonkeeper')
     };
 };
 
