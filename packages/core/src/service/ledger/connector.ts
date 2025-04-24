@@ -91,6 +91,12 @@ const isLedgerTonAppReady = async (tonTransport: TonTransport) => {
 };
 
 export const waitLedgerTonAppReady = (tonTransport: TonTransport) => {
+    /**
+     * library bug: calling requests multiplie times in a short time when app is not open will lead to inconsistent subscriptions cache inside library
+     */
+    if (tonTransport.transport instanceof TransportWebBLE) {
+        return tonTransport.isAppOpen();
+    }
     return withDeadline(isLedgerTonAppReady(tonTransport), openTonAppTimeout);
 };
 
