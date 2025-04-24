@@ -8,7 +8,7 @@ import { WalletSignerIcon } from '../../components/create/WalletIcons';
 import { AddWalletContext } from '../../components/create/AddWalletContext';
 import { useSetNotificationOnBack } from '../../components/Notification';
 import { useParseAndAddSigner } from '../../state/wallet';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
 
 const IconBlock = styled.div`
@@ -35,8 +35,12 @@ export const CreateSignerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         },
         [reset, mutateAsync, afterCompleted]
     );
+    const env = useAppTargetEnv();
 
-    const openScanner = useScanner(Date.now(), onSubmit);
+    const openScanner = useScanner(
+        env === 'mobile' || env === 'tablet' ? null : Date.now(),
+        onSubmit
+    );
 
     const { navigateHome } = useContext(AddWalletContext);
     useSetNotificationOnBack(navigateHome);
