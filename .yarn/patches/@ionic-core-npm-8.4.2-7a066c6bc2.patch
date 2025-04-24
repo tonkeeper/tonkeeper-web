@@ -1,5 +1,5 @@
 diff --git a/components/swipe-back.js b/components/swipe-back.js
-index 88ba82f43cd98120200fee821db26ddfc410a44a..6a0eb490c824f4696c51f748009c4e83cbe338fb 100644
+index 88ba82f43cd98120200fee821db26ddfc410a44a..5c47828dfff5c9746dadcc44e2249fe0a425da3b 100644
 --- a/components/swipe-back.js
 +++ b/components/swipe-back.js
 @@ -14,7 +14,7 @@ const createSwipeBackGesture = (el, canStartHandler, onStartHandler, onMoveHandl
@@ -7,7 +7,7 @@ index 88ba82f43cd98120200fee821db26ddfc410a44a..6a0eb490c824f4696c51f748009c4e83
       */
      const isAtEdge = (detail) => {
 -        const threshold = 50;
-+        const threshold =win.innerWidth - 50; 50;
++        const threshold = win.innerWidth - 50;
          const { startX } = detail;
          if (rtl) {
              return startX >= win.innerWidth - threshold;
