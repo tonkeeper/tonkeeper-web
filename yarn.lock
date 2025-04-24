@@ -4199,12 +4199,12 @@ __metadata:
 
 "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch":
   version: 8.4.2
-  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch::version=8.4.2&hash=fc75e0"
+  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch::version=8.4.2&hash=99b2b7"
   dependencies:
     "@stencil/core": "npm:4.20.0"
     ionicons: "npm:^7.2.2"
     tslib: "npm:^2.1.0"
-  checksum: 10/49fb6e3927ebd8e1a55a33ab0c876aedced0828507b640f8f576f94b15d463ee60fcd83f2fead170b401cae312dff0000885f484a898251e5288dbcb37d46c35
+  checksum: 10/55906c6f03b5da53e3f9806cf80619e08ebadd82a86486fb4180b4fde7f09b7d91688c199d6983b5b544ff1a217bf5c4087c4b22723e93121e23f89ab35b05e4
   languageName: node
   linkType: hard
 
@@ -30780,5 +30780,3 @@ __metadata:
   checksum: 10/28a1bebacab3bc60150b6b0a2ba1db2ad033f068e81f05e4892ec0ea13ae63f5d140a1d692062ac0657840c8da076f35b94433b5f1c329d7803b247de80f064a
   languageName: node
   linkType: hard
-
-# CD Cache reset ionic/core patch
