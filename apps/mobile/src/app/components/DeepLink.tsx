@@ -80,7 +80,7 @@ export const DeepLinkSubscription = () => {
         return subscribeToTonOrTonConnectUrlOpened(async (url: string) => {
             reset();
             setTkMobileUrl(modifyLinkScheme(url));
-            setTimeout(() => setTkMobileUrl(null), 3000);
+            setTimeout(() => setTkMobileUrl(null), 5000);
             setParams(await mutateAsync(url));
         });
     }, []);
