@@ -185,7 +185,7 @@ export class Tonendpoint {
     };
 
     country = async (): Promise<CountryIP> => {
-        const response = await this.fetchApi(`https://boot.tonkeeper.com/my/ip`, {
+        const response = await this.fetchApi('https://boot.tonkeeper.com/my/ip', {
             method: 'GET'
         });
 

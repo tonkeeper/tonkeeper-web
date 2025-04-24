@@ -27,6 +27,7 @@ import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHom
 import { HideOnReview } from '../components/ios/HideOnReview';
 import { PullToRefresh } from '../components/mobile-pro/PullToRefresh';
 import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/DesktopViewLayout';
+import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFARecoveryStartedBanner';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -76,6 +77,14 @@ const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
     }
 `;
 
+const TwoFARecoveryStartedBannerStyled = styled(TwoFARecoveryStartedBanner)`
+    margin: 0 8px -8px;
+`;
+
+const BannerPadding = styled.div`
+    height: 16px;
+`;
+
 export const MobileProHomePage = () => {
     const { t } = useTranslation();
     const isReadOnly = useIsActiveWalletWatchOnly();
@@ -90,6 +99,9 @@ export const MobileProHomePage = () => {
         <DesktopViewPageLayout id={mobileProHomePageId}>
             <DesktopViewHeaderStyled mobileTranslucent={false} />
             <PullToRefresh invalidate={account.id} />
+            <TwoFARecoveryStartedBannerStyled>
+                <BannerPadding />
+            </TwoFARecoveryStartedBannerStyled>
             <MobileProHomeBalance />
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />

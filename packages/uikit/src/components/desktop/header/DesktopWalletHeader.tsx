@@ -9,21 +9,18 @@ import {
     useIsActiveWalletWatchOnly
 } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { ArrowDownIcon, ArrowUpIcon, ExclamationMarkTriangleIcon, PlusIconSmall } from '../../Icon';
+import { ArrowDownIcon, ArrowUpIcon, PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
 import { Link } from 'react-router-dom';
-import { AppProRoute, AppRoute, WalletSettingsRoute } from '../../../libs/routes';
+import { AppProRoute } from '../../../libs/routes';
 import { useWalletTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
 import { useSendTransferNotification } from '../../modals/useSendTransferNotification';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { BorderSmallResponsive } from '../../shared/Styles';
-import { hexToRGBA } from '../../../libs/css';
-import { Label2 } from '../../Text';
-import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
+import { TwoFARecoveryStartedBanner } from '../../settings/two-fa/TwoFARecoveryStartedBanner';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -58,24 +55,6 @@ const LinkStyled = styled(Link)`
     text-decoration: unset;
 `;
 
-const TwoFARecoveryStarted = styled(Link)`
-    text-decoration: unset;
-    box-sizing: border-box;
-    min-height: 36px;
-    ${BorderSmallResponsive};
-    background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
-    color: ${p => p.theme.accentOrange};
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    transition: background-color 0.1s ease-in;
-
-    &:hover {
-        background-color: ${p => hexToRGBA(p.theme.accentOrange, 0.2)};
-    }
-`;
-
 const DesktopWalletHeaderPayload = () => {
     usePreFetchRates();
     const { data: balance, isLoading } = useWalletTotalBalance();
@@ -86,18 +65,12 @@ const DesktopWalletHeaderPayload = () => {
     const activeWallet = useActiveWallet();
     const { onOpen: sendTransfer } = useSendTransferNotification();
     const network = useActiveTonNetwork();
-    const { data: twoFAConfig } = useTwoFAWalletConfig();
 
     return (
         <DesktopHeaderContainer>
             <DesktopLeftPart>
                 <DesktopHeaderBalance isLoading={isLoading} balance={balance} network={network} />
-                {twoFAConfig?.status === 'disabling' && (
-                    <TwoFARecoveryStarted to={AppRoute.walletSettings + WalletSettingsRoute.twoFa}>
-                        <ExclamationMarkTriangleIcon />
-                        <Label2>{t('wallet_2fa_recovery_started')}</Label2>
-                    </TwoFARecoveryStarted>
-                )}
+                <TwoFARecoveryStartedBanner />
             </DesktopLeftPart>
             <DesktopRightPart>
                 <ButtonsContainer>
