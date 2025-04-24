@@ -151,3 +151,9 @@ async function connectWebBLE() {
 
     throw new Error('Failed to connect to Ledger with Bluetooth');
 }
+
+export async function cleanupTransport(transport: Transport) {
+    if (transport instanceof TransportWebBLE) {
+        await TransportWebBLE.disconnect(transport.id);
+    }
+}

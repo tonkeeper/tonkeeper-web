@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+    cleanupTransport,
     connectLedger,
-    isTransportReady,
     LedgerTonTransport,
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
@@ -26,7 +26,7 @@ export type LedgerAccount = {
 
 type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
 
-const _tonTransport: LedgerTonTransport | null = null;
+let _tonTransport: LedgerTonTransport | null = null;
 
 export const useLedgerConnectionType = () => {
     const env = useAppTargetEnv();
@@ -41,12 +41,15 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
     const mutation = useMutation<LedgerTonTransport, Error>(async () => {
         setIsDeviceConnected(false);
 
-        let transport: LedgerTonTransport;
-        if (_tonTransport && isTransportReady(_tonTransport)) {
-            transport = _tonTransport;
-        } else {
-            transport = await connectLedger(connectionType);
+        if (_tonTransport) {
+            try {
+                await cleanupTransport(_tonTransport.transport);
+                _tonTransport = null;
+            } catch (e) {
+                console.error(e);
+            }
         }
+        const transport = await connectLedger(connectionType);
 
         setIsDeviceConnected(true);
 
@@ -55,6 +58,7 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
             throw new Error('TON App is not opened');
         }
 
+        _tonTransport = transport;
         return transport;
     });
 
