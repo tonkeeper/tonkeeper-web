@@ -568,6 +568,7 @@ const TronTopUpUSDTWrapper = styled.div`
     ${BorderSmallResponsive};
     padding: 16px 14px;
     display: flex;
+    gap: 8px;
     align-items: center;
     justify-content: space-between;
     margin: 16px;
@@ -614,7 +615,10 @@ const TronUseBatteryBanner = () => {
                     <Label2>{t('tron_battery_required_banner_title')}</Label2>
                     <Body2>{t('tron_battery_required_banner_description')}</Body2>
                 </TextContainer>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+                <LinkStyled
+                    to={AppRoute.walletSettings + WalletSettingsRoute.battery}
+                    replace={false}
+                >
                     <Button primary size="small">
                         {t('tron_battery_required_banner_button')}
                     </Button>
