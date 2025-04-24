@@ -12,9 +12,13 @@ export const useMenuController = (type: 'aside-nav' | 'wallet-nav') => {
 
         menu?.addEventListener('ionWillOpen', onMenuOpened);
         menu?.addEventListener('ionWillClose', onMenuClosed);
+        menu?.addEventListener('ionDidOpen', onMenuOpened);
+        menu?.addEventListener('ionDidClose', onMenuClosed);
         return () => {
             menu?.removeEventListener('ionWillOpen', onMenuOpened);
             menu?.removeEventListener('ionWillClose', onMenuClosed);
+            menu?.removeEventListener('ionDidOpen', onMenuOpened);
+            menu?.removeEventListener('ionDidClose', onMenuClosed);
         };
     }, []);
 
