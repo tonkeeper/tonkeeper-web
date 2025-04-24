@@ -1,5 +1,5 @@
 diff --git a/components/swipe-back.js b/components/swipe-back.js
-index 88ba82f43cd98120200fee821db26ddfc410a44a..46ab4f93a70ef83014ba7ac9c8dfa2f10d499ac4 100644
+index 88ba82f43cd98120200fee821db26ddfc410a44a..5c47828dfff5c9746dadcc44e2249fe0a425da3b 100644
 --- a/components/swipe-back.js
 +++ b/components/swipe-back.js
 @@ -14,7 +14,7 @@ const createSwipeBackGesture = (el, canStartHandler, onStartHandler, onMoveHandl

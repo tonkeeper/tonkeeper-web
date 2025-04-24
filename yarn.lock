@@ -4199,7 +4199,7 @@ __metadata:
 
 "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch":
   version: 8.4.2
-  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch::version=8.4.2&hash=7aef17"
+  resolution: "@ionic/core@patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch::version=8.4.2&hash=fc75e0"
   dependencies:
     "@stencil/core": "npm:4.20.0"
     ionicons: "npm:^7.2.2"
