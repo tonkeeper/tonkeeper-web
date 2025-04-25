@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
-import { useAppSdk } from '../../hooks/appSdk';
+import { useAppSdk, useIsCapacitorApp } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
@@ -100,8 +100,9 @@ const ReviewerSettings = () => {
     const { mutate, isLoading } = useMutateEnableReviewerMode();
     const isOnReview = useIsOnIosReview();
     const { mainnetConfig } = useAppContext();
+    const isCapacitor = useIsCapacitorApp();
 
-    if (mainnetConfig.tablet_enable_additional_security) {
+    if (!isCapacitor || mainnetConfig.tablet_enable_additional_security) {
         return null;
     }
 

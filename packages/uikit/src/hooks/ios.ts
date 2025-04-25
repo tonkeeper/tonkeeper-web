@@ -1,7 +1,7 @@
 import { useAppContext } from './appContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
-import { useAppSdk } from './appSdk';
+import { useAppSdk, useIsCapacitorApp } from './appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 export function openIosKeyboard(keyboard: string, type = 'text', timerSeconds = 30) {
@@ -28,10 +28,14 @@ export function hideIosKeyboard() {
 export const useIsOnIosReviewQuery = () => {
     const { mainnetConfig } = useAppContext();
     const sdk = useAppSdk();
+    const isCapacitor = useIsCapacitorApp();
 
     return useQuery(
-        [QueryKey.isOnReview],
+        [QueryKey.isOnReview, mainnetConfig.tablet_enable_additional_security, isCapacitor],
         async () => {
+            if (!isCapacitor) {
+                return false;
+            }
             const localFlag =
                 (await sdk.storage.get<boolean>(AppKey.ENABLE_REVIEWER_MODE)) === true;
             const remoteFlag = Boolean(mainnetConfig.tablet_enable_additional_security);
