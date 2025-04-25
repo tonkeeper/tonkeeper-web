@@ -84,10 +84,8 @@ export const MultisigConfigForm: FC<{
     const accounts = useAccountsState();
 
     let activeWallet = activeAccount.activeTonWallet;
-    if (activeAccount.type === 'watch-only' || activeAccount.type === 'ton-multisig') {
-        activeWallet = accounts.find(
-            acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
-        )!.activeTonWallet;
+    if (!isAccountCanManageMultisigs(activeAccount)) {
+        activeWallet = accounts.find(acc => isAccountCanManageMultisigs(acc))!.activeTonWallet;
     }
 
     const context = useFormContext<MultisigUseForm>();

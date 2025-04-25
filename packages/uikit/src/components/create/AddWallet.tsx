@@ -5,7 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { Body2, Body3Class, Label1, Label2Class } from '../Text';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { Badge } from '../shared';
-import { useAccountsState } from '../../state/wallet';
+import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import {
     WalletImportIcon,
     WalletKeystoneIcon,
@@ -21,6 +21,7 @@ import { HideOnReview } from '../ios/HideOnReview';
 import { useProState } from '../../state/pro';
 import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useSecurityCheck } from '../../state/password';
+import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 
 const AddMethod = styled.button`
     display: flex;
@@ -108,9 +109,9 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     const accounts = useAccountsState();
-    const canAddMultisig = accounts.some(
-        acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
-    );
+    const activeAccount = useActiveAccount();
+    const canAddMultisig =
+        accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount.type !== 'testnet';
 
     const { data: pro } = useProState();
     const { mutateAsync: securityCheck } = useSecurityCheck();
