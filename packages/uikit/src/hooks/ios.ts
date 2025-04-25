@@ -25,23 +25,14 @@ export function hideIosKeyboard() {
     }
 }
 
-export const useIsOnIosReviewQuery = () => {
+export const useIsReviewerModeEnabled = () => {
     const { mainnetConfig } = useAppContext();
     const sdk = useAppSdk();
     const isCapacitor = useIsCapacitorApp();
 
     return useQuery(
         [QueryKey.isOnReview, mainnetConfig.tablet_enable_additional_security, isCapacitor],
-        async () => {
-            if (!isCapacitor) {
-                return false;
-            }
-            const localFlag =
-                (await sdk.storage.get<boolean>(AppKey.ENABLE_REVIEWER_MODE)) === true;
-            const remoteFlag = Boolean(mainnetConfig.tablet_enable_additional_security);
-
-            return localFlag || remoteFlag;
-        },
+        async () => (await sdk.storage.get<boolean>(AppKey.ENABLE_REVIEWER_MODE)) === true,
         {
             keepPreviousData: true
         }
@@ -58,10 +49,16 @@ export const useMutateEnableReviewerMode = () => {
 };
 
 export const useIsOnIosReview = () => {
-    const { data } = useIsOnIosReviewQuery();
-    if (data === undefined) {
-        throw new Error('Missing data');
+    const { data } = useIsReviewerModeEnabled();
+    const { mainnetConfig } = useAppContext();
+    const isCapacitor = useIsCapacitorApp();
+
+    if (!isCapacitor) {
+        return false;
     }
 
-    return data;
+    const localFlag = data === true;
+    const remoteFlag = Boolean(mainnetConfig.tablet_enable_additional_security);
+
+    return localFlag || remoteFlag;
 };
