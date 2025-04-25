@@ -52,13 +52,6 @@ export const useToggleIsTronEnabledForActiveWallet = () => {
     });
 };
 
-export const useHighlightTronFeatureForActiveWallet = () => {
-    const canUseTron = useCanUseTronForActiveWallet();
-    const globalPreferences = useGlobalPreferences();
-
-    return canUseTron && globalPreferences.highlightFeatures.tron;
-};
-
 export const useAutoMarkTronFeatureAsSeen = () => {
     const { mutate } = useMutateGlobalPreferences();
     const globalPreferences = useGlobalPreferences();

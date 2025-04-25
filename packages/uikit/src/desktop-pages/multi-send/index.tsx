@@ -9,7 +9,7 @@ import { useRate } from '../../state/rates';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
@@ -109,6 +109,7 @@ const DesktopBackButtonStyled = styled(DesktopBackButton)`
 
 export const DesktopMultiSendPage: FC = () => {
     const { t } = useTranslation();
+    const { path } = useRouteMatch();
     const { data: lists } = useUserMultiSendLists();
     const navigate = useNavigate();
     const { isOpen, onClose, onOpen } = useDisclosure();
@@ -148,7 +149,7 @@ export const DesktopMultiSendPage: FC = () => {
 
     return (
         <Switch>
-            <Route path="/list/:id" component={ListRouteElement} />
+            <Route path={path + '/list/:id'} component={ListRouteElement} />
             <Route path="*">
                 <ErrorBoundary
                     fallbackRender={fallbackRenderOver('Failed to display multi-send page')}

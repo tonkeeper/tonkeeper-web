@@ -11,3 +11,8 @@ export const useAppTargetEnv = () => {
     const sdk = useAppSdk();
     return sdk.targetEnv;
 };
+
+export const useIsCapacitorApp = () => {
+    const env = useAppTargetEnv();
+    return env === 'mobile' || env === 'tablet';
+};

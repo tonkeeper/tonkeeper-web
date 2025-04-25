@@ -9,7 +9,6 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { AppProRoute, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
 import { AsideMenu } from '@tonkeeper/uikit/dist/components/desktop/aside/AsideMenu';
-import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
@@ -36,6 +35,7 @@ import { PullToRefresh } from '../components/PullToRefresh';
 import { useQueryClient } from '@tanstack/react-query';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
+import { Navigate } from '@tonkeeper/uikit/dist/components/shared/Navigate';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -147,7 +147,9 @@ export const WideContent: FC<{
             <AsideMenu />
             <WideContentStyled>
                 <Switch>
-                    <Route path={AppProRoute.dashboard} component={DashboardPage} />
+                    <Route path={AppProRoute.dashboard}>
+                        <Navigate to={AppRoute.home} replace />
+                    </Route>
                     <Route path={AppRoute.browser} component={DesktopBrowser} />
                     <Route path={AppRoute.settings} component={PreferencesContent} />
                     <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />

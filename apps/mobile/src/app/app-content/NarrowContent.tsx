@@ -11,7 +11,6 @@ import {
     SettingsRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
-import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
@@ -258,7 +257,9 @@ const NarrowContentAppRouting = () => {
                         <MobileProWalletMenu />
                         {/* Ionic doesn't support nested routing well */}
                         <IonRouterOutlet id="main-content" animated={animated}>
-                            <Route path={AppProRoute.dashboard} component={DashboardPage} />
+                            <Route path={AppProRoute.dashboard}>
+                                <Navigate replace to={AppRoute.home} />
+                            </Route>
                             <Route path={AppRoute.browser} component={DesktopBrowser} />
                             <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
                             <Route

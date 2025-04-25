@@ -31,7 +31,7 @@ import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
+import { ForTargetEnv, NotForCapacitorApp, NotForTargetEnv } from "../../shared/TargetEnv";
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -121,7 +121,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         )}
                     </NavLink>
                 )}
-                <NotForTargetEnv env="mobile">
+                <NotForCapacitorApp>
                     <HideOnReview>
                         <NavLink to={AppRoute.settings + SettingsRoute.pro}>
                             {({ isActive }) => (

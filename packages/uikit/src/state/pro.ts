@@ -21,7 +21,7 @@ import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
-import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
+import { useAppSdk, useIsCapacitorApp } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
@@ -45,11 +45,11 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const appPlatform = useAppTargetEnv();
+    const isCapacitorApp = useIsCapacitorApp();
     const storage = useAppSdk().storage;
 
     return useMemo(() => {
-        if (appPlatform === 'tablet' || appPlatform === 'mobile') {
+        if (isCapacitorApp) {
             return {
                 async attachToken() {
                     const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
@@ -70,19 +70,19 @@ export const useProAuthTokenService = (): ProAuthTokenService => {
                 }
             };
         }
-    }, [appPlatform]);
+    }, [isCapacitorApp]);
 };
 
 export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
-    const env = useAppTargetEnv();
+    const isCapacitorApp = useIsCapacitorApp();
 
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
         let state: ProState;
 
-        if (env === 'mobile') {
+        if (isCapacitorApp) {
             state = {
                 authorizedWallet: null,
                 subscription: {

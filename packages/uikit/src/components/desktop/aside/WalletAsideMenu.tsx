@@ -42,7 +42,6 @@ import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
-import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
 import { HideForRegulatoryState } from '../../HideForState';
 import { CountryFeature } from '../../../state/country';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
@@ -95,16 +94,6 @@ const GroupsGap = styled.div`
     height: 1rem;
 `;
 
-const HighlightedIcon = styled.div`
-    width: 8px;
-    height: 8px;
-    background-color: ${p => p.theme.accentRed};
-    border-radius: ${p => p.theme.cornerFull};
-    position: absolute;
-    right: 10px;
-    top: calc(50% - 4px);
-`;
-
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
@@ -128,7 +117,6 @@ export const WalletAsideMenu = () => {
         menuController.close();
     }, [location]);
 
-    const highlightTron = useHighlightTronFeatureForActiveWallet();
     const { onScan, NotificationComponent } = useSmartScanner();
     const withCloseMenu = (callback: (e: React.MouseEvent<HTMLDivElement>) => void) => {
         return (e: React.MouseEvent<HTMLDivElement>) => {
@@ -259,7 +247,6 @@ export const WalletAsideMenu = () => {
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
-                        {highlightTron && <HighlightedIcon />}
                     </AsideMenuItemStyled>
                 )}
             </NavLink>

@@ -21,7 +21,7 @@ import {
 import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
-import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { useAppTargetEnv, useIsCapacitorApp } from '../../../hooks/appSdk';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -141,6 +141,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
     const env = useAppTargetEnv();
+    const isCapacitorApp = useIsCapacitorApp();
 
     const onRefresh = () => {
         if (rotate) {
@@ -180,7 +181,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         }
     }
 
-    if (env === 'mobile') {
+    if (isCapacitorApp) {
         if (!data) {
             return null;
         }
