@@ -5,7 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { Body2, Body3Class, Label1, Label2Class } from '../Text';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { Badge } from '../shared';
-import { useAccountsState, useActiveAccount } from '../../state/wallet';
+import { useAccountsState, useActiveAccountQuery } from '../../state/wallet';
 import {
     WalletImportIcon,
     WalletKeystoneIcon,
@@ -109,9 +109,9 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     const accounts = useAccountsState();
-    const activeAccount = useActiveAccount();
+    const { data: activeAccount } = useActiveAccountQuery();
     const canAddMultisig =
-        accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount.type !== 'testnet';
+        accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount?.type !== 'testnet';
 
     const { data: pro } = useProState();
     const { mutateAsync: securityCheck } = useSecurityCheck();
