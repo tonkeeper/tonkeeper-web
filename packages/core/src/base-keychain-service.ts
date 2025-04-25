@@ -49,15 +49,15 @@ export abstract class BaseKeychainService {
     }
 
     securityCheck = async (type?: 'biometry' | 'password' | 'preferred') => {
-        if (type === 'biometry') {
-            return this.securityCheckTouchId();
-        } else if (type === 'password') {
-            return this.securityCheckPassword();
-        }
-
         const state = await this.loadState();
-        if (state.biometryEnabled) {
-            return this.securityCheckTouchId();
+
+        if (state.biometryEnabled || type === 'biometry') {
+            try {
+                await this.securityCheckTouchId();
+                return;
+            } catch (e) {
+                console.error('Biometry authentication failed', e);
+            }
         }
 
         return this.securityCheckPassword();

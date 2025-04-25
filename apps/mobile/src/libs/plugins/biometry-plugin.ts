@@ -13,7 +13,13 @@ export const Biometric = registerPlugin<BiometricPlugin>('Biometric', {
                 return { isAvailable: true };
             },
             async prompt(reason: string) {
-                return Promise.resolve(confirm(reason));
+                return new Promise<void>((res, rej) => {
+                    if (confirm(reason)) {
+                        res();
+                    } else {
+                        rej();
+                    }
+                });
             }
         };
     }
