@@ -53,5 +53,7 @@ export enum AppKey {
 
     NOTIFICATIONS = 'notifications',
 
-    KEYCHAIN_SETTINGS = 'keychain_settings'
+    KEYCHAIN_SETTINGS = 'keychain_settings',
+
+    ENABLE_REVIEWER_MODE = 'ENABLE_REVIEWER_MODE'
 }

@@ -6,7 +6,13 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { ListBlock, ListItemElement } from '../../components/List';
+import {
+    ListBlock,
+    ListBlockDesktopAdaptive,
+    ListItem,
+    ListItemElement,
+    ListItemPayload
+} from '../../components/List';
 import styled from 'styled-components';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
@@ -21,6 +27,10 @@ import { AddWalletContext } from '../../components/create/AddWalletContext';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
 import { Notification } from '../../components/Notification';
 import { useSecurityCheck } from '../../state/password';
+import { Label1 } from '../../components/Text';
+import { Switch } from '../../components/fields/Switch';
+import { useIsOnIosReview, useMutateEnableReviewerMode } from '../../hooks/ios';
+import { useAppContext } from '../../hooks/appContext';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -86,6 +96,27 @@ const AddAccountBySK = () => {
     );
 };
 
+const ReviewerSettings = () => {
+    const { mutate, isLoading } = useMutateEnableReviewerMode();
+    const isOnReview = useIsOnIosReview();
+    const { mainnetConfig } = useAppContext();
+
+    if (mainnetConfig.tablet_enable_additional_security) {
+        return null;
+    }
+
+    return (
+        <ListBlockDesktopAdaptive>
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <Label1>Enable extra security</Label1>
+                    <Switch checked={isOnReview} onChange={mutate} disabled={isLoading} />
+                </ListItemPayload>
+            </ListItem>
+        </ListBlockDesktopAdaptive>
+    );
+};
+
 const DesktopWrapper = styled(DesktopViewPageLayout)`
     ${ListBlock} {
         margin-bottom: 0;
@@ -109,6 +140,7 @@ export const DevSettings = React.memo(() => {
                 </ForTargetEnv>
                 <CookieSettings />
                 <AddAccountBySK />
+                <ReviewerSettings />
             </DesktopWrapper>
         );
     }

@@ -73,7 +73,8 @@ export enum QueryKey {
     twoFAWalletConfig = 'twoFAWalletConfig',
     twoFAActivationProcess = 'twoFAActivationProcess',
     twoFARemovingProcess = 'twoFARemovingProcess',
-    twoFACancellRecoveryProcess = 'twoFARemovingProcess'
+    twoFACancellRecoveryProcess = 'twoFARemovingProcess',
+    isOnReview = 'isOnReview'
 }
 
 export enum JettonKey {
