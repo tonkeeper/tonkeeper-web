@@ -56,7 +56,8 @@ export const useBatteryServiceConfigQuery = () => {
             return new DefaultApi(batteryApi).getConfig();
         },
         {
-            keepPreviousData: true
+            keepPreviousData: true,
+            suspense: true
         }
     );
 };

@@ -34,7 +34,8 @@ export const useIsReviewerModeEnabled = () => {
         [QueryKey.isOnReview, mainnetConfig.tablet_enable_additional_security, isCapacitor],
         async () => (await sdk.storage.get<boolean>(AppKey.ENABLE_REVIEWER_MODE)) === true,
         {
-            keepPreviousData: true
+            keepPreviousData: true,
+            suspense: true
         }
     );
 };
