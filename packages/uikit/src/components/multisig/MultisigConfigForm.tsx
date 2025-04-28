@@ -416,6 +416,7 @@ const QuorumInput = () => {
         control,
         watch,
         trigger,
+        setValue,
         formState: { isSubmitted }
     } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
@@ -430,6 +431,12 @@ const QuorumInput = () => {
             trigger('quorum');
         }
     }, [trigger, totalSignersNumber, isSubmitted]);
+
+    useEffect(() => {
+        if (selectedSignersNumber > totalSignersNumber) {
+            setValue('quorum', totalSignersNumber);
+        }
+    }, [totalSignersNumber, selectedSignersNumber]);
 
     return (
         <QuorumAndDeadlineInputsContainer>
