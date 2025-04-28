@@ -16,12 +16,12 @@ export const useNavigate = () => {
             path: string | -1,
             options: { relative?: 'path'; replace?: boolean; disableMobileAnimation?: boolean } = {}
         ) => {
-            if (typeof path === 'string' && path.startsWith('.')) {
+            if (typeof path === 'string' && path.startsWith('.') && path !== '../') {
                 options.relative = 'path';
                 path = path.slice(1);
             }
 
-            if (path === -1) {
+            if (path === -1 || path === '../') {
                 if (ionRouter.routeInfo !== undefined) {
                     ionRouter.goBack();
                 } else {
