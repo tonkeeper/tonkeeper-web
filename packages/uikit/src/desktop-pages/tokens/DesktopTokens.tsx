@@ -98,6 +98,11 @@ const Divider = styled.div`
     width: calc(100% + 32px);
 `;
 
+const DividerInner = styled(Divider)`
+    width: 100%;
+    margin: 0;
+`;
+
 const DesktopTokensPayload = () => {
     const { assets: allAssets } = useAllChainsAssets() ?? [];
     const [tonAssetAmount, assets] = useMemo(() => {
@@ -240,7 +245,7 @@ const DesktopTokensPayload = () => {
                                     )}
                                 >
                                     <AnyChainAssetStyled balance={assets[virtualRow.index]} />
-                                    <Divider />
+                                    <DividerInner />
                                 </ErrorBoundary>
                             </div>
                         ))}
