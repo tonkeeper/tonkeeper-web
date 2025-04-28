@@ -47,7 +47,7 @@ const SettingsRouter = () => {
             <Route path={path + WalletSettingsRoute.derivations} component={MAMIndexesPage} />
             <Route path={path + WalletSettingsRoute.battery} component={BatteryPage} />
             <Route path={path + WalletSettingsRoute.twoFa} component={TwoFAPage} />
-            <Route path={WalletSettingsRoute.chains} component={ChainsPage} />
+            <Route path={path + WalletSettingsRoute.chains} component={ChainsPage} />
             <Route
                 path="*"
                 render={() => (
