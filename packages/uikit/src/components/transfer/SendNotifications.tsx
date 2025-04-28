@@ -180,9 +180,6 @@ const SendContent: FC<{
             comment: text ?? '',
             done
         });
-        if (done) {
-            setView('amount');
-        }
     };
 
     const processJetton = useCallback(
