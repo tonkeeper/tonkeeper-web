@@ -250,42 +250,6 @@ class WebKeyboardService implements KeyboardService {
     public didHide = new Subject<void>();
 
     public willHide = new Subject<void>();
-
-    private readonly initialHeight: number = 0;
-
-    private isOpen = false;
-
-    private readonly handleResize = () => {
-        const currentHeight = window.visualViewport?.height || window.innerHeight;
-
-        if (this.initialHeight - currentHeight > 100) {
-            if (this.isOpen) return;
-            this.isOpen = true;
-            this.willShow.next({ keyboardHeight: this.initialHeight - currentHeight });
-            this.didShow.next({ keyboardHeight: this.initialHeight - currentHeight });
-        } else {
-            if (!this.isOpen) return;
-            this.isOpen = false;
-            this.willHide.next();
-            this.didHide.next();
-        }
-    };
-
-    private hasTouchScreen() {
-        const win = getWindow();
-        if (!win || typeof navigator === 'undefined') return false;
-        return 'ontouchstart' in win || navigator.maxTouchPoints > 0;
-    }
-
-    constructor() {
-        const win = getWindow();
-        if (!win || !this.hasTouchScreen()) return;
-
-        this.initialHeight = win.innerHeight;
-
-        win.addEventListener('resize', this.handleResize);
-        win.visualViewport?.addEventListener('resize', this.handleResize);
-    }
 }
 
 class WebConnectionService implements InternetConnectionService {
