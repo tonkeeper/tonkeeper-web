@@ -28,7 +28,6 @@ import { useAnalytics, useAppHeight, useApplyQueryParams, useAppWidth } from './
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
-import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { useSwapWidgetDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import styled, { createGlobalStyle } from 'styled-components';
 import { SwapWidgetPage } from './components/SwapWidgetPage';
@@ -271,7 +270,6 @@ const Content: FC<{
 }> = ({ standalone }) => {
     useWindowsScroll();
     useAppWidth(standalone);
-    useKeyboardHeight();
     useTrackLocation();
     const isApplied = useApplyQueryParams();
 

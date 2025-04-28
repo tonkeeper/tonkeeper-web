@@ -6,7 +6,8 @@ import {
     InternetConnectionService,
     NotificationService,
     BiometryService,
-    ConfirmOptions
+    ConfirmOptions,
+    KeyboardService
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
@@ -16,11 +17,12 @@ import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { Network } from '@capacitor/network';
-import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { atom, Subject } from '@tonkeeper/core/dist/entries/atom';
 import { Browser } from '@capacitor/browser';
 import { App } from '@capacitor/app';
 import { KeychainCapacitor } from './keychain';
 import { Dialog } from '@capacitor/dialog';
+import { Keyboard } from '@capacitor/keyboard';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -136,6 +138,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     connectionService = new CapacitorConnectionService();
 
     signerReturnUrl = 'tonkeeper://'; // TODO replace with 'tonkeeper-pro://'; once signer is fixed
+
+    keyboard = new CapacitorKeyboardService();
 }
 
 export const getCapacitorDeviceOS = async () => {
@@ -158,5 +162,22 @@ class CapacitorConnectionService implements InternetConnectionService {
         const status = await Network.getStatus();
         this.isOnline.next(status.connected);
         return status.connected;
+    }
+}
+
+class CapacitorKeyboardService implements KeyboardService {
+    public didShow = new Subject<{ keyboardHeight: number }>();
+
+    public willShow = new Subject<{ keyboardHeight: number }>();
+
+    public didHide = new Subject<void>();
+
+    public willHide = new Subject<void>();
+
+    constructor() {
+        Keyboard.addListener('keyboardWillShow', info => this.willShow.next(info));
+        Keyboard.addListener('keyboardDidShow', info => this.didShow.next(info));
+        Keyboard.addListener('keyboardWillHide', () => this.willHide.next());
+        Keyboard.addListener('keyboardDidHide', () => this.didHide.next());
     }
 }

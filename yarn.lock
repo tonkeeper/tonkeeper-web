@@ -2294,12 +2294,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/camera@npm:latest":
-  version: 6.1.1
-  resolution: "@capacitor/camera@npm:6.1.1"
+"@capacitor/camera@npm:^6.1.1":
+  version: 6.1.2
+  resolution: "@capacitor/camera@npm:6.1.2"
   peerDependencies:
     "@capacitor/core": ^6.0.0
-  checksum: 10/5a1a7b181687eeebdba04621979b1a51116fd602ae3ed06eecb4e32784d42f4629ebabacb4c938f29db3e752d7a225cb95901313a11d73a694812773ae879b95
+  checksum: 10/42fe49b87ac219276d68a1f65d7a3873f6a62a9a6dc6cf801aa5080357cc17af17f65731a87c25209027d54f74e95ee83d613ced9fde2de1a1a6979f56e1b095
   languageName: node
   linkType: hard
 
@@ -2340,12 +2340,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/core@npm:latest":
-  version: 6.2.0
-  resolution: "@capacitor/core@npm:6.2.0"
+"@capacitor/core@npm:^6.2.0":
+  version: 6.2.1
+  resolution: "@capacitor/core@npm:6.2.1"
   dependencies:
     tslib: "npm:^2.1.0"
-  checksum: 10/d153121cb9164e69bf6367e47b87d11483682dc0e58e44ec0e86f95e30f818b9f076eb3cf0bd4d4550dd91f073eff7d23b966f044afaa75378e611bad6cad01c
+  checksum: 10/9a2b007fd9b6493b4aa1ab8974eccf487461a6f07594c8d20f615f79562d88a2c4409e34eff2d9ec815834ea84f222b9973bafe7eb04b80b02822617531f01bd
   languageName: node
   linkType: hard
 
@@ -2385,6 +2385,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/keyboard@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "@capacitor/keyboard@npm:7.0.1"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/4e7aa25edb02189d39ed4c80444a5a9cd632c959f7bc119a2d899cf43375d7acf38e06f359d4ff16d332fa214861a0d594707de4e9f0a349f72e72f21f0a85d1
+  languageName: node
+  linkType: hard
+
 "@capacitor/network@npm:^7.0.0":
   version: 7.0.0
   resolution: "@capacitor/network@npm:7.0.0"
@@ -2412,7 +2421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@capacitor/splash-screen@npm:latest":
+"@capacitor/splash-screen@npm:^6.0.3":
   version: 6.0.3
   resolution: "@capacitor/splash-screen@npm:6.0.3"
   peerDependencies:
@@ -7704,18 +7713,19 @@ __metadata:
   dependencies:
     "@capacitor/app": "npm:^6.0.1"
     "@capacitor/browser": "npm:^7.0.1"
-    "@capacitor/camera": "npm:latest"
+    "@capacitor/camera": "npm:^6.1.1"
     "@capacitor/cli": "npm:latest"
     "@capacitor/clipboard": "npm:^6.0.1"
-    "@capacitor/core": "npm:latest"
+    "@capacitor/core": "npm:^6.2.0"
     "@capacitor/device": "npm:^6.0.2"
     "@capacitor/dialog": "npm:^7.0.1"
     "@capacitor/haptics": "npm:^6.0.2"
     "@capacitor/ios": "npm:^6.1.2"
+    "@capacitor/keyboard": "npm:^7.0.1"
     "@capacitor/network": "npm:^7.0.0"
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/push-notifications": "npm:^6.0.3"
-    "@capacitor/splash-screen": "npm:latest"
+    "@capacitor/splash-screen": "npm:^6.0.3"
     "@ionic/react": "npm:^8.4.2"
     "@ionic/react-router": "npm:^8.4.2"
     "@tanstack/react-query": "npm:4.3.4"

@@ -21,6 +21,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import { useToast } from '../../../hooks/useNotification';
 import { TonRecipientInput } from '../../fields/TonRecipientInput';
 import { TonRecipient } from '@tonkeeper/core/dist/entries/send';
+import { useInputFocusScroll } from '../../../hooks/keyboard/useInputFocusScroll';
 
 const NotificationStyled = styled(Notification)`
     ${p =>
@@ -178,11 +179,14 @@ const BatteryRechargeNotificationContent: FC<{
         }
     };
 
+    const contentRef = useRef<HTMLDivElement>(null);
+    useInputFocusScroll(contentRef);
+
     const isContinueDisabled =
         !selectedPackId || (selectedPackId === 'custom' && selectedCustomAmount.error);
 
     return (
-        <ContentWrapper>
+        <ContentWrapper ref={contentRef}>
             {asGift && (
                 <TonRecipientInputStyled
                     ref={giftInputRef}

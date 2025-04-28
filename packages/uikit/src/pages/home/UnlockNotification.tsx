@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { IAppSdk, KeyboardParams } from '@tonkeeper/core/dist/AppSdk';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { passwordStorage, validatePassword } from '@tonkeeper/core/dist/service/passwordService';
 import { debounce } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,6 +12,7 @@ import { Input } from '../../components/fields/Input';
 import { hideIosKeyboard, openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useIsPasswordSet } from '../../state/wallet';
+import { useKeyboardHeight } from '../../hooks/keyboard/useKeyboardHeight';
 
 const Block = styled.form<{ padding: number }>`
     display: flex;
@@ -145,7 +146,7 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
     usePadding = false
 }) => {
     const { t } = useTranslation();
-    const [padding, setPadding] = useState(0);
+    const padding = useKeyboardHeight();
     const [requestId, setId] = useState<number | undefined>(undefined);
 
     const setRequest = useMemo(() => {
@@ -184,16 +185,6 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
     }, [reset, requestId, sdk, close]);
 
     useEffect(() => {
-        const handlerKeyboard = (options: {
-            method: 'keyboard';
-            id?: number | undefined;
-            params: KeyboardParams;
-        }) => {
-            setPadding(oldValue =>
-                Math.max(options.params.total - options.params.viewport, oldValue)
-            );
-        };
-
         const handler = (options: { method: 'getPassword'; id?: number | undefined }) => {
             openIosKeyboard('text', 'password');
 
@@ -201,11 +192,9 @@ export const UnlockNotification: FC<{ sdk: IAppSdk; usePadding?: boolean }> = ({
         };
 
         sdk.uiEvents.on('getPassword', handler);
-        sdk.uiEvents.on('keyboard', handlerKeyboard);
 
         return () => {
             sdk.uiEvents.off('getPassword', handler);
-            sdk.uiEvents.off('keyboard', handlerKeyboard);
         };
     }, [sdk]);
 

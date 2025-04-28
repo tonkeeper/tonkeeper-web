@@ -1,4 +1,13 @@
-import React, { FC, useCallback, useContext, useEffect, useId, useMemo, useState } from 'react';
+import React, {
+    FC,
+    useCallback,
+    useContext,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
@@ -38,6 +47,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
 
 const FormWrapper = styled.form`
     display: flex;
@@ -50,12 +60,6 @@ const Participants = styled.div`
     flex-direction: column;
     gap: 8px;
     margin-top: 8px;
-`;
-
-const SubmitButtonContainer = styled.div`
-    margin: 0 -16px;
-    background: ${p => p.theme.backgroundPage};
-    padding: 16px;
 `;
 
 export type MultisigUseForm = {
@@ -158,8 +162,11 @@ export const MultisigConfigForm: FC<{
     const formIdToSet = formId ?? fallbackFormId;
     const [formState, setFormState] = useState<AsyncValidationState>('idle');
 
+    const formRef = useRef<HTMLFormElement>(null);
+    useInputFocusScroll(formRef);
+
     return (
-        <FormWrapper onSubmit={handleSubmit(onSubmit)} id={formIdToSet}>
+        <FormWrapper onSubmit={handleSubmit(onSubmit)} id={formIdToSet} ref={formRef}>
             <FormProvider {...methods}>
                 <AsyncValidatorsStateProvider onStateChange={setFormState}>
                     <FormTopLabel>{t('create_multisig_participants')}</FormTopLabel>
@@ -255,6 +262,9 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
                                 onFocus={() => setFocus(true)}
                                 onBlur={() => setFocus(false)}
                                 placeholder={t('wallet_address')}
+                                spellCheck={false}
+                                autoCorrect="off"
+                                autoComplete="off"
                             />
                         </InputBlock>
                         <IconButtonTransparentBackground onClick={onRemove} type="button">

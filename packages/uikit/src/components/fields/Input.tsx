@@ -274,6 +274,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         type={type}
                         value={value}
                         spellCheck={false}
+                        autoCorrect="off"
+                        autoComplete="off"
                         tabIndex={tabIndex}
                         marginRight={marginRight}
                         onChange={e => onChange && onChange(e.target.value)}

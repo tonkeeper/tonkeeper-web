@@ -29,7 +29,7 @@ EOL
 echo "Updated $CAPACITOR_CONFIG_FILE with the Vite server URL."
 
 echo "Running npx cap sync..."
-npx cap sync
+cap sync
 
 echo "Vite process is running. Press Ctrl+C to stop."
 tail -f vite.log

@@ -20,7 +20,6 @@ import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import { AppRoute, SignerRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, Suspense, useMemo } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
@@ -112,7 +111,6 @@ export const MobileView: FC<{
     const theme = useTheme();
     useWindowsScroll();
     useAppWidth(standalone);
-    useKeyboardHeight();
     useTrackLocation();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();

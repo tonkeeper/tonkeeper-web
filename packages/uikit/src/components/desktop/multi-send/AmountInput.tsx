@@ -223,6 +223,8 @@ export const AmountInput: FC<{
                 color={currencyAmount.inFiat ? 'textPrimary' : 'textTertiary'}
                 type="text"
                 autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
                 disabled={isFiatInputDisabled}
                 ref={fiatRef}
             />

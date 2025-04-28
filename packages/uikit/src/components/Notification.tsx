@@ -30,7 +30,7 @@ import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { IonContent, IonModal } from '@ionic/react';
 import { cn } from '../libs/css';
-import { useKeyboardState } from '@ionic/react-hooks/keyboard';
+import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -604,7 +604,7 @@ export const NotificationIonic: FC<{
         return AnimateHeightChange;
     }, [disableHeightAnimation, mobileFullScreen]);
 
-    const { keyboardHeight } = useKeyboardState();
+    const keyboardHeight = useKeyboardHeight();
 
     const contentRef = useRef<HTMLDivElement>(null);
 

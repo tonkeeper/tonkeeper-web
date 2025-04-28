@@ -1,8 +1,7 @@
 import { wordlist } from '@ton/crypto/dist/mnemonic/wordlist';
 import React, { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useAppContext } from '../../hooks/appContext';
-import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
+import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { CenterContainer } from '../Layout';
@@ -16,6 +15,7 @@ import { useActiveConfig } from '../../state/wallet';
 import { hexToRGBA } from '../../libs/css';
 import { handleSubmit } from '../../libs/form';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
 
 const Block = styled.div`
     display: flex;
@@ -35,10 +35,6 @@ const BlockSmallGap = styled(Block)`
         css`
             gap: 8px;
         `}
-`;
-
-const BottomButtonBlock = styled(Block)`
-    margin-bottom: 0;
 `;
 
 const HeadingBlock = styled(Block)`
@@ -399,6 +395,8 @@ const WordInput: FC<{
             <Input
                 tabIndex={tabIndex}
                 autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
                 value={value}
                 onChange={e => onChange(e.target.value.toLocaleLowerCase())}
                 onFocus={() => setActive(true)}
@@ -562,9 +560,7 @@ export const ImportWords: FC<{
 }> = ({ isLoading, onIsDirtyChange, onMnemonic, enableShortMnemonic = true }) => {
     const [wordsNumber, setWordsNumber] = useState<12 | 24>(24);
     const sdk = useAppSdk();
-    const { standalone } = useAppContext();
     const ref = useRef<HTMLDivElement>(null);
-    const env = useAppTargetEnv();
 
     const { t } = useTranslation();
 
@@ -644,8 +640,11 @@ export const ImportWords: FC<{
         }
     };
 
+    const scrollRef = useRef<HTMLFormElement>(null);
+    useInputFocusScroll(scrollRef);
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} ref={scrollRef}>
             <Block>
                 <div>
                     <H2Label2Responsive>{t('import_wallet_title_web')}</H2Label2Responsive>

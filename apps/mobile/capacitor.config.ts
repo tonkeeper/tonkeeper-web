@@ -1,5 +1,6 @@
 import { CapacitorConfig } from '@capacitor/cli';
 import { server } from './capacitor.live-reload-config';
+import { KeyboardResize } from "@capacitor/keyboard";
 
 const config: CapacitorConfig = {
     appId: 'com.tonapps.tonkeeperpro',
@@ -15,7 +16,10 @@ const config: CapacitorConfig = {
         CapacitorCookies: {
             enabled: true
         },
-        BluetoothPlugin: {}
+        BluetoothPlugin: {},
+        Keyboard: {
+            resize: KeyboardResize.None
+        },
     },
     server
 };

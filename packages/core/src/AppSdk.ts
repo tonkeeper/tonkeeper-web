@@ -8,7 +8,8 @@ import { TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
-import { atom, ReadonlyAtom } from './entries/atom';
+import { atom, ReadonlyAtom, Subject } from './entries/atom';
+import { getWindow } from './service/telegramOauth';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -160,12 +161,21 @@ export interface IAppSdk {
     connectionService: InternetConnectionService;
 
     signerReturnUrl?: string;
+
+    keyboard: KeyboardService;
 }
 export interface ConfirmOptions {
     title?: string;
     message: string;
     okButtonTitle?: string;
     cancelButtonTitle?: string;
+}
+
+export interface KeyboardService {
+    willShow: Subject<{ keyboardHeight: number }>;
+    didShow: Subject<{ keyboardHeight: number }>;
+    willHide: Subject<void>;
+    didHide: Subject<void>;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -228,6 +238,54 @@ export abstract class BaseApp implements IAppSdk {
     connectionService: InternetConnectionService = new WebConnectionService();
 
     abstract targetEnv: TargetEnv;
+
+    keyboard: KeyboardService = new WebKeyboardService();
+}
+
+class WebKeyboardService implements KeyboardService {
+    public didShow = new Subject<{ keyboardHeight: number }>();
+
+    public willShow = new Subject<{ keyboardHeight: number }>();
+
+    public didHide = new Subject<void>();
+
+    public willHide = new Subject<void>();
+
+    private readonly initialHeight: number = 0;
+
+    private isOpen = false;
+
+    private readonly handleResize = () => {
+        const currentHeight = window.visualViewport?.height || window.innerHeight;
+
+        if (this.initialHeight - currentHeight > 100) {
+            if (this.isOpen) return;
+            this.isOpen = true;
+            this.willShow.next({ keyboardHeight: this.initialHeight - currentHeight });
+            this.didShow.next({ keyboardHeight: this.initialHeight - currentHeight });
+        } else {
+            if (!this.isOpen) return;
+            this.isOpen = false;
+            this.willHide.next();
+            this.didHide.next();
+        }
+    };
+
+    private hasTouchScreen() {
+        const win = getWindow();
+        if (!win || typeof navigator === 'undefined') return false;
+        return 'ontouchstart' in win || navigator.maxTouchPoints > 0;
+    }
+
+    constructor() {
+        const win = getWindow();
+        if (!win || !this.hasTouchScreen()) return;
+
+        this.initialHeight = win.innerHeight;
+
+        win.addEventListener('resize', this.handleResize);
+        win.visualViewport?.addEventListener('resize', this.handleResize);
+    }
 }
 
 class WebConnectionService implements InternetConnectionService {
