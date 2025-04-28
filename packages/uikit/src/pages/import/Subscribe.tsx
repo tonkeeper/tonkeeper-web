@@ -9,6 +9,7 @@ import { useSubscribeMutation } from '../../state/subscribe';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { NotificationFooter, NotificationFooterPortal } from '../../components/Notification';
+import { useIsOnIosReview } from '../../hooks/ios';
 const ProNotificationsIcon = React.lazy(() => import('./ProNotificationsIcon'));
 
 export const Subscribe: FC<{
@@ -25,6 +26,7 @@ export const Subscribe: FC<{
     );
 
     const isFullWidthMode = useIsFullWidthMode();
+    const isOnReview = useIsOnIosReview();
 
     return (
         <IconPage
@@ -39,7 +41,7 @@ export const Subscribe: FC<{
                 )
             }
             title={t('reminder_notifications_title')}
-            description={t('reminder_notifications_caption')}
+            description={!isOnReview ? t('reminder_notifications_caption') : ''}
             button={
                 <NotificationFooterPortal>
                     <NotificationFooter>

@@ -112,19 +112,19 @@ export const MobileProHomePage = () => {
                     <ChevronRightIcon />
                 </MenuItem>
                 <Divider />
-                <MenuItem to={AppRoute.purchases}>
-                    <SaleBadgeIcon />
-                    <Label2>{t('wallet_aside_collectibles')}</Label2>
-                    <ChevronRightIcon />
-                </MenuItem>
-                <Divider />
-                <MenuItem to={AppRoute.dns}>
-                    <SparkIcon />
-                    <Label2>{t('wallet_aside_domains')}</Label2>
-                    <ChevronRightIcon />
-                </MenuItem>
-                <Divider />
                 <HideOnReview>
+                    <MenuItem to={AppRoute.purchases}>
+                        <SaleBadgeIcon />
+                        <Label2>{t('wallet_aside_collectibles')}</Label2>
+                        <ChevronRightIcon />
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem to={AppRoute.dns}>
+                        <SparkIcon />
+                        <Label2>{t('wallet_aside_domains')}</Label2>
+                        <ChevronRightIcon />
+                    </MenuItem>
+                    <Divider />
                     {!isReadOnly && !isTestnet && (
                         <>
                             <MenuItem to={AppRoute.swap}>

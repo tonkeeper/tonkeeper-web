@@ -22,6 +22,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import React from 'react';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -95,7 +96,9 @@ const SwitchNotification = () => {
                 <ListItemPayload>
                     <Block>
                         <Label1>{t('reminder_notifications_title')}</Label1>
-                        <Secondary>{t('reminder_notifications_caption')}</Secondary>
+                        <HideOnReview>
+                            <Secondary>{t('reminder_notifications_caption')}</Secondary>
+                        </HideOnReview>
                     </Block>
                     <Switch checked={!!data} onChange={toggle} disabled={isFetching || isLoading} />
                 </ListItemPayload>

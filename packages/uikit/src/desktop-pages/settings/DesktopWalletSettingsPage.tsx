@@ -47,14 +47,15 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import {
-  useAutoMarkTronFeatureAsSeen,
-  useCanUseTronForActiveWallet,
-  useIsTronEnabledForActiveWallet,
-  useToggleIsTronEnabledForActiveWallet
+    useAutoMarkTronFeatureAsSeen,
+    useCanUseTronForActiveWallet,
+    useIsTronEnabledForActiveWallet,
+    useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
 import { hexToRGBA } from '../../libs/css';
 import { Badge } from '../../components/shared/Badge';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -232,12 +233,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_jettons_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
-                    <SettingsListItem>
-                        <SaleBadgeIcon />
-                        <Label2>{t('settings_collectibles_list')}</Label2>
-                    </SettingsListItem>
-                </LinkStyled>
+                <HideOnReview>
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
+                        <SettingsListItem>
+                            <SaleBadgeIcon />
+                            <Label2>{t('settings_collectibles_list')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                </HideOnReview>
                 {notificationsAvailable && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.notification}>
                         <SettingsListItem>

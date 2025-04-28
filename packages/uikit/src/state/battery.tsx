@@ -31,6 +31,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useTwoFAWalletConfig } from './two-fa';
 import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { useIsOnIosReview } from '../hooks/ios';
 
 export const useCanUseBattery = () => {
     const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
@@ -225,6 +226,7 @@ export const useBatteryEnabledConfig = () => {
     const network = useActiveTonNetwork();
     const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
+    const disableDueToIosReview = useIsOnIosReview();
 
     const disableDueToTwoFA =
         twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
@@ -233,16 +235,27 @@ export const useBatteryEnabledConfig = () => {
         if (network === Network.TESTNET) {
             return {
                 isBeta: false,
-                disableWhole: false,
-                disableOperations: false
+                disableWhole: disableDueToIosReview,
+                disableOperations: disableDueToIosReview
             };
         }
+
+        const disableWhole =
+            disableDueToIosReview || disableDueToTwoFA || (disable_battery ?? false);
+
         return {
             isBeta: battery_beta ?? false,
-            disableWhole: disableDueToTwoFA || (disable_battery ?? false),
-            disableOperations: disable_battery ? true : disable_battery_send ?? false
+            disableWhole,
+            disableOperations: disableWhole ? true : disable_battery_send ?? false
         };
-    }, [battery_beta, disable_battery, disable_battery_send, network, disableDueToTwoFA]);
+    }, [
+        battery_beta,
+        disable_battery,
+        disable_battery_send,
+        network,
+        disableDueToTwoFA,
+        disableDueToIosReview
+    ]);
 };
 
 /**

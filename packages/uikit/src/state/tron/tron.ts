@@ -21,6 +21,7 @@ import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset'
 import { useBatteryApi } from '../battery';
 import { useGlobalPreferences, useMutateGlobalPreferences } from '../global-preferences';
 import { useToggleHideJettonMutation } from '../jetton';
+import { useIsOnIosReview } from '../../hooks/ios';
 
 export const useIsTronEnabledForActiveWallet = () => {
     const isTronEnabled = useIsTronEnabledGlobally();
@@ -75,8 +76,9 @@ export const useTronApi = () => {
 
 export const useIsTronEnabledGlobally = () => {
     const config = useActiveConfig();
+    const isOnReview = useIsOnIosReview();
 
-    return !config.flags?.disable_tron;
+    return !config.flags?.disable_tron && !isOnReview;
 };
 
 export const useCanUseTronForActiveWallet = () => {

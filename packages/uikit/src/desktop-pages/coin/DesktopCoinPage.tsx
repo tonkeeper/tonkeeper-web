@@ -554,7 +554,9 @@ export const TronUSDTPage = () => {
                     </ButtonStyled>
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
-            <TronUseBatteryBanner />
+            <HideOnReview>
+                <TronUseBatteryBanner />
+            </HideOnReview>
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
