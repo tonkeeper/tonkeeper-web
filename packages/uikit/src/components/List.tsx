@@ -113,7 +113,7 @@ const ListBlockDesktop = styled(ListBlock)`
         `}
 `;
 
-export const ListItemPayload = styled.div`
+export const ListItemPayload = styled.div<{ $clickable?: boolean }>`
     flex-grow: 1;
     display: flex;
     align-items: center;
@@ -121,8 +121,13 @@ export const ListItemPayload = styled.div`
     padding: 1rem 1rem 1rem 0;
     box-sizing: border-box;
     gap: 10px;
-
     width: 100%;
+
+    ${props =>
+        props.$clickable &&
+        css`
+            cursor: pointer;
+        `}
 `;
 
 export const ListItemElement = styled.div<{

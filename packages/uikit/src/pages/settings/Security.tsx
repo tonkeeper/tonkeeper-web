@@ -168,7 +168,7 @@ const MobileProPassword = () => {
         <>
             <ListBlockDesktopAdaptive>
                 <ListItem hover={false} onClick={onOpen}>
-                    <ListItemPayload>
+                    <ListItemPayload $clickable>
                         <Label1Capitalised>{t('security_change_passcode')}</Label1Capitalised>
                         <LockIcon />
                     </ListItemPayload>
@@ -199,7 +199,7 @@ const DesktopAndTabletProPassword = () => {
         <>
             <ListBlockDesktopAdaptive>
                 <ListItem hover={false} onClick={onOpen}>
-                    <ListItemPayload>
+                    <ListItemPayload $clickable>
                         <Label1Capitalised>
                             {keychainPassword ? t('Change_password') : t('set_up_password')}
                         </Label1Capitalised>
@@ -209,7 +209,7 @@ const DesktopAndTabletProPassword = () => {
                 <LockSwitchAdditionalSecurityPassword />
                 {keychainPassword && (
                     <ListItem hover={false} onClick={onResetPassword}>
-                        <ListItemPayload>
+                        <ListItemPayload $clickable>
                             <Label1Capitalised>{t('reset_secutiry_settings')}</Label1Capitalised>
                             <CloseIcon />
                         </ListItemPayload>
@@ -301,17 +301,4 @@ export const SecuritySettings = () => {
             </InnerBody>
         </>
     );
-};
-
-export const useShouldShowSecurityPage = () => {
-    const { data: canPromptTouchId } = useCanPromptTouchId();
-    const isPasswordSet = useIsPasswordSet();
-
-    const isLedger = useIsActiveWalletLedger();
-    const isKeystone = useIsActiveWalletKeystone();
-    const isReadOnly = useIsActiveWalletWatchOnly();
-    const isFullWidthMode = useIsFullWidthMode();
-    const hidePhrasePage = isLedger || isKeystone || isReadOnly || isFullWidthMode;
-
-    return canPromptTouchId || isPasswordSet || !hidePhrasePage;
 };

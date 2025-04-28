@@ -17,7 +17,7 @@ import {
 import { useLocation } from 'react-router-dom';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
-import { useAppSdk, useAppTargetEnv } from '../../../hooks/appSdk';
+import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
 import React, { FC } from 'react';
@@ -28,7 +28,6 @@ import { useProState } from '../../../state/pro';
 import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
-import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForCapacitorApp } from '../../shared/TargetEnv';
@@ -96,8 +95,6 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
-    const showSecurityPage = useShouldShowSecurityPage();
-    const env = useAppTargetEnv();
     const availableThemes = useAvailableThemes();
 
     return (
@@ -111,16 +108,14 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                {showSecurityPage && (
-                    <NavLink to={AppRoute.settings + SettingsRoute.security}>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
-                                <LockIcon />
-                                <Label2>{t('settings_security')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
-                )}
+                <NavLink to={AppRoute.settings + SettingsRoute.security}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                            <LockIcon />
+                            <Label2>{t('settings_security')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 <NotForCapacitorApp>
                     <HideOnReview>
                         <NavLink to={AppRoute.settings + SettingsRoute.pro}>
