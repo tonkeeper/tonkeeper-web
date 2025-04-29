@@ -28,7 +28,7 @@ export const TonkeeperIcon: FC<{
     const isDark = useContext(DarkThemeContext);
     if (isDark) {
         return (
-            <Suspense fallback={<div style={{ width, height }}></div>}>
+            <Suspense fallback={<div style={{ width: `${width}px`, height: `${height}px` }}></div>}>
                 <TonkeeperLottieIcon width={width} height={height} loop={loop} />
             </Suspense>
         );

@@ -128,13 +128,19 @@ export const App: FC = () => {
                         <StorageContext.Provider value={sdk.storage}>
                             <TranslationContext.Provider value={translation}>
                                 <UserThemeProvider>
-                                    <GlobalStyle />
-                                    <HeaderGlobalStyle />
-                                    <FooterGlobalStyle />
-                                    <SybHeaderGlobalStyle />
-                                    <GlobalListStyle />
-                                    <Loader />
-                                    <UnlockNotification sdk={sdk} />
+                                        <GlobalStyle />
+                                        <HeaderGlobalStyle />
+                                        <FooterGlobalStyle />
+                                        <SybHeaderGlobalStyle />
+                                        <GlobalListStyle />
+                                        <Suspense fallback={
+                                            <FullSizeWrapper standalone={false}>
+                                                <Loading />
+                                            </FullSizeWrapper>
+                                        }>
+                                            <Loader />
+                                        </Suspense>
+                                        <UnlockNotification sdk={sdk} />
                                 </UserThemeProvider>
                             </TranslationContext.Provider>
                         </StorageContext.Provider>
@@ -159,6 +165,7 @@ const PageWrapper = styled(Container)`
 const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
     min-width: 385px;
     height: 600px;
+    width: var(--app-width);
 
     > * {
         ${props =>
