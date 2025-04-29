@@ -23,6 +23,7 @@ import { App } from '@capacitor/app';
 import { KeychainCapacitor } from './keychain';
 import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
+import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -96,7 +97,12 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         this.topMessage(notification);
     };
 
-    openPage = async (url: string) => {
+    openPage = async (
+        url: string,
+        options?: {
+            forceExternalBrowser?: boolean;
+        }
+    ) => {
         if (!url.startsWith('https://') && !url.startsWith('http://')) {
             try {
                 /* way to open in deeplinks on ios */
@@ -107,7 +113,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
                 console.error(e);
             }
         } else {
-            await Browser.open({ url });
+            if (options?.forceExternalBrowser) {
+                safeWindowOpen(url);
+            } else {
+                await Browser.open({ url });
+            }
         }
     };
 

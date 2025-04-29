@@ -136,3 +136,7 @@ export function bufferToBigInt(buffer: Buffer) {
 }
 
 export const maxBigNumber = (a: BigNumber, b: BigNumber) => (a > b ? a : b);
+
+export const safeWindowOpen = (url: string) => {
+    return window.open(url, '_blank', 'noreferrer,noopener');
+};

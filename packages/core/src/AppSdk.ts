@@ -9,7 +9,6 @@ import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types'
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
 import { atom, ReadonlyAtom, Subject } from './entries/atom';
-import { getWindow } from './service/telegramOauth';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -133,7 +132,12 @@ export interface IAppSdk {
 
     topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;
-    openPage: (url: string) => Promise<unknown>;
+    openPage: (
+        url: string,
+        options?: {
+            forceExternalBrowser?: boolean;
+        }
+    ) => Promise<unknown>;
     openNft: (nft: NFT) => void;
 
     disableScroll: () => void;
