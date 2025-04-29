@@ -18,8 +18,6 @@ import {
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
 import { HideOnReview } from '../ios/HideOnReview';
-import { useProState } from '../../state/pro';
-import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useSecurityCheck } from '../../state/password';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 
@@ -113,7 +111,6 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     const canAddMultisig =
         accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount?.type !== 'testnet';
 
-    const { data: pro } = useProState();
     const { mutateAsync: securityCheck } = useSecurityCheck();
 
     const onSelect = async (method: AddWalletMethod) => {
@@ -181,27 +178,27 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                     </AddMethodText>
                     <RightIconStyled />
                 </AddMethod>
-                {canAddMultisig && !hideMultisig && (
-                    <AddMethod onClick={() => onSelect('multisig')}>
-                        <ButtonIcon>
-                            <WalletPencilIcon />
-                        </ButtonIcon>
-                        <AddMethodText>
-                            <AddMethodLabel>
-                                {t('add_wallet_new_multisig_title')}{' '}
-                                <HideOnReview>
-                                    {!isFreeSubscription(pro?.subscription) && (
+                <HideOnReview>
+                    {canAddMultisig && !hideMultisig && (
+                        <AddMethod onClick={() => onSelect('multisig')}>
+                            <ButtonIcon>
+                                <WalletPencilIcon />
+                            </ButtonIcon>
+                            <AddMethodText>
+                                <AddMethodLabel>
+                                    {t('add_wallet_new_multisig_title')}{' '}
+                                    <HideOnReview>
                                         <Badge color="accentBlue">PRO</Badge>
-                                    )}
-                                </HideOnReview>
-                            </AddMethodLabel>
-                            <AddMethodDescription>
-                                {t('add_wallet_new_multisig_description')}
-                            </AddMethodDescription>
-                        </AddMethodText>
-                        <RightIconStyled />
-                    </AddMethod>
-                )}
+                                    </HideOnReview>
+                                </AddMethodLabel>
+                                <AddMethodDescription>
+                                    {t('add_wallet_new_multisig_description')}
+                                </AddMethodDescription>
+                            </AddMethodText>
+                            <RightIconStyled />
+                        </AddMethod>
+                    )}
+                </HideOnReview>
                 <AddMethod onClick={() => onSelect('testnet')}>
                     <ButtonIcon>
                         <WalletTestnetIcon />

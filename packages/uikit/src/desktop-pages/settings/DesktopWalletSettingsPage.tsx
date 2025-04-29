@@ -53,7 +53,7 @@ import {
     useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
-import { hexToRGBA } from '../../libs/css';
+import { hexToRGBA, hover } from '../../libs/css';
 import { Badge } from '../../components/shared/Badge';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 
@@ -69,9 +69,9 @@ const SettingsListItem = styled.div`
 
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
-    &:hover {
+    ${hover`
         background-color: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.7)};
-    }
+    `}
 
     > svg {
         color: ${p => p.theme.iconSecondary};

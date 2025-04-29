@@ -77,23 +77,10 @@ export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
-    const isCapacitorApp = useIsCapacitorApp();
 
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        let state: ProState;
+        const state = await getProState(authService, sdk.storage);
 
-        if (isCapacitorApp) {
-            state = {
-                authorizedWallet: null,
-                subscription: {
-                    isFree: true,
-                    valid: true,
-                    isTrial: false
-                }
-            };
-        } else {
-            state = await getProState(authService, sdk.storage);
-        }
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;

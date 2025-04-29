@@ -30,7 +30,7 @@ import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv, NotForCapacitorApp } from '../../shared/TargetEnv';
+import { ForTargetEnv } from '../../shared/TargetEnv';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -116,18 +116,16 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NotForCapacitorApp>
-                    <HideOnReview>
-                        <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                            {({ isActive }) => (
-                                <AsideMenuItemStyled isSelected={isActive}>
-                                    <TonkeeperSkeletIcon />
-                                    <Label2>{t('tonkeeper_pro')}</Label2>
-                                </AsideMenuItemStyled>
-                            )}
-                        </NavLink>
-                    </HideOnReview>
-                </NotForCapacitorApp>
+                <HideOnReview>
+                    <NavLink to={AppRoute.settings + SettingsRoute.pro}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <TonkeeperSkeletIcon />
+                                <Label2>{t('tonkeeper_pro')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                </HideOnReview>
                 {proState?.subscription.valid && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (

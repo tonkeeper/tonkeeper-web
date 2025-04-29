@@ -5,7 +5,7 @@ PODS:
     - Capacitor
   - CapacitorBrowser (7.0.1):
     - Capacitor
-  - CapacitorCamera (6.1.1):
+  - CapacitorCamera (6.1.2):
     - Capacitor
   - CapacitorClipboard (6.0.2):
     - Capacitor
@@ -142,7 +142,7 @@ SPEC CHECKSUMS:
   Capacitor: 05d35014f4425b0740fc8776481f6a369ad071bf
   CapacitorApp: e1e6b7d05e444d593ca16fd6d76f2b7c48b5aea7
   CapacitorBrowser: 6299776d496e968505464884d565992faa20444a
-  CapacitorCamera: fc099c42b3cbb1e8e945bc945114ff830fa82dfd
+  CapacitorCamera: 9bc7b005d0e6f1d5f525b8137045b60cffffce79
   CapacitorClipboard: 4443c3cdb7c77b1533dfe3ff0f9f7756aa8579df
   CapacitorCordova: b33e7f4aa4ed105dd43283acdd940964374a87d9
   CapacitorDevice: 9efd479d71d1baad74b75df531184c3f730eaa48
