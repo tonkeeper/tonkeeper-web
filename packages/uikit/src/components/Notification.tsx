@@ -67,7 +67,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: 
     );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ $moveToTop: boolean }>`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -76,7 +76,7 @@ const Wrapper = styled.div`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            justify-content: center;
+            justify-content: ${p.$moveToTop ? 'flex-start' : 'center'};
         `}
 `;
 
@@ -821,6 +821,7 @@ export const NotificationDesktopAndWeb: FC<{
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
     const isInWidget = useAppTargetEnv() === 'swap_widget_web';
+    const isKeyboardOpen = useKeyboardHeight();
 
     return (
         <NotificationContext.Provider
@@ -847,7 +848,7 @@ export const NotificationDesktopAndWeb: FC<{
                     <Splash ref={nodeRef} className="scrollable">
                         <NotificationOverlay handleClose={onClose} entered={entered}>
                             <NotificationWrapper entered={entered} className={className}>
-                                <Wrapper>
+                                <Wrapper $moveToTop={!!isKeyboardOpen}>
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                     <Content
