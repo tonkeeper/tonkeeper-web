@@ -202,7 +202,9 @@ const TwoFANotSetContent = () => {
                         <li>{t('two_fa_settings_warning_can_not_recover')}</li>
                         <li>{t('two_fa_settings_warning_wallet_will_stop')}</li>
                         <li>{t('two_fa_settings_warning_balance_required')}</li>
-                        <li>{t('two_fa_settings_warning_battery_gasless')}</li>
+                        <HideOnReview>
+                            <li>{t('two_fa_settings_warning_battery_gasless')}</li>
+                        </HideOnReview>
                     </WarningBlockText>
                     <ExclamationMarkTriangleIconStyled />
                 </WarningBlock>
