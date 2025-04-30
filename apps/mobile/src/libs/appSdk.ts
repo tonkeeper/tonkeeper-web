@@ -24,6 +24,7 @@ import { KeychainCapacitor } from './keychain';
 import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
 import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
+import { CAPACITOR_APPLICATION_ID } from "./aplication-id";
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -71,9 +72,6 @@ export class BiometryServiceCapacitor implements BiometryService {
         }
     };
 }
-
-export const CAPACITOR_APPLICATION_ID: 'mobile' | 'tablet' =
-    window.innerWidth <= 550 ? 'mobile' : 'tablet';
 
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     cookie = new CookieCapacitor();

@@ -4,6 +4,9 @@ import { promptMobileProPinController } from '@tonkeeper/uikit/dist/components/m
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import i18next from '../app/i18n';
 import { BaseKeychainService } from '@tonkeeper/core/dist/base-keychain-service';
+import { CAPACITOR_APPLICATION_ID } from './aplication-id';
+import { promptDesktopPasswordController } from '@tonkeeper/uikit/dist/components/modals/PromptDesktopPassword';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export class KeychainCapacitor extends BaseKeychainService implements IKeychainService {
     constructor(private biometryService: BiometryService, storage: IStorage) {
@@ -39,9 +42,19 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
     protected override async promptPassword(
         callback: (pin?: string) => Promise<boolean | undefined>
     ) {
-        promptMobileProPinController.open({
-            afterClose: callback
-        });
+        if (CAPACITOR_APPLICATION_ID === 'mobile') {
+            return promptMobileProPinController.open({
+                afterClose: callback
+            });
+        }
+
+        if (CAPACITOR_APPLICATION_ID === 'tablet') {
+            return promptDesktopPasswordController.open({
+                afterClose: callback
+            });
+        }
+
+        assertUnreachable(CAPACITOR_APPLICATION_ID);
     }
 
     protected override async securityCheckTouchId() {
