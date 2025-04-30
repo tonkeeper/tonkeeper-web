@@ -4,9 +4,9 @@ import { sharedConfig } from './vite.config.shared';
 
 export default defineConfig({
   ...sharedConfig,
-  plugins: [...sharedConfig.plugins],
   build: {
     ...sharedConfig.build,
+    minify: false,
     rollupOptions: {
       ...sharedConfig.build.rollupOptions,
       input: {
