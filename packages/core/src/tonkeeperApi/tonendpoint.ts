@@ -3,9 +3,10 @@ import { intlLocale } from '../entries/language';
 import { Network } from '../entries/network';
 import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
+import { assertUnreachable } from '../utils/types';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet' | 'swap_widget_web';
+    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet' | 'mobile' | 'swap_widget_web';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -228,8 +229,12 @@ export class Tonendpoint {
                 return 'twa';
             case 'extension':
             case 'web':
-            default:
+            case 'tablet':
+            case 'mobile':
+            case 'swap_widget_web':
                 return 'extension';
+            default:
+                assertUnreachable(this.targetEnv);
         }
     };
 }

@@ -203,7 +203,7 @@ export const Loader: FC = () => {
         build: sdk.version,
         network,
         lang,
-        platform: 'tablet' // TODO CAPACITOR_APPLICATION_ID
+        platform: CAPACITOR_APPLICATION_ID
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 

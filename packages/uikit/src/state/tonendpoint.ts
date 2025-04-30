@@ -12,7 +12,6 @@ import {
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
-import { useUserCountry } from './country';
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 
 export const useTonendpoint = (options: {
