@@ -52,6 +52,7 @@
         "generate:twaApi": "rm -fr src/twaApi && docker build -f task/Dockerfile.twaApi . -t twaapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local twaapisdk",
         "analyze": "source-map-explorer 'build/static/js/*.js'",
         "deploy": "yarn build && npx wrangler pages deploy dist/",
+        "deploy:dev": "yarn build && npx wrangler pages deploy dist/ --project-name=tonkeeper-twa-dev",
         "build:twa": "yarn build"
     },
     "browserslist": {
