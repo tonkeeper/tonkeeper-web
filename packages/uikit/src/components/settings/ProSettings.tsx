@@ -57,7 +57,7 @@ import {
     DesktopViewPageLayout
 } from '../desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../shared/TargetEnv';
-import { useAppTargetEnv } from '../../hooks/appSdk';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
 
 const Block = styled.div`
     display: flex;
@@ -353,8 +353,11 @@ const BuyProService: FC<{
         );
     };
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    useInputFocusScroll(containerRef);
+
     return (
-        <div>
+        <div ref={containerRef}>
             <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
                 plans={plans ?? []}
@@ -459,12 +462,6 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 };
 
 export const ProSettings: FC = () => {
-    const env = useAppTargetEnv();
-
-    if (env === 'mobile') {
-        return null;
-    }
-
     return (
         <HideOnReview>
             <ProSettingsResponsive />
