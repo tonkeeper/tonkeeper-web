@@ -9,6 +9,8 @@ import { Button } from '../components/fields/Button';
 import { SlideAnimation } from '../components/shared/SlideAnimation';
 import { useTranslation } from '../hooks/translation';
 import { useAppSdk } from '../hooks/appSdk';
+import { ProFreeAccessContent } from '../components/pro/ProFreeAccess';
+import { FreeProAccess, useFreeProAccessAvailable, useProState } from '../state/pro';
 
 export const MobileProCreatePasswordPage = () => {
     const sdk = useAppSdk();
@@ -21,9 +23,12 @@ export const MobileProCreatePasswordPage = () => {
     const setPinRef = useRef<HTMLDivElement>(null);
     const confirmPinRef = useRef<HTMLDivElement>(null);
     const biometricsRef = useRef<HTMLDivElement>(null);
+    const tutorialRef = useRef<HTMLDivElement>(null);
+    const freeProRef = useRef<HTMLDivElement>(null);
     const [right, setRight] = useState(true);
     const [pinChecked, setPinChecked] = useState(false);
     const [pinCompleted, setPinCompleted] = useState(false);
+    const [freeProCompleted, setFreeProCompleted] = useState(false);
 
     const finish = async () => sdk.keychain!.updatePassword(pin);
 
@@ -51,15 +56,40 @@ export const MobileProCreatePasswordPage = () => {
         setPin('');
     };
 
-    const view = pinCompleted
-        ? 'tutorial'
-        : pinSaved && canPromptBiometrics
-        ? 'biometrics'
-        : pin
-        ? 'confirm_pin'
-        : 'set_pin';
-    const nodeRef =
-        view === 'set_pin' ? setPinRef : view === 'confirm_pin' ? confirmPinRef : biometricsRef;
+    const { data: pro } = useProState();
+    const freeProAvailableInConfig = useFreeProAccessAvailable();
+    const freeProAvailable = Boolean(freeProAvailableInConfig && !pro?.subscription.valid);
+
+    let view;
+
+    switch (true) {
+        case pinCompleted: {
+            if (freeProAvailable && !freeProCompleted) {
+                view = 'free_pro';
+            } else {
+                view = 'tutorial';
+            }
+            break;
+        }
+        case pinSaved && canPromptBiometrics:
+            view = 'biometrics';
+            break;
+        case !!pin:
+            view = 'confirm_pin';
+            break;
+        default:
+            view = 'set_pin';
+            break;
+    }
+
+    const nodeRef = {
+        set_pin: setPinRef,
+        confirm_pin: confirmPinRef,
+        biometrics: biometricsRef,
+        tutorial: tutorialRef,
+        free_pro: freeProRef
+    }[view];
+
     return (
         <Wrapper>
             <TransitionGroup childFactory={childFactoryCreator(right)} style={{ height: '100%' }}>
@@ -97,6 +127,12 @@ export const MobileProCreatePasswordPage = () => {
                                 }
                             />
                         )}
+                        {view === 'free_pro' && (
+                            <ProFreeAccessScreen
+                                access={freeProAvailableInConfig!}
+                                onSubmit={() => setFreeProCompleted(true)}
+                            />
+                        )}
                         {view === 'tutorial' && <TutorialScreen onSubmit={finish} />}
                     </div>
                 </CSSTransition>
@@ -105,12 +141,20 @@ export const MobileProCreatePasswordPage = () => {
     );
 };
 
-const Wrapper = styled(SlideAnimation)`
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-top: env(safe-area-inset-top);
-    box-sizing: border-box;
-    height: 100%;
-`;
+const ProFreeAccessScreen: FC<{ onSubmit: () => void; access: FreeProAccess }> = ({
+    onSubmit,
+    access
+}) => {
+    const { t } = useTranslation();
+    return (
+        <ProPageWrapper>
+            <LaterButton secondary onClick={() => onSubmit()}>
+                {t('later')}
+            </LaterButton>
+            <ProFreeAccessContentStyled onSubmit={onSubmit} access={access} />
+        </ProPageWrapper>
+    );
+};
 
 const FullScreenWrapper = styled.div`
     height: 100%;
@@ -118,6 +162,21 @@ const FullScreenWrapper = styled.div`
     flex-direction: column;
     position: relative;
     padding: 0 32px;
+`;
+
+const ProPageWrapper = styled(FullScreenWrapper)`
+    padding: 36px 0 0;
+`;
+
+const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
+    height: 100%;
+`;
+
+const Wrapper = styled(SlideAnimation)`
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+    box-sizing: border-box;
+    height: 100%;
 `;
 
 const BiometricsFirstBlockWrapper = styled.div`

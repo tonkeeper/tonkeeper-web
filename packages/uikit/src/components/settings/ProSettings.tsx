@@ -23,6 +23,7 @@ import { useTranslation } from '../../hooks/translation';
 import {
     ConfirmState,
     useCreateInvoiceMutation,
+    useFreeProAccessAvailable,
     useProLogout,
     useProPlans,
     useProState,
@@ -58,6 +59,9 @@ import {
 } from '../desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../shared/TargetEnv';
 import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
+import { ProFreeAccessContent } from '../pro/ProFreeAccess';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { AppRoute } from '../../libs/routes';
 
 const Block = styled.div`
     display: flex;
@@ -435,6 +439,10 @@ const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSu
     return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
 };
 
+const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
+    height: 100%;
+`;
+
 export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void }> = ({
     showLogo = true,
     onSuccess
@@ -442,6 +450,21 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
     const { t } = useTranslation();
 
     const { data } = useProState();
+    const isFreeAccessAvailable = useFreeProAccessAvailable();
+    const navigate = useNavigate();
+
+    if (isFreeAccessAvailable) {
+        const onBack = () => {
+            navigate(AppRoute.home);
+        };
+
+        return (
+            <ProFreeAccessContentStyled
+                access={isFreeAccessAvailable}
+                onSubmit={onSuccess ?? onBack}
+            />
+        );
+    }
 
     return (
         <>

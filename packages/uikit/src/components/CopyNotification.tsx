@@ -30,9 +30,11 @@ const Message = styled.div`
 
 const Content = styled.div`
     width: auto;
+    min-width: 50px;
     max-width: calc(var(--app-width) - 1rem);
-    word-break: break-all;
+    word-break: break-word;
     text-align: center;
+    text-wrap: balance;
     padding: 14px 24px 14px;
     box-sizing: border-box;
     background: ${props => props.theme.backgroundContentTint};

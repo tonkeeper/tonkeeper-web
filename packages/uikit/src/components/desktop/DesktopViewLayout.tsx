@@ -51,7 +51,7 @@ const DesktopViewPageLayoutSimpleIonic = styled.div<{ $mobileContentPaddingTop?:
             box-sizing: border-box;
         `}
 
-    &::after {
+    &:not:has(ion-modal)::after {
         position: relative;
         display: block;
         content: '';

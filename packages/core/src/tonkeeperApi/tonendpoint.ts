@@ -98,6 +98,11 @@ export interface TonendpointConfig {
     '2fa_bot_url'?: string;
 
     tron_api_url?: string;
+
+    enhanced_acs_pmob?: {
+        code?: string;
+        acs_until?: number;
+    };
 }
 
 interface CountryIP {
