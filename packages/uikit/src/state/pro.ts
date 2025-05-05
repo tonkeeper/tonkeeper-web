@@ -54,9 +54,14 @@ export const useFreeProAccessAvailable = () => {
             return null;
         }
 
+        const validUntil = new Date(data.acs_until * 1000);
+        if (validUntil < new Date()) {
+            return null;
+        }
+
         return {
             code: data.code,
-            validUntil: new Date(data.acs_until * 1000)
+            validUntil
         };
     }, [mainnetConfig.enhanced_acs_pmob, env]);
 };
