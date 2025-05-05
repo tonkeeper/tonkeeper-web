@@ -42,5 +42,5 @@ export class BrowserAppSdk extends BaseApp {
 
     signerReturnUrl = 'https://wallet.tonkeeper.com/';
 
-    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'tonsign:']
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'tonsign:', 'mailto:']
 }

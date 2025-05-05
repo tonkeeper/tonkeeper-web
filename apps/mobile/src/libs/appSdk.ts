@@ -136,7 +136,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         'tonkeeper:',
         'tonkeeperx:',
         'tonkeeper-mob:',
-        'tonkeeper-tc-mob:'
+        'tonkeeper-tc-mob:',
+        'mailto:'
     ];
 
     async confirm(options: ConfirmOptions) {
