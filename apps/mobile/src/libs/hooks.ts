@@ -61,7 +61,7 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
             );
 
             tracker.init({
-                application: CAPACITOR_APPLICATION_ID,
+                application: CAPACITOR_APPLICATION_ID === 'mobile' ? 'pro-mobile' : 'pro-tablet',
                 walletType: toWalletType(activeAccount?.activeTonWallet),
                 activeAccount: activeAccount!,
                 accounts: accounts!,
