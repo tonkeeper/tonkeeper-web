@@ -25,7 +25,7 @@ export class BrowserAppSdk extends BaseApp {
         this.topMessage(notification);
     };
     openPage = async (url: string) => {
-        safeWindowOpen(url, authorizedOpenUrlProtocols);
+        safeWindowOpen(url, this.authorizedOpenUrlProtocols);
     };
 
     disableScroll = disableScroll;

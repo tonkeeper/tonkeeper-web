@@ -167,6 +167,8 @@ export interface IAppSdk {
     signerReturnUrl?: string;
 
     keyboard: KeyboardService;
+
+    authorizedOpenUrlProtocols: string[];
 }
 export interface ConfirmOptions {
     title?: string;
@@ -244,6 +246,8 @@ export abstract class BaseApp implements IAppSdk {
     abstract targetEnv: TargetEnv;
 
     keyboard: KeyboardService = new WebKeyboardService();
+
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'mailto:'];
 }
 
 class WebKeyboardService implements KeyboardService {

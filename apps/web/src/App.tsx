@@ -139,7 +139,8 @@ const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        lang
+        lang,
+        platform: 'web'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 

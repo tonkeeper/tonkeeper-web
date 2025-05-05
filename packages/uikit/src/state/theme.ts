@@ -28,6 +28,7 @@ export interface UIPreferences {
     asideWidth: number;
     showTokensChart: boolean;
     theme: 'dark' | 'pro';
+    dismissMobileQRBanner: boolean;
 }
 
 export const useUserUIPreferences = () => {

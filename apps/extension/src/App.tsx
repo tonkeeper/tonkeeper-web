@@ -89,6 +89,8 @@ const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
 
+const ExtensionMobileAppBannerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification"));
+
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -205,7 +207,8 @@ export const Loader: FC = React.memo(() => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        lang: localizationFrom(browser.i18n.getUILanguage())
+        lang: localizationFrom(browser.i18n.getUILanguage()),
+        platform: 'extension'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
@@ -368,6 +371,7 @@ export const Content: FC<{
                 <ConnectLedgerNotification />
                 <SwapMobileNotification />
                 <PairKeystoneNotification />
+                <ExtensionMobileAppBannerNotification />
             </Suspense>
         </Wrapper>
     );
