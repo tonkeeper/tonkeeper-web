@@ -137,6 +137,24 @@ export function bufferToBigInt(buffer: Buffer) {
 
 export const maxBigNumber = (a: BigNumber, b: BigNumber) => (a > b ? a : b);
 
-export const safeWindowOpen = (url: string) => {
-    return window.open(url, '_blank', 'noreferrer,noopener');
+export const isValidUrlProtocol = (url: string, authorizedOpenUrlProtocols: string[]) => {
+    try {
+        const u = new URL(url);
+        return authorizedOpenUrlProtocols.includes(u.protocol);
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+};
+
+export const safeWindowOpen = (url: string, allowedProtocols: string[]) => {
+    try {
+        if (!isValidUrlProtocol(url, allowedProtocols)) {
+            throw new Error('Unsafe protocol');
+        }
+
+        return window.open(url, '_blank', 'noreferrer,noopener');
+    } catch (e) {
+        console.error(e);
+    }
 };

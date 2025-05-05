@@ -5,6 +5,7 @@ import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {
@@ -48,8 +49,15 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
     };
 
     openPage = async (url: string) => {
+        if (!isValidUrlProtocol(url, this.authorizedOpenUrlProtocols)) {
+            console.error('Unacceptable url protocol', url);
+            return;
+        }
+
         return sendBackground<void>({ king: 'open-page', url });
     };
+
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:'];
 
     version = packageJson.version ?? 'Unknown';
 

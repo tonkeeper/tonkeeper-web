@@ -23,8 +23,8 @@ import { App } from '@capacitor/app';
 import { KeychainCapacitor } from './keychain';
 import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
-import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
-import { CAPACITOR_APPLICATION_ID } from "./aplication-id";
+import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
+import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -101,23 +101,43 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
             forceExternalBrowser?: boolean;
         }
     ) => {
-        if (!url.startsWith('https://') && !url.startsWith('http://')) {
-            try {
-                /* way to open in deeplinks on ios */
+        try {
+            if (!isValidUrlProtocol(url, this.authorizedOpenUrlProtocols)) {
+                throw new Error('Unacceptable url protocol');
+            }
 
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                window.location = url as any;
-            } catch (e) {
-                console.error(e);
-            }
-        } else {
-            if (options?.forceExternalBrowser) {
-                safeWindowOpen(url);
+            if (!url.startsWith('https://') && !url.startsWith('http://')) {
+                try {
+                    /* way to open in deeplinks on ios */
+
+                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                    window.location = url as any;
+                } catch (e) {
+                    console.error(e);
+                }
             } else {
-                await Browser.open({ url });
+                if (options?.forceExternalBrowser) {
+                    safeWindowOpen(url, this.authorizedOpenUrlProtocols);
+                } else {
+                    await Browser.open({ url });
+                }
             }
+        } catch (e) {
+            console.error(e);
         }
     };
+
+    authorizedOpenUrlProtocols = [
+        'http:',
+        'https:',
+        'tg:',
+        'tonsign:',
+        'tonsign:',
+        'tonkeeper:',
+        'tonkeeperx:',
+        'tonkeeper-mob:',
+        'tonkeeper-tc-mob:'
+    ];
 
     async confirm(options: ConfirmOptions) {
         const { value } = await Dialog.confirm(options);

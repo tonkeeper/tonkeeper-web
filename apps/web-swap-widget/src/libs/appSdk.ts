@@ -29,7 +29,7 @@ export class WidgetAppSdk extends BaseApp {
     };
 
     openPage = async (url: string) => {
-        safeWindowOpen(url);
+        safeWindowOpen(url, this.acceptedOpenUrlProtocols);
     };
 
     disableScroll = disableScroll;
@@ -48,4 +48,6 @@ export class WidgetAppSdk extends BaseApp {
     version = WidgetAppSdk.version;
 
     targetEnv = 'web' as const;
+
+    acceptedOpenUrlProtocols = ['http:', 'https:'];
 }

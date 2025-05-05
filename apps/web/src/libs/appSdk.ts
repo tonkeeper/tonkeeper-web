@@ -25,7 +25,7 @@ export class BrowserAppSdk extends BaseApp {
         this.topMessage(notification);
     };
     openPage = async (url: string) => {
-        safeWindowOpen(url);
+        safeWindowOpen(url, authorizedOpenUrlProtocols);
     };
 
     disableScroll = disableScroll;
@@ -41,4 +41,6 @@ export class BrowserAppSdk extends BaseApp {
     targetEnv= 'web' as const;
 
     signerReturnUrl = 'https://wallet.tonkeeper.com/';
+
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'tonsign:']
 }
