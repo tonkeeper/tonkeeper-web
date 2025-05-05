@@ -27,7 +27,7 @@ const QRWrapper = styled.div`
 const Body1Secondary = styled(Body1)`
     color: ${p => p.theme.textSecondary};
     margin-bottom: 32px;
-    max-width: 326px;
+    max-width: 366px;
     text-wrap: balance;
 `;
 

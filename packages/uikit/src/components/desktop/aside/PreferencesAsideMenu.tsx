@@ -3,6 +3,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { Body3, Label2 } from '../../Text';
 import {
     AppearanceIcon,
+    AppleIcon,
     BankIcon,
     CodeIcon,
     DocIcon,
@@ -30,7 +31,7 @@ import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv } from '../../shared/TargetEnv';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -218,6 +219,17 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
+                <NotForTargetEnv env="mobile">
+                    <AsideMenuItemStyled
+                        onClick={() =>
+                            config.pro_landing_url && sdk.openPage(config.pro_landing_url)
+                        }
+                        isSelected={false}
+                    >
+                        <AppleIcon />
+                        <Label2>{t('settings_pro_ios')}</Label2>
+                    </AsideMenuItemStyled>
+                </NotForTargetEnv>
             </AsideMenuItemsBlock>
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.dev}>
