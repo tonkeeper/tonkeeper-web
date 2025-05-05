@@ -51,12 +51,18 @@ const DesktopViewPageLayoutSimpleIonic = styled.div<{ $mobileContentPaddingTop?:
             box-sizing: border-box;
         `}
 
-    &:not:has(ion-modal)::after {
+    &::after {
         position: relative;
         display: block;
         content: '';
         height: calc(64px + 8px + env(safe-area-inset-bottom));
         background: transparent;
+    }
+`;
+
+const DesktopViewPageLayoutSimpleIonicModalOverride = createGlobalStyle`
+    ion-modal ${DesktopViewPageLayoutSimpleIonic}::after {
+        display: none;
     }
 `;
 
@@ -88,18 +94,21 @@ export const DesktopViewPageLayout = forwardRef<
 
     if (platform === 'mobile') {
         return (
-            <DesktopViewPageLayoutContext.Provider value={id}>
-                <IonPage id={id}>
-                    <IonContent ref={contentRef} fullscreen={true}>
-                        <DesktopViewPageLayoutSimpleIonic
-                            className={className}
-                            $mobileContentPaddingTop={mobileContentPaddingTop}
-                        >
-                            {children}
-                        </DesktopViewPageLayoutSimpleIonic>
-                    </IonContent>
-                </IonPage>
-            </DesktopViewPageLayoutContext.Provider>
+            <>
+                <DesktopViewPageLayoutContext.Provider value={id}>
+                    <IonPage id={id}>
+                        <IonContent ref={contentRef} fullscreen={true}>
+                            <DesktopViewPageLayoutSimpleIonic
+                                className={className}
+                                $mobileContentPaddingTop={mobileContentPaddingTop}
+                            >
+                                {children}
+                            </DesktopViewPageLayoutSimpleIonic>
+                        </IonContent>
+                    </IonPage>
+                </DesktopViewPageLayoutContext.Provider>
+                <DesktopViewPageLayoutSimpleIonicModalOverride />
+            </>
         );
     } else
         return (
