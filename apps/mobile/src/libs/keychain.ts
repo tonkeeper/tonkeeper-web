@@ -25,7 +25,7 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
         const { data } = await SecureStorage.getData({
             id: `Wallet-${key}`
         });
-        return data!;
+        return data;
     };
 
     removeData = async (key: string) => {

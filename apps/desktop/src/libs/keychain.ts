@@ -16,7 +16,11 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
 
     getData = async (key: string) => {
         await this.securityCheck();
-        return sendBackground<string>({ king: 'get-keychain', publicKey: key });
+        const value = sendBackground<string | null>({ king: 'get-keychain', publicKey: key });
+        if (value === null) {
+            throw new Error('Mnemonic not found in keychain');
+        }
+        return value;
     };
 
     removeData = async (key: string) => {
