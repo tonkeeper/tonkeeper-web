@@ -32,10 +32,12 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
         await SecureStorage.removeData({
             id: `Wallet-${key}`
         });
+        console.info(`Deleted password for account "${key}": Success`);
     };
 
     clearStorage = async () => {
         await SecureStorage.clearStorage();
+        console.info(`Clear keychain": Success`);
         await this.resetSecuritySettings();
     };
 
