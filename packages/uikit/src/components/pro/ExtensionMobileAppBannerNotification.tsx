@@ -3,11 +3,12 @@ import { Body1, H2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateUserUIPreferences } from '../../state/theme';
 import { FC, useEffect, useState } from 'react';
-import { Notification } from '../Notification';
+import { Notification, openedNotifications$ } from '../Notification';
 import { QRCode } from 'react-qrcode-logo';
 import { ExternalLink } from '../shared/ExternalLink';
 import { Button } from '../fields/Button';
 import { useMobileBannerUrl } from '../../hooks/browser/useMobileBannerUrl';
+import { useAtomValue } from '../../libs/useAtom';
 
 const Wrapper = styled.div`
     display: flex;
@@ -49,12 +50,13 @@ export const ExtensionMobileAppBannerNotification: FC<{ className?: string }> = 
     const [isOpen, setIsOpen] = useState(false);
 
     const isIphone = !!navigator?.userAgent && /iPhone/.test(navigator.userAgent);
+    const openedNotifications = useAtomValue(openedNotifications$);
 
     useEffect(() => {
-        if (url) {
+        if (url && openedNotifications.length === 0) {
             setIsOpen(true);
         }
-    }, [url]);
+    }, [url, openedNotifications.length]);
 
     const onClose = () => {
         setIsOpen(false);

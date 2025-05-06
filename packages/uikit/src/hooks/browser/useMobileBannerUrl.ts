@@ -10,7 +10,7 @@ export const useMobileBannerUrl = () => {
     const { data } = useUserUIPreferences();
 
     return useMemo(() => {
-        if (!configLink || !data || data.dismissMobileQRBanner) {
+        if (!configLink || data === undefined || data?.dismissMobileQRBanner) {
             return null;
         }
 

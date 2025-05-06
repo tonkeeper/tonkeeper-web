@@ -31,6 +31,7 @@ import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { IonContent, IonModal } from '@ionic/react';
 import { cn } from '../libs/css';
 import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
+import { atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -450,33 +451,55 @@ export type OnCloseInterceptor =
     | ((closeHandle: () => void, cancelCloseHandle: () => void) => void)
     | undefined;
 
-const notificationsControl$ = {
+const notificationsControl = {
     untaggedCloseHandlers: new Set<() => void>(),
-    taggedCloseHandlers: new Map<string, () => void>()
+    taggedCloseHandlers: new Map<string, () => void>(),
+    openedNotifications$: atom<{ id: string; tag?: string }[]>([])
 };
 
 export function closeAllNotifications() {
-    notificationsControl$.untaggedCloseHandlers.forEach(handler => handler());
-    [...notificationsControl$.taggedCloseHandlers.values()].forEach(handler => handler());
+    notificationsControl.untaggedCloseHandlers.forEach(handler => handler());
+    [...notificationsControl.taggedCloseHandlers.values()].forEach(handler => handler());
 }
 
 export function closeNotification(tag: string) {
-    notificationsControl$.taggedCloseHandlers.get(tag)?.();
+    notificationsControl.taggedCloseHandlers.get(tag)?.();
 }
 
-const useConnectNotificationCloseControl = (tag: string | undefined, handleClose: () => void) => {
+export const openedNotifications$: ReadonlyAtom<{ id: string; tag?: string }[]> =
+    notificationsControl.openedNotifications$;
+
+const useConnectNotificationCloseControl = (
+    tag: string | undefined,
+    handleClose: () => void,
+    isOpen: boolean
+) => {
+    const id = useRef(Date.now().toString());
+    useEffect(() => {
+        const list = notificationsControl.openedNotifications$.value;
+
+        if (isOpen) {
+            notificationsControl.openedNotifications$.next([
+                ...list.filter(v => v.id !== id.current),
+                { id: id.current, tag }
+            ]);
+        } else if (list.some(item => item.id === id.current)) {
+            notificationsControl.openedNotifications$.next(list.filter(v => v.id !== id.current));
+        }
+    }, [tag, isOpen]);
+
     useEffect(() => {
         if (tag) {
-            notificationsControl$.taggedCloseHandlers.set(tag, handleClose);
+            notificationsControl.taggedCloseHandlers.set(tag, handleClose);
             return () => {
-                notificationsControl$.taggedCloseHandlers.delete(tag);
+                notificationsControl.taggedCloseHandlers.delete(tag);
             };
         }
 
-        notificationsControl$.untaggedCloseHandlers.add(handleClose);
+        notificationsControl.untaggedCloseHandlers.add(handleClose);
 
         return () => {
-            notificationsControl$.untaggedCloseHandlers.delete(handleClose);
+            notificationsControl.untaggedCloseHandlers.delete(handleClose);
         };
     }, [tag, handleClose]);
 };
@@ -539,7 +562,7 @@ export const NotificationIonic: FC<{
         }
     }, [handleClose, onCloseInterceptor]);
 
-    useConnectNotificationCloseControl(tag, handleClose);
+    useConnectNotificationCloseControl(tag, handleClose, isOpen);
 
     /**
      * Prevent Ionic bug -- touching modal background calls canDismiss twice
@@ -736,7 +759,7 @@ export const NotificationDesktopAndWeb: FC<{
         setTimeout(() => setOpen(isOpen));
     }, [isOpen]);
 
-    useConnectNotificationCloseControl(tag, handleClose);
+    useConnectNotificationCloseControl(tag, handleClose, isOpen);
 
     const sdk = useAppSdk();
     const nodeRef = useRef<HTMLDivElement>(null);
