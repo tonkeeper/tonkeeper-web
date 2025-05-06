@@ -45,6 +45,26 @@ const SingleAccountSettings = () => {
     const twoFAEnabled = useCanViewTwoFA();
     const canUseTron = useCanUseTronForActiveWallet();
 
+    const accountItems = useMemo(() => {
+        const items: SettingsItem[] = [
+            {
+                name: t('Manage_wallets'),
+                icon: <WalletsIcon />,
+                action: () => navigate(relative(SettingsRoute.account))
+            }
+        ];
+
+        if (proFeatures) {
+            items.push({
+                name: t('tonkeeper_pro'),
+                icon: <SettingsProIcon />,
+                action: () => navigate(relative(SettingsRoute.pro))
+            });
+        }
+
+        return items;
+    }, [t]);
+
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
 
@@ -117,14 +137,6 @@ const SingleAccountSettings = () => {
             });
         }
 
-        if (proFeatures) {
-            items.unshift({
-                name: t('tonkeeper_pro'),
-                icon: <SettingsProIcon />,
-                action: () => navigate(relative(SettingsRoute.pro))
-            });
-        }
-
         if (jettons?.balances.length) {
             items.push({
                 name: t('settings_jettons_list'),
@@ -176,6 +188,7 @@ const SingleAccountSettings = () => {
 
     return (
         <>
+            <SettingsList items={accountItems} />
             <SettingsList items={mainItems} />
         </>
     );
