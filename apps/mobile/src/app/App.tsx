@@ -48,6 +48,10 @@ import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
 import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
+import { CapacitorFileLogger } from "../libs/logger";
+
+const loger = new CapacitorFileLogger('logs.txt')
+loger.overrideConsole();
 
 setupIonicReact({
     swipeBackEnabled: true,
