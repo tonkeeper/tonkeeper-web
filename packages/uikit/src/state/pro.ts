@@ -35,6 +35,7 @@ import {
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useToast } from '../hooks/useNotification';
+import { useAnalyticsTrack } from '../hooks/amplitude';
 
 export type FreeProAccess = {
     code: string;
@@ -71,6 +72,7 @@ export const useMutateIsFreeProAccessActivate = () => {
     const client = useQueryClient();
     const toast = useToast();
     const { t } = useTranslation();
+    const track = useAnalyticsTrack();
 
     return useMutation<void, Error, boolean>(async isActive => {
         await sdk.storage.set(AppKey.PRO_FREE_ACCESS_ACTIVE, isActive);
@@ -78,6 +80,8 @@ export const useMutateIsFreeProAccessActivate = () => {
 
         if (isActive) {
             toast(t('free_pro_access_activated_toast'));
+
+            track('free_pro_access_activated');
         }
     });
 };
