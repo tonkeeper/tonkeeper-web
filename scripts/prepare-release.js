@@ -63,7 +63,7 @@ try {
         execSync(`git add ${modifiedFiles.join(' ')}`, { stdio: 'inherit' });
         execSync(`git commit -m "chore: release ${newVersion}"`, { stdio: 'inherit' });
         execSync(`git tag -a v${newVersion} -m "Version ${newVersion}"`, { stdio: 'inherit' });
-        console.log(`\nSuccessfully released version ${newVersion} and created git tag v${newVersion}`);
+        console.log(`\nSuccessfully prepared release version ${newVersion} and created git tag v${newVersion}`);
     } else {
         console.error('No package.json files were modified. Nothing to commit.');
         process.exit(1);
