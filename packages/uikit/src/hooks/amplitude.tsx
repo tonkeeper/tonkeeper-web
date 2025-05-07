@@ -30,9 +30,9 @@ export const useAnalyticsTrack = () => {
     const tracker = useContext(AmplitudeAnalyticsContext);
 
     return useCallback(
-        (name: string, params: Record<string, any>) => {
+        (name: string, params?: Record<string, any>) => {
             if (tracker) {
-                tracker.track(name, params);
+                tracker.track(name, params || {});
             }
         },
         [tracker]
