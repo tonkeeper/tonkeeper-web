@@ -104,8 +104,8 @@
         <string>bluetooth-central</string>
     </array>
     <key>UIFileSharingEnabled</key>
-    <true/>
+    <false/>
     <key>LSSupportsOpeningDocumentsInPlace</key>
-    <true/>
+    <false/>
 </dict>
 </plist>
