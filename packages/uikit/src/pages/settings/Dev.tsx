@@ -180,9 +180,9 @@ export const DevSettingsLogs = () => {
 
     const onClear = async () => {
         const confirmed = await sdk.confirm({
-            title: 'Clear logs',
+            title: 'Delete logs',
             message: 'Are you sure you want to clear all logs?',
-            okButtonTitle: 'Clear Logs',
+            okButtonTitle: 'Delete Logs',
             cancelButtonTitle: 'Cancel'
         });
 
@@ -192,8 +192,16 @@ export const DevSettingsLogs = () => {
         }
     };
 
-    const onCopy = () => {
-        sdk.copyToClipboard(logs);
+    const onCopy = async () => {
+        const confirmed = await sdk.confirm({
+            title: 'Copy logs',
+            message: 'Logs might contain sensitive data. Check it before copying and sharing',
+            okButtonTitle: 'Copy Logs Anyway'
+        });
+
+        if (confirmed) {
+            sdk.copyToClipboard(logs);
+        }
     };
 
     return (
