@@ -46,6 +46,11 @@ export enum SettingsRoute {
     twoFa = '/two-fa'
 }
 
+export enum DevSettingsRoute {
+    index = '/',
+    logs = '/logs'
+}
+
 export enum WalletSettingsRoute {
     index = '/',
     recovery = '/recovery',

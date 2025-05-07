@@ -25,6 +25,7 @@ import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
 import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
+import { CapacitorFileLogger } from './logger';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -169,6 +170,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     signerReturnUrl = 'tonkeeper://'; // TODO replace with 'tonkeeper-pro://'; once signer is fixed
 
     keyboard = new CapacitorKeyboardService();
+
+    logger = new CapacitorFileLogger('logs.txt');
 }
 
 export const getCapacitorDeviceOS = async () => {

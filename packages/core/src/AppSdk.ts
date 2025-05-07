@@ -169,6 +169,11 @@ export interface IAppSdk {
     keyboard: KeyboardService;
 
     authorizedOpenUrlProtocols: string[];
+
+    logger?: {
+        read(): Promise<string>;
+        clear(): Promise<void>;
+    };
 }
 export interface ConfirmOptions {
     title?: string;

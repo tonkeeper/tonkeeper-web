@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
@@ -27,10 +27,12 @@ import { AddWalletContext } from '../../components/create/AddWalletContext';
 import { ImportBySKWallet } from '../import/ImportBySKWallet';
 import { Notification } from '../../components/Notification';
 import { useSecurityCheck } from '../../state/password';
-import { Label1 } from '../../components/Text';
-import { Switch } from '../../components/fields/Switch';
+import { Body3Class, Label1 } from '../../components/Text';
 import { useIsOnIosReview, useMutateEnableReviewerMode } from '../../hooks/ios';
 import { useAppContext } from '../../hooks/appContext';
+import { HideOnReview } from '../../components/ios/HideOnReview';
+import { AppRoute, DevSettingsRoute } from '../../libs/routes';
+import { Switch } from '../../components/fields/Switch';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -118,6 +120,26 @@ const ReviewerSettings = () => {
     );
 };
 
+const LogsSettings = () => {
+    const navigate = useNavigate();
+    const logger = useAppSdk().logger;
+    if (!logger) {
+        return null;
+    }
+
+    return (
+        <HideOnReview>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false} onClick={() => navigate('.' + DevSettingsRoute.logs)}>
+                    <ListItemPayload>
+                        <Label1>Dev Logs</Label1>
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+        </HideOnReview>
+    );
+};
+
 const DesktopWrapper = styled(DesktopViewPageLayout)`
     ${ListBlock} {
         margin-bottom: 0;
@@ -127,6 +149,82 @@ const DesktopWrapper = styled(DesktopViewPageLayout)`
         min-height: 56px;
     }
 `;
+
+const Pre = styled.pre`
+    margin: 8px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    ${Body3Class};
+`;
+
+export const DevSettingsLogs = () => {
+    const sdk = useAppSdk();
+    const logger = sdk.logger;
+    const [logs, setLogs] = useState<string>('');
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        logger?.read().then(setLogs);
+    }, [logger]);
+
+    useEffect(() => {
+        if (!logger) {
+            navigate(AppRoute.settings, { replace: true });
+        }
+    }, [logger, navigate]);
+
+    if (!logger) {
+        return null;
+    }
+
+    const onClear = async () => {
+        const confirmed = await sdk.confirm({
+            title: 'Clear logs',
+            message: 'Are you sure you want to clear all logs?',
+            okButtonTitle: 'Clear Logs',
+            cancelButtonTitle: 'Cancel'
+        });
+
+        if (confirmed) {
+            await logger!.clear();
+            setLogs('');
+        }
+    };
+
+    const onCopy = () => {
+        sdk.copyToClipboard(logs);
+    };
+
+    return (
+        <DesktopViewPageLayout>
+            <ForTargetEnv env="mobile">
+                <DesktopViewHeader>
+                    <DesktopViewHeaderContent
+                        title="Dev Logs"
+                        right={
+                            <DesktopViewHeaderContent.Right>
+                                <DesktopViewHeaderContent.RightItem
+                                    closeDropDownOnClick
+                                    onClick={onClear}
+                                >
+                                    Delete Logs
+                                </DesktopViewHeaderContent.RightItem>
+                                <DesktopViewHeaderContent.RightItem
+                                    closeDropDownOnClick
+                                    onClick={onCopy}
+                                >
+                                    Copy
+                                </DesktopViewHeaderContent.RightItem>
+                            </DesktopViewHeaderContent.Right>
+                        }
+                    />
+                </DesktopViewHeader>
+            </ForTargetEnv>
+            <Pre>{logs}</Pre>
+        </DesktopViewPageLayout>
+    );
+};
 
 export const DevSettings = React.memo(() => {
     const isProDisplay = useIsFullWidthMode();
@@ -142,6 +240,7 @@ export const DevSettings = React.memo(() => {
                 <CookieSettings />
                 <AddAccountBySK />
                 <ReviewerSettings />
+                <LogsSettings />
             </DesktopWrapper>
         );
     }
@@ -156,5 +255,3 @@ export const DevSettings = React.memo(() => {
         </>
     );
 });
-
-DevSettings.displayName = 'DevSettings';
