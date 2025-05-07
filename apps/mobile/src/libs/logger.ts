@@ -90,7 +90,7 @@ class LogBuffer {
                 await Filesystem.writeFile({ ...writeOptions, recursive: true });
             } else if (fileSize > this.maxFileSize) {
                 const savedLogs = await this.read();
-                const savedPrevLogs = savedLogs.slice(3000);
+                const savedPrevLogs = savedLogs.slice(0, 3000);
                 await Filesystem.writeFile({
                     ...writeOptions,
                     recursive: true,
