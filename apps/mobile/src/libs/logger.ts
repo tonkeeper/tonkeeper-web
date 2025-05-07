@@ -23,7 +23,7 @@ class LogBuffer {
     }
 
     public write(message: string): void {
-        this.buffer.push(message);
+        this.buffer.unshift(message);
     }
 
     public async clear(): Promise<void> {

@@ -1,10 +1,10 @@
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
 import { ProSettings } from '../../components/settings/ProSettings';
-import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
+import { AppRoute, DevSettingsRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Localization } from '../../pages/settings/Localization';
 import { Legal } from '../../pages/settings/Legal';
 import { UserTheme } from '../../pages/settings/Theme';
-import { DevSettings } from '../../pages/settings/Dev';
+import { DevSettings, DevSettingsLogs } from '../../pages/settings/Dev';
 import { FiatCurrency } from '../../pages/settings/FiatCurrency';
 import { Notifications } from '../../pages/settings/Notification';
 import { SecuritySettings } from '../../pages/settings/Security';
@@ -20,7 +20,11 @@ export const DesktopPreferencesRouting = () => {
             <Route path={path + SettingsRoute.localization} component={Localization} />
             <Route path={path + SettingsRoute.legal} component={Legal} />
             <Route path={path + SettingsRoute.theme} component={UserTheme} />
-            <Route path={path + SettingsRoute.dev} component={DevSettings} />
+            <Route path={path + SettingsRoute.dev} component={DevSettings} exact />
+            <Route
+                path={path + SettingsRoute.dev + DevSettingsRoute.logs}
+                component={DevSettingsLogs}
+            />
             <Route path={path + SettingsRoute.fiat} component={FiatCurrency} />
             <Route path={path + SettingsRoute.notification} component={Notifications} />
             <Route path={path + SettingsRoute.recovery} component={NavigateToRecovery} />

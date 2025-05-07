@@ -157,6 +157,10 @@ const Pre = styled.pre`
     ${Body3Class};
 `;
 
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    height: 100%;
+`;
+
 export const DevSettingsLogs = () => {
     const sdk = useAppSdk();
     const logger = sdk.logger;
@@ -205,32 +209,32 @@ export const DevSettingsLogs = () => {
     };
 
     return (
-        <DesktopViewPageLayout>
-            <ForTargetEnv env="mobile">
-                <DesktopViewHeader>
-                    <DesktopViewHeaderContent
-                        title="Dev Logs"
-                        right={
-                            <DesktopViewHeaderContent.Right>
-                                <DesktopViewHeaderContent.RightItem
-                                    closeDropDownOnClick
-                                    onClick={onClear}
-                                >
-                                    Delete Logs
-                                </DesktopViewHeaderContent.RightItem>
-                                <DesktopViewHeaderContent.RightItem
-                                    closeDropDownOnClick
-                                    onClick={onCopy}
-                                >
-                                    Copy
-                                </DesktopViewHeaderContent.RightItem>
-                            </DesktopViewHeaderContent.Right>
-                        }
-                    />
-                </DesktopViewHeader>
-            </ForTargetEnv>
+        <DesktopViewPageLayoutStyled>
+            <DesktopViewHeader backButton borderBottom>
+                <DesktopViewHeaderContent
+                    title="Dev Logs"
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem
+                                asDesktopButton
+                                closeDropDownOnClick
+                                onClick={onClear}
+                            >
+                                Delete Logs
+                            </DesktopViewHeaderContent.RightItem>
+                            <DesktopViewHeaderContent.RightItem
+                                asDesktopButton
+                                closeDropDownOnClick
+                                onClick={onCopy}
+                            >
+                                Copy
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
+            </DesktopViewHeader>
             <Pre>{logs}</Pre>
-        </DesktopViewPageLayout>
+        </DesktopViewPageLayoutStyled>
     );
 };
 
