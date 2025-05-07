@@ -173,35 +173,37 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                 </NavLink>
             </AsideMenuItemsBlock>
 
-            <ForTargetEnv env="mobile">
-                <AsideMenuItemsBlock>
-                    <AsideMenuItemStyled
-                        onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
-                        isSelected={false}
-                    >
-                        <GlobeIcon />
-                        <Label2>{t('preferences_aside_faq')}</Label2>
-                    </AsideMenuItemStyled>
-                    <AsideMenuItemStyled
-                        onClick={() =>
-                            config.directSupportUrl && sdk.openPage(config.directSupportUrl)
-                        }
-                        isSelected={false}
-                    >
-                        <TelegramIcon />
-                        <Label2>{t('settings_support')}</Label2>
-                    </AsideMenuItemStyled>
-                    <AsideMenuItemStyled
-                        onClick={() =>
-                            config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
-                        }
-                        isSelected={false}
-                    >
-                        <TelegramIcon />
-                        <Label2>{t('settings_news')}</Label2>
-                    </AsideMenuItemStyled>
-                </AsideMenuItemsBlock>
-            </ForTargetEnv>
+            <HideOnReview>
+                <ForTargetEnv env="mobile">
+                    <AsideMenuItemsBlock>
+                        <AsideMenuItemStyled
+                            onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
+                            isSelected={false}
+                        >
+                            <GlobeIcon />
+                            <Label2>{t('preferences_aside_faq')}</Label2>
+                        </AsideMenuItemStyled>
+                        <AsideMenuItemStyled
+                            onClick={() =>
+                                config.directSupportUrl && sdk.openPage(config.directSupportUrl)
+                            }
+                            isSelected={false}
+                        >
+                            <TelegramIcon />
+                            <Label2>{t('settings_support')}</Label2>
+                        </AsideMenuItemStyled>
+                        <AsideMenuItemStyled
+                            onClick={() =>
+                                config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
+                            }
+                            isSelected={false}
+                        >
+                            <TelegramIcon />
+                            <Label2>{t('settings_news')}</Label2>
+                        </AsideMenuItemStyled>
+                    </AsideMenuItemsBlock>
+                </ForTargetEnv>
+            </HideOnReview>
 
             <AsideMenuItemsBlock>
                 <AsideMenuItemStyled
