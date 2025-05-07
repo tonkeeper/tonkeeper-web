@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { DeepLink } from '../../libs/plugins';
 import ReactPortal from '@tonkeeper/uikit/dist/components/ReactPortal';
+import { HideOnReview } from '@tonkeeper/uikit/dist/components/ios/HideOnReview';
 
 const Wrapper = styled(motion.div)`
     position: fixed;
@@ -50,29 +51,31 @@ export const RedirectToTonkeeperMobile: FC<{
     const { data: isTonkeeperMobileInstalled } = useIsTonkeeperMobileInstalled();
 
     return (
-        <ReactPortal position="first" wrapperId="body">
-            <AnimatePresence>
-                {isOpen && isTonkeeperMobileInstalled && (
-                    <Wrapper
-                        onClick={() => onClick(true)}
-                        initial={{ opacity: 0, y: -50 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -50 }}
-                        transition={{ duration: 0.2, ease: 'easeOut' }}
-                        drag="y"
-                        dragConstraints={{ top: 0, bottom: 0 }}
-                        dragElastic={0.7}
-                        onDragEnd={(_, info) => {
-                            if (info.offset.y < -50) {
-                                onClick(false);
-                            }
-                        }}
-                    >
-                        <Label2>{t('pro_continue_in_tonkeeper_mobile')}</Label2>
-                        <ChevronRightIcon />
-                    </Wrapper>
-                )}
-            </AnimatePresence>
-        </ReactPortal>
+        <HideOnReview>
+            <ReactPortal position="first" wrapperId="body">
+                <AnimatePresence>
+                    {isOpen && isTonkeeperMobileInstalled && (
+                        <Wrapper
+                            onClick={() => onClick(true)}
+                            initial={{ opacity: 0, y: -50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -50 }}
+                            transition={{ duration: 0.2, ease: 'easeOut' }}
+                            drag="y"
+                            dragConstraints={{ top: 0, bottom: 0 }}
+                            dragElastic={0.7}
+                            onDragEnd={(_, info) => {
+                                if (info.offset.y < -50) {
+                                    onClick(false);
+                                }
+                            }}
+                        >
+                            <Label2>{t('pro_continue_in_tonkeeper_mobile')}</Label2>
+                            <ChevronRightIcon />
+                        </Wrapper>
+                    )}
+                </AnimatePresence>
+            </ReactPortal>
+        </HideOnReview>
     );
 };

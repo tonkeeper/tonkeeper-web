@@ -14,6 +14,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useIsOnIosReview } from '../../hooks/ios';
 
 const Icon = styled.span`
     display: flex;
@@ -33,18 +34,10 @@ export const Legal = React.memo(() => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const isProDisplay = useIsFullWidthMode();
+    const isOnReview = useIsOnIosReview();
 
     const items = useMemo<SettingsItem[]>(() => {
-        return [
-            {
-                name: t('legal_terms'),
-                icon: (
-                    <Icon>
-                        <ChevronRightIcon />
-                    </Icon>
-                ),
-                action: () => sdk.openPage('https://tonkeeper.com/terms/')
-            },
+        const val = [
             {
                 name: t('legal_privacy'),
                 icon: (
@@ -55,7 +48,21 @@ export const Legal = React.memo(() => {
                 action: () => sdk.openPage('https://tonkeeper.com/privacy/')
             }
         ];
-    }, [t]);
+
+        if (!isOnReview) {
+            val.unshift({
+                name: t('legal_terms'),
+                icon: (
+                    <Icon>
+                        <ChevronRightIcon />
+                    </Icon>
+                ),
+                action: () => sdk.openPage('https://tonkeeper.com/terms/')
+            });
+        }
+
+        return val;
+    }, [t, isOnReview]);
 
     const licenses = useMemo<SettingsItem[]>(() => {
         return [
