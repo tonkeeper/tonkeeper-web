@@ -44,8 +44,8 @@ export const UrlTonConnectSubscription = () => {
     useEffect(() => {
         if (location.pathname === TON_CONNECT_TRIGGER_PATH) {
             reset();
+            parseParams(window.location.href).then(setParams);
             navigate(AppRoute.home, { replace: true });
-            parseParams(location.search).then(setParams);
         }
     }, [location, navigate]);
 
