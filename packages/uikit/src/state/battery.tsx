@@ -2,7 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import type { RechargeMethods } from '@tonkeeper/core/dist/batteryApi/models/RechargeMethods';
 
-import { useActiveAccount, useActiveConfig, useActiveTonNetwork } from './wallet';
+import {
+    useActiveAccount,
+    useActiveAccountQuery,
+    useActiveConfig,
+    useActiveTonNetwork
+} from './wallet';
 import { useSignTonProof } from '../hooks/accountUtils';
 import { useEffect, useMemo } from 'react';
 import { useAppSdk } from '../hooks/appSdk';
@@ -25,6 +30,14 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useTwoFAWalletConfig } from './two-fa';
 import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { useIsOnIosReview } from '../hooks/ios';
+
+export const useCanUseBattery = () => {
+    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
+    const account = useActiveAccount();
+    return (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+};
 
 export const useBatteryApi = () => {
     const config = useActiveConfig();
@@ -44,7 +57,8 @@ export const useBatteryServiceConfigQuery = () => {
             return new DefaultApi(batteryApi).getConfig();
         },
         {
-            keepPreviousData: true
+            keepPreviousData: true,
+            suspense: true
         }
     );
 };
@@ -119,23 +133,31 @@ export const useBatteryAuthToken = () => {
 };
 
 export const useRequestBatteryAuthToken = () => {
-    const account = useActiveAccount();
+    const { data: account } = useActiveAccountQuery();
     const { mutateAsync: signTonProof } = useSignTonProof();
     const batteryApi = useBatteryApi();
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation(async () => {
-        if (account.type !== 'mnemonic' && account.type !== 'mam') {
-            throw new Error('Invalid account type');
+    return useMutation<
+        string,
+        Error,
+        { signer?: (b: Buffer) => Promise<Uint8Array | Buffer>; wallet?: TonWalletStandard } | void
+    >(async args => {
+        let wallet = args?.wallet;
+        if (!wallet) {
+            if (account?.type !== 'mnemonic' && account?.type !== 'mam') {
+                throw new Error('Invalid account type');
+            }
+            wallet = account.activeTonWallet;
         }
         const { payload } = await new ConnectApi(batteryApi).getTonConnectPayload();
         const origin = batteryApi.basePath;
 
-        const proof = await signTonProof({ payload, origin });
+        const proof = await signTonProof({ payload, origin, signer: args?.signer, wallet });
         const res = await new WalletApi(batteryApi).tonConnectProof({
             tonConnectProofRequest: {
-                address: account.activeTonWallet.rawAddress,
+                address: wallet.rawAddress,
                 proof: {
                     timestamp: proof.timestamp,
                     domain: {
@@ -149,7 +171,7 @@ export const useRequestBatteryAuthToken = () => {
             }
         });
 
-        await sdk.storage.set(tokenStorageKey(account.activeTonWallet.publicKey), {
+        await sdk.storage.set(tokenStorageKey(wallet.publicKey), {
             token: res.token
         });
         await client.invalidateQueries([QueryKey.batteryAuthToken]);
@@ -158,6 +180,23 @@ export const useRequestBatteryAuthToken = () => {
 };
 
 const tokenStorageKey = (publicKey: string) => `${AppKey.BATTERY_AUTH_TOKEN}_${publicKey}`;
+
+export const useRemoveBatteryAuthToken = () => {
+    const account = useActiveAccount();
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation(async () => {
+        const tonWallets = account.allTonWallets;
+        for (const wallet of tonWallets) {
+            if (isStandardTonWallet(wallet)) {
+                await sdk.storage.delete(tokenStorageKey(wallet.publicKey));
+            }
+        }
+
+        await client.invalidateQueries([QueryKey.batteryAuthToken]);
+    });
+};
 
 export const useProvideBatteryAuth = () => {
     const tokenQuery = useBatteryAuthToken();
@@ -187,6 +226,7 @@ export const useBatteryEnabledConfig = () => {
     const network = useActiveTonNetwork();
     const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
+    const disableDueToIosReview = useIsOnIosReview();
 
     const disableDueToTwoFA =
         twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
@@ -195,16 +235,27 @@ export const useBatteryEnabledConfig = () => {
         if (network === Network.TESTNET) {
             return {
                 isBeta: false,
-                disableWhole: false,
-                disableOperations: false
+                disableWhole: disableDueToIosReview,
+                disableOperations: disableDueToIosReview
             };
         }
+
+        const disableWhole =
+            disableDueToIosReview || disableDueToTwoFA || (disable_battery ?? false);
+
         return {
             isBeta: battery_beta ?? false,
-            disableWhole: disableDueToTwoFA || (disable_battery ?? false),
-            disableOperations: disable_battery ? true : disable_battery_send ?? false
+            disableWhole,
+            disableOperations: disableWhole ? true : disable_battery_send ?? false
         };
-    }, [battery_beta, disable_battery, disable_battery_send, network, disableDueToTwoFA]);
+    }, [
+        battery_beta,
+        disable_battery,
+        disable_battery_send,
+        network,
+        disableDueToTwoFA,
+        disableDueToIosReview
+    ]);
 };
 
 /**

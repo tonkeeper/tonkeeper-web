@@ -17,6 +17,7 @@ import {
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 import { DeployTwoFAConfirmNotification } from './DeployTwoFAConfirmNotification';
+import { NotForTargetEnv } from '../../shared/TargetEnv';
 
 export const TwoFASetUp: FC<{ className?: string }> = ({ className }) => {
     const { data: config } = useTwoFAWalletConfig();
@@ -30,7 +31,9 @@ export const TwoFASetUp: FC<{ className?: string }> = ({ className }) => {
         <StepsContainer className={className}>
             <LinkTGStep config={config} ref={ref1} />
             <DeployPluginStep config={config} ref={ref2} />
-            {params && <ConnectorStyled {...params} />}
+            <NotForTargetEnv env="mobile">
+                {params && <ConnectorStyled {...params} />}
+            </NotForTargetEnv>
         </StepsContainer>
     );
 };

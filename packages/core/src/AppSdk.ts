@@ -8,6 +8,7 @@ import { TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
+import { atom, ReadonlyAtom, Subject } from './entries/atom';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -57,6 +58,9 @@ export interface UIEvents {
     editSuggestion: FavoriteSuggestion;
     response: any;
     toast: string;
+    signerTxResponse: {
+        signatureHex: string;
+    };
 }
 
 export interface NativeBackButton {
@@ -66,12 +70,32 @@ export interface NativeBackButton {
     hide(): void;
 }
 
-export interface KeychainPassword {
-    setPassword: (publicKey: string, mnemonic: string) => Promise<void>;
-    getPassword: (publicKey: string) => Promise<string>;
+export interface KeychainSecurity {
+    biometry?: boolean;
+    password?: boolean;
 }
 
-export interface TouchId {
+export interface IKeychainService {
+    setData: (key: string, value: string) => Promise<void>;
+    getData: (key: string) => Promise<string>;
+    removeData: (key: string) => Promise<void>;
+    clearStorage: () => Promise<void>;
+
+    security: ReadonlyAtom<KeychainSecurity | undefined>;
+
+    /**
+     * Do an additional security check e.g. when changing settings
+     * @param type
+     */
+    securityCheck: (type?: 'biometry' | 'password' | 'preferred') => Promise<void>;
+
+    checkPassword: (password: string) => Promise<boolean>;
+    updatePassword: (password: string) => Promise<void>;
+    setBiometry: (enabled: boolean) => Promise<void>;
+    resetSecuritySettings: () => Promise<void>;
+}
+
+export interface BiometryService {
     canPrompt: () => Promise<boolean>;
     prompt: (reason: (lang: string) => string) => Promise<void>;
 }
@@ -94,16 +118,26 @@ export interface NotificationService {
     subscribed: (address: string) => Promise<boolean>;
 }
 
+export interface InternetConnectionService {
+    isOnline: ReadonlyAtom<boolean>;
+    retry: () => Promise<boolean>;
+}
+
 export interface IAppSdk {
     storage: IStorage;
     nativeBackButton?: NativeBackButton;
-    keychain?: KeychainPassword;
+    keychain?: IKeychainService;
     cookie?: CookieService;
-    touchId?: TouchId;
+    biometry?: BiometryService;
 
     topMessage: (text: string) => void;
     copyToClipboard: (value: string, notification?: string) => void;
-    openPage: (url: string) => Promise<unknown>;
+    openPage: (
+        url: string,
+        options?: {
+            forceExternalBrowser?: boolean;
+        }
+    ) => Promise<unknown>;
     openNft: (nft: NFT) => void;
 
     disableScroll: () => void;
@@ -115,18 +149,44 @@ export interface IAppSdk {
     uiEvents: IEventEmitter<UIEvents>;
     version: string;
 
-    confirm: (text: string) => Promise<boolean>;
+    confirm: (options: ConfirmOptions) => Promise<boolean>;
     alert: (text: string) => Promise<void>;
     prompt: (message: string, defaultValue?: string) => Promise<string | null>;
 
     requestExtensionPermission: () => Promise<void>;
     twaExpand?: () => void;
-    hapticNotification: (type: 'success' | 'error') => void;
+    hapticNotification: (type: 'success' | 'error' | 'impact_medium' | 'impact_light') => void;
 
     notifications?: NotificationService;
     targetEnv: TargetEnv;
 
     storeUrl?: string;
+    reloadApp: () => void;
+    connectionService: InternetConnectionService;
+
+    signerReturnUrl?: string;
+
+    keyboard: KeyboardService;
+
+    authorizedOpenUrlProtocols: string[];
+
+    logger?: {
+        read(): Promise<string>;
+        clear(): Promise<void>;
+    };
+}
+export interface ConfirmOptions {
+    title?: string;
+    message: string;
+    okButtonTitle?: string;
+    cancelButtonTitle?: string;
+}
+
+export interface KeyboardService {
+    willShow: Subject<{ keyboardHeight: number }>;
+    didShow: Subject<{ keyboardHeight: number }>;
+    willHide: Subject<void>;
+    didHide: Subject<void>;
 }
 
 export abstract class BaseApp implements IAppSdk {
@@ -166,7 +226,9 @@ export abstract class BaseApp implements IAppSdk {
 
     isStandalone = () => false;
 
-    confirm = async (text: string) => window.confirm(text);
+    async confirm(options: ConfirmOptions) {
+        return window.confirm(options.message);
+    }
 
     alert = async (text: string) => window.alert(text);
 
@@ -176,11 +238,50 @@ export abstract class BaseApp implements IAppSdk {
 
     twaExpand = () => {};
 
-    hapticNotification = (type: 'success' | 'error') => {};
+    hapticNotification = (_: 'success' | 'error' | 'impact_medium' | 'impact_light') => {};
 
     version = '0.0.0';
 
+    reloadApp = () => {
+        window.location.reload();
+    };
+
+    connectionService: InternetConnectionService = new WebConnectionService();
+
     abstract targetEnv: TargetEnv;
+
+    keyboard: KeyboardService = new WebKeyboardService();
+
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'mailto:'];
+}
+
+class WebKeyboardService implements KeyboardService {
+    public didShow = new Subject<{ keyboardHeight: number }>();
+
+    public willShow = new Subject<{ keyboardHeight: number }>();
+
+    public didHide = new Subject<void>();
+
+    public willHide = new Subject<void>();
+}
+
+class WebConnectionService implements InternetConnectionService {
+    isOnline = atom(this.checkIsOnline());
+
+    constructor() {
+        window.addEventListener('online', () => this.isOnline.next(true));
+        window.addEventListener('offline', () => this.isOnline.next(false));
+    }
+
+    private checkIsOnline() {
+        return window.navigator.onLine;
+    }
+
+    public async retry() {
+        const isOnline = this.checkIsOnline();
+        this.isOnline.next(isOnline);
+        return isOnline;
+    }
 }
 
 export class MockAppSdk extends BaseApp {
@@ -191,4 +292,11 @@ export class MockAppSdk extends BaseApp {
     }
 }
 
-export type TargetEnv = 'web' | 'extension' | 'desktop' | 'twa' | 'tablet' | 'swap_widget_web';
+export type TargetEnv =
+    | 'web'
+    | 'extension'
+    | 'desktop'
+    | 'twa'
+    | 'tablet'
+    | 'swap_widget_web'
+    | 'mobile';

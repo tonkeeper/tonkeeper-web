@@ -7,7 +7,7 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { FC } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../libs/routes';
@@ -35,6 +35,7 @@ import { useSideBarItems } from '../state/folders';
 import { useTwoFAWalletConfig } from '../state/two-fa';
 import { BorderSmallResponsive } from './shared/Styles';
 import { hexToRGBA } from '../libs/css';
+import { useNavigate } from '../hooks/router/useNavigate';
 
 const Block = styled.div<{
     center?: boolean;

@@ -1,6 +1,6 @@
 import { createModalControl } from './createModalControl';
 import React, { useCallback } from 'react';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { TonTransactionNotification } from '../connect/TonTransactionNotification';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 

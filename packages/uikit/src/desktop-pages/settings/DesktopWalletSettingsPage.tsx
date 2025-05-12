@@ -1,5 +1,5 @@
 import { TonWalletStandard, walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import {
     AppsIcon,
@@ -16,6 +16,7 @@ import { Body3, Label2 } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
@@ -44,6 +45,7 @@ import { useDeleteAccountNotification } from '../../components/modals/DeleteAcco
 import React from 'react';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useCanViewTwoFA } from '../../state/two-fa';
+import { useNavigate } from '../../hooks/router/useNavigate';
 import {
     useAutoMarkTronFeatureAsSeen,
     useCanUseTronForActiveWallet,
@@ -51,8 +53,9 @@ import {
     useToggleIsTronEnabledForActiveWallet
 } from '../../state/tron/tron';
 import { Switch } from '../../components/fields/Switch';
-import { hexToRGBA } from '../../libs/css';
+import { hexToRGBA, hover } from '../../libs/css';
 import { Badge } from '../../components/shared/Badge';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -66,9 +69,9 @@ const SettingsListItem = styled.div`
 
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
-    &:hover {
+    ${hover`
         background-color: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.7)};
-    }
+    `}
 
     > svg {
         color: ${p => p.theme.iconSecondary};
@@ -146,7 +149,7 @@ export const DesktopWalletSettingsPage = () => {
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
-                <Label2>{t('settings_title')}</Label2>
+                <DesktopViewHeaderContent title={t('settings_title')} />
             </DesktopViewHeader>
             <SettingsListBlock>
                 <SettingsListItem
@@ -230,12 +233,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_jettons_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
-                    <SettingsListItem>
-                        <SaleBadgeIcon />
-                        <Label2>{t('settings_collectibles_list')}</Label2>
-                    </SettingsListItem>
-                </LinkStyled>
+                <HideOnReview>
+                    <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
+                        <SettingsListItem>
+                            <SaleBadgeIcon />
+                            <Label2>{t('settings_collectibles_list')}</Label2>
+                        </SettingsListItem>
+                    </LinkStyled>
+                </HideOnReview>
                 {notificationsAvailable && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.notification}>
                         <SettingsListItem>

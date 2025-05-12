@@ -1,16 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+    cleanupTransport,
     connectLedger,
-    isTransportReady,
     LedgerTonTransport,
     waitLedgerTonAppReady
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
-import { useAppContext } from '../hooks/appContext';
 import { AccountsApi, Account } from '@tonkeeper/core/dist/tonApiV2';
 import { Address } from '@ton/core';
-import { useAppSdk } from '../hooks/appSdk';
-import { useNavigate } from 'react-router-dom';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
+import { useNavigate } from '../hooks/router/useNavigate';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
 import { useCallback, useState } from 'react';
@@ -27,20 +26,30 @@ export type LedgerAccount = {
 
 type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
 
-const _tonTransport: LedgerTonTransport | null = null;
+let _tonTransport: LedgerTonTransport | null = null;
+
+export const useLedgerConnectionType = () => {
+    const env = useAppTargetEnv();
+    return env === 'mobile' || env === 'tablet' ? 'bluetooth' : 'wire';
+};
 
 export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T => {
     // device might be connected, but mutation still pending if user didn't open Ton App on Ledger device
     const [_isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
+
+    const connectionType = useLedgerConnectionType();
     const mutation = useMutation<LedgerTonTransport, Error>(async () => {
         setIsDeviceConnected(false);
 
-        let transport: LedgerTonTransport;
-        if (_tonTransport && isTransportReady(_tonTransport)) {
-            transport = _tonTransport;
-        } else {
-            transport = await connectLedger();
+        if (_tonTransport) {
+            try {
+                await cleanupTransport(_tonTransport.transport);
+                _tonTransport = null;
+            } catch (e) {
+                console.error(e);
+            }
         }
+        const transport = await connectLedger(connectionType);
 
         setIsDeviceConnected(true);
 
@@ -49,6 +58,7 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
             throw new Error('TON App is not opened');
         }
 
+        _tonTransport = transport;
         return transport;
     });
 

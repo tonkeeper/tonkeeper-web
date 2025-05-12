@@ -3,6 +3,7 @@ import React, {
     createContext,
     FC,
     forwardRef,
+    Fragment,
     PropsWithChildren,
     ReactElement,
     ReactNode,
@@ -16,7 +17,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
 import styled, { css, useTheme } from 'styled-components';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useClickOutside } from '../hooks/useClickOutside';
 import { useIsFullWidthMode } from '../hooks/useIsFullWidthMode';
 import { Container } from '../styles/globalStyle';
@@ -24,10 +25,13 @@ import { RoundedButton, ButtonMock } from './fields/RoundedButton';
 import { ArrowLeftIcon, ChevronLeftIcon, CloseIcon } from './Icon';
 import { Gap } from './Layout';
 import ReactPortal from './ReactPortal';
-import { H2, H3, Label2 } from './Text';
+import { H2, H3Label2Responsive, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
-import { useAppPlatform } from '../hooks/appContext';
+import { IonContent, IonModal } from '@ionic/react';
+import { cn } from '../libs/css';
+import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
+import { atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -64,7 +68,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: 
     );
 };
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ $moveToTop: boolean }>`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -73,7 +77,7 @@ const Wrapper = styled.div`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            justify-content: center;
+            justify-content: ${p.$moveToTop ? 'flex-start' : 'center'};
         `}
 `;
 
@@ -222,16 +226,31 @@ const TitleRow = styled.div`
         `}
 `;
 
-const FooterWrapper = styled.div`
+const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
+            padding-bottom: max(calc(env(safe-area-inset-bottom) - 16px), 0px);
+            background-color: ${p.theme.backgroundPage};
             position: sticky;
             bottom: 0;
             z-index: 100;
+            ${p.$keyboardShift
+                ? css`
+                      transform: translateY(
+                          calc(${-p.$keyboardShift}px + env(safe-area-inset-bottom) - 16px)
+                      );
+                  `
+                : css`
+                      transform: translateY(0);
+                  `}
+
+            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.9);
 
             &:empty {
-                padding-bottom: 1rem;
+                padding-bottom: ${p.$keyboardShift
+                    ? '0'
+                    : 'max(env(safe-area-inset-bottom), 1rem)'};
             }
         `}
 `;
@@ -257,7 +276,7 @@ const HeaderWrapper = styled.div`
     }
 `;
 
-const RowTitle = styled(H3)`
+const RowTitle = styled(H3Label2Responsive)`
     overflow: hidden;
     margin: 0;
     user-select: none;
@@ -360,6 +379,12 @@ export const NotificationTitleBlock = styled.div`
     align-items: flex-start;
     width: 100%;
     gap: 1rem;
+
+    ${p =>
+        p.theme.displayType === 'full-width' &&
+        css`
+            align-items: center;
+        `}
 `;
 
 const DesktopCloseButtonStyled = styled(IconButtonTransparentBackground)`
@@ -418,15 +443,66 @@ const NotificationOverlay: FC<PropsWithChildren<{ handleClose: () => void; enter
     });
 NotificationOverlay.displayName = 'NotificationOverlay';
 
-export type OnCloseInterceptor = ((closeHandle: () => void) => void) | undefined;
+const NotificationContentPortalRoot = styled.div`
+    display: contents;
+`;
 
-const allNotificationsControl$ = {
-    closeHandlers: new Set<() => void>()
+export type OnCloseInterceptor =
+    | ((closeHandle: () => void, cancelCloseHandle: () => void) => void)
+    | undefined;
+
+const notificationsControl = {
+    untaggedCloseHandlers: new Set<() => void>(),
+    taggedCloseHandlers: new Map<string, () => void>(),
+    openedNotifications$: atom<{ id: string; tag?: string }[]>([])
 };
 
 export function closeAllNotifications() {
-    allNotificationsControl$.closeHandlers.forEach(handler => handler());
+    notificationsControl.untaggedCloseHandlers.forEach(handler => handler());
+    [...notificationsControl.taggedCloseHandlers.values()].forEach(handler => handler());
 }
+
+export function closeNotification(tag: string) {
+    notificationsControl.taggedCloseHandlers.get(tag)?.();
+}
+
+export const openedNotifications$: ReadonlyAtom<{ id: string; tag?: string }[]> =
+    notificationsControl.openedNotifications$;
+
+const useConnectNotificationCloseControl = (
+    tag: string | undefined,
+    handleClose: () => void,
+    isOpen: boolean
+) => {
+    const id = useRef(Date.now().toString());
+    useEffect(() => {
+        const list = notificationsControl.openedNotifications$.value;
+
+        if (isOpen) {
+            notificationsControl.openedNotifications$.next([
+                ...list.filter(v => v.id !== id.current),
+                { id: id.current, tag }
+            ]);
+        } else if (list.some(item => item.id === id.current)) {
+            notificationsControl.openedNotifications$.next(list.filter(v => v.id !== id.current));
+        }
+    }, [tag, isOpen]);
+
+    useEffect(() => {
+        if (tag) {
+            notificationsControl.taggedCloseHandlers.set(tag, handleClose);
+            return () => {
+                notificationsControl.taggedCloseHandlers.delete(tag);
+            };
+        }
+
+        notificationsControl.untaggedCloseHandlers.add(handleClose);
+
+        return () => {
+            notificationsControl.untaggedCloseHandlers.delete(handleClose);
+        };
+    }, [tag, handleClose]);
+};
 
 export const Notification: FC<{
     isOpen: boolean;
@@ -437,16 +513,244 @@ export const Notification: FC<{
     footer?: ReactNode;
     children: (afterClose: (action?: () => void) => void) => React.ReactNode;
     className?: string;
-}> = ({ children, isOpen, hideButton, backShadow, handleClose, title, footer, className }) => {
-    const animationTime = 200;
+    disableHeightAnimation?: boolean;
+    mobileFullScreen?: boolean;
+    afterClose?: () => void;
+    tag?: string;
+}> = props => {
+    const targetEnv = useAppTargetEnv();
+
+    if (targetEnv === 'mobile') {
+        return <NotificationIonic {...props} />;
+    }
+
+    return <NotificationDesktopAndWeb {...props} />;
+};
+
+export const NotificationIonic: FC<{
+    isOpen: boolean;
+    handleClose: () => void;
+    hideButton?: boolean;
+    title?: ReactNode;
+    footer?: ReactNode;
+    children: (afterClose: (action?: () => void) => void) => React.ReactNode;
+    className?: string;
+    disableHeightAnimation?: boolean;
+    mobileFullScreen?: boolean;
+    afterClose?: () => void;
+    tag?: string;
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    handleClose,
+    title,
+    footer,
+    className,
+    disableHeightAnimation,
+    mobileFullScreen,
+    afterClose,
+    tag
+}) => {
+    const [onBack, setOnBack] = useState<(() => void) | undefined>();
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
     const onClose = useCallback(() => {
         if (!onCloseInterceptor) {
             handleClose();
         } else {
-            onCloseInterceptor(handleClose);
+            onCloseInterceptor(handleClose, () => {});
         }
     }, [handleClose, onCloseInterceptor]);
+
+    useConnectNotificationCloseControl(tag, handleClose, isOpen);
+
+    /**
+     * Prevent Ionic bug -- touching modal background calls canDismiss twice
+     */
+    const canDismissAnswerCache = useRef<{ timestamp: number; answer: boolean } | undefined>();
+
+    const canDismiss = useMemo(() => {
+        if (!onCloseInterceptor || !isOpen) {
+            return true;
+        } else {
+            return () => {
+                if (
+                    canDismissAnswerCache.current &&
+                    Date.now() - canDismissAnswerCache.current.timestamp <= 600
+                ) {
+                    return Promise.resolve(canDismissAnswerCache.current.answer);
+                }
+
+                return new Promise<boolean>(r =>
+                    onCloseInterceptor(
+                        () => {
+                            canDismissAnswerCache.current = {
+                                timestamp: Date.now(),
+                                answer: true
+                            };
+                            r(true);
+                        },
+                        () => {
+                            canDismissAnswerCache.current = {
+                                timestamp: Date.now(),
+                                answer: false
+                            };
+                            r(false);
+                        }
+                    )
+                );
+            };
+        }
+    }, [handleClose, onCloseInterceptor, isOpen]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            canDismissAnswerCache.current = undefined;
+        }
+    }, [isOpen]);
+
+    const [footerElement, setFooterElement] = useState<HTMLDivElement | null>(null);
+    const [headerElement, setHeaderElement] = useState<HTMLDivElement | null>(null);
+
+    const Child = useMemo(() => {
+        return children((_afterClose?: () => void) => {
+            setTimeout(() => _afterClose && _afterClose(), 100);
+            onClose();
+        });
+    }, [isOpen, children, onClose]);
+
+    const HeightAnimation = useMemo(() => {
+        if (disableHeightAnimation || mobileFullScreen) {
+            return Fragment;
+        }
+
+        return AnimateHeightChange;
+    }, [disableHeightAnimation, mobileFullScreen]);
+
+    const keyboardHeight = useKeyboardHeight();
+
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    return (
+        <NotificationContext.Provider
+            value={{
+                footerElement,
+                headerElement,
+                setOnBack,
+                setOnCloseInterceptor
+            }}
+        >
+            <IonModal
+                isOpen={isOpen}
+                onWillDismiss={handleClose}
+                onDidDismiss={afterClose}
+                canDismiss={canDismiss}
+                initialBreakpoint={1}
+                breakpoints={[0, 1]}
+                handle={false}
+                className={cn(className, mobileFullScreen && 'modal-mobile-fullscreen')}
+            >
+                <IonicModalContentStyled>
+                    <HeightAnimation>
+                        <HeaderWrapper ref={setHeaderElement} />
+
+                        {/**
+                         We use createPortal here and with Child as well due to React and Ionic events binding bug.
+                         Otherwise, events binding will not work sometimes with react 18.2.0 and ionic 8.4.2
+                         https://github.com/ionic-team/ionic-framework/issues/28819
+                         */}
+                        {(title || !hideButton) &&
+                            !!headerElement &&
+                            createPortal(
+                                <NotificationHeader className="dialog-header">
+                                    <NotificationTitleRow
+                                        onBack={onBack}
+                                        handleClose={hideButton ? undefined : onClose}
+                                    >
+                                        {title}
+                                    </NotificationTitleRow>
+                                </NotificationHeader>,
+                                headerElement
+                            )}
+
+                        <NotificationContentPortalRoot ref={contentRef} />
+                        {!!contentRef.current && createPortal(Child, contentRef.current)}
+
+                        <Gap />
+                        <FooterWrapper ref={setFooterElement} $keyboardShift={keyboardHeight}>
+                            {footer}
+                        </FooterWrapper>
+                    </HeightAnimation>
+                </IonicModalContentStyled>
+            </IonModal>
+        </NotificationContext.Provider>
+    );
+};
+
+const IonicModalContentStyled = styled(IonContent)`
+    display: contents;
+
+    &::part(scroll) {
+        border-top-right-radius: ${props => props.theme.cornerMedium};
+        border-top-left-radius: ${props => props.theme.cornerMedium};
+        padding: 0 1rem 0;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+
+        overscroll-behavior-y: none;
+    }
+
+    &::part(background) {
+        border-top-right-radius: ${props => props.theme.cornerMedium};
+        border-top-left-radius: ${props => props.theme.cornerMedium};
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+`;
+
+export const NotificationDesktopAndWeb: FC<{
+    isOpen: boolean;
+    handleClose: () => void;
+    hideButton?: boolean;
+    backShadow?: boolean;
+    title?: ReactNode;
+    footer?: ReactNode;
+    children: (afterClose: (action?: () => void) => void) => React.ReactNode;
+    className?: string;
+    afterClose?: () => void;
+    tag?: string;
+}> = ({
+    children,
+    isOpen,
+    hideButton,
+    backShadow,
+    handleClose,
+    title,
+    footer,
+    className,
+    afterClose,
+    tag
+}) => {
+    const animationTime = 200;
+    const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
+    const onClose = useCallback(() => {
+        if (!onCloseInterceptor) {
+            handleClose();
+            setTimeout(() => afterClose && afterClose(), animationTime);
+        } else {
+            onCloseInterceptor(
+                () => {
+                    handleClose();
+                    setTimeout(() => afterClose && afterClose(), animationTime);
+                },
+                () => {}
+            );
+        }
+    }, [handleClose, onCloseInterceptor, afterClose]);
     const [entered, setEntered] = useState(false);
     const [open, setOpen] = useState(false);
     const { displayType } = useTheme();
@@ -455,13 +759,7 @@ export const Notification: FC<{
         setTimeout(() => setOpen(isOpen));
     }, [isOpen]);
 
-    useEffect(() => {
-        allNotificationsControl$.closeHandlers.add(handleClose);
-
-        return () => {
-            allNotificationsControl$.closeHandlers.delete(handleClose);
-        };
-    }, [handleClose]);
+    useConnectNotificationCloseControl(tag, handleClose, isOpen);
 
     const sdk = useAppSdk();
     const nodeRef = useRef<HTMLDivElement>(null);
@@ -475,8 +773,8 @@ export const Notification: FC<{
     }, [onClose]);
 
     const Child = useMemo(() => {
-        return children((afterClose?: () => void) => {
-            setTimeout(() => afterClose && afterClose(), animationTime);
+        return children((_afterClose?: () => void) => {
+            setTimeout(() => _afterClose && _afterClose(), animationTime);
             onClose();
         });
     }, [open, children, onClose]);
@@ -545,11 +843,17 @@ export const Notification: FC<{
     const containerRef = useClickOutside<HTMLDivElement>(onClickOutside, nodeRef.current);
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
 
-    const isInWidget = useAppPlatform() === 'swap_widget_web';
+    const isInWidget = useAppTargetEnv() === 'swap_widget_web';
+    const isKeyboardOpen = useKeyboardHeight();
 
     return (
         <NotificationContext.Provider
-            value={{ footerElement, headerElement, setOnBack, setOnCloseInterceptor }}
+            value={{
+                footerElement,
+                headerElement,
+                setOnBack,
+                setOnCloseInterceptor
+            }}
         >
             <ReactPortal wrapperId="react-portal-modal-container">
                 <CSSTransition
@@ -559,13 +863,15 @@ export const Notification: FC<{
                     nodeRef={nodeRef}
                     onEntering={() => setIsEntering(true)}
                     onExited={() => setIsEntering(false)}
-                    onEntered={() => setTimeout(() => setEntered(true), animationTime)}
+                    onEntered={() => {
+                        setTimeout(() => setEntered(true), animationTime);
+                    }}
                     onExit={() => setEntered(false)}
                 >
                     <Splash ref={nodeRef} className="scrollable">
                         <NotificationOverlay handleClose={onClose} entered={entered}>
                             <NotificationWrapper entered={entered} className={className}>
-                                <Wrapper>
+                                <Wrapper $moveToTop={!!isKeyboardOpen}>
                                     <Padding onClick={handleCloseOnlyOnNotFullWidth} />
                                     <GapAdjusted onClick={handleCloseOnlyOnNotFullWidth} />
                                     <Content
@@ -635,6 +941,13 @@ export const NotificationHeaderStyled = styled.div`
         p.theme.displayType === 'full-width' &&
         css`
             background: ${p.theme.backgroundPage};
+            padding-top: 8px;
+            padding-bottom: 8px;
+        `}
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
             padding-top: 16px;
             padding-bottom: 16px;
         `}

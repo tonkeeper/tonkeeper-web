@@ -48,7 +48,7 @@ export const Notifications = () => {
         <>
             <TonConnectNotification
                 origin={data?.origin}
-                params={data?.kind === 'tonConnectRequest' ? data.data : null}
+                params={data?.kind === 'tonConnectRequest' ? { request: data.data, appName: 'tonkeeper' } : null}
                 handleClose={(
                     result: {
                         replyItems: TonConnectEventPayload;

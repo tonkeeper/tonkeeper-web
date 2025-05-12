@@ -201,15 +201,6 @@ export const RecipientView: FC<{
         return true;
     }, [toAccount, comment, isLedger]);
 
-    useEffect(() => {
-        if (sdk.isIOs()) {
-            return;
-        }
-        if (ref.current) {
-            ref.current.focus();
-        }
-    }, [ref.current]);
-
     const formatted = useMemo(() => {
         if ('isFavorite' in recipient) {
             if (recipient.blockchain === BLOCKCHAIN_NAME.TRON) {
@@ -291,6 +282,7 @@ export const RecipientView: FC<{
                     label={t('transaction_recipient_address')}
                     isValid={!submitted || (!!isValidForBlockchain && isValidAddress)}
                     disabled={isExternalLoading}
+                    autoFocusTimeout={300}
                 />
             </ShowAddress>
 

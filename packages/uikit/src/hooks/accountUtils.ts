@@ -1,9 +1,8 @@
 import { Account, isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { useActiveAccount, useActiveApi } from '../state/wallet';
+import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
 import { useTranslation } from './translation';
 import { useAppSdk } from './appSdk';
-import { useCheckTouchId } from '../state/password';
 import { useMutation } from '@tanstack/react-query';
 import {
     createTonProofItem,
@@ -13,6 +12,10 @@ import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/co
 import { signTonConnectOver } from '../state/mnemonic';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
+import nacl from 'tweetnacl';
+import { sha256_sync } from '@ton/crypto';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 export function useAccountLabel(account: Account) {
     const tonWallets = account.allTonWallets;
@@ -24,38 +27,55 @@ export function useAccountLabel(account: Account) {
         : tonWallets.length + ' ' + t('wallets');
 }
 
+export const tonProofSignerByTonMnemonic = (mnemonic: string[], type: 'ton' | 'bip39') => {
+    return async (bufferToSign: Buffer) => {
+        const keyPair = await mnemonicToKeypair(mnemonic, type);
+        return nacl.sign.detached(Buffer.from(sha256_sync(bufferToSign)), keyPair.secretKey);
+    };
+};
+
 export const useSignTonProof = () => {
     const api = useActiveApi();
-    const account = useActiveAccount();
+    const { data: account } = useActiveAccountQuery();
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<
-        Omit<ReturnType<typeof createTonProofItem>, 'stateInit'> & { stateInit: string },
+        Omit<ReturnType<typeof createTonProofItem>, 'stateInit'> & {
+            stateInit: string;
+        },
         Error,
-        { payload: string; origin: string }
-    >(async ({ origin, payload }) => {
-        if (!isAccountTonWalletStandard(account)) {
-            throw new Error('Invalid account type');
+        {
+            payload: string;
+            origin: string;
+            signer?: (b: Buffer) => Promise<Uint8Array | Buffer>;
+            wallet?: TonWalletStandard;
+        }
+    >(async ({ origin, payload, signer, wallet: providedWallet }) => {
+        let wallet = providedWallet;
+        if (!wallet) {
+            if (!account || !isAccountTonWalletStandard(account)) {
+                throw new Error('Invalid account type');
+            }
+
+            wallet = account.activeTonWallet;
         }
 
         const timestamp = await getServerTime(api);
-        const proofPayload = tonConnectProofPayload(
-            timestamp,
-            origin,
-            account.activeTonWallet.rawAddress,
-            payload
-        );
-        const stateInit = walletStateInitFromState(account.activeTonWallet);
-        return createTonProofItem(
-            await signTonConnectOver({
+        const proofPayload = tonConnectProofPayload(timestamp, origin, wallet.rawAddress, payload);
+        const stateInit = walletStateInitFromState(wallet);
+
+        const signingFn =
+            signer ??
+            signTonConnectOver({
                 sdk,
-                accountId: account.id,
-                wallet: account.activeTonWallet,
-                t,
-                checkTouchId
-            })(proofPayload.bufferToSign),
+                accountId: account!.id,
+                wallet,
+                t
+            });
+
+        return createTonProofItem(
+            await signingFn(proofPayload.bufferToSign),
             proofPayload,
             stateInit
         ) as Omit<ReturnType<typeof createTonProofItem>, 'stateInit'> & { stateInit: string };

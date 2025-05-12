@@ -1,6 +1,5 @@
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes';
@@ -32,6 +31,7 @@ import {
 import { useBatteryEnabledConfig } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -44,6 +44,26 @@ const SingleAccountSettings = () => {
     const batteryEnableConfig = useBatteryEnabledConfig();
     const twoFAEnabled = useCanViewTwoFA();
     const canUseTron = useCanUseTronForActiveWallet();
+
+    const accountItems = useMemo(() => {
+        const items: SettingsItem[] = [
+            {
+                name: t('Manage_wallets'),
+                icon: <WalletsIcon />,
+                action: () => navigate(relative(SettingsRoute.account))
+            }
+        ];
+
+        if (proFeatures) {
+            items.push({
+                name: t('tonkeeper_pro'),
+                icon: <SettingsProIcon />,
+                action: () => navigate(relative(SettingsRoute.pro))
+            });
+        }
+
+        return items;
+    }, [t]);
 
     const mainItems = useMemo<SettingsItem[]>(() => {
         const items: SettingsItem[] = [];
@@ -117,14 +137,6 @@ const SingleAccountSettings = () => {
             });
         }
 
-        if (proFeatures) {
-            items.unshift({
-                name: t('tonkeeper_pro'),
-                icon: <SettingsProIcon />,
-                action: () => navigate(relative(SettingsRoute.pro))
-            });
-        }
-
         if (jettons?.balances.length) {
             items.push({
                 name: t('settings_jettons_list'),
@@ -176,6 +188,7 @@ const SingleAccountSettings = () => {
 
     return (
         <>
+            <SettingsList items={accountItems} />
             <SettingsList items={mainItems} />
         </>
     );

@@ -1,9 +1,8 @@
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { FC, useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { AppRoute } from '../../libs/routes';
 import { useMutateDeleteAll, useMutateLogOut } from '../../state/wallet';
 import { Notification } from '../Notification';
 import { Body1, H2, Label1, Label2 } from '../Text';
@@ -11,6 +10,7 @@ import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const NotificationBlock = styled.div`
     display: flex;
@@ -48,9 +48,9 @@ export const DeleteNotificationContent: FC<{
     const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
+        await mutateAsync(accountId);
         onClose();
         navigate(AppRoute.home);
-        await mutateAsync(accountId);
     };
 
     return (
@@ -123,16 +123,10 @@ export const DeleteAccountNotification: FC<{
     );
 };
 
-const DeleteAllContent: FC<{ onClose: () => void }> = ({ onClose }) => {
-    const navigate = useNavigate();
+const DeleteAllContent = () => {
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
-    const { mutateAsync, isLoading } = useMutateDeleteAll();
-
-    const onDelete = async () => {
-        await mutateAsync();
-        window.location.href = window.location.href;
-    };
+    const { mutate, isLoading } = useMutateDeleteAll();
 
     return (
         <NotificationBlock>
@@ -147,21 +141,13 @@ const DeleteAllContent: FC<{ onClose: () => void }> = ({ onClose }) => {
                         {t('I_have_a_backup_copy_of_recovery_phrase')}
                     </Checkbox>
                 </DisclaimerText>
-                <DisclaimerLink
-                    onClick={() => {
-                        navigate(AppRoute.settings + SettingsRoute.recovery);
-                        onClose();
-                    }}
-                >
-                    {t('Back_up_now')}
-                </DisclaimerLink>
             </DisclaimerBlock>
             <Button
                 disabled={!checked}
                 size="large"
                 fullWidth
                 loading={isLoading}
-                onClick={onDelete}
+                onClick={() => mutate()}
                 type="button"
             >
                 {t('Delete_wallet_data')}
@@ -174,13 +160,10 @@ export const DeleteAllNotification: FC<{
     open: boolean;
     handleClose: () => void;
 }> = ({ open, handleClose }) => {
-    const Content = useCallback(
-        (afterClose: () => void) => {
-            if (!open) return undefined;
-            return <DeleteAllContent onClose={afterClose} />;
-        },
-        [open]
-    );
+    const Content = useCallback(() => {
+        if (!open) return undefined;
+        return <DeleteAllContent />;
+    }, [open]);
 
     return (
         <Notification isOpen={open} handleClose={handleClose}>

@@ -2,8 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAppSdk } from '../hooks/appSdk';
 import { QueryKey } from '../libs/queryKey';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
-import { useTranslation } from '../hooks/translation';
+import { useAtomValue } from '../libs/useAtom';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { KeychainSecurity } from '@tonkeeper/core/dist/AppSdk';
+import { useMemo } from 'react';
+import { usePasswordStorage } from '../hooks/useStorage';
+import { getPasswordByNotification } from './mnemonic';
 
 export const useLookScreen = () => {
     const sdk = useAppSdk();
@@ -25,55 +29,30 @@ export const useMutateLookScreen = () => {
 export const useCanPromptTouchId = () => {
     const sdk = useAppSdk();
     return useQuery([QueryKey.canPromptTouchId], async () => {
-        return sdk.touchId?.canPrompt();
+        return sdk.biometry?.canPrompt();
     });
 };
 
-export const useTouchIdEnabled = () => {
+const emptyAtom = atom<KeychainSecurity>({});
+
+export const useKeychainSecuritySettings = () => {
     const sdk = useAppSdk();
-    return useQuery([QueryKey.touchId], async () => {
-        return isTouchIdEnabled(sdk);
-    });
+
+    const atomValue = useAtomValue(sdk.keychain?.security ?? emptyAtom);
+    return useMemo(() => atomValue || {}, [atomValue]);
 };
 
-const isTouchIdEnabled = async (sdk: IAppSdk): Promise<boolean> => {
-    const touchId = await sdk.storage.get<boolean>(AppKey.TOUCH_ID);
-
-    if (touchId !== null) {
-        return touchId;
-    }
-
-    const canPrompt = Boolean(await sdk.touchId?.canPrompt());
-    await sdk.storage.set(AppKey.TOUCH_ID, canPrompt);
-    return Boolean(canPrompt);
-};
-
-export const useMutateTouchId = () => {
+export const useSecurityCheck = () => {
     const sdk = useAppSdk();
-    const client = useQueryClient();
-    const { t } = useTranslation();
-
-    return useMutation<void, Error, boolean>(async value => {
-        if (!value) {
-            await sdk.touchId?.prompt(lng => t('touch_id_unlock_wallet', { lng }));
-        }
-        await sdk.storage.set(AppKey.TOUCH_ID, value);
-        await client.invalidateQueries([QueryKey.touchId]);
-    });
-};
-
-export const useCheckTouchId = () => {
-    const sdk = useAppSdk();
-    const { t } = useTranslation();
+    const passwordStorage = usePasswordStorage();
     return useMutation(async () => {
-        const touchId = await isTouchIdEnabled(sdk);
-        if (touchId) {
-            await sdk.touchId?.prompt(lng =>
-                (t as (val: string, options?: { lng?: string }) => string)(
-                    'touch_id_unlock_wallet',
-                    { lng }
-                )
-            );
+        if (sdk.keychain) {
+            return sdk.keychain.securityCheck();
+        }
+
+        if (await passwordStorage.getIsPasswordSet()) {
+            const pw = await getPasswordByNotification(sdk);
+            return passwordStorage.checkPassword(pw);
         }
     });
 };

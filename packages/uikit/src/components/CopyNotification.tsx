@@ -9,30 +9,32 @@ import { Label2 } from './Text';
 const Message = styled.div`
     position: fixed;
     z-index: 20;
-    top: -30px;
+    top: env(safe-area-inset-top);
     left: 50%;
+    transform: translateY(${p => (p.theme.proDisplayType === 'mobile' ? '0' : '-30px')}) scale(0.8);
 
     transition: all 0.1s ease-in-out;
 
     &.enter-done {
-        top: 16px;
         opacity: 1;
         pointer-events: auto;
-        transform: scale(1);
+        transform: translateY(16px) scale(1);
     }
 
     &.exit {
-        top: -30px;
         opacity: 0;
-        transform: scale(0.8);
+        transform: translateY(${p => (p.theme.proDisplayType === 'mobile' ? '0' : '-30px')})
+            scale(0.8);
     }
 `;
 
 const Content = styled.div`
     width: auto;
-    max-width: calc(var(--app-width) - 1rem);
-    word-break: break-all;
+    min-width: 50px;
+    max-width: calc(var(--app-width, 90vw) - 1rem);
+    overflow-wrap: break-word;
     text-align: center;
+    white-space: normal;
     padding: 14px 24px 14px;
     box-sizing: border-box;
     background: ${props => props.theme.backgroundContentTint};

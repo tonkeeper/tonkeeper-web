@@ -42,6 +42,7 @@ export enum AppKey {
     PRO = 'pro_state',
     PRO_BACKUP = 'pro_backup',
     PRO_AUTH_TOKEN = 'pro_auth_token',
+    PRO_FREE_ACCESS_ACTIVE = 'pro_free_access_active',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
@@ -51,5 +52,9 @@ export enum AppKey {
 
     TWO_FA_WALLET_CONFIG = 'two_fa_wallet_config',
 
-    NOTIFICATIONS = 'notifications'
+    NOTIFICATIONS = 'notifications',
+
+    KEYCHAIN_SETTINGS = 'keychain_settings',
+
+    ENABLE_REVIEWER_MODE = 'ENABLE_REVIEWER_MODE'
 }

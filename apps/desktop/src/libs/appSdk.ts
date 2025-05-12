@@ -1,23 +1,11 @@
-import {
-    BaseApp,
-    IAppSdk,
-    KeychainPassword,
-    TouchId,
-    CookieService
-} from '@tonkeeper/core/dist/AppSdk';
+// eslint-disable-next-line max-classes-per-file
+import { BaseApp, IAppSdk, BiometryService, CookieService } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
-
-export class KeychainDesktop implements KeychainPassword {
-    setPassword = async (publicKey: string, mnemonic: string) => {
-        return sendBackground<void>({ king: 'set-keychain', publicKey, mnemonic });
-    };
-    getPassword = async (publicKey: string) => {
-        return sendBackground<string>({ king: 'get-keychain', publicKey });
-    };
-}
+import { KeychainDesktop } from './keychain';
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {
@@ -25,7 +13,7 @@ export class CookieDesktop implements CookieService {
     };
 }
 
-export class TouchIdDesktop implements TouchId {
+export class BiometryServiceDesktop implements BiometryService {
     canPrompt = async () => {
         return sendBackground<boolean>({ king: 'can-prompt-touch-id' });
     };
@@ -44,8 +32,11 @@ export class TouchIdDesktop implements TouchId {
 }
 
 export class DesktopAppSdk extends BaseApp implements IAppSdk {
-    keychain = new KeychainDesktop();
     cookie = new CookieDesktop();
+
+    biometry = new BiometryServiceDesktop();
+
+    keychain = new KeychainDesktop(this.biometry, this.storage);
 
     constructor() {
         super(new DesktopStorage());
@@ -58,12 +49,22 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
     };
 
     openPage = async (url: string) => {
+        if (!isValidUrlProtocol(url, this.authorizedOpenUrlProtocols)) {
+            console.error('Unacceptable url protocol', url);
+            return;
+        }
+
         return sendBackground<void>({ king: 'open-page', url });
     };
 
-    touchId = new TouchIdDesktop();
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:'];
 
     version = packageJson.version ?? 'Unknown';
 
     targetEnv = 'desktop' as const;
+
+    reloadApp = () => {
+        // eslint-disable-next-line no-self-assign
+        window.location.href = window.location.href;
+    };
 }

@@ -22,7 +22,6 @@ import {
     MultiSendFormTokenized,
     useSendMultiTransfer
 } from '../../../hooks/blockchain/useSendMultiTransfer';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { MultiSendReceiversNotification } from './MultiSendReceiversNotification';
@@ -34,6 +33,7 @@ import {
     SenderTypeUserAvailable,
     useAvailableSendersChoices
 } from '../../../hooks/blockchain/useSender';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
 
 const ConfirmWrapper = styled.div`

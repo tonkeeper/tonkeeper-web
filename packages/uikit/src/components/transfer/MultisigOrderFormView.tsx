@@ -5,7 +5,7 @@ import {
     NotificationHeader,
     NotificationHeaderPortal
 } from '../Notification';
-import React, { FC, useState } from 'react';
+import React, { FC, ReactNode, useState } from 'react';
 import { useAppContext } from '../../hooks/appContext';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { multisigOrderLifetimeMinutes, MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -33,7 +33,7 @@ const SelectDropDownStyled = styled(SelectDropDown)`
 export const MultisigOrderFormView: FC<{
     onSubmit: (form: { lifetime: MultisigOrderLifetimeMinutes }) => void;
     isAnimationProcess: boolean;
-    Header?: () => React.JSX.Element;
+    header?: ReactNode;
     MainButton: ({
         isLoading,
         onClick
@@ -41,7 +41,7 @@ export const MultisigOrderFormView: FC<{
         isLoading?: boolean;
         onClick: () => void;
     }) => React.JSX.Element;
-}> = ({ isAnimationProcess, Header, MainButton, onSubmit }) => {
+}> = ({ isAnimationProcess, header, MainButton, onSubmit }) => {
     const isFullWidth = useIsFullWidthMode();
     const { standalone } = useAppContext();
     const shouldHideHeaderAndFooter = isFullWidth && isAnimationProcess;
@@ -62,11 +62,9 @@ export const MultisigOrderFormView: FC<{
             standalone={standalone}
             noPadding
         >
-            {!shouldHideHeaderAndFooter && !!Header && (
+            {!shouldHideHeaderAndFooter && !!header && (
                 <NotificationHeaderPortal>
-                    <NotificationHeader>
-                        <Header />
-                    </NotificationHeader>
+                    <NotificationHeader>{header}</NotificationHeader>
                 </NotificationHeaderPortal>
             )}
 

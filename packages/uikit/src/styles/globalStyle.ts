@@ -74,6 +74,10 @@ export const GlobalStyleCss = css`
     .linux .hide-scrollbar::-webkit-scrollbar {
         width: 0;
     }
+
+    .pointer-events-none {
+        pointer-events: none;
+    }
 `;
 
 export const GlobalStyle = createGlobalStyle`

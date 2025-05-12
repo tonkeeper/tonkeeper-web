@@ -222,8 +222,8 @@ const ConnectContent: FC<{
     useEffect(() => {
         if (sdk.twaExpand) {
             sdk.twaExpand();
+            sdk.hapticNotification('success');
         }
-        sdk.hapticNotification('success');
     }, []);
 
     const onSubmit = async () => {
@@ -232,6 +232,7 @@ const ConnectContent: FC<{
             sdk.hapticNotification('success');
             setTimeout(() => handleClose(result), 300);
         } catch (e) {
+            sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
             console.error(e);
         }
@@ -403,12 +404,12 @@ export const TonTransactionNotification: FC<{
                 <MultisigOrderFormView
                     onSubmit={form => setMultisigTTL(form.lifetime)}
                     MainButton={MainButton}
-                    Header={() => (
+                    header={
                         <TransferViewHeaderBlock
                             title={t('multisig_create_order_title')}
                             onClose={onClose}
                         />
-                    )}
+                    }
                     isAnimationProcess={false}
                 />
             );

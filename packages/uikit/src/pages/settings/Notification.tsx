@@ -1,15 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
-import { Body2, Label1, Label2 } from '../../components/Text';
+import { Body2, Label1 } from '../../components/Text';
 import { Switch } from '../../components/fields/Switch';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { QueryKey } from '../../libs/queryKey';
 import { signTonConnectOver } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import {
     useActiveAccount,
     useActiveApi,
@@ -19,8 +18,11 @@ import {
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
+import React from 'react';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const useSubscribed = () => {
     const sdk = useAppSdk();
@@ -41,7 +43,6 @@ const useToggleSubscribe = () => {
     const sdk = useAppSdk();
     const account = useActiveAccount();
     const client = useQueryClient();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const api = useActiveApi();
     const network = useActiveTonNetwork();
 
@@ -56,7 +57,7 @@ const useToggleSubscribe = () => {
                 await notifications.subscribe(
                     api,
                     wallet,
-                    signTonConnectOver({ sdk, accountId: account.id, t, checkTouchId })
+                    signTonConnectOver({ sdk, accountId: account.id, t })
                 );
             } catch (e) {
                 if (e instanceof Error) sdk.topMessage(e.message);
@@ -90,23 +91,21 @@ const SwitchNotification = () => {
     const { mutate: toggle, isLoading } = useToggleSubscribe();
 
     return (
-        <ListBlock>
+        <ListBlockDesktopAdaptive>
             <ListItem hover={false}>
                 <ListItemPayload>
                     <Block>
                         <Label1>{t('reminder_notifications_title')}</Label1>
-                        <Secondary>{t('reminder_notifications_caption')}</Secondary>
+                        <HideOnReview>
+                            <Secondary>{t('reminder_notifications_caption')}</Secondary>
+                        </HideOnReview>
                     </Block>
                     <Switch checked={!!data} onChange={toggle} disabled={isFetching || isLoading} />
                 </ListItemPayload>
             </ListItem>
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 };
-
-const DesktopContentView = styled.div`
-    padding: 0 16px;
-`;
 
 export const Notifications = () => {
     const { t } = useTranslation();
@@ -117,11 +116,9 @@ export const Notifications = () => {
         return (
             <DesktopViewPageLayout>
                 <DesktopViewHeader backButton>
-                    <Label2>{t('settings_notifications')}</Label2>
+                    <DesktopViewHeaderContent title={t('settings_notifications')} />
                 </DesktopViewHeader>
-                <DesktopContentView>
-                    <SwitchNotification />
-                </DesktopContentView>
+                <SwitchNotification />
             </DesktopViewPageLayout>
         );
     }

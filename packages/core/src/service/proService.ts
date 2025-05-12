@@ -131,6 +131,7 @@ const loadProState = async (
     if (subscriptionDTO.valid) {
         if (subscriptionDTO.is_trial) {
             subscription = {
+                type: 'trial-tg',
                 valid: true,
                 isTrial: true,
                 usedTrial: true,

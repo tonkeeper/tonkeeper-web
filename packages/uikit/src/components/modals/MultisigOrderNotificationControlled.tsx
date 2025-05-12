@@ -7,7 +7,7 @@ import {
 import { createModalControl } from './createModalControl';
 import React, { FC, useLayoutEffect, useMemo } from 'react';
 import { useTranslation } from '../../hooks/translation';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useAppSdk } from '../../hooks/appSdk';
 import { EmulationList } from '../connect/EstimationLayout';
 import { Label2 } from '../Text';
@@ -29,8 +29,8 @@ import {
 import { MultisigConfigDiff } from '../multisig/MultisigConfigDiff';
 import { Address } from '@ton/core';
 import { BorderSmallResponsive } from '../shared/Styles';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -143,6 +143,7 @@ const NotificationContent: FC<{
                 navigate(AppRoute.activity);
             }, 300);
         } catch (e) {
+            sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
             console.error(e);
         }

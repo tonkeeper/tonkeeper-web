@@ -3,6 +3,7 @@ import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
 import { BrowserStorage } from './storage';
+import { safeWindowOpen } from "@tonkeeper/core/dist/utils/common";
 
 function iOS() {
     return (
@@ -24,7 +25,7 @@ export class BrowserAppSdk extends BaseApp {
         this.topMessage(notification);
     };
     openPage = async (url: string) => {
-        window.open(url, '_black', 'noreferrer,noopener');
+        safeWindowOpen(url, this.authorizedOpenUrlProtocols);
     };
 
     disableScroll = disableScroll;
@@ -38,4 +39,8 @@ export class BrowserAppSdk extends BaseApp {
     version = packageJson.version ?? 'Unknown';
 
     targetEnv= 'web' as const;
+
+    signerReturnUrl = 'https://wallet.tonkeeper.com/';
+
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'tonsign:', 'mailto:']
 }

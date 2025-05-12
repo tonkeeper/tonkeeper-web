@@ -322,7 +322,7 @@ export const ReceiveContent: FC<{
                                     }
                                 />
                             ) : (
-                                !!isTronEnabled && (
+                                isTronEnabled && (
                                     <ReceiveTron token={jetton || TRON_USDT_ASSET.id} />
                                 )
                             )}

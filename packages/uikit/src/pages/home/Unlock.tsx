@@ -8,6 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useIsPasswordSet, useMutateDeleteAll, useAccountsState } from '../../state/wallet';
 import { passwordStorage } from '@tonkeeper/core/dist/service/passwordService';
+import { useKeychainSecuritySettings, useMutateLookScreen } from '../../state/password';
 
 const Block = styled.form<{ minHeight?: string }>`
     display: flex;
@@ -40,9 +41,18 @@ const Logo = styled.div`
 
 const useMutateUnlock = () => {
     const sdk = useAppSdk();
+    const isPasswordSet = useIsPasswordSet();
 
     return useMutation<void, Error, string>(async password => {
-        const isValid = await passwordStorage(sdk.storage).isPasswordValid(password);
+        let isValid = false;
+        if (isPasswordSet) {
+            isValid = await passwordStorage(sdk.storage).isPasswordValid(password);
+        } else if (sdk.keychain?.security.value?.password) {
+            isValid = await sdk.keychain.checkPassword(password);
+        } else {
+            throw new Error('Unreachable code');
+        }
+
         if (!isValid) {
             throw new Error('Password not valid');
         }
@@ -50,7 +60,10 @@ const useMutateUnlock = () => {
     });
 };
 
-export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
+const PasswordUnlock: FC<{ minHeight?: string; logOutConfirmed?: () => void }> = ({
+    minHeight,
+    logOutConfirmed
+}) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const wallets = useAccountsState();
@@ -79,14 +92,20 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
     };
 
     const onLogOut = async () => {
-        const confirm = await sdk.confirm(
-            t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
-        );
+        const confirm = await sdk.confirm({
+            message: t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
+        });
         if (confirm) {
-            await mutateLogOut();
-            window.location.href = window.location.href;
+            logOutConfirmed?.();
+            mutateLogOut();
         }
     };
+
+    useEffect(() => {
+        if (sdk.keychain?.security.value?.biometry) {
+            sdk.keychain.securityCheck('biometry').then(() => sdk.uiEvents.emit('unlock'));
+        }
+    }, []);
 
     return (
         <Block minHeight={minHeight} onSubmit={onSubmit}>
@@ -134,10 +153,22 @@ export const PasswordUnlock: FC<{ minHeight?: string }> = ({ minHeight }) => {
 
 export const Unlock = () => {
     const isPasswordSet = useIsPasswordSet();
+    const { password: keychainPassword } = useKeychainSecuritySettings();
+    const canUnlock = useRef(true);
 
-    if (isPasswordSet) {
-        return <PasswordUnlock />;
+    const { mutate } = useMutateLookScreen();
+    const sdk = useAppSdk();
+
+    useEffect(() => {
+        if (!isPasswordSet && !keychainPassword && canUnlock.current) {
+            mutate(false);
+            sdk.uiEvents.emit('unlock');
+        }
+    }, [isPasswordSet, keychainPassword, mutate]);
+
+    if (isPasswordSet || keychainPassword) {
+        return <PasswordUnlock logOutConfirmed={() => (canUnlock.current = false)} />;
     } else {
-        return <div>Other auth</div>;
+        return null;
     }
 };

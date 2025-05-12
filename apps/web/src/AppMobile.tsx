@@ -17,13 +17,12 @@ import {
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
 import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
-import { AppRoute, SignerRoute, any, SettingsRoute } from "@tonkeeper/uikit/dist/libs/routes";
+import { AppRoute, SignerRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import Initialize, { InitializeContainer } from '@tonkeeper/uikit/dist/pages/import/Initialize';
-import { useKeyboardHeight } from '@tonkeeper/uikit/dist/pages/import/hooks';
 import { Container } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import React, { FC, Suspense, useMemo } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import React, { FC, Suspense, useMemo } from "react";
+import { Route, Switch, useLocation } from "react-router-dom";
 import styled, { ThemeProvider, css, useTheme } from 'styled-components';
 import { useAppWidth } from './libs/hooks';
 import { UrlTonConnectSubscription } from "./components/UrlTonConnectSubscription";
@@ -70,6 +69,8 @@ const SwapMobileNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
 );
 
+const ExtensionMobileAppBannerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification"));
+
 const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
     ${props =>
         props.standalone
@@ -112,7 +113,6 @@ export const MobileView: FC<{
     const theme = useTheme();
     useWindowsScroll();
     useAppWidth(standalone);
-    useKeyboardHeight();
     useTrackLocation();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
@@ -148,18 +148,15 @@ export const MobileContent: FC<{
     if (location.pathname.startsWith(AppRoute.signer)) {
         return (
             <Wrapper standalone={standalone}>
-                <Routes>
+                <Switch>
                     <Route path={AppRoute.signer}>
                         <Route
                             path={SignerRoute.link}
-                            element={
-                                <Suspense>
-                                    <SignerLinkPage />
-                                </Suspense>
-                            }
-                        />
+                        ><Suspense>
+                          <SignerLinkPage />
+                        </Suspense></Route>
                     </Route>
-                </Routes>
+                </Switch>
             </Wrapper>
         );
     }
@@ -178,67 +175,47 @@ export const MobileContent: FC<{
 
     return (
         <Wrapper standalone={standalone} recovery={location.pathname.includes(SettingsRoute.recovery)}>
-            <Routes>
+            <Switch>
                 <Route
                     path={AppRoute.activity}
-                    element={
-                        <Suspense fallback={<ActivitySkeletonPage />}>
-                            <Activity />
-                        </Suspense>
-                    }
-                />
+                > <Suspense fallback={<ActivitySkeletonPage />}>
+                  <Activity />
+                </Suspense>
+                </Route>
                 <Route
-                    path={any(AppRoute.browser)}
-                    element={
-                        <Suspense fallback={<BrowserSkeletonPage />}>
-                            <Browser />
-                        </Suspense>
-                    }
-                />
+                    path={AppRoute.browser}
+                > <Suspense fallback={<BrowserSkeletonPage />}>
+                  <Browser />
+                </Suspense></Route>
                 <Route
-                    path={any(AppRoute.settings)}
-                    element={
-                        <Suspense fallback={<SettingsSkeletonPage />}>
-                            <Settings />
-                        </Suspense>
-                    }
-                />
-                <Route
-                  path={any(AppRoute.walletSettings)}
-                  element={<RedirectFromDesktopSettings />}
-                />
-                <Route path={AppRoute.coins}>
-                    <Route
-                        path=":name/*"
-                        element={
-                            <Suspense fallback={<CoinSkeletonPage />}>
-                                <Coin />
-                            </Suspense>
-                        }
-                    />
+                    path={AppRoute.settings}
+                > <Suspense fallback={<SettingsSkeletonPage />}>
+                  <Settings />
+                </Suspense></Route>
+                <Route path={AppRoute.walletSettings}>
+                  <RedirectFromDesktopSettings />
+                </Route>
+                <Route path={`${AppRoute.coins}/:name`}>
+                    <Suspense fallback={<CoinSkeletonPage />}>
+                      <Coin />
+                    </Suspense>
                 </Route>
                 <Route
                     path={AppRoute.swap}
-                    element={
-                        <Suspense fallback={null}>
-                            <SwapPage />
-                        </Suspense>
-                    }
-                />
+                > <Suspense fallback={null}>
+                  <SwapPage />
+                </Suspense></Route>
                 <Route
                     path="*"
-                    element={
-                        <>
-                            <Header />
-                            <InnerBody>
-                                <Suspense fallback={<HomeSkeleton />}>
-                                    <Home />
-                                </Suspense>
-                            </InnerBody>
-                        </>
-                    }
-                />
-            </Routes>
+                > <>
+                  <Header />
+                  <InnerBody>
+                    <Suspense fallback={<HomeSkeleton />}>
+                      <Home />
+                    </Suspense>
+                  </InnerBody>
+                </></Route>
+            </Switch>
             <Footer standalone={standalone} />
             <MemoryScroll />
             <Notifications />
@@ -262,6 +239,7 @@ const Notifications = () => {
             <ConnectLedgerNotification />
             <SwapMobileNotification />
             <PairKeystoneNotification />
+            <ExtensionMobileAppBannerNotification />
         </Suspense>
     );
 };

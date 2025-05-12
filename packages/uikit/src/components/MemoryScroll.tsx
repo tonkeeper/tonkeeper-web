@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Location, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 type ScrollProps = {
-    location: Location;
+    location: ReturnType<typeof useLocation>;
 };
 
 function withRouter(Comp: React.ComponentClass<ScrollProps>) {

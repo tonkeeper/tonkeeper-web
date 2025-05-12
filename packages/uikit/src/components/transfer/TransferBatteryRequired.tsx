@@ -16,9 +16,9 @@ import {
     NotificationTitleBlock
 } from '../Notification';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { BatteryChargingIcon } from '../settings/battery/BatteryIcons';
+import { useNavigate } from "../../hooks/router/useNavigate";
 
 export const TransferBatteryRequired: FC<{
     onBack: () => void;

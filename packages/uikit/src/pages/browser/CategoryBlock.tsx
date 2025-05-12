@@ -9,8 +9,9 @@ import { Carousel } from '../../components/shared';
 import { useAppContext } from '../../hooks/appContext';
 import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
 import { useElementSize } from '../../hooks/useElementSize';
-import { BrowserRoute } from '../../libs/routes';
+import { AppRoute, BrowserRoute } from '../../libs/routes';
 import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
+import { useTranslation } from '../../hooks/translation';
 
 const Heading = styled.div`
     display: flex;
@@ -60,6 +61,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
     category,
     className
 }) => {
+    const { t } = useTranslation();
     const { browserLength } = useAppContext();
     const [containerRef, { width: w }] = useElementSize();
     const width = w - 36;
@@ -84,9 +86,9 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
             <Heading>
                 <H3>{category.title}</H3>
                 {canExpand && (
-                    <Link to={'.' + BrowserRoute.category + '/' + category.id}>
+                    <Link to={AppRoute.browser + BrowserRoute.category + '/' + category.id}>
                         <AllButton>
-                            <Label1>All</Label1>
+                            <Label1>{t('browser_apps_all')}</Label1>
                         </AllButton>
                     </Link>
                 )}

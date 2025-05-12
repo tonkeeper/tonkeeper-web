@@ -6,7 +6,7 @@ import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/
 import { ColumnText } from '../Layout';
 import { Checkbox } from '../fields/Checkbox';
 import { AssetBlockchainBadge } from '../account/AccountBadge';
-import { Button } from '../fields/Button';
+import { ButtonResponsiveSize } from '../fields/Button';
 import {
     useIsTronEnabledForActiveWallet,
     useIsTronEnabledGlobally,
@@ -14,6 +14,7 @@ import {
 } from '../../state/tron/tron';
 import { FC, useEffect } from 'react';
 import { handleSubmit } from '../../libs/form';
+import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const Wrapper = styled.form`
     display: flex;
@@ -60,17 +61,6 @@ const TextWithLabel = styled.div`
 const ListBlockStyled = styled(ListBlockDesktopAdaptive)`
     width: 100%;
     margin-bottom: 16px;
-`;
-
-const ButtonContainer = styled.div`
-    width: 100%;
-    box-sizing: border-box;
-
-    ${p =>
-        p.theme.displayType === 'full-width' &&
-        css`
-            padding: 0 16px;
-        `}
 `;
 
 export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) => void }> = ({
@@ -124,11 +114,19 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
                     </ListItemPayload>
                 </ListItem>
             </ListBlockStyled>
-            <ButtonContainer>
-                <Button fullWidth primary onClick={onSubmit} type="submit" autoFocus>
-                    {t('continue')}
-                </Button>
-            </ButtonContainer>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonResponsiveSize
+                        fullWidth
+                        primary
+                        onClick={onSubmit}
+                        type="submit"
+                        autoFocus
+                    >
+                        {t('continue')}
+                    </ButtonResponsiveSize>
+                </NotificationFooter>
+            </NotificationFooterPortal>
         </Wrapper>
     );
 };

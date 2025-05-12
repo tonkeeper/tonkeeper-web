@@ -65,13 +65,15 @@ export const swapValue = (
 export const JettonTransferDesktopAction: FC<{
     action: Action;
     isScam: boolean;
-}> = ({ action, isScam }) => {
+}> = ({ action, isScam: isScamEvent }) => {
     const wallet = useActiveWallet();
     const { jettonTransfer } = action;
 
     if (!jettonTransfer) {
         return <ErrorRow />;
     }
+
+    const isScam = isScamEvent || jettonTransfer.jetton.verification === 'blacklist';
 
     if (eqAddresses(wallet.rawAddress, jettonTransfer.sender?.address)) {
         return (
@@ -143,7 +145,7 @@ export const JettonSwapDesktopAction: FC<{ action: Action }> = ({ action }) => {
             <HistoryCellAccount account={{ name: toDexName(jettonSwap.dex) }} />
             <ActionRow>
                 <HistoryCellComment />
-                <SwapHistoryCell>
+                <SwapHistoryCell className="grid-area-amount">
                     <HistoryCellAmount
                         amount={assetIn.amount}
                         symbol={assetIn.symbol}
@@ -203,6 +205,8 @@ export const JettonMintDesktopAction: FC<{ action: Action }> = ({ action }) => {
     }
     const isFailed = action.status === 'failed';
 
+    const isScam = jettonMint.jetton.verification === 'blacklist';
+
     return (
         <>
             <HistoryCellActionGeneric icon={<SparkIcon color="iconPrimary" />} isFailed={isFailed}>
@@ -216,6 +220,7 @@ export const JettonMintDesktopAction: FC<{ action: Action }> = ({ action }) => {
                     symbol={jettonMint.jetton.symbol}
                     decimals={jettonMint.jetton.decimals}
                     isFailed={isFailed}
+                    isSpam={isScam}
                 />
             </ActionRow>
         </>

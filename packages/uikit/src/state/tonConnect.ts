@@ -21,7 +21,6 @@ import {
 import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
-import { subject } from '../libs/atom';
 import { QueryKey } from '../libs/queryKey';
 import { getLedgerTonProofSigner, signTonConnectOver } from './mnemonic';
 import {
@@ -36,12 +35,12 @@ import {
     getNetworkByAccount,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useCheckTouchId } from './password';
 import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../hooks/appContext';
+import { subject } from '@tonkeeper/core/dist/entries/atom';
 
 export const useAppTonConnectConnections = () => {
     const sdk = useAppSdk();
@@ -98,7 +97,6 @@ export const useConnectTonConnectAppMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<
         ConnectItemReply[],
@@ -109,8 +107,9 @@ export const useConnectTonConnectAppMutation = () => {
             webViewUrl?: string;
             account: Account;
             walletId: WalletId;
+            appName: string;
         }
-    >(async ({ request, manifest, webViewUrl, account, walletId }) => {
+    >(async ({ request, manifest, webViewUrl, account, walletId, appName }) => {
         const selectedIsLedger = account.type === 'ledger';
         const network = getNetworkByAccount(account);
         const api = getContextApiByNetwork(appContext, network);
@@ -120,7 +119,7 @@ export const useConnectTonConnectAppMutation = () => {
             throw new Error('Wallet not found');
         }
 
-        const params = await getTonConnectParams(request);
+        const params = await getTonConnectParams(request, appName);
 
         const result = [] as ConnectItemReply[];
 
@@ -169,8 +168,7 @@ export const useConnectTonConnectAppMutation = () => {
                         sdk,
                         accountId: account.id,
                         wallet,
-                        t,
-                        checkTouchId
+                        t
                     });
                     result.push(
                         await toTonProofItemReply({

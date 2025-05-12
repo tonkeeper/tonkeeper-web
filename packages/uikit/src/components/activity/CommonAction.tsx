@@ -108,13 +108,18 @@ export const ColumnLayout: FC<{
     date: string;
     amount?: React.ReactNode;
     green?: boolean;
-}> = ({ title, entry, address, date, amount, green }) => {
+    isScam?: boolean;
+}> = ({ title, entry, address, date, amount, green, isScam }) => {
     return (
         <Description>
             <FirstLine>
                 <FirstLabel>{title}</FirstLabel>
-                <AmountText green={green}>{amount}</AmountText>
-                <AmountText green={green}>{entry}</AmountText>
+                <AmountText green={green} isScam={isScam}>
+                    {amount}
+                </AmountText>
+                <AmountText green={green} isScam={isScam}>
+                    {entry}
+                </AmountText>
             </FirstLine>
             <SecondLine>
                 <SecondaryText>{address}</SecondaryText>

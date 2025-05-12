@@ -1,5 +1,5 @@
 import { validatePassword } from '@tonkeeper/core/dist/service/passwordService';
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
@@ -7,6 +7,7 @@ import { CenterContainer } from '../Layout';
 import { H2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Input } from '../fields/Input';
+import { Notification } from '../Notification';
 
 const Block = styled.form`
     display: flex;
@@ -94,5 +95,27 @@ export const CreatePassword: FC<{
                 </Button>
             </Block>
         </CenterContainer>
+    );
+};
+
+export const CreatePasswordNotification: FC<{
+    isOpen: boolean;
+    handleClose: (password?: string) => void;
+}> = ({ isOpen, handleClose }) => {
+    const { t } = useTranslation();
+
+    const Content = useCallback(() => {
+        return <CreatePassword afterCreate={handleClose} />;
+    }, []);
+
+    return (
+        <Notification
+            isOpen={isOpen}
+            handleClose={handleClose}
+            title={t('set_up_password')}
+            hideButton
+        >
+            {Content}
+        </Notification>
     );
 };

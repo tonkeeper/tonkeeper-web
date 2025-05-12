@@ -2,7 +2,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
@@ -31,6 +31,10 @@ import { AsideMenuFolder } from './AsideMenuFolder';
 
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { NotForTargetEnv } from '../../shared/TargetEnv';
+import { useMenuController } from '../../../hooks/ionic';
+import { useAppSdk } from '../../../hooks/appSdk';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -38,7 +42,12 @@ const AsideContainer = styled.div<{ width: number }>`
     height: 100%;
     position: relative;
     width: ${p => p.width}px;
-    border-right: 1px solid ${p => p.theme.backgroundContentAttention};
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            border-right: 1px solid ${p.theme.backgroundContentAttention};
+        `}
 
     * {
         user-select: none;
@@ -60,7 +69,8 @@ const AsideContentContainer = styled.div`
     box-sizing: border-box;
     height: calc(100% - 69px);
 
-    background: ${p => p.theme.backgroundContent};
+    background: ${p =>
+        p.theme.proDisplayType === 'desktop' ? p.theme.backgroundContent : p.theme.backgroundPage};
     display: flex;
     flex-direction: column;
     padding: 0 0.5rem 0;
@@ -95,12 +105,21 @@ const AsideMenuBottom = styled.div`
     flex-direction: column;
     justify-content: flex-end;
 
-    background: ${p => p.theme.backgroundContent};
+    background: ${p =>
+        p.theme.proDisplayType === 'desktop' ? p.theme.backgroundContent : p.theme.backgroundPage};
     padding-bottom: 0.5rem;
 `;
 
 const AsideMenuBottomContent = styled.div`
     padding: 0.5rem 0;
+`;
+
+const SubscriptionBlockWrapper = styled.div`
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            padding-left: 0.5rem;
+        `}
 `;
 
 const DraggingBlock = styled.div<{ $isDragging: boolean }>`
@@ -113,14 +132,18 @@ const DraggingBlock = styled.div<{ $isDragging: boolean }>`
         css`
             pointer-events: auto !important;
             cursor: grabbing !important;
-            background-color: ${p.theme.backgroundContentTint};
+            background: ${p.theme.proDisplayType === 'desktop'
+                ? p.theme.backgroundContentTint
+                : p.theme.backgroundContent};
 
             * {
                 pointer-events: none;
             }
 
             div {
-                background-color: ${p.theme.backgroundContentTint};
+                background: ${p.theme.proDisplayType === 'desktop'
+                    ? p.theme.backgroundContentTint
+                    : p.theme.backgroundContent};
             }
         `}
 `;
@@ -157,24 +180,28 @@ export const AsideMenuDNDItem = forwardRef<
     useEffect(() => {
         setOptimisticWalletId(activeWalletId);
     }, [activeWalletId]);
+    const menuController = useMenuController('aside-nav');
 
     const handleNavigateHome = useCallback(() => {
+        menuController.close();
         if (shouldNavigateHome(location.pathname)) {
             return navigate(AppRoute.home);
         } else {
             scrollToTop();
         }
-    }, [location.pathname]);
+    }, [location.pathname, menuController]);
 
     const onClickWallet = useCallback(
-        (walletId: WalletId) => {
+        async (walletId: WalletId) => {
             if (shouldNavigateHome(location.pathname)) {
                 setOptimisticActiveRoute(undefined);
             }
             setOptimisticWalletId(walletId);
-            setActiveWallet(walletId).then(handleNavigateHome);
+            await menuController.close();
+            await setActiveWallet(walletId);
+            handleNavigateHome();
         },
-        [setActiveWallet, handleNavigateHome, location.pathname]
+        [setActiveWallet, handleNavigateHome, location.pathname, menuController]
     );
 
     if (!item) {
@@ -206,9 +233,13 @@ const AccountDNDBlock: FC<{
     items: (Account | AccountsFolder)[];
 }> = ({ items }) => {
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
+    const sdk = useAppSdk();
 
     return (
-        <DragDropContext onDragEnd={handleDrop}>
+        <DragDropContext
+            onDragEnd={handleDrop}
+            onDragStart={() => sdk.hapticNotification('impact_medium')}
+        >
             <Droppable direction="vertical" droppableId="droppable-1">
                 {provided => (
                     <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -255,9 +286,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const { ref, closeBottom } = useIsScrolled();
 
     const activeRoute = useAsideActiveRoute();
+    const menuController = useMenuController('aside-nav');
 
     const handleNavigateClick = useCallback(
         (route: string) => {
+            menuController.close();
             if (location.pathname !== route) {
                 return navigate(route);
             } else {
@@ -309,18 +342,22 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
 
     return (
         <AsideContainer width={asideWidth}>
-            <AsideHeader width={asideWidth} />
+            <NotForTargetEnv env="mobile">
+                <AsideHeader width={asideWidth} />
+            </NotForTargetEnv>
             <AsideContentContainer className={className}>
                 <ScrollContainer ref={ref}>
-                    {proFeatures && (
-                        <AsideMenuItem
-                            isSelected={activeRoute === AppProRoute.dashboard}
-                            onClick={() => handleNavigateClick(AppProRoute.dashboard)}
-                        >
-                            <StatsIcon />
-                            <Label2>{t('aside_dashboard')}</Label2>
-                        </AsideMenuItem>
-                    )}
+                    <NotForTargetEnv env="mobile">
+                        {proFeatures && (
+                            <AsideMenuItem
+                                isSelected={activeRoute === AppProRoute.dashboard}
+                                onClick={() => handleNavigateClick(AppProRoute.dashboard)}
+                            >
+                                <StatsIcon />
+                                <Label2>{t('aside_dashboard')}</Label2>
+                            </AsideMenuItem>
+                        )}
+                    </NotForTargetEnv>
                     <HideOnReview>
                         <AsideMenuItem
                             onClick={() => handleNavigateClick(AppRoute.browser)}
@@ -335,9 +372,17 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                     <AccountDNDBlock items={items} />
                 </ScrollContainer>
                 <AsideMenuBottom>
-                    <DividerStyled isHidden={!closeBottom} />
+                    <NotForTargetEnv env="mobile">
+                        <DividerStyled isHidden={!closeBottom} />
+                    </NotForTargetEnv>
                     <AsideMenuBottomContent>
-                        <AsideMenuItem isSelected={false} onClick={() => addWallet()}>
+                        <AsideMenuItem
+                            isSelected={false}
+                            onClick={() => {
+                                menuController.close();
+                                addWallet();
+                            }}
+                        >
                             <IconWrapper>
                                 <PlusIcon />
                             </IconWrapper>
@@ -357,18 +402,22 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                         <ErrorBoundary
                             fallbackRender={fallbackRenderOver('Failed to load Pro State')}
                         >
-                            <SubscriptionInfoBlock />
+                            <SubscriptionBlockWrapper>
+                                <SubscriptionInfoBlock />
+                            </SubscriptionBlockWrapper>
                         </ErrorBoundary>
                     </HideOnReview>
                 </AsideMenuBottom>
             </AsideContentContainer>
-            <AsideResizeHandle
-                onMouseDown={() => {
-                    isResizing.current = true;
-                    document.body.style.cursor = 'col-resize';
-                    document.documentElement.classList.add('no-user-select');
-                }}
-            />
+            <NotForTargetEnv env="mobile">
+                <AsideResizeHandle
+                    onMouseDown={() => {
+                        isResizing.current = true;
+                        document.body.style.cursor = 'col-resize';
+                        document.documentElement.classList.add('no-user-select');
+                    }}
+                />
+            </NotForTargetEnv>
         </AsideContainer>
     );
 };

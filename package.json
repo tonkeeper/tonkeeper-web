@@ -15,7 +15,7 @@
         "build:ipad": "npx turbo build:ipad",
         "build:swap-widget": "npx turbo build:swap-widget",
         "build:pkg": "npx turbo build:pkg",
-        "release": "node scripts/release.js"
+        "prepare-release": "node scripts/prepare-release.js"
     },
     "private": true,
     "devDependencies": {
@@ -49,5 +49,8 @@
     "packageManager": "yarn@4.3.0",
     "dependencies": {
         "@tonkeeper/uikit": "workspace:^"
+    },
+    "resolutions": {
+        "@ionic/core@npm:8.4.2": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch"
     }
 }

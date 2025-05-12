@@ -1,4 +1,5 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { Navigate } from '../../components/shared/Navigate';
 
 export const RedirectFromDesktopSettings = () => {
     const location = useLocation();

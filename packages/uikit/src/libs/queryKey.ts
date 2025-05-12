@@ -9,7 +9,6 @@ export enum QueryKey {
     walletConfig = 'wallet_config',
     accountConfig = 'accountConfig',
     lock = 'lock',
-    touchId = 'touchId',
     canPromptTouchId = 'canPromptTouchId',
     country = 'country',
     password = 'password',
@@ -45,6 +44,7 @@ export enum QueryKey {
     distribution = 'distribution',
     pro = 'pro',
     proBackup = 'proBackup',
+    proFreeAccessActive = 'proFreeAccessActive',
     allWalletsTotalBalance = 'allWalletsTotalBalance',
 
     dashboardColumnsForm = 'dashboardColumnsForm',
@@ -74,7 +74,8 @@ export enum QueryKey {
     twoFAWalletConfig = 'twoFAWalletConfig',
     twoFAActivationProcess = 'twoFAActivationProcess',
     twoFARemovingProcess = 'twoFARemovingProcess',
-    twoFACancellRecoveryProcess = 'twoFARemovingProcess'
+    twoFACancellRecoveryProcess = 'twoFARemovingProcess',
+    isOnReview = 'isOnReview'
 }
 
 export enum JettonKey {

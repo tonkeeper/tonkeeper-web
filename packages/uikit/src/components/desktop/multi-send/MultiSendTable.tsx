@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
-import { Link, useBlocker, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
@@ -53,6 +53,8 @@ import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useBlocker } from '../../../hooks/router/useBlocker';
 
 const FormHeadingWrapper = styled.div`
     display: flex;

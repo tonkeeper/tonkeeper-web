@@ -20,14 +20,13 @@ import {
 import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext, useAppPlatform } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppContext } from '../hooks/appContext';
+import { useAppSdk, useAppTargetEnv, useIsCapacitorApp } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
-import { useCheckTouchId } from './password';
 import {
     getAccountByWalletById,
     getWalletById,
@@ -35,6 +34,57 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { useToast } from '../hooks/useNotification';
+import { useAnalyticsTrack } from '../hooks/amplitude';
+
+export type FreeProAccess = {
+    code: string;
+    validUntil: Date;
+};
+
+export const useFreeProAccessAvailable = () => {
+    const { mainnetConfig } = useAppContext();
+    const env = useAppTargetEnv();
+
+    return useMemo<FreeProAccess | null>(() => {
+        if (!mainnetConfig.enhanced_acs_pmob || env !== 'mobile') {
+            return null;
+        }
+        const data = mainnetConfig.enhanced_acs_pmob;
+        if (!data.code || !data.acs_until) {
+            return null;
+        }
+
+        const validUntil = new Date(data.acs_until * 1000);
+        if (validUntil < new Date()) {
+            return null;
+        }
+
+        return {
+            code: data.code,
+            validUntil
+        };
+    }, [mainnetConfig.enhanced_acs_pmob, env]);
+};
+
+export const useMutateIsFreeProAccessActivate = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    const toast = useToast();
+    const { t } = useTranslation();
+    const track = useAnalyticsTrack();
+
+    return useMutation<void, Error, boolean>(async isActive => {
+        await sdk.storage.set(AppKey.PRO_FREE_ACCESS_ACTIVE, isActive);
+        await client.invalidateQueries([QueryKey.pro]);
+
+        if (isActive) {
+            toast(t('free_pro_access_activated_toast'));
+
+            track('free_pro_access_activated');
+        }
+    });
+};
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -46,11 +96,11 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const appPlatform = useAppPlatform();
+    const isCapacitorApp = useIsCapacitorApp();
     const storage = useAppSdk().storage;
 
     return useMemo(() => {
-        if (appPlatform === 'tablet') {
+        if (isCapacitorApp) {
             return {
                 async attachToken() {
                     const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
@@ -71,16 +121,37 @@ export const useProAuthTokenService = (): ProAuthTokenService => {
                 }
             };
         }
-    }, [appPlatform]);
+    }, [isCapacitorApp]);
 };
 
 export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
+    const isFreeProAccessAvailable = useFreeProAccessAvailable();
+    const env = useAppTargetEnv();
 
-    return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(authService, sdk.storage);
+    return useQuery<ProState, Error>([QueryKey.pro, isFreeProAccessAvailable], async () => {
+        let state: ProState;
+
+        const isFreeMobileTrialActive = Boolean(
+            await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
+        );
+        if (env === 'mobile' && isFreeProAccessAvailable && isFreeMobileTrialActive) {
+            state = {
+                authorizedWallet: null,
+                subscription: {
+                    type: 'trial-mobile',
+                    isTrial: true,
+                    valid: true,
+                    usedTrial: true,
+                    trialEndDate: isFreeProAccessAvailable.validUntil
+                }
+            };
+        } else {
+            state = await getProState(authService, sdk.storage);
+        }
+
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
@@ -92,7 +163,6 @@ export const useSelectWalletForProMutation = () => {
     const client = useQueryClient();
     const api = useActiveApi();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const accountsStorage = useAccountsStorage();
     const authService = useProAuthTokenService();
 
@@ -118,7 +188,7 @@ export const useSelectWalletForProMutation = () => {
             authService,
             api,
             wallet,
-            signTonConnectOver({ sdk, accountId: account.id, wallet, t, checkTouchId })
+            signTonConnectOver({ sdk, accountId: account.id, wallet, t })
         );
 
         await client.invalidateQueries([QueryKey.pro]);

@@ -44,7 +44,7 @@ export const MobileAssetHistory: FC<{
         data: activity
     } = useFetchFilteredActivity(assetAddress);
 
-    useScrollMonitor(innerRef, 5000, refetch);
+    useScrollMonitor(refetch, 5000, innerRef);
 
     const isFetchingNextPage = isActivityFetchingNextPage;
 

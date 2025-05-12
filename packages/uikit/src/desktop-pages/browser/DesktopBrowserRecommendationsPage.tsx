@@ -5,6 +5,14 @@ import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 import { DesktopCategoryBlock } from './DesktopCategoryBlock';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { useAppTargetEnv } from '../../hooks/appSdk';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useTranslation } from '../../hooks/translation';
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -20,14 +28,20 @@ const CategoryBlockStyled = styled(DesktopCategoryBlock)`
     }
 `;
 
-const CategoriesWrapper = styled.div`
+const CategoriesWrapper = styled(DesktopViewPageLayout)`
     padding-bottom: 0.5rem;
     overflow: auto;
     height: 100%;
+
+    &::after {
+        display: none;
+    }
 `;
 
 export const DesktopBrowserRecommendationsPage: FC = () => {
+    const { t } = useTranslation();
     const { data } = useRecommendations();
+    const targetEnv = useAppTargetEnv();
 
     const track = useOpenBrowser();
     useEffect(() => {
@@ -41,7 +55,15 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     return (
         <HideOnReview>
             <CategoriesWrapper>
-                <PromotionsCarouselStyled apps={data.apps} slidesToShow={2} />
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('aside_discover')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <PromotionsCarouselStyled
+                    apps={data.apps}
+                    slidesToShow={targetEnv === 'mobile' ? 1 : 2}
+                />
                 {data.categories.map((category, index) => (
                     <CategoryBlockStyled
                         key={category.id}

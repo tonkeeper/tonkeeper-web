@@ -56,7 +56,7 @@ export function useOpenLinkOnAreaClick<T extends HTMLElement = HTMLDivElement>(
 
     const callback = useCallback(() => {
         event(url, source);
-        sdk.openPage(formatBrowserUrl(url, source, track));
+        sdk.openPage(formatBrowserUrl(url, source, track), { forceExternalBrowser: true });
     }, [url, sdk, event]);
 
     return useAreaClick<T>({ callback });

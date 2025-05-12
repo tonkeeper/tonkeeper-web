@@ -1,25 +1,36 @@
-import { DesktopViewHeader } from '../../components/desktop/DesktopViewLayout';
-import { Label2 } from '../../components/Text';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
 import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { SwapProviders } from '../../components/swap/SwapProviders';
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
-import { Navigate } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { Navigate } from '../../components/shared/Navigate';
+import { NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { QueryKey } from '../../libs/queryKey';
 import { HideForRegulatoryState } from '../../components/HideForState';
 import { CountryFeature } from '../../state/country';
 
-const SwapPageWrapper = styled.div`
+const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
-    min-width: 580px;
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            min-width: 580px;
+        `}
 `;
 
 const HeaderButtons = styled.div`
@@ -40,7 +51,7 @@ const ContentWrapper = styled.div`
     margin: 0 auto;
 
     > * {
-        width: calc(50% - 4px);
+        width: ${p => (p.theme.proDisplayType === 'desktop' ? 'calc(50% - 4px)' : '100%')};
     }
 `;
 
@@ -56,19 +67,26 @@ const DesktopSwapPageContent = () => {
     }
 
     return (
-        <SwapPageWrapper>
-            <DesktopViewHeader backButton={false}>
-                <Label2>{t('wallet_swap')}</Label2>
-                <HeaderButtons>
-                    <SwapRefreshButton />
-                    <SwapSettingsButton />
-                </HeaderButtons>
+        <SwapPageWrapper mobileContentPaddingTop>
+            <DesktopViewHeader>
+                <DesktopViewHeaderContent
+                    title={t('wallet_swap')}
+                    right={
+                        <HeaderButtons>
+                            <SwapRefreshButton />
+                            <SwapSettingsButton />
+                        </HeaderButtons>
+                    }
+                />
             </DesktopViewHeader>
+            <PullToRefresh invalidate={QueryKey.swapCalculate} />
             <ContentWrapper>
                 <SwapMainForm />
-                <div>
-                    <SwapProviders />
-                </div>
+                <NotForTargetEnv env="mobile">
+                    <div>
+                        <SwapProviders />
+                    </div>
+                </NotForTargetEnv>
             </ContentWrapper>
         </SwapPageWrapper>
     );

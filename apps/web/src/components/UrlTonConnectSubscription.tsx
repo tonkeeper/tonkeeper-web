@@ -6,10 +6,11 @@ import {
     useGetConnectInfo
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
+import { AppRoute } from "@tonkeeper/uikit/dist/libs/routes";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
 
 const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 
@@ -51,7 +52,7 @@ export const UrlTonConnectSubscription = () => {
     return (
         <TonConnectNotification
             origin={undefined}
-            params={params?.request ?? null}
+            params={params ?? null}
             handleClose={handlerClose}
         />
     );

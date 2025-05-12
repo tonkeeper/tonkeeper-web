@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
-import { useAppContext } from '../hooks/appContext';
 import { GaslessApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useMemo } from 'react';
 import { useActiveApi } from './wallet';
@@ -12,9 +11,16 @@ export const useGaslessApi = () => {
 
 export const useGaslessConfigQuery = () => {
     const gaslessApi = useGaslessApi();
-    return useQuery([QueryKey.gaslessConfig], async () => {
-        return gaslessApi.gaslessConfig();
-    });
+    return useQuery(
+        [QueryKey.gaslessConfig],
+        async () => {
+            return gaslessApi.gaslessConfig();
+        },
+        {
+            keepPreviousData: true,
+            suspense: true
+        }
+    );
 };
 
 export const useGaslessConfig = () => {
