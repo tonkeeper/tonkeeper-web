@@ -60,6 +60,12 @@ const DesktopViewPageLayoutSimpleIonic = styled.div<{ $mobileContentPaddingTop?:
     }
 `;
 
+const DesktopViewPageLayoutSimpleIonicModalOverride = createGlobalStyle`
+    ion-modal ${DesktopViewPageLayoutSimpleIonic}::after {
+        display: none;
+    }
+`;
+
 const DesktopViewPageLayoutContext = createContext<string | undefined>(undefined);
 
 export const DesktopViewPageLayout = forwardRef<
@@ -88,18 +94,21 @@ export const DesktopViewPageLayout = forwardRef<
 
     if (platform === 'mobile') {
         return (
-            <DesktopViewPageLayoutContext.Provider value={id}>
-                <IonPage id={id}>
-                    <IonContent ref={contentRef} fullscreen={true}>
-                        <DesktopViewPageLayoutSimpleIonic
-                            className={className}
-                            $mobileContentPaddingTop={mobileContentPaddingTop}
-                        >
-                            {children}
-                        </DesktopViewPageLayoutSimpleIonic>
-                    </IonContent>
-                </IonPage>
-            </DesktopViewPageLayoutContext.Provider>
+            <>
+                <DesktopViewPageLayoutContext.Provider value={id}>
+                    <IonPage id={id}>
+                        <IonContent ref={contentRef} fullscreen={true}>
+                            <DesktopViewPageLayoutSimpleIonic
+                                className={className}
+                                $mobileContentPaddingTop={mobileContentPaddingTop}
+                            >
+                                {children}
+                            </DesktopViewPageLayoutSimpleIonic>
+                        </IonContent>
+                    </IonPage>
+                </DesktopViewPageLayoutContext.Provider>
+                <DesktopViewPageLayoutSimpleIonicModalOverride />
+            </>
         );
     } else
         return (

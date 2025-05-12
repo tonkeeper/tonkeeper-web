@@ -12,28 +12,33 @@ import {
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
-import { useUserCountry } from './country';
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 
-export const useTonendpoint = (options: {
+export const useTonendpoint = ({
+    targetEnv,
+    build,
+    network = Network.MAINNET,
+    lang = Language.EN,
+    platform
+}: {
     targetEnv: TargetEnv;
     build: string;
     network?: Network;
     lang?: Language;
-    platform?: BootParams['platform'];
+    platform: BootParams['platform'];
 }) => {
     return useMemo(() => {
         return new Tonendpoint(
             {
-                build: options.build,
-                network: options.network,
-                lang: localizationText(options.lang),
-                targetEnv: options.targetEnv,
-                platform: options.platform
+                build,
+                network,
+                lang: localizationText(lang),
+                targetEnv,
+                platform
             },
             {}
         );
-    }, [options.targetEnv, options.build, options.network, options.lang, options.platform]);
+    }, [targetEnv, build, network, lang, platform]);
 };
 
 export interface ServerConfig {

@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/mobile",
-    "version": "3.2.0",
+    "version": "4.0.0",
     "license": "Apache-2.0",
     "description": "Your tablet wallet on The Open Network",
     "type": "module",
@@ -29,6 +29,7 @@
         "@capacitor/core": "^6.2.0",
         "@capacitor/device": "^6.0.2",
         "@capacitor/dialog": "^7.0.1",
+        "@capacitor/filesystem": "^7.0.1",
         "@capacitor/haptics": "^6.0.2",
         "@capacitor/ios": "^6.1.2",
         "@capacitor/keyboard": "^7.0.1",

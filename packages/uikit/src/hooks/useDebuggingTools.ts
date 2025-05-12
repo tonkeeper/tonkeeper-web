@@ -5,11 +5,13 @@ import { useGetAccountSigner } from '../state/mnemonic';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from './appContext';
 import { useEffect } from 'react';
+import { useMutateUserUIPreferences } from '../state/theme';
 
 export const useDebuggingTools = () => {
     const api = useActiveApi();
     const getSigner = useGetAccountSigner();
     const { data: activeAccount } = useActiveAccountQuery();
+    const { mutate: mutateUserUIPreferences } = useMutateUserUIPreferences();
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -71,6 +73,9 @@ export const useDebuggingTools = () => {
                     });
 
                     console.log('Disable two FA with seed sent');
+                },
+                async resetMobileBanner() {
+                    mutateUserUIPreferences({ dismissMobileQRBanner: false });
                 }
             };
         }

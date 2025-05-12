@@ -39,6 +39,7 @@
         <string>tonkeeperx</string>
         <string>tonkeeper-mob</string>
         <string>tonkeeper-tc-mob</string>
+        <string>tg</string>
     </array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
@@ -102,5 +103,9 @@
     <array>
         <string>bluetooth-central</string>
     </array>
+    <key>UIFileSharingEnabled</key>
+    <false/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <false/>
 </dict>
 </plist>

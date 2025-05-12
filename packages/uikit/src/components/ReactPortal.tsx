@@ -19,8 +19,7 @@ const ReactPortal: FC<
     useLayoutEffect(() => {
         let element = document.getElementById(wrapperId);
         let systemCreated = false;
-        // if element is not found with wrapperId or wrapperId is not provided,
-        // create and append to body
+
         if (!element) {
             systemCreated = true;
             element = createWrapperAndAppendToBody(wrapperId);
@@ -28,7 +27,14 @@ const ReactPortal: FC<
         setWrapperElement(element);
 
         return () => {
-            // delete the programmatically created element
+            /**
+             * delete the programmatically created element;
+             *
+             * make sure
+             * <div id="react-portal-modal-container"></div>
+             * is added to index.html (Notification.tsx portal root),
+             * otherwise html node will be unmounted and it will cause error after ReactRouter navigation
+             */
             if (systemCreated && element && element.parentNode) {
                 element.parentNode.removeChild(element);
             }

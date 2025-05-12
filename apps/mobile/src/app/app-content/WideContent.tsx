@@ -35,7 +35,7 @@ import { PullToRefresh } from '../components/PullToRefresh';
 import { useQueryClient } from '@tanstack/react-query';
 import { SplashScreen } from '@capacitor/splash-screen';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import { Navigate } from '@tonkeeper/uikit/dist/components/shared/Navigate';
+import DashboardPage from '@tonkeeper/uikit/dist/desktop-pages/dashboard';
 
 const FullSizeWrapper = styled(Container)`
     max-width: 800px;
@@ -147,9 +147,7 @@ export const WideContent: FC<{
             <AsideMenu />
             <WideContentStyled>
                 <Switch>
-                    <Route path={AppProRoute.dashboard}>
-                        <Navigate to={AppRoute.home} replace />
-                    </Route>
+                    <Route path={AppProRoute.dashboard} component={DashboardPage} />
                     <Route path={AppRoute.browser} component={DesktopBrowser} />
                     <Route path={AppRoute.settings} component={PreferencesContent} />
                     <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />

@@ -3,6 +3,7 @@ import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
 import { SwapWidgetStorage } from './storage';
+import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 
 function iOS() {
     return (
@@ -28,7 +29,7 @@ export class WidgetAppSdk extends BaseApp {
     };
 
     openPage = async (url: string) => {
-        window.open(url, '_black', 'noreferrer,noopener');
+        safeWindowOpen(url, this.acceptedOpenUrlProtocols);
     };
 
     disableScroll = disableScroll;
@@ -47,4 +48,6 @@ export class WidgetAppSdk extends BaseApp {
     version = WidgetAppSdk.version;
 
     targetEnv = 'web' as const;
+
+    acceptedOpenUrlProtocols = ['http:', 'https:'];
 }

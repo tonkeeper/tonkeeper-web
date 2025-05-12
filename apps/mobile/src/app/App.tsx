@@ -37,7 +37,8 @@ import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import { FC, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createGlobalStyle, css } from 'styled-components';
-import { CAPACITOR_APPLICATION_ID, CapacitorAppSdk } from '../libs/appSdk';
+import { CapacitorAppSdk } from '../libs/appSdk';
+import { CAPACITOR_APPLICATION_ID } from '../libs/aplication-id';
 import { useAnalytics, useAppHeight } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
@@ -202,7 +203,7 @@ export const Loader: FC = () => {
         build: sdk.version,
         network,
         lang,
-        platform: 'tablet' // TODO CAPACITOR_APPLICATION_ID
+        platform: CAPACITOR_APPLICATION_ID === 'tablet' ? 'tablet' : 'pro_mobile_ios'
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 

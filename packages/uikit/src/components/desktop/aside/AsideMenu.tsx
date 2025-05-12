@@ -32,7 +32,7 @@ import { AsideMenuFolder } from './AsideMenuFolder';
 import { AccountsFolder, useAccountsDNDDrop, useSideBarItems } from '../../../state/folders';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useNavigate } from '../../../hooks/router/useNavigate';
-import { NotForCapacitorApp, NotForTargetEnv } from '../../shared/TargetEnv';
+import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useMenuController } from '../../../hooks/ionic';
 import { useAppSdk } from '../../../hooks/appSdk';
 
@@ -347,7 +347,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
             </NotForTargetEnv>
             <AsideContentContainer className={className}>
                 <ScrollContainer ref={ref}>
-                    <NotForCapacitorApp>
+                    <NotForTargetEnv env="mobile">
                         {proFeatures && (
                             <AsideMenuItem
                                 isSelected={activeRoute === AppProRoute.dashboard}
@@ -357,7 +357,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                                 <Label2>{t('aside_dashboard')}</Label2>
                             </AsideMenuItem>
                         )}
-                    </NotForCapacitorApp>
+                    </NotForTargetEnv>
                     <HideOnReview>
                         <AsideMenuItem
                             onClick={() => handleNavigateClick(AppRoute.browser)}

@@ -71,6 +71,10 @@ const ConnectLedgerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/ConnectLedgerNotification')
 );
 
+const DesktopMobileAppBanner = React.lazy(
+  () => import("@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner")
+);
+
 const GlobalStyle = createGlobalStyle`
     ${GlobalStyleCss};
     
@@ -244,6 +248,7 @@ export const DesktopContent: FC<{
                     <Route path="*" component={WalletContent} />
                 </Switch>
             </WideContent>
+            <DesktopMobileAppBanner />
             <BackgroundElements />
         </WideLayout>
     );

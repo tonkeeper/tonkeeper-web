@@ -578,6 +578,18 @@ const TronTopUpUSDTWrapper = styled.div`
     > ${Body2} {
         color: ${p => p.theme.textSecondary};
     }
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            gap: 16px;
+            flex-direction: column;
+
+            button {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        `}
 `;
 
 const TextContainer = styled.div`

@@ -1,4 +1,4 @@
-import { isFreeSubscription, isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
@@ -49,8 +49,7 @@ const PageWrapper = styled(DesktopViewPageLayout)`
 
 const DashboardPage: FC = () => {
     const { data } = useProState();
-    const shouldShowProBanner =
-        data && !isPaidSubscription(data.subscription) && !isFreeSubscription(data.subscription);
+    const shouldShowProBanner = data && !isPaidSubscription(data.subscription);
 
     const env = useAppTargetEnv();
     if (env === 'mobile') {

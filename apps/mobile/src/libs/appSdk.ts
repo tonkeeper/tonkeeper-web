@@ -23,6 +23,9 @@ import { App } from '@capacitor/app';
 import { KeychainCapacitor } from './keychain';
 import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
+import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
+import { CAPACITOR_APPLICATION_ID } from './aplication-id';
+import { CapacitorFileLogger } from './logger';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -71,9 +74,6 @@ export class BiometryServiceCapacitor implements BiometryService {
     };
 }
 
-export const CAPACITOR_APPLICATION_ID: 'mobile' | 'tablet' =
-    window.innerWidth <= 550 ? 'mobile' : 'tablet';
-
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     cookie = new CookieCapacitor();
 
@@ -96,20 +96,50 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         this.topMessage(notification);
     };
 
-    openPage = async (url: string) => {
-        if (!url.startsWith('https://') && !url.startsWith('http://')) {
-            try {
-                /* way to open in deeplinks on ios */
-
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                window.location = url as any;
-            } catch (e) {
-                console.error(e);
+    openPage = async (
+        url: string,
+        options?: {
+            forceExternalBrowser?: boolean;
+        }
+    ) => {
+        try {
+            if (!isValidUrlProtocol(url, this.authorizedOpenUrlProtocols)) {
+                throw new Error('Unacceptable url protocol');
             }
-        } else {
-            await Browser.open({ url });
+
+            if (!url.startsWith('https://') && !url.startsWith('http://')) {
+                try {
+                    /* way to open in deeplinks on ios */
+
+                    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                    window.location = url as any;
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                if (options?.forceExternalBrowser) {
+                    safeWindowOpen(url, this.authorizedOpenUrlProtocols);
+                } else {
+                    await Browser.open({ url });
+                }
+            }
+        } catch (e) {
+            console.error(e);
         }
     };
+
+    authorizedOpenUrlProtocols = [
+        'http:',
+        'https:',
+        'tg:',
+        'tonsign:',
+        'tonsign:',
+        'tonkeeper:',
+        'tonkeeperx:',
+        'tonkeeper-mob:',
+        'tonkeeper-tc-mob:',
+        'mailto:'
+    ];
 
     async confirm(options: ConfirmOptions) {
         const { value } = await Dialog.confirm(options);
@@ -140,6 +170,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     signerReturnUrl = 'tonkeeper://'; // TODO replace with 'tonkeeper-pro://'; once signer is fixed
 
     keyboard = new CapacitorKeyboardService();
+
+    logger = new CapacitorFileLogger('logs.txt');
 }
 
 export const getCapacitorDeviceOS = async () => {

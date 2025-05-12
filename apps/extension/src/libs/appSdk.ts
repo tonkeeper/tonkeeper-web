@@ -4,6 +4,7 @@ import browser from 'webextension-polyfill';
 import packageJson from '../../package.json';
 import { ExtensionStorage } from './storage';
 import { checkForError } from './utils';
+import { isValidUrlProtocol } from "@tonkeeper/core/dist/utils/common";
 
 export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
     process.env.REACT_APP_EXTENSION_TYPE;
@@ -19,7 +20,7 @@ export class ExtensionAppSdk extends BaseApp {
 
     openPage = (url: string) => {
         return new Promise<void>((resolve, reject) => {
-            if (!url.startsWith('http')) {
+            if (!isValidUrlProtocol(url, this.authorizedOpenUrlProtocols)) {
                 reject('Invalid url');
             }
             browser.tabs.create({ url }).then(newTab => {
@@ -31,6 +32,8 @@ export class ExtensionAppSdk extends BaseApp {
             });
         });
     };
+
+    authorizedOpenUrlProtocols = ['http:', 'https:']
 
     disableScroll = () => null;
     enableScroll = () => null;

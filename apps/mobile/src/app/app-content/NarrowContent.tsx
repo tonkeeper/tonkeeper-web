@@ -8,6 +8,7 @@ import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools
 import {
     AppProRoute,
     AppRoute,
+    DevSettingsRoute,
     SettingsRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
@@ -49,7 +50,7 @@ import { DesktopManageAccountsPage } from '@tonkeeper/uikit/dist/desktop-pages/s
 import { Localization } from '@tonkeeper/uikit/dist/pages/settings/Localization';
 import { Legal } from '@tonkeeper/uikit/dist/pages/settings/Legal';
 import { UserTheme } from '@tonkeeper/uikit/dist/pages/settings/Theme';
-import { DevSettings } from '@tonkeeper/uikit/dist/pages/settings/Dev';
+import { DevSettings, DevSettingsLogs } from '@tonkeeper/uikit/dist/pages/settings/Dev';
 import { FiatCurrency } from '@tonkeeper/uikit/dist/pages/settings/FiatCurrency';
 import { SecuritySettings } from '@tonkeeper/uikit/dist/pages/settings/Security';
 import { ProSettings } from '@tonkeeper/uikit/dist/components/settings/ProSettings';
@@ -475,6 +476,11 @@ const PreferencesModal = () => {
                         <Route
                             path={AppRoute.settings + SettingsRoute.dev}
                             component={DevSettings}
+                            exact
+                        />
+                        <Route
+                            path={AppRoute.settings + SettingsRoute.dev + DevSettingsRoute.logs}
+                            component={DevSettingsLogs}
                         />
                         <Route
                             path={AppRoute.settings + SettingsRoute.fiat}

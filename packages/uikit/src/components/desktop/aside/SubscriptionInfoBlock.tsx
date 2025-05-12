@@ -1,5 +1,4 @@
 import {
-    isFreeSubscription,
     isTrialSubscription,
     isValidSubscription,
     ProState
@@ -21,7 +20,6 @@ import {
 import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
-import { useAppTargetEnv, useIsCapacitorApp } from '../../../hooks/appSdk';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -52,7 +50,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isValidSubscription(subscription) && !isFreeSubscription(subscription)) {
+    if (isValidSubscription(subscription)) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
@@ -140,8 +138,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
-    const env = useAppTargetEnv();
-    const isCapacitorApp = useIsCapacitorApp();
 
     const onRefresh = () => {
         if (rotate) {
@@ -178,15 +174,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                     {t('pro_subscription_get_pro')}
                 </Button>
             );
-        }
-    }
-
-    if (isCapacitorApp) {
-        if (!data) {
-            return null;
-        }
-        if (isFreeSubscription(data.subscription)) {
-            return null;
         }
     }
 

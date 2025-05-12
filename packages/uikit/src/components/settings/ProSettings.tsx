@@ -23,6 +23,7 @@ import { useTranslation } from '../../hooks/translation';
 import {
     ConfirmState,
     useCreateInvoiceMutation,
+    useFreeProAccessAvailable,
     useProLogout,
     useProPlans,
     useProState,
@@ -57,7 +58,10 @@ import {
     DesktopViewPageLayout
 } from '../desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../shared/TargetEnv';
-import { useAppTargetEnv } from '../../hooks/appSdk';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
+import { ProFreeAccessContent } from '../pro/ProFreeAccess';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { AppRoute } from '../../libs/routes';
 
 const Block = styled.div`
     display: flex;
@@ -353,8 +357,11 @@ const BuyProService: FC<{
         );
     };
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    useInputFocusScroll(containerRef);
+
     return (
-        <div>
+        <div ref={containerRef}>
             <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
                 plans={plans ?? []}
@@ -432,6 +439,10 @@ const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSu
     return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
 };
 
+const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
+    height: 100%;
+`;
+
 export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void }> = ({
     showLogo = true,
     onSuccess
@@ -439,6 +450,21 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
     const { t } = useTranslation();
 
     const { data } = useProState();
+    const isFreeAccessAvailable = useFreeProAccessAvailable();
+    const navigate = useNavigate();
+
+    if (isFreeAccessAvailable) {
+        const onBack = () => {
+            navigate(AppRoute.home);
+        };
+
+        return (
+            <ProFreeAccessContentStyled
+                access={isFreeAccessAvailable}
+                onSubmit={onSuccess ?? onBack}
+            />
+        );
+    }
 
     return (
         <>
@@ -459,12 +485,6 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 };
 
 export const ProSettings: FC = () => {
-    const env = useAppTargetEnv();
-
-    if (env === 'mobile') {
-        return null;
-    }
-
     return (
         <HideOnReview>
             <ProSettingsResponsive />

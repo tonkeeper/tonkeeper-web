@@ -3,6 +3,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { Body3, Label2 } from '../../Text';
 import {
     AppearanceIcon,
+    AppleIcon,
     BankIcon,
     CodeIcon,
     DocIcon,
@@ -30,7 +31,7 @@ import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv, NotForCapacitorApp } from '../../shared/TargetEnv';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -116,18 +117,16 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NotForCapacitorApp>
-                    <HideOnReview>
-                        <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                            {({ isActive }) => (
-                                <AsideMenuItemStyled isSelected={isActive}>
-                                    <TonkeeperSkeletIcon />
-                                    <Label2>{t('tonkeeper_pro')}</Label2>
-                                </AsideMenuItemStyled>
-                            )}
-                        </NavLink>
-                    </HideOnReview>
-                </NotForCapacitorApp>
+                <HideOnReview>
+                    <NavLink to={AppRoute.settings + SettingsRoute.pro}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <TonkeeperSkeletIcon />
+                                <Label2>{t('tonkeeper_pro')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                </HideOnReview>
                 {proState?.subscription.valid && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (
@@ -174,35 +173,37 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                 </NavLink>
             </AsideMenuItemsBlock>
 
-            <ForTargetEnv env="mobile">
-                <AsideMenuItemsBlock>
-                    <AsideMenuItemStyled
-                        onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
-                        isSelected={false}
-                    >
-                        <GlobeIcon />
-                        <Label2>{t('preferences_aside_faq')}</Label2>
-                    </AsideMenuItemStyled>
-                    <AsideMenuItemStyled
-                        onClick={() =>
-                            config.directSupportUrl && sdk.openPage(config.directSupportUrl)
-                        }
-                        isSelected={false}
-                    >
-                        <TelegramIcon />
-                        <Label2>{t('settings_support')}</Label2>
-                    </AsideMenuItemStyled>
-                    <AsideMenuItemStyled
-                        onClick={() =>
-                            config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
-                        }
-                        isSelected={false}
-                    >
-                        <TelegramIcon />
-                        <Label2>{t('settings_news')}</Label2>
-                    </AsideMenuItemStyled>
-                </AsideMenuItemsBlock>
-            </ForTargetEnv>
+            <HideOnReview>
+                <ForTargetEnv env="mobile">
+                    <AsideMenuItemsBlock>
+                        <AsideMenuItemStyled
+                            onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
+                            isSelected={false}
+                        >
+                            <GlobeIcon />
+                            <Label2>{t('preferences_aside_faq')}</Label2>
+                        </AsideMenuItemStyled>
+                        <AsideMenuItemStyled
+                            onClick={() =>
+                                config.directSupportUrl && sdk.openPage(config.directSupportUrl)
+                            }
+                            isSelected={false}
+                        >
+                            <TelegramIcon />
+                            <Label2>{t('settings_support')}</Label2>
+                        </AsideMenuItemStyled>
+                        <AsideMenuItemStyled
+                            onClick={() =>
+                                config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
+                            }
+                            isSelected={false}
+                        >
+                            <TelegramIcon />
+                            <Label2>{t('settings_news')}</Label2>
+                        </AsideMenuItemStyled>
+                    </AsideMenuItemsBlock>
+                </ForTargetEnv>
+            </HideOnReview>
 
             <AsideMenuItemsBlock>
                 <AsideMenuItemStyled
@@ -220,6 +221,17 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
+                <NotForTargetEnv env="mobile">
+                    <AsideMenuItemStyled
+                        onClick={() =>
+                            config.pro_landing_url && sdk.openPage(config.pro_landing_url)
+                        }
+                        isSelected={false}
+                    >
+                        <AppleIcon />
+                        <Label2>{t('settings_pro_ios')}</Label2>
+                    </AsideMenuItemStyled>
+                </NotForTargetEnv>
             </AsideMenuItemsBlock>
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.dev}>

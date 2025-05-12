@@ -3,9 +3,10 @@ import { intlLocale } from '../entries/language';
 import { Network } from '../entries/network';
 import { DAppTrack } from '../service/urlService';
 import { FetchAPI } from '../tonApiV2';
+import { assertUnreachable } from '../utils/types';
 
 export interface BootParams {
-    platform: 'ios' | 'android' | 'web' | 'desktop' | 'tablet' | 'swap_widget_web';
+    platform: 'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'swap_widget_web';
     lang: 'en' | 'ru' | string;
     build: string; // "2.8.0"
     network: Network;
@@ -97,6 +98,14 @@ export interface TonendpointConfig {
     '2fa_bot_url'?: string;
 
     tron_api_url?: string;
+
+    enhanced_acs_pmob?: {
+        code?: string;
+        acs_until?: number;
+    };
+
+    pro_mobile_app_appstore_link?: string;
+    pro_landing_url?: string;
 }
 
 interface CountryIP {
@@ -125,13 +134,13 @@ export class Tonendpoint {
 
     constructor(
         {
-            lang = 'en',
-            build = '3.0.0',
-            network = Network.MAINNET,
-            platform = 'web',
+            lang,
+            build,
+            network,
+            platform,
             countryCode,
             targetEnv
-        }: Partial<BootParams> & { targetEnv: TargetEnv },
+        }: BootParams & { targetEnv: TargetEnv },
         { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
     ) {
         this.targetEnv = targetEnv;
@@ -228,8 +237,12 @@ export class Tonendpoint {
                 return 'twa';
             case 'extension':
             case 'web':
-            default:
+            case 'tablet':
+            case 'mobile':
+            case 'swap_widget_web':
                 return 'extension';
+            default:
+                assertUnreachable(this.targetEnv);
         }
     };
 }

@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { styled } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useProState } from '../../../state/pro';
+import { useFreeProAccessAvailable, useProState } from '../../../state/pro';
 import { Notification } from '../../Notification';
 import { Body2, Label1, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
@@ -11,7 +11,7 @@ import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { ProDashboardIcon, ProMultisendIcon } from './Icons';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useAppTargetEnv } from '../../../hooks/appSdk';
-import { isFreeSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProFreeAccessContent } from '../../pro/ProFreeAccess';
 
 const NotificationStyled = styled(Notification)`
     max-width: 768px;
@@ -21,6 +21,23 @@ export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void 
     isOpen,
     onClose
 }) => {
+    const isFreeSubscriptionAvailable = useFreeProAccessAvailable();
+
+    if (isFreeSubscriptionAvailable) {
+        return (
+            <HideOnReview>
+                <Notification isOpen={isOpen} handleClose={onClose}>
+                    {() => (
+                        <ProFreeAccessContent
+                            access={isFreeSubscriptionAvailable}
+                            onSubmit={onClose}
+                        />
+                    )}
+                </Notification>
+            </HideOnReview>
+        );
+    }
+
     return (
         <HideOnReview>
             <NotificationStyled isOpen={isOpen} handleClose={onClose}>
@@ -123,10 +140,6 @@ export const ProFeaturesNotificationContent: FC<{ onClose: () => void }> = ({ on
             onClose();
         }
     };
-
-    if (isFreeSubscription(data.subscription)) {
-        return null;
-    }
 
     return (
         <ContentWrapper>

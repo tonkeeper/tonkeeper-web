@@ -81,6 +81,7 @@ import { isSignerLink } from './signer';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
+import { useMutateIsFreeProAccessActivate } from './pro';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -232,6 +233,7 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -263,7 +265,8 @@ export const useCreateMAMAccountDerivation = () => {
             }
         ];
 
-        const isTronEnabled = (await getAccountConfig(sdk, accountId)).enableTron;
+        const isTronEnabledForAccount = (await getAccountConfig(sdk, accountId)).enableTron;
+        const isTronEnabled = isTronEnabledGlobally && isTronEnabledForAccount;
 
         account.addDerivation({
             name: account.getNewDerivationFallbackName(),
@@ -962,6 +965,7 @@ export const useMutateLogOut = () => {
     const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
     const sdk = useAppSdk();
     const { mutateAsync: securityCheck } = useSecurityCheck();
+    const { mutateAsync: setIsFreeProAccessActivate } = useMutateIsFreeProAccessActivate();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         await securityCheck();
@@ -988,6 +992,7 @@ export const useMutateLogOut = () => {
 
         if (newAccounts.length === 0) {
             await sdk.keychain?.resetSecuritySettings();
+            await setIsFreeProAccessActivate(false);
         }
 
         try {

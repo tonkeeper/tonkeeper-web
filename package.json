@@ -15,7 +15,7 @@
         "build:ipad": "npx turbo build:ipad",
         "build:swap-widget": "npx turbo build:swap-widget",
         "build:pkg": "npx turbo build:pkg",
-        "release": "node scripts/release.js"
+        "prepare-release": "node scripts/prepare-release.js"
     },
     "private": true,
     "devDependencies": {
