@@ -98,8 +98,7 @@ export async function parseTonTransaction(
     try {
         const data = queryString.parseUrl(url);
 
-        let paths = data.url.split('/');
-        paths = paths.slice(2);
+        const paths = getUrlPaths(data.url);
 
         if (paths.length !== 2 || paths[0] !== 'transfer') {
             throw new Error('Unsupported link');
@@ -312,3 +311,14 @@ async function encodeJettonMessage(
         }
     ] satisfies TonConnectTransactionPayload['messages'];
 }
+
+const getUrlPaths = (url: string) => {
+    const paths = url.split('/');
+
+    const u = new URL(url);
+    if (u.protocol === 'http:' || u.protocol === 'https:') {
+        return paths.slice(3);
+    }
+
+    return paths.slice(2);
+};
