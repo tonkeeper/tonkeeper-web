@@ -317,7 +317,16 @@ const getUrlPaths = (url: string) => {
 
     const u = new URL(url);
     if (u.protocol === 'http:' || u.protocol === 'https:') {
-        return paths.slice(3);
+        let sliced = paths.slice(3);
+
+        /**
+         * remove pro path prefix from the universal link
+         */
+        if (sliced[0] === 'pro') {
+            sliced = sliced.slice(1);
+        }
+
+        return sliced;
     }
 
     return paths.slice(2);
