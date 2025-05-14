@@ -3,7 +3,7 @@ import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connec
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
     useResponseConnectionMutation,
-    useGetConnectInfo
+    useProcessOpenedLink
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
 import { sendBackground } from '../../libs/backgroudService';
@@ -14,7 +14,7 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectParams | null>(null);
 
-    const { mutateAsync, reset } = useGetConnectInfo();
+    const { mutateAsync, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useResponseConnectionMutation();
 

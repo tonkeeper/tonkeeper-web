@@ -3,7 +3,7 @@ import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connec
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
     useResponseConnectionMutation,
-    useGetConnectInfo
+    useProcessOpenedLink
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
@@ -17,7 +17,7 @@ const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 export const UrlTonConnectSubscription = () => {
     const [params, setParams] = useState<TonConnectParams | null>(null);
 
-    const { mutateAsync: parseParams, reset } = useGetConnectInfo();
+    const { mutateAsync: parseParams, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useResponseConnectionMutation();
 

@@ -140,6 +140,7 @@ export const BatteryPageLayout: FC = () => {
 const RefundsBlock = styled.div`
     padding: 24px 0;
     color: ${p => p.theme.textSecondary};
+    text-align: center;
 `;
 
 const RefundsLink = styled(Body2)`
@@ -182,7 +183,11 @@ export const BatteryPageContent: FC = () => {
             <RefundsBlock>
                 <Body2>{t('battery_packages_disclaimer')}</Body2>{' '}
                 {!!batteryRefundEndpoint && (
-                    <RefundsLink onClick={() => sdk.openPage(batteryRefundEndpoint)}>
+                    <RefundsLink
+                        onClick={() =>
+                            sdk.openPage(batteryRefundEndpoint, { forceExternalBrowser: true })
+                        }
+                    >
                         {t('battery_refunds_link')}
                     </RefundsLink>
                 )}

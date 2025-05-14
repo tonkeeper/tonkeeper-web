@@ -15,7 +15,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useJettonList } from '../../state/jetton';
 import { useActiveTronWallet } from '../../state/tron/tron';
 import {
