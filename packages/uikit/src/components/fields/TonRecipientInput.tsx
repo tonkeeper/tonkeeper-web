@@ -13,7 +13,6 @@ import { useTranslation } from '../../hooks/translation';
 import { useAsyncValidator } from '../../hooks/useAsyncValidator';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { IconButton } from './IconButton';
-import { useAppContext } from '../../hooks/appContext';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { seeIfInvalidDns } from '../transfer/RecipientView';
 import { DNSApi } from '@tonkeeper/core/dist/tonApiV2';
@@ -216,7 +215,7 @@ export const useTonRecipientValidator = () => {
                     success: true,
                     result: {
                         address: value,
-                        bounce: await userInputAddressIsBounceable(api, value),
+                        bounce: await userInputAddressIsBounceable(api, value, { batched: true }),
                         blockchain: BLOCKCHAIN_NAME.TON
                     }
                 };
