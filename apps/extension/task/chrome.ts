@@ -1,12 +1,16 @@
-import common from './common';
+import { ExtensionBuilder, notify } from "./extension-builder";
 
-const updateChromeManifest = (path: string, version: string) => {
-  const manifestChromeData = common.readManifest(path);
-  manifestChromeData.version = version;
+export async function buildChrome() {
+  const builder = new ExtensionBuilder('chrome')
 
-  common.writeManifest(path, manifestChromeData);
-};
+  notify(`Create Chrome Build ${builder.version}`);
 
-export default {
-  updateChromeManifest,
-};
+  await builder.build({
+    REACT_APP_EXTENSION_TYPE: 'Chrome',
+    REACT_APP_STORE_URL: 'https://chromewebstore.google.com/detail/tonkeeper-%E2%80%94-wallet-for-to/omaabbefbmiijedngplfjmnooppbclkk/reviews'
+  })
+
+  builder.archive();
+
+  console.log('Chrome build successfully created');
+}
