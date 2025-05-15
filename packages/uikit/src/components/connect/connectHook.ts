@@ -32,7 +32,10 @@ import { useActiveApi, useActiveWallet } from '../../state/wallet';
 import { useBatteryServiceConfig } from '../../state/battery';
 import { useGaslessConfig } from '../../state/gasless';
 
-export const useGetConnectInfo = () => {
+export const useProcessOpenedLink = (options?: {
+    hideLoadingToast?: boolean;
+    hideErrorToast?: boolean;
+}) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const notifyError = useToast();
@@ -50,6 +53,16 @@ export const useGetConnectInfo = () => {
                 return null;
             }
 
+            const showLoadingToast = () => {
+                if (!options?.hideLoadingToast) {
+                    sdk.uiEvents.emit('copy', {
+                        method: 'copy',
+                        id: Date.now(),
+                        params: t('loading')
+                    });
+                }
+            };
+
             const transactionRequest = await parseTonTransaction(url, {
                 api,
                 walletAddress,
@@ -62,11 +75,7 @@ export const useGetConnectInfo = () => {
                         params: transactionRequest.params
                     });
                 } else {
-                    sdk.uiEvents.emit('copy', {
-                        method: 'copy',
-                        id: Date.now(),
-                        params: t('loading')
-                    });
+                    showLoadingToast();
 
                     sdk.uiEvents.emit('transfer', {
                         method: 'transfer',
@@ -83,11 +92,7 @@ export const useGetConnectInfo = () => {
 
             const tronTransfer = parseTronTransferWithAddress({ url });
             if (tronTransfer) {
-                sdk.uiEvents.emit('copy', {
-                    method: 'copy',
-                    id: Date.now(),
-                    params: t('loading')
-                });
+                showLoadingToast();
 
                 sdk.uiEvents.emit('transfer', {
                     method: 'transfer',
@@ -106,15 +111,13 @@ export const useGetConnectInfo = () => {
 
             // TODO: handle auto connect
 
-            sdk.uiEvents.emit('copy', {
-                method: 'copy',
-                id: Date.now(),
-                params: t('loading')
-            });
+            showLoadingToast();
 
             return params;
         } catch (e) {
-            notifyError(String(e));
+            if (!options?.hideErrorToast) {
+                notifyError(String(e));
+            }
             throw e;
         }
     });
