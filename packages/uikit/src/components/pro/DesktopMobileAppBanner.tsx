@@ -36,7 +36,7 @@ const Wrapper = styled.div`
 
 const LeftPart = styled.div`
     padding: 14px 16px;
-    max-width: 300px;
+    max-width: 280px;
     background-color: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
@@ -44,11 +44,10 @@ const LeftPart = styled.div`
 
 const Body2Secondary = styled(Body2)`
     color: ${p => p.theme.textSecondary};
+    word-break: break-word;
 `;
 
 const RightPart = styled.div`
-    height: 100px;
-    width: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,7 +56,13 @@ const RightPart = styled.div`
 `;
 
 const QRWrapper = styled.div`
-    transform: scale(0.7);
+    height: 120px;
+    width: 120px;
+
+    > canvas {
+        height: 100% !important;
+        width: 100% !important;
+    }
 `;
 
 export const DesktopMobileAppBanner: FC<{ className?: string }> = ({ className }) => {
@@ -89,7 +94,6 @@ export const DesktopMobileAppBanner: FC<{ className?: string }> = ({ className }
                     <QRWrapper>
                         <QRCode
                             ecLevel="M"
-                            size={140}
                             value={url}
                             bgColor={theme.constantWhite}
                             fgColor={theme.constantBlack}
