@@ -36,7 +36,7 @@ const Wrapper = styled.div`
 
 const LeftPart = styled.div`
     padding: 14px 16px;
-    max-width: 280px;
+    max-width: 268px;
     background-color: ${p => p.theme.backgroundContent};
     display: flex;
     flex-direction: column;
