@@ -21,10 +21,34 @@ import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
+import { useSecurityCheck } from '../../state/password';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
-export const useAddWalletNotification = hook;
+export const useAddWalletNotification = () => {
+    const { mutateAsync: securityCheck } = useSecurityCheck();
+    const { onOpen: onOpenHook, ...rest } = hook();
+
+    const onOpen = useCallback<typeof onOpenHook>(
+        async p => {
+            try {
+                if (p?.walletType) {
+                    await securityCheck();
+                }
+
+                onOpenHook(p);
+            } catch (e) {
+                console.error(e);
+            }
+        },
+        [securityCheck, onOpenHook]
+    );
+
+    return {
+        ...rest,
+        onOpen
+    };
+};
 
 const NotificationContentWrapper = styled.div`
     display: flex;

@@ -57,7 +57,7 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
         return sendBackground<void>({ king: 'open-page', url });
     };
 
-    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:'];
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     version = packageJson.version ?? 'Unknown';
 

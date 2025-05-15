@@ -252,7 +252,7 @@ export abstract class BaseApp implements IAppSdk {
 
     keyboard: KeyboardService = new WebKeyboardService();
 
-    authorizedOpenUrlProtocols = ['http:', 'https:', 'mailto:'];
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 }
 
 class WebKeyboardService implements KeyboardService {

@@ -2,7 +2,7 @@ import { useAppSdk } from './appSdk';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import {
-    useGetConnectInfo,
+    useProcessOpenedLink,
     useResponseConnectionMutation
 } from '../components/connect/connectHook';
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
@@ -16,7 +16,7 @@ export const useSmartScanner = () => {
     const [scanId, setScanId] = useState<number | undefined>(undefined);
     const [params, setParams] = useState<TonConnectParams | null>(null);
 
-    const { mutateAsync, reset } = useGetConnectInfo();
+    const { mutateAsync, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
         useResponseConnectionMutation();
 

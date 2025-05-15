@@ -19,6 +19,7 @@ import {
 } from '../../entries/crypto/asset/ton-asset';
 import { formatAddress } from '../../utils/common';
 import { TonEstimation } from '../../entries/send';
+import { fetchAccountBatched } from './api-utils';
 
 export const estimationSigner = async (message: Cell): Promise<Buffer> => {
     return sign(message.hash(), Buffer.alloc(64));
@@ -162,13 +163,21 @@ const isFriendlyNotBounceableAddress = (address: string) => {
 export async function userInputAddressIsBounceable(
     api: APIConfig,
     address: string,
-    retryAmount = 10
+    options?: {
+        retryAmount?: number;
+        batched?: boolean;
+    }
 ) {
+    const retryAmount = options?.retryAmount ?? 10;
     const fetchAccount = async (retries = retryAmount): Promise<Account> => {
         try {
-            return await new AccountsApi(api.tonApiV2).getAccount({
-                accountId: Address.parse(address).toRawString()
-            });
+            if (options?.batched) {
+                return await fetchAccountBatched(api, address);
+            } else {
+                return await new AccountsApi(api.tonApiV2).getAccount({
+                    accountId: Address.parse(address).toRawString()
+                });
+            }
         } catch (error) {
             if (retries > 0) {
                 await new Promise(resolve => setTimeout(resolve, 5000));

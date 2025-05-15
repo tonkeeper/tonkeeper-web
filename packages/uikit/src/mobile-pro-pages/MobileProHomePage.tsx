@@ -28,6 +28,8 @@ import { HideOnReview } from '../components/ios/HideOnReview';
 import { PullToRefresh } from '../components/mobile-pro/PullToRefresh';
 import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/DesktopViewLayout';
 import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFARecoveryStartedBanner';
+import { CountryFeature } from '../state/country';
+import { HideForRegulatoryState } from '../components/HideForState';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -125,16 +127,18 @@ export const MobileProHomePage = () => {
                         <ChevronRightIcon />
                     </MenuItem>
                     <Divider />
-                    {!isReadOnly && !isTestnet && (
-                        <>
-                            <MenuItem to={AppRoute.swap}>
-                                <SwapIconStyled />
-                                <Label2>{t('wallet_swap')}</Label2>
-                                <ChevronRightIcon />
-                            </MenuItem>
-                            <Divider />
-                        </>
-                    )}
+                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                        {!isReadOnly && !isTestnet && (
+                            <>
+                                <MenuItem to={AppRoute.swap}>
+                                    <SwapIconStyled />
+                                    <Label2>{t('wallet_swap')}</Label2>
+                                    <ChevronRightIcon />
+                                </MenuItem>
+                                <Divider />
+                            </>
+                        )}
+                    </HideForRegulatoryState>
                     {isMultisig && !isTestnet && (
                         <>
                             <MultisigOrdersMenuItem />

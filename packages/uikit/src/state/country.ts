@@ -21,10 +21,8 @@ export enum RegulatoryState {
     GB = 'GB'
 }
 
-export const seeIfFeatureAvailable = (
-    feature: CountryFeature,
-    state: RegulatoryState | string | null | undefined
-) => {
+export const useIsFeatureAvailableForRegulatoryState = (feature: CountryFeature) => {
+    const { data: state } = useUserCountry();
     return useMemo(() => {
         if (!state) return false; // Till loading
 

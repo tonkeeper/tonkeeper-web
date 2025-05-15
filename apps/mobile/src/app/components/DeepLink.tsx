@@ -3,7 +3,7 @@ import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connec
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
     useResponseConnectionMutation,
-    useGetConnectInfo
+    useProcessOpenedLink
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
 import {
@@ -24,6 +24,8 @@ import {
     tonkeeperMobileTonDeeplinkScheme
 } from './RedirectToTonkeeperMobile';
 import { useTonTransactionNotification } from '@tonkeeper/uikit/dist/components/modals/TonTransactionNotificationControlled';
+import { errorMessage } from '@tonkeeper/core/dist/utils/types';
+import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -49,9 +51,15 @@ export const DeepLinkSubscription = () => {
     }, []);
 
     const [params, setParams] = useState<TonConnectParams | null>(null);
-    const [tkMobileUrl, setTkMobileUrl] = useState<string | null>(null);
+    const [tkMobileUrl, setTkMobileUrl] = useState<{
+        url: string;
+        unsupportedLinkError?: string;
+    } | null>(null);
 
-    const { mutateAsync, reset } = useGetConnectInfo();
+    const { mutateAsync, reset } = useProcessOpenedLink({
+        hideLoadingToast: true,
+        hideErrorToast: true
+    });
     const { onClose: closeTonTransaction } = useTonTransactionNotification();
 
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
@@ -76,12 +84,26 @@ export const DeepLinkSubscription = () => {
         }
     };
 
+    const notifyError = useToast();
+
     useEffect(() => {
         return subscribeToTonOrTonConnectUrlOpened(async (url: string) => {
             reset();
-            setTkMobileUrl(modifyLinkScheme(url));
-            setTimeout(() => setTkMobileUrl(null), 5000);
-            setParams(await mutateAsync(url));
+
+            let unsupportedLinkError = undefined;
+            try {
+                setParams(await mutateAsync(url));
+            } catch (e) {
+                unsupportedLinkError = errorMessage(e);
+            }
+
+            const modifiedUrl = modifyLinkScheme(url);
+            if (modifiedUrl) {
+                setTkMobileUrl({ url: modifiedUrl, unsupportedLinkError });
+                setTimeout(() => setTkMobileUrl(null), 5000);
+            } else if (unsupportedLinkError) {
+                notifyError(unsupportedLinkError);
+            }
         });
     }, []);
 
@@ -94,12 +116,13 @@ export const DeepLinkSubscription = () => {
             />
             <RedirectToTonkeeperMobile
                 isOpen={!!tkMobileUrl}
+                unsupportedLinkError={tkMobileUrl?.unsupportedLinkError}
                 onClick={confirmed => {
                     setTkMobileUrl(null);
                     if (tkMobileUrl && confirmed) {
                         setParams(null);
                         closeTonTransaction();
-                        sdk.openPage(tkMobileUrl);
+                        sdk.openPage(tkMobileUrl.url);
                     }
                 }}
             />
@@ -119,12 +142,15 @@ const modifyLinkScheme = (link: string) => {
                 return `${tonkeeperMobileTonConnectDeeplinkScheme}://${body}`;
             case 'https':
             case 'http': {
-                if (new URL(link).pathname.startsWith('/ton-connect')) {
+                const u = new URL(link);
+                if (u.pathname.startsWith('/ton-connect')) {
                     return `${tonkeeperMobileTonConnectDeeplinkScheme}://${
                         link.split('ton-connect')[1]
                     }`;
-                } else if (new URL(link).pathname.startsWith('/transfer')) {
-                    return `${tonkeeperMobileTonDeeplinkScheme}://${link.split('transfer/')[1]}`;
+                } else {
+                    return `${tonkeeperMobileTonDeeplinkScheme}://${u.pathname.slice(1)}${
+                        u.search
+                    }`;
                 }
                 return '';
             }
