@@ -1,4 +1,4 @@
-name: PR
+tabname: PR
 on:
     workflow_dispatch:
     pull_request:
@@ -40,7 +40,7 @@ jobs:
                       tag: universal
                       dist: /apps/desktop/out/make
 
-        runs-on: ${{ matrix.os }}
+        escruns-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
@@ -237,7 +237,7 @@ jobs:
             - name: Run build
               uses: borales/actions-yarn@v5
               env:
-                  REACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
+                  tabREACT_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
                   REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
               with:
