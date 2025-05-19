@@ -33,7 +33,7 @@ export class ExtensionAppSdk extends BaseApp {
         });
     };
 
-    authorizedOpenUrlProtocols = ['http:', 'https:']
+    authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     disableScroll = () => null;
     enableScroll = () => null;

@@ -1,13 +1,14 @@
 import styled from 'styled-components';
 import { Label2 } from '@tonkeeper/uikit';
 import { ChevronRightIcon } from '@tonkeeper/uikit/dist/components/Icon';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { DeepLink } from '../../libs/plugins';
 import ReactPortal from '@tonkeeper/uikit/dist/components/ReactPortal';
 import { HideOnReview } from '@tonkeeper/uikit/dist/components/ios/HideOnReview';
+import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
 
 const Wrapper = styled(motion.div)`
     position: fixed;
@@ -44,11 +45,19 @@ const useIsTonkeeperMobileInstalled = () => {
 
 export const RedirectToTonkeeperMobile: FC<{
     isOpen: boolean;
+    unsupportedLinkError?: string;
     onClick: (confirmed?: boolean) => void;
-}> = ({ isOpen, onClick }) => {
+}> = ({ isOpen: isOpen, onClick, unsupportedLinkError }) => {
     const { t } = useTranslation();
 
     const { data: isTonkeeperMobileInstalled } = useIsTonkeeperMobileInstalled();
+    const notifyError = useToast();
+
+    useEffect(() => {
+        if (isOpen && !isTonkeeperMobileInstalled && unsupportedLinkError) {
+            notifyError(unsupportedLinkError);
+        }
+    }, [isOpen, isTonkeeperMobileInstalled, unsupportedLinkError]);
 
     return (
         <HideOnReview>
@@ -70,7 +79,13 @@ export const RedirectToTonkeeperMobile: FC<{
                                 }
                             }}
                         >
-                            <Label2>{t('pro_continue_in_tonkeeper_mobile')}</Label2>
+                            <Label2>
+                                {t(
+                                    unsupportedLinkError
+                                        ? 'pro_unsupported_continue_in_tonkeeper_mobile'
+                                        : 'pro_continue_in_tonkeeper_mobile'
+                                )}
+                            </Label2>
                             <ChevronRightIcon />
                         </Wrapper>
                     )}
