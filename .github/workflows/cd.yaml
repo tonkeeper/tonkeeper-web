@@ -101,11 +101,11 @@ jobs:
             environment: 'main'
         secrets: inherit
 
-    swap-widget-build:
-        uses: ./.github/workflows/swap-widget-build.yaml
-        with:
-            environment: 'main'
-        secrets: inherit
+    # swap-widget-build:
+    #     uses: ./.github/workflows/swap-widget-build.yaml
+    #     with:
+    #         environment: 'main'
+    #     secrets: inherit
 
     # web-tests:
     #     needs: web-build
