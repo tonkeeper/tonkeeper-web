@@ -39,7 +39,6 @@ export const PromotionsCarousel: FC<
         <Carousel
             className={className}
             gap="8px"
-            autoplay={true}
             centerPadding="16px"
             autoplaySpeed={speed}
             {...rest}

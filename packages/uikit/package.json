@@ -15,6 +15,7 @@
     "license": "ISC",
     "dependencies": {
         "@aptabase/web": "^0.4.2",
+        "@ark-ui/react": "^5.9.1",
         "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch",
         "@ionic/react": "^8.4.2",
         "@ionic/react-hooks": "^0.0.8",
@@ -40,10 +41,8 @@
         "react-lottie": "^1.2.4",
         "react-qrcode-logo": "^2.9.0",
         "react-router-dom": "^5.3.4",
-        "react-slick": "^0.29.0",
         "react-transition-group": "^4.4.5",
         "recharts": "^2.12.3",
-        "slick-carousel": "^1.8.1",
         "styled-components": "^6.1.1",
         "tronweb": "^6.0.0",
         "tweetnacl": "^1.0.3",
@@ -55,9 +54,7 @@
         "@types/react-dom": "^18.0.9",
         "@types/react-lottie": "^1.2.6",
         "@types/react-router-dom": "^5.3.3",
-        "@types/react-slick": "^0",
         "@types/react-transition-group": "^4.4.5",
-        "@types/slick-carousel": "^1",
         "@types/styled-components": "^5.1.34",
         "@types/uuid": "^9.0.1",
         "typescript": "^4.9.4"
