@@ -1,5 +1,5 @@
 import { initialize as aptabaseInitialize } from '@aptabase/electron/main';
-import { delay } from '@tonkeeper/core/dist/utils/common';
+import { delay, hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
 import { updateElectronApp } from 'update-electron-app';
@@ -15,6 +15,19 @@ app.setName('Tonkeeper Pro');
 
 log.initialize({ preload: true });
 log.info('Application start-up');
+log.hooks.push((message, _, transportName) => {
+    if (transportName !== 'file') return message;
+
+    const joined = message.data.join().toLowerCase();
+
+    const modified = hideSensitiveData(joined);
+
+    if (modified !== joined) {
+        return false;
+    }
+
+    return message;
+});
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -26,14 +39,14 @@ const onUnLock = () => {
     tonConnectSSE.reconnect();
 };
 
-if (process.platform != 'linux') {
+if (process.platform !== 'linux') {
     powerMonitor.on('unlock-screen', onUnLock);
 }
 
 app.on('before-quit', async e => {
     e.preventDefault();
     tonConnectSSE.destroy();
-    if (process.platform != 'linux') {
+    if (process.platform !== 'linux') {
         powerMonitor.off('unlock-screen', onUnLock);
     }
 
