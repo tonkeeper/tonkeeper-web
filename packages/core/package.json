@@ -7,7 +7,6 @@
     "scripts": {
         "build": "rm -fr dist && tsc",
         "start": "tsc -w",
-        "sdk": "npm-run-all -p generate:*",
         "generate:sdkV2": "rm -fr src/tonApiV2 && docker build -f resource/Dockerfile.apiV2 . -t tonapisdkv2 && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local tonapisdkv2",
         "generate:tonConsoleApi": "rm -r ./src/tonConsoleApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/tonconsole_backend/refs/heads/main/swagger.yaml?token=GHSAT0AAAAAACJYQUOCGQXJBM2BFNOB6XREZ2ZZZCA' --output ./src/tonConsoleApi",
         "generate:swapsApi": "rm -r ./src/swapsApi || true && npx openapi-typescript-codegen --input 'https://raw.githubusercontent.com/tonkeeper/swaps-backend/master/swagger.yaml?token=GHSAT0AAAAAACJYQUODBKR67AB7WULZBFWEZSUUGFQ' --output ./src/swapsApi",
@@ -16,9 +15,7 @@
         "build:pkg": "yarn build"
     },
     "devDependencies": {
-        "npm-run-all": "^4.1.5",
-        "typescript": "^4.9.4",
-        "yarn-run-all": "^3.1.1"
+        "typescript": "^4.9.4"
     },
     "dependencies": {
         "@keystonehq/keystone-sdk": "0.7.2",
