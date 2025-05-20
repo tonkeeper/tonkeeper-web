@@ -6329,7 +6329,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/dom@npm:^9.3.1, @testing-library/dom@npm:^9.3.3":
+"@testing-library/dom@npm:^9.3.1":
   version: 9.3.3
   resolution: "@testing-library/dom@npm:9.3.3"
   dependencies:
@@ -6597,13 +6597,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/extension@workspace:apps/extension"
   dependencies:
-    "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/browser": "npm:^0.1.1"
     "@tanstack/react-query": "npm:4.3.4"
-    "@testing-library/dom": "npm:^9.3.3"
-    "@testing-library/jest-dom": "npm:^5.16.5"
-    "@testing-library/react": "npm:^13.4.0"
-    "@testing-library/user-event": "npm:^13.5.0"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
@@ -6622,21 +6617,17 @@ __metadata:
     copy-to-clipboard: "npm:^3.3.3"
     dotenv: "npm:^16.5.0"
     fs-extra: "npm:^11.3.0"
-    process: "npm:^0.11.10"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
-    react-ga4: "npm:^2.1.0"
     react-is: "npm:^18.2.0"
     react-router-dom: "npm:^5.3.4"
     rollup-plugin-node-polyfills: "npm:^0.2.1"
-    stream-browserify: "npm:^3.0.0"
     styled-components: "npm:^6.1.1"
     ts-loader: "npm:^9.4.2"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^4.9.4"
     uuid: "npm:^9.0.1"
     vite: "npm:^6.3.3"
-    web-vitals: "npm:^2.1.4"
     webextension-polyfill: "npm:^0.10.0"
   languageName: unknown
   linkType: soft
@@ -6852,18 +6843,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/web@workspace:apps/web"
   dependencies:
-    "@amplitude/analytics-browser": "npm:^2.1.0"
     "@aptabase/web": "npm:^0.4.2"
     "@tanstack/react-query": "npm:4.3.4"
-    "@testing-library/dom": "npm:^9.3.1"
-    "@testing-library/jest-dom": "npm:^5.16.5"
-    "@testing-library/react": "npm:^13.4.0"
-    "@testing-library/user-event": "npm:^13.5.0"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
     "@tonkeeper/uikit": "npm:0.1.0"
     "@types/fs-extra": "npm:^11.0.4"
-    "@types/jest": "npm:^27.5.2"
     "@types/node": "npm:^20.11.0"
     "@types/react": "npm:^18.0.26"
     "@types/react-dom": "npm:^18.0.9"
@@ -21025,13 +21010,6 @@ __metadata:
   version: 6.0.11
   resolution: "react-error-overlay@npm:6.0.11"
   checksum: 10/b4ac746fc4fb50da733768aadbc638d34dd56d4e46ed4b2f2d1ac54dced0c5fa5fe47ebbbf90810ada44056ed0713bba5b9b930b69f4e45466e7f59fc806c44e
-  languageName: node
-  linkType: hard
-
-"react-ga4@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "react-ga4@npm:2.1.0"
-  checksum: 10/e47edd040b7a272d35df732e08c4a8b6b14add659db04fb81a3a2cbde59bf34dc6eae9e0b8b4abd8937d11c837954773a6ba86feb2c605e5eb916f4c99e420c7
   languageName: node
   linkType: hard
 
