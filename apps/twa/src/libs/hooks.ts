@@ -4,7 +4,6 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
-import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import React, { useEffect } from 'react';
 import { TwaAppSdk } from './appSdk';
@@ -83,8 +82,7 @@ export const useAnalytics = (
                     import.meta.env.VITE_APP_APTABASE_HOST,
                     import.meta.env.VITE_APP_APTABASE,
                     version
-                ),
-                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
+                )
             );
 
             tracker.init({

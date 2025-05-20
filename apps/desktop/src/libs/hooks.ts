@@ -3,7 +3,6 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { Amplitude } from '@tonkeeper/uikit/dist/hooks/analytics/amplitude';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
@@ -67,10 +66,7 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
                     }
                 });
 
-            const tracker = new AnalyticsGroup(
-                new AptabaseElectron(),
-                new Amplitude(REACT_APP_AMPLITUDE, userId)
-            );
+            const tracker = new AnalyticsGroup(new AptabaseElectron());
 
             tracker.init({
                 application: 'Desktop',

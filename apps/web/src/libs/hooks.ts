@@ -3,7 +3,6 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
-import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
@@ -60,8 +59,7 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[], vers
                     import.meta.env.VITE_APP_APTABASE_HOST,
                     import.meta.env.VITE_APP_APTABASE,
                     version
-                ),
-                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
+                )
             );
 
             tracker.init({

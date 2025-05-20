@@ -1,7 +1,6 @@
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { FC, forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
@@ -35,6 +34,7 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useMenuController } from '../../../hooks/ionic';
 import { useAppSdk } from '../../../hooks/appSdk';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
