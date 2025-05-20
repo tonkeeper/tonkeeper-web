@@ -35,8 +35,8 @@ export const rendererConfig: Configuration = {
             '@ton/ton': path.resolve(__dirname, '../../packages/core/node_modules/@ton/ton')
         },
         fallback: {
-            stream: require.resolve('stream-browserify'),
-            crypto: require.resolve('crypto-browserify')
+            stream: false,
+            crypto: false
         }
     }
 };
