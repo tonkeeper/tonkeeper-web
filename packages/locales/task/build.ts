@@ -1,7 +1,6 @@
 import { spawnSync } from 'child_process';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
-import fetch from 'node-fetch';
 import * as path from 'path';
 
 dotenv.config();
@@ -48,7 +47,7 @@ const loadTransactions = async () => {
     );
 
     const zipFile = path.join(src, 'translations.zip');
-    fs.writeFileSync(zipFile, await file.buffer());
+    fs.writeFileSync(zipFile, Buffer.from(await file.arrayBuffer()));
 
     await unzip(zipFile);
 
