@@ -130,17 +130,7 @@ export class TonConnectSSE {
         await this.system.bringToFront?.();
 
         if (activeWallet.id !== walletId) {
-            const accountToActivate = (await accountsStorage(this.storage).getAccounts()).find(
-                a => a.getTonWallet(walletId) !== undefined
-            );
-
-            if (!accountToActivate) {
-                throw new Error('Account not found');
-            }
-
-            accountToActivate.setActiveTonWallet(walletId);
-            await accountsStorage(this.storage).updateAccountInState(accountToActivate);
-            await accountsStorage(this.storage).setActiveAccountId(accountToActivate.id);
+            await accountsStorage(this.storage).setActiveAccountAndWalletByWalletId(walletId);
             this.system.refresh?.();
             await delay(500);
         }

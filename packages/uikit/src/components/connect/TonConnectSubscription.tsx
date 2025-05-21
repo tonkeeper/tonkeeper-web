@@ -48,7 +48,7 @@ const TonConnectSubscription = () => {
             );
 
             if (walletToActivate) {
-                setActiveWallet(walletToActivate.wallet.rawAddress).then(() =>
+                setActiveWallet(walletToActivate.wallet.id).then(() =>
                     setTimeout(() => {
                         setRequest(value);
                     }, 100)

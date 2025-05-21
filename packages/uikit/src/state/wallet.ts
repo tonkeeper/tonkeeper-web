@@ -151,15 +151,7 @@ export const useMutateActiveTonWallet = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, WalletId>(async walletId => {
-        const accounts = await storage.getAccounts();
-        const account = getAccountByWalletById(accounts, walletId);
-
-        if (!account) {
-            throw new Error('Account not found');
-        }
-        account.setActiveTonWallet(walletId);
-        await storage.updateAccountInState(account);
-        await storage.setActiveAccountId(account.id);
+        await storage.setActiveAccountAndWalletByWalletId(walletId);
         await client.invalidateQueries(anyOfKeysParts(QueryKey.account, walletId));
     });
 };
