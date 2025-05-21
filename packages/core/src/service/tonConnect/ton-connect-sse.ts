@@ -38,8 +38,6 @@ export class TonConnectSSE {
 
     private readonly storage: IStorage;
 
-    private readonly EventSourcePolyfill: typeof EventSource;
-
     private readonly system: Omit<System, 'log'> & { log: Logger };
 
     private readonly listeners: Listeners;
@@ -51,16 +49,13 @@ export class TonConnectSSE {
     constructor({
         storage,
         listeners,
-        EventSourcePolyfill = EventSource,
         system = {}
     }: {
         storage: IStorage;
         listeners: Listeners;
-        EventSourcePolyfill?: typeof EventSource;
         system?: System;
     }) {
         this.storage = storage;
-        this.EventSourcePolyfill = EventSourcePolyfill;
         this.system = { log: console, ...system };
         this.listeners = listeners;
         this.reconnect();
@@ -191,8 +186,7 @@ export class TonConnectSSE {
             storage: this.storage,
             handleMessage: this.handleMessage,
             connections: this.connections,
-            lastEventId: this.lastEventId,
-            EventSourceClass: this.EventSourcePolyfill
+            lastEventId: this.lastEventId
         });
     }
 
