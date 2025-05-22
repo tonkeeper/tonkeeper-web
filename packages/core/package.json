@@ -4,6 +4,7 @@
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Core features and state for tonkeeper web wallet",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "build": "rm -fr dist && tsc",
         "start": "tsc -w",

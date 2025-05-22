@@ -41,12 +41,12 @@ export const baseCspConfig = {
 
 export const httpCspConfig = {
     ...baseCspConfig,
-    'frame-ancestors': ["'none'"],
-}
+    'frame-ancestors': ["'none'"]
+};
 
 export const metaTagCspConfig = {
-    ...baseCspConfig,
-}
+    ...baseCspConfig
+};
 
 export function cspConfigContentToString(cspConfig: CspConfig) {
     return cspConfigContentToArray(cspConfig).join('; ') + ';';
