@@ -15,6 +15,7 @@ import path from 'path';
 import { MakerDebConfigOptions } from '@electron-forge/maker-deb/dist/Config';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
+import { mainWindowName } from './src/constants';
 
 dotenv.config();
 
@@ -127,7 +128,7 @@ const config: ForgeConfig = {
                     {
                         html: './src/index.html',
                         js: './src/renderer.ts',
-                        name: 'main_window',
+                        name: mainWindowName,
                         preload: {
                             js: './src/preload.ts'
                         }

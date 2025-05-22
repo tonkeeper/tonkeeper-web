@@ -6230,6 +6230,7 @@ __metadata:
     eslint: "npm:^8.0.1"
     eslint-plugin-import: "npm:^2.25.0"
     eventsource: "npm:^4.0.0"
+    html-webpack-plugin: "npm:^5.6.3"
     i18next: "npm:^23.7.7"
     keytar: "npm:^7.9.0"
     node-loader: "npm:^2.0.0"
@@ -15058,6 +15059,27 @@ __metadata:
   peerDependencies:
     webpack: ^5.20.0
   checksum: 10/ef3ceb84a1cd4304a3b4d2391e767ed8a32ec99454dff90daca6654bed689a54b0bc43de5a498564718e02df71e13ffb492b61234c09f59f6ab058e2c2a25be6
+  languageName: node
+  linkType: hard
+
+"html-webpack-plugin@npm:^5.6.3":
+  version: 5.6.3
+  resolution: "html-webpack-plugin@npm:5.6.3"
+  dependencies:
+    "@types/html-minifier-terser": "npm:^6.0.0"
+    html-minifier-terser: "npm:^6.0.2"
+    lodash: "npm:^4.17.21"
+    pretty-error: "npm:^4.0.0"
+    tapable: "npm:^2.0.0"
+  peerDependencies:
+    "@rspack/core": 0.x || 1.x
+    webpack: ^5.20.0
+  peerDependenciesMeta:
+    "@rspack/core":
+      optional: true
+    webpack:
+      optional: true
+  checksum: 10/fd2bf1ac04823526c8b609555d027b38b9d61b4ba9f5c8116a37cc6b62d5b86cab1f478616e8c5344fee13663d2566f5c470c66265ecb1e9574dc38d0459889d
   languageName: node
   linkType: hard
 
