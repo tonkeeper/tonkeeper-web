@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 import { extensionType } from './appSdk';
