@@ -19,6 +19,8 @@ import { mainWindowName } from './src/constants';
 
 dotenv.config();
 
+const isDev = process.env.WEBPACK_SERVE === 'true';
+
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
 
 const devAndRpmOptions = {
@@ -121,12 +123,12 @@ const config: ForgeConfig = {
         new AutoUnpackNativesPlugin({}),
         new WebpackPlugin({
             mainConfig,
-            devContentSecurityPolicy: "connect-src 'self' * 'unsafe-eval'",
+            devContentSecurityPolicy: "script-src 'self' * 'unsafe-eval'",
             renderer: {
                 config: rendererConfig,
                 entryPoints: [
                     {
-                        html: './src/index.html',
+                        html: isDev ? './src/dev.html' : './src/index.html',
                         js: './src/renderer.ts',
                         name: mainWindowName,
                         preload: {
