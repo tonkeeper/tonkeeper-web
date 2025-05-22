@@ -14,7 +14,6 @@
     },
     "license": "ISC",
     "dependencies": {
-        "@aptabase/web": "^0.4.2",
         "@ark-ui/react": "^5.9.1",
         "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch",
         "@ionic/react": "^8.4.2",

@@ -2,11 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { Viewport } from '@tma.js/sdk';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
+import { Analytics, Aptabase, toWalletType } from "@tonkeeper/uikit/dist/hooks/analytics";
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import React, { useEffect } from 'react';
 import { TwaAppSdk } from './appSdk';
+import { useAppSdk } from "@tonkeeper/uikit/dist/hooks/appSdk";
+import { getUserOS } from "@tonkeeper/uikit/dist/libs/web";
 
 export const ViewportContext = React.createContext<Viewport>(undefined!);
 
@@ -69,21 +70,21 @@ export const useTwaAppViewport = (setAppHeight: boolean, sdk: TwaAppSdk) => {
 };
 
 export const useAnalytics = (
-    activeAccount?: Account,
-    accounts?: Account[],
-    network?: Network,
-    version?: string
+    activeAccount: Account | undefined,
+    accounts: Account[] | undefined,
+    network: Network | undefined,
+    version: string
 ) => {
+    const sdk = useAppSdk();
     return useQuery<Analytics>(
         [QueryKey.analytics, activeAccount, accounts, network],
         async () => {
-            const tracker = new AnalyticsGroup(
-                new AptabaseWeb(
-                    import.meta.env.VITE_APP_APTABASE_HOST,
-                    import.meta.env.VITE_APP_APTABASE,
-                    version
-                )
-            );
+            const tracker = new Aptabase({
+                    host: import.meta.env.VITE_APP_APTABASE_HOST,
+                    key: import.meta.env.VITE_APP_APTABASE,
+                    appVersion: version,
+                    sessionId: await sdk.getUserId()
+                })
 
             tracker.init({
                 application: 'Twa',
@@ -95,6 +96,6 @@ export const useAnalytics = (
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount !== undefined }
+        { enabled: accounts != null && activeAccount != null }
     );
 };

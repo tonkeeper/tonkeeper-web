@@ -34,6 +34,7 @@
         "ethers": "^6.13.4",
         "query-string": "^8.1.0",
         "tronweb": "^6.0.0",
-        "tweetnacl": "^1.0.3"
+        "tweetnacl": "^1.0.3",
+        "uuid": "^11.1.0"
     }
 }

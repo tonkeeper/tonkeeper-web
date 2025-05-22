@@ -57,11 +57,10 @@ export interface PayloadRequest<P = any> {
 export interface UserProperties {
     application: string;
     walletType: string;
-    accounts?: Account[];
-    activeAccount?: Account;
+    accounts: Account[];
+    activeAccount: Account;
     network?: Network;
-    version?: string | undefined;
-    platform?: string | undefined;
+    sessionId: string;
 }
 
 export interface TrackEvent {

@@ -1,13 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics, toWalletType, Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { AptabaseElectron } from './aptabaseElectron';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 
 export const useAppHeight = () => {
@@ -45,7 +42,8 @@ export const useAppWidth = () => {
     }, []);
 };
 
-declare const REACT_APP_AMPLITUDE: string;
+declare const REACT_APP_APTABASE_HOST: string;
+declare const REACT_APP_APTABASE: string;
 
 export const useAnalytics = (version: string, activeAccount?: Account, accounts?: Account[]) => {
     const sdk = useAppSdk();
@@ -54,19 +52,12 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const userId = await sdk.storage
-                .get<string>(AppKey.USER_ID)
-                .then(async (userId: string | null) => {
-                    if (userId) {
-                        return userId;
-                    } else {
-                        const newUserId = uuidv4();
-                        await sdk.storage.set(AppKey.USER_ID, newUserId);
-                        return newUserId;
-                    }
-                });
-
-            const tracker = new AnalyticsGroup(new AptabaseElectron());
+            const tracker = new Aptabase({
+                host: REACT_APP_APTABASE_HOST,
+                key: REACT_APP_APTABASE,
+                appVersion: version,
+                sessionId: await sdk.getUserId()
+            });
 
             tracker.init({
                 application: 'Desktop',
@@ -74,7 +65,6 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
                 activeAccount,
                 accounts,
                 network,
-                version,
                 platform: `${window.backgroundApi.platform()}-${window.backgroundApi.arch()}`
             });
 

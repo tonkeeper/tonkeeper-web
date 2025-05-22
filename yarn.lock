@@ -136,29 +136,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aptabase/browser@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@aptabase/browser@npm:0.1.1"
-  checksum: 10/ce07902b6fa6194be0961b0762588daa36a18287670eca8454dfbe51d90b07dbe87f92f6583b08745c73ccb8a6ad3c01356be781f9e81f3d6eb6b8c301c0b775
-  languageName: node
-  linkType: hard
-
-"@aptabase/electron@npm:^0.3.1":
-  version: 0.3.1
-  resolution: "@aptabase/electron@npm:0.3.1"
-  peerDependencies:
-    electron: ">= 3.x"
-  checksum: 10/5537b6acf3c01ea7456d6455a5a7224ddabfcd1199975945d7fd3281089b3bc1e0bc93de2151a9391e4f6c222d42f07b16df18fc32f1a75658e66e91e3be9bd2
-  languageName: node
-  linkType: hard
-
-"@aptabase/web@npm:^0.4.2":
-  version: 0.4.2
-  resolution: "@aptabase/web@npm:0.4.2"
-  checksum: 10/349b605639e57ba990174d0dcc75578871b38e182b2c71de8309f9d19e96f287ff8d5c6dd9dd9e437f0041898fd93edaa5b4329da2c5e120c4834cf4d28ac3f9
-  languageName: node
-  linkType: hard
-
 "@ark-ui/react@npm:^5.9.1":
   version: 5.9.1
   resolution: "@ark-ui/react@npm:5.9.1"
@@ -6185,6 +6162,7 @@ __metadata:
     tronweb: "npm:^6.0.0"
     tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
+    uuid: "npm:^11.1.0"
   languageName: unknown
   linkType: soft
 
@@ -6192,7 +6170,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/desktop@workspace:apps/desktop"
   dependencies:
-    "@aptabase/electron": "npm:^0.3.1"
     "@electron-forge/cli": "npm:7.4.0"
     "@electron-forge/maker-deb": "npm:7.4.0"
     "@electron-forge/maker-dmg": "npm:7.4.0"
@@ -6246,7 +6223,6 @@ __metadata:
     ts-node: "npm:^10.0.0"
     typescript: "npm:^4.9.4"
     update-electron-app: "npm:^3.0.0"
-    uuid: "npm:^9.0.1"
     webpack: "npm:^5.94.0"
   languageName: unknown
   linkType: soft
@@ -6255,7 +6231,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/extension@workspace:apps/extension"
   dependencies:
-    "@aptabase/browser": "npm:^0.1.1"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
@@ -6411,7 +6386,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/uikit@workspace:packages/uikit"
   dependencies:
-    "@aptabase/web": "npm:^0.4.2"
     "@ark-ui/react": "npm:^5.9.1"
     "@ionic/core": "patch:@ionic/core@npm%3A8.4.2#~/.yarn/patches/@ionic-core-npm-8.4.2-7a066c6bc2.patch"
     "@ionic/react": "npm:^8.4.2"
@@ -6460,7 +6434,6 @@ __metadata:
   resolution: "@tonkeeper/web-swap-widget@workspace:apps/web-swap-widget"
   dependencies:
     "@amplitude/analytics-browser": "npm:^2.1.0"
-    "@aptabase/web": "npm:^0.4.2"
     "@tanstack/react-query": "npm:4.3.4"
     "@testing-library/dom": "npm:^9.3.1"
     "@testing-library/jest-dom": "npm:^5.16.5"
@@ -6500,7 +6473,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tonkeeper/web@workspace:apps/web"
   dependencies:
-    "@aptabase/web": "npm:^0.4.2"
     "@tanstack/react-query": "npm:4.3.4"
     "@tonkeeper/core": "npm:0.1.0"
     "@tonkeeper/locales": "npm:0.1.0"
@@ -24174,6 +24146,15 @@ __metadata:
   bin:
     uuid: dist/esm/bin/uuid
   checksum: 10/251385563195709eb0697c74a834764eef28e1656d61174e35edbd129288acb4d95a43f4ce8a77b8c2fc128e2b55924296a0945f964b05b9173469d045625ff2
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.1.0":
+  version: 11.1.0
+  resolution: "uuid@npm:11.1.0"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 10/d2da43b49b154d154574891ced66d0c83fc70caaad87e043400cf644423b067542d6f3eb641b7c819224a7cd3b4c2f21906acbedd6ec9c6a05887aa9115a9cf5
   languageName: node
   linkType: hard
 

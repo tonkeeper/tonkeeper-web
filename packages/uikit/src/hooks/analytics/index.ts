@@ -5,6 +5,7 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+export { Aptabase } from './aptabase';
 
 export interface Analytics {
     pageView: (location: string) => void;
@@ -15,10 +16,9 @@ export interface Analytics {
         activeAccount: Account;
         accounts: Account[];
         network?: Network;
-        version?: string;
         platform?: string;
     }) => void;
-    track: (name: string, params: Record<string, any>) => Promise<void>;
+    track: (name: string, params: Record<string, string | number | boolean>) => Promise<void>;
 }
 
 export class AnalyticsGroup implements Analytics {
@@ -38,13 +38,13 @@ export class AnalyticsGroup implements Analytics {
         activeAccount: Account;
         accounts: Account[];
         network?: Network;
-        version?: string;
+        version: string;
         platform?: string;
     }) {
         this.analytics.forEach(c => c.init(params));
     }
 
-    async track(name: string, params: Record<string, any>) {
+    async track(name: string, params: Record<string, string | number | boolean>) {
         return Promise.all(this.analytics.map(c => c.track(name, params))).then(() => undefined);
     }
 }

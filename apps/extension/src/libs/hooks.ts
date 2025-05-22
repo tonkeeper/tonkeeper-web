@@ -1,14 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { extensionType } from './appSdk';
 import { AptabaseExtension } from './aptabase-extension';
 import { Account } from "@tonkeeper/core/dist/entries/account";
+import { useAppSdk } from "@tonkeeper/uikit/dist/hooks/appSdk";
+import { useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
+import { getUserOS } from "@tonkeeper/uikit/dist/libs/web";
 
 export const useAppWidth = () => {
     useEffect(() => {
@@ -31,39 +31,28 @@ export const useAppWidth = () => {
 };
 
 export const useAnalytics = (
-    storage: IStorage,
     activeAccount?: Account,
     accounts?: Account[],
-    version?: string
 ) => {
+  const sdk = useAppSdk();
+  const network = useActiveTonNetwork();
     return useQuery<Analytics>(
-        [QueryKey.analytics, activeAccount, accounts],
+        [QueryKey.analytics, activeAccount, accounts, network],
         async () => {
-            let userId: string | undefined = undefined;
-            if (extensionType === 'FireFox') {
-                userId = await storage.get<string>(AppKey.USER_ID).then(async user => {
-                    if (user) {
-                        return user;
-                    } else {
-                        const clientId = uuidv4();
-                        await storage.set(AppKey.USER_ID, clientId);
-                        return clientId;
-                    }
-                });
-            }
-
-            const tracker = new AnalyticsGroup(
-                new AptabaseExtension()
-            );
+            const tracker = new AptabaseExtension({
+              sessionId: await sdk.getUserId()
+            });
 
             tracker.init({
               application: extensionType ?? 'Extension',
               walletType: toWalletType(activeAccount?.activeTonWallet),
               activeAccount: activeAccount!,
-              accounts: accounts!});
+              accounts: accounts!,
+              network
+            });
 
             return tracker;
         },
-      { enabled: accounts != null && activeAccount !== undefined }
+      { enabled: accounts != undefined && activeAccount != undefined }
     );
 };
