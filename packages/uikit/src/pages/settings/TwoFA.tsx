@@ -11,7 +11,6 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
 import { ExclamationMarkTriangleIcon, SpinnerRing } from '../../components/Icon';
 import { useTranslation } from '../../hooks/translation';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { AppRoute } from '../../libs/routes';
 import {
@@ -37,6 +36,7 @@ import { useSendTwoFACancelRecovery } from '../../hooks/blockchain/two-fa/useSen
 import { useSendTwoFARemove } from '../../hooks/blockchain/two-fa/useSendTwoFARemove';
 import { Navigate } from '../../components/shared/Navigate';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 export const TwoFAPage = () => {
     const canViewTwoFA = useCanViewTwoFA();

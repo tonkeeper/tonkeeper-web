@@ -1,4 +1,3 @@
-import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { usePreFetchRates } from '../../../state/rates';
@@ -9,6 +8,7 @@ import { Button } from '../../fields/Button';
 import { useAccountTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
 const ButtonsContainer = styled.div`
     display: flex;

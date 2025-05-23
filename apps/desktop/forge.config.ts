@@ -15,8 +15,11 @@ import path from 'path';
 import { MakerDebConfigOptions } from '@electron-forge/maker-deb/dist/Config';
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
+import { mainWindowName } from './src/constants';
 
 dotenv.config();
+
+const isDev = process.env.NODE_ENV === 'development';
 
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
 
@@ -120,14 +123,14 @@ const config: ForgeConfig = {
         new AutoUnpackNativesPlugin({}),
         new WebpackPlugin({
             mainConfig,
-            devContentSecurityPolicy: "connect-src 'self' * 'unsafe-eval'",
+            devContentSecurityPolicy: "script-src 'self' * 'unsafe-eval'",
             renderer: {
                 config: rendererConfig,
                 entryPoints: [
                     {
-                        html: './src/index.html',
+                        html: isDev ? './src/dev.html' : './src/index.html',
                         js: './src/renderer.ts',
-                        name: 'main_window',
+                        name: mainWindowName,
                         preload: {
                             js: './src/preload.ts'
                         }

@@ -1,6 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { AppendFileOptions, Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { App } from '@capacitor/app';
+import { hideSensitiveData } from "@tonkeeper/core/dist/utils/common";
 
 const originalConsoleError = console.error.bind(console);
 
@@ -171,45 +172,6 @@ export class CapacitorFileLogger {
         });
     }
 
-    private hideSensitiveData(message: string): string {
-        const mnemonicRegexes = [
-            // 24 words, separated by spaces, tabs or newlines
-            {
-                regex: /(^|\W)((?:\w+\s+){23}\w+)((?:\s*\n.*)?|$)/g,
-                hasSuffix: true,
-                priority: 1
-            },
-            // 12 words, separated by spaces, tabs or newlines
-            {
-                regex: /(^|\W)((?:\w+\s+){11}\w+)(?=\s|$|\W|\n)/g,
-                hasSuffix: false,
-                priority: 2
-            },
-            // 24 words, separated by commas
-            {
-                regex: /(^|\W)((?:"?\w+"?,\s*){23}(?:"?\w+"?))((?:,.*)?|$)/g,
-                hasSuffix: true,
-                priority: 1
-            },
-            // 12 words, separated by commas
-            {
-                regex: /(^|\W)((?:"?\w+"?,\s*){11}(?:"?\w+"?))(?=\s|$|\W|,)/g,
-                hasSuffix: false,
-                priority: 2
-            }
-        ];
-        mnemonicRegexes.sort((a, b) => a.priority - b.priority);
-
-        let result = message;
-        mnemonicRegexes.forEach(({ regex, hasSuffix }) => {
-            result = result.replace(regex, (_match, prefix, __mnemonic, suffix) => {
-                return prefix + '##SensitiveData##' + (hasSuffix ? suffix || '' : '');
-            });
-        });
-
-        return result;
-    }
-
     private write(level: string, args: unknown[]): void {
         try {
             const message = args
@@ -228,7 +190,7 @@ export class CapacitorFileLogger {
                 })
                 .join(' ');
 
-            const processedMessage = this.hideSensitiveData(message);
+            const processedMessage = hideSensitiveData(message);
 
             const logEntry = `${new Date().toISOString()} [${level}]: ${processedMessage}`;
             this.buffer.write(logEntry);

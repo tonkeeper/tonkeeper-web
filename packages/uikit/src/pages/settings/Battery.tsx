@@ -21,7 +21,6 @@ import { BuyBatteryMethods } from '../../components/settings/battery/BuyBatteryM
 import { BatterySettingsNotification } from '../../components/settings/battery/BatterySettingsNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useTranslation } from '../../hooks/translation';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { IconButton, IconButtonTransparentBackground } from '../../components/fields/IconButton';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -33,6 +32,7 @@ import { Navigate } from '../../components/shared/Navigate';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 export const BatteryPage = () => {
     const account = useActiveAccount();

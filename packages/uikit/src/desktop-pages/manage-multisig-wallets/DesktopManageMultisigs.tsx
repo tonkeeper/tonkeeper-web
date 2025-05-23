@@ -47,7 +47,7 @@ import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { fallbackRenderOver } from '../../components/Error';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;

@@ -1,5 +1,5 @@
-import Lottie from 'react-lottie';
 import animationCheckData from './Check.json';
+import { Lottie } from './Lottie';
 
 const defaultCheckOptions = {
     loop: false,
@@ -11,7 +11,7 @@ const defaultCheckOptions = {
 };
 
 const Check = () => {
-    return <Lottie options={defaultCheckOptions} height={160} width={160} />;
+    return <Lottie {...defaultCheckOptions} height={160} width={160} />;
 };
 
 export default Check;

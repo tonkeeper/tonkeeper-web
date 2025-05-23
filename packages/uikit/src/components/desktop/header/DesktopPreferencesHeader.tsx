@@ -1,4 +1,3 @@
-import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { fallbackRenderOver } from '../../Error';
@@ -7,9 +6,9 @@ import { Button } from '../../fields/Button';
 import { DesktopHeaderContainer } from './DesktopHeaderElements';
 import React from 'react';
 
-import { useAppContext } from '../../../hooks/appContext';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useActiveConfig } from '../../../state/wallet';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
 const ButtonsContainer = styled.div`
     display: flex;

@@ -16,7 +16,8 @@ import {
     AccountTonOnly,
     AccountsState,
     bindAccountToClass,
-    defaultAccountState
+    defaultAccountState,
+    getAccountByWalletById
 } from '../entries/account';
 
 import { DeprecatedAccountState } from '../entries/account';
@@ -229,6 +230,24 @@ export class AccountsStorage {
         if (needUpdate) {
             await this.setAccounts(accounts);
         }
+    };
+
+    public setActiveAccountAndWalletByWalletId = async (walletId: WalletId) => {
+        const active = await this.getActiveAccount();
+        if (active?.activeTonWallet?.id === walletId) {
+            return;
+        }
+
+        const accounts = await this.getAccounts();
+        const account = getAccountByWalletById(accounts, walletId);
+
+        if (!account) {
+            throw new Error('Account not found');
+        }
+
+        account.setActiveTonWallet(walletId);
+        await this.updateAccountInState(account);
+        await this.setActiveAccountId(account.id);
     };
 }
 

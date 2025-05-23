@@ -42,7 +42,10 @@ export abstract class MainWindow {
             height: 850,
             minHeight: 760,
             webPreferences: {
-                preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
+                preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+                nodeIntegration: false,
+                contextIsolation: true,
+                sandbox: true
             },
             resizable: true
         });

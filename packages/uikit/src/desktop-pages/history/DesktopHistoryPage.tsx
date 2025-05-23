@@ -25,12 +25,12 @@ import {
     AssetHistoryFilter,
     OtherHistoryFilters
 } from '../../components/desktop/history/DesktopHistoryFilters';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
 import { Button } from '../../components/fields/Button';
+import { ErrorBoundary } from "../../components/shared/ErrorBoundary";
 
 const HistoryPageWrapper = styled(DesktopViewPageLayout)`
     ${p =>

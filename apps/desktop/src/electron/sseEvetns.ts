@@ -1,11 +1,12 @@
 import { Buffer as BufferPolyfill } from 'buffer';
 import log from 'electron-log/main';
-import EventSourcePolyfill from 'eventsource';
+import { EventSource } from 'eventsource';
 import { MainWindow } from './mainWindow';
 import { mainStorage } from './storageService';
 import { TonConnectSSE } from '@tonkeeper/core/dist/service/tonConnect/ton-connect-sse';
 
 globalThis.Buffer = BufferPolyfill;
+globalThis.EventSource = EventSource;
 
 export const tonConnectSSE = new TonConnectSSE({
     storage: mainStorage,
@@ -19,6 +20,5 @@ export const tonConnectSSE = new TonConnectSSE({
         bringToFront: async () => {
             await MainWindow.bringToFront();
         }
-    },
-    EventSourcePolyfill: EventSourcePolyfill as any as typeof EventSource
+    }
 });

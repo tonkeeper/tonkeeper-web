@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
-import Lottie from 'react-lottie';
 import animationTonkeeperLogoData from './TonkeeperLogo.json';
+import { Lottie } from './Lottie';
 
 const defaultTonkeeperLogoOptions = {
     autoplay: true,
@@ -15,13 +15,7 @@ const TonkeeperLogoLottieIcon: FC<{
     height: string;
     loop: boolean;
 }> = ({ width, height, loop }) => {
-    return (
-        <Lottie
-            options={{ ...defaultTonkeeperLogoOptions, loop }}
-            height={parseInt(height)}
-            width={parseInt(width)}
-        />
-    );
+    return <Lottie {...{ ...defaultTonkeeperLogoOptions, loop }} height={height} width={width} />;
 };
 
 const TonkeeperIcon: FC<{

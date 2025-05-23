@@ -172,6 +172,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     keyboard = new CapacitorKeyboardService();
 
     logger = new CapacitorFileLogger('logs.txt');
+
+    async getUserId(): Promise<string> {
+        const device = await Device.getId();
+        return device.identifier;
+    }
 }
 
 export const getCapacitorDeviceOS = async () => {

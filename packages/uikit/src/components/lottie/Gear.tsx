@@ -1,5 +1,5 @@
 import animationGearData from './Gear.json';
-import Lottie from 'react-lottie';
+import { Lottie } from './Lottie';
 
 const defaultGearOptions = {
     loop: false,
@@ -11,7 +11,7 @@ const defaultGearOptions = {
 };
 
 const Gear = () => {
-    return <Lottie options={defaultGearOptions} height={160} width={160} />;
+    return <Lottie {...defaultGearOptions} height={160} width={160} />;
 };
 
 export default Gear;

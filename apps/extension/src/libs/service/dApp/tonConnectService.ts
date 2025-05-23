@@ -136,15 +136,14 @@ export const tonConnectTransaction = async (
         );
     }
 
-    const accounts = await accountsStorage(storage).getAccounts();
-    const accToActivate = accounts.find(a =>
-        a.allTonWallets.some(w => w.id === connection.wallet.rawAddress)
-    );
-
-    if (accToActivate) {
-        accToActivate.setActiveTonWallet(connection.wallet.rawAddress);
-        await accountsStorage(storage).updateAccountInState(accToActivate);
-        await accountsStorage(storage).setActiveAccountId(accToActivate.id);
+    try {
+        await accountsStorage(storage).setActiveAccountAndWalletByWalletId(connection.wallet.id);
+    } catch (e) {
+        console.error(e);
+        throw new TonConnectError(
+          "Requested wallet not found",
+          CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+        );
     }
 
     await delay(200);

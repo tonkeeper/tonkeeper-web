@@ -4,23 +4,22 @@ import { Account } from "@tonkeeper/core/dist/entries/account";
 import { Network } from "@tonkeeper/core/dist/entries/network";
 
 export class AptabaseExtension implements Analytics {
+    constructor(private readonly options: {sessionId: string}) {
+    }
     init =  (params: {
         application: string;
         walletType: string;
         activeAccount: Account;
         accounts: Account[];
         network?: Network;
-        version?: string;
-        platform?: string;
     }) => {
         sendBackground.message('userProperties', {
             application: params.application,
             walletType: params.walletType,
             accounts: params.accounts,
             activeAccount: params.activeAccount,
-            version: params.version,
             network: params.network,
-            platform: params.platform
+            sessionId: this.options.sessionId
         });
     };
 

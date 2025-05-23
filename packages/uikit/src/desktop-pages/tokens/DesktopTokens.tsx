@@ -1,7 +1,6 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { isTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import styled, { css } from 'styled-components';
 import { fallbackRenderOver } from '../../components/Error';
 import { Body2 } from '../../components/Text';
@@ -22,6 +21,7 @@ import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
+import { ErrorBoundary } from "../../components/shared/ErrorBoundary";
 
 export const DesktopAssetStylesOverride = css`
     background-color: transparent;

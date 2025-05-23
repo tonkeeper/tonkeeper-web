@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
-import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
-import { Gtag } from '@tonkeeper/uikit/dist/hooks/analytics/gtag';
+import { Analytics, toWalletType, Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect, useState } from 'react';
 import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -50,19 +49,18 @@ export const useAppWidth = (standalone: boolean) => {
     }, [standalone]);
 };
 
-export const useAnalytics = (activeAccount?: Account, accounts?: Account[], version?: string) => {
+export const useAnalytics = (activeAccount: Account | undefined, accounts: Account[] | undefined, version: string) => {
     const network = useActiveTonNetwork();
+    const sdk = useAppSdk();
     return useQuery<Analytics>(
         [QueryKey.analytics, network],
         async () => {
-            const tracker = new AnalyticsGroup(
-                new AptabaseWeb(
-                    import.meta.env.VITE_APP_APTABASE_HOST,
-                    import.meta.env.VITE_APP_APTABASE,
-                    version
-                ),
-                new Gtag(import.meta.env.VITE_APP_MEASUREMENT_ID)
-            );
+            const tracker = new Aptabase({
+                  host: import.meta.env.VITE_APP_APTABASE_HOST,
+                  key: import.meta.env.VITE_APP_APTABASE,
+                  appVersion: version,
+                  sessionId: await sdk.getUserId()
+            });
 
             tracker.init({
                 application: 'Web',
@@ -74,7 +72,7 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[], vers
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount !== undefined }
+        { enabled: accounts != null && activeAccount != null }
     );
 };
 

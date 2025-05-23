@@ -1,6 +1,5 @@
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 import { AppProRoute, AppRoute, SettingsRoute } from '../../../libs/routes';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../Error';
 import { MobileProHeaderWallet } from './MobileProHeaderWallet';
 import { MobileProHeaderAccount } from './MobileProHeaderAccount';
@@ -16,6 +15,7 @@ import { useActiveTonNetwork } from '../../../state/wallet';
 import { Link } from 'react-router-dom';
 import { useUserFiat } from '../../../state/fiat';
 import { MobileProPreferencesHeader } from './MobileProPreferencesHeader';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
 const BalanceContainer = styled.div`
     display: flex;

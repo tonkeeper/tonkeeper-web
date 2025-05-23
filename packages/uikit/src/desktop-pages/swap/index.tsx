@@ -10,7 +10,6 @@ import { useSwapsConfig } from '../../state/swap/useSwapsConfig';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStonfiSwapLink } from '../../state/stonfi';
 import { swapFromAsset$, swapToAsset$ } from '../../state/swap/useSwapForm';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
@@ -22,6 +21,7 @@ import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
 import { HideForRegulatoryState } from '../../components/HideForState';
 import { CountryFeature } from '../../state/country';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;

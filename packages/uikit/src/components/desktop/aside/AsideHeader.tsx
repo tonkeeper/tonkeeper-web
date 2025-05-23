@@ -6,10 +6,10 @@ import { AsideHeaderDashboard } from './AsideHeaderDashboard';
 import { AsideHeaderContainer } from './AsideHeaderElements';
 import { AsideHeaderPreferences } from './AsideHeaderPreferences';
 import { AsideHeaderDiscover } from './AsideHeaderDiscover';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../Error';
 import { AsideHeaderAccount } from './AsideHeaderAccount';
 import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { ErrorBoundary } from "../../shared/ErrorBoundary";
 
 export const AsideHeaderContent: FC<{ width: number }> = ({ width }) => {
     const route = useAsideActiveRoute();
