@@ -69,7 +69,7 @@ export class Aptabase implements Analytics {
                         sdkVersion: 'custom_0.0.1'
                     },
                     props: {
-                        os_name: this.getUserOS(),
+                        osName: this.getUserOS(),
                         ...props
                     }
                 })
