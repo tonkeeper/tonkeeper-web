@@ -9,7 +9,7 @@
         "url": "https://github.com/tonkeeper/tonkeeper-web.git"
     },
     "scripts": {
-        "start": "electron-forge start",
+        "start": "NODE_ENV=development electron-forge start",
         "package": "electron-forge package",
         "make": "electron-forge make",
         "make:arm": "electron-forge make --arch=arm64",

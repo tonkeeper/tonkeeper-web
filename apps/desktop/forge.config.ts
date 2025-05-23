@@ -19,7 +19,7 @@ import { mainWindowName } from './src/constants';
 
 dotenv.config();
 
-const isDev = process.env.WEBPACK_SERVE === 'true';
+const isDev = process.env.NODE_ENV === 'development';
 
 const schemes = ['tc', 'tonkeeper', 'tonkeeper-tc'];
 
