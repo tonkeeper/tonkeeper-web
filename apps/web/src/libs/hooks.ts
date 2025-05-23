@@ -8,7 +8,6 @@ import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { useEffect, useState } from 'react';
 import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { getUserOS } from "@tonkeeper/uikit/dist/libs/web";
 
 export const useAppHeight = () => {
     useEffect(() => {
