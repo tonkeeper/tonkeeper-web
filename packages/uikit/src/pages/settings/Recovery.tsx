@@ -1,5 +1,6 @@
 import {
     AccountId,
+    AccountMAM,
     AccountSecret,
     isAccountBip39,
     isAccountTronCompatible,
@@ -11,7 +12,7 @@ import styled, { css } from 'styled-components';
 import { BackButtonBlock } from '../../components/BackButton';
 import { WordsGridAndHeaders } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
-import { getAccountSecret, getMAMWalletMnemonic } from '../../state/mnemonic';
+import { getAccountSecret, getSecretAndPassword } from '../../state/mnemonic';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
 import { Body2Class, H2Label2Responsive } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
@@ -25,6 +26,9 @@ import { useParams } from '../../hooks/router/useParams';
 import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
+import { TonKeychainRoot } from '@ton-keychain/core';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
@@ -49,8 +53,41 @@ export const Recovery = () => {
     }
 };
 
+/* TODO tron mnemonic fx */
+export const getMAMWalletAndRootMnemonic = async (
+    sdk: IAppSdk,
+    accountId: AccountId,
+    walletId: WalletId
+) => {
+    const account = await accountsStorage(sdk.storage).getAccount(accountId);
+    if (account?.type !== 'mam') {
+        throw new Error('Unexpected account type');
+    }
+    const derivation = account.getTonWalletsDerivation(walletId);
+    if (!derivation) {
+        throw new Error('Derivation not found');
+    }
+
+    const { secret } = await getSecretAndPassword(sdk, accountId);
+    if (secret.type !== 'mnemonic') {
+        throw new Error('Unexpected secret type');
+    }
+    const root = await TonKeychainRoot.fromMnemonic(secret.mnemonic, { allowLegacyMnemonic: true });
+    const tonAccount = await root.getTonAccount(derivation.index);
+    return { mnemonic: tonAccount.mnemonics, rootMnemonic: secret.mnemonic };
+};
+/* TODO tron mnemonic fx */
+
 const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId) => {
-    const [secret, setSecret] = useState<AccountSecret | undefined>(undefined);
+    const [secret, setSecret] = useState<
+        | AccountSecret
+        | {
+              type: 'mnemonic';
+              mnemonic: string[];
+              rootMnemonic: string[];
+          }
+        | undefined
+    >(undefined);
     const sdk = useAppSdk();
 
     useEffect(() => {
@@ -58,9 +95,15 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
             try {
                 let _secret;
                 if (walletId !== undefined) {
+                    const { rootMnemonic, mnemonic } = await getMAMWalletAndRootMnemonic(
+                        sdk,
+                        accountId,
+                        walletId
+                    );
                     _secret = {
                         type: 'mnemonic' as const,
-                        mnemonic: await getMAMWalletMnemonic(sdk, accountId, walletId)
+                        mnemonic,
+                        rootMnemonic
                     };
                 } else {
                     _secret = await getAccountSecret(sdk, accountId);
@@ -211,7 +254,19 @@ export const RecoveryContent: FC<{
         wordsType !== 'mam';
 
     const onShowTron = async () => {
-        const tronMnemonic = await tonMnemonicToTronMnemonic(mnemonicBySecret(secret)!);
+        /* TODO tron mnemonic fx */
+        let tronMnemonic;
+        if (
+            account instanceof AccountMAM &&
+            account.activeDerivation.index !== 0 &&
+            secret &&
+            'rootMnemonic' in secret
+        ) {
+            tronMnemonic = await tonMnemonicToTronMnemonic(secret.rootMnemonic);
+            /* TODO tron mnemonic fx */
+        } else {
+            tronMnemonic = await tonMnemonicToTronMnemonic(mnemonicBySecret(secret)!);
+        }
         setMnemonicToShow(tronMnemonic);
         setIsExportingTrc20(true);
     };

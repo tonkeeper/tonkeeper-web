@@ -387,11 +387,26 @@ export const getTronSigner = (sdk: IAppSdk, tronApi: TronApi, account: Account):
         switch (account.type) {
             case 'mam': {
                 return async (tx: Transaction) => {
-                    const tonMnemonic = await getMAMWalletMnemonic(
-                        sdk,
-                        account.id,
-                        account.activeTonWallet.id
-                    );
+                    /* TODO tron mnemonic fx */
+                    let tonMnemonic;
+                    if (account.activeDerivation.index === 0) {
+                        tonMnemonic = await getMAMWalletMnemonic(
+                            sdk,
+                            account.id,
+                            account.activeTonWallet.id
+                        );
+                    } else {
+                        const { secret } = await getSecretAndPassword(sdk, account.id);
+                        if (secret.type !== 'mnemonic') {
+                            throw new Error('Unexpected secret type');
+                        }
+                        const root = await TonKeychainRoot.fromMnemonic(secret.mnemonic, {
+                            allowLegacyMnemonic: true
+                        });
+                        tonMnemonic = root.mnemonic;
+                    }
+                    /* TODO tron mnemonic fx */
+
                     const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');
                     const { TronWeb } = await import('tronweb');
                     const tronWeb = new TronWeb({
