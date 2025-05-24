@@ -16,7 +16,10 @@ import { getAccountSecret, getSecretAndPassword } from '../../state/mnemonic';
 import { useAccountState, useActiveAccount } from '../../state/wallet';
 import { Body2Class, H2Label2Responsive } from '../../components/Text';
 import { useTranslation } from '../../hooks/translation';
-import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
+import {
+    tonMnemonicToTronMnemonic,
+    tronWalletByTonMnemonic
+} from '@tonkeeper/core/dist/service/walletService';
 import { SpinnerRing } from '../../components/Icon';
 import { useSetNotificationOnBack } from '../../components/Notification';
 import { Navigate } from '../../components/shared/Navigate';
@@ -255,18 +258,20 @@ export const RecoveryContent: FC<{
 
     const onShowTron = async () => {
         /* TODO tron mnemonic fx */
-        let tronMnemonic;
+        let tronMnemonic = await tonMnemonicToTronMnemonic(mnemonicBySecret(secret)!);
         if (
             account instanceof AccountMAM &&
             account.activeDerivation.index !== 0 &&
             secret &&
             'rootMnemonic' in secret
         ) {
-            tronMnemonic = await tonMnemonicToTronMnemonic(secret.rootMnemonic);
+            const rootTonWallet = await tronWalletByTonMnemonic(secret.rootMnemonic);
+            if (rootTonWallet.address === account.activeTronWallet?.address) {
+                tronMnemonic = await tonMnemonicToTronMnemonic(secret.rootMnemonic);
+            }
             /* TODO tron mnemonic fx */
-        } else {
-            tronMnemonic = await tonMnemonicToTronMnemonic(mnemonicBySecret(secret)!);
         }
+
         setMnemonicToShow(tronMnemonic);
         setIsExportingTrc20(true);
     };

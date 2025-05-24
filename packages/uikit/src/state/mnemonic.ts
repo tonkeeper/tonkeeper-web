@@ -36,7 +36,10 @@ import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger
 import { useAppSdk } from '../hooks/appSdk';
 import { useCallback } from 'react';
 import { useActiveAccount } from './wallet';
-import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletService';
+import {
+    tonMnemonicToTronMnemonic,
+    tronWalletByTonMnemonic
+} from '@tonkeeper/core/dist/service/walletService';
 import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
@@ -388,22 +391,21 @@ export const getTronSigner = (sdk: IAppSdk, tronApi: TronApi, account: Account):
             case 'mam': {
                 return async (tx: Transaction) => {
                     /* TODO tron mnemonic fx */
+                    const { secret } = await getSecretAndPassword(sdk, account.id);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    const root = await TonKeychainRoot.fromMnemonic(secret.mnemonic, {
+                        allowLegacyMnemonic: true
+                    });
+
                     let tonMnemonic;
-                    if (account.activeDerivation.index === 0) {
-                        tonMnemonic = await getMAMWalletMnemonic(
-                            sdk,
-                            account.id,
-                            account.activeTonWallet.id
-                        );
-                    } else {
-                        const { secret } = await getSecretAndPassword(sdk, account.id);
-                        if (secret.type !== 'mnemonic') {
-                            throw new Error('Unexpected secret type');
-                        }
-                        const root = await TonKeychainRoot.fromMnemonic(secret.mnemonic, {
-                            allowLegacyMnemonic: true
-                        });
+                    const rootTronWallet = await tronWalletByTonMnemonic(root.mnemonic);
+                    if (account.activeTronWallet?.address === rootTronWallet.address) {
                         tonMnemonic = root.mnemonic;
+                    } else {
+                        const tonAccount = await root.getTonAccount(account.activeDerivation.index);
+                        tonMnemonic = tonAccount.mnemonics;
                     }
                     /* TODO tron mnemonic fx */
 
