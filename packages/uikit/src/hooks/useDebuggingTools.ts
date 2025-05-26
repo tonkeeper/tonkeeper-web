@@ -75,6 +75,11 @@ export const useDebuggingTools = () => {
                     console.log('Disable two FA with seed sent');
                 },
                 async resetTronMamMigration() {
+                    if (!this.checkKey()) {
+                        console.error('ERR: method is not supported');
+                        return;
+                    }
+
                     await sdk.storage.delete('TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY');
                     console.log('TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY reset');
                 }
