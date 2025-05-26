@@ -21,6 +21,7 @@ class CustomViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(SecureStoragePlugin())
         bridge?.registerPluginInstance(DeepLinkPlugin())
         bridge?.registerPluginInstance(BluetoothPlugin())
+        bridge?.registerPluginInstance(DappBrowserPlugin())
     }
 
     /*

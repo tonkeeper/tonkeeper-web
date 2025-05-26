@@ -174,6 +174,13 @@ export interface IAppSdk {
         read(): Promise<string>;
         clear(): Promise<void>;
     };
+
+    dappBrowser?: {
+        open(params: { id: string; url: string; topOffset?: number }): Promise<void>;
+        hide(params: { id: string }): Promise<void>;
+        show(params: { id: string }): Promise<void>;
+        close(params: { id: string }): Promise<void>;
+    };
 }
 export interface ConfirmOptions {
     title?: string;

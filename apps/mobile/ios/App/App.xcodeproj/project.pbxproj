@@ -21,6 +21,7 @@
 		B3BD508B2DB7A7500009E6E7 /* DeepLinkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BD508A2DB7A7500009E6E7 /* DeepLinkPlugin.swift */; };
 		B3E0A8272D03497E0089241A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B3E0A8262D03497E0089241A /* GoogleService-Info.plist */; };
 		B3E8AE6E2DA6A6E200F3344E /* BluetoothPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E8AE6D2DA6A6E200F3344E /* BluetoothPlugin.swift */; };
+		B3F1263B2DE46D9700B2D403 /* DappBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3F1263A2DE46D9700B2D403 /* DappBrowser.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		B3E0A8262D03497E0089241A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B3E0A8282D034A140089241A /* AppRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppRelease.entitlements; sourceTree = "<group>"; };
 		B3E8AE6D2DA6A6E200F3344E /* BluetoothPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPlugin.swift; sourceTree = "<group>"; };
+		B3F1263A2DE46D9700B2D403 /* DappBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappBrowser.swift; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +105,7 @@
 				B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */,
 				B3E8AE6D2DA6A6E200F3344E /* BluetoothPlugin.swift */,
 				B3BD508A2DB7A7500009E6E7 /* DeepLinkPlugin.swift */,
+				B3F1263A2DE46D9700B2D403 /* DappBrowser.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -232,6 +235,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3F1263B2DE46D9700B2D403 /* DappBrowser.swift in Sources */,
 				B3BD508B2DB7A7500009E6E7 /* DeepLinkPlugin.swift in Sources */,
 				B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */,
 				B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */,

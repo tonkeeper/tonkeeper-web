@@ -7,8 +7,10 @@ import {
     BatteryIcon,
     ChevronRightIcon,
     ClockSmoothIcon,
+    CloseIcon,
     InboxIcon,
     ListIcon,
+    MinusIcon,
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
@@ -30,6 +32,9 @@ import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/
 import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFARecoveryStartedBanner';
 import { CountryFeature } from '../state/country';
 import { HideForRegulatoryState } from '../components/HideForState';
+import { BrowserIcon } from '../components/NavigationIcons';
+import { useAppSdk } from '../hooks/appSdk';
+import { IconButtonTransparentBackground } from '../components/fields/IconButton';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -96,9 +101,22 @@ export const MobileProHomePage = () => {
     const network = useActiveTonNetwork();
     const isTestnet = network === Network.TESTNET;
     const canUseBattery = useCanUseBattery();
+    const sdk = useAppSdk();
 
     return (
         <DesktopViewPageLayout id={mobileProHomePageId}>
+            <div style={{ display: 'flex' }}>
+                <IconButtonTransparentBackground
+                    onClick={() => sdk.dappBrowser?.close({ id: '239' })}
+                >
+                    <CloseIcon />
+                </IconButtonTransparentBackground>
+                <IconButtonTransparentBackground
+                    onClick={() => sdk.dappBrowser?.hide({ id: '239' })}
+                >
+                    <MinusIcon />
+                </IconButtonTransparentBackground>
+            </div>
             <DesktopViewHeaderStyled mobileTranslucent={false} />
             <PullToRefresh invalidate={account.id} />
             <TwoFARecoveryStartedBannerStyled>
@@ -108,6 +126,26 @@ export const MobileProHomePage = () => {
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />
             <MenuWrapper>
+                <MenuItem
+                    to="/"
+                    onClick={() =>
+                        sdk.dappBrowser?.open({
+                            id: '239',
+                            url: 'https://tonkeeper.com',
+                            topOffset: 100
+                        })
+                    }
+                >
+                    <BrowserIcon />
+                    <Label2>Browser</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
+                <MenuItem to="/" onClick={() => sdk.dappBrowser?.show({ id: '239' })}>
+                    <BrowserIcon />
+                    <Label2>Show Tab</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
+
                 <MenuItem to={AppRoute.activity}>
                     <ClockSmoothIcon />
                     <Label2>{t('wallet_aside_history')}</Label2>

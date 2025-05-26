@@ -26,6 +26,7 @@ import { Keyboard } from '@capacitor/keyboard';
 import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { CapacitorFileLogger } from './logger';
+import { DappBrowser } from './plugins/dapp-browser-plugin';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -172,6 +173,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     keyboard = new CapacitorKeyboardService();
 
     logger = new CapacitorFileLogger('logs.txt');
+
+    dappBrowser = DappBrowser;
 }
 
 export const getCapacitorDeviceOS = async () => {
