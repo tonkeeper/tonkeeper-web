@@ -15,6 +15,7 @@
         "build:pkg": "yarn build"
     },
     "devDependencies": {
+        "@types/punycode": "^2",
         "typescript": "^4.9.4"
     },
     "dependencies": {
@@ -32,6 +33,7 @@
         "bip39": "^3.1.0",
         "crc-32": "^1.2.2",
         "ethers": "^6.13.4",
+        "punycode": "^2.3.1",
         "query-string": "^8.1.0",
         "tronweb": "^6.0.0",
         "tweetnacl": "^1.0.3",
