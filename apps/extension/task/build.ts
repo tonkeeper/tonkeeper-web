@@ -6,6 +6,8 @@ import fs from "fs-extra";
 
 dotenv.config();
 
+console.log('ENV', process.env);
+
 async function runBuild() {
   notify('Build UI and Extension Scripts');
 
