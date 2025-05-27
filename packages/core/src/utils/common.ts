@@ -197,3 +197,19 @@ export function hideSensitiveData(message: string): string {
 
     return result;
 }
+
+export const pTimeout = <T>(p: Promise<T>, ms: number): Promise<T> => {
+    return new Promise<T>((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+            reject(new Error('Timeout exceeded'));
+        }, ms);
+
+        p.then(result => {
+            clearTimeout(timeoutId);
+            resolve(result);
+        }).catch(err => {
+            clearTimeout(timeoutId);
+            reject(err);
+        });
+    });
+};

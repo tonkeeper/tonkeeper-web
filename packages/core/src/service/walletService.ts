@@ -42,6 +42,7 @@ import queryString from 'query-string';
 import { TronApi } from '../tronApi';
 import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
+import { pTimeout } from '../utils/common';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -724,6 +725,21 @@ export const mamAccountToMamAccountWithTron = async (
 
 /* PRO-261 tron and mam bug */
 export async function checkMamAccountForDeprecatedTronAddress(
+    rootMnemonic: string[],
+    tronApi: TronApi,
+    onOpenModal: (params: { address: string; usdtBalance: AssetAmount }) => void
+) {
+    try {
+        await pTimeout(
+            _checkMamAccountForDeprecatedTronAddress(rootMnemonic, tronApi, onOpenModal),
+            2000
+        );
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function _checkMamAccountForDeprecatedTronAddress(
     rootMnemonic: string[],
     tronApi: TronApi,
     onOpenModal: (params: { address: string; usdtBalance: AssetAmount }) => void
