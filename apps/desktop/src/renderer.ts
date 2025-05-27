@@ -1,5 +1,8 @@
 import { Buffer as BufferPolyfill } from 'buffer';
+import process from 'process';
+
 globalThis.Buffer = BufferPolyfill;
+globalThis.process = process;
 
 import log from 'electron-log/renderer';
 
