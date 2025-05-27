@@ -22,7 +22,10 @@ export const sharedConfig: UserConfig = {
         __dirname,
         '../../packages/core/node_modules/@ton/crypto/dist/mnemonic/mnemonic'
       ),
-      buffer: 'buffer'
+      buffer: 'buffer',
+      crypto: resolve(__dirname, './node_modules/crypto-browserify'),
+      stream: resolve(__dirname, './node_modules/stream-browserify'),
+      'process/browser': resolve(__dirname, './node_modules/process/browser')
     },
   },
   build: {

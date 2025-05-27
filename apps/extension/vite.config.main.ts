@@ -14,7 +14,7 @@ export default defineConfig(async () => {
         rollupOptions: {
       ...sharedConfig.build.rollupOptions,
           input: {
-          main: resolve(__dirname, 'index.html'), // ключевой момент — используем index.html как entry
+          main: resolve(__dirname, 'index.html')
         },
         output: {
           entryFileNames: 'static/js/[name].[hash].js',
