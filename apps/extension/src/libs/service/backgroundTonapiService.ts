@@ -23,8 +23,11 @@ const getToken = async (url: string) => {
 };
 
 export const createTonapiRequest = async (url: string, options: RequestInit = {}) => {
-    const token = await getToken(url);
+    if (!isTonapiUrl(url)) {
+        throw new Error('Unsupported endpoint');
+    }
 
+    const token = await getToken(url);
     const reqHeaders = new Headers(options.headers);
     const userToken = reqHeaders.get('Authorization');
     if (userToken) {
@@ -42,3 +45,14 @@ export const createTonapiRequest = async (url: string, options: RequestInit = {}
         headers: Array.from(response.headers)
     };
 };
+
+
+function isTonapiUrl(url: string) {
+    try {
+        const parsed = new URL(url);
+        const allowedHosts = ['tonapi.io', 'testnet.tonapi.io'];
+        return parsed.protocol === 'https:' && allowedHosts.includes(parsed.hostname);
+    } catch (e) {
+        return false;
+    }
+}
