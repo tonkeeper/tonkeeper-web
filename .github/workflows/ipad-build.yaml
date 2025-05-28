@@ -84,7 +84,6 @@ jobs:
             - name: Run build js and capacitor
               uses: borales/actions-yarn@v5
               env:
-                  VITE_APP_AMPLITUDE: ''
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com

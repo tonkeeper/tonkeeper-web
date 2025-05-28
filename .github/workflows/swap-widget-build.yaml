@@ -6,8 +6,6 @@ on:
                 required: true
                 type: string
         secrets:
-            REACT_APP_AMPLITUDE_EXTENSION:
-                required: true
             REACT_APP_MEASUREMENT_ID:
                 required: true
             VITE_APP_APTABASE:
