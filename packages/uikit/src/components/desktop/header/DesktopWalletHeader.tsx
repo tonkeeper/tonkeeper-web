@@ -1,4 +1,3 @@
-import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
@@ -21,6 +20,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { TwoFARecoveryStartedBanner } from '../../settings/two-fa/TwoFARecoveryStartedBanner';
+import { ErrorBoundary } from "../../shared/ErrorBoundary";
 
 const ButtonsContainer = styled.div`
     display: flex;

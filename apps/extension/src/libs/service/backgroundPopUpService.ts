@@ -9,8 +9,8 @@
 import browser from 'webextension-polyfill';
 import { BackgroundEvents, backgroundEventsEmitter, popUpEventEmitter, RESPONSE } from '../event';
 import memoryStore from '../store/memoryStore';
-import { AptabaseExtensionService } from './backgroundAptabaseService';
 import { closeCurrentPopUp, getPopup } from './dApp/notificationService';
+import { Aptabase } from "@tonkeeper/uikit/dist/hooks/analytics";
 
 let popUpPort: browser.Runtime.Port;
 
@@ -81,16 +81,24 @@ popUpEventEmitter.on('proxyChanged', message => {
 
 // End of proxy messages
 
-const aptabase = new AptabaseExtensionService();
+let aptabase: Aptabase;
 
 popUpEventEmitter.on('userProperties', message => {
-    aptabase.init(message.params);
+    const { sessionId, ...userProperties } = message.params;
+    aptabase= new Aptabase({
+        host: process.env.REACT_APP_APTABASE_HOST!,
+        key: process.env.REACT_APP_APTABASE!,
+        appVersion: browser.runtime.getManifest().version,
+        sessionId
+    });
+
+    aptabase.init(userProperties);
 });
 
 popUpEventEmitter.on('locations', message => {
-    aptabase.pageView(message.params);
+    aptabase?.pageView(message.params);
 });
 
 popUpEventEmitter.on('trackEvent', message => {
-    aptabase.track(message.params.name, message.params.params);
+    aptabase?.track(message.params.name, message.params.params);
 });

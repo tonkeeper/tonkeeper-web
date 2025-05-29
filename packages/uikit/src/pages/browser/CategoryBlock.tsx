@@ -96,15 +96,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
             {canExpand ? (
                 <Carousel gap="8px" infinite={false}>
                     {groups.map((group, groupIndex) => (
-                        <ListBlockStyled
-                            key={groupsKeys[groupIndex]}
-                            width={
-                                groupIndex === 0 || groupIndex === groups.length - 1
-                                    ? (width - 28).toString() + 'px'
-                                    : 'unset'
-                            }
-                            marginLeft={groupIndex === 0 ? '-34px' : '0'}
-                        >
+                        <ListBlockStyled key={groupsKeys[groupIndex]}>
                             {group.map(item => (
                                 <CategoryGroupItem key={item.url} item={item} />
                             ))}

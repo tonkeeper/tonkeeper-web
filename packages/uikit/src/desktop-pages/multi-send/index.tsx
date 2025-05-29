@@ -11,7 +11,6 @@ import { SkeletonText } from '../../components/shared/Skeleton';
 import { DesktopMultiSendFormPage } from './MultiSendFormPage';
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { getWillBeMultiSendValue } from '../../components/desktop/multi-send/utils';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { useAssetWeiBalance } from '../../state/home';
 import { unShiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -24,6 +23,7 @@ import { AppRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
 import { useParams } from '../../hooks/router/useParams';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 const PageWrapper = styled.div`
     overflow: auto;

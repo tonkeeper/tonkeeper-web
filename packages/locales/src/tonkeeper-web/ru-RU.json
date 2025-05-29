@@ -339,6 +339,8 @@
   "reset_password": "Сбросить пароль",
   "reset_secutiry_settings": "Сброс настроек безопасности",
   "reset_tron_cache": "Reset Tron cache",
+  "restore_mam_tron_wallet_button": "Написать в поддержку",
+  "restore_mam_tron_wallet_title": "Найден ранее используемый кошелёк",
   "save": "Сохранить",
   "secret_words_account_title": "Секретный ключ вашего аккаунта",
   "secret_words_caption_12": "Запишите эти 12 слов ровно в таком же порядке и сохраните их в секретном, надёжном месте.",

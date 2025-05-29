@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/mobile",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "license": "Apache-2.0",
     "description": "Your tablet wallet on The Open Network",
     "type": "module",
@@ -45,7 +45,6 @@
         "@tonkeeper/uikit": "0.1.0",
         "buffer": "^6.0.3",
         "copy-to-clipboard": "^3.3.3",
-        "crypto-browserify": "^3.12.0",
         "eventsource": "^2.0.2",
         "framer-motion": "^11.3.28",
         "i18next": "^23.7.7",
@@ -53,7 +52,6 @@
         "react-dom": "18.2.0",
         "react-i18next": "^13.5.0",
         "react-router-dom": "^5.3.4",
-        "stream-browserify": "^3.0.0",
         "styled-components": "^6.1.1",
         "uuid": "^11.0.2"
     },
@@ -66,7 +64,7 @@
         "@types/styled-components": "^5.1.26",
         "@vitejs/plugin-react": "^4.2.1",
         "typescript": "^5.6.3",
-        "vite": "^5.4.2",
+        "vite": "^6.3.5",
         "vite-plugin-node-polyfills": "0.17.0"
     },
     "packageManager": "yarn@4.3.0"

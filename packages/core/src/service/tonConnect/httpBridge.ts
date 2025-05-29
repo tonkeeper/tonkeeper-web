@@ -62,15 +62,13 @@ export const subscribeTonConnect = ({
     handleMessage,
     connections,
     lastEventId,
-    bridgeUrl = defaultBridgeUrl,
-    EventSourceClass = EventSource
+    bridgeUrl = defaultBridgeUrl
 }: {
     storage: IStorage;
     handleMessage: (params: TonConnectAppRequest) => void;
     lastEventId?: string;
     connections?: AccountConnection[];
     bridgeUrl?: string;
-    EventSourceClass?: typeof EventSource;
 }) => {
     if (!connections || connections.length === 0) {
         return () => {};
@@ -88,7 +86,7 @@ export const subscribeTonConnect = ({
 
     console.log('sse connect', url);
 
-    const eventSource = new EventSourceClass(url);
+    const eventSource = new EventSource(url);
 
     const onMessage = (params: MessageEvent<string>) => {
         console.log('sse message received', params.data);

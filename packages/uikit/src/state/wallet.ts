@@ -41,6 +41,7 @@ import {
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import {
     accountBySignerLink,
+    checkMamAccountForDeprecatedTronAddress,
     createMAMAccountByMnemonic,
     createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
@@ -74,7 +75,7 @@ import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { useIsTronEnabledGlobally } from './tron/tron';
+import { useIsTronEnabledGlobally, useTronApi } from './tron/tron';
 import { useNavigate } from '../hooks/router/useNavigate';
 import { AppRoute } from '../libs/routes';
 import { isSignerLink } from './signer';
@@ -82,6 +83,7 @@ import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
 import { useMutateIsFreeProAccessActivate } from './pro';
+import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -151,15 +153,7 @@ export const useMutateActiveTonWallet = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, WalletId>(async walletId => {
-        const accounts = await storage.getAccounts();
-        const account = getAccountByWalletById(accounts, walletId);
-
-        if (!account) {
-            throw new Error('Account not found');
-        }
-        account.setActiveTonWallet(walletId);
-        await storage.updateAccountInState(account);
-        await storage.setActiveAccountId(account.id);
+        await storage.setActiveAccountAndWalletByWalletId(walletId);
         await client.invalidateQueries(anyOfKeysParts(QueryKey.account, walletId));
     });
 };
@@ -234,6 +228,8 @@ export const useCreateMAMAccountDerivation = () => {
     const network = useActiveTonNetwork();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const tronApi = useTronApi();
+    const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -268,13 +264,17 @@ export const useCreateMAMAccountDerivation = () => {
         const isTronEnabledForAccount = (await getAccountConfig(sdk, accountId)).enableTron;
         const isTronEnabled = isTronEnabledGlobally && isTronEnabledForAccount;
 
+        await checkMamAccountForDeprecatedTronAddress(mnemonic, tronApi, openTronMigrationModal);
+
         account.addDerivation({
             name: account.getNewDerivationFallbackName(),
             emoji: account.emoji,
             index: newDerivationIndex,
             tonWallets,
             activeTonWalletId: tonWallets[0].id,
-            tronWallet: isTronEnabled ? await tronWalletByTonMnemonic(mnemonic) : undefined
+            tronWallet: isTronEnabled
+                ? await tronWalletByTonMnemonic(tonAccount.mnemonics)
+                : undefined
         });
 
         authBattery({
@@ -514,6 +514,8 @@ export const useAddTronToAccount = () => {
     const activeAccount = useActiveAccount();
     const accountsStorage = useAccountsStorage();
     const client = useQueryClient();
+    const tronApi = useTronApi();
+    const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
     const getMnemonic = async () => {
         const secret = await getSecret();
@@ -537,7 +539,12 @@ export const useAddTronToAccount = () => {
                 );
                 break;
             case 'mam':
-                updatedAccount = await mamAccountToMamAccountWithTron(activeAccount, getMnemonic);
+                updatedAccount = await mamAccountToMamAccountWithTron(
+                    activeAccount,
+                    getMnemonic,
+                    tronApi,
+                    openTronMigrationModal
+                );
                 break;
             default:
                 assertUnreachable(activeAccount);
@@ -710,6 +717,8 @@ export const useCreateAccountMAM = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const tronApi = useTronApi();
+    const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
     return useMutation<
         { account: AccountMAM; childrenMnemonics: string[][] },
@@ -727,6 +736,13 @@ export const useCreateAccountMAM = () => {
         };
 
         const isTronEnabled = defaultAccountConfig.enableTron && isTronEnabledGlobally;
+        if (isTronEnabled) {
+            await checkMamAccountForDeprecatedTronAddress(
+                mnemonic,
+                tronApi,
+                openTronMigrationModal
+            );
+        }
 
         const rootAccount = await TonKeychainRoot.fromMnemonic(mnemonic);
         const childrenMnemonics: string[][] = (

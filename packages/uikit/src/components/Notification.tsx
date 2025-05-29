@@ -883,7 +883,10 @@ export const NotificationDesktopAndWeb: FC<{
                                         <AnimateHeightChange>
                                             <HeaderWrapper ref={headerRef}>
                                                 {(title || !hideButton) && (
-                                                    <NotificationHeader className="dialog-header">
+                                                    <NotificationHeader
+                                                        className="dialog-header"
+                                                        noPaddingBottom={!title}
+                                                    >
                                                         <NotificationTitleRow
                                                             onBack={onBack}
                                                             handleClose={
@@ -936,7 +939,7 @@ const NotificationFooterStyled = styled.div`
         `}
 `;
 
-export const NotificationHeaderStyled = styled.div`
+export const NotificationHeaderStyled = styled.div<{ $noPaddingBottom?: boolean }>`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
@@ -949,7 +952,7 @@ export const NotificationHeaderStyled = styled.div`
         p.theme.proDisplayType === 'desktop' &&
         css`
             padding-top: 16px;
-            padding-bottom: 16px;
+            padding-bottom: ${p.$noPaddingBottom ? '0' : '16px'};
         `}
 `;
 
@@ -965,10 +968,10 @@ export const NotificationFooter = forwardRef<HTMLDivElement, { children: ReactNo
     }
 );
 
-export const NotificationHeader: FC<{ children: ReactNode; className?: string }> = forwardRef<
+export const NotificationHeader = forwardRef<
     HTMLDivElement,
-    { children: ReactNode; className?: string }
->(({ children, className }, ref) => {
+    { children: ReactNode; className?: string; noPaddingBottom?: boolean }
+>(({ children, className, noPaddingBottom }, ref) => {
     const isFullWidth = useIsFullWidthMode();
 
     if (!isFullWidth) {
@@ -989,7 +992,11 @@ export const NotificationHeader: FC<{ children: ReactNode; className?: string }>
     }
 
     return (
-        <NotificationHeaderStyled ref={ref} className={className}>
+        <NotificationHeaderStyled
+            ref={ref}
+            className={className}
+            $noPaddingBottom={noPaddingBottom}
+        >
             {children}
         </NotificationHeaderStyled>
     );

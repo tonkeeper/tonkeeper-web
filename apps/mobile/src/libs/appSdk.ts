@@ -174,6 +174,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     logger = new CapacitorFileLogger('logs.txt');
 
+    async getUserId(): Promise<string> {
+        const device = await Device.getId();
+        return device.identifier;
+    }
+
     dappBrowser = DappBrowser;
 }
 

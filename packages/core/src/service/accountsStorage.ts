@@ -16,7 +16,8 @@ import {
     AccountTonOnly,
     AccountsState,
     bindAccountToClass,
-    defaultAccountState
+    defaultAccountState,
+    getAccountByWalletById
 } from '../entries/account';
 
 import { DeprecatedAccountState } from '../entries/account';
@@ -39,6 +40,7 @@ export class AccountsStorage {
         }
 
         await this.migrateAccountSecret(state);
+        await this.migrateResetWrongMamTronAccounts(state);
         return state ?? defaultAccountState;
     };
 
@@ -229,6 +231,51 @@ export class AccountsStorage {
         if (needUpdate) {
             await this.setAccounts(accounts);
         }
+    };
+
+    /* PRO-261 tron and mam bug */
+    private async migrateResetWrongMamTronAccounts(accounts: AccountsState | null): Promise<void> {
+        const TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY = 'TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY';
+        const migrated = await this.storage.get<boolean>(TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY);
+        if (migrated) {
+            return;
+        }
+
+        let needUpdate = false;
+        accounts?.forEach(acc => {
+            if (acc.type === 'mam') {
+                acc.allAvailableDerivations.forEach(derivation => {
+                    if (derivation.tronWallet) {
+                        needUpdate = true;
+                        delete derivation.tronWallet;
+                    }
+                });
+            }
+        });
+
+        if (needUpdate && accounts) {
+            await this.setAccounts(accounts);
+        }
+
+        await this.storage.set(TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY, true);
+    }
+
+    public setActiveAccountAndWalletByWalletId = async (walletId: WalletId) => {
+        const active = await this.getActiveAccount();
+        if (active?.activeTonWallet?.id === walletId) {
+            return;
+        }
+
+        const accounts = await this.getAccounts();
+        const account = getAccountByWalletById(accounts, walletId);
+
+        if (!account) {
+            throw new Error('Account not found');
+        }
+
+        account.setActiveTonWallet(walletId);
+        await this.updateAccountInState(account);
+        await this.setActiveAccountId(account.id);
     };
 }
 

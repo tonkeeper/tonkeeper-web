@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { UserConfig } from "vite";
+import { UserConfig } from 'vite';
 import rollupNodePolyFill from 'rollup-plugin-node-polyfills';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -25,7 +25,7 @@ export const sharedConfig: UserConfig = {
       buffer: 'buffer',
       crypto: resolve(__dirname, './node_modules/crypto-browserify'),
       stream: resolve(__dirname, './node_modules/stream-browserify'),
-      'process/browser': resolve(__dirname, './node_modules/process/browser'),
+      'process/browser': resolve(__dirname, './node_modules/process/browser')
     },
   },
   build: {

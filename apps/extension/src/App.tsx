@@ -213,10 +213,8 @@ export const Loader: FC = React.memo(() => {
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     const { data: tracker } = useAnalytics(
-        sdk.storage,
         activeAccount || undefined,
-        accounts,
-        sdk.version
+        accounts
     );
 
     if (

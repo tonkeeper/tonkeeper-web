@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { throttle } from '@tonkeeper/core/dist/utils/common';
-import { Analytics, AnalyticsGroup, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics, Aptabase, toWalletType } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect, useState } from 'react';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
 import { getCapacitorDeviceOS } from './appSdk';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
-import { AptabaseWeb } from '@tonkeeper/uikit/dist/hooks/analytics/aptabase-web';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useNavigate } from '@tonkeeper/uikit/src/hooks/router/useNavigate';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -48,17 +48,17 @@ export const useAppWidth = () => {
 
 export const useAnalytics = (version: string, activeAccount?: Account, accounts?: Account[]) => {
     const network = useActiveTonNetwork();
+    const sdk = useAppSdk();
 
     return useQuery<Analytics>(
         [QueryKey.analytics],
         async () => {
-            const tracker = new AnalyticsGroup(
-                new AptabaseWeb(
-                    import.meta.env.VITE_APP_APTABASE_HOST,
-                    import.meta.env.VITE_APP_APTABASE,
-                    version
-                )
-            );
+            const tracker = new Aptabase({
+                host: import.meta.env.VITE_APP_APTABASE_HOST,
+                key: import.meta.env.VITE_APP_APTABASE,
+                appVersion: version,
+                sessionId: await sdk.getUserId()
+            });
 
             tracker.init({
                 application: CAPACITOR_APPLICATION_ID === 'mobile' ? 'pro-mobile' : 'pro-tablet',
@@ -66,7 +66,6 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
                 activeAccount: activeAccount!,
                 accounts: accounts!,
                 network,
-                version,
                 platform: `${CAPACITOR_APPLICATION_ID}-${await getCapacitorDeviceOS()}`
             });
 

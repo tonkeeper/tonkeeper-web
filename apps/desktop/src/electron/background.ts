@@ -4,8 +4,11 @@ import { Message } from '../libs/message';
 import { mainStorage } from './storageService';
 import { cookieJar } from './cookie';
 import { tonConnectSSE } from './sseEvetns';
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 const service = 'tonkeeper.com';
+
+const authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
 // eslint-disable-next-line complexity
 export const handleBackgroundMessage = async (message: Message): Promise<unknown> => {
@@ -21,8 +24,17 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'storage-clear':
             return mainStorage.clear();
         case 'open-page':
+            if (!isValidUrlProtocol(message.url, authorizedOpenUrlProtocols)) {
+                console.error('Unacceptable url protocol', message.url);
+                return;
+            }
+
             return shell.openExternal(message.url);
         case 'set-keychain':
+            if (message.mnemonic.startsWith('../') || message.mnemonic.startsWith('./')) {
+                console.error('Unacceptable value to store in keychain');
+                return;
+            }
             return await keytar.setPassword(
                 service,
                 `Wallet-${message.publicKey}`,
