@@ -1,4 +1,3 @@
-import { ErrorBoundary } from 'react-error-boundary';
 import styled from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { fallbackRenderOver } from '../../Error';
@@ -21,6 +20,7 @@ import { DesktopViewHeader, DesktopViewHeaderContent } from '../DesktopViewLayou
 import { useUserFiat } from '../../../state/fiat';
 import { formatFiatCurrency } from '../../../hooks/balance';
 import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
 const ButtonsContainer = styled.div`
     display: flex;

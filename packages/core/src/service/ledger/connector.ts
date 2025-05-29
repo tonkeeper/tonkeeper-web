@@ -5,24 +5,10 @@ import TransportWebBLE from '@ledgerhq/hw-transport-web-ble';
 import type Transport from '@ledgerhq/hw-transport';
 import { getLedgerAccountPathByIndex } from './utils';
 import { assertUnreachable } from '../../utils/types';
+import { pTimeout } from '../../utils/common';
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-const withDeadline = <T>(p: Promise<T>, ms: number): Promise<T> => {
-    return new Promise<T>((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-            reject(new Error('Timeout exceeded'));
-        }, ms);
-
-        p.then(result => {
-            clearTimeout(timeoutId);
-            resolve(result);
-        }).catch(err => {
-            clearTimeout(timeoutId);
-            reject(err);
-        });
-    });
-};
 export type LedgerTonTransport = TonTransport;
 export type LedgerTransaction = Parameters<TonTransport['signTransaction']>[1];
 export type LedgerTonProofRequest = {
@@ -97,7 +83,7 @@ export const waitLedgerTonAppReady = (tonTransport: TonTransport) => {
     if (tonTransport.transport instanceof TransportWebBLE) {
         return tonTransport.isAppOpen();
     }
-    return withDeadline(isLedgerTonAppReady(tonTransport), openTonAppTimeout);
+    return pTimeout(isLedgerTonAppReady(tonTransport), openTonAppTimeout);
 };
 
 export const isTransportReady = (tonTransport: TonTransport) => {

@@ -38,8 +38,6 @@ export class TonConnectSSE {
 
     private readonly storage: IStorage;
 
-    private readonly EventSourcePolyfill: typeof EventSource;
-
     private readonly system: Omit<System, 'log'> & { log: Logger };
 
     private readonly listeners: Listeners;
@@ -51,16 +49,13 @@ export class TonConnectSSE {
     constructor({
         storage,
         listeners,
-        EventSourcePolyfill = EventSource,
         system = {}
     }: {
         storage: IStorage;
         listeners: Listeners;
-        EventSourcePolyfill?: typeof EventSource;
         system?: System;
     }) {
         this.storage = storage;
-        this.EventSourcePolyfill = EventSourcePolyfill;
         this.system = { log: console, ...system };
         this.listeners = listeners;
         this.reconnect();
@@ -135,17 +130,7 @@ export class TonConnectSSE {
         await this.system.bringToFront?.();
 
         if (activeWallet.id !== walletId) {
-            const accountToActivate = (await accountsStorage(this.storage).getAccounts()).find(
-                a => a.getTonWallet(walletId) !== undefined
-            );
-
-            if (!accountToActivate) {
-                throw new Error('Account not found');
-            }
-
-            accountToActivate.setActiveTonWallet(walletId);
-            await accountsStorage(this.storage).updateAccountInState(accountToActivate);
-            await accountsStorage(this.storage).setActiveAccountId(accountToActivate.id);
+            await accountsStorage(this.storage).setActiveAccountAndWalletByWalletId(walletId);
             this.system.refresh?.();
             await delay(500);
         }
@@ -191,8 +176,7 @@ export class TonConnectSSE {
             storage: this.storage,
             handleMessage: this.handleMessage,
             connections: this.connections,
-            lastEventId: this.lastEventId,
-            EventSourceClass: this.EventSourcePolyfill
+            lastEventId: this.lastEventId
         });
     }
 

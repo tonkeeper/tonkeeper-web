@@ -3,7 +3,6 @@ import { SwapMainForm } from '../../components/swap/SwapMainForm';
 import { styled } from 'styled-components';
 import { Notification } from '../../components/Notification';
 import { useSwapMobileNotification } from '../../state/swap/useSwapMobileNotification';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSettingsButton';
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
@@ -11,6 +10,7 @@ import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { HideForRegulatoryState } from '../../components/HideForState';
 import { CountryFeature } from '../../state/country';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 const SwapMobileNotification = () => {
     const [isOpen, setIsOpen] = useSwapMobileNotification();

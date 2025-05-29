@@ -39,6 +39,10 @@ import { ethers } from 'ethers';
 import { KeyPair, keyPairFromSecretKey } from '@ton/crypto';
 import nacl from 'tweetnacl';
 import queryString from 'query-string';
+import { TronApi } from '../tronApi';
+import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
+import { AssetAmount } from '../entries/crypto/asset/asset-amount';
+import { pTimeout } from '../utils/common';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -685,9 +689,16 @@ export const createMAMAccountByMnemonic = async (
 
 export const mamAccountToMamAccountWithTron = async (
     account: AccountMAM,
-    getAccountMnemonic: () => Promise<string[]>
+    getAccountMnemonic: () => Promise<string[]>,
+    tronApi: TronApi,
+    mamMigrationNotification: (params: { address: string; usdtBalance: AssetAmount }) => void
 ) => {
     const rootAccount = await TonKeychainRoot.fromMnemonic(await getAccountMnemonic());
+    await checkMamAccountForDeprecatedTronAddress(
+        rootAccount.mnemonic,
+        tronApi,
+        mamMigrationNotification
+    );
 
     const derivations = await Promise.all(
         account.allAvailableDerivations.map(async d => {
@@ -711,6 +722,40 @@ export const mamAccountToMamAccountWithTron = async (
         derivations
     );
 };
+
+/* PRO-261 tron and mam bug */
+export async function checkMamAccountForDeprecatedTronAddress(
+    rootMnemonic: string[],
+    tronApi: TronApi,
+    onOpenModal: (params: { address: string; usdtBalance: AssetAmount }) => void
+) {
+    try {
+        await pTimeout(
+            _checkMamAccountForDeprecatedTronAddress(rootMnemonic, tronApi, onOpenModal),
+            2000
+        );
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function _checkMamAccountForDeprecatedTronAddress(
+    rootMnemonic: string[],
+    tronApi: TronApi,
+    onOpenModal: (params: { address: string; usdtBalance: AssetAmount }) => void
+) {
+    const rootTronAddress = await tronWalletByTonMnemonic(rootMnemonic);
+
+    const balance = await tronApi.getBalances(rootTronAddress.address);
+    if (balance.usdt === '0') {
+        return;
+    }
+
+    onOpenModal({
+        address: rootTronAddress.address,
+        usdtBalance: new AssetAmount({ asset: TRON_USDT_ASSET, weiAmount: balance.usdt })
+    });
+}
 
 export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
     let index;

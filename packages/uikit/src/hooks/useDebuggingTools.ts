@@ -5,13 +5,13 @@ import { useGetAccountSigner } from '../state/mnemonic';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from './appContext';
 import { useEffect } from 'react';
-import { useMutateUserUIPreferences } from '../state/theme';
+import { useAppSdk } from './appSdk';
 
 export const useDebuggingTools = () => {
     const api = useActiveApi();
     const getSigner = useGetAccountSigner();
     const { data: activeAccount } = useActiveAccountQuery();
-    const { mutate: mutateUserUIPreferences } = useMutateUserUIPreferences();
+    const sdk = useAppSdk();
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -74,8 +74,14 @@ export const useDebuggingTools = () => {
 
                     console.log('Disable two FA with seed sent');
                 },
-                async resetMobileBanner() {
-                    mutateUserUIPreferences({ dismissMobileQRBanner: false });
+                async resetTronMamMigration() {
+                    if (!this.checkKey()) {
+                        console.error('ERR: method is not supported');
+                        return;
+                    }
+
+                    await sdk.storage.delete('TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY');
+                    console.log('TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY reset');
                 }
             };
         }

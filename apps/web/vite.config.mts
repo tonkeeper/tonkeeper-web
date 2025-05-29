@@ -2,6 +2,7 @@ import react from '@vitejs/plugin-react';
 import * as path from 'path';
 import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { injectCSP, metaTagCspConfig } from "@tonkeeper/core/dist/utils/csp";
 
 export default defineConfig({
     plugins: [
@@ -13,7 +14,8 @@ export default defineConfig({
             },
             include: ['stream', 'buffer', 'crypto']
         }),
-        react()
+        react(),
+        injectCSP(metaTagCspConfig)
     ],
     resolve: {
         alias: {
