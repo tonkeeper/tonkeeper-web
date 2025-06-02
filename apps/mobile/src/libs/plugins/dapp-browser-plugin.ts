@@ -2,10 +2,16 @@ import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
 import { IDappBrowser } from '@tonkeeper/core/dist/AppSdk';
 
 interface IDappBrowserPlugin {
-    open(params: { id: string; url: string; topOffset?: number }): Promise<void>;
+    open(params: {
+        id: string;
+        url: string;
+        topOffset?: number;
+        bottomOffset?: number;
+    }): Promise<void>;
     hide(params: { id: string }): Promise<void>;
     show(params: { id: string }): Promise<void>;
     close(params: { id: string }): Promise<void>;
+    setIsMainViewInFocus(params: { focus: boolean }): Promise<void>;
     addListener(
         eventName: 'browserMessageReceived',
         listenerFunc: (data: {
@@ -82,7 +88,11 @@ class DappBrowser implements IDappBrowser {
 
     async open(url: string): Promise<string> {
         const id = Date.now().toString();
-        await DappBrowserPlugin.open({ url, id, topOffset: 100 });
+        await DappBrowserPlugin.open({ url, id, topOffset: 100, bottomOffset: 98 });
+
+        // TODO: remove
+        document.getElementById('main-content')!.style.opacity = '0';
+
         return id;
     }
 
@@ -108,6 +118,10 @@ class DappBrowser implements IDappBrowser {
         ) => Promise<unknown>
     ): void {
         this.requestsHandlers.set(method, handler);
+    }
+
+    setIsMainViewInFocus(focus: boolean): Promise<void> {
+        return DappBrowserPlugin.setIsMainViewInFocus({ focus });
     }
 }
 

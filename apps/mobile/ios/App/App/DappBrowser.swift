@@ -1,6 +1,28 @@
 import Capacitor
 import WebKit
 
+class InteractionRouterView: UIView {
+    weak var mainView: UIView?
+    weak var browserView: UIView?
+    var passthroughTopHeight: CGFloat = 0
+    var passthroughBottomHeight: CGFloat = 0
+    var focusDappView: Bool = false
+
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let height = self.bounds.height
+
+        if !focusDappView {
+            return mainView?.hitTest(convert(point, to: mainView), with: event)
+        }
+
+        if point.y <= passthroughTopHeight || point.y >= height - passthroughBottomHeight {
+            return mainView?.hitTest(convert(point, to: mainView), with: event)
+        }
+
+        return browserView?.hitTest(convert(point, to: browserView), with: event)
+    }
+}
+
 @objc public class DappBrowserPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "DappBrowserPlugin"
     public let jsName = "DappBrowser"
@@ -9,10 +31,12 @@ import WebKit
         CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "show", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setIsMainViewInFocus", returnType: CAPPluginReturnPromise)
     ]
 
     private var webViews: [String: WKWebView] = [:]
+    private var routerView: InteractionRouterView?
 
     @objc func open(_ call: CAPPluginCall) {
         guard let id = call.getString("id"),
@@ -23,10 +47,12 @@ import WebKit
         }
 
         let topOffset = CGFloat(call.getInt("topOffset") ?? 0)
+        let bottomOffset = CGFloat(call.getInt("bottomOffset") ?? 0)
 
         DispatchQueue.main.async {
             if let existingWebView = self.webViews[id] {
                 existingWebView.isHidden = false
+                self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: existingWebView, focusDappView: true)
                 call.resolve()
                 return
             }
@@ -66,9 +92,9 @@ import WebKit
                    webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
                ])
 
-               self.webViews[id] = webView
-               call.resolve()
-
+                self.webViews[id] = webView
+                self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: webView, focusDappView: true)
+                call.resolve()
             } else {
                call.reject("Failed to obtain root view or main WebView")
            }
@@ -84,6 +110,7 @@ import WebKit
 
         DispatchQueue.main.async {
             webView.isHidden = true
+            self.routerView?.focusDappView = false
             call.resolve()
         }
     }
@@ -97,6 +124,7 @@ import WebKit
 
         DispatchQueue.main.async {
             webView.isHidden = false
+            self.routerView?.focusDappView = true
             call.resolve()
         }
     }
@@ -111,6 +139,7 @@ import WebKit
         DispatchQueue.main.async {
             webView.removeFromSuperview()
             self.webViews.removeValue(forKey: id)
+            self.routerView?.focusDappView = false
             call.resolve()
         }
     }
@@ -147,6 +176,47 @@ import WebKit
         }
     }
 
+    @objc func setIsMainViewInFocus(_ call: CAPPluginCall) {
+        guard let focus = call.getBool("focus") else {
+            call.reject("Missing 'enabled' boolean parameter")
+            return
+        }
+
+        DispatchQueue.main.async {
+            self.routerView?.focusDappView = !focus
+            call.resolve()
+        }
+    }
+
+    func _configureRouter(top: CGFloat, bottom: CGFloat, browserView: WKWebView, focusDappView: Bool) {
+        guard let window = UIApplication.shared
+                .connectedScenes
+                .compactMap({ $0 as? UIWindowScene })
+                .flatMap({ $0.windows })
+                .first(where: { $0.isKeyWindow }),
+              let mainView = self.bridge?.webView else {
+            return
+        }
+
+        if self.routerView == nil {
+            let router = InteractionRouterView(frame: window.bounds)
+            router.mainView = mainView
+            router.browserView = browserView
+            router.passthroughTopHeight = top
+            router.passthroughBottomHeight = bottom
+            router.focusDappView = focusDappView
+            router.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            router.backgroundColor = .clear
+            window.addSubview(router)
+            self.routerView = router
+        } else {
+            routerView?.mainView = mainView
+            routerView?.browserView = browserView
+            routerView?.passthroughTopHeight = top
+            routerView?.passthroughBottomHeight = bottom
+            routerView?.focusDappView = focusDappView
+        }
+    }
 }
 
 extension DappBrowserPlugin: WKScriptMessageHandler {
