@@ -92,11 +92,6 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>WKAppBoundDomains</key>
-	<array>
-		<string>dev-pro.tonconsole.com</string>
-		<string>pro.tonconsole.com</string>
-	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
     <string>We need Bluetooth access to connect to hardware wallets</string>
     <key>UIBackgroundModes</key>

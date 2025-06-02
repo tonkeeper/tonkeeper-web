@@ -41,7 +41,7 @@ class DappBrowser implements IDappBrowser {
     private requestsHandlers = new Map<
         string,
         (
-            payload: unknown,
+            rpcParams: Record<string, unknown>,
             ctx: {
                 webViewId: string;
                 webViewOrigin: string;
@@ -51,13 +51,16 @@ class DappBrowser implements IDappBrowser {
 
     constructor() {
         DappBrowserPlugin.addListener('browserMessageReceived', async data => {
-            const parsed = JSON.parse(data.payload);
+            const parsed = JSON.parse(data.payload) as {
+                method: string;
+                params: Record<string, unknown>;
+            };
             const handler = this.requestsHandlers.get(parsed.method);
             if (!handler) {
                 console.error('No handler for method', parsed.method);
                 return;
             }
-            const result = await handler(parsed.payload, {
+            const result = await handler(parsed.params, {
                 webViewId: data.webViewId,
                 webViewOrigin: data.webViewOrigin
             });
@@ -97,7 +100,7 @@ class DappBrowser implements IDappBrowser {
     setRequestsHandler(
         method: string,
         handler: (
-            payload: unknown,
+            rpcParams: Record<string, unknown>,
             ctx: {
                 webViewId: string;
                 webViewOrigin: string;

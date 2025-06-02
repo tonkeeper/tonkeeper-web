@@ -36,7 +36,7 @@ import WebKit
 
             if let jsPath = Bundle.main.path(forResource: "injected", ofType: "js"),
                let jsSource = try? String(contentsOfFile: jsPath) {
-                let userScript = WKUserScript(source: jsSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                let userScript = WKUserScript(source: jsSource, injectionTime: .atDocumentStart, forMainFrameOnly: true)
                 contentController.addUserScript(userScript)
             }
 
@@ -115,27 +115,37 @@ import WebKit
     }
 
     @objc func sendToBrowser(_ call: CAPPluginCall) {
-        guard let webviewId = call.getString("webviewId"),
+        guard let webViewId = call.getString("webViewId"),
               let payload = call.getString("payload"),
-              let webView = webViews[webviewId] else {
+              let webView = webViews[webViewId] else {
             call.reject("Missing parameters or WebView")
             return
         }
 
         let queryId = call.getString("queryId")
 
-        var detail = "webviewId: \"\(webviewId)\", payload: \"\(payload)\""
+        var detailDict: [String: Any] = [
+            "webViewId": webViewId,
+            "payload": payload
+        ]
         if let queryId = queryId {
-            detail += ", queryId: \"\(queryId)\""
+            detailDict["queryId"] = queryId
         }
 
-        let js = "window.dispatchEvent(new CustomEvent(\"mainMessageReceived\", { detail: { \(detail) } }))"
+        guard let detailData = try? JSONSerialization.data(withJSONObject: detailDict, options: []),
+              let detailJson = String(data: detailData, encoding: .utf8) else {
+            call.reject("Failed to serialize payload")
+            return
+        }
+
+        let js = "window.dispatchEvent(new CustomEvent(\"mainMessageReceived\", { detail: \(detailJson) }))"
 
         DispatchQueue.main.async {
             webView.evaluateJavaScript(js)
             call.resolve()
         }
     }
+
 }
 
 extension DappBrowserPlugin: WKScriptMessageHandler {
@@ -146,7 +156,7 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
               let queryId = body["queryId"] as? String,
               let payload = body["payload"] as? String,
               let webview = message.webView,
-              let webviewId = self.webViews.first(where: { $0.value == webview })?.key else {
+              let webViewId = self.webViews.first(where: { $0.value == webview })?.key else {
             return
         }
 
@@ -154,7 +164,7 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
             let origin = (result as? String) ?? "unknown"
 
             self.notifyListeners("browserMessageReceived", data: [
-                "webviewId": webviewId,
+                "webViewId": webViewId,
                 "queryId": queryId,
                 "payload": payload,
                 "webViewOrigin": origin

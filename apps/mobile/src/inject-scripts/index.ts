@@ -9,4 +9,8 @@ declare global {
     }
 }
 
-window.tonkeeper.tonconnect = new MobileInjectedBridge();
+window.tonkeeper = {
+    tonconnect: new MobileInjectedBridge()
+};
+
+console.log('Tonkeeper Pro inject script loaded');

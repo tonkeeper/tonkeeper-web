@@ -99,10 +99,11 @@ class TonConnectInjectedConnector {
 
         CapacitorDappBrowser.setRequestsHandler(
             NATIVE_BRIDGE_METHODS.TON_CONNECT.CONNECT,
-            async (payload: unknown, { webViewOrigin }) => {
+            async (rpcParams: Record<string, unknown>, { webViewOrigin }) => {
                 try {
                     // TODO zod payload
-                    return await this.connectHandler(payload as ConnectRequest, webViewOrigin);
+                    const validatedRpcParams = rpcParams as { message: ConnectRequest };
+                    return await this.connectHandler(validatedRpcParams.message, webViewOrigin);
                 } catch (e) {
                     return this.handleConnectExceptions(e);
                 }
