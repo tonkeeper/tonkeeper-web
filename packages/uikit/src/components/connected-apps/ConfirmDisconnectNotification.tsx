@@ -6,14 +6,6 @@ import { Notification, NotificationFooter, NotificationFooterPortal } from '../N
 import { Button } from '../fields/Button';
 import { formatDappUrl } from './utils';
 
-const NotificationText = styled.div`
-    text-align: center;
-    margin-bottom: 24px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-`;
-
 const ButtonsBlock = styled.div`
     display: flex;
     gap: 8px;
@@ -27,7 +19,7 @@ export const ConfirmDisconnectNotification: FC<{
     isOpen: boolean;
     onClose: (confirmed?: boolean) => void;
     isLoading?: boolean;
-    app?: { url: string } | 'all';
+    app?: { id: string } | 'all';
 }> = ({ isOpen, onClose, app, isLoading }) => {
     const { t } = useTranslation();
     const prev = usePrevious(app);
@@ -43,7 +35,7 @@ export const ConfirmDisconnectNotification: FC<{
                     t('disconnect_all_apps_confirm')
                 ) : (
                     <>
-                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.url)}?
+                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.id)}?
                     </>
                 )
             }

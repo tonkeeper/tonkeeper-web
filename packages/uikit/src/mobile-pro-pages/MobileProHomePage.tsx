@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React from 'react';
+import React, { useState } from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
 import { Link } from '../components/shared/Link';
@@ -103,20 +103,20 @@ export const MobileProHomePage = () => {
     const canUseBattery = useCanUseBattery();
     const sdk = useAppSdk();
 
+    const [tabId, setTabId] = useState<string | undefined>();
+
     return (
         <DesktopViewPageLayout id={mobileProHomePageId}>
-            <div style={{ display: 'flex' }}>
-                <IconButtonTransparentBackground
-                    onClick={() => sdk.dappBrowser?.close({ id: '239' })}
-                >
-                    <CloseIcon />
-                </IconButtonTransparentBackground>
-                <IconButtonTransparentBackground
-                    onClick={() => sdk.dappBrowser?.hide({ id: '239' })}
-                >
-                    <MinusIcon />
-                </IconButtonTransparentBackground>
-            </div>
+            {tabId !== undefined && (
+                <div style={{ display: 'flex' }}>
+                    <IconButtonTransparentBackground onClick={() => sdk.dappBrowser?.close(tabId)}>
+                        <CloseIcon />
+                    </IconButtonTransparentBackground>
+                    <IconButtonTransparentBackground onClick={() => sdk.dappBrowser?.hide(tabId)}>
+                        <MinusIcon />
+                    </IconButtonTransparentBackground>
+                </div>
+            )}
             <DesktopViewHeaderStyled mobileTranslucent={false} />
             <PullToRefresh invalidate={account.id} />
             <TwoFARecoveryStartedBannerStyled>
@@ -129,22 +129,22 @@ export const MobileProHomePage = () => {
                 <MenuItem
                     to="/"
                     onClick={() =>
-                        sdk.dappBrowser?.open({
-                            id: '239',
-                            url: 'https://tonkeeper.com',
-                            topOffset: 100
-                        })
+                        sdk.dappBrowser
+                            ?.open('https://ton-connect.github.io/demo-dapp-with-wallet/')
+                            .then(setTabId)
                     }
                 >
                     <BrowserIcon />
                     <Label2>Browser</Label2>
                     <ChevronRightIcon />
                 </MenuItem>
-                <MenuItem to="/" onClick={() => sdk.dappBrowser?.show({ id: '239' })}>
-                    <BrowserIcon />
-                    <Label2>Show Tab</Label2>
-                    <ChevronRightIcon />
-                </MenuItem>
+                {tabId !== undefined && (
+                    <MenuItem to="/" onClick={() => sdk.dappBrowser?.show(tabId)}>
+                        <BrowserIcon />
+                        <Label2>Show Tab</Label2>
+                        <ChevronRightIcon />
+                    </MenuItem>
+                )}
 
                 <MenuItem to={AppRoute.activity}>
                     <ClockSmoothIcon />

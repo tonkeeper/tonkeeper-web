@@ -2,10 +2,10 @@ import { TonConnectAppRequest } from '../../entries/tonConnect';
 import { disconnectResponse, sendBadRequestResponse } from './connectService';
 import { sendEventToBridge } from './httpBridge';
 
-export const replyBadRequestResponse = async ({
+export const replyHttpBadRequestResponse = async ({
     connection,
     request: { id, method }
-}: TonConnectAppRequest) => {
+}: TonConnectAppRequest<'http'>) => {
     await sendEventToBridge({
         response: sendBadRequestResponse(id, method),
         sessionKeyPair: connection.sessionKeyPair,
@@ -13,11 +13,11 @@ export const replyBadRequestResponse = async ({
     });
 };
 
-export const replyDisconnectResponse = async ({
+export const replyHttpDisconnectResponse = async ({
     connection,
     request: { id }
-}: Pick<TonConnectAppRequest, 'connection'> & {
-    request: Pick<TonConnectAppRequest['request'], 'id'>;
+}: Pick<TonConnectAppRequest<'http'>, 'connection'> & {
+    request: Pick<TonConnectAppRequest<'http'>['request'], 'id'>;
 }) => {
     await sendEventToBridge({
         response: disconnectResponse(id),

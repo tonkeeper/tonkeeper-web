@@ -6165,6 +6165,7 @@ __metadata:
     tweetnacl: "npm:^1.0.3"
     typescript: "npm:^4.9.4"
     uuid: "npm:^11.1.0"
+    zod: "npm:^3.25.36"
   languageName: unknown
   linkType: soft
 
@@ -6329,6 +6330,7 @@ __metadata:
     uuid: "npm:^11.0.2"
     vite: "npm:^6.3.5"
     vite-plugin-node-polyfills: "npm:0.17.0"
+    zod: "npm:^3.25.36"
   languageName: unknown
   linkType: soft
 
@@ -25538,5 +25540,12 @@ __metadata:
   version: 3.22.4
   resolution: "zod@npm:3.22.4"
   checksum: 10/73622ca36a916f785cf528fe612a884b3e0f183dbe6b33365a7d0fc92abdbedf7804c5e2bd8df0a278e1472106d46674281397a3dd800fa9031dc3429758c6ac
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.25.36":
+  version: 3.25.36
+  resolution: "zod@npm:3.25.36"
+  checksum: 10/c649e997fdc8463d2e61efb6cf835789b20e02d2122c70ffcef4eac2f716650b791c53b0d330c6d831b17ac52cfd33df6ac3ce6e9b90c6720b1f37d844d87079
   languageName: node
   linkType: hard

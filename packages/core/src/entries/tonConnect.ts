@@ -1,52 +1,66 @@
-import { AccountConnection } from '../service/tonConnect/connectionService';
+import {
+    AccountConnection,
+    AccountConnectionHttp,
+    AccountConnectionInjected
+} from '../service/tonConnect/connectionService';
+import { z } from 'zod';
 
-export interface DAppManifest {
-    url: string;
-    name: string;
-    iconUrl: string;
-    termsOfUseUrl?: string;
-    privacyPolicyUrl?: string;
-}
+export const DAppManifestSchema = z.object({
+    url: z.string(),
+    name: z.string(),
+    iconUrl: z.string(),
+    termsOfUseUrl: z.string().optional(),
+    privacyPolicyUrl: z.string().optional()
+});
+
+export type DAppManifest = z.infer<typeof DAppManifestSchema>;
 
 export enum TON_CONNECT_MSG_VARIANTS_ID {
     BATTERY = 'battery',
     GASLESS = 'gasless'
 }
 
-export interface BatteryMessagesVariant {
-    messages: TonConnectTransactionPayloadMessage[];
-}
+const TonConnectTransactionPayloadMessageSchema = z.object({
+    address: z.string(),
+    amount: z.union([z.string(), z.number()]),
+    payload: z.string().optional(),
+    stateInit: z.string().optional(),
+    extra_currency: z.record(z.string()).optional()
+});
+export type TonConnectTransactionPayloadMessage = z.infer<
+    typeof TonConnectTransactionPayloadMessageSchema
+>;
 
-export interface GaslessMessagesVariant {
-    messages: TonConnectTransactionPayloadMessage[];
-    options: {
-        asset: string;
-    };
-}
+export const BatteryMessagesVariantSchema = z.object({
+    messages: z.array(TonConnectTransactionPayloadMessageSchema)
+});
+export type BatteryMessagesVariant = z.infer<typeof BatteryMessagesVariantSchema>;
 
-export interface TonConnectTransactionPayload {
-    valid_until: number; // 1658253458;
-    messages: TonConnectTransactionPayloadMessage[];
-    messagesVariants?: {
-        [TON_CONNECT_MSG_VARIANTS_ID.BATTERY]?: BatteryMessagesVariant;
-        [TON_CONNECT_MSG_VARIANTS_ID.GASLESS]?: GaslessMessagesVariant;
-    };
-}
+export const GaslessMessagesVariantSchema = z.object({
+    messages: z.array(TonConnectTransactionPayloadMessageSchema),
+    options: z.object({
+        asset: z.string()
+    })
+});
+export type GaslessMessagesVariant = z.infer<typeof GaslessMessagesVariantSchema>;
 
-export interface TonConnectTransactionPayloadMessage {
-    address: string; // address
-    amount: string | number;
-    payload?: string; // base64 cell
-    stateInit?: string; // base64 cell
-    extra_currency?: {
-        [k: number]: string;
-    };
-}
+export const TonConnectTransactionPayloadSchema = z.object({
+    valid_until: z.number(),
+    messages: z.array(TonConnectTransactionPayloadMessageSchema),
+    messagesVariants: z
+        .object({
+            battery: BatteryMessagesVariantSchema.optional(),
+            gasless: GaslessMessagesVariantSchema.optional()
+        })
+        .optional()
+});
+export type TonConnectTransactionPayload = z.infer<typeof TonConnectTransactionPayloadSchema>;
 
-export type TonConnectAccount = {
-    address: string; // '<wc>:<hex>'
-    network: string; // '-239' for the mainnet and '-3' for the testnet
-};
+export const TonConnectAccountSchema = z.object({
+    address: z.string(), // '<wc>:<hex>'
+    network: z.string() // '-239' for the mainnet and '-3' for the testnet
+});
+export type TonConnectAccount = z.infer<typeof TonConnectAccountSchema>;
 
 export enum CONNECT_EVENT_ERROR_CODES {
     UNKNOWN_ERROR = 0,
@@ -65,14 +79,15 @@ export enum CONNECT_ITEM_ERROR_CODES {
 
 export type ConnectEvent = ConnectEventSuccess | ConnectEventError;
 
-export interface ConnectEventError {
-    event: 'connect_error';
-    id: number;
-    payload: {
-        code: CONNECT_EVENT_ERROR_CODES;
-        message: string;
-    };
-}
+export const ConnectEventErrorSchema = z.object({
+    event: z.literal('connect_error'),
+    id: z.number(),
+    payload: z.object({
+        code: z.number(), // or enum
+        message: z.string()
+    })
+});
+export type ConnectEventError = z.infer<typeof ConnectEventErrorSchema>;
 
 export interface TonConnectEventPayload {
     items: ConnectItemReply[];
@@ -191,26 +206,34 @@ export type SendTransactionFeature = {
 
 export type SendTransactionFeatureDeprecated = 'SendTransaction';
 
-export interface SendTransactionRpcRequest {
-    method: 'sendTransaction';
-    params: [string];
-    id: string;
-}
+export const SendTransactionRpcRequestSchema = z.object({
+    method: z.literal('sendTransaction'),
+    params: z.tuple([z.string()]),
+    id: z.string()
+});
+export type SendTransactionRpcRequest = z.infer<typeof SendTransactionRpcRequestSchema>;
 
 export type SendTransactionRpcResponse =
     | SendTransactionRpcResponseSuccess
     | SendTransactionRpcResponseError;
 
-export interface SendTransactionRpcResponseError extends WalletResponseTemplateError {
-    error: {
-        code: SEND_TRANSACTION_ERROR_CODES;
-        message: string;
-        data?: unknown;
-    };
-    id: string;
-}
+export const SendTransactionRpcResponseErrorSchema = z.object({
+    error: z.object({
+        code: z.nativeEnum(SEND_TRANSACTION_ERROR_CODES),
+        message: z.string(),
+        data: z.unknown().optional()
+    }),
+    id: z.string()
+});
+export type SendTransactionRpcResponseError = z.infer<typeof SendTransactionRpcResponseErrorSchema>;
 
-export type SendTransactionRpcResponseSuccess = WalletResponseTemplateSuccess;
+export const SendTransactionRpcResponseSuccessSchema = z.object({
+    result: z.string(),
+    id: z.string()
+});
+export type SendTransactionRpcResponseSuccess = z.infer<
+    typeof SendTransactionRpcResponseSuccessSchema
+>;
 
 export enum SIGN_DATA_ERROR_CODES {
     UNKNOWN_ERROR = 0,
@@ -227,86 +250,117 @@ export type SignDataFeature = {
     types: SignDataType[];
 };
 
-export interface SignDataRpcRequest {
-    id: string;
-    method: 'signData';
-    params: [string];
-}
+export const SignDataRpcRequestSchema = z.object({
+    id: z.string(),
+    method: z.literal('signData'),
+    params: z.tuple([z.string()])
+});
+export type SignDataRpcRequest = z.infer<typeof SignDataRpcRequestSchema>;
 
-export type SignDataRequestPayload = SignDataRequestPayloadKind;
+export const SignDataRequestPayloadTextSchema = z.object({
+    type: z.literal('text'),
+    text: z.string()
+});
+export type SignDataRequestPayloadText = z.infer<typeof SignDataRequestPayloadTextSchema>;
 
-type SignDataRequestPayloadKind =
-    | SignDataRequestPayloadText
-    | SignDataRequestPayloadBinary
-    | SignDataRequestPayloadCell;
+export const SignDataRequestPayloadBinarySchema = z.object({
+    type: z.literal('binary'),
+    bytes: z.string() // base64 string
+});
+export type SignDataRequestPayloadBinary = z.infer<typeof SignDataRequestPayloadBinarySchema>;
 
-export type SignDataRequestPayloadText = {
-    type: 'text';
-    text: string; // arbitrary UTF-8 string
-};
-export type SignDataRequestPayloadBinary = {
-    type: 'binary';
-    bytes: string; // base64 (not url safe) encoded bytes array
-};
-export type SignDataRequestPayloadCell = {
-    type: 'cell';
-    schema: string; // TL-B scheme of the cell payload
-    cell: string; // base64 (not url safe) encoded cell
-};
+export const SignDataRequestPayloadCellSchema = z.object({
+    type: z.literal('cell'),
+    schema: z.string(), // TL-B scheme
+    cell: z.string() // base64 string
+});
+export type SignDataRequestPayloadCell = z.infer<typeof SignDataRequestPayloadCellSchema>;
 
-export type SignDataRpcResponse = SignDataRpcResponseSuccess | SignDataRpcResponseError;
+export const SignDataRequestPayloadSchema = z.union([
+    SignDataRequestPayloadTextSchema,
+    SignDataRequestPayloadBinarySchema,
+    SignDataRequestPayloadCellSchema
+]);
+export type SignDataRequestPayload = z.infer<typeof SignDataRequestPayloadSchema>;
 
-export interface SignDataRpcResponseError extends WalletResponseTemplateError {
-    error: { code: SIGN_DATA_ERROR_CODES; message: string };
-    id: string;
-}
+export const SignDataRpcResponseErrorSchema = z.object({
+    error: z.object({
+        code: z.nativeEnum(SIGN_DATA_ERROR_CODES),
+        message: z.string()
+    }),
+    id: z.string()
+});
+export type SignDataRpcResponseError = z.infer<typeof SignDataRpcResponseErrorSchema>;
 
-export interface SignDataResponse {
-    signature: string; // base64 encoded signature
-    address: string; // wallet address
-    timestamp: number; // UNIX timestamp in seconds (UTC) at the moment on creating the signature.
-    domain: string; // app domain name (as url part, without encoding)
-    payload: SignDataRequestPayload; // payload that was signed
-}
+export const SignDataResponseSchema = z.object({
+    signature: z.string(), // base64 encoded signature
+    address: z.string(),
+    timestamp: z.number(), // UNIX timestamp in seconds (UTC) at the moment on creating the signature.
+    domain: z.string(), // app domain name (as url part, without encoding)
+    payload: SignDataRequestPayloadSchema
+});
+export type SignDataResponse = z.infer<typeof SignDataResponseSchema>;
 
-export interface SignDataRpcResponseSuccess {
-    id: string;
-    result: SignDataResponse;
-}
+export const SignDataRpcResponseSuccessSchema = z.object({
+    id: z.string(),
+    result: SignDataResponseSchema
+});
+export type SignDataRpcResponseSuccess = z.infer<typeof SignDataRpcResponseSuccessSchema>;
 
-export interface TonAddressItem {
-    name: 'ton_addr';
-}
+export const SignDataRpcResponseSchema = z.union([
+    SignDataRpcResponseSuccessSchema,
+    SignDataRpcResponseErrorSchema
+]);
+export type SignDataRpcResponse = z.infer<typeof SignDataRpcResponseSchema>;
 
-export interface TonAddressItemReply {
-    name: 'ton_addr';
-    address: string;
-    network: string;
-    walletStateInit: string;
-    publicKey?: string;
-}
+export const TonAddressItemSchema = z.object({
+    name: z.literal('ton_addr')
+});
+export type TonAddressItem = z.infer<typeof TonAddressItemSchema>;
 
-export interface TonProofItem {
-    name: 'ton_proof';
-    payload: string;
-}
+export const TonAddressItemReplySchema = z.object({
+    name: z.literal('ton_addr'),
+    address: z.string(),
+    network: z.string(),
+    walletStateInit: z.string(),
+    publicKey: z.string().optional()
+});
+export type TonAddressItemReply = z.infer<typeof TonAddressItemReplySchema>;
 
-export type TonProofItemReply = TonProofItemReplySuccess | TonProofItemReplyError;
+export const TonProofItemSchema = z.object({
+    name: z.literal('ton_proof'),
+    payload: z.string()
+});
+export type TonProofItem = z.infer<typeof TonProofItemSchema>;
 
-export type TonProofItemReplyError = ConnectItemReplyError<TonProofItemReplySuccess['name']>;
+export const TonProofItemReplyErrorSchema = z.object({
+    name: z.literal('ton_proof'),
+    error: z.object({
+        code: z.nativeEnum(CONNECT_ITEM_ERROR_CODES),
+        message: z.string().optional()
+    })
+});
+export type TonProofItemReplyError = z.infer<typeof TonProofItemReplyErrorSchema>;
 
-export interface TonProofItemReplySuccess {
-    name: 'ton_proof';
-    proof: {
-        timestamp: number;
-        domain: {
-            lengthBytes: number;
-            value: string;
-        };
-        payload: string;
-        signature: string;
-    };
-}
+export const TonProofItemReplySuccessSchema = z.object({
+    name: z.literal('ton_proof'),
+    proof: z.object({
+        timestamp: z.number(),
+        domain: z.object({
+            lengthBytes: z.number(),
+            value: z.string()
+        }),
+        payload: z.string(),
+        signature: z.string()
+    })
+});
+export type TonProofItemReplySuccess = z.infer<typeof TonProofItemReplySuccessSchema>;
+
+export const TonProofItemReplySchema = z.union([
+    TonProofItemReplySuccessSchema,
+    TonProofItemReplyErrorSchema
+]);
+export type TonProofItemReply = z.infer<typeof TonProofItemReplySchema>;
 
 export type WalletEvent = ConnectEvent | DisconnectEvent;
 
@@ -320,43 +374,70 @@ export type WalletResponseSuccess<T extends RpcMethod> = RpcResponses[T]['succes
 
 export type AppRequest<T extends RpcMethod> = RpcRequests[T];
 
-export interface WalletResponseTemplateError {
-    error: {
-        code: number;
-        message: string;
-        data?: unknown;
-    };
-    id: string;
-}
+export const WalletResponseTemplateErrorSchema = z.object({
+    error: z.object({
+        code: z.number(),
+        message: z.string(),
+        data: z.unknown().optional()
+    }),
+    id: z.string()
+});
+export type WalletResponseTemplateError = z.infer<typeof WalletResponseTemplateErrorSchema>;
 
 export interface WalletResponseTemplateSuccess {
     result: string;
     id: string;
 }
 
-export interface TonConnectAppRequest {
+export interface TonConnectAppRequest<T extends AccountConnection['type']> {
     request: AppRequest<RpcMethod>;
-    connection: AccountConnection;
+    connection: T extends 'http' ? AccountConnectionHttp : AccountConnectionInjected;
 }
 
-export interface TonConnectMessageRequest {
-    message: string;
-    from: string;
-    connection: AccountConnection;
-}
-
-export interface SendTransactionAppRequest {
+export interface SendTransactionAppRequest<
+    T extends AccountConnection['type'] = AccountConnection['type']
+> {
     id: string;
-    connection: AccountConnection;
+    connection: T extends 'http'
+        ? AccountConnectionHttp
+        : T extends 'injected'
+        ? AccountConnectionInjected
+        : AccountConnection;
     kind: 'sendTransaction';
     payload: TonConnectTransactionPayload;
 }
 
-export interface SignDatAppRequest {
+export interface SignDatAppRequest<
+    T extends AccountConnection['type'] = AccountConnection['type']
+> {
     id: string;
-    connection: AccountConnection;
+    connection: T extends 'http'
+        ? AccountConnectionHttp
+        : T extends 'injected'
+        ? AccountConnectionInjected
+        : AccountConnection;
     kind: 'signData';
     payload: SignDataRequestPayload;
 }
 
-export type TonConnectAppRequestPayload = SendTransactionAppRequest | SignDatAppRequest;
+export type TonConnectAppRequestPayload<
+    T extends AccountConnection['type'] = AccountConnection['type']
+> = SendTransactionAppRequest<T> | SignDatAppRequest<T>;
+
+export interface InjectedWalletInfo {
+    name: string;
+    image: string;
+    tondns?: string;
+    about_url: string;
+}
+
+export interface ITonConnectInjectedBridge {
+    deviceInfo: DeviceInfo;
+    walletInfo?: InjectedWalletInfo;
+    protocolVersion: number;
+    isWalletBrowser: boolean;
+    connect(protocolVersion: number, message: ConnectRequest): Promise<ConnectEvent>;
+    restoreConnection(): Promise<ConnectEvent>;
+    send<T extends RpcMethod>(message: AppRequest<T>): Promise<WalletResponse<T>>;
+    listen(callback: (event: WalletEvent) => void): () => void;
+}

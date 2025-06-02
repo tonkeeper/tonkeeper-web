@@ -4,8 +4,8 @@ import {
     TonConnectAppRequestPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
-    replyBadRequestResponse,
-    replyDisconnectResponse
+    replyHttpBadRequestResponse,
+    replyHttpDisconnectResponse
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useCallback, useEffect, useState } from 'react';
@@ -22,7 +22,7 @@ import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
 import { TonConnectRequestNotification } from './TonConnectRequestNotification';
 
 const useUnSupportMethodMutation = () => {
-    return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
+    return useMutation<void, Error, TonConnectAppRequest<'http'>>(replyHttpBadRequestResponse);
 };
 
 const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
@@ -32,7 +32,7 @@ const TonConnectSubscription = () => {
 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
-    const { data: appConnections } = useAppTonConnectConnections();
+    const { data: appConnections } = useAppTonConnectConnections('http');
     const { data: lastEventId } = useTonConnectLastEventId();
 
     const { mutateAsync: disconnect } = useDisconnectTonConnectApp();
@@ -59,11 +59,11 @@ const TonConnectSubscription = () => {
                 }, 100);
             }
         };
-        const handleMessage = (params: TonConnectAppRequest) => {
+        const handleMessage = (params: TonConnectAppRequest<'http'>) => {
             switch (params.request.method) {
                 case 'disconnect': {
                     return disconnect(params.connection).then(() =>
-                        replyDisconnectResponse({ ...params })
+                        replyHttpDisconnectResponse({ ...params })
                     );
                 }
                 case 'sendTransaction': {
@@ -153,12 +153,14 @@ const TonConnectSubscription = () => {
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(connection => {
             const connectionsToDisconnect = Array.isArray(connection) ? connection : [connection];
-            connectionsToDisconnect.forEach((item, index) =>
-                replyDisconnectResponse({
-                    connection: item,
-                    request: { id: (Date.now() + index).toString() }
-                })
-            );
+            connectionsToDisconnect.forEach((item, index) => {
+                if (item.type === 'http') {
+                    replyHttpDisconnectResponse({
+                        connection: item,
+                        request: { id: (Date.now() + index).toString() }
+                    });
+                }
+            });
         });
     }, []);
 

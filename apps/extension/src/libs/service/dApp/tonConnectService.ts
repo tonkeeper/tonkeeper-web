@@ -9,11 +9,11 @@ import {
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
-    getDappConnection,
-    getDeviceInfo,
-    tonDisconnectRequest,
-    tonReConnectRequest
-} from '@tonkeeper/core/dist/service/tonConnect/connectService';
+    getInjectedDappConnection,
+    getDeviceInfo, tonConnectTonkeeperProAppName,
+    tonInjectedDisconnectRequest,
+    tonInjectedReConnectRequest
+} from "@tonkeeper/core/dist/service/tonConnect/connectService";
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../../storage';
 import memoryStore from '../../store/memoryStore';
@@ -47,22 +47,26 @@ const getTonConnectPlatform = (os: browser.Runtime.PlatformOs): DeviceInfo['plat
 };
 
 const tonReConnectResponse = async (origin: string): Promise<TonConnectEventPayload> => {
-    const { items, maxMessages } = await tonReConnectRequest(storage, origin);
-    const { version } = browser.runtime.getManifest();
-    const { os } = await browser.runtime.getPlatformInfo();
+    const { items, maxMessages } = await tonInjectedReConnectRequest(storage, origin);
 
     return {
         items,
-        device: getDeviceInfo(getTonConnectPlatform(os), version, maxMessages, 'tonkeeper')
+        device: await getExtensionDeviceInfo({ maxMessages })
     };
 };
+
+export async function getExtensionDeviceInfo(options?: { maxMessages?: number }): Promise<DeviceInfo> {
+    const { version } = browser.runtime.getManifest();
+    const { os } = await browser.runtime.getPlatformInfo();
+    return getDeviceInfo(getTonConnectPlatform(os), version, options?.maxMessages ?? 255, tonConnectTonkeeperProAppName)
+}
 
 export const tonConnectReConnect = async (origin: string) => {
     return await tonReConnectResponse(origin);
 };
 
 export const tonConnectDisconnect = async (id: number, webViewUrl: string) =>
-    tonDisconnectRequest({ storage, webViewUrl });
+    tonInjectedDisconnectRequest({ storage, webViewUrl });
 
 const cancelOpenedNotification = async () => {
     const notification = memoryStore.getNotification();
@@ -117,7 +121,7 @@ export const tonConnectRequest = async (
 };
 
 export const isDappConnectedToExtension = async (origin: string): Promise<boolean> => {
-    const connection = await getDappConnection(storage, origin);
+    const connection = await getInjectedDappConnection(storage, origin);
     return !!connection;
 };
 
@@ -127,7 +131,7 @@ export const tonConnectTransaction = async (
     data: TonConnectTransactionPayload,
     account: TonConnectAccount | undefined
 ) => {
-    const connection = await getDappConnection(storage, origin, account);
+    const connection = await getInjectedDappConnection(storage, origin, account);
 
     if (!connection) {
         throw new TonConnectError(
@@ -172,7 +176,7 @@ export const tonConnectSignData = async (
     origin: string,
     data: SignDataRequestPayload
 ) => {
-    const connection = await getDappConnection(storage, origin);
+    const connection = await getInjectedDappConnection(storage, origin);
 
     if (!connection) {
         throw new TonConnectError(

@@ -5,41 +5,26 @@ import {
     TonConnectAppRequestPayload,
     WalletResponse
 } from '@tonkeeper/core/dist/entries/tonConnect';
-import { FC, useCallback } from 'react';
+import { FC } from 'react';
 import { TonTransactionNotification } from './TonTransactionNotification';
 import { SignDataNotification } from './SignDataNotification';
 import {
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { useTonConnectResponseMutation } from './connectHook';
-import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 export const TonConnectRequestNotification: FC<{
     request: TonConnectAppRequestPayload | undefined;
-    handleClose: () => void;
+    handleClose: (result: WalletResponse<RpcMethod>) => void;
     waitInvalidation?: boolean;
 }> = ({ request, handleClose, waitInvalidation }) => {
-    const { mutateAsync: responseAsync } = useTonConnectResponseMutation();
-    const onClose = useCallback(
-        async (connection: AccountConnection, response: WalletResponse<RpcMethod>) => {
-            try {
-                await responseAsync({ connection, response });
-            } finally {
-                handleClose();
-            }
-        },
-        [responseAsync, handleClose]
-    );
-
     return (
         <>
             <TonTransactionNotification
                 params={request?.kind === 'sendTransaction' ? request.payload : null}
                 handleClose={boc => {
                     if (request) {
-                        onClose(
-                            request.connection,
+                        handleClose(
                             boc
                                 ? sendTransactionSuccessResponse(request.id, boc)
                                 : sendTransactionErrorResponse(request.id)
@@ -49,12 +34,15 @@ export const TonConnectRequestNotification: FC<{
                 waitInvalidation={waitInvalidation}
             />
             <SignDataNotification
-                origin={request?.connection.webViewUrl ?? request?.connection.manifest.url}
+                origin={
+                    request?.connection.type === 'injected'
+                        ? request?.connection.webViewOrigin
+                        : request?.connection.manifest.url
+                }
                 params={request?.kind === 'signData' ? request.payload : null}
                 handleClose={result => {
                     if (request) {
-                        onClose(
-                            request.connection,
+                        handleClose(
                             result
                                 ? ({
                                       id: request.id,

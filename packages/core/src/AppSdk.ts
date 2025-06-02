@@ -179,13 +179,24 @@ export interface IAppSdk {
 
     getUserId: () => Promise<string>;
 
-    dappBrowser?: {
-        open(params: { id: string; url: string; topOffset?: number }): Promise<void>;
-        hide(params: { id: string }): Promise<void>;
-        show(params: { id: string }): Promise<void>;
-        close(params: { id: string }): Promise<void>;
-    };
+    dappBrowser?: IDappBrowser;
 }
+
+export interface IDappBrowser {
+    open(url: string): Promise<string>;
+    hide(id: string): Promise<void>;
+    show(id: string): Promise<void>;
+    close(id: string): Promise<void>;
+    setRequestsHandler(
+        method: string,
+        handler: (
+            payload: unknown,
+            ctx: { webViewId: string; webViewOrigin: string }
+        ) => Promise<string>
+    ): void;
+    emitEvent(webViewId: string, payload: string): Promise<void>;
+}
+
 export interface ConfirmOptions {
     title?: string;
     message: string;

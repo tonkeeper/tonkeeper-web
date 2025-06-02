@@ -6,6 +6,7 @@ import {
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     createTonProofItem,
+    eqOrigins,
     getAppConnections,
     getTonConnectParams,
     tonConnectProofPayload,
@@ -14,6 +15,8 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
     AccountConnection,
+    AccountConnectionHttp,
+    AccountConnectionInjected,
     getTonWalletConnections,
     saveAccountConnection,
     setAccountConnection
@@ -42,17 +45,37 @@ import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletServi
 import { useAppContext } from '../hooks/appContext';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
 
-export const useAppTonConnectConnections = () => {
+export const useAppTonConnectConnections = <T extends AccountConnection['type']>(
+    filterType?: T
+) => {
     const sdk = useAppSdk();
 
     const { data } = useAccountsStateQuery();
 
     const wallets = data?.flatMap(a => a.allTonWallets);
 
-    return useQuery<{ wallet: TonContract; connections: AccountConnection[] }[]>(
-        [QueryKey.tonConnectConnection, wallets?.map(i => i.id)],
-        async () => {
-            return getAppConnections(sdk.storage);
+    return useQuery<
+        {
+            wallet: TonContract;
+            connections: T extends undefined
+                ? AccountConnection
+                : T extends 'injected'
+                ? AccountConnectionInjected[]
+                : AccountConnectionHttp[];
+        }[]
+    >(
+        [QueryKey.tonConnectConnection, wallets?.map(i => i.id), filterType],
+        () => {
+            return getAppConnections(sdk.storage, filterType) as Promise<
+                {
+                    wallet: TonContract;
+                    connections: T extends undefined
+                        ? AccountConnection
+                        : T extends 'injected'
+                        ? AccountConnectionInjected[]
+                        : AccountConnectionHttp[];
+                }[]
+            >;
         },
         { enabled: wallets !== undefined }
     );
@@ -75,10 +98,13 @@ export const useActiveWalletTonConnectConnections = () => {
     }
 
     if (sdk.targetEnv === 'extension') {
-        const connection = appConnections.flatMap(i => i.connections);
-        const set: AccountConnection[] = [];
+        const connection = appConnections.map(i => i.connections).flat();
+        const set: AccountConnectionInjected[] = [];
         connection.forEach(item => {
-            if (set.every(i => i.webViewUrl !== item.webViewUrl)) {
+            if (
+                item.type === 'injected' &&
+                set.every(i => !eqOrigins(i.webViewOrigin, item.webViewOrigin))
+            ) {
                 set.push(item);
             }
         });
@@ -104,12 +130,12 @@ export const useConnectTonConnectAppMutation = () => {
         {
             request: ConnectRequest;
             manifest: DAppManifest;
-            webViewUrl?: string;
+            webViewOrigin: string | null;
             account: Account;
             walletId: WalletId;
             appName: string;
         }
-    >(async ({ request, manifest, webViewUrl, account, walletId, appName }) => {
+    >(async ({ request, manifest, account, walletId, appName, webViewOrigin }) => {
         const selectedIsLedger = account.type === 'ledger';
         const network = getNetworkByAccount(account);
         const api = getContextApiByNetwork(appContext, network);
@@ -119,7 +145,7 @@ export const useConnectTonConnectAppMutation = () => {
             throw new Error('Wallet not found');
         }
 
-        const params = await getTonConnectParams(request, appName);
+        const params = await getTonConnectParams(request, appName, webViewOrigin);
 
         const result = [] as ConnectItemReply[];
 
@@ -136,7 +162,7 @@ export const useConnectTonConnectAppMutation = () => {
 
                 const proof = tonConnectProofPayload(
                     await getServerTime(api),
-                    webViewUrl ?? manifest.url,
+                    webViewOrigin ?? manifest.url,
                     wallet.rawAddress,
                     item.payload
                 );
@@ -186,11 +212,13 @@ export const useConnectTonConnectAppMutation = () => {
             storage: sdk.storage,
             wallet,
             manifest,
-            params,
-            webViewUrl
+            params
         });
 
-        if (sdk.notifications) {
+        /**
+         * subscribe to notifications for http-bridge connections
+         */
+        if (sdk.notifications && params.type === 'http') {
             try {
                 const enable = await sdk.notifications.subscribed(wallet.rawAddress);
                 if (enable) {
@@ -221,7 +249,7 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const client = useQueryClient();
     const accounts = useAccountsState().filter(isAccountTonWalletStandard);
 
-    return useMutation(async (connection: AccountConnection | 'all') => {
+    return useMutation(async (connection: { id: string } | 'all') => {
         let connectionsToDisconnect: AccountConnection[];
         if (sdk.targetEnv !== 'extension') {
             connectionsToDisconnect = await disconnectFromWallet(sdk.storage, connection, wallet);
@@ -241,11 +269,13 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
 
         if (sdk.notifications) {
             await Promise.all(
-                connectionsToDisconnect.map(c =>
-                    sdk.notifications
-                        ?.unsubscribeTonConnect(c.clientSessionId)
-                        .catch(e => console.warn(e))
-                )
+                connectionsToDisconnect.map(c => {
+                    if (c.type === 'http') {
+                        sdk.notifications
+                            ?.unsubscribeTonConnect(c.clientSessionId)
+                            .catch(e => console.warn(e));
+                    }
+                })
             );
         }
 
@@ -255,21 +285,20 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
 
 const disconnectFromWallet = async (
     storage: IStorage,
-    connection: AccountConnection | 'all',
+    connection: { id: string } | 'all',
     wallet: {
         id: string;
         publicKey?: string;
     }
 ) => {
     let connections = await getTonWalletConnections(storage, wallet);
-    const connectionsToDisconnect = connection === 'all' ? connections : [connection];
+    const connectionsToDisconnect =
+        connection === 'all' ? connections : connections.filter(c => c.id === connection.id);
 
     connections =
         connection === 'all'
             ? []
-            : connections.filter(item =>
-                  connectionsToDisconnect.every(c => c.clientSessionId !== item.clientSessionId)
-              );
+            : connections.filter(item => connectionsToDisconnect.every(c => c.id !== item.id));
 
     await setAccountConnection(storage, wallet, connections);
 

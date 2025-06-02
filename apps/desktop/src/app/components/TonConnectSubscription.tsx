@@ -6,9 +6,15 @@ import {
     useDisconnectTonConnectApp
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { sendBackground } from '../../libs/backgroudService';
-import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
+import {
+    RpcMethod,
+    TonConnectAppRequestPayload,
+    WalletResponse
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
@@ -43,9 +49,21 @@ export const TonConnectSubscription = () => {
         });
     }, []);
 
-    const handleClose = useCallback(() => {
-        setRequest(undefined);
-    }, [setRequest]);
+    const { mutateAsync: responseAsync } = useTonConnectHttpResponseMutation();
+    const handleClose = useCallback(
+        async (response: WalletResponse<RpcMethod>) => {
+            if (request?.connection.type !== 'http') {
+                return;
+            }
+
+            try {
+                await responseAsync({ connection: request.connection, response });
+            } finally {
+                setRequest(undefined);
+            }
+        },
+        [responseAsync, request?.connection]
+    );
 
     return <TonConnectRequestNotification request={request} handleClose={handleClose} />;
 };

@@ -8,7 +8,8 @@ import WebKit
         CAPPluginMethod(name: "open", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "show", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise)
     ]
 
     private var webViews: [String: WKWebView] = [:]
@@ -30,9 +31,19 @@ import WebKit
                 return
             }
 
+            let contentController = WKUserContentController()
+            contentController.add(self, name: "browserMessages")
+
+            if let jsPath = Bundle.main.path(forResource: "injected", ofType: "js"),
+               let jsSource = try? String(contentsOfFile: jsPath) {
+                let userScript = WKUserScript(source: jsSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                contentController.addUserScript(userScript)
+            }
+
             let config = WKWebViewConfiguration()
             config.allowsInlineMediaPlayback = true
             config.mediaTypesRequiringUserActionForPlayback = []
+            config.userContentController = contentController
 
             let webView = WKWebView(frame: self.bridge?.viewController?.view.bounds ?? .zero, configuration: config)
             webView.translatesAutoresizingMaskIntoConstraints = false
@@ -100,6 +111,54 @@ import WebKit
             webView.removeFromSuperview()
             self.webViews.removeValue(forKey: id)
             call.resolve()
+        }
+    }
+
+    @objc func sendToBrowser(_ call: CAPPluginCall) {
+        guard let webviewId = call.getString("webviewId"),
+              let payload = call.getString("payload"),
+              let webView = webViews[webviewId] else {
+            call.reject("Missing parameters or WebView")
+            return
+        }
+
+        let queryId = call.getString("queryId")
+
+        var detail = "webviewId: \"\(webviewId)\", payload: \"\(payload)\""
+        if let queryId = queryId {
+            detail += ", queryId: \"\(queryId)\""
+        }
+
+        let js = "window.dispatchEvent(new CustomEvent(\"mainMessageReceived\", { detail: { \(detail) } }))"
+
+        DispatchQueue.main.async {
+            webView.evaluateJavaScript(js)
+            call.resolve()
+        }
+    }
+}
+
+extension DappBrowserPlugin: WKScriptMessageHandler {
+    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.name == "browserMessages" else { return }
+
+        guard let body = message.body as? [String: Any],
+              let queryId = body["queryId"] as? String,
+              let payload = body["payload"] as? String,
+              let webview = message.webView,
+              let webviewId = self.webViews.first(where: { $0.value == webview })?.key else {
+            return
+        }
+
+        webview.evaluateJavaScript("window.location.origin") { result, error in
+            let origin = (result as? String) ?? "unknown"
+
+            self.notifyListeners("browserMessageReceived", data: [
+                "webviewId": webviewId,
+                "queryId": queryId,
+                "payload": payload,
+                "webViewOrigin": origin
+            ])
         }
     }
 }

@@ -27,7 +27,7 @@ import { SelectDropDown, SelectDropDownHost, SelectField } from '../fields/Selec
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { isStandardTonWallet, WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 const Title = styled(H2)`
     text-align: center;
@@ -121,7 +121,7 @@ const ConnectContent: FC<{
             const replyItems = await mutateAsync({
                 request: params,
                 manifest,
-                webViewUrl: origin,
+                webViewOrigin: origin ?? null,
                 appName,
                 ...selectedAccountAndWallet
             });
@@ -321,7 +321,7 @@ const useManifest = (params: ConnectRequest | null) => {
 
 export const TonConnectNotification: FC<{
     origin?: string;
-    params: Pick<TonConnectParams, 'request' | 'appName'> | null;
+    params: Pick<TonConnectConnectionParams, 'request' | 'appName'> | null;
     handleClose: (
         result: {
             replyItems: TonConnectEventPayload;
