@@ -55,22 +55,23 @@ import WebKit
             webView.scrollView.contentInsetAdjustmentBehavior = .never
             webView.load(URLRequest(url: url))
 
-            if let rootView = self.bridge?.viewController?.view,
-               let mainWebView = self.bridge?.webView {
-                rootView.insertSubview(webView, belowSubview: mainWebView)
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let rootView = windowScene.windows.first { // root view is UIWindow
+               rootView.insertSubview(webView, at: 0)
 
-                NSLayoutConstraint.activate([
-                    webView.topAnchor.constraint(equalTo: rootView.topAnchor, constant: topOffset),
-                    webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor),
-                    webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
-                    webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
-                ])
+               NSLayoutConstraint.activate([
+                   webView.topAnchor.constraint(equalTo: rootView.topAnchor, constant: topOffset),
+                   webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor),
+                   webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
+                   webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
+               ])
 
-                self.webViews[id] = webView
-                call.resolve()
+               self.webViews[id] = webView
+               call.resolve()
+
             } else {
-                call.reject("Failed to obtain root view or main WebView")
-            }
+               call.reject("Failed to obtain root view or main WebView")
+           }
         }
     }
 

@@ -507,4 +507,9 @@ const PreferencesModal = () => {
 
 export const NarrowEnvGlobalStyles = createGlobalStyle`
     ${IonicOverride};
+
+
+    body {
+        background: transparent !important;
+    }
 `;
