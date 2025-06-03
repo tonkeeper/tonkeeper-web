@@ -26,6 +26,8 @@ import {
     AccountConnectionHttp,
     isAccountConnectionHttp
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
+import { useMenuController } from '@tonkeeper/uikit/dist/hooks/ionic';
 
 const useInjectedBridgeRequestsSubscription = (
     setRequest: (params: TonConnectAppRequestPayload | undefined) => void
@@ -36,16 +38,23 @@ const useInjectedBridgeRequestsSubscription = (
     } | null>(null);
     useEffect(() => {
         tonConnectInjectedConnector.setRequestsHandler((request: TonConnectAppRequestPayload) => {
-            return new Promise<WalletResponse<RpcMethod>>((resolve, reject) => {
+            return new Promise<WalletResponse<RpcMethod>>(async (resolve, reject) => {
                 if (ref.current) {
                     ref.current.reject('Request Cancelled');
                 }
                 ref.current = { resolve, reject };
 
+                await CapacitorDappBrowser.setIsMainViewInFocus(true);
                 setRequest(request);
             });
         });
     }, []);
+
+    // TODO move to DappBrowser Component
+    const { isOpen } = useMenuController('aside-nav');
+    useEffect(() => {
+        CapacitorDappBrowser.setIsMainViewInFocus(isOpen);
+    }, [isOpen]);
 
     return ref;
 };
@@ -123,13 +132,14 @@ export const TonConnectSubscription = () => {
                     return injectedBridgeResponseRef.current.resolve(response);
                 } finally {
                     setRequest(undefined);
+                    await CapacitorDappBrowser.setIsMainViewInFocus(false);
                 }
-            }
-
-            try {
-                await responseAsync({ connection: request.connection, response });
-            } finally {
-                setRequest(undefined);
+            } else {
+                try {
+                    await responseAsync({ connection: request.connection, response });
+                } finally {
+                    setRequest(undefined);
+                }
             }
         },
         [responseAsync, request?.connection]

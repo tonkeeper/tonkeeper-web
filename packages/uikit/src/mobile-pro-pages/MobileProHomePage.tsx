@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React, { useState } from 'react';
+import React from 'react';
 import { MobileProHomeActions } from '../components/mobile-pro/home/MobileProHomeActions';
 import { MobileProHomeWidgetTokens } from '../components/mobile-pro/home/widgets/MobileProHomeWidgetTokens';
 import { Link } from '../components/shared/Link';
@@ -7,10 +7,8 @@ import {
     BatteryIcon,
     ChevronRightIcon,
     ClockSmoothIcon,
-    CloseIcon,
     InboxIcon,
     ListIcon,
-    MinusIcon,
     SaleBadgeIcon,
     SettingsSmoothIcon,
     SparkIcon,
@@ -18,7 +16,7 @@ import {
 } from '../components/Icon';
 import { Body3, Label2 } from '../components/Text';
 import { useTranslation } from '../hooks/translation';
-import { AppRoute, WalletSettingsRoute } from '../libs/routes';
+import { AppRoute, DappBrowserRoute, WalletSettingsRoute } from '../libs/routes';
 import { useActiveAccount, useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../state/wallet';
 import { useIsActiveAccountMultisig, useUnviewedAccountOrdersNumber } from '../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
@@ -33,8 +31,7 @@ import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFAR
 import { CountryFeature } from '../state/country';
 import { HideForRegulatoryState } from '../components/HideForState';
 import { BrowserIcon } from '../components/NavigationIcons';
-import { useAppSdk } from '../hooks/appSdk';
-import { IconButtonTransparentBackground } from '../components/fields/IconButton';
+import { useBrowserTabs, useOpenBrowserTab } from '../state/dapp-browser';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -101,22 +98,12 @@ export const MobileProHomePage = () => {
     const network = useActiveTonNetwork();
     const isTestnet = network === Network.TESTNET;
     const canUseBattery = useCanUseBattery();
-    const sdk = useAppSdk();
 
-    const [tabId, setTabId] = useState<string | undefined>();
+    const { data: tabs } = useBrowserTabs();
+    const { mutate } = useOpenBrowserTab();
 
     return (
         <DesktopViewPageLayout id={mobileProHomePageId}>
-            {tabId !== undefined && (
-                <div style={{ display: 'flex' }}>
-                    <IconButtonTransparentBackground onClick={() => sdk.dappBrowser?.close(tabId)}>
-                        <CloseIcon />
-                    </IconButtonTransparentBackground>
-                    <IconButtonTransparentBackground onClick={() => sdk.dappBrowser?.hide(tabId)}>
-                        <MinusIcon />
-                    </IconButtonTransparentBackground>
-                </div>
-            )}
             <DesktopViewHeaderStyled mobileTranslucent={false} />
             <PullToRefresh invalidate={account.id} />
             <TwoFARecoveryStartedBannerStyled>
@@ -126,25 +113,30 @@ export const MobileProHomePage = () => {
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />
             <MenuWrapper>
+                <MenuItem to={AppRoute.browser + DappBrowserRoute.new}>
+                    <BrowserIcon />
+                    <Label2>Explore</Label2>
+                    <ChevronRightIcon />
+                </MenuItem>
                 <MenuItem
                     to="/"
-                    onClick={() =>
-                        sdk.dappBrowser
-                            ?.open('https://ton-connect.github.io/demo-dapp-with-wallet/')
-                            .then(setTabId)
-                    }
+                    onClick={() => {
+                        mutate({
+                            url: 'https://ton-connect.github.io/demo-dapp-with-wallet/'
+                        });
+                    }}
                 >
                     <BrowserIcon />
                     <Label2>Browser</Label2>
                     <ChevronRightIcon />
                 </MenuItem>
-                {tabId !== undefined && (
-                    <MenuItem to="/" onClick={() => sdk.dappBrowser?.show(tabId)}>
+                {tabs?.map(tab => (
+                    <MenuItem key={tab.id} to={AppRoute.home} onClick={() => mutate(tab)}>
                         <BrowserIcon />
-                        <Label2>Show Tab</Label2>
+                        <Label2>Tab {tab.title}</Label2>
                         <ChevronRightIcon />
                     </MenuItem>
-                )}
+                ))}
 
                 <MenuItem to={AppRoute.activity}>
                     <ClockSmoothIcon />

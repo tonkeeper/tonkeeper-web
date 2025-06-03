@@ -71,7 +71,8 @@ class TonConnectInjectedConnector {
         CapacitorDappBrowser.setRequestsHandler(
             NATIVE_BRIDGE_METHODS.TON_CONNECT.SEND,
             async (payload: unknown, { webViewOrigin }) => {
-                const request = payload as AppRequest<RpcMethod>;
+                const request = (payload as { message: AppRequest<RpcMethod> })
+                    .message as AppRequest<RpcMethod>;
                 // TODO zod payload
                 try {
                     const result = await this.getConnectionAndWallet(webViewOrigin);

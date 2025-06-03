@@ -34,6 +34,7 @@ import { errorMessage } from '@tonkeeper/core/dist/utils/types';
 import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
 import { tonConnectTonkeeperProAppName } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { tonConnectInjectedConnector } from '../../libs/ton-connect/injected-connector';
+import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -58,12 +59,13 @@ const useInjectedBridgeConnectionSubscription = (
     useEffect(() => {
         tonConnectInjectedConnector.setConnectHandler(
             (request: ConnectRequest, webViewOrigin: string) => {
-                return new Promise<ConnectEvent>((resolve, reject) => {
+                return new Promise<ConnectEvent>(async (resolve, reject) => {
                     if (ref.current) {
                         ref.current.reject('Request Cancelled');
                     }
                     ref.current = { resolve, reject };
 
+                    await CapacitorDappBrowser.setIsMainViewInFocus(true);
                     setParams({
                         type: 'injected',
                         protocolVersion: 2,
@@ -132,6 +134,7 @@ export const DeepLinkSubscription = () => {
                 });
             } finally {
                 setParams(null);
+                await CapacitorDappBrowser.setIsMainViewInFocus(false);
             }
         } else {
             try {

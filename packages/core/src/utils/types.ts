@@ -34,3 +34,7 @@ export function errorMessage(e: unknown): string | undefined {
 
     return undefined;
 }
+
+export type OptionalProperty<T, K extends keyof T> = Omit<T, K> & {
+    [P in K]?: T[P] | undefined;
+};

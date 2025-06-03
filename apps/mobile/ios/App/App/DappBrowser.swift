@@ -53,8 +53,10 @@ class InteractionRouterView: UIView {
             if let existingWebView = self.webViews[id] {
                 existingWebView.isHidden = false
                 self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: existingWebView, focusDappView: true)
-                self.extractMetadata(from: existingWebView) { metadata in
-                    call.resolve(metadata)
+                self.waitUntilDocumentIsReady(existingWebView) {
+                    self.extractMetadata(from: existingWebView) { metadata in
+                        call.resolve(metadata)
+                    }
                 }
                 return
             }
@@ -97,8 +99,10 @@ class InteractionRouterView: UIView {
 
                 self.webViews[id] = webView
                 self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: webView, focusDappView: true)
-                self.extractMetadata(from: webView) { metadata in
-                    call.resolve(metadata)
+                self.waitUntilDocumentIsReady(webView) {
+                    self.extractMetadata(from: webView) { metadata in
+                        call.resolve(metadata)
+                    }
                 }
             } else {
                call.reject("Failed to obtain root view or main WebView")
@@ -130,7 +134,9 @@ class InteractionRouterView: UIView {
         DispatchQueue.main.async {
             webView.isHidden = false
             self.routerView?.focusDappView = true
-            call.resolve()
+            self.waitUntilDocumentIsReady(webView) {
+                call.resolve()
+            }
         }
     }
 
@@ -245,6 +251,25 @@ class InteractionRouterView: UIView {
                 completion(dict)
             } else {
                 completion([:])
+            }
+        }
+    }
+
+    private func waitUntilDocumentIsReady(_ webView: WKWebView, completion: @escaping () -> Void) {
+        webView.evaluateJavaScript("document.readyState") { result, _ in
+            if result as? String == "complete" {
+                CATransaction.begin()
+                CATransaction.setCompletionBlock {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                        completion()
+                    }
+                }
+                webView.layer.setNeedsDisplay()
+                CATransaction.commit()
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.waitUntilDocumentIsReady(webView, completion: completion)
+                }
             }
         }
     }

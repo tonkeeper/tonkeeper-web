@@ -1,5 +1,12 @@
 import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
 import { IDappBrowser } from '@tonkeeper/core/dist/AppSdk';
+import { BrowserTabBase } from '@tonkeeper/core/dist/service/dappBrowserService';
+import { subject } from '@tonkeeper/core/dist/entries/atom';
+
+interface DocumentMetadata {
+    title: string;
+    iconUrl: string;
+}
 
 interface IDappBrowserPlugin {
     open(params: {
@@ -7,7 +14,7 @@ interface IDappBrowserPlugin {
         url: string;
         topOffset?: number;
         bottomOffset?: number;
-    }): Promise<void>;
+    }): Promise<DocumentMetadata>;
     hide(params: { id: string }): Promise<void>;
     show(params: { id: string }): Promise<void>;
     close(params: { id: string }): Promise<void>;
@@ -20,6 +27,15 @@ interface IDappBrowserPlugin {
             payload: string;
             webViewOrigin: string;
         }) => void
+    ): Promise<PluginListenerHandle>;
+    addListener(
+        eventName: 'browserUrlChanged',
+        listenerFunc: (
+            data: {
+                webViewId: string;
+                url: string;
+            } & DocumentMetadata
+        ) => void
     ): Promise<PluginListenerHandle>;
     sendToBrowser(params: { webViewId: string; queryId?: string; payload: string }): Promise<void>;
 }
@@ -55,6 +71,8 @@ class DappBrowser implements IDappBrowser {
         ) => Promise<unknown>
     >();
 
+    tabChange = subject<BrowserTabBase>();
+
     constructor() {
         DappBrowserPlugin.addListener('browserMessageReceived', async data => {
             const parsed = JSON.parse(data.payload) as {
@@ -76,6 +94,15 @@ class DappBrowser implements IDappBrowser {
                 payload: JSON.stringify(result)
             });
         });
+
+        DappBrowserPlugin.addListener('browserUrlChanged', async data => {
+            this.tabChange.next({
+                id: data.webViewId,
+                url: data.url,
+                title: data.title,
+                iconUrl: data.iconUrl
+            });
+        });
     }
 
     close(id: string): Promise<void> {
@@ -86,14 +113,21 @@ class DappBrowser implements IDappBrowser {
         return DappBrowserPlugin.hide({ id });
     }
 
-    async open(url: string): Promise<string> {
-        const id = Date.now().toString();
-        await DappBrowserPlugin.open({ url, id, topOffset: 100, bottomOffset: 98 });
+    async open(url: string, id?: string): Promise<BrowserTabBase> {
+        id ??= Date.now().toString();
+        const metadata = await DappBrowserPlugin.open({
+            url,
+            id,
+            topOffset: 100,
+            bottomOffset: 98
+        });
 
-        // TODO: remove
-        document.getElementById('main-content')!.style.opacity = '0';
-
-        return id;
+        return {
+            id,
+            title: metadata.title,
+            iconUrl: metadata.iconUrl,
+            url
+        };
     }
 
     show(id: string): Promise<void> {

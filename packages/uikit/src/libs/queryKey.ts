@@ -75,7 +75,8 @@ export enum QueryKey {
     twoFAActivationProcess = 'twoFAActivationProcess',
     twoFARemovingProcess = 'twoFARemovingProcess',
     twoFACancellRecoveryProcess = 'twoFARemovingProcess',
-    isOnReview = 'isOnReview'
+    isOnReview = 'isOnReview',
+    browserTabs = 'browserTabs'
 }
 
 export enum JettonKey {

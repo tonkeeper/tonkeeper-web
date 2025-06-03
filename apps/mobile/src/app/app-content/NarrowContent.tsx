@@ -12,7 +12,6 @@ import {
     SettingsRoute,
     WalletSettingsRoute
 } from '@tonkeeper/uikit/dist/libs/routes';
-import DesktopBrowser from '@tonkeeper/uikit/dist/desktop-pages/browser';
 import { DesktopMultiSendPage } from '@tonkeeper/uikit/dist/desktop-pages/multi-send';
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
 import { DesktopCollectables } from '@tonkeeper/uikit/dist/desktop-pages/nft/DesktopCollectables';
@@ -74,6 +73,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { Button } from '@tonkeeper/uikit';
+import { MobileDappBrowserController } from '../components/dapp-browser/MobileDappBrowserController';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -261,7 +261,6 @@ const NarrowContentAppRouting = () => {
                             <Route path={AppProRoute.dashboard}>
                                 <Navigate replace to={AppRoute.home} />
                             </Route>
-                            <Route path={AppRoute.browser} component={DesktopBrowser} />
                             <Route path={AppProRoute.multiSend} component={DesktopMultiSendPage} />
                             <Route
                                 path={AppRoute.accountSettings}
@@ -356,12 +355,13 @@ const NarrowContentAppRouting = () => {
                 <PreferencesModal />
             </WideContent>
             <BackgroundElements />
+            <MobileDappBrowserController />
         </WideLayout>
     );
 };
 
 const shouldDisplayFooter = (loc: string) => {
-    return loc !== AppProRoute.dashboard && !loc?.startsWith(AppRoute.browser);
+    return loc !== AppProRoute.dashboard;
 };
 
 const NavigateToRecovery = () => {
@@ -511,5 +511,10 @@ export const NarrowEnvGlobalStyles = createGlobalStyle`
 
     body {
         background: transparent !important;
+        
+        &.dapp-browser-open #main-content {
+            opacity: 0;
+            background: transparent;
+        }
     }
 `;
