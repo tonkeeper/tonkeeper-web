@@ -53,7 +53,9 @@ class InteractionRouterView: UIView {
             if let existingWebView = self.webViews[id] {
                 existingWebView.isHidden = false
                 self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: existingWebView, focusDappView: true)
-                call.resolve()
+                self.extractMetadata(from: existingWebView) { metadata in
+                    call.resolve(metadata)
+                }
                 return
             }
 
@@ -73,28 +75,31 @@ class InteractionRouterView: UIView {
 
             let webView = WKWebView(frame: self.bridge?.viewController?.view.bounds ?? .zero, configuration: config)
             webView.translatesAutoresizingMaskIntoConstraints = false
-            webView.backgroundColor = .clear
-            webView.isOpaque = false
+            webView.backgroundColor = .systemBackground
+            webView.isOpaque = true
             webView.scrollView.bounces = false
             webView.scrollView.alwaysBounceVertical = false
             webView.scrollView.alwaysBounceHorizontal = false
             webView.scrollView.contentInsetAdjustmentBehavior = .never
+            webView.navigationDelegate = self
             webView.load(URLRequest(url: url))
 
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-               let rootView = windowScene.windows.first { // root view is UIWindow
+               let rootView = windowScene.windows.first {
                rootView.insertSubview(webView, at: 0)
 
                NSLayoutConstraint.activate([
                    webView.topAnchor.constraint(equalTo: rootView.topAnchor, constant: topOffset),
-                   webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor),
+                   webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor, constant: -bottomOffset),
                    webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
                    webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
                ])
 
                 self.webViews[id] = webView
                 self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: webView, focusDappView: true)
-                call.resolve()
+                self.extractMetadata(from: webView) { metadata in
+                    call.resolve(metadata)
+                }
             } else {
                call.reject("Failed to obtain root view or main WebView")
            }
@@ -217,6 +222,32 @@ class InteractionRouterView: UIView {
             routerView?.focusDappView = focusDappView
         }
     }
+
+    func extractMetadata(from webView: WKWebView, completion: @escaping ([String: Any]) -> Void) {
+        let js = """
+        (() => {
+          const links = Array.from(document.querySelectorAll('link[rel~="icon"], link[rel="apple-touch-icon"]'));
+          const best = links
+            .map(link => ({ href: link.href, sizes: link.sizes?.value || '0x0' }))
+            .sort((a, b) => {
+              const sizeA = parseInt(a.sizes.split('x')[0]) || 0;
+              const sizeB = parseInt(b.sizes.split('x')[0]) || 0;
+              return sizeB - sizeA;
+            })[0];
+          return {
+            title: document.title,
+            iconUrl: best?.href || new URL('/favicon.ico', location.origin).href
+          };
+        })()
+        """
+        webView.evaluateJavaScript(js) { result, error in
+            if let dict = result as? [String: Any] {
+                completion(dict)
+            } else {
+                completion([:])
+            }
+        }
+    }
 }
 
 extension DappBrowserPlugin: WKScriptMessageHandler {
@@ -240,6 +271,24 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
                 "payload": payload,
                 "webViewOrigin": origin
             ])
+        }
+    }
+}
+
+extension DappBrowserPlugin: WKNavigationDelegate {
+    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard let id = webViews.first(where: { $0.value == webView })?.key,
+              let url = webView.url?.absoluteString else {
+            return
+        }
+
+        self.extractMetadata(from: webView) { metadata in
+            var data: [String: Any] = [
+                "webViewId": id,
+                "url": url
+            ]
+            data.merge(metadata) { _, new in new }
+            self.notifyListeners("browserUrlChanged", data: data)
         }
     }
 }
