@@ -27,7 +27,6 @@ import {
     isAccountConnectionHttp
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
-import { useMenuController } from '@tonkeeper/uikit/dist/hooks/ionic';
 
 const useInjectedBridgeRequestsSubscription = (
     setRequest: (params: TonConnectAppRequestPayload | undefined) => void
@@ -49,12 +48,6 @@ const useInjectedBridgeRequestsSubscription = (
             });
         });
     }, []);
-
-    // TODO move to DappBrowser Component
-    const { isOpen } = useMenuController('aside-nav');
-    useEffect(() => {
-        CapacitorDappBrowser.setIsMainViewInFocus(isOpen);
-    }, [isOpen]);
 
     return ref;
 };

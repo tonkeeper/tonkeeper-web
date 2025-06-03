@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import styled from 'styled-components';
 import { MobileDappBrowserTab } from './MobileDappBrowserTab';
 import { MobileDappBrowserNewTab } from './MobileDappBrowserNewTab';
+import { useMenuController } from '@tonkeeper/uikit/dist/hooks/ionic';
+import { CapacitorDappBrowser } from '../../../libs/plugins/dapp-browser-plugin';
 
 const Wrapper = styled(motion.div)`
     position: fixed;
@@ -52,6 +54,12 @@ export const MobileDappBrowserController = () => {
             setBackgroundIsReady(false);
         };
     }, [shouldDisplayBrowser]);
+
+    const { isOpen: isAsideOpen } = useMenuController('aside-nav');
+    const { isOpen: isWalletMenuOpen } = useMenuController('wallet-nav');
+    useEffect(() => {
+        CapacitorDappBrowser.setIsMainViewInFocus(isAsideOpen || isWalletMenuOpen);
+    }, [isAsideOpen, isWalletMenuOpen]);
 
     return (
         <AnimatePresence mode="wait">
