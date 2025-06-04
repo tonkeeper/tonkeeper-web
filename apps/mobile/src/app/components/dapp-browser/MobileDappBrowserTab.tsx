@@ -14,7 +14,6 @@ import { IconButtonTransparentBackground } from '@tonkeeper/uikit/dist/component
 import { CloseIcon, MinusIcon } from '@tonkeeper/uikit/dist/components/Icon';
 
 const Wrapper = styled.div`
-    padding-top: env(safe-area-inset-top);
     box-sizing: border-box;
     height: 100%;
     display: flex;
@@ -26,7 +25,7 @@ const Wrapper = styled.div`
 `;
 
 const TabHeader = styled.div`
-    padding: 8px 16px;
+    padding: calc(8px + env(safe-area-inset-top)) 16px 8px 16px;
     display: flex;
     align-items: center;
     gap: 8px;

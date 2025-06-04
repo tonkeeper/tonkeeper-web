@@ -46,7 +46,7 @@ const DappBrowserPlugin = registerPlugin<IDappBrowserPlugin>('DappBrowser', {
             async open() {
                 return Promise.resolve({
                     title: 'Example tab',
-                    iconUrl: 'https://example.com/icon.png'
+                    iconUrl: 'https://capacitorjs.com/docs/img/meta/favicon.png'
                 });
             },
             async hide() {
@@ -121,7 +121,7 @@ class DappBrowser implements IDappBrowser {
         const metadata = await DappBrowserPlugin.open({
             url,
             id,
-            topOffset: 100,
+            topOffset: 52,
             bottomOffset: 98
         });
 
