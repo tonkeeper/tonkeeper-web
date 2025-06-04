@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useActiveBrowserTab, useChangeBrowserTab } from '@tonkeeper/uikit/dist/state/dapp-browser';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -12,6 +12,10 @@ const Wrapper = styled(motion.div)`
     position: fixed;
     padding-bottom: calc(var(--footer-full-height) + 1px);
     inset: 0;
+
+    &.dapp-browser-wrapper-exit {
+        background: ${p => p.theme.backgroundPage};
+    }
 
     &::after {
         position: absolute;
@@ -61,15 +65,28 @@ export const MobileDappBrowserController = () => {
         CapacitorDappBrowser.setIsMainViewInFocus(isAsideOpen || isWalletMenuOpen);
     }, [isAsideOpen, isWalletMenuOpen]);
 
+    const id = useId();
+    const exitY = 200;
+
     return (
         <AnimatePresence mode="wait">
             {shouldDisplayBrowser && (
                 <Wrapper
+                    id={id}
                     key="dapp-browser"
-                    initial={{ y: 200, opacity: 0, pointerEvents: 'none' }}
+                    initial={{ y: exitY, opacity: 0, pointerEvents: 'none' }}
                     animate={{ y: 0, opacity: 1, pointerEvents: 'unset' }}
-                    exit={{ y: 200, opacity: 0, pointerEvents: 'none' }}
+                    exit={{ y: exitY, opacity: 0, pointerEvents: 'none' }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
+                    onAnimationStart={definition => {
+                        if ((definition as { y: number }).y === exitY) {
+                            document.getElementById(id)?.classList.add('dapp-browser-wrapper-exit');
+                        } else {
+                            document
+                                .getElementById(id)
+                                ?.classList.remove('dapp-browser-wrapper-exit');
+                        }
+                    }}
                 >
                     {tab === 'blanc' ? (
                         <MobileDappBrowserNewTab />

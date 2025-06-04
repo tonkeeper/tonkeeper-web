@@ -44,16 +44,19 @@ const DappBrowserPlugin = registerPlugin<IDappBrowserPlugin>('DappBrowser', {
     web: () => {
         return {
             async open() {
-                throw new Error('DappBrowser is not supported on web.');
+                return Promise.resolve({
+                    title: 'Example tab',
+                    iconUrl: 'https://example.com/icon.png'
+                });
             },
             async hide() {
-                throw new Error('DappBrowser is not supported on web.');
+                return Promise.resolve();
             },
             async show() {
-                throw new Error('DappBrowser is not supported on web.');
+                return Promise.resolve();
             },
             async close() {
-                throw new Error('DappBrowser is not supported on web.');
+                return Promise.resolve();
             }
         };
     }
