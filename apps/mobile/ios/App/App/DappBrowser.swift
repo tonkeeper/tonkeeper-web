@@ -50,6 +50,10 @@ class InteractionRouterView: UIView {
         let bottomOffset = CGFloat(call.getInt("bottomOffset") ?? 0)
 
         DispatchQueue.main.async {
+            for (key, view) in self.webViews {
+                view.isHidden = (key != id)
+            }
+
             if let existingWebView = self.webViews[id] {
                 existingWebView.isHidden = false
                 self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: existingWebView, focusDappView: true)
@@ -91,7 +95,7 @@ class InteractionRouterView: UIView {
                rootView.insertSubview(webView, at: 0)
 
                NSLayoutConstraint.activate([
-                   webView.topAnchor.constraint(equalTo: rootView.topAnchor, constant: topOffset),
+                   webView.topAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.topAnchor, constant: topOffset),
                    webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor, constant: -bottomOffset),
                    webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
                    webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
