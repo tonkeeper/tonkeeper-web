@@ -114,7 +114,7 @@ export const saveAccountConnection = async (options: {
     }
 
     if (options.params.type === 'injected') {
-        if (eqOrigins(options.manifest.url, options.params.webViewOrigin)) {
+        if (!eqOrigins(options.manifest.url, options.params.webViewOrigin)) {
             throw new Error('WebView origin mismatch');
         }
 

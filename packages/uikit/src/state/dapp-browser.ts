@@ -30,8 +30,12 @@ export const useOpenBrowserTab = () => {
     return useMutation<
         void,
         Error,
-        { id: string } | { url: string; title?: string; iconUrl?: string }
+        { id: string } | { url: string; title?: string; iconUrl?: string } | BrowserTab
     >(async tab => {
+        if ('isActive' in tab) {
+            openedTab$.next('blanc');
+            return;
+        }
         if ('id' in tab) {
             const tabs = await client.fetchQuery<BrowserTab[]>([QueryKey.browserTabs]);
             const tabToOpen = tabs.find(t => t.id === tab.id);

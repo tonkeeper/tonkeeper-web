@@ -45,6 +45,7 @@ import { useMenuController } from '../../../hooks/ionic';
 import { HideForRegulatoryState } from '../../HideForState';
 import { CountryFeature } from '../../../state/country';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
+import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -250,6 +251,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
+            <WalletAsideMenuBrowserTabs />
         </WalletAsideContainer>
     );
 };

@@ -16,7 +16,7 @@ import {
 } from '../components/Icon';
 import { Body3, Label2 } from '../components/Text';
 import { useTranslation } from '../hooks/translation';
-import { AppRoute, DappBrowserRoute, WalletSettingsRoute } from '../libs/routes';
+import { AppRoute, WalletSettingsRoute } from '../libs/routes';
 import { useActiveAccount, useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../state/wallet';
 import { useIsActiveAccountMultisig, useUnviewedAccountOrdersNumber } from '../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
@@ -113,9 +113,16 @@ export const MobileProHomePage = () => {
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />
             <MenuWrapper>
-                <MenuItem to={AppRoute.browser + DappBrowserRoute.new}>
+                <MenuItem
+                    to="/"
+                    onClick={() => {
+                        mutate({
+                            url: 'https://app.ston.fi'
+                        });
+                    }}
+                >
                     <BrowserIcon />
-                    <Label2>Explore</Label2>
+                    <Label2>Browser StonFi</Label2>
                     <ChevronRightIcon />
                 </MenuItem>
                 <MenuItem
