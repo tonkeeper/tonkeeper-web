@@ -6,16 +6,23 @@ class InteractionRouterView: UIView {
     weak var browserView: UIView?
     var passthroughTopHeight: CGFloat = 0
     var passthroughBottomHeight: CGFloat = 0
+    var passthroughLeftWidth: CGFloat = 10
+    var passthroughRightWidth: CGFloat = 10
     var focusDappView: Bool = false
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         let height = self.bounds.height
+        let width = self.bounds.width
 
         if !focusDappView {
             return mainView?.hitTest(convert(point, to: mainView), with: event)
         }
 
         if point.y <= passthroughTopHeight || point.y >= height - passthroughBottomHeight {
+            return mainView?.hitTest(convert(point, to: mainView), with: event)
+        }
+
+        if point.x <= passthroughLeftWidth || point.x >= width - passthroughRightWidth {
             return mainView?.hitTest(convert(point, to: mainView), with: event)
         }
 
