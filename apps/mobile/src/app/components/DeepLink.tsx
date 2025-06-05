@@ -11,7 +11,7 @@ import {
     useProcessOpenedLink,
     useResponseInjectedConnectionMutation
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     subscribeToSignerResponse,
     subscribeToSignerUrlOpened,
@@ -35,6 +35,7 @@ import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
 import { tonConnectTonkeeperProAppName } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { tonConnectInjectedConnector } from '../../libs/ton-connect/injected-connector';
 import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
+import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -50,7 +51,7 @@ export const useMobileProPairSignerSubscription = () => {
 };
 
 const useInjectedBridgeConnectionSubscription = (
-    setParams: (params: TonConnectConnectionParams | null) => void
+    setParams: (params: TonConnectConnectionParams) => void
 ) => {
     const ref = useRef<{
         resolve: (value: ConnectEvent) => void;
@@ -92,7 +93,18 @@ export const DeepLinkSubscription = () => {
     }, []);
 
     const [params, setParams] = useState<TonConnectConnectionParams | null>(null);
-    const injectedBridgeConnectionRef = useInjectedBridgeConnectionSubscription(setParams);
+    const paramsRef = useValueRef(params);
+
+    const onNewParamsReceived = useCallback((p: TonConnectConnectionParams | null) => {
+        if (p && paramsRef.current) {
+            throw new Error('New params received while old params not processed');
+        }
+
+        setParams(p);
+    }, []);
+
+    const injectedBridgeConnectionRef =
+        useInjectedBridgeConnectionSubscription(onNewParamsReceived);
     const [tkMobileUrl, setTkMobileUrl] = useState<{
         url: string;
         unsupportedLinkError?: string;
@@ -154,7 +166,7 @@ export const DeepLinkSubscription = () => {
 
             let unsupportedLinkError = undefined;
             try {
-                setParams(await mutateAsync(url));
+                onNewParamsReceived(await mutateAsync(url));
             } catch (e) {
                 unsupportedLinkError = errorMessage(e);
             }

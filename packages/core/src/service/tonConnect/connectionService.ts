@@ -3,10 +3,8 @@ import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { getDevSettings } from '../devStorage';
-import { Deposit } from '../../tonConsoleApi';
-import type = Deposit.type;
 import { assertUnreachable } from '../../utils/types';
-import { eqOrigins } from './connectService';
+import { eqOrigins, originFromUrl } from './connectService';
 
 export interface TonConnectHttpConnectionParams {
     type: 'http';
@@ -44,6 +42,11 @@ export interface AccountConnectionInjected {
     type: 'injected';
     manifest: DAppManifest;
     webViewOrigin: string;
+
+    /**
+     * used to find last created connection
+     */
+    creationTimestamp: number;
 }
 
 export interface AccountConnectionHttp {
@@ -100,21 +103,44 @@ export const setAccountConnection = async (
     await storage.set(`${AppKey.CONNECTIONS}_${wallet.id}_${network}`, items);
 };
 
+/**
+ * Save new account connection. In case of duplicate connection, the old one will be replaced
+ * @param options
+ */
 export const saveAccountConnection = async (options: {
     storage: IStorage;
     wallet: TonContract;
     manifest: DAppManifest;
-    params: TonConnectConnectionParams;
+    params:
+        | Pick<TonConnectHttpConnectionParams, 'type' | 'sessionKeyPair' | 'clientSessionId'>
+        | Pick<TonConnectInjectedConnectionParams, 'type' | 'webViewOrigin'>;
 }): Promise<void> => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
 
-    const old = connections.find(item => item.manifest.url === options.manifest.url);
-    if (old) {
-        connections = connections.filter(item => item !== old);
+    /**
+     * Remove duplicates connections
+     */
+    const params = options.params;
+    if (params.type === 'injected') {
+        connections = connections.filter(item => {
+            if (item.type !== 'injected') {
+                return true;
+            }
+
+            return item.webViewOrigin !== params.webViewOrigin;
+        });
+    } else {
+        connections = connections.filter(item => {
+            if (item.type !== 'http') {
+                return true;
+            }
+
+            return item.manifest.url === options.manifest.url;
+        });
     }
 
     if (options.params.type === 'injected') {
-        if (!eqOrigins(options.manifest.url, options.params.webViewOrigin)) {
+        if (!eqOrigins(options.params.webViewOrigin, originFromUrl(options.manifest.url))) {
             throw new Error('WebView origin mismatch');
         }
 
@@ -122,7 +148,8 @@ export const saveAccountConnection = async (options: {
             id: options.manifest.url,
             manifest: options.manifest,
             type: options.params.type,
-            webViewOrigin: options.params.webViewOrigin
+            webViewOrigin: options.params.webViewOrigin,
+            creationTimestamp: Date.now()
         });
     } else if (options.params.type === 'http') {
         connections.unshift({
@@ -150,7 +177,7 @@ export const disconnectInjectedAccountConnection = async (options: {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
 
     connections = connections.filter(
-        item => item.type === 'injected' && eqOrigins(item.webViewOrigin, options.webViewUrl)
+        item => item.type === 'injected' && !eqOrigins(item.webViewOrigin, options.webViewUrl)
     );
 
     await setAccountConnection(options.storage, options.wallet, connections);
@@ -198,7 +225,8 @@ function mapDeprecatedAccountConnections(
                 id: item.manifest.url,
                 type: 'injected',
                 manifest: item.manifest,
-                webViewOrigin: item.webViewUrl
+                webViewOrigin: item.webViewUrl,
+                creationTimestamp: Date.now()
             };
         } else {
             return {

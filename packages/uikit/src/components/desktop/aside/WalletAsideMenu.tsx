@@ -46,6 +46,7 @@ import { HideForRegulatoryState } from '../../HideForState';
 import { CountryFeature } from '../../../state/country';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
 import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const WalletAsideContainer = styled.div`
     padding: 0.5rem;
@@ -119,9 +120,12 @@ export const WalletAsideMenu = () => {
     }, [location]);
 
     const { onScan, NotificationComponent } = useSmartScanner();
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
+
     const withCloseMenu = (callback: (e: React.MouseEvent<HTMLDivElement>) => void) => {
         return (e: React.MouseEvent<HTMLDivElement>) => {
             menuController.close();
+            hideBrowser();
             callback(e);
         };
     };
@@ -173,7 +177,7 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 </HideOnReview>
                 <GroupsGap />
-                <NavLink to={AppRoute.home} end disableMobileAnimation>
+                <NavLink to={AppRoute.home} end disableMobileAnimation onClick={hideBrowser}>
                     {() => (
                         <AsideMenuItemStyled isSelected={location.pathname === AppRoute.home}>
                             <HouseIcon />
@@ -181,7 +185,7 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NavLink to={AppRoute.coins} end disableMobileAnimation>
+                <NavLink to={AppRoute.coins} end disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
                             <CoinsIcon />
@@ -192,7 +196,7 @@ export const WalletAsideMenu = () => {
                 {NotificationComponent}
             </ForTargetEnv>
             <NotForTargetEnv env="mobile">
-                <NavLink to={AppRoute.home} end>
+                <NavLink to={AppRoute.home} end onClick={hideBrowser}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
                             <CoinsIcon />
@@ -201,7 +205,7 @@ export const WalletAsideMenu = () => {
                     )}
                 </NavLink>
             </NotForTargetEnv>
-            <NavLink to={AppRoute.activity} disableMobileAnimation>
+            <NavLink to={AppRoute.activity} disableMobileAnimation onClick={hideBrowser}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <ClockSmoothIcon />
@@ -211,7 +215,7 @@ export const WalletAsideMenu = () => {
             </NavLink>
 
             <HideOnReview>
-                <NavLink to={AppRoute.purchases} disableMobileAnimation>
+                <NavLink to={AppRoute.purchases} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
                             <SaleBadgeIcon />
@@ -219,7 +223,7 @@ export const WalletAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <NavLink to={AppRoute.dns} disableMobileAnimation>
+                <NavLink to={AppRoute.dns} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
                             <SparkIcon />
@@ -232,7 +236,11 @@ export const WalletAsideMenu = () => {
                 </NotForTargetEnv>
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
-                    <NavLink to={AppRoute.multisigWallets} disableMobileAnimation>
+                    <NavLink
+                        to={AppRoute.multisigWallets}
+                        disableMobileAnimation
+                        onClick={hideBrowser}
+                    >
                         {({ isActive }) => (
                             <AsideMenuItemStyled isSelected={isActive}>
                                 <ListIcon />
@@ -243,7 +251,7 @@ export const WalletAsideMenu = () => {
                 )}
                 {canUseBattery && <BatterySettingsListItem />}
             </HideOnReview>
-            <NavLink to={AppRoute.walletSettings} end disableMobileAnimation>
+            <NavLink to={AppRoute.walletSettings} end disableMobileAnimation onClick={hideBrowser}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled isSelected={isActive}>
                         <SettingsSmoothIcon />
@@ -265,11 +273,12 @@ const SwapItem = () => {
     const isReadOnly = useIsActiveWalletWatchOnly();
     const { t } = useTranslation();
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
     return (
         <HideForRegulatoryState feature={CountryFeature.swap}>
             {!isReadOnly && !isTestnet && (
-                <NavLink to={AppRoute.swap} disableMobileAnimation>
+                <NavLink to={AppRoute.swap} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
                         <AsideMenuItemStyled isSelected={isActive}>
                             <SwapIconStyled />
@@ -285,9 +294,10 @@ const SwapItem = () => {
 const MultisigOrdersMenuItem = () => {
     const ordersNumber = useUnviewedAccountOrdersNumber();
     const { t } = useTranslation();
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
     return (
-        <NavLink to={AppRoute.multisigOrders}>
+        <NavLink to={AppRoute.multisigOrders} onClick={hideBrowser}>
             {({ isActive }) => (
                 <AsideMenuItemStyled isSelected={isActive}>
                     <InboxIcon />
@@ -310,9 +320,14 @@ const SettingsListText = styled.div`
 const BatterySettingsListItem = () => {
     const { t } = useTranslation();
     const { data: batteryBalance } = useBatteryBalance();
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
     return (
-        <NavLink to={AppRoute.walletSettings + WalletSettingsRoute.battery} disableMobileAnimation>
+        <NavLink
+            to={AppRoute.walletSettings + WalletSettingsRoute.battery}
+            disableMobileAnimation
+            onClick={hideBrowser}
+        >
             {({ isActive }) => (
                 <AsideMenuItemStyled isSelected={isActive}>
                     <BatteryIcon />

@@ -18,20 +18,23 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConnectionInjected,
     disconnectInjectedAccountConnection,
-    getTonWalletConnections
+    saveAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { getWalletById } from '@tonkeeper/core/dist/entries/account';
 import { capacitorStorage } from '../appSdk';
 import {
     disconnectResponse,
-    eqOrigins,
     getBrowserPlatform,
     getDeviceInfo,
+    getInjectedDappConnection,
+    originFromUrl,
     tonConnectTonkeeperProAppName,
     tonInjectedReConnectRequest
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import packageJson from '../../../package.json';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
+import { delay } from '@tonkeeper/core/dist/utils/common';
 
 class TonConnectInjectedConnector {
     private connectHandler: (
@@ -75,7 +78,7 @@ class TonConnectInjectedConnector {
                     .message as AppRequest<RpcMethod>;
                 // TODO zod payload
                 try {
-                    const result = await this.getConnectionAndWallet(webViewOrigin);
+                    const result = await getInjectedDappConnection(storage, webViewOrigin);
                     if (!result) {
                         return {
                             error: {
@@ -90,7 +93,7 @@ class TonConnectInjectedConnector {
                             connection: result.connection,
                             request
                         },
-                        result.wallet
+                        result.wallet.id
                     );
                 } catch (e) {
                     return this.handleRequestExceptions(request.id, e);
@@ -100,11 +103,62 @@ class TonConnectInjectedConnector {
 
         CapacitorDappBrowser.setRequestsHandler(
             NATIVE_BRIDGE_METHODS.TON_CONNECT.CONNECT,
-            async (rpcParams: Record<string, unknown>, { webViewOrigin }) => {
+            async (rpcParams: Record<string, unknown>, { webViewOrigin, webViewId }) => {
                 try {
                     // TODO zod payload
                     const validatedRpcParams = rpcParams as { message: ConnectRequest };
-                    return await this.connectHandler(validatedRpcParams.message, webViewOrigin);
+
+                    /*       /!**
+                     * Do auto connect for existing connections
+                     *!/
+                    if (validatedRpcParams.message.items.every(i => i.name !== 'ton_proof')) {
+                        const activeAccount = await accountsStorage(
+                            this.storage
+                        ).getActiveAccount();
+                        if (!activeAccount) {
+                            throw new Error('Active account not found');
+                        }
+                        const existingConnection = await getInjectedDappConnection(
+                            this.storage,
+                            webViewOrigin,
+                            {
+                                address: activeAccount.activeTonWallet.rawAddress
+                            }
+                        );
+
+                        if (existingConnection) {
+                            return {
+                                event: 'connect',
+                                id: Date.now(),
+                                payload: {
+                                    items: [
+                                        toTonAddressItemReply(
+                                            activeAccount.activeTonWallet,
+                                            activeAccount.type === 'testnet'
+                                                ? Network.TESTNET
+                                                : Network.MAINNET
+                                        )
+                                    ],
+                                    device: getDeviceInfo(
+                                        getBrowserPlatform(),
+                                        packageJson.version,
+                                        getMaxMessages(activeAccount),
+                                        tonConnectTonkeeperProAppName
+                                    )
+                                }
+                            };
+                        }
+                    }*/
+
+                    const result = await this.connectHandler(
+                        validatedRpcParams.message,
+                        webViewOrigin
+                    );
+                    const sameOriginTabs = CapacitorDappBrowser.openedOriginIds(webViewOrigin);
+                    await CapacitorDappBrowser.reload({
+                        ids: sameOriginTabs.filter(id => id !== webViewId)
+                    });
+                    return result;
                 } catch (e) {
                     return this.handleConnectExceptions(e);
                 }
@@ -225,6 +279,69 @@ class TonConnectInjectedConnector {
         }
     };
 
+    /**
+     * 1. Send disconnect event to provide proper behavior for ton_proof dependent dapps (that dapps will reset their backend auth token).
+     *    But keep connections saved locally
+     * 2. Save new connection with active wallet locally
+     * 3. Reload all pages with dapp origin
+     *    After reloading dapp will call re-connect method that will restore connection with new active wallet (in case dapp doesn't require ton_proof)
+     */
+    public async changeConnectedWalletToActive(tab: BrowserTabIdentifier) {
+        const dappOrigin = originFromUrl(tab.url);
+        if (!dappOrigin) {
+            throw new Error('Dapp origin not found');
+        }
+        const existing = await getInjectedDappConnection(this.storage, dappOrigin);
+        if (!existing) {
+            throw new Error('Connection not found');
+        }
+        const existingConnection = existing.connection;
+        if (existingConnection.type !== 'injected') {
+            throw new Error('Connection type not supported');
+        }
+
+        const activeAccount = await accountsStorage(this.storage).getActiveAccount();
+        if (!activeAccount) {
+            throw new Error('Active account not found');
+        }
+
+        await CapacitorDappBrowser.emitEvent(
+            tab.id,
+            JSON.stringify(disconnectResponse(Date.now().toString()))
+        );
+
+        await delay(200);
+
+        /**
+         * even in case of connection with wallet exists this will make it actual by putting to the head of the list
+         */
+        await saveAccountConnection({
+            storage: this.storage,
+            wallet: activeAccount.activeTonWallet,
+            manifest: existingConnection.manifest,
+            params: {
+                type: 'injected',
+                webViewOrigin: existingConnection.webViewOrigin
+            }
+        });
+
+        await CapacitorDappBrowser.reload({ origin: dappOrigin });
+    }
+
+    public sendDisconnect(connection: AccountConnectionInjected | AccountConnectionInjected[]) {
+        const connectionsArray = Array.isArray(connection) ? connection : [connection];
+        connectionsArray.forEach(c => {
+            const ids = CapacitorDappBrowser.openedOriginIds(c.webViewOrigin);
+
+            ids.forEach(id => {
+                CapacitorDappBrowser.emitEvent(
+                    id,
+                    JSON.stringify(disconnectResponse(Date.now().toString()))
+                );
+            });
+        });
+    }
+
     private onDisconnect = async (params: TonConnectAppRequest<'injected'>, walletId: WalletId) => {
         const accounts = await accountsStorage(this.storage).getAccounts();
         const wallet = getWalletById(accounts, walletId);
@@ -253,40 +370,6 @@ class TonConnectInjectedConnector {
             await accountsStorage(this.storage).setActiveAccountAndWalletByWalletId(walletId);
         }
     };
-
-    private async getConnectionAndWallet(origin: string): Promise<{
-        connection: AccountConnectionInjected;
-        wallet: WalletId;
-    } | null> {
-        const walletsState = (await accountsStorage(this.storage).getAccounts()).flatMap(
-            a => a.allTonWallets
-        );
-
-        let connectionAndWallet: {
-            connection: AccountConnectionInjected;
-            wallet: WalletId;
-        } | null = null;
-
-        const checkAccountConnection =
-            (id: WalletId) => (connection: AccountConnectionInjected) => {
-                if (eqOrigins(connection.webViewOrigin, origin)) {
-                    if (connectionAndWallet !== null) {
-                        throw new Error('Multiple wallets connected');
-                    }
-                    connectionAndWallet = { connection, wallet: id };
-                }
-            };
-
-        for (const wallet of walletsState) {
-            const walletConnections = (await getTonWalletConnections(this.storage, wallet)).filter(
-                i => i.type === 'injected'
-            ) as AccountConnectionInjected[];
-
-            walletConnections.forEach(checkAccountConnection(wallet.id));
-        }
-
-        return connectionAndWallet;
-    }
 }
 
 export const tonConnectInjectedConnector = new TonConnectInjectedConnector(capacitorStorage);

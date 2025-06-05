@@ -22,14 +22,14 @@ import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { tonConnectInjectedConnector } from '../../libs/ton-connect/injected-connector';
 import {
-    AccountConnection,
-    AccountConnectionHttp,
-    isAccountConnectionHttp
+    isAccountConnectionHttp,
+    isAccountConnectionInjected
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
+import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 
 const useInjectedBridgeRequestsSubscription = (
-    setRequest: (params: TonConnectAppRequestPayload | undefined) => void
+    setRequest: (params: TonConnectAppRequestPayload) => void
 ) => {
     const ref = useRef<{
         resolve: (value: WalletResponse<RpcMethod>) => void;
@@ -60,6 +60,7 @@ const useInjectedBridgeDisconnectSubscription = (onDisconnect: (app: { id: strin
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
+    const requestRef = useValueRef(request);
 
     const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
     const { data: appConnections } = useAppTonConnectConnections();
@@ -72,15 +73,16 @@ export const TonConnectSubscription = () => {
 
     useSendNotificationAnalytics(request?.connection?.manifest);
 
-    const onTransaction = useCallback(
-        async (r: TonConnectAppRequestPayload) => {
-            await queryClient.invalidateQueries([QueryKey.account]);
-            setRequest(r);
-        },
-        [setRequest]
-    );
+    const onTransaction = useCallback(async (r: TonConnectAppRequestPayload) => {
+        if (requestRef.current) {
+            throw new Error('Request already in progress');
+        }
 
-    const injectedBridgeResponseRef = useInjectedBridgeRequestsSubscription(setRequest);
+        await queryClient.invalidateQueries([QueryKey.account]);
+        setRequest(r);
+    }, []);
+
+    const injectedBridgeResponseRef = useInjectedBridgeRequestsSubscription(onTransaction);
     useInjectedBridgeDisconnectSubscription(disconnect);
 
     useEffect(() => subscribeToHttpTonConnectRequest(onTransaction), [onTransaction]);
@@ -89,13 +91,16 @@ export const TonConnectSubscription = () => {
 
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(value => {
-            if (
-                (Array.isArray(value) && value.every(isAccountConnectionHttp)) ||
-                isAccountConnectionHttp(value as AccountConnection)
-            ) {
-                tonConnectSSE.sendDisconnect(
-                    value as AccountConnectionHttp | AccountConnectionHttp[]
-                );
+            const connections = Array.isArray(value) ? value : [value];
+            const httpConnections = connections.filter(isAccountConnectionHttp);
+            const injectedConnections = connections.filter(isAccountConnectionInjected);
+
+            if (httpConnections.length > 0) {
+                tonConnectSSE.sendDisconnect(httpConnections);
+            }
+
+            if (injectedConnections.length > 0) {
+                tonConnectInjectedConnector.sendDisconnect(injectedConnections);
             }
         });
     }, []);
@@ -122,7 +127,9 @@ export const TonConnectSubscription = () => {
                     if (!injectedBridgeResponseRef.current) {
                         throw new Error('injectedBridgeResponseRef.current is null');
                     }
-                    return injectedBridgeResponseRef.current.resolve(response);
+                    injectedBridgeResponseRef.current.resolve(response);
+                    injectedBridgeResponseRef.current = null;
+                    return;
                 } finally {
                     setRequest(undefined);
                     await CapacitorDappBrowser.setIsMainViewInFocus(false);

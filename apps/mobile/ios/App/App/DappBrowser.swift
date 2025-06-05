@@ -39,7 +39,8 @@ class InteractionRouterView: UIView {
         CAPPluginMethod(name: "show", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "setIsMainViewInFocus", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "setIsMainViewInFocus", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "reload", returnType: CAPPluginReturnPromise)
     ]
 
     private var webViews: [String: WKWebView] = [:]
@@ -282,6 +283,20 @@ class InteractionRouterView: UIView {
                     self.waitUntilDocumentIsReady(webView, completion: completion)
                 }
             }
+        }
+    }
+
+    @objc func reload(_ call: CAPPluginCall) {
+        guard let ids = call.getArray("ids", String.self), !ids.isEmpty else {
+            call.reject("'ids' must be a non-empty array of strings")
+            return
+        }
+
+        let webViewsToReload = ids.compactMap { self.webViews[$0] }
+
+        DispatchQueue.main.async {
+            webViewsToReload.forEach { $0.reload() }
+            call.resolve()
         }
     }
 }

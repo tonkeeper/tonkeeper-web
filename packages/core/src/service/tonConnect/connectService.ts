@@ -30,10 +30,12 @@ import {
     getTonWalletConnections,
     saveAccountConnection,
     TonConnectConnectionParams,
-    AccountConnection
+    AccountConnection,
+    AccountConnectionInjected,
+    isAccountConnectionInjected
 } from './connectionService';
 import { SessionCrypto } from './protocol';
-import { Account, isAccountSupportTonConnect } from '../../entries/account';
+import { Account, getAccountByWalletById, isAccountSupportTonConnect } from '../../entries/account';
 import { removeLastSlash } from '../../utils/common';
 
 export const tonConnectTonkeeperAppName = 'tonkeeper';
@@ -221,35 +223,47 @@ export const getDeviceInfo = (
     };
 };
 
+/**
+ * Get actual connection for injected dapp
+ */
 export const getInjectedDappConnection = async (
     storage: IStorage,
-    origin: string,
-    account?: TonConnectAccount
-): Promise<{ wallet: TonContract; connection: AccountConnection } | undefined> => {
+    origin: string
+): Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined> => {
     const appConnections = await getAppConnections(storage, 'injected');
-    if (account) {
-        const walletState = appConnections.find(c => c.wallet.rawAddress === account?.address);
-        const connection = walletState?.connections.find(
-            item => item.type === 'injected' && eqOrigins(item.webViewOrigin, origin)
-        );
-        if (walletState && connection) {
-            return { wallet: walletState.wallet, connection };
-        }
-    }
 
     return (
         appConnections
             .map(item => {
-                const connection = item.connections.find(
-                    ac => ac.type === 'injected' && eqOrigins(ac.webViewOrigin, origin)
-                );
+                const connection = item.connections
+                    .filter(isAccountConnectionInjected)
+                    .find(ac => eqOrigins(ac.webViewOrigin, origin));
                 if (connection) {
                     return { wallet: item.wallet, connection };
                 }
                 return null;
             })
-            .filter(Boolean)[0] ?? undefined
+            .filter(Boolean)
+            .sort((a, b) => b!.connection.creationTimestamp - a!.connection.creationTimestamp)[0] ??
+        undefined
     );
+};
+
+export const getInjectedDappConnectionForWallet = async (
+    storage: IStorage,
+    origin: string,
+    wallet: Pick<TonConnectAccount, 'address'>
+): Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined> => {
+    const appConnections = await getAppConnections(storage, 'injected');
+    const walletState = appConnections.find(c => c.wallet.rawAddress === wallet.address);
+    const connection = walletState?.connections.find(
+        item => item.type === 'injected' && eqOrigins(item.webViewOrigin, origin)
+    );
+    if (walletState && connection && connection.type === 'injected') {
+        return { wallet: walletState.wallet, connection };
+    } else {
+        return undefined;
+    }
 };
 
 export const getAppConnections = async (
@@ -286,9 +300,9 @@ export interface ReConnectPayload {
 
 export const tonInjectedReConnectRequest = async (
     storage: IStorage,
-    webViewUrl: string
+    webViewOrigin: string
 ): Promise<ReConnectPayload> => {
-    const connection = await getInjectedDappConnection(storage, webViewUrl);
+    const connection = await getInjectedDappConnection(storage, webViewOrigin);
     if (!connection) {
         throw new TonConnectError(
             'Missing connection',
@@ -296,10 +310,12 @@ export const tonInjectedReConnectRequest = async (
         );
     }
 
-    const maxMessages =
-        isStandardTonWallet(connection.wallet) && connection.wallet.version === WalletVersion.V5R1
-            ? 255
-            : 4;
+    const account = getAccountByWalletById(
+        await accountsStorage(storage).getAccounts(),
+        connection.wallet.id
+    );
+
+    const maxMessages = getMaxMessages(account!);
 
     return {
         items: [
@@ -454,7 +470,7 @@ export const tonInjectedDisconnectRequest = async (options: {
     await disconnectInjectedAccountConnection({ ...options, wallet: connection.wallet });
 };
 
-const getMaxMessages = (account: Account) => {
+export const getMaxMessages = (account: Account) => {
     if (account.type === 'ledger') {
         return 4;
     }
@@ -558,6 +574,16 @@ export const sendBadRequestResponse = (
     };
 };
 
-export function eqOrigins(origin1: string, origin2: string): boolean {
-    return removeLastSlash(origin1) === removeLastSlash(origin2);
+export function eqOrigins(origin1: string, origin2: string | undefined): boolean {
+    return origin2 !== undefined && removeLastSlash(origin1) === removeLastSlash(origin2);
+}
+
+export function originFromUrl(url: string): string | undefined {
+    try {
+        const parsed = new URL(url);
+        return removeLastSlash(parsed.origin);
+    } catch (e) {
+        console.error(e);
+        return undefined;
+    }
 }

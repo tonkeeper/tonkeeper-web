@@ -163,7 +163,7 @@ const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
     }
 `;
 
-const ConnectContent: FC<{
+const TonTransactionContent: FC<{
     params: TonConnectTransactionPayload;
     handleClose: (result?: string) => void;
     waitInvalidation?: boolean;
@@ -420,7 +420,7 @@ export const TonTransactionNotification: FC<{
                 {wallets.length > 1 && (
                     <NotificationTitleWithWalletName onClose={() => onClose()} />
                 )}
-                <ConnectContent
+                <TonTransactionContent
                     params={params}
                     handleClose={boc => (params != null ? onClose(boc) : undefined)}
                     waitInvalidation={waitInvalidation}
@@ -428,15 +428,7 @@ export const TonTransactionNotification: FC<{
                 />
             </>
         );
-    }, [
-        origin,
-        params,
-        onClose,
-        wallets.length,
-        isActiveAccountMultisig,
-        multisigTTL,
-        setMultisigTTL
-    ]);
+    }, [params, onClose, wallets.length, isActiveAccountMultisig, multisigTTL, setMultisigTTL]);
 
     return (
         <>

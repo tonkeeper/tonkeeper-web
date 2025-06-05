@@ -12,6 +12,7 @@ interface CustomNavLinkProps {
     end?: boolean;
     replace?: boolean;
     disableMobileAnimation?: boolean;
+    onClick?: () => void;
 }
 
 export const NavLink: React.FC<CustomNavLinkProps> = ({
@@ -22,7 +23,8 @@ export const NavLink: React.FC<CustomNavLinkProps> = ({
     exact = false,
     end = false,
     replace,
-    disableMobileAnimation
+    disableMobileAnimation,
+    onClick
 }) => {
     const location = useLocation();
 
@@ -34,7 +36,10 @@ export const NavLink: React.FC<CustomNavLinkProps> = ({
         return (
             <div
                 className={`${className} ${isActive ? activeClassName : ''}`}
-                onClick={() => navigate(to, { replace, disableMobileAnimation })}
+                onClick={() => {
+                    navigate(to, { replace, disableMobileAnimation })
+                    onClick?.();
+                }}
             >
                 {children({ isActive })}
             </div>
@@ -47,6 +52,7 @@ export const NavLink: React.FC<CustomNavLinkProps> = ({
             className={`${className} ${isActive ? activeClassName : ''}`}
             exact={exact} // This can still be passed in case of explicit exact matching
             replace={replace}
+            onClick={onClick}
         >
             {children({ isActive })}
         </ReactRouterNavLink>

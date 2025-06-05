@@ -12,7 +12,7 @@ import {
     getInjectedDappConnection,
     getDeviceInfo, tonConnectTonkeeperProAppName,
     tonInjectedDisconnectRequest,
-    tonInjectedReConnectRequest
+    tonInjectedReConnectRequest, getInjectedDappConnectionForWallet
 } from "@tonkeeper/core/dist/service/tonConnect/connectService";
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../../storage';
@@ -131,7 +131,7 @@ export const tonConnectTransaction = async (
     data: TonConnectTransactionPayload,
     account: TonConnectAccount | undefined
 ) => {
-    const connection = await getInjectedDappConnection(storage, origin, account);
+    const connection = await getInjectedDappConnectionForWallet(storage, origin, account);
 
     if (!connection) {
         throw new TonConnectError(

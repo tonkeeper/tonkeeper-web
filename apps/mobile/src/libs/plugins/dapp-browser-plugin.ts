@@ -2,6 +2,7 @@ import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
 import { IDappBrowser } from '@tonkeeper/core/dist/AppSdk';
 import { BrowserTabBase } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
+import { eqOrigins, originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 
 interface DocumentMetadata {
     title: string;
@@ -18,6 +19,7 @@ interface IDappBrowserPlugin {
     hide(params: { id: string }): Promise<void>;
     show(params: { id: string }): Promise<void>;
     close(params: { id: string }): Promise<void>;
+    reload(params: { ids: string[] }): Promise<void>;
     setIsMainViewInFocus(params: { focus: boolean }): Promise<void>;
     addListener(
         eventName: 'browserMessageReceived',
@@ -76,6 +78,8 @@ class DappBrowser implements IDappBrowser {
 
     tabChange = subject<BrowserTabBase>();
 
+    private liveTabs: BrowserTabBase[] = [];
+
     constructor() {
         DappBrowserPlugin.addListener('browserMessageReceived', async data => {
             const parsed = JSON.parse(data.payload) as {
@@ -99,17 +103,24 @@ class DappBrowser implements IDappBrowser {
         });
 
         DappBrowserPlugin.addListener('browserUrlChanged', async data => {
-            this.tabChange.next({
+            const updatedTab = {
                 id: data.webViewId,
                 url: data.url,
                 title: data.title,
                 iconUrl: data.iconUrl
-            });
+            };
+            this.tabChange.next(updatedTab);
+
+            const tabToChange = this.liveTabs.findIndex(t => t.id === data.webViewId);
+            if (tabToChange !== -1) {
+                this.liveTabs[tabToChange] = updatedTab;
+            }
         });
     }
 
-    close(id: string): Promise<void> {
-        return DappBrowserPlugin.close({ id });
+    async close(id: string): Promise<void> {
+        await DappBrowserPlugin.close({ id });
+        this.liveTabs = this.liveTabs.filter(t => t.id !== id);
     }
 
     hide(id: string): Promise<void> {
@@ -125,12 +136,15 @@ class DappBrowser implements IDappBrowser {
             bottomOffset: 98
         });
 
-        return {
+        const openedTab = {
             id,
             title: metadata.title,
             iconUrl: metadata.iconUrl,
             url
         };
+
+        this.liveTabs.push(openedTab);
+        return openedTab;
     }
 
     show(id: string): Promise<void> {
@@ -159,6 +173,29 @@ class DappBrowser implements IDappBrowser {
 
     setIsMainViewInFocus(focus: boolean): Promise<void> {
         return DappBrowserPlugin.setIsMainViewInFocus({ focus });
+    }
+
+    reload(selector: { id: string } | { ids: string[] } | { origin: string }): Promise<void> {
+        let ids;
+        if ('id' in selector) {
+            ids = [selector.id];
+        } else if ('ids' in selector) {
+            ids = selector.ids;
+        } else {
+            ids = this.liveTabs
+                .filter(t => eqOrigins(selector.origin, originFromUrl(t.url)))
+                .map(t => t.id);
+        }
+
+        if (!ids.length) {
+            return Promise.resolve();
+        }
+
+        return DappBrowserPlugin.reload({ ids });
+    }
+
+    openedOriginIds(origin: string): string[] {
+        return this.liveTabs.filter(t => eqOrigins(origin, originFromUrl(t.url))).map(t => t.id);
     }
 }
 

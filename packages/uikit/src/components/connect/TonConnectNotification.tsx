@@ -156,6 +156,7 @@ const ConnectContent: FC<{
             );
         } catch (err) {
             setDone(true);
+            console.error(err);
             setError(err as Error);
         }
     };
