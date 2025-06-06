@@ -1,10 +1,11 @@
 import { CapacitorDappBrowser } from '../plugins/dapp-browser-plugin';
 import { NATIVE_BRIDGE_METHODS } from '../../inject-scripts/native-bridge-methods';
 import {
-    AppRequest,
+    appRequestSchema,
     CONNECT_EVENT_ERROR_CODES,
     ConnectEvent,
     ConnectRequest,
+    connectRequestSchema,
     RpcMethod,
     SEND_TRANSACTION_ERROR_CODES,
     TonConnectAppRequest,
@@ -35,6 +36,21 @@ import packageJson from '../../../package.json';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
+import { z } from 'zod';
+
+function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: unknown): z.infer<T> {
+    const parsed = z
+        .object({
+            message: schema
+        })
+        .safeParse(payload);
+
+    if (!parsed.success) {
+        console.error('Invalid bridge request payload', parsed.error);
+        throw new Error('Invalid bridge request');
+    }
+    return parsed.data.message;
+}
 
 class TonConnectInjectedConnector {
     private connectHandler: (
@@ -73,10 +89,9 @@ class TonConnectInjectedConnector {
     constructor(private storage: IStorage) {
         CapacitorDappBrowser.setRequestsHandler(
             NATIVE_BRIDGE_METHODS.TON_CONNECT.SEND,
-            async (payload: unknown, { webViewOrigin }) => {
-                const request = (payload as { message: AppRequest<RpcMethod> })
-                    .message as AppRequest<RpcMethod>;
-                // TODO zod payload
+            async (rpcParams: Record<string, unknown>, { webViewOrigin }) => {
+                const request = parseBridgeMethodPayload(appRequestSchema, rpcParams);
+
                 try {
                     const result = await getInjectedDappConnection(storage, webViewOrigin);
                     if (!result) {
@@ -105,55 +120,9 @@ class TonConnectInjectedConnector {
             NATIVE_BRIDGE_METHODS.TON_CONNECT.CONNECT,
             async (rpcParams: Record<string, unknown>, { webViewOrigin, webViewId }) => {
                 try {
-                    // TODO zod payload
-                    const validatedRpcParams = rpcParams as { message: ConnectRequest };
+                    const request = parseBridgeMethodPayload(connectRequestSchema, rpcParams);
 
-                    /*       /!**
-                     * Do auto connect for existing connections
-                     *!/
-                    if (validatedRpcParams.message.items.every(i => i.name !== 'ton_proof')) {
-                        const activeAccount = await accountsStorage(
-                            this.storage
-                        ).getActiveAccount();
-                        if (!activeAccount) {
-                            throw new Error('Active account not found');
-                        }
-                        const existingConnection = await getInjectedDappConnection(
-                            this.storage,
-                            webViewOrigin,
-                            {
-                                address: activeAccount.activeTonWallet.rawAddress
-                            }
-                        );
-
-                        if (existingConnection) {
-                            return {
-                                event: 'connect',
-                                id: Date.now(),
-                                payload: {
-                                    items: [
-                                        toTonAddressItemReply(
-                                            activeAccount.activeTonWallet,
-                                            activeAccount.type === 'testnet'
-                                                ? Network.TESTNET
-                                                : Network.MAINNET
-                                        )
-                                    ],
-                                    device: getDeviceInfo(
-                                        getBrowserPlatform(),
-                                        packageJson.version,
-                                        getMaxMessages(activeAccount),
-                                        tonConnectTonkeeperProAppName
-                                    )
-                                }
-                            };
-                        }
-                    }*/
-
-                    const result = await this.connectHandler(
-                        validatedRpcParams.message,
-                        webViewOrigin
-                    );
+                    const result = await this.connectHandler(request, webViewOrigin);
                     const sameOriginTabs = CapacitorDappBrowser.openedOriginIds(webViewOrigin);
                     await CapacitorDappBrowser.reload({
                         ids: sameOriginTabs.filter(id => id !== webViewId)
@@ -313,7 +282,7 @@ class TonConnectInjectedConnector {
         await delay(200);
 
         /**
-         * even in case of connection with wallet exists this will make it actual by putting to the head of the list
+         * even in case of connection with wallet exists this will make it actual by changing creation timestamp
          */
         await saveAccountConnection({
             storage: this.storage,

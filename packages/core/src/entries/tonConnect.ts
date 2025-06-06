@@ -4,8 +4,11 @@ import {
     AccountConnectionInjected
 } from '../service/tonConnect/connectionService';
 import { z } from 'zod';
+import { assertTypesEqual } from '../utils/types';
 
-export const DAppManifestSchema = z.object({
+/* Protocol types */
+
+const dAppManifestSchema = z.object({
     url: z.string(),
     name: z.string(),
     iconUrl: z.string(),
@@ -13,7 +16,7 @@ export const DAppManifestSchema = z.object({
     privacyPolicyUrl: z.string().optional()
 });
 
-export type DAppManifest = z.infer<typeof DAppManifestSchema>;
+export type DAppManifest = z.infer<typeof dAppManifestSchema>;
 
 export enum TON_CONNECT_MSG_VARIANTS_ID {
     BATTERY = 'battery',
@@ -31,36 +34,36 @@ export type TonConnectTransactionPayloadMessage = z.infer<
     typeof TonConnectTransactionPayloadMessageSchema
 >;
 
-export const BatteryMessagesVariantSchema = z.object({
+const batteryMessagesVariantSchema = z.object({
     messages: z.array(TonConnectTransactionPayloadMessageSchema)
 });
-export type BatteryMessagesVariant = z.infer<typeof BatteryMessagesVariantSchema>;
+export type BatteryMessagesVariant = z.infer<typeof batteryMessagesVariantSchema>;
 
-export const GaslessMessagesVariantSchema = z.object({
+const gaslessMessagesVariantSchema = z.object({
     messages: z.array(TonConnectTransactionPayloadMessageSchema),
     options: z.object({
         asset: z.string()
     })
 });
-export type GaslessMessagesVariant = z.infer<typeof GaslessMessagesVariantSchema>;
+export type GaslessMessagesVariant = z.infer<typeof gaslessMessagesVariantSchema>;
 
-export const TonConnectTransactionPayloadSchema = z.object({
+const tonConnectTransactionPayloadSchema = z.object({
     valid_until: z.number(),
     messages: z.array(TonConnectTransactionPayloadMessageSchema),
     messagesVariants: z
         .object({
-            battery: BatteryMessagesVariantSchema.optional(),
-            gasless: GaslessMessagesVariantSchema.optional()
+            battery: batteryMessagesVariantSchema.optional(),
+            gasless: gaslessMessagesVariantSchema.optional()
         })
         .optional()
 });
-export type TonConnectTransactionPayload = z.infer<typeof TonConnectTransactionPayloadSchema>;
+export type TonConnectTransactionPayload = z.infer<typeof tonConnectTransactionPayloadSchema>;
 
-export const TonConnectAccountSchema = z.object({
+const tonConnectAccountSchema = z.object({
     address: z.string(), // '<wc>:<hex>'
     network: z.string() // '-239' for the mainnet and '-3' for the testnet
 });
-export type TonConnectAccount = z.infer<typeof TonConnectAccountSchema>;
+export type TonConnectAccount = z.infer<typeof tonConnectAccountSchema>;
 
 export enum CONNECT_EVENT_ERROR_CODES {
     UNKNOWN_ERROR = 0,
@@ -77,272 +80,25 @@ export enum CONNECT_ITEM_ERROR_CODES {
     METHOD_NOT_SUPPORTED = 400
 }
 
-export type ConnectEvent = ConnectEventSuccess | ConnectEventError;
-
-export const ConnectEventErrorSchema = z.object({
-    event: z.literal('connect_error'),
-    id: z.number(),
-    payload: z.object({
-        code: z.number(), // or enum
-        message: z.string()
-    })
-});
-export type ConnectEventError = z.infer<typeof ConnectEventErrorSchema>;
-
-export interface TonConnectEventPayload {
-    items: ConnectItemReply[];
-    device: DeviceInfo;
-}
-
-export interface ConnectEventSuccess {
-    event: 'connect';
-    id: number;
-    payload: TonConnectEventPayload;
-}
-
-export type ConnectItem = TonAddressItem | TonProofItem;
-
-export type ConnectItemReply = TonAddressItemReply | TonProofItemReply;
-
-export type ConnectItemReplyError<T> = {
-    name: T;
-    error: {
-        code: CONNECT_ITEM_ERROR_CODES;
-        message?: string;
-    };
-};
-
-export interface ConnectRequest {
-    manifestUrl: string;
-    items: ConnectItem[];
-}
-
-export interface DeviceInfo {
-    platform: 'iphone' | 'ipad' | 'android' | 'windows' | 'mac' | 'linux' | 'browser';
-    appName: string;
-    appVersion: string;
-    maxProtocolVersion: number;
-    features: Feature[];
-}
-
-export enum DISCONNECT_ERROR_CODES {
-    UNKNOWN_ERROR = 0,
-    BAD_REQUEST_ERROR = 1,
-    UNKNOWN_APP_ERROR = 100,
-    METHOD_NOT_SUPPORTED = 400
-}
-
-export interface DisconnectEvent {
-    event: 'disconnect';
-    id: number | string;
-    payload: Record<string, never>;
-}
-
-export interface DisconnectRpcRequest {
-    method: 'disconnect';
-    params: [];
-    id: string;
-}
-
-export type DisconnectRpcResponse = DisconnectRpcResponseSuccess | DisconnectRpcResponseError;
-
-export interface DisconnectRpcResponseError extends WalletResponseTemplateError {
-    error: {
-        code: DISCONNECT_ERROR_CODES;
-        message: string;
-        data?: unknown;
-    };
-    id: string;
-}
-
-export interface DisconnectRpcResponseSuccess {
-    id: string;
-    result: Record<string, never>;
-}
-
-export type Feature = SendTransactionFeatureDeprecated | SendTransactionFeature | SignDataFeature;
-
-export interface KeyPair {
-    publicKey: string;
-    secretKey: string;
-}
-
-export type RpcMethod = 'disconnect' | 'sendTransaction' | 'signData';
-
-export type RpcRequests = {
-    sendTransaction: SendTransactionRpcRequest;
-    signData: SignDataRpcRequest;
-    disconnect: DisconnectRpcRequest;
-};
-
-export type RpcResponses = {
-    sendTransaction: {
-        error: SendTransactionRpcResponseError;
-        success: SendTransactionRpcResponseSuccess;
-    };
-    signData: {
-        error: SignDataRpcResponseError;
-        success: SignDataRpcResponseSuccess;
-    };
-    disconnect: {
-        error: DisconnectRpcResponseError;
-        success: DisconnectRpcResponseSuccess;
-    };
-};
-
-export enum SEND_TRANSACTION_ERROR_CODES {
-    UNKNOWN_ERROR = 0,
-    BAD_REQUEST_ERROR = 1,
-    UNKNOWN_APP_ERROR = 100,
-    USER_REJECTS_ERROR = 300,
-    METHOD_NOT_SUPPORTED = 400
-}
-
-export type SendTransactionFeature = {
-    name: 'SendTransaction';
-    maxMessages: number;
-    extraCurrencySupported?: boolean;
-};
-
-export type SendTransactionFeatureDeprecated = 'SendTransaction';
-
-export const SendTransactionRpcRequestSchema = z.object({
-    method: z.literal('sendTransaction'),
-    params: z.tuple([z.string()]),
-    id: z.string()
-});
-export type SendTransactionRpcRequest = z.infer<typeof SendTransactionRpcRequestSchema>;
-
-export type SendTransactionRpcResponse =
-    | SendTransactionRpcResponseSuccess
-    | SendTransactionRpcResponseError;
-
-export const SendTransactionRpcResponseErrorSchema = z.object({
-    error: z.object({
-        code: z.nativeEnum(SEND_TRANSACTION_ERROR_CODES),
-        message: z.string(),
-        data: z.unknown().optional()
-    }),
-    id: z.string()
-});
-export type SendTransactionRpcResponseError = z.infer<typeof SendTransactionRpcResponseErrorSchema>;
-
-export const SendTransactionRpcResponseSuccessSchema = z.object({
-    result: z.string(),
-    id: z.string()
-});
-export type SendTransactionRpcResponseSuccess = z.infer<
-    typeof SendTransactionRpcResponseSuccessSchema
->;
-
-export enum SIGN_DATA_ERROR_CODES {
-    UNKNOWN_ERROR = 0,
-    BAD_REQUEST_ERROR = 1,
-    UNKNOWN_APP_ERROR = 100,
-    USER_REJECTS_ERROR = 300,
-    METHOD_NOT_SUPPORTED = 400
-}
-
-export declare type SignDataType = 'text' | 'binary' | 'cell';
-
-export type SignDataFeature = {
-    name: 'SignData';
-    types: SignDataType[];
-};
-
-export const SignDataRpcRequestSchema = z.object({
-    id: z.string(),
-    method: z.literal('signData'),
-    params: z.tuple([z.string()])
-});
-export type SignDataRpcRequest = z.infer<typeof SignDataRpcRequestSchema>;
-
-export const SignDataRequestPayloadTextSchema = z.object({
-    type: z.literal('text'),
-    text: z.string()
-});
-export type SignDataRequestPayloadText = z.infer<typeof SignDataRequestPayloadTextSchema>;
-
-export const SignDataRequestPayloadBinarySchema = z.object({
-    type: z.literal('binary'),
-    bytes: z.string() // base64 string
-});
-export type SignDataRequestPayloadBinary = z.infer<typeof SignDataRequestPayloadBinarySchema>;
-
-export const SignDataRequestPayloadCellSchema = z.object({
-    type: z.literal('cell'),
-    schema: z.string(), // TL-B scheme
-    cell: z.string() // base64 string
-});
-export type SignDataRequestPayloadCell = z.infer<typeof SignDataRequestPayloadCellSchema>;
-
-export const SignDataRequestPayloadSchema = z.union([
-    SignDataRequestPayloadTextSchema,
-    SignDataRequestPayloadBinarySchema,
-    SignDataRequestPayloadCellSchema
-]);
-export type SignDataRequestPayload = z.infer<typeof SignDataRequestPayloadSchema>;
-
-export const SignDataRpcResponseErrorSchema = z.object({
-    error: z.object({
-        code: z.nativeEnum(SIGN_DATA_ERROR_CODES),
-        message: z.string()
-    }),
-    id: z.string()
-});
-export type SignDataRpcResponseError = z.infer<typeof SignDataRpcResponseErrorSchema>;
-
-export const SignDataResponseSchema = z.object({
-    signature: z.string(), // base64 encoded signature
-    address: z.string(),
-    timestamp: z.number(), // UNIX timestamp in seconds (UTC) at the moment on creating the signature.
-    domain: z.string(), // app domain name (as url part, without encoding)
-    payload: SignDataRequestPayloadSchema
-});
-export type SignDataResponse = z.infer<typeof SignDataResponseSchema>;
-
-export const SignDataRpcResponseSuccessSchema = z.object({
-    id: z.string(),
-    result: SignDataResponseSchema
-});
-export type SignDataRpcResponseSuccess = z.infer<typeof SignDataRpcResponseSuccessSchema>;
-
-export const SignDataRpcResponseSchema = z.union([
-    SignDataRpcResponseSuccessSchema,
-    SignDataRpcResponseErrorSchema
-]);
-export type SignDataRpcResponse = z.infer<typeof SignDataRpcResponseSchema>;
-
-export const TonAddressItemSchema = z.object({
-    name: z.literal('ton_addr')
-});
-export type TonAddressItem = z.infer<typeof TonAddressItemSchema>;
-
-export const TonAddressItemReplySchema = z.object({
+const tonAddressItemReplySchema = z.object({
     name: z.literal('ton_addr'),
     address: z.string(),
     network: z.string(),
     walletStateInit: z.string(),
     publicKey: z.string().optional()
 });
-export type TonAddressItemReply = z.infer<typeof TonAddressItemReplySchema>;
+export type TonAddressItemReply = z.infer<typeof tonAddressItemReplySchema>;
 
-export const TonProofItemSchema = z.object({
-    name: z.literal('ton_proof'),
-    payload: z.string()
-});
-export type TonProofItem = z.infer<typeof TonProofItemSchema>;
-
-export const TonProofItemReplyErrorSchema = z.object({
+const tonProofItemReplyErrorSchema = z.object({
     name: z.literal('ton_proof'),
     error: z.object({
         code: z.nativeEnum(CONNECT_ITEM_ERROR_CODES),
         message: z.string().optional()
     })
 });
-export type TonProofItemReplyError = z.infer<typeof TonProofItemReplyErrorSchema>;
+export type TonProofItemReplyError = z.infer<typeof tonProofItemReplyErrorSchema>;
 
-export const TonProofItemReplySuccessSchema = z.object({
+const tonProofItemReplySuccessSchema = z.object({
     name: z.literal('ton_proof'),
     proof: z.object({
         timestamp: z.number(),
@@ -354,41 +110,314 @@ export const TonProofItemReplySuccessSchema = z.object({
         signature: z.string()
     })
 });
-export type TonProofItemReplySuccess = z.infer<typeof TonProofItemReplySuccessSchema>;
+export type TonProofItemReplySuccess = z.infer<typeof tonProofItemReplySuccessSchema>;
 
-export const TonProofItemReplySchema = z.union([
-    TonProofItemReplySuccessSchema,
-    TonProofItemReplyErrorSchema
+const tonProofItemReplySchema = z.union([
+    tonProofItemReplySuccessSchema,
+    tonProofItemReplyErrorSchema
 ]);
-export type TonProofItemReply = z.infer<typeof TonProofItemReplySchema>;
+export type TonProofItemReply = z.infer<typeof tonProofItemReplySchema>;
 
-export type WalletEvent = ConnectEvent | DisconnectEvent;
+const connectItemReplySchema = z.union([tonAddressItemReplySchema, tonProofItemReplySchema]);
+export type ConnectItemReply = z.infer<typeof connectItemReplySchema>;
 
-export type WalletMessage = WalletEvent | WalletResponse<RpcMethod>;
+export enum DISCONNECT_ERROR_CODES {
+    UNKNOWN_ERROR = 0,
+    BAD_REQUEST_ERROR = 1,
+    UNKNOWN_APP_ERROR = 100,
+    METHOD_NOT_SUPPORTED = 400
+}
 
-export type WalletResponse<T extends RpcMethod> = WalletResponseSuccess<T> | WalletResponseError<T>;
+const disconnectEventSchema = z.object({
+    event: z.literal('disconnect'),
+    id: z.union([z.number(), z.string()]),
+    payload: z.object({})
+});
+export type DisconnectEvent = z.infer<typeof disconnectEventSchema>;
 
-export type WalletResponseError<T extends RpcMethod> = RpcResponses[T]['error'];
+const disconnectRpcRequestSchema = z.object({
+    method: z.literal('disconnect'),
+    params: z.tuple([]),
+    id: z.string()
+});
+export type DisconnectRpcRequest = z.infer<typeof disconnectRpcRequestSchema>;
 
-export type WalletResponseSuccess<T extends RpcMethod> = RpcResponses[T]['success'];
-
-export type AppRequest<T extends RpcMethod> = RpcRequests[T];
-
-export const WalletResponseTemplateErrorSchema = z.object({
+const disconnectRpcResponseErrorSchema = z.object({
+    id: z.string(),
     error: z.object({
-        code: z.number(),
+        code: z.nativeEnum(DISCONNECT_ERROR_CODES),
+        message: z.string(),
+        data: z.unknown().optional()
+    })
+});
+export type DisconnectRpcResponseError = z.infer<typeof disconnectRpcResponseErrorSchema>;
+
+const disconnectRpcResponseSuccessSchema = z.object({
+    id: z.string(),
+    result: z.object({})
+});
+export type DisconnectRpcResponseSuccess = z.infer<typeof disconnectRpcResponseSuccessSchema>;
+
+const disconnectRpcResponseSchema = z.union([
+    disconnectRpcResponseSuccessSchema,
+    disconnectRpcResponseErrorSchema
+]);
+export type DisconnectRpcResponse = z.infer<typeof disconnectRpcResponseSchema>;
+
+const sendTransactionFeatureDeprecatedSchema = z.literal('SendTransaction');
+export type SendTransactionFeatureDeprecated = z.infer<
+    typeof sendTransactionFeatureDeprecatedSchema
+>;
+
+const sendTransactionFeatureSchema = z.object({
+    name: z.literal('SendTransaction'),
+    maxMessages: z.number(),
+    extraCurrencySupported: z.boolean().optional()
+});
+export type SendTransactionFeature = z.infer<typeof sendTransactionFeatureSchema>;
+
+const signDataTypeSchema = z.array(z.enum(['text', 'binary', 'cell']));
+export type SignDataType = z.infer<typeof signDataTypeSchema>;
+
+const signDataFeatureSchema = z.object({
+    name: z.literal('SignData'),
+    types: signDataTypeSchema
+});
+export type SignDataFeature = z.infer<typeof signDataFeatureSchema>;
+
+export const featureSchema = z.union([
+    sendTransactionFeatureDeprecatedSchema,
+    sendTransactionFeatureSchema,
+    signDataFeatureSchema
+]);
+export type Feature = z.infer<typeof featureSchema>;
+
+const deviceInfoSchema = z.object({
+    platform: z.enum(['iphone', 'ipad', 'android', 'windows', 'mac', 'linux', 'browser']),
+    appName: z.string(),
+    appVersion: z.string(),
+    maxProtocolVersion: z.number(),
+    features: z.array(featureSchema)
+});
+
+export type DeviceInfo = z.infer<typeof deviceInfoSchema>;
+
+const tonConnectEventPayloadSchema = z.object({
+    items: z.array(connectItemReplySchema),
+    device: deviceInfoSchema
+});
+export type TonConnectEventPayload = z.infer<typeof tonConnectEventPayloadSchema>;
+
+const connectEventSuccessSchema = z.object({
+    event: z.literal('connect'),
+    id: z.number(),
+    payload: tonConnectEventPayloadSchema
+});
+export type ConnectEventSuccess = z.infer<typeof connectEventSuccessSchema>;
+
+const connectEventErrorSchema = z.object({
+    event: z.literal('connect_error'),
+    id: z.number(),
+    payload: z.object({
+        code: z.nativeEnum(CONNECT_EVENT_ERROR_CODES),
+        message: z.string()
+    })
+});
+export type ConnectEventError = z.infer<typeof connectEventErrorSchema>;
+
+const connectEventSchema = z.union([connectEventSuccessSchema, connectEventErrorSchema]);
+export type ConnectEvent = z.infer<typeof connectEventSchema>;
+
+const tonAddressItemSchema = z.object({
+    name: z.literal('ton_addr')
+});
+export type TonAddressItem = z.infer<typeof tonAddressItemSchema>;
+
+const tonProofItemSchema = z.object({
+    name: z.literal('ton_proof'),
+    payload: z.string()
+});
+export type TonProofItem = z.infer<typeof tonProofItemSchema>;
+
+const connectItemSchema = z.union([tonAddressItemSchema, tonProofItemSchema]);
+export type ConnectItem = z.infer<typeof connectItemSchema>;
+
+export const connectRequestSchema = z.object({
+    manifestUrl: z.string(),
+    items: z.array(connectItemSchema)
+});
+export type ConnectRequest = z.infer<typeof connectRequestSchema>;
+
+const keyPairSchema = z.object({
+    publicKey: z.string(),
+    secretKey: z.string()
+});
+export type KeyPair = z.infer<typeof keyPairSchema>;
+
+const rpcMethodSchema = z.enum(['disconnect', 'sendTransaction', 'signData']);
+export type RpcMethod = z.infer<typeof rpcMethodSchema>;
+
+export enum SEND_TRANSACTION_ERROR_CODES {
+    UNKNOWN_ERROR = 0,
+    BAD_REQUEST_ERROR = 1,
+    UNKNOWN_APP_ERROR = 100,
+    USER_REJECTS_ERROR = 300,
+    METHOD_NOT_SUPPORTED = 400
+}
+
+const sendTransactionRpcRequestSchema = z.object({
+    method: z.literal('sendTransaction'),
+    params: z.tuple([z.string()]),
+    id: z.string()
+});
+export type SendTransactionRpcRequest = z.infer<typeof sendTransactionRpcRequestSchema>;
+
+export type SendTransactionRpcResponse =
+    | SendTransactionRpcResponseSuccess
+    | SendTransactionRpcResponseError;
+
+const sendTransactionRpcResponseErrorSchema = z.object({
+    error: z.object({
+        code: z.nativeEnum(SEND_TRANSACTION_ERROR_CODES),
         message: z.string(),
         data: z.unknown().optional()
     }),
     id: z.string()
 });
-export type WalletResponseTemplateError = z.infer<typeof WalletResponseTemplateErrorSchema>;
+export type SendTransactionRpcResponseError = z.infer<typeof sendTransactionRpcResponseErrorSchema>;
 
-export interface WalletResponseTemplateSuccess {
-    result: string;
-    id: string;
+const sendTransactionRpcResponseSuccessSchema = z.object({
+    result: z.string(),
+    id: z.string()
+});
+export type SendTransactionRpcResponseSuccess = z.infer<
+    typeof sendTransactionRpcResponseSuccessSchema
+>;
+
+export enum SIGN_DATA_ERROR_CODES {
+    UNKNOWN_ERROR = 0,
+    BAD_REQUEST_ERROR = 1,
+    UNKNOWN_APP_ERROR = 100,
+    USER_REJECTS_ERROR = 300,
+    METHOD_NOT_SUPPORTED = 400
 }
 
+const signDataRpcRequestSchema = z.object({
+    id: z.string(),
+    method: z.literal('signData'),
+    params: z.tuple([z.string()])
+});
+export type SignDataRpcRequest = z.infer<typeof signDataRpcRequestSchema>;
+
+const signDataRequestPayloadTextSchema = z.object({
+    type: z.literal('text'),
+    text: z.string()
+});
+export type SignDataRequestPayloadText = z.infer<typeof signDataRequestPayloadTextSchema>;
+
+const signDataRequestPayloadBinarySchema = z.object({
+    type: z.literal('binary'),
+    bytes: z.string() // base64 string
+});
+export type SignDataRequestPayloadBinary = z.infer<typeof signDataRequestPayloadBinarySchema>;
+
+const signDataRequestPayloadCellSchema = z.object({
+    type: z.literal('cell'),
+    schema: z.string(), // TL-B scheme
+    cell: z.string() // base64 string
+});
+export type SignDataRequestPayloadCell = z.infer<typeof signDataRequestPayloadCellSchema>;
+
+export const signDataRequestPayloadSchema = z.union([
+    signDataRequestPayloadTextSchema,
+    signDataRequestPayloadBinarySchema,
+    signDataRequestPayloadCellSchema
+]);
+export type SignDataRequestPayload = z.infer<typeof signDataRequestPayloadSchema>;
+
+const rpcRequestsSchema = z.object({
+    sendTransaction: sendTransactionRpcRequestSchema,
+    signData: signDataRpcRequestSchema,
+    disconnect: disconnectRpcRequestSchema
+});
+export type RpcRequests = z.infer<typeof rpcRequestsSchema>;
+
+const signDataRpcResponseErrorSchema = z.object({
+    error: z.object({
+        code: z.nativeEnum(SIGN_DATA_ERROR_CODES),
+        message: z.string()
+    }),
+    id: z.string()
+});
+export type SignDataRpcResponseError = z.infer<typeof signDataRpcResponseErrorSchema>;
+
+export const SignDataResponseSchema = z.object({
+    signature: z.string(), // base64 encoded signature
+    address: z.string(),
+    timestamp: z.number(), // UNIX timestamp in seconds (UTC) at the moment on creating the signature.
+    domain: z.string(), // app domain name (as url part, without encoding)
+    payload: signDataRequestPayloadSchema
+});
+export type SignDataResponse = z.infer<typeof SignDataResponseSchema>;
+
+const signDataRpcResponseSuccessSchema = z.object({
+    id: z.string(),
+    result: SignDataResponseSchema
+});
+export type SignDataRpcResponseSuccess = z.infer<typeof signDataRpcResponseSuccessSchema>;
+
+const signDataRpcResponseSchema = z.union([
+    signDataRpcResponseSuccessSchema,
+    signDataRpcResponseErrorSchema
+]);
+export type SignDataRpcResponse = z.infer<typeof signDataRpcResponseSchema>;
+
+const rpcResponsesSchema = z.object({
+    sendTransaction: z.object({
+        error: sendTransactionRpcResponseErrorSchema,
+        success: sendTransactionRpcResponseSuccessSchema
+    }),
+    signData: z.object({
+        error: signDataRpcResponseErrorSchema,
+        success: signDataRpcResponseSuccessSchema
+    }),
+    disconnect: z.object({
+        error: disconnectRpcResponseErrorSchema,
+        success: disconnectRpcResponseSuccessSchema
+    })
+});
+export type RpcResponses = z.infer<typeof rpcResponsesSchema>;
+
+const walletEventSchema = z.union([connectEventSchema, disconnectEventSchema]);
+export type WalletEvent = z.infer<typeof walletEventSchema>;
+
+export const walletResponseSchema = z.union([
+    sendTransactionRpcResponseSuccessSchema,
+    sendTransactionRpcResponseErrorSchema,
+    signDataRpcResponseSuccessSchema,
+    signDataRpcResponseErrorSchema,
+    disconnectRpcResponseSuccessSchema,
+    disconnectRpcResponseErrorSchema
+]);
+
+export type WalletResponse<T extends RpcMethod> = WalletResponseSuccess<T> | WalletResponseError<T>;
+export type WalletResponseError<T extends RpcMethod> = RpcResponses[T]['error'];
+export type WalletResponseSuccess<T extends RpcMethod> = RpcResponses[T]['success'];
+assertTypesEqual<WalletResponse<RpcMethod>, z.infer<typeof walletResponseSchema>>(true);
+
+export const walletMessageSchema = z.union([walletEventSchema, walletResponseSchema]);
+export type WalletMessage = WalletEvent | WalletResponse<RpcMethod>;
+assertTypesEqual<WalletMessage, z.infer<typeof walletMessageSchema>>(true);
+
+export const appRequestSchema = z.union([
+    sendTransactionRpcRequestSchema,
+    signDataRpcRequestSchema,
+    disconnectRpcRequestSchema
+]);
+export type AppRequest<T extends RpcMethod> = RpcRequests[T];
+assertTypesEqual<AppRequest<RpcMethod>, z.infer<typeof appRequestSchema>>(true);
+
+/* App internal types */
 export interface TonConnectAppRequest<T extends AccountConnection['type']> {
     request: AppRequest<RpcMethod>;
     connection: T extends 'http' ? AccountConnectionHttp : AccountConnectionInjected;
