@@ -8,10 +8,10 @@ import { TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
-import { atom, ReadonlyAtom, ReadonlySubject, Subject } from "./entries/atom";
+import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { AppKey } from './Keys';
 import { v4 as uuidv4 } from 'uuid';
-import { BrowserTabBase, BrowserTabStored } from "./service/dappBrowserService";
+import { BrowserTabBase } from './service/dappBrowserService';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -196,6 +196,10 @@ export interface IDappBrowser {
         ) => Promise<string>
     ): void;
     emitEvent(webViewId: string, payload: string): Promise<void>;
+
+    /**
+     * Emits when a tab meta is changed or a new tab is opened
+     */
     tabChange: ReadonlySubject<BrowserTabBase>;
 }
 

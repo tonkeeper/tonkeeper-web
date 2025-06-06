@@ -58,7 +58,7 @@ export const useHideActiveBrowserTab = () => {
     return useMutation<void, Error>(async () => {
         const tab = openedTab$.value;
         if (!tab) {
-            throw new Error('No active tab');
+            return;
         }
 
         if (tab !== 'blanc') {

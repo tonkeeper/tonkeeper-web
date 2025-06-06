@@ -28,13 +28,32 @@ const Wrapper = styled(motion.div)`
     }
 `;
 
-export const MobileDappBrowserController = () => {
+/**
+ * bridge plugin tab state change events to app state
+ */
+const useRegisterTabChangeListener = () => {
     const { mutate } = useChangeBrowserTab();
     const sdk = useAppSdk();
 
     useEffect(() => {
         return sdk.dappBrowser?.tabChange.subscribe(mutate);
     }, [sdk.dappBrowser]);
+};
+
+/**
+ * focus app on sidebar menu open
+ */
+const useRegisterViewFocusListener = () => {
+    const { isOpen: isAsideOpen } = useMenuController('aside-nav');
+    const { isOpen: isWalletMenuOpen } = useMenuController('wallet-nav');
+    useEffect(() => {
+        CapacitorDappBrowser.setIsMainViewInFocus(isAsideOpen || isWalletMenuOpen);
+    }, [isAsideOpen, isWalletMenuOpen]);
+};
+
+export const MobileDappBrowserController = () => {
+    useRegisterTabChangeListener();
+    useRegisterViewFocusListener();
 
     const tab = useActiveBrowserTab();
     const shouldDisplayBrowser = !!tab;
@@ -58,12 +77,6 @@ export const MobileDappBrowserController = () => {
             setBackgroundIsReady(false);
         };
     }, [shouldDisplayBrowser]);
-
-    const { isOpen: isAsideOpen } = useMenuController('aside-nav');
-    const { isOpen: isWalletMenuOpen } = useMenuController('wallet-nav');
-    useEffect(() => {
-        CapacitorDappBrowser.setIsMainViewInFocus(isAsideOpen || isWalletMenuOpen);
-    }, [isAsideOpen, isWalletMenuOpen]);
 
     const id = useId();
     const exitY = 200;

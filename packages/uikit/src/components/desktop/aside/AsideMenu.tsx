@@ -10,7 +10,11 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useActiveWallet, useMutateActiveTonWallet } from '../../../state/wallet';
+import {
+    asideWalletSelected$,
+    useActiveWallet,
+    useMutateActiveTonWallet
+} from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -199,6 +203,7 @@ export const AsideMenuDNDItem = forwardRef<
             }
             setOptimisticWalletId(walletId);
             await menuController.close();
+            asideWalletSelected$.next(walletId);
             await setActiveWallet(walletId);
             handleNavigateHome();
         },

@@ -12,9 +12,9 @@ import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserSe
 import { OptionalProperty } from '@tonkeeper/core/dist/utils/types';
 import { IconButtonTransparentBackground } from '@tonkeeper/uikit/dist/components/fields/IconButton';
 import { CloseIcon, MinusIcon } from '@tonkeeper/uikit/dist/components/Icon';
-import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
-import { usePrevious } from '@tonkeeper/uikit/dist/hooks/usePrevious';
+import { asideWalletSelected$, useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { tonConnectInjectedConnector } from '../../../libs/ton-connect/injected-connector';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -105,19 +105,21 @@ export const MobileDappBrowserTab: FC<{
     const { mutate: closeTab } = useCloseActiveBrowserTab();
 
     const activeWallet = useActiveWallet();
-    const prevActiveWallet = usePrevious(activeWallet.id);
 
     const tabRef = useRef(tab);
     useEffect(() => {
         tabRef.current = tab;
     }, [tab]);
 
+    const asideLastSelectedWallet = useRef<WalletId | undefined>();
+    useEffect(() => asideWalletSelected$.subscribe(w => (asideLastSelectedWallet.current = w)), []);
+
     useEffect(() => {
-        if (prevActiveWallet && activeWallet.id !== prevActiveWallet) {
+        if (activeWallet.id === asideLastSelectedWallet.current) {
             // TODO ask user if he wants to connect to new wallet
             tonConnectInjectedConnector.changeConnectedWalletToActive(tabRef.current);
         }
-    }, [activeWallet.id, prevActiveWallet]);
+    }, [activeWallet.id]);
 
     return (
         <Wrapper>
