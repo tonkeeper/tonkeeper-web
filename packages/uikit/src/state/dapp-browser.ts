@@ -24,6 +24,10 @@ export const useActiveBrowserTab = () => {
     return useAtomValue(openedTab$);
 };
 
+export const useIsBrowserOpened = () => {
+    return useAtomValue(openedTab$) !== undefined;
+};
+
 export const useOpenBrowserTab = () => {
     const client = useQueryClient();
 
@@ -65,9 +69,11 @@ export const useHideActiveBrowserTab = () => {
     });
 };
 
-export const useCloseActiveBrowserTab = () => {
+export const useCloseActiveBrowserTab = (options?: { switchToPreviousTab?: boolean }) => {
     const sdk = useAppSdk();
-    const { mutateAsync: removeTab } = useRemoveBrowserTab();
+    const { mutateAsync: removeTab } = useRemoveBrowserTabFromState();
+    const client = useQueryClient();
+
     return useMutation<void, Error>(async () => {
         const tab = openedTab$.value;
         if (!tab) {
@@ -75,7 +81,17 @@ export const useCloseActiveBrowserTab = () => {
         }
         const tabId = tab !== 'blanc' ? tab.id : undefined;
 
-        openedTab$.next(undefined);
+        let nextTab: BrowserTab | undefined;
+        if (options?.switchToPreviousTab) {
+            const tabs = (await client.fetchQuery<BrowserTab[]>([QueryKey.browserTabs])).filter(
+                t => t.id !== tabId
+            );
+
+            if (tabs.length > 0) {
+                nextTab = tabs[0];
+            }
+        }
+        openedTab$.next(nextTab);
 
         if (tabId) {
             sdk.dappBrowser?.close(tabId);
@@ -92,7 +108,7 @@ export const useBrowserTabs = () => {
     });
 };
 
-export const useAddBrowserTab = () => {
+export const useAddBrowserTabToState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, BrowserTabBase>(async tab => {
@@ -127,7 +143,7 @@ export const useChangeBrowserTab = () => {
     });
 };
 
-export const useRemoveBrowserTab = () => {
+const useRemoveBrowserTabFromState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, { id: string }>(async tab => {

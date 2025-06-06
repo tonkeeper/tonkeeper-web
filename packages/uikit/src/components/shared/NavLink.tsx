@@ -37,7 +37,7 @@ export const NavLink: React.FC<CustomNavLinkProps> = ({
             <div
                 className={`${className} ${isActive ? activeClassName : ''}`}
                 onClick={() => {
-                    navigate(to, { replace, disableMobileAnimation })
+                    navigate(to, { replace, disableMobileAnimation });
                     onClick?.();
                 }}
             >

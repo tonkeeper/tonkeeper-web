@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 import {
     BrowserTab,
-    useAddBrowserTab,
+    useAddBrowserTabToState,
     useCloseActiveBrowserTab,
     useHideActiveBrowserTab
 } from '@tonkeeper/uikit/dist/state/dapp-browser';
@@ -75,7 +75,7 @@ export const MobileDappBrowserTab: FC<{
         id: tabId,
         isLive
     } = tab as OptionalProperty<BrowserTab, 'title' | 'iconUrl' | 'isLive'>;
-    const { mutate: addTab } = useAddBrowserTab();
+    const { mutate: addTab } = useAddBrowserTabToState();
     const [tabIsReady, setTabIsReady] = useState(false);
     const [tabIsCreated, setTabIsCreated] = useState(false);
     const sdk = useAppSdk();

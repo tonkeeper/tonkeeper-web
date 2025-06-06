@@ -75,7 +75,7 @@ const useSendMutation = (
     const account = useActiveAccount();
     const client = useQueryClient();
     const getSender = useGetSender();
-    const tonConenctService = useTonConnectTransactionService();
+    const tonConnectService = useTonConnectTransactionService();
 
     return useMutation<string, Error>(async () => {
         if (account.type === 'watch-only') {
@@ -96,7 +96,7 @@ const useSendMutation = (
             sender = await getSender(options.senderChoice);
         }
 
-        const boc = await tonConenctService.send(sender, estimate, params);
+        const boc = await tonConnectService.send(sender, estimate, params);
 
         const invalidationPromise = client.invalidateQueries(
             anyOfKeysParts(account.id, account.activeTonWallet.id)
