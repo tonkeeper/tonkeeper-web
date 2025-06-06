@@ -30,6 +30,29 @@ class InteractionRouterView: UIView {
     }
 }
 
+class TabRateLimiter {
+    private var openTabAttempts: [String: [Date]] = [:]
+    private let maxTabsPerOriginPerMinute = 5
+
+    func canOpenTab(for origin: String) -> Bool {
+        let now = Date()
+        let oneMinuteAgo = now.addingTimeInterval(-60)
+
+        var timestamps = openTabAttempts[origin] ?? []
+
+        timestamps = timestamps.filter { $0 > oneMinuteAgo }
+
+        if timestamps.count >= maxTabsPerOriginPerMinute {
+            openTabAttempts[origin] = timestamps
+            return false
+        }
+
+        timestamps.append(now)
+        openTabAttempts[origin] = timestamps
+        return true
+    }
+}
+
 @objc public class DappBrowserPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "DappBrowserPlugin"
     public let jsName = "DappBrowser"
@@ -48,6 +71,7 @@ class InteractionRouterView: UIView {
     private var routerView: InteractionRouterView?
     private var topOffset: CGFloat = 0
     private var bottomOffset: CGFloat = 0
+    private let tabRateLimiter = TabRateLimiter()
 
     @objc func setOffset(_ call: CAPPluginCall) {
         guard let top = call.getInt("top"),
@@ -406,6 +430,16 @@ extension DappBrowserPlugin: WKNavigationDelegate {
             self.notifyListeners("browserUrlChanged", data: data)
         }
     }
+
+    // Disable files downloading
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
+                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if navigationResponse.canShowMIMEType == false {
+            decisionHandler(.cancel)
+            return
+        }
+        decisionHandler(.allow)
+    }
 }
 
 extension DappBrowserPlugin: WKUIDelegate {
@@ -413,6 +447,21 @@ extension DappBrowserPlugin: WKUIDelegate {
                         createWebViewWith configuration: WKWebViewConfiguration,
                         for navigationAction: WKNavigationAction,
                         windowFeatures: WKWindowFeatures) -> WKWebView? {
+
+        if webView.isHidden {
+            print("Blocked window.open: initiator WebView is hidden")
+            return nil
+        }
+
+        guard let webViewUrl = webView.url,
+              let origin = webViewUrl.scheme.flatMap({ scheme in webViewUrl.host.map { "\(scheme)://\($0)" } }) else {
+            return nil
+        }
+
+        if (!self.tabRateLimiter.canOpenTab(for: origin)) {
+            print("Blocked window.open: limit for a tab reached")
+            return nil
+        }
 
         guard let url = navigationAction.request.url else {
             print("Cannot open new tab: URL is nil")
