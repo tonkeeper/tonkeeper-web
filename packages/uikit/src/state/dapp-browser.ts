@@ -133,8 +133,11 @@ export const useChangeBrowserTab = () => {
 
         const tabs = await getBrowserTabsList(sdk.storage);
         const tabToChangeIndex = tabs.findIndex(t => t.id === tab.id);
+
+        // new tab is opened
         if (tabToChangeIndex === -1) {
-            throw new Error('Tab not found');
+            tabs.unshift({ isPinned: false, ...tab });
+            openedTab$.next(tab);
         }
 
         tabs[tabToChangeIndex] = { isPinned: false, ...tab };

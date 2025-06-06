@@ -6,8 +6,8 @@ class InteractionRouterView: UIView {
     weak var browserView: UIView?
     var passthroughTopHeight: CGFloat = 0
     var passthroughBottomHeight: CGFloat = 0
-    var passthroughLeftWidth: CGFloat = 10
-    var passthroughRightWidth: CGFloat = 10
+    var passthroughLeftWidth: CGFloat = 20
+    var passthroughRightWidth: CGFloat = 20
     var focusDappView: Bool = false
 
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
@@ -40,11 +40,51 @@ class InteractionRouterView: UIView {
         CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setIsMainViewInFocus", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "reload", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "reload", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setOffset", returnType: CAPPluginReturnPromise)
     ]
 
     private var webViews: [String: WKWebView] = [:]
     private var routerView: InteractionRouterView?
+    private var topOffset: CGFloat = 0
+    private var bottomOffset: CGFloat = 0
+
+    @objc func setOffset(_ call: CAPPluginCall) {
+        guard let top = call.getInt("top"),
+              let bottom = call.getInt("bottom") else {
+            call.reject("Missing or invalid 'top' or 'bottom'")
+            return
+        }
+
+        self.topOffset = CGFloat(top)
+        self.bottomOffset = CGFloat(bottom)
+
+        DispatchQueue.main.async {
+            self.routerView?.passthroughTopHeight = self.topOffset
+            self.routerView?.passthroughBottomHeight = self.bottomOffset
+
+            guard let activeWebView = self.webViews.values.first(where: { !$0.isHidden }),
+                  let superview = activeWebView.superview else {
+                call.reject("No active WebView to apply offsets")
+                return
+            }
+
+            for constraint in superview.constraints {
+                if constraint.firstItem as? UIView == activeWebView {
+                    if constraint.firstAttribute == .top {
+                        constraint.constant = self.topOffset
+                    }
+                    if constraint.firstAttribute == .bottom {
+                        constraint.constant = -self.bottomOffset
+                    }
+                }
+            }
+
+            superview.layoutIfNeeded()
+            call.resolve()
+        }
+    }
+
 
     @objc func open(_ call: CAPPluginCall) {
         guard let id = call.getString("id"),
@@ -54,23 +94,38 @@ class InteractionRouterView: UIView {
             return
         }
 
-        let topOffset = CGFloat(call.getInt("topOffset") ?? 0)
-        let bottomOffset = CGFloat(call.getInt("bottomOffset") ?? 0)
-
-        DispatchQueue.main.async {
-            for (key, view) in self.webViews {
-                view.isHidden = (key != id)
-            }
-
-            if let existingWebView = self.webViews[id] {
-                existingWebView.isHidden = false
-                self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: existingWebView, focusDappView: true)
+         if let existingWebView = self.webViews[id] {
+             DispatchQueue.main.async {
+                for (key, view) in self.webViews {
+                   view.isHidden = (key != id)
+                }
+                self._configureRouter(browserView: existingWebView, focusDappView: true)
                 self.waitUntilDocumentIsReady(existingWebView) {
                     self.extractMetadata(from: existingWebView) { metadata in
                         call.resolve(metadata)
                     }
                 }
-                return
+             }
+             return
+        }
+
+        self._open(
+            id: id,
+            url: URLRequest(url: url)
+        ) { result in
+            switch result {
+                case .success(let metadata):
+                    call.resolve(metadata)
+                case .failure(let error):
+                    call.reject(error.localizedDescription)
+                }
+        }
+    }
+
+    private func _open(id: String, url: URLRequest, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        DispatchQueue.main.async {
+            for (key, view) in self.webViews {
+                view.isHidden = (key != id)
             }
 
             let contentController = WKUserContentController()
@@ -86,6 +141,9 @@ class InteractionRouterView: UIView {
             config.allowsInlineMediaPlayback = true
             config.mediaTypesRequiringUserActionForPlayback = []
             config.userContentController = contentController
+            if #available(iOS 14.0, *) {
+                config.limitsNavigationsToAppBoundDomains = false
+            }
 
             let webView = WKWebView(frame: self.bridge?.viewController?.view.bounds ?? .zero, configuration: config)
             webView.translatesAutoresizingMaskIntoConstraints = false
@@ -96,28 +154,34 @@ class InteractionRouterView: UIView {
             webView.scrollView.alwaysBounceHorizontal = false
             webView.scrollView.contentInsetAdjustmentBehavior = .never
             webView.navigationDelegate = self
-            webView.load(URLRequest(url: url))
+            webView.uiDelegate = self
+            webView.load(url)
 
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootView = windowScene.windows.first {
                rootView.insertSubview(webView, at: 0)
 
                NSLayoutConstraint.activate([
-                   webView.topAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.topAnchor, constant: topOffset),
-                   webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor, constant: -bottomOffset),
+                   webView.topAnchor.constraint(equalTo: rootView.safeAreaLayoutGuide.topAnchor, constant: self.topOffset),
+                   webView.bottomAnchor.constraint(equalTo: rootView.bottomAnchor, constant: -self.bottomOffset),
                    webView.leadingAnchor.constraint(equalTo: rootView.leadingAnchor),
                    webView.trailingAnchor.constraint(equalTo: rootView.trailingAnchor),
                ])
 
                 self.webViews[id] = webView
-                self._configureRouter(top: topOffset, bottom: bottomOffset, browserView: webView, focusDappView: true)
+                self._configureRouter(browserView: webView, focusDappView: true)
                 self.waitUntilDocumentIsReady(webView) {
                     self.extractMetadata(from: webView) { metadata in
-                        call.resolve(metadata)
+                        completion(.success(metadata))
                     }
                 }
             } else {
-               call.reject("Failed to obtain root view or main WebView")
+                let error = NSError(
+                    domain: "DappBrowserPlugin",
+                    code: 1,
+                    userInfo: [NSLocalizedDescriptionKey: "Failed to obtain root view or main WebView"]
+                )
+                completion(.failure(error))
            }
         }
     }
@@ -211,7 +275,7 @@ class InteractionRouterView: UIView {
         }
     }
 
-    func _configureRouter(top: CGFloat, bottom: CGFloat, browserView: WKWebView, focusDappView: Bool) {
+    func _configureRouter(browserView: WKWebView, focusDappView: Bool) {
         guard let window = UIApplication.shared
                 .connectedScenes
                 .compactMap({ $0 as? UIWindowScene })
@@ -225,8 +289,8 @@ class InteractionRouterView: UIView {
             let router = InteractionRouterView(frame: window.bounds)
             router.mainView = mainView
             router.browserView = browserView
-            router.passthroughTopHeight = top
-            router.passthroughBottomHeight = bottom
+            router.passthroughTopHeight = self.topOffset
+            router.passthroughBottomHeight = self.bottomOffset
             router.focusDappView = focusDappView
             router.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             router.backgroundColor = .clear
@@ -235,8 +299,8 @@ class InteractionRouterView: UIView {
         } else {
             routerView?.mainView = mainView
             routerView?.browserView = browserView
-            routerView?.passthroughTopHeight = top
-            routerView?.passthroughBottomHeight = bottom
+            routerView?.passthroughTopHeight = self.topOffset
+            routerView?.passthroughBottomHeight = self.bottomOffset
             routerView?.focusDappView = focusDappView
         }
     }
@@ -253,7 +317,7 @@ class InteractionRouterView: UIView {
               return sizeB - sizeA;
             })[0];
           return {
-            title: document.title,
+            title: document.title || location.hostname,
             iconUrl: best?.href || new URL('/favicon.ico', location.origin).href
           };
         })()
@@ -341,5 +405,52 @@ extension DappBrowserPlugin: WKNavigationDelegate {
             data.merge(metadata) { _, new in new }
             self.notifyListeners("browserUrlChanged", data: data)
         }
+    }
+}
+
+extension DappBrowserPlugin: WKUIDelegate {
+    public func webView(_ webView: WKWebView,
+                        createWebViewWith configuration: WKWebViewConfiguration,
+                        for navigationAction: WKNavigationAction,
+                        windowFeatures: WKWindowFeatures) -> WKWebView? {
+
+        guard let url = navigationAction.request.url else {
+            print("Cannot open new tab: URL is nil")
+            return nil
+        }
+        let request = URLRequest(url: url)
+        let newId = UUID().uuidString
+
+        let previouslyVisibleId = self.webViews.first(where: { !$0.value.isHidden })?.key
+
+        DispatchQueue.main.async {
+            self._open(id: newId, url: request) { result in
+                switch result {
+                case .success(let metadata):
+                    var data: [String: Any] = [
+                        "webViewId": newId,
+                        "url": url.absoluteString
+                    ]
+                    data.merge(metadata) { _, new in new }
+                    self.notifyListeners("browserTabOpened", data: data)
+
+                case .failure(let error):
+                    print("Failed to open new tab:", error)
+
+                    if let failedWebView = self.webViews[newId] {
+                        failedWebView.removeFromSuperview()
+                        self.webViews.removeValue(forKey: newId)
+                    }
+
+                    if let prevId = previouslyVisibleId,
+                       let prevWebView = self.webViews[prevId] {
+                        prevWebView.isHidden = false
+                        self._configureRouter(browserView: prevWebView, focusDappView: true)
+                    }
+                }
+            }
+        }
+
+        return nil
     }
 }

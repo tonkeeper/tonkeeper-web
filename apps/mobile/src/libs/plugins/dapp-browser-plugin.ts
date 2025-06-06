@@ -10,16 +10,12 @@ interface DocumentMetadata {
 }
 
 interface IDappBrowserPlugin {
-    open(params: {
-        id: string;
-        url: string;
-        topOffset?: number;
-        bottomOffset?: number;
-    }): Promise<DocumentMetadata>;
+    open(params: { id: string; url: string }): Promise<DocumentMetadata>;
     hide(params: { id: string }): Promise<void>;
     show(params: { id: string }): Promise<void>;
     close(params: { id: string }): Promise<void>;
     reload(params: { ids: string[] }): Promise<void>;
+    setOffset(params: { top: number; bottom: number }): Promise<void>;
     setIsMainViewInFocus(params: { focus: boolean }): Promise<void>;
     addListener(
         eventName: 'browserMessageReceived',
@@ -32,6 +28,15 @@ interface IDappBrowserPlugin {
     ): Promise<PluginListenerHandle>;
     addListener(
         eventName: 'browserUrlChanged',
+        listenerFunc: (
+            data: {
+                webViewId: string;
+                url: string;
+            } & DocumentMetadata
+        ) => void
+    ): Promise<PluginListenerHandle>;
+    addListener(
+        eventName: 'browserTabOpened',
         listenerFunc: (
             data: {
                 webViewId: string;
@@ -116,6 +121,23 @@ class DappBrowser implements IDappBrowser {
                 this.liveTabs[tabToChange] = updatedTab;
             }
         });
+
+        DappBrowserPlugin.addListener('browserTabOpened', async data => {
+            const updatedTab = {
+                id: data.webViewId,
+                url: data.url,
+                title: data.title,
+                iconUrl: data.iconUrl
+            };
+            this.tabChange.next(updatedTab);
+
+            const tabToChange = this.liveTabs.findIndex(t => t.id === data.webViewId);
+            if (tabToChange !== -1) {
+                this.liveTabs[tabToChange] = updatedTab;
+            }
+        });
+
+        DappBrowserPlugin.setOffset({ top: 52, bottom: 98 });
     }
 
     async close(id: string): Promise<void> {
@@ -131,9 +153,7 @@ class DappBrowser implements IDappBrowser {
         id ??= Date.now().toString();
         const metadata = await DappBrowserPlugin.open({
             url,
-            id,
-            topOffset: 52,
-            bottomOffset: 98
+            id
         });
 
         const openedTab = {
