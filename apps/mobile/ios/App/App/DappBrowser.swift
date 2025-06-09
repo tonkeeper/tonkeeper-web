@@ -64,6 +64,7 @@ class TabRateLimiter {
         CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setIsMainViewInFocus", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "reload", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "goBack", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setOffset", returnType: CAPPluginReturnPromise)
     ]
 
@@ -387,21 +388,70 @@ class TabRateLimiter {
             call.resolve()
         }
     }
+
+    @objc func goBack(_ call: CAPPluginCall) {
+        guard let id = call.getString("id"),
+              let webView = webViews[id] else {
+            call.reject("No WebView with id '\(call.getString("id") ?? "")'")
+            return
+        }
+
+        DispatchQueue.main.async {
+            if webView.canGoBack {
+                webView.goBack()
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    let url = webView.url?.absoluteString ?? ""
+                    self.notifyBrowserUrlChanged(webView: webView)
+                }
+
+                call.resolve()
+            } else {
+                call.reject("WebView cannot go back")
+            }
+        }
+    }
+
+    private func notifyBrowserUrlChanged(webView: WKWebView) {
+         guard let id = webViews.first(where: { $0.value == webView })?.key,
+           let url = webView.url?.absoluteString else {
+           return
+         }
+
+        self.extractMetadata(from: webView) { metadata in
+            var data: [String: Any] = [
+                "webViewId": id,
+                "url": url,
+                "canGoBack": webView.canGoBack
+            ]
+            data.merge(metadata) { _, new in new }
+            self.notifyListeners("browserUrlChanged", data: data)
+        }
+    }
 }
 
 extension DappBrowserPlugin: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == "browserMessages" else { return }
-
-        guard let body = message.body as? [String: Any],
-              let queryId = body["queryId"] as? String,
-              let payload = body["payload"] as? String,
-              let webview = message.webView,
-              let webViewId = self.webViews.first(where: { $0.value == webview })?.key else {
+        guard message.name == "browserMessages",
+              let body = message.body as? [String: Any],
+              let type = body["type"] as? String,
+              let webView = message.webView else {
             return
         }
 
-        webview.evaluateJavaScript("window.location.origin") { result, error in
+        if (type == "url-changed") {
+            self.notifyBrowserUrlChanged(webView: webView)
+            return
+        }
+
+        guard type == "bridge-message",
+              let queryId = body["queryId"] as? String,
+              let payload = body["payload"] as? String,
+              let webViewId = self.webViews.first(where: { $0.value == webView })?.key else {
+            return
+        }
+
+        webView.evaluateJavaScript("window.location.origin") { result, error in
             let origin = (result as? String) ?? "unknown"
 
             self.notifyListeners("browserMessageReceived", data: [
@@ -416,19 +466,7 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
 
 extension DappBrowserPlugin: WKNavigationDelegate {
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        guard let id = webViews.first(where: { $0.value == webView })?.key,
-              let url = webView.url?.absoluteString else {
-            return
-        }
-
-        self.extractMetadata(from: webView) { metadata in
-            var data: [String: Any] = [
-                "webViewId": id,
-                "url": url
-            ]
-            data.merge(metadata) { _, new in new }
-            self.notifyListeners("browserUrlChanged", data: data)
-        }
+        self.notifyBrowserUrlChanged(webView: webView)
     }
 
     // Disable files downloading

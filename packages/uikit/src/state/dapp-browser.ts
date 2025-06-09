@@ -5,23 +5,42 @@ import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useAtomValue } from '../libs/useAtom';
 import {
     BrowserTabBase,
-    BrowserTabIdentifier,
+    BrowserTabLive,
     BrowserTabStored,
     getBrowserTabsList,
     setBrowserTabsList
 } from '@tonkeeper/core/dist/service/dappBrowserService';
-import { OptionalProperty } from '@tonkeeper/core/dist/utils/types';
+import { useMemo } from 'react';
 
-export type BrowserTab = BrowserTabStored & {
-    isLive: boolean;
-};
+export type BrowserTab =
+    | (BrowserTabStored & { isLive: false })
+    | (BrowserTabStored & BrowserTabLive);
 
-let liveTabs: string[] = [];
+let liveTabs: { id: string; canGoBack: boolean }[] = [];
 
-const openedTab$ = atom<BrowserTab | BrowserTabIdentifier | 'blanc' | undefined>(undefined);
+const openedTab$ = atom<
+    | { type: 'existing'; id: string }
+    | { type: 'new'; id: string; url: string; title?: string; iconUrl?: string }
+    | 'blanc'
+    | undefined
+>(undefined);
 
 export const useActiveBrowserTab = () => {
-    return useAtomValue(openedTab$);
+    const openedTab = useAtomValue(openedTab$);
+    const { data: tabs } = useBrowserTabs();
+
+    return useMemo(() => {
+        if (!tabs || !openedTab) {
+            return undefined;
+        }
+        if (openedTab === 'blanc') {
+            return 'blanc';
+        }
+        if (openedTab.type === 'existing') {
+            return tabs.find(t => t.id === openedTab.id);
+        }
+        return openedTab;
+    }, [tabs, openedTab]);
 };
 
 export const useIsBrowserOpened = () => {
@@ -29,26 +48,19 @@ export const useIsBrowserOpened = () => {
 };
 
 export const useOpenBrowserTab = () => {
-    const client = useQueryClient();
-
     return useMutation<
         void,
         Error,
-        { id: string } | { url: string; title?: string; iconUrl?: string } | BrowserTab
+        { id: string } | { url: string; title?: string; iconUrl?: string }
     >(async tab => {
         if ('isActive' in tab) {
             openedTab$.next('blanc');
             return;
         }
         if ('id' in tab) {
-            const tabs = await client.fetchQuery<BrowserTab[]>([QueryKey.browserTabs]);
-            const tabToOpen = tabs.find(t => t.id === tab.id);
-            if (!tabToOpen) {
-                throw new Error('Tab not found');
-            }
-            openedTab$.next(tabToOpen);
+            openedTab$.next({ type: 'existing', id: tab.id });
         } else {
-            openedTab$.next({ id: Date.now().toString(), ...tab });
+            openedTab$.next({ type: 'new', id: Date.now().toString(), ...tab });
         }
     });
 };
@@ -91,29 +103,39 @@ export const useCloseActiveBrowserTab = (options?: { switchToPreviousTab?: boole
                 nextTab = tabs[0];
             }
         }
-        openedTab$.next(nextTab);
 
         if (tabId) {
             sdk.dappBrowser?.close(tabId);
             await removeTab({ id: tabId });
         }
+        openedTab$.next(nextTab ? { type: 'existing', id: nextTab?.id } : undefined);
     });
 };
 
 export const useBrowserTabs = () => {
     const sdk = useAppSdk();
-    return useQuery<BrowserTab[]>([QueryKey.browserTabs], async () => {
-        const tabs = await getBrowserTabsList(sdk.storage);
-        return tabs.map(t => ({ ...t, isLive: liveTabs.includes(t.id) }));
-    });
+    return useQuery<BrowserTab[]>(
+        [QueryKey.browserTabs],
+        async () => {
+            const tabs = await getBrowserTabsList(sdk.storage);
+            return tabs.map(t => ({
+                ...t,
+                isLive: liveTabs.some(lt => lt.id === t.id),
+                canGoBack: liveTabs.find(lt => lt.id === t.id)?.canGoBack ?? false
+            }));
+        },
+        {
+            keepPreviousData: true
+        }
+    );
 };
 
 export const useAddBrowserTabToState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, BrowserTabBase>(async tab => {
-        if (!liveTabs.includes(tab.id)) {
-            liveTabs = [...liveTabs, tab.id];
+        if (!liveTabs.some(lt => lt.id === tab.id)) {
+            liveTabs = [...liveTabs, { id: tab.id, canGoBack: false }];
         }
         const tabs = await getBrowserTabsList(sdk.storage);
         if (!tabs.some(t => t.id === tab.id)) {
@@ -126,9 +148,12 @@ export const useAddBrowserTabToState = () => {
 export const useChangeBrowserTab = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    return useMutation<void, Error, OptionalProperty<BrowserTabStored, 'isPinned'>>(async tab => {
-        if (!liveTabs.includes(tab.id)) {
-            liveTabs = [...liveTabs, tab.id];
+    return useMutation<void, Error, BrowserTabLive & { isPinned?: boolean }>(async tab => {
+        const liveTab = liveTabs.find(lt => lt.id === tab.id);
+        if (liveTab) {
+            liveTab.canGoBack = tab.canGoBack;
+        } else {
+            liveTabs = [...liveTabs, tab];
         }
 
         const tabs = await getBrowserTabsList(sdk.storage);
@@ -137,12 +162,12 @@ export const useChangeBrowserTab = () => {
         // new tab is opened
         if (tabToChangeIndex === -1) {
             tabs.unshift({ isPinned: false, ...tab });
-            openedTab$.next(tab);
         }
 
         tabs[tabToChangeIndex] = { isPinned: false, ...tab };
         await setBrowserTabsList(sdk.storage, tabs);
         await client.invalidateQueries([QueryKey.browserTabs]);
+        openedTab$.next({ type: 'existing', id: tab.id });
     });
 };
 
@@ -150,8 +175,8 @@ const useRemoveBrowserTabFromState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     return useMutation<void, Error, { id: string }>(async tab => {
-        if (!liveTabs.includes(tab.id)) {
-            liveTabs = liveTabs.filter(id => id !== tab.id);
+        if (!liveTabs.some(lt => lt.id === tab.id)) {
+            liveTabs = liveTabs.filter(lt => lt.id !== tab.id);
         }
 
         const tabs = await getBrowserTabsList(sdk.storage);

@@ -8,7 +8,10 @@ import {
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { Body2, Body3 } from '@tonkeeper/uikit';
-import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
+import {
+    BrowserTabIdentifier,
+    isBrowserTabLive
+} from '@tonkeeper/core/dist/service/dappBrowserService';
 import { OptionalProperty } from '@tonkeeper/core/dist/utils/types';
 import { IconButtonTransparentBackground } from '@tonkeeper/uikit/dist/components/fields/IconButton';
 import {
@@ -207,9 +210,11 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
 
     return (
         <TabHeaderWrapper>
-            <BackButton>
-                <ArrowLeftIcon />
-            </BackButton>
+            {isBrowserTabLive(tab) && tab.canGoBack && (
+                <BackButton onClick={() => CapacitorDappBrowser.goBack(tab.id)}>
+                    <ArrowLeftIcon />
+                </BackButton>
+            )}
             {showTitle && (
                 <Title>
                     {hostname}

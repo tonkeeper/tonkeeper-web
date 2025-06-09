@@ -18,6 +18,17 @@ export type BrowserTabStored = BrowserTabBase & {
     isPinned: boolean;
 };
 
+export type BrowserTabLive = BrowserTabBase & {
+    isLive: true;
+    canGoBack: boolean;
+};
+
+export function isBrowserTabLive(
+    tab: BrowserTabIdentifier | BrowserTabLive
+): tab is BrowserTabLive {
+    return 'isLive' in tab && tab.isLive;
+}
+
 export async function getBrowserTabsList(storage: IStorage): Promise<BrowserTabStored[]> {
     return (await storage.get(AppKey.BROWSER_TABS)) ?? [];
 }
@@ -26,7 +37,19 @@ export async function setBrowserTabsList(
     storage: IStorage,
     tabs: BrowserTabStored[]
 ): Promise<void> {
-    await storage.set(AppKey.BROWSER_TABS, tabs);
+    await storage.set(
+        AppKey.BROWSER_TABS,
+        tabs.map(
+            t =>
+                ({
+                    id: t.id,
+                    url: t.url,
+                    title: t.title,
+                    iconUrl: t.iconUrl,
+                    isPinned: t.isPinned
+                } satisfies BrowserTabStored)
+        )
+    );
 }
 
 export async function patchBrowserTab(storage: IStorage, tab: BrowserTabStored): Promise<void> {

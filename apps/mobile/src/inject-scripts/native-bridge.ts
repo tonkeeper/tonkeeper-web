@@ -1,17 +1,5 @@
 import { ReadonlySubject, subject } from '@tonkeeper/core/dist/entries/atom';
 
-declare global {
-    interface Window {
-        webkit?: {
-            messageHandlers?: {
-                browserMessages?: {
-                    postMessage: (message: { queryId: string; payload: string }) => void;
-                };
-            };
-        };
-    }
-}
-
 type BridgeMessage = {
     queryId?: string;
     payload: string;
@@ -40,6 +28,7 @@ export function postBridgeMessage<T>(payload: unknown): Promise<T> {
         });
 
         window.webkit?.messageHandlers?.browserMessages?.postMessage({
+            type: 'bridge-message',
             queryId,
             payload: JSON.stringify(payload)
         });

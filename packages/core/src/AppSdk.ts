@@ -11,7 +11,7 @@ import { TonTransferParams } from './service/deeplinkingService';
 import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { AppKey } from './Keys';
 import { v4 as uuidv4 } from 'uuid';
-import { BrowserTabBase } from './service/dappBrowserService';
+import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -200,7 +200,7 @@ export interface IDappBrowser {
     /**
      * Emits when a tab meta is changed or a new tab is opened
      */
-    tabChange: ReadonlySubject<BrowserTabBase>;
+    tabChange: ReadonlySubject<BrowserTabLive>;
 }
 
 export interface ConfirmOptions {

@@ -1,6 +1,6 @@
 import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
 import { IDappBrowser } from '@tonkeeper/core/dist/AppSdk';
-import { BrowserTabBase } from '@tonkeeper/core/dist/service/dappBrowserService';
+import { BrowserTabBase, BrowserTabLive } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { eqOrigins, originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 
@@ -15,6 +15,7 @@ interface IDappBrowserPlugin {
     show(params: { id: string }): Promise<void>;
     close(params: { id: string }): Promise<void>;
     reload(params: { ids: string[] }): Promise<void>;
+    goBack(params: { id: string }): Promise<void>;
     setOffset(params: { top: number; bottom: number }): Promise<void>;
     setIsMainViewInFocus(params: { focus: boolean }): Promise<void>;
     addListener(
@@ -32,6 +33,7 @@ interface IDappBrowserPlugin {
             data: {
                 webViewId: string;
                 url: string;
+                canGoBack: boolean;
             } & DocumentMetadata
         ) => void
     ): Promise<PluginListenerHandle>;
@@ -81,9 +83,9 @@ class DappBrowser implements IDappBrowser {
         ) => Promise<unknown>
     >();
 
-    tabChange = subject<BrowserTabBase>();
+    tabChange = subject<BrowserTabLive>();
 
-    private liveTabs: BrowserTabBase[] = [];
+    private liveTabs: BrowserTabLive[] = [];
 
     constructor() {
         DappBrowserPlugin.addListener('browserMessageReceived', async data => {
@@ -112,7 +114,9 @@ class DappBrowser implements IDappBrowser {
                 id: data.webViewId,
                 url: data.url,
                 title: data.title,
-                iconUrl: data.iconUrl
+                iconUrl: data.iconUrl,
+                canGoBack: data.canGoBack,
+                isLive: true as const
             };
             this.tabChange.next(updatedTab);
 
@@ -127,7 +131,9 @@ class DappBrowser implements IDappBrowser {
                 id: data.webViewId,
                 url: data.url,
                 title: data.title,
-                iconUrl: data.iconUrl
+                iconUrl: data.iconUrl,
+                isLive: true as const,
+                canGoBack: false
             };
             this.tabChange.next(updatedTab);
 
@@ -160,7 +166,9 @@ class DappBrowser implements IDappBrowser {
             id,
             title: metadata.title,
             iconUrl: metadata.iconUrl,
-            url
+            url,
+            isLive: true as const,
+            canGoBack: false
         };
 
         this.liveTabs.push(openedTab);
@@ -212,6 +220,10 @@ class DappBrowser implements IDappBrowser {
         }
 
         return DappBrowserPlugin.reload({ ids });
+    }
+
+    goBack(id: string): Promise<void> {
+        return DappBrowserPlugin.goBack({ id });
     }
 
     openedOriginIds(origin: string): string[] {
