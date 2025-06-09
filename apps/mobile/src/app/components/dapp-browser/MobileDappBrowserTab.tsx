@@ -139,7 +139,6 @@ export const MobileDappBrowserTab: FC<{
 
     useEffect(() => {
         if (activeWallet.id === asideLastSelectedWallet.current) {
-            // TODO подключать только если есть активное подключение к другому кошельку
             tonConnectInjectedConnector.changeConnectedWalletToActive(tabRef.current);
         }
     }, [activeWallet.id]);
