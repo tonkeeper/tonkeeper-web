@@ -11,6 +11,7 @@ import {
     setBrowserTabsList
 } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { useMemo } from 'react';
+import { notNullish } from '@tonkeeper/core/dist/utils/types';
 
 export type BrowserTab =
     | (BrowserTabStored & { isLive: false })
@@ -81,10 +82,9 @@ export const useHideActiveBrowserTab = () => {
     });
 };
 
-export const useCloseActiveBrowserTab = (options?: { switchToPreviousTab?: boolean }) => {
+export const useCloseActiveBrowserTab = () => {
     const sdk = useAppSdk();
     const { mutateAsync: removeTab } = useRemoveBrowserTabFromState();
-    const client = useQueryClient();
 
     return useMutation<void, Error>(async () => {
         const tab = openedTab$.value;
@@ -93,10 +93,27 @@ export const useCloseActiveBrowserTab = (options?: { switchToPreviousTab?: boole
         }
         const tabId = tab !== 'blanc' ? tab.id : undefined;
 
+        if (tabId) {
+            sdk.dappBrowser?.close(tabId);
+            await removeTab({ id: tabId });
+        }
+        openedTab$.next(undefined);
+    });
+};
+
+export const useCloseBrowserTab = (options?: { autoSwitchActiveTab?: boolean }) => {
+    const sdk = useAppSdk();
+    const { mutateAsync: removeTab } = useRemoveBrowserTabFromState();
+    const client = useQueryClient();
+
+    return useMutation<void, Error, { id: string }>(async ({ id }) => {
+        const tab = openedTab$.value;
+        const openedTabId = tab !== 'blanc' ? tab?.id : undefined;
+
         let nextTab: BrowserTab | undefined;
-        if (options?.switchToPreviousTab) {
+        if (options?.autoSwitchActiveTab && id === openedTabId) {
             const tabs = (await client.fetchQuery<BrowserTab[]>([QueryKey.browserTabs])).filter(
-                t => t.id !== tabId
+                t => t.id !== openedTabId
             );
 
             if (tabs.length > 0) {
@@ -104,11 +121,12 @@ export const useCloseActiveBrowserTab = (options?: { switchToPreviousTab?: boole
             }
         }
 
-        if (tabId) {
-            sdk.dappBrowser?.close(tabId);
-            await removeTab({ id: tabId });
+        sdk.dappBrowser?.close(id);
+        await removeTab({ id });
+
+        if (openedTabId === id) {
+            openedTab$.next(nextTab ? { type: 'existing', id: nextTab?.id } : undefined);
         }
-        openedTab$.next(nextTab ? { type: 'existing', id: nextTab?.id } : undefined);
     });
 };
 
@@ -130,6 +148,39 @@ export const useBrowserTabs = () => {
     );
 };
 
+export const useReorderBrowserTabs = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (tabs: BrowserTabStored[]) => {
+            await setBrowserTabsList(sdk.storage, tabs);
+        },
+        onMutate: newTabs => {
+            const previousTabs = client.getQueryData<BrowserTab[]>([QueryKey.browserTabs]);
+
+            if (!previousTabs) {
+                return { previousTabs };
+            }
+
+            const sortedPreviousTabs = newTabs
+                .map(nt => previousTabs.find(pt => nt.id === pt.id))
+                .filter(notNullish) as BrowserTab[];
+
+            client.setQueryData([QueryKey.browserTabs], sortedPreviousTabs);
+
+            return { previousTabs };
+        },
+        onError: (_, __, context) => {
+            if (context?.previousTabs) {
+                client.setQueryData([QueryKey.browserTabs], context.previousTabs);
+            }
+        },
+        onSettled: () => {
+            client.invalidateQueries({ queryKey: [QueryKey.browserTabs] });
+        }
+    });
+};
 export const useAddBrowserTabToState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();

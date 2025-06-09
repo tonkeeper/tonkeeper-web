@@ -184,9 +184,14 @@ export interface IAppSdk {
 }
 
 export interface IDappBrowser {
-    open(url: string, id?: string): Promise<BrowserTabBase>;
+    open(
+        url: string,
+        options: {
+            id?: string;
+            keepFocusMainView?: boolean;
+        }
+    ): Promise<BrowserTabBase>;
     hide(id: string): Promise<void>;
-    show(id: string): Promise<void>;
     close(id: string): Promise<void>;
     setRequestsHandler(
         method: string,

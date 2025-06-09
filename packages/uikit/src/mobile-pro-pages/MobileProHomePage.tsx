@@ -117,19 +117,7 @@ export const MobileProHomePage = () => {
                     to="/"
                     onClick={() => {
                         mutate({
-                            url: 'https://app.ston.fi'
-                        });
-                    }}
-                >
-                    <BrowserIcon />
-                    <Label2>Browser StonFi</Label2>
-                    <ChevronRightIcon />
-                </MenuItem>
-                <MenuItem
-                    to="/"
-                    onClick={() => {
-                        mutate({
-                            url: 'https://ton-connect.github.io/demo-dapp-with-wallet/'
+                            url: 'https://google.com'
                         });
                     }}
                 >
@@ -137,14 +125,6 @@ export const MobileProHomePage = () => {
                     <Label2>Browser</Label2>
                     <ChevronRightIcon />
                 </MenuItem>
-                {tabs?.map(tab => (
-                    <MenuItem key={tab.id} to={AppRoute.home} onClick={() => mutate(tab)}>
-                        <BrowserIcon />
-                        <Label2>Tab {tab.title}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                ))}
-
                 <MenuItem to={AppRoute.activity}>
                     <ClockSmoothIcon />
                     <Label2>{t('wallet_aside_history')}</Label2>

@@ -31,7 +31,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { NotForTargetEnv } from '../../shared/TargetEnv';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useCallback, useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
 import { HideForRegulatoryState } from '../../HideForState';
@@ -40,6 +40,7 @@ import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
 import { useHideActiveBrowserTab, useIsBrowserOpened } from '../../../state/dapp-browser';
 
 const WalletAsideContainer = styled.div`
+    overflow: auto;
     padding: 0.5rem;
     background: ${p =>
         p.theme.proDisplayType === 'desktop'
@@ -81,6 +82,10 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
 
 const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
+`;
+
+const WalletAsideMenuBrowserTabsStyled = styled(WalletAsideMenuBrowserTabs)`
+    margin-top: 24px;
 `;
 
 const useHideBrowserAfterNavigation = () => {
@@ -190,7 +195,9 @@ export const WalletAsideMenu = () => {
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <WalletAsideMenuBrowserTabs />
+            <ForTargetEnv env="mobile">
+                <WalletAsideMenuBrowserTabsStyled />
+            </ForTargetEnv>
         </WalletAsideContainer>
     );
 };

@@ -59,7 +59,6 @@ class TabRateLimiter {
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "open", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "hide", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "show", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "sendToBrowser", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "setIsMainViewInFocus", returnType: CAPPluginReturnPromise),
@@ -119,12 +118,14 @@ class TabRateLimiter {
             return
         }
 
+        let focusDappView = call.getBool("focusDappView") ?? true
+
          if let existingWebView = self.webViews[id] {
              DispatchQueue.main.async {
                 for (key, view) in self.webViews {
                    view.isHidden = (key != id)
                 }
-                self._configureRouter(browserView: existingWebView, focusDappView: true)
+                self._configureRouter(browserView: existingWebView, focusDappView: focusDappView)
                 self.waitUntilDocumentIsReady(existingWebView) {
                     self.extractMetadata(from: existingWebView) { metadata in
                         call.resolve(metadata)
@@ -136,7 +137,8 @@ class TabRateLimiter {
 
         self._open(
             id: id,
-            url: URLRequest(url: url)
+            url: URLRequest(url: url),
+            focusDappView: focusDappView
         ) { result in
             switch result {
                 case .success(let metadata):
@@ -147,7 +149,7 @@ class TabRateLimiter {
         }
     }
 
-    private func _open(id: String, url: URLRequest, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+    private func _open(id: String, url: URLRequest, focusDappView: Bool, completion: @escaping (Result<[String: Any], Error>) -> Void) {
         DispatchQueue.main.async {
             for (key, view) in self.webViews {
                 view.isHidden = (key != id)
@@ -194,7 +196,7 @@ class TabRateLimiter {
                ])
 
                 self.webViews[id] = webView
-                self._configureRouter(browserView: webView, focusDappView: true)
+                self._configureRouter(browserView: webView, focusDappView: focusDappView)
                 self.waitUntilDocumentIsReady(webView) {
                     self.extractMetadata(from: webView) { metadata in
                         completion(.success(metadata))
@@ -222,22 +224,6 @@ class TabRateLimiter {
             webView.isHidden = true
             self.routerView?.focusDappView = false
             call.resolve()
-        }
-    }
-
-    @objc func show(_ call: CAPPluginCall) {
-        guard let id = call.getString("id"),
-              let webView = webViews[id] else {
-            call.reject("No WebView with id '\(call.getString("id") ?? "")'")
-            return
-        }
-
-        DispatchQueue.main.async {
-            webView.isHidden = false
-            self.routerView?.focusDappView = true
-            self.waitUntilDocumentIsReady(webView) {
-                call.resolve()
-            }
         }
     }
 
@@ -401,7 +387,6 @@ class TabRateLimiter {
                 webView.goBack()
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                    let url = webView.url?.absoluteString ?? ""
                     self.notifyBrowserUrlChanged(webView: webView)
                 }
 
@@ -511,7 +496,7 @@ extension DappBrowserPlugin: WKUIDelegate {
         let previouslyVisibleId = self.webViews.first(where: { !$0.value.isHidden })?.key
 
         DispatchQueue.main.async {
-            self._open(id: newId, url: request) { result in
+            self._open(id: newId, url: request, focusDappView: true) { result in
                 switch result {
                 case .success(let metadata):
                     var data: [String: Any] = [

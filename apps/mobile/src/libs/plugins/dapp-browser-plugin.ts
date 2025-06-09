@@ -10,9 +10,8 @@ interface DocumentMetadata {
 }
 
 interface IDappBrowserPlugin {
-    open(params: { id: string; url: string }): Promise<DocumentMetadata>;
+    open(params: { id: string; url: string; focusDappView?: boolean }): Promise<DocumentMetadata>;
     hide(params: { id: string }): Promise<void>;
-    show(params: { id: string }): Promise<void>;
     close(params: { id: string }): Promise<void>;
     reload(params: { ids: string[] }): Promise<void>;
     goBack(params: { id: string }): Promise<void>;
@@ -54,7 +53,7 @@ const DappBrowserPlugin = registerPlugin<IDappBrowserPlugin>('DappBrowser', {
         return {
             async open() {
                 return Promise.resolve({
-                    title: 'Example tab',
+                    title: 'Example tab 1',
                     iconUrl: 'https://capacitorjs.com/docs/img/meta/favicon.png'
                 });
             },
@@ -155,11 +154,18 @@ class DappBrowser implements IDappBrowser {
         return DappBrowserPlugin.hide({ id });
     }
 
-    async open(url: string, id?: string): Promise<BrowserTabBase> {
-        id ??= Date.now().toString();
+    async open(
+        url: string,
+        options: {
+            id?: string;
+            keepFocusMainView?: boolean;
+        }
+    ): Promise<BrowserTabBase> {
+        const id = options.id ?? Date.now().toString();
         const metadata = await DappBrowserPlugin.open({
             url,
-            id
+            id,
+            focusDappView: !options.keepFocusMainView
         });
 
         const openedTab = {
@@ -173,10 +179,6 @@ class DappBrowser implements IDappBrowser {
 
         this.liveTabs.push(openedTab);
         return openedTab;
-    }
-
-    show(id: string): Promise<void> {
-        return DappBrowserPlugin.show({ id });
     }
 
     emitEvent(webViewId: string, payload: string): Promise<void> {

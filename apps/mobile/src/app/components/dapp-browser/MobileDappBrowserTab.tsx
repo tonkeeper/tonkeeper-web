@@ -43,6 +43,8 @@ import {
     useDisconnectTonConnectApp,
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
+import { useMenuController } from '@tonkeeper/uikit/dist/hooks/ionic';
+import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -98,10 +100,14 @@ export const MobileDappBrowserTab: FC<{
     const { mutate: addTab } = useAddBrowserTabToState();
     const [tabIsReady, setTabIsReady] = useState(false);
     const [tabIsCreated, setTabIsCreated] = useState(false);
-    const sdk = useAppSdk();
+    const { isOpen: walletMenuIsOpen } = useMenuController('wallet-nav');
+    const walletMenuIsOpenRef = useValueRef(walletMenuIsOpen);
 
     useEffect(() => {
-        sdk.dappBrowser?.open(url, tabId).then(t => {
+        CapacitorDappBrowser.open(url, {
+            id: tabId,
+            keepFocusMainView: walletMenuIsOpenRef.current
+        }).then(t => {
             addTab(t);
             setTabIsCreated(true);
         });
@@ -133,7 +139,7 @@ export const MobileDappBrowserTab: FC<{
 
     useEffect(() => {
         if (activeWallet.id === asideLastSelectedWallet.current) {
-            // TODO ask user if he wants to connect to new wallet
+            // TODO подключать только если есть активное подключение к другому кошельку
             tonConnectInjectedConnector.changeConnectedWalletToActive(tabRef.current);
         }
     }, [activeWallet.id]);
