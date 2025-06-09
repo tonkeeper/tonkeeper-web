@@ -36,6 +36,7 @@
         "@capacitor/network": "^7.0.0",
         "@capacitor/preferences": "^6.0.2",
         "@capacitor/push-notifications": "^6.0.3",
+        "@capacitor/share": "^7.0.1",
         "@capacitor/splash-screen": "^6.0.3",
         "@ionic/react": "^8.4.2",
         "@ionic/react-router": "^8.4.2",

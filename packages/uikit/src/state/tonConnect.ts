@@ -8,6 +8,7 @@ import {
     createTonProofItem,
     eqOrigins,
     getAppConnections,
+    getInjectedDappConnection,
     getTonConnectParams,
     tonConnectProofPayload,
     toTonAddressItemReply,
@@ -116,6 +117,16 @@ export const useActiveWalletTonConnectConnections = () => {
         return { data: undefined, ...rest };
     }
     return { data: connection.connections, ...rest };
+};
+
+export const useInjectedDappConnectionByOrigin = (origin: string | undefined) => {
+    const query = useAppTonConnectConnections();
+    if (!query.data) {
+        return query;
+    } else {
+        const data = origin ? getInjectedDappConnection(query.data, origin) : undefined;
+        return { ...query, data };
+    }
 };
 
 export const useConnectTonConnectAppMutation = () => {

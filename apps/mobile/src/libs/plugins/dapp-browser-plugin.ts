@@ -137,7 +137,7 @@ class DappBrowser implements IDappBrowser {
             }
         });
 
-        DappBrowserPlugin.setOffset({ top: 52, bottom: 98 });
+        DappBrowserPlugin.setOffset({ top: 36, bottom: 98 });
     }
 
     async close(id: string): Promise<void> {

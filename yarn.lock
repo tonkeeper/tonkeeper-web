@@ -2508,6 +2508,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@capacitor/share@npm:^7.0.1":
+  version: 7.0.1
+  resolution: "@capacitor/share@npm:7.0.1"
+  peerDependencies:
+    "@capacitor/core": ">=7.0.0"
+  checksum: 10/f00a52378dc073b9879b09a15efff6ee70b34e671945a9ab6f026de035c65f6fd906c007092e966367259e7c8fdec808143714c5d3cddd63e759fa8dcc7450ad
+  languageName: node
+  linkType: hard
+
 "@capacitor/splash-screen@npm:^6.0.3":
   version: 6.0.3
   resolution: "@capacitor/splash-screen@npm:6.0.3"
@@ -6303,6 +6312,7 @@ __metadata:
     "@capacitor/network": "npm:^7.0.0"
     "@capacitor/preferences": "npm:^6.0.2"
     "@capacitor/push-notifications": "npm:^6.0.3"
+    "@capacitor/share": "npm:^7.0.1"
     "@capacitor/splash-screen": "npm:^6.0.3"
     "@ionic/react": "npm:^8.4.2"
     "@ionic/react-router": "npm:^8.4.2"

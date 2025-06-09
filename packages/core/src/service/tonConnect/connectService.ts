@@ -226,14 +226,23 @@ export const getDeviceInfo = (
 /**
  * Get actual connection for injected dapp
  */
-export const getInjectedDappConnection = async (
+export function getInjectedDappConnection(
+    connections: Awaited<ReturnType<typeof getAppConnections>>,
+    origin: string
+): { wallet: TonContract; connection: AccountConnectionInjected } | undefined;
+export async function getInjectedDappConnection(
     storage: IStorage,
     origin: string
-): Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined> => {
-    const appConnections = await getAppConnections(storage, 'injected');
-
-    return (
-        appConnections
+): Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined>;
+export function getInjectedDappConnection(
+    connectionsSource: IStorage | Awaited<ReturnType<typeof getAppConnections>>,
+    origin: string
+):
+    | Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined>
+    | { wallet: TonContract; connection: AccountConnectionInjected }
+    | undefined {
+    const getConnection = (connections: Awaited<ReturnType<typeof getAppConnections>>) =>
+        connections
             .map(item => {
                 const connection = item.connections
                     .filter(isAccountConnectionInjected)
@@ -245,9 +254,14 @@ export const getInjectedDappConnection = async (
             })
             .filter(Boolean)
             .sort((a, b) => b!.connection.creationTimestamp - a!.connection.creationTimestamp)[0] ??
-        undefined
-    );
-};
+        undefined;
+
+    if (Array.isArray(connectionsSource)) {
+        return getConnection(connectionsSource);
+    } else {
+        return getAppConnections(connectionsSource, 'injected').then(getConnection);
+    }
+}
 
 export const getInjectedDappConnectionForWallet = async (
     storage: IStorage,
