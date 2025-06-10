@@ -158,14 +158,12 @@ class DappBrowser implements IDappBrowser {
         url: string,
         options: {
             id?: string;
-            keepFocusMainView?: boolean;
         }
     ): Promise<BrowserTabBase> {
         const id = options.id ?? Date.now().toString();
         const metadata = await DappBrowserPlugin.open({
             url,
-            id,
-            focusDappView: !options.keepFocusMainView
+            id
         });
 
         const openedTab = {

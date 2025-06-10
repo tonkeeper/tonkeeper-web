@@ -101,31 +101,19 @@ export const useCloseActiveBrowserTab = () => {
     });
 };
 
-export const useCloseBrowserTab = (options?: { autoSwitchActiveTab?: boolean }) => {
+export const useCloseBrowserTab = () => {
     const sdk = useAppSdk();
     const { mutateAsync: removeTab } = useRemoveBrowserTabFromState();
-    const client = useQueryClient();
 
     return useMutation<void, Error, { id: string }>(async ({ id }) => {
         const tab = openedTab$.value;
         const openedTabId = tab !== 'blanc' ? tab?.id : undefined;
 
-        let nextTab: BrowserTab | undefined;
-        if (options?.autoSwitchActiveTab && id === openedTabId) {
-            const tabs = (await client.fetchQuery<BrowserTab[]>([QueryKey.browserTabs])).filter(
-                t => t.id !== openedTabId
-            );
-
-            if (tabs.length > 0) {
-                nextTab = tabs[0];
-            }
-        }
-
         sdk.dappBrowser?.close(id);
         await removeTab({ id });
 
         if (openedTabId === id) {
-            openedTab$.next(nextTab ? { type: 'existing', id: nextTab?.id } : undefined);
+            openedTab$.next(undefined);
         }
     });
 };

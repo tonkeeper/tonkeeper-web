@@ -96,7 +96,7 @@ export const WalletAsideMenuBrowserTabs: FC<{ className?: string }> = ({ classNa
         reorderBrowserTabs(updated);
     };
 
-    const { mutate: closeTab } = useCloseBrowserTab({ autoSwitchActiveTab: true });
+    const { mutate: closeTab } = useCloseBrowserTab();
     const { isOpen } = useMenuController('wallet-nav');
 
     useEffect(() => {

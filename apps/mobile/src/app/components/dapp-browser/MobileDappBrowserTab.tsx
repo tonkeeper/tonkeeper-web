@@ -43,8 +43,6 @@ import {
     useDisconnectTonConnectApp,
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
-import { useMenuController } from '@tonkeeper/uikit/dist/hooks/ionic';
-import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -100,14 +98,9 @@ export const MobileDappBrowserTab: FC<{
     const { mutate: addTab } = useAddBrowserTabToState();
     const [tabIsReady, setTabIsReady] = useState(false);
     const [tabIsCreated, setTabIsCreated] = useState(false);
-    const { isOpen: walletMenuIsOpen } = useMenuController('wallet-nav');
-    const walletMenuIsOpenRef = useValueRef(walletMenuIsOpen);
 
     useEffect(() => {
-        CapacitorDappBrowser.open(url, {
-            id: tabId,
-            keepFocusMainView: walletMenuIsOpenRef.current
-        }).then(t => {
+        CapacitorDappBrowser.open(url, { id: tabId }).then(t => {
             addTab(t);
             setTabIsCreated(true);
         });
