@@ -2,6 +2,7 @@ import { FC, useCallback, useEffect, useRef, useState } from 'react';
 import {
     BrowserTab,
     useAddBrowserTabToState,
+    useChangeBrowserTab,
     useCloseActiveBrowserTab,
     useHideActiveBrowserTab
 } from '@tonkeeper/uikit/dist/state/dapp-browser';
@@ -21,8 +22,10 @@ import {
     CopyIcon,
     DisconnectIcon,
     EllipsisIcon,
+    PinIconOutline,
     RefreshIcon,
-    ShareIcon
+    ShareIcon,
+    UnpinIconOutline
 } from '@tonkeeper/uikit/dist/components/Icon';
 import { asideWalletSelected$, useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { tonConnectInjectedConnector } from '../../../libs/ton-connect/injected-connector';
@@ -43,6 +46,7 @@ import {
     useDisconnectTonConnectApp,
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
+import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -122,10 +126,7 @@ export const MobileDappBrowserTab: FC<{
 
     const activeWallet = useActiveWallet();
 
-    const tabRef = useRef(tab);
-    useEffect(() => {
-        tabRef.current = tab;
-    }, [tab]);
+    const tabRef = useValueRef(tab);
 
     const asideLastSelectedWallet = useRef<WalletId | undefined>();
     useEffect(() => asideWalletSelected$.subscribe(w => (asideLastSelectedWallet.current = w)), []);
@@ -160,6 +161,10 @@ const TabHeaderWrapper = styled.div`
     justify-content: center;
     position: relative;
     background-color: ${p => p.theme.backgroundPage};
+
+    .dd-select-container-header {
+        max-height: unset;
+    }
 `;
 
 const BackButton = styled(IconButtonTransparentBackground)`
@@ -205,6 +210,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
     const sdk = useAppSdk();
     const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
     const { mutate } = useDisconnectTonConnectApp();
+    const { mutate: changeTab } = useChangeBrowserTab();
 
     return (
         <TabHeaderWrapper>
@@ -258,6 +264,41 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                 </DropDownRightIcon>
                             </DropDownItem>
                             <DropDownItemsDivider />
+                            {'isPinned' in tab && (
+                                <>
+                                    <DropDownItem
+                                        onClick={() => {
+                                            const isPinned = tab.isPinned;
+                                            closeDropDown();
+                                            changeTab({
+                                                ...tab,
+                                                isPinned: !tab.isPinned
+                                            } as BrowserTab);
+                                            sdk.topMessage(
+                                                t(
+                                                    isPinned
+                                                        ? 'tab_action_toast_unpinned'
+                                                        : 'tab_action_toast_pinned'
+                                                )
+                                            );
+                                        }}
+                                    >
+                                        {t(
+                                            tab.isPinned
+                                                ? 'browser_actions_unpin'
+                                                : 'browser_actions_pin'
+                                        )}
+                                        <DropDownRightIcon>
+                                            {tab.isPinned ? (
+                                                <UnpinIconOutline />
+                                            ) : (
+                                                <PinIconOutline />
+                                            )}
+                                        </DropDownRightIcon>
+                                    </DropDownItem>
+                                    <DropDownItemsDivider />
+                                </>
+                            )}
                             <DropDownItem
                                 onClick={() => {
                                     closeDropDown();

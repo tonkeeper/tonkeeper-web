@@ -37,8 +37,10 @@ export const useActiveBrowserTab = () => {
         if (openedTab === 'blanc') {
             return 'blanc';
         }
-        if (openedTab.type === 'existing') {
-            return tabs.find(t => t.id === openedTab.id);
+
+        const existingTab = tabs.find(t => t.id === openedTab.id);
+        if (openedTab.type === 'existing' || existingTab !== undefined) {
+            return existingTab;
         }
         return openedTab;
     }, [tabs, openedTab]);
@@ -187,26 +189,40 @@ export const useAddBrowserTabToState = () => {
 export const useChangeBrowserTab = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    return useMutation<void, Error, BrowserTabLive & { isPinned?: boolean }>(async tab => {
-        const liveTab = liveTabs.find(lt => lt.id === tab.id);
-        if (liveTab) {
-            liveTab.canGoBack = tab.canGoBack;
-        } else {
-            liveTabs = [...liveTabs, tab];
+    return useMutation<void, Error, BrowserTab | BrowserTabLive>(async tab => {
+        if (tab.isLive) {
+            const liveTab = liveTabs.find(lt => lt.id === tab.id);
+            if (liveTab) {
+                liveTab.canGoBack = tab.canGoBack;
+            } else {
+                liveTabs = [...liveTabs, tab];
+            }
         }
 
         const tabs = await getBrowserTabsList(sdk.storage);
         const tabToChangeIndex = tabs.findIndex(t => t.id === tab.id);
+        let firstNotPinnedTabIndex = tabs.findIndex(t => !t.isPinned);
+        firstNotPinnedTabIndex =
+            firstNotPinnedTabIndex === -1 ? tabs.length : firstNotPinnedTabIndex;
 
         // new tab is opened
         if (tabToChangeIndex === -1) {
-            tabs.unshift({ isPinned: false, ...tab });
-        }
+            tabs.splice(firstNotPinnedTabIndex, 0, { isPinned: false, ...tab });
+        } else {
+            const prevTab = tabs[tabToChangeIndex];
+            const newTab = { isPinned: prevTab.isPinned, ...tab };
 
-        tabs[tabToChangeIndex] = { isPinned: false, ...tab };
+            // Tab became pinned or unpinned -- move to the bottom of pinned tabs zone or to the top of not pinned tabs zone.
+            // This positions indexes are same basically
+            if (prevTab.isPinned !== newTab.isPinned) {
+                tabs.splice(tabToChangeIndex, 1);
+                tabs.splice(firstNotPinnedTabIndex, 0, newTab);
+            } else {
+                tabs[tabToChangeIndex] = newTab;
+            }
+        }
         await setBrowserTabsList(sdk.storage, tabs);
         await client.invalidateQueries([QueryKey.browserTabs]);
-        openedTab$.next({ type: 'existing', id: tab.id });
     });
 };
 

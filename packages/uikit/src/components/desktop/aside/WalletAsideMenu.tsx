@@ -84,10 +84,6 @@ const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
 `;
 
-const WalletAsideMenuBrowserTabsStyled = styled(WalletAsideMenuBrowserTabs)`
-    margin-top: 24px;
-`;
-
 const useHideBrowserAfterNavigation = () => {
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
     return useCallback(() => {
@@ -196,7 +192,7 @@ export const WalletAsideMenu = () => {
                 )}
             </NavLink>
             <ForTargetEnv env="mobile">
-                <WalletAsideMenuBrowserTabsStyled />
+                <WalletAsideMenuBrowserTabs />
             </ForTargetEnv>
         </WalletAsideContainer>
     );
