@@ -22,17 +22,18 @@ import {
     useState
 } from 'react';
 import { DragDropContext, Draggable, Droppable, DropResult } from 'react-beautiful-dnd';
-import { CloseIcon, PinIconOutline, ReorderIcon, UnpinIconOutline } from '../../Icon';
+import { CloseIcon, PinIconOutline, ReorderIcon16, UnpinIconOutline } from '../../Icon';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundPage)};
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
     gap: 0;
     height: 36px;
+    will-change: transform;
 
     ${Label2} {
         overflow: hidden;
@@ -64,9 +65,7 @@ const EditButton = styled(ButtonFlat)`
 `;
 
 const LeftIconButton = styled(IconButtonTransparentBackground)<{ $hidden?: boolean }>`
-    margin-left: -16px;
-    padding-left: 16px;
-    padding-right: 8px;
+    padding: 0 16px 0 8px;
     height: 36px;
     display: flex;
     align-items: center;
@@ -76,10 +75,8 @@ const LeftIconButton = styled(IconButtonTransparentBackground)<{ $hidden?: boole
 `;
 
 const RightIconButton = styled(IconButtonTransparentBackground)`
-    padding-left: 8px;
-    padding-right: 16px;
+    padding: 0 8px 0 16px;
     margin-left: auto;
-    margin-right: -16px;
     height: 36px;
     display: flex;
     align-items: center;
@@ -183,7 +180,7 @@ const BrowserTabsPinned: FC<{
                     transform = transform.replace(/\(.+\,/, '(0,');
                 }
 
-                const style = {
+                const style: Record<string, unknown> = {
                     ...provided.draggableProps.style,
                     transform,
                     left: '8px'
@@ -198,7 +195,7 @@ const BrowserTabsPinned: FC<{
                         onClick={() => onClickTab(tab)}
                     >
                         <LeftIconButton {...provided.dragHandleProps} $hidden={!isEditMode}>
-                            <ReorderIcon />
+                            <ReorderIcon16 />
                         </LeftIconButton>
                         <img
                             src={tab.iconUrl}

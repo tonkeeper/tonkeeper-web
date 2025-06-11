@@ -472,6 +472,26 @@ export const ReorderIcon = () => {
     );
 };
 
+export const ReorderIcon16 = () => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M13.25 3L13.3271 3.00391C13.7051 3.04253 14 3.36183 14 3.75C14 4.13817 13.7051 4.45747 13.3271 4.49609L13.25 4.5H2.75C2.33579 4.5 2 4.16421 2 3.75C2 3.33579 2.33579 3 2.75 3H13.25ZM13.25 7.25L13.3271 7.25391C13.7051 7.29253 14 7.61183 14 8C14 8.38817 13.7051 8.70747 13.3271 8.74609L13.25 8.75H2.75C2.33579 8.75 2 8.41421 2 8C2 7.58579 2.33579 7.25 2.75 7.25H13.25ZM13.3271 11.5039L13.25 11.5H2.75C2.33579 11.5 2 11.8358 2 12.25C2 12.6642 2.33579 13 2.75 13H13.25L13.3271 12.9961C13.7051 12.9575 14 12.6382 14 12.25C14 11.8618 13.7051 11.5425 13.3271 11.5039Z"
+                fill="currentColor"
+            />
+            ;
+        </svg>
+    );
+};
+
 export const EllipsisIcon = forwardRef<SVGSVGElement, React.SVGProps<SVGSVGElement>>(
     (props, ref) => {
         return (
