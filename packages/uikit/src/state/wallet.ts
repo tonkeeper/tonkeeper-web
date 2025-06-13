@@ -84,6 +84,7 @@ import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
 import { useMutateIsFreeProAccessActivate } from './pro';
 import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
+import { subject } from '@tonkeeper/core/dist/entries/atom';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -148,6 +149,8 @@ export const useMutateActiveAccountAndWallet = () => {
         }
     );
 };
+
+export const asideWalletSelected$ = subject<WalletId>();
 
 export const useMutateActiveTonWallet = () => {
     const storage = useAccountsStorage();

@@ -56,5 +56,7 @@ export enum AppKey {
 
     KEYCHAIN_SETTINGS = 'keychain_settings',
 
-    ENABLE_REVIEWER_MODE = 'ENABLE_REVIEWER_MODE'
+    ENABLE_REVIEWER_MODE = 'ENABLE_REVIEWER_MODE',
+
+    BROWSER_TABS = 'browser_tabs'
 }

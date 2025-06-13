@@ -17,6 +17,7 @@ import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
 import { NFT } from '@tonkeeper/core/dist/entries/nft';
+import { HideOnReview } from '../../components/ios/HideOnReview';
 
 const gap = '10px';
 const maxColumnsNumber = 4;
@@ -118,38 +119,42 @@ export const DesktopNFTS: FC<{
             mobileContentPaddingTop={!!nfts.length}
             emptyList$={!nfts.length}
         >
-            <DesktopViewHeader borderBottom={!closeTop}>
-                <DesktopViewHeaderContent
-                    title={pageTitle}
-                    right={
-                        <DesktopViewHeaderContent.Right>
-                            <DesktopViewHeaderContent.RightItem closeDropDownOnClick>
-                                <ExplorerLinkStyled
-                                    to={AppRoute.walletSettings + WalletSettingsRoute.nft}
-                                    replace={false}
-                                >
-                                    <SlidersIcon />
-                                    <ForTargetEnv env="mobile">{t('settings_title')}</ForTargetEnv>
-                                </ExplorerLinkStyled>
-                            </DesktopViewHeaderContent.RightItem>
-                        </DesktopViewHeaderContent.Right>
-                    }
-                />
-            </DesktopViewHeader>
-            <PullToRefresh invalidate={QueryKey.nft} />
-            {!nfts.length ? (
-                <NFTEmptyPage>
-                    <NFTEmptyContainer>
-                        <Label2>{emptyPageTitle}</Label2>
-                        <Body2>{t('nft_empty_description')}</Body2>
-                        <LinkStyled to={AppRoute.browser}>
-                            <Button size="small">{t('nft_empty_go_discover_button')}</Button>
-                        </LinkStyled>
-                    </NFTEmptyContainer>
-                </NFTEmptyPage>
-            ) : (
-                <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
-            )}
+            <HideOnReview>
+                <DesktopViewHeader borderBottom={!closeTop}>
+                    <DesktopViewHeaderContent
+                        title={pageTitle}
+                        right={
+                            <DesktopViewHeaderContent.Right>
+                                <DesktopViewHeaderContent.RightItem closeDropDownOnClick>
+                                    <ExplorerLinkStyled
+                                        to={AppRoute.walletSettings + WalletSettingsRoute.nft}
+                                        replace={false}
+                                    >
+                                        <SlidersIcon />
+                                        <ForTargetEnv env="mobile">
+                                            {t('settings_title')}
+                                        </ForTargetEnv>
+                                    </ExplorerLinkStyled>
+                                </DesktopViewHeaderContent.RightItem>
+                            </DesktopViewHeaderContent.Right>
+                        }
+                    />
+                </DesktopViewHeader>
+                <PullToRefresh invalidate={QueryKey.nft} />
+                {!nfts.length ? (
+                    <NFTEmptyPage>
+                        <NFTEmptyContainer>
+                            <Label2>{emptyPageTitle}</Label2>
+                            <Body2>{t('nft_empty_description')}</Body2>
+                            <LinkStyled to={AppRoute.browser}>
+                                <Button size="small">{t('nft_empty_go_discover_button')}</Button>
+                            </LinkStyled>
+                        </NFTEmptyContainer>
+                    </NFTEmptyPage>
+                ) : (
+                    <NFTPageBody>{nfts && <NftsListStyled nfts={nfts} />}</NFTPageBody>
+                )}
+            </HideOnReview>
         </DesktopViewPageLayoutStyled>
     );
 };

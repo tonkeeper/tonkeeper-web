@@ -45,3 +45,4 @@ export const atom = <T>(value: T): Atom<T> => new Atom<T>(value);
 export const subject = <T>(): Subject<T> => new Subject<T>();
 
 export type ReadonlyAtom<T> = Omit<Atom<T>, 'next'>;
+export type ReadonlySubject<T> = Omit<Subject<T>, 'next'>;

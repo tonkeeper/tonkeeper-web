@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/mobile",
-    "version": "4.0.2",
+    "version": "4.1.0",
     "license": "Apache-2.0",
     "description": "Your tablet wallet on The Open Network",
     "type": "module",
@@ -36,6 +36,7 @@
         "@capacitor/network": "^7.0.0",
         "@capacitor/preferences": "^6.0.2",
         "@capacitor/push-notifications": "^6.0.3",
+        "@capacitor/share": "^7.0.1",
         "@capacitor/splash-screen": "^6.0.3",
         "@ionic/react": "^8.4.2",
         "@ionic/react-router": "^8.4.2",
@@ -53,7 +54,8 @@
         "react-i18next": "^13.5.0",
         "react-router-dom": "^5.3.4",
         "styled-components": "^6.1.1",
-        "uuid": "^11.0.2"
+        "uuid": "^11.0.2",
+        "zod": "^3.25.36"
     },
     "devDependencies": {
         "@capacitor/cli": "latest",

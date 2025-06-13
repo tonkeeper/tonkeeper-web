@@ -26,6 +26,8 @@ PODS:
     - Capacitor
   - CapacitorPushNotifications (6.0.3):
     - Capacitor
+  - CapacitorShare (7.0.1):
+    - Capacitor
   - CapacitorSplashScreen (6.0.3):
     - Capacitor
   - FirebaseCore (11.6.0):
@@ -97,6 +99,7 @@ DEPENDENCIES:
   - "CapacitorNetwork (from `../../node_modules/@capacitor/network`)"
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorPushNotifications (from `../../node_modules/@capacitor/push-notifications`)"
+  - "CapacitorShare (from `../../node_modules/@capacitor/share`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - FirebaseMessaging
 
@@ -140,6 +143,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/preferences"
   CapacitorPushNotifications:
     :path: "../../node_modules/@capacitor/push-notifications"
+  CapacitorShare:
+    :path: "../../node_modules/@capacitor/share"
   CapacitorSplashScreen:
     :path: "../../node_modules/@capacitor/splash-screen"
 
@@ -158,6 +163,7 @@ SPEC CHECKSUMS:
   CapacitorNetwork: 30c2e78a0ed32530656cb426c8ee6c2caec10dbf
   CapacitorPreferences: f3eadae2369ac3ab8e21743a2959145b0d1286a3
   CapacitorPushNotifications: 9b178e010634d2f7bfca97b81478503463f86b6c
+  CapacitorShare: e573823f511f260f598d0423c33b1e3d7bbe5fd1
   CapacitorSplashScreen: fd8bf1bf9081d9aa8817b7cd37d740d1bdaf2fb2
   FirebaseCore: 48b0dd707581cf9c1a1220da68223fb0a562afaa
   FirebaseCoreInternal: d98ab91e2d80a56d7b246856a8885443b302c0c2
@@ -168,6 +174,6 @@ SPEC CHECKSUMS:
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
 
-PODFILE CHECKSUM: 17f428c2e02570ba305b299fb09caf831e304784
+PODFILE CHECKSUM: e356ecc9c691d0d3daea9a8d8a6a0cad130bb97f
 
 COCOAPODS: 1.16.2

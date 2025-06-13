@@ -1,10 +1,10 @@
 import { TonConnectSSE } from '@tonkeeper/core/dist/service/tonConnect/ton-connect-sse';
-import { CapacitorStorage } from './storage';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { App } from '@capacitor/app';
 import { isSignerLink } from '@tonkeeper/uikit/dist/state/signer';
 import { atom, subject } from '@tonkeeper/core/dist/entries/atom';
+import { capacitorStorage } from '../appSdk';
 
 const tonConnectDisconnect$ = subject<AccountConnection>();
 const tonConnectRequest$ = subject<TonConnectAppRequestPayload>();
@@ -13,19 +13,19 @@ const signerResponse$ = subject<{
 }>();
 
 export const tonConnectSSE = new TonConnectSSE({
-    storage: new CapacitorStorage(),
+    storage: capacitorStorage,
     listeners: {
         onDisconnect: connection => tonConnectDisconnect$.next(connection),
         onRequest: params => tonConnectRequest$.next(params)
     }
 });
-export const subscribeToTonConnectDisconnect = (
+export const subscribeToHttpTonConnectDisconnect = (
     listener: (connection: AccountConnection) => void
 ) => {
     return tonConnectDisconnect$.subscribe(listener);
 };
 
-export const subscribeToTonConnectRequestTransaction = (
+export const subscribeToHttpTonConnectRequest = (
     listener: (value: TonConnectAppRequestPayload) => void
 ) => {
     return tonConnectRequest$.subscribe(listener);

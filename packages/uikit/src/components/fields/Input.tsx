@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { InputHTMLAttributes, ReactNode, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { XmarkIcon } from '../Icon';
 import { Body2 } from '../Text';
@@ -190,10 +190,13 @@ const ClearBlock = styled(RightBlock)`
     }
 `;
 
-export interface InputProps {
-    type?: 'password' | undefined;
+export type InputProps = Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    'autoFocus' | 'onChange' | 'size'
+> & {
     value: string;
     onChange?: (value: string) => void;
+    onFocusChange?: (isFocused: boolean) => void;
     onSubmit?: () => void;
     isValid?: boolean;
     isSuccess?: boolean;
@@ -208,15 +211,15 @@ export interface InputProps {
     size?: 'small' | 'medium';
     id: string;
     autoFocus?: number | boolean | 'notification';
-}
+};
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     (
         {
             id,
-            type,
             value,
             onChange,
+            onFocusChange,
             isValid = true,
             isSuccess = false,
             label,
@@ -228,12 +231,17 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             marginRight,
             className,
             size,
-            autoFocus
+            autoFocus,
+            ...rest
         },
         ref
     ) => {
-        const [focus, setFocus] = useState(false);
+        const [focus, _setFocus] = useState(false);
         const focused = useRef(false);
+        const setFocus = (v: boolean) => {
+            _setFocus(v);
+            onFocusChange?.(v);
+        };
 
         const onClear: React.MouseEventHandler<HTMLDivElement> = e => {
             e.stopPropagation();
@@ -268,10 +276,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     size={size}
                 >
                     <InputField
+                        {...rest}
                         id={id}
                         ref={mergeRefs(ref, el)}
                         disabled={disabled}
-                        type={type}
                         value={value}
                         spellCheck={false}
                         autoCorrect="off"

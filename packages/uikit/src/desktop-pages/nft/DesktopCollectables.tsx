@@ -2,7 +2,6 @@ import { useTranslation } from '../../hooks/translation';
 import { useWalletFilteredNftList } from '../../state/nft';
 import { useMemo } from 'react';
 import { KnownNFTDnsCollections } from '../../components/nft/NftView';
-import { HideOnReview } from '../../components/ios/HideOnReview';
 import { DesktopNFTS } from './DesktopNft';
 
 export const DesktopCollectables = () => {
@@ -19,12 +18,10 @@ export const DesktopCollectables = () => {
     );
 
     return (
-        <HideOnReview>
-            <DesktopNFTS
-                nfts={filteredNft}
-                emptyPageTitle={t('collectibles_empty_header')}
-                pageTitle={t('wallet_aside_collectibles')}
-            />
-        </HideOnReview>
+        <DesktopNFTS
+            nfts={filteredNft}
+            emptyPageTitle={t('collectibles_empty_header')}
+            pageTitle={t('wallet_aside_collectibles')}
+        />
     );
 };

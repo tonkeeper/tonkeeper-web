@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+    ConnectEvent,
     DAppManifest,
     RpcMethod,
     TonConnectEventPayload,
@@ -16,8 +17,9 @@ import {
     saveWalletTonConnect
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
-    AccountConnection,
-    TonConnectParams
+    AccountConnectionHttp,
+    TonConnectHttpConnectionParams,
+    TonConnectInjectedConnectionParams
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { sendEventToBridge } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -45,7 +47,7 @@ export const useProcessOpenedLink = (options?: {
     const batteryConfig = useBatteryServiceConfig();
     const gaslessConfig = useGaslessConfig();
 
-    return useMutation<null | TonConnectParams, Error, string>(async url => {
+    return useMutation<null | TonConnectHttpConnectionParams, Error, string>(async url => {
         try {
             const bring = seeIfBringToFrontLink({ url });
             if (bring != null) {
@@ -123,21 +125,23 @@ export const useProcessOpenedLink = (options?: {
     });
 };
 
-export interface AppConnectionProps {
-    params: TonConnectParams;
-    result: {
-        replyItems: TonConnectEventPayload;
-        manifest: DAppManifest;
-        account: Account;
-        walletId: WalletId;
-    } | null;
-}
-
-export const useResponseConnectionMutation = () => {
+export const useResponseHttpConnectionMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation<undefined, Error, AppConnectionProps>(async ({ params, result }) => {
+    return useMutation<
+        undefined,
+        Error,
+        {
+            params: TonConnectHttpConnectionParams;
+            result: {
+                replyItems: TonConnectEventPayload;
+                manifest: DAppManifest;
+                account: Account;
+                walletId: WalletId;
+            } | null;
+        }
+    >(async ({ params, result }) => {
         if (result) {
             const response = await saveWalletTonConnect({
                 storage: sdk.storage,
@@ -169,12 +173,53 @@ export const useResponseConnectionMutation = () => {
     });
 };
 
+export const useResponseInjectedConnectionMutation = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation<
+        undefined,
+        Error,
+        {
+            params: TonConnectInjectedConnectionParams;
+            result: {
+                replyItems: TonConnectEventPayload;
+                manifest: DAppManifest;
+                account: Account;
+                walletId: WalletId;
+            } | null;
+            sendBridgeResponse: (result: ConnectEvent) => void;
+        }
+    >(async ({ params, result, sendBridgeResponse }) => {
+        if (result) {
+            const response = await saveWalletTonConnect({
+                storage: sdk.storage,
+                account: result.account,
+                walletId: result.walletId,
+                manifest: result.manifest,
+                params,
+                replyItems: result.replyItems.items,
+                appVersion: sdk.version
+            });
+
+            sendBridgeResponse(response);
+
+            await client.invalidateQueries([QueryKey.tonConnectConnection]);
+            await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
+        } else {
+            sendBridgeResponse(connectRejectResponse());
+        }
+
+        return undefined;
+    });
+};
+
 export interface ResponseSendProps {
-    connection: AccountConnection;
+    connection: AccountConnectionHttp;
     response: WalletResponse<RpcMethod>;
 }
 
-export const useTonConnectResponseMutation = () => {
+export const useTonConnectHttpResponseMutation = () => {
     return useMutation<void, Error, ResponseSendProps>(async ({ connection, response }) => {
         return sendEventToBridge({
             response,

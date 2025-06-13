@@ -26,6 +26,7 @@ import { Keyboard } from '@capacitor/keyboard';
 import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { CapacitorFileLogger } from './logger';
+import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -73,6 +74,7 @@ export class BiometryServiceCapacitor implements BiometryService {
         }
     };
 }
+export const capacitorStorage = new CapacitorStorage();
 
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     cookie = new CookieCapacitor();
@@ -87,7 +89,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainCapacitor(this.biometry, this.storage);
 
     constructor() {
-        super(new CapacitorStorage());
+        super(capacitorStorage);
     }
 
     copyToClipboard = async (value: string, notification?: string) => {
@@ -177,6 +179,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         const device = await Device.getId();
         return device.identifier;
     }
+
+    dappBrowser = CapacitorDappBrowser;
 }
 
 export const getCapacitorDeviceOS = async () => {

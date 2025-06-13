@@ -20,6 +20,7 @@ import {
 import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -152,6 +153,12 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
+    const onGetPro = () => {
+        hideBrowser();
+        onOpen();
+    };
+
     let button = <Button loading>Pro</Button>;
     if (data) {
         if (data.subscription.valid) {
@@ -170,7 +177,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
             );
         } else {
             button = (
-                <Button primary onClick={onOpen}>
+                <Button primary onClick={onGetPro}>
                     {t('pro_subscription_get_pro')}
                 </Button>
             );

@@ -125,6 +125,7 @@ export interface DropDownProps extends PropsWithChildren {
     containerClassName?: string;
     trigger?: 'click' | 'hover';
     portal?: boolean;
+    onStatusChange?: (isOpened: boolean) => void;
 }
 
 const ContainerStyled = styled(Container)<{ status: TransitionStatus }>`
@@ -154,9 +155,15 @@ export const DropDown = ({
     className,
     containerClassName,
     trigger = 'click',
-    portal
+    portal,
+    onStatusChange
 }: DropDownProps) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen, _setIsOpen] = useState(false);
+
+    const setIsOpen = (value: boolean) => {
+        _setIsOpen(value);
+        onStatusChange?.(value);
+    };
 
     useEffect(() => {
         if (isOpen && portal) {
@@ -167,7 +174,7 @@ export const DropDown = ({
 
     const toggling = () => {
         if (!disabled) {
-            setIsOpen(value => !value);
+            setIsOpen(!isOpen);
         }
     };
 
@@ -286,8 +293,17 @@ const DoneIconStyled = styled(DoneIcon)`
     color: ${p => p.theme.accentBlue};
 `;
 
+export const DropDownRightIcon = styled.div`
+    display: contents;
+    & > * {
+        flex-shrink: 0;
+        margin-left: auto;
+        color: ${p => p.theme.accentBlue};
+    }
+`;
+
 export const DropDownItem: FC<
-    PropsWithChildren<{ isSelected: boolean } & ComponentProps<'div'>>
+    PropsWithChildren<{ isSelected?: boolean } & ComponentProps<'div'>>
 > = ({ isSelected, children, ...rest }) => {
     return (
         <DropDownListItemStyled {...rest}>

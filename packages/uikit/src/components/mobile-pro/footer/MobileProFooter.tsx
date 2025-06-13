@@ -12,6 +12,7 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute } from '../../../libs/routes';
 import { FC } from 'react';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const FooterContainer = styled.div`
     display: flex;
@@ -69,6 +70,7 @@ export const MobileProFooter = () => {
     const leftMenuController = useMenuController('aside-nav');
     const rightMenuController = useMenuController('wallet-nav');
     const navigate = useNavigate();
+    const { mutate: hideBrowserTab } = useHideActiveBrowserTab();
 
     const { data: balance, isLoading } = useWalletTotalBalance();
     const fiat = useUserFiat();
@@ -76,6 +78,11 @@ export const MobileProFooter = () => {
     const onFooterClick = () => {
         leftMenuController.close();
         rightMenuController.close();
+    };
+
+    const onCenterClick = () => {
+        navigate(AppRoute.home);
+        hideBrowserTab();
     };
 
     const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
@@ -96,8 +103,8 @@ export const MobileProFooter = () => {
                     >
                         <LeftTabIcon $isActive={leftMenuController.isOpen} />
                     </TabButton>
-                    <AccountMenuWrapper>
-                        <AccountMenuLine1 onClick={() => navigate(AppRoute.home)}>
+                    <AccountMenuWrapper onClick={onCenterClick}>
+                        <AccountMenuLine1>
                             <WalletEmoji emoji={emoji} emojiSize="14px" containerSize="18px" />
                             <Label2>{name}</Label2>
                         </AccountMenuLine1>

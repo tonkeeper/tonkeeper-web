@@ -17,6 +17,11 @@ export enum AppRoute {
     home = '/'
 }
 
+export enum DappBrowserRoute {
+    new = '/new',
+    tab = '/tab'
+}
+
 export enum AppProRoute {
     dashboard = '/dashboard',
     multiSend = '/multi-send'

@@ -5,7 +5,7 @@ import { TonConnect } from './provider/tonconnect';
 const havePrevInstance = !!window.tonkeeper;
 
 const provider = new TonProvider(window?.tonkeeper?.provider);
-const tonconnect = new TonConnect(provider, window?.tonkeeper?.tonconnect);
+const tonconnect = new TonConnect(provider);
 const tonapi = new TonApi(provider);
 
 window.tonkeeper = {

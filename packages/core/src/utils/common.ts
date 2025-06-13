@@ -213,3 +213,5 @@ export const pTimeout = <T>(p: Promise<T>, ms: number): Promise<T> => {
         });
     });
 };
+
+export const removeLastSlash = (url: string) => url.replace(/\/$/, '');

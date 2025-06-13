@@ -1,8 +1,8 @@
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
-    useResponseConnectionMutation,
+    useResponseHttpConnectionMutation,
     useProcessOpenedLink
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
@@ -15,11 +15,11 @@ import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
 const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 
 export const UrlTonConnectSubscription = () => {
-    const [params, setParams] = useState<TonConnectParams | null>(null);
+    const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
 
     const { mutateAsync: parseParams, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        useResponseConnectionMutation();
+        useResponseHttpConnectionMutation();
 
     const handlerClose = async (
         result: {

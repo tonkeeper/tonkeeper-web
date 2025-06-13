@@ -1,10 +1,9 @@
 import { CarouselApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import { ComponentProps, FC } from 'react';
+import { ComponentProps, FC, useCallback } from 'react';
 import styled from 'styled-components';
 import { Body3, Label2 } from '../Text';
 import { Carousel } from '../shared';
-import { useAppContext } from '../../hooks/appContext';
-import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { useAreaClick, useOpenPromotedAppCallback } from '../../hooks/useAreaClick';
 import {
     PromotedItem,
     PromotedItemImage,
@@ -30,8 +29,10 @@ const CarouselCardFooter = styled(PromotedItem)`
 `;
 
 export const PromotionsCarousel: FC<
-    { apps: CarouselApp[]; className?: string } & Partial<ComponentProps<typeof Carousel>>
-> = ({ apps, className, ...rest }) => {
+    { apps: CarouselApp[]; onClickApp?: (app: CarouselApp) => void; className?: string } & Partial<
+        ComponentProps<typeof Carousel>
+    >
+> = ({ apps, onClickApp, className, ...rest }) => {
     const config = useActiveConfig();
     const speed = config.featured_play_interval || 1000 * 10;
 
@@ -44,15 +45,26 @@ export const PromotionsCarousel: FC<
             {...rest}
         >
             {apps.map(item => (
-                <CarouselItem item={item} key={item.url} />
+                <CarouselItem item={item} key={item.url} onClickApp={onClickApp} />
             ))}
         </Carousel>
     );
 };
 
-const CarouselItem: FC<{ item: CarouselApp }> = ({ item }) => {
-    const { tonendpoint } = useAppContext();
-    const ref = useOpenLinkOnAreaClick(item.url, 'featured', tonendpoint.getTrack());
+const CarouselItem: FC<{ item: CarouselApp; onClickApp?: (app: CarouselApp) => void }> = ({
+    item,
+    onClickApp
+}) => {
+    const openAppCallback = useOpenPromotedAppCallback(item.url, 'featured');
+    const callback = useCallback(() => {
+        if (onClickApp) {
+            onClickApp(item);
+        } else {
+            openAppCallback();
+        }
+    }, [onClickApp, openAppCallback, item]);
+
+    const ref = useAreaClick({ callback });
 
     return (
         <CarouselCard img={item.poster} ref={ref}>
