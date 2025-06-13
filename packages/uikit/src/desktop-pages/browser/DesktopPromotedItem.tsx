@@ -1,8 +1,7 @@
 import styled from 'styled-components';
 import { FC } from 'react';
 import { PromotedApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import { useAppContext } from '../../hooks/appContext';
-import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { useOpenPromotedAppCallback } from '../../hooks/useAreaClick';
 import { Body3, Label2 } from '../../components/Text';
 
 export const DesktopPromotedItem = styled.div`
@@ -55,11 +54,10 @@ export const DesktopCategoryGroupItem: FC<{ item: PromotedApp; className?: strin
     item,
     className
 }) => {
-    const { tonendpoint } = useAppContext();
-    const ref = useOpenLinkOnAreaClick(item.url, 'recommendation', tonendpoint.getTrack());
+    const openAppCallback = useOpenPromotedAppCallback(item.url, 'recommendation');
 
     return (
-        <DesktopPromotedItem ref={ref} className={className}>
+        <DesktopPromotedItem onClick={openAppCallback} className={className}>
             <DesktopPromotedItemImage src={item.icon} />
             <DesktopPromotedItemText>
                 <Label2>{item.name}</Label2>

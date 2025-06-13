@@ -29,7 +29,7 @@ import { H2, H3Label2Responsive, Label2 } from './Text';
 import { IconButtonTransparentBackground } from './fields/IconButton';
 import { AnimateHeightChange } from './shared/AnimateHeightChange';
 import { IonContent, IonModal } from '@ionic/react';
-import { cn } from '../libs/css';
+import { cn, iosKeyboardTransition } from '../libs/css';
 import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
 import { atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
 
@@ -245,7 +245,7 @@ const FooterWrapper = styled.div<{ $keyboardShift?: number }>`
                       transform: translateY(0);
                   `}
 
-            transition: transform 0.3s cubic-bezier(0.1, 0.76, 0.55, 0.9);
+            transition: transform ${iosKeyboardTransition};
 
             &:empty {
                 padding-bottom: ${p.$keyboardShift

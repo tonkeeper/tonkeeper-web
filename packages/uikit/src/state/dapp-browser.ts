@@ -8,9 +8,10 @@ import {
     BrowserTabLive,
     BrowserTabStored,
     getBrowserTabsList,
+    getSearchEngineRecommendations,
     setBrowserTabsList
 } from '@tonkeeper/core/dist/service/dappBrowserService';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 
 export type BrowserTab =
@@ -54,9 +55,9 @@ export const useOpenBrowserTab = () => {
     return useMutation<
         void,
         Error,
-        { id: string } | { url: string; title?: string; iconUrl?: string }
+        { id: string } | { url: string; title?: string; iconUrl?: string } | 'blanc'
     >(async tab => {
-        if ('isActive' in tab) {
+        if (tab === 'blanc') {
             openedTab$.next('blanc');
             return;
         }
@@ -115,6 +116,31 @@ export const useCloseBrowserTab = () => {
         await removeTab({ id });
 
         if (openedTabId === id) {
+            openedTab$.next(undefined);
+        }
+    });
+};
+
+export const useCloseAllBrowserTabs = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation<void, Error>(async () => {
+        const tab = openedTab$.value;
+        const openedTabId = tab !== 'blanc' ? tab?.id : undefined;
+
+        const tabs = await client.getQueryData<BrowserTab[]>([QueryKey.browserTabs]);
+
+        if (!tabs || !tabs.length) {
+            return;
+        }
+
+        sdk.dappBrowser?.close(tabs.map(t => t.id));
+        liveTabs = [];
+        await setBrowserTabsList(sdk.storage, []);
+        await client.invalidateQueries([QueryKey.browserTabs]);
+
+        if (openedTabId) {
             openedTab$.next(undefined);
         }
     });
@@ -240,5 +266,23 @@ const useRemoveBrowserTabFromState = () => {
             tabs.filter(t => t.id !== tab.id)
         );
         await client.invalidateQueries([QueryKey.browserTabs]);
+    });
+};
+
+export const useSearchEngine = () => {
+    return useCallback((query: string) => `https://duckduckgo.com/?q=${query}`, []);
+};
+
+export const useSearchEngineName = () => {
+    return 'DuckDuckGo';
+};
+
+export const useSearchEngineRecommendations = (query: string) => {
+    return useQuery([QueryKey.searchEngineRecommendations, query], async () => {
+        if (query.length < 2) {
+            return [];
+        }
+        const result = await getSearchEngineRecommendations(query);
+        return result.slice(0, 4);
     });
 };

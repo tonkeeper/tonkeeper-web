@@ -1,5 +1,6 @@
 import { IStorage } from '../Storage';
 import { AppKey } from '../Keys';
+import { z } from 'zod';
 
 export type BrowserTabIdentifier = {
     id: string;
@@ -60,4 +61,13 @@ export async function patchBrowserTab(storage: IStorage, tab: BrowserTabStored):
     }
     tabs[index] = tab;
     await setBrowserTabsList(storage, tabs);
+}
+
+const duckDuckGoSuggestionsSchema = z.array(z.object({ phrase: z.string() }));
+
+export async function getSearchEngineRecommendations(query: string) {
+    const result = await (await fetch(`https://duckduckgo.com/ac/?q=${query}`)).json();
+    const parsed = duckDuckGoSuggestionsSchema.parse(result);
+
+    return parsed.map(i => i.phrase);
 }

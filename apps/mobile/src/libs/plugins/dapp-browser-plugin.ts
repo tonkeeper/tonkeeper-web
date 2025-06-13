@@ -12,7 +12,7 @@ interface DocumentMetadata {
 interface IDappBrowserPlugin {
     open(params: { id: string; url: string; focusDappView?: boolean }): Promise<DocumentMetadata>;
     hide(params: { id: string }): Promise<void>;
-    close(params: { id: string }): Promise<void>;
+    close(params: { ids: string[] }): Promise<void>;
     reload(params: { ids: string[] }): Promise<void>;
     goBack(params: { id: string }): Promise<void>;
     setOffset(params: { top: number; bottom: number }): Promise<void>;
@@ -145,9 +145,10 @@ class DappBrowser implements IDappBrowser {
         DappBrowserPlugin.setOffset({ top: 36, bottom: 98 });
     }
 
-    async close(id: string): Promise<void> {
-        await DappBrowserPlugin.close({ id });
-        this.liveTabs = this.liveTabs.filter(t => t.id !== id);
+    async close(id: string | string[]): Promise<void> {
+        const ids = Array.isArray(id) ? id : [id];
+        await DappBrowserPlugin.close({ ids });
+        this.liveTabs = this.liveTabs.filter(t => !ids.includes(t.id));
     }
 
     hide(id: string): Promise<void> {

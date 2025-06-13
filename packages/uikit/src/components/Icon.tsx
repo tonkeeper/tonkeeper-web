@@ -2349,3 +2349,23 @@ export const DisconnectIcon: FC<{ className?: string }> = ({ className }) => {
         </svg>
     );
 };
+
+export const MagnifyingGlassIcon: FC<{ className?: string }> = ({ className }) => {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            className={className}
+        >
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M11.5353 12.596C10.4268 13.475 9.02469 14 7.5 14C3.91015 14 1 11.0899 1 7.5C1 3.91015 3.91015 1 7.5 1C11.0899 1 14 3.91015 14 7.5C14 9.02469 13.475 10.4268 12.596 11.5353L14.7803 13.7197C15.0732 14.0126 15.0732 14.4874 14.7803 14.7803C14.4874 15.0732 14.0126 15.0732 13.7197 14.7803L11.5353 12.596ZM12.5 7.5C12.5 10.2614 10.2614 12.5 7.5 12.5C4.73858 12.5 2.5 10.2614 2.5 7.5C2.5 4.73858 4.73858 2.5 7.5 2.5C10.2614 2.5 12.5 4.73858 12.5 7.5Z"
+                fill="currentColor"
+            />
+        </svg>
+    );
+};

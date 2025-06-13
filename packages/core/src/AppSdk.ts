@@ -192,7 +192,7 @@ export interface IDappBrowser {
         }
     ): Promise<BrowserTabBase>;
     hide(id: string): Promise<void>;
-    close(id: string): Promise<void>;
+    close(id: string | string[]): Promise<void>;
     setRequestsHandler(
         method: string,
         handler: (

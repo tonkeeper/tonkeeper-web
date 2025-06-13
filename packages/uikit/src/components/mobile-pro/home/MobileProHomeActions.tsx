@@ -6,13 +6,14 @@ import { useSendTransferNotification } from '../../modals/useSendTransferNotific
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
-import { AppProRoute, AppRoute } from '../../../libs/routes';
+import { AppRoute } from '../../../libs/routes';
 import { useSmartScanner } from '../../../hooks/useSmartScanner';
 import { hexToRGBA } from '../../../libs/css';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { CountryFeature, useIsFeatureAvailableForRegulatoryState } from '../../../state/country';
+import { useOpenBrowserTab } from '../../../state/dapp-browser';
 
 const Grid = styled.div`
     display: grid;
@@ -120,6 +121,7 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
     const sdk = useAppSdk();
     const { onOpen: onBuy } = useBuyNotification();
     const { onScan, NotificationComponent } = useSmartScanner();
+    const { mutate: openBrowserTab } = useOpenBrowserTab();
 
     const isReadOnly = useIsActiveWalletWatchOnly();
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
@@ -171,17 +173,17 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
                     <VerticalDividerCentralPart />
                     <VerticalDividerBottomPart />
                 </VerticalDivider>
-                <ActionCell onClick={() => navigate(AppProRoute.multiSend)} $disabled>
-                    <MultisendIcon />
-                    <Label2>{t('wallet_multi_send')}</Label2>
+                <ActionCell onClick={onBuy}>
+                    <PlusIcon />
+                    <Label2>{t('wallet_buy')}</Label2>
                 </ActionCell>
                 <VerticalDivider $bottom>
                     <VerticalDividerCentralPart />
                     <VerticalDividerBottomPart />
                 </VerticalDivider>
-                <ActionCell onClick={onBuy}>
-                    <PlusIcon />
-                    <Label2>{t('wallet_buy')}</Label2>
+                <ActionCell onClick={() => openBrowserTab('blanc')}>
+                    <BrowserIcon />
+                    <Label2>{t('browser_title')}</Label2>
                 </ActionCell>
             </HideOnReview>
             {NotificationComponent}
@@ -289,7 +291,7 @@ const SwapIcon = () => {
     );
 };
 
-const MultisendIcon = () => {
+const BrowserIcon = () => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -301,8 +303,8 @@ const MultisendIcon = () => {
             <path
                 fillRule="evenodd"
                 clipRule="evenodd"
-                d="M7.20711 5.29485C6.81658 4.90432 6.18342 4.90432 5.79289 5.29485L0.792893 10.2948C0.402369 10.6854 0.402369 11.3185 0.792893 11.7091C1.18342 12.0996 1.81658 12.0996 2.20711 11.7091L5.5 8.41617V22.002C5.5 22.5542 5.94772 23.002 6.5 23.002C7.05228 23.002 7.5 22.5542 7.5 22.002V8.41617L10.7929 11.7091C11.1834 12.0996 11.8166 12.0996 12.2071 11.7091C12.5976 11.3185 12.5976 10.6854 12.2071 10.2948L7.20711 5.29485ZM22.2071 5.29485C21.8166 4.90432 21.1834 4.90432 20.7929 5.29485L15.7929 10.2948C15.4024 10.6854 15.4024 11.3185 15.7929 11.7091C16.1834 12.0996 16.8166 12.0996 17.2071 11.7091L20.5 8.41617V22.002C20.5 22.5542 20.9477 23.002 21.5 23.002C22.0523 23.002 22.5 22.5542 22.5 22.002V8.41617L25.7929 11.7091C26.1834 12.0996 26.8166 12.0996 27.2071 11.7091C27.5976 11.3185 27.5976 10.6854 27.2071 10.2948L22.2071 5.29485Z"
-                fill="currentColor"
+                d="M15.9596 20.9992C15.2754 22.6834 14.549 23.002 14 23.002C13.451 23.002 12.7246 22.6834 12.0404 20.9992C11.4454 19.5346 11.0906 17.4494 11.0152 15.002H16.9848C16.9094 17.4494 16.5546 19.5346 15.9596 20.9992ZM16.9848 13.002H11.0152C11.0906 10.5545 11.4454 8.46929 12.0404 7.00471C12.7246 5.32055 13.451 5.00195 14 5.00195C14.549 5.00195 15.2754 5.32055 15.9596 7.00471C16.5546 8.46929 16.9094 10.5545 16.9848 13.002ZM18.9857 15.002C18.9029 17.8658 18.457 20.4387 17.5901 22.2574C20.4827 20.9977 22.5847 18.2623 22.9451 15.002H18.9857ZM22.9451 13.002H18.9857C18.9029 10.1381 18.457 7.56517 17.5901 5.7465C20.4827 7.00618 22.5847 9.74162 22.9451 13.002ZM9.01426 13.002C9.0971 10.1381 9.54301 7.56518 10.4099 5.7465C7.5173 7.00618 5.41534 9.74162 5.05493 13.002H9.01426ZM5.05493 15.002C5.41534 18.2623 7.5173 20.9977 10.4099 22.2574C9.54302 20.4387 9.0971 17.8658 9.01426 15.002H5.05493ZM25 14.002C25 7.92682 20.0751 3.00195 14 3.00195C7.92487 3.00195 3 7.92682 3 14.002C3 20.0771 7.92487 25.002 14 25.002C20.0751 25.002 25 20.0771 25 14.002Z"
+                fill="#EBEBEB"
             />
         </svg>
     );

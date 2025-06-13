@@ -3,6 +3,7 @@ import {
     useActiveBrowserTab,
     useBrowserTabs,
     useChangeBrowserTab,
+    useCloseAllBrowserTabs,
     useCloseBrowserTab,
     useOpenBrowserTab,
     useReorderBrowserTabs
@@ -11,7 +12,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import styled from 'styled-components';
 import { Label2 } from '../../Text';
 import { useMenuController } from '../../../hooks/ionic';
-import { ButtonFlat } from '../../fields/Button';
+import { Button, ButtonFlat } from '../../fields/Button';
 import {
     createContext,
     Dispatch,
@@ -84,7 +85,14 @@ const RightIconButton = styled(IconButtonTransparentBackground)`
 `;
 
 const GroupWrapper = styled.div`
-    margin-top: 16px;
+    margin-top: 8px;
+`;
+
+const Divider = styled.div`
+    width: calc(100% + 16px);
+    margin: 0 -8px 8px;
+    height: 1px;
+    background: ${p => p.theme.separatorAlternate};
 `;
 
 const EditeModeContext = createContext<{
@@ -219,6 +227,7 @@ const BrowserTabsPinned: FC<{
 
     return (
         <GroupWrapper>
+            <Divider />
             <HeadingWrapper>
                 <Heading>{t('wallet_aside_menu_tabs_pinned')}</Heading>
                 <EditButton onClick={() => setIsEditMode(m => !m)}>
@@ -245,12 +254,22 @@ const BrowserTabsPinned: FC<{
     );
 };
 
+const CloseAllButtonWrapper = styled.div`
+    width: 100%;
+    padding: 8px 4px 0;
+
+    > button {
+        height: 32px;
+    }
+`;
+
 const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
     const { t } = useTranslation();
     const { isEditMode, setIsEditMode, onClickTab } = useEditMode();
     const openedTabId = useOpenedTabId();
     const { mutate: changeBrowserTab } = useChangeBrowserTab();
     const { mutate: closeTab } = useCloseBrowserTab();
+    const { mutate: closeAllTabs } = useCloseAllBrowserTabs();
 
     if (!tabs) {
         return null;
@@ -258,6 +277,7 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
 
     return (
         <GroupWrapper>
+            <Divider />
             <HeadingWrapper>
                 <Heading>{t('wallet_aside_menu_tabs_active')}</Heading>
                 <EditButton onClick={() => setIsEditMode(m => !m)}>
@@ -297,6 +317,13 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
                     )}
                 </AsideMenuItemStyled>
             ))}
+            {tabs.length > 2 && (
+                <CloseAllButtonWrapper>
+                    <Button secondary fullWidth onClick={() => closeAllTabs()}>
+                        {t('wallet_aside_menu_tabs_close_all_btn')}
+                    </Button>
+                </CloseAllButtonWrapper>
+            )}
         </GroupWrapper>
     );
 };

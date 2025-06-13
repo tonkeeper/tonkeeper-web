@@ -30,8 +30,6 @@ import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/
 import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFARecoveryStartedBanner';
 import { CountryFeature } from '../state/country';
 import { HideForRegulatoryState } from '../components/HideForState';
-import { BrowserIcon } from '../components/NavigationIcons';
-import { useBrowserTabs, useOpenBrowserTab } from '../state/dapp-browser';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -99,9 +97,6 @@ export const MobileProHomePage = () => {
     const isTestnet = network === Network.TESTNET;
     const canUseBattery = useCanUseBattery();
 
-    const { data: tabs } = useBrowserTabs();
-    const { mutate } = useOpenBrowserTab();
-
     return (
         <DesktopViewPageLayout id={mobileProHomePageId}>
             <DesktopViewHeaderStyled mobileTranslucent={false} />
@@ -113,18 +108,6 @@ export const MobileProHomePage = () => {
             <MobileProHomeActionsStyled />
             <MobileProHomeWidgetTokensStyled />
             <MenuWrapper>
-                <MenuItem
-                    to="/"
-                    onClick={() => {
-                        mutate({
-                            url: 'https://google.com'
-                        });
-                    }}
-                >
-                    <BrowserIcon />
-                    <Label2>Browser</Label2>
-                    <ChevronRightIcon />
-                </MenuItem>
                 <MenuItem to={AppRoute.activity}>
                     <ClockSmoothIcon />
                     <Label2>{t('wallet_aside_history')}</Label2>
