@@ -135,11 +135,14 @@ const TabHeaderWrapper = styled.div`
     box-sizing: content-box;
     height: 32px;
     padding: env(safe-area-inset-top) 0 4px 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    position: relative;
     background-color: ${p => p.theme.backgroundPage};
+
+    display: grid;
+    grid-template-columns: 44px 1fr 96px;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
 
     .dd-select-container-header {
         max-height: unset;
@@ -147,14 +150,18 @@ const TabHeaderWrapper = styled.div`
 `;
 
 const BackButton = styled(IconButtonTransparentBackground)<{ $isHidden: boolean }>`
+    grid-column: 1;
+    width: 44px;
+    box-sizing: border-box;
+    justify-self: start;
     padding: 8px 16px 8px 12px;
-    width: 16px;
-    box-sizing: content-box;
 
     ${p => p.$isHidden && 'visibility: hidden;'}
 `;
 
 const Title = styled(Body3)`
+    grid-column: 2;
+    min-width: 0;
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -167,6 +174,9 @@ const Title = styled(Body3)`
 
 const RightButtonsGroup = styled.div`
     display: flex;
+    grid-column: 3;
+    width: 96px;
+    justify-self: end;
 `;
 
 const HideTabButton = styled(IconButtonTransparentBackground)`
@@ -349,36 +359,33 @@ const HeaderTabInfo: FC<{
         : undefined;
 
     return (
-        <>
-            <SpacerLeft />
-            <Title>
-                {hostname}
-                {walletInfo ? (
+        <Title>
+            <Spacer />
+            {hostname}
+            {walletInfo ? (
+                <>
+                    &nbsp;
+                    {t('browser_using_wallet')}
+                    <WalletEmoji emojiSize="14px" emoji={walletInfo.emoji} />
+                    <WalletName>{walletInfo.name}</WalletName>
+                </>
+            ) : (
+                !!websiteTitle && (
                     <>
-                        &nbsp;
-                        {t('browser_using_wallet')}
-                        <WalletEmoji emojiSize="14px" emoji={walletInfo.emoji} />
-                        <WalletName>{walletInfo.name}</WalletName>
+                        <Dot />
+                        {websiteTitle}
                     </>
-                ) : (
-                    !!websiteTitle && (
-                        <>
-                            <Dot />
-                            {websiteTitle}
-                        </>
-                    )
-                )}
-            </Title>
-        </>
+                )
+            )}
+        </Title>
     );
 };
 
-const SpacerLeft = styled.div`
-    width: 52px;
+const Spacer = styled.div`
     flex-shrink: 1;
+    width: 52px;
     min-width: 0;
 `;
-
 const WalletName = styled(Label3)`
     overflow: hidden;
     text-overflow: ellipsis;
