@@ -1,6 +1,6 @@
 import { IonFooter, IonToolbar } from '@ionic/react';
 import styled, { css } from 'styled-components';
-import { useActiveAccount } from '../../../state/wallet';
+import { getAccountWalletNameAndEmoji, useActiveAccount } from '../../../state/wallet';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body3, Label2, Label2Class } from '../../Text';
 import { useMenuController } from '../../../hooks/ionic';
@@ -85,8 +85,7 @@ export const MobileProFooter = () => {
         hideBrowserTab();
     };
 
-    const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
-    const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
+    const { name, emoji } = getAccountWalletNameAndEmoji(account);
     return (
         <IonFooterStyled translucent={true}>
             <IonToolbarStyled>

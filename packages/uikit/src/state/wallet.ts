@@ -1298,3 +1298,13 @@ export const useIsActiveWalletWatchOnly = () => {
     const wallet = useActiveAccount();
     return wallet.type === 'watch-only';
 };
+
+export function getAccountWalletNameAndEmoji(account: Account) {
+    const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
+    const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
+
+    return {
+        name: name,
+        emoji: emoji
+    };
+}

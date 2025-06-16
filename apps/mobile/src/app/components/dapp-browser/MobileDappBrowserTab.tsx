@@ -1,19 +1,18 @@
-import { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useRef } from 'react';
 import {
     BrowserTab,
-    useAddBrowserTabToState,
+    LoadingBrowserTab,
     useChangeBrowserTab,
     useCloseActiveBrowserTab,
     useHideActiveBrowserTab
 } from '@tonkeeper/uikit/dist/state/dapp-browser';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { Body2, Body3 } from '@tonkeeper/uikit';
+import { Body2, Body3, Label3 } from '@tonkeeper/uikit';
 import {
     BrowserTabIdentifier,
     isBrowserTabLive
 } from '@tonkeeper/core/dist/service/dappBrowserService';
-import { OptionalProperty } from '@tonkeeper/core/dist/utils/types';
 import { IconButtonTransparentBackground } from '@tonkeeper/uikit/dist/components/fields/IconButton';
 import {
     ArrowLeftIcon,
@@ -27,9 +26,14 @@ import {
     ShareIcon,
     UnpinIconOutline
 } from '@tonkeeper/uikit/dist/components/Icon';
-import { asideWalletSelected$, useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
+import {
+    asideWalletSelected$,
+    getAccountWalletNameAndEmoji,
+    useAccountsState,
+    useActiveWallet
+} from '@tonkeeper/uikit/dist/state/wallet';
 import { tonConnectInjectedConnector } from '../../../libs/ton-connect/injected-connector';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { Dot } from '@tonkeeper/uikit/dist/components/Dot';
 import { SelectDropDown } from '@tonkeeper/uikit/dist/components/fields/Select';
 import {
@@ -47,6 +51,9 @@ import {
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
+import { WalletEmoji } from '@tonkeeper/uikit/dist/components/shared/emoji/WalletEmoji';
+import { getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
+import { useQueryClient } from '@tanstack/react-query';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -89,41 +96,13 @@ const BackgroundStyled = styled.div<{ $isTransparent: boolean }>`
 `;
 
 export const MobileDappBrowserTab: FC<{
-    tab: BrowserTab | BrowserTabIdentifier;
+    tab: BrowserTab | LoadingBrowserTab;
     isAnimating?: boolean;
 }> = ({ tab, isAnimating }) => {
-    const {
-        title,
-        iconUrl,
-        url,
-        id: tabId,
-        isLive
-    } = tab as OptionalProperty<BrowserTab, 'title' | 'iconUrl' | 'isLive'>;
-    const { mutate: addTab } = useAddBrowserTabToState();
-    const [tabIsReady, setTabIsReady] = useState(false);
-    const [tabIsCreated, setTabIsCreated] = useState(false);
-
-    useEffect(() => {
-        CapacitorDappBrowser.open(url, { id: tabId }).then(t => {
-            addTab(t);
-            setTabIsCreated(true);
-        });
-    }, [tabId, url]);
-
-    useEffect(() => {
-        if (!tabIsCreated) {
-            return;
-        }
-
-        if (isLive) {
-            setTabIsReady(true);
-        } else {
-            setTimeout(() => {
-                setTabIsReady(true);
-            }, 800);
-        }
-    }, [isLive, tabIsCreated]);
-
+    const { title, iconUrl } = tab;
+    const isLive = isBrowserTabLive(tab);
+    const tabIsReady = !('type' in tab && tab.type === 'loading');
+    const client = useQueryClient();
     const activeWallet = useActiveWallet();
 
     const tabRef = useValueRef(tab);
@@ -133,7 +112,7 @@ export const MobileDappBrowserTab: FC<{
 
     useEffect(() => {
         if (activeWallet.id === asideLastSelectedWallet.current) {
-            tonConnectInjectedConnector.changeConnectedWalletToActive(tabRef.current);
+            tonConnectInjectedConnector.changeConnectedWalletToActive(tabRef.current, client);
         }
     }, [activeWallet.id]);
 
@@ -155,10 +134,10 @@ export const MobileDappBrowserTab: FC<{
 const TabHeaderWrapper = styled.div`
     box-sizing: content-box;
     height: 32px;
-    padding: env(safe-area-inset-top) 96px 4px 96px;
+    padding: env(safe-area-inset-top) 0 4px 0;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
     background-color: ${p => p.theme.backgroundPage};
 
@@ -167,22 +146,26 @@ const TabHeaderWrapper = styled.div`
     }
 `;
 
-const BackButton = styled(IconButtonTransparentBackground)`
-    position: absolute;
-    left: 0;
-    padding: 8px 24px 8px 12px;
+const BackButton = styled(IconButtonTransparentBackground)<{ $isHidden: boolean }>`
+    padding: 8px 16px 8px 12px;
+    width: 16px;
+    box-sizing: content-box;
+
+    ${p => p.$isHidden && 'visibility: hidden;'}
 `;
 
 const Title = styled(Body3)`
+    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: ${p => p.theme.textSecondary};
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 
 const RightButtonsGroup = styled.div`
-    right: 0;
-    position: absolute;
     display: flex;
 `;
 
@@ -195,10 +178,6 @@ const OptionsTabButton = styled(IconButtonTransparentBackground)`
 `;
 
 const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
-    const hostname = hostnameFromUrl(tab.url);
-    const websiteTitle = 'title' in tab ? tab.title : '';
-    const showTitle = Boolean(websiteTitle || hostname);
-
     const { mutate: hideTab } = useHideActiveBrowserTab();
     const { mutate: closeTab } = useCloseActiveBrowserTab();
 
@@ -214,22 +193,13 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
 
     return (
         <TabHeaderWrapper>
-            {isBrowserTabLive(tab) && tab.canGoBack && (
-                <BackButton onClick={() => CapacitorDappBrowser.goBack(tab.id)}>
-                    <ArrowLeftIcon />
-                </BackButton>
-            )}
-            {showTitle && (
-                <Title>
-                    {hostname}
-                    {!!websiteTitle && (
-                        <>
-                            <Dot />
-                            {websiteTitle}
-                        </>
-                    )}
-                </Title>
-            )}
+            <BackButton
+                $isHidden={!isBrowserTabLive(tab) || !tab.canGoBack}
+                onClick={() => CapacitorDappBrowser.goBack(tab.id)}
+            >
+                <ArrowLeftIcon />
+            </BackButton>
+            <HeaderTabInfo tab={tab} connectedWallet={activeConnection?.wallet} />
             <RightButtonsGroup>
                 <SelectDropDown
                     top="calc(100% + 12px)"
@@ -355,6 +325,66 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
         </TabHeaderWrapper>
     );
 };
+
+const HeaderTabInfo: FC<{
+    tab: BrowserTab | BrowserTabIdentifier;
+    connectedWallet: TonContract | undefined;
+}> = ({ tab, connectedWallet }) => {
+    const hostname = hostnameFromUrl(tab.url);
+    const websiteTitle = 'title' in tab ? tab.title : '';
+    const showTitle = Boolean(websiteTitle || hostname);
+
+    const { t } = useTranslation();
+    const accounts = useAccountsState();
+    const connectedAccount = connectedWallet
+        ? getAccountByWalletById(accounts, connectedWallet.id)
+        : undefined;
+
+    if (!showTitle) {
+        return null;
+    }
+
+    const walletInfo = connectedAccount
+        ? getAccountWalletNameAndEmoji(connectedAccount)
+        : undefined;
+
+    return (
+        <>
+            <SpacerLeft />
+            <Title>
+                {hostname}
+                {walletInfo ? (
+                    <>
+                        &nbsp;
+                        {t('browser_using_wallet')}
+                        <WalletEmoji emojiSize="14px" emoji={walletInfo.emoji} />
+                        <WalletName>{walletInfo.name}</WalletName>
+                    </>
+                ) : (
+                    !!websiteTitle && (
+                        <>
+                            <Dot />
+                            {websiteTitle}
+                        </>
+                    )
+                )}
+            </Title>
+        </>
+    );
+};
+
+const SpacerLeft = styled.div`
+    width: 52px;
+    flex-shrink: 1;
+    min-width: 0;
+`;
+
+const WalletName = styled(Label3)`
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: ${p => p.theme.textPrimary};
+`;
 
 const hostnameFromUrl = (url: string) => {
     try {

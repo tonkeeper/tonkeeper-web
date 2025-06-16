@@ -37,6 +37,8 @@ import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { z } from 'zod';
+import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
+import { QueryClient } from '@tanstack/react-query';
 
 function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: unknown): z.infer<T> {
     const parsed = z
@@ -255,7 +257,7 @@ class TonConnectInjectedConnector {
      * 3. Reload all pages with dapp origin
      *    After reloading dapp will call re-connect method that will restore connection with new active wallet (in case dapp doesn't require ton_proof)
      */
-    public async changeConnectedWalletToActive(tab: BrowserTabIdentifier) {
+    public async changeConnectedWalletToActive(tab: BrowserTabIdentifier, client: QueryClient) {
         const dappOrigin = originFromUrl(tab.url);
         if (!dappOrigin) {
             throw new Error('Dapp origin not found');
@@ -293,6 +295,7 @@ class TonConnectInjectedConnector {
                 webViewOrigin: existingConnection.webViewOrigin
             }
         });
+        await client.invalidateQueries([QueryKey.tonConnectConnection]);
 
         await CapacitorDappBrowser.reload({ origin: dappOrigin });
     }
