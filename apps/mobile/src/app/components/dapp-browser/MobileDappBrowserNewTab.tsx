@@ -34,14 +34,6 @@ const InputWrapper = styled.form<{ $keyboardShift: number }>`
     background: ${p => p.theme.backgroundPage};
     flex-shrink: 0;
     z-index: 2;
-
-    ${p =>
-        p.$keyboardShift &&
-        css`
-            transform: translateY(calc(${-p.$keyboardShift}px + var(--footer-full-height) + 1px));
-        `}
-
-    transition: transform ${iosKeyboardTransition};
 `;
 
 const Header = styled.div`
@@ -67,7 +59,7 @@ const CancelButton = styled(Button)`
     height: 32px;
 `;
 
-const PageWrapper = styled.div`
+const PageWrapper = styled.div<{ $keyboardShift: number }>`
     padding-top: env(safe-area-inset-top);
     box-sizing: border-box;
     background: ${p => p.theme.backgroundPage};
@@ -86,18 +78,21 @@ const PageWrapper = styled.div`
         background: ${p => p.theme.backgroundPage};
         z-index: 10;
     }
-`;
-
-const PageBody = styled.div<{ $keyboardShift: number }>`
-    overflow: hidden;
-    flex: 1;
-    position: relative;
 
     ${p =>
         p.$keyboardShift &&
         css`
             padding-bottom: calc(${p.$keyboardShift}px - var(--footer-full-height) - 1px);
         `}
+
+    transition: padding-bottom ${iosKeyboardTransition};
+    will-change: padding-bottom;
+`;
+
+const PageBody = styled.div`
+    overflow: hidden;
+    flex: 1;
+    position: relative;
 `;
 
 const HiddenSubmitButton = styled.button`
@@ -192,7 +187,7 @@ export const MobileDappBrowserNewTab = () => {
 
     return (
         <HideOnReview>
-            <PageWrapper>
+            <PageWrapper $keyboardShift={keyboardShift}>
                 <Header>
                     <Label2>{t('browser_title')}</Label2>
                     {isSearching ? (
@@ -212,7 +207,7 @@ export const MobileDappBrowserNewTab = () => {
                         </CloseButton>
                     )}
                 </Header>
-                <PageBody $keyboardShift={keyboardShift}>
+                <PageBody>
                     <InactiveSearchContent recommendations={data} onClickApp={onSelectApp} />
 
                     <AnimatePresence>
