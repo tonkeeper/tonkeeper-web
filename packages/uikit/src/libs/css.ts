@@ -22,4 +22,4 @@ export const hover = (...params: Parameters<typeof css>): ReturnType<typeof css>
 export const cn = (...classNames: (string | undefined | boolean)[]) =>
     classNames.filter(Boolean).join(' ');
 
-export const iosKeyboardTransition = '0.3s cubic-bezier(0.1, 0.76, 0.55, 0.9)';
+export const iosKeyboardTransition = '0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
