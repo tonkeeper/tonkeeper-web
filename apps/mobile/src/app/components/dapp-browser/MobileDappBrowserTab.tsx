@@ -137,9 +137,9 @@ const TabHeaderWrapper = styled.div`
     padding: env(safe-area-inset-top) 0 4px 0;
     background-color: ${p => p.theme.backgroundPage};
 
-    display: grid;
-    grid-template-columns: 44px 1fr 96px;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     width: 100%;
     position: relative;
 }
@@ -150,33 +150,29 @@ const TabHeaderWrapper = styled.div`
 `;
 
 const BackButton = styled(IconButtonTransparentBackground)<{ $isHidden: boolean }>`
-    grid-column: 1;
     width: 44px;
     box-sizing: border-box;
-    justify-self: start;
     padding: 8px 16px 8px 12px;
+    flex-shrink: 0;
 
     ${p => p.$isHidden && 'visibility: hidden;'}
 `;
 
 const Title = styled(Body3)`
-    grid-column: 2;
     min-width: 0;
-    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     color: ${p => p.theme.textSecondary};
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 `;
 
 const RightButtonsGroup = styled.div`
     display: flex;
-    grid-column: 3;
     width: 96px;
-    justify-self: end;
+    flex-shrink: 0;
 `;
 
 const HideTabButton = styled(IconButtonTransparentBackground)`
