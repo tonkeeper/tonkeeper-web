@@ -27,11 +27,13 @@ import { ColumnText } from '@tonkeeper/uikit/dist/components/Layout';
 import { useKeyboardHeight } from '@tonkeeper/uikit/dist/hooks/keyboard/useKeyboardHeight';
 import { handleSubmit } from '@tonkeeper/uikit/dist/libs/form';
 import { iosKeyboardTransition } from '@tonkeeper/uikit/dist/libs/css';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const InputWrapper = styled.form<{ $keyboardShift: number }>`
     padding: 16px 16px 8px;
     background: ${p => p.theme.backgroundPage};
     flex-shrink: 0;
+    z-index: 2;
 
     ${p =>
         p.$keyboardShift &&
@@ -86,9 +88,10 @@ const PageWrapper = styled.div`
     }
 `;
 
-const PageBodyScroll = styled.div<{ $keyboardShift: number }>`
-    overflow: auto;
+const PageBody = styled.div<{ $keyboardShift: number }>`
+    overflow: hidden;
     flex: 1;
+    position: relative;
 
     ${p =>
         p.$keyboardShift &&
@@ -99,6 +102,10 @@ const PageBodyScroll = styled.div<{ $keyboardShift: number }>`
 
 const HiddenSubmitButton = styled.button`
     display: none;
+`;
+
+const MotionDiv = styled(motion.div)`
+    padding: inherit;
 `;
 
 const blurInput = () => {
@@ -134,7 +141,10 @@ const useRelevantApps = (recommendations: Recommendations | undefined, inputValu
 export const MobileDappBrowserNewTab = () => {
     const { t } = useTranslation();
     const { data } = useRecommendations();
-    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [isInputFocused, _setIsInputFocused] = useState(false);
+    const setIsInputFocused = useCallback((value: boolean) => {
+        setTimeout(() => _setIsInputFocused(value));
+    }, []);
     const [inputValue, setInputValue] = useState('');
     const isSearching = isInputFocused || inputValue.length > 0;
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
@@ -202,19 +212,29 @@ export const MobileDappBrowserNewTab = () => {
                         </CloseButton>
                     )}
                 </Header>
-                <PageBodyScroll $keyboardShift={keyboardShift}>
-                    {isSearching ? (
-                        <ActiveSearchContent
-                            relevantApps={relevantApps}
-                            onClickApp={onSelectApp}
-                            topLevelPromotedApps={data.apps}
-                            query={inputValue}
-                            onSelectSearchRecommendations={onSelectSearchRecommendations}
-                        />
-                    ) : (
-                        <InactiveSearchContent recommendations={data} onClickApp={onSelectApp} />
-                    )}
-                </PageBodyScroll>
+                <PageBody $keyboardShift={keyboardShift}>
+                    <InactiveSearchContent recommendations={data} onClickApp={onSelectApp} />
+
+                    <AnimatePresence>
+                        {isSearching && (
+                            <MotionDiv
+                                key="new-tab-content-active"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.15 }}
+                            >
+                                <ActiveSearchContent
+                                    relevantApps={relevantApps}
+                                    onClickApp={onSelectApp}
+                                    topLevelPromotedApps={data.apps}
+                                    query={inputValue}
+                                    onSelectSearchRecommendations={onSelectSearchRecommendations}
+                                />
+                            </MotionDiv>
+                        )}
+                    </AnimatePresence>
+                </PageBody>
                 <InputWrapper onSubmit={handleSubmit(onSubmit)} $keyboardShift={keyboardShift}>
                     <Input
                         value={inputValue}
@@ -241,7 +261,7 @@ const InactiveSearchContent: FC<{
     onClickApp: (app: PromotedApp) => void;
 }> = ({ recommendations, onClickApp }) => {
     return (
-        <>
+        <InactiveSearchContentWrapper>
             <PromotionsCarouselStyled
                 apps={recommendations.apps}
                 slidesToShow={1}
@@ -254,9 +274,14 @@ const InactiveSearchContent: FC<{
                     onClickApp={onClickApp}
                 />
             ))}
-        </>
+        </InactiveSearchContentWrapper>
     );
 };
+
+const InactiveSearchContentWrapper = styled.div`
+    height: 100%;
+    overflow: auto;
+`;
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -308,7 +333,13 @@ const ActiveSearchContent: FC<{
 };
 
 const ActiveSearchContentWrapper = styled.div`
+    position: absolute;
+    padding: inherit;
+    inset: 0;
+    z-index: 1;
     flex: 1;
+    background: ${p => p.theme.backgroundPage};
+    overflow: auto;
 `;
 
 const SearchBlock = styled.div`
