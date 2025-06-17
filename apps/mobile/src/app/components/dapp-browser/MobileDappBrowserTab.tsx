@@ -144,8 +144,9 @@ const TabHeaderWrapper = styled.div`
     position: relative;
 }
 
-    .dd-select-container-header {
+    .dd-select-container {
         max-height: unset;
+        width: fit-content;
     }
 `;
 
@@ -183,6 +184,11 @@ const OptionsTabButton = styled(IconButtonTransparentBackground)`
     padding: 8px 8px 8px 20px;
 `;
 
+const DropDownItemStyled = styled(DropDownItem)`
+    gap: 36px;
+    white-space: nowrap;
+`;
+
 const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
     const { mutate: hideTab } = useHideActiveBrowserTab();
     const { mutate: closeTab } = useCloseActiveBrowserTab();
@@ -213,7 +219,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                     onStatusChange={onDrowDownStatusChange}
                     payload={closeDropDown => (
                         <DropDownContent>
-                            <DropDownItem
+                            <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();
                                     closeTab();
@@ -223,9 +229,9 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                 <DropDownRightIcon>
                                     <CloseIcon />
                                 </DropDownRightIcon>
-                            </DropDownItem>
+                            </DropDownItemStyled>
                             <DropDownItemsDivider />
-                            <DropDownItem
+                            <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();
                                     sdk.hapticNotification('success');
@@ -238,11 +244,11 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                 <DropDownRightIcon>
                                     <RefreshIcon />
                                 </DropDownRightIcon>
-                            </DropDownItem>
+                            </DropDownItemStyled>
                             <DropDownItemsDivider />
                             {'isPinned' in tab && (
                                 <>
-                                    <DropDownItem
+                                    <DropDownItemStyled
                                         onClick={() => {
                                             const isPinned = tab.isPinned;
                                             closeDropDown();
@@ -271,11 +277,11 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                                 <PinIconOutline />
                                             )}
                                         </DropDownRightIcon>
-                                    </DropDownItem>
+                                    </DropDownItemStyled>
                                     <DropDownItemsDivider />
                                 </>
                             )}
-                            <DropDownItem
+                            <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();
                                     sdk.hapticNotification('success');
@@ -288,9 +294,9 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                 <DropDownRightIcon>
                                     <ShareIcon />
                                 </DropDownRightIcon>
-                            </DropDownItem>
+                            </DropDownItemStyled>
                             <DropDownItemsDivider />
-                            <DropDownItem
+                            <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();
                                     sdk.copyToClipboard(tab.url);
@@ -300,11 +306,11 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                 <DropDownRightIcon>
                                     <CopyIcon />
                                 </DropDownRightIcon>
-                            </DropDownItem>
+                            </DropDownItemStyled>
                             {!!activeConnection && (
                                 <>
                                     <DropDownItemsDivider />
-                                    <DropDownItem
+                                    <DropDownItemStyled
                                         onClick={() => {
                                             closeDropDown();
                                             mutate(activeConnection.connection);
@@ -314,7 +320,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                         <DropDownRightIcon>
                                             <DisconnectIcon />
                                         </DropDownRightIcon>
-                                    </DropDownItem>
+                                    </DropDownItemStyled>
                                 </>
                             )}
                         </DropDownContent>
