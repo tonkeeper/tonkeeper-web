@@ -122,7 +122,7 @@ export const MobileDappBrowserTab: FC<{
             <BackgroundStyled $isTransparent={tabIsReady && !isAnimating}>
                 {!isLive && (
                     <>
-                        {iconUrl ? <img src={iconUrl} /> : 'FallbackIcon'}
+                        {iconUrl && <img src={iconUrl} />}
                         {title && <Body2>{title}</Body2>}
                     </>
                 )}
