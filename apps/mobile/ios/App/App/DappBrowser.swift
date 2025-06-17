@@ -443,7 +443,8 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
         guard type == "bridge-message",
               let queryId = body["queryId"] as? String,
               let payload = body["payload"] as? String,
-              let webViewId = self.webViews.first(where: { $0.value == webView })?.key else {
+              let webViewId = self.webViews.first(where: { $0.value == webView })?.key,
+              webView.isHidden == false else {
             return
         }
 
