@@ -270,6 +270,7 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
     const { mutate: changeBrowserTab } = useChangeBrowserTab();
     const { mutate: closeTab } = useCloseBrowserTab();
     const { mutate: closeAllTabs } = useCloseAllBrowserTabs();
+    const { close: closeMenu } = useMenuController('wallet-nav');
 
     if (!tabs) {
         return null;
@@ -319,7 +320,14 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
             ))}
             {tabs.length > 2 && (
                 <CloseAllButtonWrapper>
-                    <Button secondary fullWidth onClick={() => closeAllTabs()}>
+                    <Button
+                        secondary
+                        fullWidth
+                        onClick={() => {
+                            closeAllTabs();
+                            closeMenu();
+                        }}
+                    >
                         {t('wallet_aside_menu_tabs_close_all_btn')}
                     </Button>
                 </CloseAllButtonWrapper>
