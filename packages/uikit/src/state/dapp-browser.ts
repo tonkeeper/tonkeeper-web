@@ -271,9 +271,11 @@ export const useChangeBrowserTab = () => {
         firstNotPinnedTabIndex =
             firstNotPinnedTabIndex === -1 ? tabs.length : firstNotPinnedTabIndex;
 
+        let shouldChangeOpenedTab = false;
         // new tab is opened
         if (tabToChangeIndex === -1) {
             tabs.splice(firstNotPinnedTabIndex, 0, { isPinned: false, ...tab });
+            shouldChangeOpenedTab = true;
         } else {
             const prevTab = tabs[tabToChangeIndex];
             const newTab = { isPinned: prevTab.isPinned, ...tab };
@@ -289,6 +291,9 @@ export const useChangeBrowserTab = () => {
         }
         await setBrowserTabsList(sdk.storage, tabs);
         await client.invalidateQueries([QueryKey.browserTabs]);
+        if (shouldChangeOpenedTab) {
+            openedTab$.next({ type: 'existing', id: tab.id });
+        }
     });
 };
 
