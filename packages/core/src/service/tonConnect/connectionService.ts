@@ -1,4 +1,4 @@
-import { ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
+import { ConnectItem, ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
@@ -47,6 +47,7 @@ export interface AccountConnectionInjected {
      * used to find last created connection
      */
     creationTimestamp: number;
+    connectItems: ConnectItem[];
 }
 
 export interface AccountConnectionHttp {
@@ -55,6 +56,7 @@ export interface AccountConnectionHttp {
     manifest: DAppManifest;
     sessionKeyPair: KeyPair;
     clientSessionId: string;
+    connectItems: ConnectItem[];
 }
 
 export function isAccountConnectionInjected(
@@ -112,8 +114,12 @@ export const saveAccountConnection = async (options: {
     wallet: TonContract;
     manifest: DAppManifest;
     params:
-        | Pick<TonConnectHttpConnectionParams, 'type' | 'sessionKeyPair' | 'clientSessionId'>
-        | Pick<TonConnectInjectedConnectionParams, 'type' | 'webViewOrigin'>;
+        | (Pick<TonConnectHttpConnectionParams, 'type' | 'sessionKeyPair' | 'clientSessionId'> & {
+              request: Pick<TonConnectHttpConnectionParams['request'], 'items'>;
+          })
+        | (Pick<TonConnectInjectedConnectionParams, 'type' | 'webViewOrigin'> & {
+              request: Pick<TonConnectHttpConnectionParams['request'], 'items'>;
+          });
 }): Promise<void> => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
 
@@ -149,7 +155,8 @@ export const saveAccountConnection = async (options: {
             manifest: options.manifest,
             type: options.params.type,
             webViewOrigin: options.params.webViewOrigin,
-            creationTimestamp: Date.now()
+            creationTimestamp: Date.now(),
+            connectItems: options.params.request.items
         });
     } else if (options.params.type === 'http') {
         connections.unshift({
@@ -157,7 +164,8 @@ export const saveAccountConnection = async (options: {
             manifest: options.manifest,
             type: options.params.type,
             sessionKeyPair: options.params.sessionKeyPair,
-            clientSessionId: options.params.clientSessionId
+            clientSessionId: options.params.clientSessionId,
+            connectItems: options.params.request.items
         });
     } else {
         assertUnreachable(options.params);
@@ -226,7 +234,8 @@ function mapDeprecatedAccountConnections(
                 type: 'injected',
                 manifest: item.manifest,
                 webViewOrigin: item.webViewUrl,
-                creationTimestamp: Date.now()
+                creationTimestamp: Date.now(),
+                connectItems: [{ name: 'ton_addr' }]
             };
         } else {
             return {
@@ -234,7 +243,8 @@ function mapDeprecatedAccountConnections(
                 type: 'http',
                 manifest: item.manifest,
                 sessionKeyPair: item.sessionKeyPair,
-                clientSessionId: item.clientSessionId
+                clientSessionId: item.clientSessionId,
+                connectItems: [{ name: 'ton_addr' }]
             };
         }
     });

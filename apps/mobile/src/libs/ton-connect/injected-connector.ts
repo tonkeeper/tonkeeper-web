@@ -8,20 +8,23 @@ import {
     connectRequestSchema,
     RpcMethod,
     SEND_TRANSACTION_ERROR_CODES,
+    signDataRequestPayloadSchema,
     TonConnectAppRequest,
     TonConnectAppRequestPayload,
+    TonConnectNetwork,
+    transactionRequestPayloadSchema,
     type WalletResponse,
     WalletResponseError
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { eqRawAddresses, TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConnectionInjected,
     disconnectInjectedAccountConnection,
     saveAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { getWalletById } from '@tonkeeper/core/dist/entries/account';
+import { getAccountByWalletById, getWalletById } from '@tonkeeper/core/dist/entries/account';
 import { capacitorStorage } from '../appSdk';
 import {
     disconnectResponse,
@@ -35,10 +38,10 @@ import {
 import packageJson from '../../../package.json';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
-import { delay } from '@tonkeeper/core/dist/utils/common';
 import { z } from 'zod';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { QueryClient } from '@tanstack/react-query';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: unknown): z.infer<T> {
     const parsed = z
@@ -100,7 +103,7 @@ class TonConnectInjectedConnector {
                         return {
                             error: {
                                 code: SEND_TRANSACTION_ERROR_CODES.UNKNOWN_APP_ERROR,
-                                message: 'App does not connected'
+                                message: 'App is not connected'
                             },
                             id: request.id
                         };
@@ -110,7 +113,7 @@ class TonConnectInjectedConnector {
                             connection: result.connection,
                             request
                         },
-                        result.wallet.id
+                        result.wallet
                     );
                 } catch (e) {
                     return this.handleRequestExceptions(request.id, e);
@@ -211,29 +214,55 @@ class TonConnectInjectedConnector {
         }
     }
 
-    handleMessage = async (params: TonConnectAppRequest<'injected'>, walletId: WalletId) => {
+    handleMessage = async (params: TonConnectAppRequest<'injected'>, wallet: TonContract) => {
         switch (params.request.method) {
             case 'disconnect': {
-                return this.onDisconnect(params, walletId);
+                return this.onDisconnect(params, wallet.id);
             }
             case 'sendTransaction': {
+                const payload = transactionRequestPayloadSchema.parse(
+                    JSON.parse(params.request.params[0])
+                );
+                const error = await this.checkFromAndNetwork(wallet, {
+                    from: payload.from,
+                    network: payload.network,
+                    requestId: params.request.id
+                });
+
+                if (error) {
+                    return error;
+                }
+
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
                     kind: 'sendTransaction',
-                    payload: JSON.parse(params.request.params[0])
+                    payload
                 };
-                await this.selectWallet(walletId);
+                await this.selectWallet(wallet.id);
                 return this.requestsHandler(value);
             }
             case 'signData': {
+                const payload = signDataRequestPayloadSchema.parse(
+                    JSON.parse(params.request.params[0])
+                );
+                const error = await this.checkFromAndNetwork(wallet, {
+                    from: payload.from,
+                    network: payload.network,
+                    requestId: params.request.id
+                });
+
+                if (error) {
+                    return error;
+                }
+
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
                     kind: 'signData',
-                    payload: JSON.parse(params.request.params[0])
+                    payload
                 };
-                await this.selectWallet(walletId);
+                await this.selectWallet(wallet.id);
                 return this.requestsHandler(value);
             }
             default: {
@@ -250,9 +279,53 @@ class TonConnectInjectedConnector {
         }
     };
 
+    private async checkFromAndNetwork(
+        wallet: TonContract,
+        params: { from?: string; network?: TonConnectNetwork; requestId?: string }
+    ) {
+        if (params.from !== undefined) {
+            if (!eqRawAddresses(wallet.rawAddress, params.from)) {
+                return {
+                    error: {
+                        code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
+                        message: 'Invalid account provided'
+                    },
+                    id: params.requestId
+                };
+            }
+        }
+
+        if (params.network !== undefined) {
+            const account = getAccountByWalletById(
+                await accountsStorage(this.storage).getAccounts(),
+                wallet.id
+            );
+
+            if (!account) {
+                throw new Error('Unknown account provided');
+            }
+
+            const mismatchMainnet =
+                params.network.toString() === Network.MAINNET.toString() &&
+                account.type === 'testnet';
+            const mismatchTestnet =
+                params.network.toString() === Network.TESTNET.toString() &&
+                account.type !== 'testnet';
+
+            if (mismatchMainnet && mismatchTestnet) {
+                return {
+                    error: {
+                        code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
+                        message: 'Invalid network provided'
+                    },
+                    id: params.requestId
+                };
+            }
+        }
+    }
+
     /**
-     * 1. Send disconnect event to provide proper behavior for ton_proof dependent dapps (that dapps will reset their backend auth token).
-     *    But keep connections saved locally
+     * 1. Ignore dapps that require ton_proof. Works only for dapps without ton_proof
      * 2. Save new connection with active wallet locally
      * 3. Reload all pages with dapp origin
      *    After reloading dapp will call re-connect method that will restore connection with new active wallet (in case dapp doesn't require ton_proof)
@@ -276,12 +349,9 @@ class TonConnectInjectedConnector {
             throw new Error('Active account not found');
         }
 
-        await CapacitorDappBrowser.emitEvent(
-            tab.id,
-            JSON.stringify(disconnectResponse(Date.now().toString()))
-        );
-
-        await delay(200);
+        if (existingConnection.connectItems.some(i => i.name === 'ton_proof')) {
+            throw new Error('Ton proof reconnection is not supported');
+        }
 
         /**
          * even in case of connection with wallet exists this will make it actual by changing creation timestamp
@@ -292,7 +362,10 @@ class TonConnectInjectedConnector {
             manifest: existingConnection.manifest,
             params: {
                 type: 'injected',
-                webViewOrigin: existingConnection.webViewOrigin
+                webViewOrigin: existingConnection.webViewOrigin,
+                request: {
+                    items: existingConnection.connectItems
+                }
             }
         });
         await client.invalidateQueries([QueryKey.tonConnectConnection]);
