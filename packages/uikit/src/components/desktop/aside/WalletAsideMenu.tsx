@@ -31,7 +31,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
-import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
+import { ForTargetEnv } from '../../shared/TargetEnv';
 import { useCallback, useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
 import { HideForRegulatoryState } from '../../HideForState';
@@ -117,18 +117,6 @@ export const WalletAsideMenu = () => {
 
     return (
         <WalletAsideContainer>
-            <NotForTargetEnv env="mobile">
-                <NavLink to={AppRoute.home} end onClick={hideBrowser}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled
-                            isSelected={(isActive || isCoinPageOpened) && !isBrowserOpened}
-                        >
-                            <CoinsIcon />
-                            <Label2>{t('wallet_aside_tokens')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            </NotForTargetEnv>
             <NavLink to={AppRoute.coins} end disableMobileAnimation onClick={hideBrowser}>
                 {({ isActive }) => (
                     <AsideMenuItemStyled
