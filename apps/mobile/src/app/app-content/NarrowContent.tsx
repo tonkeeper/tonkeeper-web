@@ -507,14 +507,15 @@ const PreferencesModal = () => {
 
 export const NarrowEnvGlobalStyles = createGlobalStyle`
     ${IonicOverride};
-
-
+    
     body {
-        background: transparent !important;
-        
-        &.dapp-browser-open #main-content {
-            opacity: 0;
-            background: transparent;
+        &.dapp-browser-open {
+            background: transparent !important;
+
+            #main-content {
+                opacity: 0;
+                background: transparent;
+            }
         }
     }
 `;
