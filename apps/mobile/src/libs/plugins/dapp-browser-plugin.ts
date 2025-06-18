@@ -139,6 +139,8 @@ class DappBrowser implements IDappBrowser {
             const tabToChange = this.liveTabs.findIndex(t => t.id === data.webViewId);
             if (tabToChange !== -1) {
                 this.liveTabs[tabToChange] = updatedTab;
+            } else {
+                this.liveTabs.push(updatedTab);
             }
         });
 

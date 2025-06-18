@@ -236,7 +236,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     closeDropDown();
                                     sdk.hapticNotification('success');
                                     CapacitorDappBrowser.reload({
-                                        origin: originFromUrl(tab.url)!
+                                        id: tab.id
                                     });
                                 }}
                             >
