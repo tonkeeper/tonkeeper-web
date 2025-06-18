@@ -201,8 +201,9 @@ const BrowserTabsPinned: FC<{
                         style={style}
                         isSelected={tab.id === openedTabId}
                         onClick={() => onClickTab(tab)}
+                        {...(isEditMode && provided.dragHandleProps)}
                     >
-                        <LeftIconButton {...provided.dragHandleProps} $hidden={!isEditMode}>
+                        <LeftIconButton $hidden={!isEditMode}>
                             <ReorderIcon16 />
                         </LeftIconButton>
                         <img
