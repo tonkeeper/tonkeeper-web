@@ -7,9 +7,9 @@ import {
 import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
-    useResponseHttpConnectionMutation,
+    useCompleteHttpConnection,
     useProcessOpenedLink,
-    useResponseInjectedConnectionMutation
+    useCompleteInjectedConnection
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
@@ -117,9 +117,9 @@ export const DeepLinkSubscription = () => {
     const { onClose: closeTonTransaction } = useTonTransactionNotification();
 
     const { mutateAsync: responseHttpConnectionAsync, reset: responseReset } =
-        useResponseHttpConnectionMutation();
+        useCompleteHttpConnection();
     const { mutateAsync: responseInjectedConnectionAsync, reset: injectedResponseReset } =
-        useResponseInjectedConnectionMutation();
+        useCompleteInjectedConnection();
 
     const handlerClose = async (
         result: {

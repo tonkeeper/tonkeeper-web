@@ -47,7 +47,7 @@ import { useTranslation } from 'react-i18next';
 import { originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { Share } from '@capacitor/share';
 import {
-    useDisconnectTonConnectApp,
+    useDisconnectTonConnectConnection,
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
@@ -200,7 +200,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
-    const { mutate } = useDisconnectTonConnectApp();
+    const disconnect = useDisconnectTonConnectConnection();
     const { mutate: changeTab } = useChangeBrowserTab();
 
     return (
@@ -313,7 +313,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     <DropDownItemStyled
                                         onClick={() => {
                                             closeDropDown();
-                                            mutate(activeConnection.connection);
+                                            disconnect(activeConnection.connection);
                                         }}
                                     >
                                         {t('disconnect')}

@@ -14,7 +14,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectApp,
+    useDisconnectTonConnectConnection,
     useTonConnectLastEventId
 } from '../../state/tonConnect';
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
@@ -35,7 +35,7 @@ const TonConnectSubscription = () => {
     const { data: appConnections } = useAppTonConnectConnections('http');
     const { data: lastEventId } = useTonConnectLastEventId();
 
-    const { mutateAsync: disconnect } = useDisconnectTonConnectApp();
+    const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
 
     useSendNotificationAnalytics(request?.connection?.manifest);

@@ -9,7 +9,7 @@ import {
     eqOrigins,
     getAppConnections,
     getInjectedDappConnection,
-    getTonConnectParams,
+    originFromUrl,
     tonConnectProofPayload,
     toTonAddressItemReply,
     toTonProofItemReply
@@ -19,7 +19,6 @@ import {
     AccountConnectionHttp,
     AccountConnectionInjected,
     getTonWalletConnections,
-    saveAccountConnection,
     setAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { getLastEventId } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
@@ -45,6 +44,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../hooks/appContext';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
+import { useCallback } from 'react';
 
 export const useAppTonConnectConnections = <T extends AccountConnection['type']>(
     filterType?: T
@@ -90,7 +90,13 @@ export const useTonConnectLastEventId = () => {
     });
 };
 
-export const useActiveWalletTonConnectConnections = () => {
+export type ConnectedDApp = {
+    origin: string;
+    name: string;
+    icon: string;
+};
+
+export const useActiveWalletConnectedApps = () => {
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const { data: appConnections, ...rest } = useAppTonConnectConnections();
@@ -98,25 +104,34 @@ export const useActiveWalletTonConnectConnections = () => {
         return { data: undefined, ...rest };
     }
 
+    let connections: (AccountConnectionInjected | AccountConnectionHttp)[] = [];
     if (sdk.targetEnv === 'extension') {
-        const connection = appConnections.map(i => i.connections).flat();
-        const set: AccountConnectionInjected[] = [];
-        connection.forEach(item => {
-            if (
-                item.type === 'injected' &&
-                set.every(i => !eqOrigins(i.webViewOrigin, item.webViewOrigin))
-            ) {
-                set.push(item);
-            }
-        });
-        return { data: set, ...rest };
+        connections = appConnections.map(i => i.connections).flat();
+    } else {
+        const record = appConnections.find(c => c.wallet.id === wallet.id)!;
+        if (!record) {
+            return { data: [], ...rest };
+        }
+
+        connections = record.connections;
     }
 
-    const connection = appConnections.find(c => c.wallet.id === wallet.id)!;
-    if (!connection) {
-        return { data: undefined, ...rest };
-    }
-    return { data: connection.connections, ...rest };
+    const dapps: ConnectedDApp[] = [];
+    connections.forEach(connection => {
+        const origin = getConnectionDappOrigin(connection);
+        if (!origin) {
+            return;
+        }
+        if (dapps.every(d => !eqOrigins(d.origin, origin))) {
+            dapps.push({
+                origin,
+                name: connection.manifest.name,
+                icon: connection.manifest.iconUrl
+            });
+        }
+    });
+
+    return { data: dapps, ...rest };
 };
 
 export const useInjectedDappConnectionByOrigin = (origin: string | undefined) => {
@@ -129,10 +144,9 @@ export const useInjectedDappConnectionByOrigin = (origin: string | undefined) =>
     }
 };
 
-export const useConnectTonConnectAppMutation = () => {
+export const useGetTonConnectConnectResponse = () => {
     const appContext = useAppContext();
     const sdk = useAppSdk();
-    const client = useQueryClient();
     const { t } = useTranslation();
 
     return useMutation<
@@ -144,9 +158,8 @@ export const useConnectTonConnectAppMutation = () => {
             webViewOrigin: string | null;
             account: Account;
             walletId: WalletId;
-            appName: string;
         }
-    >(async ({ request, manifest, account, walletId, appName, webViewOrigin }) => {
+    >(async ({ request, manifest, account, walletId, webViewOrigin }) => {
         const selectedIsLedger = account.type === 'ledger';
         const network = getNetworkByAccount(account);
         const api = getContextApiByNetwork(appContext, network);
@@ -155,8 +168,6 @@ export const useConnectTonConnectAppMutation = () => {
         if (!wallet) {
             throw new Error('Wallet not found');
         }
-
-        const params = await getTonConnectParams(request, appName, webViewOrigin);
 
         const result = [] as ConnectItemReply[];
 
@@ -219,33 +230,6 @@ export const useConnectTonConnectAppMutation = () => {
             }
         }
 
-        await saveAccountConnection({
-            storage: sdk.storage,
-            wallet,
-            manifest,
-            params
-        });
-
-        /**
-         * subscribe to notifications for http-bridge connections
-         */
-        if (sdk.notifications && params.type === 'http') {
-            try {
-                const enable = await sdk.notifications.subscribed(wallet.rawAddress);
-                if (enable) {
-                    await sdk.notifications.subscribeTonConnect(
-                        params.clientSessionId,
-                        new URL(manifest.url).host
-                    );
-                }
-            } catch (e) {
-                if (e instanceof Error) sdk.topMessage(e.message);
-            }
-        }
-
-        await client.invalidateQueries([QueryKey.tonConnectConnection]);
-        await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
-
         return result;
     });
 };
@@ -254,22 +238,30 @@ export const tonConnectAppManuallyDisconnected$ = subject<
     AccountConnection | AccountConnection[]
 >();
 
+export const useDisconnectTonConnectConnection = (options?: { skipEmit?: boolean }) => {
+    const { mutateAsync } = useDisconnectTonConnectApp(options);
+    return useCallback(
+        (app: { id: string }) => mutateAsync({ connectionId: app.id }),
+        [mutateAsync]
+    );
+};
+
 export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => {
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const client = useQueryClient();
     const accounts = useAccountsState().filter(isAccountTonWalletStandard);
 
-    return useMutation(async (connection: { id: string } | 'all') => {
+    return useMutation(async (dapp: { origin: string } | 'all' | { connectionId: string }) => {
         let connectionsToDisconnect: AccountConnection[];
         if (sdk.targetEnv !== 'extension') {
-            connectionsToDisconnect = await disconnectFromWallet(sdk.storage, connection, wallet);
+            connectionsToDisconnect = await disconnectDappFromWallet(sdk.storage, dapp, wallet);
         } else {
             connectionsToDisconnect = (
                 await Promise.all(
                     accounts
                         .flatMap(a => a.allTonWallets)
-                        .map(w => disconnectFromWallet(sdk.storage, connection, w))
+                        .map(w => disconnectDappFromWallet(sdk.storage, dapp, w))
                 )
             ).flat();
         }
@@ -294,9 +286,9 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     });
 };
 
-const disconnectFromWallet = async (
+const disconnectDappFromWallet = async (
     storage: IStorage,
-    connection: { id: string } | 'all',
+    dapp: { origin: string } | 'all' | { connectionId: string },
     wallet: {
         id: string;
         publicKey?: string;
@@ -304,10 +296,19 @@ const disconnectFromWallet = async (
 ) => {
     let connections = await getTonWalletConnections(storage, wallet);
     const connectionsToDisconnect =
-        connection === 'all' ? connections : connections.filter(c => c.id === connection.id);
+        dapp === 'all'
+            ? connections
+            : connections.filter(c => {
+                  if ('origin' in dapp) {
+                      const origin = getConnectionDappOrigin(c);
+                      return !origin || eqOrigins(origin, dapp.origin);
+                  } else {
+                      return c.id === dapp.connectionId;
+                  }
+              });
 
     connections =
-        connection === 'all'
+        dapp === 'all'
             ? []
             : connections.filter(item => connectionsToDisconnect.every(c => c.id !== item.id));
 
@@ -315,3 +316,9 @@ const disconnectFromWallet = async (
 
     return connectionsToDisconnect;
 };
+
+function getConnectionDappOrigin(connection: AccountConnection) {
+    return connection.type === 'injected'
+        ? connection.webViewOrigin
+        : originFromUrl(connection.manifest.url);
+}

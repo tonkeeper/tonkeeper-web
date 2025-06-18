@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import {
     useProcessOpenedLink,
-    useResponseHttpConnectionMutation
+    useCompleteHttpConnection
 } from '../components/connect/connectHook';
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { Account } from '@tonkeeper/core/dist/entries/account';
@@ -18,7 +18,7 @@ export const useSmartScanner = () => {
 
     const { mutateAsync, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        useResponseHttpConnectionMutation();
+        useCompleteHttpConnection();
 
     const onScan = useCallback(
         async (link: string) => {

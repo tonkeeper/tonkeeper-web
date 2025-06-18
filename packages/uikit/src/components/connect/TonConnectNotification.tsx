@@ -15,7 +15,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
-import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
+import { useGetTonConnectConnectResponse } from '../../state/tonConnect';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon, SwitchIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
@@ -113,7 +113,7 @@ const ConnectContent: FC<{
     }, []);
 
     const [error, setError] = useState<Error | null>(null);
-    const { mutateAsync, isLoading } = useConnectTonConnectAppMutation();
+    const { mutateAsync, isLoading } = useGetTonConnectConnectResponse();
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
@@ -122,7 +122,6 @@ const ConnectContent: FC<{
                 request: params,
                 manifest,
                 webViewOrigin: origin ?? null,
-                appName,
                 ...selectedAccountAndWallet
             });
 
@@ -135,7 +134,6 @@ const ConnectContent: FC<{
                     ? 255
                     : 4;
 
-            selectedAccountAndWallet.walletId;
             setDone(true);
             setTimeout(
                 () =>

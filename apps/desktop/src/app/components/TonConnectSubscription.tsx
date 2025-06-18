@@ -3,7 +3,7 @@ import { useSendNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplit
 import { useCallback, useEffect, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
-    useDisconnectTonConnectApp
+    useDisconnectTonConnectConnection
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { sendBackground } from '../../libs/backgroudService';
 import {
@@ -14,12 +14,11 @@ import {
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
 
-    const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
+    const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
 
     const queryClient = useQueryClient();
 

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectApp
+    useDisconnectTonConnectConnection
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import {
     RpcMethod,
@@ -62,7 +62,7 @@ export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
     const requestRef = useValueRef(request);
 
-    const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
+    const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
     const { data: appConnections } = useAppTonConnectConnections();
     const wallet = useActiveWallet();
     const activeWalletConnections = useMemo(

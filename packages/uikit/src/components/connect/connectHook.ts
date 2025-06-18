@@ -111,8 +111,6 @@ export const useProcessOpenedLink = (options?: {
                 throw new Error('Unsupported link');
             }
 
-            // TODO: handle auto connect
-
             showLoadingToast();
 
             return params;
@@ -125,7 +123,7 @@ export const useProcessOpenedLink = (options?: {
     });
 };
 
-export const useResponseHttpConnectionMutation = () => {
+export const useCompleteHttpConnection = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
@@ -160,7 +158,24 @@ export const useResponseHttpConnectionMutation = () => {
             });
 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
-            await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
+
+            if (sdk.notifications) {
+                try {
+                    const wallet = result.account.getTonWallet(result.walletId);
+                    if (!wallet) {
+                        throw new Error('Wallet not found');
+                    }
+                    const enable = await sdk.notifications.subscribed(wallet.rawAddress);
+                    if (enable) {
+                        await sdk.notifications.subscribeTonConnect(
+                            params.clientSessionId,
+                            new URL(params.request.manifestUrl).host
+                        );
+                    }
+                } catch (e) {
+                    if (e instanceof Error) sdk.topMessage(e.message);
+                }
+            }
         } else {
             await sendEventToBridge({
                 response: connectRejectResponse(),
@@ -168,12 +183,13 @@ export const useResponseHttpConnectionMutation = () => {
                 clientSessionId: params.clientSessionId
             });
         }
+        await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
 
         return undefined;
     });
 };
 
-export const useResponseInjectedConnectionMutation = () => {
+export const useCompleteInjectedConnection = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
@@ -205,7 +221,6 @@ export const useResponseInjectedConnectionMutation = () => {
             sendBridgeResponse(response);
 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
-            await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
         } else {
             sendBridgeResponse(connectRejectResponse());
         }
