@@ -8,7 +8,7 @@ import {
 } from '@tonkeeper/uikit/dist/state/dapp-browser';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { Body2, Body3, Label3 } from '@tonkeeper/uikit';
+import { Body2, Body3, Label2, Label3 } from '@tonkeeper/uikit';
 import {
     BrowserTabIdentifier,
     isBrowserTabLive
@@ -225,7 +225,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     closeTab();
                                 }}
                             >
-                                {t('close')}
+                                <Label2>{t('close')}</Label2>
                                 <DropDownRightIcon>
                                     <CloseIcon />
                                 </DropDownRightIcon>
@@ -240,7 +240,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     });
                                 }}
                             >
-                                {t('browser_actions_refresh')}
+                                <Label2>{t('browser_actions_refresh')}</Label2>
                                 <DropDownRightIcon>
                                     <RefreshIcon />
                                 </DropDownRightIcon>
@@ -265,11 +265,13 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                             );
                                         }}
                                     >
-                                        {t(
-                                            tab.isPinned
-                                                ? 'browser_actions_unpin'
-                                                : 'browser_actions_pin'
-                                        )}
+                                        <Label2>
+                                            {t(
+                                                tab.isPinned
+                                                    ? 'browser_actions_unpin'
+                                                    : 'browser_actions_pin'
+                                            )}
+                                        </Label2>
                                         <DropDownRightIcon>
                                             {tab.isPinned ? (
                                                 <UnpinIconOutline />
@@ -290,7 +292,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     });
                                 }}
                             >
-                                {t('browser_actions_share')}
+                                <Label2>{t('browser_actions_share')}</Label2>
                                 <DropDownRightIcon>
                                     <ShareIcon />
                                 </DropDownRightIcon>
@@ -302,7 +304,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     sdk.copyToClipboard(tab.url);
                                 }}
                             >
-                                {t('browser_actions_copy_link')}
+                                <Label2>{t('browser_actions_copy_link')}</Label2>
                                 <DropDownRightIcon>
                                     <CopyIcon />
                                 </DropDownRightIcon>
@@ -316,7 +318,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                             disconnect(activeConnection.connection);
                                         }}
                                     >
-                                        {t('disconnect')}
+                                        <Label2> {t('disconnect')}</Label2>
                                         <DropDownRightIcon>
                                             <DisconnectIcon />
                                         </DropDownRightIcon>
