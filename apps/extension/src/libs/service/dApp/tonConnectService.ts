@@ -5,14 +5,16 @@ import {
     SIGN_DATA_ERROR_CODES,
     SignDataRequestPayload,
     TonConnectAccount,
-    TonConnectEventPayload,
+    TonConnectEventPayload, TonConnectNetwork,
     TonConnectTransactionPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+} from "@tonkeeper/core/dist/entries/tonConnect";
 import {
     getInjectedDappConnection,
-    getDeviceInfo, tonConnectTonkeeperProAppName,
+    getDeviceInfo,
     tonInjectedDisconnectRequest,
-    tonInjectedReConnectRequest, getInjectedDappConnectionForWallet
+    tonInjectedReConnectRequest,
+    tonConnectTonkeeperAppName,
+    checkTonConnectFromAndNetwork
 } from "@tonkeeper/core/dist/service/tonConnect/connectService";
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../../storage';
@@ -58,7 +60,7 @@ const tonReConnectResponse = async (origin: string): Promise<TonConnectEventPayl
 export async function getExtensionDeviceInfo(options?: { maxMessages?: number }): Promise<DeviceInfo> {
     const { version } = browser.runtime.getManifest();
     const { os } = await browser.runtime.getPlatformInfo();
-    return getDeviceInfo(getTonConnectPlatform(os), version, options?.maxMessages ?? 255, tonConnectTonkeeperProAppName)
+    return getDeviceInfo(getTonConnectPlatform(os), version, options?.maxMessages ?? 255, tonConnectTonkeeperAppName)
 }
 
 export const tonConnectReConnect = async (origin: string) => {
@@ -131,13 +133,17 @@ export const tonConnectTransaction = async (
     data: TonConnectTransactionPayload,
     account: TonConnectAccount | undefined
 ) => {
-    const connection = await getInjectedDappConnectionForWallet(storage, origin, account);
+    const connection = await getInjectedDappConnection(storage, origin);
 
     if (!connection) {
         throw new TonConnectError(
             "dApp don't have an access to wallet",
             CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
         );
+    }
+
+    if (account) {
+        await checkTonConnectFromAndNetwork(storage, connection.wallet, {from: account.address, network: account.network as TonConnectNetwork})
     }
 
     try {

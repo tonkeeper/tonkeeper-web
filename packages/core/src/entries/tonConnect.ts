@@ -8,6 +8,8 @@ import { assertTypesEqual } from '../utils/types';
 
 /* Protocol types */
 
+export const protocolVersionSchema = z.number();
+
 const rawAddressSchema = z.string().regex(/^(0|-1):[0-9a-fA-F]{64}$/);
 const tonConnectNetworkSchema = z.union([
     z.literal(-239),
@@ -328,6 +330,11 @@ const signDataRequestPayloadTextSchema = z.object({
     text: z.string()
 });
 export type SignDataRequestPayloadText = z.infer<typeof signDataRequestPayloadTextSchema>;
+
+export const sendRequestPayloadSchema = z.union([
+    transactionRequestPayloadSchema,
+    signDataRequestPayloadTextSchema
+]);
 
 const signDataRequestPayloadBinarySchema = z.object({
     network: tonConnectNetworkSchema.optional(),

@@ -18,14 +18,15 @@ import {
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
-import { eqRawAddresses, TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConnectionInjected,
     saveAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import { getAccountByWalletById, getWalletById } from '@tonkeeper/core/dist/entries/account';
+import { getWalletById } from '@tonkeeper/core/dist/entries/account';
 import { capacitorStorage } from '../appSdk';
 import {
+    checkTonConnectFromAndNetwork,
     disconnectResponse,
     getBrowserPlatform,
     getDeviceInfo,
@@ -40,7 +41,6 @@ import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserSe
 import { z } from 'zod';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { QueryClient } from '@tanstack/react-query';
-import { Network } from '@tonkeeper/core/dist/entries/network';
 import { queryClient as queryClientInstance } from '../query-client';
 
 function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: unknown): z.infer<T> {
@@ -283,40 +283,19 @@ class CapacitorTonConnectInjectedConnector {
         wallet: TonContract,
         params: { from?: string; network?: TonConnectNetwork; requestId?: string }
     ) {
-        if (params.from !== undefined) {
-            if (!eqRawAddresses(wallet.rawAddress, params.from)) {
+        try {
+            await checkTonConnectFromAndNetwork(this.storage, wallet, params);
+        } catch (e) {
+            if (e instanceof TonConnectError) {
                 return {
-                    error: {
-                        code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
-                        message: 'Invalid account provided'
-                    },
+                    error: e,
                     id: params.requestId
                 };
-            }
-        }
-
-        if (params.network !== undefined) {
-            const account = getAccountByWalletById(
-                await accountsStorage(this.storage).getAccounts(),
-                wallet.id
-            );
-
-            if (!account) {
-                throw new Error('Unknown account provided');
-            }
-
-            const mismatchMainnet =
-                params.network.toString() === Network.MAINNET.toString() &&
-                account.type === 'testnet';
-            const mismatchTestnet =
-                params.network.toString() === Network.TESTNET.toString() &&
-                account.type !== 'testnet';
-
-            if (mismatchMainnet && mismatchTestnet) {
+            } else {
                 return {
                     error: {
-                        code: SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR,
-                        message: 'Invalid network provided'
+                        code: SEND_TRANSACTION_ERROR_CODES.UNKNOWN_ERROR,
+                        message: 'Unknown error'
                     },
                     id: params.requestId
                 };

@@ -1,4 +1,8 @@
-import { CONNECT_EVENT_ERROR_CODES, SIGN_DATA_ERROR_CODES } from './tonConnect';
+import {
+    CONNECT_EVENT_ERROR_CODES,
+    SEND_TRANSACTION_ERROR_CODES,
+    SIGN_DATA_ERROR_CODES
+} from './tonConnect';
 
 export class TonConnectError extends Error {
     code: number;
@@ -7,6 +11,7 @@ export class TonConnectError extends Error {
         message: string,
         code:
             | CONNECT_EVENT_ERROR_CODES
+            | SEND_TRANSACTION_ERROR_CODES
             | SIGN_DATA_ERROR_CODES = CONNECT_EVENT_ERROR_CODES.UNKNOWN_ERROR
     ) {
         super(message);

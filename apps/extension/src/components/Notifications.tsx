@@ -1,8 +1,4 @@
-import {
-    DAppManifest,
-    SignDataResponse,
-    TonConnectEventPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+import { ConnectEvent, ConnectRequest, SignDataResponse } from "@tonkeeper/core/dist/entries/tonConnect";
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
@@ -11,8 +7,20 @@ import { useNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude'
 import { useCallback, useEffect, useState } from 'react';
 import { askBackground, sendBackground } from '../event';
 import { NotificationData } from '../libs/event';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { tonConnectTonkeeperAppName } from "@tonkeeper/core/dist/service/tonConnect/connectService";
+import { useCompleteInjectedConnection } from "@tonkeeper/uikit/dist/components/connect/connectHook";
+import { tonConnectProtocolVersion } from "../constants";
+
+const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
+  if (e.event === 'connect') {
+      sendBackground.message('approveRequest', {
+        id,
+        payload: e.payload
+      });
+  } else {
+      sendBackground.message('rejectRequest', id);
+  }
+}
 
 export const Notifications = () => {
     const [data, setData] = useState<NotificationData | undefined>(undefined);
@@ -44,28 +52,25 @@ export const Notifications = () => {
         }
     }, []);
 
+    const { mutateAsync: completeInjectedConnection } = useCompleteInjectedConnection();
+
     return (
         <>
             <TonConnectNotification
                 origin={data?.origin}
-                params={data?.kind === 'tonConnectRequest' ? { request: data.data, appName: 'tonkeeper' } : null}
-                handleClose={(
-                    result: {
-                        replyItems: TonConnectEventPayload;
-                        manifest: DAppManifest;
-                        account: Account;
-                        walletId: WalletId;
-                    } | null
-                ) => {
-                    if (!data) return;
-                    if (result) {
-                        sendBackground.message('approveRequest', {
-                            id: data.id,
-                            payload: result.replyItems
-                        });
-                    } else {
-                        sendBackground.message('rejectRequest', data.id);
-                    }
+                params={data?.kind === 'tonConnectRequest' ? { request: data.data, appName: tonConnectTonkeeperAppName } : null}
+                handleClose={async result => {
+                    await completeInjectedConnection({
+                      params: {
+                        type: 'injected',
+                        protocolVersion: tonConnectProtocolVersion,
+                        request: data!.data as ConnectRequest,
+                        appName: tonConnectTonkeeperAppName,
+                        webViewOrigin: data!.origin
+                      },
+                      result,
+                      sendBridgeResponse: bridgeConnectTransport(data!.id)
+                    })
                     reloadNotification(true);
                 }}
             />
