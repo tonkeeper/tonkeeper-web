@@ -143,7 +143,7 @@ export const saveAccountConnection = async (options: {
                 return true;
             }
 
-            return item.manifest.url === options.manifest.url;
+            return item.manifest.url !== options.manifest.url;
         });
     }
 
