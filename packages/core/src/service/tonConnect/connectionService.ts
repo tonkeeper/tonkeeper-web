@@ -5,6 +5,8 @@ import { IStorage } from '../../Storage';
 import { getDevSettings } from '../devStorage';
 import { assertUnreachable } from '../../utils/types';
 import { eqOrigins, originFromUrl } from './connectService';
+import { accountsStorage } from '../accountsStorage';
+import { isAccountSupportTonConnect } from '../../entries/account';
 
 export interface TonConnectHttpConnectionParams {
     type: 'http';
@@ -150,6 +152,11 @@ export const saveAccountConnection = async (options: {
             throw new Error('WebView origin mismatch');
         }
 
+        /**
+         * Remove other wallets injected connections to this dapp
+         */
+        await disconnectInjectedDappFromAllWallets(options.storage, options.params.webViewOrigin);
+
         connections.unshift({
             id: options.manifest.url,
             manifest: options.manifest,
@@ -183,12 +190,31 @@ export const disconnectInjectedAccountConnection = async (options: {
     webViewUrl: string;
 }) => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
+    if (!connections.length) {
+        return;
+    }
 
     connections = connections.filter(
         item => item.type === 'injected' && !eqOrigins(item.webViewOrigin, options.webViewUrl)
     );
 
     await setAccountConnection(options.storage, options.wallet, connections);
+};
+
+const disconnectInjectedDappFromAllWallets = async (storage: IStorage, webViewOrigin: string) => {
+    const accounts = (await accountsStorage(storage).getAccounts()).filter(
+        isAccountSupportTonConnect
+    );
+
+    const wallets = accounts.flatMap(a => a.allTonWallets);
+
+    for (const wallet of wallets) {
+        await disconnectInjectedAccountConnection({
+            storage,
+            wallet,
+            webViewUrl: webViewOrigin
+        });
+    }
 };
 
 /**

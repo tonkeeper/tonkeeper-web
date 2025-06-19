@@ -21,7 +21,6 @@ import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { eqRawAddresses, TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConnectionInjected,
-    disconnectInjectedAccountConnection,
     saveAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { getAccountByWalletById, getWalletById } from '@tonkeeper/core/dist/entries/account';
@@ -42,6 +41,7 @@ import { z } from 'zod';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { QueryClient } from '@tanstack/react-query';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { queryClient as queryClientInstance } from '../query-client';
 
 function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: unknown): z.infer<T> {
     const parsed = z
@@ -57,7 +57,7 @@ function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: un
     return parsed.data.message;
 }
 
-class TonConnectInjectedConnector {
+class CapacitorTonConnectInjectedConnector {
     private connectHandler: (
         request: ConnectRequest,
         webViewOrigin: string
@@ -91,7 +91,7 @@ class TonConnectInjectedConnector {
         this.disconnectHandler = handler;
     }
 
-    constructor(private storage: IStorage) {
+    constructor(private storage: IStorage, private queryClient: QueryClient) {
         CapacitorDappBrowser.setRequestsHandler(
             NATIVE_BRIDGE_METHODS.TON_CONNECT.SEND,
             async (rpcParams: Record<string, unknown>, { webViewOrigin }) => {
@@ -330,7 +330,7 @@ class TonConnectInjectedConnector {
      * 3. Reload all pages with dapp origin
      *    After reloading dapp will call re-connect method that will restore connection with new active wallet (in case dapp doesn't require ton_proof)
      */
-    public async changeConnectedWalletToActive(tab: BrowserTabIdentifier, client: QueryClient) {
+    public async changeConnectedWalletToActive(tab: BrowserTabIdentifier) {
         const dappOrigin = originFromUrl(tab.url);
         if (!dappOrigin) {
             throw new Error('Dapp origin not found');
@@ -368,7 +368,7 @@ class TonConnectInjectedConnector {
                 }
             }
         });
-        await client.invalidateQueries([QueryKey.tonConnectConnection]);
+        await this.queryClient.invalidateQueries([QueryKey.tonConnectConnection]);
 
         await CapacitorDappBrowser.reload({ origin: dappOrigin });
     }
@@ -395,11 +395,6 @@ class TonConnectInjectedConnector {
             return;
         }
 
-        await disconnectInjectedAccountConnection({
-            storage: this.storage,
-            wallet,
-            webViewUrl: params.connection.webViewOrigin
-        });
         await this.disconnectHandler(params.connection.webViewOrigin);
         return disconnectResponse(params.request.id);
     };
@@ -417,4 +412,7 @@ class TonConnectInjectedConnector {
     };
 }
 
-export const tonConnectInjectedConnector = new TonConnectInjectedConnector(capacitorStorage);
+export const capacitorTonConnectInjectedConnector = new CapacitorTonConnectInjectedConnector(
+    capacitorStorage,
+    queryClientInstance
+);

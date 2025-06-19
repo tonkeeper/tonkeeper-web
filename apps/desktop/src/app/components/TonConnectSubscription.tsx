@@ -14,6 +14,7 @@ import {
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { isAccountConnectionHttp } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
@@ -42,8 +43,14 @@ export const TonConnectSubscription = () => {
 
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(value => {
-            if (value) {
-                sendBackground({ king: 'ton-connect-send-disconnect', connection: value });
+            const connections = Array.isArray(value) ? value : [value];
+            const httpConnections = connections.filter(isAccountConnectionHttp);
+
+            if (httpConnections.length > 0) {
+                sendBackground({
+                    king: 'ton-connect-send-disconnect',
+                    connection: httpConnections
+                });
             }
         });
     }, []);

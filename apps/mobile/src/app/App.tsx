@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
@@ -48,20 +48,12 @@ import { IonApp, iosTransitionAnimation, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
 import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
+import { queryClient } from '../libs/query-client';
 
 setupIonicReact({
     swipeBackEnabled: true,
     mode: 'ios',
     navAnimation: iosTransitionAnimation
-});
-
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            staleTime: 30000,
-            refetchOnWindowFocus: false
-        }
-    }
 });
 
 const GlobalStyle = createGlobalStyle`

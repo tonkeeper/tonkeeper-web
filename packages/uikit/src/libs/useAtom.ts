@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
+import { Atom, ReadonlyAtom, Subject } from '@tonkeeper/core/dist/entries/atom';
 
 export function useAtom<T>(a: Atom<T>): [T, (value: T | ((prev: T) => T)) => void] {
     const [value, setValue] = useState(a.value);
@@ -33,6 +33,20 @@ export function useAtomValue<T>(a: ReadonlyAtom<T>): T {
             setValue(v);
         });
     }, [a]);
+
+    return value;
+}
+
+export function useSubjectValue<T>(a: Subject<T>): T | undefined {
+    const [value, setValue] = useState<T | undefined>(undefined);
+
+    useEffect(
+        () =>
+            a.subscribe(v => {
+                setValue(v);
+            }),
+        [a]
+    );
 
     return value;
 }

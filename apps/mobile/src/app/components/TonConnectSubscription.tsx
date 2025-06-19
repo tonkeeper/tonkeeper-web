@@ -15,12 +15,12 @@ import {
     subscribeToHttpTonConnectDisconnect,
     subscribeToHttpTonConnectRequest,
     tonConnectSSE
-} from '../../libs/ton-connect/http-connector';
+} from '../../libs/ton-connect/capacitor-http-connector';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { tonConnectInjectedConnector } from '../../libs/ton-connect/injected-connector';
+import { capacitorTonConnectInjectedConnector } from '../../libs/ton-connect/capacitor-injected-connector';
 import {
     isAccountConnectionHttp,
     isAccountConnectionInjected
@@ -36,17 +36,19 @@ const useInjectedBridgeRequestsSubscription = (
         reject: (reason?: unknown) => void;
     } | null>(null);
     useEffect(() => {
-        tonConnectInjectedConnector.setRequestsHandler((request: TonConnectAppRequestPayload) => {
-            return new Promise<WalletResponse<RpcMethod>>(async (resolve, reject) => {
-                if (ref.current) {
-                    ref.current.reject('Request Cancelled');
-                }
-                ref.current = { resolve, reject };
+        capacitorTonConnectInjectedConnector.setRequestsHandler(
+            (request: TonConnectAppRequestPayload) => {
+                return new Promise<WalletResponse<RpcMethod>>(async (resolve, reject) => {
+                    if (ref.current) {
+                        ref.current.reject('Request Cancelled');
+                    }
+                    ref.current = { resolve, reject };
 
-                await CapacitorDappBrowser.setIsMainViewInFocus(true);
-                setRequest(request);
-            });
-        });
+                    await CapacitorDappBrowser.setIsMainViewInFocus(true);
+                    setRequest(request);
+                });
+            }
+        );
     }, []);
 
     return ref;
@@ -54,7 +56,9 @@ const useInjectedBridgeRequestsSubscription = (
 
 const useInjectedBridgeDisconnectSubscription = (onDisconnect: (app: { id: string }) => void) => {
     useEffect(() => {
-        tonConnectInjectedConnector.setDisconnectHandler(appId => onDisconnect({ id: appId }));
+        capacitorTonConnectInjectedConnector.setDisconnectHandler(appId =>
+            onDisconnect({ id: appId })
+        );
     }, [onDisconnect]);
 };
 
@@ -100,7 +104,7 @@ export const TonConnectSubscription = () => {
             }
 
             if (injectedConnections.length > 0) {
-                tonConnectInjectedConnector.sendDisconnect(injectedConnections);
+                capacitorTonConnectInjectedConnector.sendDisconnect(injectedConnections);
             }
         });
     }, []);

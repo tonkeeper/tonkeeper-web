@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useRef } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import {
     BrowserTab,
     LoadingBrowserTab,
@@ -32,8 +32,8 @@ import {
     useAccountsState,
     useActiveWallet
 } from '@tonkeeper/uikit/dist/state/wallet';
-import { tonConnectInjectedConnector } from '../../../libs/ton-connect/injected-connector';
-import { TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { capacitorTonConnectInjectedConnector } from '../../../libs/ton-connect/capacitor-injected-connector';
+import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import { Dot } from '@tonkeeper/uikit/dist/components/Dot';
 import { SelectDropDown } from '@tonkeeper/uikit/dist/components/fields/Select';
 import {
@@ -47,13 +47,12 @@ import { useTranslation } from 'react-i18next';
 import { originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { Share } from '@capacitor/share';
 import {
-    useDisconnectTonConnectConnection,
+    useDisconnectTonConnectApp,
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
-import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 import { WalletEmoji } from '@tonkeeper/uikit/dist/components/shared/emoji/WalletEmoji';
 import { getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
-import { useQueryClient } from '@tanstack/react-query';
+import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -102,17 +101,12 @@ export const MobileDappBrowserTab: FC<{
     const { title, iconUrl } = tab;
     const isLive = isBrowserTabLive(tab);
     const tabIsReady = !('type' in tab && tab.type === 'loading');
-    const client = useQueryClient();
     const activeWallet = useActiveWallet();
 
-    const tabRef = useValueRef(tab);
-
-    const asideLastSelectedWallet = useRef<WalletId | undefined>();
-    useEffect(() => asideWalletSelected$.subscribe(w => (asideLastSelectedWallet.current = w)), []);
-
+    const asideLastSelectedWalletId = useSubjectValue(asideWalletSelected$);
     useEffect(() => {
-        if (activeWallet.id === asideLastSelectedWallet.current) {
-            tonConnectInjectedConnector.changeConnectedWalletToActive(tabRef.current, client);
+        if (activeWallet.id === asideLastSelectedWalletId) {
+            capacitorTonConnectInjectedConnector.changeConnectedWalletToActive(tab);
         }
     }, [activeWallet.id]);
 
@@ -200,7 +194,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
-    const disconnect = useDisconnectTonConnectConnection();
+    const { mutate: disconnect } = useDisconnectTonConnectApp();
     const { mutate: changeTab } = useChangeBrowserTab();
 
     return (
@@ -315,7 +309,7 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
                                     <DropDownItemStyled
                                         onClick={() => {
                                             closeDropDown();
-                                            disconnect(activeConnection.connection);
+                                            disconnect({ origin: originFromUrl(tab.url)! });
                                         }}
                                     >
                                         <Label2> {t('disconnect')}</Label2>

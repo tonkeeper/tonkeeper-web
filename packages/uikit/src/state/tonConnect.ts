@@ -33,12 +33,8 @@ import {
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import {
-    Account,
-    getNetworkByAccount,
-    isAccountTonWalletStandard
-} from '@tonkeeper/core/dist/entries/account';
-import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
+import { Account, getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
+import { useAccountsStateQuery, useActiveWallet } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
@@ -250,21 +246,13 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const client = useQueryClient();
-    const accounts = useAccountsState().filter(isAccountTonWalletStandard);
 
     return useMutation(async (dapp: { origin: string } | 'all' | { connectionId: string }) => {
-        let connectionsToDisconnect: AccountConnection[];
-        if (sdk.targetEnv !== 'extension') {
-            connectionsToDisconnect = await disconnectDappFromWallet(sdk.storage, dapp, wallet);
-        } else {
-            connectionsToDisconnect = (
-                await Promise.all(
-                    accounts
-                        .flatMap(a => a.allTonWallets)
-                        .map(w => disconnectDappFromWallet(sdk.storage, dapp, w))
-                )
-            ).flat();
-        }
+        const connectionsToDisconnect: AccountConnection[] = await disconnectDappFromWallet(
+            sdk.storage,
+            dapp,
+            wallet
+        );
 
         if (!options?.skipEmit) {
             tonConnectAppManuallyDisconnected$.next(connectionsToDisconnect);
