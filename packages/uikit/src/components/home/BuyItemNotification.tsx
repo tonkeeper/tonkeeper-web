@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { sha512_sync } from '@ton/crypto';
+import { sha512 } from '@ton/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import {
     TonendpoinFiatButton,
     TonendpoinFiatItem,
+    Tonendpoint,
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
@@ -156,9 +157,10 @@ const useShowDisclaimer = (title: string, kind: 'buy' | 'sell') => {
     });
 };
 
-const replacePlaceholders = (
+const replacePlaceholders = async (
     url: string,
     config: TonendpointConfig,
+    tonendpoint: Tonendpoint,
     wallet: TonContract,
     fiat: FiatCurrencies,
     kind: 'buy' | 'sell'
@@ -174,13 +176,35 @@ const replacePlaceholders = (
         const txId = 'mercuryo_' + uuidv4();
         url = url.replace(/\{TX_ID\}/g, txId);
         url = url.replace(/\=TON\&/gi, '=TONCOIN&');
-        url += `&signature=${sha512_sync(`${address}${config.mercuryoSecret ?? ''}`).toString(
-            'hex'
-        )}`;
+
+        if (config.mercuryoSecret) {
+            url += `&signature=${await generateMercuryoSignature({
+                tonendpoint,
+                walletAddress: address,
+                txId,
+                mercuryoSecret: config.mercuryoSecret
+            })}`;
+        }
     }
 
     return url;
 };
+
+/**
+ *  input := walletAddress + config.mercuryoSecret + ip + txID
+ *  signature := "v2:" + hex(sha512(input))
+ */
+async function generateMercuryoSignature(params: {
+    tonendpoint: Tonendpoint;
+    walletAddress: string;
+    txId: string;
+    mercuryoSecret: string;
+}) {
+    const countryIP = await params.tonendpoint.country();
+    const input = `${params.walletAddress}${params.mercuryoSecret}${countryIP.ip}${params.txId}`;
+    const hash = await sha512(input);
+    return `v2:${hash.toString('hex')}`;
+}
 
 const Label1Styled = styled(Label1)`
     display: flex;
@@ -220,6 +244,7 @@ export const BuyItemNotification: FC<{
     const { data: hided } = useShowDisclaimer(item.title, kind);
     const { mutate } = useHideDisclaimerMutation(item.title, kind);
     const { mutateAsync: createMercuryoProUrl } = useCreateMercuryoProUrl();
+    const { tonendpoint } = useAppContext();
 
     const onForceOpen = async () => {
         track(item.action_button.url);
@@ -228,7 +253,7 @@ export const BuyItemNotification: FC<{
         if (item.id === 'mercuryo_pro') {
             urlToOpen = await createMercuryoProUrl(item.action_button.url);
         }
-        sdk.openPage(replacePlaceholders(urlToOpen, config, wallet, fiat, kind));
+        sdk.openPage(await replacePlaceholders(urlToOpen, config, tonendpoint, wallet, fiat, kind));
         setOpen(false);
     };
     const onOpen: React.MouseEventHandler<HTMLDivElement> = () => {
