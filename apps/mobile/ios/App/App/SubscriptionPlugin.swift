@@ -88,7 +88,7 @@ import Capacitor
                         await transaction.finish()
                         call.resolve([
                             "status": "success",
-                            "productId": transaction.productID
+                            "originalTransactionId": transaction.originalID
                         ])
                     case .unverified(_, let error):
                         call.reject("Purchase unverified: \(error.localizedDescription)")
