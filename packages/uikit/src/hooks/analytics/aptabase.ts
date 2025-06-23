@@ -1,6 +1,7 @@
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { Analytics } from '.';
+import { Analytics, getUserIdentityProps } from './common';
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
 
 export class Aptabase implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
@@ -11,13 +12,18 @@ export class Aptabase implements Analytics {
 
     private readonly appVersion: string;
 
-    private readonly sessionId: string;
+    private readonly userIdentity: UserIdentity;
 
-    constructor(options: { host: string; key: string; appVersion: string; sessionId: string }) {
+    constructor(options: {
+        host: string;
+        key: string;
+        appVersion: string;
+        userIdentity: UserIdentity;
+    }) {
         this.apiUrl = `${options.host}/api/v0/event`;
         this.appKey = options.key;
         this.appVersion = options.appVersion;
-        this.sessionId = options.sessionId;
+        this.userIdentity = options.userIdentity;
     }
 
     init = (params: {
@@ -51,6 +57,8 @@ export class Aptabase implements Analytics {
         props?: Record<string, string | number | boolean>
     ): Promise<void> {
         try {
+            const identityProps = await getUserIdentityProps(this.userIdentity);
+
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
@@ -60,7 +68,6 @@ export class Aptabase implements Analytics {
                 credentials: 'omit',
                 body: JSON.stringify({
                     timestamp: new Date().toISOString(),
-                    sessionId: this.sessionId,
                     eventName: eventName,
                     systemProps: {
                         locale: this.getBrowserLocale(),
@@ -71,7 +78,8 @@ export class Aptabase implements Analytics {
                     props: {
                         osName: this.getUserOS(),
                         ...props
-                    }
+                    },
+                    ...identityProps
                 })
             });
 

@@ -60,7 +60,6 @@ export interface UserProperties {
     accounts: Account[];
     activeAccount: Account;
     network?: Network;
-    sessionId: string;
 }
 
 export interface TrackEvent {

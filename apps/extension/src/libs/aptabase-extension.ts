@@ -1,10 +1,10 @@
-import { Analytics } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { Analytics } from "@tonkeeper/uikit/dist/hooks/analytics";
 import { sendBackground } from '../event';
 import { Account } from "@tonkeeper/core/dist/entries/account";
 import { Network } from "@tonkeeper/core/dist/entries/network";
 
 export class AptabaseExtension implements Analytics {
-    constructor(private readonly options: {sessionId: string}) {
+    constructor() {
     }
     init =  (params: {
         application: string;
@@ -18,8 +18,7 @@ export class AptabaseExtension implements Analytics {
             walletType: params.walletType,
             accounts: params.accounts,
             activeAccount: params.activeAccount,
-            network: params.network,
-            sessionId: this.options.sessionId
+            network: params.network
         });
     };
 
