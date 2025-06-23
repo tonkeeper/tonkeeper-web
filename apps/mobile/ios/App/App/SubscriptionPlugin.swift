@@ -10,7 +10,8 @@ import Capacitor
         CAPPluginMethod(name: "getProductInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getAllProductsInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "subscribe", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "getOriginalTransactionId", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "getOriginalTransactionId", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "manageSubscriptions", returnType: CAPPluginReturnPromise)
     ]
 
     @objc public func getProductInfo(_ call: CAPPluginCall) {
@@ -125,6 +126,28 @@ import Capacitor
             }
 
             call.resolve(["originalTransactionId": NSNull()])
+        }
+    }
+
+    @objc public func manageSubscriptions(_ call: CAPPluginCall) {
+        guard #available(iOS 15.0, *) else {
+            call.reject("iOS 15+ required")
+            return
+        }
+
+        Task {
+            do {
+                guard let windowScene = await UIApplication.shared.connectedScenes
+                    .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
+                    call.reject("No active window scene")
+                    return
+                }
+
+                try await AppStore.showManageSubscriptions(in: windowScene)
+                call.resolve()
+            } catch {
+                call.reject("Failed to open subscription management: \(error.localizedDescription)")
+            }
         }
     }
 
