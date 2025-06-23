@@ -31,7 +31,8 @@ export const baseCspConfig = {
         'https://tonconsole.com',
         'https://*.tonconsole.com',
         'https://api.trongrid.io/',
-        'https://duckduckgo.com'
+        'https://duckduckgo.com',
+        'https://oauth.telegram.org'
     ],
 
     /* Allow loading pwa manifest */
