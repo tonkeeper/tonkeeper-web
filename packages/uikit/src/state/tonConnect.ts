@@ -40,7 +40,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../hooks/appContext';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export const useAppTonConnectConnections = <T extends AccountConnection['type']>(
     filterType?: T
@@ -132,12 +132,15 @@ export const useActiveWalletConnectedApps = () => {
 
 export const useInjectedDappConnectionByOrigin = (origin: string | undefined) => {
     const query = useAppTonConnectConnections();
-    if (!query.data) {
-        return query;
-    } else {
-        const data = origin ? getInjectedDappConnection(query.data, origin) : undefined;
-        return { ...query, data };
-    }
+
+    return useMemo(() => {
+        if (!query.data) {
+            return query;
+        } else {
+            const data = origin ? getInjectedDappConnection(query.data, origin) : undefined;
+            return { ...query, data };
+        }
+    }, [query.data, origin]);
 };
 
 export const useGetTonConnectConnectResponse = () => {
@@ -247,36 +250,46 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
     const wallet = useActiveWallet();
     const client = useQueryClient();
 
-    return useMutation(async (dapp: { origin: string } | 'all' | { connectionId: string }) => {
-        const connectionsToDisconnect: AccountConnection[] = await disconnectDappFromWallet(
-            sdk.storage,
-            dapp,
-            wallet
-        );
-
-        if (!options?.skipEmit) {
-            tonConnectAppManuallyDisconnected$.next(connectionsToDisconnect);
-        }
-
-        if (sdk.notifications) {
-            await Promise.all(
-                connectionsToDisconnect.map(c => {
-                    if (c.type === 'http') {
-                        sdk.notifications
-                            ?.unsubscribeTonConnect(c.clientSessionId)
-                            .catch(e => console.warn(e));
-                    }
-                })
+    return useMutation(
+        async (
+            dapp:
+                | { origin: string; connectionType?: AccountConnection['type'] }
+                | 'all'
+                | { connectionId: string }
+        ) => {
+            const connectionsToDisconnect: AccountConnection[] = await disconnectDappFromWallet(
+                sdk.storage,
+                dapp,
+                wallet
             );
-        }
 
-        await client.invalidateQueries([QueryKey.tonConnectConnection]);
-    });
+            if (!options?.skipEmit) {
+                tonConnectAppManuallyDisconnected$.next(connectionsToDisconnect);
+            }
+
+            if (sdk.notifications) {
+                await Promise.all(
+                    connectionsToDisconnect.map(c => {
+                        if (c.type === 'http') {
+                            sdk.notifications
+                                ?.unsubscribeTonConnect(c.clientSessionId)
+                                .catch(e => console.warn(e));
+                        }
+                    })
+                );
+            }
+
+            await client.invalidateQueries([QueryKey.tonConnectConnection]);
+        }
+    );
 };
 
 const disconnectDappFromWallet = async (
     storage: IStorage,
-    dapp: { origin: string } | 'all' | { connectionId: string },
+    dapp:
+        | { origin: string; connectionType?: AccountConnection['type'] }
+        | 'all'
+        | { connectionId: string },
     wallet: {
         id: string;
         publicKey?: string;
@@ -288,6 +301,10 @@ const disconnectDappFromWallet = async (
             ? connections
             : connections.filter(c => {
                   if ('origin' in dapp) {
+                      if (dapp.connectionType !== undefined && dapp.connectionType !== c.type) {
+                          return false;
+                      }
+
                       const origin = getConnectionDappOrigin(c);
                       return !origin || eqOrigins(origin, dapp.origin);
                   } else {

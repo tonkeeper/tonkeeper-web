@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectConnection
+    useDisconnectTonConnectApp
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import {
     RpcMethod,
@@ -54,19 +54,18 @@ const useInjectedBridgeRequestsSubscription = (
     return ref;
 };
 
-const useInjectedBridgeDisconnectSubscription = (onDisconnect: (app: { id: string }) => void) => {
-    useEffect(() => {
-        capacitorTonConnectInjectedConnector.setDisconnectHandler(appId =>
-            onDisconnect({ id: appId })
-        );
-    }, [onDisconnect]);
+const useInjectedBridgeDisconnectSubscription = (onDisconnect: (appOrigin: string) => void) => {
+    useEffect(
+        () => capacitorTonConnectInjectedConnector.setDisconnectHandler(onDisconnect),
+        [onDisconnect]
+    );
 };
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
     const requestRef = useValueRef(request);
 
-    const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
+    const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
     const { data: appConnections } = useAppTonConnectConnections();
     const wallet = useActiveWallet();
     const activeWalletConnections = useMemo(
@@ -87,11 +86,21 @@ export const TonConnectSubscription = () => {
     }, []);
 
     const injectedBridgeResponseRef = useInjectedBridgeRequestsSubscription(onTransaction);
-    useInjectedBridgeDisconnectSubscription(disconnect);
+
+    const disconnectInjectedDapp = useCallback(
+        (appOrigin: string) => {
+            disconnect({ origin: appOrigin, connectionType: 'injected' });
+        },
+        [disconnect]
+    );
+    useInjectedBridgeDisconnectSubscription(disconnectInjectedDapp);
 
     useEffect(() => subscribeToHttpTonConnectRequest(onTransaction), [onTransaction]);
 
-    useEffect(() => subscribeToHttpTonConnectDisconnect(disconnect), [disconnect]);
+    useEffect(
+        () => subscribeToHttpTonConnectDisconnect(c => disconnect({ connectionId: c.id })),
+        [disconnect]
+    );
 
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(value => {

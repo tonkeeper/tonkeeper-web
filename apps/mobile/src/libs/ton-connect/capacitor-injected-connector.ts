@@ -71,7 +71,7 @@ class CapacitorTonConnectInjectedConnector {
         throw new Error('Requests handler is not set');
     };
 
-    private disconnectHandler: (appId: string) => void = () => {
+    private disconnectHandler: (appOrigin: string) => void = () => {
         throw new Error('Disconnect handler is not set');
     };
 
@@ -87,7 +87,7 @@ class CapacitorTonConnectInjectedConnector {
         this.requestsHandler = handler;
     }
 
-    setDisconnectHandler(handler: (appId: string) => void) {
+    setDisconnectHandler(handler: (appOrigin: string) => void) {
         this.disconnectHandler = handler;
     }
 

@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import {
     BrowserTab,
     LoadingBrowserTab,
@@ -33,7 +33,7 @@ import {
     useActiveWallet
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { capacitorTonConnectInjectedConnector } from '../../../libs/ton-connect/capacitor-injected-connector';
-import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
+import { TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { Dot } from '@tonkeeper/uikit/dist/components/Dot';
 import { SelectDropDown } from '@tonkeeper/uikit/dist/components/fields/Select';
 import {
@@ -53,14 +53,18 @@ import {
 import { WalletEmoji } from '@tonkeeper/uikit/dist/components/shared/emoji/WalletEmoji';
 import { getAccountByWalletById } from '@tonkeeper/core/dist/entries/account';
 import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
+import { AccountAndWalletInfo } from '@tonkeeper/uikit/dist/components/account/AccountAndWalletInfo';
+import { AccountConnectionInjected } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative;
 
-    > *:last-child {
+    > *:nth-child(2) {
         flex: 1;
     }
 `;
@@ -110,9 +114,31 @@ export const MobileDappBrowserTab: FC<{
         }
     }, [activeWallet.id]);
 
+    const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
+    const [bannerData, setBannerData] = useState<WalletId | undefined>(undefined);
+    const [runEffect, setRunEffect] = useState(0);
+    useEffect(() => {
+        if (!activeConnection) {
+            setBannerData(undefined);
+        } else {
+            setBannerData(activeConnection.wallet.id);
+            const timeout = setTimeout(() => {
+                setBannerData(undefined);
+            }, 2500);
+
+            return () => {
+                clearTimeout(timeout);
+            };
+        }
+    }, [activeConnection, runEffect]);
+
     return (
         <Wrapper>
-            <TabHeader tab={tab} />
+            <TabHeader
+                tab={tab}
+                activeConnection={activeConnection}
+                onClickWallet={() => setRunEffect(c => c + 1)}
+            />
             <BackgroundStyled $isTransparent={tabIsReady && !isAnimating}>
                 {!isLive && (
                     <>
@@ -121,6 +147,7 @@ export const MobileDappBrowserTab: FC<{
                     </>
                 )}
             </BackgroundStyled>
+            <ConnectedWalletTooltip walletId={bannerData} />
         </Wrapper>
     );
 };
@@ -183,7 +210,11 @@ const DropDownItemStyled = styled(DropDownItem)`
     white-space: nowrap;
 `;
 
-const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
+const TabHeader: FC<{
+    tab: BrowserTab | BrowserTabIdentifier;
+    activeConnection: { wallet: TonContract; connection: AccountConnectionInjected } | undefined;
+    onClickWallet: () => void;
+}> = ({ tab, activeConnection, onClickWallet }) => {
     const { mutate: hideTab } = useHideActiveBrowserTab();
     const { mutate: closeTab } = useCloseActiveBrowserTab();
 
@@ -193,7 +224,6 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
 
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { data: activeConnection } = useInjectedDappConnectionByOrigin(originFromUrl(tab.url));
     const { mutate: disconnect } = useDisconnectTonConnectApp();
     const { mutate: changeTab } = useChangeBrowserTab();
 
@@ -205,7 +235,11 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
             >
                 <ArrowLeftIcon />
             </BackButton>
-            <HeaderTabInfo tab={tab} connectedWallet={activeConnection?.wallet} />
+            <HeaderTabInfo
+                tab={tab}
+                connectedWallet={activeConnection?.wallet}
+                onClickWallet={onClickWallet}
+            />
             <RightButtonsGroup>
                 <SelectDropDown
                     top="calc(100% + 12px)"
@@ -337,7 +371,8 @@ const TabHeader: FC<{ tab: BrowserTab | BrowserTabIdentifier }> = ({ tab }) => {
 const HeaderTabInfo: FC<{
     tab: BrowserTab | BrowserTabIdentifier;
     connectedWallet: TonContract | undefined;
-}> = ({ tab, connectedWallet }) => {
+    onClickWallet: () => void;
+}> = ({ tab, connectedWallet, onClickWallet }) => {
     const hostname = hostnameFromUrl(tab.url);
     const websiteTitle = 'title' in tab ? tab.title : '';
     const showTitle = Boolean(websiteTitle || hostname);
@@ -353,7 +388,7 @@ const HeaderTabInfo: FC<{
     }
 
     const walletInfo = connectedAccount
-        ? getAccountWalletNameAndEmoji(connectedAccount)
+        ? getAccountWalletNameAndEmoji(connectedAccount, connectedWallet!.id)
         : undefined;
 
     return (
@@ -361,12 +396,12 @@ const HeaderTabInfo: FC<{
             <Spacer />
             {hostname}
             {walletInfo ? (
-                <>
+                <WalletClickZone onClick={onClickWallet}>
                     &nbsp;
                     {t('browser_using_wallet')}
                     <WalletEmoji emojiSize="14px" emoji={walletInfo.emoji} />
                     <WalletName>{walletInfo.name}</WalletName>
-                </>
+                </WalletClickZone>
             ) : (
                 !!websiteTitle && (
                     <>
@@ -378,6 +413,10 @@ const HeaderTabInfo: FC<{
         </Title>
     );
 };
+
+const WalletClickZone = styled.div`
+    display: contents;
+`;
 
 const Spacer = styled.div`
     flex-shrink: 1;
@@ -398,4 +437,48 @@ const hostnameFromUrl = (url: string) => {
     } catch (e) {
         return url;
     }
+};
+
+const ConnectedWalletTooltipWrapper = styled(motion.div)`
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+`;
+
+const ConnectedWalletTooltipBlock = styled.div`
+    background: ${p => p.theme.backgroundContentTint};
+    padding: 8px 12px;
+    border-radius: ${p => p.theme.corner2xSmall};
+    display: grid;
+    overflow: hidden;
+`;
+
+const ConnectedWalletTooltip: FC<{ walletId?: WalletId }> = ({ walletId }) => {
+    const { t } = useTranslation();
+    const accounts = useAccountsState();
+    const account = walletId === undefined ? undefined : getAccountByWalletById(accounts, walletId);
+
+    return (
+        <AnimatePresence>
+            {!!account && (
+                <ConnectedWalletTooltipWrapper
+                    initial={{ opacity: 0, translateY: 50 }}
+                    animate={{ opacity: 1, translateY: 0 }}
+                    exit={{ opacity: 0, translateY: 50 }}
+                    transition={{ duration: 0.15, ease: 'linear' }}
+                >
+                    <ConnectedWalletTooltipBlock>
+                        <Label2>{t('dapp_bowser_wallet_connected_toast')}</Label2>
+                        <AccountAndWalletInfo account={account} walletId={walletId!} />
+                    </ConnectedWalletTooltipBlock>
+                </ConnectedWalletTooltipWrapper>
+            )}
+        </AnimatePresence>
+    );
 };
