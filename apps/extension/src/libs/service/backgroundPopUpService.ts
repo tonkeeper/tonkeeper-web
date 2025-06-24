@@ -97,10 +97,6 @@ popUpEventEmitter.on('userProperties', message => {
     aptabase.init(message.params);
 });
 
-popUpEventEmitter.on('locations', message => {
-    aptabase?.pageView(message.params);
-});
-
 popUpEventEmitter.on('trackEvent', message => {
     aptabase?.track(message.params.name, message.params.params);
 });

@@ -108,7 +108,9 @@ const useSendMutation = (
     });
 };
 
-const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ handleClose }) => {
+const NotificationSkeleton: FC<{
+    handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
+}> = ({ handleClose }) => {
     const { t } = useTranslation();
 
     return (
@@ -165,7 +167,7 @@ const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
 
 const TonTransactionContent: FC<{
     params: TonConnectTransactionPayload;
-    handleClose: (result?: string) => void;
+    handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
     waitInvalidation?: boolean;
     multisigTTL?: MultisigOrderLifetimeMinutes;
 }> = ({ params, handleClose, waitInvalidation, multisigTTL }) => {
@@ -230,7 +232,7 @@ const TonTransactionContent: FC<{
         try {
             const result = await mutateAsync();
             sdk.hapticNotification('success');
-            setTimeout(() => handleClose(result), 300);
+            setTimeout(() => handleClose({ boc: result, senderChoice }), 300);
         } catch (e) {
             sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
@@ -380,7 +382,7 @@ const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose 
 
 export const TonTransactionNotification: FC<{
     params: TonConnectTransactionPayload | null;
-    handleClose: (result?: string) => void;
+    handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
@@ -389,9 +391,9 @@ export const TonTransactionNotification: FC<{
     const [multisigTTL, setMultisigTTL] = useState<MultisigOrderLifetimeMinutes | undefined>();
 
     const onClose = useCallback(
-        (boc?: string) => {
+        (result?: { boc: string; senderChoice: SenderChoice }) => {
             setTimeout(() => setMultisigTTL(undefined), 400);
-            handleClose(boc);
+            handleClose(result);
         },
         [setMultisigTTL, handleClose]
     );

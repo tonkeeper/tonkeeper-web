@@ -35,7 +35,7 @@ import {
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useToast } from '../hooks/useNotification';
-import { useAnalyticsTrack } from '../hooks/amplitude';
+import { useAnalyticsTrack } from '../hooks/analytics';
 
 export type FreeProAccess = {
     code: string;

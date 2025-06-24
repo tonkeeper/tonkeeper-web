@@ -50,7 +50,7 @@ import {
     HideTwaBackButton,
     RecipientTwaHeaderBlock
 } from './SendNotificationHeader';
-import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';

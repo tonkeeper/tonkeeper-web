@@ -1,7 +1,6 @@
-import { FC, useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { FC, useCallback, useId, useMemo, useState } from 'react';
 import { useTranslation } from '@tonkeeper/uikit/dist/hooks/translation';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
-import { useOpenBrowser } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { HideOnReview } from '@tonkeeper/uikit/dist/components/ios/HideOnReview';
 
 import styled, { css } from 'styled-components';
@@ -28,6 +27,11 @@ import { useKeyboardHeight } from '@tonkeeper/uikit/dist/hooks/keyboard/useKeybo
 import { handleSubmit } from '@tonkeeper/uikit/dist/libs/form';
 import { iosKeyboardTransition } from '@tonkeeper/uikit/dist/libs/css';
 import { AnimatePresence, motion } from 'framer-motion';
+import {
+    useCountryContextTracker,
+    useTrackDappBrowserOpened
+} from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
+import { AnalyticsEventDappClick } from '@tonkeeper/core/dist/analytics';
 
 const InputWrapper = styled.form<{ $keyboardShift: number }>`
     padding: 16px 16px 8px;
@@ -134,6 +138,8 @@ const useRelevantApps = (recommendations: Recommendations | undefined, inputValu
 };
 
 export const MobileDappBrowserNewTab = () => {
+    useTrackDappBrowserOpened();
+    const trackDappOpened = useCountryContextTracker();
     const { t } = useTranslation();
     const { data } = useRecommendations();
     const [isInputFocused, _setIsInputFocused] = useState(false);
@@ -144,10 +150,6 @@ export const MobileDappBrowserNewTab = () => {
     const isSearching = isInputFocused || inputValue.length > 0;
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
-    const track = useOpenBrowser();
-    useEffect(() => {
-        if (data) track();
-    }, [track, data]);
     const id = useId();
     const keyboardShift = useKeyboardHeight();
     const { mutate: openTab } = useOpenBrowserTab();
@@ -155,7 +157,15 @@ export const MobileDappBrowserNewTab = () => {
     const search = useSearchEngine();
 
     const onSelectApp = useCallback(
-        (app: PromotedApp) => {
+        (app: PromotedApp, from: 'banner' | 'browser' = 'browser') => {
+            trackDappOpened(
+                country =>
+                    new AnalyticsEventDappClick({
+                        location: country,
+                        url: app.url,
+                        from
+                    })
+            );
             openTab({
                 url: app.url,
                 title: app.name,
@@ -167,7 +177,16 @@ export const MobileDappBrowserNewTab = () => {
 
     const onSubmit = () => {
         if (relevantApps?.length) {
-            return onSelectApp(relevantApps[0]);
+            const relevantApp = relevantApps[0];
+            trackDappOpened(
+                country =>
+                    new AnalyticsEventDappClick({
+                        location: country,
+                        url: relevantApp.url,
+                        from: 'browser_search'
+                    })
+            );
+            return onSelectApp(relevantApp);
         }
 
         openTab({
@@ -253,20 +272,20 @@ export const MobileDappBrowserNewTab = () => {
 
 const InactiveSearchContent: FC<{
     recommendations: Recommendations;
-    onClickApp: (app: PromotedApp) => void;
+    onClickApp: (app: PromotedApp, source: 'banner' | 'browser') => void;
 }> = ({ recommendations, onClickApp }) => {
     return (
         <InactiveSearchContentWrapper>
             <PromotionsCarouselStyled
                 apps={recommendations.apps}
                 slidesToShow={1}
-                onClickApp={onClickApp}
+                onClickApp={a => onClickApp(a, 'banner')}
             />
             {recommendations.categories.map(category => (
                 <MobileProCategoryBlock
                     key={category.id}
                     category={category}
-                    onClickApp={onClickApp}
+                    onClickApp={a => onClickApp(a, 'browser')}
                 />
             ))}
         </InactiveSearchContentWrapper>

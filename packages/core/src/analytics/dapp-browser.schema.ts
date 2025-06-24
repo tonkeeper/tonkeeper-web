@@ -99,7 +99,7 @@ export class AnalyticsEventDappClick {
 
     location!: string;
 
-    from!: 'banner' | 'browser' | 'browser_search' | 'browser_connected' | 'push';
+    from!: 'banner' | 'browser' | 'browser_search' | 'browser_connected' | 'push' | 'sidebar';
 
     constructor(props: {
         /** URL domain only, without private information */
@@ -107,7 +107,7 @@ export class AnalyticsEventDappClick {
         /** 2-letter string in ISO-3166 format */
         location: string;
         /** Source from which the dapp was clicked */
-        from: 'banner' | 'browser' | 'browser_search' | 'browser_connected' | 'push';
+        from: 'banner' | 'browser' | 'browser_search' | 'browser_connected' | 'push' | 'sidebar';
     }) {
         Object.assign(this, props);
     }

@@ -56,6 +56,13 @@ import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
 import { AccountAndWalletInfo } from '@tonkeeper/uikit/dist/components/account/AccountAndWalletInfo';
 import { AccountConnectionInjected } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { AnimatePresence, motion } from 'framer-motion';
+import {
+    AnalyticsEventDappPin,
+    AnalyticsEventDappSharingCopy,
+    AnalyticsEventDappUnpin
+} from '@tonkeeper/core/dist/analytics';
+import { useCountryContextTracker } from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
+import { useAnalyticsTrack } from '@tonkeeper/uikit/dist/hooks/analytics';
 
 const Wrapper = styled.div`
     box-sizing: border-box;
@@ -226,6 +233,8 @@ const TabHeader: FC<{
     const sdk = useAppSdk();
     const { mutate: disconnect } = useDisconnectTonConnectApp();
     const { mutate: changeTab } = useChangeBrowserTab();
+    const countryContextTrack = useCountryContextTracker();
+    const track = useAnalyticsTrack();
 
     return (
         <TabHeaderWrapper>
@@ -291,6 +300,17 @@ const TabHeader: FC<{
                                                         : 'tab_action_toast_pinned'
                                                 )
                                             );
+                                            countryContextTrack(country =>
+                                                isPinned
+                                                    ? new AnalyticsEventDappUnpin({
+                                                          url: tab.url,
+                                                          location: country
+                                                      })
+                                                    : new AnalyticsEventDappPin({
+                                                          url: tab.url,
+                                                          location: country
+                                                      })
+                                            );
                                         }}
                                     >
                                         <Label2>
@@ -314,6 +334,12 @@ const TabHeader: FC<{
                             <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();
+                                    track(
+                                        new AnalyticsEventDappSharingCopy({
+                                            url: tab.url,
+                                            from: 'Share'
+                                        })
+                                    );
                                     sdk.hapticNotification('success');
                                     Share.share({
                                         url: tab.url
@@ -330,6 +356,12 @@ const TabHeader: FC<{
                                 onClick={() => {
                                     closeDropDown();
                                     sdk.copyToClipboard(tab.url);
+                                    track(
+                                        new AnalyticsEventDappSharingCopy({
+                                            url: tab.url,
+                                            from: 'Copy link'
+                                        })
+                                    );
                                 }}
                             >
                                 <Label2>{t('browser_actions_copy_link')}</Label2>

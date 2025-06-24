@@ -3,7 +3,7 @@ import { ComponentProps, FC, useCallback } from 'react';
 import styled from 'styled-components';
 import { Body3, Label2 } from '../Text';
 import { Carousel } from '../shared';
-import { useAreaClick, useOpenPromotedAppCallback } from '../../hooks/useAreaClick';
+import { useAreaClick, useOpenPromotedAppInExternalBrowser } from '../../hooks/useAreaClick';
 import {
     PromotedItem,
     PromotedItemImage,
@@ -55,7 +55,7 @@ const CarouselItem: FC<{ item: CarouselApp; onClickApp?: (app: CarouselApp) => v
     item,
     onClickApp
 }) => {
-    const openAppCallback = useOpenPromotedAppCallback(item.url, 'featured');
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'featured');
     const callback = useCallback(() => {
         if (onClickApp) {
             onClickApp(item);

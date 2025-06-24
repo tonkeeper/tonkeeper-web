@@ -1,5 +1,4 @@
 import { TonConnectRequestNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectRequestNotification';
-import { useSendNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useCallback, useEffect, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
@@ -30,8 +29,6 @@ export const TonConnectSubscription = () => {
         },
         [setRequest]
     );
-
-    useSendNotificationAnalytics(request?.connection?.manifest);
 
     useEffect(() => {
         window.backgroundApi.onTonConnectRequest(onTransaction);

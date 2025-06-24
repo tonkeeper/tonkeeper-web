@@ -12,7 +12,6 @@ import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
-import { useBuyAnalytics } from '../../hooks/amplitude';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
@@ -26,6 +25,7 @@ import { Checkbox } from '../fields/Checkbox';
 import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveConfig, useActiveWallet } from '../../state/wallet';
+import { useAnalyticsTrack } from '../../hooks/analytics';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -233,7 +233,7 @@ export const BuyItemNotification: FC<{
     item: TonendpoinFiatItem;
     kind: 'buy' | 'sell';
 }> = ({ item, kind }) => {
-    const track = useBuyAnalytics();
+    const track = useAnalyticsTrack();
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const config = useActiveConfig();
@@ -247,7 +247,7 @@ export const BuyItemNotification: FC<{
     const { tonendpoint } = useAppContext();
 
     const onForceOpen = async () => {
-        track(item.action_button.url);
+        track('Navigate_Buy', { kind: item.action_button.url });
 
         let urlToOpen = item.action_button.url;
         if (item.id === 'mercuryo_pro') {

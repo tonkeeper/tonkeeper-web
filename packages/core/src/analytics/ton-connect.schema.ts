@@ -99,3 +99,27 @@ export class AnalyticsEventTcSendSuccess {
         return JSON.stringify(this.toJSON());
     }
 }
+
+export class AnalyticsEventTcSignDataSuccess {
+    readonly name = 'tc_sign_data_success';
+
+    dapp_url!: string;
+
+    payload_type!: 'text' | 'binary' | 'cell';
+
+    constructor(props: { dapp_url: string; payload_type: 'text' | 'binary' | 'cell' }) {
+        Object.assign(this, props);
+    }
+
+    toJSON() {
+        return {
+            name: this.name,
+            dapp_url: this.dapp_url,
+            payload_type: this.payload_type
+        };
+    }
+
+    toString() {
+        return JSON.stringify(this.toJSON());
+    }
+}

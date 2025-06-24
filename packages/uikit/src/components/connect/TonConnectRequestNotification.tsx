@@ -12,23 +12,36 @@ import {
     sendTransactionErrorResponse,
     sendTransactionSuccessResponse
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import {
+    useTrackerTonConnectSendSuccess,
+    useTrackTonConnectActionRequest
+} from '../../hooks/analytics/events-hooks';
 
 export const TonConnectRequestNotification: FC<{
     request: TonConnectAppRequestPayload | undefined;
     handleClose: (result: WalletResponse<RpcMethod>) => void;
     waitInvalidation?: boolean;
 }> = ({ request, handleClose, waitInvalidation }) => {
+    useTrackTonConnectActionRequest(request?.connection?.manifest.url);
+    const trackSendSuccess = useTrackerTonConnectSendSuccess();
+
     return (
         <>
             <TonTransactionNotification
                 params={request?.kind === 'sendTransaction' ? request.payload : null}
-                handleClose={boc => {
+                handleClose={result => {
                     if (request) {
                         handleClose(
-                            boc
-                                ? sendTransactionSuccessResponse(request.id, boc)
+                            result
+                                ? sendTransactionSuccessResponse(request.id, result.boc)
                                 : sendTransactionErrorResponse(request.id)
                         );
+                        if (result) {
+                            trackSendSuccess({
+                                dappUrl: request.connection.manifest.url,
+                                sender: result.senderChoice
+                            });
+                        }
                     }
                 }}
                 waitInvalidation={waitInvalidation}

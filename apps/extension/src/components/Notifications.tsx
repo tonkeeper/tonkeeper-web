@@ -3,13 +3,17 @@ import { delay } from '@tonkeeper/core/dist/utils/common';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
 import { SignDataNotification } from '@tonkeeper/uikit/dist/components/connect/SignDataNotification';
-import { useNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useCallback, useEffect, useState } from 'react';
 import { askBackground, sendBackground } from '../event';
 import { NotificationData } from '../libs/event';
 import { tonConnectTonkeeperAppName } from "@tonkeeper/core/dist/service/tonConnect/connectService";
 import { useCompleteInjectedConnection } from "@tonkeeper/uikit/dist/components/connect/connectHook";
 import { tonConnectProtocolVersion } from "../constants";
+import {
+  useTrackerTonConnectSendSuccess,
+  useTrackTonConnectActionRequest
+} from "@tonkeeper/uikit/dist/hooks/analytics/events-hooks";
+import { SenderChoice } from "@tonkeeper/uikit/dist/hooks/blockchain/useSender";
 
 const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
   if (e.event === 'connect') {
@@ -43,8 +47,8 @@ export const Notifications = () => {
             sendBackground.message('closePopUp');
         }
     }, []);
-
-    useNotificationAnalytics(data);
+    useTrackTonConnectActionRequest(data?.origin);
+    const trackSendSuccess = useTrackerTonConnectSendSuccess();
 
     useEffect(() => {
         if (window.location.hash === '#/notification') {
@@ -76,10 +80,11 @@ export const Notifications = () => {
             />
             <TonTransactionNotification
                 params={data?.kind === 'tonConnectSend' ? data.data : null}
-                handleClose={(payload?: string) => {
+                handleClose={(payload?: { boc: string; senderChoice: SenderChoice }) => {
                     if (!data) return;
                     if (payload) {
-                        sendBackground.message('approveRequest', { id: data.id, payload });
+                        sendBackground.message('approveRequest', { id: data.id, payload: payload.boc });
+                        trackSendSuccess({dappUrl: data.origin, sender: payload.senderChoice});
                     } else {
                         sendBackground.message('rejectRequest', data.id);
                     }

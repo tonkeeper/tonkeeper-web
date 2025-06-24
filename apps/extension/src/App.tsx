@@ -21,7 +21,7 @@ import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
@@ -252,20 +252,19 @@ export const Loader: FC = React.memo(() => {
         defaultWalletVersion: WalletVersion.V5R1,
         env: {
           tronApiKey: process.env.REACT_APP_TRON_API_KEY
-        }
+        },
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content activeAccount={activeAccount} lock={lock} />
-                <CopyNotification />
-                <Suspense fallback={<></>}>
-                    <QrScanner />
-                </Suspense>
-                <ModalsRoot />
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content activeAccount={activeAccount} lock={lock} />
+            <CopyNotification />
+            <Suspense fallback={<></>}>
+                <QrScanner />
+            </Suspense>
+            <ModalsRoot />
+        </AppContext.Provider>
     );
 });
 

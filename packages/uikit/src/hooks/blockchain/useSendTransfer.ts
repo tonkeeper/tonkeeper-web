@@ -8,7 +8,7 @@ import {
     TronEstimation,
     TronRecipientData
 } from '@tonkeeper/core/dist/entries/send';
-import { useAnalyticsTrack } from '../amplitude';
+import { useAnalyticsTrack } from '../analytics';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
 import {

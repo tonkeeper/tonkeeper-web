@@ -43,7 +43,7 @@ import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-page
 import DesktopAccountSettingsPage from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
@@ -332,18 +332,17 @@ export const Loader: FC = () => {
             stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS,
             tronApiKey: REACT_APP_TRON_API_KEY
         },
-        defaultWalletVersion: WalletVersion.V5R1
+        defaultWalletVersion: WalletVersion.V5R1,
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content activeAccount={activeAccount} lock={lock} />
-                <CopyNotification hideSimpleCopyNotifications />
-                <QrScanner />
-                <ModalsRoot />
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content activeAccount={activeAccount} lock={lock} />
+            <CopyNotification hideSimpleCopyNotifications />
+            <QrScanner />
+            <ModalsRoot />
+        </AppContext.Provider>
     );
 };
 

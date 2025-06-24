@@ -59,7 +59,7 @@ function generateTSType(schema: JSONSchema, defs: Record<string, JSONSchema>, na
   return "any";
 }
 
-function generateInterfaces(schema: JSONSchema, options?: { namePrefix?: string }): {code: string, reexportUnion: string} {
+function generateInterfaces(schema: JSONSchema, options?: { namePrefix?: string }): { code: string, generatedNames: string[] } {
   if (!schema.$defs) throw new Error("Schema must contain $defs");
 
   const defs = schema.$defs;
@@ -119,11 +119,9 @@ ${jsonFields.join(',\n')}
 }`);
   }
 
-  const reexportUnion = generatedNames.join(" , ");
-
   return {
     code: `/* eslint-disable max-classes-per-file */\n\n${result.join('\n\n')}`,
-    reexportUnion
+    generatedNames
   };
 }
 

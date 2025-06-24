@@ -1,15 +1,12 @@
 import { useAppSdk } from './appSdk';
 import React, { useCallback, useEffect, useState } from 'react';
 import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import {
-    useProcessOpenedLink,
-    useCompleteHttpConnection
-} from '../components/connect/connectHook';
+import { useProcessOpenedLink, useCompleteHttpConnection } from '../components/connect/connectHook';
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useRequestNotificationAnalytics } from './amplitude';
 import { TonConnectNotification } from '../components/connect/TonConnectNotification';
+import { useTrackTonConnectConnectionRequest } from './analytics/events-hooks';
 
 export const useSmartScanner = () => {
     const sdk = useAppSdk();
@@ -74,7 +71,7 @@ export const useSmartScanner = () => {
         };
     }, [sdk, scanId, onScan]);
 
-    useRequestNotificationAnalytics(params?.request?.manifestUrl);
+    useTrackTonConnectConnectionRequest(params?.request?.manifestUrl);
 
     return {
         onScan: onClick,

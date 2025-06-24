@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { FC } from 'react';
 import { PromotedApp } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
-import { useOpenPromotedAppCallback } from '../../hooks/useAreaClick';
+import { useOpenPromotedAppInExternalBrowser } from '../../hooks/useAreaClick';
 import { Body3, Label2 } from '../../components/Text';
 
 export const DesktopPromotedItem = styled.div`
@@ -54,7 +54,7 @@ export const DesktopCategoryGroupItem: FC<{ item: PromotedApp; className?: strin
     item,
     className
 }) => {
-    const openAppCallback = useOpenPromotedAppCallback(item.url, 'recommendation');
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'recommendation');
 
     return (
         <DesktopPromotedItem onClick={openAppCallback} className={className}>

@@ -27,6 +27,12 @@ import { CloseIcon, PinIconOutline, ReorderIcon16, UnpinIconOutline } from '../.
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useTranslation } from '../../../hooks/translation';
+import {
+    AnalyticsEventDappClick,
+    AnalyticsEventDappPin,
+    AnalyticsEventDappUnpin
+} from '@tonkeeper/core/dist/analytics';
+import { useCountryContextTracker } from '../../../hooks/analytics/events-hooks';
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
     background: ${p => (p.isSelected ? p.theme.backgroundContentTint : p.theme.backgroundPage)};
@@ -102,6 +108,7 @@ const EditeModeContext = createContext<{
 
 const useEditMode = () => {
     const { mutate: openTab } = useOpenBrowserTab();
+    const trackDappOpened = useCountryContextTracker();
     const { close: closeWalletMenu, isOpen } = useMenuController('wallet-nav');
 
     const { isEditMode, setIsEditMode } = useContext(EditeModeContext);
@@ -109,6 +116,14 @@ const useEditMode = () => {
     const onClickTab = (tab: BrowserTab) => {
         if (!isEditMode) {
             closeWalletMenu();
+            trackDappOpened(
+                country =>
+                    new AnalyticsEventDappClick({
+                        location: country,
+                        url: tab.url,
+                        from: 'sidebar'
+                    })
+            );
             openTab(tab);
         }
     };
@@ -166,6 +181,7 @@ const BrowserTabsPinned: FC<{
     const openedTabId = useOpenedTabId();
     const { mutate: changeBrowserTab } = useChangeBrowserTab();
     const sdk = useAppSdk();
+    const track = useCountryContextTracker();
 
     const handleDragEnd = (result: DropResult) => {
         if (!result.destination || !tabs) return;
@@ -173,6 +189,11 @@ const BrowserTabsPinned: FC<{
         const [moved] = updated.splice(result.source.index, 1);
         updated.splice(result.destination.index, 0, moved);
         onUpdateOrder(updated);
+    };
+
+    const unpinTab = (tab: BrowserTab) => {
+        changeBrowserTab({ ...tab, isPinned: false });
+        track(country => new AnalyticsEventDappUnpin({ url: tab.url, location: country }));
     };
 
     if (!tabs) {
@@ -214,9 +235,7 @@ const BrowserTabsPinned: FC<{
                         />
                         <Label2>{tab.title}</Label2>
                         {isEditMode && (
-                            <RightIconButton
-                                onClick={() => changeBrowserTab({ ...tab, isPinned: false })}
-                            >
+                            <RightIconButton onClick={() => unpinTab(tab)}>
                                 <UnpinIconOutline />
                             </RightIconButton>
                         )}
@@ -272,6 +291,12 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
     const { mutate: closeTab } = useCloseBrowserTab();
     const { mutate: closeAllTabs } = useCloseAllBrowserTabs();
     const { close: closeMenu } = useMenuController('wallet-nav');
+    const track = useCountryContextTracker();
+
+    const pinTab = (tab: BrowserTab) => {
+        changeBrowserTab({ ...tab, isPinned: true });
+        track(country => new AnalyticsEventDappPin({ url: tab.url, location: country }));
+    };
 
     if (!tabs) {
         return null;
@@ -294,10 +319,7 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
                     isSelected={tab.id === openedTabId}
                     onClick={() => onClickTab(tab)}
                 >
-                    <LeftIconButton
-                        $hidden={!isEditMode}
-                        onClick={() => changeBrowserTab({ ...tab, isPinned: true })}
-                    >
+                    <LeftIconButton $hidden={!isEditMode} onClick={() => pinTab(tab)}>
                         <PinIconOutline />
                     </LeftIconButton>
                     <img

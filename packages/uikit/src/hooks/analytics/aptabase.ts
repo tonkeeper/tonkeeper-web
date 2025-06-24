@@ -2,6 +2,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { Analytics, getUserIdentityProps } from './common';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
+import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
 
 export class Aptabase implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
@@ -24,6 +25,7 @@ export class Aptabase implements Analytics {
         this.appKey = options.key;
         this.appVersion = options.appVersion;
         this.userIdentity = options.userIdentity;
+        this.track.bind(this);
     }
 
     init = (params: {
@@ -44,15 +46,24 @@ export class Aptabase implements Analytics {
         }
     };
 
-    pageView = (location: string) => {
-        return this.trackEvent('page_view', { ...this.user_properties, location });
-    };
+    track(name: string, params?: Record<string, string | number | boolean>): Promise<void>;
+    track(event: AnalyticsEvent): Promise<void>;
+    track(
+        arg1: string | AnalyticsEvent,
+        arg2?: Record<string, string | number | boolean>
+    ): Promise<void> {
+        if (typeof arg1 === 'string') {
+            return this.trackEvent(arg1.toLowerCase(), {
+                ...this.user_properties,
+                ...(arg2 ?? {})
+            });
+        } else {
+            const { name, ...props } = arg1;
+            return this.trackEvent(name, { ...this.user_properties, ...props });
+        }
+    }
 
-    track = async (name: string, params: Record<string, string | number | boolean>) => {
-        return this.trackEvent(name.toLowerCase(), { ...this.user_properties, ...params });
-    };
-
-    async trackEvent(
+    private async trackEvent(
         eventName: string,
         props?: Record<string, string | number | boolean>
     ): Promise<void> {

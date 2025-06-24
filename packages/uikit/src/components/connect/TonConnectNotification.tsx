@@ -28,6 +28,9 @@ import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { isStandardTonWallet, WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/events-hooks';
+import { useAnalyticsTrack } from '../../hooks/analytics';
+import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
 
 const Title = styled(H2)`
     text-align: center;
@@ -114,6 +117,8 @@ const ConnectContent: FC<{
 
     const [error, setError] = useState<Error | null>(null);
     const { mutateAsync, isLoading } = useGetTonConnectConnectResponse();
+    useTrackTonConnectConnectionRequest(params.manifestUrl);
+    const track = useAnalyticsTrack();
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
@@ -151,6 +156,9 @@ const ConnectContent: FC<{
                         ...selectedAccountAndWallet
                     }),
                 300
+            );
+            track(
+                new AnalyticsEventTcConnect({ dapp_url: manifest.url, allow_notifications: false })
             );
         } catch (err) {
             setDone(true);

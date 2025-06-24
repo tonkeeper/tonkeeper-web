@@ -11,7 +11,6 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import QrScanner from '@tonkeeper/uikit/dist/components/QrScanner';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AmplitudeAnalyticsContext } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
@@ -252,19 +251,18 @@ export const Loader: FC = () => {
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
             tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
         },
-        defaultWalletVersion: WalletVersion.V5R1
+        defaultWalletVersion: WalletVersion.V5R1,
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content activeAccount={activeAccount} lock={lock} />
-                <CopyNotification />
-                <QrScanner />
-                <ModalsRoot />
-                <SignerPublishNotification />
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content activeAccount={activeAccount} lock={lock} />
+            <CopyNotification />
+            <QrScanner />
+            <ModalsRoot />
+            <SignerPublishNotification />
+        </AppContext.Provider>
     );
 };
 

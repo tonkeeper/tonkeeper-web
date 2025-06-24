@@ -1,5 +1,4 @@
 import { TonConnectRequestNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectRequestNotification';
-import { useSendNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
@@ -73,8 +72,6 @@ export const TonConnectSubscription = () => {
         [appConnections, wallet.id]
     );
     const queryClient = useQueryClient();
-
-    useSendNotificationAnalytics(request?.connection?.manifest);
 
     const onTransaction = useCallback(async (r: TonConnectAppRequestPayload) => {
         if (requestRef.current) {

@@ -6,6 +6,7 @@ import {
     TonContract,
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
+import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
 
 export type AnalyticsIdentityProps = {
     uuid_persistent: string;
@@ -31,9 +32,15 @@ export async function getUserIdentityProps(
     return result;
 }
 
-export interface Analytics {
-    pageView: (location: string) => void;
+export type AnalyticsTracker = {
+    (event: AnalyticsEvent): Promise<void>;
+    /**
+     * @deprecated
+     */
+    (name: string, params?: Record<string, string | number | boolean>): Promise<void>;
+};
 
+export interface Analytics {
     init: (params: {
         application: string;
         walletType: string;
@@ -42,7 +49,7 @@ export interface Analytics {
         network?: Network;
         platform?: string;
     }) => void;
-    track: (name: string, params: Record<string, string | number | boolean>) => Promise<void>;
+    track: AnalyticsTracker;
 }
 
 export const toWalletType = (wallet?: TonContract | null): string => {

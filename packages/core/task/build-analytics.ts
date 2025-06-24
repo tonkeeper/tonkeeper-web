@@ -42,17 +42,19 @@ async function fetchAndGenerateAll() {
   const files = config.events;
 
 
-  const unions = await Promise.all(files.map(async fileName => {
+  const unions: string[][] = await Promise.all(files.map(async fileName => {
     const schemaRaw = await fetchJSON(GITHUB_RAW_BASE + fileName);
-    const { code, reexportUnion } = generate(schemaRaw, { namePrefix: 'AnalyticsEvent' });
+    const { code, generatedNames } = generate(schemaRaw, { namePrefix: 'AnalyticsEvent' });
     const targetName = getOutputPath(fileName);
     await fs.promises.writeFile(targetName, code, { encoding: 'utf8' });
-    return reexportUnion;
+    return generatedNames;
   }));
 
-  const exportEntries = unions.map((u, index) => `export { ${u} } from './${getOutputFileName(files[index]).replace('.ts', '')}';`).join('\n\n') + '\n';
+  const importEntries =  unions.map((u, index) => `import { ${u.join(', ')} } from './${getOutputFileName(files[index]).replace('.ts', '')}';`).join('\n\n') + '\n\n';
+  const exportEntries = `export { ${unions.flat().join(', ')} };\n\n`;
+  const exportUnion = `export type AnalyticsEvent = ${unions.flat().join('| ')};\n\n`;
 
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), exportEntries);
+  fs.writeFileSync(path.join(OUTPUT_DIR, 'index.ts'), importEntries + exportEntries + exportUnion);
   try {
     child_process.execSync(`npx eslint --fix '${OUTPUT_DIR}/*.ts'`, { stdio: 'inherit' });
   } catch (_) {

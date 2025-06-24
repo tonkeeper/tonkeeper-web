@@ -4,7 +4,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useInvalidateActiveWalletQueries } from '../../../state/wallet';
-import { useTransactionAnalytics } from '../../amplitude';
+import { useTransactionAnalytics } from '../../analytics';
 import { MultisigOrderLifetimeMinutes } from '../../../libs/multisig';
 import { useTonAssetTransferService } from '../useBlockchainService';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';

@@ -1,4 +1,4 @@
-export {
+import {
     AnalyticsEventDappBrowserOpen,
     AnalyticsEventDappPin,
     AnalyticsEventDappUnpin,
@@ -6,9 +6,35 @@ export {
     AnalyticsEventDappSharingCopy
 } from './dapp-browser.schema';
 
-export {
+import {
     AnalyticsEventTcRequest,
     AnalyticsEventTcConnect,
     AnalyticsEventTcViewConfirm,
-    AnalyticsEventTcSendSuccess
+    AnalyticsEventTcSendSuccess,
+    AnalyticsEventTcSignDataSuccess
 } from './ton-connect.schema';
+
+export {
+    AnalyticsEventDappBrowserOpen,
+    AnalyticsEventDappPin,
+    AnalyticsEventDappUnpin,
+    AnalyticsEventDappClick,
+    AnalyticsEventDappSharingCopy,
+    AnalyticsEventTcRequest,
+    AnalyticsEventTcConnect,
+    AnalyticsEventTcViewConfirm,
+    AnalyticsEventTcSendSuccess,
+    AnalyticsEventTcSignDataSuccess
+};
+
+export type AnalyticsEvent =
+    | AnalyticsEventDappBrowserOpen
+    | AnalyticsEventDappPin
+    | AnalyticsEventDappUnpin
+    | AnalyticsEventDappClick
+    | AnalyticsEventDappSharingCopy
+    | AnalyticsEventTcRequest
+    | AnalyticsEventTcConnect
+    | AnalyticsEventTcViewConfirm
+    | AnalyticsEventTcSendSuccess
+    | AnalyticsEventTcSignDataSuccess;

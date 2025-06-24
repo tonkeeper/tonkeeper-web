@@ -3,7 +3,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Route, useHistory, useLocation } from 'react-router-dom';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { useAppWidth } from '../../libs/hooks';
-import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import {
     AppProRoute,
