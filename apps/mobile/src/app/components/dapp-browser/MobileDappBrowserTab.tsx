@@ -47,7 +47,7 @@ import { useTranslation } from 'react-i18next';
 import { originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { Share } from '@capacitor/share';
 import {
-    useDisconnectTonConnectApp,
+    useDisconnectInjectedTonConnectAppFromAllWallets,
     useInjectedDappConnectionByOrigin
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import { WalletEmoji } from '@tonkeeper/uikit/dist/components/shared/emoji/WalletEmoji';
@@ -231,7 +231,7 @@ const TabHeader: FC<{
 
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { mutate: disconnect } = useDisconnectTonConnectApp();
+    const { mutate: disconnect } = useDisconnectInjectedTonConnectAppFromAllWallets();
     const { mutate: changeTab } = useChangeBrowserTab();
     const countryContextTrack = useCountryContextTracker();
     const track = useAnalyticsTrack();

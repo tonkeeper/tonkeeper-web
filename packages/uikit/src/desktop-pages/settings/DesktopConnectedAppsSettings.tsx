@@ -7,7 +7,7 @@ import { ConnectedAppsList } from '../../components/connected-apps/ConnectedApps
 import { styled } from 'styled-components';
 import {
     useActiveWalletConnectedApps,
-    useDisconnectTonConnectApp
+    useDisconnectTonConnectAppFromActiveWallet
 } from '../../state/tonConnect';
 import { ConfirmDisconnectNotification } from '../../components/connected-apps/ConfirmDisconnectNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -27,7 +27,7 @@ export const DesktopConnectedAppsSettings = () => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: connections } = useActiveWalletConnectedApps();
-    const { mutate } = useDisconnectTonConnectApp();
+    const { mutate } = useDisconnectTonConnectAppFromActiveWallet();
 
     const onCloseNotification = (confirmed?: boolean) => {
         if (confirmed) {

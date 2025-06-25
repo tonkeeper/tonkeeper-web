@@ -5,7 +5,7 @@ import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
     ConnectedDApp,
     useActiveWalletConnectedApps,
-    useDisconnectTonConnectApp
+    useDisconnectTonConnectAppFromActiveWallet
 } from '../../state/tonConnect';
 import { ListBlock, ListItem } from '../List';
 import { Body2, Body3, Label2 } from '../Text';
@@ -96,7 +96,7 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
     const { t } = useTranslation();
     const { data: apps, refetch } = useActiveWalletConnectedApps();
     const [modalData, setModalData] = useState<{ origin: string } | undefined | 'all'>();
-    const { mutateAsync: disconnectDapp, isLoading } = useDisconnectTonConnectApp();
+    const { mutateAsync: disconnectDapp, isLoading } = useDisconnectTonConnectAppFromActiveWallet();
     const isFullWidthMode = useIsFullWidthMode();
 
     const onCloseModal = async (isConfirmed?: boolean) => {

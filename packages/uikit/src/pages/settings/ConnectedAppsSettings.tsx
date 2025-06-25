@@ -6,7 +6,7 @@ import { styled } from 'styled-components';
 import { ConnectedAppsList } from '../../components/connected-apps/ConnectedAppsList';
 import {
     useActiveWalletConnectedApps,
-    useDisconnectTonConnectApp
+    useDisconnectTonConnectAppFromActiveWallet
 } from '../../state/tonConnect';
 import { Button } from '../../components/fields/Button';
 import { ConfirmDisconnectNotification } from '../../components/connected-apps/ConfirmDisconnectNotification';
@@ -26,7 +26,7 @@ const DisconnectAllButtonStyled = styled(Button)`
 export const ConnectedAppsSettings = () => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { mutate } = useDisconnectTonConnectApp();
+    const { mutate } = useDisconnectTonConnectAppFromActiveWallet();
     const { data: connections } = useActiveWalletConnectedApps();
 
     const showDisconnectAll = !!connections?.length && connections.length > 1;

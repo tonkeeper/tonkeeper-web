@@ -3,7 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectApp
+    useDisconnectInjectedTonConnectAppFromAllWallets,
+    useDisconnectTonConnectAppFromActiveWallet
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import {
     RpcMethod,
@@ -53,9 +54,14 @@ const useInjectedBridgeRequestsSubscription = (
     return ref;
 };
 
-const useInjectedBridgeDisconnectSubscription = (onDisconnect: (appOrigin: string) => void) => {
+const useInjectedBridgeDisconnectSubscription = (
+    onDisconnect: (app: { origin: string }) => void
+) => {
     useEffect(
-        () => capacitorTonConnectInjectedConnector.setDisconnectHandler(onDisconnect),
+        () =>
+            capacitorTonConnectInjectedConnector.setDisconnectHandler(origin =>
+                onDisconnect({ origin })
+            ),
         [onDisconnect]
     );
 };
@@ -64,7 +70,12 @@ export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
     const requestRef = useValueRef(request);
 
-    const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
+    const { mutate: disconnectHttp } = useDisconnectTonConnectAppFromActiveWallet({
+        skipEmit: true
+    });
+    const { mutate: disconnectInjected } = useDisconnectInjectedTonConnectAppFromAllWallets({
+        skipEmit: true
+    });
     const { data: appConnections } = useAppTonConnectConnections();
     const wallet = useActiveWallet();
     const activeWalletConnections = useMemo(
@@ -84,19 +95,13 @@ export const TonConnectSubscription = () => {
 
     const injectedBridgeResponseRef = useInjectedBridgeRequestsSubscription(onTransaction);
 
-    const disconnectInjectedDapp = useCallback(
-        (appOrigin: string) => {
-            disconnect({ origin: appOrigin, connectionType: 'injected' });
-        },
-        [disconnect]
-    );
-    useInjectedBridgeDisconnectSubscription(disconnectInjectedDapp);
+    useInjectedBridgeDisconnectSubscription(disconnectInjected);
 
     useEffect(() => subscribeToHttpTonConnectRequest(onTransaction), [onTransaction]);
 
     useEffect(
-        () => subscribeToHttpTonConnectDisconnect(c => disconnect({ connectionId: c.id })),
-        [disconnect]
+        () => subscribeToHttpTonConnectDisconnect(c => disconnectHttp({ connectionId: c.id })),
+        [disconnectHttp]
     );
 
     useEffect(() => {

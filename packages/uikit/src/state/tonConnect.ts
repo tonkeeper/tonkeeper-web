@@ -34,7 +34,7 @@ import {
 } from '@tonkeeper/core/dist/entries/wallet';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { Account, getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
-import { useAccountsStateQuery, useActiveWallet } from './wallet';
+import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
 import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
@@ -238,14 +238,14 @@ export const tonConnectAppManuallyDisconnected$ = subject<
 >();
 
 export const useDisconnectTonConnectConnection = (options?: { skipEmit?: boolean }) => {
-    const { mutateAsync } = useDisconnectTonConnectApp(options);
+    const { mutateAsync } = useDisconnectTonConnectAppFromActiveWallet(options);
     return useCallback(
         (app: { id: string }) => mutateAsync({ connectionId: app.id }),
         [mutateAsync]
     );
 };
 
-export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => {
+export const useDisconnectTonConnectAppFromActiveWallet = (options?: { skipEmit?: boolean }) => {
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const client = useQueryClient();
@@ -282,6 +282,46 @@ export const useDisconnectTonConnectApp = (options?: { skipEmit?: boolean }) => 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
         }
     );
+};
+
+export const useDisconnectInjectedTonConnectAppFromAllWallets = (options?: {
+    skipEmit?: boolean;
+}) => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    const wallets = useAccountsState().flatMap(a => a.allTonWallets);
+
+    return useMutation(async (dapp: { origin: string }) => {
+        const connectionsToDisconnect = (
+            await Promise.all(
+                wallets.map(w =>
+                    disconnectDappFromWallet(
+                        sdk.storage,
+                        { origin: dapp.origin, connectionType: 'injected' },
+                        w
+                    )
+                )
+            )
+        ).flat();
+
+        if (!options?.skipEmit) {
+            tonConnectAppManuallyDisconnected$.next(connectionsToDisconnect);
+        }
+
+        if (sdk.notifications) {
+            await Promise.all(
+                connectionsToDisconnect.map(c => {
+                    if (c.type === 'http') {
+                        sdk.notifications
+                            ?.unsubscribeTonConnect(c.clientSessionId)
+                            .catch(e => console.warn(e));
+                    }
+                })
+            );
+        }
+
+        await client.invalidateQueries([QueryKey.tonConnectConnection]);
+    });
 };
 
 const disconnectDappFromWallet = async (
