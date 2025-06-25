@@ -126,6 +126,13 @@ export class Aptabase implements Analytics {
         if (navigator.userAgent.includes('Win')) {
             return 'Windows';
         }
+        if (
+            navigator.userAgent.includes('iPhone') ||
+            navigator.userAgent.includes('iPad') ||
+            navigator.userAgent.includes('iPod')
+        ) {
+            return 'iOS';
+        }
         if (navigator.userAgent.includes('Mac')) {
             return 'macOS';
         }
@@ -134,13 +141,6 @@ export class Aptabase implements Analytics {
         }
         if (navigator.userAgent.includes('Android')) {
             return 'Android';
-        }
-        if (
-            navigator.userAgent.includes('iPhone') ||
-            navigator.userAgent.includes('iPad') ||
-            navigator.userAgent.includes('iPod')
-        ) {
-            return 'IOS';
         }
 
         return 'Unknown';
