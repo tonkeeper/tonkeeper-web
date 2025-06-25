@@ -44,8 +44,8 @@ const DesktopAccountSettingsPage = React.lazy(
   () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
 );
 
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+const WebTonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
 );
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -313,7 +313,7 @@ const BackgroundElements = () => {
         <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
-            <TonConnectSubscription />
+            <WebTonConnectSubscription />
             <NftNotification />
             <SendNftNotification />
             <AddFavoriteNotification />
