@@ -131,7 +131,7 @@ export const MobileDappBrowserTab: FC<{
             setBannerData(activeConnection.wallet.id);
             const timeout = setTimeout(() => {
                 setBannerData(undefined);
-            }, 2500);
+            }, 4000);
 
             return () => {
                 clearTimeout(timeout);
