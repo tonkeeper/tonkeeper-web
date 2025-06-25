@@ -25,7 +25,7 @@ export class Aptabase implements Analytics {
         this.appKey = options.key;
         this.appVersion = options.appVersion;
         this.userIdentity = options.userIdentity;
-        this.track.bind(this);
+        this.track = this.track.bind(this);
     }
 
     init = (params: {
@@ -84,7 +84,7 @@ export class Aptabase implements Analytics {
                         locale: this.getBrowserLocale(),
                         isDebug: this.isDebug,
                         appVersion: this.appVersion,
-                        sdkVersion: 'custom_0.0.1'
+                        sdkVersion: 'custom_0.0.2'
                     },
                     props: {
                         osName: this.getUserOS(),

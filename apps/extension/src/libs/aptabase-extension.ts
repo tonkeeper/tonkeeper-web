@@ -6,7 +6,7 @@ import { AnalyticsEvent } from "@tonkeeper/core/dist/analytics";
 
 export class AptabaseExtension implements Analytics {
     constructor() {
-        this.track.bind(this);
+        this.track = this.track.bind(this);
     }
     init =  (params: {
         application: string;
