@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import {
+    AnalyticsEvent,
     AnalyticsEventDappBrowserOpen,
     AnalyticsEventTcRequest,
     AnalyticsEventTcSendSuccess,
@@ -41,9 +42,9 @@ export const useCountryContextTracker = () => {
     const client = useQueryClient();
     const track = useAnalyticsTrack();
     return useCallback(
-        async (callback: (country: string) => void) => {
+        async (map: (country: string) => AnalyticsEvent) => {
             const country: string = await client.fetchQuery([QueryKey.country]);
-            callback(country);
+            track(map(country));
         },
         [client, track]
     );
