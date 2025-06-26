@@ -1,6 +1,6 @@
 import { IonFooter, IonToolbar } from '@ionic/react';
 import styled, { css } from 'styled-components';
-import { useActiveAccount } from '../../../state/wallet';
+import { getAccountWalletNameAndEmoji, useActiveAccount } from '../../../state/wallet';
 import { WalletEmoji } from '../../shared/emoji/WalletEmoji';
 import { Body3, Label2, Label2Class } from '../../Text';
 import { useMenuController } from '../../../hooks/ionic';
@@ -12,6 +12,7 @@ import { formatFiatCurrency } from '../../../hooks/balance';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute } from '../../../libs/routes';
 import { FC } from 'react';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const FooterContainer = styled.div`
     display: flex;
@@ -69,6 +70,7 @@ export const MobileProFooter = () => {
     const leftMenuController = useMenuController('aside-nav');
     const rightMenuController = useMenuController('wallet-nav');
     const navigate = useNavigate();
+    const { mutate: hideBrowserTab } = useHideActiveBrowserTab();
 
     const { data: balance, isLoading } = useWalletTotalBalance();
     const fiat = useUserFiat();
@@ -78,8 +80,12 @@ export const MobileProFooter = () => {
         rightMenuController.close();
     };
 
-    const name = account.type === 'mam' ? account.activeDerivation.name : account.name;
-    const emoji = account.type === 'mam' ? account.activeDerivation.emoji : account.emoji;
+    const onCenterClick = () => {
+        navigate(AppRoute.home);
+        hideBrowserTab();
+    };
+
+    const { name, emoji } = getAccountWalletNameAndEmoji(account);
     return (
         <IonFooterStyled translucent={true}>
             <IonToolbarStyled>
@@ -96,8 +102,8 @@ export const MobileProFooter = () => {
                     >
                         <LeftTabIcon $isActive={leftMenuController.isOpen} />
                     </TabButton>
-                    <AccountMenuWrapper>
-                        <AccountMenuLine1 onClick={() => navigate(AppRoute.home)}>
+                    <AccountMenuWrapper onClick={onCenterClick}>
+                        <AccountMenuLine1>
                             <WalletEmoji emoji={emoji} emojiSize="14px" containerSize="18px" />
                             <Label2>{name}</Label2>
                         </AccountMenuLine1>

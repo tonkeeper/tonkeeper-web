@@ -1,10 +1,12 @@
-import { ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
+import { ConnectItem, ConnectRequest, DAppManifest, KeyPair } from '../../entries/tonConnect';
 import { TonContract, TonWalletStandard } from '../../entries/wallet';
 import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { getDevSettings } from '../devStorage';
 import { assertUnreachable } from '../../utils/types';
 import { eqOrigins, originFromUrl } from './connectService';
+import { accountsStorage } from '../accountsStorage';
+import { isAccountSupportTonConnect } from '../../entries/account';
 
 export interface TonConnectHttpConnectionParams {
     type: 'http';
@@ -47,6 +49,7 @@ export interface AccountConnectionInjected {
      * used to find last created connection
      */
     creationTimestamp: number;
+    connectItems: ConnectItem[];
 }
 
 export interface AccountConnectionHttp {
@@ -55,6 +58,7 @@ export interface AccountConnectionHttp {
     manifest: DAppManifest;
     sessionKeyPair: KeyPair;
     clientSessionId: string;
+    connectItems: ConnectItem[];
 }
 
 export function isAccountConnectionInjected(
@@ -112,8 +116,12 @@ export const saveAccountConnection = async (options: {
     wallet: TonContract;
     manifest: DAppManifest;
     params:
-        | Pick<TonConnectHttpConnectionParams, 'type' | 'sessionKeyPair' | 'clientSessionId'>
-        | Pick<TonConnectInjectedConnectionParams, 'type' | 'webViewOrigin'>;
+        | (Pick<TonConnectHttpConnectionParams, 'type' | 'sessionKeyPair' | 'clientSessionId'> & {
+              request: Pick<TonConnectHttpConnectionParams['request'], 'items'>;
+          })
+        | (Pick<TonConnectInjectedConnectionParams, 'type' | 'webViewOrigin'> & {
+              request: Pick<TonConnectHttpConnectionParams['request'], 'items'>;
+          });
 }): Promise<void> => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
 
@@ -135,7 +143,7 @@ export const saveAccountConnection = async (options: {
                 return true;
             }
 
-            return item.manifest.url === options.manifest.url;
+            return item.manifest.url !== options.manifest.url;
         });
     }
 
@@ -144,12 +152,18 @@ export const saveAccountConnection = async (options: {
             throw new Error('WebView origin mismatch');
         }
 
+        /**
+         * Remove other wallets injected connections to this dapp
+         */
+        await disconnectInjectedDappFromAllWallets(options.storage, options.params.webViewOrigin);
+
         connections.unshift({
             id: options.manifest.url,
             manifest: options.manifest,
             type: options.params.type,
             webViewOrigin: options.params.webViewOrigin,
-            creationTimestamp: Date.now()
+            creationTimestamp: Date.now(),
+            connectItems: options.params.request.items
         });
     } else if (options.params.type === 'http') {
         connections.unshift({
@@ -157,7 +171,8 @@ export const saveAccountConnection = async (options: {
             manifest: options.manifest,
             type: options.params.type,
             sessionKeyPair: options.params.sessionKeyPair,
-            clientSessionId: options.params.clientSessionId
+            clientSessionId: options.params.clientSessionId,
+            connectItems: options.params.request.items
         });
     } else {
         assertUnreachable(options.params);
@@ -175,12 +190,31 @@ export const disconnectInjectedAccountConnection = async (options: {
     webViewUrl: string;
 }) => {
     let connections = await getTonWalletConnections(options.storage, options.wallet);
+    if (!connections.length) {
+        return;
+    }
 
     connections = connections.filter(
         item => item.type === 'injected' && !eqOrigins(item.webViewOrigin, options.webViewUrl)
     );
 
     await setAccountConnection(options.storage, options.wallet, connections);
+};
+
+const disconnectInjectedDappFromAllWallets = async (storage: IStorage, webViewOrigin: string) => {
+    const accounts = (await accountsStorage(storage).getAccounts()).filter(
+        isAccountSupportTonConnect
+    );
+
+    const wallets = accounts.flatMap(a => a.allTonWallets);
+
+    for (const wallet of wallets) {
+        await disconnectInjectedAccountConnection({
+            storage,
+            wallet,
+            webViewUrl: webViewOrigin
+        });
+    }
 };
 
 /**
@@ -226,7 +260,8 @@ function mapDeprecatedAccountConnections(
                 type: 'injected',
                 manifest: item.manifest,
                 webViewOrigin: item.webViewUrl,
-                creationTimestamp: Date.now()
+                creationTimestamp: Date.now(),
+                connectItems: [{ name: 'ton_addr' }]
             };
         } else {
             return {
@@ -234,7 +269,8 @@ function mapDeprecatedAccountConnections(
                 type: 'http',
                 manifest: item.manifest,
                 sessionKeyPair: item.sessionKeyPair,
-                clientSessionId: item.clientSessionId
+                clientSessionId: item.clientSessionId,
+                connectItems: [{ name: 'ton_addr' }]
             };
         }
     });

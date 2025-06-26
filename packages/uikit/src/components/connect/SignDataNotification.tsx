@@ -24,6 +24,8 @@ import { signDataOver } from '../../state/mnemonic';
 import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
 import { Cell } from '@ton/core';
+import { useAnalyticsTrack } from '../../hooks/analytics';
+import { AnalyticsEventTcSignDataSuccess } from '@tonkeeper/core/dist/analytics';
 
 const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const activeAccount = useActiveAccount();
@@ -338,9 +340,17 @@ export const SignDataNotification: FC<{
     params: SignDataRequestPayload | null;
     handleClose: (result?: SignDataResponse) => void;
 }> = ({ origin, params, handleClose }) => {
+    const track = useAnalyticsTrack();
+
     const onClose = useCallback(
         (result?: SignDataResponse) => {
             handleClose(result);
+            track(
+                new AnalyticsEventTcSignDataSuccess({
+                    dapp_url: origin!,
+                    payload_type: params!.type
+                })
+            );
         },
         [handleClose]
     );

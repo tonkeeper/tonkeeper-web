@@ -8,6 +8,18 @@ import { assertTypesEqual } from '../utils/types';
 
 /* Protocol types */
 
+export const protocolVersionSchema = z.number();
+
+const rawAddressSchema = z.string().regex(/^(0|-1):[0-9a-fA-F]{64}$/);
+const tonConnectNetworkSchema = z.union([
+    z.literal(-239),
+    z.literal(-3),
+    z.literal('-239'),
+    z.literal('-3')
+]);
+
+export type TonConnectNetwork = z.infer<typeof tonConnectNetworkSchema>;
+
 const dAppManifestSchema = z.object({
     url: z.string(),
     name: z.string(),
@@ -47,7 +59,9 @@ const gaslessMessagesVariantSchema = z.object({
 });
 export type GaslessMessagesVariant = z.infer<typeof gaslessMessagesVariantSchema>;
 
-const tonConnectTransactionPayloadSchema = z.object({
+export const transactionRequestPayloadSchema = z.object({
+    network: tonConnectNetworkSchema.optional(),
+    from: rawAddressSchema.optional(),
     valid_until: z.number(),
     messages: z.array(TonConnectTransactionPayloadMessageSchema),
     messagesVariants: z
@@ -57,7 +71,7 @@ const tonConnectTransactionPayloadSchema = z.object({
         })
         .optional()
 });
-export type TonConnectTransactionPayload = z.infer<typeof tonConnectTransactionPayloadSchema>;
+export type TonConnectTransactionPayload = z.infer<typeof transactionRequestPayloadSchema>;
 
 const tonConnectAccountSchema = z.object({
     address: z.string(), // '<wc>:<hex>'
@@ -310,18 +324,29 @@ const signDataRpcRequestSchema = z.object({
 export type SignDataRpcRequest = z.infer<typeof signDataRpcRequestSchema>;
 
 const signDataRequestPayloadTextSchema = z.object({
+    network: tonConnectNetworkSchema.optional(),
+    from: rawAddressSchema.optional(),
     type: z.literal('text'),
     text: z.string()
 });
 export type SignDataRequestPayloadText = z.infer<typeof signDataRequestPayloadTextSchema>;
 
+export const sendRequestPayloadSchema = z.union([
+    transactionRequestPayloadSchema,
+    signDataRequestPayloadTextSchema
+]);
+
 const signDataRequestPayloadBinarySchema = z.object({
+    network: tonConnectNetworkSchema.optional(),
+    from: rawAddressSchema.optional(),
     type: z.literal('binary'),
     bytes: z.string() // base64 string
 });
 export type SignDataRequestPayloadBinary = z.infer<typeof signDataRequestPayloadBinarySchema>;
 
 const signDataRequestPayloadCellSchema = z.object({
+    network: tonConnectNetworkSchema.optional(),
+    from: rawAddressSchema.optional(),
     type: z.literal('cell'),
     schema: z.string(), // TL-B scheme
     cell: z.string() // base64 string

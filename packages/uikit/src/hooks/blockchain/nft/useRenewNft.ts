@@ -1,7 +1,7 @@
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { useActiveAccount } from '../../../state/wallet';
-import { useTransactionAnalytics } from '../../amplitude';
+import { useTransactionAnalytics } from '../../analytics';
 import { useMutation } from '@tanstack/react-query';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';

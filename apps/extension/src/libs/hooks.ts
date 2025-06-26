@@ -39,9 +39,7 @@ export const useAnalytics = (
     return useQuery<Analytics>(
         [QueryKey.analytics, activeAccount, accounts, network],
         async () => {
-            const tracker = new AptabaseExtension({
-              sessionId: await sdk.getUserId()
-            });
+            const tracker = new AptabaseExtension();
 
             tracker.init({
               application: extensionType ?? 'Extension',

@@ -11,6 +11,8 @@ import { BackgroundEvents, backgroundEventsEmitter, popUpEventEmitter, RESPONSE 
 import memoryStore from '../store/memoryStore';
 import { closeCurrentPopUp, getPopup } from './dApp/notificationService';
 import { Aptabase } from "@tonkeeper/uikit/dist/hooks/analytics";
+import { UserIdentityService } from "@tonkeeper/core/dist/user-identity";
+import { ExtensionStorage } from "../storage";
 
 let popUpPort: browser.Runtime.Port;
 
@@ -82,21 +84,17 @@ popUpEventEmitter.on('proxyChanged', message => {
 // End of proxy messages
 
 let aptabase: Aptabase;
+const userIdentity = new UserIdentityService(new ExtensionStorage());
 
 popUpEventEmitter.on('userProperties', message => {
-    const { sessionId, ...userProperties } = message.params;
     aptabase= new Aptabase({
         host: process.env.REACT_APP_APTABASE_HOST!,
         key: process.env.REACT_APP_APTABASE!,
         appVersion: browser.runtime.getManifest().version,
-        sessionId
+        userIdentity
     });
 
-    aptabase.init(userProperties);
-});
-
-popUpEventEmitter.on('locations', message => {
-    aptabase?.pageView(message.params);
+    aptabase.init(message.params);
 });
 
 popUpEventEmitter.on('trackEvent', message => {

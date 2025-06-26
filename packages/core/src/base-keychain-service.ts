@@ -98,7 +98,7 @@ export abstract class BaseKeychainService {
         return new Promise<void>((resolve, reject) => {
             this.promptPassword(async pin => {
                 if (!pin) {
-                    reject();
+                    reject('Pin Cancelled');
                     return false;
                 }
 

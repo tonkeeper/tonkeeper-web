@@ -9,12 +9,11 @@ import {
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useCallback, useEffect, useState } from 'react';
-import { useSendNotificationAnalytics } from '../../hooks/amplitude';
 import { useAppSdk } from '../../hooks/appSdk';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectApp,
+    useDisconnectTonConnectConnection,
     useTonConnectLastEventId
 } from '../../state/tonConnect';
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
@@ -27,7 +26,7 @@ const useUnSupportMethodMutation = () => {
 
 const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
 
-const TonConnectSubscription = () => {
+const WebTonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
 
     const sdk = useAppSdk();
@@ -35,10 +34,9 @@ const TonConnectSubscription = () => {
     const { data: appConnections } = useAppTonConnectConnections('http');
     const { data: lastEventId } = useTonConnectLastEventId();
 
-    const { mutateAsync: disconnect } = useDisconnectTonConnectApp();
+    const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
 
-    useSendNotificationAnalytics(request?.connection?.manifest);
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
 
     useEffect(() => {
@@ -167,4 +165,4 @@ const TonConnectSubscription = () => {
     return <TonConnectRequestNotification request={request} handleClose={handleClose} />;
 };
 
-export default TonConnectSubscription;
+export default WebTonConnectSubscription;

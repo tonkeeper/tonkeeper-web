@@ -53,7 +53,7 @@ import { MultisigOrderFormView } from './MultisigOrderFormView';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { ConfirmMultisigNewTransferView } from './ConfirmMultisigNewTransferView';
-import { useAnalyticsTrack } from '../../hooks/amplitude';
+import { useAnalyticsTrack } from '../../hooks/analytics';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveWallet } from '../../state/wallet';

@@ -1,17 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { sha512_sync } from '@ton/crypto';
+import { sha512 } from '@ton/crypto';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { TonContract } from '@tonkeeper/core/dist/entries/wallet';
 import {
     TonendpoinFiatButton,
     TonendpoinFiatItem,
+    Tonendpoint,
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
-import { useBuyAnalytics } from '../../hooks/amplitude';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useStorage } from '../../hooks/storage';
@@ -25,6 +25,7 @@ import { Checkbox } from '../fields/Checkbox';
 import { useCreateMercuryoProUrl } from '../../state/tonendpoint';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveConfig, useActiveWallet } from '../../state/wallet';
+import { useAnalyticsTrack } from '../../hooks/analytics';
 
 const Logo = styled.img<{ large?: boolean }>`
     pointer-events: none;
@@ -156,9 +157,10 @@ const useShowDisclaimer = (title: string, kind: 'buy' | 'sell') => {
     });
 };
 
-const replacePlaceholders = (
+const replacePlaceholders = async (
     url: string,
     config: TonendpointConfig,
+    tonendpoint: Tonendpoint,
     wallet: TonContract,
     fiat: FiatCurrencies,
     kind: 'buy' | 'sell'
@@ -174,13 +176,35 @@ const replacePlaceholders = (
         const txId = 'mercuryo_' + uuidv4();
         url = url.replace(/\{TX_ID\}/g, txId);
         url = url.replace(/\=TON\&/gi, '=TONCOIN&');
-        url += `&signature=${sha512_sync(`${address}${config.mercuryoSecret ?? ''}`).toString(
-            'hex'
-        )}`;
+
+        if (config.mercuryoSecret) {
+            url += `&signature=${await generateMercuryoSignature({
+                tonendpoint,
+                walletAddress: address,
+                txId,
+                mercuryoSecret: config.mercuryoSecret
+            })}`;
+        }
     }
 
     return url;
 };
+
+/**
+ *  input := walletAddress + config.mercuryoSecret + ip + txID
+ *  signature := "v2:" + hex(sha512(input))
+ */
+async function generateMercuryoSignature(params: {
+    tonendpoint: Tonendpoint;
+    walletAddress: string;
+    txId: string;
+    mercuryoSecret: string;
+}) {
+    const countryIP = await params.tonendpoint.country();
+    const input = `${params.walletAddress}${params.mercuryoSecret}${countryIP.ip}${params.txId}`;
+    const hash = await sha512(input);
+    return `v2:${hash.toString('hex')}`;
+}
 
 const Label1Styled = styled(Label1)`
     display: flex;
@@ -209,7 +233,7 @@ export const BuyItemNotification: FC<{
     item: TonendpoinFiatItem;
     kind: 'buy' | 'sell';
 }> = ({ item, kind }) => {
-    const track = useBuyAnalytics();
+    const track = useAnalyticsTrack();
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
     const config = useActiveConfig();
@@ -220,15 +244,16 @@ export const BuyItemNotification: FC<{
     const { data: hided } = useShowDisclaimer(item.title, kind);
     const { mutate } = useHideDisclaimerMutation(item.title, kind);
     const { mutateAsync: createMercuryoProUrl } = useCreateMercuryoProUrl();
+    const { tonendpoint } = useAppContext();
 
     const onForceOpen = async () => {
-        track(item.action_button.url);
+        track('Navigate_Buy', { kind: item.action_button.url });
 
         let urlToOpen = item.action_button.url;
         if (item.id === 'mercuryo_pro') {
             urlToOpen = await createMercuryoProUrl(item.action_button.url);
         }
-        sdk.openPage(replacePlaceholders(urlToOpen, config, wallet, fiat, kind));
+        sdk.openPage(await replacePlaceholders(urlToOpen, config, tonendpoint, wallet, fiat, kind));
         setOpen(false);
     };
     const onOpen: React.MouseEventHandler<HTMLDivElement> = () => {

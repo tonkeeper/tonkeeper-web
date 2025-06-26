@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useAnalyticsTrack } from '../../amplitude';
+import { useAnalyticsTrack } from '../../analytics';
 import { useActiveWallet, useInvalidateActiveWalletQueries } from '../../../state/wallet';
 import { useNotifyErrorHandle, useToast } from '../../useNotification';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';

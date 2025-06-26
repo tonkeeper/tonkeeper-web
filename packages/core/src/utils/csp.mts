@@ -30,7 +30,9 @@ export const baseCspConfig = {
         'https://*.tonapi.io',
         'https://tonconsole.com',
         'https://*.tonconsole.com',
-        'https://api.trongrid.io/'
+        'https://api.trongrid.io/',
+        'https://duckduckgo.com',
+        'https://oauth.telegram.org'
     ],
 
     /* Allow loading pwa manifest */

@@ -228,17 +228,28 @@ class TabRateLimiter {
     }
 
     @objc func close(_ call: CAPPluginCall) {
-        guard let id = call.getString("id"),
-              let webView = webViews[id] else {
-            call.reject("No WebView with id '\(call.getString("id") ?? "")'")
+        guard let ids = call.getArray("ids") as? [String], !ids.isEmpty else {
+            call.reject("Missing or invalid 'ids'")
             return
         }
 
         DispatchQueue.main.async {
-            webView.removeFromSuperview()
-            self.webViews.removeValue(forKey: id)
-            self.routerView?.focusDappView = false
-            call.resolve()
+            var closedAny = false
+
+            for id in ids {
+                if let webView = self.webViews[id] {
+                    webView.removeFromSuperview()
+                    self.webViews.removeValue(forKey: id)
+                    closedAny = true
+                }
+            }
+
+            if closedAny {
+                self.routerView?.focusDappView = false
+                call.resolve()
+            } else {
+                call.reject("No valid WebView(s) found for provided ids")
+            }
         }
     }
 
@@ -432,7 +443,8 @@ extension DappBrowserPlugin: WKScriptMessageHandler {
         guard type == "bridge-message",
               let queryId = body["queryId"] as? String,
               let payload = body["payload"] as? String,
-              let webViewId = self.webViews.first(where: { $0.value == webView })?.key else {
+              let webViewId = self.webViews.first(where: { $0.value == webView })?.key,
+              webView.isHidden == false else {
             return
         }
 

@@ -8,22 +8,25 @@ import {
     connectRequestSchema,
     RpcMethod,
     SEND_TRANSACTION_ERROR_CODES,
+    signDataRequestPayloadSchema,
     TonConnectAppRequest,
     TonConnectAppRequestPayload,
+    TonConnectNetwork,
+    transactionRequestPayloadSchema,
     type WalletResponse,
     WalletResponseError
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { TonContract, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConnectionInjected,
-    disconnectInjectedAccountConnection,
     saveAccountConnection
 } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { getWalletById } from '@tonkeeper/core/dist/entries/account';
 import { capacitorStorage } from '../appSdk';
 import {
+    checkTonConnectFromAndNetwork,
     disconnectResponse,
     getBrowserPlatform,
     getDeviceInfo,
@@ -35,8 +38,10 @@ import {
 import packageJson from '../../../package.json';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';
-import { delay } from '@tonkeeper/core/dist/utils/common';
 import { z } from 'zod';
+import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
+import { QueryClient } from '@tanstack/react-query';
+import { queryClient as queryClientInstance } from '../query-client';
 
 function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: unknown): z.infer<T> {
     const parsed = z
@@ -52,7 +57,7 @@ function parseBridgeMethodPayload<T extends z.ZodTypeAny>(schema: T, payload: un
     return parsed.data.message;
 }
 
-class TonConnectInjectedConnector {
+class CapacitorTonConnectInjectedConnector {
     private connectHandler: (
         request: ConnectRequest,
         webViewOrigin: string
@@ -66,7 +71,7 @@ class TonConnectInjectedConnector {
         throw new Error('Requests handler is not set');
     };
 
-    private disconnectHandler: (appId: string) => void = () => {
+    private disconnectHandler: (appOrigin: string) => void = () => {
         throw new Error('Disconnect handler is not set');
     };
 
@@ -82,11 +87,11 @@ class TonConnectInjectedConnector {
         this.requestsHandler = handler;
     }
 
-    setDisconnectHandler(handler: (appId: string) => void) {
+    setDisconnectHandler(handler: (appOrigin: string) => void) {
         this.disconnectHandler = handler;
     }
 
-    constructor(private storage: IStorage) {
+    constructor(private storage: IStorage, private queryClient: QueryClient) {
         CapacitorDappBrowser.setRequestsHandler(
             NATIVE_BRIDGE_METHODS.TON_CONNECT.SEND,
             async (rpcParams: Record<string, unknown>, { webViewOrigin }) => {
@@ -98,7 +103,7 @@ class TonConnectInjectedConnector {
                         return {
                             error: {
                                 code: SEND_TRANSACTION_ERROR_CODES.UNKNOWN_APP_ERROR,
-                                message: 'App does not connected'
+                                message: 'App is not connected'
                             },
                             id: request.id
                         };
@@ -108,7 +113,7 @@ class TonConnectInjectedConnector {
                             connection: result.connection,
                             request
                         },
-                        result.wallet.id
+                        result.wallet
                     );
                 } catch (e) {
                     return this.handleRequestExceptions(request.id, e);
@@ -209,29 +214,55 @@ class TonConnectInjectedConnector {
         }
     }
 
-    handleMessage = async (params: TonConnectAppRequest<'injected'>, walletId: WalletId) => {
+    handleMessage = async (params: TonConnectAppRequest<'injected'>, wallet: TonContract) => {
         switch (params.request.method) {
             case 'disconnect': {
-                return this.onDisconnect(params, walletId);
+                return this.onDisconnect(params, wallet.id);
             }
             case 'sendTransaction': {
+                const payload = transactionRequestPayloadSchema.parse(
+                    JSON.parse(params.request.params[0])
+                );
+                const error = await this.checkFromAndNetwork(wallet, {
+                    from: payload.from,
+                    network: payload.network,
+                    requestId: params.request.id
+                });
+
+                if (error) {
+                    return error;
+                }
+
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
                     kind: 'sendTransaction',
-                    payload: JSON.parse(params.request.params[0])
+                    payload
                 };
-                await this.selectWallet(walletId);
+                await this.selectWallet(wallet.id);
                 return this.requestsHandler(value);
             }
             case 'signData': {
+                const payload = signDataRequestPayloadSchema.parse(
+                    JSON.parse(params.request.params[0])
+                );
+                const error = await this.checkFromAndNetwork(wallet, {
+                    from: payload.from,
+                    network: payload.network,
+                    requestId: params.request.id
+                });
+
+                if (error) {
+                    return error;
+                }
+
                 const value: TonConnectAppRequestPayload = {
                     connection: params.connection,
                     id: params.request.id,
                     kind: 'signData',
-                    payload: JSON.parse(params.request.params[0])
+                    payload
                 };
-                await this.selectWallet(walletId);
+                await this.selectWallet(wallet.id);
                 return this.requestsHandler(value);
             }
             default: {
@@ -248,9 +279,32 @@ class TonConnectInjectedConnector {
         }
     };
 
+    private async checkFromAndNetwork(
+        wallet: TonContract,
+        params: { from?: string; network?: TonConnectNetwork; requestId?: string }
+    ) {
+        try {
+            await checkTonConnectFromAndNetwork(this.storage, wallet, params);
+        } catch (e) {
+            if (e instanceof TonConnectError) {
+                return {
+                    error: e,
+                    id: params.requestId
+                };
+            } else {
+                return {
+                    error: {
+                        code: SEND_TRANSACTION_ERROR_CODES.UNKNOWN_ERROR,
+                        message: 'Unknown error'
+                    },
+                    id: params.requestId
+                };
+            }
+        }
+    }
+
     /**
-     * 1. Send disconnect event to provide proper behavior for ton_proof dependent dapps (that dapps will reset their backend auth token).
-     *    But keep connections saved locally
+     * 1. Ignore dapps that require ton_proof. Works only for dapps without ton_proof
      * 2. Save new connection with active wallet locally
      * 3. Reload all pages with dapp origin
      *    After reloading dapp will call re-connect method that will restore connection with new active wallet (in case dapp doesn't require ton_proof)
@@ -274,12 +328,9 @@ class TonConnectInjectedConnector {
             throw new Error('Active account not found');
         }
 
-        await CapacitorDappBrowser.emitEvent(
-            tab.id,
-            JSON.stringify(disconnectResponse(Date.now().toString()))
-        );
-
-        await delay(200);
+        if (existingConnection.connectItems.some(i => i.name === 'ton_proof')) {
+            throw new Error('Ton proof reconnection is not supported');
+        }
 
         /**
          * even in case of connection with wallet exists this will make it actual by changing creation timestamp
@@ -290,9 +341,13 @@ class TonConnectInjectedConnector {
             manifest: existingConnection.manifest,
             params: {
                 type: 'injected',
-                webViewOrigin: existingConnection.webViewOrigin
+                webViewOrigin: existingConnection.webViewOrigin,
+                request: {
+                    items: existingConnection.connectItems
+                }
             }
         });
+        await this.queryClient.invalidateQueries([QueryKey.tonConnectConnection]);
 
         await CapacitorDappBrowser.reload({ origin: dappOrigin });
     }
@@ -319,11 +374,6 @@ class TonConnectInjectedConnector {
             return;
         }
 
-        await disconnectInjectedAccountConnection({
-            storage: this.storage,
-            wallet,
-            webViewUrl: params.connection.webViewOrigin
-        });
         await this.disconnectHandler(params.connection.webViewOrigin);
         return disconnectResponse(params.request.id);
     };
@@ -341,4 +391,7 @@ class TonConnectInjectedConnector {
     };
 }
 
-export const tonConnectInjectedConnector = new TonConnectInjectedConnector(capacitorStorage);
+export const capacitorTonConnectInjectedConnector = new CapacitorTonConnectInjectedConnector(
+    capacitorStorage,
+    queryClientInstance
+);

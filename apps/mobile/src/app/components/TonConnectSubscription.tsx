@@ -1,10 +1,10 @@
 import { TonConnectRequestNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectRequestNotification';
-import { useSendNotificationAnalytics } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectApp
+    useDisconnectInjectedTonConnectAppFromAllWallets,
+    useDisconnectTonConnectAppFromActiveWallet
 } from '@tonkeeper/uikit/dist/state/tonConnect';
 import {
     RpcMethod,
@@ -15,12 +15,12 @@ import {
     subscribeToHttpTonConnectDisconnect,
     subscribeToHttpTonConnectRequest,
     tonConnectSSE
-} from '../../libs/ton-connect/http-connector';
+} from '../../libs/ton-connect/capacitor-http-connector';
 import { useActiveWallet } from '@tonkeeper/uikit/dist/state/wallet';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useTonConnectHttpResponseMutation } from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { tonConnectInjectedConnector } from '../../libs/ton-connect/injected-connector';
+import { capacitorTonConnectInjectedConnector } from '../../libs/ton-connect/capacitor-injected-connector';
 import {
     isAccountConnectionHttp,
     isAccountConnectionInjected
@@ -36,33 +36,46 @@ const useInjectedBridgeRequestsSubscription = (
         reject: (reason?: unknown) => void;
     } | null>(null);
     useEffect(() => {
-        tonConnectInjectedConnector.setRequestsHandler((request: TonConnectAppRequestPayload) => {
-            return new Promise<WalletResponse<RpcMethod>>(async (resolve, reject) => {
-                if (ref.current) {
-                    ref.current.reject('Request Cancelled');
-                }
-                ref.current = { resolve, reject };
+        capacitorTonConnectInjectedConnector.setRequestsHandler(
+            (request: TonConnectAppRequestPayload) => {
+                return new Promise<WalletResponse<RpcMethod>>(async (resolve, reject) => {
+                    if (ref.current) {
+                        ref.current.reject('Request Cancelled');
+                    }
+                    ref.current = { resolve, reject };
 
-                await CapacitorDappBrowser.setIsMainViewInFocus(true);
-                setRequest(request);
-            });
-        });
+                    await CapacitorDappBrowser.setIsMainViewInFocus(true);
+                    setRequest(request);
+                });
+            }
+        );
     }, []);
 
     return ref;
 };
 
-const useInjectedBridgeDisconnectSubscription = (onDisconnect: (app: { id: string }) => void) => {
-    useEffect(() => {
-        tonConnectInjectedConnector.setDisconnectHandler(appId => onDisconnect({ id: appId }));
-    }, [onDisconnect]);
+const useInjectedBridgeDisconnectSubscription = (
+    onDisconnect: (app: { origin: string }) => void
+) => {
+    useEffect(
+        () =>
+            capacitorTonConnectInjectedConnector.setDisconnectHandler(origin =>
+                onDisconnect({ origin })
+            ),
+        [onDisconnect]
+    );
 };
 
 export const TonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
     const requestRef = useValueRef(request);
 
-    const { mutate: disconnect } = useDisconnectTonConnectApp({ skipEmit: true });
+    const { mutate: disconnectHttp } = useDisconnectTonConnectAppFromActiveWallet({
+        skipEmit: true
+    });
+    const { mutate: disconnectInjected } = useDisconnectInjectedTonConnectAppFromAllWallets({
+        skipEmit: true
+    });
     const { data: appConnections } = useAppTonConnectConnections();
     const wallet = useActiveWallet();
     const activeWalletConnections = useMemo(
@@ -70,8 +83,6 @@ export const TonConnectSubscription = () => {
         [appConnections, wallet.id]
     );
     const queryClient = useQueryClient();
-
-    useSendNotificationAnalytics(request?.connection?.manifest);
 
     const onTransaction = useCallback(async (r: TonConnectAppRequestPayload) => {
         if (requestRef.current) {
@@ -83,11 +94,15 @@ export const TonConnectSubscription = () => {
     }, []);
 
     const injectedBridgeResponseRef = useInjectedBridgeRequestsSubscription(onTransaction);
-    useInjectedBridgeDisconnectSubscription(disconnect);
+
+    useInjectedBridgeDisconnectSubscription(disconnectInjected);
 
     useEffect(() => subscribeToHttpTonConnectRequest(onTransaction), [onTransaction]);
 
-    useEffect(() => subscribeToHttpTonConnectDisconnect(disconnect), [disconnect]);
+    useEffect(
+        () => subscribeToHttpTonConnectDisconnect(c => disconnectHttp({ connectionId: c.id })),
+        [disconnectHttp]
+    );
 
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(value => {
@@ -100,7 +115,7 @@ export const TonConnectSubscription = () => {
             }
 
             if (injectedConnections.length > 0) {
-                tonConnectInjectedConnector.sendDisconnect(injectedConnections);
+                capacitorTonConnectInjectedConnector.sendDisconnect(injectedConnections);
             }
         });
     }, []);

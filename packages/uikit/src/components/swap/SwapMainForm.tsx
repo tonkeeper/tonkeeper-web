@@ -75,9 +75,9 @@ export const SwapMainForm: FC<{ className?: string }> = ({ className }) => {
         }
     };
 
-    const onCloseConfirmModal = (boc?: string) => {
+    const onCloseConfirmModal = (result?: { boc: string }) => {
         setModalParams(null);
-        if (boc) {
+        if (result) {
             navigate(AppRoute.activity);
             setIsMobileSwapOpen(false);
         }

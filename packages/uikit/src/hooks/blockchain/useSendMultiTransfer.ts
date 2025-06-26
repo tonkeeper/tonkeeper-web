@@ -4,7 +4,7 @@ import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TonEstimation, TonRecipient } from "@tonkeeper/core/dist/entries/send";
 
 import BigNumber from 'bignumber.js';
-import { useTransactionAnalytics } from '../amplitude';
+import { useTransactionAnalytics } from '../analytics';
 import { useActiveAccount } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';

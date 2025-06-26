@@ -42,8 +42,8 @@
         "vite": "^6.3.5"
     },
     "scripts": {
-        "build": "NODE_ENV=production ts-node ./task/build",
-        "build:dev": "NODE_ENV=development ts-node ./task/build",
+        "build": "tsc --noEmit && NODE_ENV=production ts-node ./task/build",
+        "build:dev": "tsc --noEmit && NODE_ENV=development ts-node ./task/build",
         "build:extension": "yarn build"
     },
     "browserslist": {

@@ -17,10 +17,10 @@ import {
     SendTransactionRpcResponseError,
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
-    TonConnectAccount,
+    TonConnectNetwork,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
-import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
+import { eqRawAddresses, isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
 import { WalletVersion } from '../../entries/wallet';
 import { accountsStorage } from '../accountsStorage';
 import { walletContractFromState } from '../wallet/contractService';
@@ -262,23 +262,6 @@ export function getInjectedDappConnection(
         return getAppConnections(connectionsSource, 'injected').then(getConnection);
     }
 }
-
-export const getInjectedDappConnectionForWallet = async (
-    storage: IStorage,
-    origin: string,
-    wallet: Pick<TonConnectAccount, 'address'>
-): Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined> => {
-    const appConnections = await getAppConnections(storage, 'injected');
-    const walletState = appConnections.find(c => c.wallet.rawAddress === wallet.address);
-    const connection = walletState?.connections.find(
-        item => item.type === 'injected' && eqOrigins(item.webViewOrigin, origin)
-    );
-    if (walletState && connection && connection.type === 'injected') {
-        return { wallet: walletState.wallet, connection };
-    } else {
-        return undefined;
-    }
-};
 
 export const getAppConnections = async (
     storage: IStorage,
@@ -599,5 +582,43 @@ export function originFromUrl(url: string): string | undefined {
     } catch (e) {
         console.error(e);
         return undefined;
+    }
+}
+
+export async function checkTonConnectFromAndNetwork(
+    storage: IStorage,
+    wallet: TonContract,
+    params: { from?: string; network?: TonConnectNetwork }
+) {
+    if (params.from !== undefined) {
+        if (!eqRawAddresses(wallet.rawAddress, params.from)) {
+            throw new TonConnectError(
+                'Invalid account provided',
+                SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR
+            );
+        }
+    }
+
+    if (params.network !== undefined) {
+        const account = getAccountByWalletById(
+            await accountsStorage(storage).getAccounts(),
+            wallet.id
+        );
+
+        if (!account) {
+            throw new Error('Unknown account provided');
+        }
+
+        const mismatchMainnet =
+            params.network.toString() === Network.MAINNET.toString() && account.type === 'testnet';
+        const mismatchTestnet =
+            params.network.toString() === Network.TESTNET.toString() && account.type !== 'testnet';
+
+        if (mismatchMainnet || mismatchTestnet) {
+            throw new TonConnectError(
+                'Invalid network provided',
+                SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR
+            );
+        }
     }
 }

@@ -7,7 +7,7 @@ import { ListBlock, ListItem } from '../../components/List';
 import { Body3, H3, Label1, Label2 } from '../../components/Text';
 import { Carousel } from '../../components/shared';
 import { useAppContext } from '../../hooks/appContext';
-import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { useOpenPromotedAppInExternalBrowser } from '../../hooks/useAreaClick';
 import { useElementSize } from '../../hooks/useElementSize';
 import { AppRoute, BrowserRoute } from '../../libs/routes';
 import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
@@ -119,11 +119,10 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
 };
 
 export const CategoryGroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
-    const { tonendpoint } = useAppContext();
-    const ref = useOpenLinkOnAreaClick(item.url, 'recommendation', tonendpoint.getTrack());
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'recommendation');
 
     return (
-        <ListItemStyled key={item.url} ref={ref}>
+        <ListItemStyled key={item.url} onClick={openAppCallback}>
             <PromotedItem>
                 <PromotedItemImage src={item.icon} />
                 <PromotedItemText>

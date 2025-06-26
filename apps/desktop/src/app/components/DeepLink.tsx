@@ -2,7 +2,7 @@ import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entri
 import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
-    useResponseHttpConnectionMutation,
+    useCompleteHttpConnection,
     useProcessOpenedLink
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
@@ -16,7 +16,7 @@ export const DeepLinkSubscription = () => {
 
     const { mutateAsync, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        useResponseHttpConnectionMutation();
+        useCompleteHttpConnection();
 
     const handlerClose = async (
         result: {

@@ -18,9 +18,9 @@ export const TonTransactionNotificationControlled = () => {
     const params = isOpen ? _params : null;
 
     const handleClose = useCallback(
-        (res?: string) => {
+        (res?: { boc: string }) => {
             onClose();
-            params?.afterClose?.(res);
+            params?.afterClose?.(res?.boc);
         },
         [onClose, params?.afterClose]
     );

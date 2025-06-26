@@ -22,7 +22,7 @@ import { DesktopPreferencesRouting } from '@tonkeeper/uikit/dist/desktop-pages/p
 import { DesktopWalletSettingsRouting } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopWalletSettingsRouting';
 import { DesktopSwapPage } from '@tonkeeper/uikit/dist/desktop-pages/swap';
 import { DesktopTokens } from '@tonkeeper/uikit/dist/desktop-pages/tokens/DesktopTokens';
-import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useRecommendations } from '@tonkeeper/uikit/dist/hooks/browser/useRecommendations';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppProRoute, AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
@@ -44,8 +44,8 @@ const DesktopAccountSettingsPage = React.lazy(
   () => import('@tonkeeper/uikit/dist/desktop-pages/settings/DesktopAccountSettingsPage')
 );
 
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+const WebTonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
 );
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -313,7 +313,7 @@ const BackgroundElements = () => {
         <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
-            <TonConnectSubscription />
+            <WebTonConnectSubscription />
             <NftNotification />
             <SendNftNotification />
             <AddFavoriteNotification />

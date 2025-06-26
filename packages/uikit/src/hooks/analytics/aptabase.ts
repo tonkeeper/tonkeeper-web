@@ -1,6 +1,8 @@
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { Analytics } from '.';
+import { Analytics, getUserIdentityProps } from './common';
 import { Account } from '@tonkeeper/core/dist/entries/account';
+import { UserIdentity } from '@tonkeeper/core/dist/user-identity';
+import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
 
 export class Aptabase implements Analytics {
     private user_properties: Record<string, string | number | boolean> = {};
@@ -11,13 +13,19 @@ export class Aptabase implements Analytics {
 
     private readonly appVersion: string;
 
-    private readonly sessionId: string;
+    private readonly userIdentity: UserIdentity;
 
-    constructor(options: { host: string; key: string; appVersion: string; sessionId: string }) {
+    constructor(options: {
+        host: string;
+        key: string;
+        appVersion: string;
+        userIdentity: UserIdentity;
+    }) {
         this.apiUrl = `${options.host}/api/v0/event`;
         this.appKey = options.key;
         this.appVersion = options.appVersion;
-        this.sessionId = options.sessionId;
+        this.userIdentity = options.userIdentity;
+        this.track = this.track.bind(this);
     }
 
     init = (params: {
@@ -38,19 +46,30 @@ export class Aptabase implements Analytics {
         }
     };
 
-    pageView = (location: string) => {
-        return this.trackEvent('page_view', { ...this.user_properties, location });
-    };
+    track(name: string, params?: Record<string, string | number | boolean>): Promise<void>;
+    track(event: AnalyticsEvent): Promise<void>;
+    track(
+        arg1: string | AnalyticsEvent,
+        arg2?: Record<string, string | number | boolean>
+    ): Promise<void> {
+        if (typeof arg1 === 'string') {
+            return this.trackEvent(arg1.toLowerCase(), {
+                ...this.user_properties,
+                ...(arg2 ?? {})
+            });
+        } else {
+            const { name, ...props } = arg1;
+            return this.trackEvent(name, { ...this.user_properties, ...props });
+        }
+    }
 
-    track = async (name: string, params: Record<string, string | number | boolean>) => {
-        return this.trackEvent(name.toLowerCase(), { ...this.user_properties, ...params });
-    };
-
-    async trackEvent(
+    private async trackEvent(
         eventName: string,
         props?: Record<string, string | number | boolean>
     ): Promise<void> {
         try {
+            const identityProps = await getUserIdentityProps(this.userIdentity);
+
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
@@ -60,18 +79,18 @@ export class Aptabase implements Analytics {
                 credentials: 'omit',
                 body: JSON.stringify({
                     timestamp: new Date().toISOString(),
-                    sessionId: this.sessionId,
                     eventName: eventName,
                     systemProps: {
                         locale: this.getBrowserLocale(),
                         isDebug: this.isDebug,
                         appVersion: this.appVersion,
-                        sdkVersion: 'custom_0.0.1'
+                        sdkVersion: 'custom_0.0.2'
                     },
                     props: {
                         osName: this.getUserOS(),
                         ...props
-                    }
+                    },
+                    ...identityProps
                 })
             });
 
@@ -107,6 +126,13 @@ export class Aptabase implements Analytics {
         if (navigator.userAgent.includes('Win')) {
             return 'Windows';
         }
+        if (
+            navigator.userAgent.includes('iPhone') ||
+            navigator.userAgent.includes('iPad') ||
+            navigator.userAgent.includes('iPod')
+        ) {
+            return 'iOS';
+        }
         if (navigator.userAgent.includes('Mac')) {
             return 'macOS';
         }
@@ -115,13 +141,6 @@ export class Aptabase implements Analytics {
         }
         if (navigator.userAgent.includes('Android')) {
             return 'Android';
-        }
-        if (
-            navigator.userAgent.includes('iPhone') ||
-            navigator.userAgent.includes('iPad') ||
-            navigator.userAgent.includes('iPod')
-        ) {
-            return 'IOS';
         }
 
         return 'Unknown';

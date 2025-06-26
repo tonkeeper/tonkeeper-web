@@ -19,7 +19,7 @@ export const ConfirmDisconnectNotification: FC<{
     isOpen: boolean;
     onClose: (confirmed?: boolean) => void;
     isLoading?: boolean;
-    app?: { id: string } | 'all';
+    app?: { origin: string } | 'all';
 }> = ({ isOpen, onClose, app, isLoading }) => {
     const { t } = useTranslation();
     const prev = usePrevious(app);
@@ -35,7 +35,7 @@ export const ConfirmDisconnectNotification: FC<{
                     t('disconnect_all_apps_confirm')
                 ) : (
                     <>
-                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.id)}?
+                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.origin)}?
                     </>
                 )
             }

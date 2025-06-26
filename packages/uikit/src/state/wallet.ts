@@ -1298,3 +1298,32 @@ export const useIsActiveWalletWatchOnly = () => {
     const wallet = useActiveAccount();
     return wallet.type === 'watch-only';
 };
+
+export function getAccountWalletNameAndEmoji(account: Account, walletId?: WalletId) {
+    let name = account.name;
+    let emoji = account.emoji;
+    if (account.type === 'mam') {
+        if (walletId !== undefined) {
+            const derivation = account.getTonWalletsDerivation(walletId);
+            if (!derivation) {
+                console.error('Error getting derivation');
+
+                return {
+                    name: 'Error',
+                    emoji: ''
+                };
+            } else {
+                name = derivation.name;
+                emoji = derivation.emoji;
+            }
+        } else {
+            name = account.activeDerivation.name;
+            emoji = account.activeDerivation.emoji;
+        }
+    }
+
+    return {
+        name,
+        emoji
+    };
+}
