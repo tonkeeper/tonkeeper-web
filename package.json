@@ -48,6 +48,9 @@
     },
     "packageManager": "yarn@4.3.0",
     "dependencies": {
+        "@noble/curves": "^1.9.2",
+        "@noble/ed25519": "^2.3.0",
+        "@tonkeeper/core": "workspace:^",
         "@tonkeeper/uikit": "workspace:^"
     },
     "resolutions": {

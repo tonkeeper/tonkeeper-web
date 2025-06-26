@@ -279,7 +279,7 @@ export const createStandardTonAccountBySK = async (
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const publicKey = publicKeyFromSecret(secret).toString('hex');
+    const publicKey = await publicKeyFromSecret(secret).toString('hex');
 
     let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
     if (options.versions) {

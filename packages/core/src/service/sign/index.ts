@@ -1,6 +1,5 @@
 import { keyPairFromSecretKey, sign } from '@ton/crypto';
 import { assertUnreachable } from '../../utils/types';
-import { fireblocksSecretToPublicKey, signWithFireblocksKey } from './fireblocks';
 import { Buffer } from 'buffer';
 
 export type SKSigningAlgorithm = 'ed25519' | 'fireblocks';
@@ -15,17 +14,17 @@ export async function signWithSecret(message: string | Uint8Array, secret: Signi
         const keyPair = keyPairFromSecretKey(Buffer.from(secret.key, 'hex'));
         return sign(messageBuffer, keyPair.secretKey);
     } else if (secret.algorithm === 'fireblocks') {
-        return signWithFireblocksKey(messageBuffer, secret.key);
+        return (await import('./fireblocks')).signWithFireblocksKey(messageBuffer, secret.key);
     } else {
         assertUnreachable(secret.algorithm);
     }
 }
-export function publicKeyFromSecret(secret: SigningSecret): Buffer {
+export async function publicKeyFromSecret(secret: SigningSecret): Promise<Buffer> {
     if (secret.algorithm === 'ed25519') {
         const pair = keyPairFromSecretKey(Buffer.from(secret.key, 'hex'));
         return pair.publicKey;
     } else if (secret.algorithm === 'fireblocks') {
-        return fireblocksSecretToPublicKey(secret.key);
+        return (await import('./fireblocks')).fireblocksSecretToPublicKey(secret.key);
     } else {
         assertUnreachable(secret.algorithm);
     }
