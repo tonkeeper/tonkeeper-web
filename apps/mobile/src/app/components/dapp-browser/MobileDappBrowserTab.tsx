@@ -170,9 +170,8 @@ const TabHeaderWrapper = styled.div`
     justify-content: space-between;
     width: 100%;
     position: relative;
-}
 
-    .dd-select-container {
+    & .dd-select-container {
         max-height: unset;
         width: fit-content;
     }
