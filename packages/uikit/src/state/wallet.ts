@@ -85,6 +85,7 @@ import { useSecurityCheck } from './password';
 import { useMutateIsFreeProAccessActivate } from './pro';
 import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
+import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -662,18 +663,18 @@ export const useCreateAccountTonSK = () => {
         AccountTonSK,
         Error,
         {
-            sk: string;
+            secret: SigningSecret;
             password?: string;
             versions: WalletVersion[];
             selectAccount?: boolean;
         }
-    >(async ({ sk, password, versions, selectAccount }) => {
+    >(async ({ secret, password, versions, selectAccount }) => {
         const accountSecret: AccountSecretSK = {
             type: 'sk',
-            sk
+            sk: secret.key
         };
         if (sdk.keychain) {
-            const account = await createStandardTonAccountBySK(context, sdk.storage, sk, {
+            const account = await createStandardTonAccountBySK(context, sdk.storage, secret, {
                 auth: {
                     kind: 'keychain'
                 },
@@ -697,7 +698,7 @@ export const useCreateAccountTonSK = () => {
         }
 
         const encryptedSK = await encryptWalletSecret(accountSecret, password);
-        const account = await createStandardTonAccountBySK(context, sdk.storage, sk, {
+        const account = await createStandardTonAccountBySK(context, sdk.storage, secret, {
             auth: {
                 kind: 'password',
                 encryptedSecret: encryptedSK

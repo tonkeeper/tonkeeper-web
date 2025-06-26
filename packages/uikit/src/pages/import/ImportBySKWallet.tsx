@@ -23,8 +23,12 @@ import { createStandardTonAccountBySK } from '@tonkeeper/core/dist/service/walle
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useMutation } from '@tanstack/react-query';
+import { SKSigningAlgorithm } from '@tonkeeper/core/dist/service/sign';
 
-export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
+export const ImportBySKWallet: FC<{
+    afterCompleted: () => void;
+    signingAlgorithm: SKSigningAlgorithm;
+}> = ({ afterCompleted, signingAlgorithm }) => {
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
         useCreateAccountTonSK();
     const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
@@ -101,7 +105,7 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
             const possibleAccount = await createStandardTonAccountBySK(
                 context,
                 sdk.storage,
-                secretKey,
+                { key: secretKey, algorithm: signingAlgorithm },
                 {
                     auth: {
                         kind: 'keychain'
@@ -137,6 +141,7 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
     if (!accountCandidate) {
         return (
             <SKInput
+                signingAlgorithm={signingAlgorithm}
                 afterInput={onSKSubmit}
                 isLoading={isSubmitingSk}
                 onIsDirtyChange={setIsDirty}
@@ -151,7 +156,7 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
                 publicKey={accountCandidate.account.activeTonWallet.publicKey}
                 onSubmit={versions => {
                     createWalletsAsync({
-                        sk: accountCandidate.sk,
+                        secret: { key: accountCandidate.sk, algorithm: signingAlgorithm },
                         versions,
                         selectAccount: true
                     }).then(setCreatedAccount);

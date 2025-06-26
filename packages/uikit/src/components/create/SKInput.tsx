@@ -7,6 +7,7 @@ import { ButtonResponsiveSize } from '../fields/Button';
 import { TextArea } from '../fields/Input';
 import { isValidSKOrSeed } from '@tonkeeper/core/dist/service/mnemonicService';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { SKSigningAlgorithm } from '@tonkeeper/core/dist/service/sign';
 
 const Block = styled.div`
     display: flex;
@@ -20,7 +21,8 @@ export const SKInput: FC<{
     isLoading?: boolean;
     className?: string;
     onIsDirtyChange?: (isDirty: boolean) => void;
-}> = ({ afterInput, isLoading, className, onIsDirtyChange }) => {
+    signingAlgorithm: SKSigningAlgorithm;
+}> = ({ afterInput, isLoading, className, onIsDirtyChange, signingAlgorithm }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLTextAreaElement>(null);
@@ -58,7 +60,11 @@ export const SKInput: FC<{
         <CenterContainer className={className} $mobileFitContent>
             <Block>
                 <div>
-                    <H2Label2Responsive>{t('add_by_sk_title')}</H2Label2Responsive>
+                    <H2Label2Responsive>
+                        {signingAlgorithm === 'fireblocks'
+                            ? t('add_by_sk_fireblocks_title')
+                            : t('add_by_sk_title')}
+                    </H2Label2Responsive>
                 </div>
                 <TextArea
                     id="secret-key"
@@ -77,7 +83,7 @@ export const SKInput: FC<{
                             marginTop
                             loading={isLoading}
                             disabled={!sk || error}
-                            onClick={() => afterInput(sk!)}
+                            onClick={() => afterInput(sk.slice(0, 64)!)}
                         >
                             {t('continue')}
                         </ButtonResponsiveSize>

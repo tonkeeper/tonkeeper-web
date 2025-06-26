@@ -95,7 +95,8 @@ export const addWalletMethod = [
     'signer',
     'keystone',
     'ledger',
-    'testnet'
+    'testnet',
+    'sk_fireblocks'
 ] as const;
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
@@ -103,7 +104,8 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     onSelect: onSelectProp
 }) => {
     const { t } = useTranslation();
-    const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig } = useAppContext();
+    const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig, hideFireblocks } =
+        useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     const accounts = useAccountsState();
@@ -211,6 +213,25 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                     </AddMethodText>
                     <RightIconStyled />
                 </AddMethod>
+                {!hideFireblocks && (
+                    <HideOnReview>
+                        <AddMethod onClick={() => onSelect('sk_fireblocks')}>
+                            <ButtonIcon>
+                                <WalletSignerIcon />
+                            </ButtonIcon>
+                            <AddMethodText>
+                                <AddMethodLabel>
+                                    {t('add_wallet_modal_fireblocks_title')}
+                                    <Badge color="accentBlue">PRO</Badge>
+                                </AddMethodLabel>
+                                <AddMethodDescription>
+                                    {t('add_wallet_modal_fireblocks_description')}
+                                </AddMethodDescription>
+                            </AddMethodText>
+                            <RightIconStyled />
+                        </AddMethod>
+                    </HideOnReview>
+                )}
             </AddMethodsGroup>
             {!hideAllHardwareWallets && (
                 <>
