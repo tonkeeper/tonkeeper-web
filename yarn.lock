@@ -6172,7 +6172,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:^, @tonkeeper/core@workspace:packages/core":
+"@tonkeeper/core@npm:0.1.0, @tonkeeper/core@workspace:packages/core":
   version: 0.0.0-use.local
   resolution: "@tonkeeper/core@workspace:packages/core"
   dependencies:
@@ -6180,6 +6180,8 @@ __metadata:
     "@ledgerhq/hw-transport-web-ble": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webhid": "npm:^6.28.6"
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
+    "@noble/curves": "npm:^1.9.2"
+    "@noble/ed25519": "npm:^2.3.0"
     "@ton-community/ton-ledger": "npm:^7.2.0-pre.3"
     "@ton-keychain/core": "npm:^0.0.4"
     "@ton-keychain/trx": "npm:^0.0.7"
@@ -23396,9 +23398,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "tonkeeper-web@workspace:."
   dependencies:
-    "@noble/curves": "npm:^1.9.2"
-    "@noble/ed25519": "npm:^2.3.0"
-    "@tonkeeper/core": "workspace:^"
     "@tonkeeper/uikit": "workspace:^"
     "@typescript-eslint/eslint-plugin": "npm:^5.50.0"
     "@typescript-eslint/parser": "npm:^5.50.0"

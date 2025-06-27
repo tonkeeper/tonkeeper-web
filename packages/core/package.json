@@ -24,6 +24,8 @@
         "@ledgerhq/hw-transport-web-ble": "^6.28.6",
         "@ledgerhq/hw-transport-webhid": "^6.28.6",
         "@ledgerhq/hw-transport-webusb": "^6.28.6",
+        "@noble/curves": "^1.9.2",
+        "@noble/ed25519": "^2.3.0",
         "@ton-community/ton-ledger": "^7.2.0-pre.3",
         "@ton-keychain/core": "^0.0.4",
         "@ton-keychain/trx": "^0.0.7",
