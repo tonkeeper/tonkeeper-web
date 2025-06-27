@@ -1,7 +1,7 @@
 import styled, { useTheme } from 'styled-components';
 import { Body2, Body3, Label1 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
-import { FreeProAccess, useMutateIsFreeProAccessActivate, useProState } from '../../state/pro';
+import { FreeProAccess, useProSubscription } from '../../state/pro';
 import { FC } from 'react';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
@@ -13,21 +13,29 @@ export const ProFreeAccessContent: FC<{
     className?: string;
 }> = ({ access, onSubmit, className }) => {
     const { t } = useTranslation();
-    const { mutateAsync } = useMutateIsFreeProAccessActivate();
-    const { data: pro } = useProState();
+    // const { mutateAsync } = useMutateIsFreeProAccessActivate();
+    const { data: subscription } = useProSubscription();
     const formatDate = useDateTimeFormat();
 
     const onClick = async () => {
-        await mutateAsync(true);
+        // await mutateAsync(true);
         onSubmit();
     };
 
     return (
         <ContentWrapper className={className}>
             <FreeProIcon />
+            {/*<Title>*/}
+            {/*    {t('free_pro_access_page_title', {*/}
+            {/*        date: formatDate(access.validUntil, {*/}
+            {/*            day: 'numeric',*/}
+            {/*            month: 'long'*/}
+            {/*        })*/}
+            {/*    })}*/}
+            {/*</Title>*/}
             <Title>
                 {t('free_pro_access_page_title', {
-                    date: formatDate(access.validUntil, {
+                    date: formatDate(new Date(), {
                         day: 'numeric',
                         month: 'long'
                     })
@@ -35,9 +43,18 @@ export const ProFreeAccessContent: FC<{
             </Title>
             <Description>{t('free_pro_access_page_description')}</Description>
             <Card>
+                {/*<Body2>*/}
+                {/*    {t('free_pro_access_page_card_acs_until', {*/}
+                {/*        date: formatDate(access.validUntil, {*/}
+                {/*            day: 'numeric',*/}
+                {/*            month: 'long',*/}
+                {/*            year: 'numeric'*/}
+                {/*        })*/}
+                {/*    })}*/}
+                {/*</Body2>*/}
                 <Body2>
                     {t('free_pro_access_page_card_acs_until', {
-                        date: formatDate(access.validUntil, {
+                        date: formatDate(new Date(), {
                             day: 'numeric',
                             month: 'long',
                             year: 'numeric'
@@ -48,11 +65,11 @@ export const ProFreeAccessContent: FC<{
             </Card>
             <Card>
                 <Body3>{t('free_pro_access_page_card_promo_code')}</Body3>
-                <Body2>{access.code}</Body2>
+                <Body2>{access.code}выаываываыв</Body2>
             </Card>
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    {pro?.subscription.valid ? (
+                    {subscription?.isActive ? (
                         <ButtonResponsiveSize secondary disabled fullWidth>
                             {t('free_pro_access_page_button_activated')}
                         </ButtonResponsiveSize>

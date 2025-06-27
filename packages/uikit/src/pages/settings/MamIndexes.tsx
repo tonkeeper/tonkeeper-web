@@ -35,7 +35,7 @@ import { useRenameNotification } from '../../components/modals/RenameNotificatio
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
 import { scrollToContainersBottom } from '../../libs/web';
-import { useProState } from '../../state/pro';
+import { useProSubscription } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -142,7 +142,7 @@ export const MAMIndexesPageContent: FC<{
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
     const config = useActiveConfig();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProSubscription();
     const { onOpen: buyPro } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -222,7 +222,7 @@ export const MAMIndexesPageContent: FC<{
 
     const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
     const showByProButton =
-        !proState?.subscription.valid &&
+        !subscription?.isActive &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (

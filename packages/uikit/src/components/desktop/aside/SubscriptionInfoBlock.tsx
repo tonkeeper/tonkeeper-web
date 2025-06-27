@@ -1,13 +1,8 @@
-import {
-    isTrialSubscription,
-    isValidSubscription,
-    ProState
-} from '@tonkeeper/core/dist/entries/pro';
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
-import { useProState } from '../../../state/pro';
+import { useProSubscription } from '../../../state/pro';
 import { Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
@@ -21,50 +16,49 @@ import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
+import { ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const Body3Block = styled(Body3)`
     display: block;
 `;
 
-export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
+export const SubscriptionStatus: FC<{ data: ProSubscription }> = ({ data }) => {
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
 
-    const { subscription } = data;
+    // if (isTrialSubscription(subscription)) {
+    //     return (
+    //         <>
+    //             <Body3Block>{t('aside_pro_trial_is_active')}</Body3Block>
+    //             <Body3Block>
+    //                 {t('aside_expires_on').replace(
+    //                     '%date%',
+    //                     formatDate(subscription.trialEndDate, {
+    //                         day: 'numeric',
+    //                         month: 'short',
+    //                         year: 'numeric',
+    //                         inputUnit: 'seconds'
+    //                     })
+    //                 )}
+    //             </Body3Block>
+    //         </>
+    //     );
+    // }
 
-    if (isTrialSubscription(subscription)) {
-        return (
-            <>
-                <Body3Block>{t('aside_pro_trial_is_active')}</Body3Block>
-                <Body3Block>
-                    {t('aside_expires_on').replace(
-                        '%date%',
-                        formatDate(subscription.trialEndDate, {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            inputUnit: 'seconds'
-                        })
-                    )}
-                </Body3Block>
-            </>
-        );
-    }
-
-    if (isValidSubscription(subscription)) {
+    if (data?.isActive) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
                 <Body3Block>
-                    {t('aside_expires_on').replace(
-                        '%date%',
-                        formatDate(subscription.nextChargeDate, {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            inputUnit: 'seconds'
-                        })
-                    )}
+                    {/*{t('aside_expires_on').replace(*/}
+                    {/*    '%date%',*/}
+                    {/*    formatDate(subscription.nextChargeDate, {*/}
+                    {/*        day: 'numeric',*/}
+                    {/*        month: 'short',*/}
+                    {/*        year: 'numeric',*/}
+                    {/*        inputUnit: 'seconds'*/}
+                    {/*    })*/}
+                    {/*)}*/}
                 </Body3Block>
             </>
         );
@@ -131,7 +125,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data } = useProState();
+    const { data: subscription } = useProSubscription();
     const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
@@ -160,14 +154,14 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     };
 
     let button = <Button loading>Pro</Button>;
-    if (data) {
-        if (data.subscription.valid) {
+    if (subscription) {
+        if (subscription?.isActive) {
             button = (
                 <DropDown
                     containerClassName="pro-subscription-dd-container"
                     payload={() => (
                         <DDContent width={width}>
-                            <SubscriptionStatus data={data} />
+                            <SubscriptionStatus data={subscription} />
                         </DDContent>
                     )}
                     trigger="hover"

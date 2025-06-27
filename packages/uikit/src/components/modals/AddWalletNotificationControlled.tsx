@@ -10,7 +10,7 @@ import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useAtom } from '../../libs/useAtom';
 import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
-import { useProState } from '../../state/pro';
+import { useProSubscription } from '../../state/pro';
 import { CreateStandardWallet } from '../../pages/import/CreateStandardWallet';
 import { CreateMAMWallet } from '../../pages/import/CreateMAMWallet';
 import { ImportExistingWallet } from '../../pages/import/ImportExistingWallet';
@@ -113,7 +113,7 @@ const closeExtensionTab = (sdk: IAppSdk) => {
 
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProSubscription();
     const { isOpen, onClose, onOpen } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
@@ -141,18 +141,18 @@ export const AddWalletNotificationControlled = () => {
         }
 
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
+    }, [isOpen, params?.walletType, subscription?.isActive, openBuyPro, onClose]);
 
     useEffect(() => {
         if (!isOpen) {
             return;
         }
-        if (params?.walletType === 'multisig' && !proState?.subscription.valid) {
+        if (params?.walletType === 'multisig' && !subscription?.isActive) {
             onClose();
             openBuyPro();
             return;
         }
-    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
+    }, [isOpen, params?.walletType, subscription?.isActive, openBuyPro, onClose]);
 
     const sdk = useAppSdk();
 
@@ -163,7 +163,7 @@ export const AddWalletNotificationControlled = () => {
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (method === 'multisig' && !proState?.subscription.valid) {
+            if (method === 'multisig' && !subscription?.isActive) {
                 openBuyPro();
                 return;
             }
@@ -171,7 +171,7 @@ export const AddWalletNotificationControlled = () => {
             openExtensionTab(sdk, method);
             setSelectedMethod(method);
         };
-    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod, sdk]);
+    }, [subscription?.isActive, openBuyPro, setSelectedMethod, sdk]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

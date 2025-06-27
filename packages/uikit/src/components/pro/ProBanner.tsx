@@ -2,10 +2,8 @@ import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
-import { useProState } from '../../state/pro';
-import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { useProSubscription } from '../../state/pro';
 import { useTranslation } from '../../hooks/translation';
-import { isPaidSubscription, isTrialSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { ChevronRightIcon } from '../Icon';
@@ -56,17 +54,15 @@ const Body2Styled = styled(Body2)`
 export const ProBanner: FC<{ className?: string }> = ({ className }) => {
     const { onOpen } = useProFeaturesNotification();
     const { t } = useTranslation();
-    const formatDate = useDateTimeFormat();
-    const { data } = useProState();
+    // const formatDate = useDateTimeFormat();
+    const { data: subscription } = useProSubscription();
     const targetEnv = useAppTargetEnv();
 
-    if (!data) {
+    if (!subscription) {
         return null;
     }
 
-    const { subscription } = data;
-
-    if (isPaidSubscription(subscription)) {
+    if (subscription.isActive) {
         return null;
     }
 
@@ -84,18 +80,19 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
             </TextContainerStyled>
             <NotForTargetEnv env="mobile">
                 <ButtonsContainerStyled>
-                    {isTrialSubscription(subscription) && (
-                        <Label2Styled>
-                            {t('pro_banner_days_left').replace(
-                                '%days%',
-                                formatDate(subscription.trialEndDate, {
-                                    day: 'numeric',
-                                    month: 'short',
-                                    year: 'numeric'
-                                })
-                            )}
-                        </Label2Styled>
-                    )}
+                    {/*{isTrialSubscription(subscription) && (*/}
+                    <Label2Styled>
+                        {t('pro_banner_days_left').replace(
+                            '%days%',
+                            '15'
+                            // formatDate(subscription.trialEndDate, {
+                            //     day: 'numeric',
+                            //     month: 'short',
+                            //     year: 'numeric'
+                            // })
+                        )}
+                    </Label2Styled>
+                    {/*)}*/}
 
                     <Button size="small" corner="2xSmall" primary onClick={onOpen}>
                         {t('about_tonkeeper_pro')}

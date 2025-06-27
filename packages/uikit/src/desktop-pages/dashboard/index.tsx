@@ -1,4 +1,3 @@
-import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
 import styled, { css } from 'styled-components';
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
@@ -8,7 +7,7 @@ import {
 } from '../../components/desktop/header/DashboardHeader';
 import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
 import { ProBanner } from '../../components/pro/ProBanner';
-import { useProState } from '../../state/pro';
+import { useProSubscription } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
@@ -48,8 +47,8 @@ const PageWrapper = styled(DesktopViewPageLayout)`
 `;
 
 const DashboardPage: FC = () => {
-    const { data } = useProState();
-    const shouldShowProBanner = data && !isPaidSubscription(data.subscription);
+    const { data: subscription } = useProSubscription();
+    const shouldShowProBanner = subscription && !subscription.isActive;
 
     const env = useAppTargetEnv();
     if (env === 'mobile') {

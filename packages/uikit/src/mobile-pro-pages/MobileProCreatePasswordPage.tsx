@@ -9,8 +9,7 @@ import { Button } from '../components/fields/Button';
 import { SlideAnimation } from '../components/shared/SlideAnimation';
 import { useTranslation } from '../hooks/translation';
 import { useAppSdk } from '../hooks/appSdk';
-import { ProFreeAccessContent } from '../components/pro/ProFreeAccess';
-import { FreeProAccess, useFreeProAccessAvailable, useProState } from '../state/pro';
+import { useProSubscription } from '../state/pro';
 
 export const MobileProCreatePasswordPage = () => {
     const sdk = useAppSdk();
@@ -28,7 +27,6 @@ export const MobileProCreatePasswordPage = () => {
     const [right, setRight] = useState(true);
     const [pinChecked, setPinChecked] = useState(false);
     const [pinCompleted, setPinCompleted] = useState(false);
-    const [freeProCompleted, setFreeProCompleted] = useState(false);
 
     const finish = async () => sdk.keychain!.updatePassword(pin);
 
@@ -56,15 +54,13 @@ export const MobileProCreatePasswordPage = () => {
         setPin('');
     };
 
-    const { data: pro } = useProState();
-    const freeProAvailableInConfig = useFreeProAccessAvailable();
-    const freeProAvailable = Boolean(freeProAvailableInConfig && !pro?.subscription.valid);
+    const { data: subscription } = useProSubscription();
 
     let view;
 
     switch (true) {
         case pinCompleted: {
-            if (freeProAvailable && !freeProCompleted) {
+            if (!subscription?.isActive) {
                 view = 'free_pro';
             } else {
                 view = 'tutorial';
@@ -127,12 +123,12 @@ export const MobileProCreatePasswordPage = () => {
                                 }
                             />
                         )}
-                        {view === 'free_pro' && (
-                            <ProFreeAccessScreen
-                                access={freeProAvailableInConfig!}
-                                onSubmit={() => setFreeProCompleted(true)}
-                            />
-                        )}
+                        {/*{view === 'free_pro' && (*/}
+                        {/*    <ProFreeAccessScreen*/}
+                        {/*        access={freeProAvailableInConfig!}*/}
+                        {/*        onSubmit={() => setFreeProCompleted(true)}*/}
+                        {/*    />*/}
+                        {/*)}*/}
                         {view === 'tutorial' && <TutorialScreen onSubmit={finish} />}
                     </div>
                 </CSSTransition>
@@ -141,20 +137,20 @@ export const MobileProCreatePasswordPage = () => {
     );
 };
 
-const ProFreeAccessScreen: FC<{ onSubmit: () => void; access: FreeProAccess }> = ({
-    onSubmit,
-    access
-}) => {
-    const { t } = useTranslation();
-    return (
-        <ProPageWrapper>
-            <LaterButton secondary onClick={() => onSubmit()}>
-                {t('later')}
-            </LaterButton>
-            <ProFreeAccessContentStyled onSubmit={onSubmit} access={access} />
-        </ProPageWrapper>
-    );
-};
+// const ProFreeAccessScreen: FC<{ onSubmit: () => void; access: FreeProAccess }> = ({
+//     onSubmit,
+//     access
+// }) => {
+//     const { t } = useTranslation();
+//     return (
+//         <ProPageWrapper>
+//             <LaterButton secondary onClick={() => onSubmit()}>
+//                 {t('later')}
+//             </LaterButton>
+//             <ProFreeAccessContentStyled onSubmit={onSubmit} access={access} />
+//         </ProPageWrapper>
+//     );
+// };
 
 const FullScreenWrapper = styled.div`
     height: 100%;
@@ -164,13 +160,13 @@ const FullScreenWrapper = styled.div`
     padding: 0 32px;
 `;
 
-const ProPageWrapper = styled(FullScreenWrapper)`
-    padding: 36px 0 0;
-`;
-
-const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
-    height: 100%;
-`;
+// const ProPageWrapper = styled(FullScreenWrapper)`
+//     padding: 36px 0 0;
+// `;
+//
+// const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
+//     height: 100%;
+// `;
 
 const Wrapper = styled(SlideAnimation)`
     padding-bottom: env(safe-area-inset-bottom);

@@ -131,6 +131,9 @@ const NarrowContentBody: FC<{
         return <NarrowContentInitialPagesLock />;
     }
 
+    // TODO DO NOT COMMIT THIS
+    // TODO DO NOT COMMIT THIS
+    // TODO DO NOT COMMIT THIS
     if (!activeAccount || !password || !accountQuery.data) {
         return <NarrowContentInitialPages accountIsCreated={!!activeAccount} />;
     }

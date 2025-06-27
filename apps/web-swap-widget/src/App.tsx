@@ -138,7 +138,7 @@ const ThemeAndContent = () => {
             displayType="compact"
             isInsideTonkeeper
         >
-            <DarkThemeContext.Provider value={!data?.valid}>
+            <DarkThemeContext.Provider value={!(data as any)?.valid}>
                 <GlobalStyle />
                 <WidgetGlobalStyle />
                 <ProvideActiveAccount>

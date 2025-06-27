@@ -13,7 +13,7 @@ import {
 } from '../../state/dashboard/useDashboardColumns';
 import { Button } from '../fields/Button';
 import { Badge } from '../shared';
-import { useProState } from '../../state/pro';
+import { useProSubscription } from '../../state/pro';
 import { ProNotification } from '../pro/ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
@@ -98,8 +98,8 @@ const CategoriesModalContent: FC<{
         data: DashboardColumnsForm | ((data: DashboardColumnsForm) => DashboardColumnsForm)
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
-    const { data } = useProState();
-    const isProEnabled = data?.subscription.valid;
+    const { data: subscription } = useProSubscription();
+    const isProEnabled = subscription?.isActive;
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {

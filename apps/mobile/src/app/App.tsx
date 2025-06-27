@@ -172,7 +172,7 @@ const ThemeAndContent = () => {
             isProSupported
             proDisplayType={CAPACITOR_APPLICATION_ID === 'mobile' ? 'mobile' : 'desktop'}
         >
-            <DarkThemeContext.Provider value={!data?.valid}>
+            <DarkThemeContext.Provider value={!data?.isActive}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
                 <FooterGlobalStyle />

@@ -25,7 +25,7 @@ import React, { FC } from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
-import { useProState } from '../../../state/pro';
+import { useProSubscription } from '../../../state/pro';
 import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
@@ -91,7 +91,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const sdk = useAppSdk();
     const config = useActiveConfig();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProSubscription();
     const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
@@ -127,7 +127,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         )}
                     </NavLink>
                 </HideOnReview>
-                {proState?.subscription.valid && (
+                {subscription?.isActive && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (
                             <AsideMenuItemLarge isSelected={isActive}>

@@ -3,9 +3,9 @@ import { Notification } from '../Notification';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
+import { useTranslation } from '../../hooks/translation';
 import { useActivateTrialMutation } from '../../state/pro';
 import { TelegramIcon } from '../Icon';
-import { useTranslation } from '../../hooks/translation';
 
 const ContentWrapper = styled.div`
     display: flex;

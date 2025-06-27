@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { ProState, ProStateAuthorized, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    IosSubscriptionStatuses,
+    ProductIds,
+    ProSubscription,
+    SubscriptionSources
+} from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
@@ -20,8 +25,7 @@ import {
 import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
 import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
-import { useAppContext } from '../hooks/appContext';
-import { useAppSdk, useAppTargetEnv, useIsCapacitorApp } from '../hooks/appSdk';
+import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
@@ -34,56 +38,11 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useToast } from '../hooks/useNotification';
-import { useAnalyticsTrack } from '../hooks/amplitude';
+import { useAppContext } from '../hooks/appContext';
 
 export type FreeProAccess = {
     code: string;
     validUntil: Date;
-};
-
-export const useFreeProAccessAvailable = () => {
-    const { mainnetConfig } = useAppContext();
-    const env = useAppTargetEnv();
-
-    return useMemo<FreeProAccess | null>(() => {
-        if (!mainnetConfig.enhanced_acs_pmob || env !== 'mobile') {
-            return null;
-        }
-        const data = mainnetConfig.enhanced_acs_pmob;
-        if (!data.code || !data.acs_until) {
-            return null;
-        }
-
-        const validUntil = new Date(data.acs_until * 1000);
-        if (validUntil < new Date()) {
-            return null;
-        }
-
-        return {
-            code: data.code,
-            validUntil
-        };
-    }, [mainnetConfig.enhanced_acs_pmob, env]);
-};
-
-export const useMutateIsFreeProAccessActivate = () => {
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-    const toast = useToast();
-    const { t } = useTranslation();
-    const track = useAnalyticsTrack();
-
-    return useMutation<void, Error, boolean>(async isActive => {
-        await sdk.storage.set(AppKey.PRO_FREE_ACCESS_ACTIVE, isActive);
-        await client.invalidateQueries([QueryKey.pro]);
-
-        if (isActive) {
-            toast(t('free_pro_access_activated_toast'));
-
-            track('free_pro_access_activated');
-        }
-    });
 };
 
 export const useProBackupState = () => {
@@ -96,65 +55,79 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const isCapacitorApp = useIsCapacitorApp();
     const storage = useAppSdk().storage;
 
     return useMemo(() => {
-        if (isCapacitorApp) {
-            return {
-                async attachToken() {
-                    const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
-                    OpenAPI.TOKEN = token ?? undefined;
-                },
-                async onTokenUpdated(token: string | null) {
-                    await storage.set(AppKey.PRO_AUTH_TOKEN, token);
-                    return this.attachToken();
-                }
-            };
-        } else {
-            return {
-                async attachToken() {
-                    /* */
-                },
-                async onTokenUpdated() {
-                    /* */
-                }
-            };
-        }
-    }, [isCapacitorApp]);
+        return {
+            async attachToken() {
+                const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
+                OpenAPI.TOKEN = token ?? undefined;
+            },
+            async onTokenUpdated(token: string | null) {
+                await storage.set(AppKey.PRO_AUTH_TOKEN, token);
+                return this.attachToken();
+            }
+        };
+    }, [storage]);
 };
 
-export const useProState = () => {
+export const useProSubscription = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
-    const isFreeProAccessAvailable = useFreeProAccessAvailable();
-    const env = useAppTargetEnv();
 
-    return useQuery<ProState, Error>([QueryKey.pro, isFreeProAccessAvailable], async () => {
-        let state: ProState;
+    return useQuery<ProSubscription, Error>([QueryKey.pro], async () => {
+        const subscription = await getProState(authService);
 
-        const isFreeMobileTrialActive = Boolean(
-            await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
-        );
-        if (env === 'mobile' && isFreeProAccessAvailable && isFreeMobileTrialActive) {
-            state = {
-                authorizedWallet: null,
-                subscription: {
-                    type: 'trial-mobile',
-                    isTrial: true,
-                    valid: true,
-                    usedTrial: true,
-                    trialEndDate: isFreeProAccessAvailable.validUntil
-                }
-            };
-        } else {
-            state = await getProState(authService, sdk.storage);
+        await setBackupState(sdk.storage, subscription);
+        await client.invalidateQueries([QueryKey.proBackup]);
+
+        return subscription;
+    });
+};
+
+export const useProSubscriptionPurchase = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    // const authService = useProAuthTokenService();
+
+    return useMutation<ProSubscription, Error, ProductIds>(async productId => {
+        const subscription = await sdk.subscription?.subscribe(productId);
+
+        alert(subscription?.originalTransactionId);
+
+        if (subscription?.originalTransactionId === undefined) {
+            throw new Error('Failed to subscribe');
         }
 
-        await setBackupState(sdk.storage, state.subscription);
-        await client.invalidateQueries([QueryKey.proBackup]);
-        return state;
+        // const updatedSubscription = await saveIapPurchase(
+        //     authService,
+        //     subscription.originalTransactionId
+        // );
+
+        const updatedSubscription = await new Promise<ProSubscription>((resolve, reject) => {
+            setTimeout(
+                () =>
+                    // reject(
+                    //     new Error(
+                    //         'This is a mock implementation, please use real subscription service'
+                    //     )
+                    // ),
+                    resolve({
+                        source: SubscriptionSources.IOS,
+                        isActive: true,
+                        expiresAt: 123123,
+                        originalTransactionId: subscription?.originalTransactionId ?? 'unknown',
+                        status: IosSubscriptionStatuses.ACTIVE
+                    }),
+                1000
+            );
+        });
+
+        // await setBackupState(sdk.storage, updatedSubscription);
+        // await client.invalidateQueries([QueryKey.proBackup]);
+
+        return updatedSubscription;
     });
 };
 
@@ -235,24 +208,28 @@ export interface ConfirmState {
 }
 
 export const useCreateInvoiceMutation = () => {
-    const ws = useAccountsStorage();
+    // const ws = useAccountsStorage();
     const api = useActiveApi();
+
     return useMutation<
         ConfirmState,
         Error,
-        { state: ProStateAuthorized; tierId: number | null; promoCode?: string }
+        { state: any; tierId: number | null; promoCode?: string }
     >(async data => {
         if (data.tierId === null) {
             throw new Error('missing tier');
         }
 
-        const wallet = (await ws.getAccounts())
-            .flatMap(a => a.allTonWallets)
-            .find(w => w.id === data.state.authorizedWallet.rawAddress);
-        if (!wallet || !isStandardTonWallet(wallet)) {
-            throw new Error('Missing wallet');
-        }
-
+        const wallet = {} as TonWalletStandard;
+        /*
+            Get an authorized wallet from storage
+            const wallet = (await ws.getAccounts())
+                .flatMap(a => a.allTonWallets)
+                .find(w => w.id === data.state.authorizedWallet.rawAddress);
+            if (!wallet || !isStandardTonWallet(wallet)) {
+                throw new Error('Missing wallet');
+            }
+        */
         const invoice = await createProServiceInvoice(data.tierId, data.promoCode);
         const [recipient, assetAmount] = await createRecipient(api, invoice);
         return {
@@ -266,12 +243,11 @@ export const useCreateInvoiceMutation = () => {
 
 export const useWaitInvoiceMutation = () => {
     const client = useQueryClient();
-    const sdk = useAppSdk();
     const authService = useProAuthTokenService();
 
     return useMutation<void, Error, ConfirmState>(async data => {
         await waitProServiceInvoice(data.invoice);
-        await retryProService(authService, sdk.storage);
+        await retryProService(authService);
         await client.invalidateQueries([QueryKey.pro]);
     });
 };

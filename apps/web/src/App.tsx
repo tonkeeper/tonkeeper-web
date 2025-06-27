@@ -43,7 +43,7 @@ import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from 'react-router-dom';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -61,9 +61,11 @@ const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
 export const App: FC = () => {
-    return <BrowserRouter>
-        <Providers />
-    </BrowserRouter>
+    return (
+        <BrowserRouter>
+            <Providers />
+        </BrowserRouter>
+    );
 };
 
 const Providers: FC<PropsWithChildren> = () => {
@@ -102,12 +104,17 @@ const Providers: FC<PropsWithChildren> = () => {
 };
 
 const ThemeAndContent = () => {
-    const { data } = useProBackupState();
+    const { data: subscription } = useProBackupState();
     const isMobile = useLayout();
 
     return (
-        <UserThemeProvider isPro={data?.valid} isProSupported proDisplayType="desktop" displayType={isMobile ? 'compact' : 'full-width'}>
-            <DarkThemeContext.Provider value={!data?.valid}>
+        <UserThemeProvider
+            isPro={subscription?.isActive}
+            isProSupported
+            proDisplayType="desktop"
+            displayType={isMobile ? 'compact' : 'full-width'}
+        >
+            <DarkThemeContext.Provider value={!subscription?.isActive}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
                 <FooterGlobalStyle />

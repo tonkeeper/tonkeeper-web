@@ -9,14 +9,14 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
+import { ProSubscription, SubscriptionSources } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
+import { TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
-    InvoiceStatus,
     InvoicesInvoice,
+    InvoiceStatus,
     ProServiceDashboardCellAddress,
     ProServiceDashboardCellNumericCrypto,
     ProServiceDashboardCellNumericFiat,
@@ -26,13 +26,10 @@ import {
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
-import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
-import { getNetworkByAccount } from '../entries/account';
-import { Network } from '../entries/network';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -44,25 +41,20 @@ export const getBackupState = async (storage: IStorage) => {
 };
 
 export const getProState = async (
-    authTokenService: ProAuthTokenService,
-    storage: IStorage
-): Promise<ProState> => {
+    authTokenService: ProAuthTokenService
+): Promise<ProSubscription> => {
     try {
-        return await loadProState(authTokenService, storage);
+        return await loadProState(authTokenService);
     } catch (e) {
         console.error(e);
-        return {
-            subscription: toEmptySubscription(),
-            authorizedWallet: null
-        };
+        return toEmptySubscription();
     }
 };
 
-const toEmptySubscription = (): ProSubscriptionInvalid => {
+const toEmptySubscription = (): ProSubscription => {
     return {
-        valid: false,
-        isTrial: false,
-        usedTrial: false
+        source: SubscriptionSources.EMPTY,
+        isActive: false
     };
 };
 
@@ -88,75 +80,20 @@ export type ProAuthTokenService = {
     onTokenUpdated: (token: string | null) => Promise<void>;
 };
 
-const loadProState = async (
-    authService: ProAuthTokenService,
-    storage: IStorage
-): Promise<ProState> => {
+const loadProState = async (authService: ProAuthTokenService): Promise<ProSubscription | any> => {
     await authService.attachToken();
-    const user = await ProServiceService.proServiceGetUserInfo();
 
-    let authorizedWallet: ProStateWallet | null = null;
-    if (user.pub_key && user.version) {
-        const wallets = (await accountsStorage(storage).getAccounts())
-            .filter(a => getNetworkByAccount(a) === Network.MAINNET)
-            .flatMap(a => a.allTonWallets);
+    return ProServiceService.proServiceGetUserInfo();
+};
 
-        const actualWallet = wallets
-            .filter(isStandardTonWallet)
-            .find(
-                w =>
-                    w.publicKey === user.pub_key &&
-                    user.version &&
-                    w.version === walletVersionFromProServiceDTO(user.version)
-            );
-        if (!actualWallet) {
-            return {
-                authorizedWallet: null,
-                subscription: {
-                    isTrial: false,
-                    usedTrial: false,
-                    valid: false
-                }
-            };
-        }
-        authorizedWallet = {
-            publicKey: actualWallet.publicKey,
-            rawAddress: actualWallet.rawAddress
-        };
-    }
+export const saveInAppPurchase = async (
+    authService: ProAuthTokenService,
+    originalTransactionId: string
+): Promise<ProSubscription> => {
+    await authService.attachToken();
 
-    const subscriptionDTO = await ProServiceService.proServiceVerify();
-
-    let subscription: ProSubscription;
-    if (subscriptionDTO.valid) {
-        if (subscriptionDTO.is_trial) {
-            subscription = {
-                type: 'trial-tg',
-                valid: true,
-                isTrial: true,
-                usedTrial: true,
-                trialUserId: user.tg_id!,
-                trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
-            };
-        } else {
-            subscription = {
-                valid: true,
-                isTrial: false,
-                usedTrial: subscriptionDTO.used_trial,
-                nextChargeDate: new Date(subscriptionDTO.next_charge! * 1000)
-            };
-        }
-    } else {
-        subscription = {
-            valid: false,
-            isTrial: false,
-            usedTrial: subscriptionDTO.used_trial
-        };
-    }
-    return {
-        subscription,
-        authorizedWallet
-    };
+    // return ProServiceService.proServiceSaveIapPurchase({ originalTransactionId });
+    return {} as ProSubscription;
 };
 
 export const authViaTonConnect = async (
@@ -196,11 +133,6 @@ export const authViaTonConnect = async (
 };
 
 export const logoutTonConsole = async (authService: ProAuthTokenService) => {
-    const result = await ProServiceService.proServiceLogout();
-    if (!result.ok) {
-        throw new Error('Unable to logout');
-    }
-
     await authService.onTokenUpdated(null);
 };
 
@@ -245,10 +177,10 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
+export const retryProService = async (authService: ProAuthTokenService) => {
     for (let i = 0; i < 10; i++) {
-        const state = await getProState(authService, storage);
-        if (state.subscription.valid) {
+        const state = await getProState(authService);
+        if (state.isActive) {
             return;
         }
         await delay(5000);

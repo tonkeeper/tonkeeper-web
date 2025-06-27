@@ -5,7 +5,6 @@ import {
     seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { ProState, ProStateAuthorized, isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import {
     DerivationItemNamed,
     TonWalletStandard,
@@ -23,10 +22,9 @@ import { useTranslation } from '../../hooks/translation';
 import {
     ConfirmState,
     useCreateInvoiceMutation,
-    useFreeProAccessAvailable,
     useProLogout,
     useProPlans,
-    useProState,
+    useProSubscription,
     useSelectWalletForProMutation,
     useWaitInvoiceMutation
 } from '../../state/pro';
@@ -60,8 +58,7 @@ import {
 import { ForTargetEnv } from '../shared/TargetEnv';
 import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
 import { ProFreeAccessContent } from '../pro/ProFreeAccess';
-import { useNavigate } from '../../hooks/router/useNavigate';
-import { AppRoute } from '../../libs/routes';
+import { ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const Block = styled.div`
     display: flex;
@@ -192,12 +189,14 @@ const SelectIconWrapper = styled.span`
 `;
 
 const ProWallet: FC<{
-    data: ProState;
+    data: ProSubscription;
     onClick: () => void;
     disabled?: boolean;
 }> = ({ data, onClick, disabled }) => {
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
-        data.authorizedWallet?.rawAddress || undefined
+        // Get it from storage
+        // data.authorizedWallet?.rawAddress || undefined
+        undefined
     );
 
     if (!account || !wallet) {
@@ -315,7 +314,7 @@ const ConfirmBuyProService: FC<
 };
 
 const BuyProService: FC<{
-    data: ProStateAuthorized;
+    data: ProSubscription;
     setReLogin: () => void;
     onSuccess?: () => void;
 }> = ({ data, setReLogin, onSuccess }) => {
@@ -406,7 +405,10 @@ const StatusText = styled(Label1)`
     display: block;
 `;
 
-const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data, setReLogin }) => {
+const PreServiceStatus: FC<{ data: ProSubscription; setReLogin: () => void }> = ({
+    data,
+    setReLogin
+}) => {
     const { t } = useTranslation();
 
     const { mutate: logOut, isLoading, error } = useProLogout();
@@ -427,13 +429,15 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data
     );
 };
 
-const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSuccess }) => {
+const ProContent: FC<{ data: ProSubscription; onSuccess?: () => void }> = ({ data, onSuccess }) => {
     const [reLogin, setReLogin] = useState(false);
-
-    if (!data.authorizedWallet || reLogin) {
+    return <SelectWallet onClose={() => setReLogin(false)} />;
+    // get it from storage
+    // if (!data.authorizedWallet || reLogin) {
+    if (reLogin) {
         return <SelectWallet onClose={() => setReLogin(false)} />;
     }
-    if (isPaidSubscription(data.subscription)) {
+    if (data?.isActive) {
         return <PreServiceStatus data={data} setReLogin={() => setReLogin(true)} />;
     }
     return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
@@ -449,22 +453,7 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 }) => {
     const { t } = useTranslation();
 
-    const { data } = useProState();
-    const isFreeAccessAvailable = useFreeProAccessAvailable();
-    const navigate = useNavigate();
-
-    if (isFreeAccessAvailable) {
-        const onBack = () => {
-            navigate(AppRoute.home);
-        };
-
-        return (
-            <ProFreeAccessContentStyled
-                access={isFreeAccessAvailable}
-                onSubmit={onSuccess ?? onBack}
-            />
-        );
-    }
+    const { data } = useProSubscription();
 
     return (
         <>
@@ -475,7 +464,8 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
             </Block>
             {data && (
                 <ProContent
-                    key={data.authorizedWallet?.rawAddress}
+                    key={undefined}
+                    // key={data.authorizedWallet?.rawAddress}
                     data={data}
                     onSuccess={onSuccess}
                 />

@@ -12,6 +12,7 @@ import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { AppKey } from './Keys';
 import { v4 as uuidv4 } from 'uuid';
 import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
+import { SubscriptionStrategy } from './entries/pro';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -181,6 +182,8 @@ export interface IAppSdk {
     getUserId: () => Promise<string>;
 
     dappBrowser?: IDappBrowser;
+
+    subscription?: SubscriptionStrategy;
 }
 
 export interface IDappBrowser {

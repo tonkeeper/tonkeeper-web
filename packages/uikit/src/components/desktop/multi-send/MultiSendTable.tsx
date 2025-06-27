@@ -29,7 +29,7 @@ import {
     useMutateUserMultiSendList,
     useUserMultiSendLists
 } from '../../../state/multiSend';
-import { useProState } from '../../../state/pro';
+import { useProSubscription } from '../../../state/pro';
 import { useRate } from '../../../state/rates';
 import { CloseIcon, DocIcon, ExportIcon } from '../../Icon';
 import { Body2, Body3 } from '../../Text';
@@ -417,7 +417,7 @@ const MultiSendFooter: FC<{
     // eslint-disable-next-line complexity
 }> = ({ asset, rowsValue, list, onBack }) => {
     const { t } = useTranslation();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProSubscription();
     const {
         isOpen: isProModalOpened,
         onClose: onProModalClose,
@@ -579,12 +579,12 @@ const MultiSendFooter: FC<{
                         )}
                     </MultiSendFooterTextWrapper>
                 )}
-                {!proState || proState.subscription.valid ? (
+                {!subscription || subscription?.isActive ? (
                     <Button
                         type="submit"
                         primary
                         disabled={remainingBalanceBN?.lt(0) || !!maxMsgsNumberExceeded || isLedger}
-                        loading={formValidationState === 'validating' || !proState}
+                        loading={formValidationState === 'validating' || !subscription}
                     >
                         {t('continue')}
                     </Button>

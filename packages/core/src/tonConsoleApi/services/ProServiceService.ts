@@ -19,6 +19,7 @@ import type { TonConnectProof } from '../models/TonConnectProof';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
+import { ProSubscription } from '../../entries/pro';
 export class ProServiceService {
     /**
      * Generating payload for TonConnect
@@ -35,8 +36,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -45,9 +46,7 @@ export class ProServiceService {
      * @returns any Ok
      * @throws ApiError
      */
-    public static proServiceTonConnectAuth(
-        requestBody?: TonConnectProof,
-    ): CancelablePromise<{
+    public static proServiceTonConnectAuth(requestBody?: TonConnectProof): CancelablePromise<{
         ok: boolean;
         auth_token: string;
     }> {
@@ -60,28 +59,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
-        });
-    }
-    /**
-     * Logout from the system
-     * @returns any Ok
-     * @throws ApiError
-     */
-    public static proServiceLogout(): CancelablePromise<{
-        ok: boolean;
-        auth_token: string;
-    }> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/v1/services/pro/logout',
-            errors: {
-                400: `Something went wrong on client side`,
-                403: `Access token is missing or invalid`,
-                404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -102,8 +81,46 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
+        });
+    }
+    /**
+     * Get subscription info
+     * @returns ProSubscription
+     * @throws ApiError
+     */
+    public static proServiceGetSubscriptionInfo(): CancelablePromise<ProSubscription> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/services/pro/info',
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`
+            }
+        });
+    }
+    /**
+     * Save originalTransactionId and get actualized subscription info
+     * @param requestBody authToken and originalTransactionId
+     * @returns ProSubscription
+     * @throws ApiError
+     */
+    public static proServiceSaveIapPurchase(requestBody: {
+        originalTransactionId: string;
+    }): CancelablePromise<ProSubscription> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/services/pro/iap_purchase',
+            body: requestBody,
+            errors: {
+                400: `Something went wrong on client side`,
+                403: `Access token is missing or invalid`,
+                404: `The specified resource was not found`,
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -115,7 +132,7 @@ export class ProServiceService {
      */
     public static getProServiceTiers(
         lang?: Lang,
-        promoCode?: string,
+        promoCode?: string
     ): CancelablePromise<{
         items: Array<ProServiceTier>;
     }> {
@@ -123,14 +140,14 @@ export class ProServiceService {
             method: 'GET',
             url: '/api/v1/services/pro/tiers',
             query: {
-                'lang': lang,
-                'promo_code': promoCode,
+                lang: lang,
+                promo_code: promoCode
             },
             errors: {
                 400: `Something went wrong on client side`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -139,12 +156,10 @@ export class ProServiceService {
      * @returns InvoicesInvoice Invoice
      * @throws ApiError
      */
-    public static createProServiceInvoice(
-        requestBody?: {
-            tier_id: number;
-            promo_code?: string;
-        },
-    ): CancelablePromise<InvoicesInvoice> {
+    public static createProServiceInvoice(requestBody?: {
+        tier_id: number;
+        promo_code?: string;
+    }): CancelablePromise<InvoicesInvoice> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/invoice',
@@ -154,8 +169,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -164,21 +179,19 @@ export class ProServiceService {
      * @returns InvoicesInvoice Invoice
      * @throws ApiError
      */
-    public static getProServiceInvoice(
-        id: string,
-    ): CancelablePromise<InvoicesInvoice> {
+    public static getProServiceInvoice(id: string): CancelablePromise<InvoicesInvoice> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/invoice/{id}',
             path: {
-                'id': id,
+                id: id
             },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -188,7 +201,7 @@ export class ProServiceService {
      * @throws ApiError
      */
     public static proServiceInvoiceWebhook(
-        requestBody?: ProServiceInvoiceWebhook,
+        requestBody?: ProServiceInvoiceWebhook
     ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -199,12 +212,12 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
-     * Verify Pro tier subscription
+     * Verify Pro tier proService
      * @returns any Verify
      * @throws ApiError
      */
@@ -222,8 +235,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -232,9 +245,7 @@ export class ProServiceService {
      * @returns any Ok
      * @throws ApiError
      */
-    public static proServiceTrial(
-        requestBody?: TgAuth,
-    ): CancelablePromise<{
+    public static proServiceTrial(requestBody?: TgAuth): CancelablePromise<{
         ok: boolean;
         auth_token: string;
     }> {
@@ -247,8 +258,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -257,23 +268,21 @@ export class ProServiceService {
      * @returns any Dashboard columns
      * @throws ApiError
      */
-    public static proServiceDashboardColumns(
-        lang?: Lang,
-    ): CancelablePromise<{
+    public static proServiceDashboardColumns(lang?: Lang): CancelablePromise<{
         items: Array<ProServiceDashboardColumn>;
     }> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/dashboard/columns',
             query: {
-                'lang': lang,
+                lang: lang
             },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -290,16 +299,23 @@ export class ProServiceService {
         requestBody?: {
             accounts: Array<string>;
             columns: Array<string>;
-        },
+        }
     ): CancelablePromise<{
-        items: Array<Array<(ProServiceDashboardCellString | ProServiceDashboardCellAddress | ProServiceDashboardCellNumericCrypto | ProServiceDashboardCellNumericFiat)>>;
+        items: Array<
+            Array<
+                | ProServiceDashboardCellString
+                | ProServiceDashboardCellAddress
+                | ProServiceDashboardCellNumericCrypto
+                | ProServiceDashboardCellNumericFiat
+            >
+        >;
     }> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/dashboard/data',
             query: {
-                'lang': lang,
-                'currency': currency,
+                lang: lang,
+                currency: currency
             },
             body: requestBody,
             mediaType: 'application/json',
@@ -307,8 +323,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -324,8 +340,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -334,9 +350,7 @@ export class ProServiceService {
      * @returns any Ok
      * @throws ApiError
      */
-    public static proServiceUpdateState(
-        requestBody?: ProServiceState,
-    ): CancelablePromise<{
+    public static proServiceUpdateState(requestBody?: ProServiceState): CancelablePromise<{
         ok: boolean;
         auth_token: string;
     }> {
@@ -349,8 +363,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
     /**
@@ -369,8 +383,8 @@ export class ProServiceService {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
                 404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
+                500: `Something went wrong on server side`
+            }
         });
     }
 }

@@ -4,7 +4,7 @@ import { QueryKey } from '../../libs/queryKey';
 import { useTranslation } from '../../hooks/translation';
 import { DashboardColumn, isSupportedColumnType } from '@tonkeeper/core/dist/entries/dashboard';
 import { getDashboardColumns } from '@tonkeeper/core/dist/service/proService';
-import { useProState } from '../pro';
+import { useProSubscription } from '../pro';
 
 export type DashboardColumnsForm = { id: string; isEnabled: boolean }[];
 
@@ -21,7 +21,7 @@ export const ClientColumns: (Omit<DashboardColumn, 'name'> & { i18Key: string })
 export function useDashboardColumnsForm() {
     const client = useQueryClient();
     const { storage } = useAppSdk();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProSubscription();
 
     const { data: columns } = useDashboardColumns();
 
@@ -44,7 +44,7 @@ export function useDashboardColumnsForm() {
                         return {
                             id: storedColumn.id,
                             isEnabled:
-                                columnInfo.onlyPro && !proState?.subscription.valid
+                                columnInfo.onlyPro && !subscription?.isActive
                                     ? false
                                     : storedColumn.isEnabled ?? columnInfo.defaultIsChecked
                         };
@@ -55,18 +55,17 @@ export function useDashboardColumnsForm() {
                     .filter(c => stored.every(s => s.id !== c.id))
                     .map(c => ({
                         id: c.id,
-                        isEnabled:
-                            c.onlyPro && !proState?.subscription.valid ? false : c.defaultIsChecked
+                        isEnabled: c.onlyPro && !subscription?.isActive ? false : c.defaultIsChecked
                     }));
                 return storedList.concat(newColumns);
             }
             return columns.map(c => ({
                 id: c.id,
-                isEnabled: c.onlyPro && !proState?.subscription.valid ? false : c.defaultIsChecked
+                isEnabled: c.onlyPro && !subscription?.isActive ? false : c.defaultIsChecked
             }));
         },
         {
-            enabled: !!columns && !!proState
+            enabled: !!columns && !!subscription
         }
     );
 
