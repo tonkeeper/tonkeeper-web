@@ -1,8 +1,9 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { ProductIds } from '@tonkeeper/core/dist/entries/pro';
+import { type IProductInfo } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Body3, Label2 } from '../Text';
+import { SkeletonText } from '../shared/Skeleton';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 
@@ -20,52 +21,73 @@ const Body2Styled = styled(Body2)`
     color: ${p => p.theme.textSecondary};
 `;
 
+const ListItemStyled = styled(ListItem)`
+    &:not(:first-child) > div {
+        padding-top: 10px;
+    }
+`;
+
 const ListItemPayloadStyled = styled(ListItemPayload)`
     padding-top: 10px;
     padding-bottom: 10px;
 `;
 
-interface IProProduct {
-    id: ProductIds;
-    titleKey: string;
-    price: string;
-}
+const SkeletonTextStyled = styled(SkeletonText)`
+    height: 20px;
+`;
 
-const IOS_PRODUCTS: IProProduct[] = [
-    {
-        id: ProductIds.MONTHLY,
-        titleKey: 'one_month',
-        price: '$2.99'
-    },
-    {
-        id: ProductIds.YEARLY,
-        titleKey: 'one_year',
-        price: '$24.99'
-    }
-];
+const normalizeKey = (str: string): string => {
+    return str.trim().toLowerCase().replace(/\s+/g, '_');
+};
+
+const getSkeletonProducts = (skeletonSize = 2) =>
+    Array.from({ length: skeletonSize }, (_, index) => ({
+        id: index,
+        displayName: null,
+        displayPrice: null
+    }));
 
 interface IProps {
     className?: string;
     removeTitle?: boolean;
-    products?: IProProduct[];
+    skeletonSize?: number;
+    products?: IProductInfo[];
 }
 
 const ProPricesListContent: FC<IProps> = props => {
-    const { className, removeTitle = false, products = IOS_PRODUCTS } = props;
+    const { className, removeTitle = false, products, skeletonSize } = props;
     const { t } = useTranslation();
+
+    const productsForRender = products?.length ? products : getSkeletonProducts(skeletonSize);
 
     return (
         <div className={className}>
             {!removeTitle && <Title>{t('prices')}</Title>}
             <ListBlock fullWidth margin={false}>
-                {products.map(({ id, titleKey, price }) => (
-                    <ListItem key={id}>
-                        <ListItemPayloadStyled>
-                            <Body2Styled>{t(titleKey)}</Body2Styled>
-                            <Label2>{price}</Label2>
-                        </ListItemPayloadStyled>
-                    </ListItem>
-                ))}
+                {productsForRender.map(productProps => {
+                    const { id, displayName, displayPrice } = productProps;
+
+                    const titleNode = displayName ? (
+                        <Body2Styled>{t(normalizeKey(displayName))}</Body2Styled>
+                    ) : (
+                        <SkeletonTextStyled width="100px" />
+                    );
+
+                    const priceNode = displayPrice ? (
+                        <Label2>{displayPrice}</Label2>
+                    ) : (
+                        <SkeletonTextStyled width="100px" />
+                    );
+
+                    return (
+                        <ListItemStyled key={id}>
+                            <ListItemPayloadStyled>
+                                {titleNode}
+                                {priceNode}
+                            </ListItemPayloadStyled>
+                        </ListItemStyled>
+                    );
+                })}
             </ListBlock>
         </div>
     );

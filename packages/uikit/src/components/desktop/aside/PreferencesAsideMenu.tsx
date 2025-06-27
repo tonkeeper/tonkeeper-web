@@ -32,6 +32,9 @@ import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -95,8 +98,23 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { data: uiPreferences } = useUserUIPreferences();
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
+    const navigate = useNavigate();
+
+    const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
 
     const availableThemes = useAvailableThemes();
+
+    const isTonkeeperProActive = location.pathname === AppRoute.settings + SettingsRoute.pro;
+
+    const handleTonkeeperProClick = async () => {
+        const hasPromoBeenShown = await sdk.storage.get<boolean>(AppKey.PRO_HAS_PROMO_BEEN_SHOWN);
+
+        if (hasPromoBeenShown) {
+            navigate(AppRoute.settings + SettingsRoute.pro);
+        } else {
+            onProFeaturesOpen();
+        }
+    };
 
     return (
         <PreferencesAsideContainer className={className}>
@@ -118,14 +136,13 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     )}
                 </NavLink>
                 <HideOnReview>
-                    <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive}>
-                                <TonkeeperSkeletIcon />
-                                <Label2>{t('tonkeeper_pro')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
+                    <AsideMenuItemStyled
+                        onClick={handleTonkeeperProClick}
+                        isSelected={isTonkeeperProActive}
+                    >
+                        <TonkeeperSkeletIcon />
+                        <Label2>{t('tonkeeper_pro')}</Label2>
+                    </AsideMenuItemStyled>
                 </HideOnReview>
                 {proState?.subscription.valid && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
