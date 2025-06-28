@@ -1,4 +1,4 @@
-import { MutableRefObject, Ref, RefCallback, useEffect, useRef } from "react";
+import { MutableRefObject, Ref, RefCallback, useEffect, useRef } from 'react';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 
 export const scrollToTop = () => {
@@ -41,6 +41,10 @@ export function randomIntFromInterval(min: number, max: number) {
 }
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const normalizeTranslationKey = (str: string): string => {
+    return str.trim().toLowerCase().replace(/\s+/g, '_');
+};
 
 export const getLanguageName = (language: string, locale?: string) => {
     return capitalize(
