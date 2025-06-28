@@ -4,8 +4,60 @@ import { type IProductInfo } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Body3, Label2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
+import { getSkeletonProducts } from '../../libs/pro';
 import { useTranslation } from '../../hooks/translation';
+import { normalizeTranslationKey } from '../../libs/common';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
+
+interface IProps {
+    className?: string;
+    removeTitle?: boolean;
+    skeletonSize?: number;
+    products?: IProductInfo[];
+}
+
+const ProPricesListContent: FC<IProps> = props => {
+    const { className, removeTitle = false, products, skeletonSize } = props;
+    const { t } = useTranslation();
+
+    const productsForRender = products?.length ? products : getSkeletonProducts(skeletonSize);
+
+    return (
+        <div className={className}>
+            {!removeTitle && <Title>{t('prices')}</Title>}
+            <ListBlock fullWidth margin={false}>
+                {productsForRender.map(productProps => {
+                    const { id, displayName, displayPrice } = productProps;
+
+                    const titleNode = displayName ? (
+                        <Body2Styled>{t(normalizeTranslationKey(displayName))}</Body2Styled>
+                    ) : (
+                        <SkeletonTextStyled width="100px" />
+                    );
+
+                    const priceNode = displayPrice ? (
+                        <Label2>{displayPrice}</Label2>
+                    ) : (
+                        <SkeletonTextStyled width="100px" />
+                    );
+
+                    return (
+                        <ListItemStyled key={id}>
+                            <ListItemPayloadStyled>
+                                {titleNode}
+                                {priceNode}
+                            </ListItemPayloadStyled>
+                        </ListItemStyled>
+                    );
+                })}
+            </ListBlock>
+        </div>
+    );
+};
+
+export const ProPricesList = styled(ProPricesListContent)`
+    width: 100%;
+`;
 
 const Text = styled(Body3)`
     display: block;
@@ -34,65 +86,4 @@ const ListItemPayloadStyled = styled(ListItemPayload)`
 
 const SkeletonTextStyled = styled(SkeletonText)`
     height: 20px;
-`;
-
-const normalizeKey = (str: string): string => {
-    return str.trim().toLowerCase().replace(/\s+/g, '_');
-};
-
-const getSkeletonProducts = (skeletonSize = 2) =>
-    Array.from({ length: skeletonSize }, (_, index) => ({
-        id: index,
-        displayName: null,
-        displayPrice: null
-    }));
-
-interface IProps {
-    className?: string;
-    removeTitle?: boolean;
-    skeletonSize?: number;
-    products?: IProductInfo[];
-}
-
-const ProPricesListContent: FC<IProps> = props => {
-    const { className, removeTitle = false, products, skeletonSize } = props;
-    const { t } = useTranslation();
-
-    const productsForRender = products?.length ? products : getSkeletonProducts(skeletonSize);
-
-    return (
-        <div className={className}>
-            {!removeTitle && <Title>{t('prices')}</Title>}
-            <ListBlock fullWidth margin={false}>
-                {productsForRender.map(productProps => {
-                    const { id, displayName, displayPrice } = productProps;
-
-                    const titleNode = displayName ? (
-                        <Body2Styled>{t(normalizeKey(displayName))}</Body2Styled>
-                    ) : (
-                        <SkeletonTextStyled width="100px" />
-                    );
-
-                    const priceNode = displayPrice ? (
-                        <Label2>{displayPrice}</Label2>
-                    ) : (
-                        <SkeletonTextStyled width="100px" />
-                    );
-
-                    return (
-                        <ListItemStyled key={id}>
-                            <ListItemPayloadStyled>
-                                {titleNode}
-                                {priceNode}
-                            </ListItemPayloadStyled>
-                        </ListItemStyled>
-                    );
-                })}
-            </ListBlock>
-        </div>
-    );
-};
-
-export const ProPricesList = styled(ProPricesListContent)`
-    width: 100%;
 `;
