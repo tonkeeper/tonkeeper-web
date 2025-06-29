@@ -12,11 +12,10 @@ import { ProPricesList } from '../../pro/ProPricesList';
 import { ProFeaturesList } from '../../pro/ProFeaturesList';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { ProFreeAccessContent } from '../../pro/ProFreeAccess';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
-import { useFreeProAccessAvailable, useProState } from '../../../state/pro';
+import { useProState } from '../../../state/pro';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { useGetAllProductsInfo } from '../../../hooks/pro/useGetAllProductsInfo';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
@@ -26,32 +25,13 @@ interface IProFeaturesNotificationProps {
     onClose: () => void;
 }
 
-export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isOpen, onClose }) => {
-    const isFreeSubscriptionAvailable = useFreeProAccessAvailable();
-
-    if (isFreeSubscriptionAvailable) {
-        return (
-            <HideOnReview>
-                <Notification isOpen={isOpen} handleClose={onClose}>
-                    {() => (
-                        <ProFreeAccessContent
-                            access={isFreeSubscriptionAvailable}
-                            onSubmit={onClose}
-                        />
-                    )}
-                </Notification>
-            </HideOnReview>
-        );
-    }
-
-    return (
-        <HideOnReview>
-            <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-                {() => <ProFeaturesNotificationContent onClose={onClose} />}
-            </NotificationStyled>
-        </HideOnReview>
-    );
-};
+export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isOpen, onClose }) => (
+    <HideOnReview>
+        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+            {() => <ProFeaturesNotificationContent onClose={onClose} />}
+        </NotificationStyled>
+    </HideOnReview>
+);
 
 export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationProps, 'onClose'>> = ({
     onClose
