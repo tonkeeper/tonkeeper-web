@@ -1,28 +1,25 @@
 import { FC, useEffect } from 'react';
 import { styled } from 'styled-components';
+import { IProductInfo } from '@tonkeeper/core/dist/entries/pro';
 
-import { useTranslation } from '../../../hooks/translation';
-import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useFreeProAccessAvailable, useProState } from '../../../state/pro';
-import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
-import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
-import { HideOnReview } from '../../ios/HideOnReview';
-import { ProFreeAccessContent } from '../../pro/ProFreeAccess';
 import { ChevronRightIcon } from '../../Icon';
-import { ProFeaturesList } from '../../pro/ProFeaturesList';
-import { ProPricesList } from '../../pro/ProPricesList';
-import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
-import { AppRoute, SettingsRoute } from '../../../libs/routes';
-import { useNavigate } from '../../../hooks/router/useNavigate';
-import { useGetAllProductsInfo } from '../../../hooks/pro/useGetAllProductsInfo';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-
-const NotificationStyled = styled(Notification)`
-    max-width: 768px;
-`;
+import { HideOnReview } from '../../ios/HideOnReview';
+import { ProPricesList } from '../../pro/ProPricesList';
+import { ProFeaturesList } from '../../pro/ProFeaturesList';
+import { useTranslation } from '../../../hooks/translation';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { ProFreeAccessContent } from '../../pro/ProFreeAccess';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
+import { useFreeProAccessAvailable, useProState } from '../../../state/pro';
+import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
+import { useGetAllProductsInfo } from '../../../hooks/pro/useGetAllProductsInfo';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -56,17 +53,7 @@ export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isO
     );
 };
 
-const ContentWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    padding-top: 1rem;
-    overflow: hidden;
-`;
-
-type ProFeaturesNotificationContentProps = Pick<IProFeaturesNotificationProps, 'onClose'>;
-export const ProFeaturesNotificationContent: FC<ProFeaturesNotificationContentProps> = ({
+export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationProps, 'onClose'>> = ({
     onClose
 }) => {
     const sdk = useAppSdk();
@@ -107,6 +94,7 @@ export const ProFeaturesNotificationContent: FC<ProFeaturesNotificationContentPr
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlockStyled
+                        products={products}
                         onBuy={handlePurchaseClick}
                         onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
                     />
@@ -117,24 +105,20 @@ export const ProFeaturesNotificationContent: FC<ProFeaturesNotificationContentPr
     );
 };
 
-const ButtonStyled = styled(Button)`
-    color: ${p => p.theme.textSecondary};
-    background-color: transparent;
-`;
-
 interface IButtonBlock {
     onBuy: () => void;
     onTrial?: () => void;
     className?: string;
+    products: IProductInfo[];
 }
 
 const ButtonsBlock: FC<IButtonBlock> = props => {
-    const { onBuy, onTrial, className } = props;
+    const { onBuy, onTrial, className, products } = props;
     const { t } = useTranslation();
 
     return (
         <div className={className}>
-            <Button size="large" fullWidth primary onClick={onBuy}>
+            <Button size="large" fullWidth primary onClick={onBuy} loading={!products.length}>
                 <Label2>{t('get_tonkeeper_pro')}</Label2>
             </Button>
             {onTrial && (
@@ -146,6 +130,24 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
         </div>
     );
 };
+
+const ContentWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    overflow: hidden;
+`;
+
+const NotificationStyled = styled(Notification)`
+    max-width: 768px;
+`;
+
+const ButtonStyled = styled(Button)`
+    color: ${p => p.theme.textSecondary};
+    background-color: transparent;
+`;
 
 const ButtonsBlockStyled = styled(ButtonsBlock)`
     display: flex;
