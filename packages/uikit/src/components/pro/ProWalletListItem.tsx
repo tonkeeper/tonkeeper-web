@@ -38,7 +38,6 @@ export const ProWalletListItem: FC<IProWalletListItemProps> = props => {
 };
 
 const Body2Limited = styled(Body2)`
-    max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

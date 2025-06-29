@@ -37,7 +37,7 @@ export const ProActiveWallet = () => {
 
 const ButtonStyled = styled(Button)`
     height: 0;
-    padding: 0;
+    padding: 0 0 0 1rem;
     margin-left: auto;
     background: none;
     color: ${props => props.theme.textAccent};
