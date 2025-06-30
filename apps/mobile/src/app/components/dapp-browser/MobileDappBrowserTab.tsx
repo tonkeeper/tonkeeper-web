@@ -4,7 +4,8 @@ import {
     LoadingBrowserTab,
     useChangeBrowserTab,
     useCloseActiveBrowserTab,
-    useHideActiveBrowserTab
+    useHideActiveBrowserTab,
+    useOpenBrowserTab
 } from '@tonkeeper/uikit/dist/state/dapp-browser';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
@@ -22,6 +23,7 @@ import {
     DisconnectIcon,
     EllipsisIcon,
     PinIconOutline,
+    PlusIcon,
     RefreshIcon,
     ShareIcon,
     UnpinIconOutline
@@ -170,9 +172,8 @@ const TabHeaderWrapper = styled.div`
     justify-content: space-between;
     width: 100%;
     position: relative;
-}
 
-    .dd-select-container {
+    & .dd-select-container {
         max-height: unset;
         width: fit-content;
     }
@@ -226,13 +227,14 @@ const TabHeader: FC<{
     const { mutate: closeTab } = useCloseActiveBrowserTab();
 
     const onDrowDownStatusChange = useCallback((isOpen: boolean) => {
-        CapacitorDappBrowser.setIsMainViewInFocus(isOpen);
+        CapacitorDappBrowser.setIsMainViewInFocus('tab-header-dd', isOpen);
     }, []);
 
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { mutate: disconnect } = useDisconnectInjectedTonConnectAppFromAllWallets();
     const { mutate: changeTab } = useChangeBrowserTab();
+    const { mutate: openNewTab } = useOpenBrowserTab();
     const countryContextTrack = useCountryContextTracker();
     const track = useAnalyticsTrack();
 
@@ -256,6 +258,18 @@ const TabHeader: FC<{
                     onStatusChange={onDrowDownStatusChange}
                     payload={closeDropDown => (
                         <DropDownContent>
+                            <DropDownItemStyled
+                                onClick={() => {
+                                    closeDropDown();
+                                    openNewTab('blanc');
+                                }}
+                            >
+                                <Label2> {t('browser_new_tab')}</Label2>
+                                <DropDownRightIcon>
+                                    <PlusIcon />
+                                </DropDownRightIcon>
+                            </DropDownItemStyled>
+                            <DropDownItemsDivider />
                             <DropDownItemStyled
                                 onClick={() => {
                                     closeDropDown();

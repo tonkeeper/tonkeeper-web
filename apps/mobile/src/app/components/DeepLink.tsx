@@ -66,7 +66,7 @@ const useInjectedBridgeConnectionSubscription = (
                     }
                     ref.current = { resolve, reject };
 
-                    await CapacitorDappBrowser.setIsMainViewInFocus(true);
+                    await CapacitorDappBrowser.setIsMainViewInFocus('tc-connect', true);
                     setParams({
                         type: 'injected',
                         protocolVersion: 2,
@@ -146,7 +146,7 @@ export const DeepLinkSubscription = () => {
                 });
             } finally {
                 setParams(null);
-                await CapacitorDappBrowser.setIsMainViewInFocus(false);
+                await CapacitorDappBrowser.setIsMainViewInFocus('tc-connect', false);
             }
         } else {
             try {

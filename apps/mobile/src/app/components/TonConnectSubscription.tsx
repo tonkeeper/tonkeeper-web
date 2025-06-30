@@ -44,7 +44,7 @@ const useInjectedBridgeRequestsSubscription = (
                     }
                     ref.current = { resolve, reject };
 
-                    await CapacitorDappBrowser.setIsMainViewInFocus(true);
+                    await CapacitorDappBrowser.setIsMainViewInFocus('tc-action', true);
                     setRequest(request);
                 });
             }
@@ -147,7 +147,7 @@ export const TonConnectSubscription = () => {
                     return;
                 } finally {
                     setRequest(undefined);
-                    await CapacitorDappBrowser.setIsMainViewInFocus(false);
+                    await CapacitorDappBrowser.setIsMainViewInFocus('tc-action', false);
                 }
             } else {
                 try {
