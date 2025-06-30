@@ -129,6 +129,10 @@ interface EmptySubscription extends Omit<BaseSubscription, 'expiresAt'> {
 
 export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
     source: SubscriptionSources.CRYPTO;
+    getAllProductsInfo(
+        lang: Language | undefined,
+        promoCode?: string
+    ): Promise<[ProServiceTier[] | undefined, string | undefined]>;
 }
 
 export enum CryptoSubscriptionStatuses {
@@ -136,6 +140,18 @@ export enum CryptoSubscriptionStatuses {
     TRIAL = 'trial',
     ACTIVE = 'active',
     EXPIRED = 'expired'
+}
+
+export function isCryptoStrategy(
+    strategy?: SubscriptionStrategy
+): strategy is ICryptoSubscriptionStrategy {
+    return strategy?.source === SubscriptionSources.CRYPTO;
+}
+
+export interface IDisplayPlan {
+    id: string;
+    displayName: string;
+    displayPrice: string;
 }
 
 // TODO REMOVE BELOW
