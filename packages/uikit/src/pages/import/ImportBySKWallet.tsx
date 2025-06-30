@@ -102,33 +102,37 @@ export const ImportBySKWallet: FC<{
 
     const { mutate: onSKSubmit, isLoading: isSubmitingSk } = useMutation(
         async (secretKey: string) => {
-            const possibleAccount = await createStandardTonAccountBySK(
-                context,
-                sdk.storage,
-                { key: secretKey, algorithm: signingAlgorithm },
-                {
-                    auth: {
-                        kind: 'keychain'
-                    },
-                    versions: [
-                        WalletVersion.V5R1,
-                        WalletVersion.V5_BETA,
-                        WalletVersion.V4R2,
-                        WalletVersion.V3R2,
-                        WalletVersion.V3R1
-                    ]
-                }
-            );
+            try {
+                const possibleAccount = await createStandardTonAccountBySK(
+                    context,
+                    sdk.storage,
+                    { key: secretKey, algorithm: signingAlgorithm },
+                    {
+                        auth: {
+                            kind: 'keychain'
+                        },
+                        versions: [
+                            WalletVersion.V5R1,
+                            WalletVersion.V5_BETA,
+                            WalletVersion.V4R2,
+                            WalletVersion.V3R2,
+                            WalletVersion.V3R1
+                        ]
+                    }
+                );
 
-            const existingAccount = accounts.find(a => a.id === possibleAccount.id);
-            if (existingAccount) {
-                setExistingAccountAndWallet({
-                    account: existingAccount,
-                    walletId: existingAccount.activeTonWallet.id
-                });
-                return;
+                const existingAccount = accounts.find(a => a.id === possibleAccount.id);
+                if (existingAccount) {
+                    setExistingAccountAndWallet({
+                        account: existingAccount,
+                        walletId: existingAccount.activeTonWallet.id
+                    });
+                    return;
+                }
+                setAccountCandidate({ account: possibleAccount, sk: secretKey });
+            } catch (e) {
+                sdk.topMessage('Failed to process secret key');
             }
-            setAccountCandidate({ account: possibleAccount, sk: secretKey });
         }
     );
 
