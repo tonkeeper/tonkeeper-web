@@ -1,9 +1,8 @@
 import { useContext } from 'react';
 
-import { SubscriptionScreens } from '../../enums/pro';
-import { ScreenContext } from '../../components/create/SubscriptionFlowContext';
+import { IScreenState, ScreenContext } from '../../components/create/SubscriptionFlowContext';
 
-export const useSubscriptionScreen = (): SubscriptionScreens => {
+export const useSubscriptionScreen = (): IScreenState => {
     const ctx = useContext(ScreenContext);
 
     if (ctx === null) {

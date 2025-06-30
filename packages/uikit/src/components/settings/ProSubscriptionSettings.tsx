@@ -1,5 +1,6 @@
 import { type FC } from 'react';
 import styled from 'styled-components';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 import { CloseIcon } from '../Icon';
 import { InnerBody } from '../Body';
@@ -10,7 +11,9 @@ import {
 } from '../desktop/DesktopViewLayout';
 import { SubHeader } from '../SubHeader';
 import { AppRoute } from '../../libs/routes';
+import { duration } from '../transfer/common';
 import { HideOnReview } from '../ios/HideOnReview';
+import { isDirectionForward } from '../../libs/pro';
 import { SubscriptionScreens } from '../../enums/pro';
 import { ProStatusScreen } from '../pro/ProStatusScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -20,6 +23,7 @@ import { ProAccountChooseScreen } from '../pro/ProAccountChooseScreen';
 import { ProPurchaseChooseScreen } from '../pro/ProPurchaseChooseScreen';
 import { useSubscriptionScreen } from '../../hooks/pro/useSubscriptionScreen';
 import { SubscriptionFlowProvider } from '../../providers/SubscriptionFlowProvider';
+import { leftToTight, rightToLeft, SlideAnimation } from '../shared/SlideAnimation';
 
 const SCREENS_MAP = {
     [SubscriptionScreens.ACCOUNTS]: <ProAccountChooseScreen />,
@@ -28,7 +32,7 @@ const SCREENS_MAP = {
 };
 
 export const ProSettingsContent: FC = () => {
-    const screen = useSubscriptionScreen();
+    const { currentScreen, prevScreen } = useSubscriptionScreen();
     const navigate = useNavigate();
 
     const handleCloseClick = () => {
@@ -48,7 +52,22 @@ export const ProSettingsContent: FC = () => {
                 />
             </DesktopViewHeader>
 
-            {SCREENS_MAP[screen]}
+            <AnimatedScreensWrapper>
+                <TransitionGroup component={null}>
+                    <CSSTransition
+                        key={currentScreen}
+                        timeout={duration}
+                        unmountOnExit
+                        classNames={
+                            isDirectionForward(currentScreen, prevScreen)
+                                ? rightToLeft
+                                : leftToTight
+                        }
+                    >
+                        {SCREENS_MAP[currentScreen]}
+                    </CSSTransition>
+                </TransitionGroup>
+            </AnimatedScreensWrapper>
         </>
     );
 };
@@ -83,3 +102,10 @@ export const ProSubscriptionSettings: FC = () => {
         </HideOnReview>
     );
 };
+
+const AnimatedScreensWrapper = styled(SlideAnimation)`
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+    box-sizing: border-box;
+    height: 100%;
+`;
