@@ -5,7 +5,7 @@ import { CenterContainer } from '../Layout';
 import { H2Label2Responsive } from '../Text';
 import { ButtonResponsiveSize } from '../fields/Button';
 import { TextArea } from '../fields/Input';
-import { isValidSKOrSeed } from '@tonkeeper/core/dist/service/mnemonicService';
+import { isValidSeed, isValidSKOrSeed } from '@tonkeeper/core/dist/service/mnemonicService';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { SKSigningAlgorithm } from '@tonkeeper/core/dist/service/sign';
 
@@ -38,7 +38,10 @@ export const SKInput: FC<{
         if (!touched) {
             return;
         }
-        if (!sk || !isValidSKOrSeed(sk)) {
+
+        const validator = signingAlgorithm === 'fireblocks' ? isValidSeed : isValidSKOrSeed;
+
+        if (!sk || !validator(sk)) {
             setError(true);
         } else {
             setError(false);
@@ -73,7 +76,11 @@ export const SKInput: FC<{
                     onChange={onChange}
                     isValid={!error}
                     label={t('recovery_wallet_secret_key')}
-                    helpText={t('sk_input_label')}
+                    helpText={
+                        signingAlgorithm === 'fireblocks'
+                            ? t('sk_input_label_fireblocks')
+                            : t('sk_input_label')
+                    }
                 />
                 <NotificationFooterPortal>
                     <NotificationFooter>

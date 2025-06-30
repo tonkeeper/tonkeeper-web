@@ -110,9 +110,14 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
 
     const accounts = useAccountsState();
     const { data: activeAccount } = useActiveAccountQuery();
-    const canAddMultisig =
-        accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount?.type !== 'testnet';
 
+    const canHaveProSubscription = accounts.some(
+        acc => acc.type === 'mnemonic' || acc.type === 'mam'
+    );
+    const canAddMultisig =
+        accounts.some(acc => isAccountCanManageMultisigs(acc)) &&
+        activeAccount?.type !== 'testnet' &&
+        canHaveProSubscription;
     const { mutateAsync: securityCheck } = useSecurityCheck();
 
     const onSelect = async (method: AddWalletMethod) => {
@@ -213,7 +218,7 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                     </AddMethodText>
                     <RightIconStyled />
                 </AddMethod>
-                {!hideFireblocks && (
+                {!hideFireblocks && canHaveProSubscription && (
                     <HideOnReview>
                         <AddMethod onClick={() => onSelect('sk_fireblocks')}>
                             <ButtonIcon>
