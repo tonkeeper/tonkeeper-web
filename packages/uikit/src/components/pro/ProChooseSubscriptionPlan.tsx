@@ -1,6 +1,6 @@
-import type { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import { ChangeEvent, Dispatch, FC, SetStateAction, useEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { IProductInfo, isProductId, ProductIds } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan, isProductId } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Body3, Num2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
@@ -9,15 +9,21 @@ import { useTranslation } from '../../hooks/translation';
 import { normalizeTranslationKey } from '../../libs/common';
 
 interface IProps {
-    productsForRender: ReturnType<typeof getSkeletonProducts> | IProductInfo[];
+    productsForRender: ReturnType<typeof getSkeletonProducts> | IDisplayPlan[];
     selectedPlan: string;
-    onPlanSelection: Dispatch<SetStateAction<ProductIds>>;
+    onPlanSelection: Dispatch<SetStateAction<string>>;
     isLoading: boolean;
 }
 
 export const ProChooseSubscriptionPlan: FC<IProps> = props => {
     const { productsForRender, selectedPlan, onPlanSelection, isLoading } = props;
     const { t } = useTranslation();
+
+    useEffect(() => {
+        if (selectedPlan || productsForRender?.length < 1) return;
+
+        onPlanSelection(String(productsForRender[0].id));
+    }, [productsForRender, selectedPlan]);
 
     const handlePlanSelection = (e: ChangeEvent<HTMLInputElement>) => {
         if (isProductId(e.target.value)) {

@@ -1,6 +1,5 @@
 import { FC, useId } from 'react';
 import { styled } from 'styled-components';
-import { IProductInfo } from '@tonkeeper/core/dist/entries/pro';
 
 import {
     Notification,
@@ -11,18 +10,19 @@ import {
 import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { ChevronRightIcon } from '../../Icon';
-import { useProState } from '../../../state/pro';
 import { handleSubmit } from '../../../libs/form';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { ProPricesList } from '../../pro/ProPricesList';
+import { adaptPlansToViewModel } from '../../../libs/pro';
 import { ProFeaturesList } from '../../pro/ProFeaturesList';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
+import { useProPlans, useProState } from '../../../state/pro';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useNotifyError } from '../../../hooks/useNotification';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
-import { useGetAllProductsInfo } from '../../../hooks/pro/useGetAllProductsInfo';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -42,7 +42,6 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
 }) => {
     const formId = useId();
     const { data } = useProState();
-    const products = useGetAllProductsInfo();
     const navigate = useNavigate();
     const {
         isOpen: isTrialModalOpen,
@@ -50,13 +49,20 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
+    const { data: products, error, isError, isLoading, refetch } = useProPlans();
+    useNotifyError(error);
+
     if (!data) {
         return null;
     }
 
     const handlePurchasePro = () => {
-        onClose();
-        navigate(AppRoute.settings + SettingsRoute.pro);
+        if (isError) {
+            void refetch();
+        } else {
+            onClose();
+            navigate(AppRoute.settings + SettingsRoute.pro);
+        }
     };
 
     const onTrialClose = (confirmed?: boolean) => {
@@ -69,13 +75,14 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
     return (
         <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
             <ProSubscriptionHeader />
-            <ProPricesList products={products} />
+            <ProPricesList displayPlans={adaptPlansToViewModel(products)} />
             <ProFeaturesList />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlockStyled
                         formId={formId}
-                        products={products}
+                        isError={isError}
+                        isLoading={isLoading}
                         onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
                     />
                 </NotificationFooter>
@@ -89,24 +96,18 @@ interface IButtonBlock {
     formId: string;
     onTrial?: () => void;
     className?: string;
-    products: IProductInfo[];
+    isError: boolean;
+    isLoading: boolean;
 }
 
 const ButtonsBlock: FC<IButtonBlock> = props => {
-    const { formId, onTrial, className, products } = props;
+    const { formId, onTrial, className, isError, isLoading } = props;
     const { t } = useTranslation();
 
     return (
         <div className={className}>
-            <Button
-                primary
-                fullWidth
-                size="large"
-                type="submit"
-                form={formId}
-                loading={!products.length}
-            >
-                <Label2>{t('get_tonkeeper_pro')}</Label2>
+            <Button primary fullWidth size="large" type="submit" form={formId} loading={isLoading}>
+                <Label2>{t(isError ? 'try_again' : 'get_tonkeeper_pro')}</Label2>
             </Button>
             {onTrial && (
                 <ButtonStyled fullWidth secondary onClick={onTrial}>

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { type IProductInfo } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Body3, Label2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
@@ -13,21 +13,23 @@ interface IProps {
     className?: string;
     removeTitle?: boolean;
     skeletonSize?: number;
-    products?: IProductInfo[];
+    displayPlans?: IDisplayPlan[];
 }
 
 const ProPricesListContent: FC<IProps> = props => {
-    const { className, removeTitle = false, products, skeletonSize } = props;
+    const { className, removeTitle = false, displayPlans, skeletonSize } = props;
     const { t } = useTranslation();
 
-    const productsForRender = products?.length ? products : getSkeletonProducts(skeletonSize);
+    const productsForRender = displayPlans?.length
+        ? displayPlans
+        : getSkeletonProducts(skeletonSize);
 
     return (
         <div className={className}>
             {!removeTitle && <Title>{t('prices')}</Title>}
             <ListBlock fullWidth margin={false}>
-                {productsForRender.map(productProps => {
-                    const { id, displayName, displayPrice } = productProps;
+                {productsForRender.map(planProps => {
+                    const { id, displayName, displayPrice } = planProps;
 
                     const titleNode = displayName ? (
                         <Body2Styled>{t(normalizeTranslationKey(displayName))}</Body2Styled>

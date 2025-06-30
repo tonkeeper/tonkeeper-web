@@ -1,5 +1,8 @@
 // export type ProSubscription = IosSubscription | CryptoSubscription | EmptySubscription;
 
+import { ProServiceTier } from '../tonConsoleApi';
+import { Language } from './language';
+
 export type IosSubscription = IosActiveSubscription | IosRevokedSubscription;
 
 export type CryptoSubscription =
@@ -8,6 +11,10 @@ export type CryptoSubscription =
     | CryptoFreeSubscription;
 
 export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
+
+export type NormalizedProPlans =
+    | { source: SubscriptionSources.IOS; plans: IProductInfo[] }
+    | { source: SubscriptionSources.CRYPTO; plans: ProServiceTier[]; promoCode?: string };
 
 export enum SubscriptionSources {
     IOS = 'ios',

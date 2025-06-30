@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     IosSubscriptionStatuses,
+    NormalizedProPlans,
     ProductIds,
     ProState,
     ProStateAuthorized,
@@ -9,13 +10,12 @@ import {
     SubscriptionSources
 } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
     createRecipient,
     getBackupState,
-    getProServiceTiers,
     getProState,
     logoutTonConsole,
     ProAuthTokenService,
@@ -25,7 +25,6 @@ import {
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
-import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv, useIsCapacitorApp } from '../hooks/appSdk';
@@ -43,6 +42,7 @@ import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useToast } from '../hooks/useNotification';
 import { useAnalyticsTrack } from '../hooks/analytics';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export type FreeProAccess = {
     code: string;
@@ -272,25 +272,45 @@ export const useProLogout = () => {
 };
 
 export const useProPlans = (promoCode?: string) => {
+    const sdk = useAppSdk();
     const { data: lang } = useUserLanguage();
 
-    const all = useQuery<ProServiceTier[], Error>([QueryKey.pro, 'plans', lang], () =>
-        getProServiceTiers(lang)
-    );
+    return useQuery<NormalizedProPlans, Error>(
+        [QueryKey.pro, QueryKey.plans, lang, promoCode ?? null],
+        async () => {
+            const strategy = sdk.subscriptionStrategy;
 
-    const promo = useQuery<ProServiceTier[], Error>(
-        [QueryKey.pro, 'promo', lang, promoCode],
-        () => getProServiceTiers(lang, promoCode !== '' ? promoCode : undefined),
-        { enabled: promoCode !== '' }
-    );
+            if (!strategy) {
+                throw new Error('pro_subscription_load_failed');
+            }
 
-    return useMemo<[ProServiceTier[] | undefined, string | undefined]>(() => {
-        if (!promo.data) {
-            return [all.data, undefined];
-        } else {
-            return [promo.data, promoCode];
+            switch (strategy.source) {
+                case SubscriptionSources.IOS: {
+                    const plans = await strategy.getAllProductsInfo();
+                    return { source: SubscriptionSources.IOS, plans };
+                }
+
+                case SubscriptionSources.CRYPTO: {
+                    const [plans, verifiedCode] = await strategy.getAllProductsInfo(
+                        lang,
+                        promoCode
+                    );
+                    return {
+                        source: SubscriptionSources.CRYPTO,
+                        plans: plans ?? [],
+                        promoCode: verifiedCode
+                    };
+                }
+
+                default:
+                    return assertUnreachable(strategy);
+            }
+        },
+        {
+            staleTime: 5 * 60 * 1000,
+            retry: 3
         }
-    }, [all.data, promo.data]);
+    );
 };
 
 export interface ConfirmState {
