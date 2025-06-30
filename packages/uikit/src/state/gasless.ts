@@ -3,6 +3,7 @@ import { QueryKey } from '../libs/queryKey';
 import { GaslessApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useMemo } from 'react';
 import { useActiveApi } from './wallet';
+import { CountryFeature, useIsFeatureAvailableForRegulatoryState } from './country';
 
 export const useGaslessApi = () => {
     const api = useActiveApi();
@@ -29,4 +30,8 @@ export const useGaslessConfig = () => {
         throw new Error('Gasless config not found');
     }
     return data;
+};
+
+export const useIsGaslessEnabledGlobally = () => {
+    return useIsFeatureAvailableForRegulatoryState(CountryFeature.gasless);
 };
