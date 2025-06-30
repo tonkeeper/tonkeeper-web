@@ -214,14 +214,20 @@ class TabRateLimiter {
     }
 
     @objc func hide(_ call: CAPPluginCall) {
-        guard let id = call.getString("id"),
-              let webView = webViews[id] else {
-            call.reject("No WebView with id '\(call.getString("id") ?? "")'")
-            return
-        }
+        let id = call.getString("id")
 
         DispatchQueue.main.async {
-            webView.isHidden = true
+            if let id, let webView = self.webViews[id] {
+                webView.isHidden = true
+            } else if id == nil {
+                for webView in self.webViews.values {
+                    webView.isHidden = true
+                }
+            } else {
+                call.reject("No WebView with id '\(id)'")
+                return
+            }
+
             self.routerView?.focusDappView = false
             call.resolve()
         }

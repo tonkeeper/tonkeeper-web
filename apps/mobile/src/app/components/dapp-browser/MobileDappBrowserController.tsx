@@ -46,9 +46,14 @@ const useRegisterTabChangeListener = () => {
 const useRegisterViewFocusListener = () => {
     const { isOpen: isAsideOpen } = useMenuController('aside-nav');
     const { isOpen: isWalletMenuOpen } = useMenuController('wallet-nav');
+
     useEffect(() => {
-        CapacitorDappBrowser.setIsMainViewInFocus(isAsideOpen || isWalletMenuOpen);
-    }, [isAsideOpen, isWalletMenuOpen]);
+        CapacitorDappBrowser.setIsMainViewInFocus('wallet-nav', isWalletMenuOpen);
+    }, [isWalletMenuOpen]);
+
+    useEffect(() => {
+        CapacitorDappBrowser.setIsMainViewInFocus('aside-nav', isAsideOpen);
+    }, [isAsideOpen]);
 };
 
 export const MobileDappBrowserController = () => {
