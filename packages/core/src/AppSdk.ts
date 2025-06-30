@@ -11,6 +11,7 @@ import { TonTransferParams } from './service/deeplinkingService';
 import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
 import { UserIdentity, UserIdentityService } from './user-identity';
+import { SubscriptionStrategy } from './entries/pro';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -180,6 +181,8 @@ export interface IAppSdk {
     userIdentity: UserIdentity;
 
     dappBrowser?: IDappBrowser;
+
+    subscriptionStrategy?: SubscriptionStrategy;
 }
 
 export interface IDappBrowser {

@@ -1,6 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { ProState, ProStateAuthorized, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    IosSubscriptionStatuses,
+    ProductIds,
+    ProState,
+    ProStateAuthorized,
+    ProSubscription,
+    SubscriptionSources
+} from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -155,6 +162,65 @@ export const useProState = () => {
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
         return state;
+    });
+};
+
+export const useProSubscriptionPurchase = () => {
+    // const sdk = useAppSdk();
+    // const client = useQueryClient();
+    // const authService = useProAuthTokenService();
+
+    return useMutation<ProSubscription, Error, ProductIds>(async productId => {
+        try {
+            // if (!isIosStrategy(sdk.subscriptionStrategy)) {
+            //     throw new Error('This is not an iOS subscription strategy');
+            // }
+            //
+            // const subscription = await sdk.subscriptionStrategy?.subscribe(productId);
+            //
+            // if (!subscription?.originalTransactionId) {
+            //     throw new Error('Failed to subscribe');
+            // }
+
+            // const updatedSubscription = await saveIapPurchase(
+            //     authService,
+            //     subscription.originalTransactionId
+            // );
+
+            const updatedSubscription = await new Promise<ProSubscription>((resolve, reject) => {
+                setTimeout(
+                    () =>
+                        // reject(
+                        //     new Error(
+                        //         'This is a mock implementation, please use real subscription service'
+                        //     )
+                        // ),
+                        resolve({
+                            source: SubscriptionSources.IOS,
+                            isActive: true,
+                            expiresAt: 123123,
+                            originalTransactionId: 'string',
+                            status: IosSubscriptionStatuses.ACTIVE
+                        }),
+                    5000
+                );
+            });
+
+            // await setBackupState(sdk.storage, updatedSubscription);
+            // await client.invalidateQueries([QueryKey.proBackup]);
+
+            return updatedSubscription;
+        } catch (e) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+
+            return {
+                source: SubscriptionSources.IOS,
+                isActive: true,
+                expiresAt: 123123,
+                originalTransactionId: 'string',
+                status: IosSubscriptionStatuses.ACTIVE
+            };
+        }
     });
 };
 
