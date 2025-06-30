@@ -81,7 +81,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
             });
         },
         async manageSubscriptions(): Promise<void> {
-            return Promise.resolve();
+            return new Promise(resolve => setTimeout(() => resolve(), 2000));
         }
     })
 });
