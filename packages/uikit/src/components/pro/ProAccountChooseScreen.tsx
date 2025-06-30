@@ -15,6 +15,7 @@ import { Label2 } from '../Text';
 import { DoneIcon } from '../Icon';
 import { ListBlock } from '../List';
 import { Button } from '../fields/Button';
+import { handleSubmit } from '../../libs/form';
 import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
@@ -63,12 +64,12 @@ export const ProAccountChooseScreen = () => {
             }));
     });
 
-    const handleNextClick = () => {
+    const handleNextScreen = () => {
         goTo(SubscriptionScreens.PURCHASE);
     };
 
     return (
-        <ProScreenContentWrapper>
+        <ProScreenContentWrapper onSubmit={handleSubmit(handleNextScreen)}>
             <ProSubscriptionHeader
                 titleKey="choose_wallet_for_pro"
                 subtitleKey="subscription_will_be_linked_to_wallet"
@@ -88,13 +89,7 @@ export const ProAccountChooseScreen = () => {
                 ))}
             </ListBlock>
             <ProSettingsMainButtonWrapper>
-                <Button
-                    primary
-                    fullWidth
-                    size="large"
-                    loading={isLoading}
-                    onClick={handleNextClick}
-                >
+                <Button primary fullWidth size="large" type="submit" loading={isLoading}>
                     <Label2>{t('continue')}</Label2>
                 </Button>
             </ProSettingsMainButtonWrapper>

@@ -4,6 +4,7 @@ import { IProductInfo, isProductId, ProductIds } from '@tonkeeper/core/dist/entr
 import { Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ProLegalNote } from './ProLegalNote';
+import { handleSubmit } from '../../libs/form';
 import { ProFeaturesList } from './ProFeaturesList';
 import { ProActiveWallet } from './ProActiveWallet';
 import { getSkeletonProducts } from '../../libs/pro';
@@ -57,7 +58,7 @@ const IosSubscriptionScreen: FC<IIosSubscriptionScreenProps> = ({ products }) =>
     const productsForRender = products?.length ? products : getSkeletonProducts();
 
     return (
-        <ProScreenContentWrapper>
+        <ProScreenContentWrapper onSubmit={handleSubmit(handleBuySubscription)}>
             <ProSubscriptionHeader
                 titleKey="get_tonkeeper_pro"
                 subtitleKey="choose_billing_description"
@@ -75,7 +76,7 @@ const IosSubscriptionScreen: FC<IIosSubscriptionScreenProps> = ({ products }) =>
                     primary
                     fullWidth
                     size="large"
-                    onClick={handleBuySubscription}
+                    type="submit"
                     loading={products?.length < 1 || isLoading}
                 >
                     <Label2>{t('continue_with_tonkeeper_pro')}</Label2>

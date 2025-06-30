@@ -1,10 +1,18 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useId } from 'react';
 import { styled } from 'styled-components';
 import { IProductInfo } from '@tonkeeper/core/dist/entries/pro';
 
+import {
+    Notification,
+    NotificationBlock,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../../Notification';
 import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { ChevronRightIcon } from '../../Icon';
+import { useProState } from '../../../state/pro';
+import { handleSubmit } from '../../../libs/form';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { HideOnReview } from '../../ios/HideOnReview';
@@ -15,10 +23,8 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
-import { useProState } from '../../../state/pro';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { useGetAllProductsInfo } from '../../../hooks/pro/useGetAllProductsInfo';
-import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -36,6 +42,7 @@ export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isO
 export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationProps, 'onClose'>> = ({
     onClose
 }) => {
+    const formId = useId();
     const sdk = useAppSdk();
     const { data } = useProState();
     const products = useGetAllProductsInfo();
@@ -54,7 +61,7 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
         return null;
     }
 
-    const handlePurchaseClick = () => {
+    const handlePurchasePro = () => {
         onClose();
         navigate(AppRoute.settings + SettingsRoute.pro);
     };
@@ -67,15 +74,15 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
     };
 
     return (
-        <ContentWrapper>
+        <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
             <ProSubscriptionHeader />
             <ProPricesList products={products} />
             <ProFeaturesList />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlockStyled
+                        formId={formId}
                         products={products}
-                        onBuy={handlePurchaseClick}
                         onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
                     />
                 </NotificationFooter>
@@ -86,19 +93,26 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
 };
 
 interface IButtonBlock {
-    onBuy: () => void;
+    formId: string;
     onTrial?: () => void;
     className?: string;
     products: IProductInfo[];
 }
 
 const ButtonsBlock: FC<IButtonBlock> = props => {
-    const { onBuy, onTrial, className, products } = props;
+    const { formId, onTrial, className, products } = props;
     const { t } = useTranslation();
 
     return (
         <div className={className}>
-            <Button size="large" fullWidth primary onClick={onBuy} loading={!products.length}>
+            <Button
+                primary
+                fullWidth
+                size="large"
+                type="submit"
+                form={formId}
+                loading={!products.length}
+            >
                 <Label2>{t('get_tonkeeper_pro')}</Label2>
             </Button>
             {onTrial && (
@@ -111,11 +125,7 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
     );
 };
 
-const ContentWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+const ContentWrapper = styled(NotificationBlock)`
     padding-top: 1rem;
     overflow: hidden;
 `;
