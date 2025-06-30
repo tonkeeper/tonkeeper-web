@@ -1,4 +1,4 @@
-import { FC, useEffect, useId } from 'react';
+import { FC, useId } from 'react';
 import { styled } from 'styled-components';
 import { IProductInfo } from '@tonkeeper/core/dist/entries/pro';
 
@@ -13,8 +13,6 @@ import { Button } from '../../fields/Button';
 import { ChevronRightIcon } from '../../Icon';
 import { useProState } from '../../../state/pro';
 import { handleSubmit } from '../../../libs/form';
-import { useAppSdk } from '../../../hooks/appSdk';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { ProPricesList } from '../../pro/ProPricesList';
 import { ProFeaturesList } from '../../pro/ProFeaturesList';
@@ -43,7 +41,6 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
     onClose
 }) => {
     const formId = useId();
-    const sdk = useAppSdk();
     const { data } = useProState();
     const products = useGetAllProductsInfo();
     const navigate = useNavigate();
@@ -52,10 +49,6 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
         onClose: onTrialModalClose,
         onOpen: onTrialModalOpen
     } = useDisclosure();
-
-    useEffect(() => {
-        void sdk.storage.set(AppKey.PRO_HAS_PROMO_BEEN_SHOWN, true);
-    }, []);
 
     if (!data) {
         return null;

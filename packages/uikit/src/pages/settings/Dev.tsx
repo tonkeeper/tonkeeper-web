@@ -120,43 +120,6 @@ const ReviewerSettings = () => {
     );
 };
 
-const PromoVisibilitySettings = () => {
-    const sdk = useAppSdk();
-    const [isPromoVisible, setIsPromoVisible] = useState(false);
-
-    useEffect(() => {
-        sdk.storage
-            .get<boolean>(AppKey.PRO_HAS_PROMO_BEEN_SHOWN)
-            .then(wasShown => setIsPromoVisible(!wasShown))
-            .catch(err => {
-                console.error('Failed to load visibility state:', err);
-                setIsPromoVisible(false);
-            });
-    }, [sdk.storage]);
-
-    const handleChange = async (isVisible: boolean) => {
-        try {
-            await sdk.storage.set(AppKey.PRO_HAS_PROMO_BEEN_SHOWN, !isVisible);
-            setIsPromoVisible(isVisible);
-        } catch (err) {
-            console.error('Failed to update visibility:', err);
-        }
-    };
-
-    return (
-        <HideOnReview>
-            <ListBlockDesktopAdaptive>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <Label1>Toggle Promo visibility</Label1>
-                        <Switch checked={isPromoVisible} onChange={handleChange} />
-                    </ListItemPayload>
-                </ListItem>
-            </ListBlockDesktopAdaptive>
-        </HideOnReview>
-    );
-};
-
 const LogsSettings = () => {
     const navigate = useNavigate();
     const logger = useAppSdk().logger;
@@ -289,7 +252,6 @@ export const DevSettings = React.memo(() => {
                 <CookieSettings />
                 <AddAccountBySK />
                 <ReviewerSettings />
-                <PromoVisibilitySettings />
                 <LogsSettings />
             </DesktopWrapper>
         );
@@ -301,7 +263,6 @@ export const DevSettings = React.memo(() => {
             <InnerBody>
                 <CookieSettings />
                 <AddAccountBySK />
-                <PromoVisibilitySettings />
             </InnerBody>
         </>
     );

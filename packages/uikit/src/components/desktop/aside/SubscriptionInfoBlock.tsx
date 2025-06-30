@@ -5,7 +5,6 @@ import {
     isValidSubscription,
     ProState
 } from '@tonkeeper/core/dist/entries/pro';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
 
 import { useTranslation } from '../../../hooks/translation';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
@@ -23,9 +22,6 @@ import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
-import { useNavigate } from '../../../hooks/router/useNavigate';
-import { AppRoute, SettingsRoute } from '../../../libs/routes';
-import { useAppSdk } from '../../../hooks/appSdk';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -135,7 +131,6 @@ const ProButtonPanel = styled(Button)`
 `;
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
-    const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data } = useProState();
     const { onOpen } = useProFeaturesNotification();
@@ -144,7 +139,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const { mutate: invalidateGlobalQueries, isLoading: isInvalidatingGlobalQueries } =
         useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
-    const navigate = useNavigate();
     const [containerRef, { width }] = useElementSize();
 
     const onRefresh = () => {
@@ -162,15 +156,8 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
 
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
     const onGetPro = async () => {
-        const hasPromoBeenShown = await sdk.storage.get<boolean>(AppKey.PRO_HAS_PROMO_BEEN_SHOWN);
-
         hideBrowser();
-
-        if (hasPromoBeenShown) {
-            navigate(AppRoute.settings + SettingsRoute.pro);
-        } else {
-            onOpen();
-        }
+        onOpen();
     };
 
     let button = <Button loading>Pro</Button>;
