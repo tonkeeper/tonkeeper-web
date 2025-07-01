@@ -112,7 +112,7 @@ const closeExtensionTab = (sdk: IAppSdk) => {
     }
 };
 
-const doesMethodRequirePro = (method: AddWalletMethod): boolean => {
+const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
     return method === 'multisig' || method === 'sk_fireblocks';
 };
 
@@ -144,20 +144,14 @@ export const AddWalletNotificationControlled = () => {
         if (!isOpen) {
             return;
         }
-
-        setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            return;
-        }
-        if (params?.walletType === 'multisig' && !proState?.subscription.valid) {
+        if (doesMethodRequirePro(params?.walletType) && !proState?.subscription.valid) {
             onClose();
             openBuyPro();
             return;
         }
-    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
+
+        setSelectedMethod(params?.walletType);
+    }, [isOpen, params?.walletType, proState?.subscription.valid]);
 
     const sdk = useAppSdk();
 
@@ -169,6 +163,7 @@ export const AddWalletNotificationControlled = () => {
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
             if (doesMethodRequirePro(method) && !proState?.subscription.valid) {
+                onClose();
                 openBuyPro();
                 return;
             }
