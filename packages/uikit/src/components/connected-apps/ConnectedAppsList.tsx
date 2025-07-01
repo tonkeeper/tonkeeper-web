@@ -1,18 +1,18 @@
-import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { FC, useState } from 'react';
 import { styled } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
-    useActiveWalletTonConnectConnections,
-    useDisconnectTonConnectApp
+    ConnectedDApp,
+    useActiveWalletConnectedApps,
+    useDisconnectTonConnectAppFromActiveWallet
 } from '../../state/tonConnect';
 import { ListBlock, ListItem } from '../List';
 import { Body2, Body3, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ConfirmDisconnectNotification } from './ConfirmDisconnectNotification';
-import { formatDappUrl } from './utils';
 import { SpinnerRing } from '../Icon';
+import { formatDappUrl } from './utils';
 
 const DesktopListContainer = styled.ul`
     padding: 0;
@@ -94,9 +94,9 @@ const SpinnerRingStyled = styled(SpinnerRing)`
 
 export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data: connections, refetch } = useActiveWalletTonConnectConnections();
-    const [modalData, setModalData] = useState<AccountConnection | undefined | 'all'>();
-    const { mutateAsync: disconnectDapp, isLoading } = useDisconnectTonConnectApp();
+    const { data: apps, refetch } = useActiveWalletConnectedApps();
+    const [modalData, setModalData] = useState<{ origin: string } | undefined | 'all'>();
+    const { mutateAsync: disconnectDapp, isLoading } = useDisconnectTonConnectAppFromActiveWallet();
     const isFullWidthMode = useIsFullWidthMode();
 
     const onCloseModal = async (isConfirmed?: boolean) => {
@@ -111,7 +111,7 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
         setModalData(undefined);
     };
 
-    if (!connections) {
+    if (!apps) {
         return (
             <FullHeightContainer className={className}>
                 <SpinnerRingStyled />
@@ -119,7 +119,7 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
         );
     }
 
-    if (!connections.length) {
+    if (!apps.length) {
         return (
             <FullHeightContainer className={className}>
                 <Body2Styled>{t('no_connected_apps')}</Body2Styled>
@@ -131,16 +131,16 @@ export const ConnectedAppsList: FC<{ className?: string }> = ({ className }) => 
 
     return (
         <>
-            <List connections={connections} onDisconnect={setModalData} className={className} />
+            <List
+                apps={apps}
+                onDisconnect={origin => setModalData({ origin })}
+                className={className}
+            />
             <ConfirmDisconnectNotification
                 isOpen={!!modalData}
                 isLoading={isLoading}
                 onClose={onCloseModal}
-                app={
-                    !!modalData && typeof modalData === 'object'
-                        ? { url: modalData.manifest.url }
-                        : modalData
-                }
+                app={modalData}
             />
         </>
     );
@@ -160,25 +160,25 @@ const Divider = styled.div`
 
 const MobileList: FC<{
     className?: string;
-    connections: AccountConnection[];
-    onDisconnect: (app: AccountConnection) => void;
-}> = ({ className, connections, onDisconnect }) => {
+    apps: ConnectedDApp[];
+    onDisconnect: (appId: string) => void;
+}> = ({ className, apps, onDisconnect }) => {
     const { t } = useTranslation();
     return (
         <ListBlock className={className}>
-            {connections.map((app, index) => (
+            {apps.map((app, index) => (
                 <>
-                    <MobileListItem hover={false} key={app.clientSessionId}>
-                        <SafeDappImage src={app.manifest.iconUrl} />
+                    <MobileListItem hover={false} key={app.origin}>
+                        <SafeDappImage src={app.icon} />
                         <DappTextBlock>
-                            <Label2>{formatDappUrl(app.manifest.url)}</Label2>
-                            <Body3>{app.manifest.name}</Body3>
+                            <Label2>{formatDappUrl(app.origin)}</Label2>
+                            <Body3>{app.name}</Body3>
                         </DappTextBlock>
-                        <DisconnectButton size="small" onClick={() => onDisconnect(app)}>
+                        <DisconnectButton size="small" onClick={() => onDisconnect(app.origin)}>
                             {t('disconnect')}
                         </DisconnectButton>
                     </MobileListItem>
-                    {index !== connections.length - 1 && <Divider />}
+                    {index !== apps.length - 1 && <Divider />}
                 </>
             ))}
         </ListBlock>
@@ -187,20 +187,24 @@ const MobileList: FC<{
 
 const DesktopList: FC<{
     className?: string;
-    connections: AccountConnection[];
-    onDisconnect: (app: AccountConnection) => void;
-}> = ({ className, connections, onDisconnect }) => {
+    apps: ConnectedDApp[];
+    onDisconnect: (appId: string) => void;
+}> = ({ className, apps, onDisconnect }) => {
     const { t } = useTranslation();
     return (
         <DesktopListContainer className={className}>
-            {connections.map(app => (
-                <DesktopListItem key={app.clientSessionId}>
-                    <SafeDappImage src={app.manifest.iconUrl} />
+            {apps.map(app => (
+                <DesktopListItem key={app.origin}>
+                    <SafeDappImage src={app.icon} />
                     <DappTextBlock>
-                        <Label2>{formatDappUrl(app.manifest.url)}</Label2>
-                        <Body3>{app.manifest.name}</Body3>
+                        <Label2>{formatDappUrl(app.origin)}</Label2>
+                        <Body3>{app.name}</Body3>
                     </DappTextBlock>
-                    <DisconnectButton secondary size="small" onClick={() => onDisconnect(app)}>
+                    <DisconnectButton
+                        secondary
+                        size="small"
+                        onClick={() => onDisconnect(app.origin)}
+                    >
                         {t('disconnect')}
                     </DisconnectButton>
                 </DesktopListItem>

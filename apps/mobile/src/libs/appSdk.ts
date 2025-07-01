@@ -26,6 +26,8 @@ import { Keyboard } from '@capacitor/keyboard';
 import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { CapacitorFileLogger } from './logger';
+import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
+import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -73,6 +75,7 @@ export class BiometryServiceCapacitor implements BiometryService {
         }
     };
 }
+export const capacitorStorage = new CapacitorStorage();
 
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     cookie = new CookieCapacitor();
@@ -87,7 +90,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     keychain = new KeychainCapacitor(this.biometry, this.storage);
 
     constructor() {
-        super(new CapacitorStorage());
+        super(capacitorStorage);
     }
 
     copyToClipboard = async (value: string, notification?: string) => {
@@ -173,10 +176,9 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     logger = new CapacitorFileLogger('logs.txt');
 
-    async getUserId(): Promise<string> {
-        const device = await Device.getId();
-        return device.identifier;
-    }
+    dappBrowser = CapacitorDappBrowser;
+
+    userIdentity = new UserIdentityService(capacitorStorage);
 }
 
 export const getCapacitorDeviceOS = async () => {
@@ -216,5 +218,12 @@ class CapacitorKeyboardService implements KeyboardService {
         Keyboard.addListener('keyboardDidShow', info => this.didShow.next(info));
         Keyboard.addListener('keyboardWillHide', () => this.willHide.next());
         Keyboard.addListener('keyboardDidHide', () => this.didHide.next());
+    }
+}
+
+export class CapacitorUserIdentityService extends UserIdentityService {
+    async getFirebaseUserId(): Promise<string> {
+        const device = await Device.getId();
+        return device.identifier;
     }
 }

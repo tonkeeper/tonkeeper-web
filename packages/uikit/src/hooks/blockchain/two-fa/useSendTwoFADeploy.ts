@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Estimation } from '@tonkeeper/core/dist/entries/send';
 
-import { useAnalyticsTrack } from '../../amplitude';
+import { useAnalyticsTrack } from '../../analytics';
 import {
     useActiveApi,
     useActiveWallet,

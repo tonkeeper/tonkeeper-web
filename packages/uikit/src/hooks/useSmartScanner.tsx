@@ -1,24 +1,21 @@
 import { useAppSdk } from './appSdk';
 import React, { useCallback, useEffect, useState } from 'react';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
-import {
-    useProcessOpenedLink,
-    useResponseConnectionMutation
-} from '../components/connect/connectHook';
+import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { useProcessOpenedLink, useCompleteHttpConnection } from '../components/connect/connectHook';
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
-import { useRequestNotificationAnalytics } from './amplitude';
 import { TonConnectNotification } from '../components/connect/TonConnectNotification';
+import { useTrackTonConnectConnectionRequest } from './analytics/events-hooks';
 
 export const useSmartScanner = () => {
     const sdk = useAppSdk();
     const [scanId, setScanId] = useState<number | undefined>(undefined);
-    const [params, setParams] = useState<TonConnectParams | null>(null);
+    const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
 
     const { mutateAsync, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        useResponseConnectionMutation();
+        useCompleteHttpConnection();
 
     const onScan = useCallback(
         async (link: string) => {
@@ -74,7 +71,7 @@ export const useSmartScanner = () => {
         };
     }, [sdk, scanId, onScan]);
 
-    useRequestNotificationAnalytics(params?.request?.manifestUrl);
+    useTrackTonConnectConnectionRequest(params?.request?.manifestUrl);
 
     return {
         onScan: onClick,

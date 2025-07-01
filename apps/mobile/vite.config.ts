@@ -37,7 +37,8 @@ export default defineConfig({
                 './node_modules/@tanstack/react-query'
             ),
             '@ionic/react': path.resolve(__dirname, './node_modules/@ionic/react'),
-            '@ionic/react-router': path.resolve(__dirname, './node_modules/@ionic/react-router')
+            '@ionic/react-router': path.resolve(__dirname, './node_modules/@ionic/react-router'),
+            zod: path.resolve(__dirname, '../../packages/core/node_modules/zod')
         }
     }
 });

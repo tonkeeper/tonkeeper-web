@@ -1,10 +1,10 @@
 import React, { FC, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { useActionAnalytics } from '../../hooks/amplitude';
 import { AppSelectionContext, useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { Label3 } from '../Text';
+import { useAnalyticsTrack } from '../../hooks/analytics';
 
 interface ActionProps {
     icon: React.ReactNode;
@@ -88,7 +88,7 @@ const Block = styled.div<{
 `;
 
 export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
-    const track = useActionAnalytics();
+    const track = useAnalyticsTrack();
     const { t } = useTranslation();
     const selection = useContext(AppSelectionContext);
     const sdk = useAppSdk();
@@ -110,7 +110,7 @@ export const Action: FC<ActionProps> = ({ icon, title, disabled, action }) => {
         if (sdk.twaExpand) {
             sdk.twaExpand();
         }
-        track(title);
+        track('Action', { kind: title });
         action();
     };
 

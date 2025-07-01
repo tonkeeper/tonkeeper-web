@@ -4,17 +4,16 @@ import {
     TonConnectAppRequestPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
-    replyBadRequestResponse,
-    replyDisconnectResponse
+    replyHttpBadRequestResponse,
+    replyHttpDisconnectResponse
 } from '@tonkeeper/core/dist/service/tonConnect/actionService';
 import { subscribeTonConnect } from '@tonkeeper/core/dist/service/tonConnect/httpBridge';
 import { useCallback, useEffect, useState } from 'react';
-import { useSendNotificationAnalytics } from '../../hooks/amplitude';
 import { useAppSdk } from '../../hooks/appSdk';
 import {
     tonConnectAppManuallyDisconnected$,
     useAppTonConnectConnections,
-    useDisconnectTonConnectApp,
+    useDisconnectTonConnectConnection,
     useTonConnectLastEventId
 } from '../../state/tonConnect';
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
@@ -22,23 +21,22 @@ import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
 import { TonConnectRequestNotification } from './TonConnectRequestNotification';
 
 const useUnSupportMethodMutation = () => {
-    return useMutation<void, Error, TonConnectAppRequest>(replyBadRequestResponse);
+    return useMutation<void, Error, TonConnectAppRequest<'http'>>(replyHttpBadRequestResponse);
 };
 
 const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
 
-const TonConnectSubscription = () => {
+const WebTonConnectSubscription = () => {
     const [request, setRequest] = useState<TonConnectAppRequestPayload | undefined>(undefined);
 
     const sdk = useAppSdk();
     const wallet = useActiveWallet();
-    const { data: appConnections } = useAppTonConnectConnections();
+    const { data: appConnections } = useAppTonConnectConnections('http');
     const { data: lastEventId } = useTonConnectLastEventId();
 
-    const { mutateAsync: disconnect } = useDisconnectTonConnectApp();
+    const disconnect = useDisconnectTonConnectConnection({ skipEmit: true });
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
 
-    useSendNotificationAnalytics(request?.connection?.manifest);
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
 
     useEffect(() => {
@@ -59,11 +57,11 @@ const TonConnectSubscription = () => {
                 }, 100);
             }
         };
-        const handleMessage = (params: TonConnectAppRequest) => {
+        const handleMessage = (params: TonConnectAppRequest<'http'>) => {
             switch (params.request.method) {
                 case 'disconnect': {
                     return disconnect(params.connection).then(() =>
-                        replyDisconnectResponse({ ...params })
+                        replyHttpDisconnectResponse({ ...params })
                     );
                 }
                 case 'sendTransaction': {
@@ -153,16 +151,18 @@ const TonConnectSubscription = () => {
     useEffect(() => {
         return tonConnectAppManuallyDisconnected$.subscribe(connection => {
             const connectionsToDisconnect = Array.isArray(connection) ? connection : [connection];
-            connectionsToDisconnect.forEach((item, index) =>
-                replyDisconnectResponse({
-                    connection: item,
-                    request: { id: (Date.now() + index).toString() }
-                })
-            );
+            connectionsToDisconnect.forEach((item, index) => {
+                if (item.type === 'http') {
+                    replyHttpDisconnectResponse({
+                        connection: item,
+                        request: { id: (Date.now() + index).toString() }
+                    });
+                }
+            });
         });
     }, []);
 
     return <TonConnectRequestNotification request={request} handleClose={handleClose} />;
 };
 
-export default TonConnectSubscription;
+export default WebTonConnectSubscription;

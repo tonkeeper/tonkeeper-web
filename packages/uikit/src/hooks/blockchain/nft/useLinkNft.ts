@@ -4,7 +4,7 @@ import { useActiveAccount } from '../../../state/wallet';
 import { useMutation } from '@tanstack/react-query';
 import { NFTEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/nft-encoder';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { useTransactionAnalytics } from '../../amplitude';
+import { useTransactionAnalytics } from '../../analytics';
 
 export const useLinkNft = (args: { nftAddress: string; linkToAddress: string }) => {
     const getSender = useGetSender();

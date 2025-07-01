@@ -12,28 +12,50 @@ import {
     DAppManifest,
     DeviceInfo,
     DisconnectEvent,
+    InjectedWalletInfo,
     SEND_TRANSACTION_ERROR_CODES,
     SendTransactionRpcResponseError,
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
-    TonConnectAccount,
+    TonConnectNetwork,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
-import { isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
-import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
+import { eqRawAddresses, isStandardTonWallet, TonContract, WalletId } from '../../entries/wallet';
+import { WalletVersion } from '../../entries/wallet';
 import { accountsStorage } from '../accountsStorage';
 import { walletContractFromState } from '../wallet/contractService';
 import {
-    AccountConnection,
-    TonConnectParams,
-    disconnectAccountConnection,
+    TonConnectHttpConnectionParams,
+    disconnectInjectedAccountConnection,
     getTonWalletConnections,
-    saveAccountConnection
+    saveAccountConnection,
+    TonConnectConnectionParams,
+    AccountConnection,
+    AccountConnectionInjected,
+    isAccountConnectionInjected
 } from './connectionService';
 import { SessionCrypto } from './protocol';
-import { Account, isAccountSupportTonConnect } from '../../entries/account';
+import { Account, getAccountByWalletById, isAccountSupportTonConnect } from '../../entries/account';
+import { removeLastSlash } from '../../utils/common';
 
-export function parseTonConnect(options: { url: string }): TonConnectParams | string {
+export const tonConnectTonkeeperAppName = 'tonkeeper';
+export const tonConnectTonkeeperProAppName = 'tonkeeper-pro';
+
+export const tonConnectTonkeeperWalletInfo: InjectedWalletInfo = {
+    name: 'Tonkeeper',
+    image: 'https://tonkeeper.com/assets/tonconnect-icon.png',
+    tondns: 'tonkeeper.ton',
+    about_url: 'https://tonkeeper.com'
+};
+
+export const tonConnectTonkeeperProWalletInfo: InjectedWalletInfo = {
+    name: 'Tonkeeper Pro',
+    image: 'https://tonkeeper.com/assets/tonconnect-icon-pro.png',
+    tondns: 'tonkeeper.ton',
+    about_url: 'https://tonkeeper.com/pro'
+};
+
+export function parseTonConnect(options: { url: string }): TonConnectHttpConnectionParams | string {
     try {
         const { query } = queryString.parseUrl(options.url);
 
@@ -56,11 +78,12 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | st
         const isPro = url.protocol.includes('pro') || url.pathname.split('/').includes('pro');
 
         return {
+            type: 'http',
             protocolVersion,
             request,
             clientSessionId,
             sessionKeyPair: sessionCrypto.stringifyKeypair(),
-            appName: isPro ? 'tonkeeper-pro' : 'tonkeeper'
+            appName: isPro ? tonConnectTonkeeperProAppName : tonConnectTonkeeperAppName
         };
     } catch (e) {
         if (e instanceof Error) {
@@ -73,16 +96,26 @@ export function parseTonConnect(options: { url: string }): TonConnectParams | st
 export const getTonConnectParams = async (
     request: ConnectRequest,
     appName: string,
-    protocolVersion?: number,
-    clientSessionId?: string
-): Promise<TonConnectParams> => {
+    webViewOrigin: string | null
+): Promise<TonConnectConnectionParams> => {
     const randomBytes: Buffer = await getSecureRandomBytes(32);
     const keyPair = keyPairFromSeed(randomBytes);
 
+    if (webViewOrigin !== null) {
+        return {
+            type: 'injected',
+            protocolVersion: 2,
+            request,
+            appName,
+            webViewOrigin
+        };
+    }
+
     return {
-        protocolVersion: protocolVersion ?? 2,
+        type: 'http',
+        protocolVersion: 2,
         request,
-        clientSessionId: clientSessionId ?? (await getSecureRandomBytes(32)).toString('hex'),
+        clientSessionId: (await getSecureRandomBytes(32)).toString('hex'),
         appName,
         sessionKeyPair: {
             secretKey: keyPair.secretKey.toString('hex'),
@@ -190,35 +223,49 @@ export const getDeviceInfo = (
     };
 };
 
-export const getDappConnection = async (
+/**
+ * Get actual connection for injected dapp
+ */
+export function getInjectedDappConnection(
+    connections: Awaited<ReturnType<typeof getAppConnections>>,
+    origin: string
+): { wallet: TonContract; connection: AccountConnectionInjected } | undefined;
+export async function getInjectedDappConnection(
     storage: IStorage,
-    origin: string,
-    account?: TonConnectAccount
-): Promise<{ wallet: TonContract; connection: AccountConnection } | undefined> => {
-    const appConnections = await getAppConnections(storage);
-    if (account) {
-        const walletState = appConnections.find(c => c.wallet.rawAddress === account?.address);
-        const connection = walletState?.connections.find(item => item.webViewUrl === origin);
-        if (walletState && connection) {
-            return { wallet: walletState.wallet, connection };
-        }
-    }
-
-    return (
-        appConnections
+    origin: string
+): Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined>;
+export function getInjectedDappConnection(
+    connectionsSource: IStorage | Awaited<ReturnType<typeof getAppConnections>>,
+    origin: string
+):
+    | Promise<{ wallet: TonContract; connection: AccountConnectionInjected } | undefined>
+    | { wallet: TonContract; connection: AccountConnectionInjected }
+    | undefined {
+    const getConnection = (connections: Awaited<ReturnType<typeof getAppConnections>>) =>
+        connections
             .map(item => {
-                const connection = item.connections.find(ac => ac.webViewUrl === origin);
+                const connection = item.connections
+                    .filter(isAccountConnectionInjected)
+                    .find(ac => eqOrigins(ac.webViewOrigin, origin));
                 if (connection) {
                     return { wallet: item.wallet, connection };
                 }
                 return null;
             })
-            .filter(Boolean)[0] ?? undefined
-    );
-};
+            .filter(Boolean)
+            .sort((a, b) => b!.connection.creationTimestamp - a!.connection.creationTimestamp)[0] ??
+        undefined;
+
+    if (Array.isArray(connectionsSource)) {
+        return getConnection(connectionsSource);
+    } else {
+        return getAppConnections(connectionsSource, 'injected').then(getConnection);
+    }
+}
 
 export const getAppConnections = async (
-    storage: IStorage
+    storage: IStorage,
+    filterType?: AccountConnection['type']
 ): Promise<{ wallet: TonContract; connections: AccountConnection[] }[]> => {
     const accounts = (await accountsStorage(storage).getAccounts()).filter(
         isAccountSupportTonConnect
@@ -235,27 +282,12 @@ export const getAppConnections = async (
             .flatMap(a => a.allTonWallets)
             .map(async wallet => {
                 const walletConnections = await getTonWalletConnections(storage, wallet);
-                return { wallet, connections: walletConnections };
+                return {
+                    wallet,
+                    connections: walletConnections.filter(i => !filterType || i.type === filterType)
+                };
             })
     );
-};
-
-export const checkWalletConnectionOrDie = async (options: {
-    storage: IStorage;
-    wallet: TonWalletStandard;
-    webViewUrl: string;
-}) => {
-    const connections = await getTonWalletConnections(options.storage, options.wallet);
-
-    console.log(connections);
-
-    const connection = connections.find(item => item.webViewUrl === options.webViewUrl);
-    if (connection === undefined) {
-        throw new TonConnectError(
-            'Missing connection',
-            CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
-        );
-    }
 };
 
 export interface ReConnectPayload {
@@ -263,11 +295,11 @@ export interface ReConnectPayload {
     maxMessages: number;
 }
 
-export const tonReConnectRequest = async (
+export const tonInjectedReConnectRequest = async (
     storage: IStorage,
-    webViewUrl: string
+    webViewOrigin: string
 ): Promise<ReConnectPayload> => {
-    const connection = await getDappConnection(storage, webViewUrl);
+    const connection = await getInjectedDappConnection(storage, webViewOrigin);
     if (!connection) {
         throw new TonConnectError(
             'Missing connection',
@@ -275,10 +307,12 @@ export const tonReConnectRequest = async (
         );
     }
 
-    const maxMessages =
-        isStandardTonWallet(connection.wallet) && connection.wallet.version === WalletVersion.V5R1
-            ? 255
-            : 4;
+    const account = getAccountByWalletById(
+        await accountsStorage(storage).getAccounts(),
+        connection.wallet.id
+    );
+
+    const maxMessages = getMaxMessages(account!);
 
     return {
         items: [
@@ -419,18 +453,21 @@ export const toTonProofItem = async (
     return createTonProofItem(signature, proof, stateInit);
 };
 
-export const tonDisconnectRequest = async (options: { storage: IStorage; webViewUrl: string }) => {
-    const connection = await getDappConnection(options.storage, options.webViewUrl);
+export const tonInjectedDisconnectRequest = async (options: {
+    storage: IStorage;
+    webViewUrl: string;
+}) => {
+    const connection = await getInjectedDappConnection(options.storage, options.webViewUrl);
     if (!connection) {
         throw new TonConnectError(
             'Missing connection',
             CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
         );
     }
-    await disconnectAccountConnection({ ...options, wallet: connection.wallet });
+    await disconnectInjectedAccountConnection({ ...options, wallet: connection.wallet });
 };
 
-const getMaxMessages = (account: Account) => {
+export const getMaxMessages = (account: Account) => {
     if (account.type === 'ledger') {
         return 4;
     }
@@ -444,11 +481,10 @@ export const saveWalletTonConnect = async (options: {
     storage: IStorage;
     account: Account;
     manifest: DAppManifest;
-    params: TonConnectParams;
+    params: TonConnectConnectionParams;
     replyItems: ConnectItemReply[];
     appVersion: string;
-    webViewUrl?: string;
-    walletId?: WalletId;
+    walletId: WalletId;
 }): Promise<ConnectEvent> => {
     const wallet =
         options.walletId !== undefined
@@ -463,8 +499,7 @@ export const saveWalletTonConnect = async (options: {
         storage: options.storage,
         wallet,
         manifest: options.manifest,
-        params: options.params,
-        webViewUrl: options.webViewUrl
+        params: options.params
     });
 
     const maxMessages = getMaxMessages(options.account);
@@ -535,3 +570,55 @@ export const sendBadRequestResponse = (
         id
     };
 };
+
+export function eqOrigins(origin1: string, origin2: string | undefined): boolean {
+    return origin2 !== undefined && removeLastSlash(origin1) === removeLastSlash(origin2);
+}
+
+export function originFromUrl(url: string): string | undefined {
+    try {
+        const parsed = new URL(url);
+        return removeLastSlash(parsed.origin);
+    } catch (e) {
+        console.error(e);
+        return undefined;
+    }
+}
+
+export async function checkTonConnectFromAndNetwork(
+    storage: IStorage,
+    wallet: TonContract,
+    params: { from?: string; network?: TonConnectNetwork }
+) {
+    if (params.from !== undefined) {
+        if (!eqRawAddresses(wallet.rawAddress, params.from)) {
+            throw new TonConnectError(
+                'Invalid account provided',
+                SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR
+            );
+        }
+    }
+
+    if (params.network !== undefined) {
+        const account = getAccountByWalletById(
+            await accountsStorage(storage).getAccounts(),
+            wallet.id
+        );
+
+        if (!account) {
+            throw new Error('Unknown account provided');
+        }
+
+        const mismatchMainnet =
+            params.network.toString() === Network.MAINNET.toString() && account.type === 'testnet';
+        const mismatchTestnet =
+            params.network.toString() === Network.TESTNET.toString() && account.type !== 'testnet';
+
+        if (mismatchMainnet || mismatchTestnet) {
+            throw new TonConnectError(
+                'Invalid network provided',
+                SEND_TRANSACTION_ERROR_CODES.BAD_REQUEST_ERROR
+            );
+        }
+    }
+}

@@ -32,7 +32,7 @@ import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 import { Platform as TwaPlatform, initViewport } from '@tma.js/sdk';
 import { SDKProvider } from '@tma.js/sdk-react';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -75,8 +75,8 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+const WebTonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
 );
 const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
@@ -291,23 +291,22 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         browserLength: 4,
         env: {
             tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        }
+        },
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content
-                    activeAccount={activeAccount}
-                    lock={lock}
-                    showQrScan={showQrScan}
-                    sdk={sdk}
-                />
-                <CopyNotification />
-                <ModalsRoot />
-                {showQrScan && <TwaQrScanner />}
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content
+                activeAccount={activeAccount}
+                lock={lock}
+                showQrScan={showQrScan}
+                sdk={sdk}
+            />
+            <CopyNotification />
+            <ModalsRoot />
+            {showQrScan && <TwaQrScanner />}
+        </AppContext.Provider>
     );
 };
 
@@ -449,7 +448,7 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
                 <Footer standalone={getUsePadding(sdk.launchParams.platform)} />
                 <MemoryScroll />
                 <Suspense>
-                    <TonConnectSubscription />
+                    <WebTonConnectSubscription />
                 </Suspense>
             </Wrapper>
         </TwaNotification>

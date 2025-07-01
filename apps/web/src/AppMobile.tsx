@@ -15,7 +15,7 @@ import {
     AddFavoriteNotification,
     EditFavoriteNotification
 } from '@tonkeeper/uikit/dist/components/transfer/FavoriteNotification';
-import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { AppRoute, SignerRoute, SettingsRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
@@ -35,8 +35,8 @@ const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/A
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
 const SwapPage = React.lazy(() => import('@tonkeeper/uikit/dist/pages/swap'));
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+const WebTonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
 );
 const SendActionNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/transfer/SendNotifications')
@@ -229,7 +229,7 @@ const Notifications = () => {
         <Suspense>
             <SendActionNotification />
             <ReceiveNotification />
-            <TonConnectSubscription />
+            <WebTonConnectSubscription />
             <NftNotification />
             <SendNftNotification />
             <AddFavoriteNotification />

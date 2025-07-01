@@ -4,7 +4,7 @@ import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { StorageContext } from '@tonkeeper/uikit/dist/hooks/storage';
@@ -246,16 +246,15 @@ const Loader: FC = () => {
         env: {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
-        }
+        },
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content standalone={standalone} />
-                <CopyNotification hideSimpleCopyNotifications={!standalone} />
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content standalone={standalone} />
+            <CopyNotification hideSimpleCopyNotifications={!standalone} />
+        </AppContext.Provider>
     );
 };
 

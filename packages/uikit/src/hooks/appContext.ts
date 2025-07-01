@@ -8,6 +8,7 @@ import {
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { useContext } from 'react';
+import { AnalyticsTracker } from './analytics/common';
 
 export interface IAppContext {
     mainnetApi: APIConfig;
@@ -36,6 +37,7 @@ export interface IAppContext {
         tronApiKey?: string;
     };
     defaultWalletVersion: WalletVersion;
+    tracker: AnalyticsTracker | undefined;
 }
 
 export const AppContext = React.createContext<IAppContext>({
@@ -54,7 +56,8 @@ export const AppContext = React.createContext<IAppContext>({
     ios: false,
     proFeatures: false,
     hideQrScanner: false,
-    defaultWalletVersion: WalletVersion.V5R1
+    defaultWalletVersion: WalletVersion.V5R1,
+    tracker: undefined
 });
 
 export const useAppContext = () => {

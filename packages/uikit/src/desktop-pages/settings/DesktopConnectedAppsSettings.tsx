@@ -6,8 +6,8 @@ import {
 import { ConnectedAppsList } from '../../components/connected-apps/ConnectedAppsList';
 import { styled } from 'styled-components';
 import {
-    useActiveWalletTonConnectConnections,
-    useDisconnectTonConnectApp
+    useActiveWalletConnectedApps,
+    useDisconnectTonConnectAppFromActiveWallet
 } from '../../state/tonConnect';
 import { ConfirmDisconnectNotification } from '../../components/connected-apps/ConfirmDisconnectNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -26,8 +26,8 @@ const ConnectedAppsListStyled = styled(ConnectedAppsList)`
 export const DesktopConnectedAppsSettings = () => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { data: connections } = useActiveWalletTonConnectConnections();
-    const { mutate } = useDisconnectTonConnectApp();
+    const { data: connections } = useActiveWalletConnectedApps();
+    const { mutate } = useDisconnectTonConnectAppFromActiveWallet();
 
     const onCloseNotification = (confirmed?: boolean) => {
         if (confirmed) {
@@ -44,7 +44,7 @@ export const DesktopConnectedAppsSettings = () => {
                 <DesktopViewHeaderContent
                     title={t('settings_connected_apps')}
                     right={
-                        (showDisconnectAll || true) && (
+                        showDisconnectAll && (
                             <DesktopViewHeaderContent.Right>
                                 <DesktopViewHeaderContent.RightItem
                                     asDesktopButton

@@ -15,7 +15,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
-import { useConnectTonConnectAppMutation } from '../../state/tonConnect';
+import { useGetTonConnectConnectResponse } from '../../state/tonConnect';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
 import { CheckmarkCircleIcon, ExclamationMarkCircleIcon, SwitchIcon } from '../Icon';
 import { Notification, NotificationBlock } from '../Notification';
@@ -27,7 +27,10 @@ import { SelectDropDown, SelectDropDownHost, SelectField } from '../fields/Selec
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { isStandardTonWallet, WalletId, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/events-hooks';
+import { useAnalyticsTrack } from '../../hooks/analytics';
+import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
 
 const Title = styled(H2)`
     text-align: center;
@@ -113,7 +116,9 @@ const ConnectContent: FC<{
     }, []);
 
     const [error, setError] = useState<Error | null>(null);
-    const { mutateAsync, isLoading } = useConnectTonConnectAppMutation();
+    const { mutateAsync, isLoading } = useGetTonConnectConnectResponse();
+    useTrackTonConnectConnectionRequest(params.manifestUrl);
+    const track = useAnalyticsTrack();
 
     const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
         e.preventDefault();
@@ -121,8 +126,7 @@ const ConnectContent: FC<{
             const replyItems = await mutateAsync({
                 request: params,
                 manifest,
-                webViewUrl: origin,
-                appName,
+                webViewOrigin: origin ?? null,
                 ...selectedAccountAndWallet
             });
 
@@ -135,7 +139,6 @@ const ConnectContent: FC<{
                     ? 255
                     : 4;
 
-            selectedAccountAndWallet.walletId;
             setDone(true);
             setTimeout(
                 () =>
@@ -154,8 +157,12 @@ const ConnectContent: FC<{
                     }),
                 300
             );
+            track(
+                new AnalyticsEventTcConnect({ dapp_url: manifest.url, allow_notifications: false })
+            );
         } catch (err) {
             setDone(true);
+            console.error(err);
             setError(err as Error);
         }
     };
@@ -321,7 +328,7 @@ const useManifest = (params: ConnectRequest | null) => {
 
 export const TonConnectNotification: FC<{
     origin?: string;
-    params: Pick<TonConnectParams, 'request' | 'appName'> | null;
+    params: Pick<TonConnectConnectionParams, 'request' | 'appName'> | null;
     handleClose: (
         result: {
             replyItems: TonConnectEventPayload;

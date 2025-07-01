@@ -1,4 +1,4 @@
-import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { AccountConnectionHttp } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 export interface GetStorageMessage {
     king: 'storage-get';
@@ -73,7 +73,7 @@ export interface PromptTouchIdMessage {
 
 export interface TonConnectSendDisconnectMessage {
     king: 'ton-connect-send-disconnect';
-    connection: AccountConnection | AccountConnection[];
+    connection: AccountConnectionHttp | AccountConnectionHttp[];
 }
 
 export type Message =

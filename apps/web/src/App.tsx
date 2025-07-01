@@ -11,7 +11,6 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AmplitudeAnalyticsContext } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
@@ -193,20 +192,19 @@ const Loader: FC = () => {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
             tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        }
+        },
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
-                <CopyNotification hideSimpleCopyNotifications={!standalone} />
-                <Suspense>
-                    <QrScanner />
-                </Suspense>
-                <ModalsRoot />
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
+            <CopyNotification hideSimpleCopyNotifications={!standalone} />
+            <Suspense>
+                <QrScanner />
+            </Suspense>
+            <ModalsRoot />
+        </AppContext.Provider>
     );
 };
 

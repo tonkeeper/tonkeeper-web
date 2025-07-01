@@ -11,7 +11,7 @@ import { FullHeightBlock, NotificationFooter, NotificationFooterPortal } from '.
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
-import { useTransactionAnalytics } from '../../../hooks/amplitude';
+import { useTransactionAnalytics } from '../../../hooks/analytics';
 import { QueryKey } from '../../../libs/queryKey';
 import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {

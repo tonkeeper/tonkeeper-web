@@ -10,7 +10,7 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     color: ${props => props.theme.textPrimary};
     background-color: ${props => props.theme.backgroundContentTint};
     opacity: 0.64;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -20,6 +20,10 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     top: calc(50% - 20px);
     ${props => (props.position === 'left' ? 'left: 12px;' : 'right: 12px;')};
     transition: opacity 0.15s ease-in-out;
+
+    @media (pointer: fine) {
+        display: flex;
+    }
 
     &:hover {
         opacity: 0.8;

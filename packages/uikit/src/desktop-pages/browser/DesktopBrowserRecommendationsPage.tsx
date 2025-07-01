@@ -1,6 +1,5 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
-import { useOpenBrowser } from '../../hooks/amplitude';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 import { DesktopCategoryBlock } from './DesktopCategoryBlock';
@@ -13,6 +12,7 @@ import {
 import { useAppTargetEnv } from '../../hooks/appSdk';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { useTranslation } from '../../hooks/translation';
+import { useTrackDappBrowserOpened } from '../../hooks/analytics/events-hooks';
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -43,10 +43,7 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     const { data } = useRecommendations();
     const targetEnv = useAppTargetEnv();
 
-    const track = useOpenBrowser();
-    useEffect(() => {
-        if (data) track();
-    }, [track, data]);
+    useTrackDappBrowserOpened();
 
     if (!data) {
         return null;

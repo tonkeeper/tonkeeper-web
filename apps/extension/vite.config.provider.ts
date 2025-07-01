@@ -15,10 +15,14 @@ export default defineConfig({
       output: {
         ...sharedConfig.build.rollupOptions.output,
         entryFileNames: 'provider.js',
+        inlineDynamicImports: true,
         chunkFileNames: () => {
           throw new Error('Chunks are not allowed for provider.js');
         },
-      }
-    }
+      },
+      treeshake: {
+        moduleSideEffects: false
+      },
+    },
   }
 });

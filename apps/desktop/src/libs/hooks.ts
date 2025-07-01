@@ -56,7 +56,7 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
                 host: REACT_APP_APTABASE_HOST,
                 key: REACT_APP_APTABASE,
                 appVersion: version,
-                sessionId: await sdk.getUserId()
+                userIdentity: sdk.userIdentity
             });
 
             tracker.init({

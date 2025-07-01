@@ -59,7 +59,7 @@ export const useAnalytics = (activeAccount: Account | undefined, accounts: Accou
                   host: import.meta.env.VITE_APP_APTABASE_HOST,
                   key: import.meta.env.VITE_APP_APTABASE,
                   appVersion: version,
-                  sessionId: await sdk.getUserId()
+                  userIdentity: sdk.userIdentity
             });
 
             tracker.init({

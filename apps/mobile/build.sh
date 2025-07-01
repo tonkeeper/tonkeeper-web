@@ -9,4 +9,4 @@ EOL
 echo "Updated $CAPACITOR_CONFIG_FILE with the empty Vite server"
 
 echo "Running npx cap sync..."
-tsc && vite build && cap sync
+tsc && vite build --config vite.injected-scripts-config.ts && vite build && cap sync

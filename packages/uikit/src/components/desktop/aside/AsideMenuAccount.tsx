@@ -44,6 +44,7 @@ import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useMenuController } from '../../../hooks/ionic';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;
@@ -405,9 +406,12 @@ export const AsideMenuAccountMAM: FC<{
     const navigate = useNavigate();
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
     const menuController = useMenuController('aside-nav');
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
     const onClickAccount = async () => {
         navigate(AppRoute.accountSettings);
+        hideBrowser();
+
         await setActiveAccount(account.id);
         menuController.close();
     };

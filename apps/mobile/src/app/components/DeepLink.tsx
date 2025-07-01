@@ -1,17 +1,23 @@
-import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import {
+    ConnectEvent,
+    ConnectRequest,
+    DAppManifest,
+    TonConnectEventPayload
+} from '@tonkeeper/core/dist/entries/tonConnect';
+import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
-    useResponseConnectionMutation,
-    useProcessOpenedLink
+    useCompleteHttpConnection,
+    useProcessOpenedLink,
+    useCompleteInjectedConnection
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
     subscribeToSignerResponse,
     subscribeToSignerUrlOpened,
     subscribeToTonOrTonConnectUrlOpened,
     tonConnectSSE
-} from '../../libs/tonConnect';
+} from '../../libs/ton-connect/capacitor-http-connector';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { useParseAndAddSigner } from '@tonkeeper/uikit/dist/state/wallet';
@@ -26,6 +32,10 @@ import {
 import { useTonTransactionNotification } from '@tonkeeper/uikit/dist/components/modals/TonTransactionNotificationControlled';
 import { errorMessage } from '@tonkeeper/core/dist/utils/types';
 import { useToast } from '@tonkeeper/uikit/dist/hooks/useNotification';
+import { tonConnectTonkeeperProAppName } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { capacitorTonConnectInjectedConnector } from '../../libs/ton-connect/capacitor-injected-connector';
+import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
+import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -40,6 +50,38 @@ export const useMobileProPairSignerSubscription = () => {
     }, []);
 };
 
+const useInjectedBridgeConnectionSubscription = (
+    setParams: (params: TonConnectConnectionParams) => void
+) => {
+    const ref = useRef<{
+        resolve: (value: ConnectEvent) => void;
+        reject: (reason?: unknown) => void;
+    } | null>(null);
+    useEffect(() => {
+        capacitorTonConnectInjectedConnector.setConnectHandler(
+            (request: ConnectRequest, webViewOrigin: string) => {
+                return new Promise<ConnectEvent>(async (resolve, reject) => {
+                    if (ref.current) {
+                        ref.current.reject('Request Cancelled');
+                    }
+                    ref.current = { resolve, reject };
+
+                    await CapacitorDappBrowser.setIsMainViewInFocus('tc-connect', true);
+                    setParams({
+                        type: 'injected',
+                        protocolVersion: 2,
+                        request,
+                        appName: tonConnectTonkeeperProAppName,
+                        webViewOrigin
+                    });
+                });
+            }
+        );
+    }, []);
+
+    return ref;
+};
+
 export const DeepLinkSubscription = () => {
     useMobileProPairSignerSubscription();
 
@@ -50,7 +92,19 @@ export const DeepLinkSubscription = () => {
         });
     }, []);
 
-    const [params, setParams] = useState<TonConnectParams | null>(null);
+    const [params, setParams] = useState<TonConnectConnectionParams | null>(null);
+    const paramsRef = useValueRef(params);
+
+    const onNewParamsReceived = useCallback((p: TonConnectConnectionParams | null) => {
+        if (p && paramsRef.current) {
+            throw new Error('New params received while old params not processed');
+        }
+
+        setParams(p);
+    }, []);
+
+    const injectedBridgeConnectionRef =
+        useInjectedBridgeConnectionSubscription(onNewParamsReceived);
     const [tkMobileUrl, setTkMobileUrl] = useState<{
         url: string;
         unsupportedLinkError?: string;
@@ -62,8 +116,10 @@ export const DeepLinkSubscription = () => {
     });
     const { onClose: closeTonTransaction } = useTonTransactionNotification();
 
-    const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        useResponseConnectionMutation();
+    const { mutateAsync: responseHttpConnectionAsync, reset: responseReset } =
+        useCompleteHttpConnection();
+    const { mutateAsync: responseInjectedConnectionAsync, reset: injectedResponseReset } =
+        useCompleteInjectedConnection();
 
     const handlerClose = async (
         result: {
@@ -75,12 +131,30 @@ export const DeepLinkSubscription = () => {
     ) => {
         setTkMobileUrl(null);
         if (!params) return;
+
         responseReset();
-        try {
-            await responseConnectionAsync({ params, result });
-        } finally {
-            setParams(null);
-            await tonConnectSSE.reconnect();
+        injectedResponseReset();
+        if (params.type === 'injected') {
+            try {
+                if (!injectedBridgeConnectionRef.current?.resolve) {
+                    throw new Error('Injected bridge not found');
+                }
+                await responseInjectedConnectionAsync({
+                    params,
+                    result,
+                    sendBridgeResponse: injectedBridgeConnectionRef.current.resolve
+                });
+            } finally {
+                setParams(null);
+                await CapacitorDappBrowser.setIsMainViewInFocus('tc-connect', false);
+            }
+        } else {
+            try {
+                await responseHttpConnectionAsync({ params, result });
+            } finally {
+                setParams(null);
+                await tonConnectSSE.reconnect();
+            }
         }
     };
 
@@ -92,7 +166,7 @@ export const DeepLinkSubscription = () => {
 
             let unsupportedLinkError = undefined;
             try {
-                setParams(await mutateAsync(url));
+                onNewParamsReceived(await mutateAsync(url));
             } catch (e) {
                 unsupportedLinkError = errorMessage(e);
             }
@@ -110,7 +184,7 @@ export const DeepLinkSubscription = () => {
     return (
         <>
             <TonConnectNotification
-                origin={undefined}
+                origin={params?.type === 'injected' ? params.webViewOrigin : undefined}
                 params={params ?? null}
                 handleClose={handlerClose}
             />

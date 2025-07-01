@@ -8,9 +8,9 @@ import { TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
-import { atom, ReadonlyAtom, Subject } from './entries/atom';
-import { AppKey } from './Keys';
-import { v4 as uuidv4 } from 'uuid';
+import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
+import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
+import { UserIdentity, UserIdentityService } from './user-identity';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -177,8 +177,36 @@ export interface IAppSdk {
         clear(): Promise<void>;
     };
 
-    getUserId: () => Promise<string>;
+    userIdentity: UserIdentity;
+
+    dappBrowser?: IDappBrowser;
 }
+
+export interface IDappBrowser {
+    open(
+        url: string,
+        options: {
+            id?: string;
+            keepFocusMainView?: boolean;
+        }
+    ): Promise<BrowserTabBase>;
+    hide(id?: string): Promise<void>;
+    close(id: string | string[]): Promise<void>;
+    setRequestsHandler(
+        method: string,
+        handler: (
+            payload: unknown,
+            ctx: { webViewId: string; webViewOrigin: string }
+        ) => Promise<string>
+    ): void;
+    emitEvent(webViewId: string, payload: string): Promise<void>;
+
+    /**
+     * Emits when a tab meta is changed or a new tab is opened
+     */
+    tabChange: ReadonlySubject<BrowserTabLive>;
+}
+
 export interface ConfirmOptions {
     title?: string;
     message: string;
@@ -196,7 +224,9 @@ export interface KeyboardService {
 export abstract class BaseApp implements IAppSdk {
     uiEvents = new EventEmitter();
 
-    constructor(public storage: IStorage) {}
+    constructor(public storage: IStorage) {
+        this.userIdentity = new UserIdentityService(storage);
+    }
 
     nativeBackButton?: NativeBackButton | undefined;
 
@@ -258,16 +288,7 @@ export abstract class BaseApp implements IAppSdk {
 
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
-    async getUserId() {
-        const userId = await this.storage.get<string>(AppKey.USER_ID);
-        if (userId) {
-            return userId;
-        } else {
-            const newUserId = uuidv4();
-            await this.storage.set(AppKey.USER_ID, newUserId);
-            return newUserId;
-        }
-    }
+    userIdentity: UserIdentity;
 }
 
 class WebKeyboardService implements KeyboardService {

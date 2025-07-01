@@ -75,7 +75,7 @@ const useSendMutation = (
     const account = useActiveAccount();
     const client = useQueryClient();
     const getSender = useGetSender();
-    const tonConenctService = useTonConnectTransactionService();
+    const tonConnectService = useTonConnectTransactionService();
 
     return useMutation<string, Error>(async () => {
         if (account.type === 'watch-only') {
@@ -96,7 +96,7 @@ const useSendMutation = (
             sender = await getSender(options.senderChoice);
         }
 
-        const boc = await tonConenctService.send(sender, estimate, params);
+        const boc = await tonConnectService.send(sender, estimate, params);
 
         const invalidationPromise = client.invalidateQueries(
             anyOfKeysParts(account.id, account.activeTonWallet.id)
@@ -108,7 +108,9 @@ const useSendMutation = (
     });
 };
 
-const NotificationSkeleton: FC<{ handleClose: (result?: string) => void }> = ({ handleClose }) => {
+const NotificationSkeleton: FC<{
+    handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
+}> = ({ handleClose }) => {
     const { t } = useTranslation();
 
     return (
@@ -163,9 +165,9 @@ const ActionFeeDetailsUniversalStyled = styled(ActionFeeDetailsUniversal)`
     }
 `;
 
-const ConnectContent: FC<{
+const TonTransactionContent: FC<{
     params: TonConnectTransactionPayload;
-    handleClose: (result?: string) => void;
+    handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
     waitInvalidation?: boolean;
     multisigTTL?: MultisigOrderLifetimeMinutes;
 }> = ({ params, handleClose, waitInvalidation, multisigTTL }) => {
@@ -230,7 +232,7 @@ const ConnectContent: FC<{
         try {
             const result = await mutateAsync();
             sdk.hapticNotification('success');
-            setTimeout(() => handleClose(result), 300);
+            setTimeout(() => handleClose({ boc: result, senderChoice }), 300);
         } catch (e) {
             sdk.hapticNotification('error');
             setTimeout(() => handleClose(), 3000);
@@ -380,7 +382,7 @@ const NotificationTitleWithWalletName: FC<{ onClose: () => void }> = ({ onClose 
 
 export const TonTransactionNotification: FC<{
     params: TonConnectTransactionPayload | null;
-    handleClose: (result?: string) => void;
+    handleClose: (result?: { boc: string; senderChoice: SenderChoice }) => void;
     waitInvalidation?: boolean;
 }> = ({ params, handleClose, waitInvalidation }) => {
     const { t } = useTranslation();
@@ -389,9 +391,9 @@ export const TonTransactionNotification: FC<{
     const [multisigTTL, setMultisigTTL] = useState<MultisigOrderLifetimeMinutes | undefined>();
 
     const onClose = useCallback(
-        (boc?: string) => {
+        (result?: { boc: string; senderChoice: SenderChoice }) => {
             setTimeout(() => setMultisigTTL(undefined), 400);
-            handleClose(boc);
+            handleClose(result);
         },
         [setMultisigTTL, handleClose]
     );
@@ -420,7 +422,7 @@ export const TonTransactionNotification: FC<{
                 {wallets.length > 1 && (
                     <NotificationTitleWithWalletName onClose={() => onClose()} />
                 )}
-                <ConnectContent
+                <TonTransactionContent
                     params={params}
                     handleClose={boc => (params != null ? onClose(boc) : undefined)}
                     waitInvalidation={waitInvalidation}
@@ -428,15 +430,7 @@ export const TonTransactionNotification: FC<{
                 />
             </>
         );
-    }, [
-        origin,
-        params,
-        onClose,
-        wallets.length,
-        isActiveAccountMultisig,
-        multisigTTL,
-        setMultisigTTL
-    ]);
+    }, [params, onClose, wallets.length, isActiveAccountMultisig, multisigTTL, setMultisigTTL]);
 
     return (
         <>

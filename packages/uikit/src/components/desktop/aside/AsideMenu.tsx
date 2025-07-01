@@ -10,7 +10,11 @@ import { useIsScrolled } from '../../../hooks/useIsScrolled';
 import { scrollToTop } from '../../../libs/common';
 import { AppProRoute, AppRoute } from '../../../libs/routes';
 import { useMutateUserUIPreferences, useUserUIPreferences } from '../../../state/theme';
-import { useActiveWallet, useMutateActiveTonWallet } from '../../../state/wallet';
+import {
+    asideWalletSelected$,
+    useActiveWallet,
+    useMutateActiveTonWallet
+} from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
@@ -35,6 +39,7 @@ import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useMenuController } from '../../../hooks/ionic';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -198,6 +203,7 @@ export const AsideMenuDNDItem = forwardRef<
             }
             setOptimisticWalletId(walletId);
             await menuController.close();
+            asideWalletSelected$.next(walletId);
             await setActiveWallet(walletId);
             handleNavigateHome();
         },
@@ -287,17 +293,19 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
 
     const activeRoute = useAsideActiveRoute();
     const menuController = useMenuController('aside-nav');
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
     const handleNavigateClick = useCallback(
         (route: string) => {
             menuController.close();
+            hideBrowser();
             if (location.pathname !== route) {
                 return navigate(route);
             } else {
                 scrollToTop();
             }
         },
-        [location.pathname]
+        [location.pathname, hideBrowser]
     );
 
     const [asideWidth, setAsideWidth] = useState(250);
@@ -357,18 +365,18 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                                 <Label2>{t('aside_dashboard')}</Label2>
                             </AsideMenuItem>
                         )}
+                        <HideOnReview>
+                            <AsideMenuItem
+                                onClick={() => handleNavigateClick(AppRoute.browser)}
+                                isSelected={activeRoute === AppRoute.browser}
+                            >
+                                <IconWrapper>
+                                    <GlobeIcon />
+                                </IconWrapper>
+                                <Label2>{t('aside_discover')}</Label2>
+                            </AsideMenuItem>
+                        </HideOnReview>
                     </NotForTargetEnv>
-                    <HideOnReview>
-                        <AsideMenuItem
-                            onClick={() => handleNavigateClick(AppRoute.browser)}
-                            isSelected={activeRoute === AppRoute.browser}
-                        >
-                            <IconWrapper>
-                                <GlobeIcon />
-                            </IconWrapper>
-                            <Label2>{t('aside_discover')}</Label2>
-                        </AsideMenuItem>
-                    </HideOnReview>
                     <AccountDNDBlock items={items} />
                 </ScrollContainer>
                 <AsideMenuBottom>
@@ -380,6 +388,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             isSelected={false}
                             onClick={() => {
                                 menuController.close();
+                                hideBrowser();
                                 addWallet();
                             }}
                         >
