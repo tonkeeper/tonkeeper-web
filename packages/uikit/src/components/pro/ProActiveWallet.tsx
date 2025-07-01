@@ -2,7 +2,6 @@ import styled from 'styled-components';
 
 import { Label2 } from '../Text';
 import { ListBlock } from '../List';
-import { Button } from '../fields/Button';
 import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
@@ -26,7 +25,7 @@ export const ProActiveWallet = () => {
                 wallet={activeWallet}
                 account={activeAccount}
                 rightElement={
-                    <ButtonStyled onClick={handleDisconnectClick}>
+                    <ButtonStyled as="button" onClick={handleDisconnectClick}>
                         <Label2>{t('disconnect')}</Label2>
                     </ButtonStyled>
                 }
@@ -35,15 +34,15 @@ export const ProActiveWallet = () => {
     );
 };
 
-const ButtonStyled = styled(Button)`
-    height: 0;
+const ButtonStyled = styled(Label2)`
+    height: auto;
     padding: 0 0 0 1rem;
     margin-left: auto;
-    background: none;
     color: ${props => props.theme.textAccent};
+    opacity: 1;
+    transition: opacity 0.3s;
 
-    :hover {
-        background: none;
-        color: ${props => props.theme.textAccent};
+    &:hover {
+        opacity: 0.7;
     }
 `;

@@ -85,7 +85,7 @@ const ProFeaturesListContent: FC<IProps> = props => {
             {!removeTitle && <Title>{t('what_is_included')}</Title>}
             <ListBlock fullWidth>
                 {features.map(({ titleKey, descriptionKey, iconComponent, badgeComponent }) => (
-                    <ListItem key={titleKey}>
+                    <ListItem hover={false} key={titleKey}>
                         <ListItemPayloadStyled>
                             <div>
                                 <LocalBadgedTitleStyled

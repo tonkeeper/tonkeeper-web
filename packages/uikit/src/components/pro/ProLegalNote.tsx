@@ -2,7 +2,6 @@ import { type FC } from 'react';
 import styled from 'styled-components';
 
 import { Body3 } from '../Text';
-import { Button } from '../fields/Button';
 import { useTranslation } from '../../hooks/translation';
 import { useOpenBrowserTab } from '../../state/dapp-browser';
 
@@ -21,16 +20,25 @@ export const ProLegalNote: FC<IProps> = ({ isCrypto = false }) => {
     ) : (
         <LegalNoteWrapper>
             <LegalNote>{t('pro_terms_privacy_restore_note')} </LegalNote>
-            <ButtonStyled onClick={() => openTab({ url: 'https://tonkeeper.com/terms' })}>
-                <Body3 as="span">{t('legal_terms')}</Body3>
+            <ButtonStyled
+                as="button"
+                onClick={() => openTab({ url: 'https://tonkeeper.com/terms' })}
+            >
+                {t('legal_terms')}
             </ButtonStyled>
             <LegalNote> {t('and')} </LegalNote>
-            <ButtonStyled onClick={() => openTab({ url: 'https://tonkeeper.com/privacy' })}>
-                <Body3 as="span">{t('legal_privacy')}</Body3>
+            <ButtonStyled
+                as="button"
+                onClick={() => openTab({ url: 'https://tonkeeper.com/privacy' })}
+            >
+                {t('legal_privacy')}
             </ButtonStyled>
             <LegalNote>. </LegalNote>
-            <ButtonStyled onClick={() => openTab({ url: 'https://tonkeeper.com/restore' })}>
-                <Body3 as="span">{t('restore_purchases')}</Body3>
+            <ButtonStyled
+                as="button"
+                onClick={() => openTab({ url: 'https://tonkeeper.com/restore' })}
+            >
+                {t('restore_purchases')}
             </ButtonStyled>
             <LegalNote>.</LegalNote>
         </LegalNoteWrapper>
@@ -48,15 +56,15 @@ const LegalNote = styled(Body3)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const ButtonStyled = styled(Button)`
+const ButtonStyled = styled(Body3)`
     display: inline;
+    height: max-content;
     padding: 0;
-    height: auto;
     color: ${props => props.theme.textPrimary};
-    background: none;
+    opacity: 1;
+    transition: opacity 0.3s;
 
-    :hover {
-        background: none;
-        color: ${props => props.theme.textAccent};
+    &:hover {
+        opacity: 0.7;
     }
 `;

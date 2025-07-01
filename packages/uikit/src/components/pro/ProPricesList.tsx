@@ -44,7 +44,7 @@ const ProPricesListContent: FC<IProps> = props => {
                     );
 
                     return (
-                        <ListItemStyled key={id}>
+                        <ListItemStyled hover={false} key={id}>
                             <ListItemPayloadStyled>
                                 {titleNode}
                                 {priceNode}

@@ -25,7 +25,7 @@ export const ProWalletListItem: FC<IProWalletListItemProps> = props => {
     const { name, emoji } = getAccountWalletNameAndEmoji(account);
 
     return (
-        <ListItemStyled onClick={onClick}>
+        <ListItemStyled hover={false} onClick={onClick}>
             <ListItemPayloadStyled>
                 <WalletEmojiStyled containerSize="16px" emojiSize="16px" emoji={emoji} />
                 <Body2Limited>{name}</Body2Limited>
