@@ -32,6 +32,7 @@ import { useTwoFAWalletConfig } from './two-fa';
 import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { useIsOnIosReview } from '../hooks/ios';
+import { CountryFeature, useIsFeatureAvailableForRegulatoryState } from './country';
 
 export const useCanUseBattery = () => {
     const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
@@ -227,6 +228,7 @@ export const useBatteryEnabledConfig = () => {
     const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const disableDueToIosReview = useIsOnIosReview();
+    const disableDueToRegulatory = !useIsFeatureAvailableForRegulatoryState(CountryFeature.battery);
 
     const disableDueToTwoFA =
         twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
@@ -241,7 +243,10 @@ export const useBatteryEnabledConfig = () => {
         }
 
         const disableWhole =
-            disableDueToIosReview || disableDueToTwoFA || (disable_battery ?? false);
+            disableDueToRegulatory ||
+            disableDueToIosReview ||
+            disableDueToTwoFA ||
+            (disable_battery ?? false);
 
         return {
             isBeta: battery_beta ?? false,

@@ -45,7 +45,7 @@ import {
     TonWalletStandard,
     WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
-import { useGaslessConfig } from '../../state/gasless';
+import { useGaslessConfig, useIsGaslessEnabledGlobally } from '../../state/gasless';
 import { TonConnectTransactionPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
@@ -99,6 +99,8 @@ export const useAvailableSendersChoices = (
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
+    const gaslessEnabledGlobally = useIsGaslessEnabledGlobally();
+
     return useQuery<SenderChoiceUserAvailable[]>(
         [
             'available-sender-choices',
@@ -109,6 +111,7 @@ export const useAvailableSendersChoices = (
             account.type,
             batteryReservedAmount,
             gaslessConfig,
+            gaslessEnabledGlobally,
             batteryEnableConfig.disableOperations,
             walletInfo,
             twoFaConfig
@@ -161,7 +164,7 @@ export const useAvailableSendersChoices = (
                 }
             }
 
-            if (isGaslessAvailable({ asset, account, gaslessConfig })) {
+            if (isGaslessAvailable({ asset, account, gaslessConfig }) && gaslessEnabledGlobally) {
                 if (
                     walletInfo!.ton.info.balance <
                     JettonEncoder.jettonTransferAmount + toNano(0.005)
@@ -202,6 +205,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const batteryUnitTonRate = useBatteryUnitTonRate();
     const gaslessConfig = useGaslessConfig();
     const { data: jettons } = useJettonList();
+    const gaslessEnabledGlobally = useIsGaslessEnabledGlobally();
 
     return useQuery<SenderChoiceUserAvailable[]>(
         [
@@ -215,6 +219,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             batteryUnitTonRate,
             gaslessConfig.relayAddress,
             gaslessConfig.gasJettons,
+            gaslessEnabledGlobally,
             jettons
         ],
         async () => {
@@ -269,6 +274,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             }
 
             if (
+                gaslessEnabledGlobally &&
                 payload.messagesVariants?.gasless &&
                 isStandardTonWallet(account.activeTonWallet) &&
                 payload.messagesVariants.gasless.options?.asset &&
