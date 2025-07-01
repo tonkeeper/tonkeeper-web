@@ -765,12 +765,13 @@ export const NotificationDesktopAndWeb: FC<{
     const nodeRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const closeOnEscapeKey = (e: KeyboardEvent) => (e.key === 'Escape' ? onClose() : null);
+        const closeOnEscapeKey = (e: KeyboardEvent) =>
+            e.key === 'Escape' && open ? onClose() : null;
         document.body.addEventListener('keydown', closeOnEscapeKey);
         return () => {
             document.body.removeEventListener('keydown', closeOnEscapeKey);
         };
-    }, [onClose]);
+    }, [onClose, open]);
 
     const Child = useMemo(() => {
         return children((_afterClose?: () => void) => {
