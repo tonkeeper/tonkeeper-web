@@ -193,6 +193,10 @@ export class AccountTonTestnet extends TonMnemonic {
 export class AccountTonSK extends TonMnemonic {
     public readonly type = 'sk';
 
+    get signingAlgorithm() {
+        return this._signingAlgorithm ?? 'ed25519';
+    }
+
     constructor(
         id: AccountId,
         name: string,
@@ -203,7 +207,7 @@ export class AccountTonSK extends TonMnemonic {
         /**
          * Undefined for existing accounts, set to 'ed25519'
          */
-        public readonly signingAlgorithm: SKSigningAlgorithm = 'ed25519'
+        private readonly _signingAlgorithm?: SKSigningAlgorithm
     ) {
         super(id, name, emoji, auth, activeTonWalletId, tonWallets);
     }
