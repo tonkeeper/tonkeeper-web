@@ -24,10 +24,11 @@ import {
     startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
-import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
+import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
+import { OpenAPI } from '@tonkeeper/core/dist/pro';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
-import { useAppSdk, useAppTargetEnv, useIsCapacitorApp } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
@@ -103,32 +104,18 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const isCapacitorApp = useIsCapacitorApp();
     const storage = useAppSdk().storage;
 
-    return useMemo(() => {
-        if (isCapacitorApp) {
-            return {
-                async attachToken() {
-                    const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
-                    OpenAPI.TOKEN = token ?? undefined;
-                },
-                async onTokenUpdated(token: string | null) {
-                    await storage.set(AppKey.PRO_AUTH_TOKEN, token);
-                    return this.attachToken();
-                }
-            };
-        } else {
-            return {
-                async attachToken() {
-                    /* */
-                },
-                async onTokenUpdated() {
-                    /* */
-                }
-            };
+    return {
+        async attachToken() {
+            const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
+            OpenAPI.TOKEN = token ?? undefined;
+        },
+        async onTokenUpdated(token: string | null) {
+            await storage.set(AppKey.PRO_AUTH_TOKEN, token);
+            return this.attachToken();
         }
-    }, [isCapacitorApp]);
+    };
 };
 
 export const useProState = () => {

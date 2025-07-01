@@ -33,6 +33,7 @@ import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getNetworkByAccount } from '../entries/account';
 import { Network } from '../entries/network';
+import { AuthService, TiersService, UserService } from '../pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -93,7 +94,7 @@ const loadProState = async (
     storage: IStorage
 ): Promise<ProState> => {
     await authService.attachToken();
-    const user = await ProServiceService.proServiceGetUserInfo();
+    const user = await UserService.getUserInfo();
 
     let authorizedWallet: ProStateWallet | null = null;
     if (user.pub_key && user.version) {
@@ -125,7 +126,7 @@ const loadProState = async (
         };
     }
 
-    const subscriptionDTO = await ProServiceService.proServiceVerify();
+    const subscriptionDTO = await UserService.verifySubscription();
 
     let subscription: ProSubscription;
     if (subscriptionDTO.valid) {
@@ -165,8 +166,8 @@ export const authViaTonConnect = async (
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
 ) => {
-    const domain = 'https://tonkeeper.com/';
-    const { payload } = await ProServiceService.proServiceAuthGeneratePayload();
+    const domain = 'tonkeeper';
+    const { payload } = await AuthService.authGeneratePayload();
 
     const timestamp = await getServerTime(api);
     const proofPayload = tonConnectProofPayload(timestamp, domain, wallet.rawAddress, payload);
@@ -177,7 +178,7 @@ export const authViaTonConnect = async (
         stateInit
     );
 
-    const result = await ProServiceService.proServiceTonConnectAuth({
+    const result = await AuthService.tonConnectAuth({
         address: wallet.rawAddress,
         proof: {
             timestamp: proof.timestamp,
@@ -196,7 +197,7 @@ export const authViaTonConnect = async (
 };
 
 export const logoutTonConsole = async (authService: ProAuthTokenService) => {
-    const result = await ProServiceService.proServiceLogout();
+    const result = await AuthService.logout();
     if (!result.ok) {
         throw new Error('Unable to logout');
     }
@@ -205,10 +206,8 @@ export const logoutTonConsole = async (authService: ProAuthTokenService) => {
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
-    const { items } = await ProServiceService.getProServiceTiers(
-        localizationText(lang) as Lang,
-        promoCode
-    );
+    const { items } = await TiersService.getTiers(localizationText(lang) as Lang, promoCode);
+
     return items;
 };
 
