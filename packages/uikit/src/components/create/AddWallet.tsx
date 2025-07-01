@@ -7,6 +7,7 @@ import { BorderSmallResponsive } from '../shared/Styles';
 import { Badge } from '../shared';
 import { useAccountsState, useActiveAccountQuery } from '../../state/wallet';
 import {
+    WalletFireblocksIcon,
     WalletImportIcon,
     WalletKeystoneIcon,
     WalletLedgerIcon,
@@ -206,37 +207,6 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                         </AddMethod>
                     )}
                 </HideOnReview>
-                <AddMethod onClick={() => onSelect('testnet')}>
-                    <ButtonIcon>
-                        <WalletTestnetIcon />
-                    </ButtonIcon>
-                    <AddMethodText>
-                        <AddMethodLabel>{t('add_wallet_modal_testnet_title')}</AddMethodLabel>
-                        <AddMethodDescription>
-                            {t('add_wallet_modal_testnet_subtitle')}
-                        </AddMethodDescription>
-                    </AddMethodText>
-                    <RightIconStyled />
-                </AddMethod>
-                {!hideFireblocks && canHaveProSubscription && (
-                    <HideOnReview>
-                        <AddMethod onClick={() => onSelect('sk_fireblocks')}>
-                            <ButtonIcon>
-                                <WalletSignerIcon />
-                            </ButtonIcon>
-                            <AddMethodText>
-                                <AddMethodLabel>
-                                    {t('add_wallet_modal_fireblocks_title')}
-                                    <Badge color="accentBlue">PRO</Badge>
-                                </AddMethodLabel>
-                                <AddMethodDescription>
-                                    {t('add_wallet_modal_fireblocks_description')}
-                                </AddMethodDescription>
-                            </AddMethodText>
-                            <RightIconStyled />
-                        </AddMethod>
-                    </HideOnReview>
-                )}
             </AddMethodsGroup>
             {!hideAllHardwareWallets && (
                 <>
@@ -284,6 +254,42 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                                 <RightIconStyled />
                             </AddMethod>
                         )}
+                    </AddMethodsGroup>
+                    <GroupsDivider>{t('add_wallet_group_other_options')}</GroupsDivider>
+                    <AddMethodsGroup>
+                        {!hideFireblocks && canHaveProSubscription && (
+                            <HideOnReview>
+                                <AddMethod onClick={() => onSelect('sk_fireblocks')}>
+                                    <ButtonIcon>
+                                        <WalletFireblocksIcon />
+                                    </ButtonIcon>
+                                    <AddMethodText>
+                                        <AddMethodLabel>
+                                            {t('add_wallet_modal_fireblocks_title')}
+                                            <Badge color="accentBlue">PRO</Badge>
+                                        </AddMethodLabel>
+                                        <AddMethodDescription>
+                                            {t('add_wallet_modal_fireblocks_description')}
+                                        </AddMethodDescription>
+                                    </AddMethodText>
+                                    <RightIconStyled />
+                                </AddMethod>
+                            </HideOnReview>
+                        )}
+                        <AddMethod onClick={() => onSelect('testnet')}>
+                            <ButtonIcon>
+                                <WalletTestnetIcon />
+                            </ButtonIcon>
+                            <AddMethodText>
+                                <AddMethodLabel>
+                                    {t('add_wallet_modal_testnet_title')}
+                                </AddMethodLabel>
+                                <AddMethodDescription>
+                                    {t('add_wallet_modal_testnet_subtitle')}
+                                </AddMethodDescription>
+                            </AddMethodText>
+                            <RightIconStyled />
+                        </AddMethod>
                     </AddMethodsGroup>
                 </>
             )}
