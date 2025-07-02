@@ -38,6 +38,8 @@ export const ProPurchaseChooseScreen = () => {
     const { data: products, error, isError, isFetching, refetch } = useProPlans();
     useNotifyError(error);
 
+    // TODO JUST FOR PIPLELINE START
+
     useEffect(() => {
         if (isSuccess) {
             toast(t('subscription_purchase_success'));
