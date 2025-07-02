@@ -76,17 +76,19 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
         <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
             <ProSubscriptionHeader />
             <ProPricesList displayPlans={adaptPlansToViewModel(products)} />
-            <ProFeaturesList />
-            <NotificationFooterPortal>
-                <NotificationFooter>
-                    <ButtonsBlockStyled
-                        formId={formId}
-                        isError={isError}
-                        isLoading={isLoading}
-                        onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
-                    />
-                </NotificationFooter>
-            </NotificationFooterPortal>
+            <ProFeaturesList headerOptions={{ rightElement: null }} />
+            {!data.subscription.valid && (
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ButtonsBlockStyled
+                            formId={formId}
+                            isError={isError}
+                            isLoading={isLoading}
+                            onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
+                        />
+                    </NotificationFooter>
+                </NotificationFooterPortal>
+            )}
             <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialClose} />
         </ContentWrapper>
     );
