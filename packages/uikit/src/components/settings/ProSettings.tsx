@@ -24,7 +24,6 @@ import {
     ConfirmState,
     useCreateInvoiceMutation,
     useProLogout,
-    useProPlans,
     useProState,
     useSelectWalletForProMutation,
     useWaitInvoiceMutation
@@ -322,7 +321,9 @@ const BuyProService: FC<{
     const [selectedPlan, setPlan] = useState<number | null>(null);
     const [promo, setPromo] = useState('');
 
-    const [plans, promoCode] = useProPlans(promo);
+    // TODO Dont forget to fix it
+    const [plans, promoCode] = [undefined, undefined];
+    // const [plans, promoCode] = useProPlans(promo);
 
     const { mutateAsync: createInvoice, isLoading: isInvoiceLoading } = useCreateInvoiceMutation();
     const { mutate: waitInvoice, isLoading: isInvoicePending } = useWaitInvoiceMutation();
@@ -331,11 +332,12 @@ const BuyProService: FC<{
 
     const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
-    useEffect(() => {
-        if (plans && plans[0] && selectedPlan == null) {
-            setPlan(plans[0].id);
-        }
-    }, [plans]);
+    // TODO Dont forget to fix it
+    // useEffect(() => {
+    //     if (plans && plans[0] && selectedPlan == null) {
+    //         setPlan(plans[0].id);
+    //     }
+    // }, [plans]);
 
     useEffect(() => {
         if (ref.current) {

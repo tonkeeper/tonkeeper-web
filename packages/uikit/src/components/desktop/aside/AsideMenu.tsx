@@ -322,7 +322,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     }, [uiPreferences?.asideWidth]);
 
     useEffect(() => {
-        const minWidth = 200;
+        const minWidth = 240;
         const maxWidth = 500;
         const onMouseUp = () => {
             document.body.style.cursor = 'unset';

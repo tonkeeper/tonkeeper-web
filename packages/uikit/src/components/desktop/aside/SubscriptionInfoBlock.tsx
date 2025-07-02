@@ -160,7 +160,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         onOpen();
     };
 
-    let button = <Button loading>Pro</Button>;
+    let button = <Button loading>Tonkeeper Pro</Button>;
     if (data) {
         if (data.subscription.valid) {
             button = (
@@ -173,7 +173,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                     )}
                     trigger="hover"
                 >
-                    <ProButtonPanel>Pro</ProButtonPanel>
+                    <ProButtonPanel>Tonkeeper Pro</ProButtonPanel>
                 </DropDown>
             );
         } else {

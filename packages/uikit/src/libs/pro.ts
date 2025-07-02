@@ -6,6 +6,8 @@ import {
 } from '@tonkeeper/core/dist/entries/pro';
 
 import { SubscriptionScreens } from '../enums/pro';
+import { formatter } from '../hooks/balance';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 
 export const getSkeletonProducts = (skeletonSize = 2) =>
     Array.from({ length: skeletonSize }, (_, index) => ({
@@ -22,6 +24,10 @@ export const isDirectionForward = (
 
     return current > prev;
 };
+
+function isValidNanoString(value: string): boolean {
+    return /^\d+$/.test(value);
+}
 
 export function adaptPlansToViewModel(
     normalizedPlans: NormalizedProPlans | undefined
@@ -43,7 +49,10 @@ export function adaptPlansToViewModel(
                 ...normalizedPlans.plans.map(plan => ({
                     id: plan.id.toString(),
                     displayName: plan.name,
-                    displayPrice: plan.amount
+                    // TODO Improve it
+                    displayPrice: isValidNanoString(plan.amount)
+                        ? `${formatter.fromNano(plan.amount)} ${CryptoCurrency.TON}`
+                        : '-'
                 }))
             ];
     }
