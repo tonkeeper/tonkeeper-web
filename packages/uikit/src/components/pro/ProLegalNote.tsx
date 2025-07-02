@@ -1,35 +1,40 @@
-import { type FC } from 'react';
 import styled from 'styled-components';
 
 import { Body3 } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
+import { isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
-interface IProps {
-    isCrypto?: boolean;
-}
-
-export const ProLegalNote: FC<IProps> = ({ isCrypto = false }) => {
+export const ProLegalNote = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    return isCrypto ? (
-        <LegalNoteWrapper />
-    ) : (
+    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+
+    return (
         <LegalNoteWrapper>
-            <LegalNote>{t('pro_terms_privacy_restore_note')} </LegalNote>
+            <LegalNote>
+                {t(`pro_terms_privacy_restore_note${isCrypto ? '_crypto' : ''}`)}{' '}
+            </LegalNote>
             <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/terms')}>
-                {t('legal_terms')}
+                {t('pro_terms')}
             </ButtonStyled>
             <LegalNote> {t('and')} </LegalNote>
             <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/privacy')}>
-                {t('legal_privacy')}
+                {t('pro_privacy')}
             </ButtonStyled>
             <LegalNote>. </LegalNote>
-            <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/restore')}>
-                {t('restore_purchases')}
-            </ButtonStyled>
-            <LegalNote>.</LegalNote>
+            {!isCrypto && (
+                <>
+                    <ButtonStyled
+                        as="button"
+                        onClick={() => sdk.openPage('https://tonkeeper.com/restore')}
+                    >
+                        {t('restore_purchases')}
+                    </ButtonStyled>
+                    <LegalNote>.</LegalNote>
+                </>
+            )}
         </LegalNoteWrapper>
     );
 };
