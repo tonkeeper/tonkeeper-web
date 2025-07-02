@@ -2,42 +2,31 @@ import { type FC } from 'react';
 import styled from 'styled-components';
 
 import { Body3 } from '../Text';
+import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { useOpenBrowserTab } from '../../state/dapp-browser';
 
 interface IProps {
     isCrypto?: boolean;
 }
 
 export const ProLegalNote: FC<IProps> = ({ isCrypto = false }) => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { mutate: openTab } = useOpenBrowserTab();
-
-    // TODO Close settings page after opening a tab
 
     return isCrypto ? (
         <LegalNoteWrapper />
     ) : (
         <LegalNoteWrapper>
             <LegalNote>{t('pro_terms_privacy_restore_note')} </LegalNote>
-            <ButtonStyled
-                as="button"
-                onClick={() => openTab({ url: 'https://tonkeeper.com/terms' })}
-            >
+            <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/terms')}>
                 {t('legal_terms')}
             </ButtonStyled>
             <LegalNote> {t('and')} </LegalNote>
-            <ButtonStyled
-                as="button"
-                onClick={() => openTab({ url: 'https://tonkeeper.com/privacy' })}
-            >
+            <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/privacy')}>
                 {t('legal_privacy')}
             </ButtonStyled>
             <LegalNote>. </LegalNote>
-            <ButtonStyled
-                as="button"
-                onClick={() => openTab({ url: 'https://tonkeeper.com/restore' })}
-            >
+            <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/restore')}>
                 {t('restore_purchases')}
             </ButtonStyled>
             <LegalNote>.</LegalNote>
