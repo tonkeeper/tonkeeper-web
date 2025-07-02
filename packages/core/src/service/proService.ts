@@ -33,7 +33,7 @@ import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 import { getNetworkByAccount } from '../entries/account';
 import { Network } from '../entries/network';
-import { AuthService, TiersService, UserService } from '../pro';
+import { AuthService, InvoicesService, TiersService, UserService } from '../pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -265,6 +265,13 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
             console.warn(e);
         }
     } while (updated.status === InvoiceStatus.PENDING);
+};
+
+export const saveIapPurchase = async (originalTransactionId: string) => {
+    return InvoicesService.activateIapPurchase({
+        original_transaction_id: originalTransactionId,
+        sandbox: true
+    });
 };
 
 export async function startProServiceTrial(
