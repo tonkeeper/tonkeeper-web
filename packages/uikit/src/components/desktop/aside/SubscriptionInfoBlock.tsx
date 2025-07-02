@@ -56,17 +56,17 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
-                <Body3Block>
-                    {t('aside_expires_on').replace(
-                        '%date%',
-                        formatDate(subscription.nextChargeDate, {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            inputUnit: 'seconds'
-                        })
-                    )}
-                </Body3Block>
+                {/*<Body3Block>*/}
+                {/*    {t('aside_expires_on').replace(*/}
+                {/*        '%date%',*/}
+                {/*        formatDate(subscription.nextChargeDate, {*/}
+                {/*            day: 'numeric',*/}
+                {/*            month: 'short',*/}
+                {/*            year: 'numeric',*/}
+                {/*            inputUnit: 'seconds'*/}
+                {/*        })*/}
+                {/*    )}*/}
+                {/*</Body3Block>*/}
             </>
         );
     }
