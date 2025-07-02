@@ -1,18 +1,34 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { defaultTheme } from '../styles/defaultTheme';
 import { proTheme } from '../styles/proTheme';
+import { mobileProTheme } from '../styles/mobileProTheme';
+import { useMemo } from 'react';
 
-export const availableThemes = {
-    dark: defaultTheme,
-    pro: proTheme
+export const useAvailableThemes = () => {
+    const env = useAppTargetEnv();
+
+    return useMemo(() => {
+        if (env === 'mobile') {
+            return {
+                dark: defaultTheme,
+                pro: mobileProTheme
+            };
+        } else {
+            return {
+                dark: defaultTheme,
+                pro: proTheme
+            };
+        }
+    }, [env]);
 };
 
 export interface UIPreferences {
     asideWidth: number;
     showTokensChart: boolean;
     theme: 'dark' | 'pro';
+    dismissMobileQRBanner: boolean;
 }
 
 export const useUserUIPreferences = () => {

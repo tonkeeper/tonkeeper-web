@@ -8,12 +8,20 @@ import { SettingsItem, SettingsList } from '../../components/settings/SettingsLi
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { useMutateUserFiat } from '../../state/fiat';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 export const FiatCurrency = () => {
     const { t, i18n } = useTranslation();
 
     const { fiat } = useAppContext();
     const { mutate } = useMutateUserFiat();
+    const isProDisplay = useIsFullWidthMode();
 
     const items = useMemo<SettingsItem[]>(() => {
         return Object.entries(FiatCurrencySymbolsConfig).map(([key]) => ({
@@ -28,6 +36,19 @@ export const FiatCurrency = () => {
             action: () => mutate(key as FiatCurrencies)
         }));
     }, [mutate, fiat, i18n.language]);
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayout>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('settings_primary_currency')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <SettingsList items={items} />
+            </DesktopViewPageLayout>
+        );
+    }
 
     return (
         <>

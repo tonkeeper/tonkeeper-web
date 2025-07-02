@@ -51,7 +51,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonConnectTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-connect-transaction.service';
 import { useAssets } from '../../state/home';
 import { JettonEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/jetton-encoder';
-import { toNano } from '@ton/core';
+import { Address, toNano } from '@ton/core';
 import {
     useTwoFAWalletConfigMayBeOfMultisigHost,
     useTwoFAApi,
@@ -63,11 +63,11 @@ import { useConfirmTwoFANotification } from '../../components/modals/ConfirmTwoF
 import { useTronApi } from '../../state/tron/tron';
 import { TronSender } from '@tonkeeper/core/dist/service/tron-blockchain/tron-sender';
 import { useAppSdk } from '../appSdk';
-import { useCheckTouchId } from '../../state/password';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { QueryKey } from '../../libs/queryKey';
 import { useJettonList } from '../../state/jetton';
+import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -268,8 +268,15 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
                 }
             }
 
-            if (payload.messagesVariants?.gasless && isStandardTonWallet(account.activeTonWallet)) {
-                const assetAddress = payload.messagesVariants.gasless.options?.asset;
+            if (
+                payload.messagesVariants?.gasless &&
+                isStandardTonWallet(account.activeTonWallet) &&
+                payload.messagesVariants.gasless.options?.asset &&
+                seeIfValidTonAddress(payload.messagesVariants.gasless.options?.asset)
+            ) {
+                const assetAddress = Address.parse(
+                    payload.messagesVariants.gasless.options?.asset
+                ).toRawString();
                 if (
                     assetAddress &&
                     gaslessConfig.gasJettons.some(j => j.masterId === assetAddress) &&
@@ -730,12 +737,11 @@ export const useGetTronSender = () => {
     const sdk = useAppSdk();
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
     const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
     const { data: authToken } = useBatteryAuthToken();
 
     return useCallback(async () => {
-        const signer = getTronSigner(sdk, tronApi, activeAccount, checkTouchId);
+        const signer = getTronSigner(sdk, tronApi, activeAccount);
 
         if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
             throw new Error('Tron is not enabled for the active wallet');
@@ -744,7 +750,7 @@ export const useGetTronSender = () => {
         const token = authToken ?? (await requestToken());
 
         return new TronSender(tronApi, activeAccount.activeTronWallet, signer, token);
-    }, [tronApi, activeAccount, checkTouchId]);
+    }, [tronApi, activeAccount]);
 };
 
 export const useGetTronEstimationSender = () => {

@@ -1,58 +1,56 @@
-import {
-    isStandardTonWallet,
-    walletVersionText,
-    TonContract
-} from '@tonkeeper/core/dist/entries/wallet';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { Network } from '@tonkeeper/core/dist/entries/network';
+import { useLocation } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
+import { useAppContext } from '../appContext';
+import { AnalyticsTracker } from './common';
 
-export interface Analytics {
-    pageView: (location: string) => void;
+export { Aptabase } from './aptabase';
+export { type Analytics, toWalletType } from './common';
 
-    init: (params: {
-        application: string;
-        walletType: string;
-        activeAccount: Account;
-        accounts: Account[];
-        network?: Network;
-        version?: string;
-        platform?: string;
-    }) => void;
-    track: (name: string, params: Record<string, any>) => Promise<void>;
-}
+export const useAnalyticsTrack = () => {
+    const { tracker } = useAppContext();
 
-export class AnalyticsGroup implements Analytics {
-    private analytics: Analytics[];
+    return useCallback<AnalyticsTracker>(
+        async (...args) => {
+            if (tracker) {
+                try {
+                    await tracker(...(args as Parameters<AnalyticsTracker>));
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        },
+        [tracker]
+    );
+};
 
-    constructor(...items: Analytics[]) {
-        this.analytics = items;
-    }
+export const useTrackLocation = () => {
+    const location = useLocation();
+    const track = useAnalyticsTrack();
 
-    pageView(location: string) {
-        this.analytics.forEach(c => c.pageView(location));
-    }
+    useEffect(() => {
+        track('page_view', { location: location.pathname });
+    }, [track, location.pathname]);
+};
 
-    init(params: {
-        application: string;
-        walletType: string;
-        activeAccount: Account;
-        accounts: Account[];
-        network?: Network;
-        version?: string;
-        platform?: string;
-    }) {
-        this.analytics.forEach(c => c.init(params));
-    }
+export type AnalyticsTransactionType =
+    | 'send-ton'
+    | 'send-jetton'
+    | 'send-nft'
+    | 'renew-dns'
+    | 'link-dns'
+    | 'send-trc20'
+    | 'multi-send-ton'
+    | 'multi-send-jetton';
 
-    async track(name: string, params: Record<string, any>) {
-        return Promise.all(this.analytics.map(c => c.track(name, params))).then(() => undefined);
-    }
-}
+export const useTransactionAnalytics = () => {
+    const track = useAnalyticsTrack();
 
-export const toWalletType = (wallet?: TonContract | null): string => {
-    if (!wallet) return 'new-user';
-    if (!isStandardTonWallet(wallet)) {
-        return 'unknown-contract';
-    }
-    return walletVersionText(wallet.version);
+    return useCallback(
+        (kind: AnalyticsTransactionType) => {
+            track('Send_Transaction', {
+                kind
+            });
+        },
+        [track]
+    );
 };

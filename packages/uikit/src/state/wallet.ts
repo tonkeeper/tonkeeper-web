@@ -9,6 +9,7 @@ import {
     AccountsState,
     AccountTonMnemonic,
     AccountTonMultisig,
+    AccountTonOnly,
     AccountTonSK,
     AccountTonTestnet,
     AccountTonWatchOnly,
@@ -39,6 +40,8 @@ import {
 } from '@tonkeeper/core/dist/service/wallet/configService';
 import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import {
+    accountBySignerLink,
+    checkMamAccountForDeprecatedTronAddress,
     createMAMAccountByMnemonic,
     createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
@@ -50,6 +53,7 @@ import {
     getTonWalletStandard,
     getWalletAddress,
     mamAccountToMamAccountWithTron,
+    parseSignerLink,
     standardTonAccountToAccountWithTron,
     tronWalletByTonMnemonic
 } from '@tonkeeper/core/dist/service/walletService';
@@ -61,7 +65,6 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
-import { useCheckTouchId } from './password';
 import {
     encryptWalletSecret,
     seeIfMnemonicValid,
@@ -72,7 +75,16 @@ import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { useIsTronEnabledGlobally } from './tron/tron';
+import { useIsTronEnabledGlobally, useTronApi } from './tron/tron';
+import { useNavigate } from '../hooks/router/useNavigate';
+import { AppRoute } from '../libs/routes';
+import { isSignerLink } from './signer';
+import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
+import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
+import { useSecurityCheck } from './password';
+import { useMutateIsFreeProAccessActivate } from './pro';
+import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
+import { subject } from '@tonkeeper/core/dist/entries/atom';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -138,19 +150,13 @@ export const useMutateActiveAccountAndWallet = () => {
     );
 };
 
+export const asideWalletSelected$ = subject<WalletId>();
+
 export const useMutateActiveTonWallet = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, WalletId>(async walletId => {
-        const accounts = await storage.getAccounts();
-        const account = getAccountByWalletById(accounts, walletId);
-
-        if (!account) {
-            throw new Error('Account not found');
-        }
-        account.setActiveTonWallet(walletId);
-        await storage.updateAccountInState(account);
-        await storage.setActiveAccountId(account.id);
+        await storage.setActiveAccountAndWalletByWalletId(walletId);
         await client.invalidateQueries(anyOfKeysParts(QueryKey.account, walletId));
     });
 };
@@ -223,7 +229,10 @@ export const useCreateMAMAccountDerivation = () => {
     const sdk = useAppSdk();
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
+    const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const tronApi = useTronApi();
+    const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
@@ -232,7 +241,7 @@ export const useCreateMAMAccountDerivation = () => {
         }
         const newDerivationIndex = account.lastAddedIndex + 1;
 
-        const secret = await getAccountSecret(sdk, accountId, checkTouchId);
+        const secret = await getAccountSecret(sdk, accountId);
         if (secret.type !== 'mnemonic') {
             throw new Error('Unexpected secret type');
         }
@@ -255,7 +264,10 @@ export const useCreateMAMAccountDerivation = () => {
             }
         ];
 
-        const isTronEnabled = (await getAccountConfig(sdk, accountId)).enableTron;
+        const isTronEnabledForAccount = (await getAccountConfig(sdk, accountId)).enableTron;
+        const isTronEnabled = isTronEnabledGlobally && isTronEnabledForAccount;
+
+        await checkMamAccountForDeprecatedTronAddress(mnemonic, tronApi, openTronMigrationModal);
 
         account.addDerivation({
             name: account.getNewDerivationFallbackName(),
@@ -263,7 +275,14 @@ export const useCreateMAMAccountDerivation = () => {
             index: newDerivationIndex,
             tonWallets,
             activeTonWalletId: tonWallets[0].id,
-            tronWallet: isTronEnabled ? await tronWalletByTonMnemonic(mnemonic) : undefined
+            tronWallet: isTronEnabled
+                ? await tronWalletByTonMnemonic(tonAccount.mnemonics)
+                : undefined
+        });
+
+        authBattery({
+            signer: tonProofSignerByTonMnemonic(tonAccount.mnemonics, 'ton'),
+            wallet: tonWallets[0]
         });
 
         await storage.updateAccountInState(account);
@@ -455,7 +474,7 @@ export const useCreateAccountTestnet = () => {
                 }
             );
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -498,6 +517,8 @@ export const useAddTronToAccount = () => {
     const activeAccount = useActiveAccount();
     const accountsStorage = useAccountsStorage();
     const client = useQueryClient();
+    const tronApi = useTronApi();
+    const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
     const getMnemonic = async () => {
         const secret = await getSecret();
@@ -521,7 +542,12 @@ export const useAddTronToAccount = () => {
                 );
                 break;
             case 'mam':
-                updatedAccount = await mamAccountToMamAccountWithTron(activeAccount, getMnemonic);
+                updatedAccount = await mamAccountToMamAccountWithTron(
+                    activeAccount,
+                    getMnemonic,
+                    tronApi,
+                    openTronMigrationModal
+                );
                 break;
             default:
                 assertUnreachable(activeAccount);
@@ -538,6 +564,7 @@ export const useCreateAccountMnemonic = () => {
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabled = useIsTronEnabledGlobally();
+    const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
 
     return useMutation<
         AccountTonMnemonic,
@@ -574,7 +601,7 @@ export const useCreateAccountMnemonic = () => {
                 }
             );
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -583,6 +610,12 @@ export const useCreateAccountMnemonic = () => {
             if (selectAccount) {
                 await selectAccountMutation(account.id);
             }
+
+            authBattery({
+                signer: tonProofSignerByTonMnemonic(mnemonic, mnemonicType),
+                wallet: account.activeTonWallet
+            });
+
             return account;
         }
 
@@ -609,6 +642,12 @@ export const useCreateAccountMnemonic = () => {
         if (selectAccount) {
             await selectAccountMutation(account.id);
         }
+
+        authBattery({
+            signer: tonProofSignerByTonMnemonic(mnemonic, mnemonicType),
+            wallet: account.activeTonWallet
+        });
+
         return account;
     });
 };
@@ -641,7 +680,7 @@ export const useCreateAccountTonSK = () => {
                 versions
             });
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -680,9 +719,12 @@ export const useCreateAccountMAM = () => {
     const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const tronApi = useTronApi();
+    const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
     return useMutation<
-        AccountMAM,
+        { account: AccountMAM; childrenMnemonics: string[][] },
         Error,
         {
             mnemonic: string[];
@@ -697,6 +739,36 @@ export const useCreateAccountMAM = () => {
         };
 
         const isTronEnabled = defaultAccountConfig.enableTron && isTronEnabledGlobally;
+        if (isTronEnabled) {
+            await checkMamAccountForDeprecatedTronAddress(
+                mnemonic,
+                tronApi,
+                openTronMigrationModal
+            );
+        }
+
+        const rootAccount = await TonKeychainRoot.fromMnemonic(mnemonic);
+        const childrenMnemonics: string[][] = (
+            await Promise.all((selectedDerivations || []).map(i => rootAccount.getTonAccount(i)))
+        ).map(a => a.mnemonics);
+
+        const authBatteryForAllChildren = async (account: AccountMAM) => {
+            for (const d of account.derivations) {
+                try {
+                    await authBattery({
+                        signer: tonProofSignerByTonMnemonic(
+                            (
+                                await rootAccount.getTonAccount(d.index)
+                            ).mnemonics,
+                            'ton'
+                        ),
+                        wallet: d.tonWallets[0]
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        };
 
         if (sdk.keychain) {
             const account = await createMAMAccountByMnemonic(context, sdk.storage, mnemonic, {
@@ -707,7 +779,7 @@ export const useCreateAccountMAM = () => {
                 generateTronWallet: isTronEnabled
             });
 
-            await sdk.keychain.setPassword(
+            await sdk.keychain.setData(
                 (account.auth as AuthKeychain).keychainStoreKey,
                 walletSecretToString(accountSecret)
             );
@@ -716,7 +788,10 @@ export const useCreateAccountMAM = () => {
             if (selectAccount) {
                 await selectAccountMutation(account.id);
             }
-            return account;
+
+            authBatteryForAllChildren(account);
+
+            return { account, childrenMnemonics };
         }
 
         if (!password) {
@@ -736,7 +811,64 @@ export const useCreateAccountMAM = () => {
         if (selectAccount) {
             await selectAccountMutation(account.id);
         }
-        return account;
+
+        authBatteryForAllChildren(account);
+
+        return { account, childrenMnemonics };
+    });
+};
+
+export const useParseAndAddSigner = () => {
+    const sdk = useAppSdk();
+    const { mutateAsync } = useAddSignerWallet();
+    return useMutation<AccountTonOnly, Error, { link: string; source: 'qr' | 'deeplink' }>(
+        async ({ link, source }) => {
+            try {
+                if (source === 'qr' && !isSignerLink(link)) {
+                    throw new Error('Unexpected QR code');
+                }
+
+                const parsed = parseSignerLink(link);
+                return await mutateAsync({ ...parsed, source });
+            } catch (e) {
+                if (e instanceof Error) sdk.alert(e.message);
+                throw e;
+            }
+        }
+    );
+};
+
+export const useAddSignerWallet = () => {
+    const sdk = useAppSdk();
+    const accountsStorage = useAccountsStorage();
+    const client = useQueryClient();
+    const context = useAppContext();
+    const navigate = useNavigate();
+
+    return useMutation<
+        AccountTonOnly,
+        Error,
+        { publicKey: string | null; name: string | null; source: 'qr' | 'deeplink' }
+    >(async ({ publicKey, name, source }) => {
+        if (publicKey === null) {
+            sdk.topMessage('Missing public key');
+            navigate(AppRoute.home);
+            throw new Error('Missing public key');
+        }
+
+        const newAccount = await accountBySignerLink(
+            context,
+            Network.MAINNET,
+            sdk.storage,
+            publicKey,
+            name,
+            source === 'deeplink' ? 'signer-deeplink' : 'signer'
+        );
+        await accountsStorage.addAccountToState(newAccount);
+        await accountsStorage.setActiveAccountId(newAccount.id);
+        await client.invalidateQueries([QueryKey.account]);
+        navigate(AppRoute.home);
+        return newAccount;
     });
 };
 
@@ -818,17 +950,22 @@ export const useMutateDeleteAll = () => {
     const storage = useAccountsStorage();
 
     return useMutation<void, Error, void>(async () => {
-        const { notifications } = sdk;
-        if (notifications) {
-            try {
-                await notifications.unsubscribe();
-            } catch (e) {
-                console.error(e);
+        try {
+            const { notifications } = sdk;
+            if (notifications) {
+                try {
+                    await notifications.unsubscribe();
+                } catch (e) {
+                    console.error(e);
+                }
             }
-        }
 
-        await storage.clearAccountFromState();
-        await sdk.storage.clear();
+            await storage.clearAccountFromState();
+            await sdk.storage.clear();
+            await sdk.keychain?.clearStorage();
+        } finally {
+            sdk.reloadApp();
+        }
     });
 };
 
@@ -844,8 +981,13 @@ export const useMutateLogOut = () => {
     const deleteFolder = useDeleteFolder();
     const accounts = useAccountsState();
     const { mutateAsync: removeAccountTwoFA } = useRemoveAccountTwoFAData();
+    const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
+    const sdk = useAppSdk();
+    const { mutateAsync: securityCheck } = useSecurityCheck();
+    const { mutateAsync: setIsFreeProAccessActivate } = useMutateIsFreeProAccessActivate();
 
     return useMutation<void, Error, AccountId>(async accountId => {
+        await securityCheck();
         const folder = folders.find(f => f.accounts.length === 1 && f.accounts[0] === accountId);
 
         if (folder) {
@@ -865,12 +1007,26 @@ export const useMutateLogOut = () => {
             )
             .map(acc => acc.id);
 
-        await storage.removeAccountsFromState([accountId, ...multisigs]);
-        await removeAccountTwoFA(accountId);
-        await client.invalidateQueries([QueryKey.account]);
-        await client.invalidateQueries([QueryKey.pro]);
-        if (folder) {
-            await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
+        const newAccounts = await storage.removeAccountsFromState([accountId, ...multisigs]);
+
+        if (newAccounts.length === 0) {
+            await sdk.keychain?.resetSecuritySettings();
+            await setIsFreeProAccessActivate(false);
+        }
+
+        try {
+            await sdk.keychain?.removeData(accountId);
+            await removeAccountTwoFA(accountId);
+            await removeBatteryAuthToken();
+            await client.invalidateQueries([QueryKey.account]);
+            await client.invalidateQueries([QueryKey.pro]);
+            if (folder) {
+                await client.invalidateQueries([QueryKey.globalPreferencesConfig]);
+            }
+        } finally {
+            if (newAccounts.length === 0) {
+                sdk.reloadApp();
+            }
         }
     });
 };
@@ -1142,3 +1298,32 @@ export const useIsActiveWalletWatchOnly = () => {
     const wallet = useActiveAccount();
     return wallet.type === 'watch-only';
 };
+
+export function getAccountWalletNameAndEmoji(account: Account, walletId?: WalletId) {
+    let name = account.name;
+    let emoji = account.emoji;
+    if (account.type === 'mam') {
+        if (walletId !== undefined) {
+            const derivation = account.getTonWalletsDerivation(walletId);
+            if (!derivation) {
+                console.error('Error getting derivation');
+
+                return {
+                    name: 'Error',
+                    emoji: ''
+                };
+            } else {
+                name = derivation.name;
+                emoji = derivation.emoji;
+            }
+        } else {
+            name = account.activeDerivation.name;
+            emoji = account.activeDerivation.emoji;
+        }
+    }
+
+    return {
+        name,
+        emoji
+    };
+}

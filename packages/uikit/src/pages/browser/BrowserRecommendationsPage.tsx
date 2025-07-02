@@ -1,13 +1,13 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { InnerBody } from '../../components/Body';
 import { BrowserHeader } from '../../components/Header';
 import { PromotionsCarousel } from '../../components/browser/PromotionsCarousel';
 import { RecommendationsPageBodySkeleton } from '../../components/skeletons/BrowserSkeletons';
-import { useOpenBrowser } from '../../hooks/amplitude';
 import { useRecommendations } from '../../hooks/browser/useRecommendations';
 import { CategoryBlock } from './CategoryBlock';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { useTrackDappBrowserOpened } from '../../hooks/analytics/events-hooks';
 
 const InnerBodyStyled = styled(InnerBody)`
     padding: 0;
@@ -27,11 +27,7 @@ const SkeletonContainer = styled.div`
 
 export const BrowserRecommendationsPage: FC = () => {
     const { data } = useRecommendations();
-
-    const track = useOpenBrowser();
-    useEffect(() => {
-        if (data) track();
-    }, [track, data]);
+    useTrackDappBrowserOpened();
 
     return (
         <HideOnReview>

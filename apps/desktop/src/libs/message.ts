@@ -1,4 +1,4 @@
-import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { AccountConnectionHttp } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 
 export interface GetStorageMessage {
     king: 'storage-get';
@@ -41,6 +41,15 @@ export interface GetKeychainMessage {
     publicKey: string;
 }
 
+export interface RemoveKeychainMessage {
+    king: 'remove-keychain';
+    publicKey: string;
+}
+
+export interface ClearKeychainMessage {
+    king: 'clear-keychain';
+}
+
 export interface TonConnectMessage {
     king: 'reconnect';
 }
@@ -64,7 +73,7 @@ export interface PromptTouchIdMessage {
 
 export interface TonConnectSendDisconnectMessage {
     king: 'ton-connect-send-disconnect';
-    connection: AccountConnection | AccountConnection[];
+    connection: AccountConnectionHttp | AccountConnectionHttp[];
 }
 
 export type Message =
@@ -76,6 +85,8 @@ export type Message =
     | OpenPageMessage
     | SetKeychainMessage
     | GetKeychainMessage
+    | RemoveKeychainMessage
+    | ClearKeychainMessage
     | TonConnectMessage
     | CanPromptTouchIdMessage
     | PromptTouchIdMessage

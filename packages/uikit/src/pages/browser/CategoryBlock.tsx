@@ -7,10 +7,11 @@ import { ListBlock, ListItem } from '../../components/List';
 import { Body3, H3, Label1, Label2 } from '../../components/Text';
 import { Carousel } from '../../components/shared';
 import { useAppContext } from '../../hooks/appContext';
-import { useOpenLinkOnAreaClick } from '../../hooks/useAreaClick';
+import { useOpenPromotedAppInExternalBrowser } from '../../hooks/useAreaClick';
 import { useElementSize } from '../../hooks/useElementSize';
-import { BrowserRoute } from '../../libs/routes';
+import { AppRoute, BrowserRoute } from '../../libs/routes';
 import { PromotedItem, PromotedItemImage, PromotedItemText } from './PromotedItem';
+import { useTranslation } from '../../hooks/translation';
 
 const Heading = styled.div`
     display: flex;
@@ -60,6 +61,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
     category,
     className
 }) => {
+    const { t } = useTranslation();
     const { browserLength } = useAppContext();
     const [containerRef, { width: w }] = useElementSize();
     const width = w - 36;
@@ -84,9 +86,9 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
             <Heading>
                 <H3>{category.title}</H3>
                 {canExpand && (
-                    <Link to={'.' + BrowserRoute.category + '/' + category.id}>
+                    <Link to={AppRoute.browser + BrowserRoute.category + '/' + category.id}>
                         <AllButton>
-                            <Label1>All</Label1>
+                            <Label1>{t('browser_apps_all')}</Label1>
                         </AllButton>
                     </Link>
                 )}
@@ -94,15 +96,7 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
             {canExpand ? (
                 <Carousel gap="8px" infinite={false}>
                     {groups.map((group, groupIndex) => (
-                        <ListBlockStyled
-                            key={groupsKeys[groupIndex]}
-                            width={
-                                groupIndex === 0 || groupIndex === groups.length - 1
-                                    ? (width - 28).toString() + 'px'
-                                    : 'unset'
-                            }
-                            marginLeft={groupIndex === 0 ? '-34px' : '0'}
-                        >
+                        <ListBlockStyled key={groupsKeys[groupIndex]}>
                             {group.map(item => (
                                 <CategoryGroupItem key={item.url} item={item} />
                             ))}
@@ -125,11 +119,10 @@ export const CategoryBlock: FC<{ category: PromotionCategory; className?: string
 };
 
 export const CategoryGroupItem: FC<{ item: PromotedApp }> = ({ item }) => {
-    const { tonendpoint } = useAppContext();
-    const ref = useOpenLinkOnAreaClick(item.url, 'recommendation', tonendpoint.getTrack());
+    const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'recommendation');
 
     return (
-        <ListItemStyled key={item.url} ref={ref}>
+        <ListItemStyled key={item.url} onClick={openAppCallback}>
             <PromotedItem>
                 <PromotedItemImage src={item.icon} />
                 <PromotedItemText>

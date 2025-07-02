@@ -5,7 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { Body2, Body3Class, Label1, Label2Class } from '../Text';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { Badge } from '../shared';
-import { useAccountsState } from '../../state/wallet';
+import { useAccountsState, useActiveAccountQuery } from '../../state/wallet';
 import {
     WalletImportIcon,
     WalletKeystoneIcon,
@@ -18,6 +18,8 @@ import {
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
 import { HideOnReview } from '../ios/HideOnReview';
+import { useSecurityCheck } from '../../state/password';
+import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 
 const AddMethod = styled.button`
     display: flex;
@@ -98,16 +100,27 @@ export const addWalletMethod = [
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
 export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }> = ({
-    onSelect
+    onSelect: onSelectProp
 }) => {
     const { t } = useTranslation();
     const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig } = useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     const accounts = useAccountsState();
-    const canAddMultisig = accounts.some(
-        acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
-    );
+    const { data: activeAccount } = useActiveAccountQuery();
+    const canAddMultisig =
+        accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount?.type !== 'testnet';
+
+    const { mutateAsync: securityCheck } = useSecurityCheck();
+
+    const onSelect = async (method: AddWalletMethod) => {
+        try {
+            await securityCheck();
+            onSelectProp(method);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     return (
         <AddMethodsWrapper>

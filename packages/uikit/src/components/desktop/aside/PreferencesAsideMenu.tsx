@@ -3,6 +3,7 @@ import { AsideMenuItem } from '../../shared/AsideItem';
 import { Body3, Label2 } from '../../Text';
 import {
     AppearanceIcon,
+    AppleIcon,
     BankIcon,
     CodeIcon,
     DocIcon,
@@ -11,23 +12,26 @@ import {
     GlobeIcon,
     LockIcon,
     SlidersIcon,
+    TelegramIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
+import React, { FC } from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
-import { availableThemes, useUserUIPreferences } from '../../../state/theme';
+import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
-import { useShouldShowSecurityPage } from '../../../pages/settings/Security';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { NavLink } from '../../shared/NavLink';
+import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -48,7 +52,10 @@ const PreferencesAsideContainer = styled.div`
 `;
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
-    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
+    background: ${p =>
+        p.isSelected && p.theme.proDisplayType !== 'mobile'
+            ? p.theme.backgroundContentTint
+            : 'unset'};
     padding-right: 50px;
 
     svg {
@@ -75,7 +82,7 @@ const AsideMenuItemsBlock = styled.div`
     padding: 0.5rem;
 `;
 
-export const PreferencesAsideMenu = () => {
+export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) => {
     const { t, i18n } = useTranslation();
     const location = useLocation();
 
@@ -89,10 +96,10 @@ export const PreferencesAsideMenu = () => {
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
-    const showSecurityPage = useShouldShowSecurityPage();
+    const availableThemes = useAvailableThemes();
 
     return (
-        <PreferencesAsideContainer>
+        <PreferencesAsideContainer className={className}>
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.account}>
                     {({ isActive }) => (
@@ -102,16 +109,14 @@ export const PreferencesAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                {showSecurityPage && (
-                    <NavLink to={AppRoute.settings + SettingsRoute.security}>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
-                                <LockIcon />
-                                <Label2>{t('settings_security')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
-                )}
+                <NavLink to={AppRoute.settings + SettingsRoute.security}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                            <LockIcon />
+                            <Label2>{t('settings_security')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
                 <HideOnReview>
                     <NavLink to={AppRoute.settings + SettingsRoute.pro}>
                         {({ isActive }) => (
@@ -168,6 +173,38 @@ export const PreferencesAsideMenu = () => {
                 </NavLink>
             </AsideMenuItemsBlock>
 
+            <HideOnReview>
+                <ForTargetEnv env="mobile">
+                    <AsideMenuItemsBlock>
+                        <AsideMenuItemStyled
+                            onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
+                            isSelected={false}
+                        >
+                            <GlobeIcon />
+                            <Label2>{t('preferences_aside_faq')}</Label2>
+                        </AsideMenuItemStyled>
+                        <AsideMenuItemStyled
+                            onClick={() =>
+                                config.directSupportUrl && sdk.openPage(config.directSupportUrl)
+                            }
+                            isSelected={false}
+                        >
+                            <TelegramIcon />
+                            <Label2>{t('settings_support')}</Label2>
+                        </AsideMenuItemStyled>
+                        <AsideMenuItemStyled
+                            onClick={() =>
+                                config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
+                            }
+                            isSelected={false}
+                        >
+                            <TelegramIcon />
+                            <Label2>{t('settings_news')}</Label2>
+                        </AsideMenuItemStyled>
+                    </AsideMenuItemsBlock>
+                </ForTargetEnv>
+            </HideOnReview>
+
             <AsideMenuItemsBlock>
                 <AsideMenuItemStyled
                     onClick={() => config.supportLink && sdk.openPage(config.supportLink)}
@@ -184,6 +221,17 @@ export const PreferencesAsideMenu = () => {
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
+                <NotForTargetEnv env="mobile">
+                    <AsideMenuItemStyled
+                        onClick={() =>
+                            config.pro_landing_url && sdk.openPage(config.pro_landing_url)
+                        }
+                        isSelected={false}
+                    >
+                        <AppleIcon />
+                        <Label2>{t('settings_pro_ios')}</Label2>
+                    </AsideMenuItemStyled>
+                </NotForTargetEnv>
             </AsideMenuItemsBlock>
             <AsideMenuItemsBlock>
                 <NavLink to={AppRoute.settings + SettingsRoute.dev}>

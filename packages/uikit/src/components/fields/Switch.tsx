@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useAppSdk } from '../../hooks/appSdk';
 
 export interface SwitchProps {
     checked: boolean;
@@ -9,6 +10,7 @@ export interface SwitchProps {
 }
 
 const Wrapper = styled.div<{ disabled?: boolean }>`
+    flex-shrink: 0;
     position: relative;
     margin: -5px 0 -5px 0;
     width: 51px;
@@ -113,6 +115,7 @@ const useActive = () => {
 
 export const Switch: FC<SwitchProps> = React.memo(({ checked, onChange, disabled, className }) => {
     const active = useActive();
+    const sdk = useAppSdk();
     return (
         <Wrapper
             className={className}
@@ -121,6 +124,7 @@ export const Switch: FC<SwitchProps> = React.memo(({ checked, onChange, disabled
                 if (!disabled && onChange) {
                     e.stopPropagation();
                     onChange(!checked);
+                    sdk.hapticNotification('impact_light');
                 }
             }}
         >

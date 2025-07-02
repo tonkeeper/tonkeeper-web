@@ -21,12 +21,29 @@ const useUpdatePassword = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const passwordStorage = usePasswordStorage();
+
+    const isCorrectPassword = async (password: string) => {
+        if (sdk.keychain?.security.value?.password) {
+            return sdk.keychain.checkPassword(password);
+        }
+
+        return passwordStorage.isPasswordValid(password);
+    };
+
+    const saveNewPassword = async (oldPassword: string, newPassword: string) => {
+        if (sdk.keychain?.security.value?.password) {
+            return sdk.keychain.updatePassword(newPassword);
+        }
+
+        return passwordStorage.updatePassword(oldPassword, newPassword);
+    };
+
     return useMutation<
         'invalid-old' | 'invalid-confirm' | 'invalid-password' | undefined,
         Error,
         { old: string; password: string; confirm: string }
     >(async ({ old, password, confirm }) => {
-        const isValidOld = await passwordStorage.isPasswordValid(old);
+        const isValidOld = await isCorrectPassword(old);
         if (!isValidOld) {
             return 'invalid-old';
         }
@@ -38,7 +55,7 @@ const useUpdatePassword = () => {
             return 'invalid-confirm';
         }
 
-        await passwordStorage.updatePassword(old, password);
+        await saveNewPassword(old, password);
 
         sdk.uiEvents.emit('copy', {
             method: 'copy',

@@ -1,24 +1,25 @@
 import { DAppManifest, TonConnectEventPayload } from '@tonkeeper/core/dist/entries/tonConnect';
-import { TonConnectParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { TonConnectHttpConnectionParams } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import {
-    useResponseConnectionMutation,
-    useGetConnectInfo
+    useCompleteHttpConnection,
+    useProcessOpenedLink
 } from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
-import { Account } from '@tonkeeper/core/dist/entries/account';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { useLocation } from "react-router-dom";
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
+import { AppRoute } from "@tonkeeper/uikit/dist/libs/routes";
+import { Account } from "@tonkeeper/core/dist/entries/account";
+import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
 
 const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 
 export const UrlTonConnectSubscription = () => {
-    const [params, setParams] = useState<TonConnectParams | null>(null);
+    const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
 
-    const { mutateAsync: parseParams, reset } = useGetConnectInfo();
+    const { mutateAsync: parseParams, reset } = useProcessOpenedLink();
     const { mutateAsync: responseConnectionAsync, reset: responseReset } =
-        useResponseConnectionMutation();
+        useCompleteHttpConnection();
 
     const handlerClose = async (
         result: {
@@ -43,15 +44,15 @@ export const UrlTonConnectSubscription = () => {
     useEffect(() => {
         if (location.pathname === TON_CONNECT_TRIGGER_PATH) {
             reset();
+            parseParams(window.location.href).then(setParams);
             navigate(AppRoute.home, { replace: true });
-            parseParams(location.search).then(setParams);
         }
     }, [location, navigate]);
 
     return (
         <TonConnectNotification
             origin={undefined}
-            params={params?.request ?? null}
+            params={params ?? null}
             handleClose={handlerClose}
         />
     );

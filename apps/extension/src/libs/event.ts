@@ -1,9 +1,9 @@
 import { EventEmitter, IEventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
 import {
-    ConnectRequest,
+    ConnectRequest, DAppManifest,
     SignDataRequestPayload,
     TonConnectTransactionPayload
-} from '@tonkeeper/core/dist/entries/tonConnect';
+} from "@tonkeeper/core/dist/entries/tonConnect";
 import { ProxyConfiguration } from '../entries/proxy';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -24,7 +24,7 @@ export type NotificationFields<Kind extends string, Value> = {
     logo?: string;
     origin: string;
     data: Value;
-};
+} & (Kind extends 'tonConnectRequest' ? {} : { manifest: DAppManifest });
 
 export type NotificationData =
     | NotificationFields<'tonConnectRequest', ConnectRequest>
@@ -57,11 +57,9 @@ export interface PayloadRequest<P = any> {
 export interface UserProperties {
     application: string;
     walletType: string;
-    accounts?: Account[];
-    activeAccount?: Account;
+    accounts: Account[];
+    activeAccount: Account;
     network?: Network;
-    version?: string | undefined;
-    platform?: string | undefined;
 }
 
 export interface TrackEvent {

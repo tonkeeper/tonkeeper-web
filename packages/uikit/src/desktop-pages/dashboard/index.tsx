@@ -1,12 +1,21 @@
 import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { FC } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { DashboardTable } from '../../components/dashboard/DashboardTable';
-import { DesktopDashboardHeader } from '../../components/desktop/header/DesktopDashboardHeader';
+import {
+    DPDashboardHeader,
+    MPDashboardHeader
+} from '../../components/desktop/header/DashboardHeader';
 import { desktopHeaderContainerHeight } from '../../components/desktop/header/DesktopHeaderElements';
 import { ProBanner } from '../../components/pro/ProBanner';
 import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv, NotForTargetEnv } from '../../components/shared/TargetEnv';
+import { MPCarouselScroll } from '../../components/shared/MPCarouselScroll';
+import { useAppTargetEnv } from '../../hooks/appSdk';
+import { Navigate } from '../../components/shared/Navigate';
+import { AppRoute } from '../../libs/routes';
 
 const DashboardTableStyled = styled(DashboardTable)``;
 
@@ -18,7 +27,7 @@ const ProBannerWrapper = styled.div`
     background: ${p => p.theme.gradientBackgroundBottom};
 `;
 
-const PageWrapper = styled.div`
+const PageWrapper = styled(DesktopViewPageLayout)`
     overflow: auto;
     position: relative;
     height: calc(100% - ${desktopHeaderContainerHeight});
@@ -26,17 +35,39 @@ const PageWrapper = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    &::after {
+        display: none;
+    }
+
+    ${p =>
+        p.theme.proDisplayType === 'mobile' &&
+        css`
+            height: calc(100% - env(safe-area-inset-top));
+        `}
 `;
 
 const DashboardPage: FC = () => {
     const { data } = useProState();
     const shouldShowProBanner = data && !isPaidSubscription(data.subscription);
 
+    const env = useAppTargetEnv();
+    if (env === 'mobile') {
+        return <Navigate to={AppRoute.home} />;
+    }
+
     return (
         <>
-            <DesktopDashboardHeader />
+            <NotForTargetEnv env="mobile">
+                <DPDashboardHeader />
+            </NotForTargetEnv>
             <PageWrapper>
-                <DashboardTableStyled />
+                <ForTargetEnv env="mobile">
+                    <MPDashboardHeader />
+                </ForTargetEnv>
+                <MPCarouselScroll>
+                    <DashboardTableStyled />
+                </MPCarouselScroll>
                 <HideOnReview>
                     {shouldShowProBanner && (
                         <ProBannerWrapper>

@@ -1,11 +1,11 @@
 import { TonProvider } from './provider/index';
 import { TonApi } from './provider/tonapi';
-import { TonConnect } from './provider/tonconnect';
+import { ExtensionTonConnectInjectedBridge } from './provider/tonconnect';
 
 const havePrevInstance = !!window.tonkeeper;
 
 const provider = new TonProvider(window?.tonkeeper?.provider);
-const tonconnect = new TonConnect(provider, window?.tonkeeper?.tonconnect);
+const tonconnect = new ExtensionTonConnectInjectedBridge(provider);
 const tonapi = new TonApi(provider);
 
 window.tonkeeper = {

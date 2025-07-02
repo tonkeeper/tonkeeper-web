@@ -6,10 +6,16 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 export const useUserCountry = () => {
     const { tonendpoint } = useAppContext();
-    return useQuery<string | null, Error>([QueryKey.country], async () => {
-        const response = await tonendpoint.country();
-        return response.country;
-    });
+    return useQuery<string | null, Error>(
+        [QueryKey.country],
+        async () => {
+            const response = await tonendpoint.country();
+            return response.country;
+        },
+        {
+            keepPreviousData: true
+        }
+    );
 };
 
 export enum CountryFeature {
@@ -21,10 +27,8 @@ export enum RegulatoryState {
     GB = 'GB'
 }
 
-export const seeIfFeatureAvailable = (
-    feature: CountryFeature,
-    state: RegulatoryState | string | null | undefined
-) => {
+export const useIsFeatureAvailableForRegulatoryState = (feature: CountryFeature) => {
+    const { data: state } = useUserCountry();
     return useMemo(() => {
         if (!state) return false; // Till loading
 

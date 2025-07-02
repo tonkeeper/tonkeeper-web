@@ -15,7 +15,7 @@ import { HistoryGridCell } from '../ton/HistoryGrid';
 import { Body2Class } from '../../../Text';
 import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 
-const HistoryCellAccount = styled(HistoryGridCell)`
+const HistoryCellAccount = styled(HistoryGridCell).attrs({ className: 'grid-area-account' })`
     ${Body2Class};
 
     color: ${p => p.theme.textSecondary};

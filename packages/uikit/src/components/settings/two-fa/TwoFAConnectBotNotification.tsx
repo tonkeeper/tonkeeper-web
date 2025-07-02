@@ -6,7 +6,7 @@ import { useTranslation } from '../../../hooks/translation';
 import styled from 'styled-components';
 import { BorderSmallResponsive } from '../../shared/Styles';
 import { QRCode } from 'react-qrcode-logo';
-import { Button } from '../../fields/Button';
+import { ButtonResponsiveSize } from '../../fields/Button';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { TelegramIcon } from '../../Icon';
 
@@ -108,13 +108,16 @@ const TwoFAConnectBotNotificationContent: FC<{ tgLink: string; reconnect?: boole
                 </QRBackground>
             </QRWrapper>
             <ButtonsContainer>
-                <Button primary onClick={() => sdk.openPage(tgLink)}>
+                <ButtonResponsiveSize primary onClick={() => sdk.openPage(tgLink)}>
                     <TelegramIconStyled />
                     {t('two_fa_settings_set_up_tg_connection_modal_open_button')}
-                </Button>
-                <Button secondary onClick={() => sdk.copyToClipboard(tgLink, t('copied'))}>
+                </ButtonResponsiveSize>
+                <ButtonResponsiveSize
+                    secondary
+                    onClick={() => sdk.copyToClipboard(tgLink, t('copied'))}
+                >
                     {t('two_fa_settings_set_up_tg_connection_modal_copy_button')}
-                </Button>
+                </ButtonResponsiveSize>
             </ButtonsContainer>
         </div>
     );

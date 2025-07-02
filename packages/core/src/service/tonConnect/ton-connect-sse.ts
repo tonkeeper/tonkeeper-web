@@ -1,19 +1,15 @@
 import {
-    AccountConnection,
-    disconnectAppConnection,
+    AccountConnectionHttp,
+    disconnectHttpAccountConnection,
     getTonWalletConnections
 } from './connectionService';
 import { isStandardTonWallet, WalletId } from '../../entries/wallet';
 import { getLastEventId, subscribeTonConnect } from './httpBridge';
 import { accountsStorage } from '../accountsStorage';
 import { IStorage } from '../../Storage';
-import {
-    SendTransactionAppRequest,
-    TonConnectAppRequest,
-    TonConnectAppRequestPayload
-} from '../../entries/tonConnect';
+import { TonConnectAppRequest, TonConnectAppRequestPayload } from '../../entries/tonConnect';
 import { getWalletById } from '../../entries/account';
-import { replyBadRequestResponse, replyDisconnectResponse } from './actionService';
+import { replyHttpBadRequestResponse, replyHttpDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
 
 type Logger = {
@@ -27,22 +23,20 @@ type System = {
 };
 
 type Listeners = {
-    onDisconnect: (connection: AccountConnection) => void;
+    onDisconnect: (connection: AccountConnectionHttp) => void;
     onRequest: (value: TonConnectAppRequestPayload) => void;
 };
 
 export class TonConnectSSE {
     private lastEventId: string | undefined;
 
-    private connections: AccountConnection[] = [];
+    private connections: AccountConnectionHttp[] = [];
 
     private dist: Record<string, WalletId> = {};
 
     private closeConnection: (() => void) | null = null;
 
     private readonly storage: IStorage;
-
-    private readonly EventSourcePolyfill: typeof EventSource;
 
     private readonly system: Omit<System, 'log'> & { log: Logger };
 
@@ -55,16 +49,13 @@ export class TonConnectSSE {
     constructor({
         storage,
         listeners,
-        EventSourcePolyfill = EventSource,
         system = {}
     }: {
         storage: IStorage;
         listeners: Listeners;
-        EventSourcePolyfill?: typeof EventSource;
         system?: System;
     }) {
         this.storage = storage;
-        this.EventSourcePolyfill = EventSourcePolyfill;
         this.system = { log: console, ...system };
         this.listeners = listeners;
         this.reconnect();
@@ -87,7 +78,9 @@ export class TonConnectSSE {
         this.dist = {};
 
         for (const wallet of walletsState) {
-            const walletConnections = await getTonWalletConnections(this.storage, wallet);
+            const walletConnections = (await getTonWalletConnections(this.storage, wallet)).filter(
+                i => i.type === 'http'
+            ) as AccountConnectionHttp[];
 
             this.connections = this.connections.concat(walletConnections);
             walletConnections.forEach(item => {
@@ -96,11 +89,11 @@ export class TonConnectSSE {
         }
     }
 
-    public sendDisconnect = async (connection: AccountConnection | AccountConnection[]) => {
+    public sendDisconnect = async (connection: AccountConnectionHttp | AccountConnectionHttp[]) => {
         const connectionsToDisconnect = Array.isArray(connection) ? connection : [connection];
         await Promise.allSettled(
             connectionsToDisconnect.map((item, index) =>
-                replyDisconnectResponse({
+                replyHttpDisconnectResponse({
                     connection: item,
                     request: { id: (Date.now() + index).toString() }
                 })
@@ -109,7 +102,7 @@ export class TonConnectSSE {
         await this.reconnect();
     };
 
-    private onDisconnect = async ({ connection, request }: TonConnectAppRequest) => {
+    private onDisconnect = async ({ connection, request }: TonConnectAppRequest<'http'>) => {
         const accounts = await accountsStorage(this.storage).getAccounts();
         const wallet = getWalletById(accounts, this.dist[connection.clientSessionId]);
 
@@ -117,12 +110,12 @@ export class TonConnectSSE {
             return;
         }
 
-        await disconnectAppConnection({
+        await disconnectHttpAccountConnection({
             storage: this.storage,
             wallet,
             clientSessionId: connection.clientSessionId
         });
-        await replyDisconnectResponse({ connection, request });
+        await replyHttpDisconnectResponse({ connection, request });
         await this.reconnect();
         this.listeners.onDisconnect(connection);
     };
@@ -139,22 +132,13 @@ export class TonConnectSSE {
         await this.system.bringToFront?.();
 
         if (activeWallet.id !== walletId) {
-            const accountToActivate = (await accountsStorage(this.storage).getAccounts()).find(
-                a => a.getTonWallet(walletId) !== undefined
-            );
-
-            if (!accountToActivate) {
-                throw new Error('Account not found');
-            }
-
-            accountToActivate.setActiveTonWallet(walletId);
-            await accountsStorage(this.storage).updateAccountInState(accountToActivate);
-            await accountsStorage(this.storage).setActiveAccountId(accountToActivate.id);
+            await accountsStorage(this.storage).setActiveAccountAndWalletByWalletId(walletId);
             this.system.refresh?.();
             await delay(500);
         }
     };
-    private handleMessage = async (params: TonConnectAppRequest) => {
+
+    private handleMessage = async (params: TonConnectAppRequest<'http'>) => {
         switch (params.request.method) {
             case 'disconnect': {
                 return this.onDisconnect(params);
@@ -174,13 +158,13 @@ export class TonConnectSSE {
                     connection: params.connection,
                     id: params.request.id,
                     kind: 'signData',
-                    payload: params.request.params
+                    payload: JSON.parse(params.request.params[0])
                 };
                 await this.selectWallet(params.connection.clientSessionId);
                 return this.listeners.onRequest(value);
             }
             default: {
-                return replyBadRequestResponse(params);
+                return replyHttpBadRequestResponse(params);
             }
         }
     };
@@ -194,8 +178,7 @@ export class TonConnectSSE {
             storage: this.storage,
             handleMessage: this.handleMessage,
             connections: this.connections,
-            lastEventId: this.lastEventId,
-            EventSourceClass: this.EventSourcePolyfill
+            lastEventId: this.lastEventId
         });
     }
 

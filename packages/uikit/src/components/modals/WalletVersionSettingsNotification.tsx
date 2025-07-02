@@ -1,6 +1,6 @@
 import { Notification } from '../Notification';
 import { WalletVersionPageContent } from '../../pages/settings/Version';
-import { useAtom } from '../../libs/atom';
+import { useAtom } from '../../libs/useAtom';
 import { useTranslation } from '../../hooks/translation';
 import { AccountId } from '@tonkeeper/core/dist/entries/account';
 import { createModalControl } from './createModalControl';

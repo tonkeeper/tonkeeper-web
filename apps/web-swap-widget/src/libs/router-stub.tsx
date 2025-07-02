@@ -8,6 +8,10 @@ export const useLocation = () => {
     };
 };
 
+export const useHistory = () => {
+    return {};
+};
+
 export const Link = () => {
     return <></>;
 };

@@ -1,20 +1,25 @@
-import React, { FC, useCallback, useContext, useEffect, useId, useMemo, useState } from 'react';
+import React, {
+    FC,
+    useCallback,
+    useContext,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState
+} from 'react';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
-import {
-    NotificationFooterPortal,
-    useSetNotificationOnBack,
-    useSetNotificationOnCloseInterceptor
-} from '../Notification';
+import { useSetNotificationOnBack, useSetNotificationOnCloseInterceptor } from '../Notification';
 import { useTranslation } from '../../hooks/translation';
 import {
     AsyncValidationState,
     AsyncValidatorsStateProvider,
     useAsyncValidator
 } from '../../hooks/useAsyncValidator';
-import { Button } from '../fields/Button';
+import { Button, ButtonResponsiveSize } from '../fields/Button';
 import styled from 'styled-components';
 import { Body2, Body3, Body3Class, Label2 } from '../Text';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -42,6 +47,7 @@ import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amo
 import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { MultisigEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
 
 const FormWrapper = styled.form`
     display: flex;
@@ -54,12 +60,6 @@ const Participants = styled.div`
     flex-direction: column;
     gap: 8px;
     margin-top: 8px;
-`;
-
-const SubmitButtonContainer = styled.div`
-    margin: 0 -16px;
-    background: ${p => p.theme.backgroundPage};
-    padding: 16px;
 `;
 
 export type MultisigUseForm = {
@@ -88,10 +88,8 @@ export const MultisigConfigForm: FC<{
     const accounts = useAccountsState();
 
     let activeWallet = activeAccount.activeTonWallet;
-    if (activeAccount.type === 'watch-only' || activeAccount.type === 'ton-multisig') {
-        activeWallet = accounts.find(
-            acc => acc.type !== 'watch-only' && acc.type !== 'ton-multisig'
-        )!.activeTonWallet;
+    if (!isAccountCanManageMultisigs(activeAccount)) {
+        activeWallet = accounts.find(acc => isAccountCanManageMultisigs(acc))!.activeTonWallet;
     }
 
     const context = useFormContext<MultisigUseForm>();
@@ -138,7 +136,7 @@ export const MultisigConfigForm: FC<{
     );
 
     const onNotificationCloseInterceptor = useCallback(
-        (closeHandle: () => void) => {
+        (closeHandle: () => void, cancelCloseHandle: () => void) => {
             if (!isDirty) {
                 closeHandle();
             } else {
@@ -146,6 +144,8 @@ export const MultisigConfigForm: FC<{
                     onClose: discard => {
                         if (discard) {
                             closeHandle();
+                        } else {
+                            cancelCloseHandle();
                         }
                     }
                 });
@@ -162,8 +162,11 @@ export const MultisigConfigForm: FC<{
     const formIdToSet = formId ?? fallbackFormId;
     const [formState, setFormState] = useState<AsyncValidationState>('idle');
 
+    const formRef = useRef<HTMLFormElement>(null);
+    useInputFocusScroll(formRef);
+
     return (
-        <FormWrapper onSubmit={handleSubmit(onSubmit)} id={formIdToSet}>
+        <FormWrapper onSubmit={handleSubmit(onSubmit)} id={formIdToSet} ref={formRef}>
             <FormProvider {...methods}>
                 <AsyncValidatorsStateProvider onStateChange={setFormState}>
                     <FormTopLabel>{t('create_multisig_participants')}</FormTopLabel>
@@ -191,20 +194,16 @@ export const MultisigConfigForm: FC<{
                 </AsyncValidatorsStateProvider>
             </FormProvider>
             {formId === undefined && (
-                <NotificationFooterPortal>
-                    <SubmitButtonContainer>
-                        <Button
-                            primary
-                            type="submit"
-                            fullWidth
-                            form={formIdToSet}
-                            loading={formState === 'validating'}
-                            disabled={formState !== 'succeed'}
-                        >
-                            {t('create_multisig_create_wallet')}
-                        </Button>
-                    </SubmitButtonContainer>
-                </NotificationFooterPortal>
+                <ButtonResponsiveSize
+                    primary
+                    type="submit"
+                    fullWidth
+                    form={formIdToSet}
+                    loading={formState === 'validating'}
+                    disabled={formState !== 'succeed'}
+                >
+                    {t('create_multisig_create_wallet')}
+                </ButtonResponsiveSize>
             )}
         </FormWrapper>
     );
@@ -263,6 +262,9 @@ const ExternalParticipantCard: FC<{ fieldIndex: number; onRemove: () => void }> 
                                 onFocus={() => setFocus(true)}
                                 onBlur={() => setFocus(false)}
                                 placeholder={t('wallet_address')}
+                                spellCheck={false}
+                                autoCorrect="off"
+                                autoComplete="off"
                             />
                         </InputBlock>
                         <IconButtonTransparentBackground onClick={onRemove} type="button">
@@ -414,6 +416,7 @@ const QuorumInput = () => {
         control,
         watch,
         trigger,
+        setValue,
         formState: { isSubmitted }
     } = useFormContext<MultisigUseForm>();
     const selectedSignersNumber = watch('quorum');
@@ -428,6 +431,12 @@ const QuorumInput = () => {
             trigger('quorum');
         }
     }, [trigger, totalSignersNumber, isSubmitted]);
+
+    useEffect(() => {
+        if (selectedSignersNumber > totalSignersNumber) {
+            setValue('quorum', totalSignersNumber);
+        }
+    }, [totalSignersNumber, selectedSignersNumber]);
 
     return (
         <QuorumAndDeadlineInputsContainer>

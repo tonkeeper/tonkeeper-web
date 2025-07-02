@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
-import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
+import {
+    ListBlock,
+    ListBlockDesktopAdaptive,
+    ListItem,
+    ListItemElement,
+    ListItemPayload
+} from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
 import { Label1 } from '../../components/Text';
 import { ChangePasswordNotification } from '../../components/create/ChangePassword';
@@ -17,11 +22,23 @@ import {
     useCanPromptTouchId,
     useLookScreen,
     useMutateLookScreen,
-    useMutateTouchId,
-    useTouchIdEnabled
+    useKeychainSecuritySettings
 } from '../../state/password';
 import { useIsActiveWalletWatchOnly, useIsPasswordSet } from '../../state/wallet';
 import styled from 'styled-components';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../../components/desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useAppSdk, useAppTargetEnv } from '../../hooks/appSdk';
+import { CreatePasswordNotification } from '../../components/create/CreatePassword';
+import { useDisclosure } from '../../hooks/useDisclosure';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { MobileProChangePinNotification } from '../../components/mobile-pro/pin/MobileProChangePin';
+import { CloseIcon } from '../../components/Icon';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -33,14 +50,14 @@ const LockSwitch = () => {
 
     if (isPasswordSet) {
         return (
-            <ListBlock>
+            <ListBlockDesktopAdaptive>
                 <ListItem hover={false}>
                     <ListItemPayload>
                         <Label1>{t('Lock_screen')}</Label1>
                         <Switch checked={!!data} onChange={toggleLock} />
                     </ListItemPayload>
                 </ListItem>
-            </ListBlock>
+            </ListBlockDesktopAdaptive>
         );
     } else {
         return <></>;
@@ -52,33 +69,56 @@ const Label1Capitalised = styled(Label1)`
 `;
 
 const TouchIdSwitch = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data: canPrompt } = useCanPromptTouchId();
+    const { password, biometry } = useKeychainSecuritySettings();
 
-    const { data: touchIdEnabled } = useTouchIdEnabled();
-    const { mutate } = useMutateTouchId();
+    const onChange = async (value: boolean) => {
+        await sdk.keychain!.securityCheck('password');
+        return sdk.keychain!.setBiometry(value);
+    };
 
-    if (!canPrompt) {
+    if (!canPrompt || !password) {
         return null;
     }
 
     return (
-        <ListBlock>
+        <ListBlockDesktopAdaptive>
             <ListItem hover={false}>
                 <ListItemPayload>
                     <Label1Capitalised>{t('biometry_default')}</Label1Capitalised>
-                    <Switch checked={!!touchIdEnabled} onChange={mutate} />
+                    <Switch checked={!!biometry} onChange={onChange} />
                 </ListItemPayload>
             </ListItem>
-        </ListBlock>
+        </ListBlockDesktopAdaptive>
     );
 };
 
-const ChangePassword = () => {
+const Password = () => {
+    const env = useAppTargetEnv();
+
+    switch (env) {
+        case 'desktop':
+        case 'tablet':
+            return <DesktopAndTabletProPassword />;
+        case 'mobile':
+            return <MobileProPassword />;
+        case 'extension':
+        case 'web':
+        case 'twa':
+            return <WebPassword />;
+        case 'swap_widget_web':
+            return null;
+        default:
+            assertUnreachable(env);
+    }
+};
+
+const WebPassword = () => {
     const { t } = useTranslation();
     const [isOpen, setOpen] = useState(false);
 
-    const isPasswordSet = useIsPasswordSet();
     const items = useMemo(() => {
         const i: SettingsItem[] = [
             {
@@ -90,16 +130,107 @@ const ChangePassword = () => {
         return i;
     }, []);
 
-    if (isPasswordSet) {
-        return (
-            <>
-                <SettingsList items={items} />
-                <ChangePasswordNotification isOpen={isOpen} handleClose={() => setOpen(false)} />
-            </>
-        );
-    } else {
-        return <></>;
+    return (
+        <>
+            <SettingsList items={items} />
+            <ChangePasswordNotification isOpen={isOpen} handleClose={() => setOpen(false)} />
+        </>
+    );
+};
+
+const LockSwitchAdditionalSecurityPassword = () => {
+    const { data } = useLookScreen();
+    const { mutate: toggleLock } = useMutateLookScreen();
+    const { t } = useTranslation();
+    const { password } = useKeychainSecuritySettings();
+
+    if (!password) {
+        return null;
     }
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label1>{t('Lock_screen')}</Label1>
+                <Switch checked={!!data} onChange={toggleLock} />
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+/**
+ * Pin is always set here
+ */
+const MobileProPassword = () => {
+    const { t } = useTranslation();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    return (
+        <>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false} onClick={onOpen}>
+                    <ListItemPayload $clickable>
+                        <Label1Capitalised>{t('security_change_passcode')}</Label1Capitalised>
+                        <LockIcon />
+                    </ListItemPayload>
+                </ListItem>
+                <LockSwitchAdditionalSecurityPassword />
+            </ListBlockDesktopAdaptive>
+            <MobileProChangePinNotification isOpen={isOpen} onClose={onClose} />
+        </>
+    );
+};
+
+/**
+ * Password can be not set here
+ */
+const DesktopAndTabletProPassword = () => {
+    const { t } = useTranslation();
+
+    const sdk = useAppSdk();
+    const { password: keychainPassword } = useKeychainSecuritySettings();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+
+    const onResetPassword = async () => {
+        await sdk.keychain?.securityCheck();
+        await sdk.keychain?.resetSecuritySettings();
+    };
+
+    return (
+        <>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false} onClick={onOpen}>
+                    <ListItemPayload $clickable>
+                        <Label1Capitalised>
+                            {keychainPassword ? t('Change_password') : t('set_up_password')}
+                        </Label1Capitalised>
+                        <LockIcon />
+                    </ListItemPayload>
+                </ListItem>
+                <LockSwitchAdditionalSecurityPassword />
+                {keychainPassword && (
+                    <ListItem hover={false} onClick={onResetPassword}>
+                        <ListItemPayload $clickable>
+                            <Label1Capitalised>{t('reset_secutiry_settings')}</Label1Capitalised>
+                            <CloseIcon />
+                        </ListItemPayload>
+                    </ListItem>
+                )}
+            </ListBlockDesktopAdaptive>
+            {keychainPassword ? (
+                <ChangePasswordNotification isOpen={isOpen} handleClose={onClose} />
+            ) : (
+                <CreatePasswordNotification
+                    isOpen={isOpen}
+                    handleClose={password => {
+                        if (password) {
+                            sdk.keychain!.updatePassword(password);
+                        }
+                        onClose();
+                    }}
+                />
+            )}
+        </>
+    );
 };
 
 const ShowPhrases = () => {
@@ -129,30 +260,45 @@ const ShowPhrases = () => {
     return <SettingsList items={items} />;
 };
 
+const DesktopWrapper = styled(DesktopViewPageLayout)`
+    ${ListBlock} {
+        margin-bottom: 0;
+    }
+
+    ${ListItemElement} {
+        min-height: 56px;
+    }
+`;
+
 export const SecuritySettings = () => {
     const { t } = useTranslation();
+    const isProDisplay = useIsFullWidthMode();
+
+    if (isProDisplay) {
+        return (
+            <DesktopWrapper>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('settings_security')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <LockSwitch />
+                <TouchIdSwitch />
+                <Password />
+                <ShowPhrases />
+            </DesktopWrapper>
+        );
+    }
+
     return (
         <>
             <SubHeader title={t('settings_security')} />
             <InnerBody>
                 <LockSwitch />
                 <TouchIdSwitch />
-                <ChangePassword />
+                <Password />
                 <ShowPhrases />
             </InnerBody>
         </>
     );
-};
-
-export const useShouldShowSecurityPage = () => {
-    const { data: canPromptTouchId } = useCanPromptTouchId();
-    const isPasswordSet = useIsPasswordSet();
-
-    const isLedger = useIsActiveWalletLedger();
-    const isKeystone = useIsActiveWalletKeystone();
-    const isReadOnly = useIsActiveWalletWatchOnly();
-    const isFullWidthMode = useIsFullWidthMode();
-    const hidePhrasePage = isLedger || isKeystone || isReadOnly || isFullWidthMode;
-
-    return canPromptTouchId || isPasswordSet || !hidePhrasePage;
 };

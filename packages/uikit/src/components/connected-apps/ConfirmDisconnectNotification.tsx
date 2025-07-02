@@ -2,17 +2,9 @@ import { FC } from 'react';
 import { styled } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { usePrevious } from '../../hooks/usePrevious';
-import { Notification } from '../Notification';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { Button } from '../fields/Button';
 import { formatDappUrl } from './utils';
-
-const NotificationText = styled.div`
-    text-align: center;
-    margin-bottom: 24px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-`;
 
 const ButtonsBlock = styled.div`
     display: flex;
@@ -27,7 +19,7 @@ export const ConfirmDisconnectNotification: FC<{
     isOpen: boolean;
     onClose: (confirmed?: boolean) => void;
     isLoading?: boolean;
-    app?: { url: string } | 'all';
+    app?: { origin: string } | 'all';
 }> = ({ isOpen, onClose, app, isLoading }) => {
     const { t } = useTranslation();
     const prev = usePrevious(app);
@@ -43,20 +35,24 @@ export const ConfirmDisconnectNotification: FC<{
                     t('disconnect_all_apps_confirm')
                 ) : (
                     <>
-                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.url)}?
+                        {t('disconnect')}&nbsp;{formatDappUrl(appWithFallback?.origin)}?
                     </>
                 )
             }
         >
             {() => (
-                <ButtonsBlock>
-                    <Button secondary loading={isLoading} onClick={() => onClose(false)}>
-                        {t('cancel')}
-                    </Button>
-                    <Button primary loading={isLoading} onClick={() => onClose(true)}>
-                        {t('disconnect')}
-                    </Button>
-                </ButtonsBlock>
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ButtonsBlock>
+                            <Button secondary loading={isLoading} onClick={() => onClose(false)}>
+                                {t('cancel')}
+                            </Button>
+                            <Button primary loading={isLoading} onClick={() => onClose(true)}>
+                                {t('disconnect')}
+                            </Button>
+                        </ButtonsBlock>
+                    </NotificationFooter>
+                </NotificationFooterPortal>
             )}
         </Notification>
     );

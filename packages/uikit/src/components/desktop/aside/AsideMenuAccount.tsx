@@ -18,8 +18,9 @@ import {
     AccountTonWatchOnly,
     Account,
     getNetworkByAccount,
-    AccountTonTestnet, AccountTonSK
-} from "@tonkeeper/core/dist/entries/account";
+    AccountTonTestnet,
+    AccountTonSK
+} from '@tonkeeper/core/dist/entries/account';
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
@@ -39,9 +40,11 @@ import { useWalletVersionSettingsNotification } from '../../modals/WalletVersion
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
 import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useMenuController } from '../../../hooks/ionic';
+import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 
 const GearIconButtonStyled = styled(IconButtonTransparentBackground)<{ isShown: boolean }>`
     margin-left: auto;
@@ -402,10 +405,15 @@ export const AsideMenuAccountMAM: FC<{
     const location = useAsideActiveRoute();
     const navigate = useNavigate();
     const { mutateAsync: setActiveAccount } = useMutateActiveAccount();
+    const menuController = useMenuController('aside-nav');
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
 
     const onClickAccount = async () => {
         navigate(AppRoute.accountSettings);
+        hideBrowser();
+
         await setActiveAccount(account.id);
+        menuController.close();
     };
 
     return (

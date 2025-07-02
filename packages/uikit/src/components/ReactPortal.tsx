@@ -8,17 +8,18 @@ function createWrapperAndAppendToBody(wrapperId: string) {
     return wrapperElement;
 }
 
-const ReactPortal: FC<PropsWithChildren<{ wrapperId?: string }>> = ({
-    children,
-    wrapperId = 'react-portal-wrapper'
-}) => {
+const ReactPortal: FC<
+    PropsWithChildren<{
+        wrapperId?: string;
+        position?: 'first' | 'last';
+    }>
+> = ({ children, wrapperId = 'react-portal-wrapper', position = 'last' }) => {
     const [wrapperElement, setWrapperElement] = useState<HTMLElement | null>(null);
 
     useLayoutEffect(() => {
         let element = document.getElementById(wrapperId);
         let systemCreated = false;
-        // if element is not found with wrapperId or wrapperId is not provided,
-        // create and append to body
+
         if (!element) {
             systemCreated = true;
             element = createWrapperAndAppendToBody(wrapperId);
@@ -26,15 +27,29 @@ const ReactPortal: FC<PropsWithChildren<{ wrapperId?: string }>> = ({
         setWrapperElement(element);
 
         return () => {
-            // delete the programmatically created element
+            /**
+             * delete the programmatically created element;
+             *
+             * make sure
+             * <div id="react-portal-modal-container"></div>
+             * is added to index.html (Notification.tsx portal root),
+             * otherwise html node will be unmounted and it will cause error after ReactRouter navigation
+             */
             if (systemCreated && element && element.parentNode) {
                 element.parentNode.removeChild(element);
             }
         };
     }, [wrapperId]);
 
-    // wrapperElement state will be null on very first render.
-    if (wrapperElement === null) return null;
+    useLayoutEffect(() => {
+        if (!wrapperElement) return;
+
+        if (position === 'first') {
+            wrapperElement.prepend(wrapperElement.lastElementChild as Node);
+        }
+    }, [wrapperElement, position]);
+
+    if (!wrapperElement) return null;
 
     return createPortal(children, wrapperElement);
 };

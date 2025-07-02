@@ -17,6 +17,11 @@ export enum AppRoute {
     home = '/'
 }
 
+export enum DappBrowserRoute {
+    new = '/new',
+    tab = '/tab'
+}
+
 export enum AppProRoute {
     dashboard = '/dashboard',
     multiSend = '/multi-send'
@@ -44,6 +49,11 @@ export enum SettingsRoute {
     subscriptions = '/subscriptions',
     pro = '/pro',
     twoFa = '/two-fa'
+}
+
+export enum DevSettingsRoute {
+    index = '/',
+    logs = '/logs'
 }
 
 export enum WalletSettingsRoute {

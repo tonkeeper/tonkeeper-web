@@ -155,6 +155,8 @@ export interface TonWalletConfig {
         enabledForTokens: boolean;
         enabledForNfts: boolean;
     };
+    cachedOwnCollectablesNumber?: number;
+    cachedHasHistory?: boolean;
 }
 
 export const defaultPreferencesConfig: TonWalletConfig = {
@@ -170,3 +172,7 @@ export const defaultPreferencesConfig: TonWalletConfig = {
         enabledForNfts: true
     }
 };
+
+export function eqRawAddresses(address1: string, address2: string) {
+    return address1.toLowerCase() === address2.toLowerCase();
+}

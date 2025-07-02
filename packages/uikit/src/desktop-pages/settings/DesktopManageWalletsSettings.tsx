@@ -2,7 +2,9 @@ import { FC, forwardRef, Fragment, ReactNode } from 'react';
 import {
     DragDropContext,
     Draggable,
+    DraggableProvided,
     DraggableProvidedDragHandleProps,
+    DraggableStateSnapshot,
     Droppable
 } from 'react-beautiful-dnd';
 import styled, { css } from 'styled-components';
@@ -14,14 +16,14 @@ import {
     ListIcon,
     PencilIcon,
     PlusIcon,
+    PlusIconSmall,
     ReorderIcon,
     TrashBinIcon
 } from '../../components/Icon';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
-import { Body2Class, Label2, TextEllipsis } from '../../components/Text';
+import { Label2, TextEllipsis } from '../../components/Text';
 import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveTonNetwork } from '../../state/wallet';
 import {
     Account,
     AccountKeystone,
@@ -37,6 +39,7 @@ import {
 import { useAddWalletNotification } from '../../components/modals/AddWalletNotificationControlled';
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import {
@@ -65,6 +68,10 @@ import {
     useSideBarItems
 } from '../../state/folders';
 import { useIsScrolled } from '../../hooks/useIsScrolled';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { useAppTargetEnv } from '../../hooks/appSdk';
+import { cardModalSwipe } from '../../hooks/ionic';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
@@ -133,20 +140,6 @@ const BottomButtonContainer = styled.div`
     padding: 1rem;
 `;
 
-const NewFolderButton = styled.button`
-    border: none;
-    background-color: transparent;
-    padding: 0.5rem 1rem;
-    margin-right: -1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: ${p => p.theme.textAccent};
-    margin-left: auto;
-    ${Body2Class};
-`;
-
 export const DesktopManageAccountsPage = () => {
     const { ref: scrollRef, closeTop } = useIsScrolled();
     const { onOpen: addWallet } = useAddWalletNotification();
@@ -156,15 +149,57 @@ export const DesktopManageAccountsPage = () => {
     const items = useSideBarItems();
     const { handleDrop, itemsOptimistic } = useAccountsDNDDrop(items);
 
+    const env = useAppTargetEnv();
+
+    const patchDragItemStyle = (provided: DraggableProvided, snapshot: DraggableStateSnapshot) => {
+        const transform = provided.draggableProps.style?.transform;
+        if (env === 'mobile') {
+            const shiftY = transform ? parseFloat(transform.split(',')[1]) : 0;
+            if (snapshot.isDragging) {
+                provided.draggableProps.style!.transform = 'translate(0px,' + (shiftY - 40) + 'px)';
+            } else if (transform) {
+                provided.draggableProps.style!.transform = 'translate(0px,' + shiftY + 'px)';
+            }
+        } else {
+            if (transform) {
+                try {
+                    const tr = transform.split(',')[1];
+                    provided.draggableProps.style!.transform = 'translate(0px,' + tr;
+                } catch (_) {
+                    //
+                }
+            }
+        }
+    };
+
     return (
         <DesktopViewPageLayoutStyled ref={scrollRef}>
             <DesktopViewHeader borderBottom={!closeTop}>
-                <Label2>{t('Manage_wallets')}</Label2>
-                <NewFolderButton onClick={() => manageFolders()}>
-                    {t('accounts_new_folder')}
-                </NewFolderButton>
+                <DesktopViewHeaderContent
+                    title={t('Manage_wallets')}
+                    right={
+                        <DesktopViewHeaderContent.Right>
+                            <DesktopViewHeaderContent.RightItem
+                                onClick={() => manageFolders()}
+                                asDesktopButton
+                                closeDropDownOnClick
+                            >
+                                <ForTargetEnv env="mobile">
+                                    <PlusIconSmall />
+                                </ForTargetEnv>
+                                {t('accounts_new_folder')}
+                            </DesktopViewHeaderContent.RightItem>
+                        </DesktopViewHeaderContent.Right>
+                    }
+                />
             </DesktopViewHeader>
-            <DragDropContext onDragEnd={handleDrop}>
+            <DragDropContext
+                onDragEnd={(...args) => {
+                    handleDrop(...args);
+                    cardModalSwipe.unlock();
+                }}
+                onBeforeDragStart={cardModalSwipe.lock}
+            >
                 <Droppable droppableId="settings_wallets" type="all_items">
                     {provided => (
                         <ListBlockDesktopAdaptive
@@ -175,16 +210,7 @@ export const DesktopManageAccountsPage = () => {
                             {itemsOptimistic.map((item, index) => (
                                 <Draggable key={item.id} draggableId={item.id} index={index}>
                                     {(p, snapshot) => {
-                                        const transform = p.draggableProps.style?.transform;
-                                        if (transform) {
-                                            try {
-                                                const tr = transform.split(',')[1];
-                                                p.draggableProps.style!.transform =
-                                                    'translate(0px,' + tr;
-                                            } catch (_) {
-                                                //
-                                            }
-                                        }
+                                        patchDragItemStyle(p, snapshot);
 
                                         return (
                                             <ListItemStyled
@@ -337,7 +363,6 @@ const AccountMnemonicRow: FC<{
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
-    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete, onRecovery } = useAccountOptions();
 
@@ -384,7 +409,14 @@ const AccountMnemonicRow: FC<{
                         <Row $tabLevel={tabLevel + 1}>
                             <DragHandleMock />
                             <Label2Styled>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                {toShortValue(
+                                    formatAddress(
+                                        wallet.rawAddress,
+                                        account.type === 'testnet'
+                                            ? Network.TESTNET
+                                            : Network.MAINNET
+                                    )
+                                )}
                             </Label2Styled>
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </Row>
@@ -400,7 +432,6 @@ const AccountLedgerRow: FC<{
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
-    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
 
@@ -443,7 +474,7 @@ const AccountLedgerRow: FC<{
                         <Row key={derivation.index} $tabLevel={tabLevel + 1}>
                             <DragHandleMock />
                             <Label2Styled>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                {toShortValue(formatAddress(wallet.rawAddress, Network.MAINNET))}
                             </Label2Styled>
                             <WalletIndexBadgeStyled size="s">
                                 {'#' + (derivation.index + 1)}
@@ -460,7 +491,6 @@ const AccountTonOnlyRow: FC<{
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
-    const network = useActiveTonNetwork();
     const { t } = useTranslation();
     const { onRename, onDelete } = useAccountOptions();
 
@@ -502,7 +532,7 @@ const AccountTonOnlyRow: FC<{
                         <Row $tabLevel={tabLevel}>
                             <DragHandleMock />
                             <Label2Styled>
-                                {toShortValue(formatAddress(wallet.rawAddress, network))}
+                                {toShortValue(formatAddress(wallet.rawAddress, Network.MAINNET))}
                             </Label2Styled>
                             <WalletVersionBadgeStyled size="s" walletVersion={wallet.version} />
                         </Row>

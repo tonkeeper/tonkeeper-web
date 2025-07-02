@@ -47,6 +47,8 @@ export const Sentence = React.forwardRef<HTMLInputElement, InputProps & { inputS
         return (
             <SentenceInput
                 autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
                 id="sentence"
                 ref={ref}
                 style={{

@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import styled, { css } from 'styled-components';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { ListBlockDesktopAdaptive, ListItem, ListItemPayload } from '../List';
 import { Body1, Label1 } from '../Text';
 
 export interface SettingsItem {
@@ -35,7 +35,7 @@ const Text = styled.span`
     gap: 0.5rem;
 `;
 
-const ListBlockStyled = styled(ListBlock)<{ isDisabled?: boolean }>`
+const ListBlockStyled = styled(ListBlockDesktopAdaptive)<{ isDisabled?: boolean }>`
     ${p =>
         p.isDisabled &&
         css`

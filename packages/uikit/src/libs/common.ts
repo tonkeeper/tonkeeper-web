@@ -1,4 +1,4 @@
-import { MutableRefObject, Ref, RefCallback } from 'react';
+import { MutableRefObject, Ref, RefCallback, useEffect, useRef } from "react";
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 
 export const scrollToTop = () => {
@@ -72,4 +72,19 @@ export const toErrorMessage = (e: unknown) => {
 
     console.error(e);
     return 'Unknown error';
+};
+
+export function sanitizeJetton(name: string | undefined, isScam: boolean | undefined) {
+    if (!name) {
+        return '';
+    }
+    return isScam ? 'FAKE' : name;
+}
+
+export const useValueRef = <T>(value: T) => {
+    const ref = useRef(value);
+    useEffect(() => {
+        ref.current = value;
+    }, [value]);
+    return ref;
 };

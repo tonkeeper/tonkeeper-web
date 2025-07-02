@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { styled } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useProState } from '../../../state/pro';
+import { useFreeProAccessAvailable, useProState } from '../../../state/pro';
 import { Notification } from '../../Notification';
 import { Body2, Label1, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
@@ -10,7 +10,8 @@ import { ProNotification } from '../../pro/ProNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { ProDashboardIcon, ProMultisendIcon } from './Icons';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useAppPlatform } from '../../../hooks/appContext';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { ProFreeAccessContent } from '../../pro/ProFreeAccess';
 
 const NotificationStyled = styled(Notification)`
     max-width: 768px;
@@ -20,6 +21,23 @@ export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void 
     isOpen,
     onClose
 }) => {
+    const isFreeSubscriptionAvailable = useFreeProAccessAvailable();
+
+    if (isFreeSubscriptionAvailable) {
+        return (
+            <HideOnReview>
+                <Notification isOpen={isOpen} handleClose={onClose}>
+                    {() => (
+                        <ProFreeAccessContent
+                            access={isFreeSubscriptionAvailable}
+                            onSubmit={onClose}
+                        />
+                    )}
+                </Notification>
+            </HideOnReview>
+        );
+    }
+
     return (
         <HideOnReview>
             <NotificationStyled isOpen={isOpen} handleClose={onClose}>
@@ -173,10 +191,10 @@ const ButtonsBlock: FC<{ className?: string; onBuy: () => void; onTrial?: () => 
     onTrial
 }) => {
     const { t } = useTranslation();
-    const appPlatform = useAppPlatform();
+    const appPlatform = useAppTargetEnv();
     return (
         <ButtonsContainer className={className}>
-            {onTrial && appPlatform !== 'tablet' && (
+            {onTrial && appPlatform !== 'tablet' && appPlatform !== 'mobile' && (
                 <Button secondary onClick={onTrial}>
                     {t('pro_banner_start_trial')}
                 </Button>

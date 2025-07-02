@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { useAppContext } from '../hooks/appContext';
 import { useTranslation } from '../hooks/translation';
@@ -8,6 +8,7 @@ import { AppRoute } from '../libs/routes';
 import { ActivityIcon, BrowserIcon, SettingsIcon, WalletIcon } from './NavigationIcons';
 import { Label3 } from './Text';
 import { HideOnReview } from './ios/HideOnReview';
+import { useNavigate } from '../hooks/router/useNavigate';
 
 const Button = styled.div<{ active: boolean }>`
     user-select: none;

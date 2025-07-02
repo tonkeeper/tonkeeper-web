@@ -5,25 +5,34 @@ import { getDecimalSeparator, getNotDecimalSeparator } from '@tonkeeper/core/dis
 import { isNumeric, removeGroupSeparator, seeIfLargeTail } from '@tonkeeper/core/dist/utils/send';
 import BigNumber from 'bignumber.js';
 import { FC } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
-import { Body1, Body2, H3, Label2, Num2 } from '../../Text';
+import { Body1, Body2, H3Label2Responsive, Label2, Num2 } from '../../Text';
 import { cropName } from '../ConfirmListItem';
 import { AmountState } from './amountState';
 import { useActiveTonNetwork } from '../../../state/wallet';
 
 export const Center = styled.div`
     text-align: center;
-    margin-bottom: -8px;
+
+    ${p =>
+        p.theme.displayType !== 'full-width' &&
+        css`
+            margin-bottom: -8px;
+        `}
 `;
 
 export const SubTitle = styled(Body2)`
     color: ${props => props.theme.textSecondary};
 `;
 
-export const Title = styled(H3)`
-    margin: -6px 0 0;
+export const Title = styled(H3Label2Responsive)`
+    ${p =>
+        p.theme.displayType !== 'full-width' &&
+        css`
+            margin: -6px 0 0;
+        `}
 `;
 
 export const AmountBlock = styled.label`
@@ -101,7 +110,7 @@ export const FiatBlock = styled(Body1)`
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, 38px);
+    transform: translate(-50%, 50px);
     z-index: 2;
 
     padding: 8px 16px;
@@ -121,6 +130,8 @@ export const FiatBlock = styled(Body1)`
 export const InputBlock = styled.div`
     display: flex;
     align-items: flex-end;
+    flex-wrap: wrap;
+    justify-content: center;
 `;
 
 export const Name = styled.span`

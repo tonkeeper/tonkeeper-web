@@ -1,9 +1,10 @@
-import React, { ReactNode, useState } from 'react';
+import React, { InputHTMLAttributes, ReactNode, useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { XmarkIcon } from '../Icon';
 import { Body2 } from '../Text';
 import { TextareaAutosize } from './TextareaAutosize';
 import { BorderSmallResponsive } from '../shared/Styles';
+import { mergeRefs } from '../../libs/common';
 
 export const InputBlock = styled.div<{
     focus: boolean;
@@ -189,10 +190,13 @@ const ClearBlock = styled(RightBlock)`
     }
 `;
 
-export interface InputProps {
-    type?: 'password' | undefined;
+export type InputProps = Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    'autoFocus' | 'onChange' | 'size'
+> & {
     value: string;
     onChange?: (value: string) => void;
+    onFocusChange?: (isFocused: boolean) => void;
     onSubmit?: () => void;
     isValid?: boolean;
     isSuccess?: boolean;
@@ -206,15 +210,16 @@ export interface InputProps {
     className?: string;
     size?: 'small' | 'medium';
     id: string;
-}
+    autoFocus?: number | boolean | 'notification';
+};
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     (
         {
             id,
-            type,
             value,
             onChange,
+            onFocusChange,
             isValid = true,
             isSuccess = false,
             label,
@@ -225,11 +230,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             rightElement,
             marginRight,
             className,
-            size
+            size,
+            autoFocus,
+            ...rest
         },
         ref
     ) => {
-        const [focus, setFocus] = useState(false);
+        const [focus, _setFocus] = useState(false);
+        const focused = useRef(false);
+        const setFocus = (v: boolean) => {
+            _setFocus(v);
+            onFocusChange?.(v);
+        };
 
         const onClear: React.MouseEventHandler<HTMLDivElement> = e => {
             e.stopPropagation();
@@ -237,6 +249,22 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             if (disabled) return;
             onChange?.('');
         };
+
+        const el = useRef<HTMLInputElement>(null);
+
+        useEffect(() => {
+            if (el.current && !focused.current && autoFocus) {
+                setTimeout(
+                    () => el.current?.focus(),
+                    typeof autoFocus === 'number'
+                        ? autoFocus
+                        : autoFocus === 'notification'
+                        ? 400
+                        : 30
+                );
+                focused.current = true;
+            }
+        }, [autoFocus]);
 
         return (
             <OuterBlock className={className}>
@@ -248,12 +276,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     size={size}
                 >
                     <InputField
+                        {...rest}
                         id={id}
-                        ref={ref}
+                        ref={mergeRefs(ref, el)}
                         disabled={disabled}
-                        type={type}
                         value={value}
                         spellCheck={false}
+                        autoCorrect="off"
+                        autoComplete="off"
                         tabIndex={tabIndex}
                         marginRight={marginRight}
                         onChange={e => onChange && onChange(e.target.value)}
@@ -261,6 +291,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         onBlur={() => setFocus(false)}
                         size={size}
                         placeholder={size === 'small' ? label : undefined}
+                        autoFocus={!!autoFocus}
                     />
                     {label && size !== 'small' && (
                         <Label active={value !== ''} htmlFor={id}>

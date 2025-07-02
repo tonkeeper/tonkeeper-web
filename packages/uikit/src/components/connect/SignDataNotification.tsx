@@ -21,17 +21,17 @@ import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCusto
 import { useAppSdk } from '../../hooks/appSdk';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { signDataOver } from '../../state/mnemonic';
-import { useCheckTouchId } from '../../state/password';
 import { handleSubmit } from '../../libs/form';
 import { ErrorIcon } from '../Icon';
 import { Cell } from '@ton/core';
+import { useAnalyticsTrack } from '../../hooks/analytics';
+import { AnalyticsEventTcSignDataSuccess } from '@tonkeeper/core/dist/analytics';
 
 const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
     const activeAccount = useActiveAccount();
     const api = useActiveApi();
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { mutateAsync: checkTouchId } = useCheckTouchId();
 
     return useMutation<SignDataResponse, Error>(async () => {
         const domain = new URL(origin).host;
@@ -47,7 +47,7 @@ const useSignMutation = (origin: string, payload: SignDataRequestPayload) => {
             address: activeAccount.activeTonWallet.rawAddress,
             timestamp
         });
-        const singer = signDataOver({ sdk, accountId: activeAccount.id, t, checkTouchId });
+        const singer = signDataOver({ sdk, accountId: activeAccount.id, t });
 
         const signature = await singer(payloadToSign);
 
@@ -115,7 +115,7 @@ const WarningBody = styled(Body2)`
 `;
 
 const stringNotEmpty = (value: string | undefined): value is string => {
-    return value != '' && value != null;
+    return value !== '' && value != null;
 };
 
 const seeIfValidCell = (value: string | undefined): boolean => {
@@ -140,7 +140,9 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                         <ButtonRow>
                             <Button
                                 size="small"
-                                onClick={handleSubmit(() => sdk.copyToClipboard(params.text))}
+                                onClick={handleSubmit(() =>
+                                    sdk.copyToClipboard(params.text, t('copied'))
+                                )}
                             >
                                 {t('receiveModal_copy')}
                             </Button>
@@ -338,9 +340,17 @@ export const SignDataNotification: FC<{
     params: SignDataRequestPayload | null;
     handleClose: (result?: SignDataResponse) => void;
 }> = ({ origin, params, handleClose }) => {
+    const track = useAnalyticsTrack();
+
     const onClose = useCallback(
         (result?: SignDataResponse) => {
             handleClose(result);
+            track(
+                new AnalyticsEventTcSignDataSuccess({
+                    dapp_url: origin!,
+                    payload_type: params!.type
+                })
+            );
         },
         [handleClose]
     );

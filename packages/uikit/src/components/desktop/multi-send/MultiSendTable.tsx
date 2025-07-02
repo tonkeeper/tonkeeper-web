@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { FC, useEffect, useState } from 'react';
 import { Controller, FormProvider, useFieldArray, useForm, useFormContext } from 'react-hook-form';
 import { ControllerRenderProps } from 'react-hook-form/dist/types/controller';
-import { Link, useBlocker, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppContext } from '../../../hooks/appContext';
 import { formatter } from '../../../hooks/balance';
@@ -53,6 +53,10 @@ import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { HideOnReview } from '../../ios/HideOnReview';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useBlocker } from '../../../hooks/router/useBlocker';
+import { useTwoFAWalletConfig } from '../../../state/two-fa';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -314,15 +318,38 @@ const FooterErrorMessage = styled(Body2)`
     max-width: 350px;
 `;
 
+const MAX_ALLOWED_TWO_FA_MESSAGES = 20;
+
+const useCheckMaxMessagesExceeded = (fieldsNumber: number) => {
+    const wallet = useActiveStandardTonWallet();
+    const { data: config } = useTwoFAWalletConfig();
+
+    if (config?.status === 'active' || config?.status === 'disabling') {
+        if (fieldsNumber > MAX_ALLOWED_TWO_FA_MESSAGES) {
+            return '2fa_max_error';
+        }
+    }
+
+    if (fieldsNumber > MAX_ALLOWED_WALLET_MSGS[wallet.version]) {
+        if (isW5Version(wallet.version)) {
+            return 'wallet_v5_max_error';
+        }
+
+        return 'wallet_max_error';
+    }
+
+    return null;
+};
+
 const MultiSendAddMore: FC<{
     onAdd: (item: MultiSendForm['rows'][number]) => void;
     fieldsNumber: number;
 }> = ({ onAdd, fieldsNumber }) => {
     const { t } = useTranslation();
 
-    const wallet = useActiveStandardTonWallet();
+    const maxError = useCheckMaxMessagesExceeded(fieldsNumber);
 
-    if (fieldsNumber < MAX_ALLOWED_WALLET_MSGS[wallet.version]) {
+    if (!maxError) {
         return (
             <Button
                 fitContent
@@ -341,7 +368,25 @@ const MultiSendAddMore: FC<{
         );
     }
 
-    if (!isW5Version(wallet.version)) {
+    if (maxError === '2fa_max_error') {
+        return (
+            <MaximumReachedContainer>
+                <Body2>
+                    {t('multi_send_maximum_2fa_reached', { number: MAX_ALLOWED_TWO_FA_MESSAGES })}
+                </Body2>
+            </MaximumReachedContainer>
+        );
+    }
+
+    if (maxError === 'wallet_v5_max_error') {
+        return (
+            <MaximumReachedContainer>
+                <Body2>{t('multi_send_maximum_255_reached')}</Body2>
+            </MaximumReachedContainer>
+        );
+    }
+
+    if (maxError === 'wallet_max_error') {
         return (
             <MaximumReachedContainer>
                 <Body2>{t('multi_send_maximum_reached')}</Body2>
@@ -361,11 +406,7 @@ const MultiSendAddMore: FC<{
         );
     }
 
-    return (
-        <MaximumReachedContainer>
-            <Body2>{t('multi_send_maximum_255_reached')}</Body2>
-        </MaximumReachedContainer>
-    );
+    assertUnreachable(maxError);
 };
 
 const MultiSendFooter: FC<{
@@ -484,9 +525,7 @@ const MultiSendFooter: FC<{
 
     const { formState: formValidationState } = useAsyncValidationState();
 
-    const wallet = useActiveStandardTonWallet();
-
-    const maxMsgsNumberExceeded = watch('rows').length > MAX_ALLOWED_WALLET_MSGS[wallet.version];
+    const maxMsgsNumberExceeded = useCheckMaxMessagesExceeded(watch('rows').length);
 
     const isLedger = useIsActiveWalletLedger();
 
@@ -517,7 +556,13 @@ const MultiSendFooter: FC<{
                 {isLedger ? (
                     <FooterErrorMessage>{t('ledger_operation_not_supported')}</FooterErrorMessage>
                 ) : maxMsgsNumberExceeded ? (
-                    <FooterErrorMessage>{t('multi_send_maximum_reached')}</FooterErrorMessage>
+                    <FooterErrorMessage>
+                        {t(
+                            maxMsgsNumberExceeded === '2fa_max_error'
+                                ? 'multi_send_maximum_for_2fa_reached'
+                                : 'multi_send_maximum_reached'
+                        )}
+                    </FooterErrorMessage>
                 ) : (
                     <MultiSendFooterTextWrapper>
                         <Body3>
@@ -538,7 +583,7 @@ const MultiSendFooter: FC<{
                     <Button
                         type="submit"
                         primary
-                        disabled={remainingBalanceBN?.lt(0) || maxMsgsNumberExceeded || isLedger}
+                        disabled={remainingBalanceBN?.lt(0) || !!maxMsgsNumberExceeded || isLedger}
                         loading={formValidationState === 'validating' || !proState}
                     >
                         {t('continue')}

@@ -1,6 +1,4 @@
-import { Navigate } from 'react-router-dom';
 import { useTranslation } from '../../hooks/translation';
-import { ErrorBoundary } from 'react-error-boundary';
 import { fallbackRenderOver } from '../../components/Error';
 import { AppRoute } from '../../libs/routes';
 
@@ -17,6 +15,8 @@ import React from 'react';
 import { ListBlock, ListItem, ListItemPayload } from '../../components/List';
 import { Switch } from '../../components/fields/Switch';
 import styled from 'styled-components';
+import { Navigate } from '../../components/shared/Navigate';
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 const LabelWithBadge = styled(Label1)`
     display: flex;

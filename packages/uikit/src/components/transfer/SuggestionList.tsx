@@ -125,12 +125,11 @@ const FavoriteItem: FC<{
                                 dropDown
                                 onClick={e => {
                                     e.stopPropagation();
-                                    sdk.confirm(
-                                        t('send_screen_steps_address_delete_alert_text').replace(
-                                            '%{name}',
-                                            item.name
-                                        )
-                                    )
+                                    sdk.confirm({
+                                        message: t('send_screen_steps_address_delete_alert_text', {
+                                            name: item.name
+                                        })
+                                    })
                                         .then(value => {
                                             if (value) {
                                                 return mutateAsync();

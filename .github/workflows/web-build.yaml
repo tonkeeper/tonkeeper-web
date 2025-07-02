@@ -6,8 +6,6 @@ on:
                 required: true
                 type: string
         secrets:
-            REACT_APP_AMPLITUDE_EXTENSION:
-                required: true
             REACT_APP_MEASUREMENT_ID:
                 required: true
             VITE_APP_APTABASE:
@@ -64,7 +62,6 @@ jobs:
             - name: Run build
               uses: borales/actions-yarn@v5
               env:
-                  VITE_APP_AMPLITUDE: ${{ secrets.REACT_APP_AMPLITUDE_EXTENSION }}
                   VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com

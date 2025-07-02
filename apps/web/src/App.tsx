@@ -11,7 +11,6 @@ import { GlobalListStyle } from '@tonkeeper/uikit/dist/components/List';
 import { Loading } from '@tonkeeper/uikit/dist/components/Loading';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
 import { SybHeaderGlobalStyle } from '@tonkeeper/uikit/dist/components/SubHeader';
-import { AmplitudeAnalyticsContext } from '@tonkeeper/uikit/dist/hooks/amplitude';
 import { AppContext, IAppContext } from '@tonkeeper/uikit/dist/hooks/appContext';
 import { AppSdkContext } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
@@ -37,13 +36,13 @@ import {
 import { GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import { MobileView } from './AppMobile';
 import { BrowserAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
+import { BrowserRouter } from "react-router-dom";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -61,7 +60,9 @@ const sdk = new BrowserAppSdk();
 const TARGET_ENV = 'web';
 
 export const App: FC = () => {
-    return <RouterProvider router={router} />;
+    return <BrowserRouter>
+        <Providers />
+    </BrowserRouter>
 };
 
 const Providers: FC<PropsWithChildren> = () => {
@@ -101,8 +102,10 @@ const Providers: FC<PropsWithChildren> = () => {
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();
+    const isMobile = useLayout();
+
     return (
-        <UserThemeProvider isPro={data?.valid} isProSupported>
+        <UserThemeProvider isPro={data?.valid} isProSupported proDisplayType="desktop" displayType={isMobile ? 'compact' : 'full-width'}>
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
@@ -115,13 +118,6 @@ const ThemeAndContent = () => {
         </UserThemeProvider>
     );
 };
-
-const router = createBrowserRouter([
-    {
-        path: '/*',
-        element: <Providers />
-    }
-]);
 
 const Loader: FC = () => {
     const { data: activeAccount, isLoading: activeWalletLoading } = useActiveAccountQuery();
@@ -142,7 +138,8 @@ const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         targetEnv: TARGET_ENV,
         build: sdk.version,
-        lang
+        lang,
+        platform: 'web'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
@@ -195,20 +192,19 @@ const Loader: FC = () => {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
             tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        }
+        },
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
-                <CopyNotification hideSimpleCopyNotifications={!standalone} />
-                <Suspense>
-                    <QrScanner />
-                </Suspense>
-                <ModalsRoot />
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
+            <CopyNotification hideSimpleCopyNotifications={!standalone} />
+            <Suspense>
+                <QrScanner />
+            </Suspense>
+            <ModalsRoot />
+        </AppContext.Provider>
     );
 };
 

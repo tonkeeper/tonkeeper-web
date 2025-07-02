@@ -8,6 +8,7 @@ import {
     TonendpointConfig
 } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import React, { useContext } from 'react';
+import { AnalyticsTracker } from './analytics/common';
 
 export interface IAppContext {
     mainnetApi: APIConfig;
@@ -36,6 +37,7 @@ export interface IAppContext {
         tronApiKey?: string;
     };
     defaultWalletVersion: WalletVersion;
+    tracker: AnalyticsTracker | undefined;
 }
 
 export const AppContext = React.createContext<IAppContext>({
@@ -48,13 +50,14 @@ export const AppContext = React.createContext<IAppContext>({
     fiat: FiatCurrencies.USD,
     mainnetConfig: defaultTonendpointConfig,
     testnetConfig: defaultTonendpointConfig,
-    tonendpoint: new Tonendpoint({ targetEnv: 'web' }, {}),
+    tonendpoint: null as unknown as Tonendpoint,
     standalone: false,
     extension: false,
     ios: false,
     proFeatures: false,
     hideQrScanner: false,
-    defaultWalletVersion: WalletVersion.V5R1
+    defaultWalletVersion: WalletVersion.V5R1,
+    tracker: undefined
 });
 
 export const useAppContext = () => {
@@ -62,8 +65,3 @@ export const useAppContext = () => {
 };
 
 export const AppSelectionContext = React.createContext<EventTarget | null>(null);
-
-export const useAppPlatform = () => {
-    const { tonendpoint } = useAppContext();
-    return tonendpoint.targetEnv;
-};

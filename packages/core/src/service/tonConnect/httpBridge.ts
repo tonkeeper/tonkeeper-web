@@ -7,11 +7,10 @@ import {
     KeyPair,
     RpcMethod,
     TonConnectAppRequest,
-    TonConnectMessageRequest,
     WalletResponse
 } from '../../entries/tonConnect';
-import { AccountConnection } from './connectionService';
 import { SessionCrypto } from './protocol';
+import { AccountConnectionHttp } from './connectionService';
 
 const defaultBridgeUrl = 'https://bridge.tonapi.io/bridge';
 const defaultTtl = 300;
@@ -62,15 +61,13 @@ export const subscribeTonConnect = ({
     handleMessage,
     connections,
     lastEventId,
-    bridgeUrl = defaultBridgeUrl,
-    EventSourceClass = EventSource
+    bridgeUrl = defaultBridgeUrl
 }: {
     storage: IStorage;
-    handleMessage: (params: TonConnectAppRequest) => void;
+    handleMessage: (params: TonConnectAppRequest<'http'>) => void;
     lastEventId?: string;
-    connections?: AccountConnection[];
+    connections?: AccountConnectionHttp[];
     bridgeUrl?: string;
-    EventSourceClass?: typeof EventSource;
 }) => {
     if (!connections || connections.length === 0) {
         return () => {};
@@ -88,7 +85,7 @@ export const subscribeTonConnect = ({
 
     console.log('sse connect', url);
 
-    const eventSource = new EventSourceClass(url);
+    const eventSource = new EventSource(url);
 
     const onMessage = (params: MessageEvent<string>) => {
         console.log('sse message received', params.data);
@@ -128,7 +125,11 @@ export const decryptTonConnectMessage = ({
     message,
     from,
     connection
-}: TonConnectMessageRequest): TonConnectAppRequest => {
+}: {
+    message: string;
+    from: string;
+    connection: AccountConnectionHttp;
+}): TonConnectAppRequest<'http'> => {
     const sessionCrypto = new SessionCrypto(connection.sessionKeyPair);
 
     const request: AppRequest<RpcMethod> = JSON.parse(

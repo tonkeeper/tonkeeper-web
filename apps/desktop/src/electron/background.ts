@@ -4,9 +4,13 @@ import { Message } from '../libs/message';
 import { mainStorage } from './storageService';
 import { cookieJar } from './cookie';
 import { tonConnectSSE } from './sseEvetns';
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 const service = 'tonkeeper.com';
 
+const authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
+
+// eslint-disable-next-line complexity
 export const handleBackgroundMessage = async (message: Message): Promise<unknown> => {
     switch (message.king) {
         case 'storage-set':
@@ -20,8 +24,17 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'storage-clear':
             return mainStorage.clear();
         case 'open-page':
+            if (!isValidUrlProtocol(message.url, authorizedOpenUrlProtocols)) {
+                console.error('Unacceptable url protocol', message.url);
+                return;
+            }
+
             return shell.openExternal(message.url);
         case 'set-keychain':
+            if (message.mnemonic.startsWith('../') || message.mnemonic.startsWith('./')) {
+                console.error('Unacceptable value to store in keychain');
+                return;
+            }
             return await keytar.setPassword(
                 service,
                 `Wallet-${message.publicKey}`,
@@ -29,6 +42,44 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
             );
         case 'get-keychain':
             return await keytar.getPassword(service, `Wallet-${message.publicKey}`);
+        case 'remove-keychain': {
+            const result = await keytar.deletePassword(service, `Wallet-${message.publicKey}`);
+            console.info(`Deleted password for account "${message.publicKey}": Success`);
+            return result;
+        }
+        case 'clear-keychain': {
+            const credentials = await keytar.findCredentials(service);
+
+            if (credentials.length === 0) {
+                return;
+            }
+
+            let failures = 0;
+
+            for (const { account } of credentials) {
+                try {
+                    const deleted = await keytar.deletePassword(service, account);
+                    if (deleted) {
+                        console.info(`Deleted password for account "${account}": Success`);
+                    } else {
+                        failures = failures + 1;
+                        console.info(
+                            `Failed to delete password for account "${account}": Password not found`
+                        );
+                    }
+                } catch (error) {
+                    failures = failures + 1;
+                    console.error(
+                        `Failed to delete password for account "${account}": ${error.message}`
+                    );
+                }
+            }
+
+            if (failures > 0) {
+                throw new Error('Some passwords could not be deleted. Check logs for details.');
+            }
+            return;
+        }
         case 'reconnect':
             return await tonConnectSSE.reconnect();
         case 'ton-connect-send-disconnect':

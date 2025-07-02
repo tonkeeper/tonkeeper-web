@@ -1,5 +1,5 @@
 import animationWriteData from './Write.json';
-import Lottie from 'react-lottie';
+import { Lottie } from './Lottie';
 
 const defaultWriteOptions = {
     loop: false,
@@ -11,7 +11,7 @@ const defaultWriteOptions = {
 };
 
 const WriteLottieIcon = () => {
-    return <Lottie options={defaultWriteOptions} height={160} width={160} />;
+    return <Lottie {...defaultWriteOptions} height={160} width={160} />;
 };
 
 export default WriteLottieIcon;

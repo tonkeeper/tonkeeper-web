@@ -1,5 +1,5 @@
-import { NavLink, useLocation } from 'react-router-dom';
-import styled from 'styled-components';
+import { useLocation } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 import { useTranslation } from '../../../hooks/translation';
 import { hexToRGBA } from '../../../libs/css';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
@@ -28,17 +28,24 @@ import {
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useHighlightTronFeatureForActiveWallet } from '../../../state/tron/tron';
+import { NavLink } from '../../shared/NavLink';
+import { ForTargetEnv } from '../../shared/TargetEnv';
+import { useCallback, useEffect } from 'react';
+import { useMenuController } from '../../../hooks/ionic';
 import { HideForRegulatoryState } from '../../HideForState';
 import { CountryFeature } from '../../../state/country';
+import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
+import { useHideActiveBrowserTab, useIsBrowserOpened } from '../../../state/dapp-browser';
 
 const WalletAsideContainer = styled.div`
+    overflow: auto;
     padding: 0.5rem;
-    width: fit-content;
-    border-right: 1px solid ${p => p.theme.backgroundContentAttention};
-    background: ${p => hexToRGBA(p.theme.backgroundContent, 0.56)};
+    background: ${p =>
+        p.theme.proDisplayType === 'desktop'
+            ? hexToRGBA(p.theme.backgroundContent, 0.56)
+            : p.theme.backgroundPage};
 
     > a {
         text-decoration: unset;
@@ -48,10 +55,22 @@ const WalletAsideContainer = styled.div`
     * {
         user-select: none;
     }
+
+    ${p =>
+        p.theme.proDisplayType === 'desktop' &&
+        css`
+            border-right: 1px solid ${p.theme.backgroundContentAttention};
+            width: fit-content;
+        `}
 `;
 
 const AsideMenuItemStyled = styled(AsideMenuItem)`
-    background: ${p => (p.isSelected ? p.theme.backgroundContentTint : 'unset')};
+    background: ${p =>
+        p.isSelected
+            ? p.theme.proDisplayType === 'desktop'
+                ? p.theme.backgroundContentTint
+                : p.theme.backgroundContent
+            : 'unset'};
     padding-right: 50px;
     height: unset;
     position: relative;
@@ -65,20 +84,18 @@ const SwapIconStyled = styled(SwapIcon)`
     transform: rotate(90deg) scale(1, -1);
 `;
 
-const HighlightedIcon = styled.div`
-    width: 8px;
-    height: 8px;
-    background-color: ${p => p.theme.accentRed};
-    border-radius: ${p => p.theme.cornerFull};
-    position: absolute;
-    right: 10px;
-    top: calc(50% - 4px);
-`;
+const useHideBrowserAfterNavigation = () => {
+    const { mutate: hideBrowser } = useHideActiveBrowserTab();
+    return useCallback(() => {
+        setTimeout(() => {
+            hideBrowser();
+        }, 150);
+    }, [hideBrowser]);
+};
 
 export const WalletAsideMenu = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const isReadOnly = useIsActiveWalletWatchOnly();
     const isMultisig = useIsActiveAccountMultisig();
     const account = useActiveAccount();
     const showMultisigs = isAccountCanManageMultisigs(account);
@@ -88,65 +105,64 @@ export const WalletAsideMenu = () => {
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
-    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
-    const canUseBattery =
-        (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+    const canUseBattery = useCanUseBattery();
 
-    const highlightTron = useHighlightTronFeatureForActiveWallet();
+    const menuController = useMenuController('wallet-nav');
+    useEffect(() => {
+        menuController.close();
+    }, [location]);
+
+    const hideBrowser = useHideBrowserAfterNavigation();
+    const isBrowserOpened = useIsBrowserOpened();
 
     return (
         <WalletAsideContainer>
-            <NavLink to={AppRoute.home}>
+            <NavLink to={AppRoute.coins} end disableMobileAnimation onClick={hideBrowser}>
                 {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive || isCoinPageOpened}>
+                    <AsideMenuItemStyled
+                        isSelected={(isActive || isCoinPageOpened) && !isBrowserOpened}
+                    >
                         <CoinsIcon />
                         <Label2>{t('wallet_aside_tokens')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
-            <NavLink to={AppRoute.activity}>
+            <NavLink to={AppRoute.activity} disableMobileAnimation onClick={hideBrowser}>
                 {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
+                    <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                         <ClockSmoothIcon />
                         <Label2>{t('wallet_aside_history')}</Label2>
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
 
-            <NavLink to={AppRoute.purchases}>
-                {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
-                        <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
-                    </AsideMenuItemStyled>
-                )}
-            </NavLink>
             <HideOnReview>
-                <NavLink to={AppRoute.dns}>
+                <NavLink to={AppRoute.purchases} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
+                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                            <SaleBadgeIcon />
+                            <Label2>{t('wallet_aside_collectibles')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+                <NavLink to={AppRoute.dns} disableMobileAnimation onClick={hideBrowser}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                             <SparkIcon />
                             <Label2>{t('wallet_aside_domains')}</Label2>
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <HideForRegulatoryState feature={CountryFeature.swap}>
-                    {!isReadOnly && !isTestnet && (
-                        <NavLink to={AppRoute.swap}>
-                            {({ isActive }) => (
-                                <AsideMenuItemStyled isSelected={isActive}>
-                                    <SwapIconStyled />
-                                    <Label2>{t('wallet_swap')}</Label2>
-                                </AsideMenuItemStyled>
-                            )}
-                        </NavLink>
-                    )}
-                </HideForRegulatoryState>
+                <SwapItem />
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
-                    <NavLink to={AppRoute.multisigWallets}>
+                    <NavLink
+                        to={AppRoute.multisigWallets}
+                        disableMobileAnimation
+                        onClick={hideBrowser}
+                    >
                         {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive}>
+                            <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                                 <ListIcon />
                                 <Label2>{t('wallet_aside_multisig_wallets')}</Label2>
                             </AsideMenuItemStyled>
@@ -155,15 +171,17 @@ export const WalletAsideMenu = () => {
                 )}
                 {canUseBattery && <BatterySettingsListItem />}
             </HideOnReview>
-            <NavLink to={AppRoute.walletSettings} end>
+            <NavLink to={AppRoute.walletSettings} end disableMobileAnimation onClick={hideBrowser}>
                 {({ isActive }) => (
-                    <AsideMenuItemStyled isSelected={isActive}>
+                    <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                         <SettingsSmoothIcon />
                         <Label2>{t('wallet_aside_settings')}</Label2>
-                        {highlightTron && <HighlightedIcon />}
                     </AsideMenuItemStyled>
                 )}
             </NavLink>
+            <ForTargetEnv env="mobile">
+                <WalletAsideMenuBrowserTabs />
+            </ForTargetEnv>
         </WalletAsideContainer>
     );
 };
@@ -173,14 +191,39 @@ const BadgeStyled = styled(RoundedBadge)`
     margin-right: -40px;
 `;
 
+const SwapItem = () => {
+    const isReadOnly = useIsActiveWalletWatchOnly();
+    const { t } = useTranslation();
+    const isTestnet = useActiveTonNetwork() === Network.TESTNET;
+    const hideBrowser = useHideBrowserAfterNavigation();
+    const isBrowserOpened = useIsBrowserOpened();
+
+    return (
+        <HideForRegulatoryState feature={CountryFeature.swap}>
+            {!isReadOnly && !isTestnet && (
+                <NavLink to={AppRoute.swap} disableMobileAnimation onClick={hideBrowser}>
+                    {({ isActive }) => (
+                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                            <SwapIconStyled />
+                            <Label2>{t('wallet_swap')}</Label2>
+                        </AsideMenuItemStyled>
+                    )}
+                </NavLink>
+            )}
+        </HideForRegulatoryState>
+    );
+};
+
 const MultisigOrdersMenuItem = () => {
     const ordersNumber = useUnviewedAccountOrdersNumber();
     const { t } = useTranslation();
+    const hideBrowser = useHideBrowserAfterNavigation();
+    const isBrowserOpened = useIsBrowserOpened();
 
     return (
-        <NavLink to={AppRoute.multisigOrders}>
+        <NavLink to={AppRoute.multisigOrders} onClick={hideBrowser} disableMobileAnimation>
             {({ isActive }) => (
-                <AsideMenuItemStyled isSelected={isActive}>
+                <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                     <InboxIcon />
                     <Label2>{t('wallet_aside_orders')}</Label2>
                     {!!ordersNumber && <BadgeStyled>{ordersNumber}</BadgeStyled>}
@@ -201,11 +244,17 @@ const SettingsListText = styled.div`
 const BatterySettingsListItem = () => {
     const { t } = useTranslation();
     const { data: batteryBalance } = useBatteryBalance();
+    const hideBrowser = useHideBrowserAfterNavigation();
+    const isBrowserOpened = useIsBrowserOpened();
 
     return (
-        <NavLink to={AppRoute.walletSettings + WalletSettingsRoute.battery}>
+        <NavLink
+            to={AppRoute.walletSettings + WalletSettingsRoute.battery}
+            disableMobileAnimation
+            onClick={hideBrowser}
+        >
             {({ isActive }) => (
-                <AsideMenuItemStyled isSelected={isActive}>
+                <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
                     <BatteryIcon />
                     <SettingsListText>
                         <Label2>{t('battery_title')}</Label2>

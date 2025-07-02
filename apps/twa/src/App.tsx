@@ -26,13 +26,13 @@ import {
     TranslationContext,
     useTWithReplaces
 } from '@tonkeeper/uikit/dist/hooks/translation';
-import { AppRoute, any } from '@tonkeeper/uikit/dist/libs/routes';
+import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { Unlock } from '@tonkeeper/uikit/dist/pages/home/Unlock';
 
 import { Platform as TwaPlatform, initViewport } from '@tma.js/sdk';
 import { SDKProvider } from '@tma.js/sdk-react';
 import { ModalsRoot } from '@tonkeeper/uikit/dist/components/ModalsRoot';
-import { AmplitudeAnalyticsContext, useTrackLocation } from '@tonkeeper/uikit/dist/hooks/amplitude';
+import { useTrackLocation } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { useLock } from '@tonkeeper/uikit/dist/hooks/lock';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { UnlockNotification } from '@tonkeeper/uikit/dist/pages/home/UnlockNotification';
@@ -51,7 +51,7 @@ import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle
 import { lightTheme } from '@tonkeeper/uikit/dist/styles/lightTheme';
 import React, { FC, PropsWithChildren, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, useLocation } from "react-router-dom";
 import styled, { ThemeProvider } from 'styled-components';
 import StandardErrorBoundary from './components/ErrorBoundary';
 import { InitDataLogger } from './components/InitData';
@@ -64,6 +64,7 @@ import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
+import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from "@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings";
 
@@ -74,8 +75,8 @@ const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings')
 const Activity = React.lazy(() => import('@tonkeeper/uikit/dist/pages/activity/Activity'));
 const Home = React.lazy(() => import('@tonkeeper/uikit/dist/pages/home/Home'));
 const Coin = React.lazy(() => import('@tonkeeper/uikit/dist/pages/coin/Coin'));
-const TonConnectSubscription = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/connect/TonConnectSubscription')
+const WebTonConnectSubscription = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/connect/WebTonConnectSubscription')
 );
 const PairSignerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairSignerNotification')
@@ -241,7 +242,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         targetEnv: TARGET_ENV,
         build: sdk.version,
         network,
-        lang
+        lang,
+        platform: 'web'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
@@ -289,23 +291,22 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         browserLength: 4,
         env: {
             tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        }
+        },
+        tracker: tracker?.track
     };
 
     return (
-        <AmplitudeAnalyticsContext.Provider value={tracker}>
-            <AppContext.Provider value={context}>
-                <Content
-                    activeAccount={activeAccount}
-                    lock={lock}
-                    showQrScan={showQrScan}
-                    sdk={sdk}
-                />
-                <CopyNotification />
-                <ModalsRoot />
-                {showQrScan && <TwaQrScanner />}
-            </AppContext.Provider>
-        </AmplitudeAnalyticsContext.Provider>
+        <AppContext.Provider value={context}>
+            <Content
+                activeAccount={activeAccount}
+                lock={lock}
+                showQrScan={showQrScan}
+                sdk={sdk}
+            />
+            <CopyNotification />
+            <ModalsRoot />
+            {showQrScan && <TwaQrScanner />}
+        </AppContext.Provider>
     );
 };
 
@@ -360,10 +361,12 @@ const Content: FC<{
 
     return (
         <>
-            <Routes>
-                <Route path={AppRoute.swap} element={<SwapScreen />} />
-                <Route path={'*'} element={<MainPages showQrScan={showQrScan} sdk={sdk} />} />
-            </Routes>
+            <Switch>
+                <Route path={AppRoute.swap} component={SwapScreen} />
+                <Route path="*">
+                    <MainPages showQrScan={showQrScan} sdk={sdk} />
+                </Route>
+            </Switch>
             <Suspense>
                 <PairSignerNotification />
                 <PairKeystoneNotification />
@@ -397,63 +400,55 @@ const MainPages: FC<{ showQrScan: boolean; sdk: TwaAppSdk }> = ({ showQrScan, sd
     return (
         <TwaNotification>
             <Wrapper standalone={getUsePadding(sdk.launchParams.platform)}>
-                <Routes>
+                <Switch>
                     <Route
                         path={AppRoute.activity}
-                        element={
-                            <Suspense fallback={<ActivitySkeletonPage />}>
-                                <Activity />
-                            </Suspense>
-                        }
-                    />
+                    >
+                        <Suspense fallback={<ActivitySkeletonPage />}>
+                            <Activity />
+                        </Suspense>
+                    </Route>
                     <Route
-                        path={any(AppRoute.browser)}
-                        element={
-                            <Suspense fallback={<BrowserSkeletonPage />}>
-                                <Browser />
-                            </Suspense>
-                        }
-                    />
+                        path={AppRoute.browser}
+                    >
+                        <Suspense fallback={<BrowserSkeletonPage />}>
+                            <Browser />
+                        </Suspense>
+                    </Route>
                     <Route
-                        path={any(AppRoute.settings)}
-                        element={
-                            <Suspense fallback={<SettingsSkeletonPage />}>
-                                <Settings />
-                            </Suspense>
-                        }
-                    />
+                        path={AppRoute.settings}
+                    >
+                        <Suspense fallback={<SettingsSkeletonPage />}>
+                            <Settings />
+                        </Suspense>
+                    </Route>
                     <Route
-                      path={any(AppRoute.walletSettings)}
-                      element={<RedirectFromDesktopSettings />}
-                    />
-                    <Route path={AppRoute.coins}>
-                        <Route
-                            path=":name/*"
-                            element={
-                                <Suspense fallback={<CoinSkeletonPage />}>
-                                    <Coin />
-                                </Suspense>
-                            }
-                        />
+                      path={AppRoute.walletSettings}
+                    >
+                      <RedirectFromDesktopSettings />
+                    </Route>
+                    <Route path={`${AppRoute.coins}/:name`}>
+                        <Suspense fallback={<CoinSkeletonPage />}>
+                            <Coin />
+                        </Suspense>
                     </Route>
                     <Route
                         path="*"
-                        element={
-                            <>
-                                <Header showQrScan={showQrScan} />
-                                <InnerBody>
-                                    <Suspense fallback={<HomeSkeleton />}>
-                                        <Home />
-                                    </Suspense>
-                                </InnerBody>
-                            </>
-                        }
-                    />
-                </Routes>
+                    >
+                        <>
+                            <Header showQrScan={showQrScan} />
+                            <InnerBody>
+                                <Suspense fallback={<HomeSkeleton />}>
+                                    <Home />
+                                </Suspense>
+                            </InnerBody>
+                        </>
+                    </Route>
+                </Switch>
                 <Footer standalone={getUsePadding(sdk.launchParams.platform)} />
                 <MemoryScroll />
                 <Suspense>
-                    <TonConnectSubscription />
+                    <WebTonConnectSubscription />
                 </Suspense>
             </Wrapper>
         </TwaNotification>

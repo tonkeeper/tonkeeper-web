@@ -16,9 +16,10 @@ import {
     NotificationTitleBlock
 } from '../Notification';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
-import { useNavigate } from 'react-router-dom';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { BatteryChargingIcon } from '../settings/battery/BatteryIcons';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { handleSubmit } from '../../libs/form';
 
 export const TransferBatteryRequired: FC<{
     onBack: () => void;
@@ -36,7 +37,7 @@ export const TransferBatteryRequired: FC<{
     }, [onClose]);
 
     return (
-        <FullHeightBlock>
+        <FullHeightBlock onSubmit={handleSubmit(onCharge)}>
             {!shouldHideHeaderAndFooter && (
                 <NotificationHeaderPortal>
                     <NotificationHeader>

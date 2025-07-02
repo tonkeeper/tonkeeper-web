@@ -23,6 +23,7 @@ import { useTranslation } from '../../hooks/translation';
 import {
     ConfirmState,
     useCreateInvoiceMutation,
+    useFreeProAccessAvailable,
     useProLogout,
     useProPlans,
     useProState,
@@ -50,6 +51,17 @@ import { WalletEmoji } from '../shared/emoji/WalletEmoji';
 import { ConfirmView } from '../transfer/ConfirmView';
 import { useNotifyError } from '../../hooks/useNotification';
 import { HideOnReview } from '../ios/HideOnReview';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import {
+    DesktopViewHeader,
+    DesktopViewHeaderContent,
+    DesktopViewPageLayout
+} from '../desktop/DesktopViewLayout';
+import { ForTargetEnv } from '../shared/TargetEnv';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
+import { ProFreeAccessContent } from '../pro/ProFreeAccess';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { AppRoute } from '../../libs/routes';
 
 const Block = styled.div`
     display: flex;
@@ -345,8 +357,11 @@ const BuyProService: FC<{
         );
     };
 
+    const containerRef = useRef<HTMLDivElement>(null);
+    useInputFocusScroll(containerRef);
+
     return (
-        <div>
+        <div ref={containerRef}>
             <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
                 plans={plans ?? []}
@@ -424,6 +439,10 @@ const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSu
     return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
 };
 
+const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
+    height: 100%;
+`;
+
 export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void }> = ({
     showLogo = true,
     onSuccess
@@ -431,6 +450,21 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
     const { t } = useTranslation();
 
     const { data } = useProState();
+    const isFreeAccessAvailable = useFreeProAccessAvailable();
+    const navigate = useNavigate();
+
+    if (isFreeAccessAvailable) {
+        const onBack = () => {
+            navigate(AppRoute.home);
+        };
+
+        return (
+            <ProFreeAccessContentStyled
+                access={isFreeAccessAvailable}
+                onSubmit={onSuccess ?? onBack}
+            />
+        );
+    }
 
     return (
         <>
@@ -451,6 +485,39 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
 };
 
 export const ProSettings: FC = () => {
+    return (
+        <HideOnReview>
+            <ProSettingsResponsive />
+        </HideOnReview>
+    );
+};
+
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    padding: 1rem 1rem 0;
+    box-sizing: border-box;
+
+    * {
+        box-sizing: border-box;
+    }
+`;
+
+export const ProSettingsResponsive: FC = () => {
+    const isProDisplay = useIsFullWidthMode();
+    const { t } = useTranslation();
+
+    if (isProDisplay) {
+        return (
+            <DesktopViewPageLayoutStyled>
+                <ForTargetEnv env="mobile">
+                    <DesktopViewHeader>
+                        <DesktopViewHeaderContent title={t('tonkeeper_pro')} />
+                    </DesktopViewHeader>
+                </ForTargetEnv>
+                <ProSettingsContent />
+            </DesktopViewPageLayoutStyled>
+        );
+    }
+
     return (
         <HideOnReview>
             <SubHeader />

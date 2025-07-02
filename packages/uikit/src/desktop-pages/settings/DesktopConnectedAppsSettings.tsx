@@ -1,13 +1,13 @@
 import {
     DesktopViewHeader,
+    DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
-import { Body2Class, Label2 } from '../../components/Text';
 import { ConnectedAppsList } from '../../components/connected-apps/ConnectedAppsList';
 import { styled } from 'styled-components';
 import {
-    useActiveWalletTonConnectConnections,
-    useDisconnectTonConnectApp
+    useActiveWalletConnectedApps,
+    useDisconnectTonConnectAppFromActiveWallet
 } from '../../state/tonConnect';
 import { ConfirmDisconnectNotification } from '../../components/connected-apps/ConfirmDisconnectNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
@@ -19,30 +19,15 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     height: 100%;
 `;
 
-const DesktopViewHeaderStyled = styled(DesktopViewHeader)`
-    padding-right: 0;
-`;
-
 const ConnectedAppsListStyled = styled(ConnectedAppsList)`
     flex: 1;
-`;
-
-const DisconnectAllButton = styled.button`
-    border: none;
-    outline: none;
-    background: transparent;
-
-    color: ${p => p.theme.accentBlue};
-    padding: 4px 15px;
-    ${Body2Class};
-    margin-left: auto;
 `;
 
 export const DesktopConnectedAppsSettings = () => {
     const { t } = useTranslation();
     const { isOpen, onClose, onOpen } = useDisclosure();
-    const { data: connections } = useActiveWalletTonConnectConnections();
-    const { mutate } = useDisconnectTonConnectApp();
+    const { data: connections } = useActiveWalletConnectedApps();
+    const { mutate } = useDisconnectTonConnectAppFromActiveWallet();
 
     const onCloseNotification = (confirmed?: boolean) => {
         if (confirmed) {
@@ -55,14 +40,24 @@ export const DesktopConnectedAppsSettings = () => {
 
     return (
         <DesktopViewPageLayoutStyled>
-            <DesktopViewHeaderStyled backButton>
-                <Label2>{t('settings_connected_apps')}</Label2>
-                {showDisconnectAll && (
-                    <DisconnectAllButton onClick={onOpen}>
-                        {t('disconnect_all_apps')}
-                    </DisconnectAllButton>
-                )}
-            </DesktopViewHeaderStyled>
+            <DesktopViewHeader backButton>
+                <DesktopViewHeaderContent
+                    title={t('settings_connected_apps')}
+                    right={
+                        showDisconnectAll && (
+                            <DesktopViewHeaderContent.Right>
+                                <DesktopViewHeaderContent.RightItem
+                                    asDesktopButton
+                                    onClick={onOpen}
+                                    closeDropDownOnClick
+                                >
+                                    {t('disconnect_all_apps')}
+                                </DesktopViewHeaderContent.RightItem>
+                            </DesktopViewHeaderContent.Right>
+                        )
+                    }
+                />
+            </DesktopViewHeader>
             <ConnectedAppsListStyled />
             <ConfirmDisconnectNotification
                 isOpen={isOpen}

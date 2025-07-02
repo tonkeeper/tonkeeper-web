@@ -12,6 +12,7 @@ import React, {
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { AppSelectionContext, useAppContext } from '../hooks/appContext';
 import { mergeRefs } from '../libs/common';
+import { useIsCapacitorApp } from '../hooks/appSdk';
 
 const ListBlockContext = createContext({ isDesktopAdaptive: false });
 
@@ -107,12 +108,12 @@ const ListBlockDesktop = styled(ListBlock)`
         css`
             background: transparent;
             & > div {
-                border-radius: 0;
+                border-radius: 0 !important;
             }
         `}
 `;
 
-export const ListItemPayload = styled.div`
+export const ListItemPayload = styled.div<{ $clickable?: boolean }>`
     flex-grow: 1;
     display: flex;
     align-items: center;
@@ -120,8 +121,13 @@ export const ListItemPayload = styled.div`
     padding: 1rem 1rem 1rem 0;
     box-sizing: border-box;
     gap: 10px;
-
     width: 100%;
+
+    ${props =>
+        props.$clickable &&
+        css`
+            cursor: pointer;
+        `}
 `;
 
 export const ListItemElement = styled.div<{
@@ -232,6 +238,11 @@ export const ListItem = forwardRef<
         }
     }, [ref.current, selection, setHover]);
     const { isDesktopAdaptive } = useContext(ListBlockContext);
+
+    const isCapacitorApp = useIsCapacitorApp();
+    if (isCapacitorApp) {
+        hover = false;
+    }
 
     return (
         <ListItemElement

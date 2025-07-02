@@ -1,9 +1,8 @@
-import React, { FC, Suspense } from 'react';
+import React, { Suspense } from 'react';
 
 const Check = React.lazy(() => import('./Check'));
 const Gear = React.lazy(() => import('./Gear'));
 const Write = React.lazy(() => import('./Write'));
-const Confetti = React.lazy(() => import('./Confetti'));
 
 const Fallback = () => {
     return <div style={{ width: '160px', height: '160px' }}></div>;
@@ -28,14 +27,6 @@ export const WriteLottieIcon = () => {
     return (
         <Suspense fallback={<Fallback />}>
             <Write />
-        </Suspense>
-    );
-};
-
-export const ConfettiLottieIcon: FC<{ width: number; height: number }> = ({ width, height }) => {
-    return (
-        <Suspense>
-            <Confetti width={width} height={height} />
         </Suspense>
     );
 };

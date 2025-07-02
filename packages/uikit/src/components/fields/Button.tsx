@@ -1,8 +1,7 @@
 import React, { ComponentProps, FC, PropsWithChildren } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import { SpinnerIcon } from '../Icon';
-import { Body2Class } from '../Text';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
+import { Body2Class, Label2Class } from '../Text';
 
 export interface ButtonProps {
     loading?: boolean;
@@ -266,7 +265,22 @@ export const Button: FC<
 };
 
 export const ButtonResponsiveSize: FC<Omit<ComponentProps<typeof Button>, 'size'>> = props => {
-    const isFullWidth = useIsFullWidthMode();
+    const theme = useTheme();
 
-    return <Button {...props} size={isFullWidth ? 'small' : 'large'} />;
+    return <Button {...props} size={theme.proDisplayType === 'desktop' ? 'small' : 'large'} />;
 };
+
+export const ButtonFlat = styled.button`
+    ${Label2Class};
+    background: transparent;
+    border: none;
+    padding: 0;
+
+    color: ${p => p.theme.accentBlue};
+    opacity: 1;
+    transition: opacity 0.15s ease-in-out;
+
+    &:active {
+        opacity: 0.8;
+    }
+`;

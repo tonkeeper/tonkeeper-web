@@ -2,7 +2,6 @@ import { UR } from '@keystonehq/keystone-sdk/dist/types/ur';
 import { parseTonAccount } from '@keystonehq/keystone-sdk/dist/wallet/hdKey';
 import { Address } from '@ton/core';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
-import queryString from 'query-string';
 import { IStorage } from '../Storage';
 import {
     AccountId,
@@ -39,6 +38,11 @@ import { TronWallet } from '../entries/tron/tron-wallet';
 import { ethers } from 'ethers';
 import { KeyPair, keyPairFromSecretKey } from '@ton/crypto';
 import nacl from 'tweetnacl';
+import queryString from 'query-string';
+import { TronApi } from '../tronApi';
+import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
+import { AssetAmount } from '../entries/crypto/asset/asset-amount';
+import { pTimeout } from '../utils/common';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -485,61 +489,31 @@ export const getWalletsAddresses = (
     ) as Record<(typeof WalletVersions)[number], { address: Address; version: WalletVersion }>;
 };
 
-export const accountBySignerQr = async (
-    appContext: CreateWalletContext,
-    storage: IStorage,
-    qrCode: string
-): Promise<AccountTonOnly> => {
-    if (!qrCode.startsWith('tonkeeper://signer')) {
-        throw new Error('Unexpected QR code');
-    }
-
+export const parseSignerLink = (link: string): { publicKey: string; name: string } => {
     const {
         query: { pk, name }
-    } = queryString.parseUrl(qrCode);
+    } = queryString.parseUrl(link);
 
-    if (typeof pk != 'string') {
-        throw new Error('Unexpected QR code');
+    if (typeof pk !== 'string') {
+        throw new Error('Unexpected link');
     }
-    if (typeof name != 'string') {
-        throw new Error('Unexpected QR code');
+    if (typeof name !== 'string') {
+        throw new Error('Unexpected link');
     }
 
-    // TODO parse network from QR?
-    const network = Network.MAINNET;
-
-    const publicKey = pk;
-
-    // TODO support multiple wallets versions configuration
-    const active = await findWalletAddress(appContext, network, publicKey);
-
-    const { name: fallbackName, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(
-        publicKey
-    );
-
-    return new AccountTonOnly(
-        publicKey,
-        name || fallbackName,
-        emoji,
-        { kind: 'signer' },
-        active.rawAddress,
-        [
-            {
-                id: active.rawAddress,
-                publicKey,
-                version: active.version,
-                rawAddress: active.rawAddress
-            }
-        ]
-    );
+    return {
+        publicKey: pk,
+        name
+    };
 };
 
-export const accountBySignerDeepLink = async (
+export const accountBySignerLink = async (
     appContext: CreateWalletContext,
     network: Network,
     storage: IStorage,
     publicKey: string,
-    name: string | null
+    name: string | null,
+    kind: 'signer-deeplink' | 'signer'
 ): Promise<AccountTonOnly> => {
     const active = await findWalletAddress(appContext, network, publicKey);
 
@@ -547,21 +521,14 @@ export const accountBySignerDeepLink = async (
         publicKey
     );
 
-    return new AccountTonOnly(
-        publicKey,
-        name || fallbackName,
-        emoji,
-        { kind: 'signer-deeplink' },
-        active.rawAddress,
-        [
-            {
-                id: active.rawAddress,
-                publicKey,
-                version: active.version,
-                rawAddress: active.rawAddress
-            }
-        ]
-    );
+    return new AccountTonOnly(publicKey, name || fallbackName, emoji, { kind }, active.rawAddress, [
+        {
+            id: active.rawAddress,
+            publicKey,
+            version: active.version,
+            rawAddress: active.rawAddress
+        }
+    ]);
 };
 
 export const accountByLedger = (
@@ -722,9 +689,16 @@ export const createMAMAccountByMnemonic = async (
 
 export const mamAccountToMamAccountWithTron = async (
     account: AccountMAM,
-    getAccountMnemonic: () => Promise<string[]>
+    getAccountMnemonic: () => Promise<string[]>,
+    tronApi: TronApi,
+    mamMigrationNotification: (params: { address: string; usdtBalance: AssetAmount }) => void
 ) => {
     const rootAccount = await TonKeychainRoot.fromMnemonic(await getAccountMnemonic());
+    await checkMamAccountForDeprecatedTronAddress(
+        rootAccount.mnemonic,
+        tronApi,
+        mamMigrationNotification
+    );
 
     const derivations = await Promise.all(
         account.allAvailableDerivations.map(async d => {
@@ -748,6 +722,40 @@ export const mamAccountToMamAccountWithTron = async (
         derivations
     );
 };
+
+/* PRO-261 tron and mam bug */
+export async function checkMamAccountForDeprecatedTronAddress(
+    rootMnemonic: string[],
+    tronApi: TronApi,
+    onOpenModal: (params: { address: string; usdtBalance: AssetAmount }) => void
+) {
+    try {
+        await pTimeout(
+            _checkMamAccountForDeprecatedTronAddress(rootMnemonic, tronApi, onOpenModal),
+            2000
+        );
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function _checkMamAccountForDeprecatedTronAddress(
+    rootMnemonic: string[],
+    tronApi: TronApi,
+    onOpenModal: (params: { address: string; usdtBalance: AssetAmount }) => void
+) {
+    const rootTronAddress = await tronWalletByTonMnemonic(rootMnemonic);
+
+    const balance = await tronApi.getBalances(rootTronAddress.address);
+    if (balance.usdt === '0') {
+        return;
+    }
+
+    onOpenModal({
+        address: rootTronAddress.address,
+        usdtBalance: new AssetAmount({ asset: TRON_USDT_ASSET, weiAmount: balance.usdt })
+    });
+}
 
 export function getFallbackAccountEmoji(publicKeyOrBase64: string) {
     let index;

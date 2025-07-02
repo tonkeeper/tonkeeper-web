@@ -34,3 +34,15 @@ export function errorMessage(e: unknown): string | undefined {
 
     return undefined;
 }
+
+export type OptionalProperty<T, K extends keyof T> = Omit<T, K> & {
+    [P in K]?: T[P] | undefined;
+};
+
+type AssertEqual<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : never;
+
+export function assertTypesEqual<A, B>(_value: AssertEqual<A, B>): void {
+    //
+}

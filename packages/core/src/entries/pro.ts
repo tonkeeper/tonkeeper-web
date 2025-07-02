@@ -24,13 +24,24 @@ export interface ProSubscriptionPaid {
     nextChargeDate: Date;
 }
 
-export interface ProSubscriptionTrial {
+export interface ProSubscriptionTrialMobilePromo {
+    type: 'trial-mobile';
+    valid: true;
+    isTrial: true;
+    trialEndDate: Date;
+    usedTrial: true;
+}
+
+export interface ProSubscriptionTrialTg {
+    type: 'trial-tg';
     trialUserId: number;
     valid: true;
     isTrial: true;
     trialEndDate: Date;
     usedTrial: true;
 }
+
+export type ProSubscriptionTrial = ProSubscriptionTrialTg | ProSubscriptionTrialMobilePromo;
 
 export type ProSubscriptionValid = ProSubscriptionPaid | ProSubscriptionTrial;
 
