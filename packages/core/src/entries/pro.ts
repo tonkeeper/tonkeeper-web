@@ -95,8 +95,8 @@ export enum IosSubscriptionStatuses {
 }
 
 export enum ProductIds {
-    MONTHLY = 'com.tonapps.tonkeeperpro.pro.monthly',
-    YEARLY = 'com.tonapps.tonkeeperpro.pro.yearly'
+    MONTHLY = 'com.tonapps.tonkeeperpro.subscription.pro.monthly',
+    YEARLY = 'com.tonapps.tonkeeperpro.subscription.pro.yearly'
 }
 
 export function isProductId(value: unknown): value is ProductIds {
