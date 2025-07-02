@@ -19,7 +19,8 @@ import {
     isAccountTonWalletStandard,
     isAccountTronCompatible,
     isAccountVersionEditable,
-    isMnemonicAndPassword
+    isMnemonicAndPassword,
+    seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
@@ -28,7 +29,9 @@ import {
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
-    WalletVersion
+    WalletVersion,
+    AccountWallet,
+    getWalletsFromAccount
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConfig,
@@ -113,6 +116,15 @@ export const useActiveAccount = () => {
 export const useActiveWallet = () => {
     const account = useActiveAccount();
     return account.activeTonWallet;
+};
+
+export const useAccountWallets = (): AccountWallet[] => {
+    const accounts = useAccountsState().filter(
+        (acc): acc is AccountTonMnemonic | AccountMAM =>
+            seeIfMainnnetAccount(acc) && (acc.type === 'mnemonic' || acc.type === 'mam')
+    );
+
+    return accounts.flatMap(getWalletsFromAccount);
 };
 
 export const useActiveStandardTonWallet = () => {

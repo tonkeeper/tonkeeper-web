@@ -1,15 +1,5 @@
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import {
-    backwardCompatibilityOnlyWalletVersions,
-    sortWalletsByVersion,
-    TonWalletStandard
-} from '@tonkeeper/core/dist/entries/wallet';
-import {
-    Account,
-    AccountMAM,
-    AccountTonMnemonic,
-    seeIfMainnnetAccount
-} from '@tonkeeper/core/dist/entries/account';
 
 import { Label2 } from '../Text';
 import { DoneIcon } from '../Icon';
@@ -19,53 +9,46 @@ import { handleSubmit } from '../../libs/form';
 import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
-import { useNotifyError } from '../../hooks/useNotification';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useSelectWalletForProMutation } from '../../state/pro';
 import { ProScreenContentWrapper } from './ProScreenContentWrapper';
-import { useAccountsState, useActiveWallet } from '../../state/wallet';
+import { useNotifyError, useToast } from '../../hooks/useNotification';
+import { useAccountWallets, useActiveWallet } from '../../state/wallet';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
-
-interface AccountWallet {
-    wallet: TonWalletStandard;
-    account: Account;
-}
 
 export const ProAccountChooseScreen = () => {
     const { t } = useTranslation();
     const activeWallet = useActiveWallet();
-    const { mutateAsync, error, isLoading } = useSelectWalletForProMutation();
+    const accountsWallets = useAccountWallets();
+    const [selectedAccountId, setSelectedAccountId] = useState(activeWallet?.rawAddress ?? '');
+
+    const toast = useToast();
     const goTo = useGoToSubscriptionScreen();
+
+    const { mutateAsync, error, isSuccess, isLoading } = useSelectWalletForProMutation();
     useNotifyError(error);
 
-    const accounts = useAccountsState()
-        .filter(seeIfMainnnetAccount)
-        .filter(acc => acc.type === 'mnemonic' || acc.type === 'mam') as (
-        | AccountTonMnemonic
-        | AccountMAM
-    )[];
+    useEffect(() => {
+        if (isSuccess) {
+            goTo(SubscriptionScreens.PURCHASE);
+        }
+    }, [isSuccess]);
 
-    const accountsWallets: AccountWallet[] = accounts.flatMap(a => {
-        if (a.type === 'mam') {
-            return a.derivations.map<AccountWallet>(derivation => ({
-                wallet: derivation.tonWallets[0],
-                account: a,
-                derivation
-            }));
+    const handleNextScreen = async () => {
+        if (!selectedAccountId) {
+            toast(t('choose_wallet_for_pro'));
+
+            return;
         }
 
-        return a.allTonWallets
-            .filter(w => !backwardCompatibilityOnlyWalletVersions.includes(w.version))
-            .sort(sortWalletsByVersion)
-            .map<AccountWallet>(w => ({
-                wallet: w,
-                account: a
-            }));
-    });
+        await mutateAsync(selectedAccountId);
+    };
 
-    const handleNextScreen = () => {
-        goTo(SubscriptionScreens.PURCHASE);
+    const handleChooseWallet = (id: string) => {
+        if (isLoading) return;
+
+        setSelectedAccountId(id);
     };
 
     return (
@@ -75,18 +58,20 @@ export const ProAccountChooseScreen = () => {
                 subtitleKey="subscription_will_be_linked_to_wallet"
             />
             <ListBlock fullWidth margin={false}>
-                {accountsWallets.flatMap(accountWalletProps => (
-                    <ProWalletListItem
-                        key={accountWalletProps.wallet.id}
-                        onClick={() => mutateAsync(accountWalletProps.wallet.id)}
-                        rightElement={
-                            <Icon>
-                                {activeWallet?.id === accountWalletProps.wallet.id && <DoneIcon />}
-                            </Icon>
-                        }
-                        {...accountWalletProps}
-                    />
-                ))}
+                {accountsWallets.flatMap(accountWalletProps => {
+                    const walletId = accountWalletProps.wallet.id;
+
+                    return (
+                        <ProWalletListItem
+                            key={walletId}
+                            onClick={() => handleChooseWallet(walletId)}
+                            rightElement={
+                                <Icon>{selectedAccountId === walletId && <DoneIcon />}</Icon>
+                            }
+                            {...accountWalletProps}
+                        />
+                    );
+                })}
             </ListBlock>
             <ProSettingsMainButtonWrapper>
                 <Button primary fullWidth size="large" type="submit" loading={isLoading}>
@@ -102,4 +87,6 @@ const Icon = styled.span`
     color: ${props => props.theme.accentBlue};
     display: flex;
     margin-left: auto;
+    height: 16px;
+    width: 24px;
 `;

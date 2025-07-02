@@ -14,18 +14,19 @@ interface IProWalletListItemProps {
     account: Account;
     wallet: TonWalletStandard;
     rightElement?: React.ReactNode;
+    disableHover?: boolean;
     onClick?: () => void;
 }
 
 export const ProWalletListItem: FC<IProWalletListItemProps> = props => {
-    const { account, wallet, rightElement, onClick } = props;
+    const { account, wallet, rightElement, disableHover = false, onClick } = props;
 
     const network = useActiveTonNetwork();
     const address = toShortValue(formatAddress(wallet.rawAddress, network)).slice(4);
     const { name, emoji } = getAccountWalletNameAndEmoji(account);
 
     return (
-        <ListItemStyled hover={false} onClick={onClick}>
+        <ListItemStyled hover={!disableHover} onClick={onClick}>
             <ListItemPayloadStyled>
                 <WalletEmojiStyled containerSize="16px" emojiSize="16px" emoji={emoji} />
                 <Body2Limited>{name}</Body2Limited>
