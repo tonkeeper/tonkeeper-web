@@ -14,10 +14,10 @@ import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { ProChooseSubscriptionPlan } from './ProChooseSubscriptionPlan';
-import { useProPlans, useProSubscriptionPurchase } from '../../state/pro';
 import { adaptPlansToViewModel, getSkeletonProducts } from '../../libs/pro';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
+import { useProLogout, useProPlans, useProSubscriptionPurchase } from '../../state/pro';
 
 export const ProPurchaseChooseScreen = () => {
     const { t } = useTranslation();
@@ -28,6 +28,13 @@ export const ProPurchaseChooseScreen = () => {
     const goTo = useGoToSubscriptionScreen();
     const { mutateAsync, isSuccess, isLoading } = useProSubscriptionPurchase();
 
+    const {
+        mutateAsync: handleLogOut,
+        error: logoutError,
+        isLoading: isLoggingOut
+    } = useProLogout();
+    useNotifyError(logoutError);
+
     const { data: products, error, isError, isFetching, refetch } = useProPlans();
     useNotifyError(error);
 
@@ -37,6 +44,8 @@ export const ProPurchaseChooseScreen = () => {
             goTo(SubscriptionScreens.STATUS);
         }
     }, [isSuccess, toast, t, navigate]);
+
+    const isTotalLoading = isFetching || isLoading || isLoggingOut;
 
     const handleBuySubscription = async () => {
         if (isError) {
@@ -63,22 +72,16 @@ export const ProPurchaseChooseScreen = () => {
                 titleKey="get_tonkeeper_pro"
                 subtitleKey="choose_billing_description"
             />
-            <ProActiveWallet />
+            <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
             <ProChooseSubscriptionPlan
-                isLoading={isLoading}
+                isLoading={isTotalLoading}
                 selectedPlan={selectedPlan}
                 onPlanSelection={setSelectedPlan}
                 productsForRender={productsForRender}
             />
             <ProFeaturesList />
             <ProSettingsMainButtonWrapper>
-                <Button
-                    primary
-                    fullWidth
-                    size="large"
-                    type="submit"
-                    loading={isFetching || isLoading}
-                >
+                <Button primary fullWidth size="large" type="submit" loading={isTotalLoading}>
                     <Label2>{t(isError ? 'try_again' : 'continue_with_tonkeeper_pro')}</Label2>
                 </Button>
                 <ProLegalNote />

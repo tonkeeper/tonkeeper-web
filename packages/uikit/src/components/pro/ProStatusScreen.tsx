@@ -4,14 +4,15 @@ import { Label2 } from '../Text';
 import { SlidersIcon } from '../Icon';
 import { Button } from '../fields/Button';
 import { useAppSdk } from '../../hooks/appSdk';
+import { useProLogout } from '../../state/pro';
 import { ProActiveWallet } from './ProActiveWallet';
 import { ProFeaturesList } from './ProFeaturesList';
-import { useToast } from '../../hooks/useNotification';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { ProStatusDetailsList } from './ProStatusDetailsList';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { ProScreenContentWrapper } from './ProScreenContentWrapper';
+import { useNotifyError, useToast } from '../../hooks/useNotification';
 
 // TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
@@ -20,6 +21,13 @@ export const ProStatusScreen = () => {
     const toast = useToast();
 
     const { isOpen: isLoading, onOpen: setLoading, onClose: removeLoading } = useDisclosure(false);
+
+    const {
+        mutateAsync: handleLogOut,
+        error: logoutError,
+        isLoading: isLoggingOut
+    } = useProLogout();
+    useNotifyError(logoutError);
 
     const isIos = isIosStrategy(sdk.subscriptionStrategy);
 
@@ -43,10 +51,15 @@ export const ProStatusScreen = () => {
                 titleKey="tonkeeper_pro_is_active"
                 subtitleKey="subscription_is_linked"
             />
-            <ProActiveWallet />
+            <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
             <ProStatusDetailsList />
             {isIos && (
-                <Button secondary fullWidth onClick={handleManageClick} loading={isLoading}>
+                <Button
+                    secondary
+                    fullWidth
+                    onClick={handleManageClick}
+                    loading={isLoading || isLoggingOut}
+                >
                     <SlidersIcon />
                     <Label2>{t('Manage')}</Label2>
                 </Button>

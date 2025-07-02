@@ -13,7 +13,7 @@ export const ProStatusDetailsList = () => {
     return (
         <ListBlock margin={false} fullWidth>
             {Object.entries(TEMP_MOCK_DATA).map(([key, value]) => (
-                <ListItemStyled key={key}>
+                <ListItemStyled hover={false} key={key}>
                     <ListItemPayloadStyled>
                         <Body2Styled>{key}</Body2Styled>
                         <Body2>{value}</Body2>
