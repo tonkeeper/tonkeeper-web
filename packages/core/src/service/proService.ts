@@ -269,7 +269,7 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
 
 export const saveIapPurchase = async (originalTransactionId: string) => {
     return InvoicesService.activateIapPurchase({
-        original_transaction_id: originalTransactionId,
+        original_transaction_id: String(originalTransactionId),
         sandbox: true
     });
 };
