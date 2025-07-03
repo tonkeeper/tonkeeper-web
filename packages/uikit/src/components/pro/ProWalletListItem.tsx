@@ -57,6 +57,8 @@ const WalletBadgeStyled = styled(WalletVersionBadge)`
     display: inline-block;
     margin-left: 6px;
     width: fit-content;
+    height: 20px;
+    line-height: 16px;
 `;
 
 const ListItemStyled = styled(ListItem)`

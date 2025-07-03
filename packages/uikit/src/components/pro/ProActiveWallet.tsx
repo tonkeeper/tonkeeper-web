@@ -2,12 +2,14 @@ import { type FC } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
-import { ListBlock } from '../List';
+import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { useProState } from '../../state/pro';
 import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
-import { useActiveAccount, useActiveStandardTonWallet } from '../../state/wallet';
+import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
+import { Skeleton } from '../shared/Skeleton';
 
 interface IProps {
     onLogout: () => Promise<void>;
@@ -16,9 +18,11 @@ interface IProps {
 
 export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
     const { t } = useTranslation();
-    const activeWallet = useActiveStandardTonWallet();
-    const activeAccount = useActiveAccount();
+    const { data } = useProState();
     const goTo = useGoToSubscriptionScreen();
+    const { account, wallet } = useControllableAccountAndWalletByWalletId(
+        data?.authorizedWallet?.rawAddress || undefined
+    );
 
     const handleDisconnectClick = async () => {
         await onLogout();
@@ -27,19 +31,35 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
 
     return (
         <ListBlock margin={false} fullWidth>
-            <ProWalletListItem
-                disableHover
-                wallet={activeWallet}
-                account={activeAccount}
-                rightElement={
-                    <ButtonStyled disabled={isLoading} onClick={handleDisconnectClick}>
-                        <Label2>{t('disconnect')}</Label2>
-                    </ButtonStyled>
-                }
-            />
+            {!isLoading && account && wallet ? (
+                <ProWalletListItem
+                    disableHover
+                    wallet={wallet}
+                    account={account}
+                    rightElement={
+                        <ButtonStyled
+                            type="button"
+                            disabled={isLoading}
+                            onClick={handleDisconnectClick}
+                        >
+                            <Label2>{t('disconnect')}</Label2>
+                        </ButtonStyled>
+                    }
+                />
+            ) : (
+                <ListItem>
+                    <ListItemPayloadStyled>
+                        <Skeleton width="100%" height="20px" />
+                    </ListItemPayloadStyled>
+                </ListItem>
+            )}
         </ListBlock>
     );
 };
+
+const ListItemPayloadStyled = styled(ListItemPayload)`
+    padding: 10px 10px 10px 0;
+`;
 
 const ButtonStyled = styled.button`
     height: auto;

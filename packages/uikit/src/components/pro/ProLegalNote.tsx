@@ -16,11 +16,19 @@ export const ProLegalNote = () => {
             <LegalNote>
                 {t(`pro_terms_privacy_restore_note${isCrypto ? '_crypto' : ''}`)}{' '}
             </LegalNote>
-            <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/terms')}>
+            <ButtonStyled
+                as="button"
+                type="button"
+                onClick={() => sdk.openPage('https://tonkeeper.com/terms')}
+            >
                 {t('pro_terms')}
             </ButtonStyled>
             <LegalNote> {t('and')} </LegalNote>
-            <ButtonStyled as="button" onClick={() => sdk.openPage('https://tonkeeper.com/privacy')}>
+            <ButtonStyled
+                as="button"
+                type="button"
+                onClick={() => sdk.openPage('https://tonkeeper.com/privacy')}
+            >
                 {t('pro_privacy')}
             </ButtonStyled>
             <LegalNote>. </LegalNote>
@@ -28,6 +36,7 @@ export const ProLegalNote = () => {
                 <>
                     <ButtonStyled
                         as="button"
+                        type="button"
                         onClick={() => sdk.openPage('https://tonkeeper.com/restore')}
                     >
                         {t('restore_purchases')}

@@ -60,7 +60,7 @@ const Header: FC<IHeaderProps> = props => {
         className,
         leftElement = <Title>{t('what_is_included')}</Title>,
         rightElement = (
-            <ButtonStyled as="button" onClick={onOpen}>
+            <ButtonStyled as="button" type="button" onClick={onOpen}>
                 {t('learn_more')}
             </ButtonStyled>
         )

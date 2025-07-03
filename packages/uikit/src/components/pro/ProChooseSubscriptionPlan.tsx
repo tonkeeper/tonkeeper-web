@@ -75,7 +75,7 @@ const SkeletonTextStyled = styled(SkeletonText)<{ height?: string; margin?: stri
     margin: ${p => p.margin ?? 0};
 `;
 
-const SubscriptionPlansBlock = styled.form`
+const SubscriptionPlansBlock = styled.div`
     width: 100%;
 `;
 
