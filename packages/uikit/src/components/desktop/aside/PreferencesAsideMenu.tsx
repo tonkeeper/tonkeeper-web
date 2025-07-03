@@ -32,7 +32,7 @@ import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
-import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
+import { useNavigate } from '../../../hooks/router/useNavigate';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -86,6 +86,7 @@ const AsideMenuItemsBlock = styled.div`
 export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) => {
     const { t, i18n } = useTranslation();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -97,14 +98,21 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
-    const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
+    // const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
 
     const availableThemes = useAvailableThemes();
 
     const isTonkeeperProActive = location.pathname === AppRoute.settings + SettingsRoute.pro;
 
     const handleTonkeeperProClick = async () => {
-        onProFeaturesOpen();
+        // TODO Correct it
+        // if (proState?.subscription.valid) {
+        //     navigate(AppRoute.settings + SettingsRoute.pro);
+        // } else {
+        //     onProFeaturesOpen();
+        // }
+
+        navigate(AppRoute.settings + SettingsRoute.pro);
     };
 
     return (
