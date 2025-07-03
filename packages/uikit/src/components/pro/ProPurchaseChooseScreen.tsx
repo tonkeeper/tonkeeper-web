@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { isProductId } from '@tonkeeper/core/dist/entries/pro';
 
 import { Label2 } from '../Text';
 import { Button } from '../fields/Button';
@@ -18,15 +17,28 @@ import { adaptPlansToViewModel, getSkeletonProducts } from '../../libs/pro';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
 import { useProLogout, useProPlans, useProSubscriptionPurchase } from '../../state/pro';
+import { IosPurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
 
 export const ProPurchaseChooseScreen = () => {
     const { t } = useTranslation();
-    const [selectedPlan, setSelectedPlan] = useState('');
+    const [selectedPlanId, setSelectedPlanId] = useState('');
 
     const toast = useToast();
     const navigate = useNavigate();
     const goTo = useGoToSubscriptionScreen();
-    const { mutateAsync, isSuccess, isLoading } = useProSubscriptionPurchase();
+    const {
+        data: purchaseStatus,
+        mutateAsync: startPurchasing,
+        isSuccess: isPurchaseSuccess,
+        isLoading: isPurchasing,
+        isError: isPurchaseError
+    } = useProSubscriptionPurchase();
+
+    useEffect(() => {
+        if (isPurchaseError) {
+            toast(t('purchase_failed'));
+        }
+    }, [isPurchaseError]);
 
     const {
         mutateAsync: handleLogOut,
@@ -39,13 +51,24 @@ export const ProPurchaseChooseScreen = () => {
     useNotifyError(error);
 
     useEffect(() => {
-        if (isSuccess) {
-            toast(t('subscription_purchase_success'));
-            goTo(SubscriptionScreens.STATUS);
-        }
-    }, [isSuccess, toast, t, navigate]);
+        if (!isPurchaseSuccess) return;
 
-    const isTotalLoading = isFetching || isLoading || isLoggingOut;
+        if (purchaseStatus === IosPurchaseStatuses.CANCELED) {
+            toast(t('purchase_canceled'));
+
+            return;
+        }
+
+        if (purchaseStatus === IosPurchaseStatuses.PENDING) {
+            toast(t('purchase_processing'));
+        } else {
+            toast(t('purchase_success'));
+        }
+
+        goTo(SubscriptionScreens.STATUS);
+    }, [isPurchaseSuccess, toast, t, navigate]);
+
+    const isTotalLoading = isFetching || isPurchasing || isLoggingOut;
 
     const handleBuySubscription = async () => {
         if (isError) {
@@ -54,13 +77,15 @@ export const ProPurchaseChooseScreen = () => {
             return;
         }
 
-        if (!selectedPlan || !isProductId(selectedPlan)) {
+        const selectedPlan = displayPlans.find(plan => plan.id === selectedPlanId);
+
+        if (!selectedPlan) {
             toast(t('purchase_failed'));
 
             return;
         }
 
-        await mutateAsync(selectedPlan);
+        await startPurchasing(selectedPlan);
     };
 
     const displayPlans = adaptPlansToViewModel(products);
@@ -75,8 +100,8 @@ export const ProPurchaseChooseScreen = () => {
             <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
             <ProChooseSubscriptionPlan
                 isLoading={isTotalLoading}
-                selectedPlan={selectedPlan}
-                onPlanSelection={setSelectedPlan}
+                selectedPlan={selectedPlanId}
+                onPlanSelection={setSelectedPlanId}
                 productsForRender={productsForRender}
             />
             <ProFeaturesList />
