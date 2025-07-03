@@ -26,8 +26,10 @@ export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => 
 export const getApiConfig = (config: TonendpointConfig, network: Network, TonConsoleBase = '') => {
     // Global config
     if (TonConsoleBase) {
+        // TODO Find out why
         TonConsoleApi.BASE = 'https://dev-pro.tonconsole.com';
         TonConsoleApi.WITH_CREDENTIALS = false;
+        TonConsoleApi.CREDENTIALS = 'omit';
     }
 
     return {

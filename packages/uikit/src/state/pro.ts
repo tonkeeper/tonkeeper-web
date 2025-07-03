@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
+    IDisplayPlan,
+    IosPurchaseStatuses,
+    IosSubscriptionStatuses,
     isIosStrategy,
+    isProductId,
     NormalizedProPlans,
-    ProductIds,
     ProState,
     ProStateAuthorized,
     ProSubscription,
@@ -32,7 +35,7 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { QueryKey } from '../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
 import {
@@ -136,10 +139,12 @@ export const useProState = () => {
             state = {
                 authorizedWallet: null,
                 subscription: {
-                    type: 'trial-mobile',
+                    source: SubscriptionSources.IOS,
+                    status: IosSubscriptionStatuses.PROMO,
                     isTrial: true,
                     valid: true,
                     usedTrial: true,
+                    originalTransactionId: null,
                     trialEndDate: isFreeProAccessAvailable.validUntil
                 }
             };
@@ -157,22 +162,42 @@ export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
 
-    return useMutation<ProSubscription, Error, ProductIds>(async productId => {
+    return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
         if (!isIosStrategy(sdk.subscriptionStrategy)) {
             throw new Error('This is not an iOS subscription strategy');
         }
 
-        const subscription = await sdk.subscriptionStrategy?.subscribe(productId);
+        if (!isProductId(selectedPlan.id)) {
+            throw new Error('This is not an iOS subscription strategy');
+        }
 
-        if (!subscription?.originalTransactionId) {
+        const subscription = await sdk.subscriptionStrategy?.subscribe(selectedPlan.id);
+
+        if (subscription.status === IosPurchaseStatuses.CANCELED) {
+            return IosPurchaseStatuses.CANCELED;
+        }
+
+        const originalTransactionId = subscription?.originalTransactionId;
+
+        if (!originalTransactionId) {
             throw new Error('Failed to subscribe');
         }
 
-        const updatedSubscription = await saveIapPurchase(subscription.originalTransactionId);
+        const savingResult = await saveIapPurchase(String(originalTransactionId));
 
-        await client.invalidateQueries([QueryKey.proBackup]);
+        if (!savingResult.ok) {
+            await sdk.storage.set(AppKey.PRO_PENDING_STATE, {
+                source: SubscriptionSources.IOS,
+                originalTransactionId,
+                ...selectedPlan
+            });
 
-        return updatedSubscription;
+            return IosPurchaseStatuses.PENDING;
+        }
+
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
+
+        return IosPurchaseStatuses.SUCCESS;
     });
 };
 
