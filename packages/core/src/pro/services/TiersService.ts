@@ -54,7 +54,7 @@ export class TiersService {
         },
     ): CancelablePromise<{
         ok: boolean;
-        auth_token: string;
+        auth_token?: string;
     }> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -79,7 +79,7 @@ export class TiersService {
         requestBody: TonConnectProof,
     ): CancelablePromise<{
         ok: boolean;
-        auth_token: string;
+        auth_token?: string;
     }> {
         return __request(OpenAPI, {
             method: 'POST',

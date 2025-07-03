@@ -6,7 +6,7 @@ import type { SubscriptionVerification } from '../models/SubscriptionVerificatio
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-export class UserService {
+export class UsersService {
     /**
      * Get authenticated user information
      * @returns any Info

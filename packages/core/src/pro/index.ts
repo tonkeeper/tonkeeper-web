@@ -26,14 +26,16 @@ export type { queryCurrency } from './models/queryCurrency';
 export type { queryLang } from './models/queryLang';
 export type { queryPromoCode } from './models/queryPromoCode';
 export type { State } from './models/State';
+export { SubscriptionSource } from './models/SubscriptionSource';
 export type { SubscriptionVerification } from './models/SubscriptionVerification';
 export type { Tier } from './models/Tier';
 export type { TonConnectProof } from './models/TonConnectProof';
 
 export { AuthService } from './services/AuthService';
 export { DashboardsService } from './services/DashboardsService';
+export { IapService } from './services/IapService';
 export { InvoicesService } from './services/InvoicesService';
 export { StatesService } from './services/StatesService';
 export { SystemService } from './services/SystemService';
 export { TiersService } from './services/TiersService';
-export { UserService } from './services/UserService';
+export { UsersService } from './services/UsersService';

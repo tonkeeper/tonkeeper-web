@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Invoice } from '../models/Invoice';
 import type { InvoiceStatus } from '../models/InvoiceStatus';
+import type { Ok } from '../models/Ok';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -59,7 +60,7 @@ export class InvoicesService {
     /**
      * Process invoice payment webhook
      * @param requestBody Data that is expected
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
     public static invoiceWebhook(
@@ -74,41 +75,10 @@ export class InvoicesService {
             date_expire: number;
             date_create: number;
         },
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token: string;
-    }> {
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/invoice/webhook',
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                400: `Something went wrong on client side`,
-                403: `Access token is missing or invalid`,
-                404: `The specified resource was not found`,
-                500: `Something went wrong on server side`,
-            },
-        });
-    }
-    /**
-     * Activate Pro subscription via IAP purchase
-     * @param requestBody Data that is expected
-     * @returns any Ok
-     * @throws ApiError
-     */
-    public static activateIapPurchase(
-        requestBody: {
-            original_transaction_id: string;
-            sandbox: boolean;
-        },
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token: string;
-    }> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/v1/services/pro/iap',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

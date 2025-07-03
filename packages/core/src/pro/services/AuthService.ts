@@ -35,7 +35,7 @@ export class AuthService {
         requestBody: TonConnectProof,
     ): CancelablePromise<{
         ok: boolean;
-        auth_token: string;
+        auth_token?: string;
     }> {
         return __request(OpenAPI, {
             method: 'POST',
@@ -57,7 +57,7 @@ export class AuthService {
      */
     public static logout(): CancelablePromise<{
         ok: boolean;
-        auth_token: string;
+        auth_token?: string;
     }> {
         return __request(OpenAPI, {
             method: 'POST',

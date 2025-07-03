@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Ok } from '../models/Ok';
 import type { State } from '../models/State';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -27,17 +28,14 @@ export class StatesService {
     /**
      * Update user UI state
      * @param requestBody Data that is expected
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
     public static updateState(
         requestBody?: {
             state: string;
         },
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token: string;
-    }> {
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/services/pro/state',
@@ -53,13 +51,10 @@ export class StatesService {
     }
     /**
      * Delete user UI state
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
-    public static deleteState(): CancelablePromise<{
-        ok: boolean;
-        auth_token: string;
-    }> {
+    public static deleteState(): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/services/pro/state',
