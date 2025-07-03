@@ -32,7 +32,11 @@ import Capacitor
                     call.reject("Product not found")
                     return
                 }
-                call.resolve(productToDict(product))
+
+                let environment = await getEnvironment()
+                var productDict = productToDict(product)
+                productDict["environment"] = environment
+                call.resolve(productDict)
             } catch {
                 call.reject("Failed to load product: \(error.localizedDescription)")
             }
@@ -53,7 +57,12 @@ import Capacitor
         Task {
             do {
                 let products = try await Product.products(for: productIds)
-                let result = products.map { productToDict($0) }
+                let environment = await getEnvironment()
+                let result = products.map { product -> [String: Any] in
+                    var dict = productToDict(product)
+                    dict["environment"] = environment
+                    return dict
+                }
                 call.resolve(["products": result])
             } catch {
                 call.reject("Failed to load products: \(error.localizedDescription)")
@@ -87,17 +96,23 @@ import Capacitor
                     switch verification {
                     case .verified(let transaction):
                         await transaction.finish()
-                        call.resolve([
+                        var response: [String: Any] = [
                             "status": "success",
                             "originalTransactionId": transaction.originalID
-                        ])
+                        ]
+                        if #available(iOS 16.0, *) {
+                            response["environment"] = transaction.environment.rawValue
+                        } else {
+                            response["environment"] = NSNull()
+                        }
+                        call.resolve(response)
                     case .unverified(_, let error):
                         call.reject("Purchase unverified: \(error.localizedDescription)")
                     }
                 case .userCancelled:
-                    call.resolve(["status": "cancelled"])
+                    call.resolve(["status": "cancelled", "environment": NSNull()])
                 case .pending:
-                    call.resolve(["status": "pending"])
+                    call.resolve(["status": "pending", "environment": NSNull()])
                 @unknown default:
                     call.reject("Unknown purchase state")
                 }
@@ -116,16 +131,22 @@ import Capacitor
         Task {
             for await result in Transaction.currentEntitlements {
                 if case .verified(let transaction) = result {
-                    call.resolve([
+                    var response: [String: Any] = [
                         "originalTransactionId": transaction.originalID,
                         "productId": transaction.productID,
                         "purchaseDate": ISO8601DateFormatter().string(from: transaction.purchaseDate)
-                    ])
+                    ]
+                    if #available(iOS 16.0, *) {
+                        response["environment"] = transaction.environment.rawValue
+                    } else {
+                        response["environment"] = NSNull()
+                    }
+                    call.resolve(response)
                     return
                 }
             }
 
-            call.resolve(["originalTransactionId": NSNull()])
+            call.resolve(["originalTransactionId": NSNull(), "environment": NSNull()])
         }
     }
 
@@ -172,5 +193,19 @@ import Capacitor
             "subscriptionGroup": product.subscription?.subscriptionGroupID ?? "",
             "subscriptionPeriod": unitString
         ]
+    }
+
+    @available(iOS 15.0, *)
+    private func getEnvironment() async -> Any {
+        for await result in Transaction.currentEntitlements {
+            if case .verified(let transaction) = result {
+                if #available(iOS 16.0, *) {
+                    return transaction.environment.rawValue
+                } else {
+                    return NSNull()
+                }
+            }
+        }
+        return NSNull()
     }
 }

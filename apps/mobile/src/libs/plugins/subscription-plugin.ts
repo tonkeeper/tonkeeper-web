@@ -1,5 +1,6 @@
 import { registerPlugin } from '@capacitor/core';
 import {
+    IosEnvironmentTypes,
     IosPurchaseStatuses,
     IosSubscriptionStatuses,
     ProductIds,
@@ -29,7 +30,8 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                 setTimeout(() => {
                     resolve({
                         status: IosPurchaseStatuses.SUCCESS,
-                        originalTransactionId: '2000000950005410'
+                        originalTransactionId: 2000000950005410,
+                        environment: IosEnvironmentTypes.SANDBOX
                     });
                 }, 3000);
             });
@@ -42,9 +44,11 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                 displayPrice: '$3.49',
                 subscriptionGroup: 'emHJGjKGJKGGJim',
                 subscriptionPeriod: '1 month',
-                status: IosSubscriptionStatuses.ACTIVE
+                status: IosSubscriptionStatuses.ACTIVE,
+                environment: IosEnvironmentTypes.SANDBOX
             });
         },
+
         async getAllProductsInfo(): Promise<{ products: IProductInfo[] }> {
             return new Promise(resolve =>
                 setTimeout(
@@ -57,7 +61,8 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                                     description: 'Access to premium features for one month',
                                     displayPrice: '$3.49',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
-                                    subscriptionPeriod: '1 month'
+                                    subscriptionPeriod: '1 month',
+                                    environment: IosEnvironmentTypes.SANDBOX
                                 },
                                 {
                                     id: ProductIds.YEARLY,
@@ -65,7 +70,8 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                                     description: 'Access to premium features for one year',
                                     displayPrice: '$34.99',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
-                                    subscriptionPeriod: '1 year'
+                                    subscriptionPeriod: '1 year',
+                                    environment: IosEnvironmentTypes.SANDBOX
                                 }
                             ]
                         }),
@@ -77,7 +83,8 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
             return Promise.resolve({
                 originalTransactionId: '2000000950005410',
                 productId: ProductIds.MONTHLY,
-                purchaseDate: new Date().toISOString()
+                purchaseDate: new Date().toISOString(),
+                environment: IosEnvironmentTypes.SANDBOX
             });
         },
         async manageSubscriptions(): Promise<void> {

@@ -211,12 +211,14 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export const saveIapPurchase = async (originalTransactionId: string): Promise<{ ok: boolean }> => {
+export const saveIapPurchase = async (
+    originalTransactionId: string,
+    sandbox: boolean
+): Promise<{ ok: boolean }> => {
     try {
         return await InvoicesService.activateIapPurchase({
             original_transaction_id: originalTransactionId,
-            // TODO Find a way to detect it
-            sandbox: true
+            sandbox
         });
     } catch (e) {
         return {
