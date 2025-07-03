@@ -80,17 +80,20 @@ export interface IProductInfo {
     displayPrice: string;
     subscriptionGroup: string;
     subscriptionPeriod: string;
+    environment: IosEnvironmentTypes;
 }
 
 export interface IIosPurchaseResult {
     status: IosPurchaseStatuses;
     originalTransactionId?: number;
+    environment: IosEnvironmentTypes;
 }
 
 export interface IOriginalTransactionInfo {
     originalTransactionId: number | string | null;
     productId?: ProductIds;
     purchaseDate?: string;
+    environment: IosEnvironmentTypes;
 }
 
 export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
@@ -124,6 +127,11 @@ export enum IosSubscriptionStatuses {
 export enum ProductIds {
     MONTHLY = 'com.tonapps.tonkeeperpro.subscription.pro.monthly',
     YEARLY = 'com.tonapps.tonkeeperpro.subscription.pro.yearly'
+}
+
+export enum IosEnvironmentTypes {
+    SANDBOX = 'Sandbox',
+    PRODUCTION = 'Production'
 }
 
 export function isProductId(value: unknown): value is ProductIds {
