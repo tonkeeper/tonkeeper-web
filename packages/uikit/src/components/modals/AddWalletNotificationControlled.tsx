@@ -22,6 +22,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -141,18 +142,18 @@ export const AddWalletNotificationControlled = () => {
         }
 
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
+    }, [isOpen, params?.walletType, proState?.subscription?.valid, openBuyPro, onClose]);
 
     useEffect(() => {
         if (!isOpen) {
             return;
         }
-        if (params?.walletType === 'multisig' && !proState?.subscription.valid) {
+        if (params?.walletType === 'multisig' && !isValidSubscription(proState?.subscription)) {
             onClose();
             openBuyPro();
             return;
         }
-    }, [isOpen, params?.walletType, proState?.subscription.valid, openBuyPro, onClose]);
+    }, [isOpen, params?.walletType, proState?.subscription?.valid, openBuyPro, onClose]);
 
     const sdk = useAppSdk();
 
@@ -163,7 +164,7 @@ export const AddWalletNotificationControlled = () => {
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (method === 'multisig' && !proState?.subscription.valid) {
+            if (method === 'multisig' && !isValidSubscription(proState?.subscription)) {
                 openBuyPro();
                 return;
             }
@@ -171,7 +172,7 @@ export const AddWalletNotificationControlled = () => {
             openExtensionTab(sdk, method);
             setSelectedMethod(method);
         };
-    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod, sdk]);
+    }, [proState?.subscription?.valid, openBuyPro, setSelectedMethod, sdk]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

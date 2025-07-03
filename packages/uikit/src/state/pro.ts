@@ -10,8 +10,7 @@ import {
     NormalizedProPlans,
     ProState,
     ProStateAuthorized,
-    ProSubscription,
-    SubscriptionSources
+    ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
@@ -30,7 +29,7 @@ import {
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
-import { OpenAPI } from '@tonkeeper/core/dist/pro';
+import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
@@ -140,12 +139,11 @@ export const useProState = () => {
             state = {
                 authorizedWallet: null,
                 subscription: {
-                    source: SubscriptionSources.IOS,
+                    source: SubscriptionSource.IOS,
                     status: IosSubscriptionStatuses.PROMO,
                     isTrial: true,
                     valid: true,
                     usedTrial: true,
-                    originalTransactionId: null,
                     trialEndDate: isFreeProAccessAvailable.validUntil
                 }
             };
@@ -191,7 +189,7 @@ export const useProSubscriptionPurchase = () => {
 
         if (!savingResult.ok) {
             await sdk.storage.set(AppKey.PRO_PENDING_STATE, {
-                source: SubscriptionSources.IOS,
+                source: SubscriptionSource.IOS,
                 originalTransactionId,
                 ...selectedPlan
             });
@@ -266,18 +264,18 @@ export const useProPlans = (promoCode?: string) => {
             }
 
             switch (strategy.source) {
-                case SubscriptionSources.IOS: {
+                case SubscriptionSource.IOS: {
                     const plans = await strategy.getAllProductsInfo();
-                    return { source: SubscriptionSources.IOS, plans };
+                    return { source: SubscriptionSource.IOS, plans };
                 }
 
-                case SubscriptionSources.CRYPTO: {
+                case SubscriptionSource.CRYPTO: {
                     const [plans, verifiedCode] = await strategy.getAllProductsInfo(
                         lang,
                         promoCode
                     );
                     return {
-                        source: SubscriptionSources.CRYPTO,
+                        source: SubscriptionSource.CRYPTO,
                         plans: plans ?? [],
                         promoCode: verifiedCode
                     };

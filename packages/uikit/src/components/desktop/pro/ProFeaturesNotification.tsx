@@ -23,6 +23,7 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
+import { hasUsedTrial, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -77,14 +78,14 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
             <ProSubscriptionHeader />
             <ProPricesList displayPlans={adaptPlansToViewModel(products)} />
             <ProFeaturesList headerOptions={{ rightElement: null }} />
-            {!data.subscription.valid && (
+            {!isValidSubscription(data.subscription) && (
                 <NotificationFooterPortal>
                     <NotificationFooter>
                         <ButtonsBlockStyled
                             formId={formId}
                             isError={isError}
                             isLoading={isLoading}
-                            onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
+                            onTrial={hasUsedTrial(data.subscription) ? undefined : onTrialModalOpen}
                         />
                     </NotificationFooter>
                 </NotificationFooterPortal>

@@ -1,7 +1,8 @@
+import { SubscriptionSource } from '../pro';
 import { ProServiceTier } from '../tonConsoleApi';
 import { Language } from './language';
 
-export type ProSubscription = IosSubscription | CryptoSubscription | EmptySubscription;
+export type ProSubscription = IosSubscription | CryptoSubscription | null;
 
 export type IosSubscription =
     | IosActiveSubscription
@@ -18,19 +19,11 @@ export type CryptoSubscription =
 export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
 
 export type NormalizedProPlans =
-    | { source: SubscriptionSources.IOS; plans: IProductInfo[] }
-    | { source: SubscriptionSources.CRYPTO; plans: ProServiceTier[]; promoCode?: string };
-
-export enum SubscriptionSources {
-    IOS = 'ios',
-    CRYPTO = 'crypto',
-    EMPTY = 'empty'
-}
+    | { source: SubscriptionSource.IOS; plans: IProductInfo[] }
+    | { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[]; promoCode?: string };
 
 interface BaseSubscription {
-    source: SubscriptionSources;
-
-    // Back compatability
+    source: SubscriptionSource;
     valid: boolean;
     isTrial: boolean;
     usedTrial: boolean;
@@ -38,26 +31,24 @@ interface BaseSubscription {
 }
 
 interface BaseSubscriptionStrategy {
-    source: SubscriptionSources;
+    source: SubscriptionSource;
 }
 
 // IOS Subscription Types
 interface BaseIosSubscription extends BaseSubscription {
-    source: SubscriptionSources.IOS;
-    originalTransactionId: string | null;
+    source: SubscriptionSource.IOS;
     status: IosSubscriptionStatuses;
 }
 
 interface IosActiveSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.ACTIVE;
-
-    // Back compatability
     valid: true;
     isTrial: false;
 }
 
 interface IosPendingSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.PENDING;
+    valid: false;
 }
 
 interface IosRevokedSubscription extends BaseIosSubscription {
@@ -67,7 +58,6 @@ interface IosRevokedSubscription extends BaseIosSubscription {
 
 interface IosPromoSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.PROMO;
-    valid: true;
     isTrial: true;
     usedTrial: true;
     trialEndDate: Date;
@@ -97,7 +87,7 @@ export interface IOriginalTransactionInfo {
 }
 
 export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
-    source: SubscriptionSources.IOS;
+    source: SubscriptionSource.IOS;
     subscribe(productId: ProductIds): Promise<IIosPurchaseResult>;
     getProductInfo(productId: ProductIds): Promise<IProductInfo>;
     getAllProductsInfo(): Promise<IProductInfo[]>;
@@ -141,26 +131,27 @@ export function isProductId(value: unknown): value is ProductIds {
 export function isIosStrategy(
     strategy?: SubscriptionStrategy
 ): strategy is IIosSubscriptionStrategy {
-    return strategy?.source === SubscriptionSources.IOS;
+    return strategy?.source === SubscriptionSource.IOS;
 }
 
 // Crypto Subscription Types
 interface BaseCryptoSubscription extends BaseSubscription {
-    source: SubscriptionSources.CRYPTO;
+    source: SubscriptionSource.CRYPTO;
     status: CryptoSubscriptionStatuses;
 }
 
 interface CryptoPendingSubscription extends BaseCryptoSubscription {
     status: CryptoSubscriptionStatuses.PENDING;
+    valid: false;
 }
 
 interface CryptoActiveSubscription extends BaseCryptoSubscription {
     status: CryptoSubscriptionStatuses.ACTIVE;
+    valid: true;
 }
 
 interface CryptoTrialSubscription extends BaseCryptoSubscription {
     status: CryptoSubscriptionStatuses.TRIAL;
-    valid: true;
     isTrial: true;
     usedTrial: true;
     trialUserId: number;
@@ -172,7 +163,7 @@ interface CryptoFreeSubscription extends BaseCryptoSubscription {
 }
 
 export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
-    source: SubscriptionSources.CRYPTO;
+    source: SubscriptionSource.CRYPTO;
     getAllProductsInfo(
         lang: Language | undefined,
         promoCode?: string
@@ -190,17 +181,10 @@ export enum CryptoSubscriptionStatuses {
 export function isCryptoStrategy(
     strategy?: SubscriptionStrategy
 ): strategy is ICryptoSubscriptionStrategy {
-    return strategy?.source === SubscriptionSources.CRYPTO;
+    return strategy?.source === SubscriptionSource.CRYPTO;
 }
 
-// Empty Subscription Types
-interface EmptySubscription extends BaseSubscription {
-    source: SubscriptionSources.EMPTY;
-    valid: false;
-    isTrial: false;
-    usedTrial: false;
-}
-
+// Pro State
 export type ProState = ProStateAuthorized | ProStateNotAuthorized;
 
 export interface ProStateWallet {
@@ -222,28 +206,43 @@ export function isTrialSubscription(
     subscription: ProSubscription
 ): subscription is IosPromoSubscription | CryptoTrialSubscription {
     return (
-        (subscription.source === SubscriptionSources.IOS &&
+        (subscription?.source === SubscriptionSource.IOS &&
             subscription.status === IosSubscriptionStatuses.PROMO) ||
-        (subscription.source === SubscriptionSources.CRYPTO &&
+        (subscription?.source === SubscriptionSource.CRYPTO &&
             subscription.status === CryptoSubscriptionStatuses.TRIAL)
     );
 }
 
 export function isValidSubscription(
-    subscription: ProSubscription
-): subscription is Exclude<ProSubscription, EmptySubscription> {
-    return subscription.valid;
+    subscription: ProSubscription | undefined
+): subscription is Exclude<ProSubscription, null | undefined> {
+    return !!subscription && hasSubscriptionSource(subscription) && subscription.valid;
 }
 
 export function isPaidSubscription(
     subscription: ProSubscription
 ): subscription is IosActiveSubscription | CryptoActiveSubscription {
     return (
-        (subscription.source === SubscriptionSources.IOS &&
+        (subscription?.source === SubscriptionSource.IOS &&
             subscription.status === IosSubscriptionStatuses.ACTIVE) ||
-        (subscription.source === SubscriptionSources.CRYPTO &&
+        (subscription?.source === SubscriptionSource.CRYPTO &&
             subscription.status === CryptoSubscriptionStatuses.ACTIVE)
     );
+}
+
+export function hasSubscriptionSource(
+    subscription: ProSubscription
+): subscription is Exclude<ProSubscription, null> {
+    return (
+        subscription?.source === SubscriptionSource.IOS ||
+        subscription?.source === SubscriptionSource.CRYPTO
+    );
+}
+
+export function hasUsedTrial(
+    subscription: ProSubscription
+): subscription is Exclude<ProSubscription, null> & { usedTrial: true } {
+    return subscription !== null && subscription.usedTrial;
 }
 
 export interface IDisplayPlan {

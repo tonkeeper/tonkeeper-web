@@ -33,6 +33,7 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useNavigate } from '../../../hooks/router/useNavigate';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -143,7 +144,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         <Label2>{t('tonkeeper_pro')}</Label2>
                     </AsideMenuItemStyled>
                 </HideOnReview>
-                {proState?.subscription.valid && (
+                {isValidSubscription(proState?.subscription) && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (
                             <AsideMenuItemLarge isSelected={isActive}>

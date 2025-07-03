@@ -57,6 +57,7 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useBlocker } from '../../../hooks/router/useBlocker';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -579,7 +580,8 @@ const MultiSendFooter: FC<{
                         )}
                     </MultiSendFooterTextWrapper>
                 )}
-                {!proState || proState.subscription.valid ? (
+                {/* TODO Check this logic again */}
+                {!proState || isValidSubscription(proState.subscription) ? (
                     <Button
                         type="submit"
                         primary

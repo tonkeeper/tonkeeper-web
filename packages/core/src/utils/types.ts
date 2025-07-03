@@ -1,5 +1,4 @@
-import { SubscriptionVerification, UserService } from '../pro';
-import { SubscriptionSources } from '../entries/pro';
+import { SubscriptionSource, SubscriptionVerification, UsersService } from '../pro';
 
 export type Flatten<T> = T extends (infer R)[] ? R : T;
 
@@ -51,8 +50,8 @@ export function assertTypesEqual<A, B>(_value: AssertEqual<A, B>): void {
 }
 
 export type ExtendedSubscriptionVerification = SubscriptionVerification & {
-    source?: SubscriptionSources;
+    source?: SubscriptionSource;
     original_transaction_id?: string;
 };
 
-export type UserInfo = Awaited<ReturnType<typeof UserService.getUserInfo>>;
+export type UserInfo = Awaited<ReturnType<typeof UsersService.getUserInfo>>;

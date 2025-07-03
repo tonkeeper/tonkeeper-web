@@ -1,13 +1,9 @@
-import {
-    IDisplayPlan,
-    NormalizedProPlans,
-    ProductIds,
-    SubscriptionSources
-} from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan, NormalizedProPlans, ProductIds } from '@tonkeeper/core/dist/entries/pro';
 
 import { SubscriptionScreens } from '../enums/pro';
 import { formatter } from '../hooks/balance';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 export const getSkeletonProducts = (skeletonSize = 2) =>
     Array.from({ length: skeletonSize }, (_, index) => ({
@@ -35,14 +31,14 @@ export function adaptPlansToViewModel(
     if (!normalizedPlans) return [];
 
     switch (normalizedPlans.source) {
-        case SubscriptionSources.IOS:
+        case SubscriptionSource.IOS:
             return normalizedPlans.plans.map(plan => ({
                 id: plan.id,
                 displayName: plan.displayName,
                 displayPrice: plan.displayPrice
             }));
 
-        case SubscriptionSources.CRYPTO:
+        case SubscriptionSource.CRYPTO:
             return [
                 // TODO Remove this side effect, it's temporal
                 { displayName: '1_month', displayPrice: '-', id: `crypto-${ProductIds.MONTHLY}` },

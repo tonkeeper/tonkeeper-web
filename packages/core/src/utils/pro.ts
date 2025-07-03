@@ -1,10 +1,10 @@
 import {
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
-    ProSubscription,
-    SubscriptionSources
+    ProSubscription
 } from '../entries/pro';
 import { IStorage } from '../Storage';
+import { SubscriptionSource } from '../pro';
 import { Network } from '../entries/network';
 import { isStandardTonWallet } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
@@ -12,78 +12,68 @@ import { accountsStorage } from '../service/accountsStorage';
 import { ExtendedSubscriptionVerification, UserInfo } from './types';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 
-export const toEmptySubscription = (): ProSubscription => {
-    return {
-        source: SubscriptionSources.EMPTY,
-        valid: false,
-        isTrial: false,
-        usedTrial: false
-    };
-};
-
 export const normalizeSubscription = (
-    subscriptionDto: ExtendedSubscriptionVerification,
+    subscriptionDto: ExtendedSubscriptionVerification | null | undefined,
     user: UserInfo
 ): ProSubscription => {
     const source = subscriptionDto?.source;
     const toDate = (ts?: number) => (ts ? new Date(ts * 1000) : undefined);
 
-    if (!source || typeof source !== 'string' || !subscriptionDto.valid) {
-        return toEmptySubscription();
+    if (!source || (source !== SubscriptionSource.CRYPTO && source !== SubscriptionSource.IOS)) {
+        return null;
     }
 
-    if (source === SubscriptionSources.CRYPTO) {
-        if (subscriptionDto.is_trial) {
+    const valid = subscriptionDto.valid;
+    const isTrial = subscriptionDto.is_trial;
+    const usedTrial = subscriptionDto.used_trial ?? false;
+    const nextChargeDate = toDate(subscriptionDto.next_charge);
+
+    if (source === SubscriptionSource.CRYPTO) {
+        if (isTrial) {
             return {
-                source: SubscriptionSources.CRYPTO,
+                source,
                 status: CryptoSubscriptionStatuses.TRIAL,
-                valid: true,
+                valid,
                 isTrial: true,
                 usedTrial: true,
                 trialUserId: user.tg_id!,
-                trialEndDate: toDate(subscriptionDto.next_charge)!
+                trialEndDate: nextChargeDate!
             };
         } else {
             return {
-                source: SubscriptionSources.CRYPTO,
+                source,
                 status: CryptoSubscriptionStatuses.ACTIVE,
                 valid: true,
                 isTrial: false,
-                usedTrial: subscriptionDto.used_trial ?? false,
-                nextChargeDate: toDate(subscriptionDto.next_charge)
+                usedTrial,
+                nextChargeDate
             };
         }
     }
 
-    if (source === SubscriptionSources.IOS) {
-        if (!subscriptionDto.original_transaction_id) {
-            return toEmptySubscription();
-        }
-
-        if (subscriptionDto.is_trial) {
+    if (source === SubscriptionSource.IOS) {
+        if (isTrial) {
             return {
-                source: SubscriptionSources.IOS,
+                source,
                 status: IosSubscriptionStatuses.PROMO,
-                valid: true,
+                valid,
                 isTrial: true,
                 usedTrial: true,
-                trialEndDate: toDate(subscriptionDto.next_charge)!,
-                originalTransactionId: subscriptionDto.original_transaction_id
+                trialEndDate: nextChargeDate!
             };
         } else {
             return {
-                source: SubscriptionSources.IOS,
+                source,
                 status: IosSubscriptionStatuses.ACTIVE,
                 valid: true,
                 isTrial: false,
-                usedTrial: subscriptionDto.used_trial ?? false,
-                nextChargeDate: toDate(subscriptionDto.next_charge),
-                originalTransactionId: subscriptionDto.original_transaction_id
+                usedTrial,
+                nextChargeDate
             };
         }
     }
 
-    return toEmptySubscription();
+    return null;
 };
 
 export const findAuthorizedWallet = async (user: UserInfo, storage: IStorage) => {

@@ -1,10 +1,11 @@
-import { ICryptoSubscriptionStrategy, SubscriptionSources } from '@tonkeeper/core/dist/entries/pro';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { ICryptoSubscriptionStrategy } from '@tonkeeper/core/dist/entries/pro';
 import { ProServiceTier } from '@tonkeeper/core/dist/tonConsoleApi';
 import { getProServiceTiers } from '@tonkeeper/core/dist/service/proService';
 import { Language } from '@tonkeeper/core/dist/entries/language';
 
 class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
-    public source = SubscriptionSources.CRYPTO as const;
+    public source = SubscriptionSource.CRYPTO as const;
 
     async getAllProductsInfo(
         lang: Language | undefined,

@@ -19,6 +19,7 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../ios/HideOnReview';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const HeaderStyled = styled.div`
     width: 100%;
@@ -99,7 +100,7 @@ const CategoriesModalContent: FC<{
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
     const { data } = useProState();
-    const isProEnabled = data?.subscription.valid;
+    const isProEnabled = isValidSubscription(data?.subscription);
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {

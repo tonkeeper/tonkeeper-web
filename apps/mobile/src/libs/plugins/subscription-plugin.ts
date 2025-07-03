@@ -3,8 +3,7 @@ import {
     IosEnvironmentTypes,
     IosPurchaseStatuses,
     IosSubscriptionStatuses,
-    ProductIds,
-    SubscriptionSources
+    ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import type {
     IProductInfo,
@@ -12,6 +11,7 @@ import type {
     IOriginalTransactionInfo,
     IIosSubscriptionStrategy
 } from '@tonkeeper/core/dist/entries/pro';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 interface ISubscriptionPlugin {
     subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult>;
@@ -94,7 +94,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
 });
 
 class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
-    public source = SubscriptionSources.IOS as const;
+    public source = SubscriptionSource.IOS as const;
 
     async subscribe(productId: ProductIds): Promise<IIosPurchaseResult> {
         return SubscriptionPlugin.subscribe({ productId });

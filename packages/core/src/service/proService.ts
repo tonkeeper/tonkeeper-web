@@ -9,7 +9,7 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateWallet, ProSubscription } from '../entries/pro';
+import { isValidSubscription, ProState, ProStateWallet, ProSubscription } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
@@ -30,8 +30,8 @@ import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
-import { AuthService, InvoicesService, TiersService, UserService } from '../pro';
-import { findAuthorizedWallet, normalizeSubscription, toEmptySubscription } from '../utils/pro';
+import { AuthService, TiersService, UsersService, IapService } from '../pro';
+import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -39,7 +39,7 @@ export const setBackupState = async (storage: IStorage, state: ProSubscription) 
 
 export const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProSubscription>(AppKey.PRO_BACKUP);
-    return backup ?? toEmptySubscription();
+    return backup ?? null;
 };
 
 export const getProState = async (
@@ -51,7 +51,7 @@ export const getProState = async (
     } catch (e) {
         console.error(e);
         return {
-            subscription: toEmptySubscription(),
+            subscription: null,
             authorizedWallet: null
         };
     }
@@ -84,18 +84,18 @@ const loadProState = async (
     storage: IStorage
 ): Promise<ProState> => {
     await authService.attachToken();
-    const user = await UserService.getUserInfo();
+    const user = await UsersService.getUserInfo();
 
     const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
 
     if (!authorizedWallet) {
         return {
             authorizedWallet: null,
-            subscription: toEmptySubscription()
+            subscription: null
         };
     }
 
-    const subscriptionDTO = await UserService.verifySubscription();
+    const subscriptionDTO = await UsersService.verifySubscription();
     const subscription = normalizeSubscription(subscriptionDTO, user);
 
     return {
@@ -133,7 +133,7 @@ export const authViaTonConnect = async (
         }
     });
 
-    if (!result.ok) {
+    if (!result.ok || !result.auth_token) {
         throw new Error('Unable to authorize');
     }
 
@@ -191,7 +191,7 @@ export const createRecipient = async (
 export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
     for (let i = 0; i < 10; i++) {
         const state = await getProState(authService, storage);
-        if (state.subscription.valid) {
+        if (isValidSubscription(state.subscription)) {
             return;
         }
         await delay(5000);
@@ -216,7 +216,7 @@ export const saveIapPurchase = async (
     sandbox: boolean
 ): Promise<{ ok: boolean }> => {
     try {
-        return await InvoicesService.activateIapPurchase({
+        return await IapService.activateIapPurchase({
             original_transaction_id: originalTransactionId,
             sandbox
         });

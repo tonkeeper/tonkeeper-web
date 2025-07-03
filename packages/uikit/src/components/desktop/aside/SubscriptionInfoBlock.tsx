@@ -164,7 +164,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
 
     let button = <Button loading>Tonkeeper Pro</Button>;
     if (data) {
-        if (data.subscription.valid) {
+        if (isValidSubscription(data.subscription)) {
             button = (
                 <DropDown
                     containerClassName="pro-subscription-dd-container"

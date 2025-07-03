@@ -39,6 +39,7 @@ import { useProState } from '../../state/pro';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -222,7 +223,7 @@ export const MAMIndexesPageContent: FC<{
 
     const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
     const showByProButton =
-        !proState?.subscription.valid &&
+        !isValidSubscription(proState?.subscription) &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (
