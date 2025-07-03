@@ -9,14 +9,14 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
+import { ProState, ProStateWallet, ProSubscription } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
+import { TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
     FiatCurrencies as FiatCurrenciesGenerated,
-    InvoiceStatus,
     InvoicesInvoice,
+    InvoiceStatus,
     ProServiceDashboardCellAddress,
     ProServiceDashboardCellNumericCrypto,
     ProServiceDashboardCellNumericFiat,
@@ -26,14 +26,12 @@ import {
 } from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
-import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
-import { getNetworkByAccount } from '../entries/account';
-import { Network } from '../entries/network';
 import { AuthService, InvoicesService, TiersService, UserService } from '../pro';
+import { findAuthorizedWallet, normalizeSubscription, toEmptySubscription } from '../utils/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -57,14 +55,6 @@ export const getProState = async (
             authorizedWallet: null
         };
     }
-};
-
-const toEmptySubscription = (): ProSubscriptionInvalid => {
-    return {
-        valid: false,
-        isTrial: false,
-        usedTrial: false
-    };
 };
 
 export const walletVersionFromProServiceDTO = (value: string) => {
@@ -96,64 +86,18 @@ const loadProState = async (
     await authService.attachToken();
     const user = await UserService.getUserInfo();
 
-    let authorizedWallet: ProStateWallet | null = null;
-    if (user.pub_key && user.version) {
-        const wallets = (await accountsStorage(storage).getAccounts())
-            .filter(a => getNetworkByAccount(a) === Network.MAINNET)
-            .flatMap(a => a.allTonWallets);
+    const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
 
-        const actualWallet = wallets
-            .filter(isStandardTonWallet)
-            .find(
-                w =>
-                    w.publicKey === user.pub_key &&
-                    user.version &&
-                    w.version === walletVersionFromProServiceDTO(user.version)
-            );
-        if (!actualWallet) {
-            return {
-                authorizedWallet: null,
-                subscription: {
-                    isTrial: false,
-                    usedTrial: false,
-                    valid: false
-                }
-            };
-        }
-        authorizedWallet = {
-            publicKey: actualWallet.publicKey,
-            rawAddress: actualWallet.rawAddress
+    if (!authorizedWallet) {
+        return {
+            authorizedWallet: null,
+            subscription: toEmptySubscription()
         };
     }
 
     const subscriptionDTO = await UserService.verifySubscription();
+    const subscription = normalizeSubscription(subscriptionDTO, user);
 
-    let subscription: ProSubscription;
-    if (subscriptionDTO.valid) {
-        if (subscriptionDTO.is_trial) {
-            subscription = {
-                type: 'trial-tg',
-                valid: true,
-                isTrial: true,
-                usedTrial: true,
-                trialUserId: user.tg_id!,
-                trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
-            };
-        } else {
-            subscription = {
-                valid: true,
-                isTrial: false,
-                usedTrial: subscriptionDTO.used_trial,
-                nextChargeDate: new Date(subscriptionDTO.next_charge! * 1000)
-            };
-        }
-    } else {
-        subscription = {
-            valid: false,
-            isTrial: false,
-            usedTrial: subscriptionDTO.used_trial
-        };
-    }
     return {
         subscription,
         authorizedWallet
@@ -267,11 +211,18 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export const saveIapPurchase = async (originalTransactionId: string) => {
-    return InvoicesService.activateIapPurchase({
-        original_transaction_id: originalTransactionId,
-        sandbox: true
-    });
+export const saveIapPurchase = async (originalTransactionId: string): Promise<{ ok: boolean }> => {
+    try {
+        return await InvoicesService.activateIapPurchase({
+            original_transaction_id: originalTransactionId,
+            // TODO Find a way to detect it
+            sandbox: true
+        });
+    } catch (e) {
+        return {
+            ok: false
+        };
+    }
 };
 
 export async function startProServiceTrial(
