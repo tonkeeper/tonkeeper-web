@@ -57,6 +57,7 @@ export const useIsBrowserOpened = () => {
     return useAtomValue(openedTab$) !== undefined;
 };
 
+let openBrowserTabCallId = 0;
 export const useOpenBrowserTab = () => {
     const sdk = useAppSdk();
     const { mutate: addToState } = useAddBrowserTabToState();
@@ -67,8 +68,13 @@ export const useOpenBrowserTab = () => {
         Error,
         { id: string } | { url: string; title?: string; iconUrl?: string } | 'blanc'
     >(async tab => {
+        const callId = Date.now();
+        openBrowserTabCallId = callId;
+        const mutationHasBeenReset = () => callId !== openBrowserTabCallId;
+
         if (tab === 'blanc') {
             openedTab$.next('blanc');
+            sdk.dappBrowser!.hide();
             return;
         }
 
@@ -76,8 +82,17 @@ export const useOpenBrowserTab = () => {
             const shownTab = await sdk.dappBrowser!.open(t.url, {
                 id: t.id
             });
+
+            if (mutationHasBeenReset()) {
+                return;
+            }
+
             addToState(shownTab);
             await delay(800);
+
+            if (mutationHasBeenReset()) {
+                return;
+            }
 
             openedTab$.next({ type: 'existing', id: t.id });
         };
@@ -95,6 +110,9 @@ export const useOpenBrowserTab = () => {
                 const shownTab = await sdk.dappBrowser!.open(existingTab.url, {
                     id: existingTab.id
                 });
+                if (mutationHasBeenReset()) {
+                    return;
+                }
                 addToState(shownTab);
             } else {
                 openedTab$.next({ type: 'loading', ...existingTab });
