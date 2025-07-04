@@ -140,6 +140,43 @@ const LogsSettings = () => {
     );
 };
 
+const ProcessingVisibilitySettings = () => {
+    const sdk = useAppSdk();
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    useEffect(() => {
+        sdk.storage
+            .get<boolean>(AppKey.PRO_PENDING_STATE)
+            .then(state => setIsProcessing(Boolean(state)))
+            .catch(err => {
+                console.error('Failed to load visibility state:', err);
+                setIsProcessing(false);
+            });
+    }, [sdk.storage]);
+
+    const handleChange = async (toBe: boolean) => {
+        try {
+            await sdk.storage.set(AppKey.PRO_PENDING_STATE, toBe ? {} : false);
+            setIsProcessing(toBe);
+        } catch (err) {
+            console.error('Failed to update visibility:', err);
+        }
+    };
+
+    return (
+        <HideOnReview>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false}>
+                    <ListItemPayload>
+                        <Label1>Is processing state</Label1>
+                        <Switch checked={isProcessing} onChange={handleChange} />
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+        </HideOnReview>
+    );
+};
+
 const DesktopWrapper = styled(DesktopViewPageLayout)`
     ${ListBlock} {
         margin-bottom: 0;
@@ -253,6 +290,7 @@ export const DevSettings = React.memo(() => {
                 <AddAccountBySK />
                 <ReviewerSettings />
                 <LogsSettings />
+                <ProcessingVisibilitySettings />
             </DesktopWrapper>
         );
     }
