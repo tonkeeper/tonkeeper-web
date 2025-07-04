@@ -1,11 +1,17 @@
+import { type FC } from 'react';
 import styled from 'styled-components';
+import { isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body3 } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
+import { ExternalLink } from '../shared/ExternalLink';
 import { useTranslation } from '../../hooks/translation';
-import { isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
-export const ProLegalNote = () => {
+interface IProps {
+    onManage: () => Promise<void>;
+}
+
+export const ProLegalNote: FC<IProps> = ({ onManage }) => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
 
@@ -16,29 +22,29 @@ export const ProLegalNote = () => {
             <LegalNote>
                 {t(`pro_terms_privacy_restore_note${isCrypto ? '_crypto' : ''}`)}{' '}
             </LegalNote>
-            <ButtonStyled
-                as="button"
-                type="button"
-                onClick={() => sdk.openPage('https://tonkeeper.com/terms')}
+            <ExternalLinkStyled
+                onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
+                href="https://tonkeeper.com/pro-terms"
             >
                 {t('pro_terms')}
-            </ButtonStyled>
+            </ExternalLinkStyled>
             <LegalNote> {t('and')} </LegalNote>
-            <ButtonStyled
-                as="button"
-                type="button"
-                onClick={() => sdk.openPage('https://tonkeeper.com/privacy')}
+            <ExternalLinkStyled
+                onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
+                href="https://tonkeeper.com/privacy"
             >
                 {t('pro_privacy')}
-            </ButtonStyled>
+            </ExternalLinkStyled>
             <LegalNote>. </LegalNote>
             {!isCrypto && (
                 <>
-                    <ButtonStyled
-                        as="button"
-                        type="button"
-                        onClick={() => sdk.openPage('https://tonkeeper.com/restore')}
-                    >
+                    <ButtonStyled as="button" type="button" onClick={onManage}>
                         {t('restore_purchases')}
                     </ButtonStyled>
                     <LegalNote>.</LegalNote>
@@ -51,11 +57,13 @@ export const ProLegalNote = () => {
 const LegalNoteWrapper = styled.p`
     display: inline;
     text-align: center;
+    line-height: 14px;
     color: ${p => p.theme.textSecondary};
 `;
 
 const LegalNote = styled(Body3)`
     display: inline;
+    line-height: 14px;
     color: ${p => p.theme.textSecondary};
 `;
 
@@ -63,6 +71,18 @@ const ButtonStyled = styled(Body3)`
     display: inline;
     height: max-content;
     padding: 0;
+    line-height: 14px;
+    color: ${props => props.theme.textPrimary};
+    opacity: 1;
+    transition: opacity 0.3s;
+
+    &:hover {
+        opacity: 0.7;
+    }
+`;
+
+const ExternalLinkStyled = styled(ExternalLink)`
+    line-height: 14px;
     color: ${props => props.theme.textPrimary};
     opacity: 1;
     transition: opacity 0.3s;

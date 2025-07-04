@@ -1,15 +1,15 @@
 import { registerPlugin } from '@capacitor/core';
+import type {
+    IIosPurchaseResult,
+    IIosSubscriptionStrategy,
+    IOriginalTransactionInfo,
+    IProductInfo
+} from '@tonkeeper/core/dist/entries/pro';
 import {
     IosEnvironmentTypes,
     IosPurchaseStatuses,
     IosSubscriptionStatuses,
     ProductIds
-} from '@tonkeeper/core/dist/entries/pro';
-import type {
-    IProductInfo,
-    IIosPurchaseResult,
-    IOriginalTransactionInfo,
-    IIosSubscriptionStrategy
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
@@ -25,13 +25,31 @@ interface ISubscriptionPlugin {
 
 const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
     web: () => ({
-        async subscribe(): Promise<IIosPurchaseResult> {
+        async subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult> {
             return new Promise<IIosPurchaseResult>(resolve => {
                 setTimeout(() => {
+                    const now = new Date();
+                    const purchaseDate = now.toISOString();
+
+                    const oneMonthLater = new Date(now);
+                    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+
+                    const oneYearLater = new Date(now);
+                    oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+
+                    const expirationDate = (
+                        options.productId === ProductIds.MONTHLY ? oneMonthLater : oneYearLater
+                    ).toISOString();
+
                     resolve({
                         status: IosPurchaseStatuses.SUCCESS,
-                        originalTransactionId: 2000000950005410,
-                        environment: IosEnvironmentTypes.SANDBOX
+                        originalTransactionId: 2000000953417084,
+                        environment: IosEnvironmentTypes.SANDBOX,
+                        productId: options.productId,
+                        purchaseDate,
+                        expirationDate,
+                        revocationDate: null,
+                        isUpgraded: false
                     });
                 }, 3000);
             });
@@ -81,7 +99,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
         },
         async getOriginalTransactionId(): Promise<IOriginalTransactionInfo> {
             return Promise.resolve({
-                originalTransactionId: '2000000950005410',
+                originalTransactionId: 2000000953417084,
                 productId: ProductIds.MONTHLY,
                 purchaseDate: new Date().toISOString(),
                 environment: IosEnvironmentTypes.SANDBOX

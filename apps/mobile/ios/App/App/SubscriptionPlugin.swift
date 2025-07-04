@@ -96,26 +96,50 @@ import Capacitor
                     switch verification {
                     case .verified(let transaction):
                         await transaction.finish()
+                        let formatter = ISO8601DateFormatter()
+
                         var response: [String: Any] = [
                             "status": "success",
-                            "originalTransactionId": transaction.originalID
+                            "originalTransactionId": transaction.originalID,
+                            "productId": transaction.productID,
+                            "purchaseDate": formatter.string(from: transaction.purchaseDate),
+                            "isUpgraded": transaction.isUpgraded
                         ]
+
+                        if let expiration = transaction.expirationDate {
+                            response["expirationDate"] = formatter.string(from: expiration)
+                        } else {
+                            response["expirationDate"] = NSNull()
+                        }
+
+                        if let revoked = transaction.revocationDate {
+                            response["revocationDate"] = formatter.string(from: revoked)
+                        } else {
+                            response["revocationDate"] = NSNull()
+                        }
+
                         if #available(iOS 16.0, *) {
                             response["environment"] = transaction.environment.rawValue
                         } else {
                             response["environment"] = NSNull()
                         }
+
                         call.resolve(response)
+
                     case .unverified(_, let error):
                         call.reject("Purchase unverified: \(error.localizedDescription)")
                     }
+
                 case .userCancelled:
                     call.resolve(["status": "cancelled", "environment": NSNull()])
+
                 case .pending:
                     call.resolve(["status": "pending", "environment": NSNull()])
+
                 @unknown default:
                     call.reject("Unknown purchase state")
                 }
+
             } catch {
                 call.reject("Purchase failed: \(error.localizedDescription)")
             }
