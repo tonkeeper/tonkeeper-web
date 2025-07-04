@@ -23,6 +23,7 @@ import { useNotifyError } from '../../../hooks/useNotification';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { hasUsedTrial, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { HideOnReview } from '../../ios/HideOnReview';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -109,12 +110,14 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
             <Button primary fullWidth size="large" type="submit" form={formId} loading={isLoading}>
                 <Label2>{t(isError ? 'try_again' : 'get_tonkeeper_pro')}</Label2>
             </Button>
-            {onTrial && (
-                <ButtonStyled fullWidth secondary onClick={onTrial}>
-                    <Body2>{t('start_free_trial')}</Body2>
-                    <ChevronRightIcon />
-                </ButtonStyled>
-            )}
+            <HideOnReview>
+                {onTrial && (
+                    <ButtonStyled fullWidth secondary onClick={onTrial}>
+                        <Body2>{t('start_free_trial')}</Body2>
+                        <ChevronRightIcon />
+                    </ButtonStyled>
+                )}
+            </HideOnReview>
         </div>
     );
 };
