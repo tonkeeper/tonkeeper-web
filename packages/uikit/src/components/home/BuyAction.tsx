@@ -113,9 +113,11 @@ export const BuyNotification: FC<{
     }, [open, buy]);
 
     return (
-        <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
-            {Content}
-        </Notification>
+        <HideOnReview>
+            <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
+                {Content}
+            </Notification>
+        </HideOnReview>
     );
 };
 

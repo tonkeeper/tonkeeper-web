@@ -17,7 +17,6 @@ import {
     WalletTestnetIcon
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
-import { HideOnReview } from '../ios/HideOnReview';
 import { useSecurityCheck } from '../../state/password';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 
@@ -186,9 +185,7 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                         <AddMethodText>
                             <AddMethodLabel>
                                 {t('add_wallet_new_multisig_title')}{' '}
-                                <HideOnReview>
-                                    <Badge color="accentBlue">PRO</Badge>
-                                </HideOnReview>
+                                <Badge color="accentBlue">PRO</Badge>
                             </AddMethodLabel>
                             <AddMethodDescription>
                                 {t('add_wallet_new_multisig_description')}
