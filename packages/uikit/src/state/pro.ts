@@ -48,6 +48,7 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useToast } from '../hooks/useNotification';
 import { useAnalyticsTrack } from '../hooks/analytics';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { parsePrice } from '../libs/pro';
 
 export type FreeProAccess = {
     code: string;
@@ -268,7 +269,11 @@ export const useProPlans = (promoCode?: string) => {
             switch (strategy.source) {
                 case SubscriptionSource.IOS: {
                     const plans = await strategy.getAllProductsInfo();
-                    return { source: SubscriptionSource.IOS, plans };
+                    const sortedPlans = [...plans].sort((a, b) => {
+                        return parsePrice(a.displayPrice) - parsePrice(b.displayPrice);
+                    });
+
+                    return { source: SubscriptionSource.IOS, plans: sortedPlans };
                 }
 
                 case SubscriptionSource.CRYPTO: {

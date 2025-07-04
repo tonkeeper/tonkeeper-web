@@ -25,6 +25,12 @@ function isValidNanoString(value: string): boolean {
     return /^\d+$/.test(value);
 }
 
+export function parsePrice(priceStr: string): number {
+    const numeric = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');
+
+    return parseFloat(numeric);
+}
+
 export function adaptPlansToViewModel(
     normalizedPlans: NormalizedProPlans | undefined
 ): IDisplayPlan[] {

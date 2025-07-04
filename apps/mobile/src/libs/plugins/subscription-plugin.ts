@@ -39,11 +39,11 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
         async getProductInfo(): Promise<IProductInfo> {
             return Promise.resolve({
                 id: ProductIds.MONTHLY,
-                displayName: '1 month',
+                displayName: 'Tonkeeper Pro Monthly',
                 description: 'Access to premium features for one month',
                 displayPrice: '$3.49',
                 subscriptionGroup: 'emHJGjKGJKGGJim',
-                subscriptionPeriod: '1 month',
+                subscriptionPeriod: 'month',
                 status: IosSubscriptionStatuses.ACTIVE,
                 environment: IosEnvironmentTypes.SANDBOX
             });
@@ -57,20 +57,20 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                             products: [
                                 {
                                     id: ProductIds.MONTHLY,
-                                    displayName: '1 month',
+                                    displayName: 'Tonkeeper Pro Monthly',
                                     description: 'Access to premium features for one month',
                                     displayPrice: '$3.49',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
-                                    subscriptionPeriod: '1 month',
+                                    subscriptionPeriod: 'month',
                                     environment: IosEnvironmentTypes.SANDBOX
                                 },
                                 {
                                     id: ProductIds.YEARLY,
-                                    displayName: '1 year',
+                                    displayName: 'Tonkeeper Pro Yearly',
                                     description: 'Access to premium features for one year',
                                     displayPrice: '$34.99',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
-                                    subscriptionPeriod: '1 year',
+                                    subscriptionPeriod: 'year',
                                     environment: IosEnvironmentTypes.SANDBOX
                                 }
                             ]
