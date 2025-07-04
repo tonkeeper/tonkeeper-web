@@ -11,7 +11,6 @@ import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { ChevronRightIcon } from '../../Icon';
 import { handleSubmit } from '../../../libs/form';
-import { HideOnReview } from '../../ios/HideOnReview';
 import { ProPricesList } from '../../pro/ProPricesList';
 import { adaptPlansToViewModel } from '../../../libs/pro';
 import { ProFeaturesList } from '../../pro/ProFeaturesList';
@@ -31,11 +30,9 @@ interface IProFeaturesNotificationProps {
 }
 
 export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isOpen, onClose }) => (
-    <HideOnReview>
-        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-            {() => <ProFeaturesNotificationContent onClose={onClose} />}
-        </NotificationStyled>
-    </HideOnReview>
+    <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+        {() => <ProFeaturesNotificationContent onClose={onClose} />}
+    </NotificationStyled>
 );
 
 export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationProps, 'onClose'>> = ({

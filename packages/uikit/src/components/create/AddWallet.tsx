@@ -178,27 +178,25 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                     </AddMethodText>
                     <RightIconStyled />
                 </AddMethod>
-                <HideOnReview>
-                    {canAddMultisig && !hideMultisig && (
-                        <AddMethod onClick={() => onSelect('multisig')}>
-                            <ButtonIcon>
-                                <WalletPencilIcon />
-                            </ButtonIcon>
-                            <AddMethodText>
-                                <AddMethodLabel>
-                                    {t('add_wallet_new_multisig_title')}{' '}
-                                    <HideOnReview>
-                                        <Badge color="accentBlue">PRO</Badge>
-                                    </HideOnReview>
-                                </AddMethodLabel>
-                                <AddMethodDescription>
-                                    {t('add_wallet_new_multisig_description')}
-                                </AddMethodDescription>
-                            </AddMethodText>
-                            <RightIconStyled />
-                        </AddMethod>
-                    )}
-                </HideOnReview>
+                {canAddMultisig && !hideMultisig && (
+                    <AddMethod onClick={() => onSelect('multisig')}>
+                        <ButtonIcon>
+                            <WalletPencilIcon />
+                        </ButtonIcon>
+                        <AddMethodText>
+                            <AddMethodLabel>
+                                {t('add_wallet_new_multisig_title')}{' '}
+                                <HideOnReview>
+                                    <Badge color="accentBlue">PRO</Badge>
+                                </HideOnReview>
+                            </AddMethodLabel>
+                            <AddMethodDescription>
+                                {t('add_wallet_new_multisig_description')}
+                            </AddMethodDescription>
+                        </AddMethodText>
+                        <RightIconStyled />
+                    </AddMethod>
+                )}
                 <AddMethod onClick={() => onSelect('testnet')}>
                     <ButtonIcon>
                         <WalletTestnetIcon />

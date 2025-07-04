@@ -7,7 +7,6 @@ import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useUserCountry } from '../../state/country';
 import { useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
@@ -26,7 +25,6 @@ import { BuyIcon, SellIcon } from './HomeIcons';
 import { useActiveConfig } from '../../state/wallet';
 import { HideOnReview } from '../ios/HideOnReview';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
-import { useNavigate } from '../../hooks/router/useNavigate';
 
 const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ items, kind }) => {
     return (
@@ -115,11 +113,9 @@ export const BuyNotification: FC<{
     }, [open, buy]);
 
     return (
-        <HideOnReview>
-            <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
-                {Content}
-            </Notification>
-        </HideOnReview>
+        <Notification isOpen={open && buy != null} handleClose={handleClose} hideButton>
+            {Content}
+        </Notification>
     );
 };
 

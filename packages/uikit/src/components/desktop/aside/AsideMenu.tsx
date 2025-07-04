@@ -407,15 +407,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_settings')}</Label2>
                         </AsideMenuItem>
                     </AsideMenuBottomContent>
-                    <HideOnReview>
-                        <ErrorBoundary
-                            fallbackRender={fallbackRenderOver('Failed to load Pro State')}
-                        >
-                            <SubscriptionBlockWrapper>
-                                <SubscriptionInfoBlock />
-                            </SubscriptionBlockWrapper>
-                        </ErrorBoundary>
-                    </HideOnReview>
+                    <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
+                        <SubscriptionBlockWrapper>
+                            <SubscriptionInfoBlock />
+                        </SubscriptionBlockWrapper>
+                    </ErrorBoundary>
                 </AsideMenuBottom>
             </AsideContentContainer>
             <NotForTargetEnv env="mobile">
