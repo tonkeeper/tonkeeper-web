@@ -10,6 +10,7 @@ import { sendBackground } from '../../libs/backgroudService';
 import { TonConnectMessage } from '../../libs/message';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 
 export const DeepLinkSubscription = () => {
     const [params, setParams] = useState<TonConnectHttpConnectionParams | null>(null);
@@ -19,12 +20,15 @@ export const DeepLinkSubscription = () => {
         useCompleteHttpConnection();
 
     const handlerClose = async (
-        result: {
-            replyItems: TonConnectEventPayload;
-            manifest: DAppManifest;
-            account: Account;
-            walletId: WalletId;
-        } | null
+        result:
+            | {
+                  replyItems: TonConnectEventPayload;
+                  manifest: DAppManifest;
+                  account: Account;
+                  walletId: WalletId;
+              }
+            | null
+            | TonConnectError
     ) => {
         if (!params) return;
         responseReset();

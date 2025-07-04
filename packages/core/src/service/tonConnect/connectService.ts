@@ -519,13 +519,16 @@ export const saveWalletTonConnect = async (options: {
     };
 };
 
-export const connectRejectResponse = (): ConnectEvent => {
+export const tonConnectUserRejectError = () =>
+    new TonConnectError('Reject Request', CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR);
+
+export const connectErrorResponse = (error: { code: number; message: string }): ConnectEvent => {
     return {
         id: Date.now(),
         event: 'connect_error',
         payload: {
-            code: CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR,
-            message: 'Reject Request'
+            code: error.code,
+            message: error?.message
         }
     };
 };
