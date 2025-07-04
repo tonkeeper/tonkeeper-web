@@ -43,7 +43,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
 
                     resolve({
                         status: IosPurchaseStatuses.SUCCESS,
-                        originalTransactionId: 2000000950005410,
+                        originalTransactionId: 2000000953417084,
                         environment: IosEnvironmentTypes.SANDBOX,
                         productId: options.productId,
                         purchaseDate,
@@ -99,7 +99,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
         },
         async getOriginalTransactionId(): Promise<IOriginalTransactionInfo> {
             return Promise.resolve({
-                originalTransactionId: '2000000950005410',
+                originalTransactionId: 2000000953417084,
                 productId: ProductIds.MONTHLY,
                 purchaseDate: new Date().toISOString(),
                 environment: IosEnvironmentTypes.SANDBOX
