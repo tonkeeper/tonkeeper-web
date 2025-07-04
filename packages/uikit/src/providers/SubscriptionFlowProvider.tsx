@@ -1,4 +1,5 @@
-import { type FC, type ReactNode, useCallback, useState } from 'react';
+import { type FC, type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
+import { isPendingSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { SubscriptionScreens } from '../enums/pro';
 import {
@@ -6,23 +7,44 @@ import {
     IScreenState,
     ScreenContext
 } from '../components/create/SubscriptionFlowContext';
+import { useProState } from '../state/pro';
 
 interface IProps {
     children: ReactNode;
 }
 
 export const SubscriptionFlowProvider: FC<IProps> = ({ children }) => {
-    const [screen, setScreen] = useState<IScreenState>({
-        currentScreen: SubscriptionScreens.ACCOUNTS,
-        prevScreen: null
-    });
+    const { data: proState } = useProState();
+    const isStatusScreen =
+        proState &&
+        (isValidSubscription(proState.subscription) ||
+            isPendingSubscription(proState.subscription));
+
+    const initialScreen = useMemo(() => {
+        if (isStatusScreen) {
+            return SubscriptionScreens.STATUS;
+        }
+
+        return SubscriptionScreens.ACCOUNTS;
+    }, [proState?.subscription]);
+
+    const [screen, setScreen] = useState<IScreenState | null>(null);
 
     const goTo = useCallback((nextScreen: SubscriptionScreens) => {
         setScreen(prevState => ({
             currentScreen: nextScreen,
-            prevScreen: prevState.currentScreen
+            prevScreen: prevState?.currentScreen ?? null
         }));
     }, []);
+
+    useEffect(() => {
+        setScreen({
+            currentScreen: initialScreen,
+            prevScreen: null
+        });
+    }, [initialScreen]);
+
+    if (!screen) return null;
 
     return (
         <ScreenContext.Provider value={screen}>

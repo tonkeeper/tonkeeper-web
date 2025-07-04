@@ -6,8 +6,7 @@ export interface IScreenState {
     prevScreen: SubscriptionScreens | null;
 }
 
-export const ScreenContext = createContext<IScreenState>({
-    currentScreen: SubscriptionScreens.ACCOUNTS,
-    prevScreen: null
-});
-export const GoToContext = createContext<(screen: SubscriptionScreens) => void>(() => {});
+export const ScreenContext = createContext<IScreenState | undefined>(undefined);
+export const GoToContext = createContext<((screen: SubscriptionScreens) => void) | undefined>(
+    undefined
+);

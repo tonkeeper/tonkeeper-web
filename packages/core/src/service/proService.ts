@@ -9,7 +9,15 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { isValidSubscription, ProState, ProStateWallet, ProSubscription } from '../entries/pro';
+import {
+    hasSubscriptionSource,
+    isPendingSubscription,
+    isProSubscription,
+    isValidSubscription,
+    ProState,
+    ProStateWallet,
+    ProSubscription
+} from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
@@ -98,9 +106,34 @@ const loadProState = async (
     const subscriptionDTO = await UsersService.verifySubscription();
     const subscription = normalizeSubscription(subscriptionDTO, user);
 
+    if (isValidSubscription(subscription)) {
+        await storage.delete(AppKey.PRO_PENDING_STATE);
+
+        return {
+            subscription,
+            authorizedWallet
+        };
+    }
+
+    const processingState: ProSubscription | undefined = await storage.get(
+        AppKey.PRO_PENDING_STATE
+    );
+
+    if (
+        isProSubscription(processingState) &&
+        hasSubscriptionSource(processingState) &&
+        isPendingSubscription(processingState)
+    ) {
+        // TODO Start polling backend
+        return {
+            authorizedWallet,
+            subscription: processingState
+        };
+    }
+
     return {
-        subscription,
-        authorizedWallet
+        authorizedWallet,
+        subscription: null
     };
 };
 

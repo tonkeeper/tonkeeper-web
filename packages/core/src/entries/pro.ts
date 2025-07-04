@@ -213,6 +213,19 @@ export function isTrialSubscription(
     );
 }
 
+export function isPendingSubscription(
+    subscription: ProSubscription
+): subscription is
+    | (IosSubscription & { status: IosSubscriptionStatuses.PENDING })
+    | (CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING }) {
+    return (
+        (subscription?.source === SubscriptionSource.IOS &&
+            subscription.status === IosSubscriptionStatuses.PENDING) ||
+        (subscription?.source === SubscriptionSource.CRYPTO &&
+            subscription.status === CryptoSubscriptionStatuses.PENDING)
+    );
+}
+
 export function isValidSubscription(
     subscription: ProSubscription | undefined
 ): subscription is Exclude<ProSubscription, null | undefined> {
@@ -228,6 +241,10 @@ export function isPaidSubscription(
         (subscription?.source === SubscriptionSource.CRYPTO &&
             subscription.status === CryptoSubscriptionStatuses.ACTIVE)
     );
+}
+
+export function isProSubscription(value: unknown): value is ProSubscription {
+    return typeof value === 'object' && value !== null && 'source' in value;
 }
 
 export function hasSubscriptionSource(

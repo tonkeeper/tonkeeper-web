@@ -6,7 +6,7 @@ import { GoToContext } from '../../components/create/SubscriptionFlowContext';
 export const useGoToSubscriptionScreen = (): ((screen: SubscriptionScreens) => void) => {
     const ctx = useContext(GoToContext);
 
-    if (ctx === null) {
+    if (!ctx) {
         throw new Error('useGoToSubscriptionScreen must be used within SubscriptionFlowProvider');
     }
 

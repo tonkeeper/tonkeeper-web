@@ -33,7 +33,8 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useNavigate } from '../../../hooks/router/useNavigate';
-import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isPendingSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -99,19 +100,25 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
-    // const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
+    const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
 
     const availableThemes = useAvailableThemes();
 
     const isTonkeeperProActive = location.pathname === AppRoute.settings + SettingsRoute.pro;
 
     const handleTonkeeperProClick = async () => {
-        // TODO Correct it
-        // if (proState?.subscription.valid) {
-        //     navigate(AppRoute.settings + SettingsRoute.pro);
-        // } else {
-        //     onProFeaturesOpen();
-        // }
+        if (isValidSubscription(proState?.subscription)) {
+            navigate(AppRoute.settings + SettingsRoute.pro);
+
+            return;
+        }
+
+        const isPromo = !proState?.subscription || !isPendingSubscription(proState?.subscription);
+        if (isPromo) {
+            onProFeaturesOpen();
+
+            return;
+        }
 
         navigate(AppRoute.settings + SettingsRoute.pro);
     };

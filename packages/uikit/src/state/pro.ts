@@ -190,9 +190,11 @@ export const useProSubscriptionPurchase = () => {
         if (!savingResult.ok) {
             await sdk.storage.set(AppKey.PRO_PENDING_STATE, {
                 source: SubscriptionSource.IOS,
+                status: IosSubscriptionStatuses.PENDING,
                 originalTransactionId,
                 ...selectedPlan
             });
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 
             return IosPurchaseStatuses.PENDING;
         }

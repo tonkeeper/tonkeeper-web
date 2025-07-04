@@ -188,8 +188,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
             isProSubscription(data?.subscription) &&
             isPendingSubscription(data?.subscription);
 
-        console.log(data);
-
         button = isProcessing ? (
             <DropDown
                 containerClassName="pro-subscription-dd-container"

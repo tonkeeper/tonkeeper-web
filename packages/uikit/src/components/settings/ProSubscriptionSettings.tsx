@@ -1,4 +1,4 @@
-import { type FC, useEffect } from 'react';
+import { type FC } from 'react';
 import styled from 'styled-components';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
@@ -12,7 +12,6 @@ import {
 import { SubHeader } from '../SubHeader';
 import { AppRoute } from '../../libs/routes';
 import { duration } from '../transfer/common';
-import { useProState } from '../../state/pro';
 import { HideOnReview } from '../ios/HideOnReview';
 import { isDirectionForward } from '../../libs/pro';
 import { SubscriptionScreens } from '../../enums/pro';
@@ -25,7 +24,6 @@ import { ProPurchaseChooseScreen } from '../pro/ProPurchaseChooseScreen';
 import { useSubscriptionScreen } from '../../hooks/pro/useSubscriptionScreen';
 import { SubscriptionFlowProvider } from '../../providers/SubscriptionFlowProvider';
 import { leftToTight, rightToLeft, SlideAnimation } from '../shared/SlideAnimation';
-import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
 
 const SCREENS_MAP = {
     [SubscriptionScreens.ACCOUNTS]: <ProAccountChooseScreen />,
@@ -34,16 +32,8 @@ const SCREENS_MAP = {
 };
 
 export const ProSettingsContent: FC = () => {
-    const { currentScreen, prevScreen } = useSubscriptionScreen();
-    const goTo = useGoToSubscriptionScreen();
     const navigate = useNavigate();
-    const { data: proState } = useProState();
-
-    useEffect(() => {
-        if (proState?.subscription?.valid) {
-            goTo(SubscriptionScreens.STATUS);
-        }
-    }, [proState]);
+    const { currentScreen, prevScreen } = useSubscriptionScreen();
 
     const handleCloseClick = () => {
         navigate(AppRoute.home, { replace: true });
