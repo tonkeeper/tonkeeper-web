@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
+import { IosPurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
 
+import {
+    useManageSubscription,
+    useProLogout,
+    useProPlans,
+    useProSubscriptionPurchase
+} from '../../state/pro';
 import { Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ProLegalNote } from './ProLegalNote';
@@ -16,8 +23,6 @@ import { ProChooseSubscriptionPlan } from './ProChooseSubscriptionPlan';
 import { adaptPlansToViewModel, getSkeletonProducts } from '../../libs/pro';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
-import { useProLogout, useProPlans, useProSubscriptionPurchase } from '../../state/pro';
-import { IosPurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
 
 export const ProPurchaseChooseScreen = () => {
     const { t } = useTranslation();
@@ -33,6 +38,9 @@ export const ProPurchaseChooseScreen = () => {
         isLoading: isPurchasing,
         isError: isPurchaseError
     } = useProSubscriptionPurchase();
+
+    const { mutateAsync: handleManageSubscription, isLoading: isManageLoading } =
+        useManageSubscription();
 
     useEffect(() => {
         if (isPurchaseError) {
@@ -68,7 +76,7 @@ export const ProPurchaseChooseScreen = () => {
         goTo(SubscriptionScreens.STATUS);
     }, [isPurchaseSuccess, toast, t, navigate]);
 
-    const isTotalLoading = isFetching || isPurchasing || isLoggingOut;
+    const isTotalLoading = isFetching || isPurchasing || isLoggingOut || isManageLoading;
 
     const handleBuySubscription = async () => {
         if (isError) {
@@ -109,7 +117,7 @@ export const ProPurchaseChooseScreen = () => {
                 <Button primary fullWidth size="large" type="submit" loading={isTotalLoading}>
                     <Label2>{t(isError ? 'try_again' : 'continue_with_tonkeeper_pro')}</Label2>
                 </Button>
-                <ProLegalNote />
+                <ProLegalNote onManage={handleManageSubscription} />
             </ProSettingsMainButtonWrapper>
         </ProScreenContentWrapper>
     );

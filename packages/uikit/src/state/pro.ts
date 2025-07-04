@@ -159,6 +159,18 @@ export const useProState = () => {
     });
 };
 
+export const useManageSubscription = () => {
+    const sdk = useAppSdk();
+
+    return useMutation<void, Error, void>(async () => {
+        if (!isIosStrategy(sdk.subscriptionStrategy)) {
+            throw new Error('This is not an iOS subscription strategy');
+        }
+
+        await sdk.subscriptionStrategy.manageSubscriptions();
+    });
+};
+
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
     const { data } = useProState();
