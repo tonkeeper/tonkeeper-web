@@ -32,6 +32,7 @@ import {
     useTrackDappBrowserOpened
 } from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
 import { AnalyticsEventDappClick } from '@tonkeeper/core/dist/analytics';
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 const InputWrapper = styled.form<{ $keyboardShift: number }>`
     padding: 16px 16px 8px;
@@ -189,9 +190,15 @@ export const MobileDappBrowserNewTab = () => {
             return onSelectApp(relevantApp);
         }
 
-        openTab({
-            url: search(inputValue)
-        });
+        if (isValidUrlProtocol(inputValue, ['https:', 'http:'])) {
+            openTab({
+                url: inputValue
+            });
+        } else {
+            openTab({
+                url: search(inputValue)
+            });
+        }
     };
 
     const onSelectSearchRecommendations = (query: string) => {
@@ -257,7 +264,6 @@ export const MobileDappBrowserNewTab = () => {
                         label="Search or enter address"
                         onFocusChange={setIsInputFocused}
                         onChange={setInputValue}
-                        inputMode="url"
                         enterKeyHint="go"
                         autoCorrect="off"
                         spellCheck="false"

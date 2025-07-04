@@ -193,7 +193,7 @@ export interface IDappBrowser {
             keepFocusMainView?: boolean;
         }
     ): Promise<BrowserTabBase>;
-    hide(id: string): Promise<void>;
+    hide(id?: string): Promise<void>;
     close(id: string | string[]): Promise<void>;
     setRequestsHandler(
         method: string,

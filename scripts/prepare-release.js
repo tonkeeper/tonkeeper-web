@@ -58,6 +58,8 @@ apps.forEach(app => {
 
 });
 
+updatePackageVersion(path.join(__dirname, '..'));
+
 try {
     if (modifiedFiles.length > 0) {
         execSync(`git add ${modifiedFiles.join(' ')}`, { stdio: 'inherit' });
