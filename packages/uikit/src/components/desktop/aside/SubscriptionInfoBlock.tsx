@@ -1,6 +1,8 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
+    isPendingSubscription,
+    isProSubscription,
     isTrialSubscription,
     isValidSubscription,
     ProState
@@ -13,7 +15,7 @@ import { Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { RefreshIcon } from '../../Icon';
+import { RefreshIcon, SpinnerIcon } from '../../Icon';
 import {
     useInvalidateActiveWalletQueries,
     useInvalidateGlobalQueries
@@ -126,7 +128,9 @@ const DDContent = styled.div<{ width: number }>`
 `;
 
 const ProButtonPanel = styled(Button)`
+    padding: 0 12px;
     cursor: default;
+
     &:hover {
         background-color: ${p => p.theme.buttonTertiaryBackground};
     }
@@ -163,28 +167,49 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     };
 
     let button = <Button loading>Tonkeeper Pro</Button>;
-    if (data) {
-        if (isValidSubscription(data.subscription)) {
-            button = (
-                <DropDown
-                    containerClassName="pro-subscription-dd-container"
-                    payload={() => (
-                        <DDContent width={width}>
-                            <SubscriptionStatus data={data} />
-                        </DDContent>
-                    )}
-                    trigger="hover"
-                >
-                    <ProButtonPanel>Tonkeeper Pro</ProButtonPanel>
-                </DropDown>
-            );
-        } else {
-            button = (
-                <Button primary onClick={onGetPro}>
-                    {t('get_tonkeeper_pro')}
-                </Button>
-            );
-        }
+
+    if (data && isValidSubscription(data.subscription)) {
+        button = (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        <SubscriptionStatus data={data} />
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel>Tonkeeper Pro</ProButtonPanel>
+            </DropDown>
+        );
+    } else {
+        const isProcessing =
+            data &&
+            isProSubscription(data?.subscription) &&
+            isPendingSubscription(data?.subscription);
+
+        console.log(data);
+
+        button = isProcessing ? (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        {t('create_multisig_await_deployment_description')}
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel>
+                    <SpinnerIcon />
+                    {t('processing')}
+                </ProButtonPanel>
+            </DropDown>
+        ) : (
+            <Button primary onClick={onGetPro}>
+                {t('get_tonkeeper_pro')}
+            </Button>
+        );
     }
 
     return (

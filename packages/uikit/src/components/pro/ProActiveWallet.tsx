@@ -2,14 +2,14 @@ import { type FC } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useProState } from '../../state/pro';
+import { Skeleton } from '../shared/Skeleton';
 import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
+import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
-import { Skeleton } from '../shared/Skeleton';
 
 interface IProps {
     onLogout: () => Promise<void>;
