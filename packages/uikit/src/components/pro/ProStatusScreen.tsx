@@ -13,6 +13,7 @@ import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { useManageSubscription, useProLogout } from '../../state/pro';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
+import { HideOnReview } from '../ios/HideOnReview';
 
 // TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
@@ -48,7 +49,10 @@ export const ProStatusScreen = () => {
                 subtitleKey="subscription_is_linked"
             />
             <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
-            <ProStatusDetailsList />
+            {/* tODO Remove it from review */}
+            <HideOnReview>
+                <ProStatusDetailsList />
+            </HideOnReview>
             {isIos && (
                 <Button
                     secondary
