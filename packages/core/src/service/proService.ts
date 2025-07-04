@@ -115,20 +115,16 @@ const loadProState = async (
         };
     }
 
-    const processingState: ProSubscription | undefined = await storage.get(
-        AppKey.PRO_PENDING_STATE
-    );
+    const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
 
     if (
-        isProSubscription(processingState) &&
-        hasSubscriptionSource(processingState) &&
-        isPendingSubscription(processingState)
+        processingState?.subscription &&
+        isProSubscription(processingState.subscription) &&
+        hasSubscriptionSource(processingState.subscription) &&
+        isPendingSubscription(processingState.subscription)
     ) {
         // TODO Start polling backend
-        return {
-            authorizedWallet,
-            subscription: processingState
-        };
+        return processingState;
     }
 
     return {

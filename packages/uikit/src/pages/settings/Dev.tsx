@@ -33,6 +33,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
+import { Button } from '../../components/fields/Button';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -142,22 +143,10 @@ const LogsSettings = () => {
 
 const ProcessingVisibilitySettings = () => {
     const sdk = useAppSdk();
-    const [isProcessing, setIsProcessing] = useState(false);
 
-    useEffect(() => {
-        sdk.storage
-            .get<boolean>(AppKey.PRO_PENDING_STATE)
-            .then(state => setIsProcessing(Boolean(state)))
-            .catch(err => {
-                console.error('Failed to load visibility state:', err);
-                setIsProcessing(false);
-            });
-    }, [sdk.storage]);
-
-    const handleChange = async (toBe: boolean) => {
+    const handleReset = async () => {
         try {
-            await sdk.storage.set(AppKey.PRO_PENDING_STATE, toBe ? {} : false);
-            setIsProcessing(toBe);
+            await sdk.storage.delete(AppKey.PRO_PENDING_STATE);
         } catch (err) {
             console.error('Failed to update visibility:', err);
         }
@@ -168,8 +157,10 @@ const ProcessingVisibilitySettings = () => {
             <ListBlockDesktopAdaptive>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        <Label1>Is processing state</Label1>
-                        <Switch checked={isProcessing} onChange={handleChange} />
+                        <Label1>Reset processing state</Label1>
+                        <Button onClick={handleReset} secondary>
+                            Reset
+                        </Button>
                     </ListItemPayload>
                 </ListItem>
             </ListBlockDesktopAdaptive>

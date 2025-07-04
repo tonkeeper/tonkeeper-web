@@ -48,6 +48,7 @@ interface IosActiveSubscription extends BaseIosSubscription {
 
 interface IosPendingSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.PENDING;
+    originalTransactionId?: number | null;
     valid: false;
 }
 
@@ -75,6 +76,11 @@ export interface IProductInfo {
 
 export interface IIosPurchaseResult {
     status: IosPurchaseStatuses;
+    productId: ProductIds;
+    isUpgraded: boolean;
+    purchaseDate: string;
+    expirationDate: string;
+    revocationDate: string | null;
     originalTransactionId?: number;
     environment: IosEnvironmentTypes;
 }

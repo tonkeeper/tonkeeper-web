@@ -4,6 +4,7 @@ import {
     IDisplayPlan,
     IosEnvironmentTypes,
     IosPurchaseStatuses,
+    IosSubscription,
     IosSubscriptionStatuses,
     isIosStrategy,
     isProductId,
@@ -160,6 +161,7 @@ export const useProState = () => {
 
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
+    const { data } = useProState();
     const client = useQueryClient();
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
@@ -189,11 +191,18 @@ export const useProSubscriptionPurchase = () => {
         );
 
         if (!savingResult.ok) {
-            await sdk.storage.set(AppKey.PRO_PENDING_STATE, {
+            const pendingSubscription: IosSubscription = {
+                ...subscription,
                 source: SubscriptionSource.IOS,
                 status: IosSubscriptionStatuses.PENDING,
-                originalTransactionId,
-                ...selectedPlan
+                valid: false,
+                isTrial: data?.subscription?.isTrial ?? false,
+                usedTrial: data?.subscription?.usedTrial ?? false
+            };
+
+            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+                authorizedWallet: data?.authorizedWallet || null,
+                subscription: pendingSubscription
             });
             await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 
