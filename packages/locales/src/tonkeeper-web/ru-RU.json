@@ -219,6 +219,7 @@
   "Manage_wallets": "Управление кошельками",
   "Minimize": "Свернуть",
   "MinPassword": "Должно быть не менее 6 символов.",
+  "monthly_pro_package": "1 месяц",
   "multichain": "Мультичейн",
   "multi_send_about_w5": "Подробнее о W5",
   "multi_send_add_more": "Добавить еще",
@@ -554,5 +555,6 @@
   "wallet_version_and_tokens": ", токены",
   "web_no_connection": "Нет сети",
   "what_is_included": "Что включено\n",
-  "Window": "Окно"
+  "Window": "Окно",
+  "yearly_pro_package": "1 год"
 }

@@ -226,6 +226,7 @@
   "Manage_wallets": "Manage Wallets",
   "Minimize": "Minimize",
   "MinPassword": "Must be at least 6 characters.",
+  "monthly_pro_package": "1 month",
   "multichain": "Multichain",
   "multi_send_about_w5": "About W5",
   "multi_send_add_more": "Add More",
@@ -575,5 +576,6 @@
   "wallet_version_and_tokens": ", tokens",
   "web_no_connection": "No Internet Connection",
   "what_is_included": "What’s included",
-  "Window": "Window"
+  "Window": "Window",
+  "yearly_pro_package": "1 year"
 }
