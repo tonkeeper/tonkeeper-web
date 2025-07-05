@@ -1,8 +1,10 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan, isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Body3, Label2 } from '../Text';
+import { useAppSdk } from '../../hooks/appSdk';
+import { formatter } from '../../hooks/balance';
 import { SkeletonText } from '../shared/Skeleton';
 import { getSkeletonProducts } from '../../libs/pro';
 import { useTranslation } from '../../hooks/translation';
@@ -18,6 +20,7 @@ interface IProps {
 
 const ProPricesListContent: FC<IProps> = props => {
     const { className, removeTitle = false, displayPlans, skeletonSize } = props;
+    const sdk = useAppSdk();
     const { t } = useTranslation();
 
     const productsForRender = displayPlans?.length
@@ -38,7 +41,11 @@ const ProPricesListContent: FC<IProps> = props => {
                     );
 
                     const priceNode = displayPrice ? (
-                        <Label2>{displayPrice}</Label2>
+                        <Label2>
+                            {isCryptoStrategy(sdk.subscriptionStrategy)
+                                ? `${formatter.fromNano(displayPrice)} TON`
+                                : displayPrice}
+                        </Label2>
                     ) : (
                         <SkeletonTextStyled width="100px" />
                     );
