@@ -24,6 +24,7 @@ import { ProPurchaseChooseScreen } from '../pro/ProPurchaseChooseScreen';
 import { useSubscriptionScreen } from '../../hooks/pro/useSubscriptionScreen';
 import { SubscriptionFlowProvider } from '../../providers/SubscriptionFlowProvider';
 import { leftToTight, rightToLeft, SlideAnimation } from '../shared/SlideAnimation';
+import { ProSettingsContent as DeprecatedProSettingsContent } from './ProSettings';
 
 const SCREENS_MAP = {
     [SubscriptionScreens.ACCOUNTS]: <ProAccountChooseScreen />,
@@ -97,7 +98,7 @@ export const ProSubscriptionSettings: FC = () => {
         <HideOnReview>
             <SubHeader />
             <InnerBody>
-                <ProSettingsContent />
+                <DeprecatedProSettingsContent />
             </InnerBody>
         </HideOnReview>
     );

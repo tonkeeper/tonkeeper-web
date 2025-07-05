@@ -286,6 +286,19 @@ export function hasUsedTrial(
     return subscription !== null && subscription.usedTrial;
 }
 
+export function isCryptoProPlans(
+    data: NormalizedProPlans | undefined
+): data is Extract<
+    NormalizedProPlans,
+    { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[] }
+> {
+    return (
+        data?.source === SubscriptionSource.CRYPTO &&
+        Array.isArray(data.plans) &&
+        data.plans.length > 0
+    );
+}
+
 export interface IDisplayPlan {
     id: string;
     displayName: string;

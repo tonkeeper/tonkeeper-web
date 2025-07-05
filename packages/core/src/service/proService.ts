@@ -21,24 +21,28 @@ import {
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
-import {
-    FiatCurrencies as FiatCurrenciesGenerated,
-    InvoicesInvoice,
-    InvoiceStatus,
-    ProServiceDashboardCellAddress,
-    ProServiceDashboardCellNumericCrypto,
-    ProServiceDashboardCellNumericFiat,
-    ProServiceDashboardCellString,
-    ProServiceDashboardColumnType,
-    ProServiceService
-} from '../tonConsoleApi';
 import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
-import { AuthService, TiersService, UsersService, IapService } from '../pro';
+import {
+    AuthService,
+    TiersService,
+    UsersService,
+    IapService,
+    InvoicesService,
+    DashboardsService,
+    DashboardColumnType,
+    DashboardCellString,
+    DashboardCellAddress,
+    DashboardCellNumericCrypto,
+    DashboardCellNumericFiat,
+    Invoice,
+    FiatCurrencies as FiatCurrenciesGenerated,
+    InvoiceStatus
+} from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
@@ -185,7 +189,7 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
 };
 
 export const createProServiceInvoice = async (tierId: number, promoCode?: string) => {
-    return ProServiceService.createProServiceInvoice({
+    return InvoicesService.createInvoice({
         tier_id: tierId,
         promo_code: promoCode
     });
@@ -193,7 +197,7 @@ export const createProServiceInvoice = async (tierId: number, promoCode?: string
 
 export const createRecipient = async (
     api: APIConfig,
-    invoice: InvoicesInvoice
+    invoice: Invoice
 ): Promise<[RecipientData, AssetAmount]> => {
     const toAccount = await new AccountsApi(api.tonApiV2).getAccount({
         accountId: invoice.pay_to_address
@@ -227,13 +231,13 @@ export const retryProService = async (authService: ProAuthTokenService, storage:
     }
 };
 
-export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
+export const waitProServiceInvoice = async (invoice: Invoice) => {
     let updated = invoice;
 
     do {
         await delay(4000);
         try {
-            updated = await ProServiceService.getProServiceInvoice(invoice.id);
+            updated = await InvoicesService.getInvoice(invoice.id);
         } catch (e) {
             console.warn(e);
         }
@@ -261,9 +265,11 @@ export async function startProServiceTrial(
     if (!tgData) {
         return false;
     }
-    const result = await ProServiceService.proServiceTrial(tgData);
+    const result = await TiersService.activateTrial(tgData);
 
-    await authService.onTokenUpdated(result.auth_token);
+    if (result.auth_token) {
+        await authService.onTokenUpdated(result.auth_token);
+    }
 
     return result.ok;
 }
@@ -273,7 +279,7 @@ export async function getDashboardColumns(lang?: string): Promise<DashboardColum
         lang = Lang.EN;
     }
 
-    const result = await ProServiceService.proServiceDashboardColumns(lang as Lang);
+    const result = await DashboardsService.getDashboardColumns(lang as Lang);
     return result.items.map(item => ({
         id: item.id,
         name: item.name,
@@ -309,7 +315,8 @@ export async function getDashboardData(
         currency = options?.currency as FiatCurrenciesGenerated;
     }
 
-    const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
+    const result = await DashboardsService.getDashboardData(lang, currency, query);
+
     return result.items.map((row, index) => ({
         id: query.accounts[index],
         cells: row.map(mapDtoCellToCell)
@@ -317,13 +324,13 @@ export async function getDashboardData(
 }
 
 type DTOCell = Flatten<
-    Flatten<Awaited<ReturnType<typeof ProServiceService.proServiceDashboardData>>['items']>
+    Flatten<Awaited<ReturnType<typeof DashboardsService.getDashboardData>>['items']>
 >;
 
 function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
     switch (dtoCell.type) {
-        case ProServiceDashboardColumnType.STRING: {
-            const cell = dtoCell as ProServiceDashboardCellString;
+        case DashboardColumnType.STRING: {
+            const cell = dtoCell as DashboardCellString;
 
             return {
                 columnId: cell.column_id,
@@ -331,16 +338,16 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
                 value: cell.value
             };
         }
-        case ProServiceDashboardColumnType.ADDRESS: {
-            const cell = dtoCell as ProServiceDashboardCellAddress;
+        case DashboardColumnType.ADDRESS: {
+            const cell = dtoCell as DashboardCellAddress;
             return {
                 columnId: cell.column_id,
                 type: 'address',
                 raw: cell.raw
             };
         }
-        case ProServiceDashboardColumnType.NUMERIC_CRYPTO: {
-            const cell = dtoCell as ProServiceDashboardCellNumericCrypto;
+        case DashboardColumnType.NUMERIC_CRYPTO: {
+            const cell = dtoCell as DashboardCellNumericCrypto;
             return {
                 columnId: cell.column_id,
                 type: 'numeric_crypto',
@@ -350,8 +357,8 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
             };
         }
 
-        case ProServiceDashboardColumnType.NUMERIC_FIAT: {
-            const cell = dtoCell as ProServiceDashboardCellNumericFiat;
+        case DashboardColumnType.NUMERIC_FIAT: {
+            const cell = dtoCell as DashboardCellNumericFiat;
             return {
                 columnId: cell.column_id,
                 type: 'numeric_fiat',
