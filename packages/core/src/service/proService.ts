@@ -240,14 +240,10 @@ export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export const saveIapPurchase = async (
-    originalTransactionId: string,
-    sandbox: boolean
-): Promise<{ ok: boolean }> => {
+export const saveIapPurchase = async (originalTransactionId: string): Promise<{ ok: boolean }> => {
     try {
         return await IapService.activateIapPurchase({
-            original_transaction_id: originalTransactionId,
-            sandbox
+            original_transaction_id: originalTransactionId
         });
     } catch (e) {
         return {

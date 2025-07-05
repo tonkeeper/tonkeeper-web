@@ -1,4 +1,4 @@
-import { SubscriptionSource } from '../pro';
+import { CryptoCurrency, SubscriptionSource } from '../pro';
 import { ProServiceTier } from '../tonConsoleApi';
 import { Language } from './language';
 
@@ -35,12 +35,25 @@ interface BaseSubscriptionStrategy {
 }
 
 // IOS Subscription Types
+interface IosDBStoredInfo {
+    txId?: string;
+    price?: number;
+    currency?: string;
+    expiresDate?: Date;
+    purchaseDate?: Date;
+    productId?: string;
+    storeFront?: string;
+    storeFrontId?: string;
+    transactionType?: string;
+    originalTransactionId?: string;
+}
+
 interface BaseIosSubscription extends BaseSubscription {
     source: SubscriptionSource.IOS;
     status: IosSubscriptionStatuses;
 }
 
-interface IosActiveSubscription extends BaseIosSubscription {
+interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
     status: IosSubscriptionStatuses.ACTIVE;
     valid: true;
     isTrial: false;
@@ -52,16 +65,15 @@ interface IosPendingSubscription extends BaseIosSubscription {
     valid: false;
 }
 
-interface IosRevokedSubscription extends BaseIosSubscription {
+interface IosRevokedSubscription extends BaseIosSubscription, IosDBStoredInfo {
     status: IosSubscriptionStatuses.REVOKED;
-    reason: 'user_cancelled' | 'billing_error' | 'refund';
 }
 
 interface IosPromoSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.PROMO;
     isTrial: true;
     usedTrial: true;
-    trialEndDate: Date;
+    trialEndDate?: Date;
 }
 
 export interface IProductInfo {
@@ -141,6 +153,12 @@ export function isIosStrategy(
 }
 
 // Crypto Subscription Types
+interface CryptoDBStoredInfo {
+    amount?: string;
+    currency?: CryptoCurrency;
+    purchaseDate?: Date;
+}
+
 interface BaseCryptoSubscription extends BaseSubscription {
     source: SubscriptionSource.CRYPTO;
     status: CryptoSubscriptionStatuses;
@@ -151,7 +169,7 @@ interface CryptoPendingSubscription extends BaseCryptoSubscription {
     valid: false;
 }
 
-interface CryptoActiveSubscription extends BaseCryptoSubscription {
+interface CryptoActiveSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
     status: CryptoSubscriptionStatuses.ACTIVE;
     valid: true;
 }
@@ -161,7 +179,7 @@ interface CryptoTrialSubscription extends BaseCryptoSubscription {
     isTrial: true;
     usedTrial: true;
     trialUserId: number;
-    trialEndDate: Date;
+    trialEndDate?: Date;
 }
 
 interface CryptoFreeSubscription extends BaseCryptoSubscription {

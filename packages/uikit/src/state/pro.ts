@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     IDisplayPlan,
-    IosEnvironmentTypes,
     IosPurchaseStatuses,
     IosSubscription,
     IosSubscriptionStatuses,
@@ -197,10 +196,7 @@ export const useProSubscriptionPurchase = () => {
             throw new Error('Failed to subscribe');
         }
 
-        const savingResult = await saveIapPurchase(
-            String(originalTransactionId),
-            subscription?.environment === IosEnvironmentTypes.SANDBOX
-        );
+        const savingResult = await saveIapPurchase(String(originalTransactionId));
 
         if (!savingResult.ok) {
             const pendingSubscription: IosSubscription = {
