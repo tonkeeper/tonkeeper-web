@@ -1,6 +1,6 @@
 import { Action, ActionStatusEnum, NftItem, Price } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../../hooks/appSdk';
@@ -23,7 +23,8 @@ import {
     FirstLine,
     ListItemGrid,
     SecondLine,
-    SecondaryText
+    SecondaryText,
+    toAddressTextValue
 } from '../CommonAction';
 import {
     ActionDate,
@@ -157,16 +158,14 @@ export const NftItemTransferAction: FC<{
                 <ColumnLayout
                     title={t('transaction_type_receive')}
                     entry="NFT"
-                    address={
-                        nftItemTransfer.sender?.name ??
-                        toShortValue(
-                            formatAddress(
-                                nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
-                                network,
-                                !nftItemTransfer.sender?.address
-                            )
+                    address={toAddressTextValue(
+                        nftItemTransfer.sender?.name,
+                        formatAddress(
+                            nftItemTransfer.sender?.address ?? nftItemTransfer.nft,
+                            network,
+                            !nftItemTransfer.sender?.address
                         )
-                    }
+                    )}
                     date={date}
                 />
                 <FailedNote status={action.status}>
@@ -185,16 +184,14 @@ export const NftItemTransferAction: FC<{
             <ColumnLayout
                 title={t('transaction_type_sent')}
                 entry="NFT"
-                address={
-                    nftItemTransfer.recipient?.name ??
-                    toShortValue(
-                        formatAddress(
-                            nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
-                            network,
-                            !nftItemTransfer.recipient?.address
-                        )
+                address={toAddressTextValue(
+                    nftItemTransfer.recipient?.name,
+                    formatAddress(
+                        nftItemTransfer.recipient?.address ?? nftItemTransfer.nft,
+                        network,
+                        !nftItemTransfer.recipient?.address
                     )
-                }
+                )}
                 date={date}
             />
             <FailedNote status={action.status}>

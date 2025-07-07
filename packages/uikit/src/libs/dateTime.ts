@@ -36,12 +36,12 @@ const prevDayTranslations = {
 };
 
 export const timeFromNow = (date: number, locale: 'en' | 'ru' = 'en') => {
-    const oneDay = 1000 * 60 * 60 * 24;
+    const sameDaySize = 1000 * 60 * 60 * 21; // after 21 hours dayjs will return "Yesterday"
     const now = new Date();
     const dt = new Date(date);
     const delta = now.getTime() - dt.getTime();
 
-    if (delta < oneDay) {
+    if (delta < sameDaySize) {
         return dayjs(dt).locale(locale).fromNow();
     }
 

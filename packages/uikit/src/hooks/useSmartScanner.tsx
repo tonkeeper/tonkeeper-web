@@ -7,6 +7,7 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { TonConnectNotification } from '../components/connect/TonConnectNotification';
 import { useTrackTonConnectConnectionRequest } from './analytics/events-hooks';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 
 export const useSmartScanner = () => {
     const sdk = useAppSdk();
@@ -25,12 +26,15 @@ export const useSmartScanner = () => {
     );
 
     const handlerClose = async (
-        result: {
-            replyItems: TonConnectEventPayload;
-            manifest: DAppManifest;
-            account: Account;
-            walletId: WalletId;
-        } | null
+        result:
+            | {
+                  replyItems: TonConnectEventPayload;
+                  manifest: DAppManifest;
+                  account: Account;
+                  walletId: WalletId;
+              }
+            | null
+            | TonConnectError
     ) => {
         if (!params) return;
         responseReset();

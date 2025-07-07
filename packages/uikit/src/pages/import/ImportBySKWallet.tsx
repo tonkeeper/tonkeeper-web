@@ -23,8 +23,12 @@ import { createStandardTonAccountBySK } from '@tonkeeper/core/dist/service/walle
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useMutation } from '@tanstack/react-query';
+import { SKSigningAlgorithm } from '@tonkeeper/core/dist/service/sign';
 
-export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterCompleted }) => {
+export const ImportBySKWallet: FC<{
+    afterCompleted: () => void;
+    signingAlgorithm: SKSigningAlgorithm;
+}> = ({ afterCompleted, signingAlgorithm }) => {
     const { mutateAsync: createWalletsAsync, isLoading: isCreateWalletLoading } =
         useCreateAccountTonSK();
     const { mutateAsync: renameWallet, isLoading: renameLoading } = useMutateRenameAccount();
@@ -98,33 +102,37 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
 
     const { mutate: onSKSubmit, isLoading: isSubmitingSk } = useMutation(
         async (secretKey: string) => {
-            const possibleAccount = await createStandardTonAccountBySK(
-                context,
-                sdk.storage,
-                secretKey,
-                {
-                    auth: {
-                        kind: 'keychain'
-                    },
-                    versions: [
-                        WalletVersion.V5R1,
-                        WalletVersion.V5_BETA,
-                        WalletVersion.V4R2,
-                        WalletVersion.V3R2,
-                        WalletVersion.V3R1
-                    ]
-                }
-            );
+            try {
+                const possibleAccount = await createStandardTonAccountBySK(
+                    context,
+                    sdk.storage,
+                    { key: secretKey, algorithm: signingAlgorithm },
+                    {
+                        auth: {
+                            kind: 'keychain'
+                        },
+                        versions: [
+                            WalletVersion.V5R1,
+                            WalletVersion.V5_BETA,
+                            WalletVersion.V4R2,
+                            WalletVersion.V3R2,
+                            WalletVersion.V3R1
+                        ]
+                    }
+                );
 
-            const existingAccount = accounts.find(a => a.id === possibleAccount.id);
-            if (existingAccount) {
-                setExistingAccountAndWallet({
-                    account: existingAccount,
-                    walletId: existingAccount.activeTonWallet.id
-                });
-                return;
+                const existingAccount = accounts.find(a => a.id === possibleAccount.id);
+                if (existingAccount) {
+                    setExistingAccountAndWallet({
+                        account: existingAccount,
+                        walletId: existingAccount.activeTonWallet.id
+                    });
+                    return;
+                }
+                setAccountCandidate({ account: possibleAccount, sk: secretKey });
+            } catch (e) {
+                sdk.topMessage('Failed to process secret key');
             }
-            setAccountCandidate({ account: possibleAccount, sk: secretKey });
         }
     );
 
@@ -137,6 +145,7 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
     if (!accountCandidate) {
         return (
             <SKInput
+                signingAlgorithm={signingAlgorithm}
                 afterInput={onSKSubmit}
                 isLoading={isSubmitingSk}
                 onIsDirtyChange={setIsDirty}
@@ -151,7 +160,7 @@ export const ImportBySKWallet: FC<{ afterCompleted: () => void }> = ({ afterComp
                 publicKey={accountCandidate.account.activeTonWallet.publicKey}
                 onSubmit={versions => {
                     createWalletsAsync({
-                        sk: accountCandidate.sk,
+                        secret: { key: accountCandidate.sk, algorithm: signingAlgorithm },
                         versions,
                         selectAccount: true
                     }).then(setCreatedAccount);

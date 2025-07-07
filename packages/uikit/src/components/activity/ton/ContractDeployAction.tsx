@@ -1,5 +1,5 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import { ListBlock } from '../../List';
@@ -59,12 +59,10 @@ export const ContractDeployAction: FC<{
         return <ErrorAction />;
     }
     const interfaces = contractDeploy.interfaces ?? [];
-    const address = toShortValue(
-        formatAddress(
-            contractDeploy.address,
-            network,
-            !interfaces.some(value => value.includes('wallet'))
-        )
+    const address = formatAddress(
+        contractDeploy.address,
+        network,
+        !interfaces.some(value => value.includes('wallet'))
     );
 
     if (interfaces.includes('nft_item')) {

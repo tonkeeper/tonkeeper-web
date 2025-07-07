@@ -19,14 +19,16 @@ import {
     FirstLine,
     ListItemGrid,
     SecondLine,
-    SecondaryText
+    SecondaryText,
+    AddressText,
+    AddressTextValue
 } from './CommonAction';
 import { sanitizeJetton } from '../../libs/common';
 
 export const SendActivityAction: FC<{
     amount: string;
     symbol: string;
-    recipient: string;
+    recipient: AddressTextValue;
     date: string;
     isScam?: boolean;
     comment?: string;
@@ -51,7 +53,7 @@ export const SendActivityAction: FC<{
                     <AmountText isScam={isScam}>{symbol}</AmountText>
                 </FirstLine>
                 <SecondLine>
-                    <SecondaryText>{recipient}</SecondaryText>
+                    <AddressText>{recipient}</AddressText>
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
@@ -66,7 +68,7 @@ export const SendActivityAction: FC<{
 export const ReceiveActivityAction: FC<{
     amount: string;
     symbol: string;
-    sender: string;
+    sender: AddressTextValue;
     date: string;
     isScam?: boolean;
     comment?: string;
@@ -92,7 +94,7 @@ export const ReceiveActivityAction: FC<{
                     </AmountText>
                 </FirstLine>
                 <SecondLine>
-                    <SecondaryText>{sender}</SecondaryText>
+                    <AddressText>{sender}</AddressText>
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>

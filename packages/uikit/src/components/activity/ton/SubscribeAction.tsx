@@ -1,11 +1,11 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import { ListBlock } from '../../List';
 import { FailedDetail } from '../ActivityDetailsLayout';
 import { ActivityIcon, SubscribeIcon, UnsubscribeIcon } from '../ActivityIcons';
-import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
+import { ColumnLayout, ErrorAction, ListItemGrid, toAddressTextValue } from '../CommonAction';
 import {
     ActionBeneficiaryDetails,
     ActionDate,
@@ -82,10 +82,10 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
             <ColumnLayout
                 title={t('transaction_type_unsubscription')}
                 entry="-"
-                address={
-                    unSubscribe.beneficiary.name ??
-                    toShortValue(formatAddress(unSubscribe.beneficiary.address, network))
-                }
+                address={toAddressTextValue(
+                    unSubscribe.beneficiary.name,
+                    formatAddress(unSubscribe.beneficiary.address, network)
+                )}
                 date={date}
             />
         </ListItemGrid>
@@ -111,7 +111,7 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, 
                 entry="-"
                 address={
                     subscribe.beneficiary.name ??
-                    toShortValue(formatAddress(subscribe.beneficiary.address, network))
+                    formatAddress(subscribe.beneficiary.address, network)
                 }
                 date={date}
             />

@@ -86,6 +86,7 @@ const AddAccountBySK = () => {
                 <Notification isOpen={isOpen} handleClose={onClose} mobileFullScreen>
                     {() => (
                         <ImportBySKWallet
+                            signingAlgorithm="ed25519"
                             afterCompleted={() => {
                                 onClose();
                                 navigate('/');
