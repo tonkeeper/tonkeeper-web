@@ -2,7 +2,7 @@ import { type FC } from 'react';
 import styled from 'styled-components';
 import { isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
-import { Body3 } from '../Text';
+import { Body3, Body3Class } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ExternalLink } from '../shared/ExternalLink';
 import { useTranslation } from '../../hooks/translation';
@@ -82,6 +82,7 @@ const ButtonStyled = styled(Body3)`
 `;
 
 const ExternalLinkStyled = styled(ExternalLink)`
+    ${Body3Class};
     line-height: 14px;
     color: ${props => props.theme.textPrimary};
     opacity: 1;
