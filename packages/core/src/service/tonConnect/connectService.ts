@@ -124,20 +124,12 @@ export const getTonConnectParams = async (
     };
 };
 
-const getManifestResponse = async (manifestUrl: string) => {
-    try {
-        return await fetch(manifestUrl);
-    } catch (e) {
-        /**
-         * Request file with CORS header;
-         */
-        return await fetch(`https://c.tonapi.io/json?url=${btoa(manifestUrl)}`);
-    }
+const fetchManifestFromProxy = async (manifestUrl: string) => {
+    return fetch(`https://c.tonapi.io/json?url=${btoa(manifestUrl)}&no-cache=true`);
 };
 
 export const getManifest = async (request: ConnectRequest) => {
-    // TODO: get fetch from context
-    const response = await getManifestResponse(request.manifestUrl);
+    const response = await fetchManifestFromProxy(request.manifestUrl);
 
     if (response.status !== 200) {
         throw new Error(`Failed to load Manifest: ${response.status}`);
