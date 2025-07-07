@@ -96,7 +96,7 @@ export const AddressText: FC<{ children: AddressTextValue }> = ({ children }) =>
 
     return (
         <AddressTextContent onClick={() => sdk.copyToClipboard(childrenValue, t('copied'))}>
-            {toShortValue(displayChildren)}
+            {displayChildren}
         </AddressTextContent>
     );
 };
