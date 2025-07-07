@@ -12,12 +12,24 @@ on:
 
 env:
     node-version: 20.11.1
-    tonconsole_env: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tonconsole_env || 'dev' }}
 
 permissions:
     pull-requests: write
 
 jobs:
+    init:
+        runs-on: ubuntu-latest
+        outputs:
+            tonconsole_env: ${{ steps.set.outputs.tonconsole_env }}
+        steps:
+        -   id: set
+            run: |
+                if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+                    echo "tonconsole_env=${{ github.event.inputs.tonconsole_env }}" >> $GITHUB_OUTPUT
+                else
+                    echo "tonconsole_env=dev" >> $GITHUB_OUTPUT
+                fi
+
     desktop-build:
         name: desktop-build
         strategy:
@@ -55,7 +67,7 @@ jobs:
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
             REACT_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-            REACT_APP_TONCONSOLE_API: ${{ inputs.tonconsole_env == 'dev' && 'https://dev-pro.tonconsole.com' || 'https://pro.tonconsole.com' }}
+            REACT_APP_TONCONSOLE_API: ${{ needs.init.outputs.tonconsole_env == 'dev' && 'https://dev-pro.tonconsole.com' || 'https://pro.tonconsole.com' }}
             REACT_APP_TG_BOT_ORIGIN: https://tonkeeper.com
             REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
             REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
@@ -139,7 +151,7 @@ jobs:
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ github.head_ref }}
-            tonconsole_env: ${{ env.tonconsole_env }}
+            tonconsole_env: ${{ needs.init.outputs.tonconsole_env }}
         secrets: inherit
 
     twa-build:
@@ -271,7 +283,7 @@ jobs:
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
         with:
-            tonconsole_env: ${{ env.tonconsole_env }}
+            tonconsole_env: ${{ needs.init.outputs.tonconsole_env }}
         secrets: inherit
 
     swap-widget-build:
