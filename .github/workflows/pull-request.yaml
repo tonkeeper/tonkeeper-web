@@ -25,10 +25,12 @@ jobs:
         -   id: set
             run: |
                 if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-                    echo "tonconsole_env=${{ github.event.inputs.tonconsole_env }}" >> $GITHUB_OUTPUT
+                    ENV_VALUE="${{ github.event.inputs.tonconsole_env }}"
                 else
-                    echo "tonconsole_env=dev" >> $GITHUB_OUTPUT
+                    ENV_VALUE="dev"
                 fi
+                    echo "tonconsole_env = $ENV_VALUE"
+                    echo "tonconsole_env=$ENV_VALUE" >> $GITHUB_OUTPUT
 
     desktop-build:
         name: desktop-build
