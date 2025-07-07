@@ -12,7 +12,7 @@ on:
 
 env:
     node-version: 20.11.1
-    TONCONSOLE_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tonconsole_env || 'dev' }}
+    tonconsole_env: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tonconsole_env || 'dev' }}
 
 permissions:
     pull-requests: write
@@ -139,7 +139,7 @@ jobs:
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ github.head_ref }}
-            tonconsole_env: ${{ env.TONCONSOLE_ENV }}
+            tonconsole_env: ${{ env.tonconsole_env }}
         secrets: inherit
 
     twa-build:
@@ -271,7 +271,7 @@ jobs:
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
         with:
-            tonconsole_env: ${{ env.TONCONSOLE_ENV }}
+            tonconsole_env: ${{ env.tonconsole_env }}
         secrets: inherit
 
     swap-widget-build:
