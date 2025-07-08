@@ -137,6 +137,7 @@
   "Edit_jettons": "Редактировать",
   "Enable_storing_config": "Cохранение конфигурации",
   "enter_password": "Введите пароль",
+  "expiration_date": "Дата истечения",
   "export_dot_csv": "Экспорт в .CSV",
   "export_trc_20_wallet": "Экспортировать TRC20 кошелек",
   "failed_to_manage": "Не удалось управлять подпиской",

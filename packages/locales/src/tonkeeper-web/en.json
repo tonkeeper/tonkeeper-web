@@ -139,6 +139,7 @@
   "Edit_jettons": "Edit",
   "Enable_storing_config": "Enable storing config",
   "enter_password": "Enter password",
+  "expiration_date": "Expiration date",
   "export_dot_csv": "Export .CSV",
   "export_trc_20_wallet": "Export TRC20 Wallet",
   "failed_to_manage": "Failed to manage subscription",
