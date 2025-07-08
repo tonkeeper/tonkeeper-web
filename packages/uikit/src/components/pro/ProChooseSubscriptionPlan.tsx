@@ -1,63 +1,39 @@
-import { ChangeEvent, Dispatch, FC, SetStateAction, useEffect } from 'react';
+import { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
 import styled from 'styled-components';
-import { IDisplayPlan, isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body3 } from '../Text';
 import { ProPlanLabel } from './ProPlanLabel';
-import { useAppSdk } from '../../hooks/appSdk';
-import { formatter } from '../../hooks/balance';
-import { getSkeletonProducts } from '../../libs/pro';
 import { useTranslation } from '../../hooks/translation';
 
 interface IProps {
-    productsForRender: ReturnType<typeof getSkeletonProducts> | IDisplayPlan[];
-    selectedPlan: string;
-    onPlanSelection: Dispatch<SetStateAction<string>>;
+    productsForRender: IDisplayPlan[];
+    selectedPlanId: string;
+    onPlanIdSelection: Dispatch<SetStateAction<string>>;
     isLoading: boolean;
 }
 
 export const ProChooseSubscriptionPlan: FC<IProps> = props => {
-    const { productsForRender, selectedPlan, onPlanSelection, isLoading } = props;
-    const sdk = useAppSdk();
+    const { productsForRender, selectedPlanId, onPlanIdSelection, isLoading } = props;
     const { t } = useTranslation();
 
-    useEffect(() => {
-        if (selectedPlan || productsForRender?.length < 1) return;
-
-        onPlanSelection(String(productsForRender[0].id));
-    }, []);
-
     const handlePlanSelection = (e: ChangeEvent<HTMLInputElement>) => {
-        onPlanSelection(e.target.value);
+        onPlanIdSelection(e.target.value);
     };
 
     return (
         <SubscriptionPlansBlock>
             <Subtitle>{t('choose_plan')}</Subtitle>
             <RadioGroup>
-                {productsForRender.map(productProps => {
-                    const { id, displayName } = productProps;
-                    const isCrypto =
-                        isCryptoStrategy(sdk.subscriptionStrategy) &&
-                        productProps.displayPrice !== null;
-
-                    const displayPrice = isCrypto
-                        ? formatter.fromNano(productProps.displayPrice)
-                        : productProps.displayPrice;
-
-                    return (
-                        <ProPlanLabel
-                            key={id}
-                            id={String(id)}
-                            isCrypto={isCrypto}
-                            isLoading={isLoading}
-                            displayName={displayName}
-                            displayPrice={displayPrice}
-                            selectedPlan={selectedPlan}
-                            onChange={handlePlanSelection}
-                        />
-                    );
-                })}
+                {productsForRender.map(productProps => (
+                    <ProPlanLabel
+                        key={productProps.id}
+                        isLoading={isLoading}
+                        selectedPlanId={selectedPlanId}
+                        onChange={handlePlanSelection}
+                        {...productProps}
+                    />
+                ))}
             </RadioGroup>
         </SubscriptionPlansBlock>
     );

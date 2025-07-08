@@ -176,15 +176,17 @@ export const useProSubscriptionPurchase = () => {
     const client = useQueryClient();
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
+        const { id, displayPrice, displayName } = selectedPlan;
+
         if (!isIosStrategy(sdk.subscriptionStrategy)) {
             throw new Error('This is not an iOS subscription strategy');
         }
 
-        if (!isProductId(selectedPlan.id)) {
+        if (!isProductId(id)) {
             throw new Error('This is not an iOS subscription strategy');
         }
 
-        const subscription = await sdk.subscriptionStrategy?.subscribe(selectedPlan.id);
+        const subscription = await sdk.subscriptionStrategy?.subscribe(id);
 
         if (subscription.status === IosPurchaseStatuses.CANCELED) {
             return IosPurchaseStatuses.CANCELED;
@@ -201,6 +203,8 @@ export const useProSubscriptionPurchase = () => {
         if (!savingResult.ok) {
             const pendingSubscription: IosSubscription = {
                 ...subscription,
+                displayName,
+                displayPrice,
                 source: SubscriptionSource.IOS,
                 status: IosSubscriptionStatuses.PENDING,
                 valid: false,

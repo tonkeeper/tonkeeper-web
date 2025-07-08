@@ -96,8 +96,18 @@ export const ProPurchaseChooseScreen = () => {
         await startPurchasing(selectedPlan);
     };
 
-    const displayPlans = adaptPlansToViewModel(products);
-    const productsForRender = displayPlans?.length ? displayPlans : getSkeletonProducts();
+    const displayPlans = adaptPlansToViewModel(products).filter(
+        plan => plan.formattedDisplayPrice !== '-'
+    );
+    const productsForRender = displayPlans?.length
+        ? displayPlans
+        : getSkeletonProducts(isCryptoStrategy(sdk.subscriptionStrategy) ? 1 : 2);
+
+    useEffect(() => {
+        if (productsForRender?.length < 1) return;
+
+        setSelectedPlanId(productsForRender[0].id);
+    }, [productsForRender]);
 
     return (
         <ProScreenContentWrapper onSubmit={handleSubmit(handleBuySubscription)}>
@@ -108,8 +118,8 @@ export const ProPurchaseChooseScreen = () => {
             <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
             <ProChooseSubscriptionPlan
                 isLoading={isTotalLoading}
-                selectedPlan={selectedPlanId}
-                onPlanSelection={setSelectedPlanId}
+                selectedPlanId={selectedPlanId}
+                onPlanIdSelection={setSelectedPlanId}
                 productsForRender={productsForRender}
             />
             <ProFeaturesList />

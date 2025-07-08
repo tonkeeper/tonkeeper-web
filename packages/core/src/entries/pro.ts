@@ -63,6 +63,8 @@ interface IosPendingSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.PENDING;
     originalTransactionId?: number | null;
     valid: false;
+    displayName?: string;
+    displayPrice?: string;
 }
 
 interface IosRevokedSubscription extends BaseIosSubscription, IosDBStoredInfo {
@@ -303,4 +305,5 @@ export interface IDisplayPlan {
     id: string;
     displayName: string;
     displayPrice: string;
+    formattedDisplayPrice: string;
 }

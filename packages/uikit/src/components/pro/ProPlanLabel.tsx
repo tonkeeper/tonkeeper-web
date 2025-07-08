@@ -2,22 +2,20 @@ import { type ChangeEvent, type FC, useLayoutEffect, useRef, useState } from 're
 import styled, { css } from 'styled-components';
 import BigNumber from 'bignumber.js';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { IDisplayPlan, isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Num2 } from '../Text';
 import { useRate } from '../../state/rates';
+import { useAppSdk } from '../../hooks/appSdk';
 import { formatter } from '../../hooks/balance';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { normalizeTranslationKey } from '../../libs/common';
 import { Skeleton, SkeletonText } from '../shared/Skeleton';
 
-interface IProps {
-    id: string;
-    isCrypto: boolean;
+interface IProps extends IDisplayPlan {
     isLoading: boolean;
-    displayName: string | null;
-    displayPrice: string | null;
-    selectedPlan: string;
+    selectedPlanId: string;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -26,18 +24,27 @@ const MAX_SIZE = 28;
 const PADDING = 24;
 
 export const ProPlanLabel: FC<IProps> = props => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
     const [fontSize, setFontSize] = useState(MAX_SIZE);
     const spanRef = useRef<HTMLSpanElement>(null);
     const labelRef = useRef<HTMLLabelElement>(null);
     const resizeObserver = useRef<ResizeObserver>();
 
-    const { displayName, selectedPlan, displayPrice, isCrypto, onChange, isLoading, id } = props;
+    const {
+        displayName,
+        selectedPlanId,
+        displayPrice,
+        formattedDisplayPrice,
+        onChange,
+        isLoading,
+        id
+    } = props;
 
-    const text = displayPrice ? (isCrypto ? `${displayPrice} TON` : displayPrice) : '';
+    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
 
     const calculateFontSize = () => {
-        if (!labelRef.current || !text) return;
+        if (!labelRef.current || !formattedDisplayPrice) return;
 
         const parentWidth = labelRef.current.clientWidth;
         const canvas = document.createElement('canvas');
@@ -57,7 +64,7 @@ export const ProPlanLabel: FC<IProps> = props => {
         while (low <= high) {
             const mid = Math.floor((low + high) / 2);
             ctx.font = `600 ${mid}px ${fontFamily}`;
-            const measuredWidth = ctx.measureText(text).width;
+            const measuredWidth = ctx.measureText(formattedDisplayPrice).width;
 
             if (measuredWidth + PADDING <= parentWidth) {
                 result = mid;
@@ -82,7 +89,7 @@ export const ProPlanLabel: FC<IProps> = props => {
         resizeObserver.current.observe(labelRef.current);
 
         return () => resizeObserver.current?.disconnect();
-    }, [text]);
+    }, [formattedDisplayPrice]);
 
     const titleNode = displayName ? (
         <Text isBottomMargin={isCrypto}>{t(normalizeTranslationKey(displayName))}</Text>
@@ -90,21 +97,21 @@ export const ProPlanLabel: FC<IProps> = props => {
         <SkeletonTextStyled width="100px" margin="0 auto" />
     );
 
-    const priceNode = displayPrice ? (
+    const priceNode = formattedDisplayPrice ? (
         <Num2Styled ref={spanRef} fontSize={fontSize}>
-            {text}
+            {formattedDisplayPrice}
         </Num2Styled>
     ) : (
         <SkeletonTextStyled height="28px" margin="8px 0 0" width="100%" />
     );
 
     return (
-        <LabelStyled ref={labelRef} selected={selectedPlan === id}>
+        <LabelStyled ref={labelRef} selected={selectedPlanId === id}>
             <input
                 id={`purchase-plan-${id}`}
                 value={id}
                 type="radio"
-                checked={selectedPlan === id}
+                checked={selectedPlanId === id}
                 onChange={onChange}
                 disabled={isLoading}
             />
@@ -129,7 +136,7 @@ const FiatEquivalent: FC<IFiatEquivalentProps> = ({ amount }) => {
 
     try {
         const bigPrice = new BigNumber(rate.prices);
-        const bigAmount = new BigNumber(amount);
+        const bigAmount = new BigNumber(formatter.fromNano(amount));
 
         if (bigPrice.isNaN() || bigAmount.isNaN()) return null;
 

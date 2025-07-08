@@ -1,3 +1,5 @@
+import { formatter } from '@tonkeeper/uikit/dist/hooks/balance';
+
 import {
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
@@ -108,4 +110,26 @@ export const findAuthorizedWallet = async (user: UserInfo, storage: IStorage) =>
         publicKey: actualWallet.publicKey,
         rawAddress: actualWallet.rawAddress
     };
+};
+
+export const isValidNanoString = (value: string): boolean => {
+    return /^\d+$/.test(value);
+};
+
+export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean) => {
+    try {
+        if (!displayPrice) return '-';
+
+        let formattedProPrice = displayPrice;
+        if (isCrypto) {
+            formattedProPrice = isValidNanoString(displayPrice)
+                ? `${formatter.fromNano(displayPrice)} TON`
+                : '-';
+        }
+
+        return formattedProPrice;
+    } catch (e) {
+        console.error('getFormattedDisplayPrice error: ', e);
+        return '-';
+    }
 };
