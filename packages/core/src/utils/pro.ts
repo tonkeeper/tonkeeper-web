@@ -3,17 +3,17 @@ import {
     IosSubscriptionStatuses,
     ProSubscription
 } from '../entries/pro';
+import { UserInfo } from './types';
 import { IStorage } from '../Storage';
-import { SubscriptionSource } from '../pro';
 import { Network } from '../entries/network';
 import { isStandardTonWallet } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
-import { ExtendedSubscriptionVerification, UserInfo } from './types';
+import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 
 export const normalizeSubscription = (
-    subscriptionDto: ExtendedSubscriptionVerification | null | undefined,
+    subscriptionDto: SubscriptionVerification | null | undefined,
     user: UserInfo
 ): ProSubscription => {
     const source = subscriptionDto?.source;
@@ -37,7 +37,7 @@ export const normalizeSubscription = (
                 isTrial: true,
                 usedTrial: true,
                 trialUserId: user.tg_id!,
-                trialEndDate: nextChargeDate!
+                trialEndDate: nextChargeDate
             };
         } else {
             return {
@@ -46,7 +46,10 @@ export const normalizeSubscription = (
                 valid: true,
                 isTrial: false,
                 usedTrial,
-                nextChargeDate
+                nextChargeDate,
+                amount: subscriptionDto.crypto?.amount,
+                currency: subscriptionDto.crypto?.currency,
+                purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
             };
         }
     }
@@ -59,7 +62,7 @@ export const normalizeSubscription = (
                 valid,
                 isTrial: true,
                 usedTrial: true,
-                trialEndDate: nextChargeDate!
+                trialEndDate: nextChargeDate
             };
         } else {
             return {
@@ -68,7 +71,16 @@ export const normalizeSubscription = (
                 valid: true,
                 isTrial: false,
                 usedTrial,
-                nextChargeDate
+                nextChargeDate,
+                txId: subscriptionDto.ios?.tx_id,
+                price: subscriptionDto.ios?.price,
+                currency: subscriptionDto.ios?.currency,
+                expiresDate: toDate(subscriptionDto.ios?.expires_date),
+                productId: subscriptionDto.ios?.product_id,
+                storeFront: subscriptionDto.ios?.store_front,
+                storeFrontId: subscriptionDto.ios?.store_front_id,
+                transactionType: subscriptionDto.ios?.transaction_type,
+                originalTransactionId: subscriptionDto.ios?.original_tx_id
             };
         }
     }

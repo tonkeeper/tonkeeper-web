@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     IDisplayPlan,
-    IosEnvironmentTypes,
     IosPurchaseStatuses,
     IosSubscription,
     IosSubscriptionStatuses,
@@ -197,10 +196,7 @@ export const useProSubscriptionPurchase = () => {
             throw new Error('Failed to subscribe');
         }
 
-        const savingResult = await saveIapPurchase(
-            String(originalTransactionId),
-            subscription?.environment === IosEnvironmentTypes.SANDBOX
-        );
+        const savingResult = await saveIapPurchase(String(originalTransactionId));
 
         if (!savingResult.ok) {
             const pendingSubscription: IosSubscription = {
@@ -287,31 +283,26 @@ export const useProPlans = (promoCode?: string) => {
                 throw new Error('pro_subscription_load_failed');
             }
 
-            switch (strategy.source) {
-                case SubscriptionSource.IOS: {
-                    const plans = await strategy.getAllProductsInfo();
-                    const sortedPlans = [...plans].sort((a, b) => {
-                        return parsePrice(a.displayPrice) - parsePrice(b.displayPrice);
-                    });
+            if (strategy.source === SubscriptionSource.IOS) {
+                const plans = await strategy.getAllProductsInfo();
+                const sortedPlans = [...plans].sort((a, b) => {
+                    return parsePrice(a.displayPrice) - parsePrice(b.displayPrice);
+                });
 
-                    return { source: SubscriptionSource.IOS, plans: sortedPlans };
-                }
-
-                case SubscriptionSource.CRYPTO: {
-                    const [plans, verifiedCode] = await strategy.getAllProductsInfo(
-                        lang,
-                        promoCode
-                    );
-                    return {
-                        source: SubscriptionSource.CRYPTO,
-                        plans: plans ?? [],
-                        promoCode: verifiedCode
-                    };
-                }
-
-                default:
-                    return assertUnreachable(strategy);
+                return { source: SubscriptionSource.IOS, plans: sortedPlans };
             }
+
+            if (strategy.source === SubscriptionSource.CRYPTO) {
+                const [plans, verifiedCode] = await strategy.getAllProductsInfo(lang, promoCode);
+
+                return {
+                    source: SubscriptionSource.CRYPTO,
+                    plans: plans ?? [],
+                    promoCode: verifiedCode
+                };
+            }
+
+            return assertUnreachable(strategy);
         },
         {
             staleTime: 5 * 60 * 1000,
@@ -330,6 +321,7 @@ export interface ConfirmState {
 export const useCreateInvoiceMutation = () => {
     const ws = useAccountsStorage();
     const api = useActiveApi();
+
     return useMutation<
         ConfirmState,
         Error,

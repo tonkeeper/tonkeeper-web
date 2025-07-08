@@ -35,7 +35,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
 
     const { subscription } = data;
 
-    if (isTrialSubscription(subscription)) {
+    if (isTrialSubscription(subscription) && subscription.trialEndDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_trial_is_active')}</Body3Block>
@@ -54,7 +54,11 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isValidSubscription(subscription)) {
+    if (
+        isValidSubscription(subscription) &&
+        isTrialSubscription(subscription) &&
+        subscription.trialEndDate
+    ) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>

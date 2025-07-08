@@ -15,7 +15,6 @@ export class IapService {
     public static activateIapPurchase(
         requestBody: {
             original_transaction_id: string;
-            sandbox: boolean;
         },
     ): CancelablePromise<{
         ok: boolean;

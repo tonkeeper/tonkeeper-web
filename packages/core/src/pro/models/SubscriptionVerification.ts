@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { CryptoCurrency } from './CryptoCurrency';
 import type { SubscriptionSource } from './SubscriptionSource';
 export type SubscriptionVerification = {
     valid: boolean;
@@ -10,6 +11,11 @@ export type SubscriptionVerification = {
     next_charge?: number;
     auth_token: string;
     source: SubscriptionSource;
+    crypto?: {
+        amount: string;
+        currency: CryptoCurrency;
+        purchase_date: number;
+    };
     ios?: {
         tx_id: string;
         original_tx_id: string;

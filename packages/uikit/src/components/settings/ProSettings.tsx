@@ -5,7 +5,12 @@ import {
     seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { ProState, ProStateAuthorized, isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    ProState,
+    ProStateAuthorized,
+    isPaidSubscription,
+    isCryptoProPlans
+} from '@tonkeeper/core/dist/entries/pro';
 import {
     DerivationItemNamed,
     TonWalletStandard,
@@ -24,6 +29,7 @@ import {
     ConfirmState,
     useCreateInvoiceMutation,
     useProLogout,
+    useProPlans,
     useProState,
     useSelectWalletForProMutation,
     useWaitInvoiceMutation
@@ -321,9 +327,9 @@ const BuyProService: FC<{
     const [selectedPlan, setPlan] = useState<number | null>(null);
     const [promo, setPromo] = useState('');
 
-    // TODO Dont forget to fix it
-    const [plans, promoCode] = [undefined, undefined];
-    // const [plans, promoCode] = useProPlans(promo);
+    const { data: proPlans } = useProPlans(promo);
+
+    const promoCode = isCryptoProPlans(proPlans) ? proPlans.promoCode : undefined;
 
     const { mutateAsync: createInvoice, isLoading: isInvoiceLoading } = useCreateInvoiceMutation();
     const { mutate: waitInvoice, isLoading: isInvoicePending } = useWaitInvoiceMutation();
@@ -332,12 +338,11 @@ const BuyProService: FC<{
 
     const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
-    // TODO Dont forget to fix it
-    // useEffect(() => {
-    //     if (plans && plans[0] && selectedPlan == null) {
-    //         setPlan(plans[0].id);
-    //     }
-    // }, [plans]);
+    useEffect(() => {
+        if (isCryptoProPlans(proPlans) && proPlans.plans[0]) {
+            setPlan(proPlans.plans[0].id);
+        }
+    }, [proPlans?.plans]);
 
     useEffect(() => {
         if (ref.current) {
@@ -362,7 +367,7 @@ const BuyProService: FC<{
         <div ref={containerRef}>
             <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
-                plans={plans ?? []}
+                plans={isCryptoProPlans(proPlans) ? proPlans?.plans : []}
                 setPlan={setPlan}
                 selected={selectedPlan}
                 disabled={isLoading}

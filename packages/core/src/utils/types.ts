@@ -1,4 +1,4 @@
-import { SubscriptionSource, SubscriptionVerification, UsersService } from '../pro';
+import { UsersService } from '../pro';
 
 export type Flatten<T> = T extends (infer R)[] ? R : T;
 
@@ -48,10 +48,5 @@ type AssertEqual<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T exten
 export function assertTypesEqual<A, B>(_value: AssertEqual<A, B>): void {
     //
 }
-
-export type ExtendedSubscriptionVerification = SubscriptionVerification & {
-    source?: SubscriptionSource;
-    original_transaction_id?: string;
-};
 
 export type UserInfo = Awaited<ReturnType<typeof UsersService.getUserInfo>>;

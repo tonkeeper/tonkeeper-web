@@ -65,6 +65,7 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
     }
 
     const { subscription } = data;
+    const trialEndDate = isTrialSubscription(subscription) ? subscription.trialEndDate : undefined;
 
     if (isPaidSubscription(subscription)) {
         return null;
@@ -84,11 +85,11 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
             </TextContainerStyled>
             <NotForTargetEnv env="mobile">
                 <ButtonsContainerStyled>
-                    {isTrialSubscription(subscription) && (
+                    {trialEndDate && (
                         <Label2Styled>
                             {t('pro_banner_days_left').replace(
                                 '%days%',
-                                formatDate(subscription.trialEndDate, {
+                                formatDate(trialEndDate, {
                                     day: 'numeric',
                                     month: 'short',
                                     year: 'numeric'

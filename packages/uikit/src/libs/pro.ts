@@ -1,8 +1,6 @@
-import { IDisplayPlan, NormalizedProPlans, ProductIds } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
 
 import { SubscriptionScreens } from '../enums/pro';
-import { formatter } from '../hooks/balance';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 export const getSkeletonProducts = (skeletonSize = 2) =>
@@ -45,17 +43,10 @@ export function adaptPlansToViewModel(
             }));
 
         case SubscriptionSource.CRYPTO:
-            return [
-                // TODO Remove this side effect, it's temporal
-                { displayName: '1_month', displayPrice: '-', id: `crypto-${ProductIds.MONTHLY}` },
-                ...normalizedPlans.plans.map(plan => ({
-                    id: plan.id.toString(),
-                    displayName: plan.name,
-                    // TODO Improve it
-                    displayPrice: isValidNanoString(plan.amount)
-                        ? `${formatter.fromNano(plan.amount)} ${CryptoCurrency.TON}`
-                        : '-'
-                }))
-            ];
+            return normalizedPlans.plans.map(plan => ({
+                id: String(plan.id),
+                displayName: plan.name,
+                displayPrice: isValidNanoString(plan.amount) ? plan.amount : '-'
+            }));
     }
 }
