@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+test.setTimeout(4 * 60 * 1000);
 
 test('2 wallets & bulk delete', async ({ page }) => {
     await page.goto('/');

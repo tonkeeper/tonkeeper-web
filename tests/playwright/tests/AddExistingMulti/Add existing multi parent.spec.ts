@@ -1,8 +1,9 @@
 import { test, expect } from '@playwright/test';
 test.setTimeout(4 * 60 * 1000);
-//Hide and add wallets in multiaccount + open added wallet in Settings
 
-test('Hide/ add wallets', async ({ page }) => {
+//Add parent wallet and delete from Preferences
+
+test('Add existing multi wallet', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Get started' }).click();
     await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
@@ -13,18 +14,12 @@ test('Hide/ add wallets', async ({ page }) => {
     await page.locator('#create-password-confirm').fill('123456');
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
+    await expect(page.getByRole('heading', { name: 'Wallet Tokens Setup' })).toBeVisible();
+    await page.getByText('Configure token support for').click();
+    await expect(page.locator('form')).toContainText('Configure token support for easier wallet management.');
+    await page.getByText('USD₮TRC20').click();
+    await page.getByText('Use USD₮ TRC20 without TRX.').click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('link', { name: 'Settings' }).click();
-    await page.getByText('Hide Current Wallet').click();
-    await page.getByRole('link', { name: 'Settings' }).click();
-    await page
-        .getByRole('button', { name: 'Account 1 Multi Wallet 3 #3' })
-        .getByRole('button')
-        .click();
-    await page.getByRole('button', { name: 'Add' }).nth(1).click();
-    await page.getByRole('button', { name: 'Open' }).first().click();
-    await expect(page.getByRole('button', { name: 'Account 1 Multi Wallet 2 #2' })).toBeVisible();
-    await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByText('Preferences').click();
     await page.getByText('Sign Out').click();
     await page
