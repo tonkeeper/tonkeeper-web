@@ -28,7 +28,7 @@ test('Incorrect seed phrase ', async ({ page }) => {
 });
 
 //incorrect password to enter 2 times, error Passwords do not match +
-//correct password to enter + delete wallet
+//correct password to enter 
 
 test('Incorrect password', async ({ page }) => {
     await page.goto('/');
