@@ -63,7 +63,7 @@ interface IosExpiredSubscription extends BaseIosSubscription, IosDBStoredInfo {
     status: IosSubscriptionStatuses.EXPIRED;
 }
 
-interface IosPendingSubscription extends BaseIosSubscription {
+export interface IosPendingSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.PENDING;
     originalTransactionId?: number | null;
     valid: false;
@@ -170,9 +170,11 @@ interface CryptoExpiredSubscription extends BaseCryptoSubscription, CryptoDBStor
     valid: false;
 }
 
-interface CryptoPendingSubscription extends BaseCryptoSubscription {
+export interface CryptoPendingSubscription extends BaseCryptoSubscription {
     status: CryptoSubscriptionStatuses.PENDING;
     valid: false;
+    displayName?: string;
+    displayPrice?: string;
 }
 
 export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {

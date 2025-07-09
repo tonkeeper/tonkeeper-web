@@ -1,8 +1,11 @@
 import { formatter } from '@tonkeeper/uikit/dist/hooks/balance';
+import { adaptPlansToViewModel, getSkeletonProducts } from '@tonkeeper/uikit/dist/libs/pro';
 
 import {
     CryptoSubscriptionStatuses,
+    IDisplayPlan,
     IosSubscriptionStatuses,
+    NormalizedProPlans,
     ProSubscription,
     TelegramSubscriptionStatuses
 } from '../entries/pro';
@@ -172,4 +175,17 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
         console.error('getFormattedDisplayPrice error: ', e);
         return '-';
     }
+};
+
+const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
+const IOS_SKELETON_PRODUCTS_QTY = 2;
+
+export const getFilteredDisplayPlans = (proPlans: NormalizedProPlans | undefined) => {
+    return adaptPlansToViewModel(proPlans).filter(plan => plan.formattedDisplayPrice !== '-');
+};
+
+export const getProductsForRender = (displayPlans: IDisplayPlan[], isCrypto: boolean) => {
+    return displayPlans.length
+        ? displayPlans
+        : getSkeletonProducts(isCrypto ? CRYPTO_SKELETON_PRODUCTS_QTY : IOS_SKELETON_PRODUCTS_QTY);
 };

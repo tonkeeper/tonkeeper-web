@@ -262,7 +262,7 @@ const SelectProPlans: FC<{
     );
 };
 
-const ConfirmNotification: FC<{
+export const ConfirmNotification: FC<{
     state: ConfirmState | null;
     onClose: (success?: boolean) => void;
     waitResult: (state: ConfirmState) => void;

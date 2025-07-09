@@ -1,10 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
+    CryptoPendingSubscription,
+    CryptoSubscriptionStatuses,
     IDisplayPlan,
+    IosPendingSubscription,
     IosPurchaseStatuses,
-    IosSubscription,
     IosSubscriptionStatuses,
+    isCryptoProPlans,
+    isCryptoStrategy,
     isIosStrategy,
     isProductId,
     NormalizedProPlans,
@@ -30,7 +34,7 @@ import {
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -45,10 +49,13 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useToast } from '../hooks/useNotification';
+import { useNotifyError, useToast } from '../hooks/useNotification';
 import { useAnalyticsTrack } from '../hooks/analytics';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { parsePrice } from '../libs/pro';
+import { useGoToSubscriptionScreen } from '../hooks/pro/useGoToSubscriptionScreen';
+import { SubscriptionScreens } from '../enums/pro';
+import { getFilteredDisplayPlans, getProductsForRender } from '@tonkeeper/core/dist/utils/pro';
 
 export type FreeProAccess = {
     code: string;
@@ -182,7 +189,7 @@ export const useProSubscriptionPurchase = () => {
         const savingResult = await saveIapPurchase(String(originalTransactionId));
 
         if (!savingResult.ok) {
-            const pendingSubscription: IosSubscription = {
+            const pendingSubscription: IosPendingSubscription = {
                 ...subscription,
                 displayName,
                 displayPrice,
@@ -289,10 +296,7 @@ export const useProPlans = (promoCode?: string) => {
 
             return assertUnreachable(strategy);
         },
-        {
-            staleTime: 5 * 60 * 1000,
-            retry: 3
-        }
+        {}
     );
 };
 
@@ -363,4 +367,201 @@ export const useActivateTrialMutation = () => {
         await client.invalidateQueries([QueryKey.pro]);
         return result;
     });
+};
+
+export const useProductSelection = () => {
+    const sdk = useAppSdk();
+    const { t } = useTranslation();
+
+    const [promoCode, setPromoCode] = useState('');
+    const [selectedPlanId, setSelectedPlanId] = useState('');
+
+    const { data: proPlans, isLoading, isError } = useProPlans(promoCode);
+    useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
+
+    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+    const isCryptoPlans = isCryptoProPlans(proPlans);
+
+    const verifiedPromoCode = isCryptoPlans ? proPlans.promoCode : undefined;
+    const displayPlans = getFilteredDisplayPlans(proPlans);
+    const productsForRender = getProductsForRender(displayPlans, isCrypto);
+
+    useEffect(() => {
+        if (productsForRender.length < 1 || !productsForRender[0].displayPrice) {
+            setSelectedPlanId('');
+
+            return;
+        }
+
+        if (!selectedPlanId) {
+            setSelectedPlanId(productsForRender[0].id);
+        }
+    }, [productsForRender]);
+
+    return {
+        plans: displayPlans,
+        productsForRender,
+        selectedPlanId,
+        promoCode,
+        setPromoCode,
+        verifiedPromoCode,
+        setSelectedPlanId,
+        isLoading
+    };
+};
+
+export const useIosPurchaseFlow = () => {
+    const toast = useToast();
+    const { t } = useTranslation();
+    const goTo = useGoToSubscriptionScreen();
+
+    const {
+        data: status,
+        mutateAsync: startPurchasing,
+        isSuccess,
+        isLoading,
+        isError
+    } = useProSubscriptionPurchase();
+    useNotifyError(isError && new Error(t('purchase_failed')));
+
+    useEffect(() => {
+        if (!isSuccess) return;
+
+        if (status === IosPurchaseStatuses.CANCELED) {
+            toast(t('purchase_canceled'));
+        } else if (status === IosPurchaseStatuses.PENDING) {
+            toast(t('purchase_processing'));
+        } else {
+            toast(t('purchase_success'));
+        }
+
+        goTo(SubscriptionScreens.STATUS);
+    }, [isSuccess]);
+
+    return { startPurchasing, isLoading };
+};
+
+export const useCryptoPurchaseFlow = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    const { data: proState } = useProState();
+    const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+    const [savedSelectedPlan, setSavedSelectedPlan] = useState<IDisplayPlan | null>(null);
+
+    const goTo = useGoToSubscriptionScreen();
+    const { mutateAsync: createInvoice, isLoading: isInvoiceLoading } = useCreateInvoiceMutation();
+    const { mutate: waitInvoice, isLoading: isWaiting } = useWaitInvoiceMutation();
+
+    const startPurchasing = async (selectedPlan: IDisplayPlan, promoCode?: string) => {
+        if (!proState?.authorizedWallet) return;
+
+        const confirmState = await createInvoice({
+            state: proState,
+            tierId: Number(selectedPlan.id),
+            promoCode
+        });
+
+        setSavedSelectedPlan(selectedPlan);
+        setConfirm(confirmState);
+    };
+
+    const onConfirmClose = async (success?: boolean) => {
+        if (success) {
+            const pendingSubscription: CryptoPendingSubscription = {
+                ...proState?.subscription,
+                displayName: savedSelectedPlan?.displayName,
+                displayPrice: savedSelectedPlan?.formattedDisplayPrice,
+                source: SubscriptionSource.CRYPTO,
+                status: CryptoSubscriptionStatuses.PENDING,
+                valid: false,
+                isTrial: false,
+                usedTrial: proState?.subscription?.usedTrial ?? false
+            };
+
+            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+                authorizedWallet: proState?.authorizedWallet || null,
+                subscription: pendingSubscription
+            });
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
+
+            goTo(SubscriptionScreens.STATUS);
+        }
+
+        setConfirm(null);
+    };
+
+    return {
+        startPurchasing,
+        waitInvoice,
+        confirm,
+        onConfirmClose,
+        isLoading: isInvoiceLoading || isWaiting
+    };
+};
+
+// TODO Make it in react-query way through useMutation when we get rid of web mobile
+export const useProPurchaseController = () => {
+    const sdk = useAppSdk();
+    const { t } = useTranslation();
+    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+
+    const {
+        plans,
+        productsForRender,
+        selectedPlanId,
+        setSelectedPlanId,
+        isLoading: isPlansLoading,
+        promoCode,
+        setPromoCode,
+        verifiedPromoCode
+    } = useProductSelection();
+
+    const { startPurchasing: startIosPurchase, isLoading: isIosLoading } = useIosPurchaseFlow();
+
+    const {
+        startPurchasing: startCryptoPurchase,
+        waitInvoice,
+        confirm,
+        onConfirmClose,
+        isLoading: isCryptoLoading
+    } = useCryptoPurchaseFlow();
+
+    const { mutateAsync: handleLogOut, isLoading: isLoggingOut, isError } = useProLogout();
+    useNotifyError(isError && new Error(t('logout_failed')));
+
+    const { mutateAsync: handleManageSubscription, isLoading: isManageLoading } =
+        useManageSubscription();
+
+    const isLoading =
+        isPlansLoading || isIosLoading || isCryptoLoading || isLoggingOut || isManageLoading;
+
+    const onSubmit = async () => {
+        const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
+
+        if (!selectedPlan) return;
+
+        if (isCrypto) {
+            await startCryptoPurchase(selectedPlan, verifiedPromoCode);
+        } else {
+            await startIosPurchase(selectedPlan);
+        }
+    };
+
+    return {
+        isCrypto,
+        isLoading,
+        selectedPlanId,
+        setSelectedPlanId,
+        productsForRender,
+        promoCode,
+        setPromoCode,
+        verifiedPromoCode,
+        onLogout: handleLogOut,
+        onManage: handleManageSubscription,
+        onSubmit,
+        waitInvoice,
+        confirmState: confirm,
+        onConfirmClose
+    };
 };
