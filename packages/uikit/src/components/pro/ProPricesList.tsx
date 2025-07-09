@@ -2,6 +2,7 @@ import { FC } from 'react';
 import styled from 'styled-components';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
+import { Badge } from '../shared';
 import { Body2, Body3, Label2 } from '../Text';
 import { SkeletonText } from '../shared/Skeleton';
 import { getSkeletonProducts } from '../../libs/pro';
@@ -32,7 +33,19 @@ const ProPricesListContent: FC<IProps> = props => {
                     const { id, displayName, formattedDisplayPrice } = planProps;
 
                     const titleNode = displayName ? (
-                        <Body2Styled>{t(normalizeTranslationKey(displayName))}</Body2Styled>
+                        <Body2Styled>
+                            {t(normalizeTranslationKey(displayName))}
+                            {formattedDisplayPrice === '-' && (
+                                <Badge
+                                    size="s"
+                                    marginLeft="6px"
+                                    color="textSecondary"
+                                    display="inline-block"
+                                >
+                                    {t('soon')}
+                                </Badge>
+                            )}
+                        </Body2Styled>
                     ) : (
                         <SkeletonTextStyled width="100px" />
                     );
