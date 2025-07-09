@@ -6,6 +6,9 @@ import type { CryptoCurrency } from './CryptoCurrency';
 import type { SubscriptionSource } from './SubscriptionSource';
 export type SubscriptionVerification = {
     valid: boolean;
+    /**
+     * @deprecated
+     */
     is_trial: boolean;
     used_trial: boolean;
     next_charge?: number;
