@@ -229,32 +229,34 @@ const SelectProPlans: FC<{
     return (
         <>
             <ListBlock>
-                {plans.map(plan => (
-                    <ListItem key={plan.id} onClick={() => !disabled && setPlan(plan.id)}>
-                        <ListItemPayload>
-                            <ColumnText
-                                noWrap
-                                text={plan.name}
-                                secondary={
-                                    <>
-                                        {plan.description ? (
-                                            <>
-                                                {plan.description}
-                                                <br />
-                                            </>
-                                        ) : null}
-                                        {format(plan.amount)} {CryptoCurrency.TON}
-                                    </>
-                                }
-                            />
-                            <Radio
-                                disabled={disabled}
-                                checked={selected === plan.id}
-                                onChange={() => setPlan(plan.id)}
-                            />
-                        </ListItemPayload>
-                    </ListItem>
-                ))}
+                {plans
+                    .filter(plan => plan.amount !== '-1')
+                    .map(plan => (
+                        <ListItem key={plan.id} onClick={() => !disabled && setPlan(plan.id)}>
+                            <ListItemPayload>
+                                <ColumnText
+                                    noWrap
+                                    text={plan.name}
+                                    secondary={
+                                        <>
+                                            {plan.description ? (
+                                                <>
+                                                    {plan.description}
+                                                    <br />
+                                                </>
+                                            ) : null}
+                                            {format(plan.amount)} {CryptoCurrency.TON}
+                                        </>
+                                    }
+                                />
+                                <Radio
+                                    disabled={disabled}
+                                    checked={selected === plan.id}
+                                    onChange={() => setPlan(plan.id)}
+                                />
+                            </ListItemPayload>
+                        </ListItem>
+                    ))}
             </ListBlock>
         </>
     );
