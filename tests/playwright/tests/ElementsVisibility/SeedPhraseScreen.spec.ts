@@ -47,5 +47,4 @@ test('Seed phrase screen', async ({ page }) => {
   await expect(page.locator('h2')).toContainText('Add Wallet');
   await expect(page.getByText('Create a new wallet or add an')).toBeVisible();
   await expect(page.locator('#react-portal-modal-container')).toContainText('Create a new wallet or add an existing one.');
-  await page.locator('.sc-laRQQM').click();
 });

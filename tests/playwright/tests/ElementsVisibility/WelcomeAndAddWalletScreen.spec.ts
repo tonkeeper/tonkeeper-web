@@ -31,9 +31,6 @@ test('"Add wallet" screen', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Existing Wallet Import wallet' })).toBeVisible();
   await expect(page.locator('#react-portal-modal-container')).toContainText('Existing Wallet');
   await expect(page.locator('#react-portal-modal-container')).toContainText('Import wallet with a 24 or 12 secret recovery words');
-  await expect(page.getByRole('button', { name: 'Testnet Account Import wallet' })).toBeVisible();
-  await expect(page.locator('#react-portal-modal-container')).toContainText('Testnet Account');
-  await expect(page.locator('#react-portal-modal-container')).toContainText('Import wallet with a 24 secret recovery words to Testnet');
   await expect(page.getByRole('button', { name: 'New Multi-Wallet Account Beta' })).toBeVisible();
   await expect(page.locator('#react-portal-modal-container')).toContainText('New Multi-Wallet AccountBeta');
   await expect(page.locator('#react-portal-modal-container')).toContainText('Manage multiple wallets with a single secret recovery phrase');
@@ -51,7 +48,10 @@ test('"Add wallet" screen', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Pair with Keystone A higher' })).toBeVisible();
   await expect(page.locator('#react-portal-modal-container')).toContainText('Pair with Keystone');
   await expect(page.locator('#react-portal-modal-container')).toContainText('A higher level of security with AIR-GAP hardware wallet');
-  await expect(page.locator('.sc-laRQQM')).toBeVisible();
-  await page.locator('.sc-laRQQM').click();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('Other Options');
+  await expect(page.getByRole('button', { name: 'Testnet Account Import wallet' })).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('Testnet Account');
+  await expect(page.locator('#react-portal-modal-container')).toContainText('Import wallet with a 24 secret recovery words to Testnet');
+  await page.locator('.sc-kfzCjt').click();
   await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });
