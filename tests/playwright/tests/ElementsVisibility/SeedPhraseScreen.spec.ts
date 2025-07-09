@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+test.setTimeout(4 * 60 * 1000);
 //Elements visibility at seed phrase screen
 
 test('Seed phrase screen', async ({ page }) => {

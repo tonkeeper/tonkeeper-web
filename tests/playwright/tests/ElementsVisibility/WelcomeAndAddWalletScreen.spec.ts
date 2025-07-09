@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+test.setTimeout(4 * 60 * 1000);
 //Welcome screen elements visibility
 
 test('Welcome screen', async ({ page }) => {

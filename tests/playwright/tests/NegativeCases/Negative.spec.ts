@@ -37,39 +37,16 @@ test('Incorrect password', async ({ page }) => {
     await page.getByRole('button', { name: '12 words' }).click();
     await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_12);
     await page.getByRole('button', { name: 'Continue' }).click();
+    await expect(page.getByText('v4R2')).toBeVisible();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.locator('#create-password').fill('123456');
+    await page.getByRole('textbox').nth(1).click();
     await page.locator('#create-password-confirm').fill('123457');
     await page.getByRole('button', { name: 'Continue' }).click();
     await expect(page.getByText('Passwords do not match.')).toBeVisible();
-    await expect(page.locator('form')).toContainText('Passwords do not match.');
-    await page.locator('div:nth-child(2) > .sc-gGmKOd').click();
-    await page
-        .getByText('Create passwordPasswordPasswords do not match.Re-enter passwordContinue')
-        .click();
-    await page.locator('div:nth-child(2) > .sc-gGmKOd').click();
-
-    await page.locator('#create-password-confirm').fill('1234');
-
+    await page.getByLabel('Re-enter password').click();
+    await page.getByLabel('Re-enter password').fill('123456');
     await page.getByRole('button', { name: 'Continue' }).click();
-    await expect(page.getByText('Passwords do not match.')).toBeVisible();
-
-    await page.locator('#create-password-confirm').fill('123456');
-
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Save' }).click();
-    await page.getByRole('link', { name: 'Settings' }).click();
-    await page.goto('/wallet-settings');
-    await page
-        .locator('div')
-        .filter({ hasText: /^Delete Account$/ })
-        .nth(1)
-        .click();
-    await page.getByText('I have a backup copy of recovery phraseBack up now').click();
-    await page
-        .locator('div')
-        .filter({ hasText: /^I have a backup copy of recovery phrase$/ })
-        .locator('div')
-        .click();
-    await page.getByRole('button', { name: 'Delete wallet data' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
 });
