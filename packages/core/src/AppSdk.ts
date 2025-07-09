@@ -134,6 +134,7 @@ export interface IAppSdk {
     biometry?: BiometryService;
 
     topMessage: (text: string) => void;
+    pasteFromClipboard: () => Promise<string>;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (
         url: string,

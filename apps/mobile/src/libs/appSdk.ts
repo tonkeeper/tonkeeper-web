@@ -93,6 +93,18 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
         super(capacitorStorage);
     }
 
+    pasteFromClipboard = async () => {
+        try {
+            const { value } = await Clipboard.read();
+
+            return value ?? '';
+        } catch (e) {
+            console.error('Failed to read clipboard', e);
+
+            return '';
+        }
+    };
+
     copyToClipboard = async (value: string, notification?: string) => {
         await Clipboard.write({ string: value });
         await this.hapticNotification('success');
