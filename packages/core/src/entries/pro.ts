@@ -2,19 +2,19 @@ import { CryptoCurrency, SubscriptionSource } from '../pro';
 import { ProServiceTier } from '../tonConsoleApi';
 import { Language } from './language';
 
-export type ProSubscription = IosSubscription | CryptoSubscription | null;
+export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
 
 export type IosSubscription =
     | IosActiveSubscription
-    | IosRevokedSubscription
-    | IosPromoSubscription
+    | IosExpiredSubscription
     | IosPendingSubscription;
 
 export type CryptoSubscription =
     | CryptoActiveSubscription
-    | CryptoTrialSubscription
-    | CryptoFreeSubscription
+    | CryptoExpiredSubscription
     | CryptoPendingSubscription;
+
+export type TelegramSubscription = TelegramActiveSubscription | TelegramExpiredSubscription;
 
 export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
 
@@ -51,12 +51,16 @@ interface IosDBStoredInfo {
 interface BaseIosSubscription extends BaseSubscription {
     source: SubscriptionSource.IOS;
     status: IosSubscriptionStatuses;
+    isTrial: false;
 }
 
 interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
     status: IosSubscriptionStatuses.ACTIVE;
     valid: true;
-    isTrial: false;
+}
+
+interface IosExpiredSubscription extends BaseIosSubscription, IosDBStoredInfo {
+    status: IosSubscriptionStatuses.EXPIRED;
 }
 
 interface IosPendingSubscription extends BaseIosSubscription {
@@ -65,17 +69,6 @@ interface IosPendingSubscription extends BaseIosSubscription {
     valid: false;
     displayName?: string;
     displayPrice?: string;
-}
-
-interface IosRevokedSubscription extends BaseIosSubscription, IosDBStoredInfo {
-    status: IosSubscriptionStatuses.REVOKED;
-}
-
-interface IosPromoSubscription extends BaseIosSubscription {
-    status: IosSubscriptionStatuses.PROMO;
-    isTrial: true;
-    usedTrial: true;
-    trialEndDate?: Date;
 }
 
 export interface IProductInfo {
@@ -164,11 +157,7 @@ interface CryptoDBStoredInfo {
 interface BaseCryptoSubscription extends BaseSubscription {
     source: SubscriptionSource.CRYPTO;
     status: CryptoSubscriptionStatuses;
-}
-
-interface CryptoPendingSubscription extends BaseCryptoSubscription {
-    status: CryptoSubscriptionStatuses.PENDING;
-    valid: false;
+    isTrial: false;
 }
 
 interface CryptoActiveSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
@@ -176,16 +165,14 @@ interface CryptoActiveSubscription extends BaseCryptoSubscription, CryptoDBStore
     valid: true;
 }
 
-interface CryptoTrialSubscription extends BaseCryptoSubscription {
-    status: CryptoSubscriptionStatuses.TRIAL;
-    isTrial: true;
-    usedTrial: true;
-    trialUserId: number;
-    trialEndDate?: Date;
+interface CryptoExpiredSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
+    status: CryptoSubscriptionStatuses.EXPIRED;
+    valid: false;
 }
 
-interface CryptoFreeSubscription extends BaseCryptoSubscription {
-    status: CryptoSubscriptionStatuses.FREE;
+interface CryptoPendingSubscription extends BaseCryptoSubscription {
+    status: CryptoSubscriptionStatuses.PENDING;
+    valid: false;
 }
 
 export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
@@ -197,9 +184,7 @@ export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
 }
 
 export enum CryptoSubscriptionStatuses {
-    FREE = 'free',
     ACTIVE = 'active',
-    TRIAL = 'trial-tg',
     EXPIRED = 'expired',
     PENDING = 'pending'
 }
@@ -208,6 +193,46 @@ export function isCryptoStrategy(
     strategy?: SubscriptionStrategy
 ): strategy is ICryptoSubscriptionStrategy {
     return strategy?.source === SubscriptionSource.CRYPTO;
+}
+
+// Telegram Subscription Types
+interface BaseTelegramSubscription extends BaseSubscription {
+    source: SubscriptionSource.TELEGRAM;
+    status: TelegramSubscriptionStatuses;
+    isTrial: true;
+    usedTrial: true;
+    trialUserId?: number;
+    trialEndDate?: Date;
+}
+
+interface TelegramActiveSubscription extends BaseTelegramSubscription {
+    status: TelegramSubscriptionStatuses.ACTIVE;
+    valid: true;
+}
+
+interface TelegramExpiredSubscription extends BaseTelegramSubscription {
+    status: TelegramSubscriptionStatuses.EXPIRED;
+    valid: false;
+}
+
+export enum TelegramSubscriptionStatuses {
+    ACTIVE = 'active',
+    EXPIRED = 'expired'
+}
+
+export function isTelegramSubscription(
+    subscription: ProSubscription
+): subscription is TelegramSubscription {
+    return subscription?.source === SubscriptionSource.TELEGRAM;
+}
+
+export function isTelegramActiveSubscription(
+    subscription: ProSubscription
+): subscription is TelegramSubscription {
+    return (
+        subscription?.source === SubscriptionSource.TELEGRAM &&
+        subscription?.status === TelegramSubscriptionStatuses.ACTIVE
+    );
 }
 
 // Pro State
@@ -226,17 +251,6 @@ export interface ProStateAuthorized {
 export interface ProStateNotAuthorized {
     authorizedWallet: null;
     subscription: ProSubscription;
-}
-
-export function isTrialSubscription(
-    subscription: ProSubscription
-): subscription is IosPromoSubscription | CryptoTrialSubscription {
-    return (
-        (subscription?.source === SubscriptionSource.IOS &&
-            subscription.status === IosSubscriptionStatuses.PROMO) ||
-        (subscription?.source === SubscriptionSource.CRYPTO &&
-            subscription.status === CryptoSubscriptionStatuses.TRIAL)
-    );
 }
 
 export function isPendingSubscription(
@@ -278,7 +292,8 @@ export function hasSubscriptionSource(
 ): subscription is Exclude<ProSubscription, null> {
     return (
         subscription?.source === SubscriptionSource.IOS ||
-        subscription?.source === SubscriptionSource.CRYPTO
+        subscription?.source === SubscriptionSource.CRYPTO ||
+        subscription?.source === SubscriptionSource.TELEGRAM
     );
 }
 

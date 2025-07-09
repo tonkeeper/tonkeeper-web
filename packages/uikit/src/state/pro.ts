@@ -128,32 +128,13 @@ export const useProState = () => {
     const client = useQueryClient();
     const authService = useProAuthTokenService();
     const isFreeProAccessAvailable = useFreeProAccessAvailable();
-    const env = useAppTargetEnv();
 
     return useQuery<ProState, Error>([QueryKey.pro, isFreeProAccessAvailable], async () => {
-        let state: ProState;
-
-        const isFreeMobileTrialActive = Boolean(
-            await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
-        );
-        if (env === 'mobile' && isFreeProAccessAvailable && isFreeMobileTrialActive) {
-            state = {
-                authorizedWallet: null,
-                subscription: {
-                    source: SubscriptionSource.IOS,
-                    status: IosSubscriptionStatuses.PROMO,
-                    isTrial: true,
-                    valid: true,
-                    usedTrial: true,
-                    trialEndDate: isFreeProAccessAvailable.validUntil
-                }
-            };
-        } else {
-            state = await getProState(authService, sdk.storage);
-        }
+        const state = await getProState(authService, sdk.storage);
 
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
+
         return state;
     });
 };
@@ -208,7 +189,7 @@ export const useProSubscriptionPurchase = () => {
                 source: SubscriptionSource.IOS,
                 status: IosSubscriptionStatuses.PENDING,
                 valid: false,
-                isTrial: data?.subscription?.isTrial ?? false,
+                isTrial: false,
                 usedTrial: data?.subscription?.usedTrial ?? false
             };
 
