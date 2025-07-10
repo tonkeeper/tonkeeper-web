@@ -285,8 +285,31 @@ export function isPaidSubscription(
     );
 }
 
-export function isProSubscription(value: unknown): value is ProSubscription {
+export function isProSubscription(value: unknown): value is Exclude<ProSubscription, null> {
     return typeof value === 'object' && value !== null && 'source' in value;
+}
+
+export function isCryptoSubscription(value: unknown): value is CryptoSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.CRYPTO;
+}
+
+export function isIosSubscription(value: unknown): value is IosSubscription {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        'source' in value &&
+        (value as any).source === SubscriptionSource.IOS &&
+        'status' in value
+    );
+}
+
+export function hasIosPrice(
+    subscription: IosSubscription
+): subscription is IosActiveSubscription | IosExpiredSubscription {
+    return (
+        subscription.status === IosSubscriptionStatuses.ACTIVE ||
+        subscription.status === IosSubscriptionStatuses.EXPIRED
+    );
 }
 
 export function hasSubscriptionSource(
