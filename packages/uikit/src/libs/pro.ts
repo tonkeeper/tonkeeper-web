@@ -1,8 +1,8 @@
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
 
 import { SubscriptionScreens } from '../enums/pro';
+import { formatter } from '../hooks/balance';
 
 export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
     Array.from({ length: skeletonSize }, (_, index) => ({
@@ -26,6 +26,28 @@ export function parsePrice(priceStr: string): number {
 
     return parseFloat(numeric);
 }
+
+export const isValidNanoString = (value: string): boolean => {
+    return /^\d+$/.test(value);
+};
+
+export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean) => {
+    try {
+        if (!displayPrice) return '-';
+
+        let formattedProPrice = displayPrice;
+        if (isCrypto) {
+            formattedProPrice = isValidNanoString(displayPrice)
+                ? `${formatter.fromNano(displayPrice)} TON`
+                : '-';
+        }
+
+        return formattedProPrice;
+    } catch (e) {
+        console.error('getFormattedDisplayPrice error: ', e);
+        return '-';
+    }
+};
 
 export function adaptPlansToViewModel(
     normalizedPlans: NormalizedProPlans | undefined
