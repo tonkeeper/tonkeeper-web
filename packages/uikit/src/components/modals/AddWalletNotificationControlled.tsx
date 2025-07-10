@@ -23,6 +23,7 @@ import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -112,6 +113,10 @@ const closeExtensionTab = (sdk: IAppSdk) => {
     }
 };
 
+const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
+    return method === 'multisig' || method === 'sk_fireblocks';
+};
+
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
     const { data: proState } = useProState();
@@ -140,20 +145,17 @@ export const AddWalletNotificationControlled = () => {
         if (!isOpen) {
             return;
         }
-
-        setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription?.valid, openBuyPro, onClose]);
-
-    useEffect(() => {
-        if (!isOpen) {
-            return;
-        }
-        if (params?.walletType === 'multisig' && !isValidSubscription(proState?.subscription)) {
+        if (
+            doesMethodRequirePro(params?.walletType) &&
+            !isValidSubscription(proState?.subscription)
+        ) {
             onClose();
             openBuyPro();
             return;
         }
-    }, [isOpen, params?.walletType, proState?.subscription?.valid, openBuyPro, onClose]);
+
+        setSelectedMethod(params?.walletType);
+    }, [isOpen, params?.walletType, proState?.subscription?.valid]);
 
     const sdk = useAppSdk();
 
@@ -164,7 +166,8 @@ export const AddWalletNotificationControlled = () => {
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (method === 'multisig' && !isValidSubscription(proState?.subscription)) {
+            if (doesMethodRequirePro(method) && !isValidSubscription(proState?.subscription)) {
+                onClose();
                 openBuyPro();
                 return;
             }
@@ -212,6 +215,14 @@ export const AddWalletNotificationControlled = () => {
             }
             case 'ledger': {
                 return <CreateLedgerWallet afterCompleted={onCloseCallback} />;
+            }
+            case 'sk_fireblocks': {
+                return (
+                    <ImportBySKWallet
+                        signingAlgorithm="fireblocks"
+                        afterCompleted={onCloseCallback}
+                    />
+                );
             }
             default: {
                 assertUnreachable(selectedMethod);

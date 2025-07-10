@@ -11,7 +11,7 @@ interface DocumentMetadata {
 
 interface IDappBrowserPlugin {
     open(params: { id: string; url: string; focusDappView?: boolean }): Promise<DocumentMetadata>;
-    hide(params: { id: string }): Promise<void>;
+    hide(params: { id?: string }): Promise<void>;
     close(params: { ids: string[] }): Promise<void>;
     reload(params: { ids: string[] }): Promise<void>;
     goBack(params: { id: string }): Promise<void>;
@@ -86,6 +86,10 @@ class DappBrowser implements IDappBrowser {
 
     private liveTabs: BrowserTabLive[] = [];
 
+    private mainWindowFocusController = new MainWindowFocusController((focus: boolean) =>
+        DappBrowserPlugin.setIsMainViewInFocus({ focus })
+    );
+
     constructor() {
         DappBrowserPlugin.addListener('browserMessageReceived', async data => {
             const parsed = JSON.parse(data.payload) as {
@@ -153,7 +157,7 @@ class DappBrowser implements IDappBrowser {
         this.liveTabs = this.liveTabs.filter(t => !ids.includes(t.id));
     }
 
-    hide(id: string): Promise<void> {
+    hide(id?: string): Promise<void> {
         return DappBrowserPlugin.hide({ id });
     }
 
@@ -202,8 +206,12 @@ class DappBrowser implements IDappBrowser {
         this.requestsHandlers.set(method, handler);
     }
 
-    setIsMainViewInFocus(focus: boolean): Promise<void> {
-        return DappBrowserPlugin.setIsMainViewInFocus({ focus });
+    setIsMainViewInFocus(element: FocusableElement, focus: boolean): Promise<void> {
+        if (focus) {
+            return this.mainWindowFocusController.focusMainWindowForElement(element);
+        } else {
+            return this.mainWindowFocusController.unfocusMainWindowForElement(element);
+        }
     }
 
     reload(selector: { id: string } | { ids: string[] } | { origin: string }): Promise<void> {
@@ -231,6 +239,32 @@ class DappBrowser implements IDappBrowser {
 
     openedOriginIds(origin: string): string[] {
         return this.liveTabs.filter(t => eqOrigins(origin, originFromUrl(t.url))).map(t => t.id);
+    }
+}
+
+const focusableElements = [
+    'wallet-nav',
+    'aside-nav',
+    'tab-header-dd',
+    'tc-connect',
+    'tc-action'
+] as const;
+type FocusableElement = (typeof focusableElements)[number];
+class MainWindowFocusController {
+    focusedElements = new Set<FocusableElement>();
+
+    constructor(private readonly setMainWindowFocus: (focus: boolean) => Promise<void>) {}
+
+    async focusMainWindowForElement(element: FocusableElement): Promise<void> {
+        this.focusedElements.add(element);
+
+        return this.setMainWindowFocus(this.focusedElements.size > 0);
+    }
+
+    async unfocusMainWindowForElement(element: FocusableElement): Promise<void> {
+        this.focusedElements.delete(element);
+
+        return this.setMainWindowFocus(this.focusedElements.size > 0);
     }
 }
 

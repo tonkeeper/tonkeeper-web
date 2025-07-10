@@ -11,6 +11,7 @@ import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 import { AppRoute } from "@tonkeeper/uikit/dist/libs/routes";
 import { Account } from "@tonkeeper/core/dist/entries/account";
 import { WalletId } from "@tonkeeper/core/dist/entries/wallet";
+import { TonConnectError } from "@tonkeeper/core/dist/entries/exception";
 
 const TON_CONNECT_TRIGGER_PATH = '/ton-connect';
 
@@ -27,7 +28,7 @@ export const UrlTonConnectSubscription = () => {
             manifest: DAppManifest;
             account: Account;
             walletId: WalletId;
-        } | null
+        } | null | TonConnectError
     ) => {
         if (!params) return;
         responseReset();

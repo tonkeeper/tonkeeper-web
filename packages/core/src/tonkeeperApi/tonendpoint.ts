@@ -23,11 +23,8 @@ export interface TonendpointConfig {
     flags?: { [key: string]: boolean };
     tonendpoint: string;
 
-    tonApiKey?: string;
     tonApiV2Key?: string;
     tonapiIOEndpoint?: string;
-
-    amplitudeKey?: string;
 
     exchangePostUrl?: string;
     supportLink?: string;
@@ -35,7 +32,6 @@ export interface TonendpointConfig {
     mam_learn_more_url?: string;
 
     mercuryoSecret?: string;
-    neocryptoWebView?: string;
 
     directSupportUrl?: string;
     faq_url?: string;
@@ -45,9 +41,6 @@ export interface TonendpointConfig {
     NFTOnExplorerUrl?: string;
 
     featured_play_interval?: number;
-
-    notcoin_burn_date?: number;
-    notcoin_burn_addresses?: string[];
 
     web_swaps_url?: string;
     web_swaps_referral_address?: string;
@@ -73,9 +66,6 @@ export interface TonendpointConfig {
 
     batteryHost?: string;
     batteryMeanFees?: string;
-    batteryMeanPrice_swap?: string;
-    batteryMeanPrice_jetton?: string;
-    batteryMeanPrice_nft?: string;
     batteryRefundEndpoint?: string;
     batteryReservedAmount?: string;
     battery_beta?: boolean;

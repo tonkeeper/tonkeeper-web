@@ -16,7 +16,10 @@ import { Button } from '../fields/Button';
 import { ResultButton } from '../transfer/common';
 import { useAccountsState, useActiveAccount, useActiveApi } from '../../state/wallet';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
-import { signDataResult, signDataUint8Array } from '@tonkeeper/core/dist/service/sign/signService';
+import {
+    signDataResult,
+    signDataUint8Array
+} from '@tonkeeper/core/dist/service/tonConnect/signService';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { useAppSdk } from '../../hooks/appSdk';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';

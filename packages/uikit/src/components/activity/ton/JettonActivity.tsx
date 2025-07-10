@@ -1,5 +1,5 @@
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
@@ -14,7 +14,8 @@ import {
     FirstLine,
     ListItemGrid,
     SecondLine,
-    SecondaryText
+    SecondaryText,
+    toAddressTextValue
 } from '../CommonAction';
 import { toDexName } from '../NotificationCommon';
 import { useSwapValue } from './JettonNotifications';
@@ -44,15 +45,13 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
             <SendActivityAction
                 amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
                 symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
-                recipient={
-                    jettonTransfer.recipient?.name ??
-                    toShortValue(
-                        formatAddress(
-                            jettonTransfer.recipient?.address ?? jettonTransfer.recipientsWallet,
-                            network
-                        )
+                recipient={toAddressTextValue(
+                    jettonTransfer.recipient?.name,
+                    formatAddress(
+                        jettonTransfer.recipient?.address ?? jettonTransfer.recipientsWallet,
+                        network
                     )
-                }
+                )}
                 isScam={isScam}
                 date={date}
                 comment={jettonTransfer.comment}
@@ -65,15 +64,13 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
         <ReceiveActivityAction
             amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
             symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
-            sender={
-                jettonTransfer.sender?.name ??
-                toShortValue(
-                    formatAddress(
-                        jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
-                        network
-                    )
+            sender={toAddressTextValue(
+                jettonTransfer.sender?.name,
+                formatAddress(
+                    jettonTransfer.sender?.address ?? jettonTransfer.sendersWallet,
+                    network
                 )
-            }
+            )}
             isScam={jettonTransfer.sender?.isScam || isScam}
             date={date}
             comment={jettonTransfer.comment}
@@ -139,7 +136,7 @@ export const JettonBurnAction: FC<JettonActionProps> = ({ action, date }) => {
                 title={t('transactions_burned')}
                 amount={<>-&thinsp;{format(jettonBurn.amount, jettonBurn.jetton.decimals)}</>}
                 entry={jettonBurn.jetton.symbol}
-                address={toShortValue(formatAddress(jettonBurn.jetton.address, network, true))}
+                address={formatAddress(jettonBurn.jetton.address, network, true)}
                 date={date}
             />
             <FailedNote status={action.status} />
@@ -168,7 +165,7 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
                 title={t('transaction_type_mint')}
                 amount={<>+&thinsp;{format(jettonMint.amount, jettonMint.jetton.decimals)}</>}
                 entry={sanitizeJetton(jettonMint.jetton.symbol, isScam)}
-                address={toShortValue(formatAddress(jettonMint.jetton.address, network, true))}
+                address={formatAddress(jettonMint.jetton.address, network, true)}
                 date={date}
                 green={!isScam}
                 isScam={isScam}

@@ -36,13 +36,12 @@ import { FiatCurrencies } from '../entries/fiat';
 import { KeychainTrxAccountsProvider, TronAddressUtils } from '@ton-keychain/trx';
 import { TronWallet } from '../entries/tron/tron-wallet';
 import { ethers } from 'ethers';
-import { KeyPair, keyPairFromSecretKey } from '@ton/crypto';
-import nacl from 'tweetnacl';
 import queryString from 'query-string';
 import { TronApi } from '../tronApi';
 import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { pTimeout } from '../utils/common';
+import { publicKeyFromSecret, SigningSecret } from './sign';
 
 export const createMultisigTonAccount = async (
     storage: IStorage,
@@ -271,36 +270,16 @@ export const createStandardTonAccountByMnemonic = async (
     });
 };
 
-const keyPairFromSecretKeyOrSeed = (sk: string): KeyPair => {
-    switch (sk.length) {
-        case 128: {
-            return keyPairFromSecretKey(Buffer.from(sk, 'hex'));
-        }
-        case 64: {
-            const pair = nacl.sign.keyPair.fromSeed(Buffer.from(sk, 'hex'));
-            return {
-                secretKey: Buffer.from(pair.secretKey),
-                publicKey: Buffer.from(pair.publicKey)
-            };
-        }
-        default: {
-            throw new Error('Unexpected secretKey size');
-        }
-    }
-};
-
 export const createStandardTonAccountBySK = async (
     appContext: CreateWalletContext,
     storage: IStorage,
-    sk: string,
+    secret: SigningSecret,
     options: {
         versions?: WalletVersion[];
         auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
     }
 ) => {
-    const keyPair = keyPairFromSecretKeyOrSeed(sk);
-
-    const publicKey = keyPair.publicKey.toString('hex');
+    const publicKey = (await publicKeyFromSecret(secret)).toString('hex');
 
     let tonWallets: { rawAddress: string; version: WalletVersion }[] = [];
     if (options.versions) {
@@ -338,7 +317,8 @@ export const createStandardTonAccountBySK = async (
         emoji,
         auth: walletAuth,
         activeTonWalletId: walletIdToActivate,
-        tonWallets: wallets
+        tonWallets: wallets,
+        signingAlgorithm: secret.algorithm
     });
 };
 

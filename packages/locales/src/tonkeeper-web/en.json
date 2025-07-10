@@ -368,9 +368,9 @@
   "pro_set_up_boimetry_subtitle": "Use your fingerprint or face recognition to open your wallet faster without having to enter your password.",
   "pro_set_up_boimetry_title": "Quick sign-in with fingerprint or face",
   "pro_subscription_get_pro": "Get Pro",
+  "pro_terms_privacy_restore_note": "Subscription renews automatically unless cancelled at least 24 hours before the end of the period. Manage in the app or in Apple ID settings. By subscribing, you agree to our",
   "pro_subscription_load_failed": "Failed to load subscription products",
   "pro_terms": "Terms",
-  "pro_terms_privacy_restore_note": "Subscription renews automatically unless cancelled at least 24 hours before the end of the period. Manage in the app or in Apple ID settings. By subscribing, you agree to our",
   "pro_terms_privacy_restore_note_crypto": "By subscribing, you agree to our",
   "pro_tutorial_screen_title": "A wide-screen wallet in your pocket",
   "pro_unlocks_premium_tools": "Tonkeeper Pro unlocks premium tools for power users. Manage your crypto smarter and faster.",
@@ -576,7 +576,7 @@
   "wallet_sell": "Sell",
   "wallet_version_and_tokens": ", tokens",
   "web_no_connection": "No Internet Connection",
-  "what_is_included": "What’s included",
-  "Window": "Window",
   "yearly_pro_package": "1 year"
+  "what_is_included": "What’s included",
+  "Window": "Window"
 }

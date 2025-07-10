@@ -9,7 +9,7 @@ import {
     useReorderBrowserTabs
 } from '../../../state/dapp-browser';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Label2 } from '../../Text';
 import { useMenuController } from '../../../hooks/ionic';
 import { Button, ButtonFlat } from '../../fields/Button';
@@ -292,6 +292,11 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
     const { mutate: closeAllTabs } = useCloseAllBrowserTabs();
     const { close: closeMenu } = useMenuController('wallet-nav');
     const track = useCountryContextTracker();
+    const { mutate: openBlancTab } = useOpenBrowserTab();
+    const onClickOpenNewTab = () => {
+        closeMenu();
+        openBlancTab('blanc');
+    };
 
     const pinTab = (tab: BrowserTab) => {
         changeBrowserTab({ ...tab, isPinned: true });
@@ -313,6 +318,12 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
                         : t('wallet_aside_menu_tabs_edit_btn_edit')}
                 </EditButton>
             </HeadingWrapper>
+            {!isEditMode && (
+                <AsideMenuItemStyled isSelected={false} onClick={onClickOpenNewTab}>
+                    <PlusImage />
+                    <Label2>{t('browser_new_tab')}</Label2>
+                </AsideMenuItemStyled>
+            )}
             {tabs.map(tab => (
                 <AsideMenuItemStyled
                     key={tab.id}
@@ -356,5 +367,29 @@ const BrowserTabsNonPinned: FC<{ tabs: BrowserTab[] }> = ({ tabs }) => {
                 </CloseAllButtonWrapper>
             )}
         </GroupWrapper>
+    );
+};
+
+const PlusImage = () => {
+    const theme = useTheme();
+
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            style={{ marginRight: '8px' }}
+        >
+            <rect width="16" height="16" rx="5" fill={theme.backgroundContent} />
+            <path
+                d="M8 8H12.25M8 8H3.75M8 8V3.75M8 8V12.25"
+                stroke={theme.iconSecondary}
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+        </svg>
     );
 };

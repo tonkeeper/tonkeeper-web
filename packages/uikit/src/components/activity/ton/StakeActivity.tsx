@@ -1,12 +1,12 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
+import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { FailedNote } from '../ActivityActionLayout';
 import { ActivityIcon, ReceiveIcon, SentIcon } from '../ActivityIcons';
-import { ColumnLayout, ErrorAction, ListItemGrid } from '../CommonAction';
+import { ColumnLayout, ErrorAction, ListItemGrid, toAddressTextValue } from '../CommonAction';
 import { useActiveTonNetwork } from '../../../state/wallet';
 
 export const DepositStakeAction: FC<{
@@ -31,10 +31,10 @@ export const DepositStakeAction: FC<{
                 title={t('staking_deposit')}
                 amount={<>-&thinsp;{format(depositStake.amount)}</>}
                 entry={CryptoCurrency.TON}
-                address={
-                    depositStake.pool.name ??
-                    toShortValue(formatAddress(depositStake.pool.address, network, true))
-                }
+                address={toAddressTextValue(
+                    depositStake.pool.name,
+                    formatAddress(depositStake.pool.address, network, true)
+                )}
                 date={date}
             />
             <FailedNote status={action.status} />
@@ -63,10 +63,10 @@ export const WithdrawStakeAction: FC<{
                 amount={<>+&thinsp;{format(withdrawStake.amount)}</>}
                 entry={CryptoCurrency.TON}
                 green
-                address={
-                    withdrawStake.pool.name ??
-                    toShortValue(formatAddress(withdrawStake.pool.address, network, true))
-                }
+                address={toAddressTextValue(
+                    withdrawStake.pool.name,
+                    formatAddress(withdrawStake.pool.address, network, true)
+                )}
                 date={date}
             />
             <FailedNote status={action.status} />
@@ -99,10 +99,10 @@ export const WithdrawRequestStakeAction: FC<{
                     ) : undefined
                 }
                 entry={withdrawStakeRequest.amount ? CryptoCurrency.TON : ''}
-                address={
-                    withdrawStakeRequest.pool.name ??
-                    toShortValue(formatAddress(withdrawStakeRequest.pool.address, network, true))
-                }
+                address={toAddressTextValue(
+                    withdrawStakeRequest.pool.name,
+                    formatAddress(withdrawStakeRequest.pool.address, network, true)
+                )}
                 date={date}
             />
             <FailedNote status={action.status} />
