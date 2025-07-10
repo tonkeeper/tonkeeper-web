@@ -37,6 +37,11 @@ export const ProStatusDetailsList = () => {
             return getFormattedProPrice(subscription?.amount, true);
         }
 
+        // TODO We can't have amount for older users
+        if (isCryptoSubscription(subscription) && !subscription?.amount) {
+            return '8 TON';
+        }
+
         if (isIosSubscription(subscription) && hasIosPrice(subscription)) {
             const { price, currency } = subscription;
 

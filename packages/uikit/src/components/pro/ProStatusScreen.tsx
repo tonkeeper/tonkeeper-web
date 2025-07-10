@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import {
     isIosStrategy,
+    isIosSubscription,
     isProSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -49,7 +50,8 @@ export const ProStatusScreen = () => {
     if (!isProSubscription(subscription)) return null;
     const isProActive = isValidSubscription(subscription);
 
-    const isIos = isIosStrategy(sdk.subscriptionStrategy);
+    const isManageAvailable =
+        isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
 
     return (
         <ProScreenContentWrapper>
@@ -62,7 +64,7 @@ export const ProStatusScreen = () => {
 
             <ProStatusDetailsList />
 
-            {isIos && (
+            {isManageAvailable && (
                 <Button
                     secondary
                     fullWidth
