@@ -5,7 +5,12 @@ import {
     seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { ProState, ProStateAuthorized, isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    ProState,
+    ProStateAuthorized,
+    isPaidSubscription,
+    isCryptoProPlans
+} from '@tonkeeper/core/dist/entries/pro';
 import {
     DerivationItemNamed,
     TonWalletStandard,
@@ -23,7 +28,6 @@ import { useTranslation } from '../../hooks/translation';
 import {
     ConfirmState,
     useCreateInvoiceMutation,
-    useFreeProAccessAvailable,
     useProLogout,
     useProPlans,
     useProState,
@@ -59,9 +63,6 @@ import {
 } from '../desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../shared/TargetEnv';
 import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
-import { ProFreeAccessContent } from '../pro/ProFreeAccess';
-import { useNavigate } from '../../hooks/router/useNavigate';
-import { AppRoute } from '../../libs/routes';
 
 const Block = styled.div`
     display: flex;
@@ -228,38 +229,40 @@ const SelectProPlans: FC<{
     return (
         <>
             <ListBlock>
-                {plans.map(plan => (
-                    <ListItem key={plan.id} onClick={() => !disabled && setPlan(plan.id)}>
-                        <ListItemPayload>
-                            <ColumnText
-                                noWrap
-                                text={plan.name}
-                                secondary={
-                                    <>
-                                        {plan.description ? (
-                                            <>
-                                                {plan.description}
-                                                <br />
-                                            </>
-                                        ) : null}
-                                        {format(plan.amount)} {CryptoCurrency.TON}
-                                    </>
-                                }
-                            />
-                            <Radio
-                                disabled={disabled}
-                                checked={selected === plan.id}
-                                onChange={() => setPlan(plan.id)}
-                            />
-                        </ListItemPayload>
-                    </ListItem>
-                ))}
+                {plans
+                    .filter(plan => plan.amount !== '-1')
+                    .map(plan => (
+                        <ListItem key={plan.id} onClick={() => !disabled && setPlan(plan.id)}>
+                            <ListItemPayload>
+                                <ColumnText
+                                    noWrap
+                                    text={plan.name}
+                                    secondary={
+                                        <>
+                                            {plan.description ? (
+                                                <>
+                                                    {plan.description}
+                                                    <br />
+                                                </>
+                                            ) : null}
+                                            {format(plan.amount)} {CryptoCurrency.TON}
+                                        </>
+                                    }
+                                />
+                                <Radio
+                                    disabled={disabled}
+                                    checked={selected === plan.id}
+                                    onChange={() => setPlan(plan.id)}
+                                />
+                            </ListItemPayload>
+                        </ListItem>
+                    ))}
             </ListBlock>
         </>
     );
 };
 
-const ConfirmNotification: FC<{
+export const ConfirmNotification: FC<{
     state: ConfirmState | null;
     onClose: (success?: boolean) => void;
     waitResult: (state: ConfirmState) => void;
@@ -326,7 +329,9 @@ const BuyProService: FC<{
     const [selectedPlan, setPlan] = useState<number | null>(null);
     const [promo, setPromo] = useState('');
 
-    const [plans, promoCode] = useProPlans(promo);
+    const { data: proPlans } = useProPlans(promo);
+
+    const promoCode = isCryptoProPlans(proPlans) ? proPlans.promoCode : undefined;
 
     const { mutateAsync: createInvoice, isLoading: isInvoiceLoading } = useCreateInvoiceMutation();
     const { mutate: waitInvoice, isLoading: isInvoicePending } = useWaitInvoiceMutation();
@@ -336,10 +341,10 @@ const BuyProService: FC<{
     const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
     useEffect(() => {
-        if (plans && plans[0] && selectedPlan == null) {
-            setPlan(plans[0].id);
+        if (isCryptoProPlans(proPlans) && proPlans.plans[0]) {
+            setPlan(proPlans.plans[0].id);
         }
-    }, [plans]);
+    }, [proPlans?.plans]);
 
     useEffect(() => {
         if (ref.current) {
@@ -364,7 +369,7 @@ const BuyProService: FC<{
         <div ref={containerRef}>
             <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
-                plans={plans ?? []}
+                plans={isCryptoProPlans(proPlans) ? proPlans?.plans : []}
                 setPlan={setPlan}
                 selected={selectedPlan}
                 disabled={isLoading}
@@ -439,10 +444,6 @@ const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSu
     return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
 };
 
-const ProFreeAccessContentStyled = styled(ProFreeAccessContent)`
-    height: 100%;
-`;
-
 export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void }> = ({
     showLogo = true,
     onSuccess
@@ -450,21 +451,6 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
     const { t } = useTranslation();
 
     const { data } = useProState();
-    const isFreeAccessAvailable = useFreeProAccessAvailable();
-    const navigate = useNavigate();
-
-    if (isFreeAccessAvailable) {
-        const onBack = () => {
-            navigate(AppRoute.home);
-        };
-
-        return (
-            <ProFreeAccessContentStyled
-                access={isFreeAccessAvailable}
-                onSubmit={onSuccess ?? onBack}
-            />
-        );
-    }
 
     return (
         <>

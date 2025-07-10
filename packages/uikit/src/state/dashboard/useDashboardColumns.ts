@@ -5,6 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { DashboardColumn, isSupportedColumnType } from '@tonkeeper/core/dist/entries/dashboard';
 import { getDashboardColumns } from '@tonkeeper/core/dist/service/proService';
 import { useProState } from '../pro';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 export type DashboardColumnsForm = { id: string; isEnabled: boolean }[];
 
@@ -44,7 +45,7 @@ export function useDashboardColumnsForm() {
                         return {
                             id: storedColumn.id,
                             isEnabled:
-                                columnInfo.onlyPro && !proState?.subscription.valid
+                                columnInfo.onlyPro && !isValidSubscription(proState?.subscription)
                                     ? false
                                     : storedColumn.isEnabled ?? columnInfo.defaultIsChecked
                         };
@@ -56,13 +57,18 @@ export function useDashboardColumnsForm() {
                     .map(c => ({
                         id: c.id,
                         isEnabled:
-                            c.onlyPro && !proState?.subscription.valid ? false : c.defaultIsChecked
+                            c.onlyPro && !isValidSubscription(proState?.subscription)
+                                ? false
+                                : c.defaultIsChecked
                     }));
                 return storedList.concat(newColumns);
             }
             return columns.map(c => ({
                 id: c.id,
-                isEnabled: c.onlyPro && !proState?.subscription.valid ? false : c.defaultIsChecked
+                isEnabled:
+                    c.onlyPro && !isValidSubscription(proState?.subscription)
+                        ? false
+                        : c.defaultIsChecked
             }));
         },
         {

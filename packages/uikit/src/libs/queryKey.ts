@@ -43,6 +43,7 @@ export enum QueryKey {
     total = 'total',
     distribution = 'distribution',
     pro = 'pro',
+    plans = 'plans',
     proBackup = 'proBackup',
     proFreeAccessActive = 'proFreeAccessActive',
     allWalletsTotalBalance = 'allWalletsTotalBalance',

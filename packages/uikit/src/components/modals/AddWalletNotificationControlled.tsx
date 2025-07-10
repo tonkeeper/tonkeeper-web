@@ -22,6 +22,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
@@ -144,14 +145,17 @@ export const AddWalletNotificationControlled = () => {
         if (!isOpen) {
             return;
         }
-        if (doesMethodRequirePro(params?.walletType) && !proState?.subscription.valid) {
+        if (
+            doesMethodRequirePro(params?.walletType) &&
+            !isValidSubscription(proState?.subscription)
+        ) {
             onClose();
             openBuyPro();
             return;
         }
 
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid]);
+    }, [isOpen, params?.walletType, proState?.subscription?.valid]);
 
     const sdk = useAppSdk();
 
@@ -162,7 +166,7 @@ export const AddWalletNotificationControlled = () => {
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (doesMethodRequirePro(method) && !proState?.subscription.valid) {
+            if (doesMethodRequirePro(method) && !isValidSubscription(proState?.subscription)) {
                 onClose();
                 openBuyPro();
                 return;
@@ -171,7 +175,7 @@ export const AddWalletNotificationControlled = () => {
             openExtensionTab(sdk, method);
             setSelectedMethod(method);
         };
-    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod, sdk]);
+    }, [proState?.subscription?.valid, openBuyPro, setSelectedMethod, sdk]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

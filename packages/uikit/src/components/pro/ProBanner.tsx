@@ -5,7 +5,7 @@ import { Button } from '../fields/Button';
 import { useProState } from '../../state/pro';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useTranslation } from '../../hooks/translation';
-import { isPaidSubscription, isTrialSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isPaidSubscription, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { ChevronRightIcon } from '../Icon';
@@ -65,6 +65,9 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
     }
 
     const { subscription } = data;
+    const trialEndDate = isTelegramSubscription(subscription)
+        ? subscription.trialEndDate
+        : undefined;
 
     if (isPaidSubscription(subscription)) {
         return null;
@@ -84,11 +87,11 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
             </TextContainerStyled>
             <NotForTargetEnv env="mobile">
                 <ButtonsContainerStyled>
-                    {isTrialSubscription(subscription) && (
+                    {trialEndDate && (
                         <Label2Styled>
                             {t('pro_banner_days_left').replace(
                                 '%days%',
-                                formatDate(subscription.trialEndDate, {
+                                formatDate(trialEndDate, {
                                     day: 'numeric',
                                     month: 'short',
                                     year: 'numeric'

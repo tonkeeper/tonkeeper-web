@@ -1,10 +1,13 @@
+import { FC, useState } from 'react';
+import styled, { css } from 'styled-components';
 import {
-    isTrialSubscription,
+    isPendingSubscription,
+    isProSubscription,
+    isTelegramSubscription,
     isValidSubscription,
     ProState
 } from '@tonkeeper/core/dist/entries/pro';
-import { FC, useState } from 'react';
-import styled, { css } from 'styled-components';
+
 import { useTranslation } from '../../../hooks/translation';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
 import { useProState } from '../../../state/pro';
@@ -12,7 +15,7 @@ import { Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { RefreshIcon } from '../../Icon';
+import { RefreshIcon, SpinnerIcon } from '../../Icon';
 import {
     useInvalidateActiveWalletQueries,
     useInvalidateGlobalQueries
@@ -32,7 +35,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
 
     const { subscription } = data;
 
-    if (isTrialSubscription(subscription)) {
+    if (isTelegramSubscription(subscription) && subscription.trialEndDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_trial_is_active')}</Body3Block>
@@ -51,19 +54,21 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isValidSubscription(subscription)) {
+    if (isProSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
                 <Body3Block>
                     {t('aside_expires_on').replace(
                         '%date%',
-                        formatDate(subscription.nextChargeDate, {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            inputUnit: 'seconds'
-                        })
+                        subscription.nextChargeDate
+                            ? formatDate(subscription.nextChargeDate, {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  inputUnit: 'seconds'
+                              })
+                            : ''
                     )}
                 </Body3Block>
             </>
@@ -123,7 +128,9 @@ const DDContent = styled.div<{ width: number }>`
 `;
 
 const ProButtonPanel = styled(Button)`
+    padding: 0 12px;
     cursor: default;
+
     &:hover {
         background-color: ${p => p.theme.buttonTertiaryBackground};
     }
@@ -154,34 +161,53 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     };
 
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
-    const onGetPro = () => {
+    const onGetPro = async () => {
         hideBrowser();
         onOpen();
     };
 
-    let button = <Button loading>Pro</Button>;
-    if (data) {
-        if (data.subscription.valid) {
-            button = (
-                <DropDown
-                    containerClassName="pro-subscription-dd-container"
-                    payload={() => (
-                        <DDContent width={width}>
-                            <SubscriptionStatus data={data} />
-                        </DDContent>
-                    )}
-                    trigger="hover"
-                >
-                    <ProButtonPanel>Pro</ProButtonPanel>
-                </DropDown>
-            );
-        } else {
-            button = (
-                <Button primary onClick={onGetPro}>
-                    {t('pro_subscription_get_pro')}
-                </Button>
-            );
-        }
+    let button = <Button loading>Tonkeeper Pro</Button>;
+
+    if (data && isValidSubscription(data.subscription)) {
+        button = (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        <SubscriptionStatus data={data} />
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel>Tonkeeper Pro</ProButtonPanel>
+            </DropDown>
+        );
+    } else {
+        const isProcessing =
+            data &&
+            isProSubscription(data?.subscription) &&
+            isPendingSubscription(data?.subscription);
+
+        button = isProcessing ? (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        {t('create_multisig_await_deployment_description')}
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel>
+                    <SpinnerIcon />
+                    {t('processing')}
+                </ProButtonPanel>
+            </DropDown>
+        ) : (
+            <Button primary onClick={onGetPro}>
+                {t('get_tonkeeper_pro')}
+            </Button>
+        );
     }
 
     return (

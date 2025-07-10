@@ -1,30 +1,41 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { ProState, ProStateAuthorized, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    IDisplayPlan,
+    IosPendingSubscription,
+    IosPurchaseStatuses,
+    IosSubscriptionStatuses,
+    isIosStrategy,
+    isProductId,
+    NormalizedProPlans,
+    ProState,
+    ProStateAuthorized,
+    ProSubscription
+} from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { TonWalletStandard, isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaTonConnect,
     createProServiceInvoice,
     createRecipient,
     getBackupState,
-    getProServiceTiers,
     getProState,
     logoutTonConsole,
     ProAuthTokenService,
     retryProService,
+    saveIapPurchase,
     setBackupState,
     startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
-import { InvoicesInvoice, OpenAPI } from '@tonkeeper/core/dist/tonConsoleApi';
-import { ProServiceTier } from '@tonkeeper/core/src/tonConsoleApi/models/ProServiceTier';
+import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
+import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
-import { useAppSdk, useAppTargetEnv, useIsCapacitorApp } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { QueryKey } from '../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
 import {
@@ -36,6 +47,8 @@ import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useToast } from '../hooks/useNotification';
 import { useAnalyticsTrack } from '../hooks/analytics';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { parsePrice } from '../libs/pro';
 
 export type FreeProAccess = {
     code: string;
@@ -96,32 +109,18 @@ export const useProBackupState = () => {
 };
 
 export const useProAuthTokenService = (): ProAuthTokenService => {
-    const isCapacitorApp = useIsCapacitorApp();
     const storage = useAppSdk().storage;
 
-    return useMemo(() => {
-        if (isCapacitorApp) {
-            return {
-                async attachToken() {
-                    const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
-                    OpenAPI.TOKEN = token ?? undefined;
-                },
-                async onTokenUpdated(token: string | null) {
-                    await storage.set(AppKey.PRO_AUTH_TOKEN, token);
-                    return this.attachToken();
-                }
-            };
-        } else {
-            return {
-                async attachToken() {
-                    /* */
-                },
-                async onTokenUpdated() {
-                    /* */
-                }
-            };
+    return {
+        async attachToken() {
+            const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
+            OpenAPI.TOKEN = token ?? undefined;
+        },
+        async onTokenUpdated(token: string | null) {
+            await storage.set(AppKey.PRO_AUTH_TOKEN, token);
+            return this.attachToken();
         }
-    }, [isCapacitorApp]);
+    };
 };
 
 export const useProState = () => {
@@ -129,32 +128,83 @@ export const useProState = () => {
     const client = useQueryClient();
     const authService = useProAuthTokenService();
     const isFreeProAccessAvailable = useFreeProAccessAvailable();
-    const env = useAppTargetEnv();
 
     return useQuery<ProState, Error>([QueryKey.pro, isFreeProAccessAvailable], async () => {
-        let state: ProState;
-
-        const isFreeMobileTrialActive = Boolean(
-            await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
-        );
-        if (env === 'mobile' && isFreeProAccessAvailable && isFreeMobileTrialActive) {
-            state = {
-                authorizedWallet: null,
-                subscription: {
-                    type: 'trial-mobile',
-                    isTrial: true,
-                    valid: true,
-                    usedTrial: true,
-                    trialEndDate: isFreeProAccessAvailable.validUntil
-                }
-            };
-        } else {
-            state = await getProState(authService, sdk.storage);
-        }
+        const state = await getProState(authService, sdk.storage);
 
         await setBackupState(sdk.storage, state.subscription);
         await client.invalidateQueries([QueryKey.proBackup]);
+
         return state;
+    });
+};
+
+export const useManageSubscription = () => {
+    const sdk = useAppSdk();
+
+    return useMutation<void, Error, void>(async () => {
+        if (!isIosStrategy(sdk.subscriptionStrategy)) {
+            throw new Error('This is not an iOS subscription strategy');
+        }
+
+        await sdk.subscriptionStrategy.manageSubscriptions();
+    });
+};
+
+export const useProSubscriptionPurchase = () => {
+    const sdk = useAppSdk();
+    const { data } = useProState();
+    const client = useQueryClient();
+
+    return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
+        const { id, displayPrice, displayName } = selectedPlan;
+
+        if (!isIosStrategy(sdk.subscriptionStrategy)) {
+            throw new Error('This is not an iOS subscription strategy');
+        }
+
+        if (!isProductId(id)) {
+            throw new Error('This is not an iOS subscription strategy');
+        }
+
+        const subscription = await sdk.subscriptionStrategy?.subscribe(id);
+
+        if (subscription.status === IosPurchaseStatuses.CANCELED) {
+            return IosPurchaseStatuses.CANCELED;
+        }
+
+        const originalTransactionId = subscription?.originalTransactionId;
+
+        if (!originalTransactionId) {
+            throw new Error('Failed to subscribe');
+        }
+
+        const savingResult = await saveIapPurchase(String(originalTransactionId));
+
+        if (!savingResult.ok) {
+            const pendingSubscription: IosPendingSubscription = {
+                ...subscription,
+                displayName,
+                displayPrice,
+                source: SubscriptionSource.IOS,
+                status: IosSubscriptionStatuses.PENDING,
+                valid: false,
+                isTrial: false,
+                usedTrial: data?.subscription?.usedTrial ?? false
+            };
+
+            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+                authorizedWallet: data?.authorizedWallet || null,
+                subscription: pendingSubscription
+            });
+            await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
+
+            return IosPurchaseStatuses.PENDING;
+        }
+
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
+
+        return IosPurchaseStatuses.SUCCESS;
     });
 };
 
@@ -206,25 +256,41 @@ export const useProLogout = () => {
 };
 
 export const useProPlans = (promoCode?: string) => {
+    const sdk = useAppSdk();
     const { data: lang } = useUserLanguage();
 
-    const all = useQuery<ProServiceTier[], Error>([QueryKey.pro, 'plans', lang], () =>
-        getProServiceTiers(lang)
-    );
+    return useQuery<NormalizedProPlans, Error>(
+        [QueryKey.pro, QueryKey.plans, lang, promoCode ?? null],
+        async () => {
+            const strategy = sdk.subscriptionStrategy;
 
-    const promo = useQuery<ProServiceTier[], Error>(
-        [QueryKey.pro, 'promo', lang, promoCode],
-        () => getProServiceTiers(lang, promoCode !== '' ? promoCode : undefined),
-        { enabled: promoCode !== '' }
-    );
+            if (!strategy) {
+                throw new Error('pro_subscription_load_failed');
+            }
 
-    return useMemo<[ProServiceTier[] | undefined, string | undefined]>(() => {
-        if (!promo.data) {
-            return [all.data, undefined];
-        } else {
-            return [promo.data, promoCode];
-        }
-    }, [all.data, promo.data]);
+            if (strategy.source === SubscriptionSource.IOS) {
+                const plans = await strategy.getAllProductsInfo();
+                const sortedPlans = [...plans].sort((a, b) => {
+                    return parsePrice(a.displayPrice) - parsePrice(b.displayPrice);
+                });
+
+                return { source: SubscriptionSource.IOS, plans: sortedPlans };
+            }
+
+            if (strategy.source === SubscriptionSource.CRYPTO) {
+                const [plans, verifiedCode] = await strategy.getAllProductsInfo(lang, promoCode);
+
+                return {
+                    source: SubscriptionSource.CRYPTO,
+                    plans: plans ?? [],
+                    promoCode: verifiedCode
+                };
+            }
+
+            return assertUnreachable(strategy);
+        },
+        {}
+    );
 };
 
 export interface ConfirmState {
@@ -237,6 +303,7 @@ export interface ConfirmState {
 export const useCreateInvoiceMutation = () => {
     const ws = useAccountsStorage();
     const api = useActiveApi();
+
     return useMutation<
         ConfirmState,
         Error,
