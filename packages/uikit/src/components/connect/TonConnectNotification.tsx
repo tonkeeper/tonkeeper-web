@@ -1,13 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import {
+    CONNECT_EVENT_ERROR_CODES,
     ConnectRequest,
     DAppManifest,
     TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
+    eqOrigins,
+    getBrowserPlatform,
     getDeviceInfo,
-    getManifest,
-    getBrowserPlatform
+    getManifest
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
@@ -31,6 +33,7 @@ import { TonConnectConnectionParams } from '@tonkeeper/core/dist/service/tonConn
 import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/events-hooks';
 import { useAnalyticsTrack } from '../../hooks/analytics';
 import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 
 const Title = styled(H2)`
     text-align: center;
@@ -330,15 +333,33 @@ export const TonConnectNotification: FC<{
     origin?: string;
     params: Pick<TonConnectConnectionParams, 'request' | 'appName'> | null;
     handleClose: (
-        result: {
-            replyItems: TonConnectEventPayload;
-            manifest: DAppManifest;
-            account: Account;
-            walletId: WalletId;
-        } | null
+        result:
+            | {
+                  replyItems: TonConnectEventPayload;
+                  manifest: DAppManifest;
+                  account: Account;
+                  walletId: WalletId;
+              }
+            | null
+            | TonConnectError
     ) => void;
 }> = ({ params, origin, handleClose }) => {
     const { data: manifest } = useManifest(params?.request ?? null);
+
+    useEffect(() => {
+        if (
+            origin !== undefined &&
+            manifest?.url !== undefined &&
+            !eqOrigins(origin, manifest.url)
+        ) {
+            handleClose(
+                new TonConnectError(
+                    'Manifest url and app origin mismatch',
+                    CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR
+                )
+            );
+        }
+    }, [origin, manifest?.url]);
 
     const Content = useCallback(() => {
         if (!params || !manifest) return undefined;

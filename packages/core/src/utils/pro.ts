@@ -1,7 +1,13 @@
+import { formatter } from '@tonkeeper/uikit/dist/hooks/balance';
+import { adaptPlansToViewModel, getSkeletonProducts } from '@tonkeeper/uikit/dist/libs/pro';
+
 import {
     CryptoSubscriptionStatuses,
+    IDisplayPlan,
     IosSubscriptionStatuses,
-    ProSubscription
+    NormalizedProPlans,
+    ProSubscription,
+    TelegramSubscriptionStatuses
 } from '../entries/pro';
 import { UserInfo } from './types';
 import { IStorage } from '../Storage';
@@ -19,27 +25,45 @@ export const normalizeSubscription = (
     const source = subscriptionDto?.source;
     const toDate = (ts?: number) => (ts ? new Date(ts * 1000) : undefined);
 
-    if (!source || (source !== SubscriptionSource.CRYPTO && source !== SubscriptionSource.IOS)) {
+    if (
+        !source ||
+        (source !== SubscriptionSource.IOS &&
+            source !== SubscriptionSource.CRYPTO &&
+            source !== SubscriptionSource.TELEGRAM)
+    ) {
         return null;
     }
 
     const valid = subscriptionDto.valid;
-    const isTrial = subscriptionDto.is_trial;
     const usedTrial = subscriptionDto.used_trial ?? false;
     const nextChargeDate = toDate(subscriptionDto.next_charge);
 
-    if (source === SubscriptionSource.CRYPTO) {
-        if (isTrial) {
+    if (source === SubscriptionSource.TELEGRAM) {
+        if (valid) {
             return {
                 source,
-                status: CryptoSubscriptionStatuses.TRIAL,
-                valid,
+                status: TelegramSubscriptionStatuses.ACTIVE,
+                valid: true,
                 isTrial: true,
                 usedTrial: true,
-                trialUserId: user.tg_id!,
+                trialUserId: user.tg_id,
                 trialEndDate: nextChargeDate
             };
-        } else {
+        }
+
+        return {
+            source,
+            status: TelegramSubscriptionStatuses.EXPIRED,
+            valid: false,
+            isTrial: true,
+            usedTrial: true,
+            trialUserId: user.tg_id,
+            trialEndDate: nextChargeDate
+        };
+    }
+
+    if (source === SubscriptionSource.CRYPTO) {
+        if (valid) {
             return {
                 source,
                 status: CryptoSubscriptionStatuses.ACTIVE,
@@ -52,19 +76,22 @@ export const normalizeSubscription = (
                 purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
             };
         }
+
+        return {
+            source,
+            status: CryptoSubscriptionStatuses.EXPIRED,
+            valid: false,
+            isTrial: false,
+            usedTrial,
+            nextChargeDate,
+            amount: subscriptionDto.crypto?.amount,
+            currency: subscriptionDto.crypto?.currency,
+            purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
+        };
     }
 
     if (source === SubscriptionSource.IOS) {
-        if (isTrial) {
-            return {
-                source,
-                status: IosSubscriptionStatuses.PROMO,
-                valid,
-                isTrial: true,
-                usedTrial: true,
-                trialEndDate: nextChargeDate
-            };
-        } else {
+        if (valid) {
             return {
                 source,
                 status: IosSubscriptionStatuses.ACTIVE,
@@ -83,6 +110,24 @@ export const normalizeSubscription = (
                 originalTransactionId: subscriptionDto.ios?.original_tx_id
             };
         }
+
+        return {
+            source,
+            status: IosSubscriptionStatuses.EXPIRED,
+            valid: false,
+            isTrial: false,
+            usedTrial,
+            nextChargeDate,
+            txId: subscriptionDto.ios?.tx_id,
+            price: subscriptionDto.ios?.price,
+            currency: subscriptionDto.ios?.currency,
+            expiresDate: toDate(subscriptionDto.ios?.expires_date),
+            productId: subscriptionDto.ios?.product_id,
+            storeFront: subscriptionDto.ios?.store_front,
+            storeFrontId: subscriptionDto.ios?.store_front_id,
+            transactionType: subscriptionDto.ios?.transaction_type,
+            originalTransactionId: subscriptionDto.ios?.original_tx_id
+        };
     }
 
     return null;
@@ -108,4 +153,39 @@ export const findAuthorizedWallet = async (user: UserInfo, storage: IStorage) =>
         publicKey: actualWallet.publicKey,
         rawAddress: actualWallet.rawAddress
     };
+};
+
+export const isValidNanoString = (value: string): boolean => {
+    return /^\d+$/.test(value);
+};
+
+export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean) => {
+    try {
+        if (!displayPrice) return '-';
+
+        let formattedProPrice = displayPrice;
+        if (isCrypto) {
+            formattedProPrice = isValidNanoString(displayPrice)
+                ? `${formatter.fromNano(displayPrice)} TON`
+                : '-';
+        }
+
+        return formattedProPrice;
+    } catch (e) {
+        console.error('getFormattedDisplayPrice error: ', e);
+        return '-';
+    }
+};
+
+const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
+const IOS_SKELETON_PRODUCTS_QTY = 2;
+
+export const getFilteredDisplayPlans = (proPlans: NormalizedProPlans | undefined) => {
+    return adaptPlansToViewModel(proPlans).filter(plan => plan.formattedDisplayPrice !== '-');
+};
+
+export const getProductsForRender = (displayPlans: IDisplayPlan[], isCrypto: boolean) => {
+    return displayPlans.length
+        ? displayPlans
+        : getSkeletonProducts(isCrypto ? CRYPTO_SKELETON_PRODUCTS_QTY : IOS_SKELETON_PRODUCTS_QTY);
 };

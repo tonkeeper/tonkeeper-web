@@ -1,13 +1,15 @@
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
 
 import { SubscriptionScreens } from '../enums/pro';
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
-export const getSkeletonProducts = (skeletonSize = 2) =>
+export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
     Array.from({ length: skeletonSize }, (_, index) => ({
-        id: index,
-        displayName: null,
-        displayPrice: null
+        id: String(index),
+        displayName: '',
+        displayPrice: '',
+        formattedDisplayPrice: ''
     }));
 
 export const isDirectionForward = (
@@ -18,10 +20,6 @@ export const isDirectionForward = (
 
     return current > prev;
 };
-
-function isValidNanoString(value: string): boolean {
-    return /^\d+$/.test(value);
-}
 
 export function parsePrice(priceStr: string): number {
     const numeric = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');
@@ -39,14 +37,16 @@ export function adaptPlansToViewModel(
             return normalizedPlans.plans.map(plan => ({
                 id: plan.id,
                 displayName: plan.displayName,
-                displayPrice: plan.displayPrice
+                displayPrice: plan.displayPrice,
+                formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
             }));
 
         case SubscriptionSource.CRYPTO:
             return normalizedPlans.plans.map(plan => ({
                 id: String(plan.id),
                 displayName: plan.name,
-                displayPrice: isValidNanoString(plan.amount) ? plan.amount : '-'
+                displayPrice: plan.amount,
+                formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
             }));
     }
 }

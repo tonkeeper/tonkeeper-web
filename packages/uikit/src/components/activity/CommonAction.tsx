@@ -4,6 +4,8 @@ import { ListItemPayload } from '../../components/List';
 import { Body2, Label1 } from '../../components/Text';
 import { ActivityIcon, ReceiveIcon } from '../../components/activity/ActivityIcons';
 import { useTranslation } from '../../hooks/translation';
+import { useAppSdk } from '../../hooks/appSdk';
+import { toShortValue } from '@tonkeeper/core/dist/utils/common';
 
 export const ListItemGrid = styled(ListItemPayload)`
     display: grid;
@@ -68,6 +70,37 @@ export const SecondaryText = styled(Body2)`
     user-select: none;
 `;
 
+const AddressTextContent = styled(SecondaryText)`
+    cursor: pointer;
+
+    transition: opacity 0.15s ease-in-out;
+    opacity: 1;
+
+    &:hover {
+        opacity: 0.7;
+    }
+`;
+
+export type AddressTextValue = string | { type: 'name'; value: string };
+export function toAddressTextValue(name: string | undefined, address: string): AddressTextValue {
+    return name ? { type: 'name', value: name } : address;
+}
+
+export const AddressText: FC<{ children: AddressTextValue }> = ({ children }) => {
+    const sdk = useAppSdk();
+    const { t } = useTranslation();
+
+    const childrenValue = typeof children === 'string' ? children : children.value;
+    const displayChildren =
+        typeof children === 'string' ? toShortValue(children, 8) : children.value;
+
+    return (
+        <AddressTextContent onClick={() => sdk.copyToClipboard(childrenValue, t('copied'))}>
+            {displayChildren}
+        </AddressTextContent>
+    );
+};
+
 const CommentMessage = styled(Body2)`
     padding: 0.5rem 0.75rem;
     background: ${props => props.theme.backgroundContentTint};
@@ -104,7 +137,7 @@ export const ErrorAction: FC<PropsWithChildren> = ({ children }) => {
 export const ColumnLayout: FC<{
     title: string;
     entry: string;
-    address: string;
+    address: AddressTextValue;
     date: string;
     amount?: React.ReactNode;
     green?: boolean;
@@ -122,7 +155,7 @@ export const ColumnLayout: FC<{
                 </AmountText>
             </FirstLine>
             <SecondLine>
-                <SecondaryText>{address}</SecondaryText>
+                <AddressText>{address}</AddressText>
                 <SecondaryText>{date}</SecondaryText>
             </SecondLine>
         </Description>

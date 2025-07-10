@@ -17,6 +17,7 @@ import {
 import { assertUnreachable } from '../utils/types';
 import { Network } from './network';
 import { TronWallet } from './tron/tron-wallet';
+import { SKSigningAlgorithm } from '../service/sign';
 
 /**
  * @deprecated
@@ -192,6 +193,25 @@ export class AccountTonTestnet extends TonMnemonic {
 export class AccountTonSK extends TonMnemonic {
     public readonly type = 'sk';
 
+    get signingAlgorithm() {
+        return this._signingAlgorithm ?? 'ed25519';
+    }
+
+    constructor(
+        id: AccountId,
+        name: string,
+        emoji: string,
+        auth: AuthPassword | AuthKeychain,
+        activeTonWalletId: WalletId,
+        tonWallets: TonWalletStandard[],
+        /**
+         * Undefined for existing accounts, set to 'ed25519'
+         */
+        private readonly _signingAlgorithm?: SKSigningAlgorithm
+    ) {
+        super(id, name, emoji, auth, activeTonWalletId, tonWallets);
+    }
+
     static create(params: {
         id: AccountId;
         name: string;
@@ -199,6 +219,7 @@ export class AccountTonSK extends TonMnemonic {
         auth: AuthPassword | AuthKeychain;
         activeTonWalletId: WalletId;
         tonWallets: TonWalletStandard[];
+        signingAlgorithm: SKSigningAlgorithm;
     }) {
         return new AccountTonSK(
             params.id,
@@ -206,7 +227,8 @@ export class AccountTonSK extends TonMnemonic {
             params.emoji,
             params.auth,
             params.activeTonWalletId,
-            params.tonWallets
+            params.tonWallets,
+            params.signingAlgorithm
         );
     }
 }
@@ -383,6 +405,9 @@ export class AccountKeystone extends Clonable implements IAccountTonWalletStanda
     }
 }
 
+/**
+ * Represents Tonkeeper Signer
+ */
 export class AccountTonOnly extends Clonable implements IAccountVersionsEditable {
     public readonly type = 'ton-only';
 

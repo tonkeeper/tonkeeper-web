@@ -7,6 +7,7 @@ import { BorderSmallResponsive } from '../shared/Styles';
 import { Badge } from '../shared';
 import { useAccountsState, useActiveAccountQuery } from '../../state/wallet';
 import {
+    WalletFireblocksIcon,
     WalletImportIcon,
     WalletKeystoneIcon,
     WalletLedgerIcon,
@@ -17,6 +18,7 @@ import {
     WalletTestnetIcon
 } from './WalletIcons';
 import { ChevronRightIcon } from '../Icon';
+import { HideOnReview } from '../ios/HideOnReview';
 import { useSecurityCheck } from '../../state/password';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 
@@ -94,7 +96,8 @@ export const addWalletMethod = [
     'signer',
     'keystone',
     'ledger',
-    'testnet'
+    'testnet',
+    'sk_fireblocks'
 ] as const;
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
@@ -102,14 +105,20 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     onSelect: onSelectProp
 }) => {
     const { t } = useTranslation();
-    const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig } = useAppContext();
+    const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig, hideFireblocks } =
+        useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
 
     const accounts = useAccountsState();
     const { data: activeAccount } = useActiveAccountQuery();
-    const canAddMultisig =
-        accounts.some(acc => isAccountCanManageMultisigs(acc)) && activeAccount?.type !== 'testnet';
 
+    const canHaveProSubscription = accounts.some(
+        acc => acc.type === 'mnemonic' || acc.type === 'mam'
+    );
+    const canAddMultisig =
+        accounts.some(acc => isAccountCanManageMultisigs(acc)) &&
+        activeAccount?.type !== 'testnet' &&
+        canHaveProSubscription;
     const { mutateAsync: securityCheck } = useSecurityCheck();
 
     const onSelect = async (method: AddWalletMethod) => {
@@ -177,35 +186,27 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                     </AddMethodText>
                     <RightIconStyled />
                 </AddMethod>
-                {canAddMultisig && !hideMultisig && (
-                    <AddMethod onClick={() => onSelect('multisig')}>
-                        <ButtonIcon>
-                            <WalletPencilIcon />
-                        </ButtonIcon>
-                        <AddMethodText>
-                            <AddMethodLabel>
-                                {t('add_wallet_new_multisig_title')}{' '}
-                                <Badge color="accentBlue">PRO</Badge>
-                            </AddMethodLabel>
-                            <AddMethodDescription>
-                                {t('add_wallet_new_multisig_description')}
-                            </AddMethodDescription>
-                        </AddMethodText>
-                        <RightIconStyled />
-                    </AddMethod>
-                )}
-                <AddMethod onClick={() => onSelect('testnet')}>
-                    <ButtonIcon>
-                        <WalletTestnetIcon />
-                    </ButtonIcon>
-                    <AddMethodText>
-                        <AddMethodLabel>{t('add_wallet_modal_testnet_title')}</AddMethodLabel>
-                        <AddMethodDescription>
-                            {t('add_wallet_modal_testnet_subtitle')}
-                        </AddMethodDescription>
-                    </AddMethodText>
-                    <RightIconStyled />
-                </AddMethod>
+                <HideOnReview>
+                    {canAddMultisig && !hideMultisig && (
+                        <AddMethod onClick={() => onSelect('multisig')}>
+                            <ButtonIcon>
+                                <WalletPencilIcon />
+                            </ButtonIcon>
+                            <AddMethodText>
+                                <AddMethodLabel>
+                                    {t('add_wallet_new_multisig_title')}{' '}
+                                    <HideOnReview>
+                                        <Badge color="accentBlue">PRO</Badge>
+                                    </HideOnReview>
+                                </AddMethodLabel>
+                                <AddMethodDescription>
+                                    {t('add_wallet_new_multisig_description')}
+                                </AddMethodDescription>
+                            </AddMethodText>
+                            <RightIconStyled />
+                        </AddMethod>
+                    )}
+                </HideOnReview>
             </AddMethodsGroup>
             {!hideAllHardwareWallets && (
                 <>
@@ -253,6 +254,42 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                                 <RightIconStyled />
                             </AddMethod>
                         )}
+                    </AddMethodsGroup>
+                    <GroupsDivider>{t('add_wallet_group_other_options')}</GroupsDivider>
+                    <AddMethodsGroup>
+                        {!hideFireblocks && canHaveProSubscription && (
+                            <HideOnReview>
+                                <AddMethod onClick={() => onSelect('sk_fireblocks')}>
+                                    <ButtonIcon>
+                                        <WalletFireblocksIcon />
+                                    </ButtonIcon>
+                                    <AddMethodText>
+                                        <AddMethodLabel>
+                                            {t('add_wallet_modal_fireblocks_title')}
+                                            <Badge color="accentBlue">PRO</Badge>
+                                        </AddMethodLabel>
+                                        <AddMethodDescription>
+                                            {t('add_wallet_modal_fireblocks_description')}
+                                        </AddMethodDescription>
+                                    </AddMethodText>
+                                    <RightIconStyled />
+                                </AddMethod>
+                            </HideOnReview>
+                        )}
+                        <AddMethod onClick={() => onSelect('testnet')}>
+                            <ButtonIcon>
+                                <WalletTestnetIcon />
+                            </ButtonIcon>
+                            <AddMethodText>
+                                <AddMethodLabel>
+                                    {t('add_wallet_modal_testnet_title')}
+                                </AddMethodLabel>
+                                <AddMethodDescription>
+                                    {t('add_wallet_modal_testnet_subtitle')}
+                                </AddMethodDescription>
+                            </AddMethodText>
+                            <RightIconStyled />
+                        </AddMethod>
                     </AddMethodsGroup>
                 </>
             )}

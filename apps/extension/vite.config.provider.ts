@@ -19,6 +19,8 @@ export default defineConfig({
         chunkFileNames: () => {
           throw new Error('Chunks are not allowed for provider.js');
         },
+        intro: '(function(){',
+        outro: '})();'
       },
       treeshake: {
         moduleSideEffects: false

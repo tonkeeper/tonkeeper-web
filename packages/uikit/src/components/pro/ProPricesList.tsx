@@ -1,10 +1,9 @@
 import { FC } from 'react';
 import styled from 'styled-components';
-import { IDisplayPlan, isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
+import { Badge } from '../shared';
 import { Body2, Body3, Label2 } from '../Text';
-import { useAppSdk } from '../../hooks/appSdk';
-import { formatter } from '../../hooks/balance';
 import { SkeletonText } from '../shared/Skeleton';
 import { getSkeletonProducts } from '../../libs/pro';
 import { useTranslation } from '../../hooks/translation';
@@ -20,7 +19,6 @@ interface IProps {
 
 const ProPricesListContent: FC<IProps> = props => {
     const { className, removeTitle = false, displayPlans, skeletonSize } = props;
-    const sdk = useAppSdk();
     const { t } = useTranslation();
 
     const productsForRender = displayPlans?.length
@@ -32,20 +30,28 @@ const ProPricesListContent: FC<IProps> = props => {
             {!removeTitle && <Title>{t('prices')}</Title>}
             <ListBlock fullWidth margin={false}>
                 {productsForRender.map(planProps => {
-                    const { id, displayName, displayPrice } = planProps;
+                    const { id, displayName, formattedDisplayPrice } = planProps;
 
                     const titleNode = displayName ? (
-                        <Body2Styled>{t(normalizeTranslationKey(displayName))}</Body2Styled>
+                        <Body2Styled>
+                            {t(normalizeTranslationKey(displayName))}
+                            {formattedDisplayPrice === '-' && (
+                                <Badge
+                                    size="s"
+                                    marginLeft="6px"
+                                    color="textSecondary"
+                                    display="inline-block"
+                                >
+                                    {t('soon')}
+                                </Badge>
+                            )}
+                        </Body2Styled>
                     ) : (
                         <SkeletonTextStyled width="100px" />
                     );
 
-                    const priceNode = displayPrice ? (
-                        <Label2>
-                            {isCryptoStrategy(sdk.subscriptionStrategy)
-                                ? `${formatter.fromNano(displayPrice)} TON`
-                                : displayPrice}
-                        </Label2>
+                    const priceNode = formattedDisplayPrice ? (
+                        <Label2>{formattedDisplayPrice}</Label2>
                     ) : (
                         <SkeletonTextStyled width="100px" />
                     );

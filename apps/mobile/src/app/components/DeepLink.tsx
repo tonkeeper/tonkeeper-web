@@ -36,6 +36,7 @@ import { tonConnectTonkeeperProAppName } from '@tonkeeper/core/dist/service/tonC
 import { capacitorTonConnectInjectedConnector } from '../../libs/ton-connect/capacitor-injected-connector';
 import { CapacitorDappBrowser } from '../../libs/plugins/dapp-browser-plugin';
 import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 
 export const useMobileProPairSignerSubscription = () => {
     const { mutateAsync } = useParseAndAddSigner();
@@ -122,12 +123,15 @@ export const DeepLinkSubscription = () => {
         useCompleteInjectedConnection();
 
     const handlerClose = async (
-        result: {
-            replyItems: TonConnectEventPayload;
-            manifest: DAppManifest;
-            account: Account;
-            walletId: WalletId;
-        } | null
+        result:
+            | {
+                  replyItems: TonConnectEventPayload;
+                  manifest: DAppManifest;
+                  account: Account;
+                  walletId: WalletId;
+              }
+            | null
+            | TonConnectError
     ) => {
         setTkMobileUrl(null);
         if (!params) return;

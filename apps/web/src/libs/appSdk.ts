@@ -21,6 +21,20 @@ export class BrowserAppSdk extends BaseApp {
     constructor() {
         super(new BrowserStorage());
     }
+
+    pasteFromClipboard = async () => {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
+            try {
+                return await navigator.clipboard.readText();
+            } catch (e) {
+                console.error('Failed to read clipboard', e);
+                return '';
+            }
+        } else {
+            return '';
+        }
+    };
+
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
 

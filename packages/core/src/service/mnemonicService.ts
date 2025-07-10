@@ -27,7 +27,7 @@ export const walletSecretFromString = async (secret: string): Promise<AccountSec
         };
     }
 
-    if (isValidSK(secret)) {
+    if (isValidSKOrSeed(secret)) {
         return {
             type: 'sk',
             sk: secret

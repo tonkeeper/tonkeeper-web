@@ -195,6 +195,7 @@ const Loader: FC = () => {
         ios,
         defaultWalletVersion: WalletVersion.V5R1,
         hideMultisig: isMobile,
+        hideFireblocks: true,
         env: {
             tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
             stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,

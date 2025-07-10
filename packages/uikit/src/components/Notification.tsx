@@ -33,6 +33,8 @@ import { cn, iosKeyboardTransition } from '../libs/css';
 import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
 import { atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
 
+const notificationMaxWidth = 650;
+
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
     padding-left: ${props => props.scrollbarWidth}px;
@@ -43,6 +45,7 @@ const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
         css`
             min-height: 100%;
             height: 100%;
+            max-width: ${notificationMaxWidth}px;
         `}
 `;
 
@@ -54,7 +57,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: 
     const sdk = useAppSdk();
 
     const scrollbarWidth = useMemo(() => {
-        return window.innerWidth > 550 ? sdk.getScrollbarWidth() : 0;
+        return window.innerWidth > notificationMaxWidth ? sdk.getScrollbarWidth() : 0;
     }, [sdk, entered]);
 
     return (
@@ -301,7 +304,7 @@ const BackShadow = styled.div`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            max-width: 550px;
+            max-width: ${notificationMaxWidth}px;
         `}
 `;
 
@@ -765,12 +768,13 @@ export const NotificationDesktopAndWeb: FC<{
     const nodeRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const closeOnEscapeKey = (e: KeyboardEvent) => (e.key === 'Escape' ? onClose() : null);
+        const closeOnEscapeKey = (e: KeyboardEvent) =>
+            e.key === 'Escape' && open ? onClose() : null;
         document.body.addEventListener('keydown', closeOnEscapeKey);
         return () => {
             document.body.removeEventListener('keydown', closeOnEscapeKey);
         };
-    }, [onClose]);
+    }, [onClose, open]);
 
     const Child = useMemo(() => {
         return children((_afterClose?: () => void) => {

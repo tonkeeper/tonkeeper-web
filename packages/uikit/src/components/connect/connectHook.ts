@@ -12,9 +12,10 @@ import {
     seeIfBringToFrontLink
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
-    connectRejectResponse,
+    connectErrorResponse,
     parseTonConnect,
-    saveWalletTonConnect
+    saveWalletTonConnect,
+    tonConnectUserRejectError
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
     AccountConnectionHttp,
@@ -33,6 +34,7 @@ import { useTonTransactionNotification } from '../modals/TonTransactionNotificat
 import { useActiveApi, useActiveWallet } from '../../state/wallet';
 import { useBatteryServiceConfig } from '../../state/battery';
 import { useGaslessConfig } from '../../state/gasless';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 
 export const useProcessOpenedLink = (options?: {
     hideLoadingToast?: boolean;
@@ -132,15 +134,24 @@ export const useCompleteHttpConnection = () => {
         Error,
         {
             params: TonConnectHttpConnectionParams;
-            result: {
-                replyItems: TonConnectEventPayload;
-                manifest: DAppManifest;
-                account: Account;
-                walletId: WalletId;
-            } | null;
+            result:
+                | {
+                      replyItems: TonConnectEventPayload;
+                      manifest: DAppManifest;
+                      account: Account;
+                      walletId: WalletId;
+                  }
+                | null
+                | TonConnectError;
         }
     >(async ({ params, result }) => {
-        if (result) {
+        if (!result || result instanceof TonConnectError) {
+            await sendEventToBridge({
+                response: connectErrorResponse(result ?? tonConnectUserRejectError()),
+                sessionKeyPair: params.sessionKeyPair,
+                clientSessionId: params.clientSessionId
+            });
+        } else {
             const response = await saveWalletTonConnect({
                 storage: sdk.storage,
                 account: result.account,
@@ -176,12 +187,6 @@ export const useCompleteHttpConnection = () => {
                     if (e instanceof Error) sdk.topMessage(e.message);
                 }
             }
-        } else {
-            await sendEventToBridge({
-                response: connectRejectResponse(),
-                sessionKeyPair: params.sessionKeyPair,
-                clientSessionId: params.clientSessionId
-            });
         }
         await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
 
@@ -198,16 +203,21 @@ export const useCompleteInjectedConnection = () => {
         Error,
         {
             params: TonConnectInjectedConnectionParams;
-            result: {
-                replyItems: TonConnectEventPayload;
-                manifest: DAppManifest;
-                account: Account;
-                walletId: WalletId;
-            } | null;
+            result:
+                | {
+                      replyItems: TonConnectEventPayload;
+                      manifest: DAppManifest;
+                      account: Account;
+                      walletId: WalletId;
+                  }
+                | null
+                | TonConnectError;
             sendBridgeResponse: (result: ConnectEvent) => void;
         }
     >(async ({ params, result, sendBridgeResponse }) => {
-        if (result) {
+        if (!result || result instanceof TonConnectError) {
+            sendBridgeResponse(connectErrorResponse(result ?? tonConnectUserRejectError()));
+        } else {
             const response = await saveWalletTonConnect({
                 storage: sdk.storage,
                 account: result.account,
@@ -221,8 +231,6 @@ export const useCompleteInjectedConnection = () => {
             sendBridgeResponse(response);
 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
-        } else {
-            sendBridgeResponse(connectRejectResponse());
         }
 
         return undefined;

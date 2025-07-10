@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
-import { isIosStrategy } from '@tonkeeper/core/dist/entries/pro';
+import {
+    isIosStrategy,
+    isProSubscription,
+    isValidSubscription
+} from '@tonkeeper/core/dist/entries/pro';
 
 import { Label2 } from '../Text';
 import { SlidersIcon } from '../Icon';
@@ -11,15 +15,17 @@ import { useTranslation } from '../../hooks/translation';
 import { ProStatusDetailsList } from './ProStatusDetailsList';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { ProScreenContentWrapper } from './ProScreenContentWrapper';
-import { useManageSubscription, useProLogout } from '../../state/pro';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
-import { HideOnReview } from '../ios/HideOnReview';
+import { useManageSubscription, useProLogout, useProState } from '../../state/pro';
 
 // TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
+    const { data: proState } = useProState();
     const toast = useToast();
+
+    const subscription = proState?.subscription;
 
     const {
         mutateAsync: handleLogOut,
@@ -40,19 +46,22 @@ export const ProStatusScreen = () => {
         }
     }, []);
 
+    if (!isProSubscription(subscription)) return null;
+    const isProActive = isValidSubscription(subscription);
+
     const isIos = isIosStrategy(sdk.subscriptionStrategy);
 
     return (
         <ProScreenContentWrapper>
             <ProSubscriptionHeader
-                titleKey="tonkeeper_pro_is_active"
-                subtitleKey="subscription_is_linked"
+                titleKey={isProActive ? 'tonkeeper_pro_is_active' : 'tonkeeper_pro_subscription'}
+                subtitleKey={isProActive ? 'subscription_is_linked' : 'pro_unlocks_premium_tools'}
             />
+
             <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
-            {/* tODO Remove it from review */}
-            <HideOnReview>
-                <ProStatusDetailsList />
-            </HideOnReview>
+
+            <ProStatusDetailsList />
+
             {isIos && (
                 <Button
                     secondary
@@ -64,6 +73,7 @@ export const ProStatusScreen = () => {
                     <Label2>{t('Manage')}</Label2>
                 </Button>
             )}
+
             <ProFeaturesList />
         </ProScreenContentWrapper>
     );

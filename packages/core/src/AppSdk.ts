@@ -134,6 +134,7 @@ export interface IAppSdk {
     biometry?: BiometryService;
 
     topMessage: (text: string) => void;
+    pasteFromClipboard: () => Promise<string>;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (
         url: string,
@@ -235,6 +236,12 @@ export abstract class BaseApp implements IAppSdk {
 
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
+    };
+
+    pasteFromClipboard = async () => {
+        console.warn('Method is not implemented yet');
+
+        return '';
     };
 
     copyToClipboard = (value: string, notification?: string) => {
