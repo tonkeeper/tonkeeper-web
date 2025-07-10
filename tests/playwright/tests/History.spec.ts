@@ -12,7 +12,14 @@ test.beforeEach(async ({ page }) => {
   await page.locator('#create-password').fill('a]HmC.;MAcQJ[+Y@&r!-3h');
   await page.locator('#create-password-confirm').fill('a]HmC.;MAcQJ[+Y@&r!-3h');
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Wallet Tokens Setup' })).toBeVisible();
+  await page.getByText('Configure token support for').click();
+  await expect(page.locator('form')).toContainText('Configure token support for easier wallet management.');
+  await page.getByText('USD₮TRC20').click();
+  await page.getByText('Use USD₮ TRC20 without TRX.').click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByText('Multichain')).toBeVisible();
 });
 
 test.afterEach(async ({ page }) => {
@@ -24,6 +31,9 @@ test.afterEach(async ({ page }) => {
     .locator('div')
     .click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
+  await page.locator('#react-portal-modal-container').getByRole('textbox').fill('a]HmC.;MAcQJ[+Y@&r!-3h');
+  await page.getByRole('button', { name: 'Confirm' }).click();
+  await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });
 
 //has link to Tonviewer

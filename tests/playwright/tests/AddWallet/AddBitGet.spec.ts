@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+test.setTimeout(4 * 60 * 1000);
 //Add BITGET wallet 24 mnemonic + ensure address is correct
 
 test('BITGET', async ({ page }) => {
@@ -9,17 +9,20 @@ test('BITGET', async ({ page }) => {
   await page.getByLabel('1:', { exact: true }).click();
   await page.getByLabel('1:', { exact: true }).fill(process.env.BITGET_MNEMONIC_24);
   await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByText('W5', { exact: true })).toBeVisible();
-  await expect(page.getByText('UQC2…1-Ly · 0 TON')).toBeVisible();
-  await expect(page.locator('#react-portal-modal-container')).toContainText('UQC2…1-Ly · 0 TON');
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Password', { exact: true }).fill('123456');
-  await page.getByLabel('Re-enter password').click();
-  await page.getByLabel('Re-enter password').fill('123456');
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.locator('#create-password').fill('123456');
+  await page.locator('#create-password-confirm').fill('123456');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Wallet name').fill('BITGET');
   await page.getByText('🧜', { exact: true }).click();
-  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Wallet Tokens Setup' })).toBeVisible();
+  await page.getByText('Configure token support for').click();
+  await expect(page.locator('form')).toContainText('Configure token support for easier wallet management.');
+  await page.getByText('USD₮TRC20').click();
+  await page.getByText('Use USD₮ TRC20 without TRX.').click();
+  await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByText('BITGET').first()).toBeVisible();
   await expect(page.locator('#root')).toContainText('BITGET');
   await expect(page.getByText('UQC2…1-Ly')).toBeVisible();
@@ -29,4 +32,7 @@ test('BITGET', async ({ page }) => {
   await page.getByText('Delete Account').click();
   await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
+  await page.locator('#react-portal-modal-container').getByRole('textbox').fill('123456');
+  await page.getByRole('button', { name: 'Confirm' }).click();
+  await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });

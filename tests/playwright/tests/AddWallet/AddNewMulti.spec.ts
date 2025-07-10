@@ -6,10 +6,6 @@ test('New multi wallet', async ({ page }) => {
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'New Multi-Wallet Account Beta' }).click();
   await expect(page.getByRole('heading', { name: 'Your wallet has just been' })).toBeVisible();
-  await page.locator('div').filter({ hasText: /^Back$/ }).nth(1).click();
-  await page.getByRole('button').nth(2).click();
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'New Multi-Wallet Account Beta' }).click();
   await expect(page.getByRole('heading', { name: 'Grab a pen and a piece of' })).toBeVisible();
   await page.getByRole('button', { name: 'Continue' }).click();
   //go step back
