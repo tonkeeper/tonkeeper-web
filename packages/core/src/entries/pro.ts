@@ -293,14 +293,8 @@ export function isCryptoSubscription(value: unknown): value is CryptoSubscriptio
     return isProSubscription(value) && value?.source === SubscriptionSource.CRYPTO;
 }
 
-export function isIosSubscription(value: unknown): value is IosSubscription {
-    return (
-        typeof value === 'object' &&
-        value !== null &&
-        'source' in value &&
-        (value as any).source === SubscriptionSource.IOS &&
-        'status' in value
-    );
+export function isIosSubscription(value: unknown): value is CryptoSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
 }
 
 export function hasIosPrice(

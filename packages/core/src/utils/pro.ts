@@ -1,6 +1,3 @@
-import { formatter } from '@tonkeeper/uikit/dist/hooks/balance';
-import { adaptPlansToViewModel, getSkeletonProducts } from '@tonkeeper/uikit/dist/libs/pro';
-
 import {
     CryptoSubscriptionStatuses,
     IDisplayPlan,
@@ -15,8 +12,10 @@ import { Network } from '../entries/network';
 import { isStandardTonWallet } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
+import { formatter } from '../../../uikit/src/hooks/balance';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
+import { adaptPlansToViewModel, getSkeletonProducts } from '../../../uikit/src/libs/pro';
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
