@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 import {
     isPendingSubscription,
     isProSubscription,
-    isTelegramActiveSubscription,
     isTelegramSubscription,
     isValidSubscription,
     ProState
@@ -55,7 +54,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isTelegramActiveSubscription(subscription) && subscription.trialEndDate) {
+    if (isProSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
