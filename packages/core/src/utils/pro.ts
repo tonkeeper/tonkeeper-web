@@ -1,8 +1,6 @@
 import {
     CryptoSubscriptionStatuses,
-    IDisplayPlan,
     IosSubscriptionStatuses,
-    NormalizedProPlans,
     ProSubscription,
     TelegramSubscriptionStatuses
 } from '../entries/pro';
@@ -12,10 +10,8 @@ import { Network } from '../entries/network';
 import { isStandardTonWallet } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
-import { formatter } from '../../../uikit/src/hooks/balance';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
-import { adaptPlansToViewModel, getSkeletonProducts } from '../../../uikit/src/libs/pro';
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
@@ -152,39 +148,4 @@ export const findAuthorizedWallet = async (user: UserInfo, storage: IStorage) =>
         publicKey: actualWallet.publicKey,
         rawAddress: actualWallet.rawAddress
     };
-};
-
-export const isValidNanoString = (value: string): boolean => {
-    return /^\d+$/.test(value);
-};
-
-export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean) => {
-    try {
-        if (!displayPrice) return '-';
-
-        let formattedProPrice = displayPrice;
-        if (isCrypto) {
-            formattedProPrice = isValidNanoString(displayPrice)
-                ? `${formatter.fromNano(displayPrice)} TON`
-                : '-';
-        }
-
-        return formattedProPrice;
-    } catch (e) {
-        console.error('getFormattedDisplayPrice error: ', e);
-        return '-';
-    }
-};
-
-const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
-const IOS_SKELETON_PRODUCTS_QTY = 2;
-
-export const getFilteredDisplayPlans = (proPlans: NormalizedProPlans | undefined) => {
-    return adaptPlansToViewModel(proPlans).filter(plan => plan.formattedDisplayPrice !== '-');
-};
-
-export const getProductsForRender = (displayPlans: IDisplayPlan[], isCrypto: boolean) => {
-    return displayPlans.length
-        ? displayPlans
-        : getSkeletonProducts(isCrypto ? CRYPTO_SKELETON_PRODUCTS_QTY : IOS_SKELETON_PRODUCTS_QTY);
 };

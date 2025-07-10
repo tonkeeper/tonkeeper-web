@@ -8,7 +8,6 @@ import {
     isProSubscription,
     isTelegramActiveSubscription
 } from '@tonkeeper/core/dist/entries/pro';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 
 import { Body2 } from '../Text';
 import { SkeletonList } from '../Skeleton';
@@ -17,6 +16,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { HideOnReview } from '../ios/HideOnReview';
+import { getFormattedProPrice } from '../../libs/pro';
 
 // TODO Improve this screen after getting the real data from Apple
 export const ProStatusDetailsList = () => {
@@ -35,6 +35,11 @@ export const ProStatusDetailsList = () => {
 
         if (isCryptoSubscription(subscription) && subscription?.amount) {
             return getFormattedProPrice(subscription?.amount, true);
+        }
+
+        // TODO We can't have amount for older users
+        if (isCryptoSubscription(subscription) && !subscription?.amount) {
+            return '8 TON';
         }
 
         if (isIosSubscription(subscription) && hasIosPrice(subscription)) {
