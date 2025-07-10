@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Notification } from '../Notification';
+import { Notification, NotificationFooterPortal } from '../Notification';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
@@ -54,12 +54,14 @@ export const ProTrialStartNotification: FC<{
             isOpen={isOpen}
             handleClose={() => onClose()}
             footer={
-                <FooterStyled>
-                    <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
-                        <TelegramIcon />
-                        {t('connect_telegram')}
-                    </ButtonStyled>
-                </FooterStyled>
+                <NotificationFooterPortal>
+                    <FooterStyled>
+                        <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
+                            <TelegramIcon />
+                            {t('connect_telegram')}
+                        </ButtonStyled>
+                    </FooterStyled>
+                </NotificationFooterPortal>
             }
         >
             {() => (
