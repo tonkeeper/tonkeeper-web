@@ -33,7 +33,16 @@ test('Backup', async ({ page }) => {
   await expect(page.getByText('9.  elite')).toBeVisible();
   await expect(page.locator('#react-portal-modal-container')).toContainText('Write down these 24 words in the order given below and store them in a secret, safe place.');
   await expect(page.getByRole('heading')).toContainText('Your recovery phrase');
-  await page.locator('#react-portal-modal-container').getByRole('button').click();
+  await page.getByRole('button', { name: 'Export TRC20 Wallet' }).click();
+  await expect(page.getByRole('heading', { name: 'Export TRC20 Wallet' })).toBeVisible();
+  await expect(page.getByText('This phrase is for TRC20 only')).toBeVisible();
+  await expect(page.locator('#react-portal-modal-container')).toContainText('This phrase is for TRC20 only. It cannot restore your TON wallet. Use your TON recovery phrase for TON wallet recovery.');
+  await expect(page.getByText('Write down these 12 words in')).toBeVisible();
+  await page.getByText('1. memory').click();
+  await page.getByText('6. resource').click();
+  await page.getByRole('button', { name: 'Copy' }).click();
+  await expect(page.getByText('Copied')).toBeVisible();
+  await page.locator('#react-portal-modal-container').getByRole('button').nth(1).click();
   await page.getByText('Delete Account').click();
   await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();

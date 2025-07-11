@@ -39,7 +39,7 @@ test.afterEach(async ({ page }) => {
 //has link to Tonviewer
 test('History', async ({ page }) => {
 
-  await page.getByRole('button', { name: 'Account 1 UQAG…gyIO v4R2 UQCk' }).click();
+
   await page.getByRole('link', { name: 'History' }).click();
   await expect(page.getByText('History').nth(1)).toBeVisible();
   const page1Promise = page.waitForEvent('popup');
@@ -54,7 +54,7 @@ test('History', async ({ page }) => {
 //can filter by token / initiator
 test('History filterS', async ({ page }) => {
 
-  await page.getByRole('button', { name: 'Account 1 UQAG…gyIO v4R2 UQCk' }).click();
+
   await page.getByRole('link', { name: 'History' }).click();
   await page.getByRole('button', { name: 'All Tokens' }).click();
   await page.locator('div').filter({ hasText: /^TON$/ }).click();
@@ -65,6 +65,5 @@ test('History filterS', async ({ page }) => {
   await page.locator('div').filter({ hasText: /^Hide SpamFilter is not reset on restart$/ }).first().click();
   await expect(page.getByText('HistoryUSD₮InitiatorHide')).toBeVisible();
   await page.getByRole('button', { name: 'USD₮' }).click();
-  await page.locator('div').filter({ hasText: /^HistoryUSD₮All TokensTONUSD₮JBCTDUSTMARGAAMBRBOLTMEMGRBSMCWTONDRIFTGGR$/ }).getByRole('button').nth(2).click();
-  await page.locator('div').filter({ hasText: /^Hide SpamFilter is not reset on restart$/ }).first().click();
+
 });
