@@ -1,10 +1,8 @@
-import { test, expect } from '@playwright/test';
-test.setTimeout(4 * 60 * 1000);
-//Elements visibility at seed phrase screen
+import { test, expect } from '@playwright/test'; test.setTimeout(4 * 60 * 1000);
+//Elements visibility at seed phrase screen 
 
 test('Seed phrase screen', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.goto('/'); await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
   await expect(page.locator('#react-portal-modal-container').getByRole('button').nth(1)).toBeVisible();
   await expect(page.locator('#react-portal-modal-container').getByRole('button').first()).toBeVisible();
