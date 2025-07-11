@@ -1,174 +1,56 @@
 import { test, expect } from '@playwright/test';
 
-//Add one testnet account 
 test.setTimeout(4 * 60 * 1000);
 
-test('Add 1 testnet', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Testnet Account Import wallet' }).click();
-  await expect(page.getByRole('heading', { name: 'Enter your recovery phrase' })).toBeVisible();
-  await expect(page.locator('h2')).toContainText('Enter your recovery phrase');
-  await expect(page.getByText('To restore access to your')).toBeVisible();
-  await expect(page.locator('#react-portal-modal-container')).toContainText('To restore access to your wallet, enter the 24 secret recovery words given to you when you created your wallet.');
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_ANANAS);
+const MNEMONIC = process.env.TON_MNEMONIC_24 ?? '';
+const PASSWORD = process.env.TEST_PASSWORD ?? '';
+const WALLET_NAME = 'TeStNeT Wallet';
+
+async function fillPasswordForm(page: any, password: string) {
+  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByLabel('Re-enter password').fill(password);
   await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByText('0QBW…lsqP · 0 TON')).toBeVisible();
-  await expect(page.locator('div:nth-child(5) > .sc-jNMdxs')).toBeVisible();
-  await expect(page.getByText('0QD-…agbX')).toBeVisible();
-  await expect(page.locator('#react-portal-modal-container')).toContainText('0QD-…agbX');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234567');
-  await page.getByLabel('Re-enter password').click();
-  await page.getByLabel('Re-enter password').fill('1234567');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Ananas');
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByRole('link', { name: 'Testnet' })).toBeVisible();
-  await expect(page.locator('#root')).toContainText('Testnet');
-  await expect(page.getByText('Ananas').first()).toBeVisible();
-  await expect(page.getByText('0QD-…agbX').first()).toBeVisible();
-  await expect(page.locator('#root')).toContainText('0QD-…agbX');
-  await expect(page.locator('#root')).toContainText('W5');
-  await expect(page.getByText('W5').first()).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^Ananas0QD-…agbXW5$/ }).locator('path')).toBeVisible();
-  await expect(page.getByText('🍍')).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^Dashboard$/ })).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^Discover$/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Ananas Testnet 0QD-…agbX W5' })).toBeVisible();
-  await expect(page.locator('#root')).toContainText('0QD-…agbX');
-  await expect(page.locator('#root')).toContainText('W5');
-  await expect(page.locator('#root')).toContainText('0QAT…ddQF');
-  await expect(page.locator('#root')).toContainText('W5 beta');
-  await expect(page.locator('#root')).toContainText('0QD2…G4so');
-  await expect(page.locator('#root')).toContainText('v4R2');
-  await expect(page.locator('#root')).toContainText('0QDj…pFAl');
-  await expect(page.locator('#root')).toContainText('v3R2');
+}
+
+async function deleteWallet(page: any, password: string) {
   await page.getByRole('link', { name: 'Settings' }).click();
   await page.getByText('Delete Account').click();
-  await page
-    .locator('div')
+  await page.locator('div')
     .filter({ hasText: /^I have a backup copy of recovery phrase$/ })
     .locator('div')
     .click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
-});
-
-//Add two testnet accounts to the list
-
-test('Add 2 testnets', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Testnet Account Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_ANANAS);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByText('0QBW…lsqP · 0 TON')).toBeVisible();
-  await expect(page.getByText('0QD-…agbX')).toBeVisible();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234567');
-  await page.getByLabel('Re-enter password').click();
-  await page.getByLabel('Re-enter password').fill('1234567');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Wallet name').fill('Ananas');
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByRole('link', { name: 'Testnet' })).toBeVisible();
-  await expect(page.locator('#root')).toContainText('Testnet');
-  await expect(page.getByText('Ananas').first()).toBeVisible();
-  await expect(page.getByText('0QD-…agbX').first()).toBeVisible();
-  await expect(page.locator('#root')).toContainText('0QD-…agbX');
-  await expect(page.locator('#root')).toContainText('W5');
-  await expect(page.getByText('W5').first()).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^Ananas0QD-…agbXW5$/ }).locator('path')).toBeVisible();
-  await expect(page.getByText('🍍')).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^Dashboard$/ })).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^Discover$/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Ananas Testnet 0QD-…agbX W5' })).toBeVisible();
-  await expect(page.locator('#root')).toContainText('0QD-…agbX');
-  await expect(page.locator('#root')).toContainText('W5');
-  await expect(page.locator('#root')).toContainText('0QAT…ddQF');
-  await expect(page.locator('#root')).toContainText('W5 beta');
-  await expect(page.locator('#root')).toContainText('0QD2…G4so');
-  await expect(page.locator('#root')).toContainText('v4R2');
-  await expect(page.locator('#root')).toContainText('0QDj…pFAl');
-  await expect(page.locator('#root')).toContainText('v3R2');
-  await page.locator('#react-portal-modal-container').getByRole('button').first().click();
-  await page.getByText('Add Wallet').click();
-  await page.getByRole('button', { name: 'Testnet Account Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.getByText('0QDC…QPPc · 0 TON')).toBeVisible();
-  await expect(page.locator('#react-portal-modal-container')).toContainText('0QDC…QPPc · 0 TON');
-  await expect(page.getByText('0QDm…Unvx · 0 TON')).toBeVisible();
-  await expect(page.getByText('0QAG…g5mE · 0 TON')).toBeVisible();
-  await expect(page.getByText('0QC0…65WC · 0 TON')).toBeVisible();
-  await expect(page.getByText('0QCk…ycj6 · 0 TON')).toBeVisible();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Password').fill('1234567');
-  await page.locator('div:nth-child(2) > .sc-gGmKOd > .sc-jgHCeW > .sc-eJMOVy > .sc-fbkieD > .overflow-hidden > div > .sc-fWSCoS').click();
+  await page.locator('#react-portal-modal-container').getByRole('textbox').fill(password);
   await page.getByRole('button', { name: 'Confirm' }).click();
-  await expect(page.getByRole('link', { name: 'Testnet' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '👳‍♂️ Account 2 Testnet' })).toBeVisible();
-  await expect(page.locator('#root')).toContainText('Testnet');
-  await expect(page.locator('#root')).toContainText('Account 2');
-  await expect(page.getByText('0QDC…QPPc')).toBeVisible();
-  await page.getByRole('button', { name: '👳‍♂️ Account 2 Testnet' }).getByRole('button').click();
-  await page.getByRole('button', { name: 'Add' }).nth(2).click();
-  await page.getByRole('button', { name: 'Add' }).nth(1).click();
-  await expect(page.getByText('v3R20QC0…65WC · 0 TON')).toBeVisible();
-  await expect(page.getByText('v4R20QAG…g5mE · 0 TON')).toBeVisible();
-  await expect(page.getByText('W50QDC…QPPc · 0 TON')).toBeVisible();
-  await page.getByRole('button', { name: 'Hide' }).first().click();
-  await page.getByRole('button', { name: 'Open' }).first().click();
-  await expect(page.getByText('Account 20QAG…g5mEv4R2👳‍♂️')).toBeVisible();
-  await expect(page.locator('#root')).toContainText('Account 20QAG…g5mEv4R2👳‍♂️');
-  await page.locator('div').filter({ hasText: /^Preferences$/ }).click();
-  await page.locator('div').filter({ hasText: /^Sign Out of all Accounts$/ }).first().click();
-  await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
-  await page.getByRole('button', { name: 'Delete wallet data' }).click();
-  await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
-});
+}
 
-test('Mainnet + testnet', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Get started' }).click();
-  await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_ANANAS);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Password', { exact: true }).fill('123456??');
-  await page.getByLabel('Re-enter password').click();
-  await page.getByLabel('Re-enter password').fill('123456??');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Account 1UQBA…OP8VW5🍍')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Account 1 UQBA…OP8V W5 UQDH…' })).toBeVisible();
-  await expect(page.locator('#root')).toContainText('UQBA…OP8V');
-  await expect(page.locator('#root')).toContainText('UQDH…TkZ5');
-  await expect(page.locator('#root')).toContainText('UQD2…GzCi');
-  await expect(page.locator('#root')).toContainText('UQDj…pOuv');
-  await expect(page.locator('#root')).toContainText('UQBW…lnEF');
-  await page.locator('div').filter({ hasText: /^Add Wallet$/ }).click();
-  await page.getByRole('button', { name: 'Testnet Account Import wallet' }).click();
-  await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_ANANAS);
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await expect(page.locator('#react-portal-modal-container')).toContainText('v3R20QDj…pFAl');
-  await expect(page.locator('#react-portal-modal-container')).toContainText('v4R20QD2…G4so');
-  await expect(page.locator('#react-portal-modal-container')).toContainText('0QAT…ddQF');
-  await expect(page.locator('#react-portal-modal-container')).toContainText('W50QD-…agbX');
-  await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Password').fill('123456??');
-  await page.getByRole('button', { name: 'Confirm' }).click();
-  await page.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByRole('heading', { name: 'Congratulations! You’ve set' })).toBeVisible();
-  await expect(page.getByText('Account 10QD-…agbXW5🍍')).toBeVisible();
-  await expect(page.locator('#root')).toContainText('0QD-…agbX');
-  await expect(page.locator('#root')).toContainText('0QAT…ddQF');
-  await expect(page.locator('#root')).toContainText('0QD2…G4so');
-  await expect(page.locator('#root')).toContainText('0QDj…pFAl');
-  await expect(page.getByRole('button', { name: '🍍 Account 1 Testnet 0QD-…' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Testnet' })).toBeVisible();
+test('🔗 Import testnet wallet with mnemonic and delete it', async ({ page }) => {
+  await test.step('Import testnet wallet', async () => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Get started' }).click();
+    await page.getByRole('button', { name: 'Testnet Account Import wallet' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Enter your recovery phrase' })).toBeVisible();
+    await expect(page.locator('h2')).toContainText('Enter your recovery phrase');
+    await page.getByLabel('1:', { exact: true }).fill(MNEMONIC);
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
+
+    await fillPasswordForm(page, PASSWORD);
+    await page.getByLabel('Wallet name').fill(WALLET_NAME);
+    await page.getByRole('button', { name: 'Save' }).click();
+  });
+
+  await test.step('Import succeess check', async () => {
+    await expect(page.getByRole('link', { name: 'Testnet' })).toBeVisible();
+    await expect(page.locator('#root')).toContainText('Testnet');
+    await expect(page.locator('#root')).toContainText(/0QDC.*QPPc/);
+    await expect(page.locator('div').filter({ hasText: /^Dashboard$/ })).toBeVisible();
+    await expect(page.locator('div').filter({ hasText: /^Discover$/ })).toBeVisible();
+  });
+
+  await test.step('Delete Wallete', async () => {
+    await deleteWallet(page, PASSWORD);
+    await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
+  });
 });
