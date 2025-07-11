@@ -52,7 +52,7 @@ test('History', async ({ page }) => {
 });
 
 //can filter by token / initiator
-test('History filterS', async ({ page }) => {
+test('History filter', async ({ page }) => {
 
 
   await page.getByRole('link', { name: 'History' }).click();

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 //generate new wallet flow(except seed phrase)
-test('new wallet', async ({ page }) => {
+test('new general wallet', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'New Wallet Create new wallet' }).click();
