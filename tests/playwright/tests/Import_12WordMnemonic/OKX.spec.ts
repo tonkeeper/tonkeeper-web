@@ -13,6 +13,7 @@ test('OKX wallet', async ({ page }) => {
   await page.getByLabel('1:', { exact: true }).fill(process.env.OKX_MNEMONIC_12);
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
   await page
     .locator('div')
     .filter({ hasText: /^Password$/ })
@@ -39,4 +40,7 @@ test('OKX wallet', async ({ page }) => {
   await page.getByText('Delete Account').click();
   await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
+  await page.getByLabel('Password').fill('123456');
+  await page.getByRole('button', { name: 'Confirm' }).click();
+  await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });
