@@ -12,7 +12,7 @@ async function clickContinue(page, times = 1) {
 }
 
 test('BITGET wallet import and delete flow', async ({ page }) => {
-  await test.step('Импорт кошелька по мнемонике', async () => {
+  await test.step('Import wallet', async () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Get started' }).click();
     await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
@@ -26,7 +26,7 @@ test('BITGET wallet import and delete flow', async ({ page }) => {
     await clickContinue(page);
   });
 
-  await test.step('Настройка токенов', async () => {
+  await test.step('Tokens', async () => {
     await expect(page.getByRole('heading', { name: 'Wallet Tokens Setup' })).toBeVisible();
     await page.getByText('Configure token support for').click();
     await expect(page.locator('form')).toContainText('Configure token support for easier wallet management.');
@@ -35,7 +35,7 @@ test('BITGET wallet import and delete flow', async ({ page }) => {
     await clickContinue(page);
   });
 
-  await test.step('Проверка кошелька', async () => {
+  await test.step('Check wallet', async () => {
     const walletName = page.getByText('BITGET').first();
     await expect(walletName).toBeVisible();
     await expect(walletName).toHaveText(/BITGET/);
@@ -43,7 +43,7 @@ test('BITGET wallet import and delete flow', async ({ page }) => {
     await expect(page.getByRole('button', { name: 'BITGET' })).toBeVisible();
   });
 
-  await test.step('Удаление кошелька', async () => {
+  await test.step('Delete wallet', async () => {
     await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByText('Delete Account').click();
     await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();

@@ -21,32 +21,32 @@ async function deleteAccount(page: any) {
 }
 
 test('📡 Watch-only wallet — DNS name', async ({ page }) => {
-    await test.step('Добавление через DNS', async () => {
+    await test.step('Add by DNS', async () => {
         await startWatchFlow(page, 'oleganza.ton', 'test name', '💚');
     });
-    await test.step('Удаление кошелька', async () => {
+    await test.step('Delete wallet', async () => {
         await deleteAccount(page);
     });
 });
 
 test('📡 Watch-only wallet — by address', async ({ page }) => {
-    await test.step('Добавление по адресу', async () => {
+    await test.step('Add by address', async () => {
         await startWatchFlow(page, 'UQAgxzj9H34-cZwyNZMai8I7Ghzko1XbIAKAVqIHD6m3fZvV', 'watch only', '💟');
     });
-    await test.step('Удаление кошелька', async () => {
+    await test.step('Delete wallet', async () => {
         await deleteAccount(page);
     });
 });
 
 test('📡 Watch-only wallet — by hex string', async ({ page }) => {
-    await test.step('Добавление по hex', async () => {
+    await test.step('Add by hex', async () => {
         await startWatchFlow(
             page,
             '0:14d76eaec79a0ae126f90e012dc9622e27492e7aad8e51ac20ebf618cad392b3',
             'watch only by hex'
         );
     });
-    await test.step('Удаление кошелька', async () => {
+    await test.step('Delete wallet', async () => {
         await deleteAccount(page);
     });
 });

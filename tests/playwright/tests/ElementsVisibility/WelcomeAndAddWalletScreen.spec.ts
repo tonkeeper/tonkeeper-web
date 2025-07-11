@@ -34,11 +34,11 @@ const EXPECTED_ADD_WALLET_TEXTS = [
 ];
 
 test('🚪 Welcome screen visibility', async ({ page }) => {
-  await test.step('Открытие Welcome экрана', async () => {
+  await test.step('Open Welcome Screen', async () => {
     await page.goto('/');
   });
 
-  await test.step('Проверка ключевых текстов и кнопок', async () => {
+  await test.step('Check texts and buttons', async () => {
     for (const text of EXPECTED_WELCOME_TEXTS) {
       await expect(page.locator('#root')).toContainText(text);
     }
@@ -47,12 +47,12 @@ test('🚪 Welcome screen visibility', async ({ page }) => {
 });
 
 test('🧩 Add wallet screen visibility', async ({ page }) => {
-  await test.step('Переход к экрану Add Wallet', async () => {
+  await test.step('Navigate to Add Wallet screen', async () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Get started' }).click();
   });
 
-  await test.step('Проверка основных опций добавления кошелька', async () => {
+  await test.step('Check Add Wallet options', async () => {
     for (const text of EXPECTED_ADD_WALLET_TEXTS) {
       await expect(page.locator('#react-portal-modal-container')).toContainText(text);
     }
@@ -73,7 +73,7 @@ test('🧩 Add wallet screen visibility', async ({ page }) => {
     }
   });
 
-  await test.step('Выход обратно на Welcome экран', async () => {
+  await test.step('Navigate back to Welcome screen', async () => {
     await page.locator('.sc-kfzCjt').click();
     await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
   });

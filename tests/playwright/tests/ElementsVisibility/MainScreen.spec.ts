@@ -52,11 +52,11 @@ async function checkMainScreenElements(page: any) {
 }
 
 test('🧩 Visibility of key elements on Main screen', async ({ page }) => {
-  await test.step('Импорт существующего кошелька', async () => {
+  await test.step('Import existing wallet', async () => {
     await importWallet(page);
   });
 
-  await test.step('Проверка основных элементов интерфейса', async () => {
+  await test.step('Check interface  elements', async () => {
     await checkMainScreenElements(page);
   });
 });

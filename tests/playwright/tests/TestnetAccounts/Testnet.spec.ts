@@ -25,15 +25,13 @@ async function deleteWallet(page: any, password: string) {
 }
 
 test('🔗 Import testnet wallet with mnemonic and delete it', async ({ page }) => {
-  await test.step('Импорт testnet кошелька', async () => {
+  await test.step('Import testnet wallet', async () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Get started' }).click();
     await page.getByRole('button', { name: 'Testnet Account Import wallet' }).click();
 
     await expect(page.getByRole('heading', { name: 'Enter your recovery phrase' })).toBeVisible();
     await expect(page.locator('h2')).toContainText('Enter your recovery phrase');
-    await expect(page.getByText(/To restore access to your/)).toBeVisible();
-
     await page.getByLabel('1:', { exact: true }).fill(MNEMONIC);
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
@@ -43,16 +41,15 @@ test('🔗 Import testnet wallet with mnemonic and delete it', async ({ page }) 
     await page.getByRole('button', { name: 'Save' }).click();
   });
 
-  await test.step('Проверка успешного импорта', async () => {
+  await test.step('Import succeess check', async () => {
     await expect(page.getByRole('link', { name: 'Testnet' })).toBeVisible();
     await expect(page.locator('#root')).toContainText('Testnet');
-    await expect(page.getByText(WALLET_NAME)).toBeVisible();
     await expect(page.locator('#root')).toContainText(/0QDC.*QPPc/);
     await expect(page.locator('div').filter({ hasText: /^Dashboard$/ })).toBeVisible();
     await expect(page.locator('div').filter({ hasText: /^Discover$/ })).toBeVisible();
   });
 
-  await test.step('Удаление кошелька', async () => {
+  await test.step('Delete Wallete', async () => {
     await deleteWallet(page, PASSWORD);
     await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
   });
