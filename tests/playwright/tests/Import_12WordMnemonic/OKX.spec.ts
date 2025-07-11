@@ -71,6 +71,7 @@ test('v4 default for OKX ', async ({ page }) => {
   await page.getByText('USD₮TRC20').click();
   await page.getByText('Use USD₮ TRC20 without TRX.').click();
   await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByText('Multichain')).toBeVisible();
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.locator('#root')).toContainText('Active address');
   await expect(page.getByRole('link', { name: 'Active address v4R2' })).toBeVisible();

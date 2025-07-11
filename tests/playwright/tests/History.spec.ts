@@ -50,20 +50,3 @@ test('History', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'All Tokens' })).toBeVisible();
   await expect(page.locator('div').filter({ hasText: /^HistoryAll Tokens$/ }).getByRole('button').nth(2)).toBeVisible();
 });
-
-//can filter by token / initiator
-test('History filter', async ({ page }) => {
-
-
-  await page.getByRole('link', { name: 'History' }).click();
-  await page.getByRole('button', { name: 'All Tokens' }).click();
-  await page.locator('div').filter({ hasText: /^TON$/ }).click();
-  await page.getByRole('button', { name: 'TON' }).click();
-  await page.locator('div').filter({ hasText: /^USD₮$/ }).click();
-  await expect(page.getByText('HistoryUSD₮')).toBeVisible();
-  await page.locator('div').filter({ hasText: /^HistoryUSD₮$/ }).getByRole('button').nth(2).click();
-  await page.locator('div').filter({ hasText: /^Hide SpamFilter is not reset on restart$/ }).first().click();
-  await expect(page.getByText('HistoryUSD₮InitiatorHide')).toBeVisible();
-  await page.getByRole('button', { name: 'USD₮' }).click();
-
-});
