@@ -50,25 +50,20 @@ export const ProTrialStartNotification: FC<{
     };
 
     return (
-        <Notification
-            isOpen={isOpen}
-            handleClose={() => onClose()}
-            footer={
-                <NotificationFooterPortal>
-                    <FooterStyled>
-                        <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
-                            <TelegramIcon />
-                            {t('connect_telegram')}
-                        </ButtonStyled>
-                    </FooterStyled>
-                </NotificationFooterPortal>
-            }
-        >
+        <Notification isOpen={isOpen} handleClose={() => onClose()}>
             {() => (
                 <ContentWrapper>
                     <ImageStyled src="https://tonkeeper.com/assets/icon.ico" />
                     <Label2>{t('start_trial_notification_heading')}</Label2>
                     <Body2>{t('start_trial_notification_description')}</Body2>
+                    <NotificationFooterPortal>
+                        <FooterStyled>
+                            <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
+                                <TelegramIcon />
+                                {t('connect_telegram')}
+                            </ButtonStyled>
+                        </FooterStyled>
+                    </NotificationFooterPortal>
                 </ContentWrapper>
             )}
         </Notification>
