@@ -189,7 +189,6 @@ export const useProSubscriptionPurchase = () => {
                 source: SubscriptionSource.IOS,
                 status: IosSubscriptionStatuses.PENDING,
                 valid: false,
-                isTrial: false,
                 usedTrial: data?.subscription?.usedTrial ?? false
             };
 

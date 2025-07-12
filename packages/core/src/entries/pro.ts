@@ -25,7 +25,6 @@ export type NormalizedProPlans =
 interface BaseSubscription {
     source: SubscriptionSource;
     valid: boolean;
-    isTrial: boolean;
     usedTrial: boolean;
     nextChargeDate?: Date;
 }
@@ -51,7 +50,6 @@ interface IosDBStoredInfo {
 interface BaseIosSubscription extends BaseSubscription {
     source: SubscriptionSource.IOS;
     status: IosSubscriptionStatuses;
-    isTrial: false;
 }
 
 interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
@@ -157,7 +155,6 @@ interface CryptoDBStoredInfo {
 interface BaseCryptoSubscription extends BaseSubscription {
     source: SubscriptionSource.CRYPTO;
     status: CryptoSubscriptionStatuses;
-    isTrial: false;
 }
 
 interface CryptoActiveSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
@@ -201,7 +198,6 @@ export function isCryptoStrategy(
 interface BaseTelegramSubscription extends BaseSubscription {
     source: SubscriptionSource.TELEGRAM;
     status: TelegramSubscriptionStatuses;
-    isTrial: true;
     usedTrial: true;
     trialUserId?: number;
     trialEndDate?: Date;

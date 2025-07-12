@@ -161,7 +161,6 @@ export const useCryptoPurchaseFlow = () => {
                 source: SubscriptionSource.CRYPTO,
                 status: CryptoSubscriptionStatuses.PENDING,
                 valid: false,
-                isTrial: false,
                 usedTrial: proState?.subscription?.usedTrial ?? false
             };
 
