@@ -16,6 +16,7 @@ import { CheckDesktopPasswordControlled } from './modals/PromptDesktopPassword';
 import { TonTransactionNotificationControlled } from './modals/TonTransactionNotificationControlled';
 import { MAMTronMigrationNotification } from './modals/MAMTronMigrationNotificationControlled';
 import { ProEndingNotificationControlled } from './modals/ProEndingNotificationControlled';
+import { ProPurchaseNotificationControlled } from './modals/ProPurchaseNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -23,6 +24,7 @@ export const ModalsRoot = () => {
             <WalletVersionSettingsNotification />
             <LedgerIndexesSettingsNotification />
             <ProFeaturesNotificationControlled />
+            <ProPurchaseNotificationControlled />
             <ProEndingNotificationControlled />
             <MAMIndexesSettingsNotification />
             <RenameNotificationControlled />

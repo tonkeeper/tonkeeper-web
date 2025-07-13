@@ -1,7 +1,7 @@
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
 
-import { SubscriptionScreens } from '../enums/pro';
+import { PurchaseSubscriptionScreens, SubscriptionScreens } from '../enums/pro';
 import { formatter } from '../hooks/balance';
 
 export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
@@ -13,8 +13,8 @@ export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
     }));
 
 export const isDirectionForward = (
-    current: SubscriptionScreens,
-    prev: SubscriptionScreens | null
+    current: SubscriptionScreens | PurchaseSubscriptionScreens,
+    prev: SubscriptionScreens | PurchaseSubscriptionScreens | null
 ): boolean => {
     if (prev === null) return true;
 

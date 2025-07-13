@@ -14,7 +14,6 @@ import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
 import { useProState } from '../../../state/pro';
 import { Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
-import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
 import { RefreshIcon, SpinnerIcon } from '../../Icon';
 import {
@@ -25,6 +24,7 @@ import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
+import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -130,7 +130,6 @@ const DDContent = styled.div<{ width: number }>`
 
 const ProButtonPanel = styled(Button)`
     padding: 0 12px;
-    cursor: default;
 
     &:hover {
         background-color: ${p => p.theme.buttonTertiaryBackground};
@@ -140,7 +139,7 @@ const ProButtonPanel = styled(Button)`
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { data } = useProState();
-    const { onOpen } = useProFeaturesNotification();
+    const { onOpen } = useProPurchaseNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
     const { mutate: invalidateGlobalQueries, isLoading: isInvalidatingGlobalQueries } =
@@ -180,7 +179,9 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 )}
                 trigger="hover"
             >
-                <ProButtonPanel>Tonkeeper Pro</ProButtonPanel>
+                <ProButtonPanel type="button" onClick={onGetPro}>
+                    Tonkeeper Pro
+                </ProButtonPanel>
             </DropDown>
         );
     } else {
