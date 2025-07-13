@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
+    isPaidSubscription,
     isPendingSubscription,
     isProSubscription,
     isTelegramSubscription,
@@ -33,7 +34,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
 
-    const { subscription } = data;
+    const { current: subscription } = data;
 
     if (isTelegramSubscription(subscription) && subscription.trialEndDate) {
         return (
@@ -54,7 +55,7 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isProSubscription(subscription) && subscription.nextChargeDate) {
+    if (isPaidSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
@@ -168,7 +169,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
 
     let button = <Button loading>Tonkeeper Pro</Button>;
 
-    if (data && isValidSubscription(data.subscription)) {
+    if (data && isValidSubscription(data.current)) {
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"
@@ -184,9 +185,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         );
     } else {
         const isProcessing =
-            data &&
-            isProSubscription(data?.subscription) &&
-            isPendingSubscription(data?.subscription);
+            data && isProSubscription(data?.current) && isPendingSubscription(data?.current);
 
         button = isProcessing ? (
             <DropDown

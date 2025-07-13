@@ -2,14 +2,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     IDisplayPlan,
-    IosPendingSubscription,
     IosPurchaseStatuses,
-    IosSubscriptionStatuses,
     isIosStrategy,
     isProductId,
     NormalizedProPlans,
     ProState,
-    ProStateAuthorized,
+    ProStateWallet,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
@@ -23,7 +21,6 @@ import {
     logoutTonConsole,
     ProAuthTokenService,
     retryProService,
-    saveIapPurchase,
     setBackupState,
     startProServiceTrial,
     waitProServiceInvoice
@@ -132,7 +129,7 @@ export const useProState = () => {
     return useQuery<ProState, Error>([QueryKey.pro, isFreeProAccessAvailable], async () => {
         const state = await getProState(authService, sdk.storage);
 
-        await setBackupState(sdk.storage, state.subscription);
+        await setBackupState(sdk.storage, state.current);
         await client.invalidateQueries([QueryKey.proBackup]);
 
         return state;
@@ -153,7 +150,7 @@ export const useManageSubscription = () => {
 
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
-    const { data } = useProState();
+    // const { data } = useProState();
     const client = useQueryClient();
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
@@ -179,27 +176,27 @@ export const useProSubscriptionPurchase = () => {
             throw new Error('Failed to subscribe');
         }
 
-        const savingResult = await saveIapPurchase(String(originalTransactionId));
+        // const savingResult = await saveIapPurchase(String(originalTransactionId));
 
-        if (!savingResult.ok) {
-            const pendingSubscription: IosPendingSubscription = {
-                ...subscription,
-                displayName,
-                displayPrice,
-                source: SubscriptionSource.IOS,
-                status: IosSubscriptionStatuses.PENDING,
-                valid: false,
-                usedTrial: data?.subscription?.usedTrial ?? false
-            };
-
-            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-                authorizedWallet: data?.authorizedWallet || null,
-                subscription: pendingSubscription
-            });
-            await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
-
-            return IosPurchaseStatuses.PENDING;
-        }
+        // if (!savingResult.ok) {
+        //     const pendingSubscription: IosPendingSubscription = {
+        //         ...subscription,
+        //         displayName,
+        //         displayPrice,
+        //         source: SubscriptionSource.IOS,
+        //         status: IosSubscriptionStatuses.PENDING,
+        //         valid: false,
+        //         usedTrial: data?.subscription?.usedTrial ?? false
+        //     };
+        //
+        //     await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+        //         authorizedWallet: data?.authorizedWallet || null,
+        //         subscription: pendingSubscription
+        //     });
+        //     await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
+        //
+        //     return IosPurchaseStatuses.PENDING;
+        // }
 
         await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 
@@ -306,7 +303,7 @@ export const useCreateInvoiceMutation = () => {
     return useMutation<
         ConfirmState,
         Error,
-        { state: ProStateAuthorized; tierId: number | null; promoCode?: string }
+        { wallet: ProStateWallet; tierId: number | null; promoCode?: string }
     >(async data => {
         if (data.tierId === null) {
             throw new Error('missing tier');
@@ -314,7 +311,7 @@ export const useCreateInvoiceMutation = () => {
 
         const wallet = (await ws.getAccounts())
             .flatMap(a => a.allTonWallets)
-            .find(w => w.id === data.state.authorizedWallet.rawAddress);
+            .find(w => w.id === data.wallet.rawAddress);
         if (!wallet || !isStandardTonWallet(wallet)) {
             throw new Error('Missing wallet');
         }

@@ -580,7 +580,7 @@ const MultiSendFooter: FC<{
                     </MultiSendFooterTextWrapper>
                 )}
                 {/* TODO Check this logic again */}
-                {!proState || isValidSubscription(proState.subscription) ? (
+                {!proState || isValidSubscription(proState.current) ? (
                     <Button
                         type="submit"
                         primary

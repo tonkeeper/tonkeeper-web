@@ -10,6 +10,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
 import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
+import { isTelegramSubscription, WalletAuth } from '@tonkeeper/core/dist/entries/pro';
 
 interface IProps {
     onLogout: () => Promise<void>;
@@ -20,9 +21,14 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
     const { t } = useTranslation();
     const { data } = useProState();
     const goTo = useGoToSubscriptionScreen();
+    // TODO Fix TS casting
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
-        data?.authorizedWallet?.rawAddress || undefined
+        (data?.current?.auth as WalletAuth)?.wallet?.rawAddress || undefined
     );
+
+    if (data?.current && isTelegramSubscription(data.current)) {
+        return null;
+    }
 
     const handleDisconnectClick = async () => {
         await onLogout();

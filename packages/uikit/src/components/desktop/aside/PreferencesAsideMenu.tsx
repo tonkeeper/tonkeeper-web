@@ -107,13 +107,13 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const isTonkeeperProActive = location.pathname === AppRoute.settings + SettingsRoute.pro;
 
     const handleTonkeeperProClick = async () => {
-        if (isValidSubscription(proState?.subscription)) {
+        if (isValidSubscription(proState?.current)) {
             navigate(AppRoute.settings + SettingsRoute.pro);
 
             return;
         }
 
-        const isPromo = !proState?.subscription || !isPendingSubscription(proState?.subscription);
+        const isPromo = !proState?.current || !isPendingSubscription(proState?.current);
         if (isPromo) {
             onProFeaturesOpen();
 
@@ -149,7 +149,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     <TonkeeperSkeletIcon />
                     <Label2>{t('tonkeeper_pro')}</Label2>
                 </AsideMenuItemStyled>
-                {isValidSubscription(proState?.subscription) && (
+                {isValidSubscription(proState?.current) && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (
                             <AsideMenuItemLarge isSelected={isActive}>

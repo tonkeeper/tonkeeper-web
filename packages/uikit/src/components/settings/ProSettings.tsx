@@ -7,9 +7,11 @@ import {
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
     ProState,
-    ProStateAuthorized,
     isPaidSubscription,
-    isCryptoProPlans
+    isCryptoProPlans,
+    isTelegramSubscription,
+    ProStateWallet,
+    hasWalletAuth
 } from '@tonkeeper/core/dist/entries/pro';
 import {
     DerivationItemNamed,
@@ -193,12 +195,12 @@ const SelectIconWrapper = styled.span`
 `;
 
 const ProWallet: FC<{
-    data: ProState;
+    authWallet: ProStateWallet;
     onClick: () => void;
     disabled?: boolean;
-}> = ({ data, onClick, disabled }) => {
+}> = ({ authWallet, onClick, disabled }) => {
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
-        data.authorizedWallet?.rawAddress || undefined
+        authWallet?.rawAddress || undefined
     );
 
     if (!account || !wallet) {
@@ -318,10 +320,10 @@ const ConfirmBuyProService: FC<
 };
 
 const BuyProService: FC<{
-    data: ProStateAuthorized;
+    wallet: ProStateWallet;
     setReLogin: () => void;
     onSuccess?: () => void;
-}> = ({ data, setReLogin, onSuccess }) => {
+}> = ({ wallet, setReLogin, onSuccess }) => {
     const { t } = useTranslation();
 
     const ref = useRef<HTMLDivElement>(null);
@@ -355,7 +357,7 @@ const BuyProService: FC<{
     const onSubmit = async () => {
         setConfirm(
             await createInvoice({
-                state: data,
+                wallet,
                 tierId: selectedPlan,
                 promoCode
             })
@@ -367,7 +369,7 @@ const BuyProService: FC<{
 
     return (
         <div ref={containerRef}>
-            <ProWallet data={data} onClick={setReLogin} disabled={isLoading} />
+            <ProWallet authWallet={wallet} onClick={setReLogin} disabled={isLoading} />
             <SelectProPlans
                 plans={isCryptoProPlans(proPlans) ? proPlans?.plans : []}
                 setPlan={setPlan}
@@ -419,7 +421,9 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data
 
     return (
         <div>
-            <ProWallet data={data} onClick={setReLogin} />
+            {hasWalletAuth(data.current) && (
+                <ProWallet authWallet={data.current.auth.wallet} onClick={setReLogin} />
+            )}
 
             <StatusText>
                 <SubscriptionStatus data={data} />
@@ -435,13 +439,20 @@ const PreServiceStatus: FC<{ data: ProState; setReLogin: () => void }> = ({ data
 const ProContent: FC<{ data: ProState; onSuccess?: () => void }> = ({ data, onSuccess }) => {
     const [reLogin, setReLogin] = useState(false);
 
-    if (!data.authorizedWallet || reLogin) {
+    // TODO Implement better condition
+    if (!(!isTelegramSubscription(data.current) && data.current?.auth?.wallet) || reLogin) {
         return <SelectWallet onClose={() => setReLogin(false)} />;
     }
-    if (isPaidSubscription(data.subscription)) {
+    if (isPaidSubscription(data.current)) {
         return <PreServiceStatus data={data} setReLogin={() => setReLogin(true)} />;
     }
-    return <BuyProService data={data} setReLogin={() => setReLogin(true)} onSuccess={onSuccess} />;
+    return (
+        <BuyProService
+            wallet={data.current.auth.wallet}
+            setReLogin={() => setReLogin(true)}
+            onSuccess={onSuccess}
+        />
+    );
 };
 
 export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void }> = ({
@@ -459,13 +470,7 @@ export const ProSettingsContent: FC<{ showLogo?: boolean; onSuccess?: () => void
                 <Title>{t('tonkeeper_pro')}</Title>
                 <Description>{t('tonkeeper_pro_description')}</Description>
             </Block>
-            {data && (
-                <ProContent
-                    key={data.authorizedWallet?.rawAddress}
-                    data={data}
-                    onSuccess={onSuccess}
-                />
-            )}
+            {data && <ProContent data={data} onSuccess={onSuccess} />}
         </>
     );
 };

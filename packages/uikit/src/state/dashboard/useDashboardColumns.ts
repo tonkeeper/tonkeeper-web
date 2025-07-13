@@ -45,7 +45,7 @@ export function useDashboardColumnsForm() {
                         return {
                             id: storedColumn.id,
                             isEnabled:
-                                columnInfo.onlyPro && !isValidSubscription(proState?.subscription)
+                                columnInfo.onlyPro && !isValidSubscription(proState?.current)
                                     ? false
                                     : storedColumn.isEnabled ?? columnInfo.defaultIsChecked
                         };
@@ -57,7 +57,7 @@ export function useDashboardColumnsForm() {
                     .map(c => ({
                         id: c.id,
                         isEnabled:
-                            c.onlyPro && !isValidSubscription(proState?.subscription)
+                            c.onlyPro && !isValidSubscription(proState?.current)
                                 ? false
                                 : c.defaultIsChecked
                     }));
@@ -66,7 +66,7 @@ export function useDashboardColumnsForm() {
             return columns.map(c => ({
                 id: c.id,
                 isEnabled:
-                    c.onlyPro && !isValidSubscription(proState?.subscription)
+                    c.onlyPro && !isValidSubscription(proState?.current)
                         ? false
                         : c.defaultIsChecked
             }));

@@ -99,7 +99,7 @@ const CategoriesModalContent: FC<{
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
     const { data } = useProState();
-    const isProEnabled = isValidSubscription(data?.subscription);
+    const isProEnabled = isValidSubscription(data?.current);
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {

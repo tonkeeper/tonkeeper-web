@@ -24,7 +24,7 @@ export const ProStatusDetailsList = () => {
     const { data, isLoading } = useProState();
     const formatDate = useDateTimeFormat();
 
-    const subscription = data?.subscription;
+    const subscription = data?.current;
 
     if (!subscription || !isProSubscription(subscription)) return null;
 

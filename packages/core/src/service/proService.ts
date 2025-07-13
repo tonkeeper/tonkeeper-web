@@ -63,8 +63,8 @@ export const getProState = async (
     } catch (e) {
         console.error(e);
         return {
-            subscription: null,
-            authorizedWallet: null
+            current: null,
+            target: null
         };
     }
 };
@@ -100,40 +100,33 @@ const loadProState = async (
 
     const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
 
-    if (!authorizedWallet) {
-        return {
-            authorizedWallet: null,
-            subscription: null
-        };
-    }
-
     const subscriptionDTO = await UsersService.verifySubscription();
-    const subscription = normalizeSubscription(subscriptionDTO, user);
+    const subscription = normalizeSubscription(subscriptionDTO, { user, authorizedWallet });
 
     if (isValidSubscription(subscription)) {
         await storage.delete(AppKey.PRO_PENDING_STATE);
 
         return {
-            subscription,
-            authorizedWallet
+            current: subscription,
+            target: null
         };
     }
 
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
 
     if (
-        processingState?.subscription &&
-        isProSubscription(processingState.subscription) &&
-        hasSubscriptionSource(processingState.subscription) &&
-        isPendingSubscription(processingState.subscription)
+        processingState?.current &&
+        isProSubscription(processingState.current) &&
+        hasSubscriptionSource(processingState.current) &&
+        isPendingSubscription(processingState.current)
     ) {
         // TODO Start polling backend
         return processingState;
     }
 
     return {
-        authorizedWallet,
-        subscription: null
+        current: null,
+        target: null
     };
 };
 
@@ -224,7 +217,7 @@ export const createRecipient = async (
 export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
     for (let i = 0; i < 10; i++) {
         const state = await getProState(authService, storage);
-        if (isValidSubscription(state.subscription)) {
+        if (isValidSubscription(state.current)) {
             return;
         }
         await delay(5000);

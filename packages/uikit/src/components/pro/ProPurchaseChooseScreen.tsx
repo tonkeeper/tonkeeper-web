@@ -30,17 +30,13 @@ import { SubscriptionScreens } from '../../enums/pro';
 import { useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import {
-    CryptoPendingSubscription,
-    CryptoSubscriptionStatuses,
+    hasWalletAuth,
     IDisplayPlan,
     IosPurchaseStatuses,
     isCryptoProPlans,
     isCryptoStrategy,
-    NormalizedProPlans,
-    ProState
+    NormalizedProPlans
 } from '@tonkeeper/core/dist/entries/pro';
-import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
 const IOS_SKELETON_PRODUCTS_QTY = 2;
@@ -140,10 +136,10 @@ export const useCryptoPurchaseFlow = () => {
     const { mutate: waitInvoice, isLoading: isWaiting } = useWaitInvoiceMutation();
 
     const startPurchasing = async (selectedPlan: IDisplayPlan, promoCode?: string) => {
-        if (!proState?.authorizedWallet) return;
+        if (!proState?.current || !hasWalletAuth(proState?.current)) return;
 
         const confirmState = await createInvoice({
-            state: proState,
+            wallet: proState.current.auth.wallet,
             tierId: Number(selectedPlan.id),
             promoCode
         });
@@ -154,20 +150,21 @@ export const useCryptoPurchaseFlow = () => {
 
     const onConfirmClose = async (success?: boolean) => {
         if (success) {
-            const pendingSubscription: CryptoPendingSubscription = {
-                ...proState?.subscription,
-                displayName: savedSelectedPlan?.displayName,
-                displayPrice: savedSelectedPlan?.formattedDisplayPrice,
-                source: SubscriptionSource.CRYPTO,
-                status: CryptoSubscriptionStatuses.PENDING,
-                valid: false,
-                usedTrial: proState?.subscription?.usedTrial ?? false
-            };
-
-            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-                authorizedWallet: proState?.authorizedWallet || null,
-                subscription: pendingSubscription
-            });
+            // TODO Fix pending status setting
+            // const pendingSubscription: CryptoPendingSubscription = {
+            //     ...proState?.current,
+            //     displayName: savedSelectedPlan?.displayName,
+            //     displayPrice: savedSelectedPlan?.formattedDisplayPrice,
+            //     source: SubscriptionSource.CRYPTO,
+            //     status: CryptoSubscriptionStatuses.PENDING,
+            //     valid: false,
+            //     usedTrial: proState?.subscription?.usedTrial ?? false
+            // };
+            //
+            // await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+            //     authorizedWallet: proState?.authorizedWallet || null,
+            //     subscription: pendingSubscription
+            // });
             await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 
             goTo(SubscriptionScreens.STATUS);

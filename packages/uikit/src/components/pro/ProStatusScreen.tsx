@@ -26,7 +26,7 @@ export const ProStatusScreen = () => {
     const { data: proState } = useProState();
     const toast = useToast();
 
-    const subscription = proState?.subscription;
+    const subscription = proState?.current;
 
     const {
         mutateAsync: handleLogOut,

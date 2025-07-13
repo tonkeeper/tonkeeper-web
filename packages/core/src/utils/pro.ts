@@ -1,6 +1,8 @@
 import {
+    AuthTypes,
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
+    ProStateWallet,
     ProSubscription,
     TelegramSubscriptionStatuses
 } from '../entries/pro';
@@ -13,10 +15,16 @@ import { accountsStorage } from '../service/accountsStorage';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 
+interface IAuthData {
+    user: UserInfo;
+    authorizedWallet: ProStateWallet | null;
+}
+
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
-    user: UserInfo
+    authData: IAuthData
 ): ProSubscription => {
+    const { user, authorizedWallet } = authData;
     const source = subscriptionDto?.source;
     const toDate = (ts?: number) => (ts ? new Date(ts * 1000) : undefined);
 
@@ -40,8 +48,11 @@ export const normalizeSubscription = (
                 status: TelegramSubscriptionStatuses.ACTIVE,
                 valid: true,
                 usedTrial: true,
-                trialUserId: user.tg_id,
-                trialEndDate: nextChargeDate
+                trialEndDate: nextChargeDate,
+                auth: {
+                    type: AuthTypes.TELEGRAM,
+                    trialUserId: user.tg_id
+                }
             };
         }
 
@@ -50,12 +61,15 @@ export const normalizeSubscription = (
             status: TelegramSubscriptionStatuses.EXPIRED,
             valid: false,
             usedTrial: true,
-            trialUserId: user.tg_id,
-            trialEndDate: nextChargeDate
+            trialEndDate: nextChargeDate,
+            auth: {
+                type: AuthTypes.TELEGRAM,
+                trialUserId: user.tg_id
+            }
         };
     }
 
-    if (source === SubscriptionSource.CRYPTO) {
+    if (source === SubscriptionSource.CRYPTO && authorizedWallet) {
         if (valid) {
             return {
                 source,
@@ -63,6 +77,10 @@ export const normalizeSubscription = (
                 valid: true,
                 usedTrial,
                 nextChargeDate,
+                auth: {
+                    type: AuthTypes.WALLET,
+                    wallet: authorizedWallet
+                },
                 amount: subscriptionDto.crypto?.amount,
                 currency: subscriptionDto.crypto?.currency,
                 purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
@@ -75,13 +93,17 @@ export const normalizeSubscription = (
             valid: false,
             usedTrial,
             nextChargeDate,
+            auth: {
+                type: AuthTypes.WALLET,
+                wallet: authorizedWallet
+            },
             amount: subscriptionDto.crypto?.amount,
             currency: subscriptionDto.crypto?.currency,
             purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
         };
     }
 
-    if (source === SubscriptionSource.IOS) {
+    if (source === SubscriptionSource.IOS && authorizedWallet) {
         if (valid) {
             return {
                 source,
@@ -89,6 +111,10 @@ export const normalizeSubscription = (
                 valid: true,
                 usedTrial,
                 nextChargeDate,
+                auth: {
+                    type: AuthTypes.WALLET,
+                    wallet: authorizedWallet
+                },
                 txId: subscriptionDto.ios?.tx_id,
                 price: subscriptionDto.ios?.price,
                 currency: subscriptionDto.ios?.currency,
@@ -107,6 +133,10 @@ export const normalizeSubscription = (
             valid: false,
             usedTrial,
             nextChargeDate,
+            auth: {
+                type: AuthTypes.WALLET,
+                wallet: authorizedWallet
+            },
             txId: subscriptionDto.ios?.tx_id,
             price: subscriptionDto.ios?.price,
             currency: subscriptionDto.ios?.currency,

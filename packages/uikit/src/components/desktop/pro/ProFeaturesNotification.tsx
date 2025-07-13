@@ -76,14 +76,14 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
             <ProSubscriptionHeader />
             <ProPricesList displayPlans={adaptPlansToViewModel(products)} />
             <ProFeaturesList headerOptions={{ rightElement: null }} />
-            {!isValidSubscription(data.subscription) && (
+            {!isValidSubscription(data.current) && (
                 <NotificationFooterPortal>
                     <NotificationFooter>
                         <ButtonsBlockStyled
                             formId={formId}
                             isError={isError}
                             isLoading={isLoading}
-                            onTrial={hasUsedTrial(data.subscription) ? undefined : onTrialModalOpen}
+                            onTrial={hasUsedTrial(data.current) ? undefined : onTrialModalOpen}
                         />
                     </NotificationFooter>
                 </NotificationFooterPortal>

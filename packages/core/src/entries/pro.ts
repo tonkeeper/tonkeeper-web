@@ -18,6 +18,21 @@ export type TelegramSubscription = TelegramActiveSubscription | TelegramExpiredS
 
 export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
 
+export enum AuthTypes {
+    WALLET = 'wallet',
+    TELEGRAM = 'telegram'
+}
+
+export interface WalletAuth {
+    type: AuthTypes.WALLET;
+    wallet: ProStateWallet;
+}
+
+export interface TelegramAuth {
+    type: AuthTypes.TELEGRAM;
+    trialUserId: number | undefined;
+}
+
 export type NormalizedProPlans =
     | { source: SubscriptionSource.IOS; plans: IProductInfo[] }
     | { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[]; promoCode?: string };
@@ -27,6 +42,7 @@ interface BaseSubscription {
     valid: boolean;
     usedTrial: boolean;
     nextChargeDate?: Date;
+    auth: WalletAuth | TelegramAuth;
 }
 
 interface BaseSubscriptionStrategy {
@@ -50,6 +66,7 @@ interface IosDBStoredInfo {
 interface BaseIosSubscription extends BaseSubscription {
     source: SubscriptionSource.IOS;
     status: IosSubscriptionStatuses;
+    auth: WalletAuth;
 }
 
 interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
@@ -155,6 +172,7 @@ interface CryptoDBStoredInfo {
 interface BaseCryptoSubscription extends BaseSubscription {
     source: SubscriptionSource.CRYPTO;
     status: CryptoSubscriptionStatuses;
+    auth: WalletAuth;
 }
 
 interface CryptoActiveSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
@@ -199,8 +217,8 @@ interface BaseTelegramSubscription extends BaseSubscription {
     source: SubscriptionSource.TELEGRAM;
     status: TelegramSubscriptionStatuses;
     usedTrial: true;
-    trialUserId?: number;
     trialEndDate?: Date;
+    auth: TelegramAuth;
 }
 
 interface TelegramActiveSubscription extends BaseTelegramSubscription {
@@ -234,21 +252,14 @@ export function isTelegramActiveSubscription(
 }
 
 // Pro State
-export type ProState = ProStateAuthorized | ProStateNotAuthorized;
+export type ProState = {
+    current: ProSubscription;
+    target: ProSubscription;
+};
 
 export interface ProStateWallet {
     publicKey: string;
     rawAddress: string;
-}
-
-export interface ProStateAuthorized {
-    authorizedWallet: ProStateWallet;
-    subscription: ProSubscription;
-}
-
-export interface ProStateNotAuthorized {
-    authorizedWallet: null;
-    subscription: ProSubscription;
 }
 
 export function isPendingSubscription(
@@ -316,6 +327,12 @@ export function hasUsedTrial(
     subscription: ProSubscription
 ): subscription is Exclude<ProSubscription, null> & { usedTrial: true } {
     return subscription !== null && subscription.usedTrial;
+}
+
+export function hasWalletAuth(
+    subscription: ProSubscription
+): subscription is Exclude<ProSubscription, null> & { auth: { type: AuthTypes.WALLET } } {
+    return subscription !== null && subscription.auth?.type === AuthTypes.WALLET;
 }
 
 export function isCryptoProPlans(

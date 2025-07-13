@@ -17,8 +17,7 @@ export const SubscriptionFlowProvider: FC<IProps> = ({ children }) => {
     const { data: proState } = useProState();
     const isStatusScreen =
         proState &&
-        (isValidSubscription(proState.subscription) ||
-            isPendingSubscription(proState.subscription));
+        (isValidSubscription(proState.current) || isPendingSubscription(proState.current));
 
     const initialScreen = useMemo(() => {
         if (isStatusScreen) {
@@ -26,7 +25,7 @@ export const SubscriptionFlowProvider: FC<IProps> = ({ children }) => {
         }
 
         return SubscriptionScreens.ACCOUNTS;
-    }, [proState?.subscription]);
+    }, [proState?.current]);
 
     const [screen, setScreen] = useState<IScreenState | null>(null);
 

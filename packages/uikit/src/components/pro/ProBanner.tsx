@@ -64,7 +64,7 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
         return null;
     }
 
-    const { subscription } = data;
+    const { current: subscription } = data;
     const trialEndDate = isTelegramSubscription(subscription)
         ? subscription.trialEndDate
         : undefined;

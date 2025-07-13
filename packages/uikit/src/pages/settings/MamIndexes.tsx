@@ -222,7 +222,7 @@ export const MAMIndexesPageContent: FC<{
 
     const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
     const showByProButton =
-        !isValidSubscription(proState?.subscription) &&
+        !isValidSubscription(proState?.current) &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (

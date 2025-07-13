@@ -14,11 +14,11 @@ export const useDeleteActiveWalletWarning = () => {
     return async () => {
         let isApprovedDeleting = true;
 
-        if (!proState?.subscription || !isPaidSubscription(proState.subscription)) {
+        if (!proState?.current || !isPaidSubscription(proState.current)) {
             return isApprovedDeleting;
         }
 
-        if (activeWallet?.rawAddress !== proState?.authorizedWallet?.rawAddress) {
+        if (activeWallet?.rawAddress !== proState?.current?.auth?.wallet?.rawAddress) {
             return isApprovedDeleting;
         }
 
