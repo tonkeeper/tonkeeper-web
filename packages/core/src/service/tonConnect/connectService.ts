@@ -17,6 +17,7 @@ import {
     SendTransactionRpcResponseError,
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
+    TonConnectEventPayload,
     TonConnectNetwork,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
@@ -474,8 +475,7 @@ export const saveWalletTonConnect = async (options: {
     account: Account;
     manifest: DAppManifest;
     params: TonConnectConnectionParams;
-    replyItems: ConnectItemReply[];
-    appVersion: string;
+    replyItems: TonConnectEventPayload;
     walletId: WalletId;
 }): Promise<ConnectEvent> => {
     const wallet =
@@ -494,20 +494,10 @@ export const saveWalletTonConnect = async (options: {
         params: options.params
     });
 
-    const maxMessages = getMaxMessages(options.account);
-
     return {
         id: Date.now(),
         event: 'connect',
-        payload: {
-            items: options.replyItems,
-            device: getDeviceInfo(
-                getBrowserPlatform(),
-                options.appVersion,
-                maxMessages,
-                options.params.appName
-            )
-        }
+        payload: options.replyItems
     };
 };
 
