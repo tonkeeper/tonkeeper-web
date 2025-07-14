@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FiatCurrencies } from '../models/FiatCurrencies';
+import type { Currencies } from '../models/Currencies';
 import type { InvoicesInvoice } from '../models/InvoicesInvoice';
 import type { Lang } from '../models/Lang';
 import type { Ok } from '../models/Ok';
@@ -286,7 +286,7 @@ export class ProServiceService {
      */
     public static proServiceDashboardData(
         lang?: Lang,
-        currency?: FiatCurrencies,
+        currency?: Currencies,
         requestBody?: {
             accounts: Array<string>;
             columns: Array<string>;
