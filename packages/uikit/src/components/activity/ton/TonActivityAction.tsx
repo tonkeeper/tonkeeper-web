@@ -302,7 +302,7 @@ export const ActivityAction: FC<{
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {
             console.log(action);
-            return <ListItemPayload>{action.simplePreview.description}</ListItemPayload>;
+            return <ListItemPayload>{action.simplePreview.name}</ListItemPayload>;
         }
     }
 };
