@@ -10,30 +10,46 @@ import { PurchaseSubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
-import { useSelectWalletForProMutation } from '../../state/pro';
+import { useProState, useSelectWalletForProMutation } from '../../state/pro';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useAccountWallets, useActiveWallet } from '../../state/wallet';
 import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { isTelegramSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../libs/routes';
 
 export const ProAccountChooseScreen = () => {
     const formId = useId();
     const { t } = useTranslation();
+    const { data: proState } = useProState();
+    const { goTo, onClose } = usePurchaseControlScreen();
+    const navigate = useNavigate();
     const activeWallet = useActiveWallet();
     const accountsWallets = useAccountWallets();
     const [selectedAccountId, setSelectedAccountId] = useState(activeWallet?.rawAddress ?? '');
 
     const toast = useToast();
-    const { goTo } = usePurchaseControlScreen();
 
     const { mutateAsync, error, isSuccess, isLoading } = useSelectWalletForProMutation();
     useNotifyError(error);
 
     useEffect(() => {
-        if (isSuccess) {
-            goTo(PurchaseSubscriptionScreens.PURCHASE);
+        if (!isSuccess) return;
+
+        if (
+            proState &&
+            !isTelegramSubscription(proState.current) &&
+            isValidSubscription(proState.current)
+        ) {
+            onClose();
+            navigate(AppRoute.settings + SettingsRoute.pro);
+
+            return;
         }
-    }, [isSuccess]);
+
+        goTo(PurchaseSubscriptionScreens.PURCHASE);
+    }, [isSuccess, proState?.current]);
 
     const handleNextScreen = async () => {
         if (!selectedAccountId) {
