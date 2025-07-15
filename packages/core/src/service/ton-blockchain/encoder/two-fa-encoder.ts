@@ -3,6 +3,7 @@ import {
     beginCell,
     Cell,
     contractAddress,
+    Dictionary,
     internal,
     OutActionSendMsg,
     SendMode,
@@ -76,15 +77,15 @@ export class TwoFAEncoder {
         seedPubKey: bigint;
     }): Promise<OutActionWalletV5[]> => {
         const stateInit = this.pluginStateInit;
-        const address = contractAddress(this.walletAddress.workChain, stateInit);
+        const pluginAddress = contractAddress(this.walletAddress.workChain, stateInit);
 
-        const seqno = await this.getPluginSeqno(address.toRawString());
+        const seqno = await this.getPluginSeqno(pluginAddress.toRawString());
 
         const msgInstall: OutActionSendMsg = {
             type: 'sendMsg',
             mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             outMsg: internal({
-                to: address,
+                to: pluginAddress,
                 bounce: false,
                 value: TwoFAEncoder.deployPluginValue,
                 init: seqno === 0 ? stateInit : undefined,
@@ -92,13 +93,16 @@ export class TwoFAEncoder {
             })
         };
 
-        return [
-            msgInstall,
-            {
+        const result = [msgInstall];
+
+        if (!(await this.isPluginAddedToWalletExtensionsList())) {
+            result.push({
                 type: 'addExtension',
-                address
-            }
-        ];
+                address: pluginAddress
+            });
+        }
+
+        return result;
     };
 
     /**
@@ -197,7 +201,7 @@ export class TwoFAEncoder {
 
             return Number(seqno);
         } catch (e) {
-            console.error(e);
+            console.warn(e);
             return 0;
         }
     }
@@ -237,6 +241,40 @@ export class TwoFAEncoder {
             };
         } else {
             throw new Error(`Unknown state ${state}`);
+        }
+    }
+
+    public async isPluginAddedToWalletExtensionsList(): Promise<boolean> {
+        try {
+            const res = await new BlockchainApi(
+                this.api.tonApiV2
+            ).execGetMethodForBlockchainAccount({
+                accountId: this.walletAddress.toRawString(),
+                methodName: 'get_extensions'
+            });
+
+            if (!res.success) {
+                return false;
+            }
+
+            const extensionsCell = res.stack[0].cell;
+            if (!extensionsCell) {
+                return false;
+            }
+            const dict = Dictionary.loadDirect(
+                Dictionary.Keys.BigUint(256),
+                Dictionary.Values.BigInt(1),
+                Cell.fromBoc(Buffer.from(extensionsCell, 'hex'))[0]
+            );
+
+            const pluginsAddresses = dict.keys().map(addressHex => {
+                const wc = this.walletAddress.workChain;
+                return Address.parseRaw(`${wc}:${addressHex.toString(16).padStart(64, '0')}`);
+            });
+            return pluginsAddresses.some(a => a.equals(this.pluginAddress));
+        } catch (e) {
+            console.warn(e);
+            return false;
         }
     }
 }
