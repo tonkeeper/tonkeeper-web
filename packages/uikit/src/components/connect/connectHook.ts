@@ -118,7 +118,7 @@ export const useProcessOpenedLink = (options?: {
             return params;
         } catch (e) {
             if (!options?.hideErrorToast) {
-                notifyError(String(e));
+                notifyError(String(e).replace(/^Error ?: ?/, ''));
             }
             throw e;
         }

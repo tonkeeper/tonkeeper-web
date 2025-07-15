@@ -70,6 +70,8 @@ export function parseTonTransferWithAddress(options: { url: string }) {
     }
 }
 
+class LinkExpiredError extends Error {}
+
 // eslint-disable-next-line complexity
 export async function parseTonTransaction(
     url: string,
@@ -147,7 +149,7 @@ export async function parseTonTransaction(
         ) {
             validUntil = parseInt(data.query.exp);
             if (validUntil - 2000 < Date.now() / 1000) {
-                throw new Error('Unsupported link: expired');
+                throw new LinkExpiredError('Unsupported link: expired');
             }
         }
 
@@ -221,6 +223,9 @@ export async function parseTonTransaction(
             params
         };
     } catch (e) {
+        if (e instanceof LinkExpiredError) {
+            throw e;
+        }
         console.error(e);
         return null;
     }
