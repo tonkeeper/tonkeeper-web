@@ -2,30 +2,19 @@ import { type FC, type ReactNode, useCallback, useEffect, useMemo, useState } fr
 
 import { PurchaseSubscriptionScreens } from '../enums/pro';
 import {
-    GoToPurchaseContext,
+    PurchaseControlContext,
     IPurchaseScreenState,
     PurchaseScreenContext
 } from '../components/create/SubscriptionPurchaseContext';
-import { useProState } from '../state/pro';
 
 interface IProps {
     onClose: () => void;
     children: ReactNode;
+    initialScreen: PurchaseSubscriptionScreens | undefined;
 }
 
-export const SubscriptionPurchaseProvider: FC<IProps> = ({ children, onClose }) => {
-    const { data: proState } = useProState();
-    // const isStatusScreen =
-    //     proState &&
-    //     (isValidSubscription(proState.current) || isPendingSubscription(proState.current));
-
-    const initialScreen = useMemo(() => {
-        // if (isStatusScreen) {
-        //     return PurchaseSubscriptionScreens.STATUS;
-        // }
-
-        return PurchaseSubscriptionScreens.PROMO;
-    }, [proState?.current]);
+export const SubscriptionPurchaseProvider: FC<IProps> = props => {
+    const { children, onClose, initialScreen } = props;
 
     const [screen, setScreen] = useState<IPurchaseScreenState | null>(null);
 
@@ -38,10 +27,10 @@ export const SubscriptionPurchaseProvider: FC<IProps> = ({ children, onClose }) 
 
     useEffect(() => {
         setScreen({
-            currentScreen: initialScreen,
+            currentScreen: initialScreen ?? PurchaseSubscriptionScreens.PROMO,
             prevScreen: null
         });
-    }, [initialScreen]);
+    }, []);
 
     const controlValue = useMemo(() => ({ goTo, onClose }), [goTo, onClose]);
 
@@ -49,9 +38,9 @@ export const SubscriptionPurchaseProvider: FC<IProps> = ({ children, onClose }) 
 
     return (
         <PurchaseScreenContext.Provider value={screen}>
-            <GoToPurchaseContext.Provider value={controlValue}>
+            <PurchaseControlContext.Provider value={controlValue}>
                 {children}
-            </GoToPurchaseContext.Provider>
+            </PurchaseControlContext.Provider>
         </PurchaseScreenContext.Provider>
     );
 };

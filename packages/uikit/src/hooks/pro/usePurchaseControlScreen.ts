@@ -2,11 +2,11 @@ import { useContext } from 'react';
 
 import {
     IPurchaseControl,
-    GoToPurchaseContext
+    PurchaseControlContext
 } from '../../components/create/SubscriptionPurchaseContext';
 
 export const usePurchaseControlScreen = (): IPurchaseControl => {
-    const ctx = useContext(GoToPurchaseContext);
+    const ctx = useContext(PurchaseControlContext);
 
     if (!ctx) {
         throw new Error(
@@ -15,4 +15,8 @@ export const usePurchaseControlScreen = (): IPurchaseControl => {
     }
 
     return ctx;
+};
+
+export const useSafePurchaseControlScreen = (): IPurchaseControl | undefined => {
+    return useContext(PurchaseControlContext);
 };

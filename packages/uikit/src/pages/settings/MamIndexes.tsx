@@ -30,7 +30,6 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
@@ -39,6 +38,7 @@ import { useProState } from '../../state/pro';
 import { Navigate } from '../../components/shared/Navigate';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -143,7 +143,7 @@ export const MAMIndexesPageContent: FC<{
     const { t } = useTranslation();
     const config = useActiveConfig();
     const { data: proState } = useProState();
-    const { onOpen: buyPro } = useProFeaturesNotification();
+    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
@@ -206,6 +206,10 @@ export const MAMIndexesPageContent: FC<{
             accountId: account.id,
             derivationIndex: index
         });
+    };
+
+    const handleBuyPro = () => {
+        onProPurchaseOpen();
     };
 
     if (!balances) {
@@ -307,7 +311,7 @@ export const MAMIndexesPageContent: FC<{
             <NotificationFooterPortal>
                 <FooterButtonContainerStyled className={buttonWrapperClassName}>
                     {showByProButton ? (
-                        <Button primary fullWidth onClick={buyPro}>
+                        <Button primary fullWidth onClick={handleBuyPro}>
                             {t('settings_mam_add_wallet_with_pro')}
                         </Button>
                     ) : (

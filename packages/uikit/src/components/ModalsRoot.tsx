@@ -1,6 +1,5 @@
 import { WalletVersionSettingsNotification } from './modals/WalletVersionSettingsNotification';
 import { LedgerIndexesSettingsNotification } from './modals/LedgerIndexesSettingsNotification';
-import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
 import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotification';
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
@@ -23,7 +22,6 @@ export const ModalsRoot = () => {
         <>
             <WalletVersionSettingsNotification />
             <LedgerIndexesSettingsNotification />
-            <ProFeaturesNotificationControlled />
             <ProPurchaseNotificationControlled />
             <ProEndingNotificationControlled />
             <MAMIndexesSettingsNotification />

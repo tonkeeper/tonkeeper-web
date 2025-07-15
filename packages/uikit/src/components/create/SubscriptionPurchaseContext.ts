@@ -13,4 +13,4 @@ export interface IPurchaseControl {
 }
 
 export const PurchaseScreenContext = createContext<IPurchaseScreenState | undefined>(undefined);
-export const GoToPurchaseContext = createContext<IPurchaseControl | undefined>(undefined);
+export const PurchaseControlContext = createContext<IPurchaseControl | undefined>(undefined);

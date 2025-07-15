@@ -6,7 +6,9 @@ import { Body3, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { CoinsIcon, ListIcon, SlidersIcon, TelegramIcon } from '../Icon';
-import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { useSafePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
+import { PurchaseSubscriptionScreens } from '../../enums/pro';
 
 interface IHeaderOptions {
     removeHeader?: boolean;
@@ -54,13 +56,22 @@ interface IHeaderProps extends Omit<IHeaderOptions, 'removeHeader'> {
 }
 const Header: FC<IHeaderProps> = props => {
     const { t } = useTranslation();
-    const { onOpen } = useProFeaturesNotification();
+    const { onOpen } = useProPurchaseNotification();
+    const purchaseContext = useSafePurchaseControlScreen();
+
+    const handleLearnMoreClick = () => {
+        if (purchaseContext) {
+            purchaseContext.goTo(PurchaseSubscriptionScreens.PROMO);
+        } else {
+            onOpen();
+        }
+    };
 
     const {
         className,
         leftElement = <Title>{t('what_is_included')}</Title>,
         rightElement = (
-            <ButtonStyled as="button" type="button" onClick={onOpen}>
+            <ButtonStyled as="button" type="button" onClick={handleLearnMoreClick}>
                 {t('learn_more')}
             </ButtonStyled>
         )

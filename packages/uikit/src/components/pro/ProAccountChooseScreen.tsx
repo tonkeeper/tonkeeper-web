@@ -6,7 +6,7 @@ import { DoneIcon } from '../Icon';
 import { ListBlock } from '../List';
 import { Button } from '../fields/Button';
 import { handleSubmit } from '../../libs/form';
-import { SubscriptionScreens } from '../../enums/pro';
+import { PurchaseSubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
@@ -15,7 +15,7 @@ import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useAccountWallets, useActiveWallet } from '../../state/wallet';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
-import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
+import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 
 export const ProAccountChooseScreen = () => {
     const { t } = useTranslation();
@@ -24,14 +24,14 @@ export const ProAccountChooseScreen = () => {
     const [selectedAccountId, setSelectedAccountId] = useState(activeWallet?.rawAddress ?? '');
 
     const toast = useToast();
-    const goTo = useGoToSubscriptionScreen();
+    const { goTo } = usePurchaseControlScreen();
 
     const { mutateAsync, error, isSuccess, isLoading } = useSelectWalletForProMutation();
     useNotifyError(error);
 
     useEffect(() => {
         if (isSuccess) {
-            goTo(SubscriptionScreens.PURCHASE);
+            goTo(PurchaseSubscriptionScreens.PURCHASE);
         }
     }, [isSuccess]);
 

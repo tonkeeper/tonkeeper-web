@@ -25,6 +25,8 @@ import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -146,6 +148,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
+    const navigate = useNavigate();
 
     const onRefresh = () => {
         if (rotate) {
@@ -169,6 +172,10 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     let button = <Button loading>Tonkeeper Pro</Button>;
 
     if (data && isValidSubscription(data.current)) {
+        const handleClick = () => {
+            navigate(AppRoute.settings + SettingsRoute.pro);
+        };
+
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"
@@ -179,7 +186,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 )}
                 trigger="hover"
             >
-                <ProButtonPanel type="button" onClick={onGetPro}>
+                <ProButtonPanel type="button" onClick={handleClick}>
                     Tonkeeper Pro
                 </ProButtonPanel>
             </DropDown>

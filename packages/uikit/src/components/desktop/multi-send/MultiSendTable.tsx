@@ -36,7 +36,6 @@ import { Body2, Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
 import { SkeletonText } from '../../shared/Skeleton';
-import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 import { AmountInput } from './AmountInput';
 import { MultisendAssetSelect } from './MultisendAssetSelect';
 import { CommentInput } from './CommentInput';
@@ -57,6 +56,7 @@ import { useBlocker } from '../../../hooks/router/useBlocker';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProPurchaseNotification } from '../pro/ProPurchaseNotification';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -628,7 +628,7 @@ const MultiSendFooter: FC<{
                 totalValue={willBeSent}
                 willDiscard={blocker.state === 'blocked'}
             />
-            <ProFeaturesNotification isOpen={isProModalOpened} onClose={onProModalClose} />
+            <ProPurchaseNotification isOpen={isProModalOpened} onClose={onProModalClose} />
         </>
     );
 };

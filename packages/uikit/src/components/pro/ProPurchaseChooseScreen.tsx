@@ -25,8 +25,6 @@ import { adaptPlansToViewModel, getSkeletonProducts } from '../../libs/pro';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useEffect, useState } from 'react';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
-import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
-import { SubscriptionScreens } from '../../enums/pro';
 import { useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import {
@@ -37,6 +35,9 @@ import {
     isCryptoStrategy,
     NormalizedProPlans
 } from '@tonkeeper/core/dist/entries/pro';
+import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
 const IOS_SKELETON_PRODUCTS_QTY = 2;
@@ -95,7 +96,8 @@ export const useProductSelection = () => {
 export const useIosPurchaseFlow = () => {
     const toast = useToast();
     const { t } = useTranslation();
-    const goTo = useGoToSubscriptionScreen();
+    const { onClose } = usePurchaseControlScreen();
+    const navigate = useNavigate();
 
     const {
         data: status,
@@ -117,7 +119,8 @@ export const useIosPurchaseFlow = () => {
             toast(t('purchase_success'));
         }
 
-        goTo(SubscriptionScreens.STATUS);
+        onClose();
+        navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
     }, [isSuccess]);
 
     return { startPurchasing, isLoading };
@@ -126,12 +129,13 @@ export const useIosPurchaseFlow = () => {
 export const useCryptoPurchaseFlow = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { onClose } = usePurchaseControlScreen();
+    const navigate = useNavigate();
 
     const { data: proState } = useProState();
     const [confirm, setConfirm] = useState<ConfirmState | null>(null);
     const [savedSelectedPlan, setSavedSelectedPlan] = useState<IDisplayPlan | null>(null);
 
-    const goTo = useGoToSubscriptionScreen();
     const { mutateAsync: createInvoice, isLoading: isInvoiceLoading } = useCreateInvoiceMutation();
     const { mutate: waitInvoice, isLoading: isWaiting } = useWaitInvoiceMutation();
 
@@ -167,7 +171,8 @@ export const useCryptoPurchaseFlow = () => {
             // });
             await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 
-            goTo(SubscriptionScreens.STATUS);
+            onClose();
+            navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
         }
 
         setConfirm(null);

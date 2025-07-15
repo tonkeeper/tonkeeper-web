@@ -14,8 +14,6 @@ import { adaptPlansToViewModel, isDirectionForward } from '../../../libs/pro';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProPlans, useProState } from '../../../state/pro';
-import { AppRoute, SettingsRoute } from '../../../libs/routes';
-import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { leftToTight, rightToLeft, SlideAnimation } from '../../shared/SlideAnimation';
@@ -29,7 +27,7 @@ import { handleSubmit } from '../../../libs/form';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ProPricesList } from '../../pro/ProPricesList';
 import { ProFeaturesList } from '../../pro/ProFeaturesList';
-import { hasUsedTrial, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { hasUsedTrial } from '@tonkeeper/core/dist/entries/pro';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { usePurchaseControlScreen } from '../../../hooks/pro/usePurchaseControlScreen';
 import { usePurchaseSubscriptionScreen } from '../../../hooks/pro/usePurchaseSubscriptionScreen';
@@ -37,23 +35,27 @@ import { usePurchaseSubscriptionScreen } from '../../../hooks/pro/usePurchaseSub
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
     onClose: () => void;
+    initialScreen?: PurchaseSubscriptionScreens;
 }
 
-export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = ({ isOpen, onClose }) => (
-    <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-        {() => (
-            <SubscriptionPurchaseProvider onClose={onClose}>
-                <ProPurchaseNotificationContent />
-            </SubscriptionPurchaseProvider>
-        )}
-    </NotificationStyled>
-);
+export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = props => {
+    const { isOpen, onClose, initialScreen } = props;
+
+    return (
+        <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+            {() => (
+                <SubscriptionPurchaseProvider onClose={onClose} initialScreen={initialScreen}>
+                    <ProPurchaseNotificationContent />
+                </SubscriptionPurchaseProvider>
+            )}
+        </NotificationStyled>
+    );
+};
 
 const ProPromoScreen = () => {
     const formId = useId();
     const { data } = useProState();
-    const { onClose } = usePurchaseControlScreen();
-    const navigate = useNavigate();
+    const { onClose, goTo } = usePurchaseControlScreen();
     const {
         isOpen: isTrialModalOpen,
         onClose: onTrialModalClose,
@@ -71,8 +73,7 @@ const ProPromoScreen = () => {
         if (isError) {
             void refetch();
         } else {
-            onClose();
-            navigate(AppRoute.settings + SettingsRoute.pro);
+            goTo(PurchaseSubscriptionScreens.ACCOUNTS);
         }
     };
 
@@ -88,18 +89,16 @@ const ProPromoScreen = () => {
             <ProSubscriptionHeader />
             <ProPricesList displayPlans={adaptPlansToViewModel(products)} />
             <ProFeaturesList headerOptions={{ rightElement: null }} />
-            {!isValidSubscription(data.current) && (
-                <NotificationFooterPortal>
-                    <NotificationFooter>
-                        <ButtonsBlockStyled
-                            formId={formId}
-                            isError={isError}
-                            isLoading={isLoading}
-                            onTrial={hasUsedTrial(data.current) ? undefined : onTrialModalOpen}
-                        />
-                    </NotificationFooter>
-                </NotificationFooterPortal>
-            )}
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonsBlockStyled
+                        formId={formId}
+                        isError={isError}
+                        isLoading={isLoading}
+                        onTrial={hasUsedTrial(data.current) ? undefined : onTrialModalOpen}
+                    />
+                </NotificationFooter>
+            </NotificationFooterPortal>
             <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialClose} />
         </ContentWrapper>
     );

@@ -4,13 +4,14 @@ import styled from 'styled-components';
 import { Label2 } from '../Text';
 import { useProState } from '../../state/pro';
 import { Skeleton } from '../shared/Skeleton';
-import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
-import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
 import { isTelegramSubscription, WalletAuth } from '@tonkeeper/core/dist/entries/pro';
+import { useSafePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
+import { PurchaseSubscriptionScreens } from '../../enums/pro';
+import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 
 interface IProps {
     onLogout: () => Promise<void>;
@@ -20,7 +21,8 @@ interface IProps {
 export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
     const { t } = useTranslation();
     const { data } = useProState();
-    const goTo = useGoToSubscriptionScreen();
+    const { onOpen } = useProPurchaseNotification();
+    const purchaseContext = useSafePurchaseControlScreen();
     // TODO Fix TS casting
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (data?.current?.auth as WalletAuth)?.wallet?.rawAddress || undefined
@@ -32,7 +34,11 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
 
     const handleDisconnectClick = async () => {
         await onLogout();
-        goTo(SubscriptionScreens.ACCOUNTS);
+        if (purchaseContext) {
+            purchaseContext.goTo(PurchaseSubscriptionScreens.ACCOUNTS);
+        } else {
+            onOpen({ initialScreen: PurchaseSubscriptionScreens.ACCOUNTS });
+        }
     };
 
     return (

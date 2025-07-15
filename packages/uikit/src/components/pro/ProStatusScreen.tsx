@@ -3,6 +3,7 @@ import {
     isIosStrategy,
     isIosSubscription,
     isProSubscription,
+    isTelegramSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 
@@ -18,6 +19,11 @@ import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useManageSubscription, useProLogout, useProState } from '../../state/pro';
+import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
+import { handleSubmit } from '../../libs/form';
+import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { AppRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
 
 // TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
@@ -25,6 +31,8 @@ export const ProStatusScreen = () => {
     const { t } = useTranslation();
     const { data: proState } = useProState();
     const toast = useToast();
+    const { onOpen } = useProPurchaseNotification();
+    const navigate = useNavigate();
 
     const subscription = proState?.current;
 
@@ -47,14 +55,23 @@ export const ProStatusScreen = () => {
         }
     }, []);
 
-    if (!isProSubscription(subscription)) return null;
+    useEffect(() => {
+        if (!isProSubscription(subscription)) {
+            navigate(AppRoute.home);
+        }
+    }, [subscription]);
+
     const isProActive = isValidSubscription(subscription);
 
     const isManageAvailable =
         isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
 
+    const handleContinueWithPro = () => {
+        onOpen();
+    };
+
     return (
-        <ProScreenContentWrapper>
+        <ProScreenContentWrapper onSubmit={handleSubmit(handleContinueWithPro)}>
             <ProSubscriptionHeader
                 titleKey={isProActive ? 'tonkeeper_pro_is_active' : 'tonkeeper_pro_subscription'}
                 subtitleKey={isProActive ? 'subscription_is_linked' : 'pro_unlocks_premium_tools'}
@@ -77,6 +94,14 @@ export const ProStatusScreen = () => {
             )}
 
             <ProFeaturesList />
+
+            {subscription && isTelegramSubscription(subscription) && (
+                <ProSettingsMainButtonWrapper>
+                    <Button primary fullWidth size="large" type="submit">
+                        <Label2>{t('continue_with_tonkeeper_pro')}</Label2>
+                    </Button>
+                </ProSettingsMainButtonWrapper>
+            )}
         </ProScreenContentWrapper>
     );
 };
