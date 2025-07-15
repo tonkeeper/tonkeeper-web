@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
@@ -11,13 +11,13 @@ import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useSelectWalletForProMutation } from '../../state/pro';
-import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useAccountWallets, useActiveWallet } from '../../state/wallet';
-import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
+import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 export const ProAccountChooseScreen = () => {
+    const formId = useId();
     const { t } = useTranslation();
     const activeWallet = useActiveWallet();
     const accountsWallets = useAccountWallets();
@@ -52,7 +52,7 @@ export const ProAccountChooseScreen = () => {
     };
 
     return (
-        <ProScreenContentWrapper onSubmit={handleSubmit(handleNextScreen)}>
+        <ContentWrapper onSubmit={handleSubmit(handleNextScreen)} id={formId}>
             <ProSubscriptionHeader
                 titleKey="choose_wallet_for_pro"
                 subtitleKey="subscription_will_be_linked_to_wallet"
@@ -73,14 +73,28 @@ export const ProAccountChooseScreen = () => {
                     );
                 })}
             </ListBlock>
-            <ProSettingsMainButtonWrapper>
-                <Button primary fullWidth size="large" type="submit" loading={isLoading}>
-                    <Label2>{t('continue')}</Label2>
-                </Button>
-            </ProSettingsMainButtonWrapper>
-        </ProScreenContentWrapper>
+
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <Button
+                        primary
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        form={formId}
+                        loading={isLoading}
+                    >
+                        <Label2>{t('continue')}</Label2>
+                    </Button>
+                </NotificationFooter>
+            </NotificationFooterPortal>
+        </ContentWrapper>
     );
 };
+
+const ContentWrapper = styled(NotificationBlock)`
+    padding-top: 1rem;
+`;
 
 const Icon = styled.span`
     padding-left: 0.5rem;

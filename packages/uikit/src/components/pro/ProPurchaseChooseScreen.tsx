@@ -1,3 +1,4 @@
+import styled from 'styled-components';
 import { Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ProLegalNote } from './ProLegalNote';
@@ -18,12 +19,10 @@ import {
 } from '../../state/pro';
 import { ConfirmNotification } from '../settings/ProSettings';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
-import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { ProChooseSubscriptionPlan } from './ProChooseSubscriptionPlan';
-import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { adaptPlansToViewModel, getSkeletonProducts } from '../../libs/pro';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
@@ -38,6 +37,7 @@ import {
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
 
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
 const IOS_SKELETON_PRODUCTS_QTY = 2;
@@ -254,6 +254,7 @@ export const useProPurchaseController = () => {
 };
 
 export const ProPurchaseChooseScreen = () => {
+    const formId = useId();
     const { t } = useTranslation();
     const {
         isCrypto,
@@ -273,7 +274,7 @@ export const ProPurchaseChooseScreen = () => {
     } = useProPurchaseController();
 
     return (
-        <ProScreenContentWrapper onSubmit={handleSubmit(onSubmit)}>
+        <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
             <ProSubscriptionHeader
                 titleKey="get_tonkeeper_pro"
                 subtitleKey="choose_billing_description"
@@ -298,18 +299,41 @@ export const ProPurchaseChooseScreen = () => {
 
             <ProFeaturesList />
 
-            <ProSettingsMainButtonWrapper>
-                <Button primary fullWidth size="large" type="submit" loading={isLoading}>
-                    <Label2>{t('continue_with_tonkeeper_pro')}</Label2>
-                </Button>
-                <ProLegalNote onManage={onManage} />
-            </ProSettingsMainButtonWrapper>
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <PurchaseButtonWrapper>
+                        <Button
+                            primary
+                            fullWidth
+                            size="large"
+                            type="submit"
+                            loading={isLoading}
+                            form={formId}
+                        >
+                            <Label2>{t('continue_with_tonkeeper_pro')}</Label2>
+                        </Button>
+                        <ProLegalNote onManage={onManage} />
+                    </PurchaseButtonWrapper>
+                </NotificationFooter>
+            </NotificationFooterPortal>
 
             <ConfirmNotification
                 state={confirmState}
                 onClose={onConfirmClose}
                 waitResult={waitInvoice}
             />
-        </ProScreenContentWrapper>
+        </ContentWrapper>
     );
 };
+
+const ContentWrapper = styled(NotificationBlock)`
+    padding-top: 1rem;
+`;
+
+const PurchaseButtonWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    width: 100%;
+`;
