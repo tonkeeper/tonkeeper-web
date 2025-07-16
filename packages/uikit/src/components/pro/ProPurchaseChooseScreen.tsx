@@ -28,6 +28,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import {
     AuthTypes,
+    CryptoPendingSubscription,
     CryptoSubscriptionStatuses,
     hasWalletAuth,
     IDisplayPlan,
@@ -40,7 +41,7 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
-import { setProTargetSubscription } from '@tonkeeper/core/dist/service/proService';
+import { setProPendingState } from '@tonkeeper/core/dist/service/proService';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
@@ -164,18 +165,23 @@ export const useCryptoPurchaseFlow = () => {
                 throw new Error('Missing wallet auth for pending subscription');
             }
 
-            await setProTargetSubscription(
-                sdk.storage,
-                {
-                    source: SubscriptionSource.CRYPTO,
-                    status: CryptoSubscriptionStatuses.PENDING,
-                    valid: false,
-                    usedTrial: false,
-                    displayName: savedSelectedPlan?.displayName,
-                    displayPrice: savedSelectedPlan?.formattedDisplayPrice
-                },
+            const pendingSubscription: CryptoPendingSubscription = {
+                source: SubscriptionSource.CRYPTO,
+                status: CryptoSubscriptionStatuses.PENDING,
+                valid: false,
+                usedTrial: proState?.target?.usedTrial ?? false,
+                displayName: savedSelectedPlan?.displayName,
+                displayPrice: savedSelectedPlan?.formattedDisplayPrice,
                 auth
-            );
+            };
+
+            await setProPendingState(sdk.storage, {
+                current: pendingSubscription,
+                target: {
+                    ...pendingSubscription,
+                    auth
+                }
+            });
 
             await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 

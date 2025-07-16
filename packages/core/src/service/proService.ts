@@ -10,6 +10,8 @@ import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboa
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
+    CryptoPendingSubscription,
+    isPendingSubscription,
     isValidSubscription,
     PendingSubscription,
     ProState,
@@ -134,6 +136,19 @@ export const setProTargetSubscription = async (
     });
 };
 
+export const setProPendingState = async (
+    storage: IStorage,
+    pending: {
+        current: CryptoPendingSubscription;
+        target: ProState['target'];
+    }
+) => {
+    await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+        current: pending.current,
+        target: pending.target
+    });
+};
+
 export const withTargetAuthToken = async <T>(
     authService: ProAuthTokenService,
     fn: () => Promise<T>
@@ -182,6 +197,13 @@ const loadProState = async (
         return {
             current: subscription,
             target: null
+        };
+    }
+
+    if (processingState?.target && hasTargetAuth && isPendingSubscription(processingState.target)) {
+        return {
+            current: processingState.target,
+            target: processingState.target
         };
     }
 

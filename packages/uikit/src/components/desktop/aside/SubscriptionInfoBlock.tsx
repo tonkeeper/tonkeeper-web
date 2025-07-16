@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
     isPaidSubscription,
@@ -140,7 +140,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data } = useProState();
+    const { data, refetch: refetchProState } = useProState();
     const { onOpen } = useProPurchaseNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
@@ -163,19 +163,31 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
+    useEffect(() => {
+        const subscription = data?.current;
+
+        if (isProSubscription(subscription) && isPendingSubscription(subscription)) {
+            const interval = setInterval(() => {
+                void refetchProState();
+            }, 5000);
+
+            return () => clearInterval(interval);
+        }
+    }, [data?.current]);
+
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
     const onGetPro = async () => {
         hideBrowser();
         onOpen();
     };
 
+    const handleNavigateToSettingsPro = () => {
+        navigate(AppRoute.settings + SettingsRoute.pro);
+    };
+
     let button = <Button loading>Tonkeeper Pro</Button>;
 
     if (data && isValidSubscription(data.current)) {
-        const handleClick = () => {
-            navigate(AppRoute.settings + SettingsRoute.pro);
-        };
-
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"
@@ -186,7 +198,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 )}
                 trigger="hover"
             >
-                <ProButtonPanel type="button" onClick={handleClick}>
+                <ProButtonPanel type="button" onClick={handleNavigateToSettingsPro}>
                     Tonkeeper Pro
                 </ProButtonPanel>
             </DropDown>
@@ -205,7 +217,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 )}
                 trigger="hover"
             >
-                <ProButtonPanel>
+                <ProButtonPanel onClick={handleNavigateToSettingsPro}>
                     <SpinnerIcon />
                     {t('processing')}
                 </ProButtonPanel>
