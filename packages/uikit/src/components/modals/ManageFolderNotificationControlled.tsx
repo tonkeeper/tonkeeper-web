@@ -21,12 +21,24 @@ import {
     useNewFolderName,
     useUpdateFolder
 } from '../../state/folders';
+import { SlidersIcon } from '../Icon';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useLocation } from '../../hooks/router/useLocation';
 
 const { hook, paramsControl } = createModalControl<{
     folderId?: string;
 }>();
 
 export const useManageFolderNotification = hook;
+
+const NotificationStyled = styled(Notification)`
+    ${p => p.theme.proDisplayType === 'desktop' && 'max-width: 400px;'};
+
+    .dialog-header {
+        padding-top: 8px;
+    }
+`;
 
 export const ManageFolderNotificationControlled = () => {
     const { isOpen, onClose } = useManageFolderNotification();
@@ -40,7 +52,7 @@ export const ManageFolderNotificationControlled = () => {
     }, [onClose, params?.folderId, folders]);
 
     return (
-        <Notification
+        <NotificationStyled
             isOpen={isOpen}
             handleClose={onClose}
             title={t(
@@ -49,7 +61,7 @@ export const ManageFolderNotificationControlled = () => {
             mobileFullScreen
         >
             {Content}
-        </Notification>
+        </NotificationStyled>
     );
 };
 
@@ -60,7 +72,7 @@ const Label2Styled = styled(Label2)`
 `;
 
 const ListBlockDesktopAdaptiveStyled = styled(ListBlockDesktopAdaptive)`
-    margin: 0 -1rem;
+    margin: 0 -1rem 1rem;
     background: transparent;
 `;
 
@@ -87,11 +99,8 @@ const Body3Secondary = styled(Body3)`
 
 const ButtonsContainer = styled.div`
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
-
-    > * {
-        flex: 1;
-    }
 `;
 
 const InputStyled = styled(Input)`
@@ -156,6 +165,15 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
         }
     };
 
+    const location = useLocation();
+    const showManageWalletsButton = location.pathname !== AppRoute.settings + SettingsRoute.account;
+    const navigate = useNavigate();
+
+    const onClickManageWallets = () => {
+        onClose();
+        navigate(AppRoute.settings + SettingsRoute.account);
+    };
+
     return (
         <ModalContentWrapper>
             <InputStyled
@@ -165,6 +183,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
                 label={t('accounts_manage_folder_name')}
                 isValid={isValidInput}
                 clearButton
+                size="small"
             />
             <ListBlockDesktopAdaptiveStyled>
                 {availableAccounts.map(acc => (
@@ -212,12 +231,15 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsContainer>
-                        <ButtonResponsiveSize secondary onClick={onClose}>
-                            {t('cancel')}
-                        </ButtonResponsiveSize>
                         <ButtonResponsiveSize primary disabled={!canSave} onClick={onSave}>
                             {t('save')}
                         </ButtonResponsiveSize>
+                        {showManageWalletsButton && (
+                            <ButtonResponsiveSize secondary onClick={onClickManageWallets}>
+                                <SlidersIcon />
+                                {t('Manage_wallets')}
+                            </ButtonResponsiveSize>
+                        )}
                     </ButtonsContainer>
                 </NotificationFooter>
             </NotificationFooterPortal>
