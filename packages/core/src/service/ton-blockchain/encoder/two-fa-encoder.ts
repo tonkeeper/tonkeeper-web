@@ -93,7 +93,7 @@ export class TwoFAEncoder {
             })
         };
 
-        const result = [msgInstall];
+        const result: OutActionWalletV5[] = [msgInstall];
 
         if (!(await this.isPluginAddedToWalletExtensionsList())) {
             result.push({
