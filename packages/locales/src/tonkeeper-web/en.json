@@ -437,6 +437,7 @@
   "settings_mam_indexes": "Wallets",
   "settings_mam_number_wallets": "%{number} wallets",
   "settings_multisig_settings": "Multisig Settings",
+  "settings_pin_multisig": "Pin Multisig Wallet",
   "settings_pro_ios": "Tonkeeper Pro for iOS",
   "set_up_password": "Set Up  Password",
   "show": "Show",

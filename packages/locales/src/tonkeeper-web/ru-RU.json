@@ -425,6 +425,7 @@
   "settings_mam_indexes": "Кошельки",
   "settings_mam_number_wallets": "%{number} кошельков",
   "settings_multisig_settings": "Настройки мультисиг-кошелька",
+  "settings_pin_multisig": "Закрепить Multisig кошелек",
   "settings_pro_ios": "Tonkeeper Pro для iOS",
   "set_up_password": "Установить пароль",
   "show": "Показать",

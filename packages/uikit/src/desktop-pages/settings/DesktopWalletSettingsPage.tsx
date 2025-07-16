@@ -7,12 +7,12 @@ import {
     ExitIcon,
     KeyIcon,
     LockIcon,
-    NotificationOutlineIcon,
+    NotificationOutlineIcon, PinIconOutline,
     SaleBadgeIcon,
     SwitchIcon,
     TrashBinIcon,
     UnpinIconOutline
-} from '../../components/Icon';
+} from "../../components/Icon";
 import { Body3, Label2, Label2Class } from '../../components/Text';
 import {
     DesktopViewDivider,
@@ -365,8 +365,19 @@ const UnpinMultisigSettingsListItem = () => {
         navigate(AppRoute.home);
     };
 
+    const onPin = () =>
+        togglePinForMultisigWallet({
+            multisigId: account.id,
+            hostWalletId: signerWallet.id
+        });
+
     if (!isPinned) {
-        return null;
+        return (
+            <SettingsListItem onClick={onPin}>
+                <PinIconOutline />
+                <Label2>{t('settings_pin_multisig')}</Label2>
+            </SettingsListItem>
+        );
     }
 
     return (
