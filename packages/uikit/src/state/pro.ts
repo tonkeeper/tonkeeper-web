@@ -207,6 +207,7 @@ export const useSelectWalletForProMutation = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
     const { t } = useTranslation();
+    const client = useQueryClient();
     const accountsStorage = useAccountsStorage();
     const authService = useProAuthTokenService();
 
@@ -242,6 +243,8 @@ export const useSelectWalletForProMutation = () => {
                 rawAddress: wallet.rawAddress
             }
         });
+
+        await client.invalidateQueries([QueryKey.pro]);
     });
 };
 
