@@ -11,7 +11,7 @@ import {
 } from '@ton/core';
 import { DNSApi } from '../tonApiV2';
 import { APIConfig } from '../entries/apis';
-import { JettonEncoder } from './ton-blockchain/encoder/jetton-encoder';
+import { JettonEncoder, JettonWalletNotFound } from './ton-blockchain/encoder/jetton-encoder';
 
 export function seeIfBringToFrontLink(options: { url: string }) {
     const { query } = queryString.parseUrl(options.url);
@@ -226,6 +226,10 @@ export async function parseTonTransaction(
         if (e instanceof LinkExpiredError) {
             throw e;
         }
+        if (e instanceof JettonWalletNotFound) {
+            throw new JettonWalletNotFound('Insufficient jetton funds');
+        }
+
         console.error(e);
         return null;
     }
