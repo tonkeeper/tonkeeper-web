@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import styled from 'styled-components';
 import {
     isIosStrategy,
     isIosSubscription,
@@ -16,7 +17,6 @@ import { ProFeaturesList } from './ProFeaturesList';
 import { useTranslation } from '../../hooks/translation';
 import { ProStatusDetailsList } from './ProStatusDetailsList';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
-import { ProScreenContentWrapper } from './ProScreenContentWrapper';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useManageSubscription, useProLogout, useProState } from '../../state/pro';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
@@ -105,3 +105,14 @@ export const ProStatusScreen = () => {
         </ProScreenContentWrapper>
     );
 };
+
+const ProScreenContentWrapper = styled.form`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    max-width: 768px;
+    margin: 0 auto;
+`;
