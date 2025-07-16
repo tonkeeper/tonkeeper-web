@@ -58,6 +58,8 @@ import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/const
 import { seeIfValidTonAddress, seeIfValidTronAddress } from '@tonkeeper/core/dist/utils/common';
 import { useActiveWallet } from '../../state/wallet';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
+import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -431,7 +433,8 @@ const SendActionNotification = () => {
     const [open, setOpen] = useState(false);
     const [chain, setChain] = useState<BLOCKCHAIN_NAME | undefined>(undefined);
     const [transferParams, setTransferParams] = useState<InitTransferData | undefined>(undefined);
-    const { data: jettons } = useJettonList();
+    const { key: jettonsQueryKey } = useJettonList();
+    const client = useQueryClient();
     const wallet = useActiveWallet();
 
     const { mutateAsync: getAccountAsync, reset } = useGetToAccount();
@@ -439,7 +442,7 @@ const SendActionNotification = () => {
     const track = useAnalyticsTrack();
 
     useEffect(() => {
-        const handler = (options: {
+        const handler = async (options: {
             method: 'transfer';
             id?: number | undefined;
             params: TransferInitParams;
@@ -456,21 +459,21 @@ const SendActionNotification = () => {
                 return;
             }
 
-            getAccountAsync({ address: wallet.rawAddress }).then(fromAccount => {
-                if (transfer.address && seeIfValidTonAddress(transfer.address)) {
-                    getAccountAsync({ address: transfer.address }).then(toAccount => {
-                        setTransferParams(
-                            makeTonTransferInitData(transfer, fromAccount, toAccount, jettons)
-                        );
-                        setOpen(true);
-                    });
-                } else {
-                    setTransferParams({
-                        initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
-                    });
-                    setOpen(true);
-                }
-            });
+            const fromAccount = await getAccountAsync({ address: wallet.rawAddress });
+            const jettons: JettonsBalances | undefined = await client.fetchQuery(jettonsQueryKey);
+
+            if (transfer.address && seeIfValidTonAddress(transfer.address)) {
+                const toAccount = await getAccountAsync({ address: transfer.address });
+                setTransferParams(
+                    makeTonTransferInitData(transfer, fromAccount, toAccount, jettons)
+                );
+                setOpen(true);
+            } else {
+                setTransferParams({
+                    initAmountState: makeTransferInitAmountState(transfer, fromAccount, jettons)
+                });
+                setOpen(true);
+            }
 
             track('send_open', { from: transfer.from });
         };
@@ -479,7 +482,7 @@ const SendActionNotification = () => {
         return () => {
             sdk.uiEvents.off('transfer', handler);
         };
-    }, [jettons, track]);
+    }, [jettonsQueryKey, track]);
 
     const onClose = useCallback(() => {
         setTransferParams(undefined);
