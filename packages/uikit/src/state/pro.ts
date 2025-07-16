@@ -26,7 +26,8 @@ import {
     setBackupState,
     setProTargetAuth,
     startProServiceTrial,
-    waitProServiceInvoice
+    waitProServiceInvoice,
+    withTargetAuthToken
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
@@ -302,31 +303,36 @@ export interface ConfirmState {
 export const useCreateInvoiceMutation = () => {
     const ws = useAccountsStorage();
     const api = useActiveApi();
+    const authService = useProAuthTokenService();
 
     return useMutation<
         ConfirmState,
         Error,
         { wallet: ProStateWallet; tierId: number | null; promoCode?: string }
     >(async data => {
-        if (data.tierId === null) {
+        const tierId = data.tierId;
+        if (tierId === null) {
             throw new Error('missing tier');
         }
 
-        const wallet = (await ws.getAccounts())
-            .flatMap(a => a.allTonWallets)
-            .find(w => w.id === data.wallet.rawAddress);
-        if (!wallet || !isStandardTonWallet(wallet)) {
-            throw new Error('Missing wallet');
-        }
+        return withTargetAuthToken(authService, async () => {
+            const wallet = (await ws.getAccounts())
+                .flatMap(a => a.allTonWallets)
+                .find(w => w.id === data.wallet.rawAddress);
+            if (!wallet || !isStandardTonWallet(wallet)) {
+                throw new Error('Missing wallet');
+            }
 
-        const invoice = await createProServiceInvoice(data.tierId, data.promoCode);
-        const [recipient, assetAmount] = await createRecipient(api, invoice);
-        return {
-            invoice,
-            wallet,
-            recipient,
-            assetAmount
-        };
+            const invoice = await createProServiceInvoice(tierId, data.promoCode);
+            const [recipient, assetAmount] = await createRecipient(api, invoice);
+
+            return {
+                invoice,
+                wallet,
+                recipient,
+                assetAmount
+            };
+        });
     });
 };
 
@@ -337,7 +343,11 @@ export const useWaitInvoiceMutation = () => {
 
     return useMutation<void, Error, ConfirmState>(async data => {
         await waitProServiceInvoice(data.invoice);
-        await retryProService(authService, sdk.storage);
+
+        await withTargetAuthToken(authService, async () => {
+            await retryProService(authService, sdk.storage);
+        });
+
         await client.invalidateQueries([QueryKey.pro]);
     });
 };

@@ -27,6 +27,8 @@ import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useQueryClient } from '@tanstack/react-query';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import {
+    AuthTypes,
+    CryptoSubscriptionStatuses,
     hasWalletAuth,
     IDisplayPlan,
     IosPurchaseStatuses,
@@ -38,6 +40,8 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { setProTargetSubscription } from '@tonkeeper/core/dist/service/proService';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
 const IOS_SKELETON_PRODUCTS_QTY = 2;
@@ -140,10 +144,10 @@ export const useCryptoPurchaseFlow = () => {
     const { mutate: waitInvoice, isLoading: isWaiting } = useWaitInvoiceMutation();
 
     const startPurchasing = async (selectedPlan: IDisplayPlan, promoCode?: string) => {
-        if (!proState?.current || !hasWalletAuth(proState?.current)) return;
+        if (!proState?.target || !hasWalletAuth(proState.target)) return;
 
         const confirmState = await createInvoice({
-            wallet: proState.current.auth.wallet,
+            wallet: proState.target.auth.wallet,
             tierId: Number(selectedPlan.id),
             promoCode
         });
@@ -154,21 +158,25 @@ export const useCryptoPurchaseFlow = () => {
 
     const onConfirmClose = async (success?: boolean) => {
         if (success) {
-            // TODO Fix pending status setting
-            // const pendingSubscription: CryptoPendingSubscription = {
-            //     ...proState?.current,
-            //     displayName: savedSelectedPlan?.displayName,
-            //     displayPrice: savedSelectedPlan?.formattedDisplayPrice,
-            //     source: SubscriptionSource.CRYPTO,
-            //     status: CryptoSubscriptionStatuses.PENDING,
-            //     valid: false,
-            //     usedTrial: proState?.subscription?.usedTrial ?? false
-            // };
-            //
-            // await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-            //     authorizedWallet: proState?.authorizedWallet || null,
-            //     subscription: pendingSubscription
-            // });
+            const auth = proState?.target?.auth;
+
+            if (!auth || auth.type !== AuthTypes.WALLET) {
+                throw new Error('Missing wallet auth for pending subscription');
+            }
+
+            await setProTargetSubscription(
+                sdk.storage,
+                {
+                    source: SubscriptionSource.CRYPTO,
+                    status: CryptoSubscriptionStatuses.PENDING,
+                    valid: false,
+                    usedTrial: false,
+                    displayName: savedSelectedPlan?.displayName,
+                    displayPrice: savedSelectedPlan?.formattedDisplayPrice
+                },
+                auth
+            );
+
             await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
 
             onClose();
@@ -307,8 +315,8 @@ export const ProPurchaseChooseScreen = () => {
                             fullWidth
                             size="large"
                             type="submit"
-                            loading={isLoading}
                             form={formId}
+                            loading={isLoading}
                         >
                             <Label2>{t('continue_with_tonkeeper_pro')}</Label2>
                         </Button>

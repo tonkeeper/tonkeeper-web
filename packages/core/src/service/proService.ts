@@ -113,6 +113,50 @@ export const setProTargetAuth = async (
     });
 };
 
+export const setProTargetSubscription = async (
+    storage: IStorage,
+    pendingSubscription: Omit<PendingSubscription, 'auth'>,
+    auth?: WalletAuth | TelegramAuth
+): Promise<void> => {
+    const state = await storage.get<ProState>(AppKey.PRO_PENDING_STATE);
+    const fallbackAuth = state?.target?.auth;
+
+    if (!auth && !fallbackAuth) {
+        throw new Error('Missing Pro target auth for subscription');
+    }
+
+    await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+        current: state?.current ?? null,
+        target: {
+            ...pendingSubscription,
+            auth: auth ?? fallbackAuth!
+        }
+    });
+};
+
+export const withTargetAuthToken = async <T>(
+    authService: ProAuthTokenService,
+    fn: () => Promise<T>
+): Promise<T> => {
+    const targetToken = await authService.getToken(ProAuthTokenType.TEMP);
+
+    if (!targetToken) return fn();
+
+    const mainToken = await authService.getToken(ProAuthTokenType.MAIN);
+
+    await authService.setToken(ProAuthTokenType.MAIN, targetToken);
+
+    try {
+        return await fn();
+    } finally {
+        const currentMain = await authService.getToken(ProAuthTokenType.MAIN);
+
+        if (mainToken && currentMain !== targetToken) {
+            await authService.setToken(ProAuthTokenType.MAIN, mainToken);
+        }
+    }
+};
+
 const loadProState = async (
     authService: ProAuthTokenService,
     storage: IStorage
@@ -129,6 +173,10 @@ const loadProState = async (
     const subscription = normalizeSubscription(subscriptionDTO, { user, authorizedWallet });
 
     if (isValidSubscription(subscription)) {
+        if (hasTargetAuth) {
+            await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
+        }
+
         await storage.delete(AppKey.PRO_PENDING_STATE);
 
         return {
