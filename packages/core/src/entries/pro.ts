@@ -4,6 +4,8 @@ import { Language } from './language';
 
 export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
 
+export type PendingSubscription = CryptoPendingSubscription | IosPendingSubscription;
+
 export type IosSubscription =
     | IosActiveSubscription
     | IosExpiredSubscription

@@ -10,13 +10,13 @@ import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboa
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
-    hasSubscriptionSource,
-    isPendingSubscription,
-    isProSubscription,
     isValidSubscription,
+    PendingSubscription,
     ProState,
     ProStateWallet,
-    ProSubscription
+    ProSubscription,
+    TelegramAuth,
+    WalletAuth
 } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
@@ -86,18 +86,43 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-export type ProAuthTokenService = {
-    attachToken: () => Promise<void>;
-    onTokenUpdated: (token: string | null) => Promise<void>;
+export enum ProAuthTokenType {
+    MAIN = 'main',
+    TEMP = 'temp'
+}
+
+export interface ProAuthTokenService {
+    attachToken(type?: ProAuthTokenType): Promise<void>;
+    setToken(type: ProAuthTokenType, token: string | null): Promise<void>;
+    getToken(type: ProAuthTokenType): Promise<string | null>;
+    promoteToken(from: ProAuthTokenType, to: ProAuthTokenType): Promise<void>;
+}
+
+export const setProTargetAuth = async (
+    storage: IStorage,
+    auth: WalletAuth | TelegramAuth
+): Promise<void> => {
+    const state = await storage.get<ProState>(AppKey.PRO_PENDING_STATE);
+
+    await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+        current: state?.current ?? null,
+        target: {
+            ...state?.target,
+            auth
+        }
+    });
 };
 
 const loadProState = async (
     authService: ProAuthTokenService,
     storage: IStorage
 ): Promise<ProState> => {
-    await authService.attachToken();
-    const user = await UsersService.getUserInfo();
+    const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
+    const hasTargetAuth = Boolean(processingState?.target?.auth);
 
+    await authService.attachToken(hasTargetAuth ? ProAuthTokenType.TEMP : ProAuthTokenType.MAIN);
+
+    const user = await UsersService.getUserInfo();
     const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
 
     const subscriptionDTO = await UsersService.verifySubscription();
@@ -112,16 +137,11 @@ const loadProState = async (
         };
     }
 
-    const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
-
-    if (
-        processingState?.current &&
-        isProSubscription(processingState.current) &&
-        hasSubscriptionSource(processingState.current) &&
-        isPendingSubscription(processingState.current)
-    ) {
-        // TODO Start polling backend
-        return processingState;
+    if (hasTargetAuth) {
+        return {
+            current: null,
+            target: processingState!.target
+        };
     }
 
     return {
@@ -163,7 +183,7 @@ export const authViaTonConnect = async (
         throw new Error('Unable to authorize');
     }
 
-    await authService.onTokenUpdated(result.auth_token);
+    await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
 };
 
 export const logoutTonConsole = async (authService: ProAuthTokenService) => {
@@ -172,7 +192,8 @@ export const logoutTonConsole = async (authService: ProAuthTokenService) => {
         throw new Error('Unable to logout');
     }
 
-    await authService.onTokenUpdated(null);
+    await authService.setToken(ProAuthTokenType.MAIN, null);
+    await authService.setToken(ProAuthTokenType.TEMP, null);
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {

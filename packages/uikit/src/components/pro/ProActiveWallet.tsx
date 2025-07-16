@@ -8,7 +8,7 @@ import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
-import { isTelegramSubscription, WalletAuth } from '@tonkeeper/core/dist/entries/pro';
+import { AuthTypes, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useSafePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 import { PurchaseSubscriptionScreens } from '../../enums/pro';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
@@ -23,9 +23,23 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
     const { data } = useProState();
     const { onOpen } = useProPurchaseNotification();
     const purchaseContext = useSafePurchaseControlScreen();
-    // TODO Fix TS casting
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
-        (data?.current?.auth as WalletAuth)?.wallet?.rawAddress || undefined
+        (() => {
+            const targetAuth = data?.target?.auth;
+            const currentAuth = data?.current?.auth;
+
+            if (targetAuth?.type === AuthTypes.WALLET) {
+                return targetAuth.wallet.rawAddress;
+            }
+
+            if (!data?.current) return undefined;
+
+            if (currentAuth?.type === AuthTypes.WALLET && !isTelegramSubscription(data?.current)) {
+                return currentAuth.wallet.rawAddress;
+            }
+
+            return undefined;
+        })()
     );
 
     if (data?.current && isTelegramSubscription(data.current)) {

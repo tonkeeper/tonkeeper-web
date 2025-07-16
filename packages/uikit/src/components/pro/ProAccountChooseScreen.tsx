@@ -37,6 +37,7 @@ export const ProAccountChooseScreen = () => {
     useEffect(() => {
         if (!isSuccess) return;
 
+        // TODO Verify PRO before
         if (
             proState &&
             !isTelegramSubscription(proState.current) &&

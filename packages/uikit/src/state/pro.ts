@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
+    AuthTypes,
     IDisplayPlan,
     IosPurchaseStatuses,
     isIosStrategy,
@@ -20,16 +21,17 @@ import {
     getProState,
     logoutTonConsole,
     ProAuthTokenService,
+    ProAuthTokenType,
     retryProService,
     setBackupState,
+    setProTargetAuth,
     startProServiceTrial,
     waitProServiceInvoice
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
-import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
+import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
@@ -78,14 +80,41 @@ export const useProBackupState = () => {
 export const useProAuthTokenService = (): ProAuthTokenService => {
     const storage = useAppSdk().storage;
 
+    const keyMap: Record<ProAuthTokenType, AppKey> = {
+        [ProAuthTokenType.MAIN]: AppKey.PRO_AUTH_TOKEN,
+        [ProAuthTokenType.TEMP]: AppKey.PRO_TEMP_AUTH_TOKEN
+    };
+
     return {
-        async attachToken() {
-            const token = await storage.get<string>(AppKey.PRO_AUTH_TOKEN);
+        async attachToken(type = ProAuthTokenType.MAIN) {
+            const token = await storage.get<string>(keyMap[type]);
+
             OpenAPI.TOKEN = token ?? undefined;
         },
-        async onTokenUpdated(token: string | null) {
-            await storage.set(AppKey.PRO_AUTH_TOKEN, token);
-            return this.attachToken();
+
+        async setToken(type: ProAuthTokenType, token: string | null) {
+            await storage.set(keyMap[type], token);
+
+            if (type === ProAuthTokenType.MAIN) {
+                OpenAPI.TOKEN = token ?? undefined;
+            }
+        },
+
+        async getToken(type: ProAuthTokenType): Promise<string | null> {
+            return storage.get<string>(keyMap[type]);
+        },
+
+        async promoteToken(from: ProAuthTokenType, to: ProAuthTokenType) {
+            const token = await storage.get<string>(keyMap[from]);
+
+            if (token) {
+                await storage.set(keyMap[to], token);
+                await storage.delete(keyMap[from]);
+
+                if (to === ProAuthTokenType.MAIN) {
+                    OpenAPI.TOKEN = token;
+                }
+            }
         }
     };
 };
@@ -175,7 +204,6 @@ export const useProSubscriptionPurchase = () => {
 
 export const useSelectWalletForProMutation = () => {
     const sdk = useAppSdk();
-    const client = useQueryClient();
     const api = useActiveApi();
     const { t } = useTranslation();
     const accountsStorage = useAccountsStorage();
@@ -206,7 +234,13 @@ export const useSelectWalletForProMutation = () => {
             signTonConnectOver({ sdk, accountId: account.id, wallet, t })
         );
 
-        await client.invalidateQueries([QueryKey.pro]);
+        await setProTargetAuth(sdk.storage, {
+            type: AuthTypes.WALLET,
+            wallet: {
+                publicKey: wallet.publicKey,
+                rawAddress: wallet.rawAddress
+            }
+        });
     });
 };
 
