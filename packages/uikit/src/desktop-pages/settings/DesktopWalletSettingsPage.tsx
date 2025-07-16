@@ -10,9 +10,10 @@ import {
     NotificationOutlineIcon,
     SaleBadgeIcon,
     SwitchIcon,
+    TrashBinIcon,
     UnpinIconOutline
 } from '../../components/Icon';
-import { Body3, Label2 } from '../../components/Text';
+import { Body3, Label2, Label2Class } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
@@ -23,6 +24,7 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import {
+    getAccountWalletNameAndEmoji,
     useActiveAccount,
     useHideMAMAccountDerivation,
     useIsActiveWalletWatchOnly,
@@ -56,6 +58,7 @@ import { Switch } from '../../components/fields/Switch';
 import { hexToRGBA, hover } from '../../libs/css';
 import { Badge } from '../../components/shared/Badge';
 import { HideOnReview } from '../../components/ios/HideOnReview';
+import { ForTargetEnv } from '../../components/shared/TargetEnv';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -109,6 +112,17 @@ const LabelWithBadge = styled(Label2)`
     gap: 6px;
 `;
 
+const SignOutTextContainer = styled.div`
+    display: flex;
+    align-items: center;
+
+    ${Label2Class};
+
+    &:nth-child(2) {
+        margin-left: 8px;
+    }
+`;
+
 export const DesktopWalletSettingsPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
@@ -146,6 +160,8 @@ export const DesktopWalletSettingsPage = () => {
     const isTronEnabled = useIsTronEnabledForActiveWallet();
     const { mutate: onToggleTron } = useToggleIsTronEnabledForActiveWallet();
 
+    const { name: accountName, emoji: accountEmoji } = getAccountWalletNameAndEmoji(account);
+
     return (
         <DesktopViewPageLayout>
             <DesktopViewHeader borderBottom>
@@ -157,15 +173,9 @@ export const DesktopWalletSettingsPage = () => {
                         rename({ accountId: account.id, derivationIndex: activeDerivation?.index })
                     }
                 >
-                    <WalletEmoji
-                        containerSize="16px"
-                        emojiSize="16px"
-                        emoji={activeDerivation?.emoji || account.emoji}
-                    />
+                    <WalletEmoji containerSize="16px" emojiSize="16px" emoji={accountEmoji} />
                     <SettingsListText>
-                        <Label2>
-                            {activeDerivation?.name || account.name || t('wallet_title')}
-                        </Label2>
+                        <Label2>{accountName}</Label2>
                         <Body3>{t('customize')}</Body3>
                     </SettingsListText>
                 </SettingsListItem>
@@ -257,6 +267,16 @@ export const DesktopWalletSettingsPage = () => {
                         </SettingsListItem>
                     </LinkStyled>
                 )}
+
+                {/*For GPDR purposes: PRO-255*/}
+                <ForTargetEnv env={['mobile', 'tablet']}>
+                    {account.type !== 'mam' && !isMultisig && (
+                        <SettingsListItem onClick={() => onDelete({ accountId: account.id })}>
+                            <TrashBinIcon />
+                            <Label2>{t('settings_delete_account')}</Label2>
+                        </SettingsListItem>
+                    )}
+                </ForTargetEnv>
             </SettingsListBlock>
             {canUseTron && (
                 <>
@@ -292,7 +312,11 @@ export const DesktopWalletSettingsPage = () => {
                                     onClick={() => onDelete({ accountId: account.id })}
                                 >
                                     <ExitIcon />
-                                    <Label2>{t('settings_delete_account')}</Label2>
+                                    <SignOutTextContainer>
+                                        {t('settings_reset')}
+                                        <WalletEmoji emojiSize="16px" emoji={account.emoji} />
+                                        {account.name}
+                                    </SignOutTextContainer>
                                 </SettingsListItem>
                             </SettingsListBlock>
                         </>
