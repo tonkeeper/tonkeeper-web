@@ -169,7 +169,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         if (isProSubscription(subscription) && isPendingSubscription(subscription)) {
             const interval = setInterval(() => {
                 void refetchProState();
-            }, 5000);
+            }, 10000);
 
             return () => clearInterval(interval);
         }
