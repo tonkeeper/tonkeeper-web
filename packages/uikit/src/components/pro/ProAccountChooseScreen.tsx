@@ -110,7 +110,7 @@ export const ProAccountChooseScreen = () => {
 };
 
 const ContentWrapper = styled(NotificationBlock)`
-    padding-top: 1rem;
+    padding: 1rem 0 2rem;
 `;
 
 const Icon = styled.span`
