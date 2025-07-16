@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
     isPaidSubscription,
@@ -27,6 +27,7 @@ import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { usePendingPolling } from '../../../hooks/pro/usePendingPolling';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -140,7 +141,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data, refetch: refetchProState } = useProState();
+    const { data } = useProState();
     const { onOpen } = useProPurchaseNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
@@ -163,17 +164,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
-    useEffect(() => {
-        const subscription = data?.current;
-
-        if (isProSubscription(subscription) && isPendingSubscription(subscription)) {
-            const interval = setInterval(() => {
-                void refetchProState();
-            }, 10000);
-
-            return () => clearInterval(interval);
-        }
-    }, [data?.current]);
+    usePendingPolling();
 
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
     const onGetPro = async () => {

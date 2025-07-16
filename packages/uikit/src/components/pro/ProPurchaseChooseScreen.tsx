@@ -118,6 +118,8 @@ export const useIosPurchaseFlow = () => {
 
         if (status === IosPurchaseStatuses.CANCELED) {
             toast(t('purchase_canceled'));
+
+            return;
         } else if (status === IosPurchaseStatuses.PENDING) {
             toast(t('purchase_processing'));
         } else {

@@ -10,15 +10,17 @@ import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboa
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
-    CryptoPendingSubscription,
+    AuthTypes,
+    IosPendingSubscription,
+    IosSubscriptionStatuses,
+    isIosStrategy,
     isPendingSubscription,
+    isProSubscription,
     isValidSubscription,
     PendingSubscription,
     ProState,
     ProStateWallet,
-    ProSubscription,
-    TelegramAuth,
-    WalletAuth
+    ProSubscription
 } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
@@ -43,9 +45,11 @@ import {
     DashboardCellNumericFiat,
     Invoice,
     FiatCurrencies as FiatCurrenciesGenerated,
-    InvoiceStatus
+    InvoiceStatus,
+    SubscriptionSource
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
+import { IAppSdk } from '../AppSdk';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -58,10 +62,10 @@ export const getBackupState = async (storage: IStorage) => {
 
 export const getProState = async (
     authTokenService: ProAuthTokenService,
-    storage: IStorage
+    sdk: IAppSdk
 ): Promise<ProState> => {
     try {
-        return await loadProState(authTokenService, storage);
+        return await loadProState(authTokenService, sdk);
     } catch (e) {
         console.error(e);
         return {
@@ -100,52 +104,16 @@ export interface ProAuthTokenService {
     promoteToken(from: ProAuthTokenType, to: ProAuthTokenType): Promise<void>;
 }
 
-export const setProTargetAuth = async (
-    storage: IStorage,
-    auth: WalletAuth | TelegramAuth
-): Promise<void> => {
-    const state = await storage.get<ProState>(AppKey.PRO_PENDING_STATE);
-
-    await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-        current: state?.current ?? null,
-        target: {
-            ...state?.target,
-            auth
-        }
-    });
-};
-
-export const setProTargetSubscription = async (
-    storage: IStorage,
-    pendingSubscription: Omit<PendingSubscription, 'auth'>,
-    auth?: WalletAuth | TelegramAuth
-): Promise<void> => {
-    const state = await storage.get<ProState>(AppKey.PRO_PENDING_STATE);
-    const fallbackAuth = state?.target?.auth;
-
-    if (!auth && !fallbackAuth) {
-        throw new Error('Missing Pro target auth for subscription');
-    }
-
-    await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-        current: state?.current ?? null,
-        target: {
-            ...pendingSubscription,
-            auth: auth ?? fallbackAuth!
-        }
-    });
-};
-
 export const setProPendingState = async (
     storage: IStorage,
-    pending: {
-        current: CryptoPendingSubscription;
+    pendingState: {
+        current: PendingSubscription;
         target: ProState['target'];
     }
 ) => {
     await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-        current: pending.current,
-        target: pending.target
+        current: pendingState.current,
+        target: pendingState.target
     });
 };
 
@@ -172,10 +140,8 @@ export const withTargetAuthToken = async <T>(
     }
 };
 
-const loadProState = async (
-    authService: ProAuthTokenService,
-    storage: IStorage
-): Promise<ProState> => {
+const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Promise<ProState> => {
+    const storage = sdk.storage;
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
     const hasTargetAuth = Boolean(processingState?.target?.auth);
 
@@ -205,6 +171,36 @@ const loadProState = async (
             current: processingState.target,
             target: processingState.target
         };
+    }
+
+    if (
+        hasTargetAuth &&
+        isIosStrategy(sdk.subscriptionStrategy) &&
+        isProSubscription(processingState?.target) &&
+        processingState!.target.auth?.type === AuthTypes.WALLET
+    ) {
+        const originalTx = await sdk.subscriptionStrategy.getOriginalTransactionId();
+
+        if (originalTx?.originalTransactionId) {
+            const pending: IosPendingSubscription = {
+                source: SubscriptionSource.IOS,
+                status: IosSubscriptionStatuses.PENDING,
+                originalTransactionId: Number(originalTx.originalTransactionId),
+                valid: false,
+                usedTrial: false,
+                auth: processingState!.target.auth
+            };
+
+            await storage.set(AppKey.PRO_PENDING_STATE, {
+                current: pending,
+                target: pending
+            });
+
+            return {
+                current: pending,
+                target: pending
+            };
+        }
     }
 
     if (hasTargetAuth) {
@@ -305,9 +301,9 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
+export const retryProService = async (authService: ProAuthTokenService, sdk: IAppSdk) => {
     for (let i = 0; i < 10; i++) {
-        const state = await getProState(authService, storage);
+        const state = await getProState(authService, sdk);
         if (isValidSubscription(state.current)) {
             return;
         }

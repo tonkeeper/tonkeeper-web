@@ -2,8 +2,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     AuthTypes,
+    hasWalletAuth,
     IDisplayPlan,
+    IosPendingSubscription,
     IosPurchaseStatuses,
+    IosSubscriptionStatuses,
     isIosStrategy,
     isProductId,
     NormalizedProPlans,
@@ -23,8 +26,9 @@ import {
     ProAuthTokenService,
     ProAuthTokenType,
     retryProService,
+    saveIapPurchase,
     setBackupState,
-    setProTargetAuth,
+    setProPendingState,
     startProServiceTrial,
     waitProServiceInvoice,
     withTargetAuthToken
@@ -35,7 +39,7 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
+import { QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
 import {
@@ -126,7 +130,7 @@ export const useProState = () => {
     const authService = useProAuthTokenService();
 
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(authService, sdk.storage);
+        const state = await getProState(authService, sdk);
 
         await setBackupState(sdk.storage, state.current);
         await client.invalidateQueries([QueryKey.proBackup]);
@@ -149,7 +153,7 @@ export const useManageSubscription = () => {
 
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
-    // const { data } = useProState();
+    const { data: proState } = useProState();
     const client = useQueryClient();
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
@@ -175,29 +179,38 @@ export const useProSubscriptionPurchase = () => {
             throw new Error('Failed to subscribe');
         }
 
-        // const savingResult = await saveIapPurchase(String(originalTransactionId));
+        const savingResult = await saveIapPurchase(String(originalTransactionId));
 
-        // if (!savingResult.ok) {
-        //     const pendingSubscription: IosPendingSubscription = {
-        //         ...subscription,
-        //         displayName,
-        //         displayPrice,
-        //         source: SubscriptionSource.IOS,
-        //         status: IosSubscriptionStatuses.PENDING,
-        //         valid: false,
-        //         usedTrial: data?.subscription?.usedTrial ?? false
-        //     };
-        //
-        //     await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-        //         authorizedWallet: data?.authorizedWallet || null,
-        //         subscription: pendingSubscription
-        //     });
-        //     await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
-        //
-        //     return IosPurchaseStatuses.PENDING;
-        // }
+        if (!savingResult.ok) {
+            if (!proState?.target || !hasWalletAuth(proState.target)) {
+                throw new Error('Failed to subscribe');
+            }
 
-        await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
+            const pendingSubscription: IosPendingSubscription = {
+                ...subscription,
+                displayName,
+                displayPrice,
+                source: SubscriptionSource.IOS,
+                status: IosSubscriptionStatuses.PENDING,
+                valid: false,
+                usedTrial: proState?.target?.usedTrial ?? false,
+                auth: proState.target.auth
+            };
+
+            await setProPendingState(sdk.storage, {
+                current: pendingSubscription,
+                target: {
+                    ...pendingSubscription,
+                    auth: pendingSubscription.auth
+                }
+            });
+
+            await client.invalidateQueries([QueryKey.pro]);
+
+            return IosPurchaseStatuses.PENDING;
+        }
+
+        await client.invalidateQueries([QueryKey.pro]);
 
         return IosPurchaseStatuses.SUCCESS;
     });
@@ -236,11 +249,18 @@ export const useSelectWalletForProMutation = () => {
             signTonConnectOver({ sdk, accountId: account.id, wallet, t })
         );
 
-        await setProTargetAuth(sdk.storage, {
-            type: AuthTypes.WALLET,
-            wallet: {
-                publicKey: wallet.publicKey,
-                rawAddress: wallet.rawAddress
+        const state = await sdk.storage.get<ProState>(AppKey.PRO_PENDING_STATE);
+
+        await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+            current: state?.current ?? null,
+            target: {
+                auth: {
+                    type: AuthTypes.WALLET,
+                    wallet: {
+                        publicKey: wallet.publicKey,
+                        rawAddress: wallet.rawAddress
+                    }
+                }
             }
         });
 
@@ -348,7 +368,7 @@ export const useWaitInvoiceMutation = () => {
         await waitProServiceInvoice(data.invoice);
 
         await withTargetAuthToken(authService, async () => {
-            await retryProService(authService, sdk.storage);
+            await retryProService(authService, sdk);
         });
 
         await client.invalidateQueries([QueryKey.pro]);
