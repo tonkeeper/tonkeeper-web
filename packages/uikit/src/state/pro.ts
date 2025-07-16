@@ -47,36 +47,6 @@ import { useAnalyticsTrack } from '../hooks/analytics';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { parsePrice } from '../libs/pro';
 
-export type FreeProAccess = {
-    code: string;
-    validUntil: Date;
-};
-
-export const useFreeProAccessAvailable = () => {
-    const { mainnetConfig } = useAppContext();
-    const env = useAppTargetEnv();
-
-    return useMemo<FreeProAccess | null>(() => {
-        if (!mainnetConfig.enhanced_acs_pmob || env !== 'mobile') {
-            return null;
-        }
-        const data = mainnetConfig.enhanced_acs_pmob;
-        if (!data.code || !data.acs_until) {
-            return null;
-        }
-
-        const validUntil = new Date(data.acs_until * 1000);
-        if (validUntil < new Date()) {
-            return null;
-        }
-
-        return {
-            code: data.code,
-            validUntil
-        };
-    }, [mainnetConfig.enhanced_acs_pmob, env]);
-};
-
 export const useMutateIsFreeProAccessActivate = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
@@ -124,9 +94,8 @@ export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
-    const isFreeProAccessAvailable = useFreeProAccessAvailable();
 
-    return useQuery<ProState, Error>([QueryKey.pro, isFreeProAccessAvailable], async () => {
+    return useQuery<ProState, Error>([QueryKey.pro], async () => {
         const state = await getProState(authService, sdk.storage);
 
         await setBackupState(sdk.storage, state.current);
