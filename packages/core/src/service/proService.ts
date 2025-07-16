@@ -11,6 +11,7 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
     AuthTypes,
+    hasTargetAuth,
     IosPendingSubscription,
     IosSubscriptionStatuses,
     isIosStrategy,
@@ -143,9 +144,10 @@ export const withTargetAuthToken = async <T>(
 const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Promise<ProState> => {
     const storage = sdk.storage;
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
-    const hasTargetAuth = Boolean(processingState?.target?.auth);
 
-    await authService.attachToken(hasTargetAuth ? ProAuthTokenType.TEMP : ProAuthTokenType.MAIN);
+    await authService.attachToken(
+        hasTargetAuth(processingState) ? ProAuthTokenType.TEMP : ProAuthTokenType.MAIN
+    );
 
     const user = await UsersService.getUserInfo();
     const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
@@ -154,7 +156,7 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
     const subscription = normalizeSubscription(subscriptionDTO, { user, authorizedWallet });
 
     if (isValidSubscription(subscription)) {
-        if (hasTargetAuth) {
+        if (hasTargetAuth(processingState)) {
             await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
         }
 
@@ -166,7 +168,11 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
         };
     }
 
-    if (processingState?.target && hasTargetAuth && isPendingSubscription(processingState.target)) {
+    if (
+        hasTargetAuth(processingState) &&
+        isProSubscription(processingState.target) &&
+        isPendingSubscription(processingState.target)
+    ) {
         return {
             current: processingState.target,
             target: processingState.target
@@ -174,10 +180,10 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
     }
 
     if (
-        hasTargetAuth &&
+        hasTargetAuth(processingState) &&
         isIosStrategy(sdk.subscriptionStrategy) &&
         isProSubscription(processingState?.target) &&
-        processingState!.target.auth?.type === AuthTypes.WALLET
+        processingState.target.auth.type === AuthTypes.WALLET
     ) {
         const originalTx = await sdk.subscriptionStrategy.getOriginalTransactionId();
 
@@ -203,7 +209,7 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
         }
     }
 
-    if (hasTargetAuth) {
+    if (hasTargetAuth(processingState)) {
         return {
             current: null,
             target: processingState!.target

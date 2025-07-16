@@ -9,6 +9,7 @@ import {
     IosSubscriptionStatuses,
     isIosStrategy,
     isProductId,
+    isProSubscription,
     NormalizedProPlans,
     ProState,
     ProStateWallet,
@@ -49,29 +50,8 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { useToast } from '../hooks/useNotification';
-import { useAnalyticsTrack } from '../hooks/analytics';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { parsePrice } from '../libs/pro';
-
-export const useMutateIsFreeProAccessActivate = () => {
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-    const toast = useToast();
-    const { t } = useTranslation();
-    const track = useAnalyticsTrack();
-
-    return useMutation<void, Error, boolean>(async isActive => {
-        await sdk.storage.set(AppKey.PRO_FREE_ACCESS_ACTIVE, isActive);
-        await client.invalidateQueries([QueryKey.pro]);
-
-        if (isActive) {
-            toast(t('free_pro_access_activated_toast'));
-
-            track('free_pro_access_activated');
-        }
-    });
-};
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -182,7 +162,11 @@ export const useProSubscriptionPurchase = () => {
         const savingResult = await saveIapPurchase(String(originalTransactionId));
 
         if (!savingResult.ok) {
-            if (!proState?.target || !hasWalletAuth(proState.target)) {
+            if (
+                !proState?.target ||
+                !isProSubscription(proState.target) ||
+                !hasWalletAuth(proState.target)
+            ) {
                 throw new Error('Failed to subscribe');
             }
 
@@ -199,10 +183,7 @@ export const useProSubscriptionPurchase = () => {
 
             await setProPendingState(sdk.storage, {
                 current: pendingSubscription,
-                target: {
-                    ...pendingSubscription,
-                    auth: pendingSubscription.auth
-                }
+                target: pendingSubscription
             });
 
             await client.invalidateQueries([QueryKey.pro]);

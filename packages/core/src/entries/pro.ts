@@ -4,6 +4,10 @@ import { Language } from './language';
 
 export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
 
+export interface ConstructedSubscription extends Partial<BaseSubscription> {
+    auth: WalletAuth | TelegramAuth;
+}
+
 export type PendingSubscription = CryptoPendingSubscription | IosPendingSubscription;
 
 export type IosSubscription =
@@ -133,15 +137,8 @@ export enum IosPurchaseStatuses {
 
 export enum IosSubscriptionStatuses {
     ACTIVE = 'active',
-    PAUSED = 'paused',
-    REVOKED = 'revoked',
     EXPIRED = 'expired',
-    PENDING = 'pending',
-    PROMO = 'trial-mobile',
-    IN_GRACE_PERIOD = 'inGracePeriod',
-    IN_BILLING_RETRY_PERIOD = 'inBillingRetryPeriod',
-    AUTO_RENEW_OFF = 'autoRenewOff',
-    AUTO_RENEW_ON = 'autoRenewOn'
+    PENDING = 'pending'
 }
 
 export enum ProductIds {
@@ -256,7 +253,7 @@ export function isTelegramActiveSubscription(
 // Pro State
 export type ProState = {
     current: ProSubscription;
-    target: ProSubscription;
+    target: ProSubscription | ConstructedSubscription;
 };
 
 export interface ProStateWallet {
@@ -295,7 +292,7 @@ export function isPaidSubscription(
 }
 
 export function isProSubscription(value: unknown): value is Exclude<ProSubscription, null> {
-    return typeof value === 'object' && value !== null && 'source' in value;
+    return typeof value === 'object' && value !== null && 'source' in value && 'status' in value;
 }
 
 export function isCryptoSubscription(value: unknown): value is CryptoSubscription {
@@ -304,6 +301,12 @@ export function isCryptoSubscription(value: unknown): value is CryptoSubscriptio
 
 export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
+}
+
+export function hasTargetAuth(
+    state: ProState | null
+): state is ProState & { target: { auth: WalletAuth | TelegramAuth } } {
+    return !!state?.target?.auth;
 }
 
 export function hasIosPrice(
@@ -332,9 +335,15 @@ export function hasUsedTrial(
 }
 
 export function hasWalletAuth(
-    subscription: ProSubscription
-): subscription is Exclude<ProSubscription, null> & { auth: { type: AuthTypes.WALLET } } {
-    return subscription !== null && subscription.auth?.type === AuthTypes.WALLET;
+    subscription: ProState['target']
+): subscription is { auth: WalletAuth } {
+    return (
+        subscription !== null &&
+        typeof subscription === 'object' &&
+        'auth' in subscription &&
+        subscription.auth?.type === AuthTypes.WALLET &&
+        'wallet' in subscription.auth
+    );
 }
 
 export function isCryptoProPlans(
