@@ -47,5 +47,5 @@ export const ProPurchaseNotificationContent = () => {
 };
 
 const NotificationStyled = styled(Notification)`
-    max-width: 768px;
+    max-width: 520px;
 `;

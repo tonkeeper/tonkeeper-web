@@ -71,7 +71,7 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
 
     return (
         <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
-            <PromoNotificationCarousel slideCount={5} />
+            <PromoNotificationCarousel />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlockStyled
@@ -130,7 +130,7 @@ const ContentWrapper = styled(NotificationBlock)`
 `;
 
 const NotificationStyled = styled(Notification)`
-    max-width: 768px;
+    max-width: 520px;
 `;
 
 const ButtonsBlockStyled = styled(ButtonsBlock)`
