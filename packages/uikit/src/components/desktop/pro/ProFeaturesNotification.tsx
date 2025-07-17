@@ -16,9 +16,10 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProPlans, useProState } from '../../../state/pro';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
-import { hasUsedTrial, IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { hasUsedTrial, IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -26,7 +27,7 @@ interface IProFeaturesNotificationProps {
 }
 
 export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isOpen, onClose }) => (
-    <NotificationStyled isOpen={isOpen} handleClose={onClose}>
+    <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
         {() => <ProFeaturesNotificationContent onClose={onClose} />}
     </NotificationStyled>
 );
@@ -70,19 +71,18 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
 
     return (
         <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
-            {!isValidSubscription(data.current) && (
-                <NotificationFooterPortal>
-                    <NotificationFooter>
-                        <ButtonsBlockStyled
-                            formId={formId}
-                            isError={isError}
-                            isLoading={isLoading}
-                            displayPlans={displayPlans}
-                            onTrial={hasUsedTrial(data.current) ? undefined : onTrialModalOpen}
-                        />
-                    </NotificationFooter>
-                </NotificationFooterPortal>
-            )}
+            <PromoNotificationCarousel slideCount={5} />
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <ButtonsBlockStyled
+                        formId={formId}
+                        isError={isError}
+                        isLoading={isLoading}
+                        displayPlans={displayPlans}
+                        onTrial={hasUsedTrial(data.current) ? undefined : onTrialModalOpen}
+                    />
+                </NotificationFooter>
+            </NotificationFooterPortal>
             <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialClose} />
         </ContentWrapper>
     );
@@ -109,11 +109,8 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
         <div className={className}>
             <Button primary fullWidth size="large" type="submit" form={formId} loading={isLoading}>
                 <Label2>
-                    {t(
-                        isError
-                            ? 'try_again'
-                            : `continue_from ${formattedDisplayPrice} / ${subscriptionPeriod}`
-                    )}
+                    {t(isError ? 'try_again' : 'continue_from')}
+                    {!isError && ` ${formattedDisplayPrice} / ${subscriptionPeriod}`}
                 </Label2>
             </Button>
             <HideOnReview>
@@ -128,7 +125,7 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
 };
 
 const ContentWrapper = styled(NotificationBlock)`
-    padding: 1rem 0 2rem;
+    padding: 0 0 2rem;
     overflow: hidden;
 `;
 
