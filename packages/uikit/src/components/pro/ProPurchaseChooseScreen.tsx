@@ -10,10 +10,10 @@ import { ProActiveWallet } from './ProActiveWallet';
 import { ProPromoCodeInput } from './ProPromoCodeInput';
 import { useTranslation } from '../../hooks/translation';
 import { ConfirmNotification } from '../settings/ProSettings';
-import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { ProChooseSubscriptionPlan } from './ProChooseSubscriptionPlan';
 import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { useProPurchaseController } from '../../hooks/pro/useProPurchaseController';
+import { ProSubscriptionLightHeader } from './ProSubscriptionLightHeader';
 
 export const ProPurchaseChooseScreen = () => {
     const formId = useId();
@@ -37,7 +37,7 @@ export const ProPurchaseChooseScreen = () => {
 
     return (
         <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
-            <ProSubscriptionHeader
+            <ProSubscriptionLightHeader
                 titleKey="get_tonkeeper_pro"
                 subtitleKey="choose_billing_description"
             />

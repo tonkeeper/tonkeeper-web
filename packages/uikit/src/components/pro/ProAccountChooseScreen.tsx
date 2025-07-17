@@ -9,7 +9,6 @@ import { handleSubmit } from '../../libs/form';
 import { PurchaseSubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
-import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useProState, useSelectWalletForProMutation } from '../../state/pro';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useAccountWallets, useActiveWallet } from '../../state/wallet';
@@ -18,6 +17,7 @@ import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from 
 import { isTelegramSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { ProSubscriptionLightHeader } from './ProSubscriptionLightHeader';
 
 export const ProAccountChooseScreen = () => {
     const formId = useId();
@@ -69,7 +69,7 @@ export const ProAccountChooseScreen = () => {
 
     return (
         <ContentWrapper onSubmit={handleSubmit(handleNextScreen)} id={formId}>
-            <ProSubscriptionHeader
+            <ProSubscriptionLightHeader
                 titleKey="choose_wallet_for_pro"
                 subtitleKey="subscription_will_be_linked_to_wallet"
             />
