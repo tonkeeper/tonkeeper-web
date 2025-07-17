@@ -158,8 +158,7 @@ export const useCompleteHttpConnection = () => {
                 walletId: result.walletId,
                 manifest: result.manifest,
                 params,
-                replyItems: result.replyItems.items,
-                appVersion: sdk.version
+                replyItems: result.replyItems
             });
 
             await sendEventToBridge({
@@ -224,8 +223,7 @@ export const useCompleteInjectedConnection = () => {
                 walletId: result.walletId,
                 manifest: result.manifest,
                 params,
-                replyItems: result.replyItems.items,
-                appVersion: sdk.version
+                replyItems: result.replyItems
             });
 
             sendBridgeResponse(response);
