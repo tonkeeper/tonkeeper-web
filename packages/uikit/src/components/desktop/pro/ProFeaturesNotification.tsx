@@ -20,6 +20,7 @@ import { hasUsedTrial, IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
+import { ClosePromoIcon } from '../../Icon';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -71,6 +72,10 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
 
     return (
         <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
+            <CloseButtonStyled type="button" onClick={onClose}>
+                <ClosePromoIcon />
+            </CloseButtonStyled>
+
             <PromoNotificationCarousel />
             <NotificationFooterPortal>
                 <NotificationFooter>
@@ -125,6 +130,7 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
 };
 
 const ContentWrapper = styled(NotificationBlock)`
+    position: relative;
     padding: 0 0 2rem;
     overflow: hidden;
 `;
@@ -137,4 +143,18 @@ const ButtonsBlockStyled = styled(ButtonsBlock)`
     display: flex;
     flex-direction: column;
     gap: 1rem;
+`;
+
+const CloseButtonStyled = styled.button`
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+        opacity: 0.7;
+    }
 `;

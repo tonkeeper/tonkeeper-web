@@ -152,6 +152,31 @@ export const CloseIcon: FC<{ className?: string; color?: string }> = ({ color, c
     );
 };
 
+export const ClosePromoIcon: FC<{ className?: string }> = ({ className }) => {
+    return (
+        <svg
+            width="32"
+            height="32"
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={className}
+        >
+            <path
+                d="M0 16C0 7.16344 7.16344 0 16 0C24.8366 0 32 7.16344 32 16C32 24.8366 24.8366 32 16 32C7.16344 32 0 24.8366 0 16Z"
+                fill="white"
+                fillOpacity="0.12"
+            />
+            <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M10.4697 10.4697C10.7626 10.1768 11.2374 10.1768 11.5303 10.4697L16 14.9393L20.4697 10.4697C20.7626 10.1768 21.2374 10.1768 21.5303 10.4697C21.8232 10.7626 21.8232 11.2374 21.5303 11.5303L17.0607 16L21.5303 20.4697C21.8232 20.7626 21.8232 21.2374 21.5303 21.5303C21.2374 21.8232 20.7626 21.8232 20.4697 21.5303L16 17.0607L11.5303 21.5303C11.2374 21.8232 10.7626 21.8232 10.4697 21.5303C10.1768 21.2374 10.1768 20.7626 10.4697 20.4697L14.9393 16L10.4697 11.5303C10.1768 11.2374 10.1768 10.7626 10.4697 10.4697Z"
+                fill="#EBEBEB"
+            />
+        </svg>
+    );
+};
+
 export const XmarkIcon = () => {
     return (
         <svg
