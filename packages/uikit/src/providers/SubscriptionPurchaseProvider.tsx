@@ -27,7 +27,7 @@ export const SubscriptionPurchaseProvider: FC<IProps> = props => {
 
     useEffect(() => {
         setScreen({
-            currentScreen: initialScreen ?? PurchaseSubscriptionScreens.PROMO,
+            currentScreen: initialScreen ?? PurchaseSubscriptionScreens.ACCOUNTS,
             prevScreen: null
         });
     }, []);

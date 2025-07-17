@@ -1,5 +1,4 @@
 export enum PurchaseSubscriptionScreens {
-    PROMO = 1,
-    ACCOUNTS = 2,
-    PURCHASE = 3
+    ACCOUNTS = 1,
+    PURCHASE = 2
 }

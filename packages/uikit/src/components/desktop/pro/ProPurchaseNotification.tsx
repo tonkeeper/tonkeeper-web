@@ -8,7 +8,6 @@ import { PurchaseSubscriptionScreens } from '../../../enums/pro';
 import { ProAccountChooseScreen } from '../../pro/ProAccountChooseScreen';
 import { ProPurchaseChooseScreen } from '../../pro/ProPurchaseChooseScreen';
 import { usePurchaseSubscriptionScreen } from '../../../hooks/pro/usePurchaseSubscriptionScreen';
-import { ProPromoScreen } from '../../pro/ProPromoScreen';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
@@ -31,7 +30,6 @@ export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = props 
 };
 
 const SCREENS_MAP = {
-    [PurchaseSubscriptionScreens.PROMO]: <ProPromoScreen />,
     [PurchaseSubscriptionScreens.ACCOUNTS]: <ProAccountChooseScreen />,
     [PurchaseSubscriptionScreens.PURCHASE]: <ProPurchaseChooseScreen />
 };
