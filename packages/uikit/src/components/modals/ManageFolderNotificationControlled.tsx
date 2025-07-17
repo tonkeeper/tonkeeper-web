@@ -184,6 +184,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
                 isValid={isValidInput}
                 clearButton
                 size="small"
+                autoFocus="notification"
             />
             <ListBlockDesktopAdaptiveStyled>
                 {availableAccounts.map(acc => (
