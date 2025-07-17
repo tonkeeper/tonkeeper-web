@@ -2,7 +2,7 @@ import { PluginListenerHandle, registerPlugin } from '@capacitor/core';
 import { IDappBrowser } from '@tonkeeper/core/dist/AppSdk';
 import { BrowserTabBase, BrowserTabLive } from '@tonkeeper/core/dist/service/dappBrowserService';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
-import { eqOrigins, originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { eqOrigins, originFromUrl } from '@tonkeeper/core/dist/utils/url';
 
 interface DocumentMetadata {
     title: string;

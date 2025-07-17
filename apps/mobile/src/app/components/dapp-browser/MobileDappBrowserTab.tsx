@@ -46,7 +46,7 @@ import {
 } from '@tonkeeper/uikit/dist/components/DropDown';
 import { CapacitorDappBrowser } from '../../../libs/plugins/dapp-browser-plugin';
 import { useTranslation } from 'react-i18next';
-import { originFromUrl } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { originFromUrl } from '@tonkeeper/core/dist/utils/url';
 import { Share } from '@capacitor/share';
 import {
     useDisconnectInjectedTonConnectAppFromAllWallets,

@@ -36,7 +36,7 @@ import {
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 import { Account, getAccountByWalletById, isAccountSupportTonConnect } from '../../entries/account';
-import { removeLastSlash } from '../../utils/common';
+import { eqOrigins, isLocalhost, originFromUrl } from '../../utils/url';
 
 export const tonConnectTonkeeperAppName = 'tonkeeper';
 export const tonConnectTonkeeperProAppName = 'tonkeeper-pro';
@@ -566,18 +566,20 @@ export const sendBadRequestResponse = (
     };
 };
 
-export function eqOrigins(origin1: string, origin2: string | undefined): boolean {
-    return origin2 !== undefined && removeLastSlash(origin1) === removeLastSlash(origin2);
-}
-
-export function originFromUrl(url: string): string | undefined {
-    try {
-        const parsed = new URL(url);
-        return removeLastSlash(parsed.origin);
-    } catch (e) {
-        console.error(e);
-        return undefined;
+export function checkDappOriginMatchesManifest(params: {
+    origin: string;
+    manifestUrl: string;
+}): boolean {
+    const manifestOrigin = originFromUrl(params.manifestUrl);
+    if (!manifestOrigin) {
+        return false;
     }
+
+    if (isLocalhost(params.origin)) {
+        return true;
+    }
+
+    return eqOrigins(params.origin, manifestOrigin);
 }
 
 export async function checkTonConnectFromAndNetwork(
