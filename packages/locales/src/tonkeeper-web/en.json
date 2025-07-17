@@ -390,6 +390,7 @@
   "purchase_processing": "Tonkeeper Pro Is Processing",
   "purchase_success": "Tonkeeper Pro Activated",
   "quit_tonkeeper_pro": "Quit Tonkeeper Pro",
+  "real_human_experts": "Real human experts to guide you through your task.",
   "receive_ton": "Receive Toncoin",
   "receive_ton_description": "Send only Toncoin TON and tokens\nin TON network to this address, or you\nmight lose your funds.",
   "receive_trc20": "Receive USDT TRC20",
