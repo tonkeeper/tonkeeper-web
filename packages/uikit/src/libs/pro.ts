@@ -60,6 +60,7 @@ export function adaptPlansToViewModel(
                 id: plan.id,
                 displayName: plan.displayName,
                 displayPrice: plan.displayPrice,
+                subscriptionPeriod: plan?.subscriptionPeriod || 'month',
                 formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
             }));
 
@@ -68,6 +69,7 @@ export function adaptPlansToViewModel(
                 id: String(plan.id),
                 displayName: plan.name,
                 displayPrice: plan.amount,
+                subscriptionPeriod: 'year',
                 formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
             }));
     }

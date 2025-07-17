@@ -16,6 +16,7 @@ import { TonTransactionNotificationControlled } from './modals/TonTransactionNot
 import { MAMTronMigrationNotification } from './modals/MAMTronMigrationNotificationControlled';
 import { ProEndingNotificationControlled } from './modals/ProEndingNotificationControlled';
 import { ProPurchaseNotificationControlled } from './modals/ProPurchaseNotificationControlled';
+import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -23,6 +24,7 @@ export const ModalsRoot = () => {
             <WalletVersionSettingsNotification />
             <LedgerIndexesSettingsNotification />
             <ProPurchaseNotificationControlled />
+            <ProFeaturesNotificationControlled />
             <ProEndingNotificationControlled />
             <MAMIndexesSettingsNotification />
             <RenameNotificationControlled />

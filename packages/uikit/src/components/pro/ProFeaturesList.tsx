@@ -6,9 +6,9 @@ import { Body3, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { CoinsIcon, ListIcon, SlidersIcon, TelegramIcon } from '../Icon';
-import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 import { useSafePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
 import { PurchaseSubscriptionScreens } from '../../enums/pro';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 interface IHeaderOptions {
     removeHeader?: boolean;
@@ -56,7 +56,7 @@ interface IHeaderProps extends Omit<IHeaderOptions, 'removeHeader'> {
 }
 const Header: FC<IHeaderProps> = props => {
     const { t } = useTranslation();
-    const { onOpen } = useProPurchaseNotification();
+    const { onOpen } = useProFeaturesNotification();
     const purchaseContext = useSafePurchaseControlScreen();
 
     const handleLearnMoreClick = () => {

@@ -34,7 +34,7 @@ import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -100,7 +100,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
-    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
+    const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
 
     const availableThemes = useAvailableThemes();
 

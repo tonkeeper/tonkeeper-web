@@ -56,7 +56,7 @@ import { useBlocker } from '../../../hooks/router/useBlocker';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { ProPurchaseNotification } from '../pro/ProPurchaseNotification';
+import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -628,7 +628,7 @@ const MultiSendFooter: FC<{
                 totalValue={willBeSent}
                 willDiscard={blocker.state === 'blocked'}
             />
-            <ProPurchaseNotification isOpen={isProModalOpened} onClose={onProModalClose} />
+            <ProFeaturesNotification isOpen={isProModalOpened} onClose={onProModalClose} />
         </>
     );
 };

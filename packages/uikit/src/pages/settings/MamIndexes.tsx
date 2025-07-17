@@ -38,7 +38,7 @@ import { useProState } from '../../state/pro';
 import { Navigate } from '../../components/shared/Navigate';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
+import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -143,7 +143,7 @@ export const MAMIndexesPageContent: FC<{
     const { t } = useTranslation();
     const config = useActiveConfig();
     const { data: proState } = useProState();
-    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
+    const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =

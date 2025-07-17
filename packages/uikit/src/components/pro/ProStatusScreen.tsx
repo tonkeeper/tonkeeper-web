@@ -21,9 +21,9 @@ import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useManageSubscription, useProLogout, useProState } from '../../state/pro';
 import { ProSettingsMainButtonWrapper } from './ProSettingsMainButtonWrapper';
 import { handleSubmit } from '../../libs/form';
-import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 import { AppRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 // TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
@@ -31,7 +31,7 @@ export const ProStatusScreen = () => {
     const { t } = useTranslation();
     const { data: proState } = useProState();
     const toast = useToast();
-    const { onOpen } = useProPurchaseNotification();
+    const { onOpen } = useProFeaturesNotification();
     const navigate = useNavigate();
 
     const subscription = proState?.current;

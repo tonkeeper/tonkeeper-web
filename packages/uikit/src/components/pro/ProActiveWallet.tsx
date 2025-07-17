@@ -51,7 +51,7 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
         if (purchaseContext) {
             purchaseContext.goTo(PurchaseSubscriptionScreens.ACCOUNTS);
         } else {
-            onOpen({ initialScreen: PurchaseSubscriptionScreens.ACCOUNTS });
+            onOpen();
         }
     };
 

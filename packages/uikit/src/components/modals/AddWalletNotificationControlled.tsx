@@ -23,7 +23,7 @@ import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
-import { useProPurchaseNotification } from './ProPurchaseNotificationControlled';
+import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -118,7 +118,7 @@ const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
 };
 
 export const AddWalletNotificationControlled = () => {
-    const { onOpen: openBuyPro } = useProPurchaseNotification();
+    const { onOpen: openBuyPro } = useProFeaturesNotification();
     const { data: proState } = useProState();
     const { isOpen, onClose, onOpen } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);

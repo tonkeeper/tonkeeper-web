@@ -24,10 +24,10 @@ import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
-import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { usePendingPolling } from '../../../hooks/pro/usePendingPolling';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -142,7 +142,7 @@ const ProButtonPanel = styled(Button)`
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { data } = useProState();
-    const { onOpen } = useProPurchaseNotification();
+    const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
     const { mutate: invalidateGlobalQueries, isLoading: isInvalidatingGlobalQueries } =

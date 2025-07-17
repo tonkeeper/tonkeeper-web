@@ -9,7 +9,7 @@ import { isPaidSubscription, isTelegramSubscription } from '@tonkeeper/core/dist
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { ChevronRightIcon } from '../Icon';
 import { useAppTargetEnv } from '../../hooks/appSdk';
-import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const ProBannerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -54,7 +54,7 @@ const Body2Styled = styled(Body2)`
 `;
 
 export const ProBanner: FC<{ className?: string }> = ({ className }) => {
-    const { onOpen } = useProPurchaseNotification();
+    const { onOpen } = useProFeaturesNotification();
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
     const { data } = useProState();
