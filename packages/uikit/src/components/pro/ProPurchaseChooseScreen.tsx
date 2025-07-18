@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import styled from 'styled-components';
 
-import { Label2 } from '../Text';
+import { Body3, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { ProLegalNote } from './ProLegalNote';
 import { handleSubmit } from '../../libs/form';
@@ -44,7 +44,11 @@ export const ProPurchaseChooseScreen = () => {
                 subtitleKey="choose_billing_description"
             />
 
-            <ProActiveWallet isLoading={isLoading} onLogout={onLogout} />
+            <ProActiveWallet
+                title={<Body3Styled>{t('selected_wallet')}</Body3Styled>}
+                isLoading={isLoading}
+                onLogout={onLogout}
+            />
 
             <ProChooseSubscriptionPlan
                 isEnterPromoVisible={isCrypto && !isPromoShown}
@@ -102,4 +106,8 @@ const PurchaseButtonWrapper = styled.div`
     align-items: center;
     padding: 1rem 0;
     width: 100%;
+`;
+
+const Body3Styled = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
 `;

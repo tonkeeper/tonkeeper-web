@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
@@ -14,11 +14,13 @@ import { PurchaseSubscriptionScreens } from '../../enums/pro';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 
 interface IProps {
+    title?: ReactNode;
     onLogout: () => Promise<void>;
     isLoading: boolean;
 }
 
-export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
+export const ProActiveWallet: FC<IProps> = props => {
+    const { onLogout, isLoading, title } = props;
     const { t } = useTranslation();
     const { data } = useProState();
     const { onOpen } = useProPurchaseNotification();
@@ -48,6 +50,7 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
 
     const handleDisconnectClick = async () => {
         await onLogout();
+
         if (purchaseContext) {
             purchaseContext.goTo(PurchaseSubscriptionScreens.ACCOUNTS);
         } else {
@@ -56,32 +59,42 @@ export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
     };
 
     return (
-        <ListBlock margin={false} fullWidth>
-            {!isLoading && account && wallet ? (
-                <ProWalletListItem
-                    disableHover
-                    wallet={wallet}
-                    account={account}
-                    rightElement={
-                        <ButtonStyled
-                            type="button"
-                            disabled={isLoading}
-                            onClick={handleDisconnectClick}
-                        >
-                            <Label2>{t('disconnect')}</Label2>
-                        </ButtonStyled>
-                    }
-                />
-            ) : (
-                <ListItem>
-                    <ListItemPayloadStyled>
-                        <Skeleton width="100%" height="20px" />
-                    </ListItemPayloadStyled>
-                </ListItem>
-            )}
-        </ListBlock>
+        <Block>
+            {title}
+            <ListBlock margin={false} fullWidth>
+                {!isLoading && account && wallet ? (
+                    <ProWalletListItem
+                        disableHover
+                        wallet={wallet}
+                        account={account}
+                        rightElement={
+                            <ButtonStyled
+                                type="button"
+                                disabled={isLoading}
+                                onClick={handleDisconnectClick}
+                            >
+                                <Label2>{t('disconnect')}</Label2>
+                            </ButtonStyled>
+                        }
+                    />
+                ) : (
+                    <ListItem>
+                        <ListItemPayloadStyled>
+                            <Skeleton width="100%" height="20px" />
+                        </ListItemPayloadStyled>
+                    </ListItem>
+                )}
+            </ListBlock>
+        </Block>
     );
 };
+
+const Block = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+`;
 
 const ListItemPayloadStyled = styled(ListItemPayload)`
     padding: 10px 10px 10px 0;
