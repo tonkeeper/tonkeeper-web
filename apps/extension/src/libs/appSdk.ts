@@ -4,7 +4,7 @@ import browser from 'webextension-polyfill';
 import packageJson from '../../package.json';
 import { ExtensionStorage } from './storage';
 import { checkForError } from './utils';
-import { isValidUrlProtocol } from "@tonkeeper/core/dist/utils/common";
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
     process.env.REACT_APP_EXTENSION_TYPE;
@@ -13,6 +13,20 @@ export class ExtensionAppSdk extends BaseApp {
     constructor() {
         super(new ExtensionStorage());
     }
+
+    pasteFromClipboard = async () => {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
+            try {
+                return await navigator.clipboard.readText();
+            } catch (e) {
+                console.error('Failed to read clipboard', e);
+                return '';
+            }
+        } else {
+            return '';
+        }
+    };
+
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
         this.topMessage(notification);

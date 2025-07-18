@@ -9,7 +9,6 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useAtom } from '../../libs/useAtom';
-import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 import { useProState } from '../../state/pro';
 import { CreateStandardWallet } from '../../pages/import/CreateStandardWallet';
 import { CreateMAMWallet } from '../../pages/import/CreateMAMWallet';
@@ -22,7 +21,9 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
+import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -144,14 +145,14 @@ export const AddWalletNotificationControlled = () => {
         if (!isOpen) {
             return;
         }
-        if (doesMethodRequirePro(params?.walletType) && !proState?.subscription.valid) {
+        if (doesMethodRequirePro(params?.walletType) && !isValidSubscription(proState?.current)) {
             onClose();
             openBuyPro();
             return;
         }
 
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid]);
+    }, [isOpen, params?.walletType, proState?.current?.valid]);
 
     const sdk = useAppSdk();
 
@@ -162,7 +163,7 @@ export const AddWalletNotificationControlled = () => {
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (doesMethodRequirePro(method) && !proState?.subscription.valid) {
+            if (doesMethodRequirePro(method) && !isValidSubscription(proState?.current)) {
                 onClose();
                 openBuyPro();
                 return;
@@ -171,7 +172,7 @@ export const AddWalletNotificationControlled = () => {
             openExtensionTab(sdk, method);
             setSelectedMethod(method);
         };
-    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod, sdk]);
+    }, [proState?.current?.valid, openBuyPro, setSelectedMethod, sdk]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

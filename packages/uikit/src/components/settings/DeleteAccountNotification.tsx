@@ -11,6 +11,7 @@ import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useDeleteActiveWalletWarning } from '../../hooks/pro/useDeleteActiveWalletWarning';
 
 const NotificationBlock = styled.div`
     display: flex;
@@ -45,9 +46,14 @@ export const DeleteNotificationContent: FC<{
     const { t } = useTranslation();
     const [checked, setChecked] = useState(isKeystone || isReadOnly);
     const { mutateAsync, isLoading } = useMutateLogOut();
+    const verifyDeleting = useDeleteActiveWalletWarning();
     const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
+        const isApprovedDeleting = await verifyDeleting();
+
+        if (!isApprovedDeleting) return;
+
         await mutateAsync(accountId);
         onClose();
         navigate(AppRoute.home);
