@@ -11,7 +11,7 @@ interface IProps {
     selectedPlanId: string;
     onPlanIdSelection: Dispatch<SetStateAction<string>>;
     isLoading: boolean;
-    isPromoShown: boolean;
+    isEnterPromoVisible: boolean;
     onPromoInputShow: () => void;
 }
 
@@ -20,7 +20,7 @@ export const ProChooseSubscriptionPlan: FC<IProps> = props => {
         productsForRender,
         selectedPlanId,
         onPlanIdSelection,
-        isPromoShown,
+        isEnterPromoVisible,
         onPromoInputShow,
         isLoading
     } = props;
@@ -34,7 +34,7 @@ export const ProChooseSubscriptionPlan: FC<IProps> = props => {
         <SubscriptionPlansBlock>
             <Header>
                 <Subtitle>{t('choose_plan')}</Subtitle>
-                {!isPromoShown && (
+                {isEnterPromoVisible && (
                     <ButtonStyled as="button" type="button" onClick={onPromoInputShow}>
                         {t('enter_promo_code')}
                     </ButtonStyled>

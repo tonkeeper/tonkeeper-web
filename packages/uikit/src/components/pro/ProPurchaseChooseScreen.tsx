@@ -47,7 +47,7 @@ export const ProPurchaseChooseScreen = () => {
             <ProActiveWallet isLoading={isLoading} onLogout={onLogout} />
 
             <ProChooseSubscriptionPlan
-                isPromoShown={isPromoShown}
+                isEnterPromoVisible={isCrypto && !isPromoShown}
                 onPromoInputShow={showPromo}
                 isLoading={isLoading}
                 selectedPlanId={selectedPlanId}
