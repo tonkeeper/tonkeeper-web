@@ -5,9 +5,8 @@ import { Badge } from '../shared';
 import { Body3, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { CoinsIcon, ListIcon, SlidersIcon, TelegramIcon } from '../Icon';
+import { ChevronRightIcon } from '../Icon';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
-import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 
 interface IHeaderOptions {
     removeHeader?: boolean;
@@ -19,33 +18,41 @@ interface IProps {
     className?: string;
     features?: IProFeature[];
     headerOptions?: IHeaderOptions;
+    onFeatureClick?: (titleKey: string) => void;
 }
 
 const ProFeaturesListContent: FC<IProps> = props => {
-    const { className, headerOptions, features = PRO_FEATURES } = props;
+    const { className, headerOptions, features = PRO_FEATURES, onFeatureClick } = props;
     const { removeHeader, ...restHeaderProps } = headerOptions ?? {};
 
     const { t } = useTranslation();
+    const { onOpen } = useProFeaturesNotification();
+
+    const onItemClick = (titleKey: string) => {
+        return onFeatureClick ? onFeatureClick(titleKey) : onOpen();
+    };
 
     return (
         <div className={className}>
             {!removeHeader && <HeaderStyled {...restHeaderProps} />}
-            <ListBlock fullWidth>
-                {features.map(({ titleKey, descriptionKey, iconComponent, badgeComponent }) => (
-                    <ListItem hover={false} key={titleKey}>
-                        <ListItemPayloadStyled>
-                            <div>
-                                <LocalBadgedTitleStyled
-                                    titleKey={t(titleKey)}
-                                    badgeComponent={badgeComponent}
-                                />
-                                <Text>{t(descriptionKey)}</Text>
-                            </div>
-                            <FeatureIconContainer>{iconComponent}</FeatureIconContainer>
-                        </ListItemPayloadStyled>
-                    </ListItem>
-                ))}
-            </ListBlock>
+            <GlowingBorderWrapper>
+                <ListBlock margin={false} fullWidth>
+                    {features.map(({ titleKey, descriptionKey, iconComponent, badgeComponent }) => (
+                        <ListItem onClick={() => onItemClick(titleKey)} key={titleKey}>
+                            <ListItemPayloadStyled>
+                                <div>
+                                    <LocalBadgedTitleStyled
+                                        titleKey={t(titleKey)}
+                                        badgeComponent={badgeComponent}
+                                    />
+                                    <Text>{t(descriptionKey)}</Text>
+                                </div>
+                                <FeatureIconContainer>{iconComponent}</FeatureIconContainer>
+                            </ListItemPayloadStyled>
+                        </ListItem>
+                    ))}
+                </ListBlock>
+            </GlowingBorderWrapper>
         </div>
     );
 };
@@ -55,11 +62,9 @@ interface IHeaderProps extends Omit<IHeaderOptions, 'removeHeader'> {
 }
 const Header: FC<IHeaderProps> = props => {
     const { t } = useTranslation();
-    const { onClose } = useProPurchaseNotification();
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
 
     const handleLearnMoreClick = () => {
-        onClose();
         onProFeaturesOpen();
     };
 
@@ -109,6 +114,27 @@ const LocalBadge = () => {
     );
 };
 
+const GlowingBorderWrapper = styled.div`
+    position: relative;
+    border-radius: 8px;
+    padding: 2px;
+    background: linear-gradient(130deg, #45aef5, transparent, #45aef5);
+    background-size: 300% 300%;
+    animation: borderShift 5s linear infinite;
+
+    @keyframes borderShift {
+        0% {
+            background-position: 0 50%;
+        }
+        50% {
+            background-position: 100% 50%;
+        }
+        100% {
+            background-position: 0 50%;
+        }
+    }
+`;
+
 const HeaderStyled = styled(Header)`
     display: flex;
     justify-content: space-between;
@@ -156,30 +182,26 @@ const ListItemPayloadStyled = styled(ListItemPayload)`
     padding-bottom: 10px;
 `;
 
-const TelegramIconStyled = styled(TelegramIcon)`
-    color: ${p => p.theme.iconSecondary};
-`;
-
 const PRO_FEATURES: IProFeature[] = [
     {
         titleKey: 'pro_feature_multisig_title',
         descriptionKey: 'pro_feature_multisig_description',
-        iconComponent: <ListIcon />
+        iconComponent: <ChevronRightIcon />
     },
     {
         titleKey: 'pro_feature_multi_accounts_title',
         descriptionKey: 'pro_feature_multi_accounts_description',
-        iconComponent: <SlidersIcon />
+        iconComponent: <ChevronRightIcon />
     },
     {
         titleKey: 'pro_feature_multi_send_title',
         descriptionKey: 'pro_feature_multi_send_description',
         badgeComponent: <LocalBadge />,
-        iconComponent: <CoinsIcon />
+        iconComponent: <ChevronRightIcon />
     },
     {
         titleKey: 'pro_feature_priority_support_title',
         descriptionKey: 'pro_feature_priority_support_description',
-        iconComponent: <TelegramIconStyled />
+        iconComponent: <ChevronRightIcon />
     }
 ];
