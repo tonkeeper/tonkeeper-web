@@ -5,9 +5,10 @@ import {
     SIGN_DATA_ERROR_CODES,
     SignDataRequestPayload,
     TonConnectAccount,
-    TonConnectEventPayload, TonConnectNetwork,
+    TonConnectEventPayload,
+    TonConnectNetwork,
     TonConnectTransactionPayload
-} from "@tonkeeper/core/dist/entries/tonConnect";
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     getInjectedDappConnection,
     getDeviceInfo,
@@ -15,7 +16,7 @@ import {
     tonInjectedReConnectRequest,
     tonConnectTonkeeperAppName,
     checkTonConnectFromAndNetwork
-} from "@tonkeeper/core/dist/service/tonConnect/connectService";
+} from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../../storage';
 import memoryStore from '../../store/memoryStore';
@@ -57,14 +58,21 @@ const tonReConnectResponse = async (origin: string): Promise<TonConnectEventPayl
     };
 };
 
-export async function getExtensionDeviceInfo(options?: { maxMessages?: number }): Promise<DeviceInfo> {
+export async function getExtensionDeviceInfo(options?: {
+    maxMessages?: number;
+}): Promise<DeviceInfo> {
     const { version } = browser.runtime.getManifest();
     const { os } = await browser.runtime.getPlatformInfo();
-    return getDeviceInfo(getTonConnectPlatform(os), version, options?.maxMessages ?? 255, tonConnectTonkeeperAppName)
+    return getDeviceInfo(
+        getTonConnectPlatform(os),
+        version,
+        options?.maxMessages ?? 255,
+        tonConnectTonkeeperAppName
+    );
 }
 
 export const tonConnectReConnect = async (origin: string) => {
-    return await tonReConnectResponse(origin);
+    return tonReConnectResponse(origin);
 };
 
 export const tonConnectDisconnect = async (id: number, webViewUrl: string) =>
@@ -143,7 +151,10 @@ export const tonConnectTransaction = async (
     }
 
     if (account) {
-        await checkTonConnectFromAndNetwork(storage, connection.wallet, {from: account.address, network: account.network as TonConnectNetwork})
+        await checkTonConnectFromAndNetwork(storage, connection.wallet, {
+            from: account.address,
+            network: account.network as TonConnectNetwork
+        });
     }
 
     try {
@@ -151,8 +162,8 @@ export const tonConnectTransaction = async (
     } catch (e) {
         console.error(e);
         throw new TonConnectError(
-          "Requested wallet not found",
-          CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
+            'Requested wallet not found',
+            CONNECT_EVENT_ERROR_CODES.BAD_REQUEST_ERROR
         );
     }
 

@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
-import { build } from "vite";
-import child_process from "child_process";
+import { build } from 'vite';
+import child_process from 'child_process';
 
 export const notify = (value: string) => console.log(`----------${value}----------`);
 
@@ -50,7 +50,7 @@ export class ExtensionBuilder {
                     mode: this.isDevMode ? 'development' : 'production',
                     configFile: config,
                     define: {
-                        'process.env': {...this.env, ...extraEnv}
+                        'process.env': { ...this.env, ...extraEnv }
                     }
                 });
             } catch (error) {
@@ -73,7 +73,9 @@ export class ExtensionBuilder {
         }
         const staticJsFiles = fs.readdirSync(`${this.buildPath}/static/js`);
         console.log(`${this.directory} static/js Output:`, staticJsFiles);
-        const mainJsFile = staticJsFiles.find(file => file.startsWith('main.') && file.endsWith('.js'));
+        const mainJsFile = staticJsFiles.find(
+            file => file.startsWith('main.') && file.endsWith('.js')
+        );
         if (!mainJsFile) {
             console.error(`Error: ${this.buildPath}/static/js/main.[hash].js is missing`);
             process.exit(1);
@@ -93,18 +95,18 @@ export class ExtensionBuilder {
 
     public archive() {
         child_process.execSync(
-          `zip ../tonkeeper_${this.directory}_v${this.version}.zip -r ${this.buildPath}/ *`,
-          {
-              cwd: `${this.buildPath}/`
-          }
+            `zip ../tonkeeper_${this.directory}_v${this.version}.zip -r ${this.buildPath}/ *`,
+            {
+                cwd: `${this.buildPath}/`
+            }
         );
     }
 
-    public readManifest(){
+    public readManifest() {
         return JSON.parse(fs.readFileSync(`${this.buildPath}/manifest.json`, 'utf8'));
-    };
+    }
 
     public writeManifest(data: any) {
         fs.writeFileSync(`${this.buildPath}/manifest.json`, JSON.stringify(data));
-    };
+    }
 }

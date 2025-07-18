@@ -1,9 +1,10 @@
 import { EventEmitter, IEventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
 import {
-    ConnectRequest, DAppManifest,
+    ConnectRequest,
+    DAppManifest,
     SignDataRequestPayload,
     TonConnectTransactionPayload
-} from "@tonkeeper/core/dist/entries/tonConnect";
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import { ProxyConfiguration } from '../entries/proxy';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';

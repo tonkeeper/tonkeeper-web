@@ -20,9 +20,9 @@ import {
     tonConnectTransaction
 } from './dApp/tonConnectService';
 import { createTonapiRequest } from './backgroundTonapiService';
-import { processInterceptTonLink } from "./backgroundTonLinkService";
+import { processInterceptTonLink } from './backgroundTonLinkService';
 
-let contentScriptPorts = new Set<browser.Runtime.Port>();
+const contentScriptPorts = new Set<browser.Runtime.Port>();
 
 const providerResponse = (
     id: number,
