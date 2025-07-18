@@ -1,49 +1,32 @@
 import { css, styled } from 'styled-components';
-import { Fragment, useState } from 'react';
+import { FC, Fragment, useEffect, useState } from 'react';
 import { Carousel as ArkCarousel } from '@ark-ui/react';
-import { Body2, Label1 } from '../Text';
-import { useTranslation } from '../../hooks/translation';
+
 import {
     MainPromoIcon,
+    MultiSendPromoIcon,
     MultiSigPromoIcon,
     MultiWalletPromoIcon,
-    SupportPromoIcon,
-    MultiSendPromoIcon
+    SupportPromoIcon
 } from './icons';
+import { Body2, Label1 } from '../Text';
+import { FeatureSlideNames } from '../../enums/pro';
+import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
 
-const META_DATA_MAP = [
-    {
-        title: 'tonkeeper_pro_subscription',
-        subtitle: 'promo_subtitle_subscription',
-        content: <MainPromoIcon />
-    },
-    {
-        title: 'promo_title_multisig_wallets',
-        subtitle: 'promo_subtitle_multisig_wallets',
-        content: <MultiSigPromoIcon />
-    },
-    {
-        title: 'promo_title_multi_wallet_accounts',
-        subtitle: 'promo_subtitle_multi_wallet_accounts',
-        content: <MultiWalletPromoIcon />
-    },
-    {
-        title: 'promo_title_multisend',
-        subtitle: 'promo_subtitle_multisend',
-        content: <MultiSendPromoIcon />
-    },
-    {
-        title: 'pro_feature_priority_support_title',
-        subtitle: 'promo_subtitle_support',
-        content: <SupportPromoIcon />
-    }
-];
 const CAROUSEL_TRIGGER_WIDTH = '40px';
 
-export const PromoNotificationCarousel = () => {
+interface Props {
+    initialSlideName?: FeatureSlideNames;
+}
+
+export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
     const { t } = useTranslation();
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(FeatureSlideNames.MAIN);
+
+    useEffect(() => {
+        setCurrentPage(initialSlideName ?? FeatureSlideNames.MAIN);
+    }, []);
 
     return (
         <CarouselWrapper
@@ -66,14 +49,14 @@ export const PromoNotificationCarousel = () => {
                 </ArkCarousel.PrevTrigger>
 
                 <ArkCarousel.ItemGroup>
-                    {META_DATA_MAP.map((_, i) => (
-                        <Slide index={i} key={i}>
-                            <ImageWrapper>{META_DATA_MAP[i].content}</ImageWrapper>
+                    {META_DATA_MAP.map(({ id, content, title, subtitle }) => (
+                        <Slide index={id} key={id}>
+                            <ImageWrapper>{content}</ImageWrapper>
 
                             <DescriptionBlock>
-                                <Label1>{t(META_DATA_MAP[i].title)}</Label1>
+                                <Label1>{t(title)}</Label1>
                                 <Body2Styled>
-                                    {t(META_DATA_MAP[i].subtitle)
+                                    {t(subtitle)
                                         .split('%')
                                         .map(line => (
                                             <Fragment key={line}>
@@ -100,13 +83,46 @@ export const PromoNotificationCarousel = () => {
             </RelativeWrapper>
 
             <DotsWrapper>
-                {META_DATA_MAP.map((_, i) => (
-                    <Dot index={i} key={i} />
+                {META_DATA_MAP.map(({ id }) => (
+                    <Dot index={id} key={id} />
                 ))}
             </DotsWrapper>
         </CarouselWrapper>
     );
 };
+
+const META_DATA_MAP = [
+    {
+        id: FeatureSlideNames.MAIN,
+        title: 'tonkeeper_pro_subscription',
+        subtitle: 'promo_subtitle_subscription',
+        content: <MainPromoIcon />
+    },
+    {
+        id: FeatureSlideNames.MULTI_SIG,
+        title: 'promo_title_multisig_wallets',
+        subtitle: 'promo_subtitle_multisig_wallets',
+        content: <MultiSigPromoIcon />
+    },
+    {
+        id: FeatureSlideNames.MULTI_WALLET,
+        title: 'promo_title_multi_wallet_accounts',
+        subtitle: 'promo_subtitle_multi_wallet_accounts',
+        content: <MultiWalletPromoIcon />
+    },
+    {
+        id: FeatureSlideNames.MULTI_SEND,
+        title: 'promo_title_multisend',
+        subtitle: 'promo_subtitle_multisend',
+        content: <MultiSendPromoIcon />
+    },
+    {
+        id: FeatureSlideNames.SUPPORT,
+        title: 'pro_feature_priority_support_title',
+        subtitle: 'promo_subtitle_support',
+        content: <SupportPromoIcon />
+    }
+];
 
 const ChevronLeftIconStyled = styled(ChevronLeftIcon)`
     width: 28px;

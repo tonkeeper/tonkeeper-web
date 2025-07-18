@@ -21,20 +21,32 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
+import { FeatureSlideNames } from '../../../enums/pro';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
     onClose: () => void;
+    initialSlideName?: FeatureSlideNames;
 }
 
-export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = ({ isOpen, onClose }) => (
-    <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
-        {() => <ProFeaturesNotificationContent onClose={onClose} />}
-    </NotificationStyled>
-);
+export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = props => {
+    const { isOpen, onClose, initialSlideName } = props;
 
-export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationProps, 'onClose'>> = ({
-    onClose
+    return (
+        <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
+            {() => (
+                <ProFeaturesNotificationContent
+                    onClose={onClose}
+                    initialSlideName={initialSlideName}
+                />
+            )}
+        </NotificationStyled>
+    );
+};
+
+export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationProps, 'isOpen'>> = ({
+    onClose,
+    initialSlideName
 }) => {
     const formId = useId();
     const { data } = useProState();
@@ -76,7 +88,7 @@ export const ProFeaturesNotificationContent: FC<Pick<IProFeaturesNotificationPro
                 <ClosePromoIcon />
             </CloseButtonStyled>
 
-            <PromoNotificationCarousel />
+            <PromoNotificationCarousel initialSlideName={initialSlideName} />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlockStyled

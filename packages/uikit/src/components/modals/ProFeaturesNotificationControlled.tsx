@@ -1,16 +1,24 @@
 import { createModalControl } from './createModalControl';
-import { PurchaseSubscriptionScreens } from '../../enums/pro';
+import { FeatureSlideNames } from '../../enums/pro';
 import { ProFeaturesNotification } from '../desktop/pro/ProFeaturesNotification';
+import { useAtomValue } from '../../libs/useAtom';
 
 interface IAtomParams {
-    initialScreen?: PurchaseSubscriptionScreens;
+    initialSlideName?: FeatureSlideNames;
 }
-const { hook } = createModalControl<IAtomParams>();
+const { hook, paramsControl } = createModalControl<IAtomParams>();
 
 export const useProFeaturesNotification = hook;
 
 export const ProFeaturesNotificationControlled = () => {
     const { isOpen, onClose } = useProFeaturesNotification();
+    const { initialSlideName } = useAtomValue(paramsControl) ?? {};
 
-    return <ProFeaturesNotification isOpen={isOpen} onClose={onClose} />;
+    return (
+        <ProFeaturesNotification
+            isOpen={isOpen}
+            onClose={onClose}
+            initialSlideName={initialSlideName}
+        />
+    );
 };
