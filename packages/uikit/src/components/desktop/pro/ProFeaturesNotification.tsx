@@ -155,8 +155,8 @@ const ButtonsBlockStyled = styled(ButtonsBlock)`
 
 const CloseButtonStyled = styled.button`
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
+    top: 12px;
+    right: 12px;
     z-index: 10;
     cursor: pointer;
     opacity: 1;
