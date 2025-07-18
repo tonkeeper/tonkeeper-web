@@ -54,5 +54,5 @@ const ContentWrapper = styled.div`
 `;
 
 const NotificationStyled = styled(Notification)`
-    max-width: 520px;
+    max-width: 650px;
 `;

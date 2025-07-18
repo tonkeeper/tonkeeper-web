@@ -109,7 +109,7 @@ const ProScreenContentWrapper = styled.form`
     gap: 1rem;
     width: 100%;
     height: 100%;
-    max-width: 520px;
+    max-width: 650px;
     margin: 0 auto;
 `;
 
