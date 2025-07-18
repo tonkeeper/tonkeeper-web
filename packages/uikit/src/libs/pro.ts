@@ -35,14 +35,13 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
     try {
         if (!displayPrice) return '-';
 
-        let formattedProPrice = displayPrice;
         if (isCrypto) {
-            formattedProPrice = isValidNanoString(displayPrice)
+            return isValidNanoString(displayPrice)
                 ? `${formatter.fromNano(displayPrice)} TON`
                 : '-';
         }
 
-        return formattedProPrice;
+        return displayPrice;
     } catch (e) {
         console.error('getFormattedDisplayPrice error: ', e);
         return '-';
