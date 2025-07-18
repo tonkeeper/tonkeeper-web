@@ -137,6 +137,14 @@ const ContentWrapper = styled(NotificationBlock)`
 
 const NotificationStyled = styled(Notification)`
     max-width: 520px;
+
+    @media (pointer: fine) {
+        &:hover {
+            [data-swipe-button] {
+                color: ${props => props.theme.textSecondary};
+            }
+        }
+    }
 `;
 
 const ButtonsBlockStyled = styled(ButtonsBlock)`

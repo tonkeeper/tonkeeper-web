@@ -1,6 +1,6 @@
-import { styled } from 'styled-components';
+import { css, styled } from 'styled-components';
 import { Fragment, useState } from 'react';
-import { Carousel as ArkCarousel, useCarousel } from '@ark-ui/react';
+import { Carousel as ArkCarousel } from '@ark-ui/react';
 import { Body2, Label1 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
@@ -39,29 +39,31 @@ const META_DATA_MAP = [
         content: <SupportPromoIcon />
     }
 ];
+const CAROUSEL_TRIGGER_WIDTH = '40px';
 
-// TODO Refactor main Carousel component to be able to reuse it
 export const PromoNotificationCarousel = () => {
     const { t } = useTranslation();
     const [currentPage, setCurrentPage] = useState(0);
 
-    const carousel = useCarousel({
-        slideCount: META_DATA_MAP.length,
-        onPageChange: ({ page }) => {
-            setCurrentPage(page);
-        },
-        slidesPerMove: 1,
-        page: currentPage
-    });
-
     return (
-        <CarouselWrapper value={carousel}>
+        <CarouselWrapper
+            page={currentPage}
+            slideCount={META_DATA_MAP.length}
+            onPageChange={({ page }) => setCurrentPage(page)}
+        >
             <RelativeWrapper>
                 <GradientLayer $page={currentPage} $total={META_DATA_MAP.length} />
 
-                <SwipeButton type="button" position="left" onClick={() => carousel?.scrollPrev()}>
-                    <ChevronLeftIcon />
-                </SwipeButton>
+                <ArkCarousel.PrevTrigger asChild>
+                    <SwipeButton
+                        data-swipe-button
+                        type="button"
+                        position="left"
+                        isVisible={currentPage !== 0}
+                    >
+                        <ChevronLeftIconStyled />
+                    </SwipeButton>
+                </ArkCarousel.PrevTrigger>
 
                 <ArkCarousel.ItemGroup>
                     {META_DATA_MAP.map((_, i) => (
@@ -85,21 +87,38 @@ export const PromoNotificationCarousel = () => {
                     ))}
                 </ArkCarousel.ItemGroup>
 
-                <SwipeButton type="button" position="right" onClick={() => carousel?.scrollNext()}>
-                    <ChevronRightIcon />
-                </SwipeButton>
+                <ArkCarousel.NextTrigger>
+                    <SwipeButton
+                        data-swipe-button
+                        type="button"
+                        position="right"
+                        isVisible={currentPage !== META_DATA_MAP.length - 1}
+                    >
+                        <ChevronRightIconStyled />
+                    </SwipeButton>
+                </ArkCarousel.NextTrigger>
             </RelativeWrapper>
 
-            <PaginationDots count={META_DATA_MAP.length} active={currentPage}>
+            <DotsWrapper>
                 {META_DATA_MAP.map((_, i) => (
-                    <div key={i} />
+                    <Dot index={i} key={i} />
                 ))}
-            </PaginationDots>
+            </DotsWrapper>
         </CarouselWrapper>
     );
 };
 
-const CarouselWrapper = styled(ArkCarousel.RootProvider)`
+const ChevronLeftIconStyled = styled(ChevronLeftIcon)`
+    width: 28px;
+    height: 28px;
+`;
+
+const ChevronRightIconStyled = styled(ChevronRightIcon)`
+    width: 28px;
+    height: 28px;
+`;
+
+const CarouselWrapper = styled(ArkCarousel.Root)`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -154,13 +173,10 @@ const Slide = styled(ArkCarousel.Item)`
     z-index: 1;
 `;
 
-const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
-    width: 50px;
-    height: 50px;
-    border-radius: ${props => props.theme.cornerFull};
-    color: ${props => props.theme.textPrimary};
-    background-color: ${props => props.theme.backgroundContentTint};
-    opacity: 0.3;
+const SwipeButton = styled.button<{ position: 'left' | 'right'; isVisible: boolean }>`
+    width: ${CAROUSEL_TRIGGER_WIDTH};
+    aspect-ratio: 1 / 1;
+    color: ${props => props.theme.textTertiary};
     display: none;
     justify-content: center;
     align-items: center;
@@ -168,17 +184,27 @@ const SwipeButton = styled.button<{ position: 'left' | 'right' }>`
     z-index: 2;
     border: none;
     cursor: pointer;
-    top: 40%;
+    bottom: 36px;
+    transform: translateY(-50%);
     ${props => (props.position === 'left' ? 'left: 12px;' : 'right: 12px;')};
-    transition: opacity 0.15s ease-in-out;
+    transition: opacity 0.3s ease-in-out, color 0.3s ease;
 
     @media (pointer: fine) {
         display: flex;
     }
 
-    &:hover {
-        opacity: 0.8;
-    }
+    ${({ isVisible }) =>
+        isVisible
+            ? css`
+                  opacity: 1;
+
+                  &:hover {
+                      opacity: 0.8;
+                  }
+              `
+            : css`
+                  opacity: 0;
+              `}
 `;
 
 const ImageWrapper = styled.div`
@@ -190,29 +216,20 @@ const ImageWrapper = styled.div`
     }
 `;
 
-const PaginationDots = styled.div<{ count: number; active: number }>`
+const DotsWrapper = styled(ArkCarousel.IndicatorGroup)`
     display: flex;
     gap: 8px;
+`;
 
-    & > div {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: ${props => props.theme.backgroundContentTint};
-    }
+const Dot = styled(ArkCarousel.Indicator)`
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: ${({ theme }) => theme.backgroundContentTint};
+    transition: background-color 0.3s;
 
-    & > div:nth-child(${props => props.active + 1}) {
-        animation: fadeInAnimation 200ms ease-in;
-        background-color: ${props => props.theme.buttonPrimaryBackground};
-    }
-
-    @keyframes fadeInAnimation {
-        0% {
-            opacity: 0;
-        }
-        100% {
-            opacity: 1;
-        }
+    &[data-current] {
+        background-color: ${({ theme }) => theme.buttonPrimaryBackground};
     }
 `;
 
@@ -225,5 +242,9 @@ const DescriptionBlock = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 32px 0 36px;
+    margin: 32px 0 28px;
+
+    @media (pointer: fine) {
+        max-width: calc(100% - (${CAROUSEL_TRIGGER_WIDTH} * 2));
+    }
 `;
