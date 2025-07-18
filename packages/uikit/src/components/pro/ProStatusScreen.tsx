@@ -24,7 +24,6 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 
-// TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
@@ -33,7 +32,7 @@ export const ProStatusScreen = () => {
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
     const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
     const {
-        mutateAsync: handleLogOut,
+        mutateAsync: mutateProLogout,
         error: logoutError,
         isLoading: isLoggingOut
     } = useProLogout();
@@ -59,6 +58,11 @@ export const ProStatusScreen = () => {
     const isTelegram = subscription && isTelegramSubscription(subscription);
 
     const handleGetPro = () => {
+        onProPurchaseOpen();
+    };
+
+    const handleLogOut = async () => {
+        await mutateProLogout();
         onProPurchaseOpen();
     };
 
