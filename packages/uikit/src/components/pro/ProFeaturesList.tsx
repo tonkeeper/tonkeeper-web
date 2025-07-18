@@ -128,19 +128,25 @@ const GlowingBorderWrapper = styled.div`
     position: relative;
     border-radius: 8px;
     padding: 2px;
-    background: linear-gradient(130deg, #45aef5, transparent, #45aef5);
+    background: linear-gradient(130deg, #45aef5, transparent, #45aef5, transparent);
     background-size: 300% 300%;
-    animation: borderShift 5s linear infinite;
+    animation: borderShift 10s linear infinite;
 
     @keyframes borderShift {
-        0% {
-            background-position: 0 50%;
+        1% {
+            background-position: 0 0;
+        }
+        33% {
+            background-position: 50% 100%;
         }
         50% {
             background-position: 100% 50%;
         }
+        75% {
+            background-position: 50% 0%;
+        }
         100% {
-            background-position: 0 50%;
+            background-position: 0 0;
         }
     }
 `;
