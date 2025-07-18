@@ -24,12 +24,13 @@ export type NotificationFields<Kind extends string, Value> = {
     logo?: string;
     origin: string;
     data: Value;
-} & (Kind extends 'tonConnectRequest' ? {} : { manifest: DAppManifest });
+} & (Kind extends 'tonConnectRequest' | 'tonLinkIntercept' ? {} : { manifest: DAppManifest });
 
 export type NotificationData =
     | NotificationFields<'tonConnectRequest', ConnectRequest>
     | NotificationFields<'tonConnectSend', TonConnectTransactionPayload>
-    | NotificationFields<'tonConnectSign', SignDataRequestPayload>;
+    | NotificationFields<'tonConnectSign', SignDataRequestPayload>
+    | NotificationFields<'tonLinkIntercept', { url: string }>;
 
 export interface PupUpEvents {
     approveRequest: PayloadRequest;

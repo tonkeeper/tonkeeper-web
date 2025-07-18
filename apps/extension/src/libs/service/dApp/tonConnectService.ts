@@ -70,7 +70,7 @@ export const tonConnectReConnect = async (origin: string) => {
 export const tonConnectDisconnect = async (id: number, webViewUrl: string) =>
     tonInjectedDisconnectRequest({ storage, webViewUrl });
 
-const cancelOpenedNotification = async () => {
+export const cancelOpenedNotification = async () => {
     const notification = memoryStore.getNotification();
     if (notification) {
         await closeOpenedPopUp();

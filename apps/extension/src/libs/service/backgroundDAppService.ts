@@ -20,6 +20,7 @@ import {
     tonConnectTransaction
 } from './dApp/tonConnectService';
 import { createTonapiRequest } from './backgroundTonapiService';
+import { processInterceptTonLink } from "./backgroundTonLinkService";
 
 let contentScriptPorts = new Set<browser.Runtime.Port>();
 
@@ -126,6 +127,9 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
         }
         case 'tonapi_request': {
             return createTonapiRequest(message.params[0], message.params[1]);
+        }
+        case 'tonLink_intercept': {
+            return processInterceptTonLink(origin, message.params[0]);
         }
         default:
             throw new TonConnectError(

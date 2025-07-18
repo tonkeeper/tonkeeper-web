@@ -14,6 +14,7 @@ import {
   useTrackTonConnectActionRequest
 } from "@tonkeeper/uikit/dist/hooks/analytics/events-hooks";
 import { SenderChoice } from "@tonkeeper/uikit/dist/hooks/blockchain/useSender";
+import { InterceptTonLinkNotification } from "./InterceptTonLinkNotification";
 
 const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
   if (e.event === 'connect') {
@@ -104,6 +105,21 @@ export const Notifications = () => {
                     reloadNotification(true);
                 }}
             />
+          <InterceptTonLinkNotification
+            url={data?.kind === 'tonLinkIntercept' ? data.data?.url : null}
+            handleClose={(processInExtension?: boolean) => {
+              if (!data) return;
+              const id = data.id;
+
+              if (processInExtension) {
+                sendBackground.message('approveRequest', { id, payload: void 0 });
+                setData(undefined);
+              } else {
+                sendBackground.message('rejectRequest', id);
+                reloadNotification(true);
+              }
+            }}
+          />
         </>
     );
 };
