@@ -10,9 +10,9 @@ import browser from 'webextension-polyfill';
 import { BackgroundEvents, backgroundEventsEmitter, popUpEventEmitter, RESPONSE } from '../event';
 import memoryStore from '../store/memoryStore';
 import { closeCurrentPopUp, getPopup } from './dApp/notificationService';
-import { Aptabase } from "@tonkeeper/uikit/dist/hooks/analytics";
-import { UserIdentityService } from "@tonkeeper/core/dist/user-identity";
-import { ExtensionStorage } from "../storage";
+import { Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
+import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
+import { ExtensionStorage } from '../storage';
 
 let popUpPort: browser.Runtime.Port;
 
@@ -87,7 +87,7 @@ let aptabase: Aptabase;
 const userIdentity = new UserIdentityService(new ExtensionStorage());
 
 popUpEventEmitter.on('userProperties', message => {
-    aptabase= new Aptabase({
+    aptabase = new Aptabase({
         host: process.env.REACT_APP_APTABASE_HOST!,
         key: process.env.REACT_APP_APTABASE!,
         appVersion: browser.runtime.getManifest().version,

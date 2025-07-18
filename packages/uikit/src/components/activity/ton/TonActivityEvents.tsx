@@ -27,7 +27,12 @@ export const TonActivityEvents: FC<{
                         })
                     }
                 >
-                    <ActivityAction action={action} date={date} isScam={event.isScam} />
+                    <ActivityAction
+                        /* issue PRO-153 */
+                        action={{ ...action, status: event.inProgress ? 'ok' : action.status }}
+                        date={date}
+                        isScam={event.isScam}
+                    />
                     {event.inProgress && <ProgressIcon />}
                 </ListItem>
             ))}

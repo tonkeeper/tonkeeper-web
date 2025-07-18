@@ -8,30 +8,30 @@
 
 import browser from 'webextension-polyfill';
 import {
-  handleDAppConnection,
-  subscriptionDAppNotifications,
+    handleDAppConnection,
+    subscriptionDAppNotifications
 } from './libs/service/backgroundDAppService';
 import { handlePopUpConnection } from './libs/service/backgroundPopUpService';
 import { subscriptionProxyNotifications } from './libs/service/backgroundProxyService';
 
-browser.runtime.onConnect.addListener((port) => {
-  if (port.name === 'TonkeeperUI') {
-    /**
-     * Subscribing to events from PopUp UI
-     * The background script is a kind of backend with responsible
-     * to processing requests and store secure data in memory store.
-     */
-    handlePopUpConnection(port);
-  }
+browser.runtime.onConnect.addListener(port => {
+    if (port.name === 'TonkeeperUI') {
+        /**
+         * Subscribing to events from PopUp UI
+         * The background script is a kind of backend with responsible
+         * to processing requests and store secure data in memory store.
+         */
+        handlePopUpConnection(port);
+    }
 
-  if (port.name === 'TonkeeperContentScript') {
-    /**
-     * Subscribing to events from dApps
-     * The background is responsible to be as a service or middleware,
-     * it could completely handle request or open notification modal to user confirmations.
-     */
-    handleDAppConnection(port);
-  }
+    if (port.name === 'TonkeeperContentScript') {
+        /**
+         * Subscribing to events from dApps
+         * The background is responsible to be as a service or middleware,
+         * it could completely handle request or open notification modal to user confirmations.
+         */
+        handleDAppConnection(port);
+    }
 });
 
 /**

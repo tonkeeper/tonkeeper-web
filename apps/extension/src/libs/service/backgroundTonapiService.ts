@@ -46,7 +46,6 @@ export const createTonapiRequest = async (url: string, options: RequestInit = {}
     };
 };
 
-
 function isTonapiUrl(url: string) {
     try {
         const parsed = new URL(url);

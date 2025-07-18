@@ -14,7 +14,7 @@ import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import {
-    FiatCurrencies as FiatCurrenciesGenerated,
+    Currencies as CurrenciesGenerated,
     InvoiceStatus,
     InvoicesInvoice,
     ProServiceDashboardCellAddress,
@@ -316,13 +316,13 @@ export async function getDashboardData(
         lang = options?.lang as Lang;
     }
 
-    let currency = FiatCurrenciesGenerated.USD;
+    let currency = CurrenciesGenerated.USD;
     if (
-        Object.values(FiatCurrenciesGenerated).includes(
-            options?.currency as FiatCurrenciesGenerated
+        Object.values(CurrenciesGenerated).includes(
+            options?.currency as unknown as CurrenciesGenerated
         )
     ) {
-        currency = options?.currency as FiatCurrenciesGenerated;
+        currency = options?.currency as unknown as CurrenciesGenerated;
     }
 
     const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
@@ -372,7 +372,7 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
                 columnId: cell.column_id,
                 type: 'numeric_fiat',
                 value: new BigNumber(cell.value),
-                fiat: cell.fiat
+                fiat: cell.fiat as unknown as FiatCurrencies
             };
         }
         default:
