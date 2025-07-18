@@ -11,10 +11,19 @@ interface IProps {
     selectedPlanId: string;
     onPlanIdSelection: Dispatch<SetStateAction<string>>;
     isLoading: boolean;
+    isPromoShown: boolean;
+    onPromoInputShow: () => void;
 }
 
 export const ProChooseSubscriptionPlan: FC<IProps> = props => {
-    const { productsForRender, selectedPlanId, onPlanIdSelection, isLoading } = props;
+    const {
+        productsForRender,
+        selectedPlanId,
+        onPlanIdSelection,
+        isPromoShown,
+        onPromoInputShow,
+        isLoading
+    } = props;
     const { t } = useTranslation();
 
     const handlePlanSelection = (e: ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +32,14 @@ export const ProChooseSubscriptionPlan: FC<IProps> = props => {
 
     return (
         <SubscriptionPlansBlock>
-            <Subtitle>{t('choose_plan')}</Subtitle>
+            <Header>
+                <Subtitle>{t('choose_plan')}</Subtitle>
+                {!isPromoShown && (
+                    <ButtonStyled as="button" type="button" onClick={onPromoInputShow}>
+                        {t('enter_promo_code')}
+                    </ButtonStyled>
+                )}
+            </Header>
             <RadioGroup>
                 {productsForRender.map(productProps => (
                     <ProPlanLabel
@@ -38,6 +54,25 @@ export const ProChooseSubscriptionPlan: FC<IProps> = props => {
         </SubscriptionPlansBlock>
     );
 };
+
+const Header = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+`;
+
+const ButtonStyled = styled(Body3)`
+    height: auto;
+    padding: 0 0 0 1rem;
+    margin-left: auto;
+    color: ${props => props.theme.textAccent};
+    opacity: 1;
+    transition: opacity 0.3s;
+
+    &:hover {
+        opacity: 0.7;
+    }
+`;
 
 const SubscriptionPlansBlock = styled.div`
     width: 100%;

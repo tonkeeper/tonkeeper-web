@@ -14,9 +14,11 @@ import { ProChooseSubscriptionPlan } from './ProChooseSubscriptionPlan';
 import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { useProPurchaseController } from '../../hooks/pro/useProPurchaseController';
 import { ProSubscriptionLightHeader } from './ProSubscriptionLightHeader';
+import { useDisclosure } from '../../hooks/useDisclosure';
 
 export const ProPurchaseChooseScreen = () => {
     const formId = useId();
+    const { isOpen: isPromoShown, onOpen: showPromo } = useDisclosure(false);
     const { t } = useTranslation();
     const {
         isCrypto,
@@ -45,13 +47,15 @@ export const ProPurchaseChooseScreen = () => {
             <ProActiveWallet isLoading={isLoading} onLogout={onLogout} />
 
             <ProChooseSubscriptionPlan
+                isPromoShown={isPromoShown}
+                onPromoInputShow={showPromo}
                 isLoading={isLoading}
                 selectedPlanId={selectedPlanId}
                 onPlanIdSelection={setSelectedPlanId}
                 productsForRender={productsForRender}
             />
 
-            {isCrypto && (
+            {isCrypto && isPromoShown && (
                 <ProPromoCodeInput
                     value={promoCode}
                     onChange={setPromoCode}
