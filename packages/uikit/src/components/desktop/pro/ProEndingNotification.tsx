@@ -5,10 +5,9 @@ import { Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useTranslation } from '../../../hooks/translation';
-import { AppRoute, SettingsRoute } from '../../../libs/routes';
-import { useNavigate } from '../../../hooks/router/useNavigate';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
+import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 
 interface IProEndingNotificationProps {
     isOpen: boolean;
@@ -24,14 +23,14 @@ export const ProEndingNotification: FC<IProEndingNotificationProps> = ({ isOpen,
 );
 
 export const ProEndingNotificationContent: FC<Pick<IProEndingNotificationProps, 'onClose'>> = ({
-    onClose
+    onClose: onCurrentClose
 }) => {
     const { t } = useTranslation();
-    const navigate = useNavigate();
+    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
 
     const handlePurchaseClick = () => {
-        onClose();
-        navigate(AppRoute.settings + SettingsRoute.pro);
+        onCurrentClose();
+        onProPurchaseOpen();
     };
 
     return (
@@ -40,7 +39,7 @@ export const ProEndingNotificationContent: FC<Pick<IProEndingNotificationProps, 
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <Button primary fullWidth onClick={handlePurchaseClick}>
-                        <Label2>{t('get_tonkeeper_pro')}</Label2>
+                        <Label2>{t('update_subscription')}</Label2>
                     </Button>
                 </NotificationFooter>
             </NotificationFooterPortal>

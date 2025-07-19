@@ -580,6 +580,7 @@
   "Unlock": "Unlock",
   "update": "Update",
   "update_ledger_error": "Make sure your Ledger software is updated",
+  "update_subscription": "Update Subscription",
   "upload_file": "Upload file",
   "View": "View",
   "view_on_tonviewer": "View on Tonviewer",
