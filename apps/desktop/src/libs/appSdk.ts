@@ -6,6 +6,7 @@ import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
+import { Subscription } from './subscription';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {
@@ -80,4 +81,6 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
         // eslint-disable-next-line no-self-assign
         window.location.href = window.location.href;
     };
+
+    subscriptionStrategy = Subscription;
 }
