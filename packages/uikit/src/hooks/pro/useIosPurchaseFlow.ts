@@ -4,24 +4,49 @@ import { IosPurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
 import { useNotifyError, useToast } from '../useNotification';
 import { useTranslation } from '../translation';
 import { useNavigate } from '../router/useNavigate';
-import { useProSubscriptionPurchase } from '../../state/pro';
+import { useOriginalTransactionInfo, useProSubscriptionPurchase } from '../../state/pro';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
+import { useProAuthNotification } from '../../components/modals/ProAuthNotificationControlled';
+import { useAppSdk } from '../appSdk';
 
 export const useIosPurchaseFlow = () => {
-    const toast = useToast();
     const { t } = useTranslation();
-    const { onClose } = useProPurchaseNotification();
+    const sdk = useAppSdk();
+    const toast = useToast();
     const navigate = useNavigate();
+
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+    const { onClose: onCurrentClose } = useProPurchaseNotification();
+    const { data: originalTxInfo, isLoading: isOriginalTxIdLoading } = useOriginalTransactionInfo();
 
     const {
         data: status,
         mutateAsync: startPurchasing,
         isSuccess,
-        isLoading,
+        isLoading: isPurchasing,
         isError
     } = useProSubscriptionPurchase();
     useNotifyError(isError && new Error(t('purchase_failed')));
+
+    useEffect(() => {
+        if (!originalTxInfo || !originalTxInfo.originalTransactionId) return;
+
+        (async () => {
+            const result = await sdk.confirm({
+                message: t('already_have_subscription', {
+                    transactionId: String(originalTxInfo.originalTransactionId)
+                }),
+                okButtonTitle: 'choose_another_wallet'
+            });
+
+            onCurrentClose();
+
+            if (result) {
+                onProAuthOpen();
+            }
+        })();
+    }, [originalTxInfo]);
 
     useEffect(() => {
         if (!isSuccess) return;
@@ -36,9 +61,9 @@ export const useIosPurchaseFlow = () => {
             toast(t('purchase_success'));
         }
 
-        onClose();
+        onCurrentClose();
         navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
     }, [isSuccess]);
 
-    return { startPurchasing, isLoading };
+    return { startPurchasing, isLoading: isPurchasing || isOriginalTxIdLoading };
 };

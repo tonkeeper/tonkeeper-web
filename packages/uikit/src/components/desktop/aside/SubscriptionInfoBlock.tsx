@@ -26,9 +26,10 @@ import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
-import { usePendingPolling } from '../../../hooks/pro/usePendingPolling';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
+import { useCryptoSubscriptionPolling } from '../../../hooks/pro/useCryptoSubscriptionPolling';
+import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -165,7 +166,8 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
-    usePendingPolling();
+    useIosSubscriptionPolling();
+    useCryptoSubscriptionPolling();
     useSubscriptionEndingVerification();
 
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
@@ -178,7 +180,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         navigate(AppRoute.settings + SettingsRoute.pro);
     };
 
-    let button = <Button loading>Tonkeeper Pro</Button>;
+    let button = <Button loading>{'Tonkeeper Pro'}</Button>;
 
     if (data && isValidSubscription(data.current)) {
         button = (
