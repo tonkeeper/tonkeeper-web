@@ -9,22 +9,17 @@ import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
 import { AuthTypes, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { useSafePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
-import { PurchaseSubscriptionScreens } from '../../enums/pro';
-import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
 
 interface IProps {
     title?: ReactNode;
-    onLogout: () => Promise<void>;
+    onDisconnect: () => Promise<void>;
     isLoading: boolean;
 }
 
 export const ProActiveWallet: FC<IProps> = props => {
-    const { onLogout, isLoading, title } = props;
+    const { onDisconnect, isLoading, title } = props;
     const { t } = useTranslation();
     const { data } = useProState();
-    const { onOpen } = useProPurchaseNotification();
-    const purchaseContext = useSafePurchaseControlScreen();
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (() => {
             const targetAuth = data?.target?.auth;
@@ -48,16 +43,6 @@ export const ProActiveWallet: FC<IProps> = props => {
         return null;
     }
 
-    const handleDisconnectClick = async () => {
-        await onLogout();
-
-        if (purchaseContext) {
-            purchaseContext.goTo(PurchaseSubscriptionScreens.ACCOUNTS);
-        } else {
-            onOpen();
-        }
-    };
-
     return (
         <Block>
             {title}
@@ -68,11 +53,7 @@ export const ProActiveWallet: FC<IProps> = props => {
                         wallet={wallet}
                         account={account}
                         rightElement={
-                            <ButtonStyled
-                                type="button"
-                                disabled={isLoading}
-                                onClick={handleDisconnectClick}
-                            >
+                            <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
                                 <Label2>{t('disconnect')}</Label2>
                             </ButtonStyled>
                         }

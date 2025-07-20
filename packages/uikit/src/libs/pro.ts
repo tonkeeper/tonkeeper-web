@@ -1,7 +1,6 @@
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
 
-import { PurchaseSubscriptionScreens } from '../enums/pro';
 import { formatter } from '../hooks/balance';
 
 export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
@@ -11,15 +10,6 @@ export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
         displayPrice: '',
         formattedDisplayPrice: ''
     }));
-
-export const isDirectionForward = (
-    current: PurchaseSubscriptionScreens,
-    prev: PurchaseSubscriptionScreens | null
-): boolean => {
-    if (prev === null) return true;
-
-    return current > prev;
-};
 
 export function parsePrice(priceStr: string): number {
     const numeric = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');

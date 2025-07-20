@@ -57,19 +57,25 @@ export const useProPurchaseController = () => {
     };
 
     return {
-        isCrypto,
-        isLoading,
-        selectedPlanId,
-        setSelectedPlanId,
-        productsForRender,
-        promoCode,
-        setPromoCode,
-        verifiedPromoCode,
-        onLogout: handleLogOut,
-        onManage: handleManageSubscription,
-        onSubmit,
-        waitInvoice,
-        confirmState: confirm,
-        onConfirmClose
+        common: {
+            onSubmit,
+            onLogout: handleLogOut,
+            isCrypto,
+            isLoading,
+            selectedPlanId,
+            setSelectedPlanId,
+            productsForRender
+        },
+        cryptoFlow: {
+            promoCode,
+            setPromoCode,
+            verifiedPromoCode,
+            waitInvoice,
+            confirmState: confirm,
+            onConfirmClose
+        },
+        iosFlow: {
+            onManage: handleManageSubscription
+        }
     };
 };

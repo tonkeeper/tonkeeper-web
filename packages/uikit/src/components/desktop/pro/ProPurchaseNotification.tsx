@@ -1,50 +1,152 @@
-import { FC } from 'react';
+import { FC, useId } from 'react';
 import { styled } from 'styled-components';
 
-import { Notification } from '../../Notification';
-import { useProState } from '../../../state/pro';
-import { SubscriptionPurchaseProvider } from '../../../providers/SubscriptionPurchaseProvider';
-import { PurchaseSubscriptionScreens } from '../../../enums/pro';
-import { ProAccountChooseScreen } from '../../pro/ProAccountChooseScreen';
-import { ProPurchaseChooseScreen } from '../../pro/ProPurchaseChooseScreen';
-import { usePurchaseSubscriptionScreen } from '../../../hooks/pro/usePurchaseSubscriptionScreen';
+import {
+    Notification,
+    NotificationBlock,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../../Notification';
+import { useDisclosure } from '../../../hooks/useDisclosure';
+import { useTranslation } from '../../../hooks/translation';
+import { useProPurchaseController } from '../../../hooks/pro/useProPurchaseController';
+import { handleSubmit } from '../../../libs/form';
+import { ProSubscriptionLightHeader } from '../../pro/ProSubscriptionLightHeader';
+import { ProActiveWallet } from '../../pro/ProActiveWallet';
+import { ProChooseSubscriptionPlan } from '../../pro/ProChooseSubscriptionPlan';
+import { ProPromoCodeInput } from '../../pro/ProPromoCodeInput';
+import { ProFeaturesList } from '../../pro/ProFeaturesList';
+import { Button } from '../../fields/Button';
+import { Body3, Label2 } from '../../Text';
+import { ProLegalNote } from '../../pro/ProLegalNote';
+import { ConfirmNotification } from '../../settings/ProSettings';
+import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
     onClose: () => void;
-    initialScreen?: PurchaseSubscriptionScreens;
 }
 
 export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = props => {
-    const { isOpen, onClose, initialScreen } = props;
+    const { isOpen, onClose } = props;
 
     return (
         <NotificationStyled mobileFullScreen isOpen={isOpen} handleClose={onClose}>
-            {() => (
-                <SubscriptionPurchaseProvider onClose={onClose} initialScreen={initialScreen}>
-                    <ProPurchaseNotificationContent />
-                </SubscriptionPurchaseProvider>
-            )}
+            {() => <ProPurchaseNotificationContent onClose={onClose} />}
         </NotificationStyled>
     );
 };
 
-const SCREENS_MAP = {
-    [PurchaseSubscriptionScreens.ACCOUNTS]: <ProAccountChooseScreen />,
-    [PurchaseSubscriptionScreens.PURCHASE]: <ProPurchaseChooseScreen />
+type ContentProps = Pick<IProPurchaseNotificationProps, 'onClose'>;
+
+export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCurrentClose }) => {
+    const formId = useId();
+    const { t } = useTranslation();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+    const { isOpen: isPromoShown, onOpen: showPromo } = useDisclosure(false);
+    const { common, iosFlow, cryptoFlow } = useProPurchaseController();
+
+    const {
+        isCrypto,
+        isLoading,
+        selectedPlanId,
+        setSelectedPlanId,
+        productsForRender,
+        onSubmit,
+        onLogout
+    } = common;
+
+    const {
+        promoCode,
+        setPromoCode,
+        verifiedPromoCode,
+        confirmState,
+        onConfirmClose,
+        waitInvoice
+    } = cryptoFlow;
+
+    const { onManage } = iosFlow;
+
+    const handleDisconnect = async () => {
+        await onLogout();
+        onCurrentClose();
+        onProAuthOpen();
+    };
+
+    return (
+        <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
+            <ProSubscriptionLightHeader
+                titleKey="get_tonkeeper_pro"
+                subtitleKey="choose_billing_description"
+            />
+
+            <ProActiveWallet
+                title={<Body3Styled>{t('selected_wallet')}</Body3Styled>}
+                isLoading={isLoading}
+                onDisconnect={handleDisconnect}
+            />
+
+            <ProChooseSubscriptionPlan
+                isEnterPromoVisible={isCrypto && !isPromoShown}
+                onPromoInputShow={showPromo}
+                isLoading={isLoading}
+                selectedPlanId={selectedPlanId}
+                onPlanIdSelection={setSelectedPlanId}
+                productsForRender={productsForRender}
+            />
+
+            {isCrypto && isPromoShown && (
+                <ProPromoCodeInput
+                    value={promoCode}
+                    onChange={setPromoCode}
+                    promoCode={verifiedPromoCode}
+                />
+            )}
+
+            <ProFeaturesList />
+
+            <NotificationFooterPortal>
+                <NotificationFooter>
+                    <PurchaseButtonWrapper>
+                        <Button
+                            primary
+                            fullWidth
+                            size="large"
+                            type="submit"
+                            form={formId}
+                            loading={isLoading}
+                        >
+                            <Label2>{t('continue_with_tonkeeper_pro')}</Label2>
+                        </Button>
+                        <ProLegalNote onManage={onManage} />
+                    </PurchaseButtonWrapper>
+                </NotificationFooter>
+            </NotificationFooterPortal>
+
+            <ConfirmNotification
+                state={confirmState}
+                onClose={onConfirmClose}
+                waitResult={waitInvoice}
+            />
+        </ContentWrapper>
+    );
 };
 
-export const ProPurchaseNotificationContent = () => {
-    const { data } = useProState();
+const ContentWrapper = styled(NotificationBlock)`
+    padding: 1rem 0 2rem;
+`;
 
-    const { currentScreen } = usePurchaseSubscriptionScreen();
+const PurchaseButtonWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    width: 100%;
+`;
 
-    if (!data) {
-        return null;
-    }
-
-    return SCREENS_MAP[currentScreen];
-};
+const Body3Styled = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+`;
 
 const NotificationStyled = styled(Notification)`
     max-width: 650px;

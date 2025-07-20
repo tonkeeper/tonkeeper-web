@@ -1,29 +1,50 @@
-import { useEffect, useId, useState } from 'react';
-import styled from 'styled-components';
-
-import { Label2 } from '../Text';
-import { DoneIcon } from '../Icon';
-import { ListBlock } from '../List';
-import { Button } from '../fields/Button';
-import { handleSubmit } from '../../libs/form';
-import { PurchaseSubscriptionScreens } from '../../enums/pro';
-import { ProWalletListItem } from './ProWalletListItem';
-import { useTranslation } from '../../hooks/translation';
-import { useProState, useSelectWalletForProMutation } from '../../state/pro';
-import { useNotifyError, useToast } from '../../hooks/useNotification';
-import { useAccountWallets, useActiveWallet } from '../../state/wallet';
-import { usePurchaseControlScreen } from '../../hooks/pro/usePurchaseControlScreen';
-import { NotificationBlock, NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { FC, useEffect, useId, useState } from 'react';
+import { styled } from 'styled-components';
 import { isTelegramSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { useNavigate } from '../../hooks/router/useNavigate';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { ProSubscriptionLightHeader } from './ProSubscriptionLightHeader';
 
-export const ProAccountChooseScreen = () => {
+import {
+    Notification,
+    NotificationBlock,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../../Notification';
+import { useProState, useSelectWalletForProMutation } from '../../../state/pro';
+import { useTranslation } from '../../../hooks/translation';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { useAccountWallets, useActiveWallet } from '../../../state/wallet';
+import { useNotifyError, useToast } from '../../../hooks/useNotification';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { handleSubmit } from '../../../libs/form';
+import { ProSubscriptionLightHeader } from '../../pro/ProSubscriptionLightHeader';
+import { ListBlock } from '../../List';
+import { ProWalletListItem } from '../../pro/ProWalletListItem';
+import { DoneIcon } from '../../Icon';
+import { Button } from '../../fields/Button';
+import { Label2 } from '../../Text';
+import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+
+interface IProAuthNotificationProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export const ProAuthNotification: FC<IProAuthNotificationProps> = props => {
+    const { isOpen, onClose } = props;
+
+    return (
+        <NotificationStyled mobileFullScreen isOpen={isOpen} handleClose={onClose}>
+            {() => <ProAuthNotificationContent onClose={onClose} />}
+        </NotificationStyled>
+    );
+};
+
+type ProAuthNotificationContentProps = Pick<IProAuthNotificationProps, 'onClose'>;
+
+export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = ({ onClose }) => {
     const formId = useId();
     const { t } = useTranslation();
     const { data: proState } = useProState();
-    const { goTo, onClose } = usePurchaseControlScreen();
+    const { onOpen: onPurchaseOpen } = useProPurchaseNotification();
     const navigate = useNavigate();
     const activeWallet = useActiveWallet();
     const accountsWallets = useAccountWallets();
@@ -37,18 +58,17 @@ export const ProAccountChooseScreen = () => {
     useEffect(() => {
         if (!isSuccess) return;
 
+        onClose();
+
         if (
             proState &&
             !isTelegramSubscription(proState.current) &&
             isValidSubscription(proState.current)
         ) {
-            onClose();
             navigate(AppRoute.settings + SettingsRoute.pro);
-
-            return;
+        } else {
+            onPurchaseOpen();
         }
-
-        goTo(PurchaseSubscriptionScreens.PURCHASE);
     }, [isSuccess, proState?.current]);
 
     const handleNextScreen = async () => {
@@ -107,6 +127,10 @@ export const ProAccountChooseScreen = () => {
         </ContentWrapper>
     );
 };
+
+const NotificationStyled = styled(Notification)`
+    max-width: 650px;
+`;
 
 const ContentWrapper = styled(NotificationBlock)`
     padding: 1rem 0 2rem;

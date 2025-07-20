@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
 import { IosPurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
 
-import { usePurchaseControlScreen } from './usePurchaseControlScreen';
 import { useNotifyError, useToast } from '../useNotification';
 import { useTranslation } from '../translation';
 import { useNavigate } from '../router/useNavigate';
 import { useProSubscriptionPurchase } from '../../state/pro';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 
 export const useIosPurchaseFlow = () => {
     const toast = useToast();
     const { t } = useTranslation();
-    const { onClose } = usePurchaseControlScreen();
+    const { onClose } = useProPurchaseNotification();
     const navigate = useNavigate();
 
     const {

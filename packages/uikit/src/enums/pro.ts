@@ -1,8 +1,3 @@
-export enum PurchaseSubscriptionScreens {
-    ACCOUNTS = 1,
-    PURCHASE = 2
-}
-
 export enum FeatureSlideNames {
     MAIN = 0,
     MULTI_SIG = 1,

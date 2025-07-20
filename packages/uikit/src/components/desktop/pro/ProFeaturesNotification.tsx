@@ -18,10 +18,10 @@ import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { hasUsedTrial, IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
 import { FeatureSlideNames } from '../../../enums/pro';
+import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -51,7 +51,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     const formId = useId();
     const { t } = useTranslation();
     const { data } = useProState();
-    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const {
         isOpen: isTrialModalOpen,
         onClose: onTrialModalClose,
@@ -65,17 +65,18 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         return null;
     }
 
-    const handlePurchasePro = () => {
+    const handleProAuth = () => {
         if (isError) {
             void refetch();
         } else {
             onClose();
-            onProPurchaseOpen();
+            onProAuthOpen();
         }
     };
 
     const onTrialClose = (confirmed?: boolean) => {
         onTrialModalClose();
+
         if (confirmed) {
             onClose();
         }
@@ -84,7 +85,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     const displayPlans = adaptPlansToViewModel(products);
 
     return (
-        <ContentWrapper onSubmit={handleSubmit(handlePurchasePro)} id={formId}>
+        <ContentWrapper onSubmit={handleSubmit(handleProAuth)} id={formId}>
             <CloseButtonStyled type="button" onClick={onClose}>
                 <ClosePromoIcon />
             </CloseButtonStyled>

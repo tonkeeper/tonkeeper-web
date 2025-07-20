@@ -22,21 +22,23 @@ import { handleSubmit } from '../../libs/form';
 import { AppRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
-import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 
 export const ProStatusScreen = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data: proState } = useProState();
     const navigate = useNavigate();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
-    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
+
     const {
         mutateAsync: mutateProLogout,
         error: logoutError,
         isLoading: isLoggingOut
     } = useProLogout();
     useNotifyError(logoutError);
+
     const {
         mutate: handleManageSubscription,
         isLoading: isManagingLoading,
@@ -58,12 +60,12 @@ export const ProStatusScreen = () => {
     const isTelegram = subscription && isTelegramSubscription(subscription);
 
     const handleGetPro = () => {
-        onProPurchaseOpen();
+        onProAuthOpen();
     };
 
-    const handleLogOut = async () => {
+    const handleDisconnect = async () => {
         await mutateProLogout();
-        onProPurchaseOpen();
+        onProAuthOpen();
     };
 
     return (
@@ -73,7 +75,9 @@ export const ProStatusScreen = () => {
                 subtitleKey={isProActive ? 'subscription_is_linked' : 'pro_unlocks_premium_tools'}
             />
 
-            {!isTelegram && <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />}
+            {!isTelegram && (
+                <ProActiveWallet isLoading={isLoggingOut} onDisconnect={handleDisconnect} />
+            )}
 
             <ProStatusDetailsList />
 

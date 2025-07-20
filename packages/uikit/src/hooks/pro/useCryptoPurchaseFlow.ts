@@ -11,7 +11,6 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { setProPendingState } from '@tonkeeper/core/dist/service/proService';
 
 import { useAppSdk } from '../appSdk';
-import { usePurchaseControlScreen } from './usePurchaseControlScreen';
 import { useNavigate } from '../router/useNavigate';
 import {
     ConfirmState,
@@ -21,11 +20,12 @@ import {
 } from '../../state/pro';
 import { anyOfKeysParts, QueryKey } from '../../libs/queryKey';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 
 export const useCryptoPurchaseFlow = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const { onClose } = usePurchaseControlScreen();
+    const { onClose } = useProPurchaseNotification();
     const navigate = useNavigate();
 
     const { data: proState } = useProState();
