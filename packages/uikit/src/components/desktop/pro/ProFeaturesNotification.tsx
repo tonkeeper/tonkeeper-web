@@ -49,6 +49,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     initialSlideName
 }) => {
     const formId = useId();
+    const { t } = useTranslation();
     const { data } = useProState();
     const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
     const {
@@ -57,8 +58,8 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
-    const { data: products, error, isError, isLoading, refetch } = useProPlans();
-    useNotifyError(error);
+    const { data: products, isError, isLoading, refetch } = useProPlans();
+    useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
     if (!data) {
         return null;
