@@ -21,6 +21,7 @@ import { WalletVersionPage } from './Version';
 import { BatteryPage } from './Battery';
 import { TwoFAPage } from './TwoFA';
 import { ChainsPage } from './Chains';
+import { InterceptLinksPage as InterceptLinks } from './InterceptLinks';
 
 const SettingsRouter = () => {
     const { path } = useRouteMatch();
@@ -30,6 +31,7 @@ const SettingsRouter = () => {
             <Route path={path + SettingsRoute.legal} component={Legal} />
             <Route path={path + SettingsRoute.dev} component={DevSettings} />
             <Route path={path + SettingsRoute.fiat} component={FiatCurrency} />
+            <Route path={path + SettingsRoute.interceptLinks} component={InterceptLinks} />
             <Route path={path + SettingsRoute.account} component={Account} />
             <Route path={path + SettingsRoute.notification} component={Notifications} />
             <Route path={path + `${SettingsRoute.recovery}/:accountId`} component={Recovery} />

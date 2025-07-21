@@ -94,4 +94,6 @@ export class ExtensionAppSdk extends BaseApp {
     targetEnv = 'extension' as const;
 
     storeUrl = process.env.REACT_APP_STORE_URL;
+
+    linksInterceptorAvailable = true;
 }
