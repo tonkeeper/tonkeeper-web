@@ -25,8 +25,9 @@ import type {
   GetAccountDiff200Response,
   GetAccountPublicKey200Response,
   GetAccountsRequest,
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
   JettonBalance,
+  JettonOperations,
   JettonsBalances,
   Multisigs,
   NftItems,
@@ -54,10 +55,12 @@ import {
     GetAccountPublicKey200ResponseToJSON,
     GetAccountsRequestFromJSON,
     GetAccountsRequestToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     JettonBalanceFromJSON,
     JettonBalanceToJSON,
+    JettonOperationsFromJSON,
+    JettonOperationsToJSON,
     JettonsBalancesFromJSON,
     JettonsBalancesToJSON,
     MultisigsFromJSON,
@@ -143,10 +146,7 @@ export interface GetAccountJettonsBalancesRequest {
 export interface GetAccountJettonsHistoryRequest {
     accountId: string;
     limit: number;
-    acceptLanguage?: string;
     beforeLt?: number;
-    startDate?: number;
-    endDate?: number;
 }
 
 export interface GetAccountMultisigsRequest {
@@ -178,6 +178,15 @@ export interface GetAccountTracesRequest {
 export interface GetAccountsOperationRequest {
     currency?: string;
     getAccountsRequest?: GetAccountsRequest;
+}
+
+export interface GetJettonAccountHistoryByIDRequest {
+    accountId: string;
+    jettonId: string;
+    limit: number;
+    beforeLt?: number;
+    startDate?: number;
+    endDate?: number;
 }
 
 export interface ReindexAccountRequest {
@@ -330,7 +339,7 @@ export interface AccountsApiInterface {
     getAccountJettonBalance(requestParameters: GetAccountJettonBalanceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonBalance>;
 
     /**
-     * Get the transfer jetton history for account and jetton
+     * Please use `getJettonAccountHistoryByID`` instead
      * @param {string} accountId account ID
      * @param {string} jettonId jetton ID
      * @param {number} limit 
@@ -339,13 +348,15 @@ export interface AccountsApiInterface {
      * @param {number} [startDate] 
      * @param {number} [endDate] 
      * @param {*} [options] Override http request option.
+     * @deprecated
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
      */
     getAccountJettonHistoryByIDRaw(requestParameters: GetAccountJettonHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>>;
 
     /**
-     * Get the transfer jetton history for account and jetton
+     * Please use `getJettonAccountHistoryByID`` instead
+     * @deprecated
      */
     getAccountJettonHistoryByID(requestParameters: GetAccountJettonHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
 
@@ -369,20 +380,17 @@ export interface AccountsApiInterface {
      * Get the transfer jettons history for account
      * @param {string} accountId account ID
      * @param {number} limit 
-     * @param {string} [acceptLanguage] 
      * @param {number} [beforeLt] omit this parameter to get last events
-     * @param {number} [startDate] 
-     * @param {number} [endDate] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApiInterface
      */
-    getAccountJettonsHistoryRaw(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>>;
+    getAccountJettonsHistoryRaw(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonOperations>>;
 
     /**
      * Get the transfer jettons history for account
      */
-    getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents>;
+    getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonOperations>;
 
     /**
      * Get account\'s multisigs
@@ -474,6 +482,25 @@ export interface AccountsApiInterface {
      * Get human-friendly information about several accounts without low-level details.
      */
     getAccounts(requestParameters: GetAccountsOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accounts>;
+
+    /**
+     * Get the transfer jetton history for account and jetton
+     * @param {string} accountId account ID
+     * @param {string} jettonId jetton ID
+     * @param {number} limit 
+     * @param {number} [beforeLt] omit this parameter to get last events
+     * @param {number} [startDate] 
+     * @param {number} [endDate] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApiInterface
+     */
+    getJettonAccountHistoryByIDRaw(requestParameters: GetJettonAccountHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonOperations>>;
+
+    /**
+     * Get the transfer jetton history for account and jetton
+     */
+    getJettonAccountHistoryByID(requestParameters: GetJettonAccountHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonOperations>;
 
     /**
      * Update internal cache for a particular account
@@ -900,7 +927,8 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     }
 
     /**
-     * Get the transfer jetton history for account and jetton
+     * Please use `getJettonAccountHistoryByID`` instead
+     * @deprecated
      */
     async getAccountJettonHistoryByIDRaw(requestParameters: GetAccountJettonHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
         if (requestParameters['accountId'] == null) {
@@ -959,7 +987,8 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     }
 
     /**
-     * Get the transfer jetton history for account and jetton
+     * Please use `getJettonAccountHistoryByID`` instead
+     * @deprecated
      */
     async getAccountJettonHistoryByID(requestParameters: GetAccountJettonHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents> {
         const response = await this.getAccountJettonHistoryByIDRaw(requestParameters, initOverrides);
@@ -1010,7 +1039,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
     /**
      * Get the transfer jettons history for account
      */
-    async getAccountJettonsHistoryRaw(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AccountEvents>> {
+    async getAccountJettonsHistoryRaw(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonOperations>> {
         if (requestParameters['accountId'] == null) {
             throw new runtime.RequiredError(
                 'accountId',
@@ -1035,19 +1064,7 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
             queryParameters['limit'] = requestParameters['limit'];
         }
 
-        if (requestParameters['startDate'] != null) {
-            queryParameters['start_date'] = requestParameters['startDate'];
-        }
-
-        if (requestParameters['endDate'] != null) {
-            queryParameters['end_date'] = requestParameters['endDate'];
-        }
-
         const headerParameters: runtime.HTTPHeaders = {};
-
-        if (requestParameters['acceptLanguage'] != null) {
-            headerParameters['Accept-Language'] = String(requestParameters['acceptLanguage']);
-        }
 
         const response = await this.request({
             path: `/v2/accounts/{account_id}/jettons/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
@@ -1056,13 +1073,13 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccountEventsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => JettonOperationsFromJSON(jsonValue));
     }
 
     /**
      * Get the transfer jettons history for account
      */
-    async getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AccountEvents> {
+    async getAccountJettonsHistory(requestParameters: GetAccountJettonsHistoryRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonOperations> {
         const response = await this.getAccountJettonsHistoryRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -1286,6 +1303,69 @@ export class AccountsApi extends runtime.BaseAPI implements AccountsApiInterface
      */
     async getAccounts(requestParameters: GetAccountsOperationRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accounts> {
         const response = await this.getAccountsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get the transfer jetton history for account and jetton
+     */
+    async getJettonAccountHistoryByIDRaw(requestParameters: GetJettonAccountHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<JettonOperations>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getJettonAccountHistoryByID().'
+            );
+        }
+
+        if (requestParameters['jettonId'] == null) {
+            throw new runtime.RequiredError(
+                'jettonId',
+                'Required parameter "jettonId" was null or undefined when calling getJettonAccountHistoryByID().'
+            );
+        }
+
+        if (requestParameters['limit'] == null) {
+            throw new runtime.RequiredError(
+                'limit',
+                'Required parameter "limit" was null or undefined when calling getJettonAccountHistoryByID().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['beforeLt'] != null) {
+            queryParameters['before_lt'] = requestParameters['beforeLt'];
+        }
+
+        if (requestParameters['limit'] != null) {
+            queryParameters['limit'] = requestParameters['limit'];
+        }
+
+        if (requestParameters['startDate'] != null) {
+            queryParameters['start_date'] = requestParameters['startDate'];
+        }
+
+        if (requestParameters['endDate'] != null) {
+            queryParameters['end_date'] = requestParameters['endDate'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/jettons/{jetton_id}/accounts/{account_id}/history`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"jetton_id"}}`, encodeURIComponent(String(requestParameters['jettonId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => JettonOperationsFromJSON(jsonValue));
+    }
+
+    /**
+     * Get the transfer jetton history for account and jetton
+     */
+    async getJettonAccountHistoryByID(requestParameters: GetJettonAccountHistoryByIDRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<JettonOperations> {
+        const response = await this.getJettonAccountHistoryByIDRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

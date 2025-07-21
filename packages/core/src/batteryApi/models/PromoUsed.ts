@@ -25,6 +25,12 @@ export interface PromoUsed {
      * @memberof PromoUsed
      */
     promoUsed: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof PromoUsed
+     */
+    bonusCharges: string;
 }
 
 /**
@@ -32,6 +38,7 @@ export interface PromoUsed {
  */
 export function instanceOfPromoUsed(value: object): value is PromoUsed {
     if (!('promoUsed' in value) || value['promoUsed'] === undefined) return false;
+    if (!('bonusCharges' in value) || value['bonusCharges'] === undefined) return false;
     return true;
 }
 
@@ -46,6 +53,7 @@ export function PromoUsedFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'promoUsed': json['promo_used'],
+        'bonusCharges': json['bonus_charges'],
     };
 }
 
@@ -61,6 +69,7 @@ export function PromoUsedFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     return {
         
         'promo_used': value['promoUsed'],
+        'bonus_charges': value['bonusCharges'],
     };
 }
 

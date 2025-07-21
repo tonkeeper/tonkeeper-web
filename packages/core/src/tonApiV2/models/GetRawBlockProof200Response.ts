@@ -88,11 +88,11 @@ export function GetRawBlockProof200ResponseFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function GetRawBlockProof200ResponseToJSON(json: any): GetRawBlockProof200Response {
-    return GetRawBlockProof200ResponseToJSONTyped(json, false);
-}
+  export function GetRawBlockProof200ResponseToJSON(json: any): GetRawBlockProof200Response {
+      return GetRawBlockProof200ResponseToJSONTyped(json, false);
+  }
 
-export function GetRawBlockProof200ResponseToJSONTyped(value?: GetRawBlockProof200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawBlockProof200ResponseToJSONTyped(value?: GetRawBlockProof200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

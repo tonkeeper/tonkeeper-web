@@ -57,11 +57,11 @@ export function NftItemsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function NftItemsToJSON(json: any): NftItems {
-    return NftItemsToJSONTyped(json, false);
-}
+  export function NftItemsToJSON(json: any): NftItems {
+      return NftItemsToJSONTyped(json, false);
+  }
 
-export function NftItemsToJSONTyped(value?: NftItems | null, ignoreDiscriminator: boolean = false): any {
+  export function NftItemsToJSONTyped(value?: NftItems | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

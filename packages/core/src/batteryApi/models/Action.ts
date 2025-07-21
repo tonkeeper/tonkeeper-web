@@ -27,6 +27,13 @@ import {
     ExtraCurrencyTransferActionToJSON,
     ExtraCurrencyTransferActionToJSONTyped,
 } from './ExtraCurrencyTransferAction';
+import type { PurchaseAction } from './PurchaseAction';
+import {
+    PurchaseActionFromJSON,
+    PurchaseActionFromJSONTyped,
+    PurchaseActionToJSON,
+    PurchaseActionToJSONTyped,
+} from './PurchaseAction';
 import type { DomainRenewAction } from './DomainRenewAction';
 import {
     DomainRenewActionFromJSON,
@@ -62,6 +69,13 @@ import {
     ElectionsDepositStakeActionToJSON,
     ElectionsDepositStakeActionToJSONTyped,
 } from './ElectionsDepositStakeAction';
+import type { GasRelayAction } from './GasRelayAction';
+import {
+    GasRelayActionFromJSON,
+    GasRelayActionFromJSONTyped,
+    GasRelayActionToJSON,
+    GasRelayActionToJSONTyped,
+} from './GasRelayAction';
 import type { DepositStakeAction } from './DepositStakeAction';
 import {
     DepositStakeActionFromJSON,
@@ -288,6 +302,18 @@ export interface Action {
     domainRenew?: DomainRenewAction;
     /**
      * 
+     * @type {PurchaseAction}
+     * @memberof Action
+     */
+    purchase?: PurchaseAction;
+    /**
+     * 
+     * @type {GasRelayAction}
+     * @memberof Action
+     */
+    gasRelay?: GasRelayAction;
+    /**
+     * 
      * @type {ActionSimplePreview}
      * @memberof Action
      */
@@ -307,11 +333,11 @@ export interface Action {
 export const ActionTypeEnum = {
     TonTransfer: 'TonTransfer',
     ExtraCurrencyTransfer: 'ExtraCurrencyTransfer',
+    ContractDeploy: 'ContractDeploy',
     JettonTransfer: 'JettonTransfer',
     JettonBurn: 'JettonBurn',
     JettonMint: 'JettonMint',
     NftItemTransfer: 'NftItemTransfer',
-    ContractDeploy: 'ContractDeploy',
     Subscribe: 'Subscribe',
     UnSubscribe: 'UnSubscribe',
     AuctionBid: 'AuctionBid',
@@ -319,11 +345,12 @@ export const ActionTypeEnum = {
     DepositStake: 'DepositStake',
     WithdrawStake: 'WithdrawStake',
     WithdrawStakeRequest: 'WithdrawStakeRequest',
+    ElectionsDepositStake: 'ElectionsDepositStake',
+    ElectionsRecoverStake: 'ElectionsRecoverStake',
     JettonSwap: 'JettonSwap',
     SmartContractExec: 'SmartContractExec',
-    ElectionsRecoverStake: 'ElectionsRecoverStake',
-    ElectionsDepositStake: 'ElectionsDepositStake',
     DomainRenew: 'DomainRenew',
+    Purchase: 'Purchase',
     Unknown: 'Unknown'
 } as const;
 export type ActionTypeEnum = typeof ActionTypeEnum[keyof typeof ActionTypeEnum];
@@ -380,6 +407,8 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'jettonSwap': json['JettonSwap'] == null ? undefined : JettonSwapActionFromJSON(json['JettonSwap']),
         'smartContractExec': json['SmartContractExec'] == null ? undefined : SmartContractActionFromJSON(json['SmartContractExec']),
         'domainRenew': json['DomainRenew'] == null ? undefined : DomainRenewActionFromJSON(json['DomainRenew']),
+        'purchase': json['Purchase'] == null ? undefined : PurchaseActionFromJSON(json['Purchase']),
+        'gasRelay': json['GasRelay'] == null ? undefined : GasRelayActionFromJSON(json['GasRelay']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
         'baseTransactions': json['base_transactions'],
     };
@@ -417,6 +446,8 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'JettonSwap': JettonSwapActionToJSON(value['jettonSwap']),
         'SmartContractExec': SmartContractActionToJSON(value['smartContractExec']),
         'DomainRenew': DomainRenewActionToJSON(value['domainRenew']),
+        'Purchase': PurchaseActionToJSON(value['purchase']),
+        'GasRelay': GasRelayActionToJSON(value['gasRelay']),
         'simple_preview': ActionSimplePreviewToJSON(value['simplePreview']),
         'base_transactions': value['baseTransactions'],
     };

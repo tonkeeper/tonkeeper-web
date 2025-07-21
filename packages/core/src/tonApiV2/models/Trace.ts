@@ -79,11 +79,11 @@ export function TraceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tra
     };
 }
 
-export function TraceToJSON(json: any): Trace {
-    return TraceToJSONTyped(json, false);
-}
+  export function TraceToJSON(json: any): Trace {
+      return TraceToJSONTyped(json, false);
+  }
 
-export function TraceToJSONTyped(value?: Trace | null, ignoreDiscriminator: boolean = false): any {
+  export function TraceToJSONTyped(value?: Trace | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
