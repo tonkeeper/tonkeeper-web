@@ -3,10 +3,9 @@ import styled from 'styled-components';
 
 import { Label2 } from '../Text';
 import { useProState } from '../../state/pro';
-import { Skeleton } from '../shared/Skeleton';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { ListBlock } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
 import { AuthTypes, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
 
@@ -47,24 +46,17 @@ export const ProActiveWallet: FC<IProps> = props => {
         <Block>
             {title}
             <ListBlock margin={false} fullWidth>
-                {!isLoading && account && wallet ? (
-                    <ProWalletListItem
-                        disableHover
-                        wallet={wallet}
-                        account={account}
-                        rightElement={
-                            <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
-                                <Label2>{t('disconnect')}</Label2>
-                            </ButtonStyled>
-                        }
-                    />
-                ) : (
-                    <ListItem>
-                        <ListItemPayloadStyled>
-                            <Skeleton width="100%" height="20px" />
-                        </ListItemPayloadStyled>
-                    </ListItem>
-                )}
+                <ProWalletListItem
+                    disableHover
+                    wallet={wallet}
+                    account={account}
+                    isLoading={isLoading}
+                    rightElement={
+                        <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
+                            <Label2>{t('disconnect')}</Label2>
+                        </ButtonStyled>
+                    }
+                />
             </ListBlock>
         </Block>
     );
@@ -75,10 +67,6 @@ const Block = styled.div`
     flex-direction: column;
     gap: 8px;
     width: 100%;
-`;
-
-const ListItemPayloadStyled = styled(ListItemPayload)`
-    padding: 10px 10px 10px 0;
 `;
 
 const ButtonStyled = styled.button`

@@ -1,4 +1,4 @@
-import { type ChangeEvent, type FC, useLayoutEffect, useRef, useState } from 'react';
+import { type ChangeEvent, type FC, useId, useLayoutEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import BigNumber from 'bignumber.js';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
@@ -11,7 +11,7 @@ import { formatter } from '../../hooks/balance';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { normalizeTranslationKey } from '../../libs/common';
-import { Skeleton, SkeletonText } from '../shared/Skeleton';
+import { Skeleton } from '../shared/Skeleton';
 
 interface IProps extends IDisplayPlan {
     isLoading: boolean;
@@ -25,6 +25,7 @@ const PADDING = 24;
 
 export const ProPlanLabel: FC<IProps> = props => {
     const sdk = useAppSdk();
+    const skeletonId = useId();
     const { t } = useTranslation();
     const [fontSize, setFontSize] = useState(MAX_SIZE);
     const spanRef = useRef<HTMLSpanElement>(null);
@@ -41,6 +42,7 @@ export const ProPlanLabel: FC<IProps> = props => {
         id
     } = props;
 
+    const isDataReady = displayName && displayPrice && formattedDisplayPrice;
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
 
     const calculateFontSize = () => {
@@ -91,21 +93,7 @@ export const ProPlanLabel: FC<IProps> = props => {
         return () => resizeObserver.current?.disconnect();
     }, [formattedDisplayPrice]);
 
-    const titleNode = displayName ? (
-        <Text isBottomMargin={isCrypto}>{t(normalizeTranslationKey(displayName))}</Text>
-    ) : (
-        <SkeletonTextStyled width="100px" margin="0 auto" />
-    );
-
-    const priceNode = formattedDisplayPrice ? (
-        <Num2Styled ref={spanRef} fontSize={fontSize}>
-            {formattedDisplayPrice}
-        </Num2Styled>
-    ) : (
-        <SkeletonTextStyled height="28px" margin="8px 0 0" width="100%" />
-    );
-
-    return (
+    return isDataReady ? (
         <LabelStyled ref={labelRef} selected={selectedPlanId === id}>
             <input
                 id={`purchase-plan-${id}`}
@@ -115,9 +103,19 @@ export const ProPlanLabel: FC<IProps> = props => {
                 onChange={onChange}
                 disabled={isLoading}
             />
-            {titleNode}
-            {priceNode}
+            <Text isBottomMargin={isCrypto}>{t(normalizeTranslationKey(displayName))}</Text>
+            <Num2Styled ref={spanRef} fontSize={fontSize}>
+                {formattedDisplayPrice}
+            </Num2Styled>
             {isCrypto && <FiatEquivalent amount={displayPrice} />}
+        </LabelStyled>
+    ) : (
+        <LabelStyled ref={labelRef} selected={selectedPlanId === id} skeletonId={skeletonId}>
+            <input />
+            <Text isBottomMargin={isCrypto}>{'Skeleton'}</Text>
+            <Num2Styled>{'Skeleton'}</Num2Styled>
+            {isCrypto && <FiatEquivalent amount={'0'} />}
+            <StyledSkeleton id={skeletonId} />
         </LabelStyled>
     );
 };
@@ -165,7 +163,8 @@ const Num2Styled = styled(Num2)<{ fontSize: number }>`
     font-size: ${p => p.fontSize};
 `;
 
-const LabelStyled = styled.label<{ selected: boolean }>`
+const LabelStyled = styled.label<{ selected: boolean; skeletonId?: string }>`
+    position: relative;
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -176,6 +175,18 @@ const LabelStyled = styled.label<{ selected: boolean }>`
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
+    opacity: 1;
+    visibility: visible;
+
+    ${props =>
+        props.skeletonId
+            ? `
+        & > *:not([id="${props.skeletonId}"]) {
+            opacity: 0;
+            visibility: hidden;
+        }
+        `
+            : ''}
 
     input {
         display: none;
@@ -193,7 +204,12 @@ const LabelStyled = styled.label<{ selected: boolean }>`
               `}
 `;
 
-const SkeletonTextStyled = styled(SkeletonText)<{ height?: string; margin?: string }>`
-    height: ${p => p.height ?? '20px'};
-    margin: ${p => p.margin ?? 0};
+const StyledSkeleton = styled(Skeleton)`
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
 `;
