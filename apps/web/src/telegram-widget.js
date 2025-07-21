@@ -595,7 +595,7 @@
                     setTimeout(checkClose, 100, bot_id);
                 };
 
-                /* PATCHED */ const origin = 'https://tonkeeper.com';
+                /* PATCHED */ const origin = 'https://wallet.tonkeeper.com';
                 /* PATCHED */ var popup_url =
                     Telegram.Login.widgetsOrigin +
                     '/auth?bot_id=' +
