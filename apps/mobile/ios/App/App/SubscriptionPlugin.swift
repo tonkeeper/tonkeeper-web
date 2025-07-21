@@ -11,7 +11,8 @@ import Capacitor
         CAPPluginMethod(name: "getAllProductsInfo", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "subscribe", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "getOriginalTransactionId", returnType: CAPPluginReturnPromise),
-        CAPPluginMethod(name: "manageSubscriptions", returnType: CAPPluginReturnPromise)
+        CAPPluginMethod(name: "manageSubscriptions", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getCurrentSubscriptionInfo", returnType: CAPPluginReturnPromise)
     ]
 
     @objc public func getProductInfo(_ call: CAPPluginCall) {
@@ -171,6 +172,47 @@ import Capacitor
             }
 
             call.resolve(["originalTransactionId": NSNull(), "environment": NSNull()])
+        }
+    }
+
+    @objc public func getCurrentSubscriptionInfo(_ call: CAPPluginCall) {
+        guard #available(iOS 15.0, *) else {
+            call.reject("iOS 15+ required")
+            return
+        }
+
+        Task {
+            var subscriptions: [[String: Any]] = []
+            let formatter = ISO8601DateFormatter()
+
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result {
+                    guard transaction.productType == .autoRenewable else { continue }
+
+                    var info: [String: Any] = [
+                        "originalTransactionId": transaction.originalID,
+                        "productId": transaction.productID,
+                        "purchaseDate": formatter.string(from: transaction.purchaseDate),
+                        "expirationDate": transaction.expirationDate != nil
+                            ? formatter.string(from: transaction.expirationDate!)
+                            : NSNull(),
+                        "revocationDate": transaction.revocationDate != nil
+                            ? formatter.string(from: transaction.revocationDate!)
+                            : NSNull(),
+                        "isUpgraded": transaction.isUpgraded
+                    ]
+
+                    if #available(iOS 16.0, *) {
+                        info["environment"] = transaction.environment.rawValue
+                    } else {
+                        info["environment"] = NSNull()
+                    }
+
+                    subscriptions.append(info)
+                }
+            }
+
+            call.resolve(["subscriptions": subscriptions])
         }
     }
 
