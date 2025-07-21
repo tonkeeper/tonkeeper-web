@@ -127,6 +127,8 @@ export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
     getAllProductsInfo(): Promise<IProductInfo[]>;
     manageSubscriptions(): Promise<void>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
+    getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]>;
+    hasActiveSubscription(): Promise<boolean>;
 }
 
 export enum IosPurchaseStatuses {

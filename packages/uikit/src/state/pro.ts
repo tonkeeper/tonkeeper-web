@@ -4,6 +4,7 @@ import {
     AuthTypes,
     hasWalletAuth,
     IDisplayPlan,
+    type IIosPurchaseResult,
     IOriginalTransactionInfo,
     IosPendingSubscription,
     IosPurchaseStatuses,
@@ -133,6 +134,23 @@ export const useOriginalTransactionInfo = () => {
             const originalTxInfo = await sdk.subscriptionStrategy.getOriginalTransactionId();
 
             return originalTxInfo || null;
+        }
+    );
+};
+
+export const useCurrentSubscriptionInfo = () => {
+    const sdk = useAppSdk();
+
+    return useQuery<IIosPurchaseResult[], Error>(
+        [QueryKey.currentIosSubscriptionInfo],
+        async () => {
+            if (!isIosStrategy(sdk.subscriptionStrategy)) {
+                throw new Error('This is not an iOS subscription strategy');
+            }
+
+            const result = await sdk.subscriptionStrategy.getCurrentSubscriptionInfo();
+
+            return result || [];
         }
     );
 };

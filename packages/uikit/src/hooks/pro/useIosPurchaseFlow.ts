@@ -4,7 +4,7 @@ import { IosPurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
 import { useNotifyError, useToast } from '../useNotification';
 import { useTranslation } from '../translation';
 import { useNavigate } from '../router/useNavigate';
-import { useOriginalTransactionInfo, useProSubscriptionPurchase } from '../../state/pro';
+import { useCurrentSubscriptionInfo, useProSubscriptionPurchase } from '../../state/pro';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useProAuthNotification } from '../../components/modals/ProAuthNotificationControlled';
@@ -18,7 +18,7 @@ export const useIosPurchaseFlow = () => {
 
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onClose: onCurrentClose } = useProPurchaseNotification();
-    const { data: originalTxInfo, isLoading: isOriginalTxIdLoading } = useOriginalTransactionInfo();
+    const { data: currentSubInfo, isLoading: isSubInfoLoading } = useCurrentSubscriptionInfo();
 
     const {
         data: status,
@@ -30,12 +30,16 @@ export const useIosPurchaseFlow = () => {
     useNotifyError(isError && new Error(t('purchase_failed')));
 
     useEffect(() => {
-        if (!originalTxInfo || !originalTxInfo.originalTransactionId) return;
+        if (!currentSubInfo || currentSubInfo.length < 1) return;
+
+        const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
+
+        if (!originalTransactionId) return;
 
         (async () => {
             const result = await sdk.confirm({
                 message: t('already_have_subscription', {
-                    transactionId: String(originalTxInfo.originalTransactionId)
+                    transactionId: String(originalTransactionId)
                 }),
                 okButtonTitle: 'choose_another_wallet'
             });
@@ -46,7 +50,7 @@ export const useIosPurchaseFlow = () => {
                 onProAuthOpen();
             }
         })();
-    }, [originalTxInfo]);
+    }, [currentSubInfo]);
 
     useEffect(() => {
         if (!isSuccess) return;
@@ -65,5 +69,5 @@ export const useIosPurchaseFlow = () => {
         navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
     }, [isSuccess]);
 
-    return { startPurchasing, isLoading: isPurchasing || isOriginalTxIdLoading };
+    return { startPurchasing, isLoading: isPurchasing || isSubInfoLoading };
 };

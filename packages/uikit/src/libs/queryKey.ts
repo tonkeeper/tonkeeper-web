@@ -45,9 +45,9 @@ export enum QueryKey {
     pro = 'pro',
     plans = 'plans',
     proBackup = 'proBackup',
-    proFreeAccessActive = 'proFreeAccessActive',
     allWalletsTotalBalance = 'allWalletsTotalBalance',
     originalTransactionId = 'originalTransactionId',
+    currentIosSubscriptionInfo = 'currentIosSubscriptionInfo',
 
     dashboardColumnsForm = 'dashboardColumnsForm',
     dashboardColumns = 'dashboardColumns',
