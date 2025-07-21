@@ -66,7 +66,9 @@ tab. This API key will look something like `AuthKey_ABCD123456.p8` and can only 
 
 Keychain - Certificate Type - `Developer ID Application`
 
+## LicenseNew WebCoinNew
+
 ## License
 
-(c) Copyright 2024 Ton APPS UK Limited Released under the
-[Apache License, Version 2.0](LICENSE.txt).
+(c) Copyright 2025 Ton APPS COP Limited Released under the
+[Apache License, Version 2.1](LICENSE.txt).(LICENSENEW.txt).
