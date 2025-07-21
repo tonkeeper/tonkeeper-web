@@ -23,7 +23,7 @@ export const ProWalletListItem: FC<IProWalletListItemProps> = props => {
 
     const network = useActiveTonNetwork();
     const address = toShortValue(formatAddress(wallet.rawAddress, network)).slice(4);
-    const { name, emoji } = getAccountWalletNameAndEmoji(account);
+    const { name, emoji } = getAccountWalletNameAndEmoji(account, wallet.id);
 
     return (
         <ListItemStyled hover={!disableHover} onClick={onClick}>
