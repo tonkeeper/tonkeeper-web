@@ -29,28 +29,29 @@ export const useIosPurchaseFlow = () => {
     } = useProSubscriptionPurchase();
     useNotifyError(isError && new Error(t('purchase_failed')));
 
-    useEffect(() => {
-        if (!currentSubInfo || currentSubInfo.length < 1) return;
-
-        const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
-
-        if (!originalTransactionId) return;
-
-        (async () => {
-            const result = await sdk.confirm({
-                message: t('already_have_subscription', {
-                    transactionId: String(originalTransactionId)
-                }),
-                okButtonTitle: 'choose_another_wallet'
-            });
-
-            onCurrentClose();
-
-            if (result) {
-                onProAuthOpen();
-            }
-        })();
-    }, [currentSubInfo]);
+    // TODO Temporary! Don't forget to bring it back
+    // useEffect(() => {
+    //     if (!currentSubInfo || currentSubInfo.length < 1) return;
+    //
+    //     const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
+    //
+    //     if (!originalTransactionId) return;
+    //
+    //     (async () => {
+    //         const result = await sdk.confirm({
+    //             message: t('already_have_subscription', {
+    //                 transactionId: String(originalTransactionId)
+    //             }),
+    //             okButtonTitle: 'choose_another_wallet'
+    //         });
+    //
+    //         onCurrentClose();
+    //
+    //         if (result) {
+    //             onProAuthOpen();
+    //         }
+    //     })();
+    // }, [currentSubInfo]);
 
     useEffect(() => {
         if (!isSuccess) return;
