@@ -665,7 +665,7 @@
                 xhr.onerror = function () {
                     callback('*', false);
                 };
-                xhr.withCredentials = false;
+                xhr.withCredentials = true;
                 xhr.send(
                     'bot_id=' +
                         encodeURIComponent(options.bot_id) +
