@@ -24,6 +24,8 @@ export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => 
 };
 
 export const getApiConfig = (config: TonendpointConfig, network: Network, TonConsoleBase = '') => {
+    console.log('TonConsoleBase:', TonConsoleBase);
+
     // Global config
     if (TonConsoleBase) {
         TonConsoleApi.BASE = TonConsoleBase;
