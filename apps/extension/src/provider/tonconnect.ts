@@ -12,15 +12,15 @@ import {
     WalletResponse,
     connectRequestSchema,
     WalletEvent
-} from "@tonkeeper/core/dist/entries/tonConnect";
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import { TonProvider } from '../provider/index';
 import {
     getDeviceInfo,
     tonConnectTonkeeperAppName,
     tonConnectTonkeeperWalletInfo
-} from "@tonkeeper/core/dist/service/tonConnect/connectService";
+} from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import packageJson from '../../package.json';
-import { tonConnectProtocolVersion } from "../constants";
+import { tonConnectProtocolVersion } from '../constants';
 
 const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
     return {
@@ -35,34 +35,32 @@ const formatConnectEventError = (error: TonConnectError): ConnectEventError => {
 
 type TonConnectCallback = (event: WalletEvent) => void;
 
-
 export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBridge {
     #callbacks: TonConnectCallback[] = [];
 
     walletInfo = tonConnectTonkeeperWalletInfo;
 
-    deviceInfo = getDeviceInfo('browser', packageJson.version,255, tonConnectTonkeeperAppName);
+    deviceInfo = getDeviceInfo('browser', packageJson.version, 255, tonConnectTonkeeperAppName);
 
     protocolVersion = tonConnectProtocolVersion;
 
     isWalletBrowser = false;
 
-    constructor(private provider: TonProvider) {
-    }
+    constructor(private provider: TonProvider) {}
 
     connect = async (_protocolVersion: unknown, _message: unknown): Promise<ConnectEvent> => {
         const { data: protocolVersion } = protocolVersionSchema.safeParse(_protocolVersion);
 
         if (protocolVersion === undefined || protocolVersion > this.protocolVersion) {
             return this.notify(
-              formatConnectEventError(new TonConnectError('Unsupported protocol version', 1))
+                formatConnectEventError(new TonConnectError('Unsupported protocol version', 1))
             );
         }
         try {
             const message = connectRequestSchema.parse(_message);
             const payload = await this.provider.send<TonConnectEventPayload>(
-              'tonConnect_connect',
-              message
+                'tonConnect_connect',
+                message
             );
 
             return this.notify({
@@ -75,16 +73,16 @@ export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBri
                 return this.notify(formatConnectEventError(e));
             } else {
                 return this.notify(
-                  formatConnectEventError(
-                    new TonConnectError((e as Error).message ?? 'Unknown error')
-                  )
+                    formatConnectEventError(
+                        new TonConnectError((e as Error).message ?? 'Unknown error')
+                    )
                 );
             }
         }
     };
 
     disconnect = async () => {
-        await this.provider.send(`tonConnect_disconnect`);
+        await this.provider.send('tonConnect_disconnect');
         return this.notify<DisconnectEvent>({
             event: 'disconnect',
             id: Date.now(),
@@ -95,8 +93,8 @@ export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBri
     restoreConnection = async (): Promise<ConnectEvent> => {
         try {
             const payload = await this.provider.send<TonConnectEventPayload>(
-              'tonConnect_reconnect',
-              [{ name: 'ton_addr' }]
+                'tonConnect_reconnect',
+                [{ name: 'ton_addr' }]
             );
 
             return this.notify({
@@ -109,9 +107,9 @@ export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBri
                 return this.notify(formatConnectEventError(e));
             } else {
                 return this.notify(
-                  formatConnectEventError(
-                    new TonConnectError((e as Error).message ?? 'Unknown error')
-                  )
+                    formatConnectEventError(
+                        new TonConnectError((e as Error).message ?? 'Unknown error')
+                    )
                 );
             }
         }
@@ -119,21 +117,17 @@ export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBri
 
     async send<T extends RpcMethod>(message: unknown): Promise<WalletResponse<T>> {
         try {
-            const {method, params: paramsRaw, id} = appRequestSchema.parse(message);
-            const params = sendRequestPayloadSchema.parse(
-              JSON.parse(paramsRaw[0]!)
-            );
+            const { method, params: paramsRaw, id } = appRequestSchema.parse(message);
+            const params = sendRequestPayloadSchema.parse(JSON.parse(paramsRaw[0]!));
 
-            const result = await this.provider.send<string>(
-              `tonConnect_${method}`,
-              params
-            );
+            const result = await this.provider.send<string>(`tonConnect_${method}`, params);
             return {
                 result,
                 id: String(id)
             };
         } catch (e) {
-            const fallbackId = typeof message === 'object' && message && 'id' in message ? message.id : Date.now();
+            const fallbackId =
+                typeof message === 'object' && message && 'id' in message ? message.id : Date.now();
             if (e instanceof TonConnectError) {
                 return {
                     error: e,
@@ -146,7 +140,7 @@ export class ExtensionTonConnectInjectedBridge implements ITonConnectInjectedBri
                 };
             }
         }
-    };
+    }
 
     listen = (callback: (event: WalletEvent) => void): (() => void) => {
         this.#callbacks.push(callback);

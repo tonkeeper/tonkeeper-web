@@ -183,6 +183,8 @@ export interface IAppSdk {
 
     dappBrowser?: IDappBrowser;
 
+    linksInterceptorAvailable?: boolean;
+
     subscriptionStrategy?: SubscriptionStrategy;
 }
 

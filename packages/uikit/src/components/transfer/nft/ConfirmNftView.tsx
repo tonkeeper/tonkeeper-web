@@ -101,7 +101,7 @@ const useNftTransferEstimation = (
                 const sender = await getSender!();
                 const nftTransferMsg = nftEncoder.encodeNftTransfer({
                     nftAddress: nftItem.address,
-                    recipientAddress: data!.address.address,
+                    recipientAddress: data!.toAccount.address,
                     forwardPayload: data!.comment ? comment(data.comment) : null,
                     responseAddress:
                         'excessAddress' in sender && sender.excessAddress
@@ -176,7 +176,7 @@ const useSendNft = (
             );
             const nftTransferMsg = nftEncoder.encodeNftTransfer({
                 nftAddress: nftItem.address,
-                recipientAddress: recipient.address.address,
+                recipientAddress: recipient.toAccount.address,
                 forwardPayload: recipient.comment ? comment(recipient.comment) : null,
                 nftTransferAmountWei,
                 responseAddress:

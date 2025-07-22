@@ -15,17 +15,24 @@
 
 import * as runtime from '../runtime';
 import type {
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
   Multisig,
+  MultisigOrder,
 } from '../models/index';
 import {
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     MultisigFromJSON,
     MultisigToJSON,
+    MultisigOrderFromJSON,
+    MultisigOrderToJSON,
 } from '../models/index';
 
 export interface GetMultisigAccountRequest {
+    accountId: string;
+}
+
+export interface GetMultisigOrderRequest {
     accountId: string;
 }
 
@@ -49,6 +56,20 @@ export interface MultisigApiInterface {
      * Get multisig account info
      */
     getMultisigAccount(requestParameters: GetMultisigAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Multisig>;
+
+    /**
+     * Get multisig order
+     * @param {string} accountId account ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MultisigApiInterface
+     */
+    getMultisigOrderRaw(requestParameters: GetMultisigOrderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MultisigOrder>>;
+
+    /**
+     * Get multisig order
+     */
+    getMultisigOrder(requestParameters: GetMultisigOrderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MultisigOrder>;
 
 }
 
@@ -87,6 +108,39 @@ export class MultisigApi extends runtime.BaseAPI implements MultisigApiInterface
      */
     async getMultisigAccount(requestParameters: GetMultisigAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Multisig> {
         const response = await this.getMultisigAccountRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get multisig order
+     */
+    async getMultisigOrderRaw(requestParameters: GetMultisigOrderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MultisigOrder>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getMultisigOrder().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/multisig/order/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MultisigOrderFromJSON(jsonValue));
+    }
+
+    /**
+     * Get multisig order
+     */
+    async getMultisigOrder(requestParameters: GetMultisigOrderRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MultisigOrder> {
+        const response = await this.getMultisigOrderRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

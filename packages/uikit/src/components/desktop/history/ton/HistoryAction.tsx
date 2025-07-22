@@ -68,7 +68,7 @@ export const HistoryAction: FC<{
             return (
                 <>
                     <HistoryGridCellFillRow>
-                        <Body2>{action.simplePreview.description}</Body2>
+                        <Body2>{action.simplePreview.name}</Body2>
                     </HistoryGridCellFillRow>
                 </>
             );

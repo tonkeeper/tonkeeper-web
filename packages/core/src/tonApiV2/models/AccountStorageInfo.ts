@@ -81,11 +81,11 @@ export function AccountStorageInfoFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function AccountStorageInfoToJSON(json: any): AccountStorageInfo {
-    return AccountStorageInfoToJSONTyped(json, false);
-}
+  export function AccountStorageInfoToJSON(json: any): AccountStorageInfo {
+      return AccountStorageInfoToJSONTyped(json, false);
+  }
 
-export function AccountStorageInfoToJSONTyped(value?: AccountStorageInfo | null, ignoreDiscriminator: boolean = false): any {
+  export function AccountStorageInfoToJSONTyped(value?: AccountStorageInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

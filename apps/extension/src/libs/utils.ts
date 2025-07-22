@@ -7,14 +7,14 @@ import browser from 'webextension-polyfill';
  * @returns {Error|undefined}
  */
 export function checkForError() {
-  const { lastError } = browser.runtime;
-  if (!lastError) {
-    return undefined;
-  }
-  // if it quacks like an Error, its an Error
-  if (lastError.message) {
-    return lastError;
-  }
-  // repair incomplete error object (eg chromium v77)
-  return new Error(lastError.message);
+    const { lastError } = browser.runtime;
+    if (!lastError) {
+        return undefined;
+    }
+    // if it quacks like an Error, its an Error
+    if (lastError.message) {
+        return lastError;
+    }
+    // repair incomplete error object (eg chromium v77)
+    return new Error(lastError.message);
 }

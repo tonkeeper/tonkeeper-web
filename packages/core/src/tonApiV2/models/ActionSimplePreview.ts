@@ -94,11 +94,11 @@ export function ActionSimplePreviewFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function ActionSimplePreviewToJSON(json: any): ActionSimplePreview {
-    return ActionSimplePreviewToJSONTyped(json, false);
-}
+  export function ActionSimplePreviewToJSON(json: any): ActionSimplePreview {
+      return ActionSimplePreviewToJSONTyped(json, false);
+  }
 
-export function ActionSimplePreviewToJSONTyped(value?: ActionSimplePreview | null, ignoreDiscriminator: boolean = false): any {
+  export function ActionSimplePreviewToJSONTyped(value?: ActionSimplePreview | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

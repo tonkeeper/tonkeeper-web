@@ -20,8 +20,10 @@ import type {
   BlockchainBlockShards,
   BlockchainBlocks,
   BlockchainConfig,
+  BlockchainLibrary,
   BlockchainRawAccount,
-  InlineObject,
+  ExecGetMethodWithBodyForBlockchainAccountRequest,
+  GetOpenapiJsonDefaultResponse,
   MethodExecutionResult,
   RawBlockchainConfig,
   ReducedBlocks,
@@ -41,10 +43,14 @@ import {
     BlockchainBlocksToJSON,
     BlockchainConfigFromJSON,
     BlockchainConfigToJSON,
+    BlockchainLibraryFromJSON,
+    BlockchainLibraryToJSON,
     BlockchainRawAccountFromJSON,
     BlockchainRawAccountToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    ExecGetMethodWithBodyForBlockchainAccountRequestFromJSON,
+    ExecGetMethodWithBodyForBlockchainAccountRequestToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     MethodExecutionResultFromJSON,
     MethodExecutionResultToJSON,
     RawBlockchainConfigFromJSON,
@@ -65,10 +71,20 @@ export interface BlockchainAccountInspectRequest {
     accountId: string;
 }
 
+export interface DownloadBlockchainBlockBocRequest {
+    blockId: string;
+}
+
 export interface ExecGetMethodForBlockchainAccountRequest {
     accountId: string;
     methodName: string;
     args?: Array<string>;
+}
+
+export interface ExecGetMethodWithBodyForBlockchainAccountOperationRequest {
+    accountId: string;
+    methodName: string;
+    execGetMethodWithBodyForBlockchainAccountRequest?: ExecGetMethodWithBodyForBlockchainAccountRequest;
 }
 
 export interface GetBlockchainAccountTransactionsRequest {
@@ -115,6 +131,10 @@ export interface GetBlockchainTransactionByMessageHashRequest {
     msgId: string;
 }
 
+export interface GetLibraryByHashRequest {
+    hash: string;
+}
+
 export interface GetRawBlockchainConfigFromBlockRequest {
     masterchainSeqno: number;
 }
@@ -150,6 +170,20 @@ export interface BlockchainApiInterface {
     blockchainAccountInspect(requestParameters: BlockchainAccountInspectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainAccountInspect>;
 
     /**
+     * Download blockchain block BOC
+     * @param {string} blockId block ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    downloadBlockchainBlockBocRaw(requestParameters: DownloadBlockchainBlockBocRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>>;
+
+    /**
+     * Download blockchain block BOC
+     */
+    downloadBlockchainBlockBoc(requestParameters: DownloadBlockchainBlockBocRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob>;
+
+    /**
      * Execute get method for account
      * @param {string} accountId account ID
      * @param {string} methodName contract get method name
@@ -164,6 +198,22 @@ export interface BlockchainApiInterface {
      * Execute get method for account
      */
     execGetMethodForBlockchainAccount(requestParameters: ExecGetMethodForBlockchainAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MethodExecutionResult>;
+
+    /**
+     * Execute get method for account
+     * @param {string} accountId account ID
+     * @param {string} methodName contract get method name
+     * @param {ExecGetMethodWithBodyForBlockchainAccountRequest} [execGetMethodWithBodyForBlockchainAccountRequest] Request body for executing a GET method on a blockchain account via POST. This format allows passing arguments in the request body instead of query parameters, which is especially useful for large or complex input data. 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    execGetMethodWithBodyForBlockchainAccountRaw(requestParameters: ExecGetMethodWithBodyForBlockchainAccountOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MethodExecutionResult>>;
+
+    /**
+     * Execute get method for account
+     */
+    execGetMethodWithBodyForBlockchainAccount(requestParameters: ExecGetMethodWithBodyForBlockchainAccountOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MethodExecutionResult>;
 
     /**
      * Get account transactions
@@ -349,6 +399,20 @@ export interface BlockchainApiInterface {
     getBlockchainValidators(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Validators>;
 
     /**
+     * Get library cell
+     * @param {string} hash hash in hex (without 0x) format
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof BlockchainApiInterface
+     */
+    getLibraryByHashRaw(requestParameters: GetLibraryByHashRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainLibrary>>;
+
+    /**
+     * Get library cell
+     */
+    getLibraryByHash(requestParameters: GetLibraryByHashRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainLibrary>;
+
+    /**
      * Get raw blockchain config
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -445,6 +509,39 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
     }
 
     /**
+     * Download blockchain block BOC
+     */
+    async downloadBlockchainBlockBocRaw(requestParameters: DownloadBlockchainBlockBocRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Blob>> {
+        if (requestParameters['blockId'] == null) {
+            throw new runtime.RequiredError(
+                'blockId',
+                'Required parameter "blockId" was null or undefined when calling downloadBlockchainBlockBoc().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/blocks/{block_id}/boc`.replace(`{${"block_id"}}`, encodeURIComponent(String(requestParameters['blockId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.BlobApiResponse(response);
+    }
+
+    /**
+     * Download blockchain block BOC
+     */
+    async downloadBlockchainBlockBoc(requestParameters: DownloadBlockchainBlockBocRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Blob> {
+        const response = await this.downloadBlockchainBlockBocRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Execute get method for account
      */
     async execGetMethodForBlockchainAccountRaw(requestParameters: ExecGetMethodForBlockchainAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MethodExecutionResult>> {
@@ -485,6 +582,49 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      */
     async execGetMethodForBlockchainAccount(requestParameters: ExecGetMethodForBlockchainAccountRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MethodExecutionResult> {
         const response = await this.execGetMethodForBlockchainAccountRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Execute get method for account
+     */
+    async execGetMethodWithBodyForBlockchainAccountRaw(requestParameters: ExecGetMethodWithBodyForBlockchainAccountOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<MethodExecutionResult>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling execGetMethodWithBodyForBlockchainAccount().'
+            );
+        }
+
+        if (requestParameters['methodName'] == null) {
+            throw new runtime.RequiredError(
+                'methodName',
+                'Required parameter "methodName" was null or undefined when calling execGetMethodWithBodyForBlockchainAccount().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v2/blockchain/accounts/{account_id}/methods/{method_name}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))).replace(`{${"method_name"}}`, encodeURIComponent(String(requestParameters['methodName']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: ExecGetMethodWithBodyForBlockchainAccountRequestToJSON(requestParameters['execGetMethodWithBodyForBlockchainAccountRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => MethodExecutionResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Execute get method for account
+     */
+    async execGetMethodWithBodyForBlockchainAccount(requestParameters: ExecGetMethodWithBodyForBlockchainAccountOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<MethodExecutionResult> {
+        const response = await this.execGetMethodWithBodyForBlockchainAccountRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -909,6 +1049,39 @@ export class BlockchainApi extends runtime.BaseAPI implements BlockchainApiInter
      */
     async getBlockchainValidators(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Validators> {
         const response = await this.getBlockchainValidatorsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get library cell
+     */
+    async getLibraryByHashRaw(requestParameters: GetLibraryByHashRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<BlockchainLibrary>> {
+        if (requestParameters['hash'] == null) {
+            throw new runtime.RequiredError(
+                'hash',
+                'Required parameter "hash" was null or undefined when calling getLibraryByHash().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/blockchain/libraries/{hash}`.replace(`{${"hash"}}`, encodeURIComponent(String(requestParameters['hash']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => BlockchainLibraryFromJSON(jsonValue));
+    }
+
+    /**
+     * Get library cell
+     */
+    async getLibraryByHash(requestParameters: GetLibraryByHashRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<BlockchainLibrary> {
+        const response = await this.getLibraryByHashRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

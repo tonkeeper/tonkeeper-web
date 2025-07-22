@@ -74,6 +74,7 @@ import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/real
 import { Button } from '@tonkeeper/uikit';
 import { MobileDappBrowserController } from '../components/dapp-browser/MobileDappBrowserController';
 import { ProSubscriptionSettings } from '@tonkeeper/uikit/dist/components/settings/ProSubscriptionSettings';
+import { routerLocation$ } from '@tonkeeper/uikit/dist/hooks/router/useLocation';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -441,6 +442,16 @@ const PreferencesModal = () => {
         setSettingsOpen(false);
         settingsHistory.current.push(AppRoute.settings);
     };
+
+    const browserLocation = useLocation();
+    useEffect(() => {
+        if (!isSettingsOpen) {
+            routerLocation$.next(browserLocation);
+        } else {
+            routerLocation$.next(settingsHistory.current.location);
+            return settingsHistory.current.listen(loc => routerLocation$.next(loc));
+        }
+    }, [browserLocation, isSettingsOpen]);
 
     return (
         <IonModalStyled
