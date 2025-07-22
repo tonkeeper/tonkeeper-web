@@ -1,9 +1,6 @@
 /**
  * Service methods to manage notification PopUp
  * Origin: https://github.com/OpenProduct/openmask-extension/blob/main/src/libs/service/dApp/notificationService.ts
- *
- * @author: KuznetsovNikita
- * @since: 0.1.0
  */
 
 import { backgroundEventsEmitter } from '../../event';
@@ -38,7 +35,7 @@ export const getPopup = async () => {
         : null;
 };
 
-const openPopUp = async (page: string) => {
+export const openPopUp = async (page: string) => {
     const popup = await getPopup();
     if (popup && popup.id) {
         return ExtensionPlatform.focusWindow(popup.id);
@@ -62,11 +59,13 @@ const openPopUp = async (page: string) => {
     }
 };
 
-export const closeCurrentPopUp = async (popupId: number | undefined) => {
-    if (popupId) {
+export const closeCurrentPopUp = async (id: number | undefined) => {
+    if (id) {
         try {
-            await ExtensionPlatform.closeWindow(popupId);
-        } catch (e) {}
+            await ExtensionPlatform.closeWindow(id);
+        } catch (e) {
+            console.error(e);
+        }
     }
 };
 

@@ -1,9 +1,6 @@
 /**
  * Service methods and subscription to handle PopUp events
  * Origin: https://github.com/OpenProduct/openmask-extension/blob/main/src/libs/service/backgroundPopUpService.ts
- *
- * @author: KuznetsovNikita
- * @since: 0.1.0
  */
 
 import browser from 'webextension-polyfill';

@@ -1,8 +1,5 @@
 /**
  * Utils methods to support services process dApp requests
- *
- * @author: KuznetsovNikita
- * @since: 0.6.1
  */
 
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';

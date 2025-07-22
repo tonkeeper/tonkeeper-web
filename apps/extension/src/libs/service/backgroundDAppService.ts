@@ -2,8 +2,6 @@
  * Service methods and subscription to handle DApp events
  * Origin: https://github.com/OpenProduct/openmask-extension/blob/main/src/libs/service/backgroundDAppService.ts
  *
- * @author: KuznetsovNikita
- * @since: 0.1.0
  */
 
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';

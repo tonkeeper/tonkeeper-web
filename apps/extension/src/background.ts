@@ -1,9 +1,6 @@
 /**
  * The background service worker - a script with run inside browser
  * The service is responsible to manage input and output events or requests from DApps and PopUp
- *
- * @author: KuznetsovNikita
- * @since: 0.1.0
  */
 
 import browser from 'webextension-polyfill';
@@ -13,6 +10,9 @@ import {
 } from './libs/service/backgroundDAppService';
 import { handlePopUpConnection } from './libs/service/backgroundPopUpService';
 import { subscriptionProxyNotifications } from './libs/service/backgroundProxyService';
+import { openPopUp } from './libs/service/dApp/notificationService';
+
+browser.action.onClicked.addListener(() => openPopUp('/'));
 
 browser.runtime.onConnect.addListener(port => {
     if (port.name === 'TonkeeperUI') {
