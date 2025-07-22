@@ -2,12 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Currencies } from '../models/Currencies';
 import type { DashboardCellAddress } from '../models/DashboardCellAddress';
 import type { DashboardCellNumericCrypto } from '../models/DashboardCellNumericCrypto';
 import type { DashboardCellNumericFiat } from '../models/DashboardCellNumericFiat';
 import type { DashboardCellString } from '../models/DashboardCellString';
 import type { DashboardColumn } from '../models/DashboardColumn';
-import type { FiatCurrencies } from '../models/FiatCurrencies';
 import type { Lang } from '../models/Lang';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -48,7 +48,7 @@ export class DashboardsService {
      */
     public static getDashboardData(
         lang?: Lang,
-        currency?: FiatCurrencies,
+        currency?: Currencies,
         requestBody?: {
             accounts: Array<string>;
             columns: Array<string>;
