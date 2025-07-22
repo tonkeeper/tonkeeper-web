@@ -33,6 +33,7 @@ jobs:
                     echo "tonconsole_env=$ENV_VALUE" >> $GITHUB_OUTPUT
 
     desktop-build:
+        needs: init
         name: desktop-build
         strategy:
             matrix:
@@ -284,6 +285,7 @@ jobs:
                       ${{ github.workspace }}/apps/extension/dist/firefox
 
     ipad-build:
+        needs: init
         uses: ./.github/workflows/ipad-build.yaml
         with:
             tonconsole_env: ${{ needs.init.outputs.tonconsole_env }}
