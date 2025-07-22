@@ -465,6 +465,12 @@ export const ActionFeeDetailsUniversal: FC<{
     );
 };
 
+const SelectDropDownStyled = styled(SelectDropDown)`
+    & .dd-select-container {
+        z-index: 1000;
+    }
+`;
+
 export const SelectSenderDropdown: FC<{
     onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
     selectedSenderType?: SenderTypeUserAvailable;
@@ -477,7 +483,7 @@ export const SelectSenderDropdown: FC<{
     }
 
     return (
-        <SelectDropDown
+        <SelectDropDownStyled
             left="0"
             bottom="0"
             className={className}
@@ -520,7 +526,7 @@ export const SelectSenderDropdown: FC<{
                 {t('send_change_fee_payment_method')}
                 <ChevronRightIcon />
             </TransparentButton>
-        </SelectDropDown>
+        </SelectDropDownStyled>
     );
 };
 

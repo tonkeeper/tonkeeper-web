@@ -57,11 +57,11 @@ export function SourceFromJSONTyped(json: any, ignoreDiscriminator: boolean): So
     };
 }
 
-export function SourceToJSON(json: any): Source {
-    return SourceToJSONTyped(json, false);
-}
+  export function SourceToJSON(json: any): Source {
+      return SourceToJSONTyped(json, false);
+  }
 
-export function SourceToJSONTyped(value?: Source | null, ignoreDiscriminator: boolean = false): any {
+  export function SourceToJSONTyped(value?: Source | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

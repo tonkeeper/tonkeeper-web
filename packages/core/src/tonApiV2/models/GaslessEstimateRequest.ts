@@ -87,11 +87,11 @@ export function GaslessEstimateRequestFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function GaslessEstimateRequestToJSON(json: any): GaslessEstimateRequest {
-    return GaslessEstimateRequestToJSONTyped(json, false);
-}
+  export function GaslessEstimateRequestToJSON(json: any): GaslessEstimateRequest {
+      return GaslessEstimateRequestToJSONTyped(json, false);
+  }
 
-export function GaslessEstimateRequestToJSONTyped(value?: GaslessEstimateRequest | null, ignoreDiscriminator: boolean = false): any {
+  export function GaslessEstimateRequestToJSONTyped(value?: GaslessEstimateRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

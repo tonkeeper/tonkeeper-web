@@ -65,11 +65,11 @@ export function GetRawBlockchainBlock200ResponseFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function GetRawBlockchainBlock200ResponseToJSON(json: any): GetRawBlockchainBlock200Response {
-    return GetRawBlockchainBlock200ResponseToJSONTyped(json, false);
-}
+  export function GetRawBlockchainBlock200ResponseToJSON(json: any): GetRawBlockchainBlock200Response {
+      return GetRawBlockchainBlock200ResponseToJSONTyped(json, false);
+  }
 
-export function GetRawBlockchainBlock200ResponseToJSONTyped(value?: GetRawBlockchainBlock200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawBlockchainBlock200ResponseToJSONTyped(value?: GetRawBlockchainBlock200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -2,8 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FiatCurrencies } from './FiatCurrencies';
+import type { Currencies } from './Currencies';
 /**
  * Currency
  */
-export type queryCurrency = FiatCurrencies;
+export type queryCurrency = Currencies;

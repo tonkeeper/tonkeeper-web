@@ -89,11 +89,11 @@ export function AddressParse200ResponseFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function AddressParse200ResponseToJSON(json: any): AddressParse200Response {
-    return AddressParse200ResponseToJSONTyped(json, false);
-}
+  export function AddressParse200ResponseToJSON(json: any): AddressParse200Response {
+      return AddressParse200ResponseToJSONTyped(json, false);
+  }
 
-export function AddressParse200ResponseToJSONTyped(value?: AddressParse200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function AddressParse200ResponseToJSONTyped(value?: AddressParse200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

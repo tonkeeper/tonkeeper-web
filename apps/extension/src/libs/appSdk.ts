@@ -50,11 +50,15 @@ export class ExtensionAppSdk extends BaseApp {
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     disableScroll = () => null;
+
     enableScroll = () => null;
+
     getScrollbarWidth = () => 0;
+
     getKeyboardHeight = () => 0;
 
     isIOs = () => false;
+
     isStandalone = () => false;
 
     requestExtensionPermission = async () => {
@@ -103,4 +107,6 @@ export class ExtensionAppSdk extends BaseApp {
     targetEnv = 'extension' as const;
 
     storeUrl = process.env.REACT_APP_STORE_URL;
+
+    linksInterceptorAvailable = true;
 }

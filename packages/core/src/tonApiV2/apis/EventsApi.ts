@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   Event,
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
 } from '../models/index';
 import {
     EventFromJSON,
     EventToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetEventRequest {

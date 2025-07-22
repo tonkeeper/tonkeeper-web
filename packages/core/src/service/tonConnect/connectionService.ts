@@ -4,9 +4,10 @@ import { AppKey } from '../../Keys';
 import { IStorage } from '../../Storage';
 import { getDevSettings } from '../devStorage';
 import { assertUnreachable } from '../../utils/types';
-import { eqOrigins, originFromUrl } from './connectService';
+import { eqOrigins } from '../../utils/url';
 import { accountsStorage } from '../accountsStorage';
 import { isAccountSupportTonConnect } from '../../entries/account';
+import { checkDappOriginMatchesManifest } from './connectService';
 
 export interface TonConnectHttpConnectionParams {
     type: 'http';
@@ -148,7 +149,12 @@ export const saveAccountConnection = async (options: {
     }
 
     if (options.params.type === 'injected') {
-        if (!eqOrigins(options.params.webViewOrigin, originFromUrl(options.manifest.url))) {
+        if (
+            !checkDappOriginMatchesManifest({
+                origin: options.params.webViewOrigin,
+                manifestUrl: options.manifest.url
+            })
+        ) {
             throw new Error('WebView origin mismatch');
         }
 

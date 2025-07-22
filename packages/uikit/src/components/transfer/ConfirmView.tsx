@@ -270,10 +270,14 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
         [TRON_USDT_ASSET.id]: t('txActions_USDT_transfer')
     };
 
-    title ||=
-        recipient && isTonRecipientData(recipient)
-            ? recipient.toAccount.name
-            : fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+    if (!title) {
+        if (recipient && isTonRecipientData(recipient) && recipient.toAccount.name) {
+            title = recipient.toAccount.name;
+        } else {
+            title =
+                fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+        }
+    }
 
     const icon =
         recipient && isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;

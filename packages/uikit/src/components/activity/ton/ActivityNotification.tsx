@@ -1,7 +1,7 @@
 import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { Notification } from '../../Notification';
-import { ErrorActivityNotification } from '../NotificationCommon';
+import { ActionDetailsBlock, ErrorActivityNotification, Title } from '../NotificationCommon';
 import {
     AuctionBidActionDetails,
     DomainRenewActionDetails,
@@ -27,6 +27,7 @@ import { TronHistoryItem } from '@tonkeeper/core/dist/tronApi';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { useTranslation } from '../../../hooks/translation';
 import { TronTransferActionNotification } from '../tron/TronActivityActionDetails';
+import { Label2 } from '../../Text';
 
 export interface ActionData {
     isScam: boolean;
@@ -52,6 +53,8 @@ export interface ActivityNotificationDataTron {
 export type ActivityNotificationData = ActivityNotificationDataTon | ActivityNotificationDataTron;
 
 const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
+    const { t } = useTranslation();
+
     switch (props.action.type) {
         case 'TonTransfer':
             return <TonTransferActionNotification {...props} />;
@@ -92,9 +95,15 @@ const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
         default: {
             console.log(props);
             return (
-                <ErrorActivityNotification event={props.event}>
-                    {props.action.type}
-                </ErrorActivityNotification>
+                <ActionDetailsBlock event={props.event}>
+                    <Title>
+                        {props.action.simplePreview.name ??
+                            t('txActions_signRaw_types_unknownTransaction')}
+                    </Title>
+                    {!!props.action.simplePreview.description && (
+                        <Label2>{props.action.simplePreview.description}</Label2>
+                    )}
+                </ActionDetailsBlock>
             );
         }
     }

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { CoinsIcon, ExitIcon, KeyIcon, SwitchIcon } from '../../components/Icon';
-import { Body3, Label2 } from '../../components/Text';
+import { Body3, Label2, Label2Class } from '../../components/Text';
 import {
     DesktopViewDivider,
     DesktopViewHeader,
@@ -76,6 +76,17 @@ const DesktopAccountSettingsPage: FC = () => {
 
     return <DesktopAccountSettingsPageContent account={account} />;
 };
+
+const SignOutTextContainer = styled.div`
+    display: flex;
+    align-items: center;
+
+    ${Label2Class};
+
+    &:nth-child(2) {
+        margin-left: 8px;
+    }
+`;
 
 export default DesktopAccountSettingsPage;
 
@@ -155,7 +166,11 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
                 <SettingsListBlock>
                     <SettingsListItem onClick={() => onDelete({ accountId: account.id })}>
                         <ExitIcon />
-                        <Label2>{t('settings_delete_account')}</Label2>
+                        <SignOutTextContainer>
+                            {t('settings_reset')}
+                            <WalletEmoji emojiSize="16px" emoji={account.emoji} />
+                            {account.name}
+                        </SignOutTextContainer>
                     </SettingsListItem>
                 </SettingsListBlock>
                 <DesktopViewDivider />

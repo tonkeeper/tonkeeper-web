@@ -1,4 +1,8 @@
-import { ConnectEvent, ConnectRequest, SignDataResponse } from "@tonkeeper/core/dist/entries/tonConnect";
+import {
+    ConnectEvent,
+    ConnectRequest,
+    SignDataResponse
+} from '@tonkeeper/core/dist/entries/tonConnect';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect/TonConnectNotification';
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
@@ -6,25 +10,26 @@ import { SignDataNotification } from '@tonkeeper/uikit/dist/components/connect/S
 import { useCallback, useEffect, useState } from 'react';
 import { askBackground, sendBackground } from '../event';
 import { NotificationData } from '../libs/event';
-import { tonConnectTonkeeperAppName } from "@tonkeeper/core/dist/service/tonConnect/connectService";
-import { useCompleteInjectedConnection } from "@tonkeeper/uikit/dist/components/connect/connectHook";
-import { tonConnectProtocolVersion } from "../constants";
+import { tonConnectTonkeeperAppName } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { useCompleteInjectedConnection } from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import { tonConnectProtocolVersion } from '../constants';
 import {
-  useTrackerTonConnectSendSuccess,
-  useTrackTonConnectActionRequest
-} from "@tonkeeper/uikit/dist/hooks/analytics/events-hooks";
-import { SenderChoice } from "@tonkeeper/uikit/dist/hooks/blockchain/useSender";
+    useTrackerTonConnectSendSuccess,
+    useTrackTonConnectActionRequest
+} from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
+import { SenderChoice } from '@tonkeeper/uikit/dist/hooks/blockchain/useSender';
+import { InterceptTonLinkNotification } from './InterceptTonLinkNotification';
 
 const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
-  if (e.event === 'connect') {
-      sendBackground.message('approveRequest', {
-        id,
-        payload: e.payload
-      });
-  } else {
-      sendBackground.message('rejectRequest', id);
-  }
-}
+    if (e.event === 'connect') {
+        sendBackground.message('approveRequest', {
+            id,
+            payload: e.payload
+        });
+    } else {
+        sendBackground.message('rejectRequest', id);
+    }
+};
 
 export const Notifications = () => {
     const [data, setData] = useState<NotificationData | undefined>(undefined);
@@ -62,19 +67,23 @@ export const Notifications = () => {
         <>
             <TonConnectNotification
                 origin={data?.origin}
-                params={data?.kind === 'tonConnectRequest' ? { request: data.data, appName: tonConnectTonkeeperAppName } : null}
+                params={
+                    data?.kind === 'tonConnectRequest'
+                        ? { request: data.data, appName: tonConnectTonkeeperAppName }
+                        : null
+                }
                 handleClose={async result => {
                     await completeInjectedConnection({
-                      params: {
-                        type: 'injected',
-                        protocolVersion: tonConnectProtocolVersion,
-                        request: data!.data as ConnectRequest,
-                        appName: tonConnectTonkeeperAppName,
-                        webViewOrigin: data!.origin
-                      },
-                      result,
-                      sendBridgeResponse: bridgeConnectTransport(data!.id)
-                    })
+                        params: {
+                            type: 'injected',
+                            protocolVersion: tonConnectProtocolVersion,
+                            request: data!.data as ConnectRequest,
+                            appName: tonConnectTonkeeperAppName,
+                            webViewOrigin: data!.origin
+                        },
+                        result,
+                        sendBridgeResponse: bridgeConnectTransport(data!.id)
+                    });
                     reloadNotification(true);
                 }}
             />
@@ -83,8 +92,11 @@ export const Notifications = () => {
                 handleClose={(payload?: { boc: string; senderChoice: SenderChoice }) => {
                     if (!data) return;
                     if (payload) {
-                        sendBackground.message('approveRequest', { id: data.id, payload: payload.boc });
-                        trackSendSuccess({dappUrl: data.origin, sender: payload.senderChoice});
+                        sendBackground.message('approveRequest', {
+                            id: data.id,
+                            payload: payload.boc
+                        });
+                        trackSendSuccess({ dappUrl: data.origin, sender: payload.senderChoice });
                     } else {
                         sendBackground.message('rejectRequest', data.id);
                     }
@@ -102,6 +114,21 @@ export const Notifications = () => {
                         sendBackground.message('rejectRequest', data.id);
                     }
                     reloadNotification(true);
+                }}
+            />
+            <InterceptTonLinkNotification
+                url={data?.kind === 'tonLinkIntercept' ? data.data?.url : null}
+                handleClose={(processInExtension?: boolean) => {
+                    if (!data) return;
+                    const id = data.id;
+
+                    if (processInExtension) {
+                        sendBackground.message('approveRequest', { id, payload: void 0 });
+                        setData(undefined);
+                    } else {
+                        sendBackground.message('rejectRequest', id);
+                        reloadNotification(true);
+                    }
                 }}
             />
         </>

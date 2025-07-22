@@ -83,35 +83,37 @@ export const useJettonList = () => {
 
     const sdk = useAppSdk();
 
-    return useQuery<JettonsBalances, Error>(
-        [wallet.id, QueryKey.jettons, fiat, network],
-        async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.rawAddress,
-                currencies: [fiat],
-                supportedExtensions: ['custom_payload']
-            });
+    const key = [wallet.id, QueryKey.jettons, fiat, network];
 
-            const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
+    const query = useQuery<JettonsBalances, Error>(key, async () => {
+        const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+            accountId: wallet.rawAddress,
+            currencies: [fiat],
+            supportedExtensions: ['custom_payload']
+        });
 
-            const balances = filterTokens(result.balances, config.hiddenTokens).sort(
-                compareTokensOver(fiat)
-            );
+        const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
-            const pinned = config.pinnedTokens.reduce((acc, address) => {
-                const item = balances.find(i => i.jetton.address === address);
-                if (item) {
-                    acc.push(item);
-                }
-                return acc;
-            }, [] as JettonBalance[]);
+        const balances = filterTokens(result.balances, config.hiddenTokens).sort(
+            compareTokensOver(fiat)
+        );
 
-            const rest = balances.filter(
-                item => !config.pinnedTokens.includes(item.jetton.address)
-            );
-            return { balances: pinned.concat(rest) };
-        }
-    );
+        const pinned = config.pinnedTokens.reduce((acc, address) => {
+            const item = balances.find(i => i.jetton.address === address);
+            if (item) {
+                acc.push(item);
+            }
+            return acc;
+        }, [] as JettonBalance[]);
+
+        const rest = balances.filter(item => !config.pinnedTokens.includes(item.jetton.address));
+        return { balances: pinned.concat(rest) };
+    });
+
+    return {
+        ...query,
+        key
+    };
 };
 
 export const useJettonBalance = (jettonAddress: string) => {

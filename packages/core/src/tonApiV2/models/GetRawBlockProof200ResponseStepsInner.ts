@@ -72,11 +72,11 @@ export function GetRawBlockProof200ResponseStepsInnerFromJSONTyped(json: any, ig
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerToJSON(json: any): GetRawBlockProof200ResponseStepsInner {
-    return GetRawBlockProof200ResponseStepsInnerToJSONTyped(json, false);
-}
+  export function GetRawBlockProof200ResponseStepsInnerToJSON(json: any): GetRawBlockProof200ResponseStepsInner {
+      return GetRawBlockProof200ResponseStepsInnerToJSONTyped(json, false);
+  }
 
-export function GetRawBlockProof200ResponseStepsInnerToJSONTyped(value?: GetRawBlockProof200ResponseStepsInner | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawBlockProof200ResponseStepsInnerToJSONTyped(value?: GetRawBlockProof200ResponseStepsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

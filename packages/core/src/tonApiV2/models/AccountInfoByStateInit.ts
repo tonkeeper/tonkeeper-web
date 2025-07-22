@@ -57,11 +57,11 @@ export function AccountInfoByStateInitFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function AccountInfoByStateInitToJSON(json: any): AccountInfoByStateInit {
-    return AccountInfoByStateInitToJSONTyped(json, false);
-}
+  export function AccountInfoByStateInitToJSON(json: any): AccountInfoByStateInit {
+      return AccountInfoByStateInitToJSONTyped(json, false);
+  }
 
-export function AccountInfoByStateInitToJSONTyped(value?: AccountInfoByStateInit | null, ignoreDiscriminator: boolean = false): any {
+  export function AccountInfoByStateInitToJSONTyped(value?: AccountInfoByStateInit | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

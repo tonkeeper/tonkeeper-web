@@ -96,11 +96,11 @@ export function GetRawListBlockTransactions200ResponseFromJSONTyped(json: any, i
     };
 }
 
-export function GetRawListBlockTransactions200ResponseToJSON(json: any): GetRawListBlockTransactions200Response {
-    return GetRawListBlockTransactions200ResponseToJSONTyped(json, false);
-}
+  export function GetRawListBlockTransactions200ResponseToJSON(json: any): GetRawListBlockTransactions200Response {
+      return GetRawListBlockTransactions200ResponseToJSONTyped(json, false);
+  }
 
-export function GetRawListBlockTransactions200ResponseToJSONTyped(value?: GetRawListBlockTransactions200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawListBlockTransactions200ResponseToJSONTyped(value?: GetRawListBlockTransactions200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
