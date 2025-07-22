@@ -28,12 +28,7 @@ export const normalizeSubscription = (
     const source = subscriptionDto?.source;
     const toDate = (ts?: number) => (ts ? new Date(ts * 1000) : undefined);
 
-    if (
-        !source ||
-        (source !== SubscriptionSource.IOS &&
-            source !== SubscriptionSource.CRYPTO &&
-            source !== SubscriptionSource.TELEGRAM)
-    ) {
+    if (!source) {
         return null;
     }
 
