@@ -30,6 +30,16 @@ export type SubscriptionVerification = {
         currency: string;
         purchase_date: number;
         expires_date: number;
+        status: SubscriptionVerification.status;
     };
 };
+export namespace SubscriptionVerification {
+    export enum status {
+        ACTIVE = 'active',
+        EXPIRED = 'expired',
+        STATUS_RETRY_PERIOD = 'status_retry_period',
+        GRACE_PERIOD = 'grace_period',
+        REVOKED = 'revoked',
+    }
+}
 
