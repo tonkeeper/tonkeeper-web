@@ -264,15 +264,16 @@ export interface ProStateWallet {
 }
 
 export function isPendingSubscription(
-    subscription: ProSubscription
+    subscription: unknown
 ): subscription is
     | (IosSubscription & { status: IosSubscriptionStatuses.PENDING })
     | (CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING }) {
     return (
-        (subscription?.source === SubscriptionSource.IOS &&
+        isProSubscription(subscription) &&
+        ((subscription?.source === SubscriptionSource.IOS &&
             subscription.status === IosSubscriptionStatuses.PENDING) ||
-        (subscription?.source === SubscriptionSource.CRYPTO &&
-            subscription.status === CryptoSubscriptionStatuses.PENDING)
+            (subscription?.source === SubscriptionSource.CRYPTO &&
+                subscription.status === CryptoSubscriptionStatuses.PENDING))
     );
 }
 
@@ -305,10 +306,12 @@ export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
 }
 
-export function hasTargetAuth(
-    state: ProState | null
-): state is ProState & { target: { auth: WalletAuth | TelegramAuth } } {
-    return !!state?.target?.auth;
+export function hasAuth(
+    subscription: ProSubscription | ConstructedSubscription | null | undefined
+): subscription is Exclude<ProSubscription | ConstructedSubscription, null> & {
+    target: { auth: WalletAuth | TelegramAuth };
+} {
+    return !!subscription?.auth;
 }
 
 export function hasIosPrice(
@@ -337,7 +340,7 @@ export function hasUsedTrial(
 }
 
 export function hasWalletAuth(
-    subscription: ProState['target']
+    subscription: ProState['target'] | null | undefined
 ): subscription is { auth: WalletAuth } {
     return (
         subscription !== null &&

@@ -10,11 +10,7 @@ import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboa
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
-    AuthTypes,
-    hasTargetAuth,
-    IosPendingSubscription,
-    IosSubscriptionStatuses,
-    isIosStrategy,
+    hasAuth,
     isPendingSubscription,
     isProSubscription,
     isValidSubscription,
@@ -46,8 +42,7 @@ import {
     DashboardCellNumericFiat,
     Invoice,
     Currencies as CurrenciesGenerated,
-    InvoiceStatus,
-    SubscriptionSource
+    InvoiceStatus
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
@@ -144,9 +139,10 @@ export const withTargetAuthToken = async <T>(
 const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Promise<ProState> => {
     const storage = sdk.storage;
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
+    const processingTargetSub = processingState?.target;
 
     await authService.attachToken(
-        hasTargetAuth(processingState) ? ProAuthTokenType.TEMP : ProAuthTokenType.MAIN
+        hasAuth(processingTargetSub) ? ProAuthTokenType.TEMP : ProAuthTokenType.MAIN
     );
 
     const user = await UsersService.getUserInfo();
@@ -156,7 +152,7 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
     const subscription = normalizeSubscription(subscriptionDTO, { user, authorizedWallet });
 
     if (isValidSubscription(subscription)) {
-        if (hasTargetAuth(processingState)) {
+        if (hasAuth(processingTargetSub)) {
             await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
         }
 
@@ -168,51 +164,28 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
         };
     }
 
-    if (
-        hasTargetAuth(processingState) &&
-        isProSubscription(processingState.target) &&
-        isPendingSubscription(processingState.target)
-    ) {
+    if (isPendingSubscription(processingTargetSub)) {
         return {
-            current: processingState.target,
-            target: processingState.target
+            current: processingTargetSub,
+            target: processingTargetSub
         };
     }
 
     if (
-        hasTargetAuth(processingState) &&
-        isIosStrategy(sdk.subscriptionStrategy) &&
-        isProSubscription(processingState?.target) &&
-        processingState.target.auth.type === AuthTypes.WALLET
+        isProSubscription(subscription) &&
+        !isPendingSubscription(subscription) &&
+        !isPendingSubscription(processingTargetSub)
     ) {
-        const originalTx = await sdk.subscriptionStrategy.getOriginalTransactionId();
-
-        if (originalTx?.originalTransactionId) {
-            const pending: IosPendingSubscription = {
-                source: SubscriptionSource.IOS,
-                status: IosSubscriptionStatuses.PENDING,
-                originalTransactionId: Number(originalTx.originalTransactionId),
-                valid: false,
-                usedTrial: false,
-                auth: processingState!.target.auth
-            };
-
-            await storage.set(AppKey.PRO_PENDING_STATE, {
-                current: pending,
-                target: pending
-            });
-
-            return {
-                current: pending,
-                target: pending
-            };
-        }
+        return {
+            current: subscription,
+            target: null
+        };
     }
 
-    if (hasTargetAuth(processingState)) {
+    if (hasAuth(processingTargetSub)) {
         return {
             current: null,
-            target: processingState!.target
+            target: processingTargetSub
         };
     }
 

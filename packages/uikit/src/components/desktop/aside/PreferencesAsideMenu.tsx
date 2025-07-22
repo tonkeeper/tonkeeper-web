@@ -33,7 +33,7 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useNavigate } from '../../../hooks/router/useNavigate';
-import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isProSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 
 const PreferencesAsideContainer = styled.div`
@@ -107,7 +107,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const isTonkeeperProActive = location.pathname === AppRoute.settings + SettingsRoute.pro;
 
     const handleTonkeeperProClick = async () => {
-        if (isValidSubscription(proState?.current)) {
+        if (isProSubscription(proState?.current)) {
             navigate(AppRoute.settings + SettingsRoute.pro);
 
             return;
