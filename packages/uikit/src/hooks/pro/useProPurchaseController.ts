@@ -35,11 +35,20 @@ export const useProPurchaseController = () => {
         isLoading: isCryptoLoading
     } = useCryptoPurchaseFlow();
 
-    const { mutateAsync: handleLogOut, isLoading: isLoggingOut, isError } = useProLogout();
-    useNotifyError(isError && new Error(t('logout_failed')));
+    const {
+        mutateAsync: handleLogOut,
+        isLoading: isLoggingOut,
+        isError: isLogoutError
+    } = useProLogout();
+    useNotifyError(isLogoutError && new Error(t('logout_failed')));
 
-    const { mutateAsync: handleManageSubscription, isLoading: isManageLoading } =
-        useManageSubscription();
+    const {
+        mutateAsync: handleManageSubscription,
+        isLoading: isManageLoading,
+        isError: isManageError
+    } = useManageSubscription();
+    useManageSubscription();
+    useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
     const isLoading =
         isPlansLoading || isIosLoading || isCryptoLoading || isLoggingOut || isManageLoading;

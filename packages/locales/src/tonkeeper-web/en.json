@@ -240,6 +240,7 @@
   "logout_on_unlock_one": "This will erase keys to the wallet. Make sure you have backed up your secret recovery phrase.",
   "mam_account_explanation": "The account recovery phrase provides access to all wallets created with it and is only supported in Tonkeeper Pro. If you want to export a specific wallet, use wallet recovery phrase backup instead.",
   "Manage": "Manage",
+  "manage_unavailable": "Subscription management is temporarily unavailable",
   "Manage_wallets": "Manage Wallets",
   "manifest_mismatch_error": "The connection is blocked to protect you from phishing. The dApp with actual domain {actual} is trying to authorise as  {declared}. Recheck the dApp URL.",
   "Minimize": "Minimize",

@@ -34,17 +34,17 @@ export const ProStatusScreen = () => {
 
     const {
         mutateAsync: mutateProLogout,
-        error: logoutError,
-        isLoading: isLoggingOut
+        isLoading: isLoggingOut,
+        isError: isLogoutError
     } = useProLogout();
-    useNotifyError(logoutError);
+    useNotifyError(isLogoutError && new Error(t('logout_failed')));
 
     const {
-        mutate: handleManageSubscription,
+        mutateAsync: handleManageSubscription,
         isLoading: isManagingLoading,
-        isError: isManagingError
+        isError: isManageError
     } = useManageSubscription();
-    useNotifyError(isManagingError && new Error('failed_to_manage'));
+    useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
     const subscription = proState?.current;
 
