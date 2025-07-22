@@ -520,6 +520,7 @@ export const Notification: FC<{
     mobileFullScreen?: boolean;
     afterClose?: () => void;
     tag?: string;
+    onTopOfBrowser?: boolean;
 }> = props => {
     const targetEnv = useAppTargetEnv();
 
@@ -542,6 +543,7 @@ export const NotificationIonic: FC<{
     mobileFullScreen?: boolean;
     afterClose?: () => void;
     tag?: string;
+    onTopOfBrowser?: boolean;
 }> = ({
     children,
     isOpen,
@@ -553,7 +555,8 @@ export const NotificationIonic: FC<{
     disableHeightAnimation,
     mobileFullScreen,
     afterClose,
-    tag
+    tag,
+    onTopOfBrowser
 }) => {
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -651,7 +654,11 @@ export const NotificationIonic: FC<{
                 initialBreakpoint={1}
                 breakpoints={[0, 1]}
                 handle={false}
-                className={cn(className, mobileFullScreen && 'modal-mobile-fullscreen')}
+                className={cn(
+                    className,
+                    mobileFullScreen && 'modal-mobile-fullscreen',
+                    onTopOfBrowser && 'on-top-of-browser'
+                )}
             >
                 <IonicModalContentStyled>
                     <HeightAnimation>

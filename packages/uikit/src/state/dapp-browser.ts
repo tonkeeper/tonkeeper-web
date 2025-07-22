@@ -15,6 +15,7 @@ import {
 import { useCallback, useMemo } from 'react';
 import { notNullish } from '@tonkeeper/core/dist/utils/types';
 import { delay } from '@tonkeeper/core/dist/utils/common';
+import { useMenuController } from '../hooks/ionic';
 
 export type BrowserTab =
     | (BrowserTabStored & { isLive: false })
@@ -62,12 +63,16 @@ export const useOpenBrowserTab = () => {
     const sdk = useAppSdk();
     const { mutate: addToState } = useAddBrowserTabToState();
     const client = useQueryClient();
+    const { close: closeAsideMenu } = useMenuController('aside-nav');
+    const { close: closeWalletMenu } = useMenuController('wallet-nav');
 
     return useMutation<
         void,
         Error,
         { id: string } | { url: string; title?: string; iconUrl?: string } | 'blanc'
     >(async tab => {
+        closeAsideMenu();
+        closeWalletMenu();
         const callId = Date.now();
         openBrowserTabCallId = callId;
         const mutationHasBeenReset = () => callId !== openBrowserTabCallId;

@@ -439,6 +439,7 @@ export const TonTransactionNotification: FC<{
                 handleClose={() => onClose()}
                 title={wallets.length > 1 ? undefined : t('txActions_signRaw_title')}
                 hideButton
+                onTopOfBrowser
             >
                 {Content}
             </Notification>
