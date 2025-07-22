@@ -58,6 +58,7 @@ export const ProStatusScreen = () => {
 
     const isIos = isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
     const isTelegram = subscription && isTelegramSubscription(subscription);
+    const isActiveIos = isIos && isProActive;
 
     const handleGetPro = () => {
         onProAuthOpen();
@@ -81,7 +82,7 @@ export const ProStatusScreen = () => {
 
             <ProStatusDetailsList />
 
-            {isIos && (
+            {isActiveIos && (
                 <>
                     <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
                     <Button
@@ -101,7 +102,7 @@ export const ProStatusScreen = () => {
                 <Label2>{t('tonkeeper_pro_features')}</Label2>
             </Button>
 
-            {!isIos && (
+            {!isActiveIos && (
                 <Button primary fullWidth size="large" type="submit">
                     <Label2>{t('get_tonkeeper_pro')}</Label2>
                 </Button>

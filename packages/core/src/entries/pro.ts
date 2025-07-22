@@ -283,6 +283,23 @@ export function isValidSubscription(
     return !!subscription && hasSubscriptionSource(subscription) && subscription.valid;
 }
 
+export function isExpiredSubscription(
+    subscription: unknown
+): subscription is
+    | IosExpiredSubscription
+    | CryptoExpiredSubscription
+    | TelegramExpiredSubscription {
+    return (
+        isProSubscription(subscription) &&
+        ((subscription?.source === SubscriptionSource.IOS &&
+            subscription.status === IosSubscriptionStatuses.EXPIRED) ||
+            (subscription?.source === SubscriptionSource.CRYPTO &&
+                subscription.status === CryptoSubscriptionStatuses.EXPIRED) ||
+            (subscription?.source === SubscriptionSource.TELEGRAM &&
+                subscription.status === TelegramSubscriptionStatuses.EXPIRED))
+    );
+}
+
 export function isPaidSubscription(
     subscription: ProSubscription
 ): subscription is IosActiveSubscription | CryptoActiveSubscription {
