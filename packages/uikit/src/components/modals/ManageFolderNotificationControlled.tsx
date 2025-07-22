@@ -185,6 +185,7 @@ const ModalContent: FC<{ folder?: AccountsFolder; onClose: () => void }> = ({
                 clearButton
                 size="small"
                 autoFocus="notification"
+                autoSelect={!folder}
             />
             <ListBlockDesktopAdaptiveStyled>
                 {availableAccounts.map(acc => (
