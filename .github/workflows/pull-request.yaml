@@ -150,6 +150,7 @@ jobs:
                   rm ${{ github.workspace }}/AuthKey.p8
 
     web-build:
+        needs: init
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ github.head_ref }}
