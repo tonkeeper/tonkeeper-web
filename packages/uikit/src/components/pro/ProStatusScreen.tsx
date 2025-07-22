@@ -1,35 +1,39 @@
 import { useEffect } from 'react';
+import styled from 'styled-components';
 import {
     isIosStrategy,
     isIosSubscription,
     isProSubscription,
+    isTelegramSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 
-import { Label2 } from '../Text';
+import { Body3, Label2 } from '../Text';
 import { SlidersIcon } from '../Icon';
 import { Button } from '../fields/Button';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ProActiveWallet } from './ProActiveWallet';
-import { ProFeaturesList } from './ProFeaturesList';
 import { useTranslation } from '../../hooks/translation';
 import { ProStatusDetailsList } from './ProStatusDetailsList';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
-import { ProScreenContentWrapper } from './ProScreenContentWrapper';
-import { useNotifyError, useToast } from '../../hooks/useNotification';
+import { useNotifyError } from '../../hooks/useNotification';
 import { useManageSubscription, useProLogout, useProState } from '../../state/pro';
+import { handleSubmit } from '../../libs/form';
+import { AppRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 
-// TODO Implement different strategies rendering
 export const ProStatusScreen = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const { data: proState } = useProState();
-    const toast = useToast();
-
-    const subscription = proState?.current;
+    const navigate = useNavigate();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+    const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
 
     const {
-        mutateAsync: handleLogOut,
+        mutateAsync: mutateProLogout,
         error: logoutError,
         isLoading: isLoggingOut
     } = useProLogout();
@@ -40,43 +44,84 @@ export const ProStatusScreen = () => {
         isLoading: isManagingLoading,
         isError: isManagingError
     } = useManageSubscription();
+    useNotifyError(isManagingError && new Error('failed_to_manage'));
+
+    const subscription = proState?.current;
 
     useEffect(() => {
-        if (isManagingError) {
-            toast(t('failed_to_manage'));
+        if (!isProSubscription(subscription)) {
+            navigate(AppRoute.home);
         }
-    }, []);
+    }, [subscription]);
 
-    if (!isProSubscription(subscription)) return null;
     const isProActive = isValidSubscription(subscription);
 
-    const isManageAvailable =
-        isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
+    const isIos = isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
+    const isTelegram = subscription && isTelegramSubscription(subscription);
+
+    const handleGetPro = () => {
+        onProAuthOpen();
+    };
+
+    const handleDisconnect = async () => {
+        await mutateProLogout();
+        onProAuthOpen();
+    };
 
     return (
-        <ProScreenContentWrapper>
+        <ProScreenContentWrapper onSubmit={handleSubmit(handleGetPro)}>
             <ProSubscriptionHeader
                 titleKey={isProActive ? 'tonkeeper_pro_is_active' : 'tonkeeper_pro_subscription'}
                 subtitleKey={isProActive ? 'subscription_is_linked' : 'pro_unlocks_premium_tools'}
             />
 
-            <ProActiveWallet isLoading={isLoggingOut} onLogout={handleLogOut} />
+            {!isTelegram && (
+                <ProActiveWallet isLoading={isLoggingOut} onDisconnect={handleDisconnect} />
+            )}
 
             <ProStatusDetailsList />
 
-            {isManageAvailable && (
-                <Button
-                    secondary
-                    fullWidth
-                    onClick={() => handleManageSubscription()}
-                    loading={isManagingLoading || isLoggingOut}
-                >
-                    <SlidersIcon />
-                    <Label2>{t('Manage')}</Label2>
-                </Button>
+            {isIos && (
+                <>
+                    <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
+                    <Button
+                        secondary
+                        fullWidth
+                        type="button"
+                        onClick={() => handleManageSubscription()}
+                        loading={isManagingLoading || isLoggingOut}
+                    >
+                        <SlidersIcon />
+                        <Label2>{t('Manage')}</Label2>
+                    </Button>
+                </>
             )}
 
-            <ProFeaturesList />
+            <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>
+                <Label2>{t('tonkeeper_pro_features')}</Label2>
+            </Button>
+
+            {!isIos && (
+                <Button primary fullWidth size="large" type="submit">
+                    <Label2>{t('get_tonkeeper_pro')}</Label2>
+                </Button>
+            )}
         </ProScreenContentWrapper>
     );
 };
+
+const ProScreenContentWrapper = styled.form`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+`;
+
+const Body3Styled = styled(Body3)`
+    margin-bottom: 16px;
+    color: ${p => p.theme.textSecondary};
+`;

@@ -76,8 +76,10 @@ const ButtonStyled = styled(Body3)`
     opacity: 1;
     transition: opacity 0.3s;
 
-    &:hover {
-        opacity: 0.7;
+    @media (pointer: fine) {
+        &:hover {
+            opacity: 0.7;
+        }
     }
 `;
 
@@ -88,7 +90,9 @@ const ExternalLinkStyled = styled(ExternalLink)`
     opacity: 1;
     transition: opacity 0.3s;
 
-    &:hover {
-        opacity: 0.7;
+    @media (pointer: fine) {
+        &:hover {
+            opacity: 0.7;
+        }
     }
 `;

@@ -6,10 +6,10 @@ import { useProState } from '../../state/pro';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useTranslation } from '../../hooks/translation';
 import { isPaidSubscription, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { ChevronRightIcon } from '../Icon';
 import { useAppTargetEnv } from '../../hooks/appSdk';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const ProBannerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -100,7 +100,7 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
                         </Label2Styled>
                     )}
 
-                    <Button size="small" corner="2xSmall" primary onClick={onOpen}>
+                    <Button size="small" corner="2xSmall" primary onClick={() => onOpen()}>
                         {t('about_tonkeeper_pro')}
                     </Button>
                 </ButtonsContainerStyled>

@@ -33,7 +33,7 @@ import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useNavigate } from '../../../hooks/router/useNavigate';
-import { isPendingSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 
 const PreferencesAsideContainer = styled.div`
@@ -100,7 +100,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
-    const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
+    const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
 
     const availableThemes = useAvailableThemes();
 
@@ -113,14 +113,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
             return;
         }
 
-        const isPromo = !proState?.current || !isPendingSubscription(proState?.current);
-        if (isPromo) {
-            onProFeaturesOpen();
-
-            return;
-        }
-
-        navigate(AppRoute.settings + SettingsRoute.pro);
+        onProPurchaseOpen();
     };
 
     return (

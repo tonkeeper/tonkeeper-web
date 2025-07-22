@@ -1,70 +1,72 @@
-import { type FC } from 'react';
+import { type FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
 import { useProState } from '../../state/pro';
-import { Skeleton } from '../shared/Skeleton';
-import { SubscriptionScreens } from '../../enums/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
-import { ListBlock, ListItem, ListItemPayload } from '../List';
+import { ListBlock } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
-import { useGoToSubscriptionScreen } from '../../hooks/pro/useGoToSubscriptionScreen';
-import { isTelegramSubscription, WalletAuth } from '@tonkeeper/core/dist/entries/pro';
+import { AuthTypes, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 interface IProps {
-    onLogout: () => Promise<void>;
+    title?: ReactNode;
+    onDisconnect: () => Promise<void>;
     isLoading: boolean;
 }
 
-export const ProActiveWallet: FC<IProps> = ({ onLogout, isLoading }) => {
+export const ProActiveWallet: FC<IProps> = props => {
+    const { onDisconnect, isLoading, title } = props;
     const { t } = useTranslation();
     const { data } = useProState();
-    const goTo = useGoToSubscriptionScreen();
-    // TODO Fix TS casting
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
-        (data?.current?.auth as WalletAuth)?.wallet?.rawAddress || undefined
+        (() => {
+            const targetAuth = data?.target?.auth;
+            const currentAuth = data?.current?.auth;
+
+            if (targetAuth?.type === AuthTypes.WALLET) {
+                return targetAuth.wallet.rawAddress;
+            }
+
+            if (!data?.current) return undefined;
+
+            if (currentAuth?.type === AuthTypes.WALLET && !isTelegramSubscription(data?.current)) {
+                return currentAuth.wallet.rawAddress;
+            }
+
+            return undefined;
+        })()
     );
 
     if (data?.current && isTelegramSubscription(data.current)) {
         return null;
     }
 
-    const handleDisconnectClick = async () => {
-        await onLogout();
-        goTo(SubscriptionScreens.ACCOUNTS);
-    };
-
     return (
-        <ListBlock margin={false} fullWidth>
-            {!isLoading && account && wallet ? (
+        <Block>
+            {title}
+            <ListBlock margin={false} fullWidth>
                 <ProWalletListItem
                     disableHover
                     wallet={wallet}
                     account={account}
+                    isLoading={isLoading}
                     rightElement={
-                        <ButtonStyled
-                            type="button"
-                            disabled={isLoading}
-                            onClick={handleDisconnectClick}
-                        >
+                        <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
                             <Label2>{t('disconnect')}</Label2>
                         </ButtonStyled>
                     }
                 />
-            ) : (
-                <ListItem>
-                    <ListItemPayloadStyled>
-                        <Skeleton width="100%" height="20px" />
-                    </ListItemPayloadStyled>
-                </ListItem>
-            )}
-        </ListBlock>
+            </ListBlock>
+        </Block>
     );
 };
 
-const ListItemPayloadStyled = styled(ListItemPayload)`
-    padding: 10px 10px 10px 0;
+const Block = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 `;
 
 const ButtonStyled = styled.button`

@@ -1,7 +1,6 @@
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
 
-import { PurchaseSubscriptionScreens, SubscriptionScreens } from '../enums/pro';
 import { formatter } from '../hooks/balance';
 
 export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
@@ -11,15 +10,6 @@ export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
         displayPrice: '',
         formattedDisplayPrice: ''
     }));
-
-export const isDirectionForward = (
-    current: SubscriptionScreens | PurchaseSubscriptionScreens,
-    prev: SubscriptionScreens | PurchaseSubscriptionScreens | null
-): boolean => {
-    if (prev === null) return true;
-
-    return current > prev;
-};
 
 export function parsePrice(priceStr: string): number {
     const numeric = priceStr.replace(/[^0-9.,]/g, '').replace(',', '.');
@@ -35,14 +25,13 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
     try {
         if (!displayPrice) return '-';
 
-        let formattedProPrice = displayPrice;
         if (isCrypto) {
-            formattedProPrice = isValidNanoString(displayPrice)
+            return isValidNanoString(displayPrice)
                 ? `${formatter.fromNano(displayPrice)} TON`
                 : '-';
         }
 
-        return formattedProPrice;
+        return displayPrice;
     } catch (e) {
         console.error('getFormattedDisplayPrice error: ', e);
         return '-';
@@ -60,6 +49,7 @@ export function adaptPlansToViewModel(
                 id: plan.id,
                 displayName: plan.displayName,
                 displayPrice: plan.displayPrice,
+                subscriptionPeriod: plan?.subscriptionPeriod || 'month',
                 formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
             }));
 
@@ -68,6 +58,7 @@ export function adaptPlansToViewModel(
                 id: String(plan.id),
                 displayName: plan.name,
                 displayPrice: plan.amount,
+                subscriptionPeriod: 'year',
                 formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
             }));
     }

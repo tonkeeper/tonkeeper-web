@@ -49,7 +49,8 @@ export const ProStatusDetailsList = () => {
                 return '-';
             }
 
-            const formattedPrice = (price / 100).toFixed(2);
+            // TODO WHY 1000? No idea, needs to be figured out
+            const formattedPrice = (price / 1000).toFixed(2);
 
             return `${currency} ${formattedPrice}`;
         }

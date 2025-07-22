@@ -1,6 +1,5 @@
 import { WalletVersionSettingsNotification } from './modals/WalletVersionSettingsNotification';
 import { LedgerIndexesSettingsNotification } from './modals/LedgerIndexesSettingsNotification';
-import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
 import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotification';
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
@@ -17,15 +16,14 @@ import { TonTransactionNotificationControlled } from './modals/TonTransactionNot
 import { MAMTronMigrationNotification } from './modals/MAMTronMigrationNotificationControlled';
 import { ProEndingNotificationControlled } from './modals/ProEndingNotificationControlled';
 import { ProPurchaseNotificationControlled } from './modals/ProPurchaseNotificationControlled';
+import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
+import { ProAuthNotificationControlled } from './modals/ProAuthNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
         <>
             <WalletVersionSettingsNotification />
             <LedgerIndexesSettingsNotification />
-            <ProFeaturesNotificationControlled />
-            <ProPurchaseNotificationControlled />
-            <ProEndingNotificationControlled />
             <MAMIndexesSettingsNotification />
             <RenameNotificationControlled />
             <RecoveryNotificationControlled />
@@ -40,6 +38,10 @@ export const ModalsRoot = () => {
             <CheckDesktopPasswordControlled />
             <TonTransactionNotificationControlled />
             <MAMTronMigrationNotification />
+            <ProPurchaseNotificationControlled />
+            <ProAuthNotificationControlled />
+            <ProFeaturesNotificationControlled />
+            <ProEndingNotificationControlled />
         </>
     );
 };

@@ -24,7 +24,12 @@ import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
-import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
+import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
+import { useCryptoSubscriptionPolling } from '../../../hooks/pro/useCryptoSubscriptionPolling';
+import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -139,13 +144,14 @@ const ProButtonPanel = styled(Button)`
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
     const { data } = useProState();
-    const { onOpen } = useProPurchaseNotification();
+    const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
     const { mutate: invalidateGlobalQueries, isLoading: isInvalidatingGlobalQueries } =
         useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
+    const navigate = useNavigate();
 
     const onRefresh = () => {
         if (rotate) {
@@ -160,13 +166,21 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
+    useIosSubscriptionPolling();
+    useCryptoSubscriptionPolling();
+    useSubscriptionEndingVerification();
+
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
     const onGetPro = async () => {
         hideBrowser();
         onOpen();
     };
 
-    let button = <Button loading>Tonkeeper Pro</Button>;
+    const handleNavigateToSettingsPro = () => {
+        navigate(AppRoute.settings + SettingsRoute.pro);
+    };
+
+    let button = <Button loading>{'Tonkeeper Pro'}</Button>;
 
     if (data && isValidSubscription(data.current)) {
         button = (
@@ -179,8 +193,8 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 )}
                 trigger="hover"
             >
-                <ProButtonPanel type="button" onClick={onGetPro}>
-                    Tonkeeper Pro
+                <ProButtonPanel type="button" onClick={handleNavigateToSettingsPro}>
+                    {'Tonkeeper Pro'}
                 </ProButtonPanel>
             </DropDown>
         );
@@ -198,7 +212,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 )}
                 trigger="hover"
             >
-                <ProButtonPanel>
+                <ProButtonPanel onClick={handleNavigateToSettingsPro}>
                     <SpinnerIcon />
                     {t('processing')}
                 </ProButtonPanel>

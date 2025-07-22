@@ -21,6 +21,9 @@ interface ISubscriptionPlugin {
     }): Promise<{ products: IProductInfo[] }>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
     manageSubscriptions(): Promise<void>;
+    getCurrentSubscriptionInfo(): Promise<{
+        subscriptions: Array<IIosPurchaseResult>;
+    }>;
 }
 
 const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
@@ -51,7 +54,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                         revocationDate: null,
                         isUpgraded: false
                     });
-                }, 3000);
+                }, 1000);
             });
         },
         async getProductInfo(): Promise<IProductInfo> {
@@ -59,14 +62,37 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                 id: ProductIds.MONTHLY,
                 displayName: 'Tonkeeper Pro Monthly',
                 description: 'Access to premium features for one month',
-                displayPrice: '$3.49',
+                displayPrice: '$1.23',
                 subscriptionGroup: 'emHJGjKGJKGGJim',
                 subscriptionPeriod: 'month',
                 status: IosSubscriptionStatuses.ACTIVE,
                 environment: IosEnvironmentTypes.SANDBOX
             });
         },
+        async getCurrentSubscriptionInfo(): Promise<{ subscriptions: IIosPurchaseResult[] }> {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const now = new Date();
+                    const expiration = new Date(now);
+                    expiration.setMonth(now.getMonth() + 1);
 
+                    resolve({
+                        subscriptions: [
+                            {
+                                status: IosPurchaseStatuses.SUCCESS,
+                                originalTransactionId: 2000000953417084,
+                                environment: IosEnvironmentTypes.SANDBOX,
+                                productId: ProductIds.MONTHLY,
+                                purchaseDate: now.toISOString(),
+                                expirationDate: expiration.toISOString(),
+                                revocationDate: null,
+                                isUpgraded: false
+                            }
+                        ]
+                    });
+                }, 1000);
+            });
+        },
         async getAllProductsInfo(): Promise<{ products: IProductInfo[] }> {
             return new Promise(resolve =>
                 setTimeout(
@@ -77,7 +103,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                                     id: ProductIds.MONTHLY,
                                     displayName: 'Tonkeeper Pro Monthly',
                                     description: 'Access to premium features for one month',
-                                    displayPrice: '$3.49',
+                                    displayPrice: '$1.23',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
                                     subscriptionPeriod: 'month',
                                     environment: IosEnvironmentTypes.SANDBOX
@@ -86,7 +112,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                                     id: ProductIds.YEARLY,
                                     displayName: 'Tonkeeper Pro Yearly',
                                     description: 'Access to premium features for one year',
-                                    displayPrice: '$34.99',
+                                    displayPrice: '$11.45',
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
                                     subscriptionPeriod: 'year',
                                     environment: IosEnvironmentTypes.SANDBOX
@@ -132,6 +158,18 @@ class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
             console.error('Failed to fetch products info:', e);
             return [];
         }
+    }
+
+    async getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]> {
+        const res = await SubscriptionPlugin.getCurrentSubscriptionInfo();
+
+        return res.subscriptions;
+    }
+
+    async hasActiveSubscription(): Promise<boolean> {
+        const subscriptions = await this.getCurrentSubscriptionInfo();
+
+        return subscriptions.length > 0;
     }
 
     async getOriginalTransactionId(): Promise<IOriginalTransactionInfo> {
