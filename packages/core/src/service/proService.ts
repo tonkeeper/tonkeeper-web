@@ -136,31 +136,66 @@ export const withTargetAuthToken = async <T>(
     }
 };
 
+// TODO Define a better data flow here and reuse the logic
 const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Promise<ProState> => {
     const storage = sdk.storage;
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
     const processingTargetSub = processingState?.target;
 
-    await authService.attachToken(
-        hasAuth(processingTargetSub) ? ProAuthTokenType.TEMP : ProAuthTokenType.MAIN
-    );
+    let currentSubscription;
+    try {
+        await authService.attachToken(ProAuthTokenType.MAIN);
 
-    const user = await UsersService.getUserInfo();
-    const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
+        const currentUser = await UsersService.getUserInfo();
+        const currentAuthWallet: ProStateWallet | null = await findAuthorizedWallet(
+            currentUser,
+            storage
+        );
 
-    const subscriptionDTO = await UsersService.verifySubscription();
-    const subscription = normalizeSubscription(subscriptionDTO, { user, authorizedWallet });
+        const currentSubscriptionDTO = await UsersService.verifySubscription();
+        currentSubscription = normalizeSubscription(currentSubscriptionDTO, {
+            user: currentUser,
+            authorizedWallet: currentAuthWallet
+        });
+    } catch {
+        currentSubscription = null;
+    }
 
-    if (isValidSubscription(subscription)) {
-        if (hasAuth(processingTargetSub)) {
-            await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
-        }
+    let targetUser;
+    let targetAuthWallet: ProStateWallet | null;
+    let targetSubscriptionDTO;
+    let targetSubscription;
 
+    if (hasAuth(processingTargetSub)) {
+        await authService.attachToken(ProAuthTokenType.TEMP);
+
+        targetUser = await UsersService.getUserInfo();
+        targetAuthWallet = await findAuthorizedWallet(targetUser, storage);
+
+        targetSubscriptionDTO = await UsersService.verifySubscription();
+        targetSubscription =
+            normalizeSubscription(targetSubscriptionDTO, {
+                user: targetUser,
+                authorizedWallet: targetAuthWallet
+            }) ?? processingTargetSub;
+    }
+
+    if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
+        await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
         await storage.delete(AppKey.PRO_PENDING_STATE);
 
         return {
-            current: subscription,
+            current: targetSubscription,
             target: null
+        };
+    }
+
+    if (isValidSubscription(currentSubscription)) {
+        await storage.delete(AppKey.PRO_PENDING_STATE);
+
+        return {
+            current: currentSubscription,
+            target: targetSubscription ?? null
         };
     }
 
@@ -172,12 +207,12 @@ const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Pro
     }
 
     if (
-        isProSubscription(subscription) &&
-        !isPendingSubscription(subscription) &&
+        isProSubscription(currentSubscription) &&
+        !isPendingSubscription(currentSubscription) &&
         !isPendingSubscription(processingTargetSub)
     ) {
         return {
-            current: subscription,
+            current: currentSubscription,
             target: null
         };
     }

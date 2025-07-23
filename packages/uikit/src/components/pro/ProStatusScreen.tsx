@@ -77,7 +77,11 @@ export const ProStatusScreen = () => {
             />
 
             {!isTelegram && (
-                <ProActiveWallet isLoading={isLoggingOut} onDisconnect={handleDisconnect} />
+                <ProActiveWallet
+                    isLoading={isLoggingOut}
+                    onDisconnect={handleDisconnect}
+                    isCurrentSubscription
+                />
             )}
 
             <ProStatusDetailsList />

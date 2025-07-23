@@ -1,6 +1,10 @@
 import { FC, useEffect, useId, useState } from 'react';
 import { styled } from 'styled-components';
-import { isTelegramSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    hasWalletAuth,
+    isTelegramSubscription,
+    isValidSubscription
+} from '@tonkeeper/core/dist/entries/pro';
 
 import {
     Notification,
@@ -58,10 +62,15 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
     useEffect(() => {
         if (!isSuccess) return;
 
+        const isSameAuth =
+            hasWalletAuth(proState?.current) &&
+            selectedAccountId === proState?.current?.auth?.wallet?.rawAddress;
+
         onClose();
 
         if (
             proState &&
+            isSameAuth &&
             !isTelegramSubscription(proState.current) &&
             isValidSubscription(proState.current)
         ) {
@@ -69,7 +78,7 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
         } else {
             onPurchaseOpen();
         }
-    }, [isSuccess, proState?.current]);
+    }, [isSuccess, proState?.current, selectedAccountId, activeWallet]);
 
     const handleNextScreen = async () => {
         if (!selectedAccountId) {

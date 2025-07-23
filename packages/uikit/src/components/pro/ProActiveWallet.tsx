@@ -11,20 +11,22 @@ import { AuthTypes, isTelegramSubscription } from '@tonkeeper/core/dist/entries/
 
 interface IProps {
     title?: ReactNode;
+    isCurrentSubscription?: ReactNode;
     onDisconnect: () => Promise<void>;
     isLoading: boolean;
 }
 
 export const ProActiveWallet: FC<IProps> = props => {
-    const { onDisconnect, isLoading, title } = props;
+    const { onDisconnect, isLoading, title, isCurrentSubscription } = props;
     const { t } = useTranslation();
     const { data } = useProState();
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (() => {
+            // TODO Refactor it somehow
             const targetAuth = data?.target?.auth;
             const currentAuth = data?.current?.auth;
 
-            if (targetAuth?.type === AuthTypes.WALLET) {
+            if (targetAuth?.type === AuthTypes.WALLET && !isCurrentSubscription) {
                 return targetAuth.wallet.rawAddress;
             }
 
