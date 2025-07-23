@@ -7,7 +7,7 @@
     window.__parseFunction = function(__func, __attrs) {
       __attrs = __attrs || [];
       __func = '(function(' + __attrs.join(',') + '){' + __func + '})';
-      return window.execScript ? window.execScript(__func) : eval(__func);
+      /*PATCHED block eval*/ throw new Error('[TG]: Unsupported method');
     }
   }(window));
   (function(window){
