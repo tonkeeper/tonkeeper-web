@@ -384,7 +384,11 @@ export const TonConnectNotification: FC<{
     }, [origin, params, manifest, handleClose]);
 
     return (
-        <Notification isOpen={manifest != null} handleClose={modalCloseHandler}>
+        <Notification
+            isOpen={manifest != null}
+            handleClose={modalCloseHandler}
+            onTopOfBrowser
+        >
             {Content}
         </Notification>
     );

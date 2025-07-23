@@ -523,7 +523,8 @@ export const NarrowEnvGlobalStyles = createGlobalStyle`
         &.dapp-browser-open {
             background: transparent !important;
 
-            #main-content {
+            #main-content, ion-modal:not(.on-top-of-browser) {
+                z-index: 0 !important;
                 opacity: 0;
                 background: transparent;
             }
