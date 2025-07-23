@@ -33,7 +33,14 @@ import {
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { Image, ImageMock, Info, SendingTitle, Title, UnverifiedTokenLabel } from './Confirm';
+import {
+    ConfirmViewImage,
+    ImageMock,
+    Info,
+    SendingTitle,
+    Title,
+    UnverifiedTokenLabel
+} from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
@@ -284,7 +291,7 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
     return (
         <Info className={className}>
             {icon ? (
-                <Image $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id} full src={image} />
+                <ConfirmViewImage noRadius={assetAmount.asset.noImageCorners} full src={image} />
             ) : (
                 <ImageMock full />
             )}
