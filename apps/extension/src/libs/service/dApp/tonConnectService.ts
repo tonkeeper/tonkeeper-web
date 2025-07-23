@@ -10,21 +10,22 @@ import {
     TonConnectTransactionPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
-    getInjectedDappConnection,
+    checkTonConnectFromAndNetwork,
     getDeviceInfo,
-    tonInjectedDisconnectRequest,
-    tonInjectedReConnectRequest,
+    getInjectedDappConnection,
     tonConnectTonkeeperAppName,
-    checkTonConnectFromAndNetwork
+    tonInjectedDisconnectRequest,
+    tonInjectedReConnectRequest
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../../storage';
-import memoryStore from '../../store/memoryStore';
-import { closeOpenedPopUp, getActiveTabLogo, openNotificationPopUp } from './notificationService';
-import { waitApprove } from './utils';
+import { awaitPopupResponse } from './utils';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import browser from 'webextension-polyfill';
+import { popupManager } from '../../background/popup-manager';
+import ExtensionPlatform from '../extension';
+import { showNotificationInPopup } from '../backgroundPopUpService';
 
 const storage = new ExtensionStorage();
 
@@ -45,7 +46,7 @@ const getTonConnectPlatform = (os: browser.Runtime.PlatformOs): DeviceInfo['plat
             return 'linux';
         }
         default:
-            return '' as any as DeviceInfo['platform'];
+            return '' as unknown as DeviceInfo['platform'];
     }
 };
 
@@ -75,17 +76,8 @@ export const tonConnectReConnect = async (origin: string) => {
     return tonReConnectResponse(origin);
 };
 
-export const tonConnectDisconnect = async (id: number, webViewUrl: string) =>
+export const tonConnectDisconnect = async (_: number, webViewUrl: string) =>
     tonInjectedDisconnectRequest({ storage, webViewUrl });
-
-export const cancelOpenedNotification = async () => {
-    const notification = memoryStore.getNotification();
-    if (notification) {
-        await closeOpenedPopUp();
-        memoryStore.removeNotification(notification.id);
-        await delay(200); // wait resolving opened notification
-    }
-};
 
 const connectWithNotification = async (
     id: number,
@@ -93,8 +85,8 @@ const connectWithNotification = async (
     data: ConnectRequest,
     logo: string
 ): Promise<TonConnectEventPayload> => {
-    await cancelOpenedNotification();
-    memoryStore.addNotification({
+    const closedPopupHandle = await popupManager.openPopup();
+    showNotificationInPopup({
         kind: 'tonConnectRequest',
         id,
         logo,
@@ -103,12 +95,9 @@ const connectWithNotification = async (
     });
 
     try {
-        const popupId = await openNotificationPopUp();
-        const result = await waitApprove<TonConnectEventPayload>(id, popupId);
-
-        return result;
+        return await awaitPopupResponse<TonConnectEventPayload>(id);
     } finally {
-        memoryStore.removeNotification(id);
+        await closedPopupHandle();
     }
 };
 
@@ -117,7 +106,7 @@ export const tonConnectRequest = async (
     origin: string,
     data: ConnectRequest
 ): Promise<TonConnectEventPayload> => {
-    const logo = await getActiveTabLogo();
+    const logo = await ExtensionPlatform.getActiveTabLogo();
     const isTonProof = data.items.some(item => item.name === 'ton_proof');
     if (isTonProof) {
         return connectWithNotification(id, origin, data, logo);
@@ -169,22 +158,20 @@ export const tonConnectTransaction = async (
 
     await delay(200);
 
-    await cancelOpenedNotification();
-    memoryStore.addNotification({
+    const closedPopupHandle = await popupManager.openPopup();
+    showNotificationInPopup({
         kind: 'tonConnectSend',
         id,
-        logo: await getActiveTabLogo(),
+        logo: await ExtensionPlatform.getActiveTabLogo(),
         origin,
         data,
         manifest: connection.connection.manifest
     });
 
     try {
-        const popupId = await openNotificationPopUp();
-        const result = await waitApprove<string>(id, popupId);
-        return result;
+        return await awaitPopupResponse<string>(id);
     } finally {
-        memoryStore.removeNotification(id);
+        await closedPopupHandle();
     }
 };
 
@@ -215,21 +202,19 @@ export const tonConnectSignData = async (
 
     await delay(200);
 
-    await cancelOpenedNotification();
-    memoryStore.addNotification({
+    const closedPopupHandle = await popupManager.openPopup();
+    showNotificationInPopup({
         kind: 'tonConnectSign',
         id,
-        logo: await getActiveTabLogo(),
+        logo: await ExtensionPlatform.getActiveTabLogo(),
         origin,
         data,
         manifest: connection.connection.manifest
     });
 
     try {
-        const popupId = await openNotificationPopUp();
-        const result = await waitApprove<string>(id, popupId);
-        return result;
+        return await awaitPopupResponse<string>(id);
     } finally {
-        memoryStore.removeNotification(id);
+        await closedPopupHandle();
     }
 };

@@ -1,11 +1,11 @@
-import memoryStore from '../store/memoryStore';
-import { getActiveTabLogo, openNotificationPopUp } from './dApp/notificationService';
 import { ExtensionStorage } from '../storage';
 import { getGlobalPreferences } from '@tonkeeper/core/dist/service/globalPreferencesService';
-import { waitApprove } from './dApp/utils';
+import { awaitPopupResponse } from './dApp/utils';
 import browser from 'webextension-polyfill';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
-import { cancelOpenedNotification } from './dApp/tonConnectService';
+import { popupManager } from '../background/popup-manager';
+import ExtensionPlatform from './extension';
+import { showNotificationInPopup } from './backgroundPopUpService';
 
 const storage = new ExtensionStorage();
 
@@ -23,21 +23,20 @@ export async function processInterceptTonLink(origin: string, url: string) {
         return;
     }
 
-    await cancelOpenedNotification();
     const id = Date.now();
-    memoryStore.addNotification({
-        kind: 'tonLinkIntercept',
-        id,
-        logo: await getActiveTabLogo(),
-        origin,
-        data: { url }
-    });
 
+    const closedPopupHandle = await popupManager.openPopup();
     try {
-        const popupId = await openNotificationPopUp();
-        await waitApprove<void>(id, popupId);
+        showNotificationInPopup({
+            kind: 'tonLinkIntercept',
+            id,
+            logo: await ExtensionPlatform.getActiveTabLogo(),
+            origin,
+            data: { url }
+        });
+        await awaitPopupResponse<void>(id);
     } catch (e) {
-        memoryStore.removeNotification(id);
         openWindowInNewTab(url);
+        await closedPopupHandle?.();
     }
 }

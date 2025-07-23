@@ -10,9 +10,9 @@ import {
 } from './libs/service/backgroundDAppService';
 import { handlePopUpConnection } from './libs/service/backgroundPopUpService';
 import { subscriptionProxyNotifications } from './libs/service/backgroundProxyService';
-import { openPopUp } from './libs/service/dApp/notificationService';
+import { popupManager } from './libs/background/popup-manager';
 
-browser.action.onClicked.addListener(() => openPopUp('/'));
+browser.action.onClicked.addListener(() => popupManager.openPopup('icon-click'));
 
 browser.runtime.onConnect.addListener(port => {
     if (port.name === 'TonkeeperUI') {

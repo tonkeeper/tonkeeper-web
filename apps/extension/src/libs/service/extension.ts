@@ -3,81 +3,7 @@ import browser from 'webextension-polyfill';
 import { checkForError } from '../utils';
 
 export default class ExtensionPlatform {
-    reload() {
-        browser.runtime.reload();
-    }
-
-    static openTab(options: browser.Tabs.CreateCreatePropertiesType) {
-        return new Promise((resolve, reject) => {
-            browser.tabs.create(options).then(newTab => {
-                const error = checkForError();
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(newTab);
-            });
-        });
-    }
-
-    static openWindow(options?: browser.Windows.CreateCreateDataType) {
-        return new Promise<browser.Windows.Window>((resolve, reject) => {
-            browser.windows.create(options).then(newWindow => {
-                const error = checkForError();
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(newWindow);
-            });
-        });
-    }
-
-    static focusWindow(windowId: number) {
-        return new Promise((resolve, reject) => {
-            browser.windows.update(windowId, { focused: true }).then(() => {
-                const error = checkForError();
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(undefined);
-            });
-        });
-    }
-
-    updateWindowPosition(windowId: number, left: number, top: number) {
-        return new Promise((resolve, reject) => {
-            browser.windows.update(windowId, { left, top }).then(() => {
-                const error = checkForError();
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(undefined);
-            });
-        });
-    }
-
-    static getLastFocusedWindow() {
-        return new Promise<browser.Windows.Window>((resolve, reject) => {
-            browser.windows.getLastFocused().then(windowObject => {
-                const error = checkForError();
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(windowObject);
-            });
-        });
-    }
-
-    static closeCurrentWindow() {
-        return browser.windows.getCurrent().then(windowDetails => {
-            return browser.windows.remove(windowDetails.id!);
-        });
-    }
-
-    static closeWindow(windowId: number) {
-        return browser.windows.remove(windowId);
-    }
-
-    getVersion() {
+    static getVersion() {
         const { version, version_name: versionName } = browser.runtime.getManifest();
 
         const versionParts = version.split('.');
@@ -110,39 +36,12 @@ export default class ExtensionPlatform {
         return version;
     }
 
-    static openExtensionInBrowser(route: string | null = null, queryString: string | null = null) {
-        let extensionURL = browser.runtime.getURL('index.html');
-
-        if (route) {
-            extensionURL += `#${route}`;
-        }
-
-        if (queryString) {
-            extensionURL += `${queryString}`;
-        }
-
-        this.openTab({ url: extensionURL });
-
-        window.close();
+    static async getActiveTabLogo() {
+        const [tab] = await ExtensionPlatform.getActiveTabs();
+        return (tab && tab.favIconUrl) ?? '';
     }
 
-    static addOnRemovedListener(listener: (windowId: number) => void) {
-        browser.windows.onRemoved.addListener(listener);
-    }
-
-    static getAllWindows() {
-        return new Promise<browser.Windows.Window[]>((resolve, reject) => {
-            browser.windows.getAll().then(windows => {
-                const error = checkForError();
-                if (error) {
-                    return reject(error);
-                }
-                return resolve(windows);
-            });
-        });
-    }
-
-    static getActiveTabs() {
+    private static getActiveTabs() {
         return new Promise<browser.Tabs.Tab[]>((resolve, reject) => {
             browser.tabs.query({ active: true }).then(tabs => {
                 const error = checkForError();
@@ -150,45 +49,6 @@ export default class ExtensionPlatform {
                     return reject(error);
                 }
                 return resolve(tabs);
-            });
-        });
-    }
-
-    currentTab() {
-        return new Promise((resolve, reject) => {
-            browser.tabs.getCurrent().then(tab => {
-                const err = checkForError();
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(tab);
-                }
-            });
-        });
-    }
-
-    switchToTab(tabId?: number) {
-        return new Promise((resolve, reject) => {
-            browser.tabs.update(tabId, { highlighted: true }).then(tab => {
-                const err = checkForError();
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(tab);
-                }
-            });
-        });
-    }
-
-    closeTab(tabId: number | number[]) {
-        return new Promise((resolve, reject) => {
-            browser.tabs.remove(tabId).then(() => {
-                const err = checkForError();
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(undefined);
-                }
             });
         });
     }

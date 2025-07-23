@@ -37,14 +37,9 @@ export interface PupUpEvents {
     approveRequest: PayloadRequest;
     rejectRequest: number;
 
-    chainChanged: string;
-    accountsChanged: string[];
     tonConnectDisconnect: string[];
 
     proxyChanged: ProxyConfiguration;
-
-    getNotification: void;
-    closePopUp: number;
 
     userProperties: UserProperties;
     locations: string;
@@ -75,8 +70,6 @@ export interface BackgroundEvents {
 
     closedPopUp: number;
 
-    chainChanged: string;
-    accountsChanged: string[];
     tonConnectDisconnect: string[];
 
     proxyChanged: ProxyConfiguration;
