@@ -124,11 +124,12 @@ const LocalBadge = () => {
     );
 };
 
-const GlowingBorderWrapper = styled.div`
+const GlowingBorderWrapper = styled.div(
+    ({ theme }) => `
     position: relative;
     border-radius: 8px;
     padding: 2px;
-    background: linear-gradient(130deg, #45aef5, transparent, #45aef5, transparent);
+    background: linear-gradient(130deg, ${theme.buttonPrimaryBackground}, transparent, ${theme.buttonPrimaryBackground}, transparent);
     background-size: 300% 300%;
     animation: borderShift 10s linear infinite;
 
@@ -149,7 +150,8 @@ const GlowingBorderWrapper = styled.div`
             background-position: 0 0;
         }
     }
-`;
+`
+);
 
 const HeaderStyled = styled(Header)`
     display: flex;
