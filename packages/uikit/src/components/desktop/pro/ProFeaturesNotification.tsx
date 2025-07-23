@@ -22,6 +22,7 @@ import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
 import { FeatureSlideNames } from '../../../enums/pro';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
+import { useAppTargetEnv } from '../../../hooks/appSdk';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -51,6 +52,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     const formId = useId();
     const { t } = useTranslation();
     const { data } = useProState();
+    const platform = useAppTargetEnv();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const {
         isOpen: isTrialModalOpen,
@@ -64,6 +66,8 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     if (!data) {
         return null;
     }
+
+    const isTrialAvailable = !hasUsedTrial(data.current) && platform === 'mobile';
 
     const handleProAuth = () => {
         if (isError) {
@@ -98,7 +102,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                         isError={isError}
                         isLoading={isLoading}
                         displayPlans={displayPlans}
-                        onTrial={hasUsedTrial(data.current) ? undefined : onTrialModalOpen}
+                        onTrial={isTrialAvailable ? onTrialModalOpen : undefined}
                     />
                 </NotificationFooter>
             </NotificationFooterPortal>
