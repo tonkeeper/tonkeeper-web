@@ -84,6 +84,7 @@ const WalletBadgeStyled = styled(WalletVersionBadge)`
     display: inline-block;
     margin-left: 6px;
     width: fit-content;
+    line-height: unset;
 `;
 
 const ListItemStyled = styled(ListItem)<{ skeletonId?: string }>`

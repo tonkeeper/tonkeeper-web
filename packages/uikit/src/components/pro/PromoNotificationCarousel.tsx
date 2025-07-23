@@ -182,7 +182,6 @@ const RelativeWrapper = styled.div`
     position: relative;
     width: 100%;
     overflow: hidden;
-    border-radius: 24px;
 `;
 
 const GradientLayer = styled.div<{ $page: number; $total: number }>`
@@ -190,10 +189,11 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
     top: 0;
     left: 0;
     width: 100%;
+    max-height: 40dvh;
     aspect-ratio: 1 / 1;
     overflow: hidden;
     z-index: 0;
-    border-radius: 24px;
+    border-radius: ${props => props.theme.corner2xSmall};
 
     &::before {
         content: '';
@@ -209,7 +209,7 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
             #4d89f2 100%
         );
         transform: translateX(${({ $page, $total }) => `-${($page * 100) / $total}%`});
-        transition: transform 2s ease-out;
+        transition: transform 1s ease-out;
     }
 `;
 
@@ -259,14 +259,20 @@ const SwipeButton = styled.button<{ position: 'left' | 'right'; isVisible: boole
 `;
 
 const ImageWrapper = styled.div<{ isActive: boolean }>`
-    transition: transform 1s ease-out, opacity 1s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-height: 40dvh;
+    aspect-ratio: 1;
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
     transform: scale(${({ isActive }) => (isActive ? 1 : 0.7)});
     opacity: ${({ isActive }) => (isActive ? 1 : 0.2)};
-    width: 100%;
-    aspect-ratio: 1;
 
     & > svg {
         margin: 40px;
+        height: calc(100% - 80px);
+        aspect-ratio: 1;
     }
 `;
 
