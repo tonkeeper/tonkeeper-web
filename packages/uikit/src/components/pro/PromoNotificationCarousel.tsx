@@ -189,11 +189,14 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
     top: 0;
     left: 0;
     width: 100%;
-    max-height: 40dvh;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1;
     overflow: hidden;
     z-index: 0;
     border-radius: ${props => props.theme.corner2xSmall};
+
+    @media (min-width: 550px) {
+        max-height: 40dvh;
+    }
 
     &::before {
         content: '';
@@ -263,11 +266,14 @@ const ImageWrapper = styled.div<{ isActive: boolean }>`
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-height: 40dvh;
     aspect-ratio: 1;
     transition: transform 0.5s ease-out, opacity 0.5s ease-out;
     transform: scale(${({ isActive }) => (isActive ? 1 : 0.7)});
     opacity: ${({ isActive }) => (isActive ? 1 : 0.2)};
+
+    @media (min-width: 550px) {
+        max-height: 40dvh;
+    }
 
     & > svg {
         margin: 40px;
