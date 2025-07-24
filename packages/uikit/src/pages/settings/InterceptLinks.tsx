@@ -63,7 +63,7 @@ export const InterceptLinksPage = () => {
                 <ListBlockStyled>
                     {Object.entries(optionsTranslations).map(([key, translation]) => (
                         <ListItem
-                            hover={false}
+                            hover
                             key={key}
                             onClick={() => onSelectOption(key as InterceptTonLinksConfig)}
                         >

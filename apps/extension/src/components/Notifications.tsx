@@ -7,10 +7,13 @@ import { TonConnectNotification } from '@tonkeeper/uikit/dist/components/connect
 import { TonTransactionNotification } from '@tonkeeper/uikit/dist/components/connect/TonTransactionNotification';
 import { SignDataNotification } from '@tonkeeper/uikit/dist/components/connect/SignDataNotification';
 import { useEffect, useState } from 'react';
-import { extensionBackgroundEvents, sendBackground } from '../event';
+import { extensionBackgroundEvents$, sendBackground } from '../event';
 import { NotificationData } from '../libs/event';
 import { tonConnectTonkeeperAppName } from '@tonkeeper/core/dist/service/tonConnect/connectService';
-import { useCompleteInjectedConnection } from '@tonkeeper/uikit/dist/components/connect/connectHook';
+import {
+    useCompleteInjectedConnection,
+    useProcessOpenedLink
+} from '@tonkeeper/uikit/dist/components/connect/connectHook';
 import { tonConnectProtocolVersion } from '../constants';
 import {
     useTrackerTonConnectSendSuccess,
@@ -18,7 +21,8 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
 import { SenderChoice } from '@tonkeeper/uikit/dist/hooks/blockchain/useSender';
 import { InterceptTonLinkNotification } from './InterceptTonLinkNotification';
-import { useValueRef } from '@tonkeeper/uikit/dist/libs/common';
+import { useGlobalPreferences } from '@tonkeeper/uikit/dist/state/global-preferences';
+import { useSubjectValue } from '@tonkeeper/uikit/dist/libs/useAtom';
 
 const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
     if (e.event === 'connect') {
@@ -33,21 +37,35 @@ const bridgeConnectTransport = (id: number) => (e: ConnectEvent) => {
 
 export const Notifications = () => {
     const [data, setData] = useState<NotificationData | undefined>(undefined);
-    const dataRef = useValueRef(data);
 
     useTrackTonConnectActionRequest(data?.origin);
     const trackSendSuccess = useTrackerTonConnectSendSuccess();
 
+    const { mutateAsync: processOpenedLink } = useProcessOpenedLink();
+    const { interceptTonLinks } = useGlobalPreferences();
+
+    const backgroundEvent = useSubjectValue(extensionBackgroundEvents$);
+
     useEffect(() => {
-        return extensionBackgroundEvents.subscribe(event => {
-            if (event.type === 'showNotification') {
-                if (dataRef.current) {
-                    sendBackground.message('rejectRequest', dataRef.current.id);
-                }
-                setData(event.data);
+        if (backgroundEvent?.type === 'showNotification') {
+            if (data) {
+                sendBackground.message('rejectRequest', data.id);
             }
-        });
-    }, []);
+            const newData = backgroundEvent.data;
+
+            if (newData.kind === 'tonLinkIntercept' && interceptTonLinks === 'always') {
+                if (newData.data.url) {
+                    sendBackground.message('approveRequest', {
+                        id: newData.id,
+                        payload: void 0
+                    });
+                    processOpenedLink(newData.data.url);
+                }
+            } else {
+                setData(newData);
+            }
+        }
+    }, [backgroundEvent]);
 
     const { mutateAsync: completeInjectedConnection } = useCompleteInjectedConnection();
 

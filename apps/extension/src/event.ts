@@ -4,7 +4,7 @@ import { replySubject } from '@tonkeeper/core/dist/entries/atom';
 
 let port: browser.Runtime.Port;
 
-export const extensionBackgroundEvents = replySubject<{
+export const extensionBackgroundEvents$ = replySubject<{
     type: 'showNotification';
     data: NotificationData;
 }>();
@@ -19,7 +19,7 @@ export const connectToBackground = () => {
     port = browser.runtime.connect({ name: 'TonkeeperUI' });
 
     port.onMessage.addListener(data => {
-        extensionBackgroundEvents.next(data);
+        extensionBackgroundEvents$.next(data);
     });
 
     port.onDisconnect.addListener(() => {
