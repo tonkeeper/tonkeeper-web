@@ -34,6 +34,7 @@ export const ProWalletListItem: FC<IProWalletListItemProps> = props => {
                     <Body2Limited>{'Skeleton'}</Body2Limited>
                     <Body2Styled>&nbsp;{'Skeleton'}</Body2Styled>
                     <WalletBadgeStyled walletVersion={WalletVersion.V5_BETA} />
+                    {rightElement}
                 </ListItemPayloadStyled>
                 <StyledSkeleton id={skeletonId} />
             </ListItemStyled>

@@ -72,7 +72,7 @@ const Block = styled.div`
 `;
 
 const ButtonStyled = styled.button`
-    height: auto;
+    height: 20px;
     padding: 0 0 0 1rem;
     margin-left: auto;
     color: ${props => props.theme.textAccent};
