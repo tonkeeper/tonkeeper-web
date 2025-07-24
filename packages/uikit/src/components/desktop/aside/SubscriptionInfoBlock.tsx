@@ -3,7 +3,6 @@ import styled, { css } from 'styled-components';
 import {
     isPaidSubscription,
     isPendingSubscription,
-    isProSubscription,
     isTelegramSubscription,
     isValidSubscription,
     ProState
@@ -180,7 +179,11 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         navigate(AppRoute.settings + SettingsRoute.pro);
     };
 
-    let button = <Button loading>{'Tonkeeper Pro'}</Button>;
+    let button = (
+        <Button primary onClick={onGetPro}>
+            {t('get_tonkeeper_pro')}
+        </Button>
+    );
 
     if (data && isValidSubscription(data.current)) {
         button = (
@@ -198,11 +201,10 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 </ProButtonPanel>
             </DropDown>
         );
-    } else {
-        const isProcessing =
-            data && isProSubscription(data?.current) && isPendingSubscription(data?.current);
+    }
 
-        button = isProcessing ? (
+    if (isPendingSubscription(data?.current)) {
+        button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"
                 payload={() => (
@@ -217,10 +219,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                     {t('processing')}
                 </ProButtonPanel>
             </DropDown>
-        ) : (
-            <Button primary onClick={onGetPro}>
-                {t('get_tonkeeper_pro')}
-            </Button>
         );
     }
 
