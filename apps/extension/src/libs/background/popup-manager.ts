@@ -32,6 +32,7 @@ export class PopupManager {
         browser.windows.onRemoved.addListener(() => {
             this.openedPopup = undefined;
         });
+        this.syncPopup();
     }
 
     public async openPopup(source: 'icon-click' | 'programmatically' = 'programmatically') {
@@ -39,6 +40,7 @@ export class PopupManager {
             source === 'icon-click'
                 ? 'icon-click'
                 : `programmatically-${PopupManager.createOpenerId()}`;
+        await this.syncPopup();
 
         if (this.openedPopup === undefined) {
             const id = (await this.createPopup()).id!;
@@ -87,6 +89,47 @@ export class PopupManager {
             this.rejectIfError(reject);
             resolve(newWindow);
         });
+    }
+
+    private async syncPopup() {
+        const popupWindows = await this.getPopupWindows();
+
+        const currentPopupId = this.openedPopup?.id;
+
+        const stillOpen = popupWindows.find(w => w.id === currentPopupId);
+        if (this.openedPopup && !stillOpen) {
+            this.openedPopup = undefined;
+        }
+
+        if (this.openedPopup === undefined) {
+            if (popupWindows.length > 0) {
+                // Take last popup and save to state as opened
+                const lastPopup = popupWindows[popupWindows.length - 1];
+                if (lastPopup.id !== undefined) {
+                    this.openedPopup = {
+                        id: lastPopup.id,
+                        opener: 'icon-click'
+                    };
+                }
+
+                await this.closeAllPopupsExceptId(popupWindows, lastPopup.id);
+            }
+        } else {
+            await this.closeAllPopupsExceptId(popupWindows, currentPopupId);
+        }
+    }
+
+    private async getPopupWindows() {
+        const allWindows = await browser.windows.getAll();
+        return allWindows.filter(w => w.type === 'popup');
+    }
+
+    private async closeAllPopupsExceptId(
+        popupWindows: browser.Windows.Window[],
+        currentPopupId: number
+    ) {
+        const toClose = popupWindows.filter(w => w.id !== currentPopupId);
+        await Promise.all(toClose.map(w => w.id && browser.windows.remove(w.id).catch(() => {})));
     }
 
     private async ensurePopupReady() {
