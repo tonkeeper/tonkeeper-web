@@ -101,7 +101,7 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
                 </ListItem>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        <AssetImage src={TRON_USDT_ASSET.image} />
+                        <AssetImage src={TRON_USDT_ASSET.image} noRadius />
                         <ColumnText
                             text={
                                 <TextWithLabel>
