@@ -337,16 +337,7 @@ export async function startProServiceTrial(
     botId: string,
     lang?: string
 ) {
-    const tgData = (await loginViaTG(botId, lang)) ?? {
-        id: 391183694,
-        first_name: 'Dmitrii',
-        last_name: 'Liulekin',
-        username: 'dimalyulekin',
-        photo_url: 'https://t.me/i/userpic/320/3BdeHd3N6p0uyVCg6CPHnM5UgsXqhDfcT_L708fa_DQ.jpg',
-        auth_date: 1753304325,
-        hash: 'f7df52a13f70a07036ff624612eb5a01d63dcd953f52fb9de8db5416780924e8'
-    };
-
+    const tgData = await loginViaTG(botId, lang);
     if (!tgData) {
         return false;
     }
