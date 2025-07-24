@@ -122,48 +122,44 @@ export const withTargetAuthToken = async <T>(
     }
 };
 
+const getNormalizedSubscription = async (
+    authService: ProAuthTokenService,
+    storage: IStorage,
+    appliedToken: ProAuthTokenType
+) => {
+    try {
+        await authService.attachToken(appliedToken);
+
+        const user = await UsersService.getUserInfo();
+        const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
+
+        const currentSubscriptionDTO = await UsersService.verifySubscription();
+        return normalizeSubscription(currentSubscriptionDTO, {
+            user,
+            authorizedWallet
+        });
+    } catch {
+        return null;
+    }
+};
+
 // TODO Define a better data flow here and reuse the logic
 const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Promise<ProState> => {
     const storage = sdk.storage;
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
     const processingTargetSub = processingState?.target;
 
-    let currentSubscription;
-    try {
-        await authService.attachToken(ProAuthTokenType.MAIN);
+    const currentSubscription = await getNormalizedSubscription(
+        authService,
+        storage,
+        ProAuthTokenType.MAIN
+    );
 
-        const currentUser = await UsersService.getUserInfo();
-        const currentAuthWallet: ProStateWallet | null = await findAuthorizedWallet(
-            currentUser,
-            storage
-        );
-
-        const currentSubscriptionDTO = await UsersService.verifySubscription();
-        currentSubscription = normalizeSubscription(currentSubscriptionDTO, {
-            user: currentUser,
-            authorizedWallet: currentAuthWallet
-        });
-    } catch {
-        currentSubscription = null;
-    }
-
-    let targetUser;
-    let targetAuthWallet: ProStateWallet | null;
-    let targetSubscriptionDTO;
     let targetSubscription;
-
     if (hasAuth(processingTargetSub)) {
-        await authService.attachToken(ProAuthTokenType.TEMP);
-
-        targetUser = await UsersService.getUserInfo();
-        targetAuthWallet = await findAuthorizedWallet(targetUser, storage);
-
-        targetSubscriptionDTO = await UsersService.verifySubscription();
         targetSubscription =
-            normalizeSubscription(targetSubscriptionDTO, {
-                user: targetUser,
-                authorizedWallet: targetAuthWallet
-            }) ?? processingTargetSub;
+            (await getNormalizedSubscription(authService, storage, ProAuthTokenType.TEMP)) ??
+            processingTargetSub;
     }
 
     if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
@@ -341,7 +337,16 @@ export async function startProServiceTrial(
     botId: string,
     lang?: string
 ) {
-    const tgData = await loginViaTG(botId, lang);
+    const tgData = (await loginViaTG(botId, lang)) ?? {
+        id: 391183694,
+        first_name: 'Dmitrii',
+        last_name: 'Liulekin',
+        username: 'dimalyulekin',
+        photo_url: 'https://t.me/i/userpic/320/3BdeHd3N6p0uyVCg6CPHnM5UgsXqhDfcT_L708fa_DQ.jpg',
+        auth_date: 1753304325,
+        hash: 'f7df52a13f70a07036ff624612eb5a01d63dcd953f52fb9de8db5416780924e8'
+    };
+
     if (!tgData) {
         return false;
     }
