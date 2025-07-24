@@ -4,11 +4,12 @@ import {
     CryptoPendingSubscription,
     CryptoSubscriptionStatuses,
     hasWalletAuth,
-    IDisplayPlan
+    IDisplayPlan,
+    ProState
 } from '@tonkeeper/core/dist/entries/pro';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { setProPendingState } from '@tonkeeper/core/dist/service/proService';
 
 import { useAppSdk } from '../appSdk';
 import { useNavigate } from '../router/useNavigate';
@@ -66,12 +67,9 @@ export const useCryptoPurchaseFlow = () => {
                 auth
             };
 
-            await setProPendingState(sdk.storage, {
+            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
                 current: pendingSubscription,
-                target: {
-                    ...pendingSubscription,
-                    auth
-                }
+                target: pendingSubscription
             });
 
             await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));

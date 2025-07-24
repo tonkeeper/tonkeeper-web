@@ -11,7 +11,6 @@ import {
     IosSubscriptionStatuses,
     isIosStrategy,
     isProductId,
-    isProSubscription,
     NormalizedProPlans,
     ProState,
     ProStateWallet,
@@ -31,7 +30,6 @@ import {
     retryProService,
     saveIapPurchase,
     setBackupState,
-    setProPendingState,
     startProServiceTrial,
     waitProServiceInvoice,
     withTargetAuthToken
@@ -169,8 +167,9 @@ export const useManageSubscription = () => {
 
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
-    const { data: proState } = useProState();
     const client = useQueryClient();
+    const { data: proState } = useProState();
+    const targetSubscription = proState?.target;
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
         const { id, displayPrice, displayName } = selectedPlan;
@@ -198,11 +197,7 @@ export const useProSubscriptionPurchase = () => {
         const savingResult = await saveIapPurchase(String(originalTransactionId));
 
         if (!savingResult.ok) {
-            if (
-                !proState?.target ||
-                !isProSubscription(proState.target) ||
-                !hasWalletAuth(proState.target)
-            ) {
+            if (!hasWalletAuth(targetSubscription)) {
                 throw new Error('Failed to subscribe');
             }
 
@@ -213,11 +208,11 @@ export const useProSubscriptionPurchase = () => {
                 source: SubscriptionSource.IOS,
                 status: IosSubscriptionStatuses.PENDING,
                 valid: false,
-                usedTrial: proState?.target?.usedTrial ?? false,
-                auth: proState.target.auth
+                usedTrial: targetSubscription?.usedTrial ?? false,
+                auth: targetSubscription.auth
             };
 
-            await setProPendingState(sdk.storage, {
+            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
                 current: pendingSubscription,
                 target: pendingSubscription
             });

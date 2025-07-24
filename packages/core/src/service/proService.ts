@@ -14,7 +14,6 @@ import {
     isPendingSubscription,
     isProSubscription,
     isValidSubscription,
-    PendingSubscription,
     ProState,
     ProStateWallet,
     ProSubscription
@@ -99,19 +98,6 @@ export interface ProAuthTokenService {
     getToken(type: ProAuthTokenType): Promise<string | null>;
     promoteToken(from: ProAuthTokenType, to: ProAuthTokenType): Promise<void>;
 }
-
-export const setProPendingState = async (
-    storage: IStorage,
-    pendingState: {
-        current: PendingSubscription;
-        target: ProState['target'];
-    }
-) => {
-    await storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-        current: pendingState.current,
-        target: pendingState.target
-    });
-};
 
 export const withTargetAuthToken = async <T>(
     authService: ProAuthTokenService,
