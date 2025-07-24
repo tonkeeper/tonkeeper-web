@@ -31,6 +31,7 @@ export type SubscriptionVerification = {
         purchase_date: number;
         expires_date: number;
         status: SubscriptionVerification.status;
+        auto_renew_status: boolean;
     };
 };
 export namespace SubscriptionVerification {
