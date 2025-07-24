@@ -68,7 +68,7 @@ export class Aptabase implements Analytics {
         props?: Record<string, string | number | boolean>
     ): Promise<void> {
         try {
-            const identityProps = await getUserIdentityProps(this.userIdentity);
+            const { sessionId, ...identityProps } = await getUserIdentityProps(this.userIdentity);
 
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
@@ -79,18 +79,19 @@ export class Aptabase implements Analytics {
                 credentials: 'omit',
                 body: JSON.stringify({
                     timestamp: new Date().toISOString(),
-                    eventName: eventName,
+                    eventName,
+                    sessionId,
                     systemProps: {
                         locale: this.getBrowserLocale(),
                         isDebug: this.isDebug,
                         appVersion: this.appVersion,
-                        sdkVersion: 'custom_0.0.2'
+                        sdkVersion: 'custom_0.0.3',
+                        osName: this.getUserOS()
                     },
                     props: {
-                        osName: this.getUserOS(),
-                        ...props
-                    },
-                    ...identityProps
+                        ...props,
+                        ...identityProps
+                    }
                 })
             });
 
