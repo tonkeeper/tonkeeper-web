@@ -41,7 +41,7 @@ export const useIosPurchaseFlow = () => {
                 message: t('already_have_subscription', {
                     transactionId: String(originalTransactionId)
                 }),
-                okButtonTitle: 'choose_another_wallet'
+                okButtonTitle: t('choose_another_wallet')
             });
 
             onCurrentClose();
