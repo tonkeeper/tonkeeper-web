@@ -67,7 +67,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         return null;
     }
 
-    const isTrialAvailable = !hasUsedTrial(data.current) && platform === 'mobile';
+    const isTrialAvailable = !hasUsedTrial(data.current) && platform !== 'tablet';
 
     const handleProAuth = () => {
         if (isError) {
@@ -168,7 +168,7 @@ const NotificationStyled = styled(Notification)`
 const ButtonsBlockStyled = styled(ButtonsBlock)`
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 8px;
 `;
 
 const CloseButtonStyled = styled.button`
