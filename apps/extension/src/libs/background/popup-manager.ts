@@ -11,7 +11,7 @@ export class PopupManager {
 
     private static NOTIFICATION_HEIGHT = 650;
 
-    private static NOTIFICATION_WIDTH = 380;
+    private static NOTIFICATION_WIDTH = 410;
 
     private openedPopup:
         | {
@@ -126,7 +126,7 @@ export class PopupManager {
 
     private async closeAllPopupsExceptId(
         popupWindows: browser.Windows.Window[],
-        currentPopupId: number
+        currentPopupId: number | undefined
     ) {
         const toClose = popupWindows.filter(w => w.id !== currentPopupId);
         await Promise.all(toClose.map(w => w.id && browser.windows.remove(w.id).catch(() => {})));
