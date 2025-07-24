@@ -126,6 +126,10 @@ export function jettonToTonAssetAmount(jetton: JettonBalance): AssetAmount<TonAs
 }
 
 export function shouldHideTonJettonImageCorners(address: string): boolean {
+    if (address === TON_ASSET.address) {
+        return false;
+    }
+
     try {
         return Address.parse(address).equals(
             Address.parse(tonAssetAddressToString(TON_USDT_ASSET.address))
