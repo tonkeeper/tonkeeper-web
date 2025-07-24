@@ -11,7 +11,7 @@ export class PopupManager {
 
     private static NOTIFICATION_HEIGHT = 650;
 
-    private static NOTIFICATION_WIDTH = 410;
+    private static NOTIFICATION_WIDTH = 430;
 
     private openedPopup:
         | {
