@@ -320,11 +320,16 @@ export const waitProServiceInvoice = async (invoice: Invoice) => {
     } while (updated.status === InvoiceStatus.PENDING);
 };
 
-export const saveIapPurchase = async (originalTransactionId: string): Promise<{ ok: boolean }> => {
+export const saveIapPurchase = async (
+    authService: ProAuthTokenService,
+    originalTransactionId: string
+): Promise<{ ok: boolean }> => {
     try {
-        return await IapService.activateIapPurchase({
-            original_transaction_id: originalTransactionId
-        });
+        return await withTargetAuthToken(authService, () =>
+            IapService.activateIapPurchase({
+                original_transaction_id: originalTransactionId
+            })
+        );
     } catch (e) {
         return {
             ok: false

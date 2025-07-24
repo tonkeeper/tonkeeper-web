@@ -167,8 +167,9 @@ export const useManageSubscription = () => {
 
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
-    const client = useQueryClient();
     const { data: proState } = useProState();
+    const client = useQueryClient();
+    const authService = useProAuthTokenService();
     const targetSubscription = proState?.target;
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
@@ -194,7 +195,7 @@ export const useProSubscriptionPurchase = () => {
             throw new Error('Failed to subscribe');
         }
 
-        const savingResult = await saveIapPurchase(String(originalTransactionId));
+        const savingResult = await saveIapPurchase(authService, String(originalTransactionId));
 
         if (!savingResult.ok) {
             if (!hasWalletAuth(targetSubscription)) {
