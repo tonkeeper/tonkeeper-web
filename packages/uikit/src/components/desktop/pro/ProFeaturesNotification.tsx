@@ -16,7 +16,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProPlans, useProState } from '../../../state/pro';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
-import { hasUsedTrial, IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
+import { hasUsedTrial, IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
@@ -67,7 +67,8 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         return null;
     }
 
-    const isTrialAvailable = !hasUsedTrial(data.current) && platform !== 'tablet';
+    const currentSubscription = data.current;
+    const isTrialAvailable = !hasUsedTrial(currentSubscription) && platform !== 'tablet';
 
     const handleProAuth = () => {
         if (isError) {
@@ -95,17 +96,19 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
             </CloseButtonStyled>
 
             <PromoNotificationCarousel initialSlideName={initialSlideName} />
-            <NotificationFooterPortal>
-                <NotificationFooter>
-                    <ButtonsBlockStyled
-                        formId={formId}
-                        isError={isError}
-                        isLoading={isLoading}
-                        displayPlans={displayPlans}
-                        onTrial={isTrialAvailable ? onTrialModalOpen : undefined}
-                    />
-                </NotificationFooter>
-            </NotificationFooterPortal>
+            {!isValidSubscription(currentSubscription) && (
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ButtonsBlockStyled
+                            formId={formId}
+                            isError={isError}
+                            isLoading={isLoading}
+                            displayPlans={displayPlans}
+                            onTrial={isTrialAvailable ? onTrialModalOpen : undefined}
+                        />
+                    </NotificationFooter>
+                </NotificationFooterPortal>
+            )}
             <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialClose} />
         </ContentWrapper>
     );
