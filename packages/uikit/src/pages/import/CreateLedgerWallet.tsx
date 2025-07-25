@@ -63,7 +63,8 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         isDeviceConnected,
         mutate: connectLedger,
         reset: resetConnection,
-        data: tonTransport
+        data: tonTransport,
+        isError: isConnectionError
     } = useConnectLedgerMutation();
 
     const onStartConnection = useCallback(() => {
@@ -107,7 +108,7 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     return (
         <ConnectLedgerWrapper>
             <H2Styled>{t('ledger_connect_header')}</H2Styled>
-            <LedgerConnectionSteps currentStep={currentStep} />
+            <LedgerConnectionSteps currentStep={currentStep} isErrored={isConnectionError} />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlock>

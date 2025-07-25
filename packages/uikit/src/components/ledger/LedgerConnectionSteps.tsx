@@ -7,6 +7,7 @@ import { Dot } from '../Dot';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig } from '../../state/wallet';
+import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 
 const CardStyled = styled.div`
     box-sizing: border-box;
@@ -32,12 +33,16 @@ const TextBlockStyled = styled.div`
     gap: 0.5rem;
 `;
 
-const Body2Colored = styled(Body2)<{ isCompleted?: boolean }>`
+const Body2Colored = styled(Body2)<{ $isCompleted?: boolean; $isErrored?: boolean }>`
     ${p =>
-        p.isCompleted &&
-        css`
-            color: ${p.theme.accentGreen};
-        `};
+        p.$isCompleted
+            ? css`
+                  color: ${p.theme.accentGreen};
+              `
+            : p.$isErrored &&
+              css`
+                  color: ${p.theme.accentRed};
+              `};
 `;
 
 const IconContainer = styled.div`
@@ -69,7 +74,15 @@ export const LedgerConnectionSteps: FC<{
     action?: 'transaction' | 'ton-proof';
     currentStep: 'connect' | 'open-ton' | 'confirm-tx' | 'all-completed';
     className?: string;
-}> = ({ currentStep, transactionsToSign, signingTransactionIndex, className, action }) => {
+    isErrored: boolean;
+}> = ({
+    currentStep,
+    transactionsToSign,
+    signingTransactionIndex,
+    className,
+    action,
+    isErrored
+}) => {
     const config = useActiveConfig();
     const { t } = useTranslation();
 
@@ -106,8 +119,14 @@ export const LedgerConnectionSteps: FC<{
             </ImageStyled>
             <TextStepsContainer>
                 <TextBlockStyled>
-                    <StepIcon state={currentStep === 'connect' ? 'active' : 'completed'} />
-                    <Body2Colored isCompleted={currentStep !== 'connect'}>
+                    <StepIcon
+                        state={currentStep === 'connect' ? 'active' : 'completed'}
+                        isErrored={isErrored}
+                    />
+                    <Body2Colored
+                        $isCompleted={currentStep !== 'connect'}
+                        $isErrored={isErrored && currentStep === 'connect'}
+                    >
                         {t('ledger_steps_connect')}
                     </Body2Colored>
                 </TextBlockStyled>
@@ -120,11 +139,13 @@ export const LedgerConnectionSteps: FC<{
                                 ? 'future'
                                 : 'completed'
                         }
+                        isErrored={isErrored && currentStep === 'open-ton'}
                     />
                     <Body2Colored
-                        isCompleted={
+                        $isCompleted={
                             currentStep === 'all-completed' || currentStep === 'confirm-tx'
                         }
+                        $isErrored={isErrored && currentStep === 'open-ton'}
                     >
                         {t('ledger_steps_open_ton')}
                         {!transactionsToSign && (
@@ -148,7 +169,7 @@ export const LedgerConnectionSteps: FC<{
                                     : 'completed'
                             }
                         />
-                        <Body2Colored isCompleted={currentStep === 'all-completed'}>
+                        <Body2Colored $isCompleted={currentStep === 'all-completed'}>
                             {t(
                                 action === 'ton-proof'
                                     ? 'ledger_steps_confirm_proof'
@@ -173,7 +194,7 @@ export const LedgerConnectionSteps: FC<{
                                 }
                             />
                             <Body2Colored
-                                isCompleted={
+                                $isCompleted={
                                     currentStep === 'all-completed' ||
                                     index < signingTransactionIndex!
                                 }
@@ -192,7 +213,18 @@ const DoneIconStyled = styled(DoneIcon)`
     color: ${p => p.theme.accentGreen};
 `;
 
-const StepIcon: FC<{ state: 'future' | 'active' | 'completed' }> = ({ state }) => {
+const StepIcon: FC<{ state: 'future' | 'active' | 'completed'; isErrored?: boolean }> = ({
+    state,
+    isErrored
+}) => {
+    if (state === 'completed') {
+        return (
+            <IconContainer>
+                <DoneIconStyled />
+            </IconContainer>
+        );
+    }
+
     if (state === 'future') {
         return (
             <IconContainer>
@@ -204,14 +236,10 @@ const StepIcon: FC<{ state: 'future' | 'active' | 'completed' }> = ({ state }) =
     if (state === 'active') {
         return (
             <IconContainer>
-                <ResponsiveSpinner />
+                {isErrored ? <DotIcon color="accentRed" /> : <ResponsiveSpinner />}
             </IconContainer>
         );
     }
 
-    return (
-        <IconContainer>
-            <DoneIconStyled />
-        </IconContainer>
-    );
+    assertUnreachable(state);
 };
