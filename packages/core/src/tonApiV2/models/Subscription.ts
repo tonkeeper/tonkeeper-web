@@ -13,6 +13,28 @@
  */
 
 import { mapValues } from '../runtime';
+import type { Price } from './Price';
+import {
+    PriceFromJSON,
+    PriceFromJSONTyped,
+    PriceToJSON,
+    PriceToJSONTyped,
+} from './Price';
+import type { Metadata } from './Metadata';
+import {
+    MetadataFromJSON,
+    MetadataFromJSONTyped,
+    MetadataToJSON,
+    MetadataToJSONTyped,
+} from './Metadata';
+import type { AccountAddress } from './AccountAddress';
+import {
+    AccountAddressFromJSON,
+    AccountAddressFromJSONTyped,
+    AccountAddressToJSON,
+    AccountAddressToJSONTyped,
+} from './AccountAddress';
+
 /**
  * 
  * @export
@@ -20,88 +42,92 @@ import { mapValues } from '../runtime';
  */
 export interface Subscription {
     /**
-     * 
+     * type of subscription
      * @type {string}
      * @memberof Subscription
      */
-    address: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Subscription
-     */
-    walletAddress: string;
+    type: string;
     /**
      * 
      * @type {string}
      * @memberof Subscription
      */
-    beneficiaryAddress: string;
+    status: SubscriptionStatusEnum;
     /**
-     * 
-     * @type {number}
-     * @memberof Subscription
-     */
-    amount: number;
-    /**
-     * 
+     * payment period in seconds
      * @type {number}
      * @memberof Subscription
      */
     period: number;
     /**
-     * 
-     * @type {number}
+     * common identifier
+     * @type {string}
      * @memberof Subscription
      */
-    startTime: number;
+    subscriptionId: string;
+    /**
+     * 
+     * @type {Price}
+     * @memberof Subscription
+     */
+    paymentPerPeriod: Price;
+    /**
+     * 
+     * @type {AccountAddress}
+     * @memberof Subscription
+     */
+    wallet: AccountAddress;
     /**
      * 
      * @type {number}
      * @memberof Subscription
      */
-    timeout: number;
+    nextChargeAt: number;
     /**
      * 
-     * @type {number}
+     * @type {Metadata}
      * @memberof Subscription
      */
-    lastPaymentTime: number;
+    metadata: Metadata;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Subscription
      */
-    lastRequestTime: number;
+    address?: string;
     /**
      * 
-     * @type {number}
+     * @type {AccountAddress}
      * @memberof Subscription
      */
-    subscriptionId: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof Subscription
-     */
-    failedAttempts: number;
+    beneficiary?: AccountAddress;
 }
+
+
+/**
+ * @export
+ */
+export const SubscriptionStatusEnum = {
+    NotReady: 'not_ready',
+    Active: 'active',
+    Suspended: 'suspended',
+    Cancelled: 'cancelled'
+} as const;
+export type SubscriptionStatusEnum = typeof SubscriptionStatusEnum[keyof typeof SubscriptionStatusEnum];
+
 
 /**
  * Check if a given object implements the Subscription interface.
  */
 export function instanceOfSubscription(value: object): value is Subscription {
-    if (!('address' in value) || value['address'] === undefined) return false;
-    if (!('walletAddress' in value) || value['walletAddress'] === undefined) return false;
-    if (!('beneficiaryAddress' in value) || value['beneficiaryAddress'] === undefined) return false;
-    if (!('amount' in value) || value['amount'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
+    if (!('status' in value) || value['status'] === undefined) return false;
     if (!('period' in value) || value['period'] === undefined) return false;
-    if (!('startTime' in value) || value['startTime'] === undefined) return false;
-    if (!('timeout' in value) || value['timeout'] === undefined) return false;
-    if (!('lastPaymentTime' in value) || value['lastPaymentTime'] === undefined) return false;
-    if (!('lastRequestTime' in value) || value['lastRequestTime'] === undefined) return false;
     if (!('subscriptionId' in value) || value['subscriptionId'] === undefined) return false;
-    if (!('failedAttempts' in value) || value['failedAttempts'] === undefined) return false;
+    if (!('paymentPerPeriod' in value) || value['paymentPerPeriod'] === undefined) return false;
+    if (!('wallet' in value) || value['wallet'] === undefined) return false;
+    if (!('nextChargeAt' in value) || value['nextChargeAt'] === undefined) return false;
+    if (!('metadata' in value) || value['metadata'] === undefined) return false;
     return true;
 }
 
@@ -115,42 +141,40 @@ export function SubscriptionFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'address': json['address'],
-        'walletAddress': json['wallet_address'],
-        'beneficiaryAddress': json['beneficiary_address'],
-        'amount': json['amount'],
+        'type': json['type'],
+        'status': json['status'],
         'period': json['period'],
-        'startTime': json['start_time'],
-        'timeout': json['timeout'],
-        'lastPaymentTime': json['last_payment_time'],
-        'lastRequestTime': json['last_request_time'],
         'subscriptionId': json['subscription_id'],
-        'failedAttempts': json['failed_attempts'],
+        'paymentPerPeriod': PriceFromJSON(json['payment_per_period']),
+        'wallet': AccountAddressFromJSON(json['wallet']),
+        'nextChargeAt': json['next_charge_at'],
+        'metadata': MetadataFromJSON(json['metadata']),
+        'address': json['address'] == null ? undefined : json['address'],
+        'beneficiary': json['beneficiary'] == null ? undefined : AccountAddressFromJSON(json['beneficiary']),
     };
 }
 
-export function SubscriptionToJSON(json: any): Subscription {
-    return SubscriptionToJSONTyped(json, false);
-}
+  export function SubscriptionToJSON(json: any): Subscription {
+      return SubscriptionToJSONTyped(json, false);
+  }
 
-export function SubscriptionToJSONTyped(value?: Subscription | null, ignoreDiscriminator: boolean = false): any {
+  export function SubscriptionToJSONTyped(value?: Subscription | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'address': value['address'],
-        'wallet_address': value['walletAddress'],
-        'beneficiary_address': value['beneficiaryAddress'],
-        'amount': value['amount'],
+        'type': value['type'],
+        'status': value['status'],
         'period': value['period'],
-        'start_time': value['startTime'],
-        'timeout': value['timeout'],
-        'last_payment_time': value['lastPaymentTime'],
-        'last_request_time': value['lastRequestTime'],
         'subscription_id': value['subscriptionId'],
-        'failed_attempts': value['failedAttempts'],
+        'payment_per_period': PriceToJSON(value['paymentPerPeriod']),
+        'wallet': AccountAddressToJSON(value['wallet']),
+        'next_charge_at': value['nextChargeAt'],
+        'metadata': MetadataToJSON(value['metadata']),
+        'address': value['address'],
+        'beneficiary': AccountAddressToJSON(value['beneficiary']),
     };
 }
 

@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { MultisigOrderChangingParameters } from './MultisigOrderChangingParameters';
+import {
+    MultisigOrderChangingParametersFromJSON,
+    MultisigOrderChangingParametersFromJSONTyped,
+    MultisigOrderChangingParametersToJSON,
+    MultisigOrderChangingParametersToJSONTyped,
+} from './MultisigOrderChangingParameters';
 import type { Risk } from './Risk';
 import {
     RiskFromJSON,
@@ -87,6 +94,18 @@ export interface MultisigOrder {
      * @memberof MultisigOrder
      */
     signedBy: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof MultisigOrder
+     */
+    multisigAddress: string;
+    /**
+     * 
+     * @type {MultisigOrderChangingParameters}
+     * @memberof MultisigOrder
+     */
+    changingParameters?: MultisigOrderChangingParameters;
 }
 
 /**
@@ -103,6 +122,7 @@ export function instanceOfMultisigOrder(value: object): value is MultisigOrder {
     if (!('risk' in value) || value['risk'] === undefined) return false;
     if (!('creationDate' in value) || value['creationDate'] === undefined) return false;
     if (!('signedBy' in value) || value['signedBy'] === undefined) return false;
+    if (!('multisigAddress' in value) || value['multisigAddress'] === undefined) return false;
     return true;
 }
 
@@ -126,14 +146,16 @@ export function MultisigOrderFromJSONTyped(json: any, ignoreDiscriminator: boole
         'risk': RiskFromJSON(json['risk']),
         'creationDate': json['creation_date'],
         'signedBy': json['signed_by'],
+        'multisigAddress': json['multisig_address'],
+        'changingParameters': json['changing_parameters'] == null ? undefined : MultisigOrderChangingParametersFromJSON(json['changing_parameters']),
     };
 }
 
-export function MultisigOrderToJSON(json: any): MultisigOrder {
-    return MultisigOrderToJSONTyped(json, false);
-}
+  export function MultisigOrderToJSON(json: any): MultisigOrder {
+      return MultisigOrderToJSONTyped(json, false);
+  }
 
-export function MultisigOrderToJSONTyped(value?: MultisigOrder | null, ignoreDiscriminator: boolean = false): any {
+  export function MultisigOrderToJSONTyped(value?: MultisigOrder | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -150,6 +172,8 @@ export function MultisigOrderToJSONTyped(value?: MultisigOrder | null, ignoreDis
         'risk': RiskToJSON(value['risk']),
         'creation_date': value['creationDate'],
         'signed_by': value['signedBy'],
+        'multisig_address': value['multisigAddress'],
+        'changing_parameters': MultisigOrderChangingParametersToJSON(value['changingParameters']),
     };
 }
 

@@ -57,11 +57,11 @@ export function DomainBidsFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function DomainBidsToJSON(json: any): DomainBids {
-    return DomainBidsToJSONTyped(json, false);
-}
+  export function DomainBidsToJSON(json: any): DomainBids {
+      return DomainBidsToJSONTyped(json, false);
+  }
 
-export function DomainBidsToJSONTyped(value?: DomainBids | null, ignoreDiscriminator: boolean = false): any {
+  export function DomainBidsToJSONTyped(value?: DomainBids | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

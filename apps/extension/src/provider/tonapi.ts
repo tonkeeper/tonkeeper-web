@@ -1,7 +1,7 @@
 import { TonProvider } from '.';
 
 interface TonApiResult {
-    payload: Object;
+    payload: Record<string, unknown>;
     status: number;
     statusText: string;
     headers: [string, string][];

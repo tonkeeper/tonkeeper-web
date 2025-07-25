@@ -57,11 +57,11 @@ export function BlockchainConfig7CurrenciesInnerFromJSONTyped(json: any, ignoreD
     };
 }
 
-export function BlockchainConfig7CurrenciesInnerToJSON(json: any): BlockchainConfig7CurrenciesInner {
-    return BlockchainConfig7CurrenciesInnerToJSONTyped(json, false);
-}
+  export function BlockchainConfig7CurrenciesInnerToJSON(json: any): BlockchainConfig7CurrenciesInner {
+      return BlockchainConfig7CurrenciesInnerToJSONTyped(json, false);
+  }
 
-export function BlockchainConfig7CurrenciesInnerToJSONTyped(value?: BlockchainConfig7CurrenciesInner | null, ignoreDiscriminator: boolean = false): any {
+  export function BlockchainConfig7CurrenciesInnerToJSONTyped(value?: BlockchainConfig7CurrenciesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

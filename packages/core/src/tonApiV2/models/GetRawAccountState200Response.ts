@@ -89,11 +89,11 @@ export function GetRawAccountState200ResponseFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function GetRawAccountState200ResponseToJSON(json: any): GetRawAccountState200Response {
-    return GetRawAccountState200ResponseToJSONTyped(json, false);
-}
+  export function GetRawAccountState200ResponseToJSON(json: any): GetRawAccountState200Response {
+      return GetRawAccountState200ResponseToJSONTyped(json, false);
+  }
 
-export function GetRawAccountState200ResponseToJSONTyped(value?: GetRawAccountState200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawAccountState200ResponseToJSONTyped(value?: GetRawAccountState200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -18,6 +18,8 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { JettonKey, QueryKey } from '../libs/queryKey';
 import { useActiveApi, useActiveTonNetwork, useActiveWallet } from './wallet';
+import { TON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 export const useJettonInfo = (jettonAddress: string) => {
     const wallet = useActiveWallet();
@@ -41,6 +43,20 @@ const filterTokens = (balances: JettonBalance[], hiddenTokens: string[]) => {
             new BigNumber(item.balance).gt(0) &&
             !hiddenTokens.includes(item.jetton.address)
     );
+};
+
+export const patchedTokenImage = (address: string, imageUrl: string) => {
+    if (address === tonAssetAddressToString(TON_USDT_ASSET.address)) {
+        return TON_USDT_ASSET.image!;
+    }
+
+    return imageUrl;
+};
+
+const patchTokensImages = (balances: JettonBalance[]) => {
+    balances.forEach(item => {
+        item.jetton.image = patchedTokenImage(item.jetton.address, item.jetton.image);
+    });
 };
 
 const getTokenBalance = ({ price, balance, jetton }: JettonBalance, fiat: FiatCurrencies) => {
@@ -70,6 +86,7 @@ export const useJettonRawList = () => {
                 supportedExtensions: ['custom_payload']
             });
             const balances = filterTokens(result.balances, []).sort(compareTokensOver(fiat));
+            patchTokensImages(result.balances);
             return { balances };
         }
     );
@@ -83,35 +100,38 @@ export const useJettonList = () => {
 
     const sdk = useAppSdk();
 
-    return useQuery<JettonsBalances, Error>(
-        [wallet.id, QueryKey.jettons, fiat, network],
-        async () => {
-            const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
-                accountId: wallet.rawAddress,
-                currencies: [fiat],
-                supportedExtensions: ['custom_payload']
-            });
+    const key = [wallet.id, QueryKey.jettons, fiat, network];
 
-            const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
+    const query = useQuery<JettonsBalances, Error>(key, async () => {
+        const result = await new AccountsApi(api.tonApiV2).getAccountJettonsBalances({
+            accountId: wallet.rawAddress,
+            currencies: [fiat],
+            supportedExtensions: ['custom_payload']
+        });
 
-            const balances = filterTokens(result.balances, config.hiddenTokens).sort(
-                compareTokensOver(fiat)
-            );
+        const config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
-            const pinned = config.pinnedTokens.reduce((acc, address) => {
-                const item = balances.find(i => i.jetton.address === address);
-                if (item) {
-                    acc.push(item);
-                }
-                return acc;
-            }, [] as JettonBalance[]);
+        const balances = filterTokens(result.balances, config.hiddenTokens).sort(
+            compareTokensOver(fiat)
+        );
+        patchTokensImages(balances);
 
-            const rest = balances.filter(
-                item => !config.pinnedTokens.includes(item.jetton.address)
-            );
-            return { balances: pinned.concat(rest) };
-        }
-    );
+        const pinned = config.pinnedTokens.reduce((acc, address) => {
+            const item = balances.find(i => i.jetton.address === address);
+            if (item) {
+                acc.push(item);
+            }
+            return acc;
+        }, [] as JettonBalance[]);
+
+        const rest = balances.filter(item => !config.pinnedTokens.includes(item.jetton.address));
+        return { balances: pinned.concat(rest) };
+    });
+
+    return {
+        ...query,
+        key
+    };
 };
 
 export const useJettonBalance = (jettonAddress: string) => {
@@ -125,6 +145,7 @@ export const useJettonBalance = (jettonAddress: string) => {
                 jettonId: jettonAddress,
                 supportedExtensions: ['custom_payload']
             });
+            patchTokensImages([result]);
             return result;
         }
     );

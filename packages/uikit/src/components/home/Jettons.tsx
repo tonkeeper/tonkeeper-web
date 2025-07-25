@@ -51,7 +51,7 @@ export const TonAsset = forwardRef<
             ref={ref}
         >
             <ListItemPayload>
-                <TokenLogo src="https://wallet.tonkeeper.com/img/toncoin.svg" />
+                <TokenLogo src={TON_ASSET.image} noRadius={TON_ASSET.noImageCorners} />
                 <TokenLayout
                     name={t('Toncoin')}
                     symbol={balance.asset.symbol}
@@ -131,7 +131,7 @@ export const JettonAsset = forwardRef<
             ref={ref}
         >
             <ListItemPayload>
-                <TokenLogo src={balance.asset.image} />
+                <TokenLogo src={balance.asset.image} noRadius={balance.asset.noImageCorners} />
                 <TokenLayout
                     name={balance.asset.name ?? t('Unknown_COIN')}
                     verification={verification}

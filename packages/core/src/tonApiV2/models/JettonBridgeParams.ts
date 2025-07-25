@@ -109,11 +109,11 @@ export function JettonBridgeParamsFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function JettonBridgeParamsToJSON(json: any): JettonBridgeParams {
-    return JettonBridgeParamsToJSONTyped(json, false);
-}
+  export function JettonBridgeParamsToJSON(json: any): JettonBridgeParams {
+      return JettonBridgeParamsToJSONTyped(json, false);
+  }
 
-export function JettonBridgeParamsToJSONTyped(value?: JettonBridgeParams | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonBridgeParamsToJSONTyped(value?: JettonBridgeParams | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

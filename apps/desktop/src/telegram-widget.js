@@ -1,13 +1,13 @@
 /* eslint-disable */
 /* patched version of 'https://telegram.org/js/telegram-widget.js?22' */
-/* changes: set iframe display to 'none' on line 342, change origin on 521-522 lines and `widgetsOrigin` on 576 line */
+
 
 (function(window) {
   (function(window){
     window.__parseFunction = function(__func, __attrs) {
       __attrs = __attrs || [];
       __func = '(function(' + __attrs.join(',') + '){' + __func + '})';
-      return window.execScript ? window.execScript(__func) : eval(__func);
+      /*PATCHED block eval*/ throw new Error('[TG]: Unsupported method');
     }
   }(window));
   (function(window){
@@ -518,7 +518,7 @@
           setTimeout(checkClose, 100, bot_id);
         }
 
-/* PATCHED */ const origin =  REACT_APP_TG_BOT_ORIGIN;
+/* PATCHED */ const origin = 'https://wallet.tonkeeper.com';
 /* PATCHED */ var popup_url = Telegram.Login.widgetsOrigin + '/auth?bot_id=' + encodeURIComponent(options.bot_id) + '&origin=' + encodeURIComponent(origin) + (options.request_access ? '&request_access=' + encodeURIComponent(options.request_access) : '') + ('&lang=' + encodeURIComponent(options.lang)) + '&return_to=' + encodeURIComponent(origin);
         var popup = window.open(popup_url, '_blank', 'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top + ',status=0,location=0,menubar=0,toolbar=0');
         TelegramLogin.popups[bot_id] = {
@@ -562,7 +562,7 @@
         xhr.onerror = function() {
           callback('*', false);
         };
-        xhr.withCredentials = false;
+/*PATCHED*/ xhr.withCredentials = false;
         xhr.send('bot_id=' + encodeURIComponent(options.bot_id) + (options.lang ? '&lang=' + encodeURIComponent(options.lang) : ''));
       }
     };

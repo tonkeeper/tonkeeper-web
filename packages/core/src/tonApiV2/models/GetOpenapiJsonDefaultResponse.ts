@@ -16,36 +16,36 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface InlineObject
+ * @interface GetOpenapiJsonDefaultResponse
  */
-export interface InlineObject {
+export interface GetOpenapiJsonDefaultResponse {
     /**
      * 
      * @type {string}
-     * @memberof InlineObject
+     * @memberof GetOpenapiJsonDefaultResponse
      */
     error: string;
     /**
      * 
      * @type {number}
-     * @memberof InlineObject
+     * @memberof GetOpenapiJsonDefaultResponse
      */
     errorCode?: number;
 }
 
 /**
- * Check if a given object implements the InlineObject interface.
+ * Check if a given object implements the GetOpenapiJsonDefaultResponse interface.
  */
-export function instanceOfInlineObject(value: object): value is InlineObject {
+export function instanceOfGetOpenapiJsonDefaultResponse(value: object): value is GetOpenapiJsonDefaultResponse {
     if (!('error' in value) || value['error'] === undefined) return false;
     return true;
 }
 
-export function InlineObjectFromJSON(json: any): InlineObject {
-    return InlineObjectFromJSONTyped(json, false);
+export function GetOpenapiJsonDefaultResponseFromJSON(json: any): GetOpenapiJsonDefaultResponse {
+    return GetOpenapiJsonDefaultResponseFromJSONTyped(json, false);
 }
 
-export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineObject {
+export function GetOpenapiJsonDefaultResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): GetOpenapiJsonDefaultResponse {
     if (json == null) {
         return json;
     }
@@ -56,11 +56,11 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function InlineObjectToJSON(json: any): InlineObject {
-    return InlineObjectToJSONTyped(json, false);
-}
+  export function GetOpenapiJsonDefaultResponseToJSON(json: any): GetOpenapiJsonDefaultResponse {
+      return GetOpenapiJsonDefaultResponseToJSONTyped(json, false);
+  }
 
-export function InlineObjectToJSONTyped(value?: InlineObject | null, ignoreDiscriminator: boolean = false): any {
+  export function GetOpenapiJsonDefaultResponseToJSONTyped(value?: GetOpenapiJsonDefaultResponse | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

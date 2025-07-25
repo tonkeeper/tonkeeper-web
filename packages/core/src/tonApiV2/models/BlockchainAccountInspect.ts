@@ -114,11 +114,11 @@ export function BlockchainAccountInspectFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function BlockchainAccountInspectToJSON(json: any): BlockchainAccountInspect {
-    return BlockchainAccountInspectToJSONTyped(json, false);
-}
+  export function BlockchainAccountInspectToJSON(json: any): BlockchainAccountInspect {
+      return BlockchainAccountInspectToJSONTyped(json, false);
+  }
 
-export function BlockchainAccountInspectToJSONTyped(value?: BlockchainAccountInspect | null, ignoreDiscriminator: boolean = false): any {
+  export function BlockchainAccountInspectToJSONTyped(value?: BlockchainAccountInspect | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

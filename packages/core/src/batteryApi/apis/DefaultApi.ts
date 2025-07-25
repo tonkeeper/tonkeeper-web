@@ -38,6 +38,7 @@ import type {
   GetTonConnectPayloadDefaultResponse,
   GetTronConfig200Response,
   IOSBatteryPurchaseStatus,
+  IncreaseUserBalanceRequest,
   IosBatteryPurchaseRequest,
   PromoCodeBatteryPurchaseRequest,
   PromoCodeBatteryPurchaseStatus,
@@ -51,6 +52,7 @@ import type {
   Transactions,
   TronSendRequest,
   TronTransactionsList,
+  VerifyPurchasePromo200Response,
 } from '../models/index';
 import {
     AndroidBatteryPurchaseRequestFromJSON,
@@ -99,6 +101,8 @@ import {
     GetTronConfig200ResponseToJSON,
     IOSBatteryPurchaseStatusFromJSON,
     IOSBatteryPurchaseStatusToJSON,
+    IncreaseUserBalanceRequestFromJSON,
+    IncreaseUserBalanceRequestToJSON,
     IosBatteryPurchaseRequestFromJSON,
     IosBatteryPurchaseRequestToJSON,
     PromoCodeBatteryPurchaseRequestFromJSON,
@@ -125,6 +129,8 @@ import {
     TronSendRequestToJSON,
     TronTransactionsListFromJSON,
     TronTransactionsListToJSON,
+    VerifyPurchasePromo200ResponseFromJSON,
+    VerifyPurchasePromo200ResponseToJSON,
 } from '../models/index';
 
 export interface AndroidBatteryPurchaseOperationRequest {
@@ -185,6 +191,7 @@ export interface EstimateGaslessCostOperationRequest {
     xTonConnectAuth?: string;
     walletAddress?: string;
     walletPublicKey?: string;
+    enableValidation?: boolean;
 }
 
 export interface ExtendRefundPeriodRequest {
@@ -195,6 +202,7 @@ export interface ExtendRefundPeriodRequest {
 export interface GetBalanceRequest {
     xTonConnectAuth: string;
     units?: GetBalanceUnitsEnum;
+    region?: string;
 }
 
 export interface GetBatteryChargedRequest {
@@ -232,9 +240,19 @@ export interface GetTronTransactionsRequest {
     maxTimestamp?: number;
 }
 
+export interface IncreaseUserBalanceOperationRequest {
+    token: string;
+    userId: number;
+    increaseUserBalanceRequest: IncreaseUserBalanceRequest;
+}
+
 export interface IosBatteryPurchaseOperationRequest {
     xTonConnectAuth: string;
     iosBatteryPurchaseRequest: IosBatteryPurchaseRequest;
+}
+
+export interface ItrxIoCallbackRequest {
+    requestBody: { [key: string]: any; };
 }
 
 export interface PromoCodeBatteryPurchaseOperationRequest {
@@ -431,6 +449,7 @@ export interface DefaultApiInterface {
      * @param {string} [xTonConnectAuth] 
      * @param {string} [walletAddress] 
      * @param {string} [walletPublicKey] 
+     * @param {boolean} [enableValidation] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -459,6 +478,7 @@ export interface DefaultApiInterface {
      * This method returns information about a user\'s balance.
      * @param {string} xTonConnectAuth 
      * @param {'usd' | 'ton'} [units] 
+     * @param {string} [region] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -599,6 +619,21 @@ export interface DefaultApiInterface {
     getTronTransactions(requestParameters: GetTronTransactionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TronTransactionsList>;
 
     /**
+     * 
+     * @param {string} token 
+     * @param {number} userId 
+     * @param {IncreaseUserBalanceRequest} increaseUserBalanceRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    increaseUserBalanceRaw(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     */
+    increaseUserBalance(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+
+    /**
      * verify an in-app purchase
      * @param {string} xTonConnectAuth 
      * @param {IosBatteryPurchaseRequest} iosBatteryPurchaseRequest In-App purchase
@@ -612,6 +647,20 @@ export interface DefaultApiInterface {
      * verify an in-app purchase
      */
     iosBatteryPurchase(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IOSBatteryPurchaseStatus>;
+
+    /**
+     * receive callback from itrx.io
+     * @param {{ [key: string]: any; }} requestBody 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApiInterface
+     */
+    itrxIoCallbackRaw(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+
+    /**
+     * receive callback from itrx.io
+     */
+    itrxIoCallback(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
 
     /**
      * charge battery with promo code
@@ -711,11 +760,11 @@ export interface DefaultApiInterface {
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
      */
-    verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>>;
+    verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyPurchasePromo200Response>>;
 
     /**
      */
-    verifyPurchasePromo(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }>;
+    verifyPurchasePromo(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyPurchasePromo200Response>;
 
 }
 
@@ -1198,6 +1247,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             queryParameters['wallet_public_key'] = requestParameters['walletPublicKey'];
         }
 
+        if (requestParameters['enableValidation'] != null) {
+            queryParameters['enable_validation'] = requestParameters['enableValidation'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -1281,6 +1334,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
         if (requestParameters['units'] != null) {
             queryParameters['units'] = requestParameters['units'];
+        }
+
+        if (requestParameters['region'] != null) {
+            queryParameters['region'] = requestParameters['region'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -1634,6 +1691,58 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
     }
 
     /**
+     */
+    async increaseUserBalanceRaw(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        if (requestParameters['token'] == null) {
+            throw new runtime.RequiredError(
+                'token',
+                'Required parameter "token" was null or undefined when calling increaseUserBalance().'
+            );
+        }
+
+        if (requestParameters['userId'] == null) {
+            throw new runtime.RequiredError(
+                'userId',
+                'Required parameter "userId" was null or undefined when calling increaseUserBalance().'
+            );
+        }
+
+        if (requestParameters['increaseUserBalanceRequest'] == null) {
+            throw new runtime.RequiredError(
+                'increaseUserBalanceRequest',
+                'Required parameter "increaseUserBalanceRequest" was null or undefined when calling increaseUserBalance().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['token'] != null) {
+            queryParameters['token'] = requestParameters['token'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/restricted/users/{user_id}/increase-balance`.replace(`{${"user_id"}}`, encodeURIComponent(String(requestParameters['userId']))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: IncreaseUserBalanceRequestToJSON(requestParameters['increaseUserBalanceRequest']),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     */
+    async increaseUserBalance(requestParameters: IncreaseUserBalanceOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.increaseUserBalanceRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * verify an in-app purchase
      */
     async iosBatteryPurchaseRaw(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IOSBatteryPurchaseStatus>> {
@@ -1677,6 +1786,42 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      */
     async iosBatteryPurchase(requestParameters: IosBatteryPurchaseOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IOSBatteryPurchaseStatus> {
         const response = await this.iosBatteryPurchaseRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * receive callback from itrx.io
+     */
+    async itrxIoCallbackRaw(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+        if (requestParameters['requestBody'] == null) {
+            throw new runtime.RequiredError(
+                'requestBody',
+                'Required parameter "requestBody" was null or undefined when calling itrxIoCallback().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/v0/tron/itrx-io-callback`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: requestParameters['requestBody'],
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * receive callback from itrx.io
+     */
+    async itrxIoCallback(requestParameters: ItrxIoCallbackRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+        const response = await this.itrxIoCallbackRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -1967,7 +2112,7 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
 
     /**
      */
-    async verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: any; }>> {
+    async verifyPurchasePromoRaw(requestParameters: VerifyPurchasePromoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VerifyPurchasePromo200Response>> {
         const queryParameters: any = {};
 
         if (requestParameters['promo'] != null) {
@@ -1983,12 +2128,12 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => VerifyPurchasePromo200ResponseFromJSON(jsonValue));
     }
 
     /**
      */
-    async verifyPurchasePromo(requestParameters: VerifyPurchasePromoRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: any; }> {
+    async verifyPurchasePromo(requestParameters: VerifyPurchasePromoRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VerifyPurchasePromo200Response> {
         const response = await this.verifyPurchasePromoRaw(requestParameters, initOverrides);
         return await response.value();
     }

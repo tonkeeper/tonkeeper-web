@@ -178,7 +178,8 @@ const HistoryEventSingle: FC<{
                         <HistoryDateCell />
                     )}
                     <HistoryAction
-                        action={action}
+                        /* issue PRO-153 */
+                        action={{ ...action, status: event.inProgress ? 'ok' : action.status }}
                         isScam={event.isScam}
                         date={event.timestamp.toString()}
                     />

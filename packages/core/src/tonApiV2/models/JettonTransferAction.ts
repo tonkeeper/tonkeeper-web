@@ -137,11 +137,11 @@ export function JettonTransferActionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function JettonTransferActionToJSON(json: any): JettonTransferAction {
-    return JettonTransferActionToJSONTyped(json, false);
-}
+  export function JettonTransferActionToJSON(json: any): JettonTransferAction {
+      return JettonTransferActionToJSONTyped(json, false);
+  }
 
-export function JettonTransferActionToJSONTyped(value?: JettonTransferAction | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonTransferActionToJSONTyped(value?: JettonTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

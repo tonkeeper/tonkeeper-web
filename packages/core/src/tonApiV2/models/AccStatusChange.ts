@@ -18,9 +18,9 @@
  * @export
  */
 export const AccStatusChange = {
-    AcstUnchanged: 'acst_unchanged',
-    AcstFrozen: 'acst_frozen',
-    AcstDeleted: 'acst_deleted'
+    Unchanged: 'acst_unchanged',
+    Frozen: 'acst_frozen',
+    Deleted: 'acst_deleted'
 } as const;
 export type AccStatusChange = typeof AccStatusChange[keyof typeof AccStatusChange];
 

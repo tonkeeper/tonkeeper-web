@@ -13,7 +13,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TonEstimation, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
 import { useTransactionAnalytics } from '../../../hooks/analytics';
 import { QueryKey } from '../../../libs/queryKey';
-import { Image, ImageMock, Info, SendingTitle, Title } from '../Confirm';
+import { ConfirmViewImage, ImageMock, Info, SendingTitle, Title } from '../Confirm';
 import {
     ConfirmViewContext,
     ConfirmViewDetailsComment,
@@ -49,7 +49,6 @@ import { comment } from '@ton/core';
 import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
-import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
 
 const assetAmount = new AssetAmount({
@@ -101,7 +100,7 @@ const useNftTransferEstimation = (
                 const sender = await getSender!();
                 const nftTransferMsg = nftEncoder.encodeNftTransfer({
                     nftAddress: nftItem.address,
-                    recipientAddress: data!.address.address,
+                    recipientAddress: data!.toAccount.address,
                     forwardPayload: data!.comment ? comment(data.comment) : null,
                     responseAddress:
                         'excessAddress' in sender && sender.excessAddress
@@ -176,7 +175,7 @@ const useSendNft = (
             );
             const nftTransferMsg = nftEncoder.encodeNftTransfer({
                 nftAddress: nftItem.address,
-                recipientAddress: recipient.address.address,
+                recipientAddress: recipient.toAccount.address,
                 forwardPayload: recipient.comment ? comment(recipient.comment) : null,
                 nftTransferAmountWei,
                 responseAddress:
@@ -284,7 +283,7 @@ export const ConfirmNftView: FC<{
             <FullHeightBlock onSubmit={onSubmit} standalone={standalone}>
                 {headerBlock}
                 <Info>
-                    {image ? <Image src={image.url} /> : <ImageMock />}
+                    {image ? <ConfirmViewImage src={image.url} /> : <ImageMock />}
                     <SendingTitle>{nftItem.dns ?? nftItem.metadata.name}</SendingTitle>
                     <Title>{t('txActions_signRaw_types_nftItemTransfer')}</Title>
                 </Info>

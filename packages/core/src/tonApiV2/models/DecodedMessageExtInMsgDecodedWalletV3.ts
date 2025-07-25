@@ -81,11 +81,11 @@ export function DecodedMessageExtInMsgDecodedWalletV3FromJSONTyped(json: any, ig
     };
 }
 
-export function DecodedMessageExtInMsgDecodedWalletV3ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV3 {
-    return DecodedMessageExtInMsgDecodedWalletV3ToJSONTyped(json, false);
-}
+  export function DecodedMessageExtInMsgDecodedWalletV3ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletV3 {
+      return DecodedMessageExtInMsgDecodedWalletV3ToJSONTyped(json, false);
+  }
 
-export function DecodedMessageExtInMsgDecodedWalletV3ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV3 | null, ignoreDiscriminator: boolean = false): any {
+  export function DecodedMessageExtInMsgDecodedWalletV3ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletV3 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

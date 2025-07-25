@@ -73,11 +73,11 @@ export function DomainRenewActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function DomainRenewActionToJSON(json: any): DomainRenewAction {
-    return DomainRenewActionToJSONTyped(json, false);
-}
+  export function DomainRenewActionToJSON(json: any): DomainRenewAction {
+      return DomainRenewActionToJSONTyped(json, false);
+  }
 
-export function DomainRenewActionToJSONTyped(value?: DomainRenewAction | null, ignoreDiscriminator: boolean = false): any {
+  export function DomainRenewActionToJSONTyped(value?: DomainRenewAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

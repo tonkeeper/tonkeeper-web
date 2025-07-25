@@ -84,8 +84,10 @@ export abstract class MainWindow {
 
                     /* patch tg auth headers  */
                     if (details.url === 'https://oauth.telegram.org/auth/get') {
-                        details.requestHeaders.origin = 'https://tonkeeper.com';
-                        details.requestHeaders.referer = 'https://tonkeeper.com';
+                        details.requestHeaders.origin = 'https://wallet.tonkeeper.com';
+                        details.requestHeaders.Origin = 'https://wallet.tonkeeper.com';
+                        details.requestHeaders.referer = 'https://wallet.tonkeeper.com';
+                        details.requestHeaders.Referer = 'https://wallet.tonkeeper.com';
                     }
 
                     callback({

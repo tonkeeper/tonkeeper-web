@@ -1,5 +1,6 @@
 module.exports = {
     root: true,
+    parser: '@typescript-eslint/parser',
     ignorePatterns: ['node_modules', 'dist'],
     extends: ['plugin:prettier/recommended', 'prettier'],
     rules: {

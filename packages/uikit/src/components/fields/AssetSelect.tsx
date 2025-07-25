@@ -1,6 +1,7 @@
 import React, { FC, useMemo } from 'react';
 import {
     isTon,
+    shouldHideTonJettonImageCorners,
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
@@ -11,8 +12,9 @@ import styled from 'styled-components';
 import { SelectDropDown, SelectDropDownHost, SelectField } from './Select';
 import { SwitchIcon } from '../Icon';
 import { Body3Class, Label2 } from '../Text';
+import { Image } from '../shared/Image';
 
-const AssetIcon = styled.img`
+const AssetIcon = styled(Image)`
     width: 24px;
     height: 24px;
     border-radius: ${props => props.theme.cornerFull};
@@ -89,7 +91,10 @@ export const AssetSelect: FC<{
                 <SelectDropDownHostStyled isErrored={!!error}>
                     {!!selectedAsset && (
                         <>
-                            <AssetIcon src={selectedAsset.image} />
+                            <AssetIcon
+                                src={selectedAsset.image}
+                                noRadius={selectedAsset.noImageCorners}
+                            />
                             <Label2>{selectedAsset.symbol}</Label2>
                             <SwitchIcon />
                         </>
@@ -141,7 +146,12 @@ export const AssetSelectDropdownContent: FC<{
                             onAssetChange(item.asset);
                         }}
                     >
-                        <AssetIcon src={item.asset.image} />
+                        <AssetIcon
+                            src={item.asset.image}
+                            noRadius={shouldHideTonJettonImageCorners(
+                                tonAssetAddressToString(item.asset.address)
+                            )}
+                        />
                         <ColumnText
                             text={item.asset.symbol}
                             secondary={item.stringAssetRelativeAmount}

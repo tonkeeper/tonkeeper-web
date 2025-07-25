@@ -73,11 +73,11 @@ export function JettonHoldersAddressesInnerFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-export function JettonHoldersAddressesInnerToJSON(json: any): JettonHoldersAddressesInner {
-    return JettonHoldersAddressesInnerToJSONTyped(json, false);
-}
+  export function JettonHoldersAddressesInnerToJSON(json: any): JettonHoldersAddressesInner {
+      return JettonHoldersAddressesInnerToJSONTyped(json, false);
+  }
 
-export function JettonHoldersAddressesInnerToJSONTyped(value?: JettonHoldersAddressesInner | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonHoldersAddressesInnerToJSONTyped(value?: JettonHoldersAddressesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

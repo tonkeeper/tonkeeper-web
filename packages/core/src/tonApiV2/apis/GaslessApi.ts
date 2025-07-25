@@ -19,7 +19,7 @@ import type {
   GaslessEstimateRequest,
   GaslessSendRequest,
   GaslessTx,
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
   SignRawParams,
 } from '../models/index';
 import {
@@ -31,8 +31,8 @@ import {
     GaslessSendRequestToJSON,
     GaslessTxFromJSON,
     GaslessTxToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     SignRawParamsFromJSON,
     SignRawParamsToJSON,
 } from '../models/index';

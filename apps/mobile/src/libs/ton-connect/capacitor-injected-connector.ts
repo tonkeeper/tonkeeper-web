@@ -31,10 +31,10 @@ import {
     getBrowserPlatform,
     getDeviceInfo,
     getInjectedDappConnection,
-    originFromUrl,
     tonConnectTonkeeperProAppName,
     tonInjectedReConnectRequest
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
+import { originFromUrl } from '@tonkeeper/core/dist/utils/url';
 import packageJson from '../../../package.json';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { BrowserTabIdentifier } from '@tonkeeper/core/dist/service/dappBrowserService';

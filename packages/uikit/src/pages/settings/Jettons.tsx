@@ -29,7 +29,6 @@ import {
     jettonToTonAssetAmount
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useTronBalances } from '../../state/tron/tron';
-import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent,
@@ -38,6 +37,7 @@ import {
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
+import { Image } from '../../components/shared/Image';
 
 const TurnOnIcon = styled.span`
     color: ${props => props.theme.accentBlue};
@@ -53,10 +53,10 @@ const Row = styled.div`
     display: flex;
     gap: 1rem;
 `;
-const Logo = styled.img<{ $noCorners?: boolean }>`
+const Logo = styled(Image)`
     width: 44px;
     height: 44px;
-    border-radius: ${props => (props.$noCorners ? 'none' : props.theme.cornerFull)};
+    border-radius: ${props => props.theme.cornerFull};
 `;
 
 const Icon = styled.span`
@@ -101,10 +101,7 @@ const SampleJettonRow: FC<{ jetton: AssetAmount; config: TonWalletConfig }> = ({
     return (
         <ListItemPayload>
             <Row>
-                <Logo
-                    src={jetton.asset.image}
-                    $noCorners={jetton.asset.id === TRON_USDT_ASSET.id}
-                />
+                <Logo src={jetton.asset.image} noRadius={jetton.asset.noImageCorners} />
                 <TextWrapper>
                     <ColumnText
                         text={jetton.asset.name ?? t('Unknown_COIN')}
@@ -224,10 +221,7 @@ const JettonRow: FC<{
     return (
         <ListItemPayload>
             <Row>
-                <Logo
-                    src={jetton.asset.image}
-                    $noCorners={jetton.asset.id === TRON_USDT_ASSET.id}
-                />
+                <Logo src={jetton.asset.image} noRadius={jetton.asset.noImageCorners} />
                 <ColumnText
                     text={jetton.asset.name ?? t('Unknown_COIN')}
                     secondary={jetton.stringAssetRelativeAmount}

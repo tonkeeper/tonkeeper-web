@@ -82,6 +82,12 @@ export interface AccountEvent {
      * @memberof AccountEvent
      */
     extra: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof AccountEvent
+     */
+    progress: number;
 }
 
 /**
@@ -96,6 +102,7 @@ export function instanceOfAccountEvent(value: object): value is AccountEvent {
     if (!('lt' in value) || value['lt'] === undefined) return false;
     if (!('inProgress' in value) || value['inProgress'] === undefined) return false;
     if (!('extra' in value) || value['extra'] === undefined) return false;
+    if (!('progress' in value) || value['progress'] === undefined) return false;
     return true;
 }
 
@@ -117,6 +124,7 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lt': json['lt'],
         'inProgress': json['in_progress'],
         'extra': json['extra'],
+        'progress': json['progress'],
     };
 }
 
@@ -139,6 +147,7 @@ export function AccountEventFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lt': value['lt'],
         'in_progress': value['inProgress'],
         'extra': value['extra'],
+        'progress': value['progress'],
     };
 }
 

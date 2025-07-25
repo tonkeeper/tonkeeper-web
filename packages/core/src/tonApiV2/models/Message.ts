@@ -219,11 +219,11 @@ export function MessageFromJSONTyped(json: any, ignoreDiscriminator: boolean): M
     };
 }
 
-export function MessageToJSON(json: any): Message {
-    return MessageToJSONTyped(json, false);
-}
+  export function MessageToJSON(json: any): Message {
+      return MessageToJSONTyped(json, false);
+  }
 
-export function MessageToJSONTyped(value?: Message | null, ignoreDiscriminator: boolean = false): any {
+  export function MessageToJSONTyped(value?: Message | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

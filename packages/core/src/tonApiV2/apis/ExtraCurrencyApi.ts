@@ -16,13 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   EcPreview,
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
 } from '../models/index';
 import {
     EcPreviewFromJSON,
     EcPreviewToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
 } from '../models/index';
 
 export interface GetExtraCurrencyInfoRequest {

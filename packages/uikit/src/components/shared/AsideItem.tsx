@@ -1,5 +1,5 @@
-import styled, { css } from 'styled-components';
-import { hexToRGBA } from '../../libs/css';
+import styled from 'styled-components';
+import { hexToRGBA, hover } from '../../libs/css';
 
 /**
  * Need to be a 'div' instead of 'button' to provide correct dnd behavior
@@ -31,11 +31,7 @@ export const AsideMenuItem = styled.div<{ isSelected: boolean }>`
 
     ${p =>
         p.theme.proDisplayType !== 'mobile' &&
-        css`
-            @media (pointer: fine) {
-                &:hover {
-                    background: ${p => hexToRGBA(p.theme.backgroundContentTint, 0.56)};
-                }
-            }
+        hover`
+            background: ${hexToRGBA(p.theme.backgroundContentTint, 0.56)};
         `}
 `;

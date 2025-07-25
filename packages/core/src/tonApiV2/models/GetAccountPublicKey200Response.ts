@@ -49,11 +49,11 @@ export function GetAccountPublicKey200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function GetAccountPublicKey200ResponseToJSON(json: any): GetAccountPublicKey200Response {
-    return GetAccountPublicKey200ResponseToJSONTyped(json, false);
-}
+  export function GetAccountPublicKey200ResponseToJSON(json: any): GetAccountPublicKey200Response {
+      return GetAccountPublicKey200ResponseToJSONTyped(json, false);
+  }
 
-export function GetAccountPublicKey200ResponseToJSONTyped(value?: GetAccountPublicKey200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetAccountPublicKey200ResponseToJSONTyped(value?: GetAccountPublicKey200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

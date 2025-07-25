@@ -13,6 +13,21 @@
  */
 
 import { mapValues } from '../runtime';
+import type { TrustType } from './TrustType';
+import {
+    TrustTypeFromJSON,
+    TrustTypeFromJSONTyped,
+    TrustTypeToJSON,
+    TrustTypeToJSONTyped,
+} from './TrustType';
+import type { CurrencyType } from './CurrencyType';
+import {
+    CurrencyTypeFromJSON,
+    CurrencyTypeFromJSONTyped,
+    CurrencyTypeToJSON,
+    CurrencyTypeToJSONTyped,
+} from './CurrencyType';
+
 /**
  * 
  * @export
@@ -21,24 +36,60 @@ import { mapValues } from '../runtime';
 export interface Price {
     /**
      * 
+     * @type {CurrencyType}
+     * @memberof Price
+     */
+    currencyType: CurrencyType;
+    /**
+     * 
      * @type {string}
      * @memberof Price
      */
     value: string;
     /**
      * 
+     * @type {number}
+     * @memberof Price
+     */
+    decimals: number;
+    /**
+     * 
      * @type {string}
      * @memberof Price
      */
     tokenName: string;
+    /**
+     * 
+     * @type {TrustType}
+     * @memberof Price
+     */
+    verification: TrustType;
+    /**
+     * 
+     * @type {string}
+     * @memberof Price
+     */
+    image: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Price
+     */
+    jetton?: string;
 }
+
+
 
 /**
  * Check if a given object implements the Price interface.
  */
 export function instanceOfPrice(value: object): value is Price {
+    if (!('currencyType' in value) || value['currencyType'] === undefined) return false;
     if (!('value' in value) || value['value'] === undefined) return false;
+    if (!('decimals' in value) || value['decimals'] === undefined) return false;
     if (!('tokenName' in value) || value['tokenName'] === undefined) return false;
+    if (!('verification' in value) || value['verification'] === undefined) return false;
+    if (!('image' in value) || value['image'] === undefined) return false;
     return true;
 }
 
@@ -52,24 +103,34 @@ export function PriceFromJSONTyped(json: any, ignoreDiscriminator: boolean): Pri
     }
     return {
         
+        'currencyType': CurrencyTypeFromJSON(json['currency_type']),
         'value': json['value'],
+        'decimals': json['decimals'],
         'tokenName': json['token_name'],
+        'verification': TrustTypeFromJSON(json['verification']),
+        'image': json['image'],
+        'jetton': json['jetton'] == null ? undefined : json['jetton'],
     };
 }
 
-export function PriceToJSON(json: any): Price {
-    return PriceToJSONTyped(json, false);
-}
+  export function PriceToJSON(json: any): Price {
+      return PriceToJSONTyped(json, false);
+  }
 
-export function PriceToJSONTyped(value?: Price | null, ignoreDiscriminator: boolean = false): any {
+  export function PriceToJSONTyped(value?: Price | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
+        'currency_type': CurrencyTypeToJSON(value['currencyType']),
         'value': value['value'],
+        'decimals': value['decimals'],
         'token_name': value['tokenName'],
+        'verification': TrustTypeToJSON(value['verification']),
+        'image': value['image'],
+        'jetton': value['jetton'],
     };
 }
 

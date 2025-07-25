@@ -136,11 +136,11 @@ export function JettonSwapActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function JettonSwapActionToJSON(json: any): JettonSwapAction {
-    return JettonSwapActionToJSONTyped(json, false);
-}
+  export function JettonSwapActionToJSON(json: any): JettonSwapAction {
+      return JettonSwapActionToJSONTyped(json, false);
+  }
 
-export function JettonSwapActionToJSONTyped(value?: JettonSwapAction | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonSwapActionToJSONTyped(value?: JettonSwapAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

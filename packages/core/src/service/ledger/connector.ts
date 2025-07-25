@@ -32,7 +32,7 @@ export const connectLedger = async (transportType: 'wire' | 'bluetooth') => {
 
     if (transportType === 'wire') {
         if (await TransportWebHID.isSupported()) {
-            transport = await connectWebHID();
+            transport = await pTimeout(connectWebHID(), 1500);
         } else if (await TransportWebUSB.isSupported()) {
             transport = await connectWebUSB();
         } else {
@@ -51,7 +51,7 @@ export const connectLedger = async (transportType: 'wire' | 'bluetooth') => {
     return new TonTransport(transport);
 };
 
-const openTonAppTimeout = 30000;
+const openTonAppTimeout = 300; // TODO increase when ton ledger tonTransport.isAppOpen bug is fixed
 const openTonAppRetryEvery = 100;
 
 const isLedgerTonAppReady = async (tonTransport: TonTransport) => {
@@ -91,11 +91,14 @@ export const isTransportReady = (tonTransport: TonTransport) => {
 };
 
 async function connectWebHID() {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
         const [device] = await TransportWebHID.list();
-
         if (!device) {
-            await TransportWebHID.create();
+            try {
+                await pTimeout(TransportWebHID.create(), 100);
+            } catch (err) {
+                console.error(err);
+            }
             await wait(100);
             continue;
         }

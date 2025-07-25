@@ -180,6 +180,8 @@ export interface IAppSdk {
     userIdentity: UserIdentity;
 
     dappBrowser?: IDappBrowser;
+
+    linksInterceptorAvailable?: boolean;
 }
 
 export interface IDappBrowser {

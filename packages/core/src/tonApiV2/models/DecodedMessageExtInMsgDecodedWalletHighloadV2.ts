@@ -73,11 +73,11 @@ export function DecodedMessageExtInMsgDecodedWalletHighloadV2FromJSONTyped(json:
     };
 }
 
-export function DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletHighloadV2 {
-    return DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSONTyped(json, false);
-}
+  export function DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSON(json: any): DecodedMessageExtInMsgDecodedWalletHighloadV2 {
+      return DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSONTyped(json, false);
+  }
 
-export function DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletHighloadV2 | null, ignoreDiscriminator: boolean = false): any {
+  export function DecodedMessageExtInMsgDecodedWalletHighloadV2ToJSONTyped(value?: DecodedMessageExtInMsgDecodedWalletHighloadV2 | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

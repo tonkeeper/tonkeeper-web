@@ -43,6 +43,12 @@ export interface TronSendRequest {
      * @memberof TronSendRequest
      */
     wallet: string;
+    /**
+     * base64 encoded payment transaction in the TON network
+     * @type {string}
+     * @memberof TronSendRequest
+     */
+    instantFeeTx?: string;
 }
 
 /**
@@ -67,6 +73,7 @@ export function TronSendRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
         'energy': json['energy'] == null ? undefined : json['energy'],
         'bandwidth': json['bandwidth'] == null ? undefined : json['bandwidth'],
         'wallet': json['wallet'],
+        'instantFeeTx': json['instant_fee_tx'] == null ? undefined : json['instant_fee_tx'],
     };
 }
 
@@ -85,6 +92,7 @@ export function TronSendRequestFromJSONTyped(json: any, ignoreDiscriminator: boo
         'energy': value['energy'],
         'bandwidth': value['bandwidth'],
         'wallet': value['wallet'],
+        'instant_fee_tx': value['instantFeeTx'],
     };
 }
 

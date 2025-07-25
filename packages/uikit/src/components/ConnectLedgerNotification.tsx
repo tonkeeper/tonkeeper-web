@@ -55,6 +55,7 @@ export const LedgerContent: FC<{
         mutateAsync: connectLedger,
         data: tonTransport,
         isLoading: isLedgerConnecting,
+        isError: isLedgerConnectingError,
         isDeviceConnected,
         reset: resetConnection
     } = useConnectLedgerMutation();
@@ -133,7 +134,11 @@ export const LedgerContent: FC<{
 
     return (
         <ConnectLedgerWrapper>
-            <LedgerConnectionStepsStyled {...connectionStepsProps} currentStep={currentStep} />
+            <LedgerConnectionStepsStyled
+                {...connectionStepsProps}
+                currentStep={currentStep}
+                isErrored={isLedgerConnectingError}
+            />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlock>

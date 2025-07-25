@@ -3,12 +3,14 @@ import { getTonkeeperQueryId, StateInit, toStateInit } from '../utils';
 import { APIConfig } from '../../../entries/apis';
 import { TonAsset, tonAssetAddressToString } from '../../../entries/crypto/asset/ton-asset';
 import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
-import { AccountsApi, JettonBalance, JettonsApi } from '../../../tonApiV2';
+import { AccountsApi, JettonBalance, JettonsApi, ResponseError } from '../../../tonApiV2';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 
 type AssetAmountSimple = Pick<AssetAmount<TonAsset>, 'stringWeiAmount'> & {
     asset: Pick<TonAsset, 'address'>;
 };
+
+export class JettonWalletNotFound extends Error {}
 
 export class JettonEncoder {
     static jettonTransferAmount = toNano(0.05);
@@ -67,11 +69,22 @@ export class JettonEncoder {
         stateInit: StateInit;
         jettonWalletAddress: string;
     }> => {
-        const jetton = await new AccountsApi(this.api.tonApiV2).getAccountJettonBalance({
-            accountId: this.walletAddress,
-            jettonId: jettonAddress,
-            supportedExtensions: ['custom_payload']
-        });
+        let jetton: JettonBalance;
+        try {
+            jetton = await new AccountsApi(this.api.tonApiV2).getAccountJettonBalance({
+                accountId: this.walletAddress,
+                jettonId: jettonAddress,
+                supportedExtensions: ['custom_payload']
+            });
+        } catch (e) {
+            if (
+                e instanceof ResponseError &&
+                (await e.response.text()).includes('no jetton wallet')
+            ) {
+                throw new JettonWalletNotFound(e.message);
+            }
+            throw e;
+        }
 
         if (!this.isCompressed(jetton)) {
             return {

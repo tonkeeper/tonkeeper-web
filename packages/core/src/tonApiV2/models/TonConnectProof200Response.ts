@@ -49,11 +49,11 @@ export function TonConnectProof200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function TonConnectProof200ResponseToJSON(json: any): TonConnectProof200Response {
-    return TonConnectProof200ResponseToJSONTyped(json, false);
-}
+  export function TonConnectProof200ResponseToJSON(json: any): TonConnectProof200Response {
+      return TonConnectProof200ResponseToJSONTyped(json, false);
+  }
 
-export function TonConnectProof200ResponseToJSONTyped(value?: TonConnectProof200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function TonConnectProof200ResponseToJSONTyped(value?: TonConnectProof200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -104,11 +104,11 @@ export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardF
     };
 }
 
-export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward {
-    return GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped(json, false);
-}
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSON(json: any): GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward {
+      return GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped(json, false);
+  }
 
-export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForwardToJSONTyped(value?: GetRawBlockProof200ResponseStepsInnerLiteServerBlockLinkForward | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

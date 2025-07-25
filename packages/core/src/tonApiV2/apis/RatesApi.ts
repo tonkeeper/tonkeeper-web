@@ -17,18 +17,18 @@ import * as runtime from '../runtime';
 import type {
   GetChartRates200Response,
   GetMarketsRates200Response,
+  GetOpenapiJsonDefaultResponse,
   GetRates200Response,
-  InlineObject,
 } from '../models/index';
 import {
     GetChartRates200ResponseFromJSON,
     GetChartRates200ResponseToJSON,
     GetMarketsRates200ResponseFromJSON,
     GetMarketsRates200ResponseToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     GetRates200ResponseFromJSON,
     GetRates200ResponseToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
 } from '../models/index';
 
 export interface GetChartRatesRequest {

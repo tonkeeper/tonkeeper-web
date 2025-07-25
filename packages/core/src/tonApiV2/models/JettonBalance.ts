@@ -115,11 +115,11 @@ export function JettonBalanceFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JettonBalanceToJSON(json: any): JettonBalance {
-    return JettonBalanceToJSONTyped(json, false);
-}
+  export function JettonBalanceToJSON(json: any): JettonBalance {
+      return JettonBalanceToJSONTyped(json, false);
+  }
 
-export function JettonBalanceToJSONTyped(value?: JettonBalance | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonBalanceToJSONTyped(value?: JettonBalance | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

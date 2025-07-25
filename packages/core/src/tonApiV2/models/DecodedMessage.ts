@@ -79,11 +79,11 @@ export function DecodedMessageFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function DecodedMessageToJSON(json: any): DecodedMessage {
-    return DecodedMessageToJSONTyped(json, false);
-}
+  export function DecodedMessageToJSON(json: any): DecodedMessage {
+      return DecodedMessageToJSONTyped(json, false);
+  }
 
-export function DecodedMessageToJSONTyped(value?: DecodedMessage | null, ignoreDiscriminator: boolean = false): any {
+  export function DecodedMessageToJSONTyped(value?: DecodedMessage | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

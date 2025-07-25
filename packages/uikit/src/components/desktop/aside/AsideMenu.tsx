@@ -16,7 +16,7 @@ import {
     useMutateActiveTonWallet
 } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
+import { FolderIconOutline, GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
@@ -40,6 +40,7 @@ import { useMenuController } from '../../../hooks/ionic';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
+import { useManageFolderNotification } from '../../modals/ManageFolderNotificationControlled';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -313,6 +314,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const isResizing = useRef(false);
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutate: mutateWidth } = useMutateUserUIPreferences();
+    const { onOpen: createNewFolder } = useManageFolderNotification();
 
     useLayoutEffect(() => {
         if (uiPreferences?.asideWidth) {
@@ -396,6 +398,19 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                                 <PlusIcon />
                             </IconWrapper>
                             <Label2>{t('aside_add_wallet')}</Label2>
+                        </AsideMenuItem>
+                        <AsideMenuItem
+                            isSelected={false}
+                            onClick={() => {
+                                menuController.close();
+                                hideBrowser();
+                                createNewFolder();
+                            }}
+                        >
+                            <IconWrapper>
+                                <FolderIconOutline />
+                            </IconWrapper>
+                            <Label2>{t('accounts_new_folder')}</Label2>
                         </AsideMenuItem>
                         <AsideMenuItem
                             onClick={() => handleNavigateClick(AppRoute.settings)}

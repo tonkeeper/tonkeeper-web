@@ -49,11 +49,11 @@ export function GaslessTxFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function GaslessTxToJSON(json: any): GaslessTx {
-    return GaslessTxToJSONTyped(json, false);
-}
+  export function GaslessTxToJSON(json: any): GaslessTx {
+      return GaslessTxToJSONTyped(json, false);
+  }
 
-export function GaslessTxToJSONTyped(value?: GaslessTx | null, ignoreDiscriminator: boolean = false): any {
+  export function GaslessTxToJSONTyped(value?: GaslessTx | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

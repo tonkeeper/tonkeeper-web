@@ -87,11 +87,11 @@ export function SaleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Sale
     };
 }
 
-export function SaleToJSON(json: any): Sale {
-    return SaleToJSONTyped(json, false);
-}
+  export function SaleToJSON(json: any): Sale {
+      return SaleToJSONTyped(json, false);
+  }
 
-export function SaleToJSONTyped(value?: Sale | null, ignoreDiscriminator: boolean = false): any {
+  export function SaleToJSONTyped(value?: Sale | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

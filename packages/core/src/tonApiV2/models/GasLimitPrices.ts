@@ -110,11 +110,11 @@ export function GasLimitPricesFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function GasLimitPricesToJSON(json: any): GasLimitPrices {
-    return GasLimitPricesToJSONTyped(json, false);
-}
+  export function GasLimitPricesToJSON(json: any): GasLimitPrices {
+      return GasLimitPricesToJSONTyped(json, false);
+  }
 
-export function GasLimitPricesToJSONTyped(value?: GasLimitPrices | null, ignoreDiscriminator: boolean = false): any {
+  export function GasLimitPricesToJSONTyped(value?: GasLimitPrices | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

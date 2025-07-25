@@ -49,11 +49,11 @@ export function GaslessEstimateRequestMessagesInnerFromJSONTyped(json: any, igno
     };
 }
 
-export function GaslessEstimateRequestMessagesInnerToJSON(json: any): GaslessEstimateRequestMessagesInner {
-    return GaslessEstimateRequestMessagesInnerToJSONTyped(json, false);
-}
+  export function GaslessEstimateRequestMessagesInnerToJSON(json: any): GaslessEstimateRequestMessagesInner {
+      return GaslessEstimateRequestMessagesInnerToJSONTyped(json, false);
+  }
 
-export function GaslessEstimateRequestMessagesInnerToJSONTyped(value?: GaslessEstimateRequestMessagesInner | null, ignoreDiscriminator: boolean = false): any {
+  export function GaslessEstimateRequestMessagesInnerToJSONTyped(value?: GaslessEstimateRequestMessagesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

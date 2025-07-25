@@ -88,11 +88,11 @@ export function JettonMintActionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function JettonMintActionToJSON(json: any): JettonMintAction {
-    return JettonMintActionToJSONTyped(json, false);
-}
+  export function JettonMintActionToJSON(json: any): JettonMintAction {
+      return JettonMintActionToJSONTyped(json, false);
+  }
 
-export function JettonMintActionToJSONTyped(value?: JettonMintAction | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonMintActionToJSONTyped(value?: JettonMintAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -72,11 +72,11 @@ export function GetStakingPools200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function GetStakingPools200ResponseToJSON(json: any): GetStakingPools200Response {
-    return GetStakingPools200ResponseToJSONTyped(json, false);
-}
+  export function GetStakingPools200ResponseToJSON(json: any): GetStakingPools200Response {
+      return GetStakingPools200ResponseToJSONTyped(json, false);
+  }
 
-export function GetStakingPools200ResponseToJSONTyped(value?: GetStakingPools200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetStakingPools200ResponseToJSONTyped(value?: GetStakingPools200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -6,6 +6,7 @@ import { relative, SettingsRoute } from '../../libs/routes';
 import { MessageIcon, NotificationIcon } from '../Icon';
 import { SettingsItem, SettingsList } from './SettingsList';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { CellRightIcon } from './SettingsIcons';
 
 export const ThemeSettings = () => {
     const sdk = useAppSdk();
@@ -29,6 +30,14 @@ export const ThemeSettings = () => {
             icon: fiat,
             action: () => navigate(relative(SettingsRoute.fiat))
         });
+
+        if (sdk.linksInterceptorAvailable) {
+            items.push({
+                name: t('settings_intercept_links'),
+                icon: <CellRightIcon />,
+                action: () => navigate(relative(SettingsRoute.interceptLinks))
+            });
+        }
 
         if (i18n.enable) {
             items.push({

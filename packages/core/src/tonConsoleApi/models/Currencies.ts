@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export enum FiatCurrencies {
+export enum Currencies {
     USD = 'USD',
     EUR = 'EUR',
     RUB = 'RUB',
@@ -16,4 +16,5 @@ export enum FiatCurrencies {
     IDR = 'IDR',
     INR = 'INR',
     JPY = 'JPY',
+    TON = 'TON',
 }

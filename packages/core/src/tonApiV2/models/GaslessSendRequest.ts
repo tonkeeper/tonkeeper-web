@@ -57,11 +57,11 @@ export function GaslessSendRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function GaslessSendRequestToJSON(json: any): GaslessSendRequest {
-    return GaslessSendRequestToJSONTyped(json, false);
-}
+  export function GaslessSendRequestToJSON(json: any): GaslessSendRequest {
+      return GaslessSendRequestToJSONTyped(json, false);
+  }
 
-export function GaslessSendRequestToJSONTyped(value?: GaslessSendRequest | null, ignoreDiscriminator: boolean = false): any {
+  export function GaslessSendRequestToJSONTyped(value?: GaslessSendRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -74,11 +74,11 @@ export function StoragePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function StoragePhaseToJSON(json: any): StoragePhase {
-    return StoragePhaseToJSONTyped(json, false);
-}
+  export function StoragePhaseToJSON(json: any): StoragePhase {
+      return StoragePhaseToJSONTyped(json, false);
+  }
 
-export function StoragePhaseToJSONTyped(value?: StoragePhase | null, ignoreDiscriminator: boolean = false): any {
+  export function StoragePhaseToJSONTyped(value?: StoragePhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
