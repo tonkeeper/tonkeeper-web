@@ -91,7 +91,10 @@ export const AssetSelect: FC<{
                 <SelectDropDownHostStyled isErrored={!!error}>
                     {!!selectedAsset && (
                         <>
-                            <AssetIcon src={selectedAsset.image} />
+                            <AssetIcon
+                                src={selectedAsset.image}
+                                noRadius={selectedAsset.noImageCorners}
+                            />
                             <Label2>{selectedAsset.symbol}</Label2>
                             <SwitchIcon />
                         </>
