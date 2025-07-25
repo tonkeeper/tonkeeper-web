@@ -18,6 +18,7 @@ export type SubscriptionVerification = {
         amount: string;
         currency: CryptoCurrency;
         purchase_date: number;
+        expires_date: number;
     };
     ios?: {
         tx_id: string;
