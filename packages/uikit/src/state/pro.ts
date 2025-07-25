@@ -2,13 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     AuthTypes,
-    hasWalletAuth,
     IDisplayPlan,
     type IIosPurchaseResult,
     IOriginalTransactionInfo,
-    IosPendingSubscription,
     IosPurchaseStatuses,
-    IosSubscriptionStatuses,
     isIosStrategy,
     isProductId,
     NormalizedProPlans,
@@ -198,29 +195,7 @@ export const useProSubscriptionPurchase = () => {
         const savingResult = await saveIapPurchase(authService, String(originalTransactionId));
 
         if (!savingResult.ok) {
-            if (!hasWalletAuth(targetSubscription)) {
-                throw new Error('Failed to subscribe');
-            }
-
-            const pendingSubscription: IosPendingSubscription = {
-                ...subscription,
-                displayName,
-                displayPrice,
-                source: SubscriptionSource.IOS,
-                status: IosSubscriptionStatuses.PENDING,
-                valid: false,
-                usedTrial: targetSubscription?.usedTrial ?? false,
-                auth: targetSubscription.auth
-            };
-
-            await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-                current: pendingSubscription,
-                target: pendingSubscription
-            });
-
-            await client.invalidateQueries([QueryKey.pro]);
-
-            return IosPurchaseStatuses.PENDING;
+            throw new Error('Failed to subscribe');
         }
 
         await client.invalidateQueries([QueryKey.pro]);

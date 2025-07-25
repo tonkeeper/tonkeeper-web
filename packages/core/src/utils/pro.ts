@@ -118,7 +118,8 @@ export const normalizeSubscription = (
                 storeFront: subscriptionDto.ios?.store_front,
                 storeFrontId: subscriptionDto.ios?.store_front_id,
                 transactionType: subscriptionDto.ios?.transaction_type,
-                originalTransactionId: subscriptionDto.ios?.original_tx_id
+                originalTransactionId: subscriptionDto.ios?.original_tx_id,
+                autoRenewStatus: subscriptionDto.ios?.auto_renew_status
             };
         }
 
@@ -140,7 +141,8 @@ export const normalizeSubscription = (
             storeFront: subscriptionDto.ios?.store_front,
             storeFrontId: subscriptionDto.ios?.store_front_id,
             transactionType: subscriptionDto.ios?.transaction_type,
-            originalTransactionId: subscriptionDto.ios?.original_tx_id
+            originalTransactionId: subscriptionDto.ios?.original_tx_id,
+            autoRenewStatus: subscriptionDto.ios?.auto_renew_status
         };
     }
 

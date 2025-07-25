@@ -1,118 +1,72 @@
 import styled from 'styled-components';
-import {
-    hasIosPrice,
-    isCryptoSubscription,
-    isIosSubscription,
-    isPaidSubscription,
-    isPendingSubscription,
-    isProSubscription,
-    isTelegramActiveSubscription
-} from '@tonkeeper/core/dist/entries/pro';
+import { isIosSubscription, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2 } from '../Text';
 import { SkeletonList } from '../Skeleton';
 import { useProState } from '../../state/pro';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
-import { HideOnReview } from '../ios/HideOnReview';
-import { getFormattedProPrice } from '../../libs/pro';
+import { useProStatusDetailsDisplayData } from '../../hooks/pro/useProStatusDetailsDisplayData';
 
-// TODO Improve this screen after getting the real data from Apple
 export const ProStatusDetailsList = () => {
     const { t } = useTranslation();
     const { data, isLoading } = useProState();
-    const formatDate = useDateTimeFormat();
+    const { price, expirationDate } = useProStatusDetailsDisplayData(data?.current);
 
     const subscription = data?.current;
+    const isIos = isIosSubscription(subscription);
+    const isAutoRenew = isIos && subscription?.autoRenewStatus;
+    const isCanceled = isIos && !subscription?.autoRenewStatus;
 
-    if (!subscription || !isProSubscription(subscription)) return null;
+    const getStatusText = () => {
+        if (!subscription) return '-';
 
-    const getDisplayPrice = () => {
-        if (isPendingSubscription(subscription)) {
-            return subscription.displayPrice;
-        }
+        const baseStatus = isCanceled ? 'canceled' : subscription.status;
+        const trialSuffix = isTelegramSubscription(subscription) ? ` (${t('trial')})` : '';
 
-        if (isCryptoSubscription(subscription) && subscription?.amount) {
-            return getFormattedProPrice(subscription?.amount, true);
-        }
-
-        // TODO We can't have amount for older users
-        if (isCryptoSubscription(subscription) && !subscription?.amount) {
-            return '8 TON';
-        }
-
-        if (isIosSubscription(subscription) && hasIosPrice(subscription)) {
-            const { price, currency } = subscription;
-
-            if (!price || !currency) {
-                return '-';
-            }
-
-            // TODO WHY 1000? No idea, needs to be figured out
-            const formattedPrice = (price / 1000).toFixed(2);
-
-            return `${currency} ${formattedPrice}`;
-        }
-
-        return t('free');
+        return `${t(baseStatus)}${trialSuffix}`;
     };
 
-    const getDisplayExpirationDate = () => {
-        try {
-            if (isTelegramActiveSubscription(subscription) && subscription.trialEndDate) {
-                return formatDate(subscription.trialEndDate, {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                });
-            }
-
-            if (isPaidSubscription(subscription) && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                });
-            }
-
-            return '-';
-        } catch (e) {
-            console.error('During formatDate error: ', e);
-            return '-';
+    const getExpirationTitle = () => {
+        if (!isIos) {
+            return t('expiration_date');
         }
+
+        return t(isAutoRenew ? 'renews' : 'ends');
     };
 
-    return isLoading ? (
-        <SkeletonList fullWidth size={3} />
-    ) : (
+    if (isLoading) {
+        return <SkeletonList fullWidth size={3} />;
+    }
+
+    return (
         <ListBlock margin={false} fullWidth>
             <ListItemStyled hover={false}>
                 <ListItemPayloadStyled>
                     <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                    <Body2Styled>{subscription.status}</Body2Styled>
+                    <Body2Styled isCanceled={isCanceled}>{getStatusText()}</Body2Styled>
                 </ListItemPayloadStyled>
             </ListItemStyled>
-            <HideOnReview>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('price')}</Body2RegularStyled>
-                        <Body2Styled>{getDisplayPrice()}</Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
-            </HideOnReview>
+
             <ListItemStyled hover={false}>
                 <ListItemPayloadStyled>
-                    <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>
-                    <Body2Styled>{getDisplayExpirationDate()}</Body2Styled>
+                    <Body2RegularStyled>{getExpirationTitle()}</Body2RegularStyled>
+                    <Body2Styled>{expirationDate}</Body2Styled>
+                </ListItemPayloadStyled>
+            </ListItemStyled>
+
+            <ListItemStyled hover={false}>
+                <ListItemPayloadStyled>
+                    <Body2RegularStyled>{t('price')}</Body2RegularStyled>
+                    <Body2Styled>{price}</Body2Styled>
                 </ListItemPayloadStyled>
             </ListItemStyled>
         </ListBlock>
     );
 };
 
-const Body2Styled = styled(Body2)`
-    color: ${({ theme }) => theme.textPrimary};
+const Body2Styled = styled(Body2)<{ isCanceled?: boolean }>`
+    color: ${({ theme, isCanceled }) => (isCanceled ? theme.accentOrange : theme.textPrimary)};
     text-transform: capitalize;
 `;
 

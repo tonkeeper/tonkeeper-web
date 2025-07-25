@@ -8,12 +8,7 @@ export interface ConstructedSubscription extends Partial<BaseSubscription> {
     auth: WalletAuth | TelegramAuth;
 }
 
-export type PendingSubscription = CryptoPendingSubscription | IosPendingSubscription;
-
-export type IosSubscription =
-    | IosActiveSubscription
-    | IosExpiredSubscription
-    | IosPendingSubscription;
+export type IosSubscription = IosActiveSubscription | IosExpiredSubscription;
 
 export type CryptoSubscription =
     | CryptoActiveSubscription
@@ -67,6 +62,7 @@ interface IosDBStoredInfo {
     storeFrontId?: string;
     transactionType?: string;
     originalTransactionId?: string;
+    autoRenewStatus?: boolean;
 }
 
 interface BaseIosSubscription extends BaseSubscription {
@@ -82,14 +78,6 @@ interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
 
 interface IosExpiredSubscription extends BaseIosSubscription, IosDBStoredInfo {
     status: IosSubscriptionStatuses.EXPIRED;
-}
-
-export interface IosPendingSubscription extends BaseIosSubscription {
-    status: IosSubscriptionStatuses.PENDING;
-    originalTransactionId?: number | null;
-    valid: false;
-    displayName?: string;
-    displayPrice?: string;
 }
 
 export interface IProductInfo {
@@ -237,21 +225,6 @@ export enum TelegramSubscriptionStatuses {
     EXPIRED = 'expired'
 }
 
-export function isTelegramSubscription(
-    subscription: ProSubscription
-): subscription is TelegramSubscription {
-    return subscription?.source === SubscriptionSource.TELEGRAM;
-}
-
-export function isTelegramActiveSubscription(
-    subscription: ProSubscription
-): subscription is TelegramSubscription {
-    return (
-        subscription?.source === SubscriptionSource.TELEGRAM &&
-        subscription?.status === TelegramSubscriptionStatuses.ACTIVE
-    );
-}
-
 // Pro State
 export type ProState = {
     current: ProSubscription;
@@ -265,15 +238,11 @@ export interface ProStateWallet {
 
 export function isPendingSubscription(
     subscription: unknown
-): subscription is
-    | (IosSubscription & { status: IosSubscriptionStatuses.PENDING })
-    | (CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING }) {
+): subscription is CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING } {
     return (
         isProSubscription(subscription) &&
-        ((subscription?.source === SubscriptionSource.IOS &&
-            subscription.status === IosSubscriptionStatuses.PENDING) ||
-            (subscription?.source === SubscriptionSource.CRYPTO &&
-                subscription.status === CryptoSubscriptionStatuses.PENDING))
+        subscription?.source === SubscriptionSource.CRYPTO &&
+        subscription.status === CryptoSubscriptionStatuses.PENDING
     );
 }
 
@@ -301,13 +270,14 @@ export function isExpiredSubscription(
 }
 
 export function isPaidSubscription(
-    subscription: ProSubscription
-): subscription is IosActiveSubscription | CryptoActiveSubscription {
+    value: unknown
+): value is IosActiveSubscription | CryptoActiveSubscription {
     return (
-        (subscription?.source === SubscriptionSource.IOS &&
-            subscription.status === IosSubscriptionStatuses.ACTIVE) ||
-        (subscription?.source === SubscriptionSource.CRYPTO &&
-            subscription.status === CryptoSubscriptionStatuses.ACTIVE)
+        isProSubscription(value) &&
+        ((value?.source === SubscriptionSource.IOS &&
+            value.status === IosSubscriptionStatuses.ACTIVE) ||
+            (value?.source === SubscriptionSource.CRYPTO &&
+                value.status === CryptoSubscriptionStatuses.ACTIVE))
     );
 }
 
@@ -321,6 +291,18 @@ export function isCryptoSubscription(value: unknown): value is CryptoSubscriptio
 
 export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
+}
+
+export function isTelegramSubscription(value: unknown): value is TelegramSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.TELEGRAM;
+}
+
+export function isTelegramActiveSubscription(value: unknown): value is TelegramActiveSubscription {
+    return (
+        isTelegramSubscription(value) &&
+        value?.source === SubscriptionSource.TELEGRAM &&
+        value?.status === TelegramSubscriptionStatuses.ACTIVE
+    );
 }
 
 export function hasAuth(

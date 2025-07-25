@@ -55,10 +55,10 @@ export const ProStatusScreen = () => {
     }, [subscription]);
 
     const isProActive = isValidSubscription(subscription);
-
     const isIos = isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
-    const isTelegram = subscription && isTelegramSubscription(subscription);
+    const isTelegram = isTelegramSubscription(subscription);
     const isActiveIos = isIos && isProActive;
+    const isAutoRenew = isIos && subscription?.autoRenewStatus;
 
     const handleGetPro = () => {
         onProAuthOpen();
@@ -86,27 +86,26 @@ export const ProStatusScreen = () => {
 
             <ProStatusDetailsList />
 
+            {isAutoRenew && <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>}
+
             {isActiveIos && (
-                <>
-                    <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
-                    <Button
-                        secondary
-                        fullWidth
-                        type="button"
-                        onClick={() => handleManageSubscription()}
-                        loading={isManagingLoading || isLoggingOut}
-                    >
-                        <SlidersIcon />
-                        <Label2>{t('Manage')}</Label2>
-                    </Button>
-                </>
+                <Button
+                    secondary
+                    fullWidth
+                    type="button"
+                    onClick={() => handleManageSubscription()}
+                    loading={isManagingLoading || isLoggingOut}
+                >
+                    <SlidersIcon />
+                    <Label2>{t('Manage')}</Label2>
+                </Button>
             )}
 
             <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>
                 <Label2>{t('tonkeeper_pro_features')}</Label2>
             </Button>
 
-            {!isActiveIos && (
+            {isTelegram && (
                 <Button primary fullWidth size="large" type="submit">
                     <Label2>{t('get_tonkeeper_pro')}</Label2>
                 </Button>

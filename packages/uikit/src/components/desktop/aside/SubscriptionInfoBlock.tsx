@@ -142,7 +142,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data } = useProState();
+    const { data, isLoading: isProStateLoading } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
@@ -180,7 +180,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     };
 
     let button = (
-        <Button primary onClick={onGetPro}>
+        <Button primary onClick={onGetPro} loading={isProStateLoading}>
             {t('get_tonkeeper_pro')}
         </Button>
     );
