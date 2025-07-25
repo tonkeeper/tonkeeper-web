@@ -116,11 +116,11 @@ export function NftPurchaseActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function NftPurchaseActionToJSON(json: any): NftPurchaseAction {
-    return NftPurchaseActionToJSONTyped(json, false);
-}
+  export function NftPurchaseActionToJSON(json: any): NftPurchaseAction {
+      return NftPurchaseActionToJSONTyped(json, false);
+  }
 
-export function NftPurchaseActionToJSONTyped(value?: NftPurchaseAction | null, ignoreDiscriminator: boolean = false): any {
+  export function NftPurchaseActionToJSONTyped(value?: NftPurchaseAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

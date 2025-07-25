@@ -25,7 +25,7 @@ import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
 import styled from 'styled-components';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { useAccountsState, useMutateActiveAccount } from '../../../state/wallet';
+import { useMutateActiveAccount } from '../../../state/wallet';
 import {
     useMultisigsOfAccountToDisplay,
     useMutateMultisigSelectedHostWallet
@@ -134,7 +134,6 @@ export const AsideMenuAccountMnemonic: FC<{
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
-    const shouldShowIcon = useAccountsState().length > 1;
     const network = getNetworkByAccount(account);
 
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
@@ -151,9 +150,7 @@ export const AsideMenuAccountMnemonic: FC<{
                 onClick={() => onClickWallet(sortedWallets[0].id)}
                 ref={ref}
             >
-                {shouldShowIcon && (
-                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-                )}
+                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2>{account.name}</Label2>
                 <NetworkBadgeStyled network={network} size="s" />
 
@@ -203,7 +200,6 @@ export const AsideMenuAccountLedger: FC<{
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
-    const shouldShowIcon = useAccountsState().length > 1;
     const network = getNetworkByAccount(account);
 
     const { onOpen: openLedgerIndexesSettings } = useLedgerIndexesSettingsNotification();
@@ -219,9 +215,7 @@ export const AsideMenuAccountLedger: FC<{
                 onClick={() => onClickWallet(sortedDerivations[0].activeTonWalletId)}
                 ref={ref}
             >
-                {shouldShowIcon && (
-                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-                )}
+                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2>{account.name}</Label2>
                 <AccountBadgeStyled accountType={account.type} size="s" />
 
@@ -285,7 +279,6 @@ export const AsideMenuAccountTonOnly: FC<{
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
-    const shouldShowIcon = useAccountsState().length > 1;
     const network = getNetworkByAccount(account);
 
     const { onOpen: openWalletVersionSettings } = useWalletVersionSettingsNotification();
@@ -301,9 +294,7 @@ export const AsideMenuAccountTonOnly: FC<{
                 onClick={() => onClickWallet(account.activeTonWallet.id)}
                 ref={ref}
             >
-                {shouldShowIcon && (
-                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-                )}
+                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2>{account.name}</Label2>
                 <AccountBadgeStyled accountType={account.type} size="s" />
                 <GearIconButtonStyled
@@ -351,16 +342,12 @@ export const AsideMenuAccountKeystone: FC<{
     selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
-    const shouldShowIcon = useAccountsState().length > 1;
-
     return (
         <AsideMenuItem
             isSelected={mightBeHighlighted && selectedWalletId === account.activeTonWallet.id}
             onClick={() => onClickWallet(account.activeTonWallet.id)}
         >
-            {shouldShowIcon && (
-                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-            )}
+            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
             <Label2>{account.name}</Label2>
             <AccountBadgeStyled accountType={account.type} size="s" />
         </AsideMenuItem>
@@ -373,16 +360,12 @@ export const AsideMenuAccountWatchOnly: FC<{
     selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
-    const shouldShowIcon = useAccountsState().length > 1;
-
     return (
         <AsideMenuItem
             isSelected={mightBeHighlighted && selectedWalletId === account.activeTonWallet.id}
             onClick={() => onClickWallet(account.activeTonWallet.id)}
         >
-            {shouldShowIcon && (
-                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-            )}
+            <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
             <Label2>{account.name}</Label2>
             <AccountBadgeStyled accountType={account.type} size="s" />
         </AsideMenuItem>
@@ -396,8 +379,6 @@ export const AsideMenuAccountMAM: FC<{
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
-    const shouldShowIcon = useAccountsState().length > 1;
-
     const network = getNetworkByAccount(account);
     const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
@@ -426,9 +407,7 @@ export const AsideMenuAccountMAM: FC<{
                 onClick={onClickAccount}
                 ref={ref}
             >
-                {shouldShowIcon && (
-                    <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
-                )}
+                <WalletEmoji emojiSize="16px" containerSize="16px" emoji={account.emoji} />
                 <Label2>{account.name}</Label2>
                 <NetworkBadgeStyled network={network} size="s" />
                 <AccountBadgeStyled accountType={account.type} size="s" />
@@ -454,13 +433,11 @@ export const AsideMenuAccountMAM: FC<{
                             }
                             onClick={() => onClickWallet(derivation.activeTonWalletId)}
                         >
-                            {shouldShowIcon && (
-                                <WalletEmoji
-                                    emojiSize="16px"
-                                    containerSize="16px"
-                                    emoji={derivation.emoji}
-                                />
-                            )}
+                            <WalletEmoji
+                                emojiSize="16px"
+                                containerSize="16px"
+                                emoji={derivation.emoji}
+                            />
                             <Label2>{derivation.name}</Label2>
                             <WalletIndexBadgeStyled size="s">
                                 {'#' + (derivation.index + 1)}

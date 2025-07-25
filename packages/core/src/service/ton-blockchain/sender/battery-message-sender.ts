@@ -51,7 +51,8 @@ export class BatteryMessageSender implements ISender {
             xTonConnectAuth: this.batteryConfig.authToken,
             emulateMessageToWalletRequest: {
                 boc: external.toBoc().toString('base64')
-            }
+            },
+            enableValidation: true
         });
 
         const extra = new AssetAmount({

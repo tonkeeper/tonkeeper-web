@@ -65,11 +65,11 @@ export function GetRawShardBlockProof200ResponseLinksInnerFromJSONTyped(json: an
     };
 }
 
-export function GetRawShardBlockProof200ResponseLinksInnerToJSON(json: any): GetRawShardBlockProof200ResponseLinksInner {
-    return GetRawShardBlockProof200ResponseLinksInnerToJSONTyped(json, false);
-}
+  export function GetRawShardBlockProof200ResponseLinksInnerToJSON(json: any): GetRawShardBlockProof200ResponseLinksInner {
+      return GetRawShardBlockProof200ResponseLinksInnerToJSONTyped(json, false);
+  }
 
-export function GetRawShardBlockProof200ResponseLinksInnerToJSONTyped(value?: GetRawShardBlockProof200ResponseLinksInner | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawShardBlockProof200ResponseLinksInnerToJSONTyped(value?: GetRawShardBlockProof200ResponseLinksInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

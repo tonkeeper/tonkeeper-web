@@ -16,6 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   GetAllRawShardsInfo200Response,
+  GetOpenapiJsonDefaultResponse,
   GetOutMsgQueueSizes200Response,
   GetRawAccountState200Response,
   GetRawBlockProof200Response,
@@ -30,13 +31,14 @@ import type {
   GetRawShardInfo200Response,
   GetRawTime200Response,
   GetRawTransactions200Response,
-  InlineObject,
   SendRawMessage200Response,
   SendRawMessageRequest,
 } from '../models/index';
 import {
     GetAllRawShardsInfo200ResponseFromJSON,
     GetAllRawShardsInfo200ResponseToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     GetOutMsgQueueSizes200ResponseFromJSON,
     GetOutMsgQueueSizes200ResponseToJSON,
     GetRawAccountState200ResponseFromJSON,
@@ -65,8 +67,6 @@ import {
     GetRawTime200ResponseToJSON,
     GetRawTransactions200ResponseFromJSON,
     GetRawTransactions200ResponseToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
     SendRawMessage200ResponseFromJSON,
     SendRawMessage200ResponseToJSON,
     SendRawMessageRequestFromJSON,

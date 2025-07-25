@@ -4,6 +4,7 @@ import { styled } from 'styled-components';
 import { Label2 } from '../Text';
 import { SwitchIcon } from '../Icon';
 import { useOpenSwapTokensList } from './tokens-list/SwapTokensListNotification';
+import { Image } from '../shared/Image';
 
 const TokenSymbol = styled(Label2)`
     display: block;
@@ -34,7 +35,7 @@ const SelectContainer = styled.button`
     }
 `;
 
-const TokenImage = styled.img`
+const TokenImage = styled(Image)`
     height: 24px;
     width: 24px;
     border-radius: 100%;
@@ -55,7 +56,7 @@ export const SwapTokenSelect: FC<{
 
     return (
         <SelectContainer className={className} onClick={openList}>
-            <TokenImage src={token.image} />
+            <TokenImage src={token.image} noRadius={token.noImageCorners} />
             <TokenSymbol>{token.symbol}</TokenSymbol>
             <SwitchIcon />
         </SelectContainer>

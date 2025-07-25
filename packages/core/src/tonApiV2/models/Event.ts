@@ -76,6 +76,12 @@ export interface Event {
      * @memberof Event
      */
     inProgress: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof Event
+     */
+    progress: number;
 }
 
 /**
@@ -89,6 +95,7 @@ export function instanceOfEvent(value: object): value is Event {
     if (!('isScam' in value) || value['isScam'] === undefined) return false;
     if (!('lt' in value) || value['lt'] === undefined) return false;
     if (!('inProgress' in value) || value['inProgress'] === undefined) return false;
+    if (!('progress' in value) || value['progress'] === undefined) return false;
     return true;
 }
 
@@ -109,14 +116,15 @@ export function EventFromJSONTyped(json: any, ignoreDiscriminator: boolean): Eve
         'isScam': json['is_scam'],
         'lt': json['lt'],
         'inProgress': json['in_progress'],
+        'progress': json['progress'],
     };
 }
 
-export function EventToJSON(json: any): Event {
-    return EventToJSONTyped(json, false);
-}
+  export function EventToJSON(json: any): Event {
+      return EventToJSONTyped(json, false);
+  }
 
-export function EventToJSONTyped(value?: Event | null, ignoreDiscriminator: boolean = false): any {
+  export function EventToJSONTyped(value?: Event | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -130,6 +138,7 @@ export function EventToJSONTyped(value?: Event | null, ignoreDiscriminator: bool
         'is_scam': value['isScam'],
         'lt': value['lt'],
         'in_progress': value['inProgress'],
+        'progress': value['progress'],
     };
 }
 

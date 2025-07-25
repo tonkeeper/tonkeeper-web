@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { Body3, Label2 } from '../../Text';
+import { Body2, Body3, Label2 } from '../../Text';
 import {
     AppearanceIcon,
     AppleIcon,
@@ -13,6 +13,7 @@ import {
     LockIcon,
     SlidersIcon,
     TelegramIcon,
+    TonkeeperProOutlineIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
 import { useLocation } from 'react-router-dom';
@@ -27,11 +28,14 @@ import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
-import { hexToRGBA } from '../../../libs/css';
+import { hexToRGBA, hover } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { isProSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -63,6 +67,26 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
     }
 `;
 
+const AsideMenuItemVersion = styled(AsideMenuItemStyled)`
+    color: ${p => p.theme.textTertiary};
+    transition: color 0.15s ease-in-out;
+
+    svg {
+        color: ${p => p.theme.iconTertiary};
+        transition: color 0.15s ease-in-out;
+    }
+
+    ${p =>
+        p.theme.proDisplayType !== 'mobile' &&
+        hover`
+             background: unset;
+             
+             color: ${p.theme.textSecondary};
+             svg {
+                 color: ${p.theme.iconSecondary};
+        `}
+`;
+
 const AsideMenuItemLarge = styled(AsideMenuItemStyled)`
     height: 48px;
     max-height: 48px;
@@ -85,6 +109,7 @@ const AsideMenuItemsBlock = styled.div`
 export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) => {
     const { t, i18n } = useTranslation();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
@@ -96,7 +121,21 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
+    const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
+
     const availableThemes = useAvailableThemes();
+
+    const isTonkeeperProActive = location.pathname === AppRoute.settings + SettingsRoute.pro;
+
+    const handleTonkeeperProClick = async () => {
+        if (isProSubscription(proState?.current)) {
+            navigate(AppRoute.settings + SettingsRoute.pro);
+
+            return;
+        }
+
+        onProPurchaseOpen();
+    };
 
     return (
         <PreferencesAsideContainer className={className}>
@@ -117,17 +156,14 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     )}
                 </NavLink>
-                <HideOnReview>
-                    <NavLink to={AppRoute.settings + SettingsRoute.pro}>
-                        {({ isActive }) => (
-                            <AsideMenuItemStyled isSelected={isActive}>
-                                <TonkeeperSkeletIcon />
-                                <Label2>{t('tonkeeper_pro')}</Label2>
-                            </AsideMenuItemStyled>
-                        )}
-                    </NavLink>
-                </HideOnReview>
-                {proState?.subscription.valid && (
+                <AsideMenuItemStyled
+                    onClick={handleTonkeeperProClick}
+                    isSelected={isTonkeeperProActive}
+                >
+                    <TonkeeperSkeletIcon />
+                    <Label2>{t('tonkeeper_pro')}</Label2>
+                </AsideMenuItemStyled>
+                {isValidSubscription(proState?.current) && (
                     <NavLink to={AppRoute.settings + SettingsRoute.theme}>
                         {({ isActive }) => (
                             <AsideMenuItemLarge isSelected={isActive}>
@@ -173,9 +209,9 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                 </NavLink>
             </AsideMenuItemsBlock>
 
-            <HideOnReview>
-                <ForTargetEnv env="mobile">
-                    <AsideMenuItemsBlock>
+            <ForTargetEnv env="mobile">
+                <AsideMenuItemsBlock>
+                    <HideOnReview>
                         <AsideMenuItemStyled
                             onClick={() => config.faq_url && sdk.openPage(config.faq_url)}
                             isSelected={false}
@@ -183,15 +219,17 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                             <GlobeIcon />
                             <Label2>{t('preferences_aside_faq')}</Label2>
                         </AsideMenuItemStyled>
-                        <AsideMenuItemStyled
-                            onClick={() =>
-                                config.directSupportUrl && sdk.openPage(config.directSupportUrl)
-                            }
-                            isSelected={false}
-                        >
-                            <TelegramIcon />
-                            <Label2>{t('settings_support')}</Label2>
-                        </AsideMenuItemStyled>
+                    </HideOnReview>
+                    <AsideMenuItemStyled
+                        onClick={() =>
+                            config.directSupportUrl && sdk.openPage(config.directSupportUrl)
+                        }
+                        isSelected={false}
+                    >
+                        <TelegramIcon />
+                        <Label2>{t('settings_support')}</Label2>
+                    </AsideMenuItemStyled>
+                    <HideOnReview>
                         <AsideMenuItemStyled
                             onClick={() =>
                                 config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
@@ -201,9 +239,9 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                             <TelegramIcon />
                             <Label2>{t('settings_news')}</Label2>
                         </AsideMenuItemStyled>
-                    </AsideMenuItemsBlock>
-                </ForTargetEnv>
-            </HideOnReview>
+                    </HideOnReview>
+                </AsideMenuItemsBlock>
+            </ForTargetEnv>
 
             <AsideMenuItemsBlock>
                 <AsideMenuItemStyled
@@ -253,6 +291,20 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     </Label2>
                 </AsideMenuItemStyled>
                 <DeleteAllNotification open={isOpen} handleClose={onClose} />
+            </AsideMenuItemsBlock>
+            <AsideMenuItemsBlock>
+                <AsideMenuItemVersion
+                    isSelected={false}
+                    onClick={() =>
+                        sdk.copyToClipboard(
+                            `Tonkeeper Pro for ${sdk.targetEnv} v${sdk.version}`,
+                            t('copied')
+                        )
+                    }
+                >
+                    <TonkeeperProOutlineIcon />
+                    <Body2>Tonkeeper Pro {sdk.version}</Body2>
+                </AsideMenuItemVersion>
             </AsideMenuItemsBlock>
         </PreferencesAsideContainer>
     );

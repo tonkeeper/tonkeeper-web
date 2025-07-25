@@ -67,3 +67,25 @@ export async function loginViaTG(botId: string, lang?: string): Promise<TGLoginD
         });
     });
 }
+
+export function getTgAuthResult(): string | false {
+    const locationHash = window.location.hash.toString();
+    const re = /[#?&]tgAuthResult=([A-Za-z0-9\-_]*)$/;
+    const match = locationHash.match(re);
+
+    if (!match) return false;
+
+    try {
+        let data = match[1] || '';
+        data = data.replace(/-/g, '+').replace(/_/g, '/');
+
+        const pad = data.length % 4;
+        if (pad > 0) {
+            data += '='.repeat(4 - pad);
+        }
+
+        return data;
+    } catch (e) {
+        return false;
+    }
+}

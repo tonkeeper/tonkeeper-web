@@ -89,11 +89,11 @@ export function MsgForwardPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function MsgForwardPricesToJSON(json: any): MsgForwardPrices {
-    return MsgForwardPricesToJSONTyped(json, false);
-}
+  export function MsgForwardPricesToJSON(json: any): MsgForwardPrices {
+      return MsgForwardPricesToJSONTyped(json, false);
+  }
 
-export function MsgForwardPricesToJSONTyped(value?: MsgForwardPrices | null, ignoreDiscriminator: boolean = false): any {
+  export function MsgForwardPricesToJSONTyped(value?: MsgForwardPrices | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

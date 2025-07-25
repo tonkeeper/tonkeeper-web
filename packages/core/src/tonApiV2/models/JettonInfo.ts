@@ -120,11 +120,11 @@ export function JettonInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function JettonInfoToJSON(json: any): JettonInfo {
-    return JettonInfoToJSONTyped(json, false);
-}
+  export function JettonInfoToJSON(json: any): JettonInfo {
+      return JettonInfoToJSONTyped(json, false);
+  }
 
-export function JettonInfoToJSONTyped(value?: JettonInfo | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonInfoToJSONTyped(value?: JettonInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

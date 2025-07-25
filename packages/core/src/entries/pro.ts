@@ -1,70 +1,372 @@
-export interface ProStateAuthorized {
-    authorizedWallet: ProStateWallet;
-    subscription: ProSubscription;
+import { CryptoCurrency, SubscriptionSource } from '../pro';
+import { ProServiceTier } from '../tonConsoleApi';
+import { Language } from './language';
+
+export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
+
+export interface ConstructedSubscription extends Partial<BaseSubscription> {
+    auth: WalletAuth | TelegramAuth;
 }
 
-export interface ProStateNotAuthorized {
-    authorizedWallet: null;
-    subscription: ProSubscription;
+export type IosSubscription = IosActiveSubscription | IosExpiredSubscription;
+
+export type CryptoSubscription =
+    | CryptoActiveSubscription
+    | CryptoExpiredSubscription
+    | CryptoPendingSubscription;
+
+export type TelegramSubscription = TelegramActiveSubscription | TelegramExpiredSubscription;
+
+export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
+
+export enum AuthTypes {
+    WALLET = 'wallet',
+    TELEGRAM = 'telegram'
 }
 
-export type ProState = ProStateAuthorized | ProStateNotAuthorized;
+export interface WalletAuth {
+    type: AuthTypes.WALLET;
+    wallet: ProStateWallet;
+}
+
+export interface TelegramAuth {
+    type: AuthTypes.TELEGRAM;
+    trialUserId: number | undefined;
+}
+
+export type NormalizedProPlans =
+    | { source: SubscriptionSource.IOS; plans: IProductInfo[] }
+    | { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[]; promoCode?: string };
+
+interface BaseSubscription {
+    source: SubscriptionSource;
+    valid: boolean;
+    usedTrial: boolean;
+    nextChargeDate?: Date;
+    auth: WalletAuth | TelegramAuth;
+}
+
+interface BaseSubscriptionStrategy {
+    source: SubscriptionSource;
+}
+
+// IOS Subscription Types
+interface IosDBStoredInfo {
+    txId?: string;
+    price?: number;
+    currency?: string;
+    expiresDate?: Date;
+    purchaseDate?: Date;
+    productId?: string;
+    storeFront?: string;
+    storeFrontId?: string;
+    transactionType?: string;
+    originalTransactionId?: string;
+    autoRenewStatus?: boolean;
+}
+
+interface BaseIosSubscription extends BaseSubscription {
+    source: SubscriptionSource.IOS;
+    status: IosSubscriptionStatuses;
+    auth: WalletAuth;
+}
+
+interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
+    status: IosSubscriptionStatuses.ACTIVE;
+    valid: true;
+}
+
+interface IosExpiredSubscription extends BaseIosSubscription, IosDBStoredInfo {
+    status: IosSubscriptionStatuses.EXPIRED;
+}
+
+export interface IProductInfo {
+    id: ProductIds;
+    displayName: string;
+    description: string;
+    displayPrice: string;
+    subscriptionGroup: string;
+    subscriptionPeriod: string;
+    environment: IosEnvironmentTypes;
+}
+
+export interface IIosPurchaseResult {
+    status: IosPurchaseStatuses;
+    productId: ProductIds;
+    isUpgraded: boolean;
+    purchaseDate: string;
+    expirationDate: string;
+    revocationDate: string | null;
+    originalTransactionId?: number;
+    environment: IosEnvironmentTypes;
+}
+
+export interface IOriginalTransactionInfo {
+    originalTransactionId: number | string | null;
+    productId?: ProductIds;
+    purchaseDate?: string;
+    environment: IosEnvironmentTypes;
+}
+
+export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
+    source: SubscriptionSource.IOS;
+    subscribe(productId: ProductIds): Promise<IIosPurchaseResult>;
+    getProductInfo(productId: ProductIds): Promise<IProductInfo>;
+    getAllProductsInfo(): Promise<IProductInfo[]>;
+    manageSubscriptions(): Promise<void>;
+    getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
+    getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]>;
+    hasActiveSubscription(): Promise<boolean>;
+}
+
+export enum IosPurchaseStatuses {
+    SUCCESS = 'success',
+    PENDING = 'pending',
+    CANCELED = 'cancelled'
+}
+
+export enum IosSubscriptionStatuses {
+    ACTIVE = 'active',
+    EXPIRED = 'expired',
+    PENDING = 'pending'
+}
+
+export enum ProductIds {
+    MONTHLY = 'com.tonapps.tonkeeperpro.subscription.pro.monthly',
+    YEARLY = 'com.tonapps.tonkeeperpro.subscription.pro.yearly'
+}
+
+export enum IosEnvironmentTypes {
+    SANDBOX = 'Sandbox',
+    PRODUCTION = 'Production'
+}
+
+export function isProductId(value: unknown): value is ProductIds {
+    return typeof value === 'string' && Object.values(ProductIds).includes(value as ProductIds);
+}
+
+export function isIosStrategy(
+    strategy?: SubscriptionStrategy
+): strategy is IIosSubscriptionStrategy {
+    return strategy?.source === SubscriptionSource.IOS;
+}
+
+// Crypto Subscription Types
+interface CryptoDBStoredInfo {
+    amount?: string;
+    currency?: CryptoCurrency;
+    purchaseDate?: Date;
+}
+
+interface BaseCryptoSubscription extends BaseSubscription {
+    source: SubscriptionSource.CRYPTO;
+    status: CryptoSubscriptionStatuses;
+    auth: WalletAuth;
+}
+
+interface CryptoActiveSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
+    status: CryptoSubscriptionStatuses.ACTIVE;
+    valid: true;
+}
+
+interface CryptoExpiredSubscription extends BaseCryptoSubscription, CryptoDBStoredInfo {
+    status: CryptoSubscriptionStatuses.EXPIRED;
+    valid: false;
+}
+
+export interface CryptoPendingSubscription extends BaseCryptoSubscription {
+    status: CryptoSubscriptionStatuses.PENDING;
+    valid: false;
+    displayName?: string;
+    displayPrice?: string;
+}
+
+export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
+    source: SubscriptionSource.CRYPTO;
+    getAllProductsInfo(
+        lang: Language | undefined,
+        promoCode?: string
+    ): Promise<[ProServiceTier[] | undefined, string | undefined]>;
+}
+
+export enum CryptoSubscriptionStatuses {
+    ACTIVE = 'active',
+    EXPIRED = 'expired',
+    PENDING = 'pending'
+}
+
+export function isCryptoStrategy(
+    strategy?: SubscriptionStrategy
+): strategy is ICryptoSubscriptionStrategy {
+    return strategy?.source === SubscriptionSource.CRYPTO;
+}
+
+// Telegram Subscription Types
+interface BaseTelegramSubscription extends BaseSubscription {
+    source: SubscriptionSource.TELEGRAM;
+    status: TelegramSubscriptionStatuses;
+    usedTrial: true;
+    trialEndDate?: Date;
+    auth: TelegramAuth;
+}
+
+interface TelegramActiveSubscription extends BaseTelegramSubscription {
+    status: TelegramSubscriptionStatuses.ACTIVE;
+    valid: true;
+}
+
+interface TelegramExpiredSubscription extends BaseTelegramSubscription {
+    status: TelegramSubscriptionStatuses.EXPIRED;
+    valid: false;
+}
+
+export enum TelegramSubscriptionStatuses {
+    ACTIVE = 'active',
+    EXPIRED = 'expired'
+}
+
+// Pro State
+export type ProState = {
+    current: ProSubscription;
+    target: ProSubscription | ConstructedSubscription;
+};
 
 export interface ProStateWallet {
     publicKey: string;
     rawAddress: string;
 }
 
-export type ProSubscription = ProSubscriptionValid | ProSubscriptionInvalid;
-
-export interface ProSubscriptionPaid {
-    valid: true;
-    isTrial: false;
-    usedTrial: boolean;
-    nextChargeDate: Date;
-}
-
-export interface ProSubscriptionTrialMobilePromo {
-    type: 'trial-mobile';
-    valid: true;
-    isTrial: true;
-    trialEndDate: Date;
-    usedTrial: true;
-}
-
-export interface ProSubscriptionTrialTg {
-    type: 'trial-tg';
-    trialUserId: number;
-    valid: true;
-    isTrial: true;
-    trialEndDate: Date;
-    usedTrial: true;
-}
-
-export type ProSubscriptionTrial = ProSubscriptionTrialTg | ProSubscriptionTrialMobilePromo;
-
-export type ProSubscriptionValid = ProSubscriptionPaid | ProSubscriptionTrial;
-
-export interface ProSubscriptionInvalid {
-    valid: false;
-    isTrial: false;
-    usedTrial: boolean;
-}
-
-export function isTrialSubscription(
-    subscription: ProSubscription
-): subscription is ProSubscriptionTrial {
-    return subscription.isTrial && subscription.valid;
+export function isPendingSubscription(
+    subscription: unknown
+): subscription is CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING } {
+    return (
+        isProSubscription(subscription) &&
+        subscription?.source === SubscriptionSource.CRYPTO &&
+        subscription.status === CryptoSubscriptionStatuses.PENDING
+    );
 }
 
 export function isValidSubscription(
-    subscription: ProSubscription
-): subscription is ProSubscriptionValid {
-    return subscription.valid;
+    subscription: ProSubscription | undefined
+): subscription is Exclude<ProSubscription, null | undefined> {
+    return !!subscription && hasSubscriptionSource(subscription) && subscription.valid;
+}
+
+export function isExpiredSubscription(
+    subscription: unknown
+): subscription is
+    | IosExpiredSubscription
+    | CryptoExpiredSubscription
+    | TelegramExpiredSubscription {
+    return (
+        isProSubscription(subscription) &&
+        ((subscription?.source === SubscriptionSource.IOS &&
+            subscription.status === IosSubscriptionStatuses.EXPIRED) ||
+            (subscription?.source === SubscriptionSource.CRYPTO &&
+                subscription.status === CryptoSubscriptionStatuses.EXPIRED) ||
+            (subscription?.source === SubscriptionSource.TELEGRAM &&
+                subscription.status === TelegramSubscriptionStatuses.EXPIRED))
+    );
 }
 
 export function isPaidSubscription(
+    value: unknown
+): value is IosActiveSubscription | CryptoActiveSubscription {
+    return (
+        isProSubscription(value) &&
+        ((value?.source === SubscriptionSource.IOS &&
+            value.status === IosSubscriptionStatuses.ACTIVE) ||
+            (value?.source === SubscriptionSource.CRYPTO &&
+                value.status === CryptoSubscriptionStatuses.ACTIVE))
+    );
+}
+
+export function isProSubscription(value: unknown): value is Exclude<ProSubscription, null> {
+    return typeof value === 'object' && value !== null && 'source' in value && 'status' in value;
+}
+
+export function isCryptoSubscription(value: unknown): value is CryptoSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.CRYPTO;
+}
+
+export function isIosSubscription(value: unknown): value is IosSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
+}
+
+export function isTelegramSubscription(value: unknown): value is TelegramSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.TELEGRAM;
+}
+
+export function isTelegramActiveSubscription(value: unknown): value is TelegramActiveSubscription {
+    return (
+        isTelegramSubscription(value) &&
+        value?.source === SubscriptionSource.TELEGRAM &&
+        value?.status === TelegramSubscriptionStatuses.ACTIVE
+    );
+}
+
+export function hasAuth(
+    subscription: ProSubscription | ConstructedSubscription | null | undefined
+): subscription is Exclude<ProSubscription | ConstructedSubscription, null> & {
+    target: { auth: WalletAuth | TelegramAuth };
+} {
+    return !!subscription?.auth;
+}
+
+export function hasIosPrice(
+    subscription: IosSubscription
+): subscription is IosActiveSubscription | IosExpiredSubscription {
+    return (
+        subscription.status === IosSubscriptionStatuses.ACTIVE ||
+        subscription.status === IosSubscriptionStatuses.EXPIRED
+    );
+}
+
+export function hasSubscriptionSource(
     subscription: ProSubscription
-): subscription is ProSubscriptionPaid {
-    return subscription.valid && !subscription.isTrial;
+): subscription is Exclude<ProSubscription, null> {
+    return (
+        subscription?.source === SubscriptionSource.IOS ||
+        subscription?.source === SubscriptionSource.CRYPTO ||
+        subscription?.source === SubscriptionSource.TELEGRAM
+    );
+}
+
+export function hasUsedTrial(
+    subscription: ProSubscription
+): subscription is Exclude<ProSubscription, null> & { usedTrial: true } {
+    return subscription !== null && subscription.usedTrial;
+}
+
+export function hasWalletAuth(
+    subscription: ProState['target'] | null | undefined
+): subscription is { auth: WalletAuth } {
+    return (
+        subscription !== null &&
+        typeof subscription === 'object' &&
+        'auth' in subscription &&
+        subscription.auth?.type === AuthTypes.WALLET &&
+        'wallet' in subscription.auth
+    );
+}
+
+export function isCryptoProPlans(
+    data: NormalizedProPlans | undefined
+): data is Extract<
+    NormalizedProPlans,
+    { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[] }
+> {
+    return (
+        data?.source === SubscriptionSource.CRYPTO &&
+        Array.isArray(data.plans) &&
+        data.plans.length > 0
+    );
+}
+
+export interface IDisplayPlan {
+    id: string;
+    displayName: string;
+    displayPrice: string;
+    subscriptionPeriod?: string;
+    formattedDisplayPrice: string;
 }

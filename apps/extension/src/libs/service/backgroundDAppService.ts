@@ -2,14 +2,12 @@
  * Service methods and subscription to handle DApp events
  * Origin: https://github.com/OpenProduct/openmask-extension/blob/main/src/libs/service/backgroundDAppService.ts
  *
- * @author: KuznetsovNikita
- * @since: 0.1.0
  */
 
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { CONNECT_EVENT_ERROR_CODES } from '@tonkeeper/core/dist/entries/tonConnect';
 import browser from 'webextension-polyfill';
-import { DAppMessage, TonkeeperApiEvent, TonkeeperApiResponse } from '../../entries/message';
+import { DAppMessage, TonkeeperApiResponse } from '../../entries/message';
 import { backgroundEventsEmitter } from '../event';
 import {
     isDappConnectedToExtension,
@@ -20,8 +18,9 @@ import {
     tonConnectTransaction
 } from './dApp/tonConnectService';
 import { createTonapiRequest } from './backgroundTonapiService';
+import { processInterceptTonLink } from './backgroundTonLinkService';
 
-let contentScriptPorts = new Set<browser.Runtime.Port>();
+const contentScriptPorts = new Set<browser.Runtime.Port>();
 
 const providerResponse = (
     id: number,
@@ -52,22 +51,8 @@ const providerTonConnectEvent = (id: number, event: 'disconnect') => {
         message: {
             jsonrpc: '2.0',
             id,
-            event: 'disconnect',
+            event,
             payload: {}
-        }
-    };
-};
-
-const providerEvent = (
-    method: 'accountsChanged' | 'chainChanged',
-    result: undefined | unknown
-): TonkeeperApiEvent => {
-    return {
-        type: 'TonkeeperAPI',
-        message: {
-            jsonrpc: '2.0',
-            method,
-            result
         }
     };
 };
@@ -80,7 +65,7 @@ export const handleDAppConnection = (port: browser.Runtime.Port) => {
         }
 
         const [result, error] = await handleDAppMessage(msg.message)
-            .then(result => [result, undefined] as const)
+            .then(r => [r, undefined] as const)
             .catch((e: TonConnectError) => [undefined, e] as const);
 
         if (contentPort) {
@@ -89,16 +74,14 @@ export const handleDAppConnection = (port: browser.Runtime.Port) => {
             );
         }
     });
-    port.onDisconnect.addListener(async port => {
-        if (port.sender?.url) {
-            const dappIsConnected = await isDappConnectedToExtension(
-                new URL(port.sender.url).origin
-            );
+    port.onDisconnect.addListener(async p => {
+        if (p.sender?.url) {
+            const dappIsConnected = await isDappConnectedToExtension(new URL(p.sender.url).origin);
             if (dappIsConnected) {
                 return;
             }
         }
-        contentScriptPorts.delete(port);
+        contentScriptPorts.delete(p);
     });
 };
 
@@ -127,6 +110,9 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
         case 'tonapi_request': {
             return createTonapiRequest(message.params[0], message.params[1]);
         }
+        case 'tonLink_intercept': {
+            return processInterceptTonLink(origin, message.params[0]);
+        }
         default:
             throw new TonConnectError(
                 `Method "${message.method}" not implemented`,
@@ -136,18 +122,6 @@ const handleDAppMessage = async (message: DAppMessage): Promise<unknown> => {
 };
 
 export const subscriptionDAppNotifications = () => {
-    backgroundEventsEmitter.on('chainChanged', message => {
-        contentScriptPorts.forEach(port => {
-            port.postMessage(providerEvent('chainChanged', message.params));
-        });
-    });
-
-    backgroundEventsEmitter.on('accountsChanged', async message => {
-        contentScriptPorts.forEach(port => {
-            port.postMessage(providerEvent('accountsChanged', message.params));
-        });
-    });
-
     backgroundEventsEmitter.on('tonConnectDisconnect', async message => {
         const dappHosts = message.params.map(parap => new URL(parap).host);
         const ports = [...contentScriptPorts.values()].filter(
@@ -158,7 +132,9 @@ export const subscriptionDAppNotifications = () => {
             ports.forEach(port => {
                 try {
                     port.postMessage(providerTonConnectEvent(Date.now(), 'disconnect'));
-                } catch (e) {}
+                } catch (e) {
+                    console.error(e);
+                }
                 contentScriptPorts.delete(port);
             });
         }

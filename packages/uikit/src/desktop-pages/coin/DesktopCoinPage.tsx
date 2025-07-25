@@ -31,8 +31,11 @@ import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wal
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    jettonToTonAssetAmount,
+    tonAssetAddressFromString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
@@ -52,6 +55,7 @@ import { HideForRegulatoryState } from '../../components/HideForState';
 import { CountryFeature } from '../../state/country';
 import { Redirect } from 'react-router-dom';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
+import { Image } from '../../components/shared/Image';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -232,62 +236,70 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
     const { data: rate } = useRate(token);
     const { fiat } = useAppContext();
 
-    const asset: { symbol: string; image: string; amount: string; fiatAmount: string } | undefined =
-        useMemo(() => {
-            if (!assets) {
+    const asset:
+        | {
+              symbol: string;
+              image: string;
+              amount: string;
+              fiatAmount: string;
+              noImageCorners?: boolean;
+          }
+        | undefined = useMemo(() => {
+        if (!assets) {
+            return undefined;
+        }
+
+        if (token === CryptoCurrency.TON) {
+            const amount = assets.ton.info.balance;
+            return {
+                image: TON_ASSET.image!,
+                symbol: TON_ASSET.symbol,
+                amount: format(amount),
+                fiatAmount: formatFiatCurrency(
+                    fiat,
+                    rate ? new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount)) : 0
+                )
+            };
+        }
+
+        if (seeIfValidTonAddress(token)) {
+            const jettonBalance = assets.ton.jettons.balances.find(b =>
+                eqAddresses(b.jetton.address, token)
+            );
+
+            if (!jettonBalance) {
                 return undefined;
             }
 
-            if (token === CryptoCurrency.TON) {
-                const amount = assets.ton.info.balance;
-                return {
-                    image: 'https://wallet.tonkeeper.com/img/toncoin.svg',
-                    symbol: 'TON',
-                    amount: format(amount),
-                    fiatAmount: formatFiatCurrency(
-                        fiat,
-                        rate ? new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount)) : 0
-                    )
-                };
-            }
+            const amount = jettonBalance.balance;
 
-            if (seeIfValidTonAddress(token)) {
-                const jettonBalance = assets.ton.jettons.balances.find(b =>
-                    eqAddresses(b.jetton.address, token)
-                );
-
-                if (!jettonBalance) {
-                    return undefined;
-                }
-
-                const amount = jettonBalance.balance;
-
-                return {
-                    image: jettonBalance.jetton.image,
-                    symbol: jettonBalance.jetton.symbol,
-                    amount: format(amount, jettonBalance.jetton.decimals),
-                    fiatAmount: formatFiatCurrency(
-                        fiat,
-                        jettonBalance.price
-                            ? shiftedDecimals(
-                                  jettonBalance.balance,
-                                  jettonBalance.jetton.decimals
-                              ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
-                            : 0
-                    )
-                };
-            }
-
-            const extra = assets.ton.info.extraBalance?.find(item => item.preview.symbol === token);
-
-            if (!extra) return undefined;
             return {
-                image: extra.preview.image,
-                symbol: extra.preview.symbol,
-                amount: format(extra.amount, extra.preview.decimals),
-                fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
+                image: jettonBalance.jetton.image,
+                symbol: jettonBalance.jetton.symbol,
+                amount: format(amount, jettonBalance.jetton.decimals),
+                fiatAmount: formatFiatCurrency(
+                    fiat,
+                    jettonBalance.price
+                        ? shiftedDecimals(
+                              jettonBalance.balance,
+                              jettonBalance.jetton.decimals
+                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                        : 0
+                ),
+                noImageCorners: jettonToTonAssetAmount(jettonBalance).asset.noImageCorners
             };
-        }, [assets, format, rate, fiat]);
+        }
+
+        const extra = assets.ton.info.extraBalance?.find(item => item.preview.symbol === token);
+
+        if (!extra) return undefined;
+        return {
+            image: extra.preview.image,
+            symbol: extra.preview.symbol,
+            amount: format(extra.amount, extra.preview.decimals),
+            fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
+        };
+    }, [assets, format, rate, fiat]);
 
     if (!asset) {
         return <></>;
@@ -295,7 +307,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
 
     return (
         <CoinInfoWrapper>
-            <img src={asset.image} alt={asset.symbol} />
+            <Image src={asset.image} alt={asset.symbol} noRadius={asset.noImageCorners} />
             <CoinInfoAmounts>
                 <Num3>
                     {asset.amount}&nbsp;{asset.symbol}

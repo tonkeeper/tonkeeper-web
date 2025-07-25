@@ -4,7 +4,7 @@ import browser from 'webextension-polyfill';
 import packageJson from '../../package.json';
 import { ExtensionStorage } from './storage';
 import { checkForError } from './utils';
-import { isValidUrlProtocol } from "@tonkeeper/core/dist/utils/common";
+import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 
 export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
     process.env.REACT_APP_EXTENSION_TYPE;
@@ -13,6 +13,20 @@ export class ExtensionAppSdk extends BaseApp {
     constructor() {
         super(new ExtensionStorage());
     }
+
+    pasteFromClipboard = async () => {
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
+            try {
+                return await navigator.clipboard.readText();
+            } catch (e) {
+                console.error('Failed to read clipboard', e);
+                return '';
+            }
+        } else {
+            return '';
+        }
+    };
+
     copyToClipboard = (value: string, notification?: string) => {
         copyToClipboard(value);
         this.topMessage(notification);
@@ -36,11 +50,15 @@ export class ExtensionAppSdk extends BaseApp {
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     disableScroll = () => null;
+
     enableScroll = () => null;
+
     getScrollbarWidth = () => 0;
+
     getKeyboardHeight = () => 0;
 
     isIOs = () => false;
+
     isStandalone = () => false;
 
     requestExtensionPermission = async () => {
@@ -89,4 +107,6 @@ export class ExtensionAppSdk extends BaseApp {
     targetEnv = 'extension' as const;
 
     storeUrl = process.env.REACT_APP_STORE_URL;
+
+    linksInterceptorAvailable = true;
 }

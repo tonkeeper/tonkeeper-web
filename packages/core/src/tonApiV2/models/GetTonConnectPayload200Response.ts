@@ -49,11 +49,11 @@ export function GetTonConnectPayload200ResponseFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function GetTonConnectPayload200ResponseToJSON(json: any): GetTonConnectPayload200Response {
-    return GetTonConnectPayload200ResponseToJSONTyped(json, false);
-}
+  export function GetTonConnectPayload200ResponseToJSON(json: any): GetTonConnectPayload200Response {
+      return GetTonConnectPayload200ResponseToJSONTyped(json, false);
+  }
 
-export function GetTonConnectPayload200ResponseToJSONTyped(value?: GetTonConnectPayload200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetTonConnectPayload200ResponseToJSONTyped(value?: GetTonConnectPayload200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

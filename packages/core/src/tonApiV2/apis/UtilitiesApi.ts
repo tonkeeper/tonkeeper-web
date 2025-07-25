@@ -16,14 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   AddressParse200Response,
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
   ServiceStatus,
 } from '../models/index';
 import {
     AddressParse200ResponseFromJSON,
     AddressParse200ResponseToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     ServiceStatusFromJSON,
     ServiceStatusToJSON,
 } from '../models/index';

@@ -89,11 +89,11 @@ export function WithdrawStakeRequestActionFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function WithdrawStakeRequestActionToJSON(json: any): WithdrawStakeRequestAction {
-    return WithdrawStakeRequestActionToJSONTyped(json, false);
-}
+  export function WithdrawStakeRequestActionToJSON(json: any): WithdrawStakeRequestAction {
+      return WithdrawStakeRequestActionToJSONTyped(json, false);
+  }
 
-export function WithdrawStakeRequestActionToJSONTyped(value?: WithdrawStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
+  export function WithdrawStakeRequestActionToJSONTyped(value?: WithdrawStakeRequestAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

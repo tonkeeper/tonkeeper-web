@@ -1,7 +1,7 @@
 import { Notification } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AddWalletContent, addWalletMethod, AddWalletMethod } from '../create/AddWallet';
+import { AddWalletContent, AddWalletMethod } from '../create/AddWallet';
 import styled, { css } from 'styled-components';
 import { Body1, Body2Class, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
@@ -9,7 +9,6 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useAtom } from '../../libs/useAtom';
-import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 import { useProState } from '../../state/pro';
 import { CreateStandardWallet } from '../../pages/import/CreateStandardWallet';
 import { CreateMAMWallet } from '../../pages/import/CreateMAMWallet';
@@ -19,10 +18,11 @@ import { CreateSignerWallet } from '../../pages/import/CreateSignerWallet';
 import { CreateKeystoneWallet } from '../../pages/import/CreateKeystoneWallet';
 import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
+import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -84,34 +84,6 @@ const NotificationStyled = styled(Notification)<{ mWidth: string | undefined }>`
         `}
 `;
 
-const ADD_WALLET_QUERY = 'add_wallet';
-
-const openExtensionTab = (sdk: IAppSdk, forMethod: AddWalletMethod) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const methodName = urlParams.get(ADD_WALLET_QUERY);
-
-    if (
-        !methodName &&
-        'openExtensionInBrowser' in sdk &&
-        typeof sdk.openExtensionInBrowser === 'function'
-    ) {
-        sdk.openExtensionInBrowser(null, `?${ADD_WALLET_QUERY}=${forMethod}`);
-    }
-};
-
-const closeExtensionTab = (sdk: IAppSdk) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const methodName = urlParams.get(ADD_WALLET_QUERY);
-
-    if (
-        methodName &&
-        'closeExtensionInBrowser' in sdk &&
-        typeof sdk.closeExtensionInBrowser === 'function'
-    ) {
-        sdk.closeExtensionInBrowser();
-    }
-};
-
 const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
     return method === 'multisig' || method === 'sk_fireblocks';
 };
@@ -119,7 +91,7 @@ const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
     const { data: proState } = useProState();
-    const { isOpen, onClose, onOpen } = useAddWalletNotification();
+    const { isOpen, onClose } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
     const [selectedMethod, setSelectedMethod] = useState<AddWalletMethod | undefined>(
@@ -127,51 +99,35 @@ export const AddWalletNotificationControlled = () => {
     );
 
     useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const methodName = urlParams.get(ADD_WALLET_QUERY);
-
-        if (!methodName) {
-            return;
-        }
-        if (addWalletMethod.includes(methodName as AddWalletMethod)) {
-            onOpen({ walletType: methodName as AddWalletMethod });
-        } else {
-            onOpen();
-        }
-    }, []);
-
-    useEffect(() => {
         if (!isOpen) {
             return;
         }
-        if (doesMethodRequirePro(params?.walletType) && !proState?.subscription.valid) {
+        if (doesMethodRequirePro(params?.walletType) && !isValidSubscription(proState?.current)) {
             onClose();
             openBuyPro();
             return;
         }
 
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid]);
+    }, [isOpen, params?.walletType, proState?.current?.valid]);
 
     const sdk = useAppSdk();
 
     const onCloseCallback = useCallback(() => {
-        closeExtensionTab(sdk);
         onClose();
     }, [onClose, setSelectedMethod, sdk]);
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (doesMethodRequirePro(method) && !proState?.subscription.valid) {
+            if (doesMethodRequirePro(method) && !isValidSubscription(proState?.current)) {
                 onClose();
                 openBuyPro();
                 return;
             }
 
-            openExtensionTab(sdk, method);
             setSelectedMethod(method);
         };
-    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod, sdk]);
+    }, [proState?.current?.valid, openBuyPro, setSelectedMethod, sdk]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

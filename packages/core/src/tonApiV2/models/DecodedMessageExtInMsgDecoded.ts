@@ -98,11 +98,11 @@ export function DecodedMessageExtInMsgDecodedFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-export function DecodedMessageExtInMsgDecodedToJSON(json: any): DecodedMessageExtInMsgDecoded {
-    return DecodedMessageExtInMsgDecodedToJSONTyped(json, false);
-}
+  export function DecodedMessageExtInMsgDecodedToJSON(json: any): DecodedMessageExtInMsgDecoded {
+      return DecodedMessageExtInMsgDecodedToJSONTyped(json, false);
+  }
 
-export function DecodedMessageExtInMsgDecodedToJSONTyped(value?: DecodedMessageExtInMsgDecoded | null, ignoreDiscriminator: boolean = false): any {
+  export function DecodedMessageExtInMsgDecodedToJSONTyped(value?: DecodedMessageExtInMsgDecoded | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -10,8 +10,10 @@ import { Body3, Label2 } from '../../Text';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { Image } from '../../shared/Image';
+import { shouldHideTonJettonImageCorners } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
-export const MethodImageRounded = styled.img`
+export const MethodImageRounded = styled(Image)`
     width: 40px;
     height: 40px;
     border-radius: ${props => props.theme.cornerFull};
@@ -93,7 +95,10 @@ export const BuyBatteryMethods: FC<{
                     }
                 >
                     <ListItemPayloadStyled>
-                        <MethodImageRounded src={m.image} />
+                        <MethodImageRounded
+                            src={m.image}
+                            noRadius={shouldHideTonJettonImageCorners(m.jettonMaster!)}
+                        />
                         <Label2>
                             {t('battery_other_ways_by_crypto_title', { symbol: m.symbol })}
                         </Label2>

@@ -57,11 +57,11 @@ export function BlockchainRawAccountLibrariesInnerFromJSONTyped(json: any, ignor
     };
 }
 
-export function BlockchainRawAccountLibrariesInnerToJSON(json: any): BlockchainRawAccountLibrariesInner {
-    return BlockchainRawAccountLibrariesInnerToJSONTyped(json, false);
-}
+  export function BlockchainRawAccountLibrariesInnerToJSON(json: any): BlockchainRawAccountLibrariesInner {
+      return BlockchainRawAccountLibrariesInnerToJSONTyped(json, false);
+  }
 
-export function BlockchainRawAccountLibrariesInnerToJSONTyped(value?: BlockchainRawAccountLibrariesInner | null, ignoreDiscriminator: boolean = false): any {
+  export function BlockchainRawAccountLibrariesInnerToJSONTyped(value?: BlockchainRawAccountLibrariesInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

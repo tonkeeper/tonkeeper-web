@@ -52,7 +52,6 @@ import { UserTheme } from '@tonkeeper/uikit/dist/pages/settings/Theme';
 import { DevSettings, DevSettingsLogs } from '@tonkeeper/uikit/dist/pages/settings/Dev';
 import { FiatCurrency } from '@tonkeeper/uikit/dist/pages/settings/FiatCurrency';
 import { SecuritySettings } from '@tonkeeper/uikit/dist/pages/settings/Security';
-import { ProSettings } from '@tonkeeper/uikit/dist/components/settings/ProSettings';
 import { IonReactMemoryRouter } from '@ionic/react-router';
 import { createIsolatedMemoryHistory } from '../../libs/isolated-memory-history';
 import { SplashScreen } from '@capacitor/splash-screen';
@@ -74,6 +73,8 @@ import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { Button } from '@tonkeeper/uikit';
 import { MobileDappBrowserController } from '../components/dapp-browser/MobileDappBrowserController';
+import { ProSubscriptionSettings } from '@tonkeeper/uikit/dist/components/settings/ProSubscriptionSettings';
+import { routerLocation$ } from '@tonkeeper/uikit/dist/hooks/router/useLocation';
 
 const WideLayout = styled.div`
     width: 100%;
@@ -442,6 +443,16 @@ const PreferencesModal = () => {
         settingsHistory.current.push(AppRoute.settings);
     };
 
+    const browserLocation = useLocation();
+    useEffect(() => {
+        if (!isSettingsOpen) {
+            routerLocation$.next(browserLocation);
+        } else {
+            routerLocation$.next(settingsHistory.current.location);
+            return settingsHistory.current.listen(loc => routerLocation$.next(loc));
+        }
+    }, [browserLocation, isSettingsOpen]);
+
     return (
         <IonModalStyled
             presentingElement={presentingElement!}
@@ -492,7 +503,7 @@ const PreferencesModal = () => {
                         />
                         <Route
                             path={AppRoute.settings + SettingsRoute.pro}
-                            component={ProSettings}
+                            component={ProSubscriptionSettings}
                         />
                         <Route
                             path={AppRoute.settings + SettingsRoute.recovery}
@@ -512,7 +523,8 @@ export const NarrowEnvGlobalStyles = createGlobalStyle`
         &.dapp-browser-open {
             background: transparent !important;
 
-            #main-content {
+            #main-content, ion-modal:not(.on-top-of-browser) {
+                z-index: 0 !important;
                 opacity: 0;
                 background: transparent;
             }

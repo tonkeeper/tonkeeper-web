@@ -57,11 +57,11 @@ export function BlockchainBlocksFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function BlockchainBlocksToJSON(json: any): BlockchainBlocks {
-    return BlockchainBlocksToJSONTyped(json, false);
-}
+  export function BlockchainBlocksToJSON(json: any): BlockchainBlocks {
+      return BlockchainBlocksToJSONTyped(json, false);
+  }
 
-export function BlockchainBlocksToJSONTyped(value?: BlockchainBlocks | null, ignoreDiscriminator: boolean = false): any {
+  export function BlockchainBlocksToJSONTyped(value?: BlockchainBlocks | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

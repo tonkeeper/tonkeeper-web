@@ -18,7 +18,7 @@ import { ProNotification } from '../pro/ProNotification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
 import { useTranslation } from '../../hooks/translation';
-import { HideOnReview } from '../ios/HideOnReview';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const HeaderStyled = styled.div`
     width: 100%;
@@ -99,7 +99,7 @@ const CategoriesModalContent: FC<{
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
     const { data } = useProState();
-    const isProEnabled = data?.subscription.valid;
+    const isProEnabled = isValidSubscription(data?.current);
     const { isOpen, onClose, onOpen } = useDisclosure();
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
@@ -156,11 +156,7 @@ const CategoriesModalContent: FC<{
                                                             <ReorderIcon />
                                                         </Icon>
                                                         <Body1>{category?.name}</Body1>
-                                                        <HideOnReview>
-                                                            {category?.onlyPro && (
-                                                                <Badge>PRO</Badge>
-                                                            )}
-                                                        </HideOnReview>
+                                                        {category?.onlyPro && <Badge>PRO</Badge>}
                                                         <CheckboxStyled
                                                             checked={isEnabled}
                                                             disabled={isDisabled}

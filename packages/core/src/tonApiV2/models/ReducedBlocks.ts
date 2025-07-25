@@ -57,11 +57,11 @@ export function ReducedBlocksFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function ReducedBlocksToJSON(json: any): ReducedBlocks {
-    return ReducedBlocksToJSONTyped(json, false);
-}
+  export function ReducedBlocksToJSON(json: any): ReducedBlocks {
+      return ReducedBlocksToJSONTyped(json, false);
+  }
 
-export function ReducedBlocksToJSONTyped(value?: ReducedBlocks | null, ignoreDiscriminator: boolean = false): any {
+  export function ReducedBlocksToJSONTyped(value?: ReducedBlocks | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

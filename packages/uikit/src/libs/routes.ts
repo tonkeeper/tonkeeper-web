@@ -39,6 +39,7 @@ export enum SettingsRoute {
     theme = '/theme',
     dev = '/dev',
     fiat = '/fiat',
+    interceptLinks = '/intercept-links',
     account = '/account',
     recovery = '/recovery',
     version = '/version',

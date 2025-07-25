@@ -32,6 +32,7 @@ export interface EmulateMessageToWalletOperationRequest {
     xTonConnectAuth: string;
     emulateMessageToWalletRequest: EmulateMessageToWalletRequest;
     acceptLanguage?: string;
+    enableValidation?: boolean;
 }
 
 export interface GetJettonMetadataRequest {
@@ -50,6 +51,7 @@ export interface EmulationApiInterface {
      * @param {string} xTonConnectAuth 
      * @param {EmulateMessageToWalletRequest} emulateMessageToWalletRequest bag-of-cells serialized to base64
      * @param {string} [acceptLanguage] 
+     * @param {boolean} [enableValidation] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EmulationApiInterface
@@ -100,6 +102,10 @@ export class EmulationApi extends runtime.BaseAPI implements EmulationApiInterfa
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['enableValidation'] != null) {
+            queryParameters['enable_validation'] = requestParameters['enableValidation'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

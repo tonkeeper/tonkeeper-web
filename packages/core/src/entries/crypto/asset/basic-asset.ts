@@ -7,6 +7,7 @@ export interface BasicAsset {
     decimals: number;
     name?: string;
     image?: string;
+    noImageCorners?: boolean;
 }
 
 export function packAssetId(blockchain: BLOCKCHAIN_NAME, address: string | Address): string {

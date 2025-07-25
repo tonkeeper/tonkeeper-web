@@ -110,9 +110,10 @@ export interface NftItem {
      */
     dns?: string;
     /**
-     * 
+     * Please use trust field
      * @type {Array<string>}
      * @memberof NftItem
+     * @deprecated
      */
     approvedBy: Array<NftItemApprovedByEnum>;
     /**

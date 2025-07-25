@@ -1,7 +1,6 @@
 import { Route, Switch, useRouteMatch } from 'react-router-dom';
 import { InnerBody } from '../../components/Body';
 import { SettingsHeader } from '../../components/Header';
-import { ProSettings } from '../../components/settings/ProSettings';
 import { SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Account } from './Account';
 import { ConnectedAppsSettings } from './ConnectedAppsSettings';
@@ -21,6 +20,8 @@ import { WalletVersionPage } from './Version';
 import { BatteryPage } from './Battery';
 import { TwoFAPage } from './TwoFA';
 import { ChainsPage } from './Chains';
+import { InterceptLinksPage as InterceptLinks } from './InterceptLinks';
+import { ProSubscriptionSettings } from '../../components/settings/ProSubscriptionSettings';
 
 const SettingsRouter = () => {
     const { path } = useRouteMatch();
@@ -30,6 +31,7 @@ const SettingsRouter = () => {
             <Route path={path + SettingsRoute.legal} component={Legal} />
             <Route path={path + SettingsRoute.dev} component={DevSettings} />
             <Route path={path + SettingsRoute.fiat} component={FiatCurrency} />
+            <Route path={path + SettingsRoute.interceptLinks} component={InterceptLinks} />
             <Route path={path + SettingsRoute.account} component={Account} />
             <Route path={path + SettingsRoute.notification} component={Notifications} />
             <Route path={path + `${SettingsRoute.recovery}/:accountId`} component={Recovery} />
@@ -39,7 +41,7 @@ const SettingsRouter = () => {
             <Route path={path + SettingsRoute.jettons} component={JettonsSettings} />
             <Route path={path + SettingsRoute.nft} component={NFTSettings} />
             <Route path={path + SettingsRoute.security} component={SecuritySettings} />
-            <Route path={path + SettingsRoute.pro} component={ProSettings} />
+            <Route path={path + SettingsRoute.pro} component={ProSubscriptionSettings} />
             <Route
                 path={path + WalletSettingsRoute.connectedApps}
                 component={ConnectedAppsSettings}

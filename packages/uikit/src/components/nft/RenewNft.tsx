@@ -3,7 +3,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { NFTDNS } from '@tonkeeper/core/dist/entries/nft';
 import BigNumber from 'bignumber.js';
-import { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useAreNftActionsDisabled } from '../../hooks/blockchain/nft/useAreNftActionsDisabled';
 import { useEstimateNftRenew } from '../../hooks/blockchain/nft/useEstimateNftRenew';
@@ -16,7 +16,12 @@ import { useNftDNSExpirationDate } from '../../state/nft';
 import { Notification } from '../Notification';
 import { Body2 } from '../Text';
 import { Button } from '../fields/Button';
-import { ConfirmView, ConfirmViewButtons, ConfirmViewButtonsSlot } from '../transfer/ConfirmView';
+import {
+    ConfirmView,
+    ConfirmViewButtons,
+    ConfirmViewButtonsSlot, ConfirmViewHeading,
+    ConfirmViewHeadingSlot
+} from "../transfer/ConfirmView";
 import { ConfirmAndCancelMainButton } from '../transfer/common';
 import { useNotifyErrorHandle, useToast } from '../../hooks/useNotification';
 
@@ -156,7 +161,11 @@ export const RenewNft: FC<{
                         fitContent
                         estimation={estimation}
                         {...mutation}
-                    />
+                    >
+                        <ConfirmViewHeadingSlot>
+                            <ConfirmViewHeading title={t('dns_renew_title')} />
+                        </ConfirmViewHeadingSlot>
+                    </ConfirmView>
                 )}
             </Notification>
         </>

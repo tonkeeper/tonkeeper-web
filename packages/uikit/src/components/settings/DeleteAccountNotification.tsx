@@ -11,6 +11,7 @@ import { Checkbox } from '../fields/Checkbox';
 import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useDeleteActiveWalletWarning } from '../../hooks/pro/useDeleteActiveWalletWarning';
 
 const NotificationBlock = styled.div`
     display: flex;
@@ -32,7 +33,11 @@ const DisclaimerText = styled(Label2)`
 const DisclaimerLink = styled(Label1)`
     cursor: pointer;
     color: ${props => props.theme.textAccent};
-    margin-left: 2.35rem;
+    margin-left: 40px;
+`;
+
+const CheckboxStyled = styled(Checkbox)`
+    gap: 16px;
 `;
 
 export const DeleteNotificationContent: FC<{
@@ -45,9 +50,14 @@ export const DeleteNotificationContent: FC<{
     const { t } = useTranslation();
     const [checked, setChecked] = useState(isKeystone || isReadOnly);
     const { mutateAsync, isLoading } = useMutateLogOut();
+    const verifyDeleting = useDeleteActiveWalletWarning();
     const { onOpen: onRecovery } = useRecoveryNotification();
 
     const onDelete = async () => {
+        const isApprovedDeleting = await verifyDeleting();
+
+        if (!isApprovedDeleting) return;
+
         await mutateAsync(accountId);
         onClose();
         navigate(AppRoute.home);
@@ -68,9 +78,9 @@ export const DeleteNotificationContent: FC<{
             {!isKeystone && !isReadOnly && (
                 <DisclaimerBlock>
                     <DisclaimerText>
-                        <Checkbox checked={checked} onChange={setChecked} light>
+                        <CheckboxStyled checked={checked} onChange={setChecked} light>
                             {t('I_have_a_backup_copy_of_recovery_phrase')}
-                        </Checkbox>
+                        </CheckboxStyled>
                     </DisclaimerText>
                     <DisclaimerLink
                         onClick={() => {
@@ -137,9 +147,9 @@ const DeleteAllContent = () => {
 
             <DisclaimerBlock>
                 <DisclaimerText>
-                    <Checkbox checked={checked} onChange={setChecked} light>
+                    <CheckboxStyled checked={checked} onChange={setChecked} light>
                         {t('I_have_a_backup_copy_of_recovery_phrase')}
-                    </Checkbox>
+                    </CheckboxStyled>
                 </DisclaimerText>
             </DisclaimerBlock>
             <Button

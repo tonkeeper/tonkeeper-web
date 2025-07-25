@@ -81,11 +81,11 @@ export function BlockRawFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function BlockRawToJSON(json: any): BlockRaw {
-    return BlockRawToJSONTyped(json, false);
-}
+  export function BlockRawToJSON(json: any): BlockRaw {
+      return BlockRawToJSONTyped(json, false);
+  }
 
-export function BlockRawToJSONTyped(value?: BlockRaw | null, ignoreDiscriminator: boolean = false): any {
+  export function BlockRawToJSONTyped(value?: BlockRaw | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

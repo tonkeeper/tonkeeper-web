@@ -81,11 +81,11 @@ export function GetRawConfig200ResponseFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function GetRawConfig200ResponseToJSON(json: any): GetRawConfig200Response {
-    return GetRawConfig200ResponseToJSONTyped(json, false);
-}
+  export function GetRawConfig200ResponseToJSON(json: any): GetRawConfig200Response {
+      return GetRawConfig200ResponseToJSONTyped(json, false);
+  }
 
-export function GetRawConfig200ResponseToJSONTyped(value?: GetRawConfig200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawConfig200ResponseToJSONTyped(value?: GetRawConfig200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

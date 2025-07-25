@@ -57,11 +57,11 @@ export function ExtraCurrenciesFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function ExtraCurrenciesToJSON(json: any): ExtraCurrencies {
-    return ExtraCurrenciesToJSONTyped(json, false);
-}
+  export function ExtraCurrenciesToJSON(json: any): ExtraCurrencies {
+      return ExtraCurrenciesToJSONTyped(json, false);
+  }
 
-export function ExtraCurrenciesToJSONTyped(value?: ExtraCurrencies | null, ignoreDiscriminator: boolean = false): any {
+  export function ExtraCurrenciesToJSONTyped(value?: ExtraCurrencies | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

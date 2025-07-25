@@ -108,11 +108,11 @@ export function TonTransferActionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-export function TonTransferActionToJSON(json: any): TonTransferAction {
-    return TonTransferActionToJSONTyped(json, false);
-}
+  export function TonTransferActionToJSON(json: any): TonTransferAction {
+      return TonTransferActionToJSONTyped(json, false);
+  }
 
-export function TonTransferActionToJSONTyped(value?: TonTransferAction | null, ignoreDiscriminator: boolean = false): any {
+  export function TonTransferActionToJSONTyped(value?: TonTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

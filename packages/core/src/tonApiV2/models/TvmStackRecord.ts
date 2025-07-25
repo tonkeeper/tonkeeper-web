@@ -91,11 +91,11 @@ export function TvmStackRecordFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function TvmStackRecordToJSON(json: any): TvmStackRecord {
-    return TvmStackRecordToJSONTyped(json, false);
-}
+  export function TvmStackRecordToJSON(json: any): TvmStackRecord {
+      return TvmStackRecordToJSONTyped(json, false);
+  }
 
-export function TvmStackRecordToJSONTyped(value?: TvmStackRecord | null, ignoreDiscriminator: boolean = false): any {
+  export function TvmStackRecordToJSONTyped(value?: TvmStackRecord | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

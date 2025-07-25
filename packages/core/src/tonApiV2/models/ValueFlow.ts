@@ -87,11 +87,11 @@ export function ValueFlowFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function ValueFlowToJSON(json: any): ValueFlow {
-    return ValueFlowToJSONTyped(json, false);
-}
+  export function ValueFlowToJSON(json: any): ValueFlow {
+      return ValueFlowToJSONTyped(json, false);
+  }
 
-export function ValueFlowToJSONTyped(value?: ValueFlow | null, ignoreDiscriminator: boolean = false): any {
+  export function ValueFlowToJSONTyped(value?: ValueFlow | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Notification } from '../Notification';
+import { Notification, NotificationFooterPortal } from '../Notification';
 import styled from 'styled-components';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
@@ -50,23 +50,20 @@ export const ProTrialStartNotification: FC<{
     };
 
     return (
-        <Notification
-            isOpen={isOpen}
-            handleClose={() => onClose()}
-            footer={
-                <FooterStyled>
-                    <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
-                        <TelegramIcon />
-                        {t('connect_telegram')}
-                    </ButtonStyled>
-                </FooterStyled>
-            }
-        >
+        <Notification isOpen={isOpen} handleClose={() => onClose()}>
             {() => (
                 <ContentWrapper>
                     <ImageStyled src="https://tonkeeper.com/assets/icon.ico" />
                     <Label2>{t('start_trial_notification_heading')}</Label2>
                     <Body2>{t('start_trial_notification_description')}</Body2>
+                    <NotificationFooterPortal>
+                        <FooterStyled>
+                            <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
+                                <TelegramIcon />
+                                {t('connect_telegram')}
+                            </ButtonStyled>
+                        </FooterStyled>
+                    </NotificationFooterPortal>
                 </ContentWrapper>
             )}
         </Notification>

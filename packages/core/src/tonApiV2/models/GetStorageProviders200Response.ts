@@ -57,11 +57,11 @@ export function GetStorageProviders200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function GetStorageProviders200ResponseToJSON(json: any): GetStorageProviders200Response {
-    return GetStorageProviders200ResponseToJSONTyped(json, false);
-}
+  export function GetStorageProviders200ResponseToJSON(json: any): GetStorageProviders200Response {
+      return GetStorageProviders200ResponseToJSONTyped(json, false);
+  }
 
-export function GetStorageProviders200ResponseToJSONTyped(value?: GetStorageProviders200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetStorageProviders200ResponseToJSONTyped(value?: GetStorageProviders200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

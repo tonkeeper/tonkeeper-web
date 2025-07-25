@@ -17,18 +17,18 @@ import * as runtime from '../runtime';
 import type {
   AccountInfoByStateInit,
   GetAccountInfoByStateInitRequest,
+  GetOpenapiJsonDefaultResponse,
   GetTonConnectPayload200Response,
-  InlineObject,
 } from '../models/index';
 import {
     AccountInfoByStateInitFromJSON,
     AccountInfoByStateInitToJSON,
     GetAccountInfoByStateInitRequestFromJSON,
     GetAccountInfoByStateInitRequestToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     GetTonConnectPayload200ResponseFromJSON,
     GetTonConnectPayload200ResponseToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
 } from '../models/index';
 
 export interface GetAccountInfoByStateInitOperationRequest {

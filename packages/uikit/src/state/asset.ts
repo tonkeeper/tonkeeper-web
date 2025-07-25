@@ -92,7 +92,7 @@ export function useTonAssetImage({ blockchain, address }: AssetIdentification): 
     const { data: jettons } = useJettonList();
 
     if (id === TON_ASSET.id) {
-        return 'https://wallet.tonkeeper.com/img/toncoin.svg';
+        return TON_ASSET.image;
     }
 
     if (typeof address === 'string') {

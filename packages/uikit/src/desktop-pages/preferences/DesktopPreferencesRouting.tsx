@@ -1,5 +1,4 @@
 import { Redirect, Route, Switch, useLocation, useRouteMatch } from 'react-router-dom';
-import { ProSettings } from '../../components/settings/ProSettings';
 import { AppRoute, DevSettingsRoute, SettingsRoute, WalletSettingsRoute } from '../../libs/routes';
 import { Localization } from '../../pages/settings/Localization';
 import { Legal } from '../../pages/settings/Legal';
@@ -10,6 +9,7 @@ import { Notifications } from '../../pages/settings/Notification';
 import { SecuritySettings } from '../../pages/settings/Security';
 import { DesktopManageAccountsPage } from '../settings/DesktopManageWalletsSettings';
 import { Navigate } from '../../components/shared/Navigate';
+import { ProSubscriptionSettings } from '../../components/settings/ProSubscriptionSettings';
 
 export const DesktopPreferencesRouting = () => {
     const { path } = useRouteMatch();
@@ -38,7 +38,7 @@ export const DesktopPreferencesRouting = () => {
                 <Redirect to={AppRoute.walletSettings + WalletSettingsRoute.twoFa} />
             </Route>
             <Route path={path + SettingsRoute.security} component={SecuritySettings} />
-            <Route path={path + SettingsRoute.pro} component={ProSettings} />
+            <Route path={path + SettingsRoute.pro} component={ProSubscriptionSettings} />
             <Route
                 path="*"
                 render={() => <Redirect to={AppRoute.settings + SettingsRoute.account} />}
