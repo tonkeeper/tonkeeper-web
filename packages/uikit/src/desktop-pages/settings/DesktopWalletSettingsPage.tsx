@@ -118,7 +118,7 @@ const SignOutTextContainer = styled.div`
 
     ${Label2Class};
 
-    &:nth-child(2) {
+    > *:nth-child(1) {
         margin-left: 8px;
     }
 `;

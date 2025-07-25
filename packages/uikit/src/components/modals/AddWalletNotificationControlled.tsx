@@ -1,7 +1,7 @@
 import { Notification } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AddWalletContent, addWalletMethod, AddWalletMethod } from '../create/AddWallet';
+import { AddWalletContent, AddWalletMethod } from '../create/AddWallet';
 import styled, { css } from 'styled-components';
 import { Body1, Body2Class, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
@@ -18,7 +18,6 @@ import { CreateSignerWallet } from '../../pages/import/CreateSignerWallet';
 import { CreateKeystoneWallet } from '../../pages/import/CreateKeystoneWallet';
 import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
@@ -85,34 +84,6 @@ const NotificationStyled = styled(Notification)<{ mWidth: string | undefined }>`
         `}
 `;
 
-const ADD_WALLET_QUERY = 'add_wallet';
-
-const openExtensionTab = (sdk: IAppSdk, forMethod: AddWalletMethod) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const methodName = urlParams.get(ADD_WALLET_QUERY);
-
-    if (
-        !methodName &&
-        'openExtensionInBrowser' in sdk &&
-        typeof sdk.openExtensionInBrowser === 'function'
-    ) {
-        sdk.openExtensionInBrowser(null, `?${ADD_WALLET_QUERY}=${forMethod}`);
-    }
-};
-
-const closeExtensionTab = (sdk: IAppSdk) => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const methodName = urlParams.get(ADD_WALLET_QUERY);
-
-    if (
-        methodName &&
-        'closeExtensionInBrowser' in sdk &&
-        typeof sdk.closeExtensionInBrowser === 'function'
-    ) {
-        sdk.closeExtensionInBrowser();
-    }
-};
-
 const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
     return method === 'multisig' || method === 'sk_fireblocks';
 };
@@ -120,26 +91,12 @@ const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
     const { data: proState } = useProState();
-    const { isOpen, onClose, onOpen } = useAddWalletNotification();
+    const { isOpen, onClose } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
     const [selectedMethod, setSelectedMethod] = useState<AddWalletMethod | undefined>(
         params?.walletType
     );
-
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const methodName = urlParams.get(ADD_WALLET_QUERY);
-
-        if (!methodName) {
-            return;
-        }
-        if (addWalletMethod.includes(methodName as AddWalletMethod)) {
-            onOpen({ walletType: methodName as AddWalletMethod });
-        } else {
-            onOpen();
-        }
-    }, []);
 
     useEffect(() => {
         if (!isOpen) {
@@ -157,7 +114,6 @@ export const AddWalletNotificationControlled = () => {
     const sdk = useAppSdk();
 
     const onCloseCallback = useCallback(() => {
-        closeExtensionTab(sdk);
         onClose();
     }, [onClose, setSelectedMethod, sdk]);
 
@@ -169,7 +125,6 @@ export const AddWalletNotificationControlled = () => {
                 return;
             }
 
-            openExtensionTab(sdk, method);
             setSelectedMethod(method);
         };
     }, [proState?.current?.valid, openBuyPro, setSelectedMethod, sdk]);

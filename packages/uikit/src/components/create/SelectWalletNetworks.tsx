@@ -15,6 +15,7 @@ import {
 import { FC, useEffect } from 'react';
 import { handleSubmit } from '../../libs/form';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { Image } from '../shared/Image';
 
 const Wrapper = styled.form`
     display: flex;
@@ -33,11 +34,11 @@ const Wrapper = styled.form`
         `}
 `;
 
-const AssetImage = styled.img<{ $noRadius?: boolean }>`
+const AssetImage = styled(Image)`
     width: 40px;
     height: 40px;
 
-    border-radius: ${p => (p.$noRadius ? 0 : p.theme.cornerFull)};
+    border-radius: ${p => p.theme.cornerFull};
 `;
 
 const Subtitle = styled(Body2)`
@@ -100,7 +101,7 @@ export const SelectWalletNetworks: FC<{ onContinue: (result: { tron: boolean }) 
                 </ListItem>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        <AssetImage src={TRON_USDT_ASSET.image} $noRadius />
+                        <AssetImage src={TRON_USDT_ASSET.image} noRadius />
                         <ColumnText
                             text={
                                 <TextWithLabel>

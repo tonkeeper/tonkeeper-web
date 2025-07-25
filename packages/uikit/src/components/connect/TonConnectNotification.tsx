@@ -34,6 +34,7 @@ import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/event
 import { useAnalyticsTrack } from '../../hooks/analytics';
 import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { originFromUrl } from "@tonkeeper/core/dist/utils/url";
 
 const Title = styled(H2)`
     text-align: center;
@@ -236,7 +237,14 @@ const ConnectContent: FC<{
                 )}
                 {cantConnectProof && <LedgerError>{t('operation_not_supported')}</LedgerError>}
                 {isReadOnly && <LedgerError>{t('operation_not_supported')}</LedgerError>}
-                {manifestUrlMismatch && <LedgerError>{t('manifest_mismatch_error')}</LedgerError>}
+                {manifestUrlMismatch && (
+                    <LedgerError>
+                        {t('manifest_mismatch_error', {
+                            actual: origin,
+                            declared: originFromUrl(manifest.url) ?? manifest.url
+                        })}
+                    </LedgerError>
+                )}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
         </NotificationBlock>

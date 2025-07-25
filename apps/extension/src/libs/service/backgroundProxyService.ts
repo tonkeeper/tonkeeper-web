@@ -2,9 +2,6 @@
  * The background service to manage proxy configuration
  * The service is responsible to manage enable and disable proxy configuration base users local configuration
  * Origin: https://github.com/OpenProduct/openmask-extension/blob/main/src/libs/service/backgroundProxyService.ts
- *
- * @author: KuznetsovNikita
- * @since: 0.8.0
  */
 
 import browser from 'webextension-polyfill';

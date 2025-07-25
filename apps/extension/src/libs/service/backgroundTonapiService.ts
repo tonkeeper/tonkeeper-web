@@ -5,7 +5,7 @@ import ExtensionPlatform from './extension';
 const getToken = async (url: string) => {
     let token = memoryStore.getTonapiToken();
     if (!token) {
-        const version = new ExtensionPlatform().getVersion();
+        const version = ExtensionPlatform.getVersion();
         const chainName = url.includes('testnet') ? 'testnet' : 'mainnet';
 
         const boot = `https://boot.tonkeeper.com/keys?build=${version}&chainName=${chainName}`;

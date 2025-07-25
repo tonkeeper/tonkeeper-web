@@ -1,5 +1,8 @@
 import { Address } from '@ton/core';
-import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    jettonToTonAssetAmount,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { JettonBalance, JettonInfo } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC, Suspense, useMemo, useRef } from 'react';
@@ -89,6 +92,7 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
     const total = useFormatBalance(amount, info.metadata.decimals);
     const { fiatAmount } = useFormatFiat(data, amount);
     const { description, image } = info.metadata;
+    const assetAmount = jettonToTonAssetAmount(balance);
 
     return (
         <CoinInfo
@@ -96,7 +100,8 @@ const JettonHeader: FC<{ info: JettonInfo; balance: JettonBalance }> = ({ info, 
             symbol={info.metadata.symbol}
             price={fiatAmount}
             description={description}
-            image={image}
+            image={assetAmount.image ?? image}
+            noImageCorners={assetAmount.asset.noImageCorners}
         />
     );
 };

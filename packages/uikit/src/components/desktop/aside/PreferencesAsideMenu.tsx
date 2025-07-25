@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { Body3, Label2 } from '../../Text';
+import { Body2, Body3, Label2 } from '../../Text';
 import {
     AppearanceIcon,
     AppleIcon,
@@ -13,6 +13,7 @@ import {
     LockIcon,
     SlidersIcon,
     TelegramIcon,
+    TonkeeperProOutlineIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
 import { useLocation } from 'react-router-dom';
@@ -27,7 +28,7 @@ import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
 import { useProState } from '../../../state/pro';
 import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
-import { hexToRGBA } from '../../../libs/css';
+import { hexToRGBA, hover } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
@@ -64,6 +65,26 @@ const AsideMenuItemStyled = styled(AsideMenuItem)`
     svg {
         color: ${p => p.theme.iconSecondary};
     }
+`;
+
+const AsideMenuItemVersion = styled(AsideMenuItemStyled)`
+    color: ${p => p.theme.textTertiary};
+    transition: color 0.15s ease-in-out;
+
+    svg {
+        color: ${p => p.theme.iconTertiary};
+        transition: color 0.15s ease-in-out;
+    }
+
+    ${p =>
+        p.theme.proDisplayType !== 'mobile' &&
+        hover`
+             background: unset;
+             
+             color: ${p.theme.textSecondary};
+             svg {
+                 color: ${p.theme.iconSecondary};
+        `}
 `;
 
 const AsideMenuItemLarge = styled(AsideMenuItemStyled)`
@@ -270,6 +291,20 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     </Label2>
                 </AsideMenuItemStyled>
                 <DeleteAllNotification open={isOpen} handleClose={onClose} />
+            </AsideMenuItemsBlock>
+            <AsideMenuItemsBlock>
+                <AsideMenuItemVersion
+                    isSelected={false}
+                    onClick={() =>
+                        sdk.copyToClipboard(
+                            `Tonkeeper Pro for ${sdk.targetEnv} v${sdk.version}`,
+                            t('copied')
+                        )
+                    }
+                >
+                    <TonkeeperProOutlineIcon />
+                    <Body2>Tonkeeper Pro {sdk.version}</Body2>
+                </AsideMenuItemVersion>
             </AsideMenuItemsBlock>
         </PreferencesAsideContainer>
     );

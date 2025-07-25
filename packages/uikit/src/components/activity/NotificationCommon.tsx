@@ -38,6 +38,7 @@ import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/ass
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { Image } from '../shared/Image';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -403,7 +404,7 @@ const TransparentButton = styled.button`
     padding: 0;
 `;
 
-const TokenImage = styled.img`
+const TokenImage = styled(Image)`
     width: 24px;
     height: 24px;
     border-radius: ${p => p.theme.cornerFull};
@@ -506,7 +507,10 @@ export const SelectSenderDropdown: FC<{
                                     </>
                                 ) : s.type === 'gasless' ? (
                                     <>
-                                        <TokenImage src={s.asset.image} />
+                                        <TokenImage
+                                            src={s.asset.image}
+                                            noRadius={s.asset.noImageCorners}
+                                        />
                                         <Label2>{s.asset.symbol}</Label2>
                                     </>
                                 ) : (

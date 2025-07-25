@@ -7,7 +7,6 @@ export interface DAppMessage {
 
 export type TonkeeperApiMessage =
     | TonkeeperApiResponse
-    | TonkeeperApiEvent
     | TonkeeperApiTonConnectEvent;
 
 export interface TonkeeperError {
@@ -22,17 +21,6 @@ export interface TonkeeperApiResponse {
         jsonrpc: '2.0';
         id: number;
         method: string;
-        result: undefined | unknown;
-        error?: TonkeeperError;
-    };
-}
-
-export interface TonkeeperApiEvent {
-    type: 'TonkeeperAPI';
-    message: {
-        jsonrpc: '2.0';
-        id?: undefined;
-        method: 'accountsChanged' | 'chainChanged';
         result: undefined | unknown;
         error?: TonkeeperError;
     };

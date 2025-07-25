@@ -15,6 +15,7 @@ import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../../hooks/translation';
 import { ExternalLink } from '../../shared/ExternalLink';
 import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { Image } from '../../shared/Image';
 
 const SwapTokensListWrapper = styled.div`
     overflow-y: auto;
@@ -146,7 +147,7 @@ const TokenListItemWrapper = styled.button`
     }
 `;
 
-const TokenImage = styled.img`
+const TokenImage = styled(Image)`
     height: 40px;
     width: 40px;
     border-radius: 100%;
@@ -221,7 +222,10 @@ const TokenListItem: FC<{ swapAsset: WalletSwapAsset; onClick: () => void }> = (
 
     return (
         <TokenListItemWrapper onClick={onClick}>
-            <TokenImage src={swapAsset.assetAmount.asset.image} />
+            <TokenImage
+                src={swapAsset.assetAmount.asset.image}
+                noRadius={swapAsset.assetAmount.asset.noImageCorners}
+            />
             <TokenInfo>
                 <TokenInfoLine>
                     <Label2>{swapAsset.assetAmount.asset.symbol}</Label2>

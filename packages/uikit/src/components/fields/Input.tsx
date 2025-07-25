@@ -211,6 +211,7 @@ export type InputProps = Omit<
     size?: 'small' | 'medium';
     id: string;
     autoFocus?: number | boolean | 'notification';
+    autoSelect?: boolean;
 };
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -232,6 +233,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className,
             size,
             autoFocus,
+            autoSelect,
             ...rest
         },
         ref
@@ -255,7 +257,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         useEffect(() => {
             if (el.current && !focused.current && autoFocus) {
                 setTimeout(
-                    () => el.current?.focus(),
+                    () => {
+                        el.current?.focus();
+                        if (autoSelect) {
+                            setTimeout(() => {
+                                el.current?.select();
+                            }, 0);
+                        }
+                    },
                     typeof autoFocus === 'number'
                         ? autoFocus
                         : autoFocus === 'notification'
@@ -264,7 +273,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 );
                 focused.current = true;
             }
-        }, [autoFocus]);
+        }, [autoFocus, autoSelect]);
 
         return (
             <OuterBlock className={className}>

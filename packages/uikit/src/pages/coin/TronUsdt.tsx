@@ -27,7 +27,7 @@ const TronUsdtHeader: FC<{ assetAmount: AssetAmount<TronAsset> }> = ({ assetAmou
             symbol={assetAmount.asset.symbol}
             price={fiatAmount}
             image={assetAmount.asset.image}
-            imageNoCorners
+            noImageCorners={assetAmount.asset.noImageCorners}
         />
     );
 };

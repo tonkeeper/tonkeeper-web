@@ -1,16 +1,6 @@
 import { EventEmitter } from '@tonkeeper/core/dist/entries/eventEmitter';
 import { TonkeeperApiMessage } from '../entries/message';
 
-const seeIsEvent = (method: string) => {
-    switch (method) {
-        case 'accountsChanged':
-        case 'chainChanged':
-            return true;
-        default:
-            return false;
-    }
-};
-
 export class TonProvider extends EventEmitter {
     isTonkeeper = true;
 
@@ -115,9 +105,7 @@ export class TonProvider extends EventEmitter {
                 delete this.promises[id];
             }
         } else {
-            if (method && seeIsEvent(method)) {
-                this.emit(method, result);
-            }
+            throw new Error(`Method is not a valid string. ${method}`);
         }
     };
 

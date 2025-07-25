@@ -1,18 +1,11 @@
-import React, { FC, forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import { AppRoute } from '../../libs/routes';
 import { useFormatFiat, useUSDTRate } from '../../state/rates';
 import { ListItem } from '../List';
 import { ListItemPayload, TokenLayout, TokenLogo } from './TokenLayout';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import styled from 'styled-components';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { useNavigate } from '../../hooks/router/useNavigate';
-
-const TokenLogoNotRounded = styled(TokenLogo)`
-    border-radius: unset;
-`;
 
 export const TronAssetComponent = forwardRef<
     HTMLDivElement,
@@ -35,11 +28,7 @@ export const TronAssetComponent = forwardRef<
             ref={ref}
         >
             <ListItemPayload>
-                {assetAmount.asset.id === TRON_USDT_ASSET.id ? (
-                    <TokenLogoNotRounded src={assetAmount.image} />
-                ) : (
-                    <TokenLogo src={assetAmount.image} />
-                )}
+                <TokenLogo src={assetAmount.image} noRadius={assetAmount.asset.noImageCorners} />
                 <TokenLayout
                     name={assetAmount.asset.name!}
                     symbol={assetAmount.asset.symbol}

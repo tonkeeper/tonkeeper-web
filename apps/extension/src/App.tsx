@@ -44,7 +44,6 @@ import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo
 import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import browser from 'webextension-polyfill';
-import { Notifications } from './components/Notifications';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
@@ -59,6 +58,7 @@ import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
+import { Notifications } from './components/Notifications';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -351,6 +351,7 @@ export const Content: FC<{
             </Switch>
             <Footer />
             <MemoryScroll />
+            <Notifications />
             <TonConnectSubscription />
             <Suspense>
                 <SendActionNotification />
@@ -377,7 +378,6 @@ const IndexPage = () => {
                     <Home />
                 </Suspense>
             </InnerBody>
-            <Notifications />
         </>
     );
 };
