@@ -1,5 +1,11 @@
 import styled from 'styled-components';
-import { isIosSubscription, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    CryptoSubscriptionStatuses,
+    isExpiredSubscription,
+    isIosAutoRenewableSubscription,
+    isIosCanceledSubscription,
+    isTelegramSubscription
+} from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2 } from '../Text';
 import { SkeletonList } from '../Skeleton';
@@ -14,25 +20,43 @@ export const ProStatusDetailsList = () => {
     const { price, expirationDate } = useProStatusDetailsDisplayData(data?.current);
 
     const subscription = data?.current;
-    const isIos = isIosSubscription(subscription);
-    const isAutoRenew = isIos && subscription?.autoRenewStatus;
-    const isCanceled = isIos && !subscription?.autoRenewStatus;
+
+    const isExpired = isExpiredSubscription(subscription);
+    const isCanceled = isIosCanceledSubscription(subscription);
+    const isAutoRenew = isIosAutoRenewableSubscription(subscription);
 
     const getStatusText = () => {
         if (!subscription) return '-';
 
-        const baseStatus = isCanceled ? 'canceled' : subscription.status;
+        if (subscription.status === CryptoSubscriptionStatuses.PENDING) {
+            return `${t('processing')}...`;
+        }
+
         const trialSuffix = isTelegramSubscription(subscription) ? ` (${t('trial')})` : '';
 
-        return `${t(baseStatus)}${trialSuffix}`;
+        return `${t(subscription.status)}${trialSuffix}`;
+    };
+
+    const getStatusColor = () => {
+        if (!subscription) return undefined;
+
+        if (subscription.status === CryptoSubscriptionStatuses.PENDING) {
+            return 'textSecondary';
+        }
+
+        if (isExpired) {
+            return 'accentOrange';
+        }
+
+        return undefined;
     };
 
     const getExpirationTitle = () => {
-        if (!isIos) {
-            return t('expiration_date');
+        if (isAutoRenew || isCanceled) {
+            return t(isAutoRenew ? 'renews' : 'ends');
         }
 
-        return t(isAutoRenew ? 'renews' : 'ends');
+        return t('expiration_date');
     };
 
     if (isLoading) {
@@ -44,7 +68,7 @@ export const ProStatusDetailsList = () => {
             <ListItemStyled hover={false}>
                 <ListItemPayloadStyled>
                     <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                    <Body2Styled isCanceled={isCanceled}>{getStatusText()}</Body2Styled>
+                    <Body2Styled color={getStatusColor()}>{getStatusText()}</Body2Styled>
                 </ListItemPayloadStyled>
             </ListItemStyled>
 
@@ -54,6 +78,17 @@ export const ProStatusDetailsList = () => {
                     <Body2Styled>{expirationDate}</Body2Styled>
                 </ListItemPayloadStyled>
             </ListItemStyled>
+
+            {(isCanceled || isAutoRenew) && (
+                <ListItemStyled hover={false}>
+                    <ListItemPayloadStyled>
+                        <Body2RegularStyled>{t('auto_renew')}</Body2RegularStyled>
+                        <Body2Styled color={isCanceled ? 'accentOrange' : undefined}>
+                            {t(isCanceled ? 'disabled' : 'enabled')}
+                        </Body2Styled>
+                    </ListItemPayloadStyled>
+                </ListItemStyled>
+            )}
 
             <ListItemStyled hover={false}>
                 <ListItemPayloadStyled>
@@ -65,8 +100,10 @@ export const ProStatusDetailsList = () => {
     );
 };
 
-const Body2Styled = styled(Body2)<{ isCanceled?: boolean }>`
-    color: ${({ theme, isCanceled }) => (isCanceled ? theme.accentOrange : theme.textPrimary)};
+const Body2Styled = styled(Body2)<{
+    color?: 'accentOrange' | 'textSecondary';
+}>`
+    color: ${({ theme, color }) => (color ? theme[color] : theme.textPrimary)};
     text-transform: capitalize;
 `;
 

@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
 import styled from 'styled-components';
 import {
+    isExpiredSubscription,
+    isIosAutoRenewableSubscription,
+    isIosCanceledSubscription,
+    isIosExpiredSubscription,
     isIosStrategy,
-    isIosSubscription,
-    isProSubscription,
     isTelegramSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -19,18 +20,21 @@ import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useNotifyError } from '../../hooks/useNotification';
 import { useManageSubscription, useProLogout, useProState } from '../../state/pro';
 import { handleSubmit } from '../../libs/form';
-import { AppRoute } from '../../libs/routes';
-import { useNavigate } from '../../hooks/router/useNavigate';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
+import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useEffect } from 'react';
+import { AppRoute } from '../../libs/routes';
 
 export const ProStatusScreen = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
-    const { data: proState } = useProState();
     const navigate = useNavigate();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
+    const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
+    const { data: proState, isLoading: isProStateLoading } = useProState();
 
     const {
         mutateAsync: mutateProLogout,
@@ -47,21 +51,30 @@ export const ProStatusScreen = () => {
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
     const subscription = proState?.current;
+    const isIosEnvironment = isIosStrategy(sdk.subscriptionStrategy);
 
-    useEffect(() => {
-        if (!isProSubscription(subscription)) {
-            navigate(AppRoute.home);
-        }
-    }, [subscription]);
+    const isTelegram = isTelegramSubscription(subscription);
 
     const isProActive = isValidSubscription(subscription);
-    const isIos = isIosStrategy(sdk.subscriptionStrategy) && isIosSubscription(subscription);
-    const isTelegram = isTelegramSubscription(subscription);
-    const isActiveIos = isIos && isProActive;
-    const isAutoRenew = isIos && subscription?.autoRenewStatus;
+    const isProExpired = isExpiredSubscription(subscription);
+
+    const isIosExpired = isIosEnvironment && isIosExpiredSubscription(subscription);
+    const isIosCanceled = isIosEnvironment && isIosCanceledSubscription(subscription);
+    const isIosAutoRenewable = isIosEnvironment && isIosAutoRenewableSubscription(subscription);
+    const isIosActive = isIosCanceled || isIosAutoRenewable;
+
+    useEffect(() => {
+        if (!subscription && !isProStateLoading) {
+            navigate(AppRoute.home);
+        }
+    }, [subscription, isProStateLoading]);
 
     const handleGetPro = () => {
-        onProAuthOpen();
+        if (isTelegram) {
+            onProAuthOpen();
+        } else {
+            onProPurchaseOpen();
+        }
     };
 
     const handleDisconnect = async () => {
@@ -86,30 +99,40 @@ export const ProStatusScreen = () => {
 
             <ProStatusDetailsList />
 
-            {isAutoRenew && <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>}
-
-            {isActiveIos && (
-                <Button
-                    secondary
-                    fullWidth
-                    type="button"
-                    onClick={() => handleManageSubscription()}
-                    loading={isManagingLoading || isLoggingOut}
-                >
-                    <SlidersIcon />
-                    <Label2>{t('Manage')}</Label2>
-                </Button>
+            {isIosAutoRenewable && (
+                <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
             )}
 
-            <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>
-                <Label2>{t('tonkeeper_pro_features')}</Label2>
-            </Button>
+            <ButtonsBlockStyled>
+                {isIosActive && (
+                    <Button
+                        secondary
+                        fullWidth
+                        type="button"
+                        onClick={() => handleManageSubscription()}
+                        loading={isManagingLoading || isLoggingOut}
+                    >
+                        <SlidersIcon />
+                        <Label2>{t('Manage')}</Label2>
+                    </Button>
+                )}
 
-            {isTelegram && (
-                <Button primary fullWidth size="large" type="submit">
-                    <Label2>{t('get_tonkeeper_pro')}</Label2>
+                <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>
+                    <Label2>{t('tonkeeper_pro_features')}</Label2>
                 </Button>
-            )}
+
+                {(isTelegram || (isProExpired && !isIosExpired)) && (
+                    <Button primary fullWidth size="large" type="submit">
+                        <Label2>{t('get_tonkeeper_pro')}</Label2>
+                    </Button>
+                )}
+
+                {(isIosExpired || isIosCanceled) && (
+                    <Button primary fullWidth size="large" type="submit">
+                        <Label2>{t('renew')}</Label2>
+                    </Button>
+                )}
+            </ButtonsBlockStyled>
         </ProScreenContentWrapper>
     );
 };
@@ -123,6 +146,14 @@ const ProScreenContentWrapper = styled.form`
     height: 100%;
     max-width: 650px;
     margin: 0 auto;
+`;
+
+const ButtonsBlockStyled = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 `;
 
 const Body3Styled = styled(Body3)`

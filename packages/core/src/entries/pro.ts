@@ -74,10 +74,13 @@ interface BaseIosSubscription extends BaseSubscription, IosDBStoredInfo {
 interface IosActiveSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.ACTIVE;
     valid: true;
+    autoRenewStatus: boolean;
 }
 
 interface IosExpiredSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.EXPIRED;
+    valid: false;
+    autoRenewStatus: false;
 }
 
 export interface IProductInfo {
@@ -296,6 +299,26 @@ export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
 }
 
+export function isIosAutoRenewableSubscription(value: unknown): value is IosActiveSubscription & {
+    autoRenewStatus: true;
+} {
+    return isPaidSubscription(value) && isIosSubscription(value) && value?.autoRenewStatus === true;
+}
+
+export function isIosExpiredSubscription(value: unknown): value is IosExpiredSubscription {
+    return isIosSubscription(value) && value.status === IosSubscriptionStatuses.EXPIRED;
+}
+
+export function isIosCanceledSubscription(
+    value: unknown
+): value is IosActiveSubscription & { autoRenewStatus: false } {
+    return (
+        isIosSubscription(value) &&
+        value.status === IosSubscriptionStatuses.ACTIVE &&
+        !value.autoRenewStatus
+    );
+}
+
 export function isTelegramSubscription(value: unknown): value is TelegramSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.TELEGRAM;
 }
@@ -311,7 +334,7 @@ export function isTelegramActiveSubscription(value: unknown): value is TelegramA
 export function hasAuth(
     subscription: ProSubscription | ConstructedSubscription | null | undefined
 ): subscription is Exclude<ProSubscription | ConstructedSubscription, null> & {
-    target: { auth: WalletAuth | TelegramAuth };
+    auth: WalletAuth | TelegramAuth;
 } {
     return !!subscription?.auth;
 }

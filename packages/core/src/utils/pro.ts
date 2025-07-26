@@ -43,11 +43,12 @@ export const normalizeSubscription = (
                 status: TelegramSubscriptionStatuses.ACTIVE,
                 valid: true,
                 usedTrial: true,
-                trialEndDate: nextChargeDate,
+                nextChargeDate,
                 auth: {
                     type: AuthTypes.TELEGRAM,
                     trialUserId: user.tg_id
-                }
+                },
+                expiresDate: toDate(subscriptionDto?.telegram?.expires_date)
             };
         }
 
@@ -56,11 +57,12 @@ export const normalizeSubscription = (
             status: TelegramSubscriptionStatuses.EXPIRED,
             valid: false,
             usedTrial: true,
-            trialEndDate: nextChargeDate,
+            nextChargeDate,
             auth: {
                 type: AuthTypes.TELEGRAM,
                 trialUserId: user.tg_id
-            }
+            },
+            expiresDate: toDate(subscriptionDto?.telegram?.expires_date)
         };
     }
 
@@ -78,7 +80,8 @@ export const normalizeSubscription = (
                 },
                 amount: subscriptionDto.crypto?.amount,
                 currency: subscriptionDto.crypto?.currency,
-                purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
+                purchaseDate: toDate(subscriptionDto.crypto?.purchase_date),
+                expiresDate: toDate(subscriptionDto.crypto?.expires_date)
             };
         }
 
@@ -94,7 +97,8 @@ export const normalizeSubscription = (
             },
             amount: subscriptionDto.crypto?.amount,
             currency: subscriptionDto.crypto?.currency,
-            purchaseDate: toDate(subscriptionDto.crypto?.purchase_date)
+            purchaseDate: toDate(subscriptionDto.crypto?.purchase_date),
+            expiresDate: toDate(subscriptionDto.crypto?.expires_date)
         };
     }
 
@@ -119,7 +123,7 @@ export const normalizeSubscription = (
                 storeFrontId: subscriptionDto.ios?.store_front_id,
                 transactionType: subscriptionDto.ios?.transaction_type,
                 originalTransactionId: subscriptionDto.ios?.original_tx_id,
-                autoRenewStatus: subscriptionDto.ios?.auto_renew_status
+                autoRenewStatus: subscriptionDto.ios?.auto_renew_status ?? false
             };
         }
 
@@ -142,7 +146,7 @@ export const normalizeSubscription = (
             storeFrontId: subscriptionDto.ios?.store_front_id,
             transactionType: subscriptionDto.ios?.transaction_type,
             originalTransactionId: subscriptionDto.ios?.original_tx_id,
-            autoRenewStatus: subscriptionDto.ios?.auto_renew_status
+            autoRenewStatus: false
         };
     }
 
