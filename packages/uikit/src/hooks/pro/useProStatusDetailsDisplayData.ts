@@ -1,10 +1,10 @@
 import {
     hasIosPrice,
     isCryptoSubscription,
+    isExpiredSubscription,
     isIosSubscription,
-    isPaidSubscription,
     isPendingSubscription,
-    isTelegramActiveSubscription,
+    isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 
@@ -40,16 +40,16 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
 
     const getExpirationDate = () => {
         try {
-            if (isTelegramActiveSubscription(subscription) && subscription.trialEndDate) {
-                return formatDate(subscription.trialEndDate, {
+            if (isValidSubscription(subscription) && subscription.nextChargeDate) {
+                return formatDate(subscription.nextChargeDate, {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric'
                 });
             }
 
-            if (isPaidSubscription(subscription) && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, {
+            if (isExpiredSubscription(subscription) && subscription.expiresDate) {
+                return formatDate(subscription.expiresDate, {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric'

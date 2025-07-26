@@ -164,7 +164,7 @@ const getPseudoTelegramSubscription = (
             type: AuthTypes.TELEGRAM,
             trialUserId: 0
         },
-        trialEndDate: promoExpirationDate
+        nextChargeDate: promoExpirationDate
     };
 };
 

@@ -65,18 +65,18 @@ interface IosDBStoredInfo {
     autoRenewStatus?: boolean;
 }
 
-interface BaseIosSubscription extends BaseSubscription {
+interface BaseIosSubscription extends BaseSubscription, IosDBStoredInfo {
     source: SubscriptionSource.IOS;
     status: IosSubscriptionStatuses;
     auth: WalletAuth;
 }
 
-interface IosActiveSubscription extends BaseIosSubscription, IosDBStoredInfo {
+interface IosActiveSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.ACTIVE;
     valid: true;
 }
 
-interface IosExpiredSubscription extends BaseIosSubscription, IosDBStoredInfo {
+interface IosExpiredSubscription extends BaseIosSubscription {
     status: IosSubscriptionStatuses.EXPIRED;
 }
 
@@ -127,8 +127,7 @@ export enum IosPurchaseStatuses {
 
 export enum IosSubscriptionStatuses {
     ACTIVE = 'active',
-    EXPIRED = 'expired',
-    PENDING = 'pending'
+    EXPIRED = 'expired'
 }
 
 export enum ProductIds {
@@ -155,6 +154,7 @@ export function isIosStrategy(
 interface CryptoDBStoredInfo {
     amount?: string;
     currency?: CryptoCurrency;
+    expiresDate?: Date;
     purchaseDate?: Date;
 }
 
@@ -202,11 +202,14 @@ export function isCryptoStrategy(
 }
 
 // Telegram Subscription Types
-interface BaseTelegramSubscription extends BaseSubscription {
+interface TelegramDBStoredInfo {
+    expiresDate?: Date;
+}
+
+interface BaseTelegramSubscription extends BaseSubscription, TelegramDBStoredInfo {
     source: SubscriptionSource.TELEGRAM;
     status: TelegramSubscriptionStatuses;
     usedTrial: true;
-    trialEndDate?: Date;
     auth: TelegramAuth;
 }
 

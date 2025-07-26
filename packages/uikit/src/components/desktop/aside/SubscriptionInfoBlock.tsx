@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import {
     isPaidSubscription,
     isPendingSubscription,
-    isTelegramSubscription,
+    isTelegramActiveSubscription,
     isValidSubscription,
     ProState
 } from '@tonkeeper/core/dist/entries/pro';
@@ -40,14 +40,14 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
 
     const { current: subscription } = data;
 
-    if (isTelegramSubscription(subscription) && subscription.trialEndDate) {
+    if (isTelegramActiveSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_trial_is_active')}</Body3Block>
                 <Body3Block>
                     {t('aside_expires_on').replace(
                         '%date%',
-                        formatDate(subscription.trialEndDate, {
+                        formatDate(subscription.nextChargeDate, {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',
