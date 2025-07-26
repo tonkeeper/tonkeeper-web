@@ -33,7 +33,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
-import { Button } from '../../components/fields/Button';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -122,6 +121,42 @@ const ReviewerSettings = () => {
     );
 };
 
+// TODO Remove it before release
+const PromoStateSettings = () => {
+    const sdk = useAppSdk();
+    const isCapacitor = useIsCapacitorApp();
+    const [isActive, setIsActive] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const isFreeActive = Boolean(
+                await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
+            );
+            setIsActive(isFreeActive);
+        })();
+    }, [sdk.storage]);
+
+    const handleChange = async (checked: boolean) => {
+        await sdk.storage.set<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE, checked);
+        setIsActive(checked);
+    };
+
+    if (!isCapacitor) {
+        return null;
+    }
+
+    return (
+        <ListBlockDesktopAdaptive>
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <Label1>Mobile Promo state</Label1>
+                    <Switch checked={isActive} onChange={handleChange} />
+                </ListItemPayload>
+            </ListItem>
+        </ListBlockDesktopAdaptive>
+    );
+};
+
 const LogsSettings = () => {
     const navigate = useNavigate();
     const logger = useAppSdk().logger;
@@ -135,33 +170,6 @@ const LogsSettings = () => {
                 <ListItem hover={false} onClick={() => navigate('.' + DevSettingsRoute.logs)}>
                     <ListItemPayload>
                         <Label1>Dev Logs</Label1>
-                    </ListItemPayload>
-                </ListItem>
-            </ListBlockDesktopAdaptive>
-        </HideOnReview>
-    );
-};
-
-const ProcessingVisibilitySettings = () => {
-    const sdk = useAppSdk();
-
-    const handleReset = async () => {
-        try {
-            await sdk.storage.delete(AppKey.PRO_PENDING_STATE);
-        } catch (err) {
-            console.error('Failed to update visibility:', err);
-        }
-    };
-
-    return (
-        <HideOnReview>
-            <ListBlockDesktopAdaptive>
-                <ListItem hover={false}>
-                    <ListItemPayload>
-                        <Label1>Reset processing state</Label1>
-                        <Button onClick={handleReset} secondary>
-                            Reset
-                        </Button>
                     </ListItemPayload>
                 </ListItem>
             </ListBlockDesktopAdaptive>
@@ -281,8 +289,8 @@ export const DevSettings = React.memo(() => {
                 <CookieSettings />
                 <AddAccountBySK />
                 <ReviewerSettings />
+                <PromoStateSettings />
                 <LogsSettings />
-                <ProcessingVisibilitySettings />
             </DesktopWrapper>
         );
     }

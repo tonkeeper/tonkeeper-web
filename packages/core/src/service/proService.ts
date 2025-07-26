@@ -10,13 +10,16 @@ import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboa
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
+    AuthTypes,
     hasAuth,
     isPendingSubscription,
     isProSubscription,
     isValidSubscription,
     ProState,
     ProStateWallet,
-    ProSubscription
+    ProSubscription,
+    TelegramSubscription,
+    TelegramSubscriptionStatuses
 } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
@@ -41,10 +44,17 @@ import {
     DashboardCellNumericFiat,
     Invoice,
     Currencies as CurrenciesGenerated,
-    InvoiceStatus
+    InvoiceStatus,
+    SubscriptionSource
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
+
+interface IGetProStateParams {
+    authService: ProAuthTokenService;
+    sdk: IAppSdk;
+    promoExpirationDate: Date | null;
+}
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -55,12 +65,9 @@ export const getBackupState = async (storage: IStorage) => {
     return backup ?? null;
 };
 
-export const getProState = async (
-    authTokenService: ProAuthTokenService,
-    sdk: IAppSdk
-): Promise<ProState> => {
+export const getProState = async (params: IGetProStateParams): Promise<ProState> => {
     try {
-        return await loadProState(authTokenService, sdk);
+        return await loadProState(params);
     } catch (e) {
         console.error(e);
         return {
@@ -132,8 +139,8 @@ const getNormalizedSubscription = async (
 
         const user = await UsersService.getUserInfo();
         const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
-
         const currentSubscriptionDTO = await UsersService.verifySubscription();
+
         return normalizeSubscription(currentSubscriptionDTO, {
             user,
             authorizedWallet
@@ -143,17 +150,35 @@ const getNormalizedSubscription = async (
     }
 };
 
-// TODO Define a better data flow here and reuse the logic
-const loadProState = async (authService: ProAuthTokenService, sdk: IAppSdk): Promise<ProState> => {
+const getPseudoTelegramSubscription = (
+    promoExpirationDate: Date | null
+): TelegramSubscription | null => {
+    if (!promoExpirationDate) return null;
+
+    return {
+        source: SubscriptionSource.TELEGRAM,
+        valid: true,
+        status: TelegramSubscriptionStatuses.ACTIVE,
+        usedTrial: true,
+        auth: {
+            type: AuthTypes.TELEGRAM,
+            trialUserId: 0
+        },
+        trialEndDate: promoExpirationDate
+    };
+};
+
+const loadProState = async (params: IGetProStateParams): Promise<ProState> => {
+    const { authService, sdk, promoExpirationDate } = params;
+
     const storage = sdk.storage;
     const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
     const processingTargetSub = processingState?.target;
 
-    const currentSubscription = await getNormalizedSubscription(
-        authService,
-        storage,
-        ProAuthTokenType.MAIN
-    );
+    // TODO Remove it after August 13th
+    const currentSubscription =
+        (await getNormalizedSubscription(authService, storage, ProAuthTokenType.MAIN)) ??
+        getPseudoTelegramSubscription(promoExpirationDate);
 
     let targetSubscription;
     if (hasAuth(processingTargetSub)) {
@@ -297,9 +322,9 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const retryProService = async (authService: ProAuthTokenService, sdk: IAppSdk) => {
+export const retryProService = async (params: IGetProStateParams) => {
     for (let i = 0; i < 10; i++) {
-        const state = await getProState(authService, sdk);
+        const state = await getProState(params);
         if (isValidSubscription(state.current)) {
             return;
         }

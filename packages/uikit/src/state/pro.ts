@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
@@ -34,7 +35,7 @@ import {
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { useAppContext } from '../hooks/appContext';
-import { useAppSdk } from '../hooks/appSdk';
+import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { QueryKey } from '../libs/queryKey';
@@ -49,6 +50,36 @@ import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { parsePrice } from '../libs/pro';
+
+type FreeProAccess = {
+    code: string;
+    validUntil: Date;
+};
+
+export const useFreeProAccessAvailable = () => {
+    const { mainnetConfig } = useAppContext();
+    const env = useAppTargetEnv();
+
+    return useMemo<FreeProAccess | null>(() => {
+        if (!mainnetConfig.enhanced_acs_pmob || env !== 'mobile') {
+            return null;
+        }
+        const data = mainnetConfig.enhanced_acs_pmob;
+        if (!data.code || !data.acs_until) {
+            return null;
+        }
+
+        const validUntil = new Date(data.acs_until * 1000);
+        if (validUntil < new Date()) {
+            return null;
+        }
+
+        return {
+            code: data.code,
+            validUntil
+        };
+    }, [mainnetConfig.enhanced_acs_pmob, env]);
+};
 
 export const useProBackupState = () => {
     const sdk = useAppSdk();
@@ -103,11 +134,21 @@ export const useProAuthTokenService = (): ProAuthTokenService => {
 
 export const useProState = () => {
     const sdk = useAppSdk();
+    const env = useAppTargetEnv();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
+    const isFreeProAccessAvailable = useFreeProAccessAvailable();
 
     return useQuery<ProState, Error>([QueryKey.pro], async () => {
-        const state = await getProState(authService, sdk);
+        const isFreeMobileTrialActive = Boolean(
+            await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
+        );
+
+        const { validUntil } = isFreeProAccessAvailable ?? {};
+        const isPromo = env === 'mobile' && isFreeMobileTrialActive && validUntil;
+        const promoExpirationDate = isPromo && validUntil > new Date() ? validUntil : null;
+
+        const state = await getProState({ authService, sdk, promoExpirationDate });
 
         await setBackupState(sdk.storage, state.current);
         await client.invalidateQueries([QueryKey.proBackup]);
@@ -164,19 +205,13 @@ export const useManageSubscription = () => {
 
 export const useProSubscriptionPurchase = () => {
     const sdk = useAppSdk();
-    const { data: proState } = useProState();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
-    const targetSubscription = proState?.target;
 
     return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
-        const { id, displayPrice, displayName } = selectedPlan;
+        const { id } = selectedPlan;
 
-        if (!isIosStrategy(sdk.subscriptionStrategy)) {
-            throw new Error('This is not an iOS subscription strategy');
-        }
-
-        if (!isProductId(id)) {
+        if (!isIosStrategy(sdk.subscriptionStrategy) || !isProductId(id)) {
             throw new Error('This is not an iOS subscription strategy');
         }
 
@@ -356,7 +391,7 @@ export const useWaitInvoiceMutation = () => {
         await waitProServiceInvoice(data.invoice);
 
         await withTargetAuthToken(authService, async () => {
-            await retryProService(authService, sdk);
+            await retryProService({ authService, sdk, promoExpirationDate: null });
         });
 
         await client.invalidateQueries([QueryKey.pro]);
