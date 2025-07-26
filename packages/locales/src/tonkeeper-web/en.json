@@ -424,6 +424,7 @@
   "Redo": "Redo",
   "Reload": "Reload",
   "Rename": "Rename",
+  "renew": "Renew",
   "renew_nft_expiration_date": "Expires %1%",
   "renew_nft_in_progress": "Domain renew in progress…",
   "renew_nft_renewed": "Domain renewed for 1 year",

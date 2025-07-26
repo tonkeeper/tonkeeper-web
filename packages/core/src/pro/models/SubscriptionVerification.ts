@@ -10,6 +10,9 @@ export type SubscriptionVerification = {
      * @deprecated
      */
     is_trial: boolean;
+    /**
+     * @deprecated
+     */
     used_trial: boolean;
     next_charge?: number;
     auth_token: string;
@@ -18,6 +21,9 @@ export type SubscriptionVerification = {
         amount: string;
         currency: CryptoCurrency;
         purchase_date: number;
+        expires_date: number;
+    };
+    telegram?: {
         expires_date: number;
     };
     ios?: {

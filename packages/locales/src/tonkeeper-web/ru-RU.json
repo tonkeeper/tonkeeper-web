@@ -413,6 +413,7 @@
   "Redo": "Повторить",
   "Reload": "Перезагрузить",
   "Rename": "Переименовать",
+  "renew": "Обновить",
   "renew_nft_expiration_date": "Истекает %1%",
   "renew_nft_in_progress": "Выполняется продление домена…",
   "renew_nft_renewed": "Домен продлён на 1 год",
