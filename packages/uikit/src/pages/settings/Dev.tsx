@@ -33,6 +33,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
+import { QueryKey } from '../../libs/queryKey';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -124,6 +125,7 @@ const ReviewerSettings = () => {
 // TODO Remove it before release
 const PromoStateSettings = () => {
     const sdk = useAppSdk();
+    const client = useQueryClient();
     const isCapacitor = useIsCapacitorApp();
     const [isActive, setIsActive] = useState(false);
 
@@ -139,6 +141,8 @@ const PromoStateSettings = () => {
     const handleChange = async (checked: boolean) => {
         await sdk.storage.set<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE, checked);
         setIsActive(checked);
+
+        await client.invalidateQueries([QueryKey.pro]);
     };
 
     if (!isCapacitor) {
