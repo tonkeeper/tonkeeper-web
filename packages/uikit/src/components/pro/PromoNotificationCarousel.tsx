@@ -83,7 +83,7 @@ export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
                     </SwipeButton>
                 </ArkCarousel.PrevTrigger>
 
-                <ArkCarousel.ItemGroup ref={containerRef}>
+                <ItemGroupStyled ref={containerRef}>
                     {META_DATA_MAP.map(({ id, content, title, subtitle }, idx) => (
                         <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
                             <ImageWrapper isActive={observedSlide === idx}>{content}</ImageWrapper>
@@ -103,7 +103,7 @@ export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
                             </DescriptionBlock>
                         </Slide>
                     ))}
-                </ArkCarousel.ItemGroup>
+                </ItemGroupStyled>
 
                 <ArkCarousel.NextTrigger>
                     <SwipeButton
@@ -178,6 +178,14 @@ const CarouselWrapper = styled(ArkCarousel.RootProvider)`
     overflow: hidden;
 `;
 
+const ItemGroupStyled = styled(ArkCarousel.ItemGroup)`
+    overflow-x: auto;
+
+    @media (pointer: fine) {
+        overflow-x: hidden !important;
+    }
+`;
+
 const RelativeWrapper = styled.div`
     position: relative;
     width: 100%;
@@ -196,6 +204,7 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
 
     @media (min-width: 550px) {
         max-height: 40dvh;
+        aspect-ratio: unset;
     }
 
     &::before {
