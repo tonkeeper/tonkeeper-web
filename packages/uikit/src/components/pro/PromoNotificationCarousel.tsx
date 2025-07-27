@@ -9,6 +9,7 @@ import {
     MultiWalletPromoIcon,
     SupportPromoIcon
 } from './icons';
+import { Badge } from '../shared';
 import { Body2, Label1 } from '../Text';
 import { FeatureSlideNames } from '../../enums/pro';
 import { useTranslation } from '../../hooks/translation';
@@ -84,25 +85,34 @@ export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
                 </ArkCarousel.PrevTrigger>
 
                 <ItemGroupStyled ref={containerRef}>
-                    {META_DATA_MAP.map(({ id, content, title, subtitle }, idx) => (
-                        <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
-                            <ImageWrapper isActive={observedSlide === idx}>{content}</ImageWrapper>
+                    {META_DATA_MAP.map((localProps, idx) => {
+                        const { id, content, titleKey, subtitleKey, badgeComponent } = localProps;
 
-                            <DescriptionBlock>
-                                <Label1>{t(title)}</Label1>
-                                <Body2Styled>
-                                    {t(subtitle)
-                                        .split('%')
-                                        .map(line => (
-                                            <Fragment key={line}>
-                                                {line}
-                                                <br />
-                                            </Fragment>
-                                        ))}
-                                </Body2Styled>
-                            </DescriptionBlock>
-                        </Slide>
-                    ))}
+                        return (
+                            <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
+                                <ImageWrapper isActive={observedSlide === idx}>
+                                    {content}
+                                </ImageWrapper>
+
+                                <DescriptionBlock>
+                                    <LocalBadgedTitleStyled
+                                        titleKey={titleKey}
+                                        badgeComponent={badgeComponent}
+                                    />
+                                    <Body2Styled>
+                                        {t(subtitleKey)
+                                            .split('%')
+                                            .map(line => (
+                                                <Fragment key={line}>
+                                                    {line}
+                                                    <br />
+                                                </Fragment>
+                                            ))}
+                                    </Body2Styled>
+                                </DescriptionBlock>
+                            </Slide>
+                        );
+                    })}
                 </ItemGroupStyled>
 
                 <ArkCarousel.NextTrigger>
@@ -126,38 +136,68 @@ export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
     );
 };
 
+const LocalBadge = () => {
+    const { t } = useTranslation();
+
+    return (
+        <Badge color="textSecondary" size="s" display="inline-block">
+            {t('desktop_only')}
+        </Badge>
+    );
+};
+
 const META_DATA_MAP = [
     {
         id: FeatureSlideNames.MAIN,
-        title: 'tonkeeper_pro_subscription',
-        subtitle: 'promo_subtitle_subscription',
+        titleKey: 'tonkeeper_pro_subscription',
+        subtitleKey: 'promo_subtitle_subscription',
         content: <MainPromoIcon />
     },
     {
         id: FeatureSlideNames.MULTI_SIG,
-        title: 'promo_title_multisig_wallets',
-        subtitle: 'promo_subtitle_multisig_wallets',
+        titleKey: 'promo_title_multisig_wallets',
+        subtitleKey: 'promo_subtitle_multisig_wallets',
         content: <MultiSigPromoIcon />
     },
     {
         id: FeatureSlideNames.MULTI_WALLET,
-        title: 'promo_title_multi_wallet_accounts',
-        subtitle: 'promo_subtitle_multi_wallet_accounts',
+        titleKey: 'promo_title_multi_wallet_accounts',
+        subtitleKey: 'promo_subtitle_multi_wallet_accounts',
         content: <MultiWalletPromoIcon />
     },
     {
         id: FeatureSlideNames.MULTI_SEND,
-        title: 'promo_title_multisend',
-        subtitle: 'promo_subtitle_multisend',
+        titleKey: 'promo_title_multisend',
+        badgeComponent: <LocalBadge />,
+        subtitleKey: 'promo_subtitle_multisend',
         content: <MultiSendPromoIcon />
     },
     {
         id: FeatureSlideNames.SUPPORT,
-        title: 'pro_feature_priority_support_title',
-        subtitle: 'promo_subtitle_support',
+        titleKey: 'pro_feature_priority_support_title',
+        subtitleKey: 'promo_subtitle_support',
         content: <SupportPromoIcon />
     }
 ];
+
+type LocalBadgedTitleProps = Pick<(typeof META_DATA_MAP)[number], 'titleKey' | 'badgeComponent'>;
+const LocalBadgedTitle: FC<LocalBadgedTitleProps & { className?: string }> = props => {
+    const { t } = useTranslation();
+    const { titleKey, badgeComponent: badge, className } = props;
+
+    return (
+        <div className={className}>
+            <Label1>{t(titleKey)}</Label1>
+            {!!badge && badge}
+        </div>
+    );
+};
+
+const LocalBadgedTitleStyled = styled(LocalBadgedTitle)`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+`;
 
 const ChevronLeftIconStyled = styled(ChevronLeftIcon)`
     width: 28px;
@@ -307,6 +347,7 @@ const Dot = styled.div<{ isActive: boolean }>`
 
 const Body2Styled = styled(Body2)`
     text-align: center;
+    text-wrap: balance;
     color: ${p => p.theme.textSecondary};
 `;
 
