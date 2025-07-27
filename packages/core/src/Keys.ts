@@ -41,6 +41,7 @@ export enum AppKey {
     USER_ID = 'user_id',
     PRO = 'pro_state',
     PRO_BACKUP = 'pro_backup',
+    PRO_USED_TRIAL = 'pro_used_trial',
     PRO_AUTH_TOKEN = 'pro_auth_token',
     PRO_TEMP_AUTH_TOKEN = 'pro_temp_auth_token',
     PRO_PENDING_STATE = 'pro_pending_state',

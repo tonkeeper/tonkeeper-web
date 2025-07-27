@@ -1,11 +1,13 @@
-import { FC } from 'react';
-import { Notification, NotificationFooterPortal } from '../Notification';
+import { FC, useEffect } from 'react';
 import styled from 'styled-components';
+
+import { TelegramIcon } from '../Icon';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
-import { useActivateTrialMutation } from '../../state/pro';
-import { TelegramIcon } from '../Icon';
 import { useTranslation } from '../../hooks/translation';
+import { useActivateTrialMutation } from '../../state/pro';
+import { useNotifyError } from '../../hooks/useNotification';
+import { Notification, NotificationFooterPortal } from '../Notification';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -42,11 +44,17 @@ export const ProTrialStartNotification: FC<{
     onClose: (confirmed?: boolean) => void;
 }> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
-    const { mutateAsync, isLoading } = useActivateTrialMutation();
+    const { mutateAsync, isError, isSuccess, isLoading } = useActivateTrialMutation();
+    useNotifyError(isError && new Error(t('failed_connect_telegram')));
+
+    useEffect(() => {
+        if (!isSuccess) return;
+
+        onClose(true);
+    }, [isSuccess]);
 
     const onConfirm = async () => {
-        const result = await mutateAsync();
-        onClose(result);
+        await mutateAsync();
     };
 
     return (

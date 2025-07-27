@@ -81,6 +81,18 @@ export const useFreeProAccessAvailable = () => {
     }, [mainnetConfig.enhanced_acs_pmob, env]);
 };
 
+export const useTrialAvailability = () => {
+    const sdk = useAppSdk();
+    const platform = useAppTargetEnv();
+
+    return useQuery<boolean, Error>([QueryKey.pro], async () => {
+        const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+        const isMobilePromo = Boolean(await sdk.storage.get(AppKey.PRO_FREE_ACCESS_ACTIVE));
+
+        return platform !== 'tablet' && !isMobilePromo && !isUsedTrial;
+    });
+};
+
 export const useProBackupState = () => {
     const sdk = useAppSdk();
     return useQuery<ProSubscription, Error>(
@@ -399,11 +411,13 @@ export const useWaitInvoiceMutation = () => {
 };
 
 export const useActivateTrialMutation = () => {
-    const client = useQueryClient();
+    const sdk = useAppSdk();
     const ctx = useAppContext();
+    const client = useQueryClient();
     const {
         i18n: { language }
     } = useTranslation();
+
     const authService = useProAuthTokenService();
 
     return useMutation<boolean, Error>(async () => {
@@ -412,7 +426,14 @@ export const useActivateTrialMutation = () => {
             (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
             language
         );
+
+        if (!result) {
+            throw new Error('Failed to activate trial');
+        }
+
+        await sdk.storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
         await client.invalidateQueries([QueryKey.pro]);
+
         return result;
     });
 };

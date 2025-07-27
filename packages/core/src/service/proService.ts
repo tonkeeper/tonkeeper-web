@@ -368,9 +368,11 @@ export async function startProServiceTrial(
     lang?: string
 ) {
     const tgData = await loginViaTG(botId, lang);
+
     if (!tgData) {
         return false;
     }
+
     const result = await TiersService.activateTrial(tgData);
 
     if (result.auth_token) {

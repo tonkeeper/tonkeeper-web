@@ -13,7 +13,7 @@ import { handleSubmit } from '../../../libs/form';
 import { adaptPlansToViewModel } from '../../../libs/pro';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useProPlans, useProState } from '../../../state/pro';
+import { useProPlans, useProState, useTrialAvailability } from '../../../state/pro';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { hasUsedTrial, IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
@@ -22,7 +22,8 @@ import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
 import { FeatureSlideNames } from '../../../enums/pro';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
-import { useAppTargetEnv } from '../../../hooks/appSdk';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -51,8 +52,9 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
 }) => {
     const formId = useId();
     const { t } = useTranslation();
-    const { data } = useProState();
-    const platform = useAppTargetEnv();
+    const navigate = useNavigate();
+    const { data: proState } = useProState();
+    const { data: isTrialAvailable } = useTrialAvailability();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const {
         isOpen: isTrialModalOpen,
@@ -60,15 +62,15 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
-    const { data: products, isError, isLoading, refetch } = useProPlans();
+    const { data: products, isError, isLoading: isProPlanLaoding, refetch } = useProPlans();
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
-    if (!data) {
+    if (!proState) {
         return null;
     }
 
-    const currentSubscription = data.current;
-    const isTrialAvailable = !hasUsedTrial(currentSubscription) && platform !== 'tablet';
+    const currentSubscription = proState.current;
+    const isFinalTrialAvailable = !hasUsedTrial(currentSubscription) && isTrialAvailable;
 
     const handleProAuth = () => {
         if (isError) {
@@ -84,6 +86,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
 
         if (confirmed) {
             onClose();
+            navigate(AppRoute.settings + SettingsRoute.pro);
         }
     };
 
@@ -102,9 +105,9 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                         <ButtonsBlockStyled
                             formId={formId}
                             isError={isError}
-                            isLoading={isLoading}
+                            isLoading={isProPlanLaoding}
                             displayPlans={displayPlans}
-                            onTrial={isTrialAvailable ? onTrialModalOpen : undefined}
+                            onTrial={isFinalTrialAvailable ? onTrialModalOpen : undefined}
                         />
                     </NotificationFooter>
                 </NotificationFooterPortal>

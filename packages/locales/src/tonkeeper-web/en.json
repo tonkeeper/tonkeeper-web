@@ -158,6 +158,7 @@
   "expired": "Expired",
   "export_dot_csv": "Export .CSV",
   "export_trc_20_wallet": "Export TRC20 Wallet",
+  "failed_connect_telegram": "Telegram connection failed!",
   "failed_subscriptions_loading": "Failed to load subscriptions",
   "failed_to_manage": "Failed to manage subscription",
   "force_reload": "Force Reload",

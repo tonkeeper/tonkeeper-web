@@ -156,6 +156,7 @@
   "expired": "Истекла",
   "export_dot_csv": "Экспорт в .CSV",
   "export_trc_20_wallet": "Экспортировать TRC20 кошелек",
+  "failed_connect_telegram": "Не удалось подключиться к Telegram!",
   "failed_subscriptions_loading": "Не удалось загрузить подписки",
   "failed_to_manage": "Не удалось управлять подпиской",
   "force_reload": "Принудительная перезагрузка",
