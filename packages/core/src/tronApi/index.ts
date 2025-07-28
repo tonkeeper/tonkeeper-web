@@ -1,11 +1,11 @@
 import BigNumber from 'bignumber.js';
-import { TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
+import { TRON_TRX_ASSET, TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
 import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
-import { Configuration, DefaultApi, EstimatedTronTx } from '../batteryApi';
-import type { Transaction } from 'tronweb/lib/commonjs/types';
+import { Configuration, DefaultApi } from '../batteryApi';
 import { TransactionFee } from '../entries/crypto/transaction-fee';
+import type { SignedTransaction } from 'tronweb/src/types/Transaction';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
 
@@ -40,12 +40,26 @@ export type TronResources = {
     bandwidth: number;
 };
 
+export type TronResourcePrices = {
+    energy: AssetAmount<TronAsset>;
+    bandwidth: AssetAmount<TronAsset>;
+};
+
+export type EstimateResourcesRequest = {
+    from: string;
+    contractAddress: string;
+    selector: string;
+    data: string;
+};
+
 export class TronApi {
-    public readonly tronGridBaseUrl: string;
+    readonly tronGridBaseUrl: string;
 
     private readonly batteryApi: DefaultApi;
 
-    public get headers() {
+    private safetyMargin: number | undefined;
+
+    get headers() {
         return {
             ...(this.trongrid.apiKey && {
                 'TRON-PRO-API-KEY': this.trongrid.apiKey
@@ -53,8 +67,6 @@ export class TronApi {
             'Content-Type': 'application/json'
         };
     }
-
-    private safetyMargin: number | undefined;
 
     constructor(
         private readonly trongrid: { baseURL: string; readonly apiKey?: string },
@@ -115,55 +127,7 @@ export class TronApi {
         };
     }
 
-    public async activateWallet(wallet: string, options: { xTonConnectAuth: string }) {
-        return this.batteryApi.tronSend({
-            xTonConnectAuth: options.xTonConnectAuth,
-            tronSendRequest: { tx: '', wallet }
-        });
-    }
-
-    public async sendTransaction(
-        tx: Transaction,
-        fromWallet: string,
-        resources: TronResources,
-        options: { xTonConnectAuth: string }
-    ) {
-        return this.batteryApi.tronSend({
-            xTonConnectAuth: options.xTonConnectAuth,
-            tronSendRequest: {
-                tx: Buffer.from(JSON.stringify(tx)).toString('base64'),
-                wallet: fromWallet,
-                energy: resources.energy,
-                bandwidth: resources.bandwidth
-            }
-        });
-    }
-
-    public async estimateBatteryCharges(params: {
-        from: string;
-        contractAddress: string;
-        selector: string;
-        data: string;
-    }): Promise<{ estimation: EstimatedTronTx; resources: TronResources }> {
-        const resources = await this.applyResourcesSafetyMargin(
-            await this.estimateResources(params)
-        );
-        const bandwidhAvailable = await this.getAccountBandwidth(params.from);
-
-        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
-
-        const estimation = await this.batteryApi.tronEstimate({
-            wallet: params.from,
-            ...resources
-        });
-
-        return {
-            estimation,
-            resources
-        };
-    }
-
-    private async getAccountBandwidth(address: string): Promise<number> {
+    async getAccountBandwidth(address: string): Promise<number> {
         const res = await (
             await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
                 headers: this.headers
@@ -182,27 +146,7 @@ export class TronApi {
         return info.free_net_usage || 0;
     }
 
-    private async applyResourcesSafetyMargin(resources: TronResources) {
-        const { energy, bandwidth } = resources;
-
-        if (this.safetyMargin === undefined) {
-            const config = await this.batteryApi.getTronConfig();
-            const backendMargin = parseInt(config.safetyMarginPercent);
-            this.safetyMargin = (isFinite(backendMargin) ? backendMargin : 3) / 100;
-        }
-
-        return {
-            energy: Math.ceil(energy * (1 + this.safetyMargin)),
-            bandwidth: Math.ceil(bandwidth * (1 + this.safetyMargin))
-        };
-    }
-
-    private async estimateResources(params: {
-        from: string;
-        contractAddress: string;
-        selector: string;
-        data: string;
-    }): Promise<TronResources> {
+    async estimateResources(params: EstimateResourcesRequest): Promise<TronResources> {
         try {
             const response = await (
                 await fetch(`${this.tronGridBaseUrl}/wallet/triggerconstantcontract`, {
@@ -300,34 +244,48 @@ export class TronApi {
         }
     }
 
-    async rpc(method: string, params: string[] = []) {
-        try {
-            const response = await (
-                await fetch(`${this.tronGridBaseUrl}/jsonrpc`, {
-                    method: 'POST',
-                    headers: this.headers,
-                    body: JSON.stringify({
-                        jsonrpc: '2.0',
-                        id: 1,
-                        method,
-                        params
-                    })
-                })
-            ).json();
+    async getResourcePrices(): Promise<TronResourcePrices> {
+        const res = await fetch(`${this.tronGridBaseUrl}/wallet/getchainparameters`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
 
-            if ('error' in response) {
-                throw new Error(response.error);
-            }
+        const data = await res.json();
+        const params: { key: string; value: string | number }[] = Array.isArray(data.chainParameter)
+            ? data.chainParameter
+            : [];
 
-            if (!('result' in response)) {
-                throw new Error('RPC error');
-            }
+        const getValue = (key: string): number | undefined => {
+            const param = params.find(p => p.key === key);
+            return param && typeof param.value === 'number' ? param.value : undefined;
+        };
 
-            return response.result;
-        } catch (error) {
-            console.error('Error estimating energy:', error);
-            throw error;
+        const energySun = getValue('getEnergyFee');
+        const bandwidthSun = getValue('getTransactionFee');
+
+        if (!energySun || !bandwidthSun) {
+            throw new Error('Missing or invalid energy or bandwidth price in chain parameters');
         }
+
+        return {
+            energy: new AssetAmount({ weiAmount: energySun, asset: TRON_TRX_ASSET }),
+            bandwidth: new AssetAmount({ weiAmount: bandwidthSun, asset: TRON_TRX_ASSET })
+        };
+    }
+
+    async applyResourcesSafetyMargin(resources: TronResources) {
+        const { energy, bandwidth } = resources;
+
+        if (this.safetyMargin === undefined) {
+            const config = await this.batteryApi.getTronConfig();
+            const backendMargin = parseInt(config.safetyMarginPercent);
+            this.safetyMargin = (isFinite(backendMargin) ? backendMargin : 3) / 100;
+        }
+
+        return {
+            energy: Math.ceil(energy * (1 + this.safetyMargin)),
+            bandwidth: Math.ceil(bandwidth * (1 + this.safetyMargin))
+        };
     }
 
     async getTransfersHistory(
@@ -462,5 +420,20 @@ export class TronApi {
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);
+    }
+
+    async broadcastSignedTransaction(signedTx: SignedTransaction) {
+        const res = await fetch(`${this.tronGridBaseUrl}/wallet/broadcasttransaction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(signedTx)
+        });
+
+        const json = await res.json();
+
+        if (!json.result) {
+            console.error('Broadcast failed:', json);
+            throw new Error(json.message || 'Broadcast failed');
+        }
     }
 }

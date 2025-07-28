@@ -88,7 +88,7 @@ export class TonAssetTransactionService {
                 throw new Error('Ledger multisend is not supported.');
             } else {
                 return sender.estimate(
-                    await new TonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                    await new TonEncoder(this.api).encodeTransfer(
                         params.map(p => ({ ...p, weiAmount: p.amount.weiAmount }))
                     )
                 );
@@ -100,7 +100,7 @@ export class TonAssetTransactionService {
                 ).estimate();
             } else {
                 return sender.estimate(
-                    await new TonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                    await new TonEncoder(this.api).encodeTransfer({
                         ...params,
                         weiAmount: params.amount.weiAmount
                     })
@@ -146,11 +146,7 @@ export class TonAssetTransactionService {
         }
     }
 
-    private async sendExtraCurrency(
-        sender: Sender,
-        estimation: TonEstimation,
-        params: TransferParams
-    ) {
+    private async sendExtraCurrency(sender: Sender, _: TonEstimation, params: TransferParams) {
         // await this.checkTransferPossibility(sender, params, estimation); // TODO: Extra Currency validation
 
         if (Array.isArray(params)) {
@@ -194,7 +190,7 @@ export class TonAssetTransactionService {
                 throw new Error('Ledger multisend is not supported.');
             } else {
                 return sender.send(
-                    await new TonEncoder(this.api, this.wallet.rawAddress).encodeTransfer(
+                    await new TonEncoder(this.api).encodeTransfer(
                         params.map(p => ({ ...p, weiAmount: p.amount.weiAmount }))
                     )
                 );
@@ -206,7 +202,7 @@ export class TonAssetTransactionService {
                 ).send();
             } else {
                 return sender.send(
-                    await new TonEncoder(this.api, this.wallet.rawAddress).encodeTransfer({
+                    await new TonEncoder(this.api).encodeTransfer({
                         ...params,
                         weiAmount: params.amount.weiAmount
                     })
