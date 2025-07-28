@@ -573,7 +573,7 @@
   },
   "import_add_wallet": "Добавить кошелёк",
   "import_add_wallet_description": "Создать новый кошелёк или добавить существующий.",
-  "import_existing_wallet": "Существующий кошелёк",
+  "import_existing_wallet": "Импорт кошелька",
   "import_existing_wallet_description": "Добавить кошелёк с помощью секретного ключа из 24 слов",
   "import_new_wallet": "Новый кошелёк",
   "import_new_wallet_description": "Создать новый кошелёк",
