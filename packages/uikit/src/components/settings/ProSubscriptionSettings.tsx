@@ -10,6 +10,7 @@ import {
 } from '../desktop/DesktopViewLayout';
 import { SubHeader } from '../SubHeader';
 import { AppRoute } from '../../libs/routes';
+import { ForTargetEnv } from '../shared/TargetEnv';
 import { HideOnReview } from '../ios/HideOnReview';
 import { ProStatusScreen } from '../pro/ProStatusScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -30,9 +31,11 @@ export const ProSettingsContent: FC = () => {
                 <DesktopViewHeaderContent
                     title={null}
                     right={
-                        <IconButtonTransparentBackground onClick={handleCloseClick}>
-                            <CloseIcon />
-                        </IconButtonTransparentBackground>
+                        <ForTargetEnv env="mobile">
+                            <IconButtonTransparentBackground onClick={handleCloseClick}>
+                                <CloseIcon />
+                            </IconButtonTransparentBackground>
+                        </ForTargetEnv>
                     }
                 />
             </DesktopViewHeader>
