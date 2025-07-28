@@ -32,6 +32,7 @@ import { IonContent, IonModal } from '@ionic/react';
 import { cn, iosKeyboardTransition } from '../libs/css';
 import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
 import { atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
+import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 
 const notificationMaxWidth = 650;
 
@@ -111,14 +112,15 @@ const GapAdjusted = styled(Gap)`
         `}
 `;
 
-const Overlay = styled.div<{ entered: boolean; paddingRight: number }>`
+const Overlay = styled.div<{ entered: boolean; paddingRight: number; $appTargetEnv: TargetEnv }>`
     position: fixed;
     left: 0;
     right: 0;
     height: 100%;
     top: 100%;
     transition: top 0.3s ease-in-out;
-    overflow-y: ${props => (props.entered ? 'scroll' : 'hidden')};
+    overflow-y: ${props =>
+        props.entered ? (props.$appTargetEnv === 'extension' ? 'auto' : 'scroll') : 'hidden'};
     padding-right: ${props => props.paddingRight}px;
     -webkit-overflow-scrolling: touch;
 `;
@@ -137,6 +139,7 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
                 entered={entered}
                 paddingRight={entered ? 0 : scrollbarWidth}
                 className="notification-overlay"
+                $appTargetEnv={sdk.targetEnv}
             >
                 {children}
             </Overlay>
