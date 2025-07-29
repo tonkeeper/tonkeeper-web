@@ -20,7 +20,6 @@ import { hasUsedTrial, IDisplayPlan, isValidSubscription } from '@tonkeeper/core
 import { HideOnReview } from '../../ios/HideOnReview';
 import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
-import { FeatureSlideNames } from '../../../enums/pro';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
@@ -28,27 +27,20 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
     onClose: () => void;
-    initialSlideName?: FeatureSlideNames;
 }
 
 export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = props => {
-    const { isOpen, onClose, initialSlideName } = props;
+    const { isOpen, onClose } = props;
 
     return (
         <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
-            {() => (
-                <ProFeaturesNotificationContent
-                    onClose={onClose}
-                    initialSlideName={initialSlideName}
-                />
-            )}
+            {() => <ProFeaturesNotificationContent onClose={onClose} />}
         </NotificationStyled>
     );
 };
 
 export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationProps, 'isOpen'>> = ({
-    onClose,
-    initialSlideName
+    onClose
 }) => {
     const formId = useId();
     const { t } = useTranslation();
@@ -98,7 +90,8 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                 <ClosePromoIcon />
             </CloseButtonStyled>
 
-            <PromoNotificationCarousel initialSlideName={initialSlideName} />
+            <PromoNotificationCarousel />
+
             {!isValidSubscription(currentSubscription) && (
                 <NotificationFooterPortal>
                     <NotificationFooter>
@@ -112,6 +105,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                     </NotificationFooter>
                 </NotificationFooterPortal>
             )}
+
             <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialClose} />
         </ContentWrapper>
     );

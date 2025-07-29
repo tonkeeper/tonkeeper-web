@@ -1,6 +1,6 @@
 import { css, styled } from 'styled-components';
 import { FC, Fragment, useEffect, useRef, useState } from 'react';
-import { Carousel as ArkCarousel, useCarousel } from '@ark-ui/react';
+import { CarouselItem, CarouselRootProvider, CarouselItemGroup, useCarousel } from '@ark-ui/react';
 
 import {
     MainPromoIcon,
@@ -17,28 +17,16 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
 
 const CAROUSEL_TRIGGER_WIDTH = '40px';
 
-interface Props {
-    initialSlideName?: FeatureSlideNames;
-}
-
-export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
+export const PromoNotificationCarousel = () => {
     const { t } = useTranslation();
-    const [currentPage, setCurrentPage] = useState(FeatureSlideNames.MAIN);
-    const [observedSlide, setObservedSlide] = useState(currentPage);
+    const [observedSlide, setObservedSlide] = useState(FeatureSlideNames.MAIN);
+
     const carousel = useCarousel({
-        page: currentPage,
-        onPageChange: ({ page }) => setCurrentPage(page),
         slideCount: META_DATA_MAP.length
     });
 
     const containerRef = useRef<HTMLDivElement>(null);
     const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-    useEffect(() => {
-        if (!initialSlideName) return;
-
-        carousel.scrollTo(initialSlideName, true);
-    }, [initialSlideName]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -73,16 +61,15 @@ export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
             <RelativeWrapper>
                 <GradientLayer $page={observedSlide} $total={META_DATA_MAP.length} />
 
-                <ArkCarousel.PrevTrigger asChild>
-                    <SwipeButton
-                        data-swipe-button
-                        type="button"
-                        position="left"
-                        isVisible={observedSlide !== 0}
-                    >
-                        <ChevronLeftIconStyled />
-                    </SwipeButton>
-                </ArkCarousel.PrevTrigger>
+                <SwipeButton
+                    data-swipe-button
+                    type="button"
+                    position="left"
+                    onClick={() => carousel.scrollPrev(true)}
+                    isVisible={carousel.canScrollPrev}
+                >
+                    <ChevronLeftIconStyled />
+                </SwipeButton>
 
                 <ItemGroupStyled ref={containerRef}>
                     {META_DATA_MAP.map((localProps, idx) => {
@@ -115,16 +102,15 @@ export const PromoNotificationCarousel: FC<Props> = ({ initialSlideName }) => {
                     })}
                 </ItemGroupStyled>
 
-                <ArkCarousel.NextTrigger>
-                    <SwipeButton
-                        data-swipe-button
-                        type="button"
-                        position="right"
-                        isVisible={observedSlide !== META_DATA_MAP.length - 1}
-                    >
-                        <ChevronRightIconStyled />
-                    </SwipeButton>
-                </ArkCarousel.NextTrigger>
+                <SwipeButton
+                    data-swipe-button
+                    type="button"
+                    position="right"
+                    onClick={() => carousel.scrollNext(true)}
+                    isVisible={carousel.canScrollNext}
+                >
+                    <ChevronRightIconStyled />
+                </SwipeButton>
             </RelativeWrapper>
 
             <DotsWrapper>
@@ -209,16 +195,18 @@ const ChevronRightIconStyled = styled(ChevronRightIcon)`
     height: 28px;
 `;
 
-const CarouselWrapper = styled(ArkCarousel.RootProvider)`
+const CarouselWrapper = styled(CarouselRootProvider)`
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     overflow: hidden;
+
+    -webkit-user-select: none;
 `;
 
-const ItemGroupStyled = styled(ArkCarousel.ItemGroup)`
+const ItemGroupStyled = styled(CarouselItemGroup)`
     overflow-x: auto;
 
     @media (pointer: fine) {
@@ -261,11 +249,11 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
             #4d89f2 100%
         );
         transform: translateX(${({ $page, $total }) => `-${($page * 100) / $total}%`});
-        transition: transform 1s ease-out;
+        transition: transform 0.5s ease-out;
     }
 `;
 
-const Slide = styled(ArkCarousel.Item)`
+const Slide = styled(CarouselItem)`
     display: flex;
     flex: 0 0 100%;
     flex-direction: column;
@@ -286,7 +274,7 @@ const SwipeButton = styled.button<{ position: 'left' | 'right'; isVisible: boole
     position: absolute;
     z-index: 2;
     border: none;
-    cursor: pointer;
+    cursor: unset;
     bottom: 36px;
     transform: translateY(-50%);
     ${props => (props.position === 'left' ? 'left: 12px;' : 'right: 12px;')};
@@ -300,6 +288,7 @@ const SwipeButton = styled.button<{ position: 'left' | 'right'; isVisible: boole
         isVisible
             ? css`
                   opacity: 1;
+                  cursor: pointer;
 
                   &:hover {
                       opacity: 0.8;
@@ -316,7 +305,7 @@ const ImageWrapper = styled.div<{ isActive: boolean }>`
     justify-content: center;
     width: 100%;
     aspect-ratio: 1;
-    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
     transform: scale(${({ isActive }) => (isActive ? 1 : 0.7)});
     opacity: ${({ isActive }) => (isActive ? 1 : 0.2)};
 
