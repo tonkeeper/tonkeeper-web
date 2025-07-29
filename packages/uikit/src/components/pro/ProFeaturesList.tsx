@@ -5,7 +5,6 @@ import { Badge } from '../shared';
 import { Body3, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
-import { ChevronRightIcon } from '../Icon';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { FeatureSlideNames } from '../../enums/pro';
 
@@ -19,41 +18,26 @@ interface IProps {
     className?: string;
     features?: IProFeature[];
     headerOptions?: IHeaderOptions;
-    onFeatureClick?: (
-        id: Exclude<FeatureSlideNames, FeatureSlideNames.MAIN>,
-        titleKey: string
-    ) => void;
 }
 
 const ProFeaturesListContent: FC<IProps> = props => {
-    const { className, headerOptions, features = PRO_FEATURES, onFeatureClick } = props;
+    const { className, headerOptions, features = PRO_FEATURES } = props;
     const { removeHeader, ...restHeaderProps } = headerOptions ?? {};
 
     const { t } = useTranslation();
-    const { onOpen } = useProFeaturesNotification();
-
-    const onItemClick = (
-        id: Exclude<FeatureSlideNames, FeatureSlideNames.MAIN>,
-        titleKey: string
-    ) => {
-        return onFeatureClick ? onFeatureClick(id, titleKey) : onOpen({ initialSlideName: id });
-    };
 
     return (
         <div className={className}>
             {!removeHeader && <HeaderStyled {...restHeaderProps} />}
             <ListBlock margin={false} fullWidth>
-                {features.map(({ id, titleKey, descriptionKey, iconComponent, badgeComponent }) => (
-                    <ListItem onClick={() => onItemClick(id, titleKey)} key={titleKey}>
+                {features.map(({ id, titleKey, descriptionKey, badgeComponent }) => (
+                    <ListItem key={id} hover={false}>
                         <ListItemPayloadStyled>
-                            <div>
-                                <LocalBadgedTitleStyled
-                                    titleKey={t(titleKey)}
-                                    badgeComponent={badgeComponent}
-                                />
-                                <Text>{t(descriptionKey)}</Text>
-                            </div>
-                            <FeatureIconContainer>{iconComponent}</FeatureIconContainer>
+                            <LocalBadgedTitleStyled
+                                titleKey={t(titleKey)}
+                                badgeComponent={badgeComponent}
+                            />
+                            <Text>{t(descriptionKey)}</Text>
                         </ListItemPayloadStyled>
                     </ListItem>
                 ))}
@@ -107,7 +91,6 @@ interface IProFeature {
     id: Exclude<FeatureSlideNames, FeatureSlideNames.MAIN>;
     titleKey: string;
     descriptionKey: string;
-    iconComponent: JSX.Element;
     badgeComponent?: JSX.Element;
 }
 const LocalBadge = () => {
@@ -158,11 +141,10 @@ const Title = styled(Text)`
     margin: 8px 0;
 `;
 
-const FeatureIconContainer = styled.div`
-    color: ${p => p.theme.iconSecondary};
-`;
-
 const ListItemPayloadStyled = styled(ListItemPayload)`
+    display: flex;
+    flex-direction: column;
+    align-items: start;
     padding-top: 10px;
     padding-bottom: 10px;
 `;
@@ -171,26 +153,22 @@ const PRO_FEATURES: IProFeature[] = [
     {
         id: FeatureSlideNames.MULTI_SIG,
         titleKey: 'pro_feature_multisig_title',
-        descriptionKey: 'pro_feature_multisig_description',
-        iconComponent: <ChevronRightIcon />
+        descriptionKey: 'pro_feature_multisig_description'
     },
     {
         id: FeatureSlideNames.MULTI_WALLET,
         titleKey: 'pro_feature_multi_accounts_title',
-        descriptionKey: 'pro_feature_multi_accounts_description',
-        iconComponent: <ChevronRightIcon />
+        descriptionKey: 'pro_feature_multi_accounts_description'
     },
     {
         id: FeatureSlideNames.MULTI_SEND,
         titleKey: 'pro_feature_multi_send_title',
         descriptionKey: 'pro_feature_multi_send_description',
-        badgeComponent: <LocalBadge />,
-        iconComponent: <ChevronRightIcon />
+        badgeComponent: <LocalBadge />
     },
     {
         id: FeatureSlideNames.SUPPORT,
         titleKey: 'pro_feature_priority_support_title',
-        descriptionKey: 'pro_feature_priority_support_description',
-        iconComponent: <ChevronRightIcon />
+        descriptionKey: 'pro_feature_priority_support_description'
     }
 ];
