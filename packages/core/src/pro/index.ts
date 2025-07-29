@@ -36,6 +36,7 @@ export { DashboardsService } from './services/DashboardsService';
 export { IapService } from './services/IapService';
 export { InvoicesService } from './services/InvoicesService';
 export { StatesService } from './services/StatesService';
+export { SupportService } from './services/SupportService';
 export { SystemService } from './services/SystemService';
 export { TiersService } from './services/TiersService';
 export { UsersService } from './services/UsersService';
