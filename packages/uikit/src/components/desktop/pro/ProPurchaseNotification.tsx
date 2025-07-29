@@ -49,6 +49,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
     const {
         isCrypto,
         isLoading,
+        isLoggingOut,
         selectedPlanId,
         setSelectedPlanId,
         productsForRender,
@@ -82,7 +83,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
             <ProActiveWallet
                 title={<Body3Styled>{t('selected_wallet')}</Body3Styled>}
-                isLoading={isLoading}
+                isLoading={isLoggingOut}
                 onDisconnect={handleDisconnect}
             />
 

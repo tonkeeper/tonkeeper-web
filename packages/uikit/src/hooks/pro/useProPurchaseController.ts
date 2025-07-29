@@ -71,6 +71,7 @@ export const useProPurchaseController = () => {
             onLogout: handleLogOut,
             isCrypto,
             isLoading,
+            isLoggingOut,
             selectedPlanId,
             setSelectedPlanId,
             productsForRender
