@@ -9,8 +9,10 @@ import {
 import { LedgerConnectionSteps } from '@tonkeeper/uikit/dist/components/ledger/LedgerConnectionSteps';
 import { ButtonResponsiveSize, H2 } from '@tonkeeper/uikit';
 import { useLocation } from 'react-router-dom';
-import { connectLedgerLocation } from '../libs/appSdk';
+import { getOpenedPopup } from '@tonkeeper/core/dist/service/extensionPopupStorage';
 import browser from 'webextension-polyfill';
+import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 
 const Wrapper = styled.div`
     display: flex;
@@ -37,26 +39,10 @@ const ButtonsBlock = styled.div`
     }
 `;
 
-async function focusPopup() {
-    try {
-        const query = window.location.hash.slice(1).split('?')[1];
-        if (!query) {
-            return;
-        }
-
-        const params = new URLSearchParams(query);
-        const popupId = params.get('popupId');
-        if (popupId) {
-            await browser.windows.update(Number(popupId), { focused: true });
-        }
-    } catch (e) {
-        console.error(e);
-    }
-}
-
 const ConnectLedgerPage = () => {
     const { t } = useTranslation();
     const [tried, setTried] = useState(false);
+    const sdk = useAppSdk();
 
     const {
         isDeviceConnected,
@@ -67,13 +53,20 @@ const ConnectLedgerPage = () => {
     } = useConnectLedgerMutation();
 
     const onAfterCompleted = useCallback(async () => {
-        await focusPopup();
+        try {
+            const popup = await getOpenedPopup(sdk.storage);
+            if (popup?.id !== undefined) {
+                await browser.windows.update(popup.id, { focused: true });
+            }
+        } catch (e) {
+            console.error(e);
+        }
         window.close();
     }, []);
 
     const location = useLocation();
     useEffect(() => {
-        if (location.pathname !== connectLedgerLocation) {
+        if (location.pathname !== AppRoute.connectLedger) {
             onAfterCompleted();
         }
     }, [location.pathname, onAfterCompleted]);

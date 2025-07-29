@@ -58,5 +58,7 @@ export enum AppKey {
 
     ENABLE_REVIEWER_MODE = 'ENABLE_REVIEWER_MODE',
 
-    BROWSER_TABS = 'browser_tabs'
+    BROWSER_TABS = 'browser_tabs',
+
+    EXTENSION_POPUP_ID = 'extension_popup_id'
 }

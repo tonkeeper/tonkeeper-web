@@ -14,7 +14,12 @@ export enum AppRoute {
     swap = '/swap',
     multisigOrders = '/multisig-orders',
     multisigWallets = '/multisig-wallets',
-    home = '/'
+    home = '/',
+
+    /**
+     * Special extension route to bypass browser popup HID access restrictions
+     */
+    connectLedger = '/connect-ledger'
 }
 
 export enum DappBrowserRoute {

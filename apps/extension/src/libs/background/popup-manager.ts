@@ -2,13 +2,12 @@ import browser from 'webextension-polyfill';
 import { checkForError } from '../utils';
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { ExtensionStorage } from '../storage';
-
-type Opener = 'icon-click' | `programmatically-${number}`;
-
-type OpenedPopup = {
-    id: number;
-    opener: Opener;
-};
+import {
+    getOpenedPopup,
+    OpenedPopup,
+    PopupOpener,
+    setOpenedPopup
+} from '@tonkeeper/core/dist/service/extensionPopupStorage';
 
 export class PopupManager {
     static createOpenerId() {
@@ -22,16 +21,11 @@ export class PopupManager {
     private storage = new ExtensionStorage();
 
     setOpenedPopup(popup: OpenedPopup | null) {
-        return this.storage.set('openedPopup', popup);
+        return setOpenedPopup(this.storage, popup);
     }
 
     async getOpenedPopup(): Promise<OpenedPopup | undefined> {
-        const value = await this.storage.get('openedPopup');
-        if (!value) {
-            return undefined;
-        }
-
-        return value as OpenedPopup;
+        return getOpenedPopup(this.storage);
     }
 
     constructor() {
@@ -46,7 +40,7 @@ export class PopupManager {
 
     public async openPopup(source: 'icon-click' | 'programmatically' = 'programmatically') {
         await this.syncPopup();
-        const opener: Opener =
+        const opener: PopupOpener =
             source === 'icon-click'
                 ? 'icon-click'
                 : `programmatically-${PopupManager.createOpenerId()}`;
@@ -67,7 +61,7 @@ export class PopupManager {
         return () => this.closePopupOpenedByOpener(opener);
     }
 
-    public async closePopupOpenedByOpener(opener: Opener) {
+    public async closePopupOpenedByOpener(opener: PopupOpener) {
         const openedPopup = await this.getOpenedPopup();
         if (openedPopup?.opener === opener) {
             return this.closePopup();

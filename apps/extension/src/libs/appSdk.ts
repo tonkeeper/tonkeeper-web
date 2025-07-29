@@ -6,11 +6,10 @@ import { ExtensionStorage } from './storage';
 import { checkForError } from './utils';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 import { atom, mapAtom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
+import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 
 export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
     process.env.REACT_APP_EXTENSION_TYPE;
-
-export const connectLedgerLocation = '/connect-ledger';
 
 export class ExtensionAppSdk extends BaseApp {
     constructor() {
@@ -27,7 +26,7 @@ export class ExtensionAppSdk extends BaseApp {
             if (!isValidUrlProtocol(url, this.authorizedOpenUrlProtocols)) {
                 reject('Invalid url');
             }
-            browser.tabs.create({ url }).then(newTab => {
+            browser.tabs.create({ url }).then(_ => {
                 const error = checkForError();
                 if (error) {
                     return reject(error);
@@ -75,7 +74,7 @@ class LedgerConnectionPageManage {
 
     static create() {
         const hash = window.location.hash.slice(1).split('?')[0];
-        if (hash !== connectLedgerLocation) {
+        if (hash !== AppRoute.connectLedger) {
             return new LedgerConnectionPageManage();
         }
         return undefined;
@@ -96,11 +95,7 @@ class LedgerConnectionPageManage {
     async open() {
         await this.close();
         const tab = await browser.tabs.create({
-            url: `index.html#${connectLedgerLocation}?popupId=${
-                (
-                    await browser.windows.getCurrent()
-                ).id
-            }`,
+            url: `index.html#${AppRoute.connectLedger}`,
             active: true
         });
 

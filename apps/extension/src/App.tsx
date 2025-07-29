@@ -46,7 +46,7 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
-import { connectLedgerLocation, ExtensionAppSdk } from './libs/appSdk';
+import { ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
 import { useMutateUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
@@ -305,7 +305,7 @@ export const Content: FC<{
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
 
-    if (location.pathname === connectLedgerLocation) {
+    if (location.pathname === AppRoute.connectLedger) {
         return (
             <PageWrapper>
                 <Suspense fallback={<Loading />}>
