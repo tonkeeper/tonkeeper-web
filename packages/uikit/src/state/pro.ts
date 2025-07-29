@@ -8,6 +8,7 @@ import {
     IOriginalTransactionInfo,
     IosPurchaseStatuses,
     isIosStrategy,
+    isPaidSubscription,
     isProductId,
     NormalizedProPlans,
     ProState,
@@ -17,6 +18,7 @@ import {
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import {
+    authViaSeedPhrase,
     authViaTonConnect,
     createProServiceInvoice,
     createRecipient,
@@ -50,6 +52,7 @@ import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { parsePrice } from '../libs/pro';
+import { IAuthViaSeedPhraseData } from '@tonkeeper/core/dist/entries/password';
 
 type FreeProAccess = {
     code: string;
@@ -298,6 +301,21 @@ export const useSelectWalletForProMutation = () => {
                 }
             }
         });
+
+        await client.invalidateQueries([QueryKey.pro]);
+    });
+};
+
+export const useAutoAuthMutation = () => {
+    const api = useActiveApi();
+    const { data: proState } = useProState();
+    const client = useQueryClient();
+    const authService = useProAuthTokenService();
+
+    return useMutation<void, Error, IAuthViaSeedPhraseData>(async authData => {
+        if (isPaidSubscription(proState?.current)) return;
+
+        await authViaSeedPhrase(api, authService, authData);
 
         await client.invalidateQueries([QueryKey.pro]);
     });

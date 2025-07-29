@@ -49,6 +49,9 @@ import {
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
+import { mnemonicToKeypair } from './mnemonicService';
+import { sign } from '@ton/crypto';
+import { IAuthViaSeedPhraseData } from '../entries/password';
 
 interface IGetProStateParams {
     authService: ProAuthTokenService;
@@ -254,6 +257,45 @@ export const authViaTonConnect = async (
         proofPayload,
         stateInit
     );
+
+    const result = await AuthService.tonConnectAuth({
+        address: wallet.rawAddress,
+        proof: {
+            timestamp: proof.timestamp,
+            domain: proof.domain.value,
+            signature: proof.signature,
+            payload,
+            state_init: proof.stateInit
+        }
+    });
+
+    if (!result.ok || !result.auth_token) {
+        throw new Error('Unable to authorize');
+    }
+
+    await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
+};
+
+export const authViaSeedPhrase = async (
+    api: APIConfig,
+    authService: ProAuthTokenService,
+    authData: IAuthViaSeedPhraseData
+) => {
+    const domain = 'tonkeeper';
+    const { wallet, mnemonic, mnemonicType } = authData;
+    const { payload } = await AuthService.authGeneratePayload();
+
+    const timestamp = await getServerTime(api);
+
+    const proofPayload = tonConnectProofPayload(timestamp, domain, wallet.rawAddress, payload);
+
+    const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
+
+    const signature = sign(proofPayload.bufferToSign, keyPair.secretKey);
+
+    const stateInit = walletStateInitFromState(wallet);
+
+    const proof = createTonProofItem(signature, proofPayload, stateInit);
 
     const result = await AuthService.tonConnectAuth({
         address: wallet.rawAddress,

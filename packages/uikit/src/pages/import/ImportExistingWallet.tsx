@@ -46,6 +46,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { useTranslation } from '../../hooks/translation';
+import { useAutoAuthMutation } from '../../state/pro';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
@@ -255,6 +256,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     const { mutateAsync: renameDerivations, isLoading: renameDerivationsLoading } =
         useMutateRenameAccountDerivations();
 
+    const { mutate: tryAutoAuth } = useAutoAuthMutation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
     const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
@@ -486,6 +488,15 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
+    const handleDoneState = () => {
+        tryAutoAuth({
+            mnemonic,
+            wallet: createdAccount.activeTonWallet,
+            mnemonicType: selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+        });
+        setNotificationsSubscribePagePassed(true);
+    };
+
     if (
         sdk.notifications &&
         !notificationsSubscribePagePassed &&
@@ -496,7 +507,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 wallet={createdAccount.activeTonWallet}
                 mnemonic={mnemonic}
-                onDone={() => setNotificationsSubscribePagePassed(true)}
+                onDone={handleDoneState}
             />
         );
     }
