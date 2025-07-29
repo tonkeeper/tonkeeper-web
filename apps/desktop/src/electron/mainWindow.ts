@@ -130,8 +130,10 @@ export abstract class MainWindow {
 
         this.mainWindow.webContents.session.on('select-hid-device', (event, details, callback) => {
             event.preventDefault();
-            if (details.deviceList && details.deviceList.length > 0) {
+            if (details.deviceList.length > 0) {
                 callback(details.deviceList[0].deviceId);
+            } else {
+                callback(undefined);
             }
         });
 

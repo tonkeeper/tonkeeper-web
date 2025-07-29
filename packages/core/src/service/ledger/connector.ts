@@ -32,7 +32,7 @@ export const connectLedger = async (transportType: 'wire' | 'bluetooth') => {
 
     if (transportType === 'wire') {
         if (await TransportWebHID.isSupported()) {
-            transport = await pTimeout(connectWebHID(), 1500);
+            transport = await connectWebHID();
         } else if (await TransportWebUSB.isSupported()) {
             transport = await connectWebUSB();
         } else {
@@ -91,18 +91,9 @@ export const isTransportReady = (tonTransport: TonTransport) => {
 };
 
 async function connectWebHID() {
-    for (let i = 0; i < 5; i++) {
-        const [device] = await TransportWebHID.list();
-        if (!device) {
-            try {
-                await pTimeout(TransportWebHID.create(), 100);
-            } catch (err) {
-                console.error(err);
-            }
-            await wait(100);
-            continue;
-        }
+    const [device] = await TransportWebHID.list();
 
+    if (device) {
         if (device.opened) {
             return new TransportWebHID(device);
         } else {
@@ -110,7 +101,7 @@ async function connectWebHID() {
         }
     }
 
-    throw new Error('Failed to connect to Ledger with HID');
+    return TransportWebHID.create();
 }
 
 async function connectWebUSB() {
