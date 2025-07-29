@@ -27,20 +27,24 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
     onClose: () => void;
+    onOpenProps?: {
+        removeButtonsBlock?: boolean;
+    };
 }
 
 export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = props => {
-    const { isOpen, onClose } = props;
+    const { isOpen, onClose, onOpenProps } = props;
 
     return (
         <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
-            {() => <ProFeaturesNotificationContent onClose={onClose} />}
+            {() => <ProFeaturesNotificationContent onOpenProps={onOpenProps} onClose={onClose} />}
         </NotificationStyled>
     );
 };
 
 export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationProps, 'isOpen'>> = ({
-    onClose
+    onClose,
+    onOpenProps
 }) => {
     const formId = useId();
     const { t } = useTranslation();
@@ -82,7 +86,9 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         }
     };
 
+    const { removeButtonsBlock } = onOpenProps ?? {};
     const displayPlans = adaptPlansToViewModel(products);
+    const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(currentSubscription);
 
     return (
         <ContentWrapper onSubmit={handleSubmit(handleProAuth)} id={formId}>
@@ -92,7 +98,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
 
             <PromoNotificationCarousel />
 
-            {!isValidSubscription(currentSubscription) && (
+            {isButtonsBlockVisible && (
                 <NotificationFooterPortal>
                     <NotificationFooter>
                         <ButtonsBlockStyled

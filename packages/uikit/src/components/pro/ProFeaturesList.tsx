@@ -54,7 +54,7 @@ const Header: FC<IHeaderProps> = props => {
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
 
     const handleLearnMoreClick = () => {
-        onProFeaturesOpen();
+        onProFeaturesOpen({ removeButtonsBlock: true });
     };
 
     const {
