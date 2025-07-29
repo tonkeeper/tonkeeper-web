@@ -55,7 +55,9 @@ export const ProActiveWallet: FC<IProps> = props => {
                     isLoading={isLoading}
                     rightElement={
                         <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
-                            <Label2>{t(isCurrentSubscription ? 'disconnect' : 'Edit')}</Label2>
+                            <Label2>
+                                {t(isCurrentSubscription ? 'disconnect' : 'edit_wallet')}
+                            </Label2>
                         </ButtonStyled>
                     }
                 />
