@@ -4,6 +4,7 @@ import { useTranslation } from '../../hooks/translation';
 import {
     useAddLedgerAccountMutation,
     useConnectLedgerMutation,
+    useEffectOnLedgerConnectionPageClosed,
     useLedgerWallets
 } from '../../state/ledger';
 import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -70,6 +71,19 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     const onStartConnection = useCallback(() => {
         resetConnection();
         connectLedger();
+    }, []);
+
+    const onConnectionPageClosed = useCallback(() => {
+        resetConnection();
+        connectLedger({ skipOpenConnectionPage: true });
+    }, []);
+
+    useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
+
+    useEffect(() => {
+        return () => {
+            sdk.ledgerConnectionPage?.close();
+        };
     }, []);
 
     useEffect(() => {

@@ -80,3 +80,25 @@ export const subject = <T>(): Subject<T> => new Subject<T>();
 export type ReadonlyAtom<T> = Omit<Atom<T>, 'next'>;
 export type ReadonlySubject<T> = Omit<Subject<T>, 'next'>;
 export type ReadonlyReplySubject<T> = Omit<ReplySubject<T>, 'next'>;
+
+export function mapSubject<T, U>(source: Subject<T>, fn: (value: T) => U): Subject<U> {
+    const mapped = new Subject<U>();
+    source.subscribe(value => mapped.next(fn(value)));
+    return mapped;
+}
+
+export function mapAtom<T, U>(source: Atom<T>, fn: (value: T) => U): Atom<U> {
+    const mapped = new Atom<U>(fn(source.value));
+    source.subscribe(value => mapped.next(fn(value)));
+    return mapped;
+}
+
+export function mapReplySubject<T, U>(
+    source: ReplySubject<T>,
+    fn: (value: T) => U,
+    bufferSize: number | 'all' = 1
+): ReplySubject<U> {
+    const mapped = new ReplySubject<U>(bufferSize);
+    source.subscribe(value => mapped.next(fn(value)));
+    return mapped;
+}

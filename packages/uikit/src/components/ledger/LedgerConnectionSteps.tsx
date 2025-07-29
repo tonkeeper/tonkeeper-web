@@ -8,6 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useActiveConfig } from '../../state/wallet';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { useLedgerConnectionPageOpened } from '../../state/ledger';
 
 const CardStyled = styled.div`
     box-sizing: border-box;
@@ -72,6 +73,7 @@ export const LedgerConnectionSteps: FC<{
     transactionsToSign?: number;
     signingTransactionIndex?: number;
     action?: 'transaction' | 'ton-proof';
+    pristine?: boolean;
     currentStep: 'connect' | 'open-ton' | 'confirm-tx' | 'all-completed';
     className?: string;
     isErrored: boolean;
@@ -81,7 +83,8 @@ export const LedgerConnectionSteps: FC<{
     signingTransactionIndex,
     className,
     action,
-    isErrored
+    isErrored,
+    pristine
 }) => {
     const config = useActiveConfig();
     const { t } = useTranslation();
@@ -104,6 +107,106 @@ export const LedgerConnectionSteps: FC<{
         [transactionsToSign]
     );
 
+    const ContinueOnConnectionPageSteps = (
+        <TextStepsContainer>
+            <TextBlockStyled>
+                <StepIcon state="active" />
+                <Body2>{t('ledger_steps_connect_tab_switch')}</Body2>
+            </TextBlockStyled>
+            <TextBlockStyled>
+                <StepIcon state="future" />
+                <Body2>{t('ledger_steps_connect_tab_back')}</Body2>
+            </TextBlockStyled>
+        </TextStepsContainer>
+    );
+
+    const UsualSteps = (
+        <TextStepsContainer>
+            <TextBlockStyled>
+                <StepIcon
+                    state={pristine ? 'future' : currentStep === 'connect' ? 'active' : 'completed'}
+                    isErrored={isErrored}
+                />
+                <Body2Colored
+                    $isCompleted={currentStep !== 'connect'}
+                    $isErrored={isErrored && currentStep === 'connect'}
+                >
+                    {t('ledger_steps_connect')}
+                </Body2Colored>
+            </TextBlockStyled>
+            <TextBlockStyled>
+                <StepIcon
+                    state={
+                        currentStep === 'open-ton'
+                            ? 'active'
+                            : currentStep === 'connect'
+                            ? 'future'
+                            : 'completed'
+                    }
+                    isErrored={isErrored && currentStep === 'open-ton'}
+                />
+                <Body2Colored
+                    $isCompleted={currentStep === 'all-completed' || currentStep === 'confirm-tx'}
+                    $isErrored={isErrored && currentStep === 'open-ton'}
+                >
+                    {t('ledger_steps_open_ton')}
+                    {!transactionsToSign && (
+                        <>
+                            <Dot />
+                            <AStyled onClick={onOpenFaq}>{t('ledger_steps_install_ton')}</AStyled>
+                        </>
+                    )}
+                </Body2Colored>
+            </TextBlockStyled>
+            {transactionsToSign === 1 || action === 'ton-proof' ? (
+                <TextBlockStyled>
+                    <StepIcon
+                        state={
+                            currentStep === 'confirm-tx'
+                                ? 'active'
+                                : currentStep === 'connect' || currentStep === 'open-ton'
+                                ? 'future'
+                                : 'completed'
+                        }
+                    />
+                    <Body2Colored $isCompleted={currentStep === 'all-completed'}>
+                        {t(
+                            action === 'ton-proof'
+                                ? 'ledger_steps_confirm_proof'
+                                : 'ledger_steps_confirm_tx'
+                        )}
+                    </Body2Colored>
+                </TextBlockStyled>
+            ) : transactionsToSign && transactionsToSign > 1 ? (
+                txToSignIndexes.map(index => (
+                    <TextBlockStyled key={index}>
+                        <StepIcon
+                            state={
+                                currentStep === 'connect' ||
+                                currentStep === 'open-ton' ||
+                                (currentStep === 'confirm-tx' && index > signingTransactionIndex!)
+                                    ? 'future'
+                                    : currentStep === 'confirm-tx' &&
+                                      signingTransactionIndex === index
+                                    ? 'active'
+                                    : 'completed'
+                            }
+                        />
+                        <Body2Colored
+                            $isCompleted={
+                                currentStep === 'all-completed' || index < signingTransactionIndex!
+                            }
+                        >
+                            {t('ledger_steps_confirm_num_tx', { number: index + 1 })}
+                        </Body2Colored>
+                    </TextBlockStyled>
+                ))
+            ) : null}
+        </TextStepsContainer>
+    );
+
+    const isContinueOnConnectionPage = useLedgerConnectionPageOpened();
+
     return (
         <CardStyled className={className}>
             <ImageStyled>
@@ -117,94 +220,7 @@ export const LedgerConnectionSteps: FC<{
                     }
                 />
             </ImageStyled>
-            <TextStepsContainer>
-                <TextBlockStyled>
-                    <StepIcon
-                        state={currentStep === 'connect' ? 'active' : 'completed'}
-                        isErrored={isErrored}
-                    />
-                    <Body2Colored
-                        $isCompleted={currentStep !== 'connect'}
-                        $isErrored={isErrored && currentStep === 'connect'}
-                    >
-                        {t('ledger_steps_connect')}
-                    </Body2Colored>
-                </TextBlockStyled>
-                <TextBlockStyled>
-                    <StepIcon
-                        state={
-                            currentStep === 'open-ton'
-                                ? 'active'
-                                : currentStep === 'connect'
-                                ? 'future'
-                                : 'completed'
-                        }
-                        isErrored={isErrored && currentStep === 'open-ton'}
-                    />
-                    <Body2Colored
-                        $isCompleted={
-                            currentStep === 'all-completed' || currentStep === 'confirm-tx'
-                        }
-                        $isErrored={isErrored && currentStep === 'open-ton'}
-                    >
-                        {t('ledger_steps_open_ton')}
-                        {!transactionsToSign && (
-                            <>
-                                <Dot />
-                                <AStyled onClick={onOpenFaq}>
-                                    {t('ledger_steps_install_ton')}
-                                </AStyled>
-                            </>
-                        )}
-                    </Body2Colored>
-                </TextBlockStyled>
-                {transactionsToSign === 1 || action === 'ton-proof' ? (
-                    <TextBlockStyled>
-                        <StepIcon
-                            state={
-                                currentStep === 'confirm-tx'
-                                    ? 'active'
-                                    : currentStep === 'connect' || currentStep === 'open-ton'
-                                    ? 'future'
-                                    : 'completed'
-                            }
-                        />
-                        <Body2Colored $isCompleted={currentStep === 'all-completed'}>
-                            {t(
-                                action === 'ton-proof'
-                                    ? 'ledger_steps_confirm_proof'
-                                    : 'ledger_steps_confirm_tx'
-                            )}
-                        </Body2Colored>
-                    </TextBlockStyled>
-                ) : transactionsToSign && transactionsToSign > 1 ? (
-                    txToSignIndexes.map(index => (
-                        <TextBlockStyled key={index}>
-                            <StepIcon
-                                state={
-                                    currentStep === 'connect' ||
-                                    currentStep === 'open-ton' ||
-                                    (currentStep === 'confirm-tx' &&
-                                        index > signingTransactionIndex!)
-                                        ? 'future'
-                                        : currentStep === 'confirm-tx' &&
-                                          signingTransactionIndex === index
-                                        ? 'active'
-                                        : 'completed'
-                                }
-                            />
-                            <Body2Colored
-                                $isCompleted={
-                                    currentStep === 'all-completed' ||
-                                    index < signingTransactionIndex!
-                                }
-                            >
-                                {t('ledger_steps_confirm_num_tx', { number: index + 1 })}
-                            </Body2Colored>
-                        </TextBlockStyled>
-                    ))
-                ) : null}
-            </TextStepsContainer>
+            {isContinueOnConnectionPage ? ContinueOnConnectionPageSteps : UsualSteps}
         </CardStyled>
     );
 };

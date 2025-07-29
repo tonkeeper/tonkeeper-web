@@ -46,7 +46,7 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
-import { ExtensionAppSdk } from './libs/appSdk';
+import { connectLedgerLocation, ExtensionAppSdk } from './libs/appSdk';
 import { useAnalytics, useAppWidth } from './libs/hooks';
 import { useMutateUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
@@ -92,6 +92,7 @@ const PairKeystoneNotification = React.lazy(
 const ExtensionMobileAppBannerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
 );
+const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -303,6 +304,16 @@ export const Content: FC<{
     useTrackLocation();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
+
+    if (location.pathname === connectLedgerLocation) {
+        return (
+            <PageWrapper>
+                <Suspense fallback={<Loading />}>
+                    <ConnectLedgerPage />
+                </Suspense>
+            </PageWrapper>
+        );
+    }
 
     if (lock) {
         return (
