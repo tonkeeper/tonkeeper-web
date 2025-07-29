@@ -107,15 +107,6 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                                     subscriptionGroup: 'emHJGjKGJKGGJim',
                                     subscriptionPeriod: 'month',
                                     environment: IosEnvironmentTypes.SANDBOX
-                                },
-                                {
-                                    id: ProductIds.YEARLY,
-                                    displayName: 'Tonkeeper Pro Yearly',
-                                    description: 'Access to premium features for one year',
-                                    displayPrice: '$11.45',
-                                    subscriptionGroup: 'emHJGjKGJKGGJim',
-                                    subscriptionPeriod: 'year',
-                                    environment: IosEnvironmentTypes.SANDBOX
                                 }
                             ]
                         }),
