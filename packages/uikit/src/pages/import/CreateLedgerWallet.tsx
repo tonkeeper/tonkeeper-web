@@ -4,6 +4,7 @@ import { useTranslation } from '../../hooks/translation';
 import {
     useAddLedgerAccountMutation,
     useConnectLedgerMutation,
+    useEffectOnLedgerConnectionPageClosed,
     useLedgerWallets
 } from '../../state/ledger';
 import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -63,12 +64,26 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
         isDeviceConnected,
         mutate: connectLedger,
         reset: resetConnection,
-        data: tonTransport
+        data: tonTransport,
+        isError: isConnectionError
     } = useConnectLedgerMutation();
 
     const onStartConnection = useCallback(() => {
         resetConnection();
         connectLedger();
+    }, []);
+
+    const onConnectionPageClosed = useCallback(() => {
+        resetConnection();
+        connectLedger({ skipOpenConnectionPage: true });
+    }, []);
+
+    useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
+
+    useEffect(() => {
+        return () => {
+            sdk.ledgerConnectionPage?.close();
+        };
     }, []);
 
     useEffect(() => {
@@ -107,7 +122,7 @@ export const CreateLedgerWallet: FC<{ afterCompleted: () => void }> = ({ afterCo
     return (
         <ConnectLedgerWrapper>
             <H2Styled>{t('ledger_connect_header')}</H2Styled>
-            <LedgerConnectionSteps currentStep={currentStep} />
+            <LedgerConnectionSteps currentStep={currentStep} isErrored={isConnectionError} />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlock>

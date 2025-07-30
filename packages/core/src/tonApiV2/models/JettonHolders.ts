@@ -65,11 +65,11 @@ export function JettonHoldersFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function JettonHoldersToJSON(json: any): JettonHolders {
-    return JettonHoldersToJSONTyped(json, false);
-}
+  export function JettonHoldersToJSON(json: any): JettonHolders {
+      return JettonHoldersToJSONTyped(json, false);
+  }
 
-export function JettonHoldersToJSONTyped(value?: JettonHolders | null, ignoreDiscriminator: boolean = false): any {
+  export function JettonHoldersToJSONTyped(value?: JettonHolders | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

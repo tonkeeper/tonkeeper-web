@@ -57,11 +57,11 @@ export function OracleFromJSONTyped(json: any, ignoreDiscriminator: boolean): Or
     };
 }
 
-export function OracleToJSON(json: any): Oracle {
-    return OracleToJSONTyped(json, false);
-}
+  export function OracleToJSON(json: any): Oracle {
+      return OracleToJSONTyped(json, false);
+  }
 
-export function OracleToJSONTyped(value?: Oracle | null, ignoreDiscriminator: boolean = false): any {
+  export function OracleToJSONTyped(value?: Oracle | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

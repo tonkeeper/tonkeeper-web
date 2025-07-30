@@ -84,7 +84,12 @@ export const MobileProCategoryBlock: FC<{
                     </GroupItem>
                 ))}
             </ListContainer>
-            <DesktopCategoryModal category={category} isOpen={isOpen} onClose={onClose} />
+            <DesktopCategoryModal
+                category={category}
+                isOpen={isOpen}
+                onClose={onClose}
+                onClickApp={onClickApp}
+            />
         </div>
     );
 };

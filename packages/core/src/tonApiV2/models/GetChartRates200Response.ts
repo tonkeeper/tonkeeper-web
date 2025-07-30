@@ -20,11 +20,14 @@ import { mapValues } from '../runtime';
  */
 export interface GetChartRates200Response {
     /**
+     * Each inner array is a pair [timestamp, price]:
+     *   • index 0 — Unix timestamp (int64)  
+     *   • index 1 — token price (decimal) in the requested currency.
      * 
-     * @type {Array<Array<any>>}
+     * @type {Array<Array<number>>}
      * @memberof GetChartRates200Response
      */
-    points: Array<Array<any>>;
+    points: Array<Array<number>>;
 }
 
 /**
@@ -49,11 +52,11 @@ export function GetChartRates200ResponseFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-export function GetChartRates200ResponseToJSON(json: any): GetChartRates200Response {
-    return GetChartRates200ResponseToJSONTyped(json, false);
-}
+  export function GetChartRates200ResponseToJSON(json: any): GetChartRates200Response {
+      return GetChartRates200ResponseToJSONTyped(json, false);
+  }
 
-export function GetChartRates200ResponseToJSONTyped(value?: GetChartRates200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetChartRates200ResponseToJSONTyped(value?: GetChartRates200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

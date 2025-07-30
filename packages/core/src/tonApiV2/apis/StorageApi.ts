@@ -15,14 +15,14 @@
 
 import * as runtime from '../runtime';
 import type {
+  GetOpenapiJsonDefaultResponse,
   GetStorageProviders200Response,
-  InlineObject,
 } from '../models/index';
 import {
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     GetStorageProviders200ResponseFromJSON,
     GetStorageProviders200ResponseToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
 } from '../models/index';
 
 /**

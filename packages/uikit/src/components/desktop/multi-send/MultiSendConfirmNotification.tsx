@@ -1,6 +1,6 @@
 import { Notification } from '../../Notification';
 import React, { FC, useEffect, useMemo, useState } from 'react';
-import { Image, ImageMock } from '../../transfer/Confirm';
+import { ConfirmViewImage, ImageMock } from '../../transfer/Confirm';
 import { MultiSendForm } from '../../../state/multiSend';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import styled from 'styled-components';
@@ -207,7 +207,7 @@ const MultiSendConfirmContent: FC<{
     return (
         <>
             <ConfirmWrapper>
-                {image ? <Image full src={image} /> : <ImageMock full />}
+                {image ? <ConfirmViewImage full src={image} /> : <ImageMock full />}
                 <TransferLabel>{t('confirm_modal_transfer')}</TransferLabel>
                 <Num2>{willBeSent}</Num2>
                 <FiatValue>{willBeSentInFiat}</FiatValue>

@@ -15,26 +15,33 @@
 
 import * as runtime from '../runtime';
 import type {
-  Accounts,
-  InlineObject,
+  GetOpenapiJsonDefaultResponse,
   Seqno,
   TonConnectProof200Response,
   TonConnectProofRequest,
+  Wallet,
+  Wallets,
 } from '../models/index';
 import {
-    AccountsFromJSON,
-    AccountsToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     SeqnoFromJSON,
     SeqnoToJSON,
     TonConnectProof200ResponseFromJSON,
     TonConnectProof200ResponseToJSON,
     TonConnectProofRequestFromJSON,
     TonConnectProofRequestToJSON,
+    WalletFromJSON,
+    WalletToJSON,
+    WalletsFromJSON,
+    WalletsToJSON,
 } from '../models/index';
 
 export interface GetAccountSeqnoRequest {
+    accountId: string;
+}
+
+export interface GetWalletInfoRequest {
     accountId: string;
 }
 
@@ -68,18 +75,32 @@ export interface WalletApiInterface {
     getAccountSeqno(requestParameters: GetAccountSeqnoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Seqno>;
 
     /**
+     * Get human-friendly information about a wallet without low-level details.
+     * @param {string} accountId account ID
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WalletApiInterface
+     */
+    getWalletInfoRaw(requestParameters: GetWalletInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Wallet>>;
+
+    /**
+     * Get human-friendly information about a wallet without low-level details.
+     */
+    getWalletInfo(requestParameters: GetWalletInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallet>;
+
+    /**
      * Get wallets by public key
      * @param {string} publicKey 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof WalletApiInterface
      */
-    getWalletsByPublicKeyRaw(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accounts>>;
+    getWalletsByPublicKeyRaw(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Wallets>>;
 
     /**
      * Get wallets by public key
      */
-    getWalletsByPublicKey(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accounts>;
+    getWalletsByPublicKey(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallets>;
 
     /**
      * Account verification and token issuance
@@ -136,9 +157,42 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
     }
 
     /**
+     * Get human-friendly information about a wallet without low-level details.
+     */
+    async getWalletInfoRaw(requestParameters: GetWalletInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Wallet>> {
+        if (requestParameters['accountId'] == null) {
+            throw new runtime.RequiredError(
+                'accountId',
+                'Required parameter "accountId" was null or undefined when calling getWalletInfo().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/v2/wallet/{account_id}`.replace(`{${"account_id"}}`, encodeURIComponent(String(requestParameters['accountId']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WalletFromJSON(jsonValue));
+    }
+
+    /**
+     * Get human-friendly information about a wallet without low-level details.
+     */
+    async getWalletInfo(requestParameters: GetWalletInfoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallet> {
+        const response = await this.getWalletInfoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * Get wallets by public key
      */
-    async getWalletsByPublicKeyRaw(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Accounts>> {
+    async getWalletsByPublicKeyRaw(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Wallets>> {
         if (requestParameters['publicKey'] == null) {
             throw new runtime.RequiredError(
                 'publicKey',
@@ -157,13 +211,13 @@ export class WalletApi extends runtime.BaseAPI implements WalletApiInterface {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AccountsFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => WalletsFromJSON(jsonValue));
     }
 
     /**
      * Get wallets by public key
      */
-    async getWalletsByPublicKey(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Accounts> {
+    async getWalletsByPublicKey(requestParameters: GetWalletsByPublicKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Wallets> {
         const response = await this.getWalletsByPublicKeyRaw(requestParameters, initOverrides);
         return await response.value();
     }

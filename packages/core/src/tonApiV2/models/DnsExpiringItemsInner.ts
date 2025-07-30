@@ -72,11 +72,11 @@ export function DnsExpiringItemsInnerFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function DnsExpiringItemsInnerToJSON(json: any): DnsExpiringItemsInner {
-    return DnsExpiringItemsInnerToJSONTyped(json, false);
-}
+  export function DnsExpiringItemsInnerToJSON(json: any): DnsExpiringItemsInner {
+      return DnsExpiringItemsInnerToJSONTyped(json, false);
+  }
 
-export function DnsExpiringItemsInnerToJSONTyped(value?: DnsExpiringItemsInner | null, ignoreDiscriminator: boolean = false): any {
+  export function DnsExpiringItemsInnerToJSONTyped(value?: DnsExpiringItemsInner | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

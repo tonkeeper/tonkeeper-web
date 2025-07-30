@@ -8,7 +8,8 @@ import {
     TonAsset,
     isTon,
     tonAssetAddressFromString,
-    tonAssetAddressToString
+    tonAssetAddressToString,
+    shouldHideTonJettonImageCorners
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { JettonsApi, JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -20,7 +21,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useAtom } from '../../libs/useAtom';
 import { QueryKey } from '../../libs/queryKey';
 import { useAssets } from '../home';
-import { useJettonList } from '../jetton';
+import { patchedTokenImage, useJettonList } from '../jetton';
 import { useRate } from '../rates';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useActiveApi } from '../wallet';
@@ -45,8 +46,11 @@ export function useAllSwapAssets() {
                             symbol: asset.symbol,
                             decimals: asset.decimals,
                             name: asset.name,
-                            image: asset.image,
+                            image: patchedTokenImage(tonAssetAddressToString(address), asset.image),
                             blockchain: BLOCKCHAIN_NAME.TON,
+                            noImageCorners: shouldHideTonJettonImageCorners(
+                                tonAssetAddressToString(address)
+                            ),
                             address
                         };
                     })

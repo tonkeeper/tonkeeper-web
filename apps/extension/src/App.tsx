@@ -39,12 +39,11 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveAccountQuery, useAccountsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from 'react';
-import { MemoryRouter, Route, Switch, useLocation } from "react-router-dom";
-import styled, { css } from 'styled-components';
+import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import browser from 'webextension-polyfill';
-import { Notifications } from './components/Notifications';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
 import { ExtensionAppSdk } from './libs/appSdk';
@@ -56,9 +55,10 @@ import { Account } from '@tonkeeper/core/dist/entries/account';
 import { useDebuggingTools } from '@tonkeeper/uikit/dist/hooks/useDebuggingTools';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
-import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
+import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import { RedirectFromDesktopSettings } from "@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings";
+import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
+import { Notifications } from './components/Notifications';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -89,7 +89,10 @@ const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
 
-const ExtensionMobileAppBannerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification"));
+const ExtensionMobileAppBannerNotification = React.lazy(
+    () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
+);
+const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -103,6 +106,14 @@ const queryClient = new QueryClient({
 const sdk = new ExtensionAppSdk();
 const TARGET_ENV = 'extension';
 connectToBackground();
+
+const ExtensionGlobalStyle = createGlobalStyle`
+  ${GlobalStyleCss}
+  
+  body {
+      overflow-y: auto;
+  }
+`;
 
 export const App: FC = () => {
     const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
@@ -130,19 +141,21 @@ export const App: FC = () => {
                         <StorageContext.Provider value={sdk.storage}>
                             <TranslationContext.Provider value={translation}>
                                 <UserThemeProvider>
-                                        <GlobalStyle />
-                                        <HeaderGlobalStyle />
-                                        <FooterGlobalStyle />
-                                        <SybHeaderGlobalStyle />
-                                        <GlobalListStyle />
-                                        <Suspense fallback={
+                                    <ExtensionGlobalStyle />
+                                    <HeaderGlobalStyle />
+                                    <FooterGlobalStyle />
+                                    <SybHeaderGlobalStyle />
+                                    <GlobalListStyle />
+                                    <Suspense
+                                        fallback={
                                             <FullSizeWrapper standalone={false}>
                                                 <Loading />
                                             </FullSizeWrapper>
-                                        }>
-                                            <Loader />
-                                        </Suspense>
-                                        <UnlockNotification sdk={sdk} />
+                                        }
+                                    >
+                                        <Loader />
+                                    </Suspense>
+                                    <UnlockNotification sdk={sdk} />
                                 </UserThemeProvider>
                             </TranslationContext.Provider>
                         </StorageContext.Provider>
@@ -212,10 +225,7 @@ export const Loader: FC = React.memo(() => {
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(
-        activeAccount || undefined,
-        accounts
-    );
+    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts);
 
     if (
         activeWalletLoading ||
@@ -252,7 +262,7 @@ export const Loader: FC = React.memo(() => {
         hideFireblocks: true,
         defaultWalletVersion: WalletVersion.V5R1,
         env: {
-          tronApiKey: process.env.REACT_APP_TRON_API_KEY
+            tronApiKey: process.env.REACT_APP_TRON_API_KEY
         },
         tracker: tracker?.track
     };
@@ -295,6 +305,16 @@ export const Content: FC<{
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
 
+    if (location.pathname === AppRoute.connectLedger) {
+        return (
+            <PageWrapper>
+                <Suspense fallback={<Loading />}>
+                    <ConnectLedgerPage />
+                </Suspense>
+            </PageWrapper>
+        );
+    }
+
     if (lock) {
         return (
             <FullSizeWrapper standalone>
@@ -318,38 +338,30 @@ export const Content: FC<{
     return (
         <Wrapper standalone recovery={location.pathname.includes(SettingsRoute.recovery)}>
             <Switch>
-                <Route
-                    path={AppRoute.activity}
-                >
+                <Route path={AppRoute.activity}>
                     <Suspense fallback={<ActivitySkeletonPage />}>
-                    <Activity />
-                 </Suspense>
+                        <Activity />
+                    </Suspense>
                 </Route>
-                <Route
-                    path={AppRoute.browser}
-                >
+                <Route path={AppRoute.browser}>
                     <Suspense fallback={<BrowserSkeletonPage />}>
                         <Browser />
                     </Suspense>
                 </Route>
-                <Route
-                    path={AppRoute.settings}
-                >
+                <Route path={AppRoute.settings}>
                     <Suspense fallback={<SettingsSkeletonPage />}>
                         <Settings />
                     </Suspense>
                 </Route>
                 <Route path={AppRoute.walletSettings}>
-                  <RedirectFromDesktopSettings />
+                    <RedirectFromDesktopSettings />
                 </Route>
                 <Route path={`${AppRoute.coins}/:name`}>
                     <Suspense fallback={<CoinSkeletonPage />}>
                         <Coin />
                     </Suspense>
                 </Route>
-                <Route
-                    path={AppRoute.swap}
-                >
+                <Route path={AppRoute.swap}>
                     <Suspense fallback={null}>
                         <SwapPage />
                     </Suspense>
@@ -358,6 +370,7 @@ export const Content: FC<{
             </Switch>
             <Footer />
             <MemoryScroll />
+            <Notifications />
             <TonConnectSubscription />
             <Suspense>
                 <SendActionNotification />
@@ -384,7 +397,6 @@ const IndexPage = () => {
                     <Home />
                 </Suspense>
             </InnerBody>
-            <Notifications />
         </>
     );
 };

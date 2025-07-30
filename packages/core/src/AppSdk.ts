@@ -180,6 +180,14 @@ export interface IAppSdk {
     userIdentity: UserIdentity;
 
     dappBrowser?: IDappBrowser;
+
+    linksInterceptorAvailable?: boolean;
+
+    ledgerConnectionPage?: {
+        isOpened: ReadonlyAtom<boolean>;
+        open(): Promise<void>;
+        close(): Promise<void>;
+    };
 }
 
 export interface IDappBrowser {

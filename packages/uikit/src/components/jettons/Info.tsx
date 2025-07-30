@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { SkeletonImage, SkeletonText } from '../shared/Skeleton';
 import { H2 } from '../Text';
 import { Body } from './CroppedText';
+import { Image } from '../shared/Image';
 
 const Block = styled.div`
     display: flex;
@@ -17,11 +18,11 @@ const Text = styled.div`
     flex-grow: 1;
 `;
 
-const Image = styled.img<{ $noCorners?: boolean }>`
+const JettonImage = styled(Image)`
     width: 64px;
     height: 64px;
     flex-shrink: 0;
-    border-radius: ${p => (p.$noCorners ? '0' : '100%')};
+    border-radius: ${p => p.theme.cornerFull};
 `;
 
 interface CoinProps {
@@ -30,7 +31,7 @@ interface CoinProps {
     price?: string;
     image?: string;
     description?: string;
-    imageNoCorners?: boolean;
+    noImageCorners?: boolean;
 }
 
 export const CoinInfoSkeleton = () => {
@@ -53,7 +54,7 @@ const Title = styled(H2)`
     margin-bottom: 2px;
 `;
 
-export const CoinInfo: FC<CoinProps> = ({ amount, symbol, price, image, imageNoCorners }) => {
+export const CoinInfo: FC<CoinProps> = ({ amount, symbol, price, image, noImageCorners }) => {
     return (
         <Block>
             <Text>
@@ -63,7 +64,7 @@ export const CoinInfo: FC<CoinProps> = ({ amount, symbol, price, image, imageNoC
                 {price && <Body open>{price}</Body>}
             </Text>
             {image ? (
-                <Image src={image} $noCorners={imageNoCorners} />
+                <JettonImage src={image} noRadius={noImageCorners} />
             ) : (
                 <SkeletonImage width="64px" />
             )}

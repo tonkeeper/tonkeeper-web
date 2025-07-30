@@ -89,11 +89,11 @@ export function SubscriptionActionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function SubscriptionActionToJSON(json: any): SubscriptionAction {
-    return SubscriptionActionToJSONTyped(json, false);
-}
+  export function SubscriptionActionToJSON(json: any): SubscriptionAction {
+      return SubscriptionActionToJSONTyped(json, false);
+  }
 
-export function SubscriptionActionToJSONTyped(value?: SubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
+  export function SubscriptionActionToJSONTyped(value?: SubscriptionAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

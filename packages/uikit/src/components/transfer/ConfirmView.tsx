@@ -33,7 +33,14 @@ import {
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
 import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { Image, ImageMock, Info, SendingTitle, Title, UnverifiedTokenLabel } from './Confirm';
+import {
+    ConfirmViewImage,
+    ImageMock,
+    Info,
+    SendingTitle,
+    Title,
+    UnverifiedTokenLabel
+} from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
@@ -270,17 +277,21 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
         [TRON_USDT_ASSET.id]: t('txActions_USDT_transfer')
     };
 
-    title ||=
-        recipient && isTonRecipientData(recipient)
-            ? recipient.toAccount.name
-            : fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+    if (!title) {
+        if (recipient && isTonRecipientData(recipient) && recipient.toAccount.name) {
+            title = recipient.toAccount.name;
+        } else {
+            title =
+                fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+        }
+    }
 
     const icon =
         recipient && isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
     return (
         <Info className={className}>
             {icon ? (
-                <Image $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id} full src={image} />
+                <ConfirmViewImage noRadius={assetAmount.asset.noImageCorners} full src={image} />
             ) : (
                 <ImageMock full />
             )}

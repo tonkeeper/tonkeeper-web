@@ -137,11 +137,11 @@ export function WorkchainDescrFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function WorkchainDescrToJSON(json: any): WorkchainDescr {
-    return WorkchainDescrToJSONTyped(json, false);
-}
+  export function WorkchainDescrToJSON(json: any): WorkchainDescr {
+      return WorkchainDescrToJSONTyped(json, false);
+  }
 
-export function WorkchainDescrToJSONTyped(value?: WorkchainDescr | null, ignoreDiscriminator: boolean = false): any {
+  export function WorkchainDescrToJSONTyped(value?: WorkchainDescr | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

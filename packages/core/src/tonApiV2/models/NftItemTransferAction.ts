@@ -113,11 +113,11 @@ export function NftItemTransferActionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-export function NftItemTransferActionToJSON(json: any): NftItemTransferAction {
-    return NftItemTransferActionToJSONTyped(json, false);
-}
+  export function NftItemTransferActionToJSON(json: any): NftItemTransferAction {
+      return NftItemTransferActionToJSONTyped(json, false);
+  }
 
-export function NftItemTransferActionToJSONTyped(value?: NftItemTransferAction | null, ignoreDiscriminator: boolean = false): any {
+  export function NftItemTransferActionToJSONTyped(value?: NftItemTransferAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

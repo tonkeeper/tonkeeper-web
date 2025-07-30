@@ -1,6 +1,6 @@
 import { Notification } from '../../components/Notification';
 import React, { FC } from 'react';
-import { PromotionCategory } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
+import { PromotedApp, PromotionCategory } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { DesktopCategoryGroupItem } from './DesktopPromotedItem';
 import styled from 'styled-components';
 
@@ -16,12 +16,17 @@ export const DesktopCategoryModal: FC<{
     category: PromotionCategory;
     isOpen: boolean;
     onClose: () => void;
-}> = ({ category, isOpen, onClose }) => {
+    onClickApp?: (app: PromotedApp) => void;
+}> = ({ category, isOpen, onClose, onClickApp }) => {
     return (
         <Notification isOpen={isOpen} handleClose={onClose} title={category.title}>
             {() =>
                 category.apps.map(app => (
-                    <DesktopCategoryGroupItemStyled item={app} key={app.url} />
+                    <DesktopCategoryGroupItemStyled
+                        item={app}
+                        key={app.url}
+                        onClickApp={onClickApp ? () => onClickApp(app) : undefined}
+                    />
                 ))
             }
         </Notification>

@@ -16,22 +16,22 @@
 import * as runtime from '../runtime';
 import type {
   AccountStaking,
+  GetOpenapiJsonDefaultResponse,
   GetStakingPoolHistory200Response,
   GetStakingPoolInfo200Response,
   GetStakingPools200Response,
-  InlineObject,
 } from '../models/index';
 import {
     AccountStakingFromJSON,
     AccountStakingToJSON,
+    GetOpenapiJsonDefaultResponseFromJSON,
+    GetOpenapiJsonDefaultResponseToJSON,
     GetStakingPoolHistory200ResponseFromJSON,
     GetStakingPoolHistory200ResponseToJSON,
     GetStakingPoolInfo200ResponseFromJSON,
     GetStakingPoolInfo200ResponseToJSON,
     GetStakingPools200ResponseFromJSON,
     GetStakingPools200ResponseToJSON,
-    InlineObjectFromJSON,
-    InlineObjectToJSON,
 } from '../models/index';
 
 export interface GetAccountNominatorsPoolsRequest {

@@ -49,11 +49,11 @@ export function SeqnoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Seq
     };
 }
 
-export function SeqnoToJSON(json: any): Seqno {
-    return SeqnoToJSONTyped(json, false);
-}
+  export function SeqnoToJSON(json: any): Seqno {
+      return SeqnoToJSONTyped(json, false);
+  }
 
-export function SeqnoToJSONTyped(value?: Seqno | null, ignoreDiscriminator: boolean = false): any {
+  export function SeqnoToJSONTyped(value?: Seqno | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

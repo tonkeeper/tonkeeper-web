@@ -57,11 +57,11 @@ export function AddressParse200ResponseBounceableFromJSONTyped(json: any, ignore
     };
 }
 
-export function AddressParse200ResponseBounceableToJSON(json: any): AddressParse200ResponseBounceable {
-    return AddressParse200ResponseBounceableToJSONTyped(json, false);
-}
+  export function AddressParse200ResponseBounceableToJSON(json: any): AddressParse200ResponseBounceable {
+      return AddressParse200ResponseBounceableToJSONTyped(json, false);
+  }
 
-export function AddressParse200ResponseBounceableToJSONTyped(value?: AddressParse200ResponseBounceable | null, ignoreDiscriminator: boolean = false): any {
+  export function AddressParse200ResponseBounceableToJSONTyped(value?: AddressParse200ResponseBounceable | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

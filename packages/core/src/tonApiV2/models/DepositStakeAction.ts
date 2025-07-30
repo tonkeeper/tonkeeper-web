@@ -90,11 +90,11 @@ export function DepositStakeActionFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-export function DepositStakeActionToJSON(json: any): DepositStakeAction {
-    return DepositStakeActionToJSONTyped(json, false);
-}
+  export function DepositStakeActionToJSON(json: any): DepositStakeAction {
+      return DepositStakeActionToJSONTyped(json, false);
+  }
 
-export function DepositStakeActionToJSONTyped(value?: DepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
+  export function DepositStakeActionToJSONTyped(value?: DepositStakeAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

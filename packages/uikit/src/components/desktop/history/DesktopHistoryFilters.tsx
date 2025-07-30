@@ -11,11 +11,12 @@ import { useTranslation } from '../../../hooks/translation';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Badge } from '../../shared';
 import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
+import { Image } from '../../shared/Image';
 
-const AssetIcon = styled.img<{ $noBorders?: boolean }>`
+const AssetIcon = styled(Image)`
     width: 24px;
     height: 24px;
-    border-radius: ${props => !props.$noBorders && props.theme.cornerFull};
+    border-radius: ${props => props.theme.cornerFull};
     margin-right: 12px;
 
     pointer-events: none;
@@ -141,7 +142,7 @@ export const AssetHistoryFilter = () => {
                             >
                                 <AssetIcon
                                     src={assetAmount.image}
-                                    $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id}
+                                    noRadius={assetAmount.asset.noImageCorners}
                                 />
                                 <Label2>{assetAmount.asset.symbol}</Label2>
                                 {assetAmount.asset.id === TRON_USDT_ASSET.id && (
@@ -158,7 +159,7 @@ export const AssetHistoryFilter = () => {
                     {selectedAsset ? (
                         <AssetIconSm
                             src={selectedAsset.image}
-                            $noBorders={selectedAsset.id === TRON_USDT_ASSET.id}
+                            noRadius={selectedAsset.noImageCorners}
                         />
                     ) : (
                         <AllAssetsIconSm />

@@ -57,11 +57,11 @@ export function ContractDeployActionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function ContractDeployActionToJSON(json: any): ContractDeployAction {
-    return ContractDeployActionToJSONTyped(json, false);
-}
+  export function ContractDeployActionToJSON(json: any): ContractDeployAction {
+      return ContractDeployActionToJSONTyped(json, false);
+  }
 
-export function ContractDeployActionToJSONTyped(value?: ContractDeployAction | null, ignoreDiscriminator: boolean = false): any {
+  export function ContractDeployActionToJSONTyped(value?: ContractDeployAction | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

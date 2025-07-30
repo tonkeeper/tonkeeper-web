@@ -6,7 +6,7 @@ import {
     TonConnectEventPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
-    eqOrigins,
+    checkDappOriginMatchesManifest,
     getBrowserPlatform,
     getDeviceInfo,
     getManifest
@@ -34,6 +34,7 @@ import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/event
 import { useAnalyticsTrack } from '../../hooks/analytics';
 import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { originFromUrl } from "@tonkeeper/core/dist/utils/url";
 
 const Title = styled(H2)`
     text-align: center;
@@ -180,6 +181,9 @@ const ConnectContent: FC<{
     const tonProofRequested = params.items.some(item => item.name === 'ton_proof');
     const cantConnectProof =
         selectedAccountAndWallet.account.type === 'ton-multisig' && tonProofRequested;
+    const manifestUrlMismatch =
+        origin !== undefined &&
+        !checkDappOriginMatchesManifest({ origin, manifestUrl: manifest.url });
 
     return (
         <NotificationBlock onSubmit={onSubmit}>
@@ -223,7 +227,9 @@ const ConnectContent: FC<{
                         fullWidth
                         primary
                         loading={isLoading}
-                        disabled={isLoading || cantConnectProof || isReadOnly}
+                        disabled={
+                            isLoading || cantConnectProof || isReadOnly || manifestUrlMismatch
+                        }
                         type="submit"
                     >
                         {t('ton_login_connect_button')}
@@ -231,6 +237,14 @@ const ConnectContent: FC<{
                 )}
                 {cantConnectProof && <LedgerError>{t('operation_not_supported')}</LedgerError>}
                 {isReadOnly && <LedgerError>{t('operation_not_supported')}</LedgerError>}
+                {manifestUrlMismatch && (
+                    <LedgerError>
+                        {t('manifest_mismatch_error', {
+                            actual: origin,
+                            declared: originFromUrl(manifest.url) ?? manifest.url
+                        })}
+                    </LedgerError>
+                )}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
         </NotificationBlock>
@@ -346,20 +360,23 @@ export const TonConnectNotification: FC<{
 }> = ({ params, origin, handleClose }) => {
     const { data: manifest } = useManifest(params?.request ?? null);
 
-    useEffect(() => {
-        if (
-            origin !== undefined &&
-            manifest?.url !== undefined &&
-            !eqOrigins(origin, manifest.url)
-        ) {
-            handleClose(
-                new TonConnectError(
-                    'Manifest url and app origin mismatch',
-                    CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR
-                )
+    const manifestUrlMismatch = Boolean(
+        origin !== undefined &&
+            manifest?.url &&
+            !checkDappOriginMatchesManifest({ origin, manifestUrl: manifest?.url })
+    );
+
+    const modalCloseHandler = () => {
+        let closeParameter = null;
+        if (manifestUrlMismatch) {
+            closeParameter = new TonConnectError(
+                'Manifest url and app origin mismatch',
+                CONNECT_EVENT_ERROR_CODES.MANIFEST_CONTENT_ERROR
             );
         }
-    }, [origin, manifest?.url]);
+
+        handleClose(closeParameter);
+    };
 
     const Content = useCallback(() => {
         if (!params || !manifest) return undefined;
@@ -375,7 +392,7 @@ export const TonConnectNotification: FC<{
     }, [origin, params, manifest, handleClose]);
 
     return (
-        <Notification isOpen={manifest != null} handleClose={() => handleClose(null)}>
+        <Notification isOpen={manifest != null} handleClose={modalCloseHandler}>
             {Content}
         </Notification>
     );

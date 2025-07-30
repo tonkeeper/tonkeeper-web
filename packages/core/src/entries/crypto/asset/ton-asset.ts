@@ -8,7 +8,7 @@ import {
 } from '../../../tonApiV2';
 import { BLOCKCHAIN_NAME } from '../../crypto';
 import { BasicAsset, packAssetId } from './basic-asset';
-import { TON_ASSET } from './constants';
+import { TON_ASSET, TON_USDT_ASSET } from './constants';
 import { AssetAmount } from './asset-amount';
 import { TronAsset } from './tron-asset';
 import { seeIfValidTonAddress } from '../../../utils/common';
@@ -104,6 +104,7 @@ export function jettonToTonAsset(address: string, jettons: JettonsBalances): Ton
         address: Address.parseRaw(address),
         id: packAssetId(BLOCKCHAIN_NAME.TON, address),
         image: jetton.jetton.image,
+        noImageCorners: shouldHideTonJettonImageCorners(jetton.jetton.address),
         verification: jetton.jetton.verification
     };
 }
@@ -117,10 +118,25 @@ export function jettonToTonAssetAmount(jetton: JettonBalance): AssetAmount<TonAs
         address: Address.parseRaw(jetton.jetton.address),
         id: packAssetId(BLOCKCHAIN_NAME.TON, jetton.jetton.address),
         image: jetton.jetton.image,
+        noImageCorners: shouldHideTonJettonImageCorners(jetton.jetton.address),
         verification: jetton.jetton.verification
     };
 
     return new AssetAmount({ weiAmount: jetton.balance, asset, image: jetton.jetton.image });
+}
+
+export function shouldHideTonJettonImageCorners(address: string): boolean {
+    if (address === TON_ASSET.address) {
+        return false;
+    }
+
+    try {
+        return Address.parse(address).equals(
+            Address.parse(tonAssetAddressToString(TON_USDT_ASSET.address))
+        );
+    } catch {
+        return true;
+    }
 }
 
 export function legacyTonAssetId(

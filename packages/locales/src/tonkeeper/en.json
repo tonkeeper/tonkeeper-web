@@ -561,7 +561,7 @@
   },
   "import_add_wallet": "Add Wallet",
   "import_add_wallet_description": "Create a new wallet or add an existing one.",
-  "import_existing_wallet": "Import Existing Wallet",
+  "import_existing_wallet": "Import Wallet",
   "import_existing_wallet_description": "Import wallet with a 24 secret recovery words",
   "import_new_wallet": "New Wallet",
   "import_new_wallet_description": "Create new wallet",

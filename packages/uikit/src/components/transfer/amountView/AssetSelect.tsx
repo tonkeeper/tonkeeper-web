@@ -8,6 +8,8 @@ import { DropDown } from '../../DropDown';
 import { DoneIcon, DownIcon } from '../../Icon';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
 import { Body1, Label1 } from '../../Text';
+import { Image } from '../../shared/Image';
+import { shouldHideTonJettonImageCorners } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const AssetValue = styled.div`
     background: ${props => props.theme.buttonTertiaryBackground};
@@ -23,7 +25,7 @@ const DownIconWrapper = styled.span`
     align-items: center;
 `;
 
-const AssetImage = styled.img`
+const AssetImage = styled(Image)`
     border-radius: ${props => props.theme.cornerFull};
     width: 24px;
     height: 24px;
@@ -125,7 +127,10 @@ const AssetDropDown: FC<{
                     >
                         <ListItemPayload>
                             <AssetInfo>
-                                <AssetImage src={item.jetton.image}></AssetImage>
+                                <AssetImage
+                                    src={item.jetton.image}
+                                    noRadius={shouldHideTonJettonImageCorners(item.jetton.address)}
+                                ></AssetImage>
                                 <Label1>{item.jetton.symbol}</Label1>
                                 <Amount>{format(item.balance, item.jetton.decimals)}</Amount>
                             </AssetInfo>

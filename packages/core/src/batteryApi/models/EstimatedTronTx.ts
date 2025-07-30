@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { EstimatedTronTxInstantFee } from './EstimatedTronTxInstantFee';
+import {
+    EstimatedTronTxInstantFeeFromJSON,
+    EstimatedTronTxInstantFeeFromJSONTyped,
+    EstimatedTronTxInstantFeeToJSON,
+    EstimatedTronTxInstantFeeToJSONTyped,
+} from './EstimatedTronTxInstantFee';
+
 /**
  * 
  * @export
@@ -43,6 +51,12 @@ export interface EstimatedTronTx {
      * @memberof EstimatedTronTx
      */
     totalCharges: number;
+    /**
+     * 
+     * @type {EstimatedTronTxInstantFee}
+     * @memberof EstimatedTronTx
+     */
+    instantFee: EstimatedTronTxInstantFee;
 }
 
 /**
@@ -53,6 +67,7 @@ export function instanceOfEstimatedTronTx(value: object): value is EstimatedTron
     if (!('bandwidthCharges' in value) || value['bandwidthCharges'] === undefined) return false;
     if (!('activationCharges' in value) || value['activationCharges'] === undefined) return false;
     if (!('totalCharges' in value) || value['totalCharges'] === undefined) return false;
+    if (!('instantFee' in value) || value['instantFee'] === undefined) return false;
     return true;
 }
 
@@ -70,6 +85,7 @@ export function EstimatedTronTxFromJSONTyped(json: any, ignoreDiscriminator: boo
         'bandwidthCharges': json['bandwidth_charges'],
         'activationCharges': json['activation_charges'],
         'totalCharges': json['total_charges'],
+        'instantFee': EstimatedTronTxInstantFeeFromJSON(json['instant_fee']),
     };
 }
 
@@ -88,6 +104,7 @@ export function EstimatedTronTxFromJSONTyped(json: any, ignoreDiscriminator: boo
         'bandwidth_charges': value['bandwidthCharges'],
         'activation_charges': value['activationCharges'],
         'total_charges': value['totalCharges'],
+        'instant_fee': EstimatedTronTxInstantFeeToJSON(value['instantFee']),
     };
 }
 

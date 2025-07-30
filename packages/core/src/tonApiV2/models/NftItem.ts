@@ -110,9 +110,10 @@ export interface NftItem {
      */
     dns?: string;
     /**
-     * 
+     * Please use trust field
      * @type {Array<string>}
      * @memberof NftItem
+     * @deprecated
      */
     approvedBy: Array<NftItemApprovedByEnum>;
     /**
@@ -178,11 +179,11 @@ export function NftItemFromJSONTyped(json: any, ignoreDiscriminator: boolean): N
     };
 }
 
-export function NftItemToJSON(json: any): NftItem {
-    return NftItemToJSONTyped(json, false);
-}
+  export function NftItemToJSON(json: any): NftItem {
+      return NftItemToJSONTyped(json, false);
+  }
 
-export function NftItemToJSONTyped(value?: NftItem | null, ignoreDiscriminator: boolean = false): any {
+  export function NftItemToJSONTyped(value?: NftItem | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

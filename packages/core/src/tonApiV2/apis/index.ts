@@ -12,6 +12,7 @@ export * from './JettonsApi';
 export * from './LiteServerApi';
 export * from './MultisigApi';
 export * from './NFTApi';
+export * from './PurchasesApi';
 export * from './RatesApi';
 export * from './StakingApi';
 export * from './StorageApi';
