@@ -22,6 +22,7 @@ export type SubscriptionVerification = {
         currency: CryptoCurrency;
         purchase_date: number;
         expires_date: number;
+        promo_code?: string;
     };
     telegram?: {
         expires_date: number;
