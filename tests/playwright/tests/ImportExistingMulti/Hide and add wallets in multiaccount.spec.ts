@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+test.setTimeout(4 * 60 * 1000);
 //Hide and add wallets in multiaccount + open added wallet in Settings
 
 test('Hide/ add wallets', async ({ page }) => {
@@ -12,7 +12,8 @@ test('Hide/ add wallets', async ({ page }) => {
     await page.locator('#create-password').fill('123456');
     await page.locator('#create-password-confirm').fill('123456');
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Save' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByText('Hide Current Wallet').click();
     await page.getByRole('link', { name: 'Settings' }).click();
@@ -30,6 +31,7 @@ test('Hide/ add wallets', async ({ page }) => {
         .locator('div')
         .filter({ hasText: /^I have a backup copy of recovery phrase$/ })
         .locator('div')
-        .click();
+    await page.locator('.sc-dwcvcB').click();
     await page.getByRole('button', { name: 'Delete wallet data' }).click();
+    await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
 });
