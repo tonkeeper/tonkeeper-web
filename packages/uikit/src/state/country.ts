@@ -19,7 +19,9 @@ export const useUserCountry = () => {
 };
 
 export enum CountryFeature {
-    swap = 'swap'
+    swap = 'swap',
+    gasless = 'gasless',
+    battery = 'battery'
 }
 
 export enum RegulatoryState {
@@ -37,6 +39,8 @@ export const useIsFeatureAvailableForRegulatoryState = (feature: CountryFeature)
             case RegulatoryState.UK: {
                 switch (feature) {
                     case CountryFeature.swap:
+                    case CountryFeature.gasless:
+                    case CountryFeature.battery:
                         return false;
                     default:
                         assertUnreachable(feature);
