@@ -2,21 +2,16 @@ import { type FC } from 'react';
 import styled from 'styled-components';
 
 import { CloseIcon } from '../Icon';
-import { InnerBody } from '../Body';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent,
     DesktopViewPageLayout
 } from '../desktop/DesktopViewLayout';
-import { SubHeader } from '../SubHeader';
 import { AppRoute } from '../../libs/routes';
 import { ForTargetEnv } from '../shared/TargetEnv';
-import { HideOnReview } from '../ios/HideOnReview';
 import { ProStatusScreen } from '../pro/ProStatusScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
-import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
-import { ProSettingsContent as DeprecatedProSettingsContent } from './ProSettings';
 
 export const ProSettingsContent: FC = () => {
     const navigate = useNavigate();
@@ -53,23 +48,8 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
     }
 `;
 
-export const ProSubscriptionSettings: FC = () => {
-    const isProDisplay = useIsFullWidthMode();
-
-    if (isProDisplay) {
-        return (
-            <DesktopViewPageLayoutStyled>
-                <ProSettingsContent />
-            </DesktopViewPageLayoutStyled>
-        );
-    }
-
-    return (
-        <HideOnReview>
-            <SubHeader />
-            <InnerBody>
-                <DeprecatedProSettingsContent />
-            </InnerBody>
-        </HideOnReview>
-    );
-};
+export const ProSubscriptionSettings: FC = () => (
+    <DesktopViewPageLayoutStyled>
+        <ProSettingsContent />
+    </DesktopViewPageLayoutStyled>
+);

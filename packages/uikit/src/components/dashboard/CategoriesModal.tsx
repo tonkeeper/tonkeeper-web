@@ -14,11 +14,10 @@ import {
 import { Button } from '../fields/Button';
 import { Badge } from '../shared';
 import { useProState } from '../../state/pro';
-import { ProNotification } from '../pro/ProNotification';
-import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
 import { useTranslation } from '../../hooks/translation';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const HeaderStyled = styled.div`
     width: 100%;
@@ -99,8 +98,8 @@ const CategoriesModalContent: FC<{
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
     const { data } = useProState();
+    const { onOpen } = useProFeaturesNotification();
     const isProEnabled = isValidSubscription(data?.current);
-    const { isOpen, onClose, onOpen } = useDisclosure();
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
         const destination = droppedItem.destination;
@@ -177,7 +176,6 @@ const CategoriesModalContent: FC<{
                     )}
                 </Droppable>
             </DragDropContext>
-            <ProNotification isOpen={isOpen} onClose={onClose} />
         </>
     );
 };
