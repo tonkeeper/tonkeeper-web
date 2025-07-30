@@ -13,6 +13,7 @@ import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
     AuthTypes,
+    CryptoPendingSubscription,
     hasAuth,
     isPendingSubscription,
     isProSubscription,
@@ -172,12 +173,22 @@ const getPseudoTelegramSubscription = (
     };
 };
 
+const clearProAuthBreadCrumbs = async (storage: IStorage) => {
+    await storage.delete(AppKey.PRO_FREE_ACCESS_ACTIVE);
+    await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
+    await storage.delete(AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP);
+};
+
 const loadProState = async (params: IGetProStateParams): Promise<ProState> => {
     const { authService, sdk, promoExpirationDate } = params;
 
     const storage = sdk.storage;
-    const processingState: ProState | null = await storage.get(AppKey.PRO_PENDING_STATE);
-    const processingTargetSub = processingState?.target;
+    const targetSubscriptionBackup: ProState['target'] | null = await storage.get(
+        AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP
+    );
+    const pendingSubscription: CryptoPendingSubscription | null = await storage.get(
+        AppKey.PRO_PENDING_SUBSCRIPTION
+    );
 
     // TODO Remove it after August 13th
     const currentSubscription =
@@ -185,15 +196,16 @@ const loadProState = async (params: IGetProStateParams): Promise<ProState> => {
         getPseudoTelegramSubscription(promoExpirationDate);
 
     let targetSubscription;
-    if (hasAuth(processingTargetSub)) {
+    if (hasAuth(targetSubscriptionBackup)) {
         targetSubscription =
             (await getNormalizedSubscription(authService, storage, ProAuthTokenType.TEMP)) ??
-            processingTargetSub;
+            targetSubscriptionBackup;
     }
 
     if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
         await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
-        await storage.delete(AppKey.PRO_PENDING_STATE);
+
+        await clearProAuthBreadCrumbs(storage);
 
         return {
             current: targetSubscription,
@@ -202,7 +214,7 @@ const loadProState = async (params: IGetProStateParams): Promise<ProState> => {
     }
 
     if (isValidSubscription(currentSubscription)) {
-        await storage.delete(AppKey.PRO_PENDING_STATE);
+        await clearProAuthBreadCrumbs(storage);
 
         return {
             current: currentSubscription,
@@ -210,28 +222,24 @@ const loadProState = async (params: IGetProStateParams): Promise<ProState> => {
         };
     }
 
-    if (isPendingSubscription(processingTargetSub)) {
+    if (isPendingSubscription(pendingSubscription)) {
         return {
-            current: processingTargetSub,
-            target: processingTargetSub
+            current: pendingSubscription,
+            target: targetSubscriptionBackup
         };
     }
 
-    if (
-        isProSubscription(currentSubscription) &&
-        !isPendingSubscription(currentSubscription) &&
-        !isPendingSubscription(processingTargetSub)
-    ) {
+    if (isProSubscription(currentSubscription)) {
         return {
             current: currentSubscription,
             target: null
         };
     }
 
-    if (hasAuth(processingTargetSub)) {
+    if (hasAuth(targetSubscription)) {
         return {
             current: null,
-            target: processingTargetSub
+            target: targetSubscription
         };
     }
 
@@ -318,12 +326,14 @@ export const authViaSeedPhrase = async (
     await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
 };
 
-export const logoutTonConsole = async (authService: ProAuthTokenService) => {
+export const logoutTonConsole = async (storage: IStorage, authService: ProAuthTokenService) => {
     const result = await AuthService.logout();
+
     if (!result.ok) {
         throw new Error('Unable to logout');
     }
 
+    await storage.delete(AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP);
     await authService.setToken(ProAuthTokenType.MAIN, null);
     await authService.setToken(ProAuthTokenType.TEMP, null);
 };

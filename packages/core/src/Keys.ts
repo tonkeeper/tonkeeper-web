@@ -44,9 +44,10 @@ export enum AppKey {
     PRO_USED_TRIAL = 'pro_used_trial',
     PRO_AUTH_TOKEN = 'pro_auth_token',
     PRO_TEMP_AUTH_TOKEN = 'pro_temp_auth_token',
-    PRO_PENDING_STATE = 'pro_pending_state',
     PRO_FREE_ACCESS_ACTIVE = 'pro_free_access_active',
+    PRO_PENDING_SUBSCRIPTION = 'pro_pending_subscription',
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
+    PRO_TARGET_SUBSCRIPTION_BACKUP = 'pro_target_subscription_backup',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',

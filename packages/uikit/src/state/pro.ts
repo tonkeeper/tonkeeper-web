@@ -287,17 +287,12 @@ export const useSelectWalletForProMutation = () => {
             signTonConnectOver({ sdk, accountId: account.id, wallet, t })
         );
 
-        const state = await sdk.storage.get<ProState>(AppKey.PRO_PENDING_STATE);
-
-        await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-            current: state?.current ?? null,
-            target: {
-                auth: {
-                    type: AuthTypes.WALLET,
-                    wallet: {
-                        publicKey: wallet.publicKey,
-                        rawAddress: wallet.rawAddress
-                    }
+        await sdk.storage.set<ProState['target']>(AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP, {
+            auth: {
+                type: AuthTypes.WALLET,
+                wallet: {
+                    publicKey: wallet.publicKey,
+                    rawAddress: wallet.rawAddress
                 }
             }
         });
@@ -318,17 +313,12 @@ export const useAutoAuthMutation = () => {
 
         await authViaSeedPhrase(api, authService, authData);
 
-        const state = await sdk.storage.get<ProState>(AppKey.PRO_PENDING_STATE);
-
-        await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
-            current: state?.current ?? null,
-            target: {
-                auth: {
-                    type: AuthTypes.WALLET,
-                    wallet: {
-                        publicKey: authData.wallet.publicKey,
-                        rawAddress: authData.wallet.rawAddress
-                    }
+        await sdk.storage.set<ProState['target']>(AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP, {
+            auth: {
+                type: AuthTypes.WALLET,
+                wallet: {
+                    publicKey: authData.wallet.publicKey,
+                    rawAddress: authData.wallet.rawAddress
                 }
             }
         });
@@ -338,11 +328,13 @@ export const useAutoAuthMutation = () => {
 };
 
 export const useProLogout = () => {
+    const sdk = useAppSdk();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
 
     return useMutation(async () => {
-        await logoutTonConsole(authService);
+        await logoutTonConsole(sdk.storage, authService);
+
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
