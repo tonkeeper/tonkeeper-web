@@ -59,7 +59,7 @@ export const useProductSelection = () => {
         productsForRender,
         selectedPlanId,
         promoCode,
-        setPromoCode,
+        setPromoCode: (newPromo: string) => setPromoCode(newPromo.toLowerCase()),
         verifiedPromoCode,
         setSelectedPlanId,
         isLoading
