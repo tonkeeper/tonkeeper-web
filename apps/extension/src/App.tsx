@@ -39,10 +39,10 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useActiveAccountQuery, useAccountsStateQuery } from '@tonkeeper/uikit/dist/state/wallet';
-import { Container, GlobalStyle } from '@tonkeeper/uikit/dist/styles/globalStyle';
+import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
 import React, { FC, PropsWithChildren, Suspense, useCallback, useEffect, useMemo } from 'react';
 import { MemoryRouter, Route, Switch, useLocation } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import browser from 'webextension-polyfill';
 import { TonConnectSubscription } from './components/TonConnectSubscription';
 import { connectToBackground } from './event';
@@ -92,6 +92,7 @@ const PairKeystoneNotification = React.lazy(
 const ExtensionMobileAppBannerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
 );
+const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -105,6 +106,14 @@ const queryClient = new QueryClient({
 const sdk = new ExtensionAppSdk();
 const TARGET_ENV = 'extension';
 connectToBackground();
+
+const ExtensionGlobalStyle = createGlobalStyle`
+  ${GlobalStyleCss}
+  
+  body {
+      overflow-y: auto;
+  }
+`;
 
 export const App: FC = () => {
     const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
@@ -132,7 +141,7 @@ export const App: FC = () => {
                         <StorageContext.Provider value={sdk.storage}>
                             <TranslationContext.Provider value={translation}>
                                 <UserThemeProvider>
-                                    <GlobalStyle />
+                                    <ExtensionGlobalStyle />
                                     <HeaderGlobalStyle />
                                     <FooterGlobalStyle />
                                     <SybHeaderGlobalStyle />
@@ -295,6 +304,16 @@ export const Content: FC<{
     useTrackLocation();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
+
+    if (location.pathname === AppRoute.connectLedger) {
+        return (
+            <PageWrapper>
+                <Suspense fallback={<Loading />}>
+                    <ConnectLedgerPage />
+                </Suspense>
+            </PageWrapper>
+        );
+    }
 
     if (lock) {
         return (

@@ -1,8 +1,13 @@
 import browser from 'webextension-polyfill';
 import { checkForError } from '../utils';
 import { delay } from '@tonkeeper/core/dist/utils/common';
-
-type Opener = 'icon-click' | `programmatically-${number}`;
+import { ExtensionStorage } from '../storage';
+import {
+    getOpenedPopup,
+    OpenedPopup,
+    PopupOpener,
+    setOpenedPopup
+} from '@tonkeeper/core/dist/service/extensionPopupStorage';
 
 export class PopupManager {
     static createOpenerId() {
@@ -13,41 +18,41 @@ export class PopupManager {
 
     private static NOTIFICATION_WIDTH = 430;
 
-    private openedPopup:
-        | {
-              id: number;
-              opener: Opener;
-          }
-        | undefined;
+    private storage = new ExtensionStorage();
 
-    get openedPopupIdAssertNotNullish(): number {
-        if (this.openedPopup === undefined) {
-            throw new Error('Popup is not opened');
-        }
+    setOpenedPopup(popup: OpenedPopup | null) {
+        return setOpenedPopup(this.storage, popup);
+    }
 
-        return this.openedPopup.id;
+    async getOpenedPopup(): Promise<OpenedPopup | undefined> {
+        return getOpenedPopup(this.storage);
     }
 
     constructor() {
-        browser.windows.onRemoved.addListener(() => {
-            this.openedPopup = undefined;
+        browser.windows.onRemoved.addListener(async windowId => {
+            const openedPopup = await this.getOpenedPopup();
+            if (openedPopup?.id === windowId) {
+                await this.setOpenedPopup(null);
+            }
         });
         this.syncPopup();
     }
 
     public async openPopup(source: 'icon-click' | 'programmatically' = 'programmatically') {
-        const opener: Opener =
+        await this.syncPopup();
+        const opener: PopupOpener =
             source === 'icon-click'
                 ? 'icon-click'
                 : `programmatically-${PopupManager.createOpenerId()}`;
-        await this.syncPopup();
 
-        if (this.openedPopup === undefined) {
+        const openedPopup = await this.getOpenedPopup();
+
+        if (openedPopup === undefined) {
             const id = (await this.createPopup()).id!;
-            this.openedPopup = { id, opener };
+            await this.setOpenedPopup({ id, opener });
         } else {
-            if (this.openedPopup.opener !== 'icon-click') {
-                this.openedPopup = { ...this.openedPopup, opener };
+            if (openedPopup.opener !== 'icon-click') {
+                await this.setOpenedPopup({ ...openedPopup, opener });
             }
             await this.focusPopup();
         }
@@ -56,101 +61,70 @@ export class PopupManager {
         return () => this.closePopupOpenedByOpener(opener);
     }
 
-    public async closePopupOpenedByOpener(opener: Opener) {
-        if (this.openedPopup?.opener === opener) {
+    public async closePopupOpenedByOpener(opener: PopupOpener) {
+        const openedPopup = await this.getOpenedPopup();
+        if (openedPopup?.opener === opener) {
             return this.closePopup();
         }
     }
 
     private async closePopup() {
-        if (this.openedPopup === undefined) {
+        const openedPopup = await this.getOpenedPopup();
+        if (openedPopup === undefined) {
             return;
         }
 
-        await browser.windows.remove(this.openedPopup.id);
-        this.openedPopup = undefined;
+        await browser.windows.remove(openedPopup.id);
+        await this.setOpenedPopup(null);
     }
 
-    private createPopup() {
-        return new Promise<browser.Windows.Window>(async (resolve, reject) => {
-            const windowInfo = await browser.windows.getLastFocused();
-            const left =
-                windowInfo.left! + windowInfo.width! - PopupManager.NOTIFICATION_WIDTH - 10;
-            const top = windowInfo.top! + 40;
+    private async createPopup() {
+        const windowInfo = await browser.windows.getLastFocused();
+        const left = windowInfo.left! + windowInfo.width! - PopupManager.NOTIFICATION_WIDTH - 10;
+        const top = windowInfo.top! + 40;
 
-            const newWindow = await browser.windows.create({
-                url: 'index.html',
-                type: 'popup',
-                width: PopupManager.NOTIFICATION_WIDTH,
-                height: PopupManager.NOTIFICATION_HEIGHT,
-                left,
-                top
-            });
-            this.rejectIfError(reject);
-            resolve(newWindow);
+        const newWindow = await browser.windows.create({
+            url: 'index.html',
+            type: 'popup',
+            width: PopupManager.NOTIFICATION_WIDTH,
+            height: PopupManager.NOTIFICATION_HEIGHT,
+            left,
+            top
         });
-    }
-
-    private async syncPopup() {
-        const popupWindows = await this.getPopupWindows();
-
-        const currentPopupId = this.openedPopup?.id;
-
-        const stillOpen = popupWindows.find(w => w.id === currentPopupId);
-        if (this.openedPopup && !stillOpen) {
-            this.openedPopup = undefined;
-        }
-
-        if (this.openedPopup === undefined) {
-            if (popupWindows.length > 0) {
-                // Take last popup and save to state as opened
-                const lastPopup = popupWindows[popupWindows.length - 1];
-                if (lastPopup.id !== undefined) {
-                    this.openedPopup = {
-                        id: lastPopup.id,
-                        opener: 'icon-click'
-                    };
-                }
-
-                await this.closeAllPopupsExceptId(popupWindows, lastPopup.id);
-            }
-        } else {
-            await this.closeAllPopupsExceptId(popupWindows, currentPopupId);
-        }
-    }
-
-    private async getPopupWindows() {
-        const allWindows = await browser.windows.getAll();
-        return allWindows.filter(w => w.type === 'popup');
-    }
-
-    private async closeAllPopupsExceptId(
-        popupWindows: browser.Windows.Window[],
-        currentPopupId: number | undefined
-    ) {
-        const toClose = popupWindows.filter(w => w.id !== currentPopupId);
-        await Promise.all(toClose.map(w => w.id && browser.windows.remove(w.id).catch(() => {})));
+        this.rejectIfError();
+        return newWindow;
     }
 
     private async ensurePopupReady() {
         await delay(200);
     }
 
-    private focusPopup() {
-        return new Promise((resolve, reject) => {
-            browser.windows
-                .update(this.openedPopupIdAssertNotNullish, { focused: true })
-                .then(() => {
-                    this.rejectIfError(reject);
-                    resolve(undefined);
-                });
-        });
+    private async focusPopup() {
+        const openedPopup = await this.getOpenedPopup();
+        if (!openedPopup) {
+            throw new Error('Popup is not opened');
+        }
+
+        await browser.windows.update(openedPopup.id, { focused: true });
+        this.rejectIfError();
     }
 
-    private rejectIfError(rejectHandle: (e: Error) => void) {
+    private async syncPopup() {
+        const popupId = (await this.getOpenedPopup())?.id;
+
+        if (popupId !== undefined) {
+            try {
+                await browser.windows.get(popupId);
+            } catch (e) {
+                await this.setOpenedPopup(null);
+            }
+        }
+    }
+
+    private rejectIfError() {
         const error = checkForError();
         if (error) {
-            rejectHandle(error);
+            throw error;
         }
     }
 }

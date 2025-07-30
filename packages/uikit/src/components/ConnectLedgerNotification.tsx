@@ -8,7 +8,7 @@ import {
     LedgerTonProofResponse,
     LedgerTransaction
 } from '@tonkeeper/core/dist/service/ledger/connector';
-import { useConnectLedgerMutation } from '../state/ledger';
+import { useConnectLedgerMutation, useEffectOnLedgerConnectionPageClosed } from '../state/ledger';
 import styled from 'styled-components';
 import { Cell } from '@ton/core';
 import { LedgerConnectionSteps } from './ledger/LedgerConnectionSteps';
@@ -55,13 +55,14 @@ export const LedgerContent: FC<{
         mutateAsync: connectLedger,
         data: tonTransport,
         isLoading: isLedgerConnecting,
+        isError: isLedgerConnectingError,
         isDeviceConnected,
         reset: resetConnection
     } = useConnectLedgerMutation();
 
-    const connect = async () => {
+    const connect = async (connectOptions?: Parameters<typeof connectLedger>[0]) => {
         try {
-            const transport = await connectLedger();
+            const transport = await connectLedger(connectOptions);
             try {
                 if ('tonProof' in ledgerParams) {
                     const val = await transport.getAddressProof(
@@ -104,6 +105,20 @@ export const LedgerContent: FC<{
         connect();
     }, []);
 
+    const onConnectionPageClosed = useCallback(() => {
+        resetConnection();
+        connect({ skipOpenConnectionPage: true });
+    }, []);
+
+    useEffectOnLedgerConnectionPageClosed(onConnectionPageClosed);
+
+    const sdk = useAppSdk();
+    useEffect(() => {
+        return () => {
+            sdk.ledgerConnectionPage?.close();
+        };
+    }, []);
+
     const onRetry = () => {
         resetConnection();
         connect();
@@ -133,7 +148,11 @@ export const LedgerContent: FC<{
 
     return (
         <ConnectLedgerWrapper>
-            <LedgerConnectionStepsStyled {...connectionStepsProps} currentStep={currentStep} />
+            <LedgerConnectionStepsStyled
+                {...connectionStepsProps}
+                currentStep={currentStep}
+                isErrored={isLedgerConnectingError}
+            />
             <NotificationFooterPortal>
                 <NotificationFooter>
                     <ButtonsBlock>

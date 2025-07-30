@@ -185,6 +185,12 @@ export interface IAppSdk {
 
     linksInterceptorAvailable?: boolean;
 
+    ledgerConnectionPage?: {
+        isOpened: ReadonlyAtom<boolean>;
+        open(): Promise<void>;
+        close(): Promise<void>;
+    };
+
     subscriptionStrategy?: SubscriptionStrategy;
 }
 

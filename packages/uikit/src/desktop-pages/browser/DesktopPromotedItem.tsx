@@ -50,14 +50,15 @@ export const DesktopPromotedItemText = styled.div<{ color?: string }>`
       white-space: nowrap;
 `;
 
-export const DesktopCategoryGroupItem: FC<{ item: PromotedApp; className?: string }> = ({
-    item,
-    className
-}) => {
+export const DesktopCategoryGroupItem: FC<{
+    item: PromotedApp;
+    className?: string;
+    onClickApp?: () => void;
+}> = ({ item, className, onClickApp }) => {
     const openAppCallback = useOpenPromotedAppInExternalBrowser(item.url, 'recommendation');
 
     return (
-        <DesktopPromotedItem onClick={openAppCallback} className={className}>
+        <DesktopPromotedItem onClick={onClickApp ?? openAppCallback} className={className}>
             <DesktopPromotedItemImage src={item.icon} />
             <DesktopPromotedItemText>
                 <Label2>{item.name}</Label2>
