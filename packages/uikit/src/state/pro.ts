@@ -307,6 +307,7 @@ export const useSelectWalletForProMutation = () => {
 };
 
 export const useAutoAuthMutation = () => {
+    const sdk = useAppSdk();
     const api = useActiveApi();
     const { data: proState } = useProState();
     const client = useQueryClient();
@@ -316,6 +317,21 @@ export const useAutoAuthMutation = () => {
         if (isPaidSubscription(proState?.current)) return;
 
         await authViaSeedPhrase(api, authService, authData);
+
+        const state = await sdk.storage.get<ProState>(AppKey.PRO_PENDING_STATE);
+
+        await sdk.storage.set<ProState>(AppKey.PRO_PENDING_STATE, {
+            current: state?.current ?? null,
+            target: {
+                auth: {
+                    type: AuthTypes.WALLET,
+                    wallet: {
+                        publicKey: authData.wallet.publicKey,
+                        rawAddress: authData.wallet.rawAddress
+                    }
+                }
+            }
+        });
 
         await client.invalidateQueries([QueryKey.pro]);
     });

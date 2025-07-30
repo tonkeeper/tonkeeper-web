@@ -1,4 +1,4 @@
-import React, { FC, useContext, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportMnemonicType, ImportWords, SelectMnemonicType } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -256,7 +256,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     const { mutateAsync: renameDerivations, isLoading: renameDerivationsLoading } =
         useMutateRenameAccountDerivations();
 
-    const { mutate: tryAutoAuth } = useAutoAuthMutation();
+    const { mutateAsync: tryAutoAuth } = useAutoAuthMutation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
     const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
@@ -416,6 +416,16 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     }, [isMnemonicFormDirty, openConfirmDiscard, createdAccount, existingAccountAndWallet]);
     useSetNotificationOnCloseInterceptor(onCloseInterceptor);
 
+    useEffect(() => {
+        if (createdAccount && mnemonic && selectedMnemonicType && selectNetworksPassed) {
+            void tryAutoAuth({
+                mnemonic,
+                wallet: createdAccount.activeTonWallet,
+                mnemonicType: selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+            });
+        }
+    }, [createdAccount, mnemonic, selectedMnemonicType, editNamePagePassed, selectNetworksPassed]);
+
     if (!mnemonic) {
         return (
             <ImportWords
@@ -488,15 +498,6 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         return <SelectWalletNetworks onContinue={() => setSelectNetworksPassed(true)} />;
     }
 
-    const handleDoneState = () => {
-        tryAutoAuth({
-            mnemonic,
-            wallet: createdAccount.activeTonWallet,
-            mnemonicType: selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
-        });
-        setNotificationsSubscribePagePassed(true);
-    };
-
     if (
         sdk.notifications &&
         !notificationsSubscribePagePassed &&
@@ -507,7 +508,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 mnemonicType={selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'}
                 wallet={createdAccount.activeTonWallet}
                 mnemonic={mnemonic}
-                onDone={handleDoneState}
+                onDone={() => setNotificationsSubscribePagePassed(true)}
             />
         );
     }

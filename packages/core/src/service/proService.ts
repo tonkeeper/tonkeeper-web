@@ -1,4 +1,6 @@
+import nacl from 'tweetnacl';
 import { Address } from '@ton/core';
+import { sha256_sync } from '@ton/crypto';
 import BigNumber from 'bignumber.js';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
@@ -49,9 +51,8 @@ import {
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
-import { mnemonicToKeypair } from './mnemonicService';
-import { sign } from '@ton/crypto';
 import { IAuthViaSeedPhraseData } from '../entries/password';
+import { mnemonicToKeypair } from './mnemonicService';
 
 interface IGetProStateParams {
     authService: ProAuthTokenService;
@@ -291,7 +292,9 @@ export const authViaSeedPhrase = async (
 
     const keyPair = await mnemonicToKeypair(mnemonic, mnemonicType);
 
-    const signature = sign(proofPayload.bufferToSign, keyPair.secretKey);
+    const signer = async (bufferToSign: Buffer) =>
+        nacl.sign.detached(Buffer.from(sha256_sync(bufferToSign)), keyPair.secretKey);
+    const signature = await signer(proofPayload.bufferToSign);
 
     const stateInit = walletStateInitFromState(wallet);
 
