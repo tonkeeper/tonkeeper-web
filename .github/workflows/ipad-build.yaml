@@ -1,6 +1,11 @@
 name: Tonkeeper iPad Build
 on:
     workflow_call:
+        inputs:
+            tonconsole_env:
+                required: false
+                type: string
+                default: prod
         secrets:
             APP_STORE_CONNECT_TEAM_ID:
                 required: true
@@ -88,7 +93,7 @@ jobs:
                   VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
                   VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
                   VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
-                  VITE_APP_TONCONSOLE_HOST: https://pro.tonconsole.com
+                  VITE_APP_TONCONSOLE_HOST: ${{ inputs.tonconsole_env == 'dev' && 'https://dev-pro.tonconsole.com' || 'https://pro.tonconsole.com' }}
                   VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
                   VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
               with:
