@@ -48,8 +48,8 @@ const PageWrapper = styled(DesktopViewPageLayout)`
 `;
 
 const DashboardPage: FC = () => {
-    const { data } = useProState();
-    const shouldShowProBanner = data && !isPaidSubscription(data.current);
+    const { data: subscription } = useProState();
+    const shouldShowProBanner = !isPaidSubscription(subscription);
 
     const env = useAppTargetEnv();
     if (env === 'mobile') {

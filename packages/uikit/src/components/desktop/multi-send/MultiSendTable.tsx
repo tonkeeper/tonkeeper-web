@@ -417,7 +417,7 @@ const MultiSendFooter: FC<{
     // eslint-disable-next-line complexity
 }> = ({ asset, rowsValue, list, onBack }) => {
     const { t } = useTranslation();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
     const {
         isOpen: isProModalOpened,
         onClose: onProModalClose,
@@ -579,13 +579,12 @@ const MultiSendFooter: FC<{
                         )}
                     </MultiSendFooterTextWrapper>
                 )}
-                {/* TODO Check this logic again */}
-                {!proState || isValidSubscription(proState.current) ? (
+                {isValidSubscription(subscription) ? (
                     <Button
                         type="submit"
                         primary
                         disabled={remainingBalanceBN?.lt(0) || !!maxMsgsNumberExceeded || isLedger}
-                        loading={formValidationState === 'validating' || !proState}
+                        loading={formValidationState === 'validating' || !subscription}
                     >
                         {t('continue')}
                     </Button>

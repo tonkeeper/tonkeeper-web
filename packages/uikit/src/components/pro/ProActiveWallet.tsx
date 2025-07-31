@@ -2,12 +2,13 @@ import { type FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
-import { useProState } from '../../state/pro';
+import { selectedTargetAuth, useProState } from '../../state/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock } from '../List';
 import { useControllableAccountAndWalletByWalletId } from '../../state/wallet';
 import { AuthTypes, isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useAtom } from '../../libs/useAtom';
 
 interface IProps {
     title?: ReactNode;
@@ -19,20 +20,19 @@ interface IProps {
 export const ProActiveWallet: FC<IProps> = props => {
     const { onDisconnect, isLoading, title, isCurrentSubscription } = props;
     const { t } = useTranslation();
-    const { data } = useProState();
+    const { data: subscription } = useProState();
+    const [targetAuth] = useAtom(selectedTargetAuth);
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (() => {
-            // TODO Refactor it somehow
-            const targetAuth = data?.target?.auth;
-            const currentAuth = data?.current?.auth;
+            const currentAuth = subscription?.auth;
 
             if (targetAuth?.type === AuthTypes.WALLET && !isCurrentSubscription) {
                 return targetAuth.wallet.rawAddress;
             }
 
-            if (!data?.current) return undefined;
+            if (!subscription) return undefined;
 
-            if (currentAuth?.type === AuthTypes.WALLET && !isTelegramSubscription(data?.current)) {
+            if (currentAuth?.type === AuthTypes.WALLET) {
                 return currentAuth.wallet.rawAddress;
             }
 
@@ -40,7 +40,7 @@ export const ProActiveWallet: FC<IProps> = props => {
         })()
     );
 
-    if (data?.current && isTelegramSubscription(data.current)) {
+    if (subscription && isTelegramSubscription(subscription)) {
         return null;
     }
 

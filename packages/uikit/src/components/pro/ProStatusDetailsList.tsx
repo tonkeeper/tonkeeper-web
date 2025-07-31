@@ -16,10 +16,8 @@ import { useProStatusDetailsDisplayData } from '../../hooks/pro/useProStatusDeta
 
 export const ProStatusDetailsList = () => {
     const { t } = useTranslation();
-    const { data, isLoading } = useProState();
-    const { price, expirationDate } = useProStatusDetailsDisplayData(data?.current);
-
-    const subscription = data?.current;
+    const { data: subscription, isLoading } = useProState();
+    const { price, expirationDate } = useProStatusDetailsDisplayData(subscription);
 
     const isExpired = isExpiredSubscription(subscription);
     const isCanceled = isIosCanceledSubscription(subscription);

@@ -8,17 +8,17 @@ import { useActiveWallet } from '../../state/wallet';
 export const useDeleteActiveWalletWarning = () => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
     const activeWallet = useActiveWallet();
 
     return async () => {
         let isApprovedDeleting = true;
 
-        if (!proState?.current || !isPaidSubscription(proState.current)) {
+        if (!isPaidSubscription(subscription)) {
             return isApprovedDeleting;
         }
 
-        if (activeWallet?.rawAddress !== proState?.current?.auth?.wallet?.rawAddress) {
+        if (activeWallet?.rawAddress !== subscription?.auth?.wallet?.rawAddress) {
             return isApprovedDeleting;
         }
 

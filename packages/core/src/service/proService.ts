@@ -14,11 +14,9 @@ import { Language, localizationText } from '../entries/language';
 import {
     AuthTypes,
     CryptoPendingSubscription,
-    hasAuth,
     isPendingSubscription,
     isProSubscription,
     isValidSubscription,
-    ProState,
     ProStateWallet,
     ProSubscription,
     TelegramSubscription,
@@ -27,7 +25,6 @@ import {
 import { RecipientData, TonRecipientData } from '../entries/send';
 import { TonWalletStandard, WalletVersion } from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
-import { delay } from '../utils/common';
 import { Flatten } from '../utils/types';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
@@ -35,20 +32,19 @@ import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 import {
     AuthService,
-    TiersService,
-    UsersService,
-    IapService,
-    InvoicesService,
-    DashboardsService,
-    DashboardColumnType,
-    DashboardCellString,
+    Currencies as CurrenciesGenerated,
     DashboardCellAddress,
     DashboardCellNumericCrypto,
     DashboardCellNumericFiat,
+    DashboardCellString,
+    DashboardColumnType,
+    DashboardsService,
+    IapService,
     Invoice,
-    Currencies as CurrenciesGenerated,
-    InvoiceStatus,
-    SubscriptionSource
+    InvoicesService,
+    SubscriptionSource,
+    TiersService,
+    UsersService
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
@@ -70,15 +66,12 @@ export const getBackupState = async (storage: IStorage) => {
     return backup ?? null;
 };
 
-export const getProState = async (params: IGetProStateParams): Promise<ProState> => {
+export const getProState = async (params: IGetProStateParams): Promise<ProSubscription> => {
     try {
         return await loadProState(params);
     } catch (e) {
         console.error(e);
-        return {
-            current: null,
-            target: null
-        };
+        return null;
     }
 };
 
@@ -109,39 +102,15 @@ export interface ProAuthTokenService {
     setToken(type: ProAuthTokenType, token: string | null): Promise<void>;
     getToken(type: ProAuthTokenType): Promise<string | null>;
     promoteToken(from: ProAuthTokenType, to: ProAuthTokenType): Promise<void>;
+    withTokenContext<T>(type: ProAuthTokenType, fn: () => Promise<T>): Promise<T>;
 }
-
-export const withTargetAuthToken = async <T>(
-    authService: ProAuthTokenService,
-    fn: () => Promise<T>
-): Promise<T> => {
-    const targetToken = await authService.getToken(ProAuthTokenType.TEMP);
-
-    if (!targetToken) return fn();
-
-    const mainToken = await authService.getToken(ProAuthTokenType.MAIN);
-
-    await authService.setToken(ProAuthTokenType.MAIN, targetToken);
-
-    try {
-        return await fn();
-    } finally {
-        const currentMain = await authService.getToken(ProAuthTokenType.MAIN);
-
-        if (mainToken && currentMain !== targetToken) {
-            await authService.setToken(ProAuthTokenType.MAIN, mainToken);
-        }
-    }
-};
 
 const getNormalizedSubscription = async (
     authService: ProAuthTokenService,
     storage: IStorage,
     appliedToken: ProAuthTokenType
 ) => {
-    try {
-        await authService.attachToken(appliedToken);
-
+    const request = async () => {
         const user = await UsersService.getUserInfo();
         const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
         const currentSubscriptionDTO = await UsersService.verifySubscription();
@@ -150,11 +119,18 @@ const getNormalizedSubscription = async (
             user,
             authorizedWallet
         });
+    };
+
+    try {
+        return await authService.withTokenContext(appliedToken, request);
     } catch {
         return null;
     }
 };
 
+/**
+ * @deprecated
+ */
 const getPseudoTelegramSubscription = (
     promoExpirationDate: Date | null
 ): TelegramSubscription | null => {
@@ -176,77 +152,53 @@ const getPseudoTelegramSubscription = (
 const clearProAuthBreadCrumbs = async (storage: IStorage) => {
     await storage.delete(AppKey.PRO_FREE_ACCESS_ACTIVE);
     await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
-    await storage.delete(AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP);
 };
 
-const loadProState = async (params: IGetProStateParams): Promise<ProState> => {
+const loadProState = async (params: IGetProStateParams): Promise<ProSubscription> => {
     const { authService, sdk, promoExpirationDate } = params;
 
     const storage = sdk.storage;
-    const targetSubscriptionBackup: ProState['target'] | null = await storage.get(
-        AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP
-    );
+
     const pendingSubscription: CryptoPendingSubscription | null = await storage.get(
         AppKey.PRO_PENDING_SUBSCRIPTION
     );
 
-    // TODO Remove it after August 13th
     const currentSubscription =
         (await getNormalizedSubscription(authService, storage, ProAuthTokenType.MAIN)) ??
         getPseudoTelegramSubscription(promoExpirationDate);
 
-    let targetSubscription;
-    if (hasAuth(targetSubscriptionBackup)) {
-        targetSubscription =
-            (await getNormalizedSubscription(authService, storage, ProAuthTokenType.TEMP)) ??
-            targetSubscriptionBackup;
-    }
+    const targetSubscription = await getNormalizedSubscription(
+        authService,
+        storage,
+        ProAuthTokenType.TEMP
+    );
 
     if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
         await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
 
         await clearProAuthBreadCrumbs(storage);
 
+        return targetSubscription;
+    }
+
+    if (isPendingSubscription(pendingSubscription)) {
         return {
-            current: targetSubscription,
-            target: null
+            ...pendingSubscription,
+            valid: Boolean(currentSubscription?.valid)
         };
     }
 
     if (isValidSubscription(currentSubscription)) {
         await clearProAuthBreadCrumbs(storage);
 
-        return {
-            current: currentSubscription,
-            target: targetSubscription ?? null
-        };
-    }
-
-    if (isPendingSubscription(pendingSubscription)) {
-        return {
-            current: pendingSubscription,
-            target: targetSubscriptionBackup
-        };
+        return currentSubscription;
     }
 
     if (isProSubscription(currentSubscription)) {
-        return {
-            current: currentSubscription,
-            target: null
-        };
+        return currentSubscription;
     }
 
-    if (hasAuth(targetSubscription)) {
-        return {
-            current: null,
-            target: targetSubscription
-        };
-    }
-
-    return {
-        current: null,
-        target: null
-    };
+    return null;
 };
 
 export const authViaTonConnect = async (
@@ -326,16 +278,27 @@ export const authViaSeedPhrase = async (
     await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
 };
 
-export const logoutTonConsole = async (storage: IStorage, authService: ProAuthTokenService) => {
-    const result = await AuthService.logout();
+export const logoutTonConsole = async (authService: ProAuthTokenService) => {
+    const errors: unknown[] = [];
 
-    if (!result.ok) {
-        throw new Error('Unable to logout');
+    const logoutWithToken = async (type: ProAuthTokenType) => {
+        try {
+            await authService.withTokenContext(type, () => AuthService.logout());
+        } catch (e) {
+            errors.push(e);
+        } finally {
+            await authService.setToken(type, null);
+        }
+    };
+
+    await Promise.all([
+        logoutWithToken(ProAuthTokenType.TEMP),
+        logoutWithToken(ProAuthTokenType.MAIN)
+    ]);
+
+    if (errors.length === 2) {
+        throw new Error('Logout failed!');
     }
-
-    await storage.delete(AppKey.PRO_TARGET_SUBSCRIPTION_BACKUP);
-    await authService.setToken(ProAuthTokenType.MAIN, null);
-    await authService.setToken(ProAuthTokenType.TEMP, null);
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {

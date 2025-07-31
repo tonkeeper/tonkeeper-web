@@ -13,8 +13,7 @@ enum ProEndingNotificationState {
 export const useSubscriptionEndingVerification = () => {
     const sdk = useAppSdk();
     const { onOpen } = useProEndingNotification();
-    const { data: proState } = useProState();
-    const subscription = proState?.current;
+    const { data: subscription } = useProState();
 
     useEffect(() => {
         if (!isProSubscription(subscription)) return;

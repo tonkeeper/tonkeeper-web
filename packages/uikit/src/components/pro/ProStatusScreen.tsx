@@ -34,7 +34,7 @@ export const ProStatusScreen = () => {
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
-    const { data: proState, isLoading: isProStateLoading } = useProState();
+    const { data: subscription, isLoading: isProStateLoading } = useProState();
 
     const {
         mutateAsync: mutateProLogout,
@@ -50,7 +50,6 @@ export const ProStatusScreen = () => {
     } = useManageSubscription();
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
-    const subscription = proState?.current;
     const isIosEnvironment = isIosStrategy(sdk.subscriptionStrategy);
 
     const isTelegram = isTelegramSubscription(subscription);

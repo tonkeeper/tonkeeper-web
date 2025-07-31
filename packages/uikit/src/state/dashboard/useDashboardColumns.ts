@@ -22,7 +22,7 @@ export const ClientColumns: (Omit<DashboardColumn, 'name'> & { i18Key: string })
 export function useDashboardColumnsForm() {
     const client = useQueryClient();
     const { storage } = useAppSdk();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
 
     const { data: columns } = useDashboardColumns();
 
@@ -45,7 +45,7 @@ export function useDashboardColumnsForm() {
                         return {
                             id: storedColumn.id,
                             isEnabled:
-                                columnInfo.onlyPro && !isValidSubscription(proState?.current)
+                                columnInfo.onlyPro && !isValidSubscription(subscription)
                                     ? false
                                     : storedColumn.isEnabled ?? columnInfo.defaultIsChecked
                         };
@@ -57,7 +57,7 @@ export function useDashboardColumnsForm() {
                     .map(c => ({
                         id: c.id,
                         isEnabled:
-                            c.onlyPro && !isValidSubscription(proState?.current)
+                            c.onlyPro && !isValidSubscription(subscription)
                                 ? false
                                 : c.defaultIsChecked
                     }));
@@ -66,13 +66,11 @@ export function useDashboardColumnsForm() {
             return columns.map(c => ({
                 id: c.id,
                 isEnabled:
-                    c.onlyPro && !isValidSubscription(proState?.current)
-                        ? false
-                        : c.defaultIsChecked
+                    c.onlyPro && !isValidSubscription(subscription) ? false : c.defaultIsChecked
             }));
         },
         {
-            enabled: !!columns && !!proState
+            enabled: !!columns && !!subscription
         }
     );
 

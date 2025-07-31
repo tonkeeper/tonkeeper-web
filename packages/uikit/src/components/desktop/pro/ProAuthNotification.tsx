@@ -47,11 +47,11 @@ type ProAuthNotificationContentProps = Pick<IProAuthNotificationProps, 'onClose'
 export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = ({ onClose }) => {
     const formId = useId();
     const { t } = useTranslation();
-    const { data: proState } = useProState();
-    const { onOpen: onPurchaseOpen } = useProPurchaseNotification();
+    const { data: subscription } = useProState();
     const navigate = useNavigate();
-    const activeWallet = useActiveWallet();
     const accountsWallets = useAccountWallets();
+    const { onOpen: onPurchaseOpen } = useProPurchaseNotification();
+    const activeWallet = useActiveWallet();
     const [selectedAccountId, setSelectedAccountId] = useState(activeWallet?.rawAddress ?? '');
 
     const toast = useToast();
@@ -63,22 +63,22 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
         if (!isSuccess) return;
 
         const isSameAuth =
-            hasWalletAuth(proState?.current) &&
-            selectedAccountId === proState?.current?.auth?.wallet?.rawAddress;
+            hasWalletAuth(subscription) &&
+            selectedAccountId === subscription?.auth?.wallet?.rawAddress;
 
         onClose();
 
         if (
-            proState &&
+            subscription &&
             isSameAuth &&
-            !isTelegramSubscription(proState.current) &&
-            isValidSubscription(proState.current)
+            !isTelegramSubscription(subscription) &&
+            isValidSubscription(subscription)
         ) {
             navigate(AppRoute.settings + SettingsRoute.pro);
         } else {
             onPurchaseOpen();
         }
-    }, [isSuccess, proState?.current, selectedAccountId, activeWallet]);
+    }, [isSuccess, subscription, selectedAccountId, activeWallet]);
 
     const handleNextScreen = async () => {
         if (!selectedAccountId) {

@@ -142,7 +142,7 @@ export const MAMIndexesPageContent: FC<{
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
     const config = useActiveConfig();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
     const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
@@ -226,7 +226,7 @@ export const MAMIndexesPageContent: FC<{
 
     const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
     const showByProButton =
-        !isValidSubscription(proState?.current) &&
+        !isValidSubscription(subscription) &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (

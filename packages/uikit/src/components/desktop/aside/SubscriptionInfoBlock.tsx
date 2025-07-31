@@ -5,7 +5,7 @@ import {
     isPendingSubscription,
     isTelegramActiveSubscription,
     isValidSubscription,
-    ProState
+    ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 
 import { useTranslation } from '../../../hooks/translation';
@@ -34,11 +34,9 @@ const Body3Block = styled(Body3)`
     display: block;
 `;
 
-export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
+export const SubscriptionStatus: FC<{ subscription: ProSubscription }> = ({ subscription }) => {
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
-
-    const { current: subscription } = data;
 
     if (isTelegramActiveSubscription(subscription) && subscription.nextChargeDate) {
         return (
@@ -142,7 +140,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data, isLoading: isProStateLoading } = useProState();
+    const { data: subscription, isLoading: isProStateLoading } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
@@ -185,13 +183,13 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         </Button>
     );
 
-    if (data && isValidSubscription(data.current)) {
+    if (subscription && isValidSubscription(subscription)) {
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"
                 payload={() => (
                     <DDContent width={width}>
-                        <SubscriptionStatus data={data} />
+                        <SubscriptionStatus subscription={subscription} />
                     </DDContent>
                 )}
                 trigger="hover"
@@ -203,7 +201,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         );
     }
 
-    if (isPendingSubscription(data?.current)) {
+    if (isPendingSubscription(subscription)) {
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"

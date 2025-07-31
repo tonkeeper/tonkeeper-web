@@ -97,9 +97,9 @@ const CategoriesModalContent: FC<{
         data: DashboardColumnsForm | ((data: DashboardColumnsForm) => DashboardColumnsForm)
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
-    const { data } = useProState();
+    const { data: subscription } = useProState();
     const { onOpen } = useProFeaturesNotification();
-    const isProEnabled = isValidSubscription(data?.current);
+    const isProEnabled = isValidSubscription(subscription);
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
         const destination = droppedItem.destination;

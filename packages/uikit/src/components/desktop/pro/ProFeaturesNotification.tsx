@@ -48,7 +48,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     const formId = useId();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
     const { data: isTrialAvailable } = useTrialAvailability();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const {
@@ -60,12 +60,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     const { data: products, isError, isLoading: isProPlanLoading, refetch } = useProPlans();
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
-    if (!proState) {
-        return null;
-    }
-
-    const currentSubscription = proState.current;
-    const isFinalTrialAvailable = !hasUsedTrial(currentSubscription) && isTrialAvailable;
+    const isFinalTrialAvailable = !hasUsedTrial(subscription) && isTrialAvailable;
 
     const handleProAuth = () => {
         if (isError) {
@@ -87,7 +82,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
 
     const { removeButtonsBlock } = onOpenProps ?? {};
     const displayPlans = products?.plans ?? [];
-    const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(currentSubscription);
+    const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(subscription);
 
     return (
         <ContentWrapper onSubmit={handleSubmit(handleProAuth)} id={formId}>

@@ -180,7 +180,6 @@ interface CryptoExpiredSubscription extends BaseCryptoSubscription, CryptoDBStor
 
 export interface CryptoPendingSubscription extends BaseCryptoSubscription {
     status: CryptoSubscriptionStatuses.PENDING;
-    valid: false;
     displayName?: string;
     displayPrice?: string;
 }
@@ -227,12 +226,6 @@ export enum TelegramSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired'
 }
-
-// Pro State
-export type ProState = {
-    current: ProSubscription;
-    target: ProSubscription | ConstructedSubscription;
-};
 
 export interface ProStateWallet {
     publicKey: string;
@@ -356,20 +349,17 @@ export function hasSubscriptionSource(
 }
 
 export function hasUsedTrial(
-    subscription: ProSubscription
-): subscription is Exclude<ProSubscription, null> & { usedTrial: true } {
-    return subscription !== null && subscription.usedTrial;
+    value?: unknown
+): value is Exclude<ProSubscription, null> & { usedTrial: true } {
+    return isProSubscription(value) && value?.usedTrial;
 }
 
-export function hasWalletAuth(
-    subscription: ProState['target'] | null | undefined
-): subscription is { auth: WalletAuth } {
+export function hasWalletAuth(value?: unknown): value is { auth: WalletAuth } {
     return (
-        subscription !== null &&
-        typeof subscription === 'object' &&
-        'auth' in subscription &&
-        subscription.auth?.type === AuthTypes.WALLET &&
-        'wallet' in subscription.auth
+        isProSubscription(value) &&
+        'auth' in value &&
+        value.auth?.type === AuthTypes.WALLET &&
+        'wallet' in value.auth
     );
 }
 

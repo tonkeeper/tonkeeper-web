@@ -57,14 +57,13 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
     const { onOpen } = useProFeaturesNotification();
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
-    const { data } = useProState();
+    const { data: subscription } = useProState();
     const targetEnv = useAppTargetEnv();
 
-    if (!data) {
+    if (!subscription) {
         return null;
     }
 
-    const { current: subscription } = data;
     const nextChargeDate = isTelegramActiveSubscription(subscription)
         ? subscription.nextChargeDate
         : undefined;
