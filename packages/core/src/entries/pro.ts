@@ -1,5 +1,4 @@
 import { CryptoCurrency, SubscriptionSource } from '../pro';
-import { ProServiceTier } from '../tonConsoleApi';
 import { Language } from './language';
 
 export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
@@ -34,9 +33,10 @@ export interface TelegramAuth {
     trialUserId: number | undefined;
 }
 
-export type NormalizedProPlans =
-    | { source: SubscriptionSource.IOS; plans: IProductInfo[] }
-    | { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[]; promoCode?: string };
+export type NormalizedProPlans = {
+    plans: IDisplayPlan[] | undefined;
+    verifiedPromoCode: string | undefined;
+};
 
 interface BaseSubscription {
     source: SubscriptionSource;
@@ -48,6 +48,8 @@ interface BaseSubscription {
 
 interface BaseSubscriptionStrategy {
     source: SubscriptionSource;
+
+    getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;
 }
 
 // IOS Subscription Types
@@ -115,7 +117,6 @@ export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
     source: SubscriptionSource.IOS;
     subscribe(productId: ProductIds): Promise<IIosPurchaseResult>;
     getProductInfo(productId: ProductIds): Promise<IProductInfo>;
-    getAllProductsInfo(): Promise<IProductInfo[]>;
     manageSubscriptions(): Promise<void>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
     getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]>;
@@ -186,10 +187,6 @@ export interface CryptoPendingSubscription extends BaseCryptoSubscription {
 
 export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
     source: SubscriptionSource.CRYPTO;
-    getAllProductsInfo(
-        lang: Language | undefined,
-        promoCode?: string
-    ): Promise<[ProServiceTier[] | undefined, string | undefined]>;
 }
 
 export enum CryptoSubscriptionStatuses {
@@ -373,19 +370,6 @@ export function hasWalletAuth(
         'auth' in subscription &&
         subscription.auth?.type === AuthTypes.WALLET &&
         'wallet' in subscription.auth
-    );
-}
-
-export function isCryptoProPlans(
-    data: NormalizedProPlans | undefined
-): data is Extract<
-    NormalizedProPlans,
-    { source: SubscriptionSource.CRYPTO; plans: ProServiceTier[] }
-> {
-    return (
-        data?.source === SubscriptionSource.CRYPTO &&
-        Array.isArray(data.plans) &&
-        data.plans.length > 0
     );
 }
 

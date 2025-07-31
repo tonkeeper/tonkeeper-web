@@ -1,11 +1,10 @@
 import {
     IDisplayPlan,
-    isCryptoProPlans,
     isCryptoStrategy,
     NormalizedProPlans
 } from '@tonkeeper/core/dist/entries/pro';
 
-import { adaptPlansToViewModel, getSkeletonProducts } from '../../libs/pro';
+import { getSkeletonProducts } from '../../libs/pro';
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useEffect, useState } from 'react';
@@ -15,8 +14,10 @@ import { useNotifyError } from '../useNotification';
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
 const IOS_SKELETON_PRODUCTS_QTY = 2;
 
-export const getFilteredDisplayPlans = (proPlans: NormalizedProPlans | undefined) => {
-    return adaptPlansToViewModel(proPlans).filter(plan => plan.formattedDisplayPrice !== '-');
+export const getFilteredDisplayPlans = (proPlans?: NormalizedProPlans) => {
+    const { plans = [] } = proPlans ?? {};
+
+    return plans.filter(plan => plan.formattedDisplayPrice !== '-');
 };
 
 export const getProductsForRender = (displayPlans: IDisplayPlan[], isCrypto: boolean) => {
@@ -36,9 +37,8 @@ export const useProductSelection = () => {
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
-    const isCryptoPlans = isCryptoProPlans(proPlans);
 
-    const verifiedPromoCode = isCryptoPlans ? proPlans.promoCode : undefined;
+    const { verifiedPromoCode } = proPlans ?? {};
     const displayPlans = getFilteredDisplayPlans(proPlans);
     const productsForRender = getProductsForRender(displayPlans, isCrypto);
 

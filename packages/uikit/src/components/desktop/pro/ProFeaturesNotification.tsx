@@ -10,7 +10,6 @@ import {
 import { Body2, Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { handleSubmit } from '../../../libs/form';
-import { adaptPlansToViewModel } from '../../../libs/pro';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProPlans, useProState, useTrialAvailability } from '../../../state/pro';
@@ -58,7 +57,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
-    const { data: products, isError, isLoading: isProPlanLaoding, refetch } = useProPlans();
+    const { data: products, isError, isLoading: isProPlanLoading, refetch } = useProPlans();
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
     if (!proState) {
@@ -87,7 +86,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     };
 
     const { removeButtonsBlock } = onOpenProps ?? {};
-    const displayPlans = adaptPlansToViewModel(products);
+    const displayPlans = products?.plans ?? [];
     const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(currentSubscription);
 
     return (
@@ -104,7 +103,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                         <ButtonsBlockStyled
                             formId={formId}
                             isError={isError}
-                            isLoading={isProPlanLaoding}
+                            isLoading={isProPlanLoading}
                             displayPlans={displayPlans}
                             onTrial={isFinalTrialAvailable ? onTrialModalOpen : undefined}
                         />

@@ -1,5 +1,4 @@
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { IDisplayPlan, NormalizedProPlans } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { formatter } from '../hooks/balance';
 
@@ -37,29 +36,3 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
         return '-';
     }
 };
-
-export function adaptPlansToViewModel(
-    normalizedPlans: NormalizedProPlans | undefined
-): IDisplayPlan[] {
-    if (!normalizedPlans) return [];
-
-    switch (normalizedPlans.source) {
-        case SubscriptionSource.IOS:
-            return normalizedPlans.plans.map(plan => ({
-                id: plan.id,
-                displayName: plan.displayName,
-                displayPrice: plan.displayPrice,
-                subscriptionPeriod: plan?.subscriptionPeriod || 'month',
-                formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
-            }));
-
-        case SubscriptionSource.CRYPTO:
-            return normalizedPlans.plans.map(plan => ({
-                id: String(plan.id),
-                displayName: plan.name,
-                displayPrice: plan.amount,
-                subscriptionPeriod: 'year',
-                formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
-            }));
-    }
-}

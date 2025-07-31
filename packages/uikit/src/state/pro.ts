@@ -35,7 +35,7 @@ import {
     withTargetAuthToken
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
-import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { OpenAPI } from '@tonkeeper/core/dist/pro';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -50,8 +50,6 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
-import { parsePrice } from '../libs/pro';
 import { IAuthViaSeedPhraseData } from '@tonkeeper/core/dist/entries/password';
 
 type FreeProAccess = {
@@ -352,28 +350,8 @@ export const useProPlans = (promoCode?: string) => {
                 throw new Error('pro_subscription_load_failed');
             }
 
-            if (strategy.source === SubscriptionSource.IOS) {
-                const plans = await strategy.getAllProductsInfo();
-                const sortedPlans = [...plans].sort((a, b) => {
-                    return parsePrice(a.displayPrice) - parsePrice(b.displayPrice);
-                });
-
-                return { source: SubscriptionSource.IOS, plans: sortedPlans };
-            }
-
-            if (strategy.source === SubscriptionSource.CRYPTO) {
-                const [plans, verifiedCode] = await strategy.getAllProductsInfo(lang, promoCode);
-
-                return {
-                    source: SubscriptionSource.CRYPTO,
-                    plans: plans ?? [],
-                    promoCode: verifiedCode
-                };
-            }
-
-            return assertUnreachable(strategy);
-        },
-        {}
+            return strategy.getAllProductsInfo(lang, promoCode);
+        }
     );
 };
 

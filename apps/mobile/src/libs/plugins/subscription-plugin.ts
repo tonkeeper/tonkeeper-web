@@ -1,9 +1,11 @@
 import { registerPlugin } from '@capacitor/core';
 import type {
+    IDisplayPlan,
     IIosPurchaseResult,
     IIosSubscriptionStrategy,
     IOriginalTransactionInfo,
-    IProductInfo
+    IProductInfo,
+    NormalizedProPlans
 } from '@tonkeeper/core/dist/entries/pro';
 import {
     IosEnvironmentTypes,
@@ -12,6 +14,7 @@ import {
     ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { getFormattedProPrice } from '@tonkeeper/uikit/dist/libs/pro';
 
 interface ISubscriptionPlugin {
     subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult>;
@@ -139,15 +142,23 @@ class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         return SubscriptionPlugin.getProductInfo({ productId });
     }
 
-    async getAllProductsInfo(): Promise<IProductInfo[]> {
+    async getAllProductsInfo(): Promise<NormalizedProPlans> {
         try {
             const productIds = Object.values(ProductIds);
-            const result = await SubscriptionPlugin.getAllProductsInfo({ productIds });
+            const { products } = await SubscriptionPlugin.getAllProductsInfo({ productIds });
 
-            return result.products;
+            const normalizedPlans: IDisplayPlan[] = products.map(plan => ({
+                id: plan.id,
+                displayName: plan.displayName,
+                displayPrice: plan.displayPrice,
+                subscriptionPeriod: plan?.subscriptionPeriod || 'month',
+                formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
+            }));
+
+            return { plans: normalizedPlans, verifiedPromoCode: undefined };
         } catch (e) {
             console.error('Failed to fetch products info:', e);
-            return [];
+            return { plans: undefined, verifiedPromoCode: undefined };
         }
     }
 
