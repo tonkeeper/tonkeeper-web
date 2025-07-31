@@ -19,7 +19,6 @@ import { ProFeaturesList } from '../../pro/ProFeaturesList';
 import { Button } from '../../fields/Button';
 import { Body3, Label2 } from '../../Text';
 import { ProLegalNote } from '../../pro/ProLegalNote';
-import { ConfirmNotification } from '../../settings/ProSettings';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 
 interface IProPurchaseNotificationProps {
@@ -57,14 +56,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         onLogout
     } = common;
 
-    const {
-        promoCode,
-        setPromoCode,
-        verifiedPromoCode,
-        confirmState,
-        onConfirmClose,
-        waitInvoice
-    } = cryptoFlow;
+    const { promoCode, setPromoCode, verifiedPromoCode } = cryptoFlow;
 
     const { onManage } = iosFlow;
 
@@ -123,12 +115,6 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
                     </PurchaseButtonWrapper>
                 </NotificationFooter>
             </NotificationFooterPortal>
-
-            <ConfirmNotification
-                state={confirmState}
-                onClose={onConfirmClose}
-                waitResult={waitInvoice}
-            />
         </ContentWrapper>
     );
 };

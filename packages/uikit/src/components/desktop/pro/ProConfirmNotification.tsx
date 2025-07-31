@@ -1,0 +1,68 @@
+import { styled } from 'styled-components';
+import { Notification } from '../../Notification';
+import { FC, PropsWithChildren } from 'react';
+import { ConfirmState } from '../../../state/pro';
+import { useEstimateTransfer } from '../../../hooks/blockchain/useEstimateTransfer';
+import { useSendTransfer } from '../../../hooks/blockchain/useSendTransfer';
+import { ConfirmView } from '../../transfer/ConfirmView';
+
+interface IProConfirmNotificationProps {
+    onClose: () => void;
+    confirmState: ConfirmState | null;
+    onConfirm?: (success?: boolean) => void;
+}
+
+export const ProConfirmNotification: FC<IProConfirmNotificationProps> = props => {
+    const { confirmState, onConfirm, onClose } = props;
+
+    return (
+        <NotificationStyled isOpen={!!confirmState} handleClose={onClose} hideButton backShadow>
+            {() =>
+                confirmState ? (
+                    <ProConfirmNotificationContent
+                        {...confirmState}
+                        onClose={confirmed => {
+                            if (confirmed) {
+                                onConfirm?.(true);
+                            }
+
+                            onClose();
+                        }}
+                    />
+                ) : (
+                    <></>
+                )
+            }
+        </NotificationStyled>
+    );
+};
+
+const ProConfirmNotificationContent: FC<
+    PropsWithChildren<
+        {
+            onBack?: () => void;
+            onClose: (confirmed?: boolean) => void;
+            fitContent?: boolean;
+        } & ConfirmState
+    >
+> = ({ ...rest }) => {
+    const estimation = useEstimateTransfer({
+        recipient: rest.recipient,
+        amount: rest.assetAmount,
+        isMax: false,
+        senderType: 'external'
+    });
+    const mutation = useSendTransfer({
+        recipient: rest.recipient,
+        amount: rest.assetAmount,
+        isMax: false,
+        estimation: estimation.data!,
+        senderType: 'external'
+    });
+
+    return <ConfirmView estimation={estimation} {...mutation} {...rest} />;
+};
+
+const NotificationStyled = styled(Notification)`
+    max-width: 650px;
+`;

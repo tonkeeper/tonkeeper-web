@@ -27,13 +27,8 @@ export const useProPurchaseController = () => {
 
     const { startPurchasing: startIosPurchase, isLoading: isIosLoading } = useIosPurchaseFlow();
 
-    const {
-        startPurchasing: startCryptoPurchase,
-        waitInvoice,
-        confirm,
-        onConfirmClose,
-        isLoading: isCryptoLoading
-    } = useCryptoPurchaseFlow();
+    const { startPurchasing: startCryptoPurchase, isLoading: isCryptoLoading } =
+        useCryptoPurchaseFlow();
 
     const {
         mutateAsync: handleLogOut,
@@ -79,10 +74,7 @@ export const useProPurchaseController = () => {
         cryptoFlow: {
             promoCode,
             setPromoCode,
-            verifiedPromoCode,
-            waitInvoice,
-            confirmState: confirm,
-            onConfirmClose
+            verifiedPromoCode
         },
         iosFlow: {
             onManage: handleManageSubscription

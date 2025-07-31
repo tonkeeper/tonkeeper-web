@@ -27,12 +27,9 @@ import {
     logoutTonConsole,
     ProAuthTokenService,
     ProAuthTokenType,
-    retryProService,
     saveIapPurchase,
     setBackupState,
-    startProServiceTrial,
-    waitProServiceInvoice,
-    withTargetAuthToken
+    startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
 import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
@@ -362,53 +359,79 @@ export interface ConfirmState {
 export const useCreateInvoiceMutation = () => {
     const ws = useAccountsStorage();
     const api = useActiveApi();
+    const sdk = useAppSdk();
+    const navigate = useNavigate();
+    const client = useQueryClient();
+    const [targetAuth] = useAtom(selectedTargetAuth);
+    const { onOpen } = useProConfirmNotification();
+    const { onClose: onProPurchaseClose } = useProPurchaseNotification();
     const authService = useProAuthTokenService();
 
-    return useMutation<
-        ConfirmState,
-        Error,
-        { wallet: ProStateWallet; tierId: number | null; promoCode?: string }
-    >(async data => {
-        const tierId = data.tierId;
-        if (tierId === null) {
-            throw new Error('missing tier');
-        }
-
-        return withTargetAuthToken(authService, async () => {
-            const wallet = (await ws.getAccounts())
-                .flatMap(a => a.allTonWallets)
-                .find(w => w.id === data.wallet.rawAddress);
-            if (!wallet || !isStandardTonWallet(wallet)) {
-                throw new Error('Missing wallet');
+    return useMutation<void, Error, { selectedPlan: IDisplayPlan; promoCode?: string }>(
+        async data => {
+            if (!data.selectedPlan) {
+                throw new Error('missing selectedPlan');
             }
 
-            const invoice = await createProServiceInvoice(tierId, data.promoCode);
-            const [recipient, assetAmount] = await createRecipient(api, invoice);
+            const { id, displayName, formattedDisplayPrice } = data.selectedPlan;
+            const tierId = Number(id);
 
-            return {
-                invoice,
-                wallet,
-                recipient,
-                assetAmount
-            };
-        });
-    });
-};
+            if (tierId === null) {
+                throw new Error('missing tier');
+            }
 
-export const useWaitInvoiceMutation = () => {
-    const client = useQueryClient();
-    const sdk = useAppSdk();
-    const authService = useProAuthTokenService();
+            return authService.withTokenContext(ProAuthTokenType.TEMP, async () => {
+                const wallet = (await ws.getAccounts())
+                    .flatMap(a => a.allTonWallets)
+                    .find(w => w.id === targetAuth?.wallet?.rawAddress);
 
-    return useMutation<void, Error, ConfirmState>(async data => {
-        await waitProServiceInvoice(data.invoice);
+                if (!wallet || !isStandardTonWallet(wallet)) {
+                    throw new Error('Missing wallet');
+                }
 
-        await withTargetAuthToken(authService, async () => {
-            await retryProService({ authService, sdk, promoExpirationDate: null });
-        });
+                const invoice = await createProServiceInvoice(tierId, data.promoCode);
+                const [recipient, assetAmount] = await createRecipient(api, invoice);
 
-        await client.invalidateQueries([QueryKey.pro]);
-    });
+                onOpen({
+                    confirmState: {
+                        invoice,
+                        wallet,
+                        recipient,
+                        assetAmount
+                    },
+                    onConfirm: async (success?: boolean) => {
+                        if (!success) return;
+
+                        if (!targetAuth) {
+                            throw new Error('Missing wallet auth for pending subscription');
+                        }
+
+                        const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+
+                        const pendingSubscription: CryptoPendingSubscription = {
+                            source: SubscriptionSource.CRYPTO,
+                            status: CryptoSubscriptionStatuses.PENDING,
+                            valid: false,
+                            usedTrial: isUsedTrial,
+                            displayName,
+                            displayPrice: formattedDisplayPrice,
+                            auth: targetAuth
+                        };
+
+                        await sdk.storage.set<CryptoPendingSubscription>(
+                            AppKey.PRO_PENDING_SUBSCRIPTION,
+                            pendingSubscription
+                        );
+
+                        await client.invalidateQueries([QueryKey.pro]);
+
+                        onProPurchaseClose();
+                        navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
+                    }
+                });
+            });
+        }
+    );
 };
 
 export const useActivateTrialMutation = () => {

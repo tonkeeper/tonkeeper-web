@@ -340,35 +340,12 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const retryProService = async (params: IGetProStateParams) => {
-    for (let i = 0; i < 10; i++) {
-        const state = await getProState(params);
-        if (isValidSubscription(state.current)) {
-            return;
-        }
-        await delay(5000);
-    }
-};
-
-export const waitProServiceInvoice = async (invoice: Invoice) => {
-    let updated = invoice;
-
-    do {
-        await delay(4000);
-        try {
-            updated = await InvoicesService.getInvoice(invoice.id);
-        } catch (e) {
-            console.warn(e);
-        }
-    } while (updated.status === InvoiceStatus.PENDING);
-};
-
 export const saveIapPurchase = async (
     authService: ProAuthTokenService,
     originalTransactionId: string
 ): Promise<{ ok: boolean }> => {
     try {
-        return await withTargetAuthToken(authService, () =>
+        return await authService.withTokenContext(ProAuthTokenType.TEMP, () =>
             IapService.activateIapPurchase({
                 original_transaction_id: originalTransactionId
             })
