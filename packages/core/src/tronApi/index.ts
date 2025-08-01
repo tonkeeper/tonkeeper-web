@@ -4,7 +4,7 @@ import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
 import { Configuration, DefaultApi } from '../batteryApi';
-import { TransactionFee } from '../entries/crypto/transaction-fee';
+import { TronTransactionFee } from '../entries/crypto/transaction-fee';
 import type { SignedTransaction } from 'tronweb/src/types/Transaction';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
@@ -30,7 +30,7 @@ export type TronHistoryItemTransferAsset = {
     to: string;
     isScam: boolean;
     isFailed: boolean;
-    fee?: TransactionFee;
+    fee?: TronTransactionFee;
     inProgress?: boolean;
 };
 export type TronHistoryItem = TronHistoryItemTransferAsset;

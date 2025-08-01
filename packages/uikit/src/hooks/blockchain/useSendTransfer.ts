@@ -11,18 +11,14 @@ import {
 import { useAnalyticsTrack } from '../analytics';
 import { useInvalidateActiveWalletQueries } from '../../state/wallet';
 
-import {
-    BATTERY_SENDER_CHOICE,
-    EXTERNAL_SENDER_CHOICE,
-    SenderTypeUserAvailable,
-    useGetSender,
-    useGetTronSender
-} from './useSender';
+import { BATTERY_SENDER_CHOICE, EXTERNAL_SENDER_CHOICE, useGetSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import { tronSenderChoiceByType, TronSenderType, useGetTronSender } from './sender/useTronSender';
+import { AllChainsSenderType } from './sender/sender-type';
 
 export function useSendTransfer<T extends Asset>({
     recipient,
@@ -35,7 +31,7 @@ export function useSendTransfer<T extends Asset>({
     amount: AssetAmount<T>;
     isMax: boolean;
     estimation: Estimation<T>;
-    senderType: SenderTypeUserAvailable;
+    senderType: AllChainsSenderType;
 }) {
     const track = useAnalyticsTrack();
     const { mutateAsync: invalidateAccountQueries } = useInvalidateActiveWalletQueries();
@@ -89,11 +85,13 @@ export function useSendTransfer<T extends Asset>({
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
                 });
             } else if (amount.asset.id === TRON_USDT_ASSET.id) {
-                const tronSender = await getTronSender();
+                const tronSender = await getTronSender(
+                    tronSenderChoiceByType(senderType as TronSenderType)!
+                );
                 await tronSender.send(
                     recipient.address.address,
                     amount as AssetAmount<TronAsset>,
-                    (estimation as TronEstimation).resources
+                    estimation as TronEstimation
                 );
             } else {
                 throw new Error('Unexpected asset');

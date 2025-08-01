@@ -9,7 +9,7 @@ import { useActiveAccount } from '../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useNotifyErrorHandle } from '../useNotification';
-import { SenderChoiceUserAvailable, useGetSender } from './useSender';
+import { TonSenderChoiceUserAvailable, useGetSender } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { TransferParams } from '@tonkeeper/core/dist/service/ton-blockchain/ton-asset-transaction.service';
 
@@ -53,7 +53,7 @@ export function useSendMultiTransfer() {
             form: MultiSendFormTokenized;
             asset: TonAsset;
             estimation: TonEstimation;
-            senderChoice: SenderChoiceUserAvailable;
+            senderChoice: TonSenderChoiceUserAvailable;
         }
     >(async ({ form, asset, estimation, senderChoice }) => {
         const walletId = account.activeTonWallet.id;

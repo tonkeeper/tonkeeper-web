@@ -29,12 +29,13 @@ import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBala
 import { AccountAndWalletInfo } from '../../account/AccountAndWalletInfo';
 import { ActionFeeDetailsUniversal } from '../../activity/NotificationCommon';
 import {
-    SenderChoiceUserAvailable,
-    SenderTypeUserAvailable,
-    useAvailableSendersChoices
+    TonSenderChoiceUserAvailable,
+    TonSenderTypeUserAvailable,
+    useAvailableTonSendersChoices
 } from '../../../hooks/blockchain/useSender';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 const ConfirmWrapper = styled.div`
     display: flex;
@@ -172,9 +173,9 @@ const MultiSendConfirmContent: FC<{
             asset
         } as const;
     }, [asset]);
-    const { data: availableSendersChoices } = useAvailableSendersChoices(operationType);
+    const { data: availableSendersChoices } = useAvailableTonSendersChoices(operationType);
 
-    const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>();
+    const [selectedSenderType, onSenderTypeChange] = useState<TonSenderTypeUserAvailable>();
 
     const selectedSenderChoice = useMemo(() => {
         if (!availableSendersChoices) {
@@ -232,6 +233,7 @@ const MultiSendConfirmContent: FC<{
                         <Label2>{listName}</Label2>
                     </ListItemStyled>
                     <ActionFeeDetailsUniversalStyled
+                        blockchain={BLOCKCHAIN_NAME.TON}
                         fee={estimateData?.fee}
                         availableSendersChoices={availableSendersChoices}
                         selectedSenderType={selectedSenderType}
@@ -283,7 +285,7 @@ const ButtonBlock: FC<{
     asset: TonAsset;
     estimation: TonEstimation | undefined;
     estimationError: Error | null;
-    selectedSenderChoice: SenderChoiceUserAvailable | undefined;
+    selectedSenderChoice: TonSenderChoiceUserAvailable | undefined;
     mutation: ReturnType<typeof useSendMultiTransfer>;
 }> = ({
     onSuccess,

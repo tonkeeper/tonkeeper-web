@@ -30,7 +30,7 @@ export class TronTrc20Encoder {
             throw new Error(`Unsupported tron asset ${assetAmount.asset.symbol}`);
         }
 
-        const { AbiCoder } = await import('ethers/lib.esm');
+        const { AbiCoder } = await import('ethers');
 
         return {
             from: this.walletAddress,

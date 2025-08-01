@@ -37,8 +37,8 @@ import { styled } from 'styled-components';
 import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
-    SenderTypeUserAvailable,
-    useAvailableSendersChoices,
+    TonSenderTypeUserAvailable,
+    useAvailableTonSendersChoices,
     useGetEstimationSender,
     useGetSender
 } from '../../../hooks/blockchain/useSender';
@@ -50,6 +50,7 @@ import { useNotifyErrorHandle } from '../../../hooks/useNotification';
 import { zeroFeeEstimation } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { useToQueryKeyPart } from '../../../hooks/useToQueryKeyPart';
 import { useIsFullWidthMode } from '../../../hooks/useIsFullWidthMode';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 const assetAmount = new AssetAmount({
     asset: TON_ASSET,
@@ -59,7 +60,7 @@ const assetAmount = new AssetAmount({
 const useNftTransferEstimation = (
     nftItem: NftItem,
     data: TonRecipientData,
-    selectedSenderType: SenderTypeUserAvailable | undefined
+    selectedSenderType: TonSenderTypeUserAvailable | undefined
 ) => {
     const account = useActiveAccount();
     const accounts = useAccountsState();
@@ -124,7 +125,7 @@ const useSendNft = (
     estimation: TonEstimation | undefined,
     options: {
         multisigTTL?: MultisigOrderLifetimeMinutes;
-        selectedSenderType: SenderTypeUserAvailable;
+        selectedSenderType: TonSenderTypeUserAvailable;
     }
 ) => {
     const account = useActiveAccount();
@@ -222,9 +223,9 @@ export const ConfirmNftView: FC<{
     const { t } = useTranslation();
     const isActiveMultisig = useIsActiveAccountMultisig();
 
-    const { data: availableSendersChoices } = useAvailableSendersChoices(operationTypeSendNFT);
+    const { data: availableSendersChoices } = useAvailableTonSendersChoices(operationTypeSendNFT);
     const [selectedSenderType, onSenderTypeChange] = useState<
-        SenderTypeUserAvailable | undefined
+        TonSenderTypeUserAvailable | undefined
     >();
 
     const estimation = useNftTransferEstimation(nftItem, recipient, selectedSenderType);
@@ -290,6 +291,7 @@ export const ConfirmNftView: FC<{
                 <ListBlock margin={false} fullWidth>
                     <ConfirmViewDetailsRecipient />
                     <ConfirmViewDetailsFee
+                        blockchain={BLOCKCHAIN_NAME.TON}
                         availableSendersChoices={availableSendersChoices}
                         selectedSenderType={selectedSenderType}
                         onSenderTypeChange={onSenderTypeChange}

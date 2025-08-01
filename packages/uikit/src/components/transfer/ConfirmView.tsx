@@ -32,7 +32,11 @@ import {
 } from '../Notification';
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
-import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
+import {
+    ActionFeeDetailsUniversal,
+    FeeDetailsPropsTon,
+    FeeDetailsPropsUniversal
+} from '../activity/NotificationCommon';
 import {
     ConfirmViewImage,
     ImageMock,
@@ -45,13 +49,14 @@ import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import {
-    SenderChoiceUserAvailable,
-    SenderTypeUserAvailable
-} from '../../hooks/blockchain/useSender';
+
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    AllChainsSenderChoice,
+    AllChainsSenderType
+} from '../../hooks/blockchain/sender/sender-type';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -91,9 +96,9 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
-        onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
-        availableSendersChoices?: SenderChoiceUserAvailable[];
-        selectedSenderType?: SenderTypeUserAvailable;
+        onSenderTypeChange?: (type: AllChainsSenderType) => void;
+        availableSendersChoices?: AllChainsSenderChoice[];
+        selectedSenderType?: AllChainsSenderType;
         estimation: {
             data: Pick<Estimation<T>, 'fee'> | undefined;
             isLoading: boolean;
@@ -333,19 +338,13 @@ export const ConfirmViewDetailsAmount: FC = () => {
     );
 };
 
-export const ConfirmViewDetailsFee: FC<{
-    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
-    availableSendersChoices?: SenderChoiceUserAvailable[];
-    selectedSenderType?: SenderTypeUserAvailable;
-}> = ({ onSenderTypeChange, availableSendersChoices, selectedSenderType }) => {
+export const ConfirmViewDetailsFee: FC<FeeDetailsPropsUniversal | FeeDetailsPropsTon> = props => {
     const { estimation } = useConfirmViewContext();
 
     return (
         <ActionFeeDetailsUniversal
             fee={estimation.isLoading ? undefined : estimation.error ? null : estimation.data?.fee}
-            onSenderTypeChange={onSenderTypeChange}
-            availableSendersChoices={availableSendersChoices}
-            selectedSenderType={selectedSenderType}
+            {...props}
         />
     );
 };

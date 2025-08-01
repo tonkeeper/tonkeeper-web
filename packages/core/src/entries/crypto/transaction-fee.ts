@@ -2,7 +2,13 @@ import { AssetAmount } from './asset/asset-amount';
 import { TonAsset } from './asset/ton-asset';
 import { TronAsset } from './asset/tron-asset';
 
-export type TransactionFee = TransactionFeeTonAsset | TransactionFeeBattery;
+export type TransactionFee = TonTransactionFee | TronTransactionFee;
+
+export type TonTransactionFee = TransactionFeeTonAsset | TransactionFeeBattery;
+export type TronTransactionFee =
+    | TransactionFeeTronAsset
+    | TransactionFeeBattery
+    | TransactionFeeTonAssetRelayed;
 
 export type TransactionFeeTonAsset = {
     type: 'ton-asset';

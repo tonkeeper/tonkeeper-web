@@ -4,10 +4,7 @@ import React, { FC, PropsWithChildren, useEffect, useMemo, useState } from 'reac
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from './ConfirmView';
-import {
-    SenderTypeUserAvailable,
-    useAvailableSendersChoices
-} from '../../hooks/blockchain/useSender';
+import { useAvailableTonSendersChoices } from '../../hooks/blockchain/useSender';
 import {
     TonAsset,
     tonAssetAddressToString
@@ -21,6 +18,8 @@ import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useQuery } from '@tanstack/react-query';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useActiveApi } from '../../state/wallet';
+import { useAvailableTronSendersChoices } from '../../hooks/blockchain/sender/useTronSender';
+import { AllChainsSenderType } from '../../hooks/blockchain/sender/sender-type';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -58,9 +57,13 @@ export const ConfirmTransferView: FC<
      */
     const [assetAmountPatched, setAssetAmountPatched] = useState<AssetAmount>(assetAmount);
 
-    const { data: availableSendersChoices } = useAvailableSendersChoices(operationType);
+    const { data: availableTonSendersChoices } = useAvailableTonSendersChoices(operationType);
+    const { data: availableTronSendersChoices } = useAvailableTronSendersChoices(
+        rest.recipient.address.address,
+        assetAmount
+    );
 
-    const [selectedSenderType, onSenderTypeChange] = useState<SenderTypeUserAvailable>();
+    const [selectedSenderType, onSenderTypeChange] = useState<AllChainsSenderType>();
 
     const estimation = useEstimateTransfer({
         recipient: rest.recipient,
@@ -76,15 +79,35 @@ export const ConfirmTransferView: FC<
         senderType: selectedSenderType!
     });
 
+    const isTonBlockchainAssetTransfer = isTonAsset(assetAmount.asset);
     useEffect(() => {
-        if (!mutation.isIdle) {
+        if (!mutation.isIdle || !isTonBlockchainAssetTransfer || selectedSenderType) {
             return;
         }
 
-        if (availableSendersChoices) {
-            onSenderTypeChange(availableSendersChoices[0].type);
+        if (availableTonSendersChoices) {
+            onSenderTypeChange(availableTonSendersChoices[0].type);
         }
-    }, [JSON.stringify(availableSendersChoices), mutation.isIdle]);
+    }, [
+        selectedSenderType,
+        isTonBlockchainAssetTransfer,
+        JSON.stringify(availableTonSendersChoices),
+        mutation.isIdle
+    ]);
+    useEffect(() => {
+        if (!mutation.isIdle || isTonBlockchainAssetTransfer || selectedSenderType) {
+            return;
+        }
+
+        if (availableTronSendersChoices) {
+            onSenderTypeChange(availableTronSendersChoices[0].type);
+        }
+    }, [
+        selectedSenderType,
+        isTonBlockchainAssetTransfer,
+        JSON.stringify(availableTronSendersChoices),
+        mutation.isIdle
+    ]);
 
     const assetAddress = isTonAsset(assetAmount.asset)
         ? tonAssetAddressToString((assetAmount.asset as TonAsset).address)
@@ -140,7 +163,11 @@ export const ConfirmTransferView: FC<
             assetAmount={assetAmountPatched}
             selectedSenderType={selectedSenderType}
             onSenderTypeChange={onSenderTypeChange}
-            availableSendersChoices={availableSendersChoices}
+            availableSendersChoices={
+                isTonBlockchainAssetTransfer
+                    ? availableTonSendersChoices
+                    : availableTronSendersChoices
+            }
         />
     );
 };

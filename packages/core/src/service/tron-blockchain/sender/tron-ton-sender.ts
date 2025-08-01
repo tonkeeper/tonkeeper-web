@@ -1,7 +1,7 @@
 import { TronApi } from '../../../tronApi';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../../entries/crypto/asset/tron-asset';
-import { TronSigner } from '../../../entries/signer';
+import { OpenedSignerProvider } from '../../../entries/signer';
 import { TronWallet } from '../../../entries/tron/tron-wallet';
 import { TronEstimation } from '../../../entries/send';
 import { errorMessage } from '../../../utils/types';
@@ -13,8 +13,15 @@ import {
 } from '../../../batteryApi';
 import { TronTrc20Encoder } from '../encoder/tron-trc20-encoder';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
-import { WalletMessageSender } from '../../ton-blockchain/sender';
 import { TonEncoder } from '../../ton-blockchain/encoder/ton-encoder';
+import { APIConfig } from '../../../entries/apis';
+import { TransactionFeeTonAssetRelayed } from '../../../entries/crypto/transaction-fee';
+import { WalletMessageSender } from '../../ton-blockchain/sender';
+import { TonWalletStandard } from '../../../entries/wallet';
+import { Cell } from '@ton/core';
+import type { SignedTransaction, Transaction } from 'tronweb/src/types/Transaction';
+import { AccountsApi } from '../../../tonApiV2';
+import { TronNotEnoughTonBalanceError } from '../../../errors/TronNotEnoughTonBalanceError';
 
 export class TronTonSender implements ITronSender {
     private batteryApi: BatteryApi;
@@ -23,15 +30,16 @@ export class TronTonSender implements ITronSender {
 
     constructor(
         private tronApi: TronApi,
+        private tonApi: APIConfig,
         batteryConfig: BatteryConfiguration,
-        private walletInfo: TronWallet,
-        private tronSigner: TronSigner,
-        private readonly xTonConnectAuth: string,
-        private tonSender: WalletMessageSender
+        private tronWalletInfo: TronWallet,
+        private tonWalletInfo: TonWalletStandard,
+        private usingOpenedSigner: OpenedSignerProvider,
+        private readonly xTonConnectAuth: string
     ) {
         this.batteryApi = new BatteryApi(batteryConfig);
         this.trc20Encoder = new TronTrc20Encoder({
-            walletAddress: this.walletInfo.address,
+            walletAddress: this.tronWalletInfo.address,
             tronGridBaseUrl: this.tronApi.tronGridBaseUrl
         });
     }
@@ -41,25 +49,35 @@ export class TronTonSender implements ITronSender {
             throw new Error('Unacceptable fee type');
         }
 
-        const signedTronTx = await this.tronSigner(
-            await this.trc20Encoder.encodeTransferTransaction(to, assetAmount)
-        );
+        let signedTronTx: Transaction & SignedTransaction;
+        let signedTonTx: Cell;
+        await this.usingOpenedSigner(async ({ cellSigner, tronSigner }) => {
+            const fee = estimation.fee as TransactionFeeTonAssetRelayed;
+            signedTronTx = await tronSigner(
+                await this.trc20Encoder.encodeTransferTransaction(to, assetAmount)
+            );
 
-        const tonTransfer = await new TonEncoder(this.tonSender.api).encodeTransfer({
-            to: estimation.fee.sendToAddress,
-            weiAmount: estimation.fee.extra.weiAmount
+            const tonTransfer = await new TonEncoder(this.tonApi).encodeTransfer({
+                to: fee.sendToAddress,
+                weiAmount: fee.extra.weiAmount
+            });
+
+            signedTonTx = await new WalletMessageSender(
+                this.tonApi,
+                this.tonWalletInfo,
+                cellSigner
+            ).toExternal(tonTransfer);
         });
-        const signedTonTx = await this.tonSender.toExternal(tonTransfer);
 
         try {
             await this.batteryApi.tronSend({
                 xTonConnectAuth: this.xTonConnectAuth,
                 tronSendRequest: {
-                    tx: Buffer.from(JSON.stringify(signedTronTx)).toString('base64'),
-                    wallet: this.walletInfo.address,
+                    tx: Buffer.from(JSON.stringify(signedTronTx!)).toString('base64'),
+                    wallet: this.tronWalletInfo.address,
                     energy: estimation.resources.energy,
                     bandwidth: estimation.resources.bandwidth,
-                    instantFeeTx: signedTonTx.toBoc().toString('base64')
+                    instantFeeTx: signedTonTx!.toBoc().toString('base64')
                 }
             });
         } catch (e) {
@@ -85,7 +103,7 @@ export class TronTonSender implements ITronSender {
         resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);*/
 
         const estimation = await this.batteryApi.tronEstimate({
-            wallet: this.walletInfo.address,
+            wallet: this.tronWalletInfo.address,
             ...resources
         });
 
@@ -94,10 +112,35 @@ export class TronTonSender implements ITronSender {
             throw new Error('Instant fee for ton not allowed');
         }
 
+        const extra = new AssetAmount({ weiAmount: tonInstantFee.amountNano, asset: TON_ASSET });
+
+        const account = await new AccountsApi(this.tonApi.tonApiV2).getAccount({
+            accountId: this.tonWalletInfo.rawAddress
+        });
+
+        const tonTransferOwnFee = AssetAmount.fromRelativeAmount({
+            amount: 0.01,
+            asset: TON_ASSET
+        });
+
+        const requiredTonBalance = new AssetAmount({
+            weiAmount: extra.weiAmount.plus(tonTransferOwnFee.weiAmount),
+            asset: TON_ASSET
+        });
+
+        if (requiredTonBalance.weiAmount.isGreaterThan(account.balance)) {
+            throw new TronNotEnoughTonBalanceError(
+                `Not enough balance to pay instant fee in ton. Required: ${requiredTonBalance.stringAssetRelativeAmount}`
+            );
+        }
+
         return {
             fee: {
                 type: 'ton-asset-relayed' as const,
-                extra: new AssetAmount({ weiAmount: tonInstantFee.amountNano, asset: TON_ASSET }),
+                extra: new AssetAmount({
+                    weiAmount: tonInstantFee.amountNano,
+                    asset: TON_ASSET
+                }),
                 sendToAddress: estimation.instantFee.feeAddress
             },
             resources

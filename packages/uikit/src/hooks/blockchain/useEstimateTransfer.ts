@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
+import { Asset, isTonAsset, isTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { Estimation, RecipientData, TonRecipientData } from '@tonkeeper/core/dist/entries/send';
@@ -8,9 +8,8 @@ import { DefaultRefetchInterval } from '../../state/tonendpoint';
 import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
-    SenderTypeUserAvailable,
-    useGetEstimationSender,
-    useGetTronEstimationSender
+    TonSenderTypeUserAvailable,
+    useGetEstimationSender
 } from './useSender';
 import { useTonAssetTransferService } from './useBlockchainService';
 import { useNotifyErrorHandle } from '../useNotification';
@@ -20,6 +19,12 @@ import { useMemo } from 'react';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import {
+    tronSenderChoiceByType,
+    TronSenderType,
+    useTronEstimationSender
+} from './sender/useTronSender';
+import { AllChainsSenderType } from './sender/sender-type';
 
 export function useEstimateTransfer({
     recipient,
@@ -30,12 +35,14 @@ export function useEstimateTransfer({
     recipient: RecipientData;
     amount: AssetAmount<Asset>;
     isMax: boolean;
-    senderType: SenderTypeUserAvailable | undefined;
+    senderType: AllChainsSenderType | undefined;
 }) {
-    const senderChoice = useMemo(() => {
-        if (senderType === undefined) {
+    const tonSenderChoice = useMemo(() => {
+        if (senderType === undefined || !isTonAsset(amount.asset)) {
             return undefined;
         }
+
+        senderType = senderType as TonSenderTypeUserAvailable;
 
         if (senderType === 'external') {
             return EXTERNAL_SENDER_CHOICE;
@@ -58,12 +65,14 @@ export function useEstimateTransfer({
 
         assertUnreachable(senderType);
     }, [senderType, amount]);
-    const getSender = useGetEstimationSender(senderChoice);
+
+    const getSender = useGetEstimationSender(tonSenderChoice);
     const transferService = useTonAssetTransferService();
     const notifyError = useNotifyErrorHandle();
     const getSenderKey = useToQueryKeyPart(getSender);
-    const getTronSender = useGetTronEstimationSender();
-    const getTronEstimationSenderKey = useToQueryKeyPart(getTronSender);
+    const tronSender = useTronEstimationSender(
+        isTronAsset(amount.asset) ? tronSenderChoiceByType(senderType as TronSenderType) : undefined
+    );
 
     return useQuery<Estimation, Error>(
         [
@@ -72,7 +81,7 @@ export function useEstimateTransfer({
             amount,
             isMax,
             getSenderKey,
-            getTronEstimationSenderKey,
+            tronSender,
             transferService,
             notifyError
         ],
@@ -92,8 +101,7 @@ export function useEstimateTransfer({
                         payload: comment ? { type: 'comment', value: comment } : undefined
                     });
                 } else if (amount.asset.id === TRON_USDT_ASSET.id) {
-                    const tronSender = getTronSender();
-                    return await tronSender.estimate(
+                    return await tronSender!.estimate(
                         recipient.address.address,
                         amount as AssetAmount<TronAsset>
                     );
@@ -108,7 +116,7 @@ export function useEstimateTransfer({
         {
             refetchInterval: DefaultRefetchInterval,
             refetchOnMount: 'always',
-            enabled: !!getSender && senderChoice !== undefined,
+            enabled: !!getSender && senderType !== undefined,
             retry: 2
         }
     );
