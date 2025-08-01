@@ -77,15 +77,17 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
                 selectedPlanId={selectedPlanId}
                 onPlanIdSelection={setSelectedPlanId}
                 productsForRender={productsForRender}
+                promoCodeNode={
+                    isCrypto &&
+                    isPromoShown && (
+                        <ProPromoCodeInput
+                            value={promoCode}
+                            onChange={setPromoCode}
+                            promoCode={verifiedPromoCode}
+                        />
+                    )
+                }
             />
-
-            {isCrypto && isPromoShown && (
-                <ProPromoCodeInput
-                    value={promoCode}
-                    onChange={setPromoCode}
-                    promoCode={verifiedPromoCode}
-                />
-            )}
 
             <ProFeaturesList />
 

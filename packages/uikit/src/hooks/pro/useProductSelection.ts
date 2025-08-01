@@ -12,7 +12,7 @@ import { useProPlans } from '../../state/pro';
 import { useNotifyError } from '../useNotification';
 
 const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
-const IOS_SKELETON_PRODUCTS_QTY = 2;
+const IOS_SKELETON_PRODUCTS_QTY = 1;
 
 export const getFilteredDisplayPlans = (proPlans?: NormalizedProPlans) => {
     const { plans = [] } = proPlans ?? {};

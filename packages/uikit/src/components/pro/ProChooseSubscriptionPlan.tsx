@@ -1,10 +1,10 @@
-import { ChangeEvent, Dispatch, FC, SetStateAction } from 'react';
+import { ChangeEvent, Dispatch, FC, ReactNode, SetStateAction } from 'react';
 import styled from 'styled-components';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body3 } from '../Text';
-import { ProPlanLabel } from './ProPlanLabel';
 import { useTranslation } from '../../hooks/translation';
+import { ProPlanLabelTemporal } from './ProPlanLabelTemporal';
 
 interface IProps {
     productsForRender: IDisplayPlan[];
@@ -13,6 +13,7 @@ interface IProps {
     isLoading: boolean;
     isEnterPromoVisible: boolean;
     onPromoInputShow: () => void;
+    promoCodeNode: ReactNode;
 }
 
 export const ProChooseSubscriptionPlan: FC<IProps> = props => {
@@ -22,6 +23,7 @@ export const ProChooseSubscriptionPlan: FC<IProps> = props => {
         onPlanIdSelection,
         isEnterPromoVisible,
         onPromoInputShow,
+        promoCodeNode,
         isLoading
     } = props;
     const { t } = useTranslation();
@@ -33,16 +35,19 @@ export const ProChooseSubscriptionPlan: FC<IProps> = props => {
     return (
         <SubscriptionPlansBlock>
             <Header>
-                <Subtitle>{t('choose_plan')}</Subtitle>
+                <Subtitle>{t('your_plan')}</Subtitle>
                 {isEnterPromoVisible && (
                     <ButtonStyled as="button" type="button" onClick={onPromoInputShow}>
                         {t('enter_promo_code')}
                     </ButtonStyled>
                 )}
             </Header>
+
+            {promoCodeNode}
+
             <RadioGroup>
                 {productsForRender.map(productProps => (
-                    <ProPlanLabel
+                    <ProPlanLabelTemporal
                         key={productProps.id}
                         isLoading={isLoading}
                         selectedPlanId={selectedPlanId}
@@ -59,6 +64,7 @@ const Header = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 8px;
 `;
 
 const ButtonStyled = styled(Body3)`
@@ -83,12 +89,11 @@ const RadioGroup = styled.fieldset`
     display: flex;
     gap: 8px;
     padding: 0;
-    margin: 0;
+    margin: 8px 0 0;
     min-width: 0;
 `;
 
 const Subtitle = styled(Body3)`
-    margin-bottom: 8px;
     max-width: 576px;
     display: block;
     color: ${p => p.theme.textSecondary};

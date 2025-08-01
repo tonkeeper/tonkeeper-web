@@ -1,4 +1,4 @@
-import { type FC } from 'react';
+import { type FC, useEffect, useRef } from 'react';
 import { useTranslation } from '../../hooks/translation';
 import { Input } from '../fields/Input';
 import { styled } from 'styled-components';
@@ -16,6 +16,11 @@ export const ProPromoCodeInput: FC<IProps> = props => {
     const sdk = useAppSdk();
     const { value, onChange, promoCode } = props;
     const { t } = useTranslation();
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
 
     const isValid = promoCode !== undefined;
 
@@ -44,6 +49,7 @@ export const ProPromoCodeInput: FC<IProps> = props => {
     return (
         <InputStyled
             id="crypto-promocode"
+            ref={inputRef}
             isSuccess={promoCode !== undefined}
             value={value}
             onChange={onChange}
