@@ -1,7 +1,8 @@
 import { styled } from 'styled-components';
+import { ConfirmState } from '@tonkeeper/core/dist/entries/pro';
+
 import { Notification } from '../../Notification';
 import { FC, PropsWithChildren } from 'react';
-import { ConfirmState } from '../../../state/pro';
 import { useEstimateTransfer } from '../../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from '../../transfer/ConfirmView';
@@ -27,6 +28,7 @@ export const ProConfirmNotification: FC<IProConfirmNotificationProps> = props =>
                             }
 
                             onClose();
+                            onConfirm?.(false);
                         }}
                     />
                 ) : (

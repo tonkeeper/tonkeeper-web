@@ -1,20 +1,24 @@
 import { registerPlugin } from '@capacitor/core';
-import type {
+import {
     IDisplayPlan,
     IIosPurchaseResult,
     IIosSubscriptionStrategy,
+    ISubscriptionFormData,
     IOriginalTransactionInfo,
     IProductInfo,
-    NormalizedProPlans
+    NormalizedProPlans,
+    ISubscriptionConfig,
+    isProductId
 } from '@tonkeeper/core/dist/entries/pro';
 import {
     IosEnvironmentTypes,
-    IosPurchaseStatuses,
+    PurchaseStatuses,
     IosSubscriptionStatuses,
     ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { getFormattedProPrice } from '@tonkeeper/uikit/dist/libs/pro';
+import { ProAuthTokenType, saveIapPurchase } from '@tonkeeper/core/dist/service/proService';
 
 interface ISubscriptionPlugin {
     subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult>;
@@ -48,7 +52,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                     ).toISOString();
 
                     resolve({
-                        status: IosPurchaseStatuses.SUCCESS,
+                        status: PurchaseStatuses.SUCCESS,
                         originalTransactionId: 2000000953417084,
                         environment: IosEnvironmentTypes.SANDBOX,
                         productId: options.productId,
@@ -82,7 +86,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                     resolve({
                         subscriptions: [
                             {
-                                status: IosPurchaseStatuses.SUCCESS,
+                                status: PurchaseStatuses.SUCCESS,
                                 originalTransactionId: 2000000953417084,
                                 environment: IosEnvironmentTypes.SANDBOX,
                                 productId: ProductIds.MONTHLY,
@@ -134,8 +138,44 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
 class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
     public source = SubscriptionSource.IOS as const;
 
-    async subscribe(productId: ProductIds): Promise<IIosPurchaseResult> {
-        return SubscriptionPlugin.subscribe({ productId });
+    async subscribe(
+        formData: ISubscriptionFormData,
+        config: ISubscriptionConfig
+    ): Promise<PurchaseStatuses> {
+        const productId = formData.selectedPlan.id;
+        const authService = config.authService;
+
+        if (!authService) {
+            throw new Error('Missing authService');
+        }
+
+        if (!isProductId(productId)) {
+            throw new Error('Missing product id for this product');
+        }
+
+        const subscription = await SubscriptionPlugin.subscribe({
+            productId
+        });
+
+        if (subscription.status === PurchaseStatuses.CANCELED) {
+            return PurchaseStatuses.CANCELED;
+        }
+
+        const originalTransactionId = subscription?.originalTransactionId;
+
+        if (!originalTransactionId) {
+            throw new Error('Failed to subscribe');
+        }
+
+        const savingResult = await authService.withTokenContext(ProAuthTokenType.TEMP, () =>
+            saveIapPurchase(String(originalTransactionId))
+        );
+
+        if (!savingResult.ok) {
+            throw new Error('Failed to subscribe');
+        }
+
+        return PurchaseStatuses.SUCCESS;
     }
 
     async getProductInfo(productId: ProductIds): Promise<IProductInfo> {

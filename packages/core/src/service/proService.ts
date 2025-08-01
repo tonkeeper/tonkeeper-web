@@ -340,16 +340,11 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const saveIapPurchase = async (
-    authService: ProAuthTokenService,
-    originalTransactionId: string
-): Promise<{ ok: boolean }> => {
+export const saveIapPurchase = async (originalTransactionId: string): Promise<{ ok: boolean }> => {
     try {
-        return await authService.withTokenContext(ProAuthTokenType.TEMP, () =>
-            IapService.activateIapPurchase({
-                original_transaction_id: originalTransactionId
-            })
-        );
+        return await IapService.activateIapPurchase({
+            original_transaction_id: originalTransactionId
+        });
     } catch (e) {
         return {
             ok: false

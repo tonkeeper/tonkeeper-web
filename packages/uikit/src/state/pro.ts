@@ -1,37 +1,29 @@
 import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import {
     AuthTypes,
     CryptoPendingSubscription,
     CryptoSubscriptionStatuses,
-    IDisplayPlan,
-    type IIosPurchaseResult,
-    IosPurchaseStatuses,
     isIosStrategy,
     isPaidSubscription,
-    isProductId,
+    ISubscriptionFormData,
     NormalizedProPlans,
     ProSubscription,
+    PurchaseStatuses,
     WalletAuth
 } from '@tonkeeper/core/dist/entries/pro';
-import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaSeedPhrase,
     authViaTonConnect,
-    createProServiceInvoice,
-    createRecipient,
     getBackupState,
     getProState,
     logoutTonConsole,
     ProAuthTokenService,
     ProAuthTokenType,
-    saveIapPurchase,
     setBackupState,
     startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
-import { InvoicesInvoice } from '@tonkeeper/core/dist/tonConsoleApi';
 import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
@@ -51,9 +43,6 @@ import { IAuthViaSeedPhraseData } from '@tonkeeper/core/dist/entries/password';
 import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
-import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
-import { AppRoute, SettingsRoute } from '../libs/routes';
-import { useNavigate } from '../hooks/router/useNavigate';
 
 type FreeProAccess = {
     code: string;
@@ -196,23 +185,6 @@ export const useProState = () => {
     );
 };
 
-export const useCurrentSubscriptionInfo = () => {
-    const sdk = useAppSdk();
-
-    return useQuery<IIosPurchaseResult[], Error>(
-        [QueryKey.currentIosSubscriptionInfo],
-        async () => {
-            if (!isIosStrategy(sdk.subscriptionStrategy)) {
-                throw new Error('This is not an iOS subscription strategy');
-            }
-
-            const result = await sdk.subscriptionStrategy.getCurrentSubscriptionInfo();
-
-            return result || [];
-        }
-    );
-};
-
 export const useManageSubscription = () => {
     const sdk = useAppSdk();
 
@@ -222,42 +194,6 @@ export const useManageSubscription = () => {
         }
 
         await sdk.subscriptionStrategy.manageSubscriptions();
-    });
-};
-
-export const useProSubscriptionPurchase = () => {
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-    const authService = useProAuthTokenService();
-
-    return useMutation<IosPurchaseStatuses, Error, IDisplayPlan>(async selectedPlan => {
-        const { id } = selectedPlan;
-
-        if (!isIosStrategy(sdk.subscriptionStrategy) || !isProductId(id)) {
-            throw new Error('This is not an iOS subscription strategy');
-        }
-
-        const subscription = await sdk.subscriptionStrategy?.subscribe(id);
-
-        if (subscription.status === IosPurchaseStatuses.CANCELED) {
-            return IosPurchaseStatuses.CANCELED;
-        }
-
-        const originalTransactionId = subscription?.originalTransactionId;
-
-        if (!originalTransactionId) {
-            throw new Error('Failed to subscribe');
-        }
-
-        const savingResult = await saveIapPurchase(authService, String(originalTransactionId));
-
-        if (!savingResult.ok) {
-            throw new Error('Failed to subscribe');
-        }
-
-        await client.invalidateQueries([QueryKey.pro]);
-
-        return IosPurchaseStatuses.SUCCESS;
     });
 };
 
@@ -349,89 +285,60 @@ export const useProPlans = (promoCode?: string) => {
     );
 };
 
-export interface ConfirmState {
-    invoice: InvoicesInvoice;
-    recipient: RecipientData;
-    assetAmount: AssetAmount;
-    wallet: TonWalletStandard;
-}
-
-export const useCreateInvoiceMutation = () => {
-    const ws = useAccountsStorage();
-    const api = useActiveApi();
+export const useProPurchaseMutation = () => {
     const sdk = useAppSdk();
-    const navigate = useNavigate();
+    const api = useActiveApi();
     const client = useQueryClient();
-    const [targetAuth] = useAtom(selectedTargetAuth);
     const { onOpen } = useProConfirmNotification();
-    const { onClose: onProPurchaseClose } = useProPurchaseNotification();
+    const ws = useAccountsStorage();
+    const [targetAuth] = useAtom(selectedTargetAuth);
     const authService = useProAuthTokenService();
 
-    return useMutation<void, Error, { selectedPlan: IDisplayPlan; promoCode?: string }>(
-        async data => {
-            if (!data.selectedPlan) {
-                throw new Error('missing selectedPlan');
-            }
-
-            const { id, displayName, formattedDisplayPrice } = data.selectedPlan;
-            const tierId = Number(id);
-
-            if (tierId === null) {
-                throw new Error('missing tier');
-            }
-
-            return authService.withTokenContext(ProAuthTokenType.TEMP, async () => {
-                const wallet = (await ws.getAccounts())
-                    .flatMap(a => a.allTonWallets)
-                    .find(w => w.id === targetAuth?.wallet?.rawAddress);
-
-                if (!wallet || !isStandardTonWallet(wallet)) {
-                    throw new Error('Missing wallet');
-                }
-
-                const invoice = await createProServiceInvoice(tierId, data.promoCode);
-                const [recipient, assetAmount] = await createRecipient(api, invoice);
-
-                onOpen({
-                    confirmState: {
-                        invoice,
-                        wallet,
-                        recipient,
-                        assetAmount
-                    },
-                    onConfirm: async (success?: boolean) => {
-                        if (!success) return;
-
-                        if (!targetAuth) {
-                            throw new Error('Missing wallet auth for pending subscription');
-                        }
-
-                        const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-
-                        const pendingSubscription: CryptoPendingSubscription = {
-                            source: SubscriptionSource.CRYPTO,
-                            status: CryptoSubscriptionStatuses.PENDING,
-                            valid: false,
-                            usedTrial: isUsedTrial,
-                            displayName,
-                            displayPrice: formattedDisplayPrice,
-                            auth: targetAuth
-                        };
-
-                        await sdk.storage.set<CryptoPendingSubscription>(
-                            AppKey.PRO_PENDING_SUBSCRIPTION,
-                            pendingSubscription
-                        );
-
-                        await client.invalidateQueries([QueryKey.pro]);
-
-                        onProPurchaseClose();
-                        navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
-                    }
-                });
-            });
+    return useMutation<PurchaseStatuses, Error, ISubscriptionFormData>(async formData => {
+        if (!sdk.subscriptionStrategy) {
+            throw new Error('Missing subscription strategy!');
         }
-    );
+
+        const onConfirm = async (success?: boolean) => {
+            if (!success) return;
+
+            if (!targetAuth) {
+                throw new Error('Missing wallet auth for pending subscription');
+            }
+
+            const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+
+            const pendingSubscription: CryptoPendingSubscription = {
+                source: SubscriptionSource.CRYPTO,
+                status: CryptoSubscriptionStatuses.PENDING,
+                valid: false,
+                usedTrial: isUsedTrial,
+                displayName: formData.selectedPlan.displayName,
+                displayPrice: formData.selectedPlan.formattedDisplayPrice,
+                auth: targetAuth
+            };
+
+            await sdk.storage.set<CryptoPendingSubscription>(
+                AppKey.PRO_PENDING_SUBSCRIPTION,
+                pendingSubscription
+            );
+        };
+
+        const status = await sdk.subscriptionStrategy.subscribe(formData, {
+            authService,
+            api,
+            ws,
+            onOpen,
+            onConfirm,
+            targetAuth
+        });
+
+        if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {
+            await client.invalidateQueries([QueryKey.pro]);
+        }
+
+        return status;
+    });
 };
 
 export const useActivateTrialMutation = () => {

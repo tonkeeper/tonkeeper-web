@@ -41,24 +41,15 @@ type ContentProps = Pick<IProPurchaseNotificationProps, 'onClose'>;
 export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCurrentClose }) => {
     const formId = useId();
     const { t } = useTranslation();
+    const { states, methods } = useProPurchaseController();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { isOpen: isPromoShown, onOpen: showPromo } = useDisclosure(false);
-    const { common, iosFlow, cryptoFlow } = useProPurchaseController();
 
-    const {
-        isCrypto,
-        isLoading,
-        isLoggingOut,
-        selectedPlanId,
-        setSelectedPlanId,
-        productsForRender,
-        onSubmit,
-        onLogout
-    } = common;
+    const { isCrypto, isLoading, isLoggingOut, promoCode, productsForRender, verifiedPromoCode } =
+        states;
 
-    const { promoCode, setPromoCode, verifiedPromoCode } = cryptoFlow;
-
-    const { onManage } = iosFlow;
+    const { onSubmit, onLogout, setPromoCode, selectedPlanId, setSelectedPlanId, onManage } =
+        methods;
 
     const handleDisconnect = async () => {
         await onLogout();

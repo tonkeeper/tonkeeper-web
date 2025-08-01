@@ -1,11 +1,15 @@
 import { CryptoCurrency, SubscriptionSource } from '../pro';
 import { Language } from './language';
+import { IAppSdk } from '../AppSdk';
+import { APIConfig } from './apis';
+import { AccountsStorage } from '../service/accountsStorage';
+import { TonWalletStandard } from './wallet';
+import { InvoicesInvoice } from '../tonConsoleApi';
+import { RecipientData } from './send';
+import { AssetAmount } from './crypto/asset/asset-amount';
+import { ProAuthTokenService } from '../service/proService';
 
 export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
-
-export interface ConstructedSubscription extends Partial<BaseSubscription> {
-    auth: WalletAuth | TelegramAuth;
-}
 
 export type IosSubscription = IosActiveSubscription | IosExpiredSubscription;
 
@@ -46,9 +50,37 @@ interface BaseSubscription {
     auth: WalletAuth | TelegramAuth;
 }
 
+export interface ConfirmState {
+    invoice: InvoicesInvoice;
+    recipient: RecipientData;
+    assetAmount: AssetAmount;
+    wallet: TonWalletStandard;
+}
+
+export interface ISubscriptionFormData {
+    selectedPlan: IDisplayPlan;
+    promoCode?: string;
+}
+
+export interface ISubscriptionConfig {
+    ws?: AccountsStorage;
+    sdk?: IAppSdk;
+    api?: APIConfig;
+    authService?: ProAuthTokenService;
+    onConfirm?: (success?: boolean) => Promise<void>;
+    onOpen?: (p?: {
+        confirmState: ConfirmState | null;
+        onConfirm?: (success?: boolean) => void;
+    }) => void;
+    targetAuth?: WalletAuth | null;
+}
+
 interface BaseSubscriptionStrategy {
     source: SubscriptionSource;
-
+    subscribe(
+        formData: ISubscriptionFormData,
+        config: ISubscriptionConfig
+    ): Promise<PurchaseStatuses>;
     getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;
 }
 
@@ -96,7 +128,7 @@ export interface IProductInfo {
 }
 
 export interface IIosPurchaseResult {
-    status: IosPurchaseStatuses;
+    status: PurchaseStatuses;
     productId: ProductIds;
     isUpgraded: boolean;
     purchaseDate: string;
@@ -115,7 +147,6 @@ export interface IOriginalTransactionInfo {
 
 export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
     source: SubscriptionSource.IOS;
-    subscribe(productId: ProductIds): Promise<IIosPurchaseResult>;
     getProductInfo(productId: ProductIds): Promise<IProductInfo>;
     manageSubscriptions(): Promise<void>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
@@ -123,7 +154,7 @@ export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
     hasActiveSubscription(): Promise<boolean>;
 }
 
-export enum IosPurchaseStatuses {
+export enum PurchaseStatuses {
     SUCCESS = 'success',
     PENDING = 'pending',
     CANCELED = 'cancelled'
@@ -135,13 +166,11 @@ export enum IosSubscriptionStatuses {
 }
 
 export enum ProductIds {
-    MONTHLY = 'com.tonapps.tonkeeperpro.subscription.pro.monthly',
-    YEARLY = 'com.tonapps.tonkeeperpro.subscription.pro.yearly'
+    MONTHLY = 'com.tonapps.tonkeeperpro.subscription.pro.monthly'
 }
 
 export enum IosEnvironmentTypes {
-    SANDBOX = 'Sandbox',
-    PRODUCTION = 'Production'
+    SANDBOX = 'Sandbox'
 }
 
 export function isProductId(value: unknown): value is ProductIds {
@@ -319,14 +348,6 @@ export function isTelegramActiveSubscription(value: unknown): value is TelegramA
         value?.source === SubscriptionSource.TELEGRAM &&
         value?.status === TelegramSubscriptionStatuses.ACTIVE
     );
-}
-
-export function hasAuth(
-    subscription: ProSubscription | ConstructedSubscription | null | undefined
-): subscription is Exclude<ProSubscription | ConstructedSubscription, null> & {
-    auth: WalletAuth | TelegramAuth;
-} {
-    return !!subscription?.auth;
 }
 
 export function hasIosPrice(
