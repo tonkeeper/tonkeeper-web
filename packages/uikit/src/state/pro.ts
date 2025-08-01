@@ -4,6 +4,7 @@ import {
     AuthTypes,
     CryptoPendingSubscription,
     CryptoSubscriptionStatuses,
+    IOriginalTransactionInfo,
     isIosStrategy,
     isPaidSubscription,
     ISubscriptionFormData,
@@ -281,6 +282,23 @@ export const useProPlans = (promoCode?: string) => {
             }
 
             return strategy.getAllProductsInfo(lang, promoCode);
+        }
+    );
+};
+
+export const useOriginalTransactionInfo = () => {
+    const sdk = useAppSdk();
+
+    return useQuery<IOriginalTransactionInfo | null, Error>(
+        [QueryKey.originalTransactionId],
+        async () => {
+            if (!isIosStrategy(sdk.subscriptionStrategy)) {
+                throw new Error('This is not an iOS subscription strategy');
+            }
+
+            const originalTxInfo = await sdk.subscriptionStrategy.getOriginalTransactionId();
+
+            return originalTxInfo || null;
         }
     );
 };

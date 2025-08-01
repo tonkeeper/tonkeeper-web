@@ -27,7 +27,6 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
-import { useCryptoSubscriptionPolling } from '../../../hooks/pro/useCryptoSubscriptionPolling';
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 
 const Body3Block = styled(Body3)`
@@ -164,7 +163,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     };
 
     useIosSubscriptionPolling();
-    useCryptoSubscriptionPolling();
     useSubscriptionEndingVerification();
 
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
