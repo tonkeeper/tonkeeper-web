@@ -3,22 +3,29 @@ import { FC, Fragment, useEffect, useRef, useState } from 'react';
 import { CarouselItem, CarouselRootProvider, CarouselItemGroup, useCarousel } from '@ark-ui/react';
 
 import {
-    MainPromoIcon,
-    MultiSendPromoIcon,
-    MultiSigPromoIcon,
-    MultiWalletPromoIcon,
-    SupportPromoIcon
+    MainPromoEnIcon,
+    MainPromoRuIcon,
+    MultiSendPromoEnIcon,
+    MultiSendPromoRuIcon,
+    MultiSigPromoEnIcon,
+    MultiWalletPromoEnIcon,
+    MultiWalletPromoRuIcon,
+    SupportPromoEnIcon,
+    SupportPromoRuIcon
 } from './icons';
 import { Badge } from '../shared';
-import { Body2, Label1 } from '../Text';
+import { Body2Class, Label1, Label1Class } from '../Text';
 import { FeatureSlideNames } from '../../enums/pro';
 import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
+import { useUserLanguage } from '../../state/language';
+import { localizationText } from '@tonkeeper/core/dist/entries/language';
 
 const CAROUSEL_TRIGGER_WIDTH = '40px';
 
 export const PromoNotificationCarousel = () => {
     const { t } = useTranslation();
+    const { data: lang } = useUserLanguage();
     const [observedSlide, setObservedSlide] = useState(FeatureSlideNames.MAIN);
 
     const carousel = useCarousel({
@@ -75,10 +82,13 @@ export const PromoNotificationCarousel = () => {
                     {META_DATA_MAP.map((localProps, idx) => {
                         const { id, content, titleKey, subtitleKey, badgeComponent } = localProps;
 
+                        const locText = localizationText(lang);
+                        const langKey = ['ru', 'en'].includes(locText) ? locText : 'en';
+
                         return (
                             <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
                                 <ImageWrapper isActive={observedSlide === idx}>
-                                    {content}
+                                    {content[langKey as 'en' | 'ru']}
                                 </ImageWrapper>
 
                                 <DescriptionBlock>
@@ -86,7 +96,7 @@ export const PromoNotificationCarousel = () => {
                                         titleKey={titleKey}
                                         badgeComponent={badgeComponent}
                                     />
-                                    <Body2Styled>
+                                    <SubTitle>
                                         {t(subtitleKey)
                                             .split('%')
                                             .map(line => (
@@ -95,7 +105,7 @@ export const PromoNotificationCarousel = () => {
                                                     <br />
                                                 </Fragment>
                                             ))}
-                                    </Body2Styled>
+                                    </SubTitle>
                                 </DescriptionBlock>
                             </Slide>
                         );
@@ -137,32 +147,47 @@ const META_DATA_MAP = [
         id: FeatureSlideNames.MAIN,
         titleKey: 'tonkeeper_pro_subscription',
         subtitleKey: 'promo_subtitle_subscription',
-        content: <MainPromoIcon />
+        content: {
+            ru: <MainPromoRuIcon />,
+            en: <MainPromoEnIcon />
+        }
     },
     {
         id: FeatureSlideNames.MULTI_SIG,
         titleKey: 'promo_title_multisig_wallets',
         subtitleKey: 'promo_subtitle_multisig_wallets',
-        content: <MultiSigPromoIcon />
+        content: {
+            ru: <MultiSigPromoEnIcon />,
+            en: <MultiSigPromoEnIcon />
+        }
     },
     {
         id: FeatureSlideNames.MULTI_WALLET,
         titleKey: 'promo_title_multi_wallet_accounts',
         subtitleKey: 'promo_subtitle_multi_wallet_accounts',
-        content: <MultiWalletPromoIcon />
+        content: {
+            ru: <MultiWalletPromoRuIcon />,
+            en: <MultiWalletPromoEnIcon />
+        }
     },
     {
         id: FeatureSlideNames.MULTI_SEND,
         titleKey: 'promo_title_multisend',
         badgeComponent: <LocalBadge />,
         subtitleKey: 'promo_subtitle_multisend',
-        content: <MultiSendPromoIcon />
+        content: {
+            ru: <MultiSendPromoRuIcon />,
+            en: <MultiSendPromoEnIcon />
+        }
     },
     {
         id: FeatureSlideNames.SUPPORT,
         titleKey: 'pro_feature_priority_support_title',
         subtitleKey: 'promo_subtitle_support',
-        content: <SupportPromoIcon />
+        content: {
+            ru: <SupportPromoRuIcon />,
+            en: <SupportPromoEnIcon />
+        }
     }
 ];
 
@@ -334,10 +359,15 @@ const Dot = styled.div<{ isActive: boolean }>`
     transition: background-color 0.3s;
 `;
 
-const Body2Styled = styled(Body2)`
+const SubTitle = styled.span`
+    ${Label1Class}
     text-align: center;
     text-wrap: balance;
     color: ${p => p.theme.textSecondary};
+
+    @media (pointer: fine) {
+        ${Body2Class}
+    }
 `;
 
 const DescriptionBlock = styled.div`
