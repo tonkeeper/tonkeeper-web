@@ -140,6 +140,8 @@
   "Delete_wallet_data_description": "Wallet keys and all personal data will be erased from this device.",
   "deleting_disable_pro_access": "Deleting this wallet will disable Pro access",
   "deleting_disable_pro_access_description": "Your Tonkeeper Pro subscription is linked to this wallet. If you delete it, Pro features will be unavailable until you add the wallet again.",
+  "deleting_wallets_warning": "After deleting all wallets, PRO features will become unavailable. They will be restored after logging in with a wallet that has an active subscription.",
+  "deleting_wallet_warning": "After deleting the wallet, PRO features will become unavailable. They will be restored after logging in with a wallet that has an active subscription.",
   "desktop_only": "DESKTOP ONLY",
   "disabled": "Disabled",
   "disconnect": "Disconnect",

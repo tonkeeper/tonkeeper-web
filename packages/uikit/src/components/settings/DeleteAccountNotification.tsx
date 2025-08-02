@@ -1,63 +1,38 @@
-import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
 import { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
+import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
 import { useMutateDeleteAll, useMutateLogOut } from '../../state/wallet';
 import { Notification } from '../Notification';
-import { Body1, H2, Label1, Label2 } from '../Text';
+import { Body2, Body3, Body3Class, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { Checkbox } from '../fields/Checkbox';
-import { DisclaimerBlock } from '../home/BuyItemNotification';
 import { useRecoveryNotification } from '../modals/RecoveryNotificationControlled';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { hexToRGBA } from '../../libs/css';
+import { BorderSmallResponsive } from '../shared/Styles';
+import { ExclamationMarkTriangleIcon } from '../Icon';
 import { useDeleteActiveWalletWarning } from '../../hooks/pro/useDeleteActiveWalletWarning';
-
-const NotificationBlock = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-`;
-
-const BodyText = styled(Body1)`
-    color: ${props => props.theme.textSecondary};
-`;
-const TextBlock = styled.div`
-    text-align: center;
-`;
-
-const DisclaimerText = styled(Label2)`
-    display: flex;
-`;
-
-const DisclaimerLink = styled(Label1)`
-    cursor: pointer;
-    color: ${props => props.theme.textAccent};
-    margin-left: 40px;
-`;
-
-const CheckboxStyled = styled(Checkbox)`
-    gap: 16px;
-`;
+import { useProState } from '../../state/pro';
 
 export const DeleteNotificationContent: FC<{
     onClose: () => void;
     accountId: AccountId;
     isKeystone: boolean;
     isReadOnly: boolean;
-}> = ({ onClose, accountId, isKeystone, isReadOnly }) => {
+}> = props => {
+    const { onClose, accountId, isKeystone, isReadOnly } = props;
     const navigate = useNavigate();
     const { t } = useTranslation();
     const [checked, setChecked] = useState(isKeystone || isReadOnly);
     const { mutateAsync, isLoading } = useMutateLogOut();
-    const verifyDeleting = useDeleteActiveWalletWarning();
     const { onOpen: onRecovery } = useRecoveryNotification();
+    const { isWarningVisible } = useDeleteActiveWalletWarning();
 
     const onDelete = async () => {
-        const isApprovedDeleting = await verifyDeleting();
-
-        if (!isApprovedDeleting) return;
-
         await mutateAsync(accountId);
         onClose();
         navigate(AppRoute.home);
@@ -66,7 +41,7 @@ export const DeleteNotificationContent: FC<{
     return (
         <NotificationBlock>
             <TextBlock>
-                <H2>{t('Delete_wallet_data')}</H2>
+                <Label2>{t('Delete_wallet_data')}</Label2>
                 <BodyText>
                     {t(
                         isKeystone
@@ -75,25 +50,36 @@ export const DeleteNotificationContent: FC<{
                     )}
                 </BodyText>
             </TextBlock>
-            {!isKeystone && !isReadOnly && (
-                <DisclaimerBlock>
-                    <DisclaimerText>
-                        <CheckboxStyled checked={checked} onChange={setChecked} light>
-                            {t('I_have_a_backup_copy_of_recovery_phrase')}
-                        </CheckboxStyled>
-                    </DisclaimerText>
-                    <DisclaimerLink
-                        onClick={() => {
-                            onRecovery({ accountId });
-                            onClose();
-                        }}
-                    >
-                        {t('Back_up_now')}
-                    </DisclaimerLink>
-                </DisclaimerBlock>
-            )}
+
+            <CentralBlockStyled>
+                {isWarningVisible && (
+                    <WarningBlock>
+                        <span>{t('deleting_wallet_warning')}</span>
+                        <ExclamationMarkTriangleIconStyled />
+                    </WarningBlock>
+                )}
+
+                {!isKeystone && !isReadOnly && (
+                    <DisclaimerBlock>
+                        <DisclaimerLink
+                            onClick={() => {
+                                onRecovery({ accountId });
+                                onClose();
+                            }}
+                        >
+                            <DisclaimerText>
+                                {t('I_have_a_backup_copy_of_recovery_phrase')}
+                            </DisclaimerText>
+                            {t('Back_up_now')}
+                        </DisclaimerLink>
+                        <Checkbox checked={checked} onChange={setChecked} light />
+                    </DisclaimerBlock>
+                )}
+            </CentralBlockStyled>
+
             {(isKeystone || isReadOnly) && <div style={{ height: 16 }} />}
-            <Button
+
+            <ButtonStyled
                 disabled={!checked}
                 size="large"
                 fullWidth
@@ -102,7 +88,7 @@ export const DeleteNotificationContent: FC<{
                 type="button"
             >
                 {t('Delete_wallet_data')}
-            </Button>
+            </ButtonStyled>
         </NotificationBlock>
     );
 };
@@ -137,22 +123,30 @@ const DeleteAllContent = () => {
     const { t } = useTranslation();
     const [checked, setChecked] = useState(false);
     const { mutate, isLoading } = useMutateDeleteAll();
+    const { data: subscription } = useProState();
 
     return (
         <NotificationBlock>
             <TextBlock>
-                <H2>{t('Delete_wallet_data')}</H2>
+                <Label2>{t('Delete_wallet_data')}</Label2>
                 <BodyText>{t('Delete_wallet_data_description')}</BodyText>
             </TextBlock>
 
-            <DisclaimerBlock>
-                <DisclaimerText>
-                    <CheckboxStyled checked={checked} onChange={setChecked} light>
-                        {t('I_have_a_backup_copy_of_recovery_phrase')}
-                    </CheckboxStyled>
-                </DisclaimerText>
-            </DisclaimerBlock>
-            <Button
+            <CentralBlockStyled>
+                {isPaidSubscription(subscription) && (
+                    <WarningBlock>
+                        <span>{t('deleting_wallets_warning')}</span>
+                        <ExclamationMarkTriangleIconStyled />
+                    </WarningBlock>
+                )}
+
+                <DisclaimerBlock>
+                    <Body3>{t('I_have_a_backup_copy_of_recovery_phrase')}</Body3>
+                    <Checkbox checked={checked} onChange={setChecked} light />
+                </DisclaimerBlock>
+            </CentralBlockStyled>
+
+            <ButtonStyled
                 disabled={!checked}
                 size="large"
                 fullWidth
@@ -161,7 +155,7 @@ const DeleteAllContent = () => {
                 type="button"
             >
                 {t('Delete_wallet_data')}
-            </Button>
+            </ButtonStyled>
         </NotificationBlock>
     );
 };
@@ -181,3 +175,73 @@ export const DeleteAllNotification: FC<{
         </Notification>
     );
 };
+
+const NotificationBlock = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+`;
+
+const CentralBlockStyled = styled.div`
+    width: 100%;
+`;
+
+const BodyText = styled(Body2)`
+    color: ${props => props.theme.textSecondary};
+`;
+const TextBlock = styled.div`
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+`;
+
+const DisclaimerBlock = styled.div`
+    ${Body3Class};
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 8px 16px 8px 12px;
+    box-sizing: border-box;
+
+    ${BorderSmallResponsive};
+    background: ${props => props.theme.backgroundContent};
+`;
+
+const DisclaimerText = styled(Label2)`
+    display: flex;
+    flex-direction: column;
+
+    ${Body3Class};
+    color: ${({ theme }) => theme.textPrimary};
+`;
+
+const DisclaimerLink = styled(Body3)`
+    cursor: pointer;
+    color: ${props => props.theme.textAccent};
+`;
+
+const WarningBlock = styled.div`
+    display: flex;
+    gap: 24px;
+    ${BorderSmallResponsive};
+    margin-bottom: 8px;
+    padding: 8px 16px 8px 12px;
+    justify-content: space-between;
+
+    ${Body3Class};
+    background: ${p => hexToRGBA(p.theme.accentOrange, 0.16)};
+    color: ${p => p.theme.accentOrange};
+`;
+
+const ExclamationMarkTriangleIconStyled = styled(ExclamationMarkTriangleIcon)`
+    min-width: 24px;
+    min-height: 24px;
+`;
+
+const ButtonStyled = styled(Button)`
+    text-transform: capitalize;
+`;
