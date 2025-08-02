@@ -31,7 +31,7 @@ const ProFeaturesListContent: FC<IProps> = props => {
             {!removeHeader && <HeaderStyled {...restHeaderProps} />}
             <ListBlock margin={false} fullWidth>
                 {features.map(({ id, titleKey, descriptionKey, badgeComponent }) => (
-                    <ListItem key={id} hover={false}>
+                    <ListItemStyled key={id} hover={false}>
                         <ListItemPayloadStyled>
                             <LocalBadgedTitleStyled
                                 titleKey={t(titleKey)}
@@ -39,7 +39,7 @@ const ProFeaturesListContent: FC<IProps> = props => {
                             />
                             <Text>{t(descriptionKey)}</Text>
                         </ListItemPayloadStyled>
-                    </ListItem>
+                    </ListItemStyled>
                 ))}
             </ListBlock>
         </div>
@@ -141,10 +141,17 @@ const Title = styled(Text)`
     margin: 8px 0;
 `;
 
+const ListItemStyled = styled(ListItem)`
+    &:not(:first-child) > div {
+        padding-top: 10px;
+    }
+`;
+
 const ListItemPayloadStyled = styled(ListItemPayload)`
     display: flex;
     flex-direction: column;
     align-items: start;
+    gap: 0;
     padding-top: 10px;
     padding-bottom: 10px;
 `;
