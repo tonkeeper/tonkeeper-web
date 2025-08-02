@@ -80,6 +80,7 @@ export const normalizeSubscription = (
                 },
                 amount: subscriptionDto.crypto?.amount,
                 currency: subscriptionDto.crypto?.currency,
+                promoCode: subscriptionDto.crypto?.promo_code,
                 purchaseDate: toDate(subscriptionDto.crypto?.purchase_date),
                 expiresDate: toDate(subscriptionDto.crypto?.expires_date)
             };
@@ -97,6 +98,7 @@ export const normalizeSubscription = (
             },
             amount: subscriptionDto.crypto?.amount,
             currency: subscriptionDto.crypto?.currency,
+            promoCode: subscriptionDto.crypto?.promo_code,
             purchaseDate: toDate(subscriptionDto.crypto?.purchase_date),
             expiresDate: toDate(subscriptionDto.crypto?.expires_date)
         };

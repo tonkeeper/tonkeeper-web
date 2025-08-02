@@ -189,6 +189,7 @@ interface CryptoDBStoredInfo {
     currency?: CryptoCurrency;
     expiresDate?: Date;
     purchaseDate?: Date;
+    promoCode?: string;
 }
 
 interface BaseCryptoSubscription extends BaseSubscription {
@@ -211,6 +212,7 @@ export interface CryptoPendingSubscription extends BaseCryptoSubscription {
     status: CryptoSubscriptionStatuses.PENDING;
     displayName?: string;
     displayPrice?: string;
+    promoCode?: string;
 }
 
 export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {

@@ -158,6 +158,8 @@ const clearProAuthBreadCrumbs = async (storage: IStorage) => {
 const loadProState = async (params: IGetProStateParams): Promise<ProSubscription> => {
     const { authService, sdk, promoExpirationDate } = params;
 
+    await authService.attachToken(ProAuthTokenType.MAIN);
+
     const storage = sdk.storage;
 
     const pendingSubscription: CryptoPendingSubscription | null = await storage.get(
