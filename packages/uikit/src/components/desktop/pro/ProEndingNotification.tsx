@@ -1,13 +1,16 @@
 import { type FC } from 'react';
 import { styled } from 'styled-components';
+import { isTelegramSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
+import { useProState } from '../../../state/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useTranslation } from '../../../hooks/translation';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
-import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
+import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 
 interface IProEndingNotificationProps {
     isOpen: boolean;
@@ -26,11 +29,18 @@ export const ProEndingNotificationContent: FC<Pick<IProEndingNotificationProps, 
     onClose: onCurrentClose
 }) => {
     const { t } = useTranslation();
+    const { data: subscription } = useProState();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onOpen: onProPurchaseOpen } = useProPurchaseNotification();
 
     const handlePurchaseClick = () => {
         onCurrentClose();
-        onProPurchaseOpen();
+
+        if (isTelegramSubscription(subscription)) {
+            onProAuthOpen();
+        } else {
+            onProPurchaseOpen();
+        }
     };
 
     return (
