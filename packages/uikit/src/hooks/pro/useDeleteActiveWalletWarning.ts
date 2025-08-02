@@ -1,4 +1,4 @@
-import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isPaidActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { useProState } from '../../state/pro';
 import { useActiveWallet } from '../../state/wallet';
@@ -9,7 +9,7 @@ export const useDeleteActiveWalletWarning = () => {
 
     return {
         isWarningVisible:
-            isPaidSubscription(subscription) &&
+            isPaidActiveSubscription(subscription) &&
             activeWallet?.rawAddress === subscription?.auth?.wallet?.rawAddress
     };
 };

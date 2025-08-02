@@ -6,7 +6,7 @@ import {
     CryptoSubscriptionStatuses,
     IOriginalTransactionInfo,
     isIosStrategy,
-    isPaidSubscription,
+    isPaidActiveSubscription,
     ISubscriptionFormData,
     NormalizedProPlans,
     ProSubscription,
@@ -256,7 +256,7 @@ export const useAutoAuthMutation = () => {
     const authService = useProAuthTokenService();
 
     return useMutation<void, Error, IAuthViaSeedPhraseData>(async authData => {
-        if (isPaidSubscription(subscription)) return;
+        if (isPaidActiveSubscription(subscription)) return;
 
         await authViaSeedPhrase(api, authService, authData);
 

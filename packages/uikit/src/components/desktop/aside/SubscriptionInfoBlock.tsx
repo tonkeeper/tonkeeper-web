@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-    isPaidSubscription,
+    isPaidActiveSubscription,
     isPendingSubscription,
     isTelegramActiveSubscription,
     isValidSubscription,
@@ -56,7 +56,7 @@ export const SubscriptionStatus: FC<{ subscription: ProSubscription }> = ({ subs
         );
     }
 
-    if (isPaidSubscription(subscription) && subscription.nextChargeDate) {
+    if (isPaidActiveSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>

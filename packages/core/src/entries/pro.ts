@@ -293,7 +293,7 @@ export function isExpiredSubscription(
     );
 }
 
-export function isPaidSubscription(
+export function isPaidActiveSubscription(
     value: unknown
 ): value is IosActiveSubscription | CryptoActiveSubscription {
     return (
@@ -320,7 +320,11 @@ export function isIosSubscription(value: unknown): value is IosSubscription {
 export function isIosAutoRenewableSubscription(value: unknown): value is IosActiveSubscription & {
     autoRenewStatus: true;
 } {
-    return isPaidSubscription(value) && isIosSubscription(value) && value?.autoRenewStatus === true;
+    return (
+        isPaidActiveSubscription(value) &&
+        isIosSubscription(value) &&
+        value?.autoRenewStatus === true
+    );
 }
 
 export function isIosExpiredSubscription(value: unknown): value is IosExpiredSubscription {

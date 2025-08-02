@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import { Account, AccountId } from '@tonkeeper/core/dist/entries/account';
-import { isPaidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { isPaidActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { useTranslation } from '../../hooks/translation';
 import { AppRoute } from '../../libs/routes';
@@ -133,7 +133,7 @@ const DeleteAllContent = () => {
             </TextBlock>
 
             <CentralBlockStyled>
-                {isPaidSubscription(subscription) && (
+                {isPaidActiveSubscription(subscription) && (
                     <WarningBlock>
                         <span>{t('deleting_wallets_warning')}</span>
                         <ExclamationMarkTriangleIconStyled />

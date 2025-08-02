@@ -5,7 +5,10 @@ import { Button } from '../fields/Button';
 import { useProState } from '../../state/pro';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useTranslation } from '../../hooks/translation';
-import { isPaidSubscription, isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    isPaidActiveSubscription,
+    isTelegramActiveSubscription
+} from '@tonkeeper/core/dist/entries/pro';
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { ChevronRightIcon } from '../Icon';
 import { useAppTargetEnv } from '../../hooks/appSdk';
@@ -68,7 +71,7 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
         ? subscription.nextChargeDate
         : undefined;
 
-    if (isPaidSubscription(subscription)) {
+    if (isPaidActiveSubscription(subscription)) {
         return null;
     }
 
