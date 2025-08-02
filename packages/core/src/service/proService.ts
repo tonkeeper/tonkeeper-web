@@ -139,8 +139,7 @@ const getPseudoTelegramSubscription = (
         valid: true,
         status: TelegramSubscriptionStatuses.ACTIVE,
         auth: {
-            type: AuthTypes.TELEGRAM,
-            trialUserId: 0
+            type: AuthTypes.TELEGRAM
         },
         nextChargeDate: promoExpirationDate
     };
