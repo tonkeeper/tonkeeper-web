@@ -82,7 +82,7 @@ export const useTrialAvailability = () => {
     const sdk = useAppSdk();
     const platform = useAppTargetEnv();
 
-    return useQuery<boolean, Error>([QueryKey.pro], async () => {
+    return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability], async () => {
         const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
         const isMobilePromo = Boolean(await sdk.storage.get(AppKey.PRO_FREE_ACCESS_ACTIVE));
 
