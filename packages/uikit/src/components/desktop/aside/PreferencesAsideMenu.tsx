@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { AsideMenuItem } from '../../shared/AsideItem';
-import { Body2, Body3, Label2 } from '../../Text';
+import { Body2, Body3, Label2, Label2Class } from '../../Text';
 import {
     AppearanceIcon,
     AppleIcon,
@@ -26,7 +26,7 @@ import React, { FC } from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
-import { useProState } from '../../../state/pro';
+import { useProState, useProSupportUrl } from '../../../state/pro';
 import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA, hover } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
@@ -36,6 +36,7 @@ import { ForTargetEnv, NotForTargetEnv } from '../../shared/TargetEnv';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { isProSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
+import { Badge } from '../../shared';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -118,6 +119,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: subscription } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
+    const { data: prioritySupportUrl } = useProSupportUrl();
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
@@ -222,12 +224,23 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     </HideOnReview>
                     <AsideMenuItemStyled
                         onClick={() =>
-                            config.directSupportUrl && sdk.openPage(config.directSupportUrl)
+                            config.directSupportUrl &&
+                            sdk.openPage(
+                                prioritySupportUrl ? prioritySupportUrl : config.directSupportUrl
+                            )
                         }
                         isSelected={false}
                     >
                         <TelegramIcon />
-                        <Label2>{t('settings_support')}</Label2>
+                        <PriorityButtonContent>
+                            <PriorityLabelStyled>
+                                {t('settings_support')}
+                                {prioritySupportUrl && <Badge size="s"> {t('priority')}</Badge>}
+                            </PriorityLabelStyled>
+                            {prioritySupportUrl && (
+                                <Body3Styled>{t('priority_support_description')}</Body3Styled>
+                            )}
+                        </PriorityButtonContent>
                     </AsideMenuItemStyled>
                     <HideOnReview>
                         <AsideMenuItemStyled
@@ -309,3 +322,20 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
         </PreferencesAsideContainer>
     );
 };
+
+const PriorityButtonContent = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const PriorityLabelStyled = styled.div`
+    ${Label2Class};
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+`;
+
+const Body3Styled = styled(Body3)`
+    color: ${({ theme }) => theme.textSecondary};
+`;

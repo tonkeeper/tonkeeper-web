@@ -43,6 +43,7 @@ import {
     Invoice,
     InvoicesService,
     SubscriptionSource,
+    SupportService,
     TiersService,
     UsersService
 } from '../pro';
@@ -468,3 +469,13 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
             throw new Error('Unsupported cell type');
     }
 }
+
+export const getProSupportUrl = async () => {
+    try {
+        const supportToken = await SupportService.getProSupport();
+
+        return supportToken?.url ?? null;
+    } catch (e) {
+        return null;
+    }
+};

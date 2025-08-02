@@ -45,6 +45,7 @@ export enum QueryKey {
     pro = 'pro',
     plans = 'plans',
     proBackup = 'proBackup',
+    supportToken = 'supportToken',
     allWalletsTotalBalance = 'allWalletsTotalBalance',
     originalTransactionId = 'originalTransactionId',
     currentIosSubscriptionInfo = 'currentIosSubscriptionInfo',

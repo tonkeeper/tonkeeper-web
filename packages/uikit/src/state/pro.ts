@@ -19,6 +19,7 @@ import {
     authViaTonConnect,
     getBackupState,
     getProState,
+    getProSupportUrl,
     logoutTonConsole,
     ProAuthTokenService,
     ProAuthTokenType,
@@ -87,6 +88,12 @@ export const useTrialAvailability = () => {
 
         return platform !== 'tablet' && !isMobilePromo && !isUsedTrial;
     });
+};
+
+export const useProSupportUrl = () => {
+    return useQuery<string | null, Error>([QueryKey.pro, QueryKey.supportToken], async () =>
+        getProSupportUrl()
+    );
 };
 
 export const useProBackupState = () => {
