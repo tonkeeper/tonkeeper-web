@@ -1,4 +1,5 @@
 import { KeystonePathInfo } from '../service/keystone/types';
+import { TonWalletStandard } from './wallet';
 
 export type AuthState =
     | AuthPassword
@@ -9,6 +10,12 @@ export type AuthState =
     | AuthKeystone;
 
 export type MnemonicType = 'ton' | 'bip39';
+
+export interface IAuthViaSeedPhraseData {
+    wallet: TonWalletStandard;
+    mnemonic: string[];
+    mnemonicType?: MnemonicType;
+}
 
 export interface AuthPassword {
     kind: 'password';

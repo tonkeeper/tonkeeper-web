@@ -1,12 +1,19 @@
 import { useEffect, useId, useState } from 'react';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
-import { useActiveBrowserTab, useChangeBrowserTab } from '@tonkeeper/uikit/dist/state/dapp-browser';
+import {
+    useActiveBrowserTab,
+    useChangeBrowserTab,
+    useCloseActiveBrowserTab,
+    useOpenBrowserTab
+} from '@tonkeeper/uikit/dist/state/dapp-browser';
 import { AnimatePresence, motion } from 'framer-motion';
 import styled from 'styled-components';
 import { MobileDappBrowserTab } from './MobileDappBrowserTab';
 import { MobileDappBrowserNewTab } from './MobileDappBrowserNewTab';
 import { useMenuController } from '@tonkeeper/uikit/dist/hooks/ionic';
 import { CapacitorDappBrowser } from '../../../libs/plugins/dapp-browser-plugin';
+import { NATIVE_BRIDGE_METHODS } from '../../../inject-scripts/native-bridge-methods';
+import { z } from 'zod';
 
 const Wrapper = styled(motion.div)`
     position: fixed;
@@ -56,9 +63,52 @@ const useRegisterViewFocusListener = () => {
     }, [isAsideOpen]);
 };
 
+const tgResponseSchema = z.object({
+    base64Result: z.string()
+});
+const useProvideWindowApi = () => {
+    const { mutate: openTab } = useOpenBrowserTab();
+    const { mutate: closeTab } = useCloseActiveBrowserTab();
+    const allowedHosts = ['oauth.telegram.org'];
+    const allowedResponseOrigins = ['https://wallet.tonkeeper.com'];
+
+    useEffect(() => {
+        (window as unknown as { openDappBrowser: (url: string) => void }).openDappBrowser = (
+            url: string
+        ) => {
+            const u = new URL(url);
+            if (!allowedHosts.includes(u.host)) {
+                throw new Error('Unsafe host');
+            }
+
+            openTab({ url });
+        };
+
+        CapacitorDappBrowser.setRequestsHandler(
+            NATIVE_BRIDGE_METHODS.TG_AUTH.SEND_RESULT,
+            async (rpcParams: Record<string, unknown>, { webViewOrigin }) => {
+                if (!allowedResponseOrigins.includes(webViewOrigin)) {
+                    throw new Error('Unsafe origin');
+                }
+
+                const { base64Result } = tgResponseSchema.parse(rpcParams);
+                const detail = JSON.parse(Buffer.from(base64Result, 'base64').toString('utf8'));
+
+                const customEvent = new CustomEvent('telegram-auth-success', {
+                    detail: detail
+                });
+
+                window.dispatchEvent(customEvent);
+                closeTab();
+            }
+        );
+    }, []);
+};
+
 export const MobileDappBrowserController = () => {
     useRegisterTabChangeListener();
     useRegisterViewFocusListener();
+    useProvideWindowApi();
 
     const tab = useActiveBrowserTab();
     const shouldDisplayBrowser = !!tab;

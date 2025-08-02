@@ -5,11 +5,11 @@ import { Button } from '../fields/Button';
 import { useProState } from '../../state/pro';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useTranslation } from '../../hooks/translation';
-import { isPaidSubscription, isTrialSubscription } from '@tonkeeper/core/dist/entries/pro';
-import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { isPaidSubscription, isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { ChevronRightIcon } from '../Icon';
 import { useAppTargetEnv } from '../../hooks/appSdk';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const ProBannerStyled = styled.div`
     background: ${p => p.theme.backgroundContent};
@@ -57,14 +57,16 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
     const { onOpen } = useProFeaturesNotification();
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
-    const { data } = useProState();
+    const { data: subscription } = useProState();
     const targetEnv = useAppTargetEnv();
 
-    if (!data) {
+    if (!subscription) {
         return null;
     }
 
-    const { subscription } = data;
+    const nextChargeDate = isTelegramActiveSubscription(subscription)
+        ? subscription.nextChargeDate
+        : undefined;
 
     if (isPaidSubscription(subscription)) {
         return null;
@@ -84,11 +86,11 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
             </TextContainerStyled>
             <NotForTargetEnv env="mobile">
                 <ButtonsContainerStyled>
-                    {isTrialSubscription(subscription) && (
+                    {nextChargeDate && (
                         <Label2Styled>
                             {t('pro_banner_days_left').replace(
                                 '%days%',
-                                formatDate(subscription.trialEndDate, {
+                                formatDate(nextChargeDate, {
                                     day: 'numeric',
                                     month: 'short',
                                     year: 'numeric'
@@ -97,7 +99,7 @@ export const ProBanner: FC<{ className?: string }> = ({ className }) => {
                         </Label2Styled>
                     )}
 
-                    <Button size="small" corner="2xSmall" primary onClick={onOpen}>
+                    <Button size="small" corner="2xSmall" primary onClick={() => onOpen()}>
                         {t('about_tonkeeper_pro')}
                     </Button>
                 </ButtonsContainerStyled>

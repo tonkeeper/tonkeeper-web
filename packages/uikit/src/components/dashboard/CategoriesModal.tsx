@@ -14,11 +14,10 @@ import {
 import { Button } from '../fields/Button';
 import { Badge } from '../shared';
 import { useProState } from '../../state/pro';
-import { ProNotification } from '../pro/ProNotification';
-import { useDisclosure } from '../../hooks/useDisclosure';
 import { DashboardColumn } from '@tonkeeper/core/dist/entries/dashboard';
 import { useTranslation } from '../../hooks/translation';
-import { HideOnReview } from '../ios/HideOnReview';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const HeaderStyled = styled.div`
     width: 100%;
@@ -98,9 +97,9 @@ const CategoriesModalContent: FC<{
         data: DashboardColumnsForm | ((data: DashboardColumnsForm) => DashboardColumnsForm)
     ) => void;
 }> = ({ categories, categoriesForm, setCategoriesForm }) => {
-    const { data } = useProState();
-    const isProEnabled = data?.subscription.valid;
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { data: subscription } = useProState();
+    const { onOpen } = useProFeaturesNotification();
+    const isProEnabled = isValidSubscription(subscription);
 
     const handleDrop: OnDragEndResponder = useCallback(droppedItem => {
         const destination = droppedItem.destination;
@@ -156,11 +155,7 @@ const CategoriesModalContent: FC<{
                                                             <ReorderIcon />
                                                         </Icon>
                                                         <Body1>{category?.name}</Body1>
-                                                        <HideOnReview>
-                                                            {category?.onlyPro && (
-                                                                <Badge>PRO</Badge>
-                                                            )}
-                                                        </HideOnReview>
+                                                        {category?.onlyPro && <Badge>PRO</Badge>}
                                                         <CheckboxStyled
                                                             checked={isEnabled}
                                                             disabled={isDisabled}
@@ -181,7 +176,6 @@ const CategoriesModalContent: FC<{
                     )}
                 </Droppable>
             </DragDropContext>
-            <ProNotification isOpen={isOpen} onClose={onClose} />
         </>
     );
 };

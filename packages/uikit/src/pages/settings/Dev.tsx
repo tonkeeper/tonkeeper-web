@@ -3,7 +3,7 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk, useIsCapacitorApp } from '../../hooks/appSdk';
-import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
+import { CloseIcon, PlusIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
@@ -33,14 +33,23 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
+import { QueryKey } from '../../libs/queryKey';
+import { useProAuthTokenService } from '../../state/pro';
+import { ProAuthTokenType } from '@tonkeeper/core/dist/service/proService';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const authService = useProAuthTokenService();
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
-        await sdk.storage.set(AppKey.PRO_AUTH_TOKEN, null);
+
+        await authService.setToken(ProAuthTokenType.MAIN, null);
+        await authService.setToken(ProAuthTokenType.TEMP, null);
+
+        await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
+
         await client.invalidateQueries();
     });
 
@@ -115,6 +124,45 @@ const ReviewerSettings = () => {
                 <ListItemPayload>
                     <Label1>Enable extra security</Label1>
                     <Switch checked={isOnReview} onChange={mutate} disabled={isLoading} />
+                </ListItemPayload>
+            </ListItem>
+        </ListBlockDesktopAdaptive>
+    );
+};
+
+// TODO Remove it before release
+const PromoStateSettings = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    const isCapacitor = useIsCapacitorApp();
+    const [isActive, setIsActive] = useState(false);
+
+    useEffect(() => {
+        (async () => {
+            const isFreeActive = Boolean(
+                await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
+            );
+            setIsActive(isFreeActive);
+        })();
+    }, [sdk.storage]);
+
+    const handleChange = async (checked: boolean) => {
+        await sdk.storage.set<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE, checked);
+        setIsActive(checked);
+
+        await client.invalidateQueries([QueryKey.pro]);
+    };
+
+    if (!isCapacitor) {
+        return null;
+    }
+
+    return (
+        <ListBlockDesktopAdaptive>
+            <ListItem hover={false}>
+                <ListItemPayload>
+                    <Label1>Mobile Promo state</Label1>
+                    <Switch checked={isActive} onChange={handleChange} />
                 </ListItemPayload>
             </ListItem>
         </ListBlockDesktopAdaptive>
@@ -253,6 +301,7 @@ export const DevSettings = React.memo(() => {
                 <CookieSettings />
                 <AddAccountBySK />
                 <ReviewerSettings />
+                <PromoStateSettings />
                 <LogsSettings />
             </DesktopWrapper>
         );

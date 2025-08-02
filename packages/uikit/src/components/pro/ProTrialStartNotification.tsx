@@ -1,11 +1,13 @@
-import { FC } from 'react';
-import { Notification } from '../Notification';
+import { FC, useEffect } from 'react';
 import styled from 'styled-components';
+
+import { TelegramIcon } from '../Icon';
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
-import { useActivateTrialMutation } from '../../state/pro';
-import { TelegramIcon } from '../Icon';
 import { useTranslation } from '../../hooks/translation';
+import { useActivateTrialMutation } from '../../state/pro';
+import { useNotifyError } from '../../hooks/useNotification';
+import { Notification, NotificationFooterPortal } from '../Notification';
 
 const ContentWrapper = styled.div`
     display: flex;
@@ -42,31 +44,34 @@ export const ProTrialStartNotification: FC<{
     onClose: (confirmed?: boolean) => void;
 }> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
-    const { mutateAsync, isLoading } = useActivateTrialMutation();
+    const { mutateAsync, isError, isSuccess, isLoading } = useActivateTrialMutation();
+    useNotifyError(isError && new Error(t('failed_connect_telegram')));
+
+    useEffect(() => {
+        if (!isSuccess) return;
+
+        onClose(true);
+    }, [isSuccess]);
 
     const onConfirm = async () => {
-        const result = await mutateAsync();
-        onClose(result);
+        await mutateAsync();
     };
 
     return (
-        <Notification
-            isOpen={isOpen}
-            handleClose={() => onClose()}
-            footer={
-                <FooterStyled>
-                    <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
-                        <TelegramIcon />
-                        {t('connect_telegram')}
-                    </ButtonStyled>
-                </FooterStyled>
-            }
-        >
+        <Notification isOpen={isOpen} handleClose={() => onClose()}>
             {() => (
                 <ContentWrapper>
                     <ImageStyled src="https://tonkeeper.com/assets/icon.ico" />
                     <Label2>{t('start_trial_notification_heading')}</Label2>
                     <Body2>{t('start_trial_notification_description')}</Body2>
+                    <NotificationFooterPortal>
+                        <FooterStyled>
+                            <ButtonStyled primary fullWidth loading={isLoading} onClick={onConfirm}>
+                                <TelegramIcon />
+                                {t('connect_telegram')}
+                            </ButtonStyled>
+                        </FooterStyled>
+                    </NotificationFooterPortal>
                 </ContentWrapper>
             )}
         </Notification>

@@ -36,7 +36,6 @@ import { Body2, Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { IconButton } from '../../fields/IconButton';
 import { SkeletonText } from '../../shared/Skeleton';
-import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 import { AmountInput } from './AmountInput';
 import { MultisendAssetSelect } from './MultisendAssetSelect';
 import { CommentInput } from './CommentInput';
@@ -52,11 +51,12 @@ import { removeGroupSeparator } from '@tonkeeper/core/dist/utils/send';
 import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { useActiveStandardTonWallet } from '../../../state/wallet';
 import { MAX_ALLOWED_WALLET_MSGS } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { HideOnReview } from '../../ios/HideOnReview';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { useBlocker } from '../../../hooks/router/useBlocker';
 import { useTwoFAWalletConfig } from '../../../state/two-fa';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { ProFeaturesNotification } from '../pro/ProFeaturesNotification';
 
 const FormHeadingWrapper = styled.div`
     display: flex;
@@ -417,7 +417,7 @@ const MultiSendFooter: FC<{
     // eslint-disable-next-line complexity
 }> = ({ asset, rowsValue, list, onBack }) => {
     const { t } = useTranslation();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
     const {
         isOpen: isProModalOpened,
         onClose: onProModalClose,
@@ -579,21 +579,19 @@ const MultiSendFooter: FC<{
                         )}
                     </MultiSendFooterTextWrapper>
                 )}
-                {!proState || proState.subscription.valid ? (
+                {isValidSubscription(subscription) ? (
                     <Button
                         type="submit"
                         primary
                         disabled={remainingBalanceBN?.lt(0) || !!maxMsgsNumberExceeded || isLedger}
-                        loading={formValidationState === 'validating' || !proState}
+                        loading={formValidationState === 'validating' || !subscription}
                     >
                         {t('continue')}
                     </Button>
                 ) : (
-                    <HideOnReview>
-                        <Button type="button" primary onClick={onBuyPro}>
-                            {t('multi_send_continue_with_pro')}
-                        </Button>
-                    </HideOnReview>
+                    <Button type="button" primary onClick={onBuyPro}>
+                        {t('multi_send_continue_with_pro')}
+                    </Button>
                 )}
             </MultiSendFooterWrapper>
             <SaveListNotification

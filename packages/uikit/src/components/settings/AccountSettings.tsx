@@ -1,6 +1,5 @@
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
@@ -16,7 +15,6 @@ import {
     RecoveryPhraseIcon,
     SaleBadgeIcon,
     SecurityIcon,
-    SettingsProIcon,
     WalletsIcon,
     BatteryIcon,
     LockIcon,
@@ -39,7 +37,6 @@ const SingleAccountSettings = () => {
     const account = useActiveAccount();
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
-    const { proFeatures } = useAppContext();
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
     const twoFAEnabled = useCanViewTwoFA();
@@ -53,14 +50,6 @@ const SingleAccountSettings = () => {
                 action: () => navigate(relative(SettingsRoute.account))
             }
         ];
-
-        if (proFeatures) {
-            items.push({
-                name: t('tonkeeper_pro'),
-                icon: <SettingsProIcon />,
-                action: () => navigate(relative(SettingsRoute.pro))
-            });
-        }
 
         return items;
     }, [t]);
@@ -200,7 +189,6 @@ const MultipleAccountSettings = () => {
 
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
-    const { proFeatures } = useAppContext();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
     const batteryEnableConfig = useBatteryEnabledConfig();
@@ -219,20 +207,7 @@ const MultipleAccountSettings = () => {
                 icon: <WalletsIcon />,
                 action: () => navigate(relative(SettingsRoute.account))
             }
-            // {
-            //   name: t('Subscriptions'),
-            //   icon: <SubscriptionIcon />,
-            //   action: () => navigate(relative(SettingsRoute.subscriptions)),
-            // },
         ];
-
-        if (proFeatures) {
-            items.push({
-                name: t('tonkeeper_pro'),
-                icon: <SettingsProIcon />,
-                action: () => navigate(relative(SettingsRoute.pro))
-            });
-        }
 
         return items;
     }, [wallet, t]);

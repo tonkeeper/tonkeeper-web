@@ -324,7 +324,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     }, [uiPreferences?.asideWidth]);
 
     useEffect(() => {
-        const minWidth = 200;
+        const minWidth = 240;
         const maxWidth = 500;
         const onMouseUp = () => {
             document.body.style.cursor = 'unset';
@@ -422,15 +422,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_settings')}</Label2>
                         </AsideMenuItem>
                     </AsideMenuBottomContent>
-                    <HideOnReview>
-                        <ErrorBoundary
-                            fallbackRender={fallbackRenderOver('Failed to load Pro State')}
-                        >
-                            <SubscriptionBlockWrapper>
-                                <SubscriptionInfoBlock />
-                            </SubscriptionBlockWrapper>
-                        </ErrorBoundary>
-                    </HideOnReview>
+                    <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
+                        <SubscriptionBlockWrapper>
+                            <SubscriptionInfoBlock />
+                        </SubscriptionBlockWrapper>
+                    </ErrorBoundary>
                 </AsideMenuBottom>
             </AsideContentContainer>
             <NotForTargetEnv env="mobile">
