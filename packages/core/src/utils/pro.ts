@@ -15,16 +15,10 @@ import { accountsStorage } from '../service/accountsStorage';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 
-interface IAuthData {
-    user: UserInfo;
-    authorizedWallet: ProStateWallet | null;
-}
-
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
-    authData: IAuthData
+    authorizedWallet: ProStateWallet | null
 ): ProSubscription => {
-    const { user, authorizedWallet } = authData;
     const source = subscriptionDto?.source;
     const toDate = (ts?: number) => (ts ? new Date(ts * 1000) : undefined);
 
@@ -33,7 +27,6 @@ export const normalizeSubscription = (
     }
 
     const valid = subscriptionDto.valid;
-    const usedTrial = subscriptionDto.used_trial ?? false;
     const nextChargeDate = toDate(subscriptionDto.next_charge);
 
     if (source === SubscriptionSource.TELEGRAM) {
@@ -42,11 +35,9 @@ export const normalizeSubscription = (
                 source,
                 status: TelegramSubscriptionStatuses.ACTIVE,
                 valid: true,
-                usedTrial: true,
                 nextChargeDate,
                 auth: {
-                    type: AuthTypes.TELEGRAM,
-                    trialUserId: user.tg_id
+                    type: AuthTypes.TELEGRAM
                 },
                 expiresDate: toDate(subscriptionDto?.telegram?.expires_date)
             };
@@ -56,11 +47,9 @@ export const normalizeSubscription = (
             source,
             status: TelegramSubscriptionStatuses.EXPIRED,
             valid: false,
-            usedTrial: true,
             nextChargeDate,
             auth: {
-                type: AuthTypes.TELEGRAM,
-                trialUserId: user.tg_id
+                type: AuthTypes.TELEGRAM
             },
             expiresDate: toDate(subscriptionDto?.telegram?.expires_date)
         };
@@ -72,7 +61,6 @@ export const normalizeSubscription = (
                 source,
                 status: CryptoSubscriptionStatuses.ACTIVE,
                 valid: true,
-                usedTrial,
                 nextChargeDate,
                 auth: {
                     type: AuthTypes.WALLET,
@@ -90,7 +78,6 @@ export const normalizeSubscription = (
             source,
             status: CryptoSubscriptionStatuses.EXPIRED,
             valid: false,
-            usedTrial,
             nextChargeDate,
             auth: {
                 type: AuthTypes.WALLET,
@@ -110,7 +97,6 @@ export const normalizeSubscription = (
                 source,
                 status: IosSubscriptionStatuses.ACTIVE,
                 valid: true,
-                usedTrial,
                 nextChargeDate,
                 auth: {
                     type: AuthTypes.WALLET,
@@ -133,7 +119,6 @@ export const normalizeSubscription = (
             source,
             status: IosSubscriptionStatuses.EXPIRED,
             valid: false,
-            usedTrial,
             nextChargeDate,
             auth: {
                 type: AuthTypes.WALLET,

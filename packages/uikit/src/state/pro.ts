@@ -331,13 +331,10 @@ export const useProPurchaseMutation = () => {
                 throw new Error('Missing wallet auth for pending subscription');
             }
 
-            const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-
             const pendingSubscription: CryptoPendingSubscription = {
                 source: SubscriptionSource.CRYPTO,
                 status: CryptoSubscriptionStatuses.PENDING,
                 valid: false,
-                usedTrial: isUsedTrial,
                 displayName: formData.selectedPlan.displayName,
                 displayPrice: formData.selectedPlan.formattedDisplayPrice,
                 auth: targetAuth

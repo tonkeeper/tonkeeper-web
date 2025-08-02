@@ -15,7 +15,7 @@ import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useProPlans, useProState, useTrialAvailability } from '../../../state/pro';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
-import { hasUsedTrial, IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
 import { ClosePromoIcon } from '../../Icon';
@@ -60,8 +60,6 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     const { data: products, isError, isLoading: isProPlanLoading, refetch } = useProPlans();
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
-    const isFinalTrialAvailable = !hasUsedTrial(subscription) && isTrialAvailable;
-
     const handleProAuth = () => {
         if (isError) {
             void refetch();
@@ -100,7 +98,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                             isError={isError}
                             isLoading={isProPlanLoading}
                             displayPlans={displayPlans}
-                            onTrial={isFinalTrialAvailable ? onTrialModalOpen : undefined}
+                            onTrial={isTrialAvailable ? onTrialModalOpen : undefined}
                         />
                     </NotificationFooter>
                 </NotificationFooterPortal>

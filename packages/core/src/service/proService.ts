@@ -116,10 +116,7 @@ const getNormalizedSubscription = async (
         const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
         const currentSubscriptionDTO = await UsersService.verifySubscription();
 
-        return normalizeSubscription(currentSubscriptionDTO, {
-            user,
-            authorizedWallet
-        });
+        return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
     };
 
     try {
@@ -141,7 +138,6 @@ const getPseudoTelegramSubscription = (
         source: SubscriptionSource.TELEGRAM,
         valid: true,
         status: TelegramSubscriptionStatuses.ACTIVE,
-        usedTrial: true,
         auth: {
             type: AuthTypes.TELEGRAM,
             trialUserId: 0

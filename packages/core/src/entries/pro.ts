@@ -34,7 +34,6 @@ export interface WalletAuth {
 
 export interface TelegramAuth {
     type: AuthTypes.TELEGRAM;
-    trialUserId: number | undefined;
 }
 
 export type NormalizedProPlans = {
@@ -45,7 +44,6 @@ export type NormalizedProPlans = {
 interface BaseSubscription {
     source: SubscriptionSource;
     valid: boolean;
-    usedTrial: boolean;
     nextChargeDate?: Date;
     auth: WalletAuth | TelegramAuth;
 }
@@ -239,7 +237,6 @@ interface TelegramDBStoredInfo {
 interface BaseTelegramSubscription extends BaseSubscription, TelegramDBStoredInfo {
     source: SubscriptionSource.TELEGRAM;
     status: TelegramSubscriptionStatuses;
-    usedTrial: true;
     auth: TelegramAuth;
 }
 
@@ -369,12 +366,6 @@ export function hasSubscriptionSource(
         subscription?.source === SubscriptionSource.CRYPTO ||
         subscription?.source === SubscriptionSource.TELEGRAM
     );
-}
-
-export function hasUsedTrial(
-    value?: unknown
-): value is Exclude<ProSubscription, null> & { usedTrial: true } {
-    return isProSubscription(value) && value?.usedTrial;
 }
 
 export function hasWalletAuth(value?: unknown): value is { auth: WalletAuth } {
