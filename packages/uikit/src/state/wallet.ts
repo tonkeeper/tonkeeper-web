@@ -31,7 +31,8 @@ import {
     WalletId,
     WalletVersion,
     AccountWallet,
-    getWalletsFromAccount
+    getWalletsFromAccount,
+    WalletsTransform
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConfig,
@@ -118,13 +119,13 @@ export const useActiveWallet = () => {
     return account.activeTonWallet;
 };
 
-export const useAccountWallets = (): AccountWallet[] => {
+export const useAccountWallets = (transform?: WalletsTransform): AccountWallet[] => {
     const accounts = useAccountsState().filter(
         (acc): acc is AccountTonMnemonic | AccountMAM =>
             seeIfMainnnetAccount(acc) && (acc.type === 'mnemonic' || acc.type === 'mam')
     );
 
-    return accounts.flatMap(getWalletsFromAccount);
+    return accounts.flatMap(acc => getWalletsFromAccount(acc, transform));
 };
 
 export const useActiveStandardTonWallet = () => {

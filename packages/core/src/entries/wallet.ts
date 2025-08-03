@@ -14,8 +14,11 @@ export enum WalletVersion {
     V5R1 = 5
 }
 
+export type WalletsTransform = (wallets: ReadonlyArray<TonWalletStandard>) => TonWalletStandard[];
+
 export const getWalletsFromAccount = (
-    account: AccountTonMnemonic | AccountMAM
+    account: AccountTonMnemonic | AccountMAM,
+    transformAllWallets?: WalletsTransform
 ): AccountWallet[] => {
     if (account.type === 'mam') {
         return account.derivations.map(derivation => ({
@@ -25,13 +28,16 @@ export const getWalletsFromAccount = (
         }));
     }
 
-    return account.allTonWallets
-        .filter(w => !backwardCompatibilityOnlyWalletVersions.includes(w.version))
-        .sort(sortWalletsByVersion)
-        .map(w => ({
-            wallet: w,
-            account
-        }));
+    const immutableWallets = account.allTonWallets as ReadonlyArray<TonWalletStandard>;
+
+    const modifiedWallets = transformAllWallets
+        ? transformAllWallets(immutableWallets.slice())
+        : immutableWallets.slice();
+
+    return modifiedWallets.sort(sortWalletsByVersion).map(w => ({
+        wallet: w,
+        account
+    }));
 };
 
 export function sortWalletsByVersion(

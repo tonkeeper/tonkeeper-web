@@ -5,6 +5,7 @@ import {
     isTelegramSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
+import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 
 import {
     Notification,
@@ -49,9 +50,9 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
     const { t } = useTranslation();
     const { data: subscription } = useProState();
     const navigate = useNavigate();
-    const accountsWallets = useAccountWallets();
     const { onOpen: onPurchaseOpen } = useProPurchaseNotification();
     const activeWallet = useActiveWallet();
+    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
     const [selectedAccountId, setSelectedAccountId] = useState(activeWallet?.rawAddress ?? '');
 
     const toast = useToast();

@@ -23,7 +23,11 @@ import {
     TelegramSubscriptionStatuses
 } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { TonWalletStandard, WalletVersion } from '../entries/wallet';
+import {
+    backwardCompatibilityOnlyWalletVersions,
+    TonWalletStandard,
+    WalletVersion
+} from '../entries/wallet';
 import { AccountsApi } from '../tonApiV2';
 import { Flatten } from '../utils/types';
 import { loginViaTG } from './telegramOauth';
@@ -478,3 +482,8 @@ export const getProSupportUrl = async () => {
         return null;
     }
 };
+
+export const backwardCompatibilityFilter = (wallets: ReadonlyArray<TonWalletStandard>) =>
+    wallets.filter(
+        (w: TonWalletStandard) => !backwardCompatibilityOnlyWalletVersions.includes(w?.version)
+    );
