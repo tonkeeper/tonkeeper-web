@@ -4,8 +4,8 @@ import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 
 import { BrowserStorage } from './storage';
 import packageJson from '../../package.json';
-import { Subscription } from './subscription';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
+import { Subscription } from '@tonkeeper/core/CryptoSubscriptionStrategy';
 
 function iOS() {
     return (

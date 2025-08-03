@@ -1,21 +1,25 @@
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { SubscriptionSource } from './src/pro';
 import {
+    AuthTypes,
+    CryptoPendingSubscription,
+    CryptoSubscriptionStatuses,
     ICryptoSubscriptionStrategy,
     IDisplayPlan,
-    PurchaseStatuses,
-    NormalizedProPlans,
+    isTonWalletStandard,
     ISubscriptionConfig,
-    ISubscriptionFormData
-} from '@tonkeeper/core/dist/entries/pro';
+    ISubscriptionFormData,
+    NormalizedProPlans,
+    PurchaseStatuses
+} from './src/entries/pro';
 import {
     createProServiceInvoice,
     createRecipient,
     getProServiceTiers,
     ProAuthTokenType
-} from '@tonkeeper/core/dist/service/proService';
-import { Language } from '@tonkeeper/core/dist/entries/language';
+} from './src/service/proService';
+import { Language } from './src/entries/language';
 import { getFormattedProPrice } from '@tonkeeper/uikit/dist/libs/pro';
-import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
+import { AppKey } from './src/Keys';
 
 class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
     public source = SubscriptionSource.CRYPTO as const;
@@ -35,21 +39,42 @@ class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
             throw new Error('missing tier');
         }
 
-        const { authService, api, ws, onConfirm, onOpen, targetAuth } = config;
+        const { authService, api, sdk, onOpen, wallet } = config;
 
-        if (!authService || !api || !ws || !onConfirm || !onOpen || !targetAuth) {
+        if (!authService || !api || !sdk || !onOpen || !wallet) {
             throw new Error('Missing crypto purchase config!');
         }
 
-        return await new Promise((resolve, reject) =>
+        return await new Promise(resolve =>
             authService.withTokenContext(ProAuthTokenType.TEMP, async () => {
-                const wallet = (await ws.getAccounts())
-                    .flatMap(a => a.allTonWallets)
-                    .find(w => w.id === targetAuth?.wallet?.rawAddress);
-
-                if (!wallet || !isStandardTonWallet(wallet)) {
-                    throw new Error('Missing wallet');
+                if (!isTonWalletStandard(wallet)) {
+                    throw new Error('Incorrect wallet type!');
                 }
+
+                const onConfirm = async (success?: boolean) => {
+                    if (success) {
+                        const pendingSubscription: CryptoPendingSubscription = {
+                            source: SubscriptionSource.CRYPTO,
+                            status: CryptoSubscriptionStatuses.PENDING,
+                            valid: false,
+                            displayName: formData.selectedPlan.displayName,
+                            displayPrice: formData.selectedPlan.formattedDisplayPrice,
+                            auth: {
+                                type: AuthTypes.WALLET,
+                                wallet
+                            }
+                        };
+
+                        await sdk.storage.set<CryptoPendingSubscription>(
+                            AppKey.PRO_PENDING_SUBSCRIPTION,
+                            pendingSubscription
+                        );
+
+                        resolve(PurchaseStatuses.PENDING);
+                    } else {
+                        return resolve(PurchaseStatuses.CANCELED);
+                    }
+                };
 
                 const invoice = await createProServiceInvoice(tierId, formData.promoCode);
                 const [recipient, assetAmount] = await createRecipient(api, invoice);
@@ -61,14 +86,9 @@ class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
                         recipient,
                         assetAmount
                     },
-                    onConfirm: (success?: boolean) => {
-                        onConfirm?.(success);
-
-                        if (success) {
-                            resolve(PurchaseStatuses.PENDING);
-                        } else {
-                            reject(PurchaseStatuses.CANCELED);
-                        }
+                    onConfirm,
+                    onCancel: () => {
+                        resolve(PurchaseStatuses.CANCELED);
                     }
                 });
             })

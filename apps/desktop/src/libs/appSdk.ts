@@ -6,7 +6,7 @@ import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
-import { Subscription } from './subscription';
+import { Subscription } from '@tonkeeper/core/CryptoSubscriptionStrategy';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {

@@ -11,24 +11,29 @@ interface IProConfirmNotificationProps {
     onClose: () => void;
     confirmState: ConfirmState | null;
     onConfirm?: (success?: boolean) => void;
+    onCancel?: () => void;
 }
 
 export const ProConfirmNotification: FC<IProConfirmNotificationProps> = props => {
-    const { confirmState, onConfirm, onClose } = props;
+    const { confirmState, onConfirm, onClose, onCancel } = props;
 
     return (
-        <NotificationStyled isOpen={!!confirmState} handleClose={onClose} hideButton backShadow>
+        <NotificationStyled
+            isOpen={!!confirmState}
+            handleClose={() => {
+                onCancel?.();
+                onClose();
+            }}
+            hideButton
+            backShadow
+        >
             {() =>
                 confirmState ? (
                     <ProConfirmNotificationContent
                         {...confirmState}
                         onClose={confirmed => {
-                            if (confirmed) {
-                                onConfirm?.(true);
-                            }
-
+                            onConfirm?.(confirmed);
                             onClose();
-                            onConfirm?.(false);
                         }}
                     />
                 ) : (

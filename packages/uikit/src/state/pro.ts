@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
-    CryptoPendingSubscription,
     CryptoSubscriptionStatuses,
     IOriginalTransactionInfo,
     isIosStrategy,
@@ -26,7 +25,7 @@ import {
     setBackupState,
     startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
-import { OpenAPI, SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { OpenAPI } from '@tonkeeper/core/dist/pro';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -315,7 +314,6 @@ export const useProPurchaseMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
     const { onOpen } = useProConfirmNotification();
-    const ws = useAccountsStorage();
     const [targetAuth] = useAtom(selectedTargetAuth);
     const authService = useProAuthTokenService();
 
@@ -324,35 +322,12 @@ export const useProPurchaseMutation = () => {
             throw new Error('Missing subscription strategy!');
         }
 
-        const onConfirm = async (success?: boolean) => {
-            if (!success) return;
-
-            if (!targetAuth) {
-                throw new Error('Missing wallet auth for pending subscription');
-            }
-
-            const pendingSubscription: CryptoPendingSubscription = {
-                source: SubscriptionSource.CRYPTO,
-                status: CryptoSubscriptionStatuses.PENDING,
-                valid: false,
-                displayName: formData.selectedPlan.displayName,
-                displayPrice: formData.selectedPlan.formattedDisplayPrice,
-                auth: targetAuth
-            };
-
-            await sdk.storage.set<CryptoPendingSubscription>(
-                AppKey.PRO_PENDING_SUBSCRIPTION,
-                pendingSubscription
-            );
-        };
-
         const status = await sdk.subscriptionStrategy.subscribe(formData, {
             authService,
             api,
-            ws,
             onOpen,
-            onConfirm,
-            targetAuth
+            sdk,
+            wallet: targetAuth?.wallet
         });
 
         if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {

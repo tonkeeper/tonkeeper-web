@@ -2,7 +2,6 @@ import { CryptoCurrency, SubscriptionSource } from '../pro';
 import { Language } from './language';
 import { IAppSdk } from '../AppSdk';
 import { APIConfig } from './apis';
-import { AccountsStorage } from '../service/accountsStorage';
 import { TonWalletStandard } from './wallet';
 import { InvoicesInvoice } from '../tonConsoleApi';
 import { RecipientData } from './send';
@@ -61,16 +60,15 @@ export interface ISubscriptionFormData {
 }
 
 export interface ISubscriptionConfig {
-    ws?: AccountsStorage;
     sdk?: IAppSdk;
     api?: APIConfig;
     authService?: ProAuthTokenService;
-    onConfirm?: (success?: boolean) => Promise<void>;
     onOpen?: (p?: {
         confirmState: ConfirmState | null;
         onConfirm?: (success?: boolean) => void;
+        onCancel?: () => void;
     }) => void;
-    targetAuth?: WalletAuth | null;
+    wallet?: ProStateWallet | null;
 }
 
 interface BaseSubscriptionStrategy {
@@ -351,6 +349,10 @@ export function isTelegramActiveSubscription(value: unknown): value is TelegramA
         value?.source === SubscriptionSource.TELEGRAM &&
         value?.status === TelegramSubscriptionStatuses.ACTIVE
     );
+}
+
+export function isTonWalletStandard(wallet: ProStateWallet): wallet is TonWalletStandard {
+    return wallet !== null && typeof wallet === 'object' && 'id' in wallet;
 }
 
 export function hasIosPrice(
