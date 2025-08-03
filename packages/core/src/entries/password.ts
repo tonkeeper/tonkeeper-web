@@ -13,8 +13,7 @@ export type MnemonicType = 'ton' | 'bip39';
 
 export interface IAuthViaSeedPhraseData {
     wallet: TonWalletStandard;
-    mnemonic: string[];
-    mnemonicType?: MnemonicType;
+    signer: (b: Buffer) => Promise<Uint8Array | Buffer>;
 }
 
 export interface AuthPassword {

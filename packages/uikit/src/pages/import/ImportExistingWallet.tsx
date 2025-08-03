@@ -47,6 +47,7 @@ import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { useTranslation } from '../../hooks/translation';
 import { useAutoAuthMutation } from '../../state/pro';
+import { tonProofSignerByTonMnemonic } from '../../hooks/accountUtils';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
@@ -419,9 +420,11 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     useEffect(() => {
         if (createdAccount && mnemonic && selectedMnemonicType && selectNetworksPassed) {
             void tryAutoAuth({
-                mnemonic,
                 wallet: createdAccount.activeTonWallet,
-                mnemonicType: selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                signer: tonProofSignerByTonMnemonic(
+                    mnemonic,
+                    selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                )
             });
         }
     }, [createdAccount, mnemonic, selectedMnemonicType, editNamePagePassed, selectNetworksPassed]);
