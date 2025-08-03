@@ -90,8 +90,11 @@ export const useTrialAvailability = () => {
 };
 
 export const useProSupportUrl = () => {
-    return useQuery<string | null, Error>([QueryKey.pro, QueryKey.supportToken], async () =>
-        getProSupportUrl()
+    const { data: subscription } = useProState();
+
+    return useQuery<string | null, Error>(
+        [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
+        async () => getProSupportUrl()
     );
 };
 

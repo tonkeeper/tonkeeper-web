@@ -196,6 +196,8 @@ const loadProState = async (params: IGetProStateParams): Promise<ProSubscription
         return currentSubscription;
     }
 
+    await authService.setToken(ProAuthTokenType.MAIN, null);
+
     return null;
 };
 
