@@ -1,4 +1,3 @@
-import { SubscriptionSource } from './src/pro';
 import {
     AuthTypes,
     CryptoPendingSubscription,
@@ -10,16 +9,17 @@ import {
     ISubscriptionFormData,
     NormalizedProPlans,
     PurchaseStatuses
-} from './src/entries/pro';
+} from './dist/entries/pro';
+import { SubscriptionSource } from './dist/pro';
 import {
     createProServiceInvoice,
     createRecipient,
     getProServiceTiers,
     ProAuthTokenType
-} from './src/service/proService';
-import { Language } from './src/entries/language';
-import { getFormattedProPrice } from '@tonkeeper/uikit/dist/libs/pro';
-import { AppKey } from './src/Keys';
+} from './dist/service/proService';
+import { AppKey } from './dist/Keys';
+import { Language } from './dist/entries/language';
+import { getFormattedProPrice } from './dist/utils/pro';
 
 class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
     public source = SubscriptionSource.CRYPTO as const;

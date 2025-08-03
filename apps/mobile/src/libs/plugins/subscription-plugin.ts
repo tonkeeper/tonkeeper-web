@@ -17,7 +17,7 @@ import {
     ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { getFormattedProPrice } from '@tonkeeper/uikit/dist/libs/pro';
+import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 import { ProAuthTokenType, saveIapPurchase } from '@tonkeeper/core/dist/service/proService';
 
 interface ISubscriptionPlugin {

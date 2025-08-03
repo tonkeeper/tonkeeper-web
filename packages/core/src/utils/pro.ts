@@ -12,6 +12,8 @@ import { Network } from '../entries/network';
 import { isStandardTonWallet } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
+import { TON_ASSET } from '../entries/crypto/asset/constants';
+import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 
@@ -160,4 +162,27 @@ export const findAuthorizedWallet = async (user: UserInfo, storage: IStorage) =>
         publicKey: actualWallet.publicKey,
         rawAddress: actualWallet.rawAddress
     };
+};
+
+export const isValidNanoString = (value: string): boolean => {
+    return /^\d+$/.test(value);
+};
+
+export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean): string => {
+    try {
+        if (!displayPrice) return '-';
+
+        if (isCrypto) {
+            const assetAmount = new AssetAmount({ weiAmount: displayPrice, asset: TON_ASSET });
+
+            return isValidNanoString(displayPrice)
+                ? assetAmount.toStringAssetRelativeAmount(0)
+                : '-';
+        }
+
+        return displayPrice;
+    } catch (e) {
+        console.error('getFormattedDisplayPrice error: ', e);
+        return '-';
+    }
 };

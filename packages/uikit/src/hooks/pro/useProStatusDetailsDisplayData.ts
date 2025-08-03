@@ -13,8 +13,8 @@ import {
 } from '@tonkeeper/core/dist/entries/pro';
 
 import { useTranslation } from '../translation';
-import { getFormattedProPrice } from '../../libs/pro';
 import { useDateTimeFormat } from '../useDateTimeFormat';
+import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 
 export const useProStatusDetailsDisplayData = (subscription: ProSubscription | undefined) => {
     const { t } = useTranslation();
