@@ -168,6 +168,10 @@ export const isValidNanoString = (value: string): boolean => {
     return /^\d+$/.test(value);
 };
 
+export function trimEmptyDecimals(text: string): string {
+    return text.replace(/(-?\d+)\.00(?!\d)/g, '$1');
+}
+
 export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean): string => {
     try {
         if (!displayPrice) return '-';
@@ -176,7 +180,7 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
             const assetAmount = new AssetAmount({ weiAmount: displayPrice, asset: TON_ASSET });
 
             return isValidNanoString(displayPrice)
-                ? assetAmount.toStringAssetRelativeAmount(0)
+                ? trimEmptyDecimals(assetAmount.toStringAssetRelativeAmount(2))
                 : '-';
         }
 
