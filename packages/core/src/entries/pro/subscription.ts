@@ -1,14 +1,11 @@
 import {
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
-    ProductIds,
     PurchaseStatuses,
     TelegramSubscriptionStatuses
 } from './enums';
 import {
-    IIosPurchaseResult,
     IOriginalTransactionInfo,
-    IProductInfo,
     ISubscriptionConfig,
     ISubscriptionFormData,
     NormalizedProPlans,
@@ -82,11 +79,8 @@ export interface IosExpiredSubscription extends BaseIosSubscription {
 
 export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
     source: SubscriptionSource.IOS;
-    getProductInfo(productId: ProductIds): Promise<IProductInfo>;
     manageSubscriptions(): Promise<void>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
-    getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]>;
-    hasActiveSubscription(): Promise<boolean>;
 }
 
 // Crypto Subscription Types
