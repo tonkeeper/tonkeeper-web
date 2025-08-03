@@ -122,16 +122,18 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
 
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    <Button
-                        primary
-                        fullWidth
-                        size="large"
-                        type="submit"
-                        form={formId}
-                        loading={isLoading}
-                    >
-                        <Label2>{t('continue')}</Label2>
-                    </Button>
+                    <ButtonWrapper>
+                        <Button
+                            primary
+                            fullWidth
+                            size="large"
+                            type="submit"
+                            form={formId}
+                            loading={isLoading}
+                        >
+                            <Label2>{t('continue')}</Label2>
+                        </Button>
+                    </ButtonWrapper>
                 </NotificationFooter>
             </NotificationFooterPortal>
         </ContentWrapper>
@@ -144,6 +146,11 @@ const NotificationStyled = styled(Notification)`
 
 const ContentWrapper = styled(NotificationBlock)`
     padding: 1rem 0 2rem;
+`;
+
+const ButtonWrapper = styled.div`
+    width: 100%;
+    padding: 1rem 0;
 `;
 
 const Icon = styled.span`
