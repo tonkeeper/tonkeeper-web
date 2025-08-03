@@ -1,10 +1,12 @@
 import { type FC, useEffect, useRef } from 'react';
-import { useTranslation } from '../../hooks/translation';
+
+import { DoneIcon } from '../Icon';
 import { Input } from '../fields/Input';
 import { styled } from 'styled-components';
 import { Body2Class, Label2 } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
-import { DoneIcon } from '../Icon';
+import { useToast } from '../../hooks/useNotification';
+import { useTranslation } from '../../hooks/translation';
 
 interface IProps {
     value: string;
@@ -13,8 +15,10 @@ interface IProps {
 }
 
 export const ProPromoCodeInput: FC<IProps> = props => {
-    const sdk = useAppSdk();
     const { value, onChange, promoCode } = props;
+
+    const sdk = useAppSdk();
+    const toast = useToast();
     const { t } = useTranslation();
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -25,9 +29,13 @@ export const ProPromoCodeInput: FC<IProps> = props => {
     const isValid = promoCode !== undefined;
 
     const handlePasteValue = async () => {
-        const valueFromClipboard = await sdk.pasteFromClipboard();
+        try {
+            const valueFromClipboard = await sdk.pasteFromClipboard();
 
-        onChange(valueFromClipboard);
+            onChange(valueFromClipboard);
+        } catch {
+            toast(t('paste_failed'));
+        }
     };
 
     const renderRightElement = () => {

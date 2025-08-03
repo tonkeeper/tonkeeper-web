@@ -345,6 +345,7 @@
   "PasswordChanged": "Пароль изменен",
   "PasswordDoNotMatch": "Пароли не совпадают.",
   "paste": "Вставить",
+  "paste_failed": "Не удалось вставить из буфера обмена!",
   "please_try_again_later": "Попробуйте позже",
   "preferences_aside_dev_menu": "Функции для разработчиков",
   "preferences_aside_faq": "FAQ",

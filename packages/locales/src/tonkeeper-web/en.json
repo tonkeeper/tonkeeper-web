@@ -356,6 +356,7 @@
   "PasswordChanged": "Password Changed",
   "PasswordDoNotMatch": "Passwords do not match.",
   "paste": "Paste",
+  "paste_failed": "Failed to paste from clipboard!",
   "pinned_jettons": "Pinned",
   "please_try_again_later": "Please try again later",
   "preferences_aside_dev_menu": "Dev Menu",

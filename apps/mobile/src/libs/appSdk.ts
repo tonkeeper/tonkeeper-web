@@ -94,14 +94,12 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     }
 
     pasteFromClipboard = async () => {
-        try {
-            const { value } = await Clipboard.read();
+        const { value } = await Clipboard.read();
 
-            return value ?? '';
-        } catch (e) {
-            console.error('Failed to read clipboard', e);
-
-            return '';
+        if (value || value === '') {
+            return value;
+        } else {
+            throw new Error('Paste from Clipboard failed!');
         }
     };
 

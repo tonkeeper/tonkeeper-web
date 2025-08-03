@@ -246,11 +246,7 @@ export abstract class BaseApp implements IAppSdk {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
     };
 
-    pasteFromClipboard = async () => {
-        console.warn('Method is not implemented yet');
-
-        return '';
-    };
+    pasteFromClipboard = async () => navigator.clipboard.readText();
 
     copyToClipboard = (value: string, notification?: string) => {
         console.log(value, notification);
