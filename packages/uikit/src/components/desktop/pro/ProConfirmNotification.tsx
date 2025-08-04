@@ -6,6 +6,8 @@ import { FC, PropsWithChildren } from 'react';
 import { useEstimateTransfer } from '../../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../../hooks/blockchain/useSendTransfer';
 import { ConfirmView } from '../../transfer/ConfirmView';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../../Error';
 
 interface IProConfirmNotificationProps {
     onClose: () => void;
@@ -29,13 +31,17 @@ export const ProConfirmNotification: FC<IProConfirmNotificationProps> = props =>
         >
             {() =>
                 confirmState ? (
-                    <ProConfirmNotificationContent
-                        {...confirmState}
-                        onClose={confirmed => {
-                            onConfirm?.(confirmed);
-                            onClose();
-                        }}
-                    />
+                    <ErrorBoundary
+                        fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
+                    >
+                        <ProConfirmNotificationContent
+                            {...confirmState}
+                            onClose={confirmed => {
+                                onConfirm?.(confirmed);
+                                onClose();
+                            }}
+                        />
+                    </ErrorBoundary>
                 ) : (
                     <></>
                 )

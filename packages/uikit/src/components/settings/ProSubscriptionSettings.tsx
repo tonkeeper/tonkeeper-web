@@ -12,6 +12,8 @@ import { ForTargetEnv } from '../shared/TargetEnv';
 import { ProStatusScreen } from '../pro/ProStatusScreen';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
+import { fallbackRenderOver } from '../Error';
+import { ErrorBoundary } from '../shared/ErrorBoundary';
 
 export const ProSettingsContent: FC = () => {
     const navigate = useNavigate();
@@ -50,6 +52,10 @@ const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
 
 export const ProSubscriptionSettings: FC = () => (
     <DesktopViewPageLayoutStyled>
-        <ProSettingsContent />
+        <ErrorBoundary
+            fallbackRender={fallbackRenderOver('Failed to display Pro Subscription page')}
+        >
+            <ProSettingsContent />
+        </ErrorBoundary>
     </DesktopViewPageLayoutStyled>
 );

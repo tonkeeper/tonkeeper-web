@@ -27,6 +27,8 @@ import { DoneIcon } from '../../Icon';
 import { Button } from '../../fields/Button';
 import { Label2 } from '../../Text';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../../Error';
 
 interface IProAuthNotificationProps {
     isOpen: boolean;
@@ -38,7 +40,13 @@ export const ProAuthNotification: FC<IProAuthNotificationProps> = props => {
 
     return (
         <NotificationStyled mobileFullScreen isOpen={isOpen} handleClose={onClose}>
-            {() => <ProAuthNotificationContent onClose={onClose} />}
+            {() => (
+                <ErrorBoundary
+                    fallbackRender={fallbackRenderOver('Failed to display Pro Authorization modal')}
+                >
+                    <ProAuthNotificationContent onClose={onClose} />
+                </ErrorBoundary>
+            )}
         </NotificationStyled>
     );
 };

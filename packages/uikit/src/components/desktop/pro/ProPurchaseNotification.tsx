@@ -20,6 +20,8 @@ import { Button } from '../../fields/Button';
 import { Body3, Label2 } from '../../Text';
 import { ProLegalNote } from '../../pro/ProLegalNote';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../../Error';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
@@ -31,7 +33,13 @@ export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = props 
 
     return (
         <NotificationStyled mobileFullScreen isOpen={isOpen} handleClose={onClose}>
-            {() => <ProPurchaseNotificationContent onClose={onClose} />}
+            {() => (
+                <ErrorBoundary
+                    fallbackRender={fallbackRenderOver('Failed to display Pro Purchase modal')}
+                >
+                    <ProPurchaseNotificationContent onClose={onClose} />
+                </ErrorBoundary>
+            )}
         </NotificationStyled>
     );
 };

@@ -11,6 +11,8 @@ import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../../modals/ProPurchaseNotificationControlled';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../../Error';
 
 interface IProEndingNotificationProps {
     isOpen: boolean;
@@ -20,7 +22,13 @@ interface IProEndingNotificationProps {
 export const ProEndingNotification: FC<IProEndingNotificationProps> = ({ isOpen, onClose }) => (
     <HideOnReview>
         <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-            {() => <ProEndingNotificationContent onClose={onClose} />}
+            {() => (
+                <ErrorBoundary
+                    fallbackRender={fallbackRenderOver('Failed to display Pro Ending modal')}
+                >
+                    <ProEndingNotificationContent onClose={onClose} />
+                </ErrorBoundary>
+            )}
         </NotificationStyled>
     </HideOnReview>
 );

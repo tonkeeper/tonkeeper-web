@@ -22,6 +22,8 @@ import { ClosePromoIcon } from '../../Icon';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../../Error';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -36,7 +38,13 @@ export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = props 
 
     return (
         <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
-            {() => <ProFeaturesNotificationContent onOpenProps={onOpenProps} onClose={onClose} />}
+            {() => (
+                <ErrorBoundary
+                    fallbackRender={fallbackRenderOver('Failed to display Pro Features modal')}
+                >
+                    <ProFeaturesNotificationContent onOpenProps={onOpenProps} onClose={onClose} />
+                </ErrorBoundary>
+            )}
         </NotificationStyled>
     );
 };
