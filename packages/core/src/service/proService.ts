@@ -172,8 +172,6 @@ const loadProState = async (params: IGetProStateParams): Promise<ProSubscription
         ProAuthTokenType.TEMP
     );
 
-    debugger;
-
     if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
         await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
 
