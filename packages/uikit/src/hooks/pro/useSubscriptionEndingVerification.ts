@@ -3,7 +3,10 @@ import { useAppSdk } from '../appSdk';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useProEndingNotification } from '../../components/modals/ProEndingNotificationControlled';
 import { useProState } from '../../state/pro';
-import { isProSubscription } from '@tonkeeper/core/dist/entries/pro';
+import {
+    isIosAutoRenewableSubscription,
+    isProSubscription
+} from '@tonkeeper/core/dist/entries/pro';
 
 enum ProEndingNotificationState {
     DAY = 'DAY',
@@ -18,6 +21,7 @@ export const useSubscriptionEndingVerification = () => {
     useEffect(() => {
         if (!isProSubscription(subscription)) return;
         if (!subscription.nextChargeDate) return;
+        if (isIosAutoRenewableSubscription(subscription)) return;
 
         const targetTime = subscription.nextChargeDate.getTime();
         const diffDays = (targetTime - Date.now()) / (1000 * 60 * 60 * 24);
