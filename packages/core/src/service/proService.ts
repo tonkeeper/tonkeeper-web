@@ -363,7 +363,7 @@ export async function startProServiceTrial(
     const result = await TiersService.activateTrial(tgData);
 
     if (result.auth_token) {
-        await authService.setToken(ProAuthTokenType.MAIN, result.auth_token);
+        await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
     }
 
     return result.ok;
