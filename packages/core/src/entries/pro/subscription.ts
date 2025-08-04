@@ -46,17 +46,17 @@ export interface BaseSubscriptionStrategy {
 
 // IOS Subscription Types
 export interface IosDBStoredInfo {
-    txId?: string;
-    price?: number;
-    currency?: string;
-    expiresDate?: Date;
-    purchaseDate?: Date;
-    productId?: string;
-    storeFront?: string;
-    storeFrontId?: string;
-    transactionType?: string;
-    originalTransactionId?: string;
-    autoRenewStatus?: boolean;
+    txId: string;
+    price: number;
+    currency: string;
+    expiresDate: Date;
+    purchaseDate: Date;
+    productId: string;
+    storeFront: string;
+    storeFrontId: string;
+    transactionType: string;
+    originalTransactionId: string;
+    autoRenewStatus: boolean;
 }
 
 export interface BaseIosSubscription extends BaseSubscription, IosDBStoredInfo {
@@ -85,10 +85,10 @@ export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
 
 // Crypto Subscription Types
 export interface CryptoDBStoredInfo {
-    amount?: string;
-    currency?: CryptoCurrency;
-    expiresDate?: Date;
-    purchaseDate?: Date;
+    amount: string;
+    currency: CryptoCurrency;
+    expiresDate: Date;
+    purchaseDate: Date;
     promoCode?: string;
 }
 
@@ -121,7 +121,7 @@ export interface ICryptoSubscriptionStrategy extends BaseSubscriptionStrategy {
 
 // Telegram Subscription Types
 export interface TelegramDBStoredInfo {
-    expiresDate?: Date;
+    expiresDate: Date;
 }
 
 export interface BaseTelegramSubscription extends BaseSubscription, TelegramDBStoredInfo {

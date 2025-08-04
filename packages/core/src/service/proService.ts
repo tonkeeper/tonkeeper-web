@@ -142,6 +142,7 @@ const getPseudoTelegramSubscription = (
         auth: {
             type: AuthTypes.TELEGRAM
         },
+        expiresDate: promoExpirationDate,
         nextChargeDate: promoExpirationDate
     };
 };

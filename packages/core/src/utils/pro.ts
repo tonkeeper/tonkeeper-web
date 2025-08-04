@@ -22,16 +22,24 @@ export const normalizeSubscription = (
     authorizedWallet: ProStateWallet | null
 ): ProSubscription => {
     const source = subscriptionDto?.source;
-    const toDate = (ts?: number) => (ts ? new Date(ts * 1000) : undefined);
+    const toDate = (ts: number) => new Date(ts * 1000);
 
     if (!source) {
         return null;
     }
 
     const valid = subscriptionDto.valid;
-    const nextChargeDate = toDate(subscriptionDto.next_charge);
+    const nextChargeDate = subscriptionDto.next_charge
+        ? new Date(subscriptionDto.next_charge * 1000)
+        : undefined;
 
     if (source === SubscriptionSource.TELEGRAM) {
+        const dBStoredInfo = subscriptionDto?.telegram;
+
+        if (dBStoredInfo === undefined) {
+            throw new Error('Missing telegram dBStoredInfo');
+        }
+
         if (valid) {
             return {
                 source,
@@ -41,7 +49,7 @@ export const normalizeSubscription = (
                 auth: {
                     type: AuthTypes.TELEGRAM
                 },
-                expiresDate: toDate(subscriptionDto?.telegram?.expires_date)
+                expiresDate: toDate(dBStoredInfo.expires_date)
             };
         }
 
@@ -53,11 +61,17 @@ export const normalizeSubscription = (
             auth: {
                 type: AuthTypes.TELEGRAM
             },
-            expiresDate: toDate(subscriptionDto?.telegram?.expires_date)
+            expiresDate: toDate(dBStoredInfo.expires_date)
         };
     }
 
     if (source === SubscriptionSource.CRYPTO && authorizedWallet) {
+        const dBStoredInfo = subscriptionDto?.crypto;
+
+        if (dBStoredInfo === undefined) {
+            throw new Error('Missing crypto dBStoredInfo');
+        }
+
         if (valid) {
             return {
                 source,
@@ -68,11 +82,11 @@ export const normalizeSubscription = (
                     type: AuthTypes.WALLET,
                     wallet: authorizedWallet
                 },
-                amount: subscriptionDto.crypto?.amount,
-                currency: subscriptionDto.crypto?.currency,
-                promoCode: subscriptionDto.crypto?.promo_code,
-                purchaseDate: toDate(subscriptionDto.crypto?.purchase_date),
-                expiresDate: toDate(subscriptionDto.crypto?.expires_date)
+                amount: dBStoredInfo.amount,
+                currency: dBStoredInfo.currency,
+                promoCode: dBStoredInfo.promo_code,
+                purchaseDate: toDate(dBStoredInfo.purchase_date),
+                expiresDate: toDate(dBStoredInfo.expires_date)
             };
         }
 
@@ -85,15 +99,21 @@ export const normalizeSubscription = (
                 type: AuthTypes.WALLET,
                 wallet: authorizedWallet
             },
-            amount: subscriptionDto.crypto?.amount,
-            currency: subscriptionDto.crypto?.currency,
-            promoCode: subscriptionDto.crypto?.promo_code,
-            purchaseDate: toDate(subscriptionDto.crypto?.purchase_date),
-            expiresDate: toDate(subscriptionDto.crypto?.expires_date)
+            amount: dBStoredInfo.amount,
+            currency: dBStoredInfo.currency,
+            promoCode: dBStoredInfo.promo_code,
+            purchaseDate: toDate(dBStoredInfo.purchase_date),
+            expiresDate: toDate(dBStoredInfo.expires_date)
         };
     }
 
     if (source === SubscriptionSource.IOS && authorizedWallet) {
+        const dBStoredInfo = subscriptionDto?.ios;
+
+        if (dBStoredInfo === undefined) {
+            throw new Error('Missing ios dBStoredInfo');
+        }
+
         if (valid) {
             return {
                 source,
@@ -104,16 +124,17 @@ export const normalizeSubscription = (
                     type: AuthTypes.WALLET,
                     wallet: authorizedWallet
                 },
-                txId: subscriptionDto.ios?.tx_id,
-                price: subscriptionDto.ios?.price,
-                currency: subscriptionDto.ios?.currency,
-                expiresDate: toDate(subscriptionDto.ios?.expires_date),
-                productId: subscriptionDto.ios?.product_id,
-                storeFront: subscriptionDto.ios?.store_front,
-                storeFrontId: subscriptionDto.ios?.store_front_id,
-                transactionType: subscriptionDto.ios?.transaction_type,
-                originalTransactionId: subscriptionDto.ios?.original_tx_id,
-                autoRenewStatus: subscriptionDto.ios?.auto_renew_status ?? false
+                txId: dBStoredInfo.tx_id,
+                price: dBStoredInfo.price,
+                currency: dBStoredInfo.currency,
+                expiresDate: toDate(dBStoredInfo.expires_date),
+                productId: dBStoredInfo.product_id,
+                storeFront: dBStoredInfo.store_front,
+                storeFrontId: dBStoredInfo.store_front_id,
+                transactionType: dBStoredInfo.transaction_type,
+                purchaseDate: toDate(dBStoredInfo.purchase_date),
+                originalTransactionId: dBStoredInfo.original_tx_id,
+                autoRenewStatus: dBStoredInfo.auto_renew_status
             };
         }
 
@@ -126,15 +147,16 @@ export const normalizeSubscription = (
                 type: AuthTypes.WALLET,
                 wallet: authorizedWallet
             },
-            txId: subscriptionDto.ios?.tx_id,
-            price: subscriptionDto.ios?.price,
-            currency: subscriptionDto.ios?.currency,
-            expiresDate: toDate(subscriptionDto.ios?.expires_date),
-            productId: subscriptionDto.ios?.product_id,
-            storeFront: subscriptionDto.ios?.store_front,
-            storeFrontId: subscriptionDto.ios?.store_front_id,
-            transactionType: subscriptionDto.ios?.transaction_type,
-            originalTransactionId: subscriptionDto.ios?.original_tx_id,
+            txId: dBStoredInfo.tx_id,
+            price: dBStoredInfo.price,
+            currency: dBStoredInfo.currency,
+            expiresDate: toDate(dBStoredInfo.expires_date),
+            productId: dBStoredInfo.product_id,
+            storeFront: dBStoredInfo.store_front,
+            storeFrontId: dBStoredInfo.store_front_id,
+            transactionType: dBStoredInfo.transaction_type,
+            purchaseDate: toDate(dBStoredInfo.purchase_date),
+            originalTransactionId: dBStoredInfo.original_tx_id,
             autoRenewStatus: false
         };
     }
