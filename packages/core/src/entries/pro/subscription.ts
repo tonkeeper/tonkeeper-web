@@ -57,6 +57,7 @@ export interface IosDBStoredInfo {
     transactionType: string;
     originalTransactionId: string;
     autoRenewStatus: boolean;
+    priceMultiplier: number;
 }
 
 export interface BaseIosSubscription extends BaseSubscription, IosDBStoredInfo {

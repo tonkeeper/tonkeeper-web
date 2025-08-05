@@ -41,12 +41,11 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
         }
 
         if (isIosSub && hasIosPrice(subscription)) {
-            const { price, currency } = subscription;
+            const { price, priceMultiplier, currency } = subscription;
 
             if (!price || !currency) return '-';
 
-            // TODO WHY 1000? No idea, needs to be figured out
-            return `${currency} ${(price / 1000).toFixed(2)}`;
+            return `${currency} ${(price / priceMultiplier).toFixed(2)}`;
         }
 
         return 'free';
