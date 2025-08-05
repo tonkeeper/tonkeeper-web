@@ -19,7 +19,7 @@ export const DesktopCategoryModal: FC<{
     onClickApp?: (app: PromotedApp) => void;
 }> = ({ category, isOpen, onClose, onClickApp }) => {
     return (
-        <Notification isOpen={isOpen} handleClose={onClose} title={category.title}>
+        <Notification isOpen={isOpen} handleClose={onClose} title={category.title} onTopOfBrowser>
             {() =>
                 category.apps.map(app => (
                     <DesktopCategoryGroupItemStyled
