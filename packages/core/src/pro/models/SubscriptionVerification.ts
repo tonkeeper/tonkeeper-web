@@ -35,6 +35,7 @@ export type SubscriptionVerification = {
         product_id: string;
         transaction_type: string;
         price: number;
+        price_multiplier: number;
         currency: string;
         purchase_date: number;
         expires_date: number;
