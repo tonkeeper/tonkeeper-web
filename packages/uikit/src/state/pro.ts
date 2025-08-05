@@ -22,6 +22,7 @@ import {
     logoutTonConsole,
     ProAuthTokenService,
     ProAuthTokenType,
+    ProAuthViaSeedPhraseParams,
     setBackupState,
     startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
@@ -40,7 +41,6 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { IAuthViaSeedPhraseData } from '@tonkeeper/core/dist/entries/password';
 import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
@@ -261,7 +261,7 @@ export const useAutoAuthMutation = () => {
     const client = useQueryClient();
     const authService = useProAuthTokenService();
 
-    return useMutation<void, Error, IAuthViaSeedPhraseData>(async authData => {
+    return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {
             if (isPaidActiveSubscription(subscription)) return;
 

@@ -51,7 +51,6 @@ import {
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
-import { IAuthViaSeedPhraseData } from '../entries/password';
 
 interface IGetProStateParams {
     authService: ProAuthTokenService;
@@ -243,10 +242,15 @@ export const authViaTonConnect = async (
     await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
 };
 
+export interface ProAuthViaSeedPhraseParams {
+    wallet: TonWalletStandard;
+    signer: (b: Buffer) => Promise<Uint8Array | Buffer>;
+}
+
 export const authViaSeedPhrase = async (
     api: APIConfig,
     authService: ProAuthTokenService,
-    authData: IAuthViaSeedPhraseData
+    authData: ProAuthViaSeedPhraseParams
 ) => {
     const domain = 'tonkeeper';
     const { wallet, signer } = authData;
