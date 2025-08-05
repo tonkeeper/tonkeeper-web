@@ -19,6 +19,7 @@
  */
 export const JettonVerificationType = {
     Whitelist: 'whitelist',
+    Graylist: 'graylist',
     Blacklist: 'blacklist',
     None: 'none'
 } as const;

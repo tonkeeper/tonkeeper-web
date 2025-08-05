@@ -156,8 +156,7 @@ const useGetTronTonSender = () => {
             batteryApi,
             activeTronWallet,
             activeTonWallet,
-            signer,
-            batteryToken
+            signer
         );
     }, [
         activeAccount,
@@ -293,8 +292,7 @@ const useTronEstimationTonSender = () => {
             batteryApi,
             activeTronWallet,
             activeAccount.activeTonWallet,
-            emptySigner,
-            ''
+            emptySigner
         );
     }, [activeAccount, activeTronWallet, activeAccount.activeTonWallet, tronApi, batteryApi]);
 };

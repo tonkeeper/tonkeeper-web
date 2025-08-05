@@ -34,8 +34,7 @@ export class TronTonSender implements ITronSender {
         batteryConfig: BatteryConfiguration,
         private tronWalletInfo: TronWallet,
         private tonWalletInfo: TonWalletStandard,
-        private usingOpenedSigner: OpenedSignerProvider,
-        private readonly xTonConnectAuth: string
+        private usingOpenedSigner: OpenedSignerProvider
     ) {
         this.batteryApi = new BatteryApi(batteryConfig);
         this.trc20Encoder = new TronTrc20Encoder({
@@ -59,7 +58,11 @@ export class TronTonSender implements ITronSender {
 
             const tonTransfer = await new TonEncoder(this.tonApi).encodeTransfer({
                 to: fee.sendToAddress,
-                weiAmount: fee.extra.weiAmount
+                weiAmount: fee.extra.weiAmount,
+                payload: {
+                    type: 'comment',
+                    value: 'Tron gas fee'
+                }
             });
 
             signedTonTx = await new WalletMessageSender(
@@ -71,14 +74,14 @@ export class TronTonSender implements ITronSender {
 
         try {
             await this.batteryApi.tronSend({
-                xTonConnectAuth: this.xTonConnectAuth,
                 tronSendRequest: {
                     tx: Buffer.from(JSON.stringify(signedTronTx!)).toString('base64'),
                     wallet: this.tronWalletInfo.address,
                     energy: estimation.resources.energy,
                     bandwidth: estimation.resources.bandwidth,
                     instantFeeTx: signedTonTx!.toBoc().toString('base64')
-                }
+                },
+                userPublicKey: Buffer.from(this.tonWalletInfo.publicKey, 'hex').toString('base64')
             });
         } catch (e) {
             if (e && typeof e === 'object' && 'response' in e && e.response instanceof Response) {
