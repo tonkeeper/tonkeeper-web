@@ -94,7 +94,11 @@ export const useProSupportUrl = () => {
 
     return useQuery<string | null, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
-        async () => getProSupportUrl()
+        getProSupportUrl,
+        {
+            staleTime: 0,
+            cacheTime: 0
+        }
     );
 };
 
