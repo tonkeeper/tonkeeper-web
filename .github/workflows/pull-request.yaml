@@ -8,6 +8,7 @@ on:
           options:
             - dev
             - prod
+          default: prod
     pull_request:
 
 env:
@@ -27,7 +28,7 @@ jobs:
                 if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
                     ENV_VALUE="${{ github.event.inputs.tonconsole_env }}"
                 else
-                    ENV_VALUE="dev"
+                    ENV_VALUE="prod"
                 fi
                     echo "tonconsole_env = $ENV_VALUE"
                     echo "tonconsole_env=$ENV_VALUE" >> $GITHUB_OUTPUT
