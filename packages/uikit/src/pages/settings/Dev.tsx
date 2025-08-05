@@ -33,7 +33,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
-import { QueryKey } from '../../libs/queryKey';
 import { useProAuthTokenService } from '../../state/pro';
 import { ProAuthTokenType } from '@tonkeeper/core/dist/service/proService';
 
@@ -124,88 +123,6 @@ const ReviewerSettings = () => {
                 <ListItemPayload>
                     <Label1>Enable extra security</Label1>
                     <Switch checked={isOnReview} onChange={mutate} disabled={isLoading} />
-                </ListItemPayload>
-            </ListItem>
-        </ListBlockDesktopAdaptive>
-    );
-};
-
-// TODO Remove it before release
-/**
- * @deprecated
- */
-const PromoStateSettings = () => {
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-    const isCapacitor = useIsCapacitorApp();
-    const [isActive, setIsActive] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const isFreeActive = Boolean(
-                await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
-            );
-            setIsActive(isFreeActive);
-        })();
-    }, [sdk.storage]);
-
-    const handleChange = async (checked: boolean) => {
-        await sdk.storage.set<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE, checked);
-        setIsActive(checked);
-
-        await client.invalidateQueries([QueryKey.pro]);
-    };
-
-    if (!isCapacitor) {
-        return null;
-    }
-
-    return (
-        <ListBlockDesktopAdaptive>
-            <ListItem hover={false}>
-                <ListItemPayload>
-                    <Label1>Mobile Promo state</Label1>
-                    <Switch checked={isActive} onChange={handleChange} />
-                </ListItemPayload>
-            </ListItem>
-        </ListBlockDesktopAdaptive>
-    );
-};
-
-// TODO Remove it before release
-/**
- * @deprecated
- */
-const TrialStateSettings = () => {
-    const sdk = useAppSdk();
-    const client = useQueryClient();
-    const isCapacitor = useIsCapacitorApp();
-    const [isActive, setIsActive] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            const isFreeActive = Boolean(await sdk.storage.get<boolean>(AppKey.PRO_USED_TRIAL));
-            setIsActive(isFreeActive);
-        })();
-    }, [sdk.storage]);
-
-    const handleChange = async (checked: boolean) => {
-        await sdk.storage.set<boolean>(AppKey.PRO_USED_TRIAL, checked);
-        setIsActive(checked);
-
-        await client.invalidateQueries([QueryKey.pro]);
-    };
-
-    if (!isCapacitor) {
-        return null;
-    }
-
-    return (
-        <ListBlockDesktopAdaptive>
-            <ListItem hover={false}>
-                <ListItemPayload>
-                    <Label1>Used Trial state</Label1>
-                    <Switch checked={isActive} onChange={handleChange} />
                 </ListItemPayload>
             </ListItem>
         </ListBlockDesktopAdaptive>
@@ -344,8 +261,6 @@ export const DevSettings = React.memo(() => {
                 <CookieSettings />
                 <AddAccountBySK />
                 <ReviewerSettings />
-                <PromoStateSettings />
-                <TrialStateSettings />
                 <LogsSettings />
             </DesktopWrapper>
         );
