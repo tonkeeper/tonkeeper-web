@@ -181,10 +181,9 @@ const Loader: FC = () => {
     const context: IAppContext = {
         mainnetApi: getApiConfig(
             serverConfig.mainnetConfig,
-            Network.MAINNET,
             import.meta.env.VITE_APP_TONCONSOLE_HOST
         ),
-        testnetApi: getApiConfig(serverConfig.mainnetConfig, Network.TESTNET),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,

@@ -23,6 +23,8 @@ export interface TonendpointConfig {
     flags?: { [key: string]: boolean };
     tonendpoint: string;
 
+    ton_connect_bridge?: string;
+    tonapiV2Endpoint?: string;
     tonApiV2Key?: string;
     tonapiIOEndpoint?: string;
 
@@ -134,7 +136,7 @@ export class Tonendpoint {
             countryCode,
             targetEnv
         }: BootParams & { targetEnv: TargetEnv },
-        { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
+        { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions = {}
     ) {
         this.targetEnv = targetEnv;
         this.params = { lang, build, network, platform, countryCode };
