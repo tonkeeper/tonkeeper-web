@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../router/useNavigate';
+import { useExistingIosSubscription } from './useExistingIosSubscription';
 
 export const useProPurchaseController = () => {
     const sdk = useAppSdk();
@@ -17,6 +18,8 @@ export const useProPurchaseController = () => {
     const navigate = useNavigate();
     const { onClose: onCurrentClose } = useProPurchaseNotification();
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+
+    useExistingIosSubscription();
 
     const {
         plans,

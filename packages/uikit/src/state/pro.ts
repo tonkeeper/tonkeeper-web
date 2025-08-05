@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    IIosPurchaseResult,
     IOriginalTransactionInfo,
     isIosStrategy,
     isPaidActiveSubscription,
@@ -195,6 +196,23 @@ export const useProState = () => {
             keepPreviousData: true,
             suspense: true,
             refetchInterval: s => (s?.status === CryptoSubscriptionStatuses.PENDING ? 1000 : false)
+        }
+    );
+};
+
+export const useCurrentSubscriptionInfo = () => {
+    const sdk = useAppSdk();
+
+    return useQuery<IIosPurchaseResult[], Error>(
+        [QueryKey.currentIosSubscriptionInfo],
+        async () => {
+            if (!isIosStrategy(sdk.subscriptionStrategy)) {
+                throw new Error('This is not an iOS subscription strategy');
+            }
+
+            const result = await sdk.subscriptionStrategy.getCurrentSubscriptionInfo();
+
+            return result || [];
         }
     );
 };
