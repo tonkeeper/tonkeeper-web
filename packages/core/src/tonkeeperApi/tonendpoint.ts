@@ -96,6 +96,9 @@ export interface TonendpointConfig {
 
     pro_mobile_app_appstore_link?: string;
     pro_landing_url?: string;
+    pro_terms_of_use?: string;
+    privacy_policy?: string;
+    terms_of_use?: string;
 }
 
 interface CountryIP {
@@ -103,7 +106,7 @@ interface CountryIP {
     country: string;
 }
 
-const defaultTonendpoint = 'https://api.tonkeeper.com'; //  'http://localhost:1339';
+const defaultTonendpoint = 'https://api.tonkeeper.com';
 
 export const defaultTonendpointConfig: TonendpointConfig = {
     tonendpoint: defaultTonendpoint,

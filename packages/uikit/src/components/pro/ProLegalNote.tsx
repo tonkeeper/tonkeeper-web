@@ -6,6 +6,7 @@ import { Body3, Body3Class } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ExternalLink } from '../shared/ExternalLink';
 import { useTranslation } from '../../hooks/translation';
+import { useLegalLinks } from '../../state/legal';
 
 interface IProps {
     onManage: () => Promise<void>;
@@ -16,6 +17,7 @@ export const ProLegalNote: FC<IProps> = ({ onManage }) => {
     const { t } = useTranslation();
 
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+    const { termsLink, privacyLink } = useLegalLinks();
 
     return (
         <LegalNoteWrapper>
@@ -27,7 +29,7 @@ export const ProLegalNote: FC<IProps> = ({ onManage }) => {
                     e.preventDefault();
                     e.stopPropagation();
                 }}
-                href="https://tonkeeper.com/pro-terms"
+                href={termsLink}
             >
                 {t('pro_terms')}
             </ExternalLinkStyled>
@@ -37,7 +39,7 @@ export const ProLegalNote: FC<IProps> = ({ onManage }) => {
                     e.preventDefault();
                     e.stopPropagation();
                 }}
-                href="https://tonkeeper.com/privacy"
+                href={privacyLink}
             >
                 {t('pro_privacy')}
             </ExternalLinkStyled>
