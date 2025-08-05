@@ -258,11 +258,15 @@ export const useAutoAuthMutation = () => {
     const authService = useProAuthTokenService();
 
     return useMutation<void, Error, IAuthViaSeedPhraseData>(async authData => {
-        if (isPaidActiveSubscription(subscription)) return;
+        try {
+            if (isPaidActiveSubscription(subscription)) return;
 
-        await authViaSeedPhrase(api, authService, authData);
+            await authViaSeedPhrase(api, authService, authData);
 
-        await client.invalidateQueries([QueryKey.pro]);
+            await client.invalidateQueries([QueryKey.pro]);
+        } catch (e) {
+            console.error('Pro auto auth failed', e);
+        }
     });
 };
 

@@ -418,7 +418,12 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     useSetNotificationOnCloseInterceptor(onCloseInterceptor);
 
     useEffect(() => {
-        if (createdAccount && mnemonic && selectedMnemonicType && selectNetworksPassed) {
+        if (
+            createdAccount &&
+            mnemonic &&
+            (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') &&
+            selectNetworksPassed
+        ) {
             void tryAutoAuth({
                 wallet: createdAccount.activeTonWallet,
                 signer: tonProofSignerByTonMnemonic(
