@@ -37,8 +37,7 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
         }
 
         if (isCryptoSub) {
-            // TODO We can't have amount for older users
-            return subscription.amount ? getFormattedProPrice(subscription.amount, true) : '8 TON';
+            return getFormattedProPrice(subscription.amount, true);
         }
 
         if (isIosSub && hasIosPrice(subscription)) {
