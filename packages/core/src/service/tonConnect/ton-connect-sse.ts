@@ -44,13 +44,18 @@ export const createBridgeEndpointFetcher =
     }) =>
     async () => {
         try {
-            const tonendpoint = new Tonendpoint({
-                platform,
-                lang: 'en',
-                build,
-                network: Network.MAINNET,
-                targetEnv
-            });
+            const tonendpoint = new Tonendpoint(
+                {
+                    platform,
+                    lang: 'en',
+                    build,
+                    network: Network.MAINNET,
+                    targetEnv
+                },
+                {
+                    fetchApi: fetch
+                }
+            );
             const country = await tonendpoint.country();
             tonendpoint.setCountryCode(country.country);
             const config = await getServerConfig(tonendpoint, Network.MAINNET);
