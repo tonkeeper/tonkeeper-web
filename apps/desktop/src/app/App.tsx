@@ -181,7 +181,7 @@ const ThemeAndContent = () => {
     return (
         <UserThemeProvider
             displayType="full-width"
-            isPro={data?.valid}
+            isPro={Boolean(data?.valid)}
             isProSupported
             proDisplayType="desktop"
         >

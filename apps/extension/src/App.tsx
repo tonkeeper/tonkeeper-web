@@ -92,6 +92,7 @@ const PairKeystoneNotification = React.lazy(
 const ExtensionMobileAppBannerNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
 );
+const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -303,6 +304,16 @@ export const Content: FC<{
     useTrackLocation();
     useDebuggingTools();
     useRealtimeUpdatesInvalidation();
+
+    if (location.pathname === AppRoute.connectLedger) {
+        return (
+            <PageWrapper>
+                <Suspense fallback={<Loading />}>
+                    <ConnectLedgerPage />
+                </Suspense>
+            </PageWrapper>
+        );
+    }
 
     if (lock) {
         return (

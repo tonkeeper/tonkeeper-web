@@ -3,6 +3,7 @@ import { Network } from './network';
 import { DeprecatedAuthState } from './password';
 import { WalletProxy } from './proxy';
 import { TronWallet } from './tron/tron-wallet';
+import { Account, AccountMAM, AccountTonMnemonic } from './account';
 
 export enum WalletVersion {
     V3R1 = 0,
@@ -12,6 +13,32 @@ export enum WalletVersion {
     V5_BETA = 4,
     V5R1 = 5
 }
+
+export type WalletsTransform = (wallets: ReadonlyArray<TonWalletStandard>) => TonWalletStandard[];
+
+export const getWalletsFromAccount = (
+    account: AccountTonMnemonic | AccountMAM,
+    transformAllWallets?: WalletsTransform
+): AccountWallet[] => {
+    if (account.type === 'mam') {
+        return account.derivations.map(derivation => ({
+            wallet: derivation.tonWallets[0],
+            account,
+            derivation
+        }));
+    }
+
+    const immutableWallets = account.allTonWallets as ReadonlyArray<TonWalletStandard>;
+
+    const modifiedWallets = transformAllWallets
+        ? transformAllWallets(immutableWallets.slice())
+        : immutableWallets.slice();
+
+    return modifiedWallets.sort(sortWalletsByVersion).map(w => ({
+        wallet: w,
+        account
+    }));
+};
 
 export function sortWalletsByVersion(
     w1: { version: WalletVersion },
@@ -175,4 +202,9 @@ export const defaultPreferencesConfig: TonWalletConfig = {
 
 export function eqRawAddresses(address1: string, address2: string) {
     return address1.toLowerCase() === address2.toLowerCase();
+}
+
+export interface AccountWallet {
+    wallet: TonWalletStandard;
+    account: Account;
 }

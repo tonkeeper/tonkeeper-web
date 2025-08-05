@@ -213,3 +213,17 @@ export const pTimeout = <T>(p: Promise<T>, ms: number): Promise<T> => {
         });
     });
 };
+
+export const maxOneCall = <A extends unknown[], R>(fn: (...args: A) => R): ((...args: A) => R) => {
+    let called = false;
+
+    return (...args: A): R => {
+        if (called) {
+            throw new Error('Function was already invoked');
+        }
+
+        called = true;
+
+        return fn(...args);
+    };
+};

@@ -12,11 +12,14 @@ import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useNavigate } from '../hooks/router/useNavigate';
 import { QueryKey } from '../libs/queryKey';
 import { AppRoute } from '../libs/routes';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { useActiveAccount, useActiveApi } from './wallet';
 import { accountByLedger } from '@tonkeeper/core/dist/service/walletService';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { useAtomValue } from '../libs/useAtom';
+import { usePrevious } from '../hooks/usePrevious';
+import { atom } from '@tonkeeper/core/dist/entries/atom';
 
 export type LedgerAccount = {
     accountIndex: number;
@@ -24,7 +27,9 @@ export type LedgerAccount = {
     version: WalletVersion;
 } & Account;
 
-type T = ReturnType<typeof useMutation<LedgerTonTransport, Error>>;
+type T = ReturnType<
+    typeof useMutation<LedgerTonTransport, Error, { skipOpenConnectionPage?: boolean } | void>
+>;
 
 let _tonTransport: LedgerTonTransport | null = null;
 
@@ -33,12 +38,34 @@ export const useLedgerConnectionType = () => {
     return env === 'mobile' || env === 'tablet' ? 'bluetooth' : 'wire';
 };
 
+const emptyAtom = atom<boolean>(false);
+export const useLedgerConnectionPageOpened = () => {
+    const sdk = useAppSdk();
+    return useAtomValue(sdk.ledgerConnectionPage?.isOpened ?? emptyAtom);
+};
+
+export const useEffectOnLedgerConnectionPageClosed = (callback: () => void) => {
+    const connectionPageOpened = useLedgerConnectionPageOpened();
+    const prevConnectionPageOpened = usePrevious(connectionPageOpened);
+
+    useEffect(() => {
+        if (prevConnectionPageOpened && !connectionPageOpened) {
+            callback();
+        }
+    }, [connectionPageOpened, prevConnectionPageOpened, callback]);
+};
+
 export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T => {
     // device might be connected, but mutation still pending if user didn't open Ton App on Ledger device
     const [_isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
+    const sdk = useAppSdk();
 
     const connectionType = useLedgerConnectionType();
-    const mutation = useMutation<LedgerTonTransport, Error>(async () => {
+    const mutation = useMutation<
+        LedgerTonTransport,
+        Error,
+        { skipOpenConnectionPage?: boolean } | void
+    >(async options => {
         setIsDeviceConnected(false);
 
         if (_tonTransport) {
@@ -49,7 +76,17 @@ export const useConnectLedgerMutation = (): { isDeviceConnected: boolean } & T =
                 console.error(e);
             }
         }
-        const transport = await connectLedger(connectionType);
+
+        let transport: LedgerTonTransport;
+        try {
+            transport = await connectLedger(connectionType);
+        } catch (e) {
+            if (!options?.skipOpenConnectionPage) {
+                sdk.ledgerConnectionPage?.open();
+            }
+            console.error(e);
+            throw e;
+        }
 
         setIsDeviceConnected(true);
 

@@ -9,7 +9,6 @@ import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { CreateMultisig } from '../create/Multisig';
 import { AddWalletContext } from '../create/AddWalletContext';
 import { useAtom } from '../../libs/useAtom';
-import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 import { useProState } from '../../state/pro';
 import { CreateStandardWallet } from '../../pages/import/CreateStandardWallet';
 import { CreateMAMWallet } from '../../pages/import/CreateMAMWallet';
@@ -21,7 +20,9 @@ import { CreateLedgerWallet } from '../../pages/import/CreateLedgerWallet';
 import { useAppSdk } from '../../hooks/appSdk';
 import { ImportTestnetWallet } from '../../pages/import/ImportTestnetWallet';
 import { useSecurityCheck } from '../../state/password';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
+import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -89,7 +90,7 @@ const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
 
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
-    const { data: proState } = useProState();
+    const { data: subscription } = useProState();
     const { isOpen, onClose } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
@@ -101,14 +102,14 @@ export const AddWalletNotificationControlled = () => {
         if (!isOpen) {
             return;
         }
-        if (doesMethodRequirePro(params?.walletType) && !proState?.subscription.valid) {
+        if (doesMethodRequirePro(params?.walletType) && !isValidSubscription(subscription)) {
             onClose();
             openBuyPro();
             return;
         }
 
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, proState?.subscription.valid]);
+    }, [isOpen, params?.walletType, subscription]);
 
     const sdk = useAppSdk();
 
@@ -118,7 +119,7 @@ export const AddWalletNotificationControlled = () => {
 
     const onSelect = useMemo(() => {
         return (method: AddWalletMethod) => {
-            if (doesMethodRequirePro(method) && !proState?.subscription.valid) {
+            if (doesMethodRequirePro(method) && !isValidSubscription(subscription)) {
                 onClose();
                 openBuyPro();
                 return;
@@ -126,7 +127,7 @@ export const AddWalletNotificationControlled = () => {
 
             setSelectedMethod(method);
         };
-    }, [proState?.subscription.valid, openBuyPro, setSelectedMethod, sdk]);
+    }, [subscription, openBuyPro, setSelectedMethod, sdk]);
 
     const Content = useCallback(() => {
         if (!selectedMethod) {

@@ -25,6 +25,7 @@ export const PromptMobileProPinNotificationControlled = () => {
                 params?.afterClose?.();
             }}
             mobileFullScreen
+            onTopOfBrowser
         >
             {() => (
                 <MobileProPin
