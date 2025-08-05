@@ -52,7 +52,6 @@ import {
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
 import { IAuthViaSeedPhraseData } from '../entries/password';
-import { maxOneCall } from '../utils/common';
 
 interface IGetProStateParams {
     authService: ProAuthTokenService;
@@ -253,13 +252,11 @@ export const authViaSeedPhrase = async (
     const { wallet, signer } = authData;
     const { payload } = await AuthService.authGeneratePayload();
 
-    const oneTimeSigner = maxOneCall(signer);
-
     const timestamp = await getServerTime(api);
 
     const proofPayload = tonConnectProofPayload(timestamp, domain, wallet.rawAddress, payload);
 
-    const signature = await oneTimeSigner(proofPayload.bufferToSign);
+    const signature = await signer(proofPayload.bufferToSign);
 
     const stateInit = walletStateInitFromState(wallet);
 

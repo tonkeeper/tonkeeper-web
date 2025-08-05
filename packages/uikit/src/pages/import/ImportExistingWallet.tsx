@@ -48,6 +48,7 @@ import { SelectWalletNetworks } from '../../components/create/SelectWalletNetwor
 import { useTranslation } from '../../hooks/translation';
 import { useAutoAuthMutation } from '../../state/pro';
 import { tonProofSignerByTonMnemonic } from '../../hooks/accountUtils';
+import { maxOneCall } from '@tonkeeper/core/dist/utils/common';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
@@ -426,9 +427,11 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         ) {
             void tryAutoAuth({
                 wallet: createdAccount.activeTonWallet,
-                signer: tonProofSignerByTonMnemonic(
-                    mnemonic,
-                    selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                signer: maxOneCall(
+                    tonProofSignerByTonMnemonic(
+                        mnemonic,
+                        selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                    )
                 )
             });
         }
