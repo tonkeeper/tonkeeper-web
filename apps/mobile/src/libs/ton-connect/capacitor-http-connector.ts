@@ -24,6 +24,7 @@ export const tonConnectSSE = new TonConnectSSE({
     },
     bridgeEndpointFetcher: createBridgeEndpointFetcher({
         platform: 'pro_mobile_ios',
+        targetEnv: 'mobile',
         build: packageJson.version,
         onError: e => console.error(e)
     })

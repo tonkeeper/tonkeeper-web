@@ -13,6 +13,7 @@ import { replyHttpBadRequestResponse, replyHttpDisconnectResponse } from './acti
 import { delay } from '../../utils/common';
 import { BootParams, getServerConfig, Tonendpoint } from '../../tonkeeperApi/tonendpoint';
 import { Network } from '../../entries/network';
+import { TargetEnv } from '../../AppSdk';
 
 type Logger = {
     info: (message: string) => void;
@@ -32,10 +33,12 @@ type Listeners = {
 export const createBridgeEndpointFetcher =
     ({
         platform,
+        targetEnv,
         onError,
         build
     }: {
         platform: BootParams['platform'];
+        targetEnv: TargetEnv;
         build: BootParams['build'];
         onError: (e: unknown) => void;
     }) =>
@@ -45,7 +48,8 @@ export const createBridgeEndpointFetcher =
                 platform,
                 lang: 'en',
                 build,
-                network: Network.MAINNET
+                network: Network.MAINNET,
+                targetEnv
             });
             const country = await tonendpoint.country();
             tonendpoint.setCountryCode(country.country);
