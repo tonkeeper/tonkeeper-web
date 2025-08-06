@@ -85,3 +85,8 @@ export type NormalizedProPlans = {
     plans: IDisplayPlan[] | undefined;
     verifiedPromoCode: string | undefined;
 };
+
+export interface ISupportData {
+    url: string;
+    isPriority: boolean;
+}
