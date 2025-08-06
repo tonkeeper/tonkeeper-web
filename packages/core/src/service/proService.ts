@@ -14,6 +14,7 @@ import {
     CryptoPendingSubscription,
     isPendingSubscription,
     isProSubscription,
+    ISupportData,
     isValidSubscription,
     ProStateWallet,
     ProSubscription,
@@ -475,13 +476,19 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
     }
 }
 
-export const getProSupportUrl = async () => {
+export const getProSupportUrl = async (): Promise<ISupportData> => {
     try {
-        const supportToken = await SupportService.getProSupport();
+        const { url, is_priority } = await SupportService.getProSupport();
 
-        return supportToken?.url ?? null;
+        return {
+            url,
+            isPriority: is_priority
+        };
     } catch (e) {
-        return null;
+        return {
+            url: '',
+            isPriority: false
+        };
     }
 };
 

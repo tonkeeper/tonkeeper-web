@@ -5,6 +5,7 @@ import {
     CryptoSubscriptionStatuses,
     IIosPurchaseResult,
     IOriginalTransactionInfo,
+    ISupportData,
     isIosStrategy,
     isPaidActiveSubscription,
     ISubscriptionFormData,
@@ -90,10 +91,10 @@ export const useTrialAvailability = () => {
     });
 };
 
-export const useProSupportUrl = () => {
+export const useSupport = () => {
     const { data: subscription } = useProState();
 
-    return useQuery<string | null, Error>(
+    return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
         getProSupportUrl,
         {

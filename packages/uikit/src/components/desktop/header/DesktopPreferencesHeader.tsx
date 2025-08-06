@@ -6,7 +6,7 @@ import { Button } from '../../fields/Button';
 import { DesktopHeaderContainer } from './DesktopHeaderElements';
 
 import { useAppSdk } from '../../../hooks/appSdk';
-import { useProSupportUrl } from '../../../state/pro';
+import { useSupport } from '../../../state/pro';
 import { useActiveConfig } from '../../../state/wallet';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
@@ -29,7 +29,7 @@ const DesktopPreferencesHeaderPayload = () => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const config = useActiveConfig();
-    const { data: prioritySupportUrl, isLoading: isPriorityLoading } = useProSupportUrl();
+    const { data: support, isLoading: isSupportLoading } = useSupport();
 
     const newsUrl = config.tonkeeperNewsUrl;
     const supportUrl = config.directSupportUrl;
@@ -46,12 +46,12 @@ const DesktopPreferencesHeaderPayload = () => {
                 )}
                 {!!supportUrl && (
                     <Button
-                        loading={isPriorityLoading}
+                        loading={isSupportLoading}
                         size="small"
-                        onClick={() => sdk.openPage(prioritySupportUrl ?? supportUrl)}
+                        onClick={() => sdk.openPage(support.url ?? support.url)}
                     >
                         <TelegramIcon />
-                        {t(prioritySupportUrl ? 'priority_support' : 'settings_support')}
+                        {t(support.isPriority ? 'priority_support' : 'settings_support')}
                     </Button>
                 )}
                 {!!newsUrl && (
