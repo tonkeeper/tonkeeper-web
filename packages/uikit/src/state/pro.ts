@@ -92,12 +92,17 @@ export const useTrialAvailability = () => {
 };
 
 export const useSupport = () => {
+    const { mainnetConfig } = useAppContext();
     const { data: subscription } = useProState();
 
     return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
         getProSupportUrl,
         {
+            initialData: {
+                url: mainnetConfig.directSupportUrl ?? '',
+                isPriority: false
+            },
             staleTime: 0,
             cacheTime: 0
         }
