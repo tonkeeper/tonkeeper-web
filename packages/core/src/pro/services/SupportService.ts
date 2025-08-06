@@ -13,6 +13,7 @@ export class SupportService {
      */
     public static getProSupport(): CancelablePromise<{
         url: string;
+        is_priority: boolean;
     }> {
         return __request(OpenAPI, {
             method: 'GET',
