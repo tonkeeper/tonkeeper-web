@@ -3,6 +3,7 @@ import { useActiveAccount, useActiveApi } from '../../../state/wallet';
 import {
     useBatteryApi,
     useBatteryAuthToken,
+    useBatteryUnitTonRate,
     useRequestBatteryAuthToken
 } from '../../../state/battery';
 import { useAppSdk } from '../../appSdk';
@@ -19,28 +20,33 @@ import { useQuery } from '@tanstack/react-query';
 import { useToQueryKeyPart } from '../../useToQueryKeyPart';
 import { isTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
+import {
+    TransactionFeeBattery,
+    TransactionFeeTonAssetRelayed,
+    TransactionFeeTronAsset
+} from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { TronNotEnoughBalanceEstimationError } from '@tonkeeper/core/dist/errors/TronNotEnoughBalanceEstimationError';
 
-export type TronSenderChoice = { type: 'trx' } | { type: 'battery' } | { type: 'ton-asset' };
-export const TRON_SENDER_CHOICE_TRX = { type: 'trx' as const };
-export const TRON_SENDER_CHOICE_BATTERY = { type: 'battery' as const };
-export const TRON_SENDER_CHOICE_TON_ASSET = { type: 'ton-asset' as const };
-export type TronSenderType = TronSenderChoice['type'];
+export enum TRON_SENDER_TYPE {
+    TRX = 'tron-trx',
+    BATTERY = 'tron-battery',
+    TON_ASSET = 'tron-ton-asset'
+}
 
-export const tronSenderChoiceByType = (type: TronSenderType | undefined) => {
-    if (type === undefined) {
-        return undefined;
-    }
-    switch (type) {
-        case 'trx':
-            return TRON_SENDER_CHOICE_TRX;
-        case 'battery':
-            return TRON_SENDER_CHOICE_BATTERY;
-        case 'ton-asset':
-            return TRON_SENDER_CHOICE_TON_ASSET;
-        default:
-            assertUnreachable(type);
-    }
-};
+export type TronSenderType = (typeof TRON_SENDER_TYPE)[keyof typeof TRON_SENDER_TYPE];
+
+export type TronSenderOption =
+    | { type: TRON_SENDER_TYPE.TRX; isEnoughBalance: boolean; fee: TransactionFeeTronAsset }
+    | {
+          type: TRON_SENDER_TYPE.BATTERY;
+          isEnoughBalance: boolean;
+          fee: TransactionFeeBattery;
+      }
+    | {
+          type: TRON_SENDER_TYPE.TON_ASSET;
+          isEnoughBalance: boolean;
+          fee: TransactionFeeTonAssetRelayed;
+      };
 
 export const useAvailableTronSendersChoices = (receiver: string, assetAmount: AssetAmount) => {
     const batteryTronSender = useTronEstimationBatterySender();
@@ -51,7 +57,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
     const queryKeyTrx = useToQueryKeyPart(tronTrxSender);
     const queryKeyTon = useToQueryKeyPart(tronTonSender);
 
-    return useQuery(
+    return useQuery<TronSenderOption[]>(
         [
             'tron-available-senders',
             queryKeyBattery,
@@ -64,40 +70,79 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             if (!isTronAsset(assetAmount.asset)) {
                 return [];
             }
-            const choices: TronSenderChoice[] = [];
+            const options: TronSenderOption[] = [];
 
-            /**
-             * battery is not authorized, but might be available
-             */
-            if (!batteryTronSender) {
-                choices.push(TRON_SENDER_CHOICE_BATTERY);
-            } else {
+            if (batteryTronSender) {
                 try {
-                    await batteryTronSender.estimate(
+                    const { fee } = await batteryTronSender.estimate(
                         receiver,
                         assetAmount as AssetAmount<TronAsset>
                     );
-                    choices.push(TRON_SENDER_CHOICE_BATTERY);
-                } catch (e) {
+                    options.push({
+                        type: TRON_SENDER_TYPE.BATTERY,
+                        isEnoughBalance: true,
+                        fee
+                    });
+                } catch (e: unknown) {
+                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                        options.push({
+                            type: TRON_SENDER_TYPE.BATTERY,
+                            isEnoughBalance: false,
+                            fee: e.fee as TransactionFeeBattery
+                        });
+                    }
                     console.debug(e);
                 }
             }
 
-            try {
-                await tronTrxSender?.estimate(receiver, assetAmount as AssetAmount<TronAsset>);
-                choices.push(TRON_SENDER_CHOICE_TRX);
-            } catch (e) {
-                console.debug(e);
+            if (tronTonSender) {
+                try {
+                    const { fee } = await tronTonSender.estimate(
+                        receiver,
+                        assetAmount as AssetAmount<TronAsset>
+                    );
+                    options.push({
+                        type: TRON_SENDER_TYPE.TON_ASSET,
+                        isEnoughBalance: true,
+                        fee
+                    });
+                } catch (e) {
+                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                        options.push({
+                            type: TRON_SENDER_TYPE.TON_ASSET,
+                            isEnoughBalance: false,
+                            fee: e.fee as TransactionFeeTonAssetRelayed
+                        });
+                    }
+                    console.debug(e);
+                }
             }
 
-            try {
-                await tronTonSender?.estimate(receiver, assetAmount as AssetAmount<TronAsset>);
-                choices.push(TRON_SENDER_CHOICE_TON_ASSET);
-            } catch (e) {
-                console.debug(e);
+            if (tronTrxSender) {
+                try {
+                    const { fee } = await tronTrxSender.estimate(
+                        receiver,
+                        assetAmount as AssetAmount<TronAsset>
+                    );
+                    options.push({ type: TRON_SENDER_TYPE.TRX, isEnoughBalance: true, fee });
+                } catch (e) {
+                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                        options.push({
+                            type: TRON_SENDER_TYPE.TRX,
+                            isEnoughBalance: false,
+                            fee: e.fee as TransactionFeeTronAsset
+                        });
+                    }
+                    console.debug(e);
+                }
             }
 
-            return choices;
+            return options
+                .filter(o => o.isEnoughBalance)
+                .concat(options.filter(o => !o.isEnoughBalance));
+        },
+        {
+            enabled: !!tronTrxSender || !!tronTonSender
         }
     );
 };
@@ -108,16 +153,16 @@ export const useGetTronSender = () => {
     const tronTrxSender = useGetTronTrxSender();
 
     return useCallback(
-        (choice: TronSenderChoice) => {
-            switch (choice.type) {
-                case 'trx':
+        (type: TronSenderType) => {
+            switch (type) {
+                case TRON_SENDER_TYPE.TRX:
                     return tronTrxSender();
-                case 'battery':
+                case TRON_SENDER_TYPE.BATTERY:
                     return batteryTronSender();
-                case 'ton-asset':
+                case TRON_SENDER_TYPE.TON_ASSET:
                     return tronTonSender();
                 default:
-                    assertUnreachable(choice);
+                    assertUnreachable(type);
             }
         },
         [tronTonSender, batteryTronSender, tronTrxSender]
@@ -129,8 +174,6 @@ const useGetTronTonSender = () => {
     const tonApi = useActiveApi();
     const activeAccount = useActiveAccount();
     const batteryApi = useBatteryApi();
-    const { data: authToken } = useBatteryAuthToken();
-    const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
     const sdk = useAppSdk();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
@@ -149,7 +192,6 @@ const useGetTronTonSender = () => {
             throw new Error('Ton wallet does not support trc20 fee covering');
         }
         const signer = getOpenedSignerProvider(sdk, tronApi, activeAccount);
-        const batteryToken = authToken ?? (await requestToken());
         return new TronTonSender(
             tronApi,
             tonApi,
@@ -158,16 +200,7 @@ const useGetTronTonSender = () => {
             activeTonWallet,
             signer
         );
-    }, [
-        activeAccount,
-        activeTonWallet,
-        activeTronWallet,
-        authToken,
-        requestToken,
-        tonApi,
-        tronApi,
-        batteryApi
-    ]);
+    }, [activeAccount, activeTonWallet, activeTronWallet, tonApi, tronApi, batteryApi]);
 };
 
 const useGetBatteryTronSender = () => {
@@ -177,6 +210,7 @@ const useGetBatteryTronSender = () => {
     const { data: authToken } = useBatteryAuthToken();
     const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
     const sdk = useAppSdk();
+    const batteryUnitTonRate = useBatteryUnitTonRate();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -190,8 +224,23 @@ const useGetBatteryTronSender = () => {
         const signer = getTronSigner(sdk, tronApi, activeAccount);
         const batteryToken = authToken ?? (await requestToken());
 
-        return new TronBatterySender(tronApi, batteryApi, activeTronWallet, signer, batteryToken);
-    }, [requestToken, authToken, activeAccount, activeTronWallet, tronApi, batteryApi]);
+        return new TronBatterySender(
+            tronApi,
+            batteryApi,
+            activeTronWallet,
+            signer,
+            batteryUnitTonRate,
+            batteryToken
+        );
+    }, [
+        requestToken,
+        authToken,
+        activeAccount,
+        activeTronWallet,
+        tronApi,
+        batteryApi,
+        batteryUnitTonRate
+    ]);
 };
 
 const useGetTronTrxSender = () => {
@@ -213,21 +262,21 @@ const useGetTronTrxSender = () => {
     }, [activeAccount, activeTronWallet, tronApi]);
 };
 
-export const useTronEstimationSender = (senderChoice: TronSenderChoice | undefined) => {
+export const useTronEstimationSender = (senderType: TronSenderType | undefined) => {
     const batteryTronSender = useTronEstimationBatterySender();
     const tronTrxSender = useTronEstimationTrxSender();
     const tronTonSender = useTronEstimationTonSender();
-    switch (senderChoice?.type) {
+    switch (senderType) {
         case undefined:
             return undefined;
-        case 'trx':
+        case TRON_SENDER_TYPE.TRX:
             return tronTrxSender;
-        case 'battery':
+        case TRON_SENDER_TYPE.BATTERY:
             return batteryTronSender;
-        case 'ton-asset':
+        case TRON_SENDER_TYPE.TON_ASSET:
             return tronTonSender;
         default:
-            assertUnreachable(senderChoice);
+            assertUnreachable(senderType);
     }
 };
 
@@ -239,6 +288,8 @@ const useTronEstimationBatterySender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
     const batteryApi = useBatteryApi();
+    const { data: authToken } = useBatteryAuthToken();
+    const batteryUnitTonRate = useBatteryUnitTonRate();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -246,10 +297,17 @@ const useTronEstimationBatterySender = () => {
 
     return useMemo(
         () =>
-            activeTronWallet
-                ? new TronBatterySender(tronApi, batteryApi, activeTronWallet, emptySigner, '')
+            activeTronWallet && authToken
+                ? new TronBatterySender(
+                      tronApi,
+                      batteryApi,
+                      activeTronWallet,
+                      emptySigner,
+                      batteryUnitTonRate,
+                      authToken
+                  )
                 : undefined,
-        [activeAccount, activeTronWallet, tronApi, batteryApi]
+        [activeAccount, activeTronWallet, tronApi, batteryApi, authToken, batteryUnitTonRate]
     );
 };
 

@@ -54,7 +54,7 @@ import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBala
 import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import {
-    AllChainsSenderChoice,
+    AllChainsSenderOptions,
     AllChainsSenderType
 } from '../../hooks/blockchain/sender/sender-type';
 
@@ -97,7 +97,7 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
         onSenderTypeChange?: (type: AllChainsSenderType) => void;
-        availableSendersChoices?: AllChainsSenderChoice[];
+        availableSendersOptions?: AllChainsSenderOptions[];
         selectedSenderType?: AllChainsSenderType;
         estimation: {
             data: Pick<Estimation<T>, 'fee'> | undefined;
@@ -118,7 +118,7 @@ export function ConfirmView<T extends Asset = Asset>({
     className,
     onSenderTypeChange,
     selectedSenderType,
-    availableSendersChoices,
+    availableSendersOptions,
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, reset } = mutation;
@@ -143,7 +143,7 @@ export function ConfirmView<T extends Asset = Asset>({
             <ConfirmViewDetailsFee
                 onSenderTypeChange={onSenderTypeChange}
                 selectedSenderType={selectedSenderType}
-                availableSendersChoices={availableSendersChoices}
+                availableSendersOptions={availableSendersOptions}
             />
             <ConfirmViewDetailsComment />
         </ConfirmViewDetailsSlot>

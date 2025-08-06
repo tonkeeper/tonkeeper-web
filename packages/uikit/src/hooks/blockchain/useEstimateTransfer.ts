@@ -19,11 +19,7 @@ import { useMemo } from 'react';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import {
-    tronSenderChoiceByType,
-    TronSenderType,
-    useTronEstimationSender
-} from './sender/useTronSender';
+import { TronSenderType, useTronEstimationSender } from './sender/useTronSender';
 import { AllChainsSenderType } from './sender/sender-type';
 
 export function useEstimateTransfer({
@@ -71,7 +67,7 @@ export function useEstimateTransfer({
     const notifyError = useNotifyErrorHandle();
     const getSenderKey = useToQueryKeyPart(getSender);
     const tronSender = useTronEstimationSender(
-        isTronAsset(amount.asset) ? tronSenderChoiceByType(senderType as TronSenderType) : undefined
+        isTronAsset(amount.asset) ? (senderType as TronSenderType) : undefined
     );
 
     return useQuery<Estimation, Error>(

@@ -75,7 +75,7 @@ export const AmountView: FC<{
 }> = props => {
     const { data: batteryBalance } = useBatteryBalance();
 
-    if (
+   /* if (
         props.recipient.address.blockchain === BLOCKCHAIN_NAME.TRON &&
         (!batteryBalance || batteryBalance.batteryUnitsBalance.isZero())
     ) {
@@ -94,7 +94,7 @@ export const AmountView: FC<{
                 />
             );
         }
-    }
+    }*/
 
     return <AmountViewContent {...props} />;
 };

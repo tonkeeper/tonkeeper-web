@@ -163,7 +163,7 @@ export const ConfirmTransferView: FC<
             assetAmount={assetAmountPatched}
             selectedSenderType={selectedSenderType}
             onSenderTypeChange={onSenderTypeChange}
-            availableSendersChoices={
+            availableSendersOptions={
                 isTonBlockchainAssetTransfer
                     ? availableTonSendersChoices
                     : availableTronSendersChoices

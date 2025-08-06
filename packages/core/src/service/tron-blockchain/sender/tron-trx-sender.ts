@@ -8,7 +8,8 @@ import { ITronSender } from './I-tron-sender';
 
 import { TronTrc20Encoder } from '../encoder/tron-trc20-encoder';
 import { TRON_TRX_ASSET } from '../../../entries/crypto/asset/constants';
-import { NotEnoughBalanceError } from '../../../errors/NotEnoughBalanceError';
+import { TransactionFeeTronAsset } from '../../../entries/crypto/transaction-fee';
+import { TronNotEnoughBalanceEstimationError } from '../../../errors/TronNotEnoughBalanceEstimationError';
 
 export class TronTrxSender implements ITronSender {
     private trc20Encoder: TronTrc20Encoder;
@@ -35,7 +36,13 @@ export class TronTrxSender implements ITronSender {
         await this.tronApi.broadcastSignedTransaction(signedTx);
     }
 
-    async estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation> {
+    async estimate(
+        to: string,
+        assetAmount: AssetAmount<TronAsset>
+    ): Promise<{
+        fee: TransactionFeeTronAsset;
+        resources: TronResources;
+    }> {
         const resources = await this.tronApi.applyResourcesSafetyMargin(
             await this.tronApi.estimateResources(
                 await this.trc20Encoder.encodeTransferEstimateRequest(to, assetAmount)
@@ -43,13 +50,14 @@ export class TronTrxSender implements ITronSender {
         );
 
         const extra = await this.getBurnTrxAmountForResources(resources);
-        await this.checkBalanceIsEnough(extra);
+        const fee = {
+            type: 'tron-asset' as const,
+            extra
+        };
+        await this.checkBalanceIsEnough(extra, fee);
 
         return {
-            fee: {
-                type: 'tron-asset' as const,
-                extra
-            },
+            fee,
             resources
         };
     }
@@ -67,14 +75,13 @@ export class TronTrxSender implements ITronSender {
         });
     }
 
-    private async checkBalanceIsEnough(trxRequired: AssetAmount<TronAsset>) {
+    private async checkBalanceIsEnough(
+        trxRequired: AssetAmount<TronAsset>,
+        fee?: TransactionFeeTronAsset
+    ) {
         const balance = await this.tronApi.getBalances(this.walletInfo.address);
         if (trxRequired.weiAmount.gt(balance.trx)) {
-            throw new NotEnoughBalanceError(
-                'Not enough balance',
-                new AssetAmount<TronAsset>({ weiAmount: balance.trx, asset: TRON_TRX_ASSET }),
-                trxRequired
-            );
+            throw new TronNotEnoughBalanceEstimationError('Not enough balance', fee);
         }
     }
 }

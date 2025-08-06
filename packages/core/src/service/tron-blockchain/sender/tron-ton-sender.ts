@@ -1,4 +1,4 @@
-import { TronApi } from '../../../tronApi';
+import { TronApi, TronResources } from '../../../tronApi';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../../entries/crypto/asset/tron-asset';
 import { OpenedSignerProvider } from '../../../entries/signer';
@@ -21,12 +21,18 @@ import { TonWalletStandard } from '../../../entries/wallet';
 import { Cell } from '@ton/core';
 import type { SignedTransaction, Transaction } from 'tronweb/src/types/Transaction';
 import { AccountsApi } from '../../../tonApiV2';
-import { TronNotEnoughTonBalanceError } from '../../../errors/TronNotEnoughTonBalanceError';
+import { TronNotEnoughBalanceEstimationError } from '../../../errors/TronNotEnoughBalanceEstimationError';
+import { TonAsset } from '../../../entries/crypto/asset/ton-asset';
 
 export class TronTonSender implements ITronSender {
     private batteryApi: BatteryApi;
 
     private trc20Encoder: TronTrc20Encoder;
+
+    private tonTransferOwnFee = AssetAmount.fromRelativeAmount({
+        amount: 0.01,
+        asset: TON_ASSET
+    });
 
     constructor(
         private tronApi: TronApi,
@@ -47,6 +53,8 @@ export class TronTonSender implements ITronSender {
         if (estimation.fee.type !== 'ton-asset-relayed') {
             throw new Error('Unacceptable fee type');
         }
+
+        await this.checkBalanceIsEnough(estimation.fee.extra);
 
         let signedTronTx: Transaction & SignedTransaction;
         let signedTonTx: Cell;
@@ -95,7 +103,13 @@ export class TronTonSender implements ITronSender {
         }
     }
 
-    async estimate(to: string, assetAmount: AssetAmount<TronAsset>): Promise<TronEstimation> {
+    async estimate(
+        to: string,
+        assetAmount: AssetAmount<TronAsset>
+    ): Promise<{
+        fee: TransactionFeeTonAssetRelayed;
+        resources: TronResources;
+    }> {
         const resources = await this.tronApi.applyResourcesSafetyMargin(
             await this.tronApi.estimateResources(
                 await this.trc20Encoder.encodeTransferEstimateRequest(to, assetAmount)
@@ -115,38 +129,43 @@ export class TronTonSender implements ITronSender {
             throw new Error('Instant fee for ton not allowed');
         }
 
-        const extra = new AssetAmount({ weiAmount: tonInstantFee.amountNano, asset: TON_ASSET });
+        const extra = new AssetAmount({
+            weiAmount: tonInstantFee.amountNano,
+            asset: TON_ASSET
+        });
 
+        const fee = {
+            type: 'ton-asset-relayed' as const,
+            extra,
+            sendToAddress: estimation.instantFee.feeAddress
+        };
+
+        await this.checkBalanceIsEnough(extra, fee);
+
+        return {
+            fee,
+            resources
+        };
+    }
+
+    private async checkBalanceIsEnough(
+        extra: AssetAmount<TonAsset>,
+        fee?: TransactionFeeTonAssetRelayed
+    ) {
         const account = await new AccountsApi(this.tonApi.tonApiV2).getAccount({
             accountId: this.tonWalletInfo.rawAddress
         });
 
-        const tonTransferOwnFee = AssetAmount.fromRelativeAmount({
-            amount: 0.01,
-            asset: TON_ASSET
-        });
-
         const requiredTonBalance = new AssetAmount({
-            weiAmount: extra.weiAmount.plus(tonTransferOwnFee.weiAmount),
+            weiAmount: extra.weiAmount.plus(this.tonTransferOwnFee.weiAmount),
             asset: TON_ASSET
         });
 
         if (requiredTonBalance.weiAmount.isGreaterThan(account.balance)) {
-            throw new TronNotEnoughTonBalanceError(
-                `Not enough balance to pay instant fee in ton. Required: ${requiredTonBalance.stringAssetRelativeAmount}`
+            throw new TronNotEnoughBalanceEstimationError(
+                `Not enough balance to pay instant fee in ton. Required: ${requiredTonBalance.stringAssetRelativeAmount}`,
+                fee
             );
         }
-
-        return {
-            fee: {
-                type: 'ton-asset-relayed' as const,
-                extra: new AssetAmount({
-                    weiAmount: tonInstantFee.amountNano,
-                    asset: TON_ASSET
-                }),
-                sendToAddress: estimation.instantFee.feeAddress
-            },
-            resources
-        };
     }
 }

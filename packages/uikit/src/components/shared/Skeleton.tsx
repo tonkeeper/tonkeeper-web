@@ -67,6 +67,7 @@ export const Skeleton = styled(Base)<{
     borderRadius?: string;
     margin?: string;
     marginBottom?: string;
+    marginTop?: string;
 }>`
     display: block;
     border-radius: ${props =>
@@ -79,6 +80,7 @@ export const Skeleton = styled(Base)<{
         height: ${props.height ?? '20px'};
         ${props.margin && `margin: ${props.margin};`}
         ${props.marginBottom && `margin-bottom: ${props.marginBottom};`}
+        ${props.marginTop && `margin-top: ${props.marginTop};`}
     `}
 `;
 

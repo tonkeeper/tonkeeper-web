@@ -17,7 +17,7 @@ import { useNotifyErrorHandle } from '../useNotification';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
-import { tronSenderChoiceByType, TronSenderType, useGetTronSender } from './sender/useTronSender';
+import { TronSenderType, useGetTronSender } from './sender/useTronSender';
 import { AllChainsSenderType } from './sender/sender-type';
 
 export function useSendTransfer<T extends Asset>({
@@ -85,9 +85,7 @@ export function useSendTransfer<T extends Asset>({
                     token: isTon(amount.asset.address) ? 'ton' : amount.asset.symbol
                 });
             } else if (amount.asset.id === TRON_USDT_ASSET.id) {
-                const tronSender = await getTronSender(
-                    tronSenderChoiceByType(senderType as TronSenderType)!
-                );
+                const tronSender = await getTronSender(senderType as TronSenderType);
                 await tronSender.send(
                     recipient.address.address,
                     amount as AssetAmount<TronAsset>,

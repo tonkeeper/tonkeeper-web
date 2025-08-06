@@ -292,7 +292,7 @@ export const ConfirmNftView: FC<{
                     <ConfirmViewDetailsRecipient />
                     <ConfirmViewDetailsFee
                         blockchain={BLOCKCHAIN_NAME.TON}
-                        availableSendersChoices={availableSendersChoices}
+                        availableSendersOptions={availableSendersChoices}
                         selectedSenderType={selectedSenderType}
                         onSenderTypeChange={onSenderTypeChange}
                     />

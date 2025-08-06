@@ -235,7 +235,7 @@ const MultiSendConfirmContent: FC<{
                     <ActionFeeDetailsUniversalStyled
                         blockchain={BLOCKCHAIN_NAME.TON}
                         fee={estimateData?.fee}
-                        availableSendersChoices={availableSendersChoices}
+                        availableSendersOptions={availableSendersChoices}
                         selectedSenderType={selectedSenderType}
                         onSenderTypeChange={onSenderTypeChange}
                     />

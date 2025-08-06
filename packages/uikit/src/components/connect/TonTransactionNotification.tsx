@@ -258,7 +258,7 @@ const TonTransactionContent: FC<{
                     </ErrorStyled>
                     <SelectSenderDropdown
                         blockchain={BLOCKCHAIN_NAME.TON}
-                        availableSendersChoices={availableSendersChoices}
+                        availableSendersOptions={availableSendersChoices}
                         onSenderTypeChange={onSenderTypeChange}
                         selectedSenderType={selectedSenderType}
                     />
@@ -269,7 +269,7 @@ const TonTransactionContent: FC<{
             {!!estimate?.fee && (
                 <ActionFeeDetailsUniversalStyled
                     blockchain={BLOCKCHAIN_NAME.TON}
-                    availableSendersChoices={availableSendersChoices}
+                    availableSendersOptions={availableSendersChoices}
                     selectedSenderType={selectedSenderType}
                     onSenderTypeChange={onSenderTypeChange}
                     fee={estimate.fee}
