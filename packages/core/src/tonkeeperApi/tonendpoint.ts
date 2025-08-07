@@ -99,6 +99,7 @@ export interface TonendpointConfig {
     pro_terms_of_use?: string;
     privacy_policy?: string;
     terms_of_use?: string;
+    faq_tron_fee_url?: string;
 }
 
 interface CountryIP {

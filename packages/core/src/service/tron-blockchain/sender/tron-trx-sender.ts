@@ -14,6 +14,19 @@ import { TronNotEnoughBalanceEstimationError } from '../../../errors/TronNotEnou
 export class TronTrxSender implements ITronSender {
     private trc20Encoder: TronTrc20Encoder;
 
+    public static async getBurnTrxAmountForResources(tronApi: TronApi, resources: TronResources) {
+        const resourcesTrxPrice = await tronApi.getResourcePrices();
+        const burnTrxForEnergy = resourcesTrxPrice.energy.weiAmount.multipliedBy(resources.energy);
+        const burnTrxForBandwidth = resourcesTrxPrice.bandwidth.weiAmount.multipliedBy(
+            resources.bandwidth
+        );
+
+        return new AssetAmount<TronAsset>({
+            weiAmount: burnTrxForEnergy.plus(burnTrxForBandwidth),
+            asset: TRON_TRX_ASSET
+        });
+    }
+
     constructor(
         private tronApi: TronApi,
         private walletInfo: TronWallet,
@@ -62,17 +75,8 @@ export class TronTrxSender implements ITronSender {
         };
     }
 
-    private async getBurnTrxAmountForResources(resources: TronResources) {
-        const resourcesTrxPrice = await this.tronApi.getResourcePrices();
-        const burnTrxForEnergy = resourcesTrxPrice.energy.weiAmount.multipliedBy(resources.energy);
-        const burnTrxForBandwidth = resourcesTrxPrice.bandwidth.weiAmount.multipliedBy(
-            resources.bandwidth
-        );
-
-        return new AssetAmount<TronAsset>({
-            weiAmount: burnTrxForEnergy.plus(burnTrxForBandwidth),
-            asset: TRON_TRX_ASSET
-        });
+    public async getBurnTrxAmountForResources(resources: TronResources) {
+        return TronTrxSender.getBurnTrxAmountForResources(this.tronApi, resources);
     }
 
     private async checkBalanceIsEnough(

@@ -5,6 +5,11 @@ import { TronAddressUtils } from '@ton-keychain/trx';
 import { TRON_USDT_ASSET } from '../../../entries/crypto/asset/constants';
 
 export class TronTrc20Encoder {
+    public static transferDefaultResources = {
+        energy: 64285,
+        bandwidth: 345
+    };
+
     private static transferSelector = 'transfer(address,uint256)';
 
     private readonly walletAddress: string;
