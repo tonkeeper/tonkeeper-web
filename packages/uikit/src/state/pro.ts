@@ -3,7 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    IIosPurchaseResult,
     IOriginalTransactionInfo,
+    ISupportData,
     isIosStrategy,
     isPaidActiveSubscription,
     ISubscriptionFormData,
@@ -22,6 +24,7 @@ import {
     logoutTonConsole,
     ProAuthTokenService,
     ProAuthTokenType,
+    ProAuthViaSeedPhraseParams,
     setBackupState,
     startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
@@ -40,7 +43,6 @@ import {
 } from '@tonkeeper/core/dist/entries/account';
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { IAuthViaSeedPhraseData } from '@tonkeeper/core/dist/entries/password';
 import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
@@ -89,12 +91,21 @@ export const useTrialAvailability = () => {
     });
 };
 
-export const useProSupportUrl = () => {
+export const useSupport = () => {
+    const { mainnetConfig } = useAppContext();
     const { data: subscription } = useProState();
 
-    return useQuery<string | null, Error>(
+    return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
-        async () => getProSupportUrl()
+        getProSupportUrl,
+        {
+            initialData: {
+                url: mainnetConfig.directSupportUrl ?? '',
+                isPriority: false
+            },
+            staleTime: 0,
+            cacheTime: 0
+        }
     );
 };
 
@@ -195,6 +206,23 @@ export const useProState = () => {
     );
 };
 
+export const useCurrentSubscriptionInfo = () => {
+    const sdk = useAppSdk();
+
+    return useQuery<IIosPurchaseResult[], Error>(
+        [QueryKey.currentIosSubscriptionInfo],
+        async () => {
+            if (!isIosStrategy(sdk.subscriptionStrategy)) {
+                throw new Error('This is not an iOS subscription strategy');
+            }
+
+            const result = await sdk.subscriptionStrategy.getCurrentSubscriptionInfo();
+
+            return result || [];
+        }
+    );
+};
+
 export const useManageSubscription = () => {
     const sdk = useAppSdk();
 
@@ -257,7 +285,7 @@ export const useAutoAuthMutation = () => {
     const client = useQueryClient();
     const authService = useProAuthTokenService();
 
-    return useMutation<void, Error, IAuthViaSeedPhraseData>(async authData => {
+    return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {
             if (isPaidActiveSubscription(subscription)) return;
 

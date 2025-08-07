@@ -26,6 +26,9 @@ interface ISubscriptionPlugin {
     }): Promise<{ products: IProductInfo[] }>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
     manageSubscriptions(): Promise<void>;
+    getCurrentSubscriptionInfo(): Promise<{
+        subscriptions: Array<IIosPurchaseResult>;
+    }>;
 }
 
 const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
@@ -55,6 +58,30 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                         expirationDate,
                         revocationDate: null,
                         isUpgraded: false
+                    });
+                }, 1000);
+            });
+        },
+        async getCurrentSubscriptionInfo(): Promise<{ subscriptions: IIosPurchaseResult[] }> {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const now = new Date();
+                    const expiration = new Date(now);
+                    expiration.setMonth(now.getMonth() + 1);
+
+                    resolve({
+                        subscriptions: [
+                            {
+                                status: PurchaseStatuses.SUCCESS,
+                                originalTransactionId: 2000000953417084,
+                                environment: IosEnvironmentTypes.SANDBOX,
+                                productId: ProductIds.MONTHLY,
+                                purchaseDate: now.toISOString(),
+                                expirationDate: expiration.toISOString(),
+                                revocationDate: null,
+                                isUpgraded: false
+                            }
+                        ]
                     });
                 }, 1000);
             });
@@ -155,6 +182,12 @@ class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
             console.error('Failed to fetch products info:', e);
             return { plans: undefined, verifiedPromoCode: undefined };
         }
+    }
+
+    async getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]> {
+        const res = await SubscriptionPlugin.getCurrentSubscriptionInfo();
+
+        return res.subscriptions;
     }
 
     async getOriginalTransactionId(): Promise<IOriginalTransactionInfo> {

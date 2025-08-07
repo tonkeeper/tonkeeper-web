@@ -12,13 +12,13 @@ import {
 import { SettingsItem, SettingsList } from './SettingsList';
 import { useActiveConfig } from '../../state/wallet';
 import { useNavigate } from '../../hooks/router/useNavigate';
-import { useProSupportUrl } from '../../state/pro';
+import { useSupport } from '../../state/pro';
 
 export const SettingsSocialList: FC = React.memo(() => {
     const navigate = useNavigate();
     const sdk = useAppSdk();
     const config = useActiveConfig();
-    const { data: prioritySupportUrl } = useProSupportUrl();
+    const { data: support } = useSupport();
 
     const { t } = useTranslation();
     const items = useMemo(() => {
@@ -34,11 +34,9 @@ export const SettingsSocialList: FC = React.memo(() => {
 
         return result.concat([
             {
-                name: t(prioritySupportUrl ? 'priority_support' : 'settings_support'),
+                name: t(support.isPriority ? 'priority_support' : 'settings_support'),
                 icon: <TelegramIcon />,
-                action: () =>
-                    config.directSupportUrl &&
-                    sdk.openPage(prioritySupportUrl ? prioritySupportUrl : config.directSupportUrl)
+                action: () => support.url && sdk.openPage(support.url)
             },
             {
                 name: t('settings_pro_ios'),

@@ -5,6 +5,7 @@ import {
     TelegramSubscriptionStatuses
 } from './enums';
 import {
+    IIosPurchaseResult,
     IOriginalTransactionInfo,
     ISubscriptionConfig,
     ISubscriptionFormData,
@@ -57,6 +58,7 @@ export interface IosDBStoredInfo {
     transactionType: string;
     originalTransactionId: string;
     autoRenewStatus: boolean;
+    priceMultiplier: number;
 }
 
 export interface BaseIosSubscription extends BaseSubscription, IosDBStoredInfo {
@@ -81,6 +83,7 @@ export interface IIosSubscriptionStrategy extends BaseSubscriptionStrategy {
     source: SubscriptionSource.IOS;
     manageSubscriptions(): Promise<void>;
     getOriginalTransactionId(): Promise<IOriginalTransactionInfo>;
+    getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]>;
 }
 
 // Crypto Subscription Types

@@ -70,7 +70,7 @@ export function useDashboardColumnsForm() {
             }));
         },
         {
-            enabled: !!columns && !!subscription
+            enabled: !!columns && subscription !== undefined
         }
     );
 

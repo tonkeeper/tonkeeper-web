@@ -26,7 +26,7 @@ import React, { FC } from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
-import { useProState, useProSupportUrl } from '../../../state/pro';
+import { useProState, useSupport } from '../../../state/pro';
 import { useAvailableThemes, useUserUIPreferences } from '../../../state/theme';
 import { hexToRGBA, hover } from '../../../libs/css';
 import { useAccountsState, useActiveConfig } from '../../../state/wallet';
@@ -119,7 +119,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: subscription } = useProState();
     const { data: uiPreferences } = useUserUIPreferences();
-    const { data: prioritySupportUrl } = useProSupportUrl();
+    const { data: support } = useSupport();
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
 
@@ -223,21 +223,16 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </AsideMenuItemStyled>
                     </HideOnReview>
                     <AsideMenuItemStyled
-                        onClick={() =>
-                            config.directSupportUrl &&
-                            sdk.openPage(
-                                prioritySupportUrl ? prioritySupportUrl : config.directSupportUrl
-                            )
-                        }
+                        onClick={() => support.url && sdk.openPage(support.url)}
                         isSelected={false}
                     >
                         <TelegramIcon />
                         <PriorityButtonContent>
                             <PriorityLabelStyled>
                                 {t('settings_support')}
-                                {prioritySupportUrl && <Badge size="s"> {t('priority')}</Badge>}
+                                {support.isPriority && <Badge size="s"> {t('priority')}</Badge>}
                             </PriorityLabelStyled>
-                            {prioritySupportUrl && (
+                            {support.isPriority && (
                                 <Body3Styled>{t('priority_support_description')}</Body3Styled>
                             )}
                         </PriorityButtonContent>

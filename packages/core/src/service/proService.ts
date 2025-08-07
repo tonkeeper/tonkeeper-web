@@ -14,6 +14,7 @@ import {
     CryptoPendingSubscription,
     isPendingSubscription,
     isProSubscription,
+    ISupportData,
     isValidSubscription,
     ProStateWallet,
     ProSubscription,
@@ -51,7 +52,6 @@ import {
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
 import { IAppSdk } from '../AppSdk';
-import { IAuthViaSeedPhraseData } from '../entries/password';
 
 interface IGetProStateParams {
     authService: ProAuthTokenService;
@@ -243,10 +243,15 @@ export const authViaTonConnect = async (
     await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
 };
 
+export interface ProAuthViaSeedPhraseParams {
+    wallet: TonWalletStandard;
+    signer: (b: Buffer) => Promise<Uint8Array | Buffer>;
+}
+
 export const authViaSeedPhrase = async (
     api: APIConfig,
     authService: ProAuthTokenService,
-    authData: IAuthViaSeedPhraseData
+    authData: ProAuthViaSeedPhraseParams
 ) => {
     const domain = 'tonkeeper';
     const { wallet, signer } = authData;
@@ -471,13 +476,19 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
     }
 }
 
-export const getProSupportUrl = async () => {
+export const getProSupportUrl = async (): Promise<ISupportData> => {
     try {
-        const supportToken = await SupportService.getProSupport();
+        const { url, is_priority } = await SupportService.getProSupport();
 
-        return supportToken?.url ?? null;
+        return {
+            url,
+            isPriority: is_priority
+        };
     } catch (e) {
-        return null;
+        return {
+            url: '',
+            isPriority: false
+        };
     }
 };
 
