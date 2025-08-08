@@ -30,15 +30,15 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { IconButtonTransparentBackground } from '../../components/fields/IconButton';
-import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { usePrevious } from '../../hooks/usePrevious';
 import { scrollToContainersBottom } from '../../libs/web';
 import { useProState } from '../../state/pro';
-import { HideOnReview } from '../../components/ios/HideOnReview';
 import { Navigate } from '../../components/shared/Navigate';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProFeaturesNotification } from '../../components/modals/ProFeaturesNotificationControlled';
 
 const FirstLineContainer = styled.div`
     display: flex;
@@ -142,8 +142,8 @@ export const MAMIndexesPageContent: FC<{
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
     const { t } = useTranslation();
     const config = useActiveConfig();
-    const { data: proState } = useProState();
-    const { onOpen: buyPro } = useProFeaturesNotification();
+    const { data: subscription } = useProState();
+    const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
     const ref = useRef<HTMLDivElement | null>(null);
 
     const { mutateAsync: selectDerivation, isLoading: isSelectDerivationLoading } =
@@ -208,6 +208,10 @@ export const MAMIndexesPageContent: FC<{
         });
     };
 
+    const handleBuyPro = () => {
+        onProPurchaseOpen();
+    };
+
     if (!balances) {
         return <SkeletonListDesktopAdaptive size={account.allAvailableDerivations.length} />;
     }
@@ -222,7 +226,7 @@ export const MAMIndexesPageContent: FC<{
 
     const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
     const showByProButton =
-        !proState?.subscription.valid &&
+        !isValidSubscription(subscription) &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (
@@ -307,11 +311,9 @@ export const MAMIndexesPageContent: FC<{
             <NotificationFooterPortal>
                 <FooterButtonContainerStyled className={buttonWrapperClassName}>
                     {showByProButton ? (
-                        <HideOnReview>
-                            <Button primary fullWidth onClick={buyPro}>
-                                {t('settings_mam_add_wallet_with_pro')}
-                            </Button>
-                        </HideOnReview>
+                        <Button primary fullWidth onClick={handleBuyPro}>
+                            {t('settings_mam_add_wallet_with_pro')}
+                        </Button>
                     ) : (
                         <Button fullWidth onClick={onCreateDerivation}>
                             {t('settings_mam_add_wallet')}

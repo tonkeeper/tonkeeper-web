@@ -4,9 +4,9 @@ import { fallbackRenderOver } from '../../Error';
 import { GlobeIcon, TelegramIcon } from '../../Icon';
 import { Button } from '../../fields/Button';
 import { DesktopHeaderContainer } from './DesktopHeaderElements';
-import React from 'react';
 
 import { useAppSdk } from '../../../hooks/appSdk';
+import { useSupport } from '../../../state/pro';
 import { useActiveConfig } from '../../../state/wallet';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
@@ -27,8 +27,9 @@ const ButtonsContainer = styled.div`
 
 const DesktopPreferencesHeaderPayload = () => {
     const { t } = useTranslation();
-    const config = useActiveConfig();
     const sdk = useAppSdk();
+    const config = useActiveConfig();
+    const { data: support, isLoading: isSupportLoading } = useSupport();
 
     const newsUrl = config.tonkeeperNewsUrl;
     const supportUrl = config.directSupportUrl;
@@ -44,9 +45,13 @@ const DesktopPreferencesHeaderPayload = () => {
                     </Button>
                 )}
                 {!!supportUrl && (
-                    <Button size="small" onClick={() => sdk.openPage(supportUrl)}>
+                    <Button
+                        loading={isSupportLoading}
+                        size="small"
+                        onClick={() => sdk.openPage(support.url ?? support.url)}
+                    >
                         <TelegramIcon />
-                        {t('settings_support')}
+                        {t(support.isPriority ? 'priority_support' : 'settings_support')}
                     </Button>
                 )}
                 {!!newsUrl && (

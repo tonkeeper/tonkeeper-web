@@ -11,6 +11,7 @@ import { TonTransferParams } from './service/deeplinkingService';
 import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
 import { UserIdentity, UserIdentityService } from './user-identity';
+import { SubscriptionStrategy } from './entries/pro';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -133,6 +134,7 @@ export interface IAppSdk {
     biometry?: BiometryService;
 
     topMessage: (text: string) => void;
+    pasteFromClipboard: () => Promise<string>;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (
         url: string,
@@ -188,6 +190,8 @@ export interface IAppSdk {
         open(): Promise<void>;
         close(): Promise<void>;
     };
+
+    subscriptionStrategy?: SubscriptionStrategy;
 }
 
 export interface IDappBrowser {
@@ -241,6 +245,8 @@ export abstract class BaseApp implements IAppSdk {
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
     };
+
+    pasteFromClipboard = async () => navigator.clipboard.readText();
 
     copyToClipboard = (value: string, notification?: string) => {
         console.log(value, notification);

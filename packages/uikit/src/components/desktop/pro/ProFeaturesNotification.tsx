@@ -1,211 +1,192 @@
-import { FC } from 'react';
+import { FC, useId } from 'react';
 import { styled } from 'styled-components';
+
+import {
+    Notification,
+    NotificationBlock,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../../Notification';
+import { Body2, Label2 } from '../../Text';
+import { Button } from '../../fields/Button';
+import { handleSubmit } from '../../../libs/form';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useFreeProAccessAvailable, useProState } from '../../../state/pro';
-import { Notification } from '../../Notification';
-import { Body2, Label1, Label2 } from '../../Text';
-import { Button } from '../../fields/Button';
-import { ProNotification } from '../../pro/ProNotification';
+import { useProPlans, useProState, useTrialAvailability } from '../../../state/pro';
+import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
-import { ProDashboardIcon, ProMultisendIcon } from './Icons';
+import { IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { useAppTargetEnv } from '../../../hooks/appSdk';
-import { ProFreeAccessContent } from '../../pro/ProFreeAccess';
+import { PromoNotificationCarousel } from '../../pro/PromoNotificationCarousel';
+import { ClosePromoIcon } from '../../Icon';
+import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { fallbackRenderOver } from '../../Error';
 
-const NotificationStyled = styled(Notification)`
-    max-width: 768px;
-`;
+interface IProFeaturesNotificationProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onOpenProps?: {
+        removeButtonsBlock?: boolean;
+    };
+}
 
-export const ProFeaturesNotification: FC<{ isOpen: boolean; onClose: () => void }> = ({
-    isOpen,
-    onClose
-}) => {
-    const isFreeSubscriptionAvailable = useFreeProAccessAvailable();
-
-    if (isFreeSubscriptionAvailable) {
-        return (
-            <HideOnReview>
-                <Notification isOpen={isOpen} handleClose={onClose}>
-                    {() => (
-                        <ProFreeAccessContent
-                            access={isFreeSubscriptionAvailable}
-                            onSubmit={onClose}
-                        />
-                    )}
-                </Notification>
-            </HideOnReview>
-        );
-    }
+export const ProFeaturesNotification: FC<IProFeaturesNotificationProps> = props => {
+    const { isOpen, onClose, onOpenProps } = props;
 
     return (
-        <HideOnReview>
-            <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-                {() => <ProFeaturesNotificationContent onClose={onClose} />}
-            </NotificationStyled>
-        </HideOnReview>
+        <NotificationStyled hideButton isOpen={isOpen} handleClose={onClose}>
+            {() => (
+                <ErrorBoundary
+                    fallbackRender={fallbackRenderOver('Failed to display Pro Features modal')}
+                >
+                    <ProFeaturesNotificationContent onOpenProps={onOpenProps} onClose={onClose} />
+                </ErrorBoundary>
+            )}
+        </NotificationStyled>
     );
 };
 
-const ContentWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 40px;
-    overflow: hidden;
-`;
-
-const ProImage = styled.img`
-    width: 78px;
-    height: 78px;
-    margin-bottom: 12px;
-`;
-
-const Title = styled(Label1)`
-    margin-bottom: 4px;
-`;
-
-const ProDescription = styled(Body2)`
-    color: ${p => p.theme.textSecondary};
-    text-align: center;
-    margin-bottom: 8px;
-    max-width: 576px;
-    display: block;
-`;
-
-const FeatureBlock = styled.div`
-    padding-top: 48px;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-    overflow: hidden;
-    max-width: 100%;
-
-    > * {
-        display: block;
-    }
-`;
-
-const FeatureIconContainer = styled.div`
-    color: ${p => p.theme.accentBlue};
-    margin-bottom: 12px;
-`;
-
-const FeatureDescription = styled(Body2)`
-    margin-top: 4px;
-    margin-bottom: 26px;
-    max-width: 576px;
-    display: block;
-    color: ${p => p.theme.textSecondary};
-`;
-
-const FeatureDescriptionLast = styled(FeatureDescription)`
-    margin-top: 0;
-`;
-
-const FeatureImage = styled.img`
-    width: 624px;
-    border-radius: ${p => p.theme.corner2xSmall};
-`;
-
-export const ProFeaturesNotificationContent: FC<{ onClose: () => void }> = ({ onClose }) => {
+export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationProps, 'isOpen'>> = ({
+    onClose,
+    onOpenProps
+}) => {
+    const formId = useId();
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { data: subscription } = useProState();
+    const { data: isTrialAvailable } = useTrialAvailability();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const {
         isOpen: isTrialModalOpen,
         onClose: onTrialModalClose,
         onOpen: onTrialModalOpen
     } = useDisclosure();
-    const { data } = useProState();
-    const {
-        isOpen: isPurchaseModalOpen,
-        onOpen: onPurchaseModalOpen,
-        onClose: onPurchaseModalClose
-    } = useDisclosure();
 
-    if (!data) {
-        return null;
-    }
+    const { data: products, isError, isLoading: isProPlanLoading, refetch } = useProPlans();
+    useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
+
+    const handleProAuth = () => {
+        if (isError) {
+            void refetch();
+        } else {
+            onClose();
+            onProAuthOpen();
+        }
+    };
 
     const onTrialClose = (confirmed?: boolean) => {
         onTrialModalClose();
+
         if (confirmed) {
             onClose();
+            navigate(AppRoute.settings + SettingsRoute.pro);
         }
     };
 
-    const onPurchaseClose = (confirmed?: boolean) => {
-        onPurchaseModalClose();
-        if (confirmed) {
-            onClose();
-        }
-    };
+    const { removeButtonsBlock } = onOpenProps ?? {};
+    const displayPlans = products?.plans ?? [];
+    const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(subscription);
 
     return (
-        <ContentWrapper>
-            <ProImage src="https://tonkeeper.com/assets/icon.ico" />
-            <Title>{t('tonkeeper_pro')}</Title>
-            <ProDescription>{t('pro_features_description')}</ProDescription>
-            <ButtonsBlockStyled
-                onBuy={onPurchaseModalOpen}
-                onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
-            />
-            <FeatureBlock>
-                <FeatureIconContainer>
-                    <ProDashboardIcon />
-                </FeatureIconContainer>
-                <Label2>{t('pro_features_dashboard')}</Label2>
-                <FeatureDescription>{t('pro_features_dashboard_description')}</FeatureDescription>
-                <FeatureImage src="https://wallet.tonkeeper.com/img/pro/dashboard.webp" />
-            </FeatureBlock>
-            <FeatureBlock>
-                <FeatureIconContainer>
-                    <ProMultisendIcon />
-                </FeatureIconContainer>
-                <Label2>{t('pro_feature_multisend')}</Label2>
-                <FeatureDescription>{t('pro_feature_multisend_description')}</FeatureDescription>
-                <FeatureImage src="https://wallet.tonkeeper.com/img/pro/multisend.webp" />
-            </FeatureBlock>
-            <FeatureBlock>
-                <FeatureDescriptionLast>{t('pro_other_features')}</FeatureDescriptionLast>
-            </FeatureBlock>
-            <ButtonsBlockStyled
-                onBuy={onPurchaseModalOpen}
-                onTrial={data.subscription.usedTrial ? undefined : onTrialModalOpen}
-            />
-            <ProNotification isOpen={isPurchaseModalOpen} onClose={onPurchaseClose} />
+        <ContentWrapper onSubmit={handleSubmit(handleProAuth)} id={formId}>
+            <CloseButtonStyled type="button" onClick={onClose}>
+                <ClosePromoIcon />
+            </CloseButtonStyled>
+
+            <PromoNotificationCarousel />
+
+            {isButtonsBlockVisible && (
+                <NotificationFooterPortal>
+                    <NotificationFooter>
+                        <ButtonsBlockStyled
+                            formId={formId}
+                            isError={isError}
+                            isLoading={isProPlanLoading}
+                            displayPlans={displayPlans}
+                            onTrial={isTrialAvailable ? onTrialModalOpen : undefined}
+                        />
+                    </NotificationFooter>
+                </NotificationFooterPortal>
+            )}
+
             <ProTrialStartNotification isOpen={isTrialModalOpen} onClose={onTrialClose} />
         </ContentWrapper>
     );
 };
 
-const ButtonsContainer = styled.div`
-    display: flex;
-    padding: 1rem;
-    gap: 0.5rem;
-`;
+interface IButtonBlock {
+    formId: string;
+    onTrial?: () => void;
+    className?: string;
+    isError: boolean;
+    isLoading: boolean;
+    displayPlans: IDisplayPlan[];
+}
 
-const ButtonsBlock: FC<{ className?: string; onBuy: () => void; onTrial?: () => void }> = ({
-    className,
-    onBuy,
-    onTrial
-}) => {
+const ButtonsBlock: FC<IButtonBlock> = props => {
+    const { formId, onTrial, className, isError, isLoading, displayPlans } = props;
     const { t } = useTranslation();
-    const appPlatform = useAppTargetEnv();
+
+    const filteredPlan = displayPlans?.filter(p => p.formattedDisplayPrice !== '-')?.[0];
+
+    const { formattedDisplayPrice, subscriptionPeriod } = filteredPlan || {};
+
     return (
-        <ButtonsContainer className={className}>
-            {onTrial && appPlatform !== 'tablet' && appPlatform !== 'mobile' && (
-                <Button secondary onClick={onTrial}>
-                    {t('pro_banner_start_trial')}
-                </Button>
-            )}
-            <Button primary onClick={onBuy}>
-                {t('pro_banner_buy')}
+        <div className={className}>
+            <Button primary fullWidth size="large" type="submit" form={formId} loading={isLoading}>
+                <Label2>
+                    {t(isError ? 'try_again' : 'continue_from')}
+                    {!isError && ` ${formattedDisplayPrice} / ${subscriptionPeriod}`}
+                </Label2>
             </Button>
-        </ButtonsContainer>
+            <HideOnReview>
+                {onTrial && (
+                    <Button fullWidth secondary onClick={onTrial}>
+                        <Body2>{t('start_free_trial')}</Body2>
+                    </Button>
+                )}
+            </HideOnReview>
+        </div>
     );
 };
 
+const ContentWrapper = styled(NotificationBlock)`
+    position: relative;
+    padding: 0 0 2rem;
+    overflow: hidden;
+`;
+
+const NotificationStyled = styled(Notification)`
+    max-width: 650px;
+
+    @media (pointer: fine) {
+        &:hover {
+            [data-swipe-button] {
+                color: ${props => props.theme.textSecondary};
+            }
+        }
+    }
+`;
+
 const ButtonsBlockStyled = styled(ButtonsBlock)`
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+
+const CloseButtonStyled = styled.button`
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+
+    &:hover {
+        opacity: 0.7;
+    }
 `;

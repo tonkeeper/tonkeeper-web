@@ -12,7 +12,7 @@ import {
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
-import { Biometric } from './plugins';
+import { Biometric, Subscription } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
@@ -92,6 +92,16 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     constructor() {
         super(capacitorStorage);
     }
+
+    pasteFromClipboard = async () => {
+        const { value } = await Clipboard.read();
+
+        if (value || value === '') {
+            return value;
+        } else {
+            throw new Error('Paste from Clipboard failed!');
+        }
+    };
 
     copyToClipboard = async (value: string, notification?: string) => {
         await Clipboard.write({ string: value });
@@ -179,6 +189,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     dappBrowser = CapacitorDappBrowser;
 
     userIdentity = new UserIdentityService(capacitorStorage);
+
+    subscriptionStrategy = Subscription;
 }
 
 export const getCapacitorDeviceOS = async () => {

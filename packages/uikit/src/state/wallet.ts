@@ -19,7 +19,8 @@ import {
     isAccountTonWalletStandard,
     isAccountTronCompatible,
     isAccountVersionEditable,
-    isMnemonicAndPassword
+    isMnemonicAndPassword,
+    seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
@@ -28,7 +29,10 @@ import {
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
-    WalletVersion
+    WalletVersion,
+    AccountWallet,
+    getWalletsFromAccount,
+    WalletsTransform
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConfig,
@@ -82,7 +86,6 @@ import { isSignerLink } from './signer';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
-import { useMutateIsFreeProAccessActivate } from './pro';
 import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
@@ -114,6 +117,15 @@ export const useActiveAccount = () => {
 export const useActiveWallet = () => {
     const account = useActiveAccount();
     return account.activeTonWallet;
+};
+
+export const useAccountWallets = (transform?: WalletsTransform): AccountWallet[] => {
+    const accounts = useAccountsState().filter(
+        (acc): acc is AccountTonMnemonic | AccountMAM =>
+            seeIfMainnnetAccount(acc) && (acc.type === 'mnemonic' || acc.type === 'mam')
+    );
+
+    return accounts.flatMap(acc => getWalletsFromAccount(acc, transform));
 };
 
 export const useActiveStandardTonWallet = () => {
@@ -985,7 +997,6 @@ export const useMutateLogOut = () => {
     const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
     const sdk = useAppSdk();
     const { mutateAsync: securityCheck } = useSecurityCheck();
-    const { mutateAsync: setIsFreeProAccessActivate } = useMutateIsFreeProAccessActivate();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         await securityCheck();
@@ -1012,7 +1023,6 @@ export const useMutateLogOut = () => {
 
         if (newAccounts.length === 0) {
             await sdk.keychain?.resetSecuritySettings();
-            await setIsFreeProAccessActivate(false);
         }
 
         try {

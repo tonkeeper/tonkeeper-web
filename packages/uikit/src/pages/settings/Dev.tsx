@@ -3,7 +3,7 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk, useIsCapacitorApp } from '../../hooks/appSdk';
-import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
+import { CloseIcon, PlusIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
@@ -33,14 +33,22 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
+import { useProAuthTokenService } from '../../state/pro';
+import { ProAuthTokenType } from '@tonkeeper/core/dist/service/proService';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const authService = useProAuthTokenService();
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
-        await sdk.storage.set(AppKey.PRO_AUTH_TOKEN, null);
+
+        await authService.setToken(ProAuthTokenType.MAIN, null);
+        await authService.setToken(ProAuthTokenType.TEMP, null);
+
+        await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
+
         await client.invalidateQueries();
     });
 

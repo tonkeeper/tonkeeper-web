@@ -1,18 +1,20 @@
-import {
-    isTrialSubscription,
-    isValidSubscription,
-    ProState
-} from '@tonkeeper/core/dist/entries/pro';
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
+import {
+    isPaidActiveSubscription,
+    isPendingSubscription,
+    isTelegramActiveSubscription,
+    isValidSubscription,
+    ProSubscription
+} from '@tonkeeper/core/dist/entries/pro';
+
 import { useTranslation } from '../../../hooks/translation';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
 import { useProState } from '../../../state/pro';
 import { Body3 } from '../../Text';
 import { Button } from '../../fields/Button';
-import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { IconButtonTransparentBackground } from '../../fields/IconButton';
-import { RefreshIcon } from '../../Icon';
+import { RefreshIcon, SpinnerIcon } from '../../Icon';
 import {
     useInvalidateActiveWalletQueries,
     useInvalidateGlobalQueries
@@ -21,25 +23,28 @@ import { DropDown } from '../../DropDown';
 import { useElementSize } from '../../../hooks/useElementSize';
 import { NotForTargetEnv } from '../../shared/TargetEnv';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
+import { useNavigate } from '../../../hooks/router/useNavigate';
+import { AppRoute, SettingsRoute } from '../../../libs/routes';
+import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
+import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
+import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 
 const Body3Block = styled(Body3)`
     display: block;
 `;
 
-export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
+export const SubscriptionStatus: FC<{ subscription: ProSubscription }> = ({ subscription }) => {
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
 
-    const { subscription } = data;
-
-    if (isTrialSubscription(subscription)) {
+    if (isTelegramActiveSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_trial_is_active')}</Body3Block>
                 <Body3Block>
                     {t('aside_expires_on').replace(
                         '%date%',
-                        formatDate(subscription.trialEndDate, {
+                        formatDate(subscription.nextChargeDate, {
                             day: 'numeric',
                             month: 'short',
                             year: 'numeric',
@@ -51,19 +56,21 @@ export const SubscriptionStatus: FC<{ data: ProState }> = ({ data }) => {
         );
     }
 
-    if (isValidSubscription(subscription)) {
+    if (isPaidActiveSubscription(subscription) && subscription.nextChargeDate) {
         return (
             <>
                 <Body3Block>{t('aside_pro_subscription_is_active')}</Body3Block>
                 <Body3Block>
                     {t('aside_expires_on').replace(
                         '%date%',
-                        formatDate(subscription.nextChargeDate, {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                            inputUnit: 'seconds'
-                        })
+                        subscription.nextChargeDate
+                            ? formatDate(subscription.nextChargeDate, {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  inputUnit: 'seconds'
+                              })
+                            : ''
                     )}
                 </Body3Block>
             </>
@@ -123,7 +130,8 @@ const DDContent = styled.div<{ width: number }>`
 `;
 
 const ProButtonPanel = styled(Button)`
-    cursor: default;
+    padding: 0 12px;
+
     &:hover {
         background-color: ${p => p.theme.buttonTertiaryBackground};
     }
@@ -131,7 +139,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
-    const { data } = useProState();
+    const { data: subscription, isLoading: isProStateLoading } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
         useInvalidateActiveWalletQueries();
@@ -139,6 +147,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         useInvalidateGlobalQueries();
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
+    const navigate = useNavigate();
 
     const onRefresh = () => {
         if (rotate) {
@@ -153,35 +162,60 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
+    useIosSubscriptionPolling();
+    useSubscriptionEndingVerification();
+
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
-    const onGetPro = () => {
+    const onGetPro = async () => {
         hideBrowser();
         onOpen();
     };
 
-    let button = <Button loading>Pro</Button>;
-    if (data) {
-        if (data.subscription.valid) {
-            button = (
-                <DropDown
-                    containerClassName="pro-subscription-dd-container"
-                    payload={() => (
-                        <DDContent width={width}>
-                            <SubscriptionStatus data={data} />
-                        </DDContent>
-                    )}
-                    trigger="hover"
-                >
-                    <ProButtonPanel>Pro</ProButtonPanel>
-                </DropDown>
-            );
-        } else {
-            button = (
-                <Button primary onClick={onGetPro}>
-                    {t('pro_subscription_get_pro')}
-                </Button>
-            );
-        }
+    const handleNavigateToSettingsPro = () => {
+        navigate(AppRoute.settings + SettingsRoute.pro);
+    };
+
+    let button = (
+        <Button primary onClick={onGetPro} loading={isProStateLoading}>
+            {t('get_tonkeeper_pro')}
+        </Button>
+    );
+
+    if (subscription && isValidSubscription(subscription)) {
+        button = (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        <SubscriptionStatus subscription={subscription} />
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel type="button" onClick={handleNavigateToSettingsPro}>
+                    {'Tonkeeper Pro'}
+                </ProButtonPanel>
+            </DropDown>
+        );
+    }
+
+    if (isPendingSubscription(subscription)) {
+        button = (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        {t('create_multisig_await_deployment_description')}
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel onClick={handleNavigateToSettingsPro}>
+                    <SpinnerIcon />
+                    {t('processing')}
+                </ProButtonPanel>
+            </DropDown>
+        );
     }
 
     return (

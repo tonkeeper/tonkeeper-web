@@ -379,6 +379,7 @@ export const SignDataNotification: FC<{
                 handleClose={() => onClose()}
                 title={undefined}
                 hideButton
+                onTopOfBrowser
             >
                 {Content}
             </Notification>
