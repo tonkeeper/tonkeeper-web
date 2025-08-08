@@ -13,3 +13,11 @@ export type LedgerSigner = ((messages: LedgerTransaction[]) => Promise<Cell[]>) 
 export type Signer = CellSigner | LedgerSigner;
 
 export type TronSigner = (tx: Transaction) => Promise<Transaction & SignedTransaction>;
+
+/**
+ * Access secret once and sign several transactions. Signers must be available only inside callback and closed after use.
+ * Applicable only for MAM and Mnemonic accounts
+ */
+export type OpenedSignerProvider = (
+    callback: (signers: { cellSigner: CellSigner; tronSigner: TronSigner }) => Promise<void>
+) => Promise<void>;

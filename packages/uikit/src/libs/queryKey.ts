@@ -81,7 +81,9 @@ export enum QueryKey {
     twoFACancellRecoveryProcess = 'twoFARemovingProcess',
     isOnReview = 'isOnReview',
     browserTabs = 'browserTabs',
-    searchEngineRecommendations = 'searchEngineRecommendations'
+    searchEngineRecommendations = 'searchEngineRecommendations',
+
+    trc20TrxDefaultFee = 'trc20TrxDefaultFee'
 }
 
 export enum JettonKey {

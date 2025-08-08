@@ -10,7 +10,12 @@ import {
     AccountSecret
 } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
-import { CellSigner, Signer, TronSigner } from '@tonkeeper/core/dist/entries/signer';
+import {
+    CellSigner,
+    OpenedSignerProvider,
+    Signer,
+    TronSigner
+} from '@tonkeeper/core/dist/entries/signer';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
@@ -424,6 +429,118 @@ export const getTronSigner = (sdk: IAppSdk, tronApi: TronApi, account: Account):
                     });
 
                     return tronWeb.trx.sign(tx);
+                };
+            }
+            default: {
+                assertUnreachable(account);
+            }
+        }
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+const closedSigner = () => {
+    throw new Error('Call outside of callback is not allowed');
+};
+closedSigner.type = 'cell' as const;
+
+export const getOpenedSignerProvider = (
+    sdk: IAppSdk,
+    tronApi: TronApi,
+    account: Account
+): OpenedSignerProvider => {
+    try {
+        if (!isAccountTronCompatible(account)) {
+            throw new Error("Account doesn't support tron");
+        }
+
+        const wallet = account.activeTronWallet;
+
+        if (!wallet) {
+            throw new Error('Wallet not found');
+        }
+
+        switch (account.type) {
+            case 'mam': {
+                return async (callback: Parameters<OpenedSignerProvider>[0]) => {
+                    const tonMnemonic = await getMAMWalletMnemonic(
+                        sdk,
+                        account.id,
+                        account.activeTonWallet.id
+                    );
+                    let cellSigner: CellSigner = (async message => {
+                        const keyPair = await mnemonicToKeypair(tonMnemonic, 'ton');
+                        return sign(message.hash(), keyPair.secretKey);
+                    }) as CellSigner;
+                    cellSigner.type = 'cell' as const;
+
+                    const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, 'ton');
+                    let tronSigner: TronSigner = async tx => {
+                        const { TronWeb } = await import('tronweb');
+                        const tronWeb = new TronWeb({
+                            fullHost: tronApi.tronGridBaseUrl,
+                            privateKey: TronWeb.fromMnemonic(
+                                tronMnemonic.join(' ')
+                            ).privateKey.slice(2)
+                        });
+                        return tronWeb.trx.sign(tx);
+                    };
+
+                    await callback({ cellSigner, tronSigner });
+
+                    /**
+                     * Force clear memory and prevent signers from being used outside of callback
+                     */
+                    tonMnemonic.fill('');
+                    tronMnemonic.fill('');
+                    cellSigner = closedSigner;
+                    tronSigner = closedSigner;
+                };
+            }
+            case 'mnemonic': {
+                return async (callback: Parameters<OpenedSignerProvider>[0]) => {
+                    const secret = await getAccountSecret(sdk, account.id);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    const tonMnemonic = secret.mnemonic;
+
+                    let cellSigner: CellSigner = (async (message: Cell) => {
+                        const keyPair = await mnemonicToKeypair(
+                            secret.mnemonic,
+                            account.mnemonicType
+                        );
+                        return sign(message.hash(), keyPair.secretKey);
+                    }) as CellSigner;
+                    cellSigner.type = 'cell' as const;
+
+                    const tronMnemonic = await tonMnemonicToTronMnemonic(
+                        tonMnemonic,
+                        account.mnemonicType
+                    );
+                    let tronSigner: TronSigner = async tx => {
+                        const { TronWeb } = await import('tronweb');
+                        const tronWeb = new TronWeb({
+                            fullHost: tronApi.tronGridBaseUrl,
+                            privateKey: TronWeb.fromMnemonic(
+                                tronMnemonic.join(' ')
+                            ).privateKey.slice(2)
+                        });
+
+                        return tronWeb.trx.sign(tx);
+                    };
+
+                    await callback({ cellSigner, tronSigner });
+
+                    /**
+                     * Force clear memory and prevent signers from being used outside of callback
+                     */
+                    tonMnemonic.fill('');
+                    tronMnemonic.fill('');
+                    cellSigner = closedSigner;
+                    tronSigner = closedSigner;
                 };
             }
             default: {

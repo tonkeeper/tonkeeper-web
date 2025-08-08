@@ -123,11 +123,11 @@ export const useUSDTRate = () => {
     );
 };
 
-export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount: BigNumber.Value) => {
+export const useFormatFiat = (rate: TokenRate | undefined, tokenAmount?: BigNumber.Value) => {
     const { fiat } = useAppContext();
 
     const [fiatPrice, fiatAmount] = useMemo(() => {
-        if (!rate) return [undefined, undefined] as const;
+        if (!rate || !tokenAmount) return [undefined, undefined] as const;
         return [
             formatFiatCurrency(fiat, rate.prices),
             formatFiatCurrency(fiat, new BigNumber(rate.prices).multipliedBy(tokenAmount))

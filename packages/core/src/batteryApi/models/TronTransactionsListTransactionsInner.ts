@@ -73,6 +73,18 @@ export interface TronTransactionsListTransactionsInner {
      * @memberof TronTransactionsListTransactionsInner
      */
     trongridResult?: number;
+    /**
+     * Type of fee used for this transaction (battery, ton, etc.)
+     * @type {string}
+     * @memberof TronTransactionsListTransactionsInner
+     */
+    feeType?: string;
+    /**
+     * Fee amount in TON nano units
+     * @type {number}
+     * @memberof TronTransactionsListTransactionsInner
+     */
+    feeTonNano?: number;
 }
 
 /**
@@ -109,6 +121,8 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
         'batteryCharges': json['battery_charges'],
         'timestamp': json['timestamp'],
         'trongridResult': json['trongrid_result'] == null ? undefined : json['trongrid_result'],
+        'feeType': json['fee_type'] == null ? undefined : json['fee_type'],
+        'feeTonNano': json['fee_ton_nano'] == null ? undefined : json['fee_ton_nano'],
     };
 }
 
@@ -132,6 +146,8 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
         'battery_charges': value['batteryCharges'],
         'timestamp': value['timestamp'],
         'trongrid_result': value['trongridResult'],
+        'fee_type': value['feeType'],
+        'fee_ton_nano': value['feeTonNano'],
     };
 }
 

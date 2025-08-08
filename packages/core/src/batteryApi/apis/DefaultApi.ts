@@ -279,13 +279,16 @@ export interface SendMessageRequest {
 
 export interface TronEstimateRequest {
     wallet: string;
+    xTonConnectAuth?: string;
     energy?: number;
     bandwidth?: number;
+    enableValidation?: boolean;
 }
 
 export interface TronSendOperationRequest {
-    xTonConnectAuth: string;
     tronSendRequest: TronSendRequest;
+    xTonConnectAuth?: string;
+    userPublicKey?: string;
 }
 
 export interface VerifyPurchasePromoRequest {
@@ -725,8 +728,10 @@ export interface DefaultApiInterface {
     /**
      * Estimate cost of sending a tx in Tron network
      * @param {string} wallet 
+     * @param {string} [xTonConnectAuth] 
      * @param {number} [energy] 
      * @param {number} [bandwidth] 
+     * @param {boolean} [enableValidation] Enable balance validation for battery charges
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -740,8 +745,9 @@ export interface DefaultApiInterface {
 
     /**
      * send TRON tx
-     * @param {string} xTonConnectAuth 
      * @param {TronSendRequest} tronSendRequest 
+     * @param {string} [xTonConnectAuth] 
+     * @param {string} [userPublicKey] User public key for commission payments (required when instant_fee_tx is provided)
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApiInterface
@@ -2043,7 +2049,15 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
             queryParameters['wallet'] = requestParameters['wallet'];
         }
 
+        if (requestParameters['enableValidation'] != null) {
+            queryParameters['enable_validation'] = requestParameters['enableValidation'];
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
+
+        if (requestParameters['xTonConnectAuth'] != null) {
+            headerParameters['X-TonConnect-Auth'] = String(requestParameters['xTonConnectAuth']);
+        }
 
         const response = await this.request({
             path: `/v0/tron/estimate`,
@@ -2067,13 +2081,6 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
      * send TRON tx
      */
     async tronSendRaw(requestParameters: TronSendOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SentTronTx>> {
-        if (requestParameters['xTonConnectAuth'] == null) {
-            throw new runtime.RequiredError(
-                'xTonConnectAuth',
-                'Required parameter "xTonConnectAuth" was null or undefined when calling tronSend().'
-            );
-        }
-
         if (requestParameters['tronSendRequest'] == null) {
             throw new runtime.RequiredError(
                 'tronSendRequest',
@@ -2082,6 +2089,10 @@ export class DefaultApi extends runtime.BaseAPI implements DefaultApiInterface {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['userPublicKey'] != null) {
+            queryParameters['user_public_key'] = requestParameters['userPublicKey'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

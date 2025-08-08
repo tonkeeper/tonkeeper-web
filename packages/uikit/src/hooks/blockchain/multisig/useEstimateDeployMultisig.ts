@@ -12,7 +12,7 @@ import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/
 import { TwoFAWalletConfig, useTwoFAApi, useTwoFAServiceConfig } from '../../../state/two-fa';
 import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
 import { QueryKey } from '../../../libs/queryKey';
-import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { TonTransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 
 export const useEstimateDeployMultisig = () => {
     const accounts = useAccountsState();
@@ -29,7 +29,7 @@ export const useEstimateDeployMultisig = () => {
     const twoFAServiceConfig = useTwoFAServiceConfig();
 
     return useMutation<
-        { fee: TransactionFee; address: Address },
+        { fee: TonTransactionFee; address: Address },
         Error,
         { multisigConfig: MultisigConfig; fromWallet: WalletId }
     >(async ({ multisigConfig, fromWallet }) => {

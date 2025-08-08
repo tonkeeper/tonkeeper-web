@@ -20,7 +20,7 @@ import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
@@ -38,7 +38,6 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
@@ -46,8 +45,6 @@ import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { mergeRefs } from '../../libs/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
-import { useBatteryBalance } from '../../state/battery';
-import { Link } from '../../components/shared/Link';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
@@ -56,6 +53,7 @@ import { CountryFeature } from '../../state/country';
 import { Redirect } from 'react-router-dom';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
+import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -567,90 +565,12 @@ export const TronUSDTPage = () => {
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
             <HideOnReview>
-                <TronUseBatteryBanner />
+                <TronFeeBanner />
             </HideOnReview>
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
         </DesktopViewPageLayout>
-    );
-};
-
-const TronTopUpUSDTWrapper = styled.div`
-    background-color: ${p => p.theme.backgroundContent};
-    ${BorderSmallResponsive};
-    padding: 16px 14px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: space-between;
-    margin: 16px;
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-
-    ${p =>
-        p.theme.proDisplayType === 'mobile' &&
-        css`
-            gap: 16px;
-            flex-direction: column;
-
-            button {
-                width: 100%;
-                box-sizing: border-box;
-            }
-        `}
-`;
-
-const TextContainer = styled.div`
-    > * {
-        display: block;
-    }
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
-
-const SmallDivider = styled.div`
-    width: 100%;
-    height: 1px;
-    background-color: ${p => p.theme.separatorCommon};
-`;
-
-const LinkStyled = styled(Link)`
-    text-decoration: unset;
-    color: ${p => p.theme.textPrimary};
-    display: contents;
-`;
-
-const TronUseBatteryBanner = () => {
-    const { t } = useTranslation();
-    const { data: batteryBalance } = useBatteryBalance();
-
-    if (batteryBalance && batteryBalance.batteryUnitsBalance.gt(500)) {
-        return null;
-    }
-
-    return (
-        <>
-            <TronTopUpUSDTWrapper>
-                <TextContainer>
-                    <Label2>{t('tron_battery_required_banner_title')}</Label2>
-                    <Body2>{t('tron_battery_required_banner_description')}</Body2>
-                </TextContainer>
-                <LinkStyled
-                    to={AppRoute.walletSettings + WalletSettingsRoute.battery}
-                    replace={false}
-                >
-                    <Button primary size="small">
-                        {t('tron_battery_required_banner_button')}
-                    </Button>
-                </LinkStyled>
-            </TronTopUpUSDTWrapper>
-            <SmallDivider />
-        </>
     );
 };

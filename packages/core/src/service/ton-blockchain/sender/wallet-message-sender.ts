@@ -13,7 +13,7 @@ import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActio
 
 export class WalletMessageSender implements ISender {
     constructor(
-        private readonly api: APIConfig,
+        public readonly api: APIConfig,
         private readonly wallet: TonWalletStandard,
         private readonly signer: CellSigner
     ) {}
@@ -52,7 +52,7 @@ export class WalletMessageSender implements ISender {
         };
     }
 
-    private async toExternal(msg: WalletOutgoingMessage | OutActionWalletV5[]) {
+    public async toExternal(msg: WalletOutgoingMessage | OutActionWalletV5[]) {
         const timestamp = await getServerTime(this.api);
         const seqno = await getWalletSeqNo(this.api, this.wallet.rawAddress);
 
