@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -181,10 +181,9 @@ const Loader: FC = () => {
     const context: IAppContext = {
         mainnetApi: getApiConfig(
             serverConfig.mainnetConfig,
-            Network.MAINNET,
             import.meta.env.VITE_APP_TONCONSOLE_HOST
         ),
-        testnetApi: getApiConfig(serverConfig.mainnetConfig, Network.TESTNET),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,

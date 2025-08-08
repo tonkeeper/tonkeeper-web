@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -245,8 +245,8 @@ export const Loader: FC = React.memo(() => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
-        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,

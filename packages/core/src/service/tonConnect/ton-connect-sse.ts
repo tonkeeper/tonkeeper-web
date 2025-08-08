@@ -11,6 +11,9 @@ import { TonConnectAppRequest, TonConnectAppRequestPayload } from '../../entries
 import { getWalletById } from '../../entries/account';
 import { replyHttpBadRequestResponse, replyHttpDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
+import { BootParams, getServerConfig, Tonendpoint } from '../../tonkeeperApi/tonendpoint';
+import { Network } from '../../entries/network';
+import { TargetEnv } from '../../AppSdk';
 
 type Logger = {
     info: (message: string) => void;
@@ -27,6 +30,42 @@ type Listeners = {
     onRequest: (value: TonConnectAppRequestPayload) => void;
 };
 
+export const createBridgeEndpointFetcher =
+    ({
+        platform,
+        targetEnv,
+        onError,
+        build
+    }: {
+        platform: BootParams['platform'];
+        targetEnv: TargetEnv;
+        build: BootParams['build'];
+        onError: (e: unknown) => void;
+    }) =>
+    async () => {
+        try {
+            const tonendpoint = new Tonendpoint(
+                {
+                    platform,
+                    lang: 'en',
+                    build,
+                    network: Network.MAINNET,
+                    targetEnv
+                },
+                {
+                    fetchApi: fetch
+                }
+            );
+            const country = await tonendpoint.country();
+            tonendpoint.setCountryCode(country.country);
+            const config = await getServerConfig(tonendpoint, Network.MAINNET);
+            return config.ton_connect_bridge;
+        } catch (e) {
+            onError(e);
+            return undefined;
+        }
+    };
+
 export class TonConnectSSE {
     private lastEventId: string | undefined;
 
@@ -42,6 +81,8 @@ export class TonConnectSSE {
 
     private readonly listeners: Listeners;
 
+    private readonly bridgeEndpoint: Promise<string | undefined>;
+
     public get currentConnections() {
         return this.connections;
     }
@@ -49,15 +90,18 @@ export class TonConnectSSE {
     constructor({
         storage,
         listeners,
+        bridgeEndpointFetcher,
         system = {}
     }: {
         storage: IStorage;
         listeners: Listeners;
+        bridgeEndpointFetcher: () => Promise<string | undefined>;
         system?: System;
     }) {
         this.storage = storage;
         this.system = { log: console, ...system };
         this.listeners = listeners;
+        this.bridgeEndpoint = bridgeEndpointFetcher();
         this.reconnect();
     }
 
@@ -91,11 +135,13 @@ export class TonConnectSSE {
 
     public sendDisconnect = async (connection: AccountConnectionHttp | AccountConnectionHttp[]) => {
         const connectionsToDisconnect = Array.isArray(connection) ? connection : [connection];
+        const bridgeEndpoint = await this.bridgeEndpoint;
         await Promise.allSettled(
             connectionsToDisconnect.map((item, index) =>
                 replyHttpDisconnectResponse({
                     connection: item,
-                    request: { id: (Date.now() + index).toString() }
+                    request: { id: (Date.now() + index).toString() },
+                    bridgeEndpoint
                 })
             )
         );
@@ -115,7 +161,11 @@ export class TonConnectSSE {
             wallet,
             clientSessionId: connection.clientSessionId
         });
-        await replyHttpDisconnectResponse({ connection, request });
+        await replyHttpDisconnectResponse({
+            connection,
+            request,
+            bridgeEndpoint: await this.bridgeEndpoint
+        });
         await this.reconnect();
         this.listeners.onDisconnect(connection);
     };
@@ -164,7 +214,10 @@ export class TonConnectSSE {
                 return this.listeners.onRequest(value);
             }
             default: {
-                return replyHttpBadRequestResponse(params);
+                return replyHttpBadRequestResponse({
+                    ...params,
+                    bridgeEndpoint: await this.bridgeEndpoint
+                });
             }
         }
     };
@@ -178,7 +231,8 @@ export class TonConnectSSE {
             storage: this.storage,
             handleMessage: this.handleMessage,
             connections: this.connections,
-            lastEventId: this.lastEventId
+            lastEventId: this.lastEventId,
+            bridgeEndpoint: await this.bridgeEndpoint
         });
     }
 

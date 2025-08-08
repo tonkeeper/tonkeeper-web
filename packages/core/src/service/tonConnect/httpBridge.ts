@@ -11,25 +11,28 @@ import {
 } from '../../entries/tonConnect';
 import { SessionCrypto } from './protocol';
 import { AccountConnectionHttp } from './connectionService';
+import { removeLastSlash } from '../../utils/url';
 
-const defaultBridgeUrl = 'https://bridge.tonapi.io/bridge';
+const defaultBridgeEndpoint = 'https://bridge.tonapi.io';
 const defaultTtl = 300;
 
 export const sendEventToBridge = async <T extends RpcMethod>({
     response,
     sessionKeyPair,
     clientSessionId,
-    ttl = defaultTtl,
-    bridgeUrl = defaultBridgeUrl
+    bridgeEndpoint,
+    ttl = defaultTtl
 }: {
     response: WalletResponse<T> | ConnectEvent | DisconnectEvent;
     sessionKeyPair: KeyPair;
     clientSessionId: string;
     ttl?: number;
-    bridgeUrl?: string;
+    bridgeEndpoint: string | undefined;
 }) => {
     const sessionCrypto = new SessionCrypto(sessionKeyPair);
-    const url = `${bridgeUrl}/message?client_id=${sessionCrypto.sessionId}&to=${clientSessionId}&ttl=${ttl}`;
+    const url = `${removeLastSlash(
+        bridgeEndpoint ?? defaultBridgeEndpoint
+    )}/bridge/message?client_id=${sessionCrypto.sessionId}&to=${clientSessionId}&ttl=${ttl}`;
 
     const encodedResponse = sessionCrypto.encrypt(
         JSON.stringify(response),
@@ -61,13 +64,13 @@ export const subscribeTonConnect = ({
     handleMessage,
     connections,
     lastEventId,
-    bridgeUrl = defaultBridgeUrl
+    bridgeEndpoint
 }: {
     storage: IStorage;
     handleMessage: (params: TonConnectAppRequest<'http'>) => void;
     lastEventId?: string;
     connections?: AccountConnectionHttp[];
-    bridgeUrl?: string;
+    bridgeEndpoint: string | undefined;
 }) => {
     if (!connections || connections.length === 0) {
         return () => {};
@@ -77,7 +80,9 @@ export const subscribeTonConnect = ({
         .map(item => new SessionCrypto(item.sessionKeyPair).sessionId)
         .join(',');
 
-    let url = `${bridgeUrl}/events?client_id=${walletSessionIds}`;
+    let url = `${removeLastSlash(
+        bridgeEndpoint ?? defaultBridgeEndpoint
+    )}/bridge/events?client_id=${walletSessionIds}`;
 
     if (lastEventId) {
         url += `&last_event_id=${lastEventId}`;

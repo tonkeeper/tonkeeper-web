@@ -13,6 +13,7 @@ import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
+import { useToQueryKeyPart } from '../hooks/useToQueryKeyPart';
 
 export const useTonendpoint = ({
     targetEnv,
@@ -28,16 +29,13 @@ export const useTonendpoint = ({
     platform: BootParams['platform'];
 }) => {
     return useMemo(() => {
-        return new Tonendpoint(
-            {
-                build,
-                network,
-                lang: localizationText(lang),
-                targetEnv,
-                platform
-            },
-            {}
-        );
+        return new Tonendpoint({
+            build,
+            network,
+            lang: localizationText(lang),
+            targetEnv,
+            platform
+        });
     }, [targetEnv, build, network, lang, platform]);
 };
 
@@ -47,8 +45,10 @@ export interface ServerConfig {
 }
 
 export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
+    const tonendpointKey = useToQueryKeyPart(tonendpoint);
+
     return useQuery<ServerConfig, Error>(
-        [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpoint],
+        [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpointKey],
         async () => {
             const country = await tonendpoint.country();
             tonendpoint.setCountryCode(country.country);
@@ -93,16 +93,14 @@ export const useTonendpointBuyMethods = () => {
 };
 
 export const useCreateMercuryoProUrl = () => {
-    const { tonendpoint } = useAppContext();
-    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { mainnetConfig } = useAppContext();
 
     return useMutation<string, Error, string>(async baseUrl => {
-        const data = serverConfig?.mainnetConfig;
         try {
-            if (!data?.mercuryo_otc_id) {
+            if (!mainnetConfig?.mercuryo_otc_id) {
                 throw new Error('Missing mercuryo get otc url');
             }
-            const mercurioConfig = (await (await fetch(data.mercuryo_otc_id)).json()) as {
+            const mercurioConfig = (await (await fetch(mainnetConfig.mercuryo_otc_id)).json()) as {
                 data: {
                     otc_id: string;
                 };

@@ -271,8 +271,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
-        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,

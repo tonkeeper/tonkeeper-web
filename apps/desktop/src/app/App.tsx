@@ -312,12 +312,8 @@ export const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            serverConfig.mainnetConfig,
-            Network.MAINNET,
-            REACT_APP_TONCONSOLE_API
-        ),
-        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig, REACT_APP_TONCONSOLE_API),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,
