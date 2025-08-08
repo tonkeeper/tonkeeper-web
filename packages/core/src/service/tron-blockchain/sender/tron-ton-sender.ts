@@ -112,17 +112,11 @@ export class TronTonSender implements ITronSender {
         fee: TransactionFeeTonAssetRelayed;
         resources: TronResources;
     }> {
-        const res = await this.tronApi.applyResourcesSafetyMargin(
+        const resources = await this.tronApi.applyResourcesSafetyMargin(
             await this.tronApi.estimateResources(
                 await this.trc20Encoder.encodeTransferEstimateRequest(to, assetAmount)
             )
         );
-
-        // TODO remove
-        const resources = {
-            energy: Math.ceil(res.energy * 1.02),
-            bandwidth: Math.ceil(res.bandwidth * 1.02)
-        };
 
         /* const bandwidhAvailable = await this.tronApi.getAccountBandwidth(this.walletInfo.address);
         resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);*/
