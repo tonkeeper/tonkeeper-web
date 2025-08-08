@@ -1,17 +1,28 @@
 import { test, expect } from '@playwright/test';
 
+//Add OKX wallet 12 words mnemonic + w5 version
 test.setTimeout(4 * 60 * 1000);
-test.beforeEach(async ({ page }) => {
+
+
+test('OKX wallet', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'Existing Wallet Import wallet' }).click();
+  await page.getByRole('button', { name: '12 words' }).click();
   await page.getByLabel('1:', { exact: true }).click();
-  await page.getByLabel('1:', { exact: true }).fill(process.env.TON_MNEMONIC_24);
+  await page.getByLabel('1:', { exact: true }).fill(process.env.OKX_MNEMONIC_12);
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.locator('#create-password').fill('a]HmC.;MAcQJ[+Y@&r!-3h');
-  await page.locator('#create-password-confirm').fill('a]HmC.;MAcQJ[+Y@&r!-3h');
   await page.getByRole('button', { name: 'Continue' }).click();
+  await page
+    .locator('div')
+    .filter({ hasText: /^Password$/ })
+    .getByRole('textbox')
+    .fill('123456');
+  await page.getByRole('textbox').nth(1).click();
+  await page.getByRole('textbox').nth(1).fill('123456');
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByLabel('Wallet name').fill('OKX wallet');
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Wallet Tokens Setup' })).toBeVisible();
   await page.getByText('Configure token support for').click();
@@ -20,33 +31,16 @@ test.beforeEach(async ({ page }) => {
   await page.getByText('Use USD₮ TRC20 without TRX.').click();
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByText('Multichain')).toBeVisible();
-});
-
-test.afterEach(async ({ page }) => {
+  await expect(page.getByText('OKX wallet').first()).toBeVisible();
+  await expect(page.locator('#root')).toContainText('OKX wallet');
+  await page.getByRole('button', { name: 'OKX wallet' }).getByRole('button').click();
+  await page.getByRole('button', { name: 'Add' }).nth(2).click();
+  await page.getByRole('button', { name: 'Open' }).nth(1).click();
   await page.getByRole('link', { name: 'Settings' }).click();
   await page.getByText('Delete Account').click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^I have a backup copy of recovery phrase$/ })
-    .locator('div')
-    .click();
+  await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
-  await page.locator('#react-portal-modal-container').getByRole('textbox').fill('a]HmC.;MAcQJ[+Y@&r!-3h');
+  await page.getByLabel('Password').fill('123456');
   await page.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.getByRole('button', { name: 'Get started' })).toBeVisible();
-});
-
-//has link to Tonviewer
-test('History', async ({ page }) => {
-
-
-  await page.getByRole('link', { name: 'History' }).click();
-  await expect(page.getByText('History').nth(1)).toBeVisible();
-  const page1Promise = page.waitForEvent('popup');
-  await page.locator('div').filter({ hasText: /^HistoryAll Tokens$/ }).getByRole('button').first().click();
-  const page1 = await page1Promise;
-  await expect(page1.locator('.ldpypfq')).toBeVisible();
-  await expect(page1.getByPlaceholder('Search')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'All Tokens' })).toBeVisible();
-  await expect(page.locator('div').filter({ hasText: /^HistoryAll Tokens$/ }).getByRole('button').nth(2)).toBeVisible();
 });
