@@ -183,12 +183,8 @@ export const useProState = () => {
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            const isFreeMobileTrialActive = Boolean(
-                await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
-            );
-
             const { validUntil } = isFreeProAccessAvailable ?? {};
-            const isPromo = env === 'mobile' && isFreeMobileTrialActive && validUntil;
+            const isPromo = env === 'mobile' && validUntil;
             const promoExpirationDate = isPromo && validUntil > new Date() ? validUntil : null;
 
             const state = await getProState({ authService, sdk, promoExpirationDate });
