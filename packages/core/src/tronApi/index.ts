@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { TRON_TRX_ASSET, TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
+import { TON_ASSET, TRON_TRX_ASSET, TRON_USDT_ASSET } from '../entries/crypto/asset/constants';
 import { TronAsset } from '../entries/crypto/asset/tron-asset';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
@@ -413,10 +413,20 @@ export class TronApi {
                     isScam: false,
                     isFailed: item.isFailed,
                     inProgress: item.isPending,
-                    fee: {
-                        type: 'battery' as const,
-                        charges: item.batteryCharges
-                    }
+                    fee:
+                        item.feeType === 'ton' && item.feeTonNano
+                            ? {
+                                  type: 'ton-asset-relayed' as const,
+                                  extra: new AssetAmount({
+                                      asset: TON_ASSET,
+                                      weiAmount: item.feeTonNano! * -1
+                                  }),
+                                  sendToAddress: ''
+                              }
+                            : {
+                                  type: 'battery' as const,
+                                  charges: item.batteryCharges
+                              }
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);

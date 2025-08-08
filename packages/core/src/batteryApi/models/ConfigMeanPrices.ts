@@ -14,37 +14,35 @@
 
 import { mapValues } from '../runtime';
 /**
- *
+ * 
  * @export
  * @interface ConfigMeanPrices
  */
 export interface ConfigMeanPrices {
     /**
-     *
+     * 
      * @type {number}
      * @memberof ConfigMeanPrices
      */
     batteryMeanPriceSwap: number;
     /**
-     *
+     * 
      * @type {number}
      * @memberof ConfigMeanPrices
      */
     batteryMeanPriceJetton: number;
     /**
-     *
+     * 
      * @type {number}
      * @memberof ConfigMeanPrices
      */
     batteryMeanPriceNft: number;
     /**
-     *
+     * 
      * @type {number}
      * @memberof ConfigMeanPrices
      */
-    batteryMeanPriceTronUsdt: number;
-
-    tonMeanPriceTronUsdt: number;
+    batteryMeanPriceTronUsdt?: number;
 }
 
 /**
@@ -66,12 +64,11 @@ export function ConfigMeanPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
         return json;
     }
     return {
-
+        
         'batteryMeanPriceSwap': json['battery_mean_price_swap'],
         'batteryMeanPriceJetton': json['battery_mean_price_jetton'],
         'batteryMeanPriceNft': json['battery_mean_price_nft'],
         'batteryMeanPriceTronUsdt': json['battery_mean_price_tron_usdt'] == null ? undefined : json['battery_mean_price_tron_usdt'],
-        'tonMeanPriceTronUsdt': 0.44
     };
 }
 
@@ -85,7 +82,7 @@ export function ConfigMeanPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
 
     return {
-
+        
         'battery_mean_price_swap': value['batteryMeanPriceSwap'],
         'battery_mean_price_jetton': value['batteryMeanPriceJetton'],
         'battery_mean_price_nft': value['batteryMeanPriceNft'],

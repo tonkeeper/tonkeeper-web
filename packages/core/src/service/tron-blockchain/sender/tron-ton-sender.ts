@@ -25,6 +25,8 @@ import { TronNotEnoughBalanceEstimationError } from '../../../errors/TronNotEnou
 import { TonAsset } from '../../../entries/crypto/asset/ton-asset';
 
 export class TronTonSender implements ITronSender {
+    public static identifyingComment = 'Tron gas fee';
+
     private batteryApi: BatteryApi;
 
     private trc20Encoder: TronTrc20Encoder;
@@ -69,7 +71,7 @@ export class TronTonSender implements ITronSender {
                 weiAmount: fee.extra.weiAmount,
                 payload: {
                     type: 'comment',
-                    value: 'Tron gas fee'
+                    value: TronTonSender.identifyingComment
                 }
             });
 
