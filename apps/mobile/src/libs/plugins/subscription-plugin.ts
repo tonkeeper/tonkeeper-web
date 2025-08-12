@@ -62,30 +62,6 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                 }, 1000);
             });
         },
-        async getCurrentSubscriptionInfo(): Promise<{ subscriptions: IIosPurchaseResult[] }> {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    const now = new Date();
-                    const expiration = new Date(now);
-                    expiration.setMonth(now.getMonth() + 1);
-
-                    resolve({
-                        subscriptions: [
-                            {
-                                status: PurchaseStatuses.SUCCESS,
-                                originalTransactionId: 2000000953417084,
-                                environment: IosEnvironmentTypes.SANDBOX,
-                                productId: ProductIds.MONTHLY,
-                                purchaseDate: now.toISOString(),
-                                expirationDate: expiration.toISOString(),
-                                revocationDate: null,
-                                isUpgraded: false
-                            }
-                        ]
-                    });
-                }, 1000);
-            });
-        },
         async getAllProductsInfo(): Promise<{ products: IProductInfo[] }> {
             return new Promise(resolve =>
                 setTimeout(
