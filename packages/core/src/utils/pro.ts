@@ -2,6 +2,8 @@ import {
     AuthTypes,
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
+    isProductId,
+    ProductIds,
     ProStateWallet,
     ProSubscription,
     TelegramSubscriptionStatuses
@@ -114,6 +116,12 @@ export const normalizeSubscription = (
             throw new Error('Missing ios dBStoredInfo');
         }
 
+        const productId = dBStoredInfo.product_id;
+
+        if (!isProductId(productId)) {
+            throw new Error('ProductId is incorrect or missed');
+        }
+
         if (valid) {
             return {
                 source,
@@ -129,7 +137,7 @@ export const normalizeSubscription = (
                 priceMultiplier: dBStoredInfo.price_multiplier,
                 currency: dBStoredInfo.currency,
                 expiresDate: toDate(dBStoredInfo.expires_date),
-                productId: dBStoredInfo.product_id,
+                productId,
                 storeFront: dBStoredInfo.store_front,
                 storeFrontId: dBStoredInfo.store_front_id,
                 transactionType: dBStoredInfo.transaction_type,
@@ -153,7 +161,7 @@ export const normalizeSubscription = (
             priceMultiplier: dBStoredInfo.price_multiplier,
             currency: dBStoredInfo.currency,
             expiresDate: toDate(dBStoredInfo.expires_date),
-            productId: dBStoredInfo.product_id,
+            productId,
             storeFront: dBStoredInfo.store_front,
             storeFrontId: dBStoredInfo.store_front_id,
             transactionType: dBStoredInfo.transaction_type,
@@ -214,3 +222,7 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
         return '-';
     }
 };
+
+export const SUBSCRIPTION_PERIODS_MAP = new Map<ProductIds, string>([
+    [ProductIds.MONTHLY, 'per_month']
+]);

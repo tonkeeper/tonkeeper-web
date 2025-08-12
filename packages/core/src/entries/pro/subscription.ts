@@ -1,6 +1,7 @@
 import {
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
+    ProductIds,
     PurchaseStatuses,
     TelegramSubscriptionStatuses
 } from './enums';
@@ -52,7 +53,7 @@ export interface IosDBStoredInfo {
     currency: string;
     expiresDate: Date;
     purchaseDate: Date;
-    productId: string;
+    productId: ProductIds;
     storeFront: string;
     storeFrontId: string;
     transactionType: string;
