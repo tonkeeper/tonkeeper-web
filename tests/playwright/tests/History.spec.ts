@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }) => {
 
 test.afterEach(async ({ page }) => {
   await page.getByRole('link', { name: 'Settings' }).click();
-  await page.getByText('Delete Account').click();
+  await page.getByText('Sign Out').click();
   await page
     .locator('div')
     .filter({ hasText: /^I have a backup copy of recovery phrase$/ })

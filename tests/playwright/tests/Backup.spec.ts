@@ -43,7 +43,7 @@ test('Backup', async ({ page }) => {
   await page.getByRole('button', { name: 'Copy' }).click();
   await expect(page.getByText('Copied')).toBeVisible();
   await page.locator('#react-portal-modal-container').getByRole('button').nth(1).click();
-  await page.getByText('Delete Account').click();
+  await page.getByText('Sign Out').click();
   await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
   await page.getByRole('button', { name: 'Delete wallet data' }).click();
   await page.locator('#react-portal-modal-container').getByRole('textbox').fill('123456');

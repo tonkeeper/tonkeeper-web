@@ -45,7 +45,7 @@ test('BITGET wallet import and delete flow', async ({ page }) => {
 
   await test.step('Delete wallet', async () => {
     await page.getByRole('link', { name: 'Settings' }).click();
-    await page.getByText('Delete Account').click();
+    await page.getByText('Sign Out').click();
     await page.locator('div').filter({ hasText: /^I have a backup copy of recovery phrase$/ }).locator('div').click();
     await page.getByRole('button', { name: 'Delete wallet data' }).click();
     await page.locator('#react-portal-modal-container').getByRole('textbox').fill(PASSWORD1);
