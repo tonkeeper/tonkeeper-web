@@ -248,7 +248,19 @@ export const DevSettingsLogs = () => {
 };
 
 export const DevSettings = React.memo(() => {
+    const sdk = useAppSdk();
+    const navigate = useNavigate();
     const isProDisplay = useIsFullWidthMode();
+
+    useEffect(() => {
+        (async () => {
+            const isDevVisible = Boolean(await sdk.storage.get(AppKey.IS_DEV_MENU_VISIBLE));
+
+            if (!isDevVisible) {
+                navigate(AppRoute.home);
+            }
+        })();
+    }, []);
 
     if (isProDisplay) {
         return (

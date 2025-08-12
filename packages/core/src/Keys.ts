@@ -51,6 +51,8 @@ export enum AppKey {
     PRO_PENDING_SUBSCRIPTION = 'pro_pending_subscription',
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
 
+    IS_DEV_MENU_VISIBLE = 'is_dev_menu_visible',
+
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',
     SWAP_OPTIONS = 'swap_options',
