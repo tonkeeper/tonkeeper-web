@@ -226,3 +226,6 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
 export const SUBSCRIPTION_PERIODS_MAP = new Map<ProductIds, string>([
     [ProductIds.MONTHLY, 'per_month']
 ]);
+
+// TODO Put BASE_URL into config
+export const BASE_SLIDE_URL = 'https://tonkeeper.com/assets/stories/prosubscriptions';

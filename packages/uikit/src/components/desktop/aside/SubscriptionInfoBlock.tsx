@@ -28,6 +28,8 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
+import { usePreloadImages } from '../../../hooks/usePreloadImages';
+import { BASE_SLIDE_URL } from '@tonkeeper/core/dist/utils/pro';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -162,6 +164,18 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
+    usePreloadImages([
+        `${BASE_SLIDE_URL}/eng/1.png`,
+        `${BASE_SLIDE_URL}/eng/2.png`,
+        `${BASE_SLIDE_URL}/eng/3.png`,
+        `${BASE_SLIDE_URL}/eng/4.png`,
+        `${BASE_SLIDE_URL}/eng/5.png`,
+        `${BASE_SLIDE_URL}/ru/1.png`,
+        `${BASE_SLIDE_URL}/ru/2.png`,
+        `${BASE_SLIDE_URL}/ru/3.png`,
+        `${BASE_SLIDE_URL}/ru/4.png`,
+        `${BASE_SLIDE_URL}/ru/5.png`
+    ]);
     useIosSubscriptionPolling();
     useSubscriptionEndingVerification();
 
