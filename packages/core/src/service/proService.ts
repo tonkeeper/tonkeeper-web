@@ -10,16 +10,13 @@ import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboa
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
 import {
-    AuthTypes,
     CryptoPendingSubscription,
     isPendingSubscription,
     isProSubscription,
     ISupportData,
     isValidSubscription,
     ProStateWallet,
-    ProSubscription,
-    TelegramSubscription,
-    TelegramSubscriptionStatuses
+    ProSubscription
 } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import {
@@ -45,7 +42,6 @@ import {
     IapService,
     Invoice,
     InvoicesService,
-    SubscriptionSource,
     SupportService,
     TiersService,
     UsersService
@@ -56,7 +52,6 @@ import { IAppSdk } from '../AppSdk';
 interface IGetProStateParams {
     authService: ProAuthTokenService;
     sdk: IAppSdk;
-    promoExpirationDate: Date | null;
 }
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
@@ -127,33 +122,12 @@ const getNormalizedSubscription = async (
     }
 };
 
-/**
- * @deprecated
- */
-const getPseudoTelegramSubscription = (
-    promoExpirationDate: Date | null
-): TelegramSubscription | null => {
-    if (!promoExpirationDate) return null;
-
-    return {
-        source: SubscriptionSource.TELEGRAM,
-        valid: true,
-        status: TelegramSubscriptionStatuses.ACTIVE,
-        auth: {
-            type: AuthTypes.TELEGRAM
-        },
-        expiresDate: promoExpirationDate,
-        nextChargeDate: promoExpirationDate
-    };
-};
-
 const clearProAuthBreadCrumbs = async (storage: IStorage) => {
-    await storage.delete(AppKey.PRO_FREE_ACCESS_ACTIVE);
     await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
 };
 
 const loadProState = async (params: IGetProStateParams): Promise<ProSubscription> => {
-    const { authService, sdk, promoExpirationDate } = params;
+    const { authService, sdk } = params;
 
     await authService.attachToken(ProAuthTokenType.MAIN);
 
@@ -163,9 +137,11 @@ const loadProState = async (params: IGetProStateParams): Promise<ProSubscription
         AppKey.PRO_PENDING_SUBSCRIPTION
     );
 
-    const currentSubscription =
-        (await getNormalizedSubscription(authService, storage, ProAuthTokenType.MAIN)) ??
-        getPseudoTelegramSubscription(promoExpirationDate);
+    const currentSubscription = await getNormalizedSubscription(
+        authService,
+        storage,
+        ProAuthTokenType.MAIN
+    );
 
     const targetSubscription = await getNormalizedSubscription(
         authService,

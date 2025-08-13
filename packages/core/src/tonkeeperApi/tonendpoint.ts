@@ -89,11 +89,6 @@ export interface TonendpointConfig {
 
     tron_api_url?: string;
 
-    enhanced_acs_pmob?: {
-        code?: string;
-        acs_until?: number;
-    };
-
     pro_mobile_app_appstore_link?: string;
     pro_landing_url?: string;
     pro_terms_of_use?: string;

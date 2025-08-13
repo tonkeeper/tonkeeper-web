@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
@@ -47,37 +46,7 @@ import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
 
-type FreeProAccess = {
-    code: string;
-    validUntil: Date;
-};
-
 export const selectedTargetAuth = atom<WalletAuth | null>(null);
-
-export const useFreeProAccessAvailable = () => {
-    const { mainnetConfig } = useAppContext();
-    const env = useAppTargetEnv();
-
-    return useMemo<FreeProAccess | null>(() => {
-        if (!mainnetConfig.enhanced_acs_pmob || env !== 'mobile') {
-            return null;
-        }
-        const data = mainnetConfig.enhanced_acs_pmob;
-        if (!data.code || !data.acs_until) {
-            return null;
-        }
-
-        const validUntil = new Date(data.acs_until * 1000);
-        if (validUntil < new Date()) {
-            return null;
-        }
-
-        return {
-            code: data.code,
-            validUntil
-        };
-    }, [mainnetConfig.enhanced_acs_pmob, env]);
-};
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -85,9 +54,8 @@ export const useTrialAvailability = () => {
 
     return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability], async () => {
         const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-        const isMobilePromo = Boolean(await sdk.storage.get(AppKey.PRO_FREE_ACCESS_ACTIVE));
 
-        return platform !== 'tablet' && !isMobilePromo && !isUsedTrial;
+        return platform !== 'tablet' && !isUsedTrial;
     });
 };
 
@@ -175,19 +143,13 @@ export const useProAuthTokenService = (): ProAuthTokenService => {
 
 export const useProState = () => {
     const sdk = useAppSdk();
-    const env = useAppTargetEnv();
     const client = useQueryClient();
     const authService = useProAuthTokenService();
-    const isFreeProAccessAvailable = useFreeProAccessAvailable();
 
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            const { validUntil } = isFreeProAccessAvailable ?? {};
-            const isPromo = env === 'mobile' && validUntil;
-            const promoExpirationDate = isPromo && validUntil > new Date() ? validUntil : null;
-
-            const state = await getProState({ authService, sdk, promoExpirationDate });
+            const state = await getProState({ authService, sdk });
 
             await setBackupState(sdk.storage, state);
             await client.invalidateQueries([QueryKey.proBackup]);
