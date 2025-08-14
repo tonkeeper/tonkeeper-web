@@ -18,16 +18,12 @@ import {
     authViaSeedPhrase,
     authViaTonConnect,
     getBackupState,
-    getProState,
     getProSupportUrl,
     logoutTonConsole,
-    ProAuthTokenService,
-    ProAuthTokenType,
     ProAuthViaSeedPhraseParams,
     setBackupState,
     startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
-import { OpenAPI } from '@tonkeeper/core/dist/pro';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -86,75 +82,23 @@ export const useProBackupState = () => {
     );
 };
 
-export const useProAuthTokenService = (): ProAuthTokenService => {
-    const storage = useAppSdk().storage;
-
-    const keyMap: Record<ProAuthTokenType, AppKey> = {
-        [ProAuthTokenType.MAIN]: AppKey.PRO_AUTH_TOKEN,
-        [ProAuthTokenType.TEMP]: AppKey.PRO_TEMP_AUTH_TOKEN
-    };
-
-    return {
-        async attachToken(type = ProAuthTokenType.MAIN) {
-            const token = await storage.get<string>(keyMap[type]);
-
-            OpenAPI.TOKEN = token ?? undefined;
-        },
-
-        async setToken(type: ProAuthTokenType, token: string | null) {
-            await storage.set(keyMap[type], token);
-
-            if (type === ProAuthTokenType.MAIN) {
-                OpenAPI.TOKEN = token ?? undefined;
-            }
-        },
-
-        async getToken(type: ProAuthTokenType): Promise<string | null> {
-            return storage.get<string>(keyMap[type]);
-        },
-
-        async promoteToken(from: ProAuthTokenType, to: ProAuthTokenType) {
-            const token = await storage.get<string>(keyMap[from]);
-
-            if (token) {
-                await storage.set(keyMap[to], token);
-                await storage.delete(keyMap[from]);
-
-                if (to === ProAuthTokenType.MAIN) {
-                    OpenAPI.TOKEN = token;
-                }
-            }
-        },
-
-        async withTokenContext<T>(type: ProAuthTokenType, fn: () => Promise<T>): Promise<T> {
-            const originalToken = OpenAPI.TOKEN;
-
-            const token = await storage.get<string>(keyMap[type]);
-            OpenAPI.TOKEN = token ?? undefined;
-
-            try {
-                return await fn();
-            } finally {
-                OpenAPI.TOKEN = originalToken;
-            }
-        }
-    };
-};
-
 export const useProState = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
 
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            const state = await getProState({ authService, sdk });
+            if (!sdk.subscriptionStrategy) {
+                throw new Error('Missing SubscriptionStrategy');
+            }
 
-            await setBackupState(sdk.storage, state);
+            const subscription = await sdk.subscriptionStrategy.getSubscription();
+
+            await setBackupState(sdk.storage, subscription);
             await client.invalidateQueries([QueryKey.proBackup]);
 
-            return state;
+            return subscription;
         },
         {
             keepPreviousData: true,
@@ -201,11 +145,11 @@ export const useSelectWalletForProMutation = () => {
 
     const [, setTargetAuth] = useAtom(selectedTargetAuth);
     const accountsStorage = useAccountsStorage();
-    const authService = useProAuthTokenService();
 
     return useMutation<void, Error, string>(async walletId => {
         const accounts = (await accountsStorage.getAccounts()).filter(isAccountTonWalletStandard);
         const account = getAccountByWalletById(accounts, walletId);
+        const authService = sdk.authService;
 
         if (!account) {
             throw new Error('Account not found');
@@ -238,16 +182,16 @@ export const useSelectWalletForProMutation = () => {
 };
 
 export const useAutoAuthMutation = () => {
+    const sdk = useAppSdk();
     const api = useActiveApi();
     const { data: subscription } = useProState();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
 
     return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {
             if (isPaidActiveSubscription(subscription)) return;
 
-            await authViaSeedPhrase(api, authService, authData);
+            await authViaSeedPhrase(api, sdk.authService, authData);
 
             await client.invalidateQueries([QueryKey.pro]);
         } catch (e) {
@@ -257,11 +201,11 @@ export const useAutoAuthMutation = () => {
 };
 
 export const useProLogout = () => {
+    const sdk = useAppSdk();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
 
     return useMutation(async () => {
-        await logoutTonConsole(authService);
+        await logoutTonConsole(sdk.authService);
 
         await client.invalidateQueries([QueryKey.pro]);
     });
@@ -307,8 +251,6 @@ export const useProPurchaseMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
     const { onOpen } = useProConfirmNotification();
-    const [targetAuth] = useAtom(selectedTargetAuth);
-    const authService = useProAuthTokenService();
 
     return useMutation<PurchaseStatuses, Error, ISubscriptionFormData>(async formData => {
         if (!sdk.subscriptionStrategy) {
@@ -316,11 +258,8 @@ export const useProPurchaseMutation = () => {
         }
 
         const status = await sdk.subscriptionStrategy.subscribe(formData, {
-            authService,
             api,
-            onOpen,
-            sdk,
-            wallet: targetAuth?.wallet
+            onOpen
         });
 
         if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {
@@ -339,11 +278,9 @@ export const useActivateTrialMutation = () => {
         i18n: { language }
     } = useTranslation();
 
-    const authService = useProAuthTokenService();
-
     return useMutation<boolean, Error>(async () => {
         const result = await startProServiceTrial(
-            authService,
+            sdk.authService,
             (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
             language
         );

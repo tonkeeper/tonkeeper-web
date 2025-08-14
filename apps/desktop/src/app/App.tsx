@@ -82,6 +82,7 @@ import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { DesktopMobileAppBanner } from '@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner';
+import { CryptoSubscriptionStrategy } from '@tonkeeper/core/CryptoSubscriptionStrategy';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -120,6 +121,10 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new DesktopAppSdk();
+const strategy = new CryptoSubscriptionStrategy(sdk);
+
+sdk.setSubscriptionStrategy(strategy);
+
 const TARGET_ENV = 'desktop';
 
 const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';

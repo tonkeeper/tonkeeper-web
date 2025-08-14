@@ -1,10 +1,8 @@
 import { APIConfig } from '../apis';
-import { IAppSdk } from '../../AppSdk';
 import { RecipientData } from '../send';
 import { TonWalletStandard } from '../wallet';
 import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
-import { ProAuthTokenService } from '../../service/proService';
 import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
 
 export interface ProStateWallet {
@@ -56,20 +54,18 @@ export interface ConfirmState {
 }
 
 export interface ISubscriptionFormData {
+    wallet?: ProStateWallet;
     selectedPlan: IDisplayPlan;
     promoCode?: string;
 }
 
 export interface ISubscriptionConfig {
-    sdk?: IAppSdk;
     api?: APIConfig;
-    authService?: ProAuthTokenService;
     onOpen?: (p?: {
         confirmState: ConfirmState | null;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;
     }) => void;
-    wallet?: ProStateWallet | null;
 }
 
 export interface WalletAuth {

@@ -2,14 +2,13 @@ import { useEffect } from 'react';
 import { hasWalletAuth, isIosStrategy, isProSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ProAuthTokenType, saveIapPurchase } from '@tonkeeper/core/dist/service/proService';
 
-import { useOriginalTransactionInfo, useProAuthTokenService, useProState } from '../../state/pro';
+import { useOriginalTransactionInfo, useProState } from '../../state/pro';
 import { useAppSdk } from '../appSdk';
 
 export const useIosSubscriptionPolling = (intervalMs = 10000) => {
     const sdk = useAppSdk();
     const { data: subscription, refetch } = useProState();
     const { data: originalTxInfo } = useOriginalTransactionInfo();
-    const authService = useProAuthTokenService();
 
     useEffect(() => {
         if (!isIosStrategy(sdk.subscriptionStrategy)) return;
@@ -22,7 +21,7 @@ export const useIosSubscriptionPolling = (intervalMs = 10000) => {
 
         let isMounted = true;
         const resaveIosPurchase = async () => {
-            const result = await authService.withTokenContext(ProAuthTokenType.MAIN, () =>
+            const result = await sdk.authService.withTokenContext(ProAuthTokenType.MAIN, () =>
                 saveIapPurchase(String(originalTransactionId))
             );
 

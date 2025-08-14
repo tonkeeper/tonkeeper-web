@@ -2,7 +2,12 @@ import { isCryptoStrategy, PurchaseStatuses } from '@tonkeeper/core/dist/entries
 
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
+import {
+    selectedTargetAuth,
+    useManageSubscription,
+    useProLogout,
+    useProPurchaseMutation
+} from '../../state/pro';
 import { useNotifyError, useToast } from '../useNotification';
 import { useProductSelection } from './useProductSelection';
 import { useEffect } from 'react';
@@ -10,12 +15,14 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../router/useNavigate';
 import { useExistingIosSubscription } from './useExistingIosSubscription';
+import { useAtom } from '../../libs/useAtom';
 
 export const useProPurchaseController = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const toast = useToast();
     const navigate = useNavigate();
+    const [targetAuth] = useAtom(selectedTargetAuth);
     const { onClose: onCurrentClose } = useProPurchaseNotification();
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
 
@@ -84,7 +91,11 @@ export const useProPurchaseController = () => {
 
         if (!selectedPlan) return;
 
-        await startPurchasing({ selectedPlan, promoCode: verifiedPromoCode });
+        await startPurchasing({
+            selectedPlan,
+            wallet: targetAuth?.wallet,
+            promoCode: verifiedPromoCode
+        });
     };
 
     return {

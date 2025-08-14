@@ -20,33 +20,37 @@ import {
 import { AppKey } from './dist/Keys';
 import { Language } from './dist/entries/language';
 import { getFormattedProPrice } from './dist/utils/pro';
+import { getNormalizedSubscription } from './dist/service/proService';
+import {
+    isPendingSubscription,
+    isValidSubscription,
+    isProSubscription,
+    ProSubscription
+} from './dist/entries/pro';
+import { IStorage } from './dist/Storage';
+import { IAppSdk } from './dist/AppSdk';
 
-class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
+export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
     public source = SubscriptionSource.CRYPTO as const;
+
+    constructor(private sdk: IAppSdk) {}
 
     async subscribe(
         formData: ISubscriptionFormData,
         config: ISubscriptionConfig
     ): Promise<PurchaseStatuses> {
-        if (!formData.selectedPlan) {
-            throw new Error('missing selectedPlan');
-        }
+        const { onOpen, api } = config;
+        const { wallet, selectedPlan } = formData;
+        const { id, formattedDisplayPrice, displayName } = selectedPlan;
 
-        const { id } = formData.selectedPlan;
         const tierId = Number(id);
 
-        if (tierId === null) {
-            throw new Error('missing tier');
-        }
-
-        const { authService, api, sdk, onOpen, wallet } = config;
-
-        if (!authService || !api || !sdk || !onOpen || !wallet) {
-            throw new Error('Missing crypto purchase config!');
+        if (!tierId || !onOpen || !api || !wallet) {
+            throw new Error('Missing subscribe data!');
         }
 
         return await new Promise(resolve =>
-            authService.withTokenContext(ProAuthTokenType.TEMP, async () => {
+            this.sdk.authService.withTokenContext(ProAuthTokenType.TEMP, async () => {
                 if (!isTonWalletStandard(wallet)) {
                     throw new Error('Incorrect wallet type!');
                 }
@@ -57,15 +61,15 @@ class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
                             source: SubscriptionSource.CRYPTO,
                             status: CryptoSubscriptionStatuses.PENDING,
                             valid: false,
-                            displayName: formData.selectedPlan.displayName,
-                            displayPrice: formData.selectedPlan.formattedDisplayPrice,
+                            displayName,
+                            displayPrice: formattedDisplayPrice,
                             auth: {
                                 type: AuthTypes.WALLET,
                                 wallet
                             }
                         };
 
-                        await sdk.storage.set<CryptoPendingSubscription>(
+                        await this.sdk.storage.set<CryptoPendingSubscription>(
                             AppKey.PRO_PENDING_SUBSCRIPTION,
                             pendingSubscription
                         );
@@ -114,6 +118,64 @@ class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
             return { plans: undefined, verifiedPromoCode: undefined };
         }
     }
-}
 
-export const Subscription = new CryptoSubscriptionStrategy();
+    clearProAuthBreadCrumbs = async (storage: IStorage) => {
+        await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
+    };
+
+    async getSubscription(): Promise<ProSubscription> {
+        const storage = this.sdk.storage;
+        const authService = this.sdk.authService;
+
+        await authService.attachToken(ProAuthTokenType.MAIN);
+
+        const currentSubscription = await getNormalizedSubscription(
+            authService,
+            storage,
+            ProAuthTokenType.MAIN
+        );
+
+        const targetSubscription = await getNormalizedSubscription(
+            authService,
+            storage,
+            ProAuthTokenType.TEMP
+        );
+
+        const pendingSubscription: CryptoPendingSubscription | null = await storage.get(
+            AppKey.PRO_PENDING_SUBSCRIPTION
+        );
+
+        if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
+            await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
+
+            await this.clearProAuthBreadCrumbs(storage);
+
+            return targetSubscription;
+        }
+
+        if (isPendingSubscription(pendingSubscription)) {
+            return {
+                ...pendingSubscription,
+                valid: Boolean(currentSubscription?.valid)
+            };
+        }
+
+        if (isValidSubscription(currentSubscription)) {
+            await this.clearProAuthBreadCrumbs(storage);
+
+            return currentSubscription;
+        }
+
+        if (isProSubscription(currentSubscription)) {
+            return currentSubscription;
+        }
+
+        if (isProSubscription(targetSubscription)) {
+            return targetSubscription;
+        }
+
+        await authService.setToken(ProAuthTokenType.MAIN, null);
+
+        return null;
+    }
+}

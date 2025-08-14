@@ -43,6 +43,7 @@ export interface BaseSubscriptionStrategy {
         formData: ISubscriptionFormData,
         config: ISubscriptionConfig
     ): Promise<PurchaseStatuses>;
+    getSubscription(): Promise<ProSubscription>;
     getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;
 }
 

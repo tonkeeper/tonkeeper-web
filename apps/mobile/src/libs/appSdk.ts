@@ -12,7 +12,7 @@ import {
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
-import { Biometric, Subscription } from './plugins';
+import { Biometric } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
@@ -28,6 +28,7 @@ import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { CapacitorFileLogger } from './logger';
 import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
+import { IIosSubscriptionStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -89,8 +90,14 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     keychain = new KeychainCapacitor(this.biometry, this.storage);
 
+    subscriptionStrategy?: IIosSubscriptionStrategy = undefined;
+
     constructor() {
         super(capacitorStorage);
+    }
+
+    setSubscriptionStrategy(strategy: IIosSubscriptionStrategy) {
+        this.subscriptionStrategy = strategy;
     }
 
     pasteFromClipboard = async () => {
@@ -189,8 +196,6 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     dappBrowser = CapacitorDappBrowser;
 
     userIdentity = new UserIdentityService(capacitorStorage);
-
-    subscriptionStrategy = Subscription;
 }
 
 export const getCapacitorDeviceOS = async () => {

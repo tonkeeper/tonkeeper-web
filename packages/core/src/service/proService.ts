@@ -9,15 +9,7 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import {
-    CryptoPendingSubscription,
-    isPendingSubscription,
-    isProSubscription,
-    ISupportData,
-    isValidSubscription,
-    ProStateWallet,
-    ProSubscription
-} from '../entries/pro';
+import { ISupportData, ProStateWallet, ProSubscription } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import {
     backwardCompatibilityOnlyWalletVersions,
@@ -47,12 +39,6 @@ import {
     UsersService
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
-import { IAppSdk } from '../AppSdk';
-
-interface IGetProStateParams {
-    authService: ProAuthTokenService;
-    sdk: IAppSdk;
-}
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -61,15 +47,6 @@ export const setBackupState = async (storage: IStorage, state: ProSubscription) 
 export const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProSubscription>(AppKey.PRO_BACKUP);
     return backup ?? null;
-};
-
-export const getProState = async (params: IGetProStateParams): Promise<ProSubscription> => {
-    try {
-        return await loadProState(params);
-    } catch (e) {
-        console.error(e);
-        return null;
-    }
 };
 
 export const walletVersionFromProServiceDTO = (value: string) => {
@@ -94,7 +71,7 @@ export enum ProAuthTokenType {
     TEMP = 'temp'
 }
 
-export interface ProAuthTokenService {
+export interface IProAuthTokenService {
     attachToken(type?: ProAuthTokenType): Promise<void>;
     setToken(type: ProAuthTokenType, token: string | null): Promise<void>;
     getToken(type: ProAuthTokenType): Promise<string | null>;
@@ -102,8 +79,8 @@ export interface ProAuthTokenService {
     withTokenContext<T>(type: ProAuthTokenType, fn: () => Promise<T>): Promise<T>;
 }
 
-const getNormalizedSubscription = async (
-    authService: ProAuthTokenService,
+export const getNormalizedSubscription = async (
+    authService: IProAuthTokenService,
     storage: IStorage,
     appliedToken: ProAuthTokenType
 ) => {
@@ -122,69 +99,8 @@ const getNormalizedSubscription = async (
     }
 };
 
-const clearProAuthBreadCrumbs = async (storage: IStorage) => {
-    await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
-};
-
-const loadProState = async (params: IGetProStateParams): Promise<ProSubscription> => {
-    const { authService, sdk } = params;
-
-    await authService.attachToken(ProAuthTokenType.MAIN);
-
-    const storage = sdk.storage;
-
-    const pendingSubscription: CryptoPendingSubscription | null = await storage.get(
-        AppKey.PRO_PENDING_SUBSCRIPTION
-    );
-
-    const currentSubscription = await getNormalizedSubscription(
-        authService,
-        storage,
-        ProAuthTokenType.MAIN
-    );
-
-    const targetSubscription = await getNormalizedSubscription(
-        authService,
-        storage,
-        ProAuthTokenType.TEMP
-    );
-
-    if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
-        await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
-
-        await clearProAuthBreadCrumbs(storage);
-
-        return targetSubscription;
-    }
-
-    if (isPendingSubscription(pendingSubscription)) {
-        return {
-            ...pendingSubscription,
-            valid: Boolean(currentSubscription?.valid)
-        };
-    }
-
-    if (isValidSubscription(currentSubscription)) {
-        await clearProAuthBreadCrumbs(storage);
-
-        return currentSubscription;
-    }
-
-    if (isProSubscription(currentSubscription)) {
-        return currentSubscription;
-    }
-
-    if (isProSubscription(targetSubscription)) {
-        return targetSubscription;
-    }
-
-    await authService.setToken(ProAuthTokenType.MAIN, null);
-
-    return null;
-};
-
 export const authViaTonConnect = async (
-    authService: ProAuthTokenService,
+    authService: IProAuthTokenService,
     api: APIConfig,
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
@@ -226,7 +142,7 @@ export interface ProAuthViaSeedPhraseParams {
 
 export const authViaSeedPhrase = async (
     api: APIConfig,
-    authService: ProAuthTokenService,
+    authService: IProAuthTokenService,
     authData: ProAuthViaSeedPhraseParams
 ) => {
     const domain = 'tonkeeper';
@@ -261,7 +177,7 @@ export const authViaSeedPhrase = async (
     await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
 };
 
-export const logoutTonConsole = async (authService: ProAuthTokenService) => {
+export const logoutTonConsole = async (authService: IProAuthTokenService) => {
     const errors: unknown[] = [];
 
     const logoutWithToken = async (type: ProAuthTokenType) => {
@@ -336,7 +252,7 @@ export const saveIapPurchase = async (originalTransactionId: string): Promise<{ 
 };
 
 export async function startProServiceTrial(
-    authService: ProAuthTokenService,
+    authService: IProAuthTokenService,
     botId: string,
     lang?: string
 ) {

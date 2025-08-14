@@ -12,6 +12,8 @@ import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
 import { UserIdentity, UserIdentityService } from './user-identity';
 import { SubscriptionStrategy } from './entries/pro';
+import { IProAuthTokenService } from './service/proService';
+import { ProAuthTokenService } from './ProAuthTokenService';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -128,10 +130,14 @@ export interface InternetConnectionService {
 
 export interface IAppSdk {
     storage: IStorage;
+    authService: IProAuthTokenService;
     nativeBackButton?: NativeBackButton;
     keychain?: IKeychainService;
     cookie?: CookieService;
     biometry?: BiometryService;
+
+    subscriptionStrategy?: SubscriptionStrategy;
+    setSubscriptionStrategy(strategy: SubscriptionStrategy): void;
 
     topMessage: (text: string) => void;
     pasteFromClipboard: () => Promise<string>;
@@ -190,8 +196,6 @@ export interface IAppSdk {
         open(): Promise<void>;
         close(): Promise<void>;
     };
-
-    subscriptionStrategy?: SubscriptionStrategy;
 }
 
 export interface IDappBrowser {
@@ -238,7 +242,32 @@ export abstract class BaseApp implements IAppSdk {
 
     constructor(public storage: IStorage) {
         this.userIdentity = new UserIdentityService(storage);
+        this.authService = new ProAuthTokenService(storage);
     }
+
+    keychain?: IKeychainService | undefined;
+
+    cookie?: CookieService | undefined;
+
+    biometry?: BiometryService | undefined;
+
+    subscriptionStrategy?: SubscriptionStrategy | undefined;
+
+    notifications?: NotificationService | undefined;
+
+    storeUrl?: string | undefined;
+
+    signerReturnUrl?: string | undefined;
+
+    logger?: { read(): Promise<string>; clear(): Promise<void> } | undefined;
+
+    dappBrowser?: IDappBrowser | undefined;
+
+    linksInterceptorAvailable?: boolean | undefined;
+
+    ledgerConnectionPage?:
+        | { isOpened: ReadonlyAtom<boolean>; open(): Promise<void>; close(): Promise<void> }
+        | undefined;
 
     nativeBackButton?: NativeBackButton | undefined;
 
@@ -303,6 +332,12 @@ export abstract class BaseApp implements IAppSdk {
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     userIdentity: UserIdentity;
+
+    authService: IProAuthTokenService;
+
+    setSubscriptionStrategy(strategy: SubscriptionStrategy): void {
+        this.subscriptionStrategy = strategy;
+    }
 }
 
 class WebKeyboardService implements KeyboardService {
