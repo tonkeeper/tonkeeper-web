@@ -9,7 +9,7 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ISupportData, ProStateWallet, ProSubscription } from '../entries/pro';
+import { ISupportData, ProStateWallet, ProSubscription, PurchaseErrors } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import {
     backwardCompatibilityOnlyWalletVersions,
@@ -23,6 +23,7 @@ import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connect
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 import {
+    ApiError,
     AuthService,
     Currencies as CurrenciesGenerated,
     DashboardCellAddress,
@@ -66,41 +67,27 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-export enum ProAuthTokenType {
-    MAIN = 'main',
-    TEMP = 'temp'
-}
-
 export interface IProAuthTokenService {
-    attachToken(type?: ProAuthTokenType): Promise<void>;
-    setToken(type: ProAuthTokenType, token: string | null): Promise<void>;
-    getToken(type: ProAuthTokenType): Promise<string | null>;
-    promoteToken(from: ProAuthTokenType, to: ProAuthTokenType): Promise<void>;
-    withTokenContext<T>(type: ProAuthTokenType, fn: () => Promise<T>): Promise<T>;
+    setToken(token: string): Promise<void>;
+    getToken(): Promise<string | null>;
+    deleteToken(): Promise<void>;
 }
 
-export const getNormalizedSubscription = async (
-    authService: IProAuthTokenService,
-    storage: IStorage,
-    appliedToken: ProAuthTokenType
-) => {
-    const request = async () => {
-        const user = await UsersService.getUserInfo();
-        const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
-        const currentSubscriptionDTO = await UsersService.verifySubscription();
-
-        return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
-    };
+export const getNormalizedSubscription = async (storage: IStorage, token: string | null) => {
+    if (!token) return null;
 
     try {
-        return await authService.withTokenContext(appliedToken, request);
+        const user = await UsersService.getUserInfo(`Bearer ${token}`);
+        const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
+        const currentSubscriptionDTO = await UsersService.verifySubscription(`Bearer ${token}`);
+
+        return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
     } catch {
         return null;
     }
 };
 
 export const authViaTonConnect = async (
-    authService: IProAuthTokenService,
     api: APIConfig,
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
@@ -132,7 +119,7 @@ export const authViaTonConnect = async (
         throw new Error('Unable to authorize');
     }
 
-    await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
+    return result.auth_token;
 };
 
 export interface ProAuthViaSeedPhraseParams {
@@ -140,11 +127,7 @@ export interface ProAuthViaSeedPhraseParams {
     signer: (b: Buffer) => Promise<Uint8Array | Buffer>;
 }
 
-export const authViaSeedPhrase = async (
-    api: APIConfig,
-    authService: IProAuthTokenService,
-    authData: ProAuthViaSeedPhraseParams
-) => {
+export const authViaSeedPhrase = async (api: APIConfig, authData: ProAuthViaSeedPhraseParams) => {
     const domain = 'tonkeeper';
     const { wallet, signer } = authData;
     const { payload } = await AuthService.authGeneratePayload();
@@ -174,29 +157,19 @@ export const authViaSeedPhrase = async (
         throw new Error('Unable to authorize');
     }
 
-    await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
+    return result.auth_token;
 };
 
 export const logoutTonConsole = async (authService: IProAuthTokenService) => {
-    const errors: unknown[] = [];
+    try {
+        const mainToken = await authService.getToken();
 
-    const logoutWithToken = async (type: ProAuthTokenType) => {
-        try {
-            await authService.withTokenContext(type, () => AuthService.logout());
-        } catch (e) {
-            errors.push(e);
-        } finally {
-            await authService.setToken(type, null);
+        if (mainToken) {
+            await AuthService.logout(`Bearer ${mainToken}`);
+            await authService.deleteToken();
         }
-    };
-
-    await Promise.all([
-        logoutWithToken(ProAuthTokenType.TEMP),
-        logoutWithToken(ProAuthTokenType.MAIN)
-    ]);
-
-    if (errors.length === 2) {
-        throw new Error('Logout failed!');
+    } finally {
+        await authService.deleteToken();
     }
 };
 
@@ -206,11 +179,36 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
     return items;
 };
 
-export const createProServiceInvoice = async (tierId: number, promoCode?: string) => {
-    return InvoicesService.createInvoice({
-        tier_id: tierId,
-        promo_code: promoCode
-    });
+type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };
+
+export const createProServiceInvoice = async (
+    tempToken: string,
+    tierId: number,
+    promoCode?: string
+): Promise<ProServiceInvoiceResponse> => {
+    try {
+        const invoice = await InvoicesService.createInvoice(`Bearer ${tempToken}`, {
+            tier_id: tierId,
+            promo_code: promoCode
+        });
+
+        return {
+            ok: true,
+            data: invoice
+        };
+    } catch (e) {
+        if (e instanceof ApiError && e.status === 400) {
+            return {
+                ok: false,
+                data: PurchaseErrors.PROMOCODE_ALREADY_USED
+            };
+        }
+
+        return {
+            ok: false,
+            data: PurchaseErrors.PURCHASE_FAILED
+        };
+    }
 };
 
 export const createRecipient = async (
@@ -239,11 +237,17 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const saveIapPurchase = async (originalTransactionId: string): Promise<{ ok: boolean }> => {
+export const saveIapPurchase = async (
+    originalTransactionId: string,
+    token: string
+): Promise<{ ok: boolean }> => {
     try {
-        return await IapService.activateIapPurchase({
-            original_transaction_id: originalTransactionId
-        });
+        return await IapService.activateIapPurchase(
+            {
+                original_transaction_id: originalTransactionId
+            },
+            `Bearer ${token}`
+        );
     } catch (e) {
         return {
             ok: false
@@ -251,24 +255,20 @@ export const saveIapPurchase = async (originalTransactionId: string): Promise<{ 
     }
 };
 
-export async function startProServiceTrial(
-    authService: IProAuthTokenService,
-    botId: string,
-    lang?: string
-) {
+export async function startProServiceTrial(botId: string, lang?: string): Promise<string> {
     const tgData = await loginViaTG(botId, lang);
 
     if (!tgData) {
-        return false;
+        throw new Error('Unable to activate Trial');
     }
 
     const result = await TiersService.activateTrial(tgData);
 
-    if (result.auth_token) {
-        await authService.setToken(ProAuthTokenType.TEMP, result.auth_token);
+    if (!result.ok || !result.auth_token) {
+        throw new Error('Unable to activate Trial');
     }
 
-    return result.ok;
+    return result.auth_token;
 }
 
 export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {
@@ -368,19 +368,23 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
     }
 }
 
-export const getProSupportUrl = async (): Promise<ISupportData> => {
+export const getProSupportUrl = async (mainToken: string | null): Promise<ISupportData> => {
+    const falsyResponse = {
+        url: '',
+        isPriority: false
+    };
+
+    if (!mainToken) return falsyResponse;
+
     try {
-        const { url, is_priority } = await SupportService.getProSupport();
+        const { url, is_priority } = await SupportService.getProSupport(`Bearer ${mainToken}`);
 
         return {
             url,
             isPriority: is_priority
         };
-    } catch (e) {
-        return {
-            url: '',
-            isPriority: false
-        };
+    } catch {
+        return falsyResponse;
     }
 };
 

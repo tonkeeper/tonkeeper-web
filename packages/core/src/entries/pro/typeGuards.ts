@@ -3,6 +3,7 @@ import {
     CryptoSubscriptionStatuses,
     IosSubscriptionStatuses,
     ProductIds,
+    PurchaseErrors,
     TelegramSubscriptionStatuses
 } from './enums';
 import {
@@ -26,6 +27,12 @@ import { ProStateWallet, WalletAuth } from './common';
 
 export function isProductId(value: unknown): value is ProductIds {
     return typeof value === 'string' && Object.values(ProductIds).includes(value as ProductIds);
+}
+
+export function isPurchaseError(value: unknown): value is PurchaseErrors {
+    return (
+        typeof value === 'string' && Object.values(PurchaseErrors).includes(value as PurchaseErrors)
+    );
 }
 
 export function isStrategy(strategy?: unknown): strategy is SubscriptionStrategy {

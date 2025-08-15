@@ -14,8 +14,7 @@ import { SubscriptionSource } from './dist/pro';
 import {
     createProServiceInvoice,
     createRecipient,
-    getProServiceTiers,
-    ProAuthTokenType
+    getProServiceTiers
 } from './dist/service/proService';
 import { AppKey } from './dist/Keys';
 import { Language } from './dist/entries/language';
@@ -29,6 +28,7 @@ import {
 } from './dist/entries/pro';
 import { IStorage } from './dist/Storage';
 import { IAppSdk } from './dist/AppSdk';
+import { PurchaseErrors } from './src/entries/pro';
 
 export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
     public source = SubscriptionSource.CRYPTO as const;
@@ -49,54 +49,66 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
             throw new Error('Missing subscribe data!');
         }
 
-        return await new Promise(resolve =>
-            this.sdk.authService.withTokenContext(ProAuthTokenType.TEMP, async () => {
-                if (!isTonWalletStandard(wallet)) {
-                    throw new Error('Incorrect wallet type!');
+        return new Promise(async (resolve, reject) => {
+            if (!isTonWalletStandard(wallet)) {
+                reject(new Error(PurchaseErrors.INCORRECT_WALLET_TYPE));
+
+                return;
+            }
+
+            const onConfirm = async (success?: boolean) => {
+                if (success) {
+                    const pendingSubscription: CryptoPendingSubscription = {
+                        source: SubscriptionSource.CRYPTO,
+                        status: CryptoSubscriptionStatuses.PENDING,
+                        valid: false,
+                        displayName,
+                        displayPrice: formattedDisplayPrice,
+                        auth: {
+                            type: AuthTypes.WALLET,
+                            wallet
+                        }
+                    };
+
+                    await this.sdk.storage.set<CryptoPendingSubscription>(
+                        AppKey.PRO_PENDING_SUBSCRIPTION,
+                        pendingSubscription
+                    );
+
+                    resolve(PurchaseStatuses.PENDING);
+                } else {
+                    return resolve(PurchaseStatuses.CANCELED);
                 }
+            };
 
-                const onConfirm = async (success?: boolean) => {
-                    if (success) {
-                        const pendingSubscription: CryptoPendingSubscription = {
-                            source: SubscriptionSource.CRYPTO,
-                            status: CryptoSubscriptionStatuses.PENDING,
-                            valid: false,
-                            displayName,
-                            displayPrice: formattedDisplayPrice,
-                            auth: {
-                                type: AuthTypes.WALLET,
-                                wallet
-                            }
-                        };
+            const result = await createProServiceInvoice(
+                formData.tempToken,
+                tierId,
+                formData.promoCode
+            );
 
-                        await this.sdk.storage.set<CryptoPendingSubscription>(
-                            AppKey.PRO_PENDING_SUBSCRIPTION,
-                            pendingSubscription
-                        );
+            if (result.ok === false) {
+                reject(new Error(result.data));
 
-                        resolve(PurchaseStatuses.PENDING);
-                    } else {
-                        return resolve(PurchaseStatuses.CANCELED);
-                    }
-                };
+                return;
+            }
 
-                const invoice = await createProServiceInvoice(tierId, formData.promoCode);
-                const [recipient, assetAmount] = await createRecipient(api, invoice);
+            const invoice = result.data;
+            const [recipient, assetAmount] = await createRecipient(api, invoice);
 
-                onOpen({
-                    confirmState: {
-                        invoice,
-                        wallet,
-                        recipient,
-                        assetAmount
-                    },
-                    onConfirm,
-                    onCancel: () => {
-                        resolve(PurchaseStatuses.CANCELED);
-                    }
-                });
-            })
-        );
+            onOpen({
+                confirmState: {
+                    invoice,
+                    wallet,
+                    recipient,
+                    assetAmount
+                },
+                onConfirm,
+                onCancel: () => {
+                    resolve(PurchaseStatuses.CANCELED);
+                }
+            });
+        });
     }
 
     async getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans> {
@@ -123,30 +135,21 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
         await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
     };
 
-    async getSubscription(): Promise<ProSubscription> {
+    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
         const storage = this.sdk.storage;
         const authService = this.sdk.authService;
 
-        await authService.attachToken(ProAuthTokenType.MAIN);
+        const mainToken = await authService.getToken();
 
-        const currentSubscription = await getNormalizedSubscription(
-            authService,
-            storage,
-            ProAuthTokenType.MAIN
-        );
-
-        const targetSubscription = await getNormalizedSubscription(
-            authService,
-            storage,
-            ProAuthTokenType.TEMP
-        );
+        const currentSubscription = await getNormalizedSubscription(storage, mainToken);
+        const targetSubscription = await getNormalizedSubscription(storage, tempToken);
 
         const pendingSubscription: CryptoPendingSubscription | null = await storage.get(
             AppKey.PRO_PENDING_SUBSCRIPTION
         );
 
         if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
-            await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
+            await authService.setToken(tempToken);
 
             await this.clearProAuthBreadCrumbs(storage);
 
@@ -173,8 +176,6 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
         if (isProSubscription(targetSubscription)) {
             return targetSubscription;
         }
-
-        await authService.setToken(ProAuthTokenType.MAIN, null);
 
         return null;
     }

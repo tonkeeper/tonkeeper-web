@@ -55,8 +55,9 @@ export interface ConfirmState {
 
 export interface ISubscriptionFormData {
     wallet?: ProStateWallet;
-    selectedPlan: IDisplayPlan;
+    tempToken: string;
     promoCode?: string;
+    selectedPlan: IDisplayPlan;
 }
 
 export interface ISubscriptionConfig {
@@ -71,6 +72,10 @@ export interface ISubscriptionConfig {
 export interface WalletAuth {
     type: AuthTypes.WALLET;
     wallet: ProStateWallet;
+}
+
+export interface ISelectedTargetAuth extends WalletAuth {
+    tempToken: string;
 }
 
 export interface TelegramAuth {

@@ -33,7 +33,6 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
-import { ProAuthTokenType } from '@tonkeeper/core/dist/service/proService';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -42,8 +41,7 @@ const CookieSettings = () => {
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
 
-        await sdk.authService.setToken(ProAuthTokenType.MAIN, null);
-        await sdk.authService.setToken(ProAuthTokenType.TEMP, null);
+        await sdk.authService.deleteToken();
 
         await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
 

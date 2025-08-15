@@ -21,7 +21,6 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 import {
     getNormalizedSubscription,
-    ProAuthTokenType,
     saveIapPurchase
 } from '@tonkeeper/core/dist/service/proService';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
@@ -111,7 +110,6 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
 
     async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
         const productId = formData.selectedPlan.id;
-        const authService = this.sdk.authService;
 
         if (!isProductId(productId)) {
             throw new Error('Missing product id for this product');
@@ -131,8 +129,9 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
             throw new Error('Failed to subscribe');
         }
 
-        const savingResult = await authService.withTokenContext(ProAuthTokenType.TEMP, () =>
-            saveIapPurchase(String(originalTransactionId))
+        const savingResult = await saveIapPurchase(
+            formData.tempToken,
+            String(originalTransactionId)
         );
 
         if (!savingResult.ok) {
@@ -176,26 +175,19 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         return SubscriptionPlugin.manageSubscriptions();
     }
 
-    async getSubscription(): Promise<ProSubscription> {
+    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
         const storage = this.sdk.storage;
         const authService = this.sdk.authService;
 
-        await authService.attachToken(ProAuthTokenType.MAIN);
+        const mainToken = await authService.getToken();
 
-        const currentSubscription = await getNormalizedSubscription(
-            authService,
-            storage,
-            ProAuthTokenType.MAIN
-        );
-
-        const targetSubscription = await getNormalizedSubscription(
-            authService,
-            storage,
-            ProAuthTokenType.TEMP
-        );
+        const currentSubscription = await getNormalizedSubscription(storage, mainToken);
+        const targetSubscription = await getNormalizedSubscription(storage, tempToken);
 
         if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
-            await authService.promoteToken(ProAuthTokenType.TEMP, ProAuthTokenType.MAIN);
+            if (tempToken) {
+                await authService.setToken(tempToken);
+            }
 
             return targetSubscription;
         }
@@ -211,8 +203,6 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         if (isProSubscription(targetSubscription)) {
             return targetSubscription;
         }
-
-        await authService.setToken(ProAuthTokenType.MAIN, null);
 
         return null;
     }

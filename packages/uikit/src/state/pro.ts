@@ -11,7 +11,7 @@ import {
     NormalizedProPlans,
     ProSubscription,
     PurchaseStatuses,
-    WalletAuth
+    ISelectedTargetAuth
 } from '@tonkeeper/core/dist/entries/pro';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -42,7 +42,7 @@ import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
 
-export const selectedTargetAuth = atom<WalletAuth | null>(null);
+export const selectedTargetAuthAtom = atom<ISelectedTargetAuth | null>(null);
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -56,12 +56,13 @@ export const useTrialAvailability = () => {
 };
 
 export const useSupport = () => {
+    const sdk = useAppSdk();
     const { mainnetConfig } = useAppContext();
     const { data: subscription } = useProState();
 
     return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
-        getProSupportUrl,
+        async () => getProSupportUrl(await sdk.authService.getToken()),
         {
             initialData: {
                 url: mainnetConfig.directSupportUrl ?? '',
@@ -93,7 +94,9 @@ export const useProState = () => {
                 throw new Error('Missing SubscriptionStrategy');
             }
 
-            const subscription = await sdk.subscriptionStrategy.getSubscription();
+            const subscription = await sdk.subscriptionStrategy.getSubscription(
+                selectedTargetAuthAtom?.value?.tempToken ?? null
+            );
 
             await setBackupState(sdk.storage, subscription);
             await client.invalidateQueries([QueryKey.proBackup]);
@@ -143,13 +146,12 @@ export const useSelectWalletForProMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
 
-    const [, setTargetAuth] = useAtom(selectedTargetAuth);
+    const [, setTargetAuth] = useAtom(selectedTargetAuthAtom);
     const accountsStorage = useAccountsStorage();
 
     return useMutation<void, Error, string>(async walletId => {
         const accounts = (await accountsStorage.getAccounts()).filter(isAccountTonWalletStandard);
         const account = getAccountByWalletById(accounts, walletId);
-        const authService = sdk.authService;
 
         if (!account) {
             throw new Error('Account not found');
@@ -165,8 +167,7 @@ export const useSelectWalletForProMutation = () => {
             throw new Error("Can't use non-standard ton wallet for pro auth");
         }
 
-        await authViaTonConnect(
-            authService,
+        const tempToken = await authViaTonConnect(
             api,
             wallet,
             signTonConnectOver({ sdk, accountId: account.id, wallet, t })
@@ -174,7 +175,8 @@ export const useSelectWalletForProMutation = () => {
 
         setTargetAuth({
             type: AuthTypes.WALLET,
-            wallet
+            wallet,
+            tempToken
         });
 
         await client.invalidateQueries([QueryKey.pro]);
@@ -182,16 +184,22 @@ export const useSelectWalletForProMutation = () => {
 };
 
 export const useAutoAuthMutation = () => {
-    const sdk = useAppSdk();
     const api = useActiveApi();
     const { data: subscription } = useProState();
     const client = useQueryClient();
+    const [, setTargetAuth] = useAtom(selectedTargetAuthAtom);
 
     return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {
             if (isPaidActiveSubscription(subscription)) return;
 
-            await authViaSeedPhrase(api, sdk.authService, authData);
+            const tempToken = await authViaSeedPhrase(api, authData);
+
+            setTargetAuth({
+                type: AuthTypes.WALLET,
+                wallet: authData.wallet,
+                tempToken
+            });
 
             await client.invalidateQueries([QueryKey.pro]);
         } catch (e) {
@@ -278,20 +286,16 @@ export const useActivateTrialMutation = () => {
         i18n: { language }
     } = useTranslation();
 
-    return useMutation<boolean, Error>(async () => {
-        const result = await startProServiceTrial(
-            sdk.authService,
+    return useMutation<string, Error>(async () => {
+        const token = await startProServiceTrial(
             (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
             language
         );
 
-        if (!result) {
-            throw new Error('Failed to activate trial');
-        }
-
+        await sdk.authService.setToken(token);
         await sdk.storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
         await client.invalidateQueries([QueryKey.pro]);
 
-        return result;
+        return token;
     });
 };
