@@ -1,5 +1,9 @@
 import { AppKey } from './Keys';
 import { IStorage } from './Storage';
+import { atom } from './entries/atom';
+import { ITokenizedWalletAuth } from './entries/pro';
+
+export const tokenizedWalletAuthAtom = atom<ITokenizedWalletAuth | null>(null);
 
 export class ProAuthTokenService {
     constructor(private storage: IStorage) {}
@@ -10,9 +14,11 @@ export class ProAuthTokenService {
 
     async setToken(token: string) {
         await this.storage.set(AppKey.PRO_AUTH_TOKEN, token);
+        tokenizedWalletAuthAtom.next(null);
     }
 
     async deleteToken() {
         await this.storage.set(AppKey.PRO_AUTH_TOKEN, null);
+        tokenizedWalletAuthAtom.next(null);
     }
 }

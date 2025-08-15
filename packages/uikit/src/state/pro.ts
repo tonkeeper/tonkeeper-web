@@ -10,9 +10,7 @@ import {
     ISubscriptionFormData,
     NormalizedProPlans,
     ProSubscription,
-    PurchaseStatuses,
-    ITokenizedWalletAuth,
-    isValidSubscription
+    PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -40,10 +38,8 @@ import {
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
-import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
-
-export const tokenizedWalletAuthAtom = atom<ITokenizedWalletAuth | null>(null);
+import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -98,10 +94,6 @@ export const useProState = () => {
             const subscription = await sdk.subscriptionStrategy.getSubscription(
                 tokenizedWalletAuthAtom?.value?.tempToken ?? null
             );
-
-            if (isValidSubscription(subscription)) {
-                tokenizedWalletAuthAtom.next(null);
-            }
 
             await setBackupState(sdk.storage, subscription);
             await client.invalidateQueries([QueryKey.proBackup]);

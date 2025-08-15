@@ -4,15 +4,11 @@ import {
     PurchaseErrors,
     PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
+import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import {
-    tokenizedWalletAuthAtom,
-    useManageSubscription,
-    useProLogout,
-    useProPurchaseMutation
-} from '../../state/pro';
+import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
 import { useNotifyError, useToast } from '../useNotification';
 import { useProductSelection } from './useProductSelection';
 import { useEffect } from 'react';

@@ -1,8 +1,9 @@
 import { type FC, ReactNode } from 'react';
 import styled from 'styled-components';
+import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 import { Label2 } from '../Text';
-import { tokenizedWalletAuthAtom, useProState } from '../../state/pro';
+import { useProState } from '../../state/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock } from '../List';
