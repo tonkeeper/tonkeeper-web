@@ -2,7 +2,7 @@ import { type FC, ReactNode } from 'react';
 import styled from 'styled-components';
 
 import { Label2 } from '../Text';
-import { selectedTargetAuthAtom, useProState } from '../../state/pro';
+import { tokenizedWalletAuthAtom, useProState } from '../../state/pro';
 import { ProWalletListItem } from './ProWalletListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock } from '../List';
@@ -21,7 +21,7 @@ export const ProActiveWallet: FC<IProps> = props => {
     const { onDisconnect, isLoading, title, isCurrentSubscription } = props;
     const { t } = useTranslation();
     const { data: subscription } = useProState();
-    const targetAuth = useAtomValue(selectedTargetAuthAtom);
+    const targetAuth = useAtomValue(tokenizedWalletAuthAtom);
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (() => {
             const currentAuth = subscription?.auth;

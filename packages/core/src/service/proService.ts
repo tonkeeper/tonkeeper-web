@@ -9,7 +9,6 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ISupportData, ProStateWallet, ProSubscription, PurchaseErrors } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
 import {
     backwardCompatibilityOnlyWalletVersions,
@@ -40,6 +39,7 @@ import {
     UsersService
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
+import { IProStateWallet, ISupportData, ProSubscription, PurchaseErrors } from '../entries/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -78,7 +78,7 @@ export const getNormalizedSubscription = async (storage: IStorage, token: string
 
     try {
         const user = await UsersService.getUserInfo(`Bearer ${token}`);
-        const authorizedWallet: ProStateWallet | null = await findAuthorizedWallet(user, storage);
+        const authorizedWallet: IProStateWallet | null = await findAuthorizedWallet(user, storage);
         const currentSubscriptionDTO = await UsersService.verifySubscription(`Bearer ${token}`);
 
         return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
@@ -179,13 +179,19 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
     return items;
 };
 
+interface IProServiceInvoiceData {
+    tierId: number;
+    promoCode?: string;
+}
+
 type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };
 
 export const createProServiceInvoice = async (
     tempToken: string,
-    tierId: number,
-    promoCode?: string
+    data: IProServiceInvoiceData
 ): Promise<ProServiceInvoiceResponse> => {
+    const { promoCode, tierId } = data;
+
     try {
         const invoice = await InvoicesService.createInvoice(`Bearer ${tempToken}`, {
             tier_id: tierId,

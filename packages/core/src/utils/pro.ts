@@ -1,13 +1,3 @@
-import {
-    AuthTypes,
-    CryptoSubscriptionStatuses,
-    IosSubscriptionStatuses,
-    isProductId,
-    ProductIds,
-    ProStateWallet,
-    ProSubscription,
-    TelegramSubscriptionStatuses
-} from '../entries/pro';
 import { UserInfo } from './types';
 import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
@@ -18,10 +8,22 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
+import {
+    AuthTypes,
+    CryptoSubscriptionStatuses,
+    IosSubscriptionStatuses,
+    IProStateWallet,
+    isProductId,
+    isProSubscription,
+    isValidSubscription,
+    ProductIds,
+    ProSubscription,
+    TelegramSubscriptionStatuses
+} from '../entries/pro';
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
-    authorizedWallet: ProStateWallet | null
+    authorizedWallet: IProStateWallet | null
 ): ProSubscription => {
     const source = subscriptionDto?.source;
     const toDate = (ts: number) => new Date(ts * 1000);
@@ -229,3 +231,16 @@ export const SUBSCRIPTION_PERIODS_MAP = new Map<ProductIds, string>([
 
 // TODO Put BASE_URL into config
 export const BASE_SLIDE_URL = 'https://tonkeeper.com/assets/stories/prosubscriptions';
+
+export const pickBestSubscription = (
+    current: ProSubscription | null,
+    target: ProSubscription | null
+): ProSubscription | null => {
+    if (isValidSubscription(target)) return target;
+    if (isValidSubscription(current)) return current;
+
+    if (isProSubscription(current)) return current;
+    if (isProSubscription(target)) return target;
+
+    return null;
+};

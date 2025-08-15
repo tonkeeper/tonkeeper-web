@@ -195,7 +195,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         </Button>
     );
 
-    if (subscription && isValidSubscription(subscription)) {
+    if (isValidSubscription(subscription)) {
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"

@@ -8,7 +8,7 @@ import {
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import {
-    selectedTargetAuthAtom,
+    tokenizedWalletAuthAtom,
     useManageSubscription,
     useProLogout,
     useProPurchaseMutation
@@ -27,7 +27,7 @@ export const useProPurchaseController = () => {
     const { t } = useTranslation();
     const toast = useToast();
     const navigate = useNavigate();
-    const targetAuth = useAtomValue(selectedTargetAuthAtom);
+    const targetAuth = useAtomValue(tokenizedWalletAuthAtom);
     const { onClose: onCurrentClose } = useProPurchaseNotification();
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
 

@@ -5,7 +5,7 @@ import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
 import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
 
-export interface ProStateWallet {
+export interface IProStateWallet {
     publicKey: string;
     rawAddress: string;
 }
@@ -46,7 +46,7 @@ export interface IOriginalTransactionInfo {
     environment: IosEnvironmentTypes;
 }
 
-export interface ConfirmState {
+export interface IConfirmState {
     invoice: InvoicesInvoice;
     recipient: RecipientData;
     assetAmount: AssetAmount;
@@ -54,7 +54,7 @@ export interface ConfirmState {
 }
 
 export interface ISubscriptionFormData {
-    wallet?: ProStateWallet;
+    wallet?: IProStateWallet;
     tempToken: string;
     promoCode?: string;
     selectedPlan: IDisplayPlan;
@@ -63,22 +63,22 @@ export interface ISubscriptionFormData {
 export interface ISubscriptionConfig {
     api?: APIConfig;
     onOpen?: (p?: {
-        confirmState: ConfirmState | null;
+        confirmState: IConfirmState | null;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;
     }) => void;
 }
 
-export interface WalletAuth {
+export interface IWalletAuth {
     type: AuthTypes.WALLET;
-    wallet: ProStateWallet;
+    wallet: IProStateWallet;
 }
 
-export interface ISelectedTargetAuth extends WalletAuth {
+export interface ITokenizedWalletAuth extends IWalletAuth {
     tempToken: string;
 }
 
-export interface TelegramAuth {
+export interface ITelegramAuth {
     type: AuthTypes.TELEGRAM;
 }
 

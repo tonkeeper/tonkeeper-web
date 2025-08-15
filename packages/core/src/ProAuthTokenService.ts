@@ -13,6 +13,6 @@ export class ProAuthTokenService {
     }
 
     async deleteToken() {
-        await this.storage.delete(AppKey.PRO_AUTH_TOKEN);
+        await this.storage.set(AppKey.PRO_AUTH_TOKEN, null);
     }
 }

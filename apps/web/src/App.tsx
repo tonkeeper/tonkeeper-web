@@ -43,7 +43,7 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { BrowserRouter } from 'react-router-dom';
-import { CryptoSubscriptionStrategy } from '@tonkeeper/core/CryptoSubscriptionStrategy';
+import { CryptoSubscriptionStrategy } from '@tonkeeper/core/dist/CryptoSubscriptionStrategy';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));

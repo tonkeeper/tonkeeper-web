@@ -8,9 +8,8 @@ import {
     IProductInfo,
     NormalizedProPlans,
     isProductId,
-    isProSubscription,
-    isValidSubscription,
-    ProSubscription
+    ProSubscription,
+    isProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 import {
     IosEnvironmentTypes,
@@ -18,7 +17,7 @@ import {
     ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
+import { getFormattedProPrice, pickBestSubscription } from '@tonkeeper/core/dist/utils/pro';
 import {
     getNormalizedSubscription,
     saveIapPurchase
@@ -181,29 +180,22 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
 
         const mainToken = await authService.getToken();
 
-        const currentSubscription = await getNormalizedSubscription(storage, mainToken);
-        const targetSubscription = await getNormalizedSubscription(storage, tempToken);
+        const [currentSubscription, targetSubscription] = await Promise.all([
+            getNormalizedSubscription(storage, mainToken),
+            getNormalizedSubscription(storage, tempToken)
+        ]);
 
-        if (isProSubscription(targetSubscription) && isValidSubscription(targetSubscription)) {
-            if (tempToken) {
-                await authService.setToken(tempToken);
-            }
+        const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
 
-            return targetSubscription;
+        const shouldPromoteToken =
+            tempToken &&
+            bestSubscription === targetSubscription &&
+            isProSubscription(bestSubscription);
+
+        if (shouldPromoteToken) {
+            await authService.setToken(tempToken);
         }
 
-        if (isValidSubscription(currentSubscription)) {
-            return currentSubscription;
-        }
-
-        if (isProSubscription(currentSubscription)) {
-            return currentSubscription;
-        }
-
-        if (isProSubscription(targetSubscription)) {
-            return targetSubscription;
-        }
-
-        return null;
+        return bestSubscription;
     }
 }

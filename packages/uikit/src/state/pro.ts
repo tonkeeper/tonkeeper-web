@@ -11,7 +11,8 @@ import {
     NormalizedProPlans,
     ProSubscription,
     PurchaseStatuses,
-    ISelectedTargetAuth
+    ITokenizedWalletAuth,
+    isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
@@ -42,7 +43,7 @@ import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
 
-export const selectedTargetAuthAtom = atom<ISelectedTargetAuth | null>(null);
+export const tokenizedWalletAuthAtom = atom<ITokenizedWalletAuth | null>(null);
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -95,8 +96,12 @@ export const useProState = () => {
             }
 
             const subscription = await sdk.subscriptionStrategy.getSubscription(
-                selectedTargetAuthAtom?.value?.tempToken ?? null
+                tokenizedWalletAuthAtom?.value?.tempToken ?? null
             );
+
+            if (isValidSubscription(subscription)) {
+                tokenizedWalletAuthAtom.next(null);
+            }
 
             await setBackupState(sdk.storage, subscription);
             await client.invalidateQueries([QueryKey.proBackup]);
@@ -146,7 +151,7 @@ export const useSelectWalletForProMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
 
-    const [, setTargetAuth] = useAtom(selectedTargetAuthAtom);
+    const [, setTargetAuth] = useAtom(tokenizedWalletAuthAtom);
     const accountsStorage = useAccountsStorage();
 
     return useMutation<void, Error, string>(async walletId => {
@@ -187,7 +192,7 @@ export const useAutoAuthMutation = () => {
     const api = useActiveApi();
     const { data: subscription } = useProState();
     const client = useQueryClient();
-    const [, setTargetAuth] = useAtom(selectedTargetAuthAtom);
+    const [, setTargetAuth] = useAtom(tokenizedWalletAuthAtom);
 
     return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {
