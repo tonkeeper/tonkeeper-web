@@ -48,6 +48,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
 import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
 import { queryClient } from '../libs/query-client';
+import { IosSubscriptionStrategy } from '../libs/plugins/subscription-plugin';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -100,6 +101,9 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new CapacitorAppSdk();
+const strategy = new IosSubscriptionStrategy(sdk);
+
+sdk.setSubscriptionStrategy(strategy);
 
 const langs = import.meta.env.VITE_APP_LOCALES;
 

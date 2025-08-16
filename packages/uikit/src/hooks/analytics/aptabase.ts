@@ -85,7 +85,7 @@ export class Aptabase implements Analytics {
                         locale: this.getBrowserLocale(),
                         isDebug: this.isDebug,
                         appVersion: this.appVersion,
-                        sdkVersion: 'custom_0.0.3',
+                        sdkVersion: 'custom@0.0.4',
                         osName: this.getUserOS()
                     },
                     props: {

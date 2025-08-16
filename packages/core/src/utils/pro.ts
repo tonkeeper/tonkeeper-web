@@ -1,11 +1,3 @@
-import {
-    AuthTypes,
-    CryptoSubscriptionStatuses,
-    IosSubscriptionStatuses,
-    ProStateWallet,
-    ProSubscription,
-    TelegramSubscriptionStatuses
-} from '../entries/pro';
 import { UserInfo } from './types';
 import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
@@ -16,10 +8,22 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
+import {
+    AuthTypes,
+    CryptoSubscriptionStatuses,
+    IosSubscriptionStatuses,
+    IProStateWallet,
+    isProductId,
+    isProSubscription,
+    isValidSubscription,
+    ProductIds,
+    ProSubscription,
+    TelegramSubscriptionStatuses
+} from '../entries/pro';
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
-    authorizedWallet: ProStateWallet | null
+    authorizedWallet: IProStateWallet | null
 ): ProSubscription => {
     const source = subscriptionDto?.source;
     const toDate = (ts: number) => new Date(ts * 1000);
@@ -114,6 +118,12 @@ export const normalizeSubscription = (
             throw new Error('Missing ios dBStoredInfo');
         }
 
+        const productId = dBStoredInfo.product_id;
+
+        if (!isProductId(productId)) {
+            throw new Error('ProductId is incorrect or missed');
+        }
+
         if (valid) {
             return {
                 source,
@@ -129,7 +139,7 @@ export const normalizeSubscription = (
                 priceMultiplier: dBStoredInfo.price_multiplier,
                 currency: dBStoredInfo.currency,
                 expiresDate: toDate(dBStoredInfo.expires_date),
-                productId: dBStoredInfo.product_id,
+                productId,
                 storeFront: dBStoredInfo.store_front,
                 storeFrontId: dBStoredInfo.store_front_id,
                 transactionType: dBStoredInfo.transaction_type,
@@ -153,7 +163,7 @@ export const normalizeSubscription = (
             priceMultiplier: dBStoredInfo.price_multiplier,
             currency: dBStoredInfo.currency,
             expiresDate: toDate(dBStoredInfo.expires_date),
-            productId: dBStoredInfo.product_id,
+            productId,
             storeFront: dBStoredInfo.store_front,
             storeFrontId: dBStoredInfo.store_front_id,
             transactionType: dBStoredInfo.transaction_type,
@@ -213,4 +223,24 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
         console.error('getFormattedDisplayPrice error: ', e);
         return '-';
     }
+};
+
+export const SUBSCRIPTION_PERIODS_MAP = new Map<ProductIds, string>([
+    [ProductIds.MONTHLY, 'per_month']
+]);
+
+// TODO Put BASE_URL into config
+export const BASE_SLIDE_URL = 'https://tonkeeper.com/assets/stories/prosubscriptions';
+
+export const pickBestSubscription = (
+    current: ProSubscription | null,
+    target: ProSubscription | null
+): ProSubscription | null => {
+    if (isValidSubscription(target)) return target;
+    if (isValidSubscription(current)) return current;
+
+    if (isProSubscription(current)) return current;
+    if (isProSubscription(target)) return target;
+
+    return null;
 };

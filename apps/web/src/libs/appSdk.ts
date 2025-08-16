@@ -5,7 +5,7 @@ import { safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { BrowserStorage } from './storage';
 import packageJson from '../../package.json';
 import { disableScroll, enableScroll, getScrollbarWidth } from './scroll';
-import { Subscription } from '@tonkeeper/core/CryptoSubscriptionStrategy';
+import { ICryptoSubscriptionStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 function iOS() {
     return (
@@ -18,8 +18,14 @@ function iOS() {
 }
 
 export class BrowserAppSdk extends BaseApp {
+    subscriptionStrategy?: ICryptoSubscriptionStrategy = undefined;
+
     constructor() {
         super(new BrowserStorage());
+    }
+
+    setSubscriptionStrategy(strategy: ICryptoSubscriptionStrategy) {
+        this.subscriptionStrategy = strategy;
     }
 
     copyToClipboard = (value: string, notification?: string) => {
@@ -46,6 +52,4 @@ export class BrowserAppSdk extends BaseApp {
     signerReturnUrl = 'https://wallet.tonkeeper.com/';
 
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:', 'tonsign:'];
-
-    subscriptionStrategy = Subscription;
 }

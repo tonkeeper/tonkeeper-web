@@ -11,11 +11,13 @@ import { request as __request } from '../core/request';
 export class InvoicesService {
     /**
      * Create Pro subscription invoice
+     * @param authorization
      * @param requestBody Data that is expected
      * @returns Invoice Invoice created successfully
      * @throws ApiError
      */
     public static createInvoice(
+        authorization?: string,
         requestBody?: {
             tier_id: number;
             promo_code?: string;
@@ -24,6 +26,9 @@ export class InvoicesService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/invoice',
+            headers: {
+                'Authorization': authorization,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {

@@ -6,7 +6,7 @@ platform :ios do
     desc 'Export ipa and submit to TestFlight'
     lane :beta do
       keychain_info = { keychain_name: "ios-build-#{Time.now.to_i}.keychain", keychain_password: SecureRandom.uuid }
-      
+
 
       begin
         setup_signing(keychain_info)
@@ -18,7 +18,7 @@ platform :ios do
         cleanup_keychain(keychain_info)
       end
     end
-  
+
     private_lane :setup_signing do |options|
       create_keychain(
         name: options[:keychain_name],
@@ -30,9 +30,11 @@ platform :ios do
       )
       import_cert(options)
       install_profile
+      sh("security find-identity -v -p codesigning #{options[:keychain_name]} || true")
+      sh("ls -la ~/Library/MobileDevice/'Provisioning Profiles' || true")
       update_project_settings
     end
-    
+
     desc "Load ASC API Key information to use in subsequent lanes"
     private_lane :load_asc_api_key do
       app_store_connect_api_key(
@@ -43,7 +45,7 @@ platform :ios do
         in_house: false
       )
     end
-    
+
     lane :bump_build_number do
       package = read_json(json_path: "./package.json")
       increment_version_number(
@@ -69,12 +71,12 @@ platform :ios do
         xcodeproj: xcodeproj,
         build_number: build_number
       )
-      
+
       UI.message("Bumped build number to #{build_number}")
       sh("echo VERSION_CODE=#{package[:version]} >> $GITHUB_ENV")
       sh("echo BUILD_CODE=#{build_number} >> $GITHUB_ENV")
     end
-  
+
     private_lane :import_cert do |options|
       cert_path = "#{Dir.tmpdir}/build_certificate.p12"
       File.write(cert_path, Base64.decode64(ENV['BUILD_CERTIFICATE_BASE64']))
@@ -87,13 +89,13 @@ platform :ios do
       )
       File.delete(cert_path)
     end
-  
+
     private_lane :cleanup_keychain do |options|
       delete_keychain(
         name: options[:keychain_name]
       )
     end
-  
+
     private_lane :install_profile do
       profile_path = "#{Dir.tmpdir}/build_pp.mobileprovision"
       File.write(profile_path, Base64.decode64(ENV['BUILD_PROVISION_PROFILE_BASE64']))
@@ -102,7 +104,7 @@ platform :ios do
       install_provisioning_profile(path: profile_path)
       File.delete(profile_path)
     end
-  
+
     private_lane :update_project_settings do
       app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
       team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
@@ -110,7 +112,7 @@ platform :ios do
       update_code_signing_settings(
         path: xcodeproj,
         use_automatic_signing: false,
-        code_sign_identity: "iPhone Distribution",
+        code_sign_identity: "Apple Distribution",
         team_id: team_id,
         bundle_identifier: app_identifier,
         profile_name: ENV['APPLE_PROFILE_NAME'],
@@ -121,7 +123,7 @@ platform :ios do
         teamid: team_id
       )
     end
-  
+
     private_lane :build_app_with_signing do |options|
       unlock_keychain(
         path: options[:keychain_name],
@@ -129,6 +131,7 @@ platform :ios do
         set_default: false
       )
       app_identifier = CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier)
+      team_id = CredentialsManager::AppfileConfig.try_fetch_value(:team_id)
       build_app(
         workspace: workspace,
         scheme: "App",
@@ -138,9 +141,11 @@ platform :ios do
         export_options: {
           provisioningProfiles: {
             app_identifier => ENV['APPLE_PROFILE_NAME']
-          }
+          },
+          signingStyle: "manual",
+          teamID: team_id
         },
-        xcargs: "-verbose",
+        xcargs: "DEVELOPMENT_TEAM=#{team_id} CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution' PROVISIONING_PROFILE_SPECIFIER='#{ENV['APPLE_PROFILE_NAME']}' -verbose",
         buildlog_path: "./build_logs",
         export_xcargs: "-allowProvisioningUpdates",
       )

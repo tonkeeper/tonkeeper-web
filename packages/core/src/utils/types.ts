@@ -50,3 +50,9 @@ export function assertTypesEqual<A, B>(_value: AssertEqual<A, B>): void {
 }
 
 export type UserInfo = Awaited<ReturnType<typeof UsersService.getUserInfo>>;
+
+export type MultiTapOptions = {
+    intervalMs?: number;
+    requiredCount?: number;
+    resetAfterTrigger?: boolean;
+};

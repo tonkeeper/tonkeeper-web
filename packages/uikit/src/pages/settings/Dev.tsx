@@ -33,19 +33,15 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
-import { useProAuthTokenService } from '../../state/pro';
-import { ProAuthTokenType } from '@tonkeeper/core/dist/service/proService';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
 
-        await authService.setToken(ProAuthTokenType.MAIN, null);
-        await authService.setToken(ProAuthTokenType.TEMP, null);
+        await sdk.authService.deleteToken();
 
         await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
 
@@ -248,7 +244,19 @@ export const DevSettingsLogs = () => {
 };
 
 export const DevSettings = React.memo(() => {
+    const sdk = useAppSdk();
+    const navigate = useNavigate();
     const isProDisplay = useIsFullWidthMode();
+
+    useEffect(() => {
+        (async () => {
+            const isDevVisible = Boolean(await sdk.storage.get(AppKey.IS_DEV_MENU_VISIBLE));
+
+            if (!isDevVisible) {
+                navigate(AppRoute.home);
+            }
+        })();
+    }, []);
 
     if (isProDisplay) {
         return (

@@ -4,6 +4,12 @@ export enum PurchaseStatuses {
     CANCELED = 'cancelled'
 }
 
+export enum PurchaseErrors {
+    INCORRECT_WALLET_TYPE = 'incorrect_wallet_type',
+    PROMOCODE_ALREADY_USED = 'promocode_already_used',
+    PURCHASE_FAILED = 'purchase_failed'
+}
+
 export enum IosSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired'

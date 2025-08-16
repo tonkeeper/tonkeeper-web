@@ -8,16 +8,22 @@ import { request as __request } from '../core/request';
 export class SupportService {
     /**
      * Retrieve support link
+     * @param authorization
      * @returns any Returns a link to the support
      * @throws ApiError
      */
-    public static getProSupport(): CancelablePromise<{
+    public static getProSupport(
+        authorization?: string,
+    ): CancelablePromise<{
         url: string;
         is_priority: boolean;
     }> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/support',
+            headers: {
+                'Authorization': authorization,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,

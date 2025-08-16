@@ -3,6 +3,7 @@ import { decodeBase58, sha256 } from 'ethers';
 import { Network } from '../entries/network';
 import { CryptoCurrency } from '../entries/crypto';
 import BigNumber from 'bignumber.js';
+import { MultiTapOptions } from './types';
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -227,3 +228,31 @@ export const maxOneCall = <A extends unknown[], R>(fn: (...args: A) => R): ((...
         return fn(...args);
     };
 };
+
+export function createMultiTap(callback: () => void, config: MultiTapOptions = {}) {
+    const { requiredCount = 5, intervalMs = 500, resetAfterTrigger = true } = config;
+
+    let tapsCount = 0;
+    let lastTapTime = 0;
+
+    return function trigger() {
+        const now = Date.now();
+
+        if (now - lastTapTime <= intervalMs) {
+            tapsCount += 1;
+        } else {
+            tapsCount = 1;
+        }
+
+        lastTapTime = now;
+
+        if (tapsCount >= requiredCount) {
+            callback();
+
+            if (resetAfterTrigger) {
+                tapsCount = 0;
+                lastTapTime = 0;
+            }
+        }
+    };
+}
