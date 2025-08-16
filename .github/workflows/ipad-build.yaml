@@ -50,6 +50,13 @@ jobs:
               with:
                   xcode-version: '16.0'
 
+            - name: Show Xcode env
+              run: |
+                  echo "DEVELOPER_DIR=$DEVELOPER_DIR"
+                  xcode-select -p
+                  xcodebuild -version
+                  xcodebuild -showsdks
+
             - name: Verify iOS SDK
               run: |
                   xcodebuild -showsdks | tee /tmp/sdks.txt
@@ -123,6 +130,25 @@ jobs:
                   APPLE_KEY_CONTENT: ${{ secrets.APPLE_API_KEY }}
                   APPLE_PROFILE_NAME: GitHub CI/CD iPad
                   BUILD_PROVISION_PROFILE_BASE64: ${{ secrets.BUILD_PROVISION_PROFILE_BASE64 }}
+
+            # --- temp show logs ---
+            - name: Print xcodebuild log tail (always)
+              if: always()
+              run: |
+                  echo "=== List logs dir ==="
+                  ls -la ./apps/mobile/build_logs || true
+                  echo "=== Tail App-App.log ==="
+                  tail -n 300 ./apps/mobile/build_logs/App-App.log || true
+
+            - name: Upload build logs (always)
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ios-build-logs
+                  path: ./apps/mobile/build_logs
+                  if-no-files-found: warn
+                  retention-days: 7
+            # --- end ---
 
             - name: Summary
               run: |
