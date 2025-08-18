@@ -29,7 +29,7 @@ import { useProFeaturesNotification } from '../../modals/ProFeaturesNotification
 import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 import { usePreloadImages } from '../../../hooks/usePreloadImages';
-import { BASE_SLIDE_URL } from '@tonkeeper/core/dist/utils/pro';
+import { useAppContext } from '../../../hooks/appContext';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -141,6 +141,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
+    const { mainnetConfig } = useAppContext();
     const { data: subscription, isLoading: isProStateLoading } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
@@ -150,6 +151,8 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
     const navigate = useNavigate();
+
+    const baseSlideUrl = mainnetConfig.pro_media_base_url;
 
     const onRefresh = () => {
         if (rotate) {
@@ -165,16 +168,16 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     };
 
     usePreloadImages([
-        `${BASE_SLIDE_URL}/eng/1.png`,
-        `${BASE_SLIDE_URL}/eng/2.png`,
-        `${BASE_SLIDE_URL}/eng/3.png`,
-        `${BASE_SLIDE_URL}/eng/4.png`,
-        `${BASE_SLIDE_URL}/eng/5.png`,
-        `${BASE_SLIDE_URL}/ru/1.png`,
-        `${BASE_SLIDE_URL}/ru/2.png`,
-        `${BASE_SLIDE_URL}/ru/3.png`,
-        `${BASE_SLIDE_URL}/ru/4.png`,
-        `${BASE_SLIDE_URL}/ru/5.png`
+        `${baseSlideUrl}eng/1.png`,
+        `${baseSlideUrl}eng/2.png`,
+        `${baseSlideUrl}eng/3.png`,
+        `${baseSlideUrl}eng/4.png`,
+        `${baseSlideUrl}eng/5.png`,
+        `${baseSlideUrl}ru/1.png`,
+        `${baseSlideUrl}ru/2.png`,
+        `${baseSlideUrl}ru/3.png`,
+        `${baseSlideUrl}ru/4.png`,
+        `${baseSlideUrl}ru/5.png`
     ]);
     useIosSubscriptionPolling();
     useSubscriptionEndingVerification();

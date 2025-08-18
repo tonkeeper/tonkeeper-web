@@ -9,11 +9,12 @@ import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
 import { useUserLanguage } from '../../state/language';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { BASE_SLIDE_URL } from '@tonkeeper/core/dist/utils/pro';
+import { useAppContext } from '../../hooks/appContext';
 
 export const PromoNotificationCarousel = () => {
     const { t } = useTranslation();
     const { data: lang } = useUserLanguage();
+    const { mainnetConfig } = useAppContext();
     const [observedSlide, setObservedSlide] = useState(FeatureSlideNames.MAIN);
 
     const carousel = useCarousel({
@@ -22,6 +23,8 @@ export const PromoNotificationCarousel = () => {
 
     const containerRef = useRef<HTMLDivElement>(null);
     const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const baseSlideUrl = mainnetConfig.pro_media_base_url;
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -67,7 +70,7 @@ export const PromoNotificationCarousel = () => {
                             <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
                                 <ImageWrapper isActive={observedSlide === idx}>
                                     <SlideImage
-                                        src={`${BASE_SLIDE_URL}/${langKey}/${idx + 1}.png`}
+                                        src={`${baseSlideUrl}${langKey}/${idx + 1}.png`}
                                         alt={titleKey}
                                     />
                                 </ImageWrapper>

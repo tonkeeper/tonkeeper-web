@@ -89,6 +89,7 @@ export interface TonendpointConfig {
 
     tron_api_url?: string;
 
+    pro_media_base_url?: string;
     pro_mobile_app_appstore_link?: string;
     pro_landing_url?: string;
     pro_terms_of_use?: string;
