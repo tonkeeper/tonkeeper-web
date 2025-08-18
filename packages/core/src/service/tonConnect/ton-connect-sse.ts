@@ -11,7 +11,12 @@ import { TonConnectAppRequest, TonConnectAppRequestPayload } from '../../entries
 import { getWalletById } from '../../entries/account';
 import { replyHttpBadRequestResponse, replyHttpDisconnectResponse } from './actionService';
 import { delay } from '../../utils/common';
-import { BootParams, getServerConfig, Tonendpoint } from '../../tonkeeperApi/tonendpoint';
+import {
+    BootParams,
+    defaultTonendpointConfig,
+    getServerConfig,
+    Tonendpoint
+} from '../../tonkeeperApi/tonendpoint';
 import { Network } from '../../entries/network';
 import { TargetEnv } from '../../AppSdk';
 
@@ -60,7 +65,7 @@ export const createBridgeEndpointFetcher =
             return config.ton_connect_bridge;
         } catch (e) {
             onError(e);
-            return undefined;
+            return defaultTonendpointConfig.ton_connect_bridge;
         }
     };
 
