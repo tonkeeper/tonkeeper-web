@@ -45,6 +45,11 @@ jobs:
               with:
                   fetch-depth: 0
 
+            - name: Use Xcode 16.4
+              run: |
+                sudo xcode-select --switch /Applications/Xcode_16.4.app
+                echo "DEVELOPER_DIR=/Applications/Xcode_16.4.app/Contents/Developer" >> $GITHUB_ENV
+
             - name: Set up Node
               uses: actions/setup-node@v4
               with:
