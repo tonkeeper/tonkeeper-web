@@ -57,6 +57,8 @@ export interface UserProperties {
     accounts: Account[];
     activeAccount: Account;
     network?: Network;
+    aptabaseEndpoint: string;
+    aptabaseKey?: string;
 }
 
 export interface TrackEvent {

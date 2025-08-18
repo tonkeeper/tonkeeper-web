@@ -36,6 +36,9 @@ export interface TonendpointConfig {
     tonapiIOEndpoint: string;
     tron_api_url: string;
 
+    aptabaseEndpoint: string;
+    aptabaseKey?: string;
+
     exchangePostUrl?: string;
     mercuryoSecret?: string;
     mercuryo_otc_id?: string;
@@ -140,7 +143,8 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     '2fa_tg_linked_ttl_seconds': 600,
     pro_terms_of_use: 'https://tonkeeper.com/pro-terms',
     privacy_policy: 'https://tonkeeper.com/privacy',
-    terms_of_use: 'https://tonkeeper.com/terms'
+    terms_of_use: 'https://tonkeeper.com/terms',
+    aptabaseEndpoint: 'https://anonymous-analytics.tonkeeper.com'
 };
 
 interface CountryIP {

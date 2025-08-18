@@ -4,10 +4,11 @@ import { throttle } from '@tonkeeper/core/dist/utils/common';
 import { Analytics, toWalletType, Aptabase } from '@tonkeeper/uikit/dist/hooks/analytics';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
-import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
 import { useEffect, useState } from 'react';
 import { useNavigate } from "@tonkeeper/uikit/dist/hooks/router/useNavigate";
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { TonendpointConfig } from "@tonkeeper/core/dist/tonkeeperApi/tonendpoint";
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -49,15 +50,16 @@ export const useAppWidth = (standalone: boolean) => {
     }, [standalone]);
 };
 
-export const useAnalytics = (activeAccount: Account | undefined, accounts: Account[] | undefined, version: string) => {
+export const useAnalytics = (activeAccount: Account | undefined, accounts: Account[] | undefined, version: string, config: TonendpointConfig | undefined) => {
     const network = useActiveTonNetwork();
     const sdk = useAppSdk();
+
     return useQuery<Analytics>(
-        [QueryKey.analytics, network],
+        [QueryKey.analytics, network, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
             const tracker = new Aptabase({
-                  host: import.meta.env.VITE_APP_APTABASE_HOST,
-                  key: import.meta.env.VITE_APP_APTABASE,
+                  host: config!.aptabaseEndpoint,
+                  key: config!.aptabaseKey ?? import.meta.env.VITE_APP_APTABASE,
                   appVersion: version,
                   userIdentity: sdk.userIdentity
             });
@@ -72,7 +74,7 @@ export const useAnalytics = (activeAccount: Account | undefined, accounts: Accou
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount != null }
+        { enabled: accounts != null && activeAccount != null && config != undefined }
     );
 };
 

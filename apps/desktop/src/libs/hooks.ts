@@ -6,6 +6,7 @@ import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -42,19 +43,23 @@ export const useAppWidth = () => {
     }, []);
 };
 
-declare const REACT_APP_APTABASE_HOST: string;
 declare const REACT_APP_APTABASE: string;
 
-export const useAnalytics = (version: string, activeAccount?: Account, accounts?: Account[]) => {
+export const useAnalytics = (
+    version: string,
+    config: TonendpointConfig | undefined,
+    activeAccount?: Account,
+    accounts?: Account[]
+) => {
     const sdk = useAppSdk();
     const network = useActiveTonNetwork();
 
     return useQuery<Analytics>(
-        [QueryKey.analytics],
+        [QueryKey.analytics, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
             const tracker = new Aptabase({
-                host: REACT_APP_APTABASE_HOST,
-                key: REACT_APP_APTABASE,
+                host: config!.aptabaseEndpoint,
+                key: config!.aptabaseKey ?? REACT_APP_APTABASE,
                 appVersion: version,
                 userIdentity: sdk.userIdentity
             });
@@ -70,6 +75,6 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount !== undefined }
+        { enabled: accounts != null && activeAccount !== undefined && config !== undefined }
     );
 };

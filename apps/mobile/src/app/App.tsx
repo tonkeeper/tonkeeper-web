@@ -203,7 +203,12 @@ export const Loader: FC = () => {
 
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(sdk.version, activeAccount!, accounts);
+    const { data: tracker } = useAnalytics(
+        sdk.version,
+        config?.mainnetConfig,
+        activeAccount!,
+        accounts
+    );
 
     useEffect(() => {
         if (lang && i18n.language !== localizationText(lang)) {

@@ -11,6 +11,7 @@ import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useNavigate } from '@tonkeeper/uikit/src/hooks/router/useNavigate';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { CountryInfo } from './plugins/country-info-plugin';
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -47,16 +48,21 @@ export const useAppWidth = () => {
     }, []);
 };
 
-export const useAnalytics = (version: string, activeAccount?: Account, accounts?: Account[]) => {
+export const useAnalytics = (
+    version: string,
+    config: TonendpointConfig | undefined,
+    activeAccount?: Account,
+    accounts?: Account[]
+) => {
     const network = useActiveTonNetwork();
     const sdk = useAppSdk();
 
     return useQuery<Analytics>(
-        [QueryKey.analytics],
+        [QueryKey.analytics, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
             const tracker = new Aptabase({
-                host: import.meta.env.VITE_APP_APTABASE_HOST,
-                key: import.meta.env.VITE_APP_APTABASE,
+                host: config!.aptabaseEndpoint,
+                key: config!.aptabaseKey ?? import.meta.env.VITE_APP_APTABASE,
                 appVersion: version,
                 userIdentity: sdk.userIdentity
             });
@@ -72,7 +78,7 @@ export const useAnalytics = (version: string, activeAccount?: Account, accounts?
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount !== undefined }
+        { enabled: accounts != null && activeAccount !== undefined && config !== undefined }
     );
 };
 
