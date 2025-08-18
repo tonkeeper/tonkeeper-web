@@ -225,7 +225,11 @@ export const Loader: FC = React.memo(() => {
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts);
+    const { data: tracker } = useAnalytics(
+        serverConfig?.mainnetConfig,
+        activeAccount || undefined,
+        accounts
+    );
 
     if (
         activeWalletLoading ||
