@@ -10,6 +10,7 @@ import { ClientColumns, useDashboardColumnsAsForm } from './useDashboardColumns'
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import { useAccountsOrdered } from '../folders';
 import { seeIfMainnnetAccount, Account } from '@tonkeeper/core/dist/entries/account';
+import { useAppSdk } from '../../hooks/appSdk';
 
 const sortedAccountWallets = (a: Account) => {
     if (a.type === 'mnemonic' || a.type === 'ton-only') {
@@ -20,6 +21,7 @@ const sortedAccountWallets = (a: Account) => {
 };
 
 export function useDashboardData() {
+    const sdk = useAppSdk();
     const { data: columns } = useDashboardColumnsAsForm();
     const selectedColumns = columns?.filter(c => c.isEnabled);
     const { fiat } = useAppContext();
@@ -55,7 +57,8 @@ export function useDashboardData() {
                 if (queryToFetch.columns.length > 0) {
                     fetchResult = await getDashboardData(queryToFetch, {
                         currency: fiat,
-                        lang: language
+                        lang: language,
+                        token: await sdk.authService.getToken()
                     });
                 }
 

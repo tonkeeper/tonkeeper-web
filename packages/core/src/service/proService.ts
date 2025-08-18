@@ -299,8 +299,10 @@ export async function getDashboardData(
         accounts: string[];
         columns: string[];
     },
-    options?: { lang?: string; currency?: FiatCurrencies }
+    options?: { lang?: string; currency?: FiatCurrencies; token: string | null }
 ): Promise<DashboardRow[]> {
+    const authToken = options?.token ? `Bearer ${options.token}` : undefined;
+
     let lang = Lang.EN;
     if (Object.values(Lang).includes(options?.lang as Lang)) {
         lang = options?.lang as Lang;
@@ -315,7 +317,7 @@ export async function getDashboardData(
         currency = options?.currency as unknown as CurrenciesGenerated;
     }
 
-    const result = await DashboardsService.getDashboardData(lang, currency, query);
+    const result = await DashboardsService.getDashboardData(lang, currency, authToken, query);
 
     return result.items.map((row, index) => ({
         id: query.accounts[index],

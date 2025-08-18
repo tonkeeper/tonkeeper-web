@@ -35,6 +35,7 @@ import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
+import { useAppSdk } from '../hooks/appSdk';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -183,6 +184,7 @@ export const useWalletTotalBalance = () => {
 };
 
 export const useAllWalletsTotalBalance = (network: Network) => {
+    const sdk = useAppSdk();
     const fiat = useUserFiat();
     const allAccounts = useAccountsState();
     const allWalletsAddresses = useMemo(
@@ -202,7 +204,8 @@ export const useAllWalletsTotalBalance = (network: Network) => {
                 columns: ['total_balance']
             };
             const result = await getDashboardData(queryToFetch, {
-                currency: fiat
+                currency: fiat,
+                token: await sdk.authService.getToken()
             });
 
             return result
@@ -213,6 +216,7 @@ export const useAllWalletsTotalBalance = (network: Network) => {
 };
 
 export const useAccountTotalBalance = () => {
+    const sdk = useAppSdk();
     const fiat = useUserFiat();
     const account = useActiveAccount();
     const allWalletsAddresses = useMemo(
@@ -230,7 +234,8 @@ export const useAccountTotalBalance = () => {
                 columns: ['total_balance']
             };
             const result = await getDashboardData(queryToFetch, {
-                currency: fiat
+                currency: fiat,
+                token: await sdk.authService.getToken()
             });
 
             const totalTonAssetsBalances = result
