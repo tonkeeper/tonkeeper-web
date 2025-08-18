@@ -8,16 +8,16 @@ import { request as __request } from '../core/request';
 export class IapService {
     /**
      * Activate Pro subscription via IAP purchase
-     * @param requestBody Data that is expected
      * @param authorization
+     * @param requestBody Data that is expected
      * @returns any Ok
      * @throws ApiError
      */
     public static activateIapPurchase(
+        authorization: string,
         requestBody: {
             original_transaction_id: string;
         },
-        authorization?: string,
     ): CancelablePromise<{
         ok: boolean;
         auth_token?: string;

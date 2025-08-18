@@ -14,7 +14,7 @@ export class UsersService {
      * @throws ApiError
      */
     public static getUserInfo(
-        authorization?: string,
+        authorization: string,
     ): CancelablePromise<{
         pub_key?: string;
         version?: string;
@@ -42,7 +42,7 @@ export class UsersService {
      * @throws ApiError
      */
     public static verifySubscription(
-        authorization?: string,
+        authorization: string,
     ): CancelablePromise<SubscriptionVerification> {
         return __request(OpenAPI, {
             method: 'GET',

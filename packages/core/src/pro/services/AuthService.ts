@@ -57,7 +57,7 @@ export class AuthService {
      * @throws ApiError
      */
     public static logout(
-        authorization?: string,
+        authorization: string,
     ): CancelablePromise<{
         ok: boolean;
         auth_token?: string;

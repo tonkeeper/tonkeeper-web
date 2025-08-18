@@ -17,7 +17,7 @@ export class InvoicesService {
      * @throws ApiError
      */
     public static createInvoice(
-        authorization?: string,
+        authorization: string,
         requestBody?: {
             tier_id: number;
             promo_code?: string;
@@ -42,17 +42,22 @@ export class InvoicesService {
     /**
      * Get invoice details
      * @param id Invoice ID
+     * @param authorization
      * @returns Invoice Invoice details retrieved successfully
      * @throws ApiError
      */
     public static getInvoice(
         id: string,
+        authorization: string,
     ): CancelablePromise<Invoice> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/invoice/{id}',
             path: {
                 'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
             },
             errors: {
                 400: `Something went wrong on client side`,
