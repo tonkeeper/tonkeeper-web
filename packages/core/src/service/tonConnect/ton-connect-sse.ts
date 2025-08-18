@@ -56,8 +56,6 @@ export const createBridgeEndpointFetcher =
                     fetchApi: fetch
                 }
             );
-            const country = await tonendpoint.country();
-            tonendpoint.setCountryCode(country.country);
             const config = await getServerConfig(tonendpoint, Network.MAINNET);
             return config.ton_connect_bridge;
         } catch (e) {

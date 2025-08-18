@@ -10,7 +10,8 @@ export interface BootParams {
     lang: 'en' | 'ru' | string;
     build: string;
     network: Network;
-    countryCode?: string | null;
+    store_country_code?: string;
+    device_country_code?: string;
 }
 interface BootOptions {
     fetchApi?: FetchAPI;
@@ -25,7 +26,7 @@ export interface TonendpointConfig {
         disable_tron: boolean;
         disable_battery: boolean;
         disable_gaseless: boolean;
-        diable_swaps: boolean;
+        disable_swap: boolean;
         disable_2fa: boolean;
     };
 
@@ -101,7 +102,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
         disable_tron: false,
         disable_battery: false,
         disable_gaseless: false,
-        diable_swaps: false,
+        disable_swap: false,
         disable_2fa: false
     },
     ton_connect_bridge: 'https://bridge.tonapi.io',
@@ -164,20 +165,17 @@ export class Tonendpoint {
             build,
             network,
             platform,
-            countryCode,
-            targetEnv
+            targetEnv,
+            store_country_code,
+            device_country_code
         }: BootParams & { targetEnv: TargetEnv },
         { fetchApi = defaultFetch, basePath = defaultTonendpointUrl }: BootOptions = {}
     ) {
         this.targetEnv = targetEnv;
-        this.params = { lang, build, network, platform, countryCode };
+        this.params = { lang, build, network, platform, store_country_code, device_country_code };
         this.fetchApi = fetchApi;
         this.basePath = basePath;
     }
-
-    setCountryCode = (countryCode?: string | null | undefined) => {
-        this.params.countryCode = countryCode;
-    };
 
     toSearchParams = (
         rewriteParams?: Partial<BootParams>,
@@ -192,10 +190,17 @@ export class Tonendpoint {
                     : 'mainnet',
             platform: rewriteParams?.platform ?? this.params.platform
         });
-        const countryCode = rewriteParams?.countryCode ?? this.params.countryCode;
 
-        if (countryCode) {
-            params.append('countryCode', countryCode);
+        const device_country_code =
+            rewriteParams?.device_country_code ?? this.params.device_country_code;
+        if (device_country_code) {
+            params.append('device_country_code', device_country_code);
+        }
+
+        const store_country_code =
+            rewriteParams?.store_country_code ?? this.params.store_country_code;
+        if (store_country_code) {
+            params.append('store_country_code', store_country_code);
         }
 
         if (!additionalParams) {

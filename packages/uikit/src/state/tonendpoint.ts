@@ -15,19 +15,24 @@ import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 import { useToQueryKeyPart } from '../hooks/useToQueryKeyPart';
 import { useActiveConfig } from './wallet';
+import { useUserCountry } from './country';
 
 export const useTonendpoint = ({
     targetEnv,
     build,
     network = Network.MAINNET,
     lang = Language.EN,
-    platform
+    platform,
+    deviceCountryCode,
+    storeCountryCode
 }: {
     targetEnv: TargetEnv;
     build: string;
     network?: Network;
     lang?: Language;
     platform: BootParams['platform'];
+    deviceCountryCode?: string | null;
+    storeCountryCode?: string | null;
 }) => {
     return useMemo(() => {
         return new Tonendpoint({
@@ -35,9 +40,11 @@ export const useTonendpoint = ({
             network,
             lang: localizationText(lang),
             targetEnv,
-            platform
+            platform,
+            device_country_code: deviceCountryCode ?? undefined,
+            store_country_code: storeCountryCode ?? undefined
         });
-    }, [targetEnv, build, network, lang, platform]);
+    }, [targetEnv, build, network, lang, platform, deviceCountryCode, storeCountryCode]);
 };
 
 export interface ServerConfig {
@@ -51,8 +58,6 @@ export const useTonenpointConfig = (tonendpoint: Tonendpoint) => {
     return useQuery<ServerConfig, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.config, tonendpointKey],
         async () => {
-            const country = await tonendpoint.country();
-            tonendpoint.setCountryCode(country.country);
             return {
                 mainnetConfig: await getServerConfig(tonendpoint, Network.MAINNET),
                 testnetConfig: await getServerConfig(tonendpoint, Network.TESTNET)
@@ -65,15 +70,15 @@ export const DefaultRefetchInterval = 60000; // 60 sec
 
 export const useTonendpointBuyMethods = () => {
     const { tonendpoint } = useAppContext();
+    const { data: countryCode } = useUserCountry();
+
     return useQuery<TonendpoinFiatCategory, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang],
         async () => {
             const methods = await tonendpoint.getFiatMethods();
             const buy = methods.categories[0];
 
-            const layout = methods.layoutByCountry.find(
-                item => item.countryCode === tonendpoint.params.countryCode
-            );
+            const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
 
             const buildMethods = (acc: TonendpoinFiatItem[], id: string) => {
                 const method = buy.items.find(item => item.id === id);
@@ -89,6 +94,9 @@ export const useTonendpointBuyMethods = () => {
                     ? layout.methods.reduce(buildMethods, [] as TonendpoinFiatItem[])
                     : methods.defaultLayout.methods.reduce(buildMethods, [] as TonendpoinFiatItem[])
             };
+        },
+        {
+            enabled: !!countryCode
         }
     );
 };
@@ -131,7 +139,7 @@ export enum FLAGGED_FEATURE {
 const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = {
     battery: 'disable_battery',
     gasless: 'disable_gaseless',
-    swaps: 'diable_swaps',
+    swaps: 'disable_swap',
     tron: 'disable_tron',
     '2fa': 'disable_2fa'
 };

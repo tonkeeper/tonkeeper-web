@@ -10,6 +10,7 @@ import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useNavigate } from '@tonkeeper/uikit/src/hooks/router/useNavigate';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { CountryInfo } from './plugins/country-info-plugin';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -110,4 +111,14 @@ export const useLayout = () => {
         };
     }, [navigate, setMobile]);
     return isMobile;
+};
+
+export const useDeviceCountryInfo = () => {
+    return useQuery(
+        ['deviceCountryInfo'],
+        async () => {
+            return CountryInfo.getInfo();
+        },
+        { suspense: true, staleTime: Infinity }
+    );
 };
