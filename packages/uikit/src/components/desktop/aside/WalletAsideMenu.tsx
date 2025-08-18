@@ -34,10 +34,10 @@ import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv } from '../../shared/TargetEnv';
 import { useCallback, useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
-import { HideForRegulatoryState } from '../../HideForState';
-import { CountryFeature } from '../../../state/country';
 import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
 import { useHideActiveBrowserTab, useIsBrowserOpened } from '../../../state/dapp-browser';
+import { IfFeatureEnabled } from '../../shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../../state/tonendpoint';
 
 const WalletAsideContainer = styled.div`
     overflow: auto;
@@ -199,7 +199,7 @@ const SwapItem = () => {
     const isBrowserOpened = useIsBrowserOpened();
 
     return (
-        <HideForRegulatoryState feature={CountryFeature.swap}>
+        <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
             {!isReadOnly && !isTestnet && (
                 <NavLink to={AppRoute.swap} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
@@ -210,7 +210,7 @@ const SwapItem = () => {
                     )}
                 </NavLink>
             )}
-        </HideForRegulatoryState>
+        </IfFeatureEnabled>
     );
 };
 

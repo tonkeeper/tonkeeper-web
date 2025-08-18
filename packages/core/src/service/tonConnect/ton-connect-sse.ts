@@ -81,7 +81,7 @@ export class TonConnectSSE {
 
     private readonly listeners: Listeners;
 
-    private readonly bridgeEndpoint: Promise<string | undefined>;
+    private readonly bridgeEndpoint: Promise<string>;
 
     public get currentConnections() {
         return this.connections;
@@ -95,7 +95,7 @@ export class TonConnectSSE {
     }: {
         storage: IStorage;
         listeners: Listeners;
-        bridgeEndpointFetcher: () => Promise<string | undefined>;
+        bridgeEndpointFetcher: () => Promise<string>;
         system?: System;
     }) {
         this.storage = storage;

@@ -600,7 +600,7 @@ export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> 
     children
 }) => {
     const config = useActiveConfig();
-    const url = config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
+    const url = config.transactionExplorer;
     return (
         <CommonActionDetailsBlock url={url} eventId={event.eventId}>
             {children}

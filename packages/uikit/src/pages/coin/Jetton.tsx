@@ -29,8 +29,8 @@ import { useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import EmptyActivity from '../../components/activity/EmptyActivity';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
-import { HideForRegulatoryState } from '../../components/HideForState';
-import { CountryFeature } from '../../state/country';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
 export const MobileAssetHistory: FC<{
     assetAddress: string;
@@ -131,9 +131,9 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
                         <SendAction asset={info.metadata.address} chain={BLOCKCHAIN_NAME.TON} />
                     )}
                     <ReceiveAction jetton={info.metadata.address} />
-                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                         {swapAsset && <SwapAction fromAsset={swapAsset} />}
-                    </HideForRegulatoryState>
+                    </IfFeatureEnabled>
                 </ActionsRow>
 
                 <MobileAssetHistory assetAddress={balance.jetton.address} innerRef={ref} />

@@ -26,7 +26,7 @@ import {
     isAccountVersionEditable,
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
-import { useBatteryEnabledConfig } from '../../state/battery';
+import { useCanUseBattery } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -38,7 +38,7 @@ const SingleAccountSettings = () => {
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { onOpen: rename } = useRenameNotification();
-    const batteryEnableConfig = useBatteryEnabledConfig();
+    const canUseBattery = useCanUseBattery();
     const twoFAEnabled = useCanViewTwoFA();
     const canUseTron = useCanUseTronForActiveWallet();
 
@@ -155,8 +155,7 @@ const SingleAccountSettings = () => {
             });
         }
 
-        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
-        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+        if (canUseBattery) {
             items.push({
                 name: t('battery_title'),
                 icon: <BatteryIcon />,
@@ -173,7 +172,7 @@ const SingleAccountSettings = () => {
         }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
+    }, [t, navigate, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron]);
 
     return (
         <>
@@ -191,7 +190,7 @@ const MultipleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
-    const batteryEnableConfig = useBatteryEnabledConfig();
+    const canUseBattery = useCanUseBattery();
     const twoFAEnabled = useCanViewTwoFA();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
@@ -315,8 +314,7 @@ const MultipleAccountSettings = () => {
             });
         }
 
-        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
-        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+        if (canUseBattery) {
             items.push({
                 name: t('battery_title'),
                 icon: <BatteryIcon />,
@@ -338,7 +336,7 @@ const MultipleAccountSettings = () => {
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
+    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron]);
 
     return (
         <>

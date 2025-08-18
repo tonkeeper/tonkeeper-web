@@ -1,13 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAppContext } from '../../hooks/appContext';
 import { QueryKey } from '../../libs/queryKey';
-import { DefaultRefetchInterval } from '../tonendpoint';
-import {
-    useActiveAccount,
-    useActiveConfig,
-    useActiveTonWalletConfig,
-    useAddTronToAccount
-} from '../wallet';
+import { DefaultRefetchInterval, FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
+import { useActiveAccount, useActiveTonWalletConfig, useAddTronToAccount } from '../wallet';
 import { useEffect, useMemo } from 'react';
 import { isAccountTronCompatible } from '@tonkeeper/core/dist/entries/account';
 import { TronWallet } from '@tonkeeper/core/dist/entries/tron/tron-wallet';
@@ -21,7 +16,6 @@ import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset'
 import { useBatteryApi } from '../battery';
 import { useGlobalPreferences, useMutateGlobalPreferences } from '../global-preferences';
 import { useToggleHideJettonMutation } from '../jetton';
-import { useIsOnIosReview } from '../../hooks/ios';
 
 export const useIsTronEnabledForActiveWallet = () => {
     const isTronEnabled = useIsTronEnabledGlobally();
@@ -68,17 +62,14 @@ export const useTronApi = () => {
     const appContext = useAppContext();
     const apiKey = appContext.env?.tronApiKey;
 
-    const apiUrl = appContext.mainnetConfig.tron_api_url || 'https://api.trongrid.io';
+    const apiUrl = appContext.mainnetConfig.tron_api_url;
     const batteryApi = useBatteryApi();
 
     return useMemo(() => new TronApi({ baseURL: apiUrl, apiKey }, batteryApi), [apiKey, apiUrl]);
 };
 
 export const useIsTronEnabledGlobally = () => {
-    const config = useActiveConfig();
-    const isOnReview = useIsOnIosReview();
-
-    return !config.flags?.disable_tron && !isOnReview;
+    return useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 };
 
 export const useCanUseTronForActiveWallet = () => {

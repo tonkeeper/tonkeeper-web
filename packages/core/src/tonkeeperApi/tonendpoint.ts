@@ -8,7 +8,7 @@ import { assertUnreachable } from '../utils/types';
 export interface BootParams {
     platform: 'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'swap_widget_web';
     lang: 'en' | 'ru' | string;
-    build: string; // "2.8.0"
+    build: string;
     network: Network;
     countryCode?: string | null;
 }
@@ -20,60 +20,51 @@ interface BootOptions {
 type TonendpointResponse<Data> = { success: false } | { success: true; data: Data };
 
 export interface TonendpointConfig {
-    flags?: { [key: string]: boolean };
-    tonendpoint: string;
+    flags: {
+        disable_staking: boolean;
+        disable_tron: boolean;
+        disable_battery: boolean;
+        disable_gaseless: boolean;
+        diable_swaps: boolean;
+        disable_2fa: boolean;
+    };
 
-    ton_connect_bridge?: string;
-    tonapiV2Endpoint?: string;
+    ton_connect_bridge: string;
+    tonapiV2Endpoint: string;
     tonApiV2Key?: string;
-    tonapiIOEndpoint?: string;
+    tonapiIOEndpoint: string;
+    tron_api_url: string;
 
     exchangePostUrl?: string;
-    supportLink?: string;
-    tonkeeperNewsUrl?: string;
-    mam_learn_more_url?: string;
-
     mercuryoSecret?: string;
+    mercuryo_otc_id?: string;
+    featured_play_interval: number;
 
     directSupportUrl?: string;
     faq_url?: string;
+    supportLink?: string;
+    tonkeeperNewsUrl?: string;
+    scam_api_url?: string;
 
-    accountExplorer?: string;
-    transactionExplorer?: string;
-    NFTOnExplorerUrl?: string;
-
-    featured_play_interval?: number;
+    accountExplorer: string;
+    transactionExplorer: string;
+    NFTOnExplorerUrl: string;
 
     web_swaps_url?: string;
     web_swaps_referral_address?: string;
 
-    mercuryo_otc_id?: string;
-
-    scam_api_url?: string;
-
-    mam_max_wallets_without_pro?: number;
-
-    /**
-     * @deprecated use ton api
-     */
-    tonEndpoint: string;
-    /**
-     * @deprecated use ton api
-     */
-    tonEndpointAPIKey?: string;
+    mam_learn_more_url?: string;
+    mam_max_wallets_without_pro: number;
 
     multisig_help_url?: string;
-
     multisig_about_url?: string;
 
-    batteryHost?: string;
-    batteryMeanFees?: string;
+    batteryHost: string;
+    batteryMeanFees: string;
     batteryRefundEndpoint?: string;
-    batteryReservedAmount?: string;
-    battery_beta?: boolean;
-    disable_battery?: boolean;
-    disable_battery_send?: boolean;
-    battery_packages?: {
+    batteryReservedAmount: string;
+    disable_battery: boolean;
+    battery_packages: {
         value: number;
         image: string;
     }[];
@@ -85,11 +76,9 @@ export interface TonendpointConfig {
 
     '2fa_public_key'?: string;
     '2fa_api_url'?: string;
-    '2fa_tg_confirm_send_message_ttl_seconds'?: number;
-    '2fa_tg_linked_ttl_seconds'?: number;
+    '2fa_tg_confirm_send_message_ttl_seconds': number;
+    '2fa_tg_linked_ttl_seconds': number;
     '2fa_bot_url'?: string;
-
-    tron_api_url?: string;
 
     enhanced_acs_pmob?: {
         code?: string;
@@ -98,23 +87,65 @@ export interface TonendpointConfig {
 
     pro_mobile_app_appstore_link?: string;
     pro_landing_url?: string;
-    pro_terms_of_use?: string;
-    privacy_policy?: string;
-    terms_of_use?: string;
+
+    pro_terms_of_use: string;
+    privacy_policy: string;
+    terms_of_use: string;
 }
+
+const defaultTonendpointUrl = 'https://api.tonkeeper.com';
+
+export const defaultTonendpointConfig: TonendpointConfig = {
+    flags: {
+        disable_staking: false,
+        disable_tron: false,
+        disable_battery: false,
+        disable_gaseless: false,
+        diable_swaps: false,
+        disable_2fa: false
+    },
+    ton_connect_bridge: 'https://bridge.tonapi.io',
+    tonapiV2Endpoint: 'https://keeper.tonapi.io',
+    tonapiIOEndpoint: 'https://keeper.tonapi.io',
+    tron_api_url: 'https://api.trongrid.io',
+    batteryHost: 'https://battery.tonkeeper.com',
+    batteryMeanFees: '0.0026',
+    batteryReservedAmount: '0.065',
+    disable_battery: false,
+    battery_packages: [
+        {
+            value: 1000,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-max.png'
+        },
+        {
+            value: 400,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-100.png'
+        },
+        {
+            value: 250,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-75.png'
+        },
+        {
+            value: 150,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-25.png'
+        }
+    ],
+    accountExplorer: 'https://tonviewer.com/%s',
+    transactionExplorer: 'https://tonviewer.com/transaction/%s',
+    NFTOnExplorerUrl: 'https://tonviewer.com/nft/%s',
+    featured_play_interval: 1000 * 10,
+    mam_max_wallets_without_pro: 3,
+    '2fa_tg_confirm_send_message_ttl_seconds': 600,
+    '2fa_tg_linked_ttl_seconds': 600,
+    pro_terms_of_use: 'https://tonkeeper.com/pro-terms',
+    privacy_policy: 'https://tonkeeper.com/privacy',
+    terms_of_use: 'https://tonkeeper.com/terms'
+};
 
 interface CountryIP {
     ip: string;
     country: string;
 }
-
-const defaultTonendpoint = 'https://api.tonkeeper.com';
-
-export const defaultTonendpointConfig: TonendpointConfig = {
-    tonendpoint: defaultTonendpoint,
-    tonEndpoint: '',
-    flags: {}
-};
 
 const defaultFetch: FetchAPI = (input, init) => window.fetch(input, init);
 
@@ -136,7 +167,7 @@ export class Tonendpoint {
             countryCode,
             targetEnv
         }: BootParams & { targetEnv: TargetEnv },
-        { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions = {}
+        { fetchApi = defaultFetch, basePath = defaultTonendpointUrl }: BootOptions = {}
     ) {
         this.targetEnv = targetEnv;
         this.params = { lang, build, network, platform, countryCode };
@@ -249,8 +280,12 @@ export const getServerConfig = async (
     const result = await tonendpoint.boot(network);
 
     return {
-        flags: {},
-        ...result
+        ...defaultTonendpointConfig,
+        ...result,
+        flags: {
+            ...defaultTonendpointConfig.flags,
+            ...result.flags
+        }
     };
 };
 

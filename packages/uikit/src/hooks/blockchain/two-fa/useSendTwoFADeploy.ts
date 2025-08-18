@@ -11,14 +11,11 @@ import {
 import { useNotifyErrorHandle } from '../../useNotification';
 import { EXTERNAL_SENDER_CHOICE, useGetSender } from '../useSender';
 import { useTonRawTransactionService } from '../useBlockchainService';
-import {
-    useIsTwoFAEnabledGlobally,
-    useTwoFAServiceConfig,
-    useTwoFAWalletConfig
-} from '../../../state/two-fa';
+import { useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { QueryKey } from '../../../libs/queryKey';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../../state/tonendpoint';
 
 export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const track = useAnalyticsTrack();
@@ -27,7 +24,7 @@ export function useSendTwoFADeploy(estimation: Estimation<TonAsset>) {
     const getSender = useGetSender();
     const rawTransactionService = useTonRawTransactionService();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
-    const isTwoFAEnabledGlobally = useIsTwoFAEnabledGlobally();
+    const isTwoFAEnabledGlobally = useIsFeatureEnabled(FLAGGED_FEATURE.TWO_FA);
     const wallet = useActiveWallet();
     const { servicePubKey } = useTwoFAServiceConfig();
     const api = useActiveApi();

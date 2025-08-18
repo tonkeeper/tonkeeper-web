@@ -15,7 +15,7 @@ export const switchNetwork = (current: Network): Network => {
 
 export const getTonClientV2 = (config: TonendpointConfig) => {
     return new ConfigurationV2({
-        basePath: config.tonapiV2Endpoint ?? 'https://keeper.tonapi.io',
+        basePath: config.tonapiV2Endpoint,
         headers: {
             Authorization: `Bearer ${config.tonApiV2Key}`
         }

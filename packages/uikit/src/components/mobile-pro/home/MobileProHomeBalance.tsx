@@ -15,7 +15,7 @@ import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useInternetConnection } from '../../../hooks/useInternetConnection';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { BatteryBalanceIcon } from '../../settings/battery/BatteryInfoHeading';
 
@@ -83,7 +83,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     const network = useActiveTonNetwork();
     const { data: batteryBalance } = useBatteryBalance();
     const navigate = useNavigate();
-    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
+    const canUseBattery = useCanUseBattery();
 
     let content;
 
@@ -92,7 +92,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
             <AddressMultiChain top="80px">
                 <Row>
                     <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
-                    {batteryBalance?.batteryUnitsBalance.gt(0) && !disableWholeBattery && (
+                    {batteryBalance?.batteryUnitsBalance.gt(0) && canUseBattery && (
                         <BatteryBalanceIcon
                             onClick={e => {
                                 e.stopPropagation();
@@ -122,7 +122,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
             <ClickWrapper onClick={() => isConnected && sdk.copyToClipboard(userFriendlyAddress)}>
                 <Row>
                     <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
-                    {batteryBalance?.batteryUnitsBalance.gt(0) && !disableWholeBattery && (
+                    {batteryBalance?.batteryUnitsBalance.gt(0) && canUseBattery && (
                         <BatteryBalanceIcon
                             onClick={e => {
                                 e.stopPropagation();

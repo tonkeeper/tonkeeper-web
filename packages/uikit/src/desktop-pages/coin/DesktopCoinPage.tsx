@@ -26,7 +26,7 @@ import { useAssets } from '../../state/home';
 import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
-import { useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
@@ -51,11 +51,10 @@ import { Link } from '../../components/shared/Link';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
-import { HideForRegulatoryState } from '../../components/HideForState';
-import { CountryFeature } from '../../state/country';
 import { Redirect } from 'react-router-dom';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -173,14 +172,14 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     {t('wallet_receive')}
                 </ButtonStyled>
                 <HideOnReview>
-                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                         {swapAsset && (
                             <ButtonStyled size="small" onClick={onSwap}>
                                 <SwapIcon />
                                 {t('wallet_swap')}
                             </ButtonStyled>
                         )}
-                    </HideForRegulatoryState>
+                    </IfFeatureEnabled>
 
                     {canBuy && (
                         <ButtonStyled size="small" onClick={onOpen}>

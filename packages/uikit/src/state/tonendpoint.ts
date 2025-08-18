@@ -14,6 +14,7 @@ import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
 import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 import { useToQueryKeyPart } from '../hooks/useToQueryKeyPart';
+import { useActiveConfig } from './wallet';
 
 export const useTonendpoint = ({
     targetEnv,
@@ -119,3 +120,23 @@ export const useCreateMercuryoProUrl = () => {
         }
     });
 };
+
+export enum FLAGGED_FEATURE {
+    BATTERY = 'battery',
+    GASLESS = 'gasless',
+    SWAPS = 'swaps',
+    TRON = 'tron',
+    TWO_FA = '2fa'
+}
+const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = {
+    battery: 'disable_battery',
+    gasless: 'disable_gaseless',
+    swaps: 'diable_swaps',
+    tron: 'disable_tron',
+    '2fa': 'disable_2fa'
+};
+
+export function useIsFeatureEnabled(feature: FLAGGED_FEATURE) {
+    const config = useActiveConfig();
+    return !config.flags[flagsMapping[feature]];
+}

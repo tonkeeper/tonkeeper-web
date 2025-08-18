@@ -27,23 +27,35 @@ import {
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useTwoFAWalletConfig } from './two-fa';
 import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/battery/BatteryIcons';
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
-import { useIsOnIosReview } from '../hooks/ios';
+import { useTwoFAWalletConfig } from './two-fa';
+import { Network } from '@tonkeeper/core/dist/entries/network';
 
 export const useCanUseBattery = () => {
-    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
+    const network = useActiveTonNetwork();
+    const {
+        flags: { disable_battery: disableBatteryFlag }
+    } = useActiveConfig();
+    const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const account = useActiveAccount();
-    return (account.type === 'mnemonic' || account.type === 'mam') && !disableWholeBattery;
+
+    const isAccountSuitable = account.type === 'mnemonic' || account.type === 'mam';
+
+    let disableDueToTwoFA = false;
+    if (network === Network.MAINNET) {
+        disableDueToTwoFA =
+            twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
+    }
+
+    return isAccountSuitable && !disableDueToTwoFA && !disableBatteryFlag;
 };
 
 export const useBatteryApi = () => {
     const config = useActiveConfig();
     return useMemo(() => {
         return new Configuration({
-            basePath: config.batteryHost || 'https://battery.tonkeeper.com'
+            basePath: config.batteryHost
         });
     }, []);
 };
@@ -223,43 +235,7 @@ export const useProvideBatteryAuth = () => {
 export const useBatteryUnitTonRate = () => {
     const { batteryMeanFees } = useActiveConfig();
 
-    return useMemo(() => new BigNumber(batteryMeanFees || '0.0026'), [batteryMeanFees]);
-};
-
-export const useBatteryEnabledConfig = () => {
-    const network = useActiveTonNetwork();
-    const { battery_beta, disable_battery, disable_battery_send } = useActiveConfig();
-    const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
-    const disableDueToIosReview = useIsOnIosReview();
-
-    const disableDueToTwoFA =
-        twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
-
-    return useMemo(() => {
-        if (network === Network.TESTNET) {
-            return {
-                isBeta: false,
-                disableWhole: disableDueToIosReview,
-                disableOperations: disableDueToIosReview
-            };
-        }
-
-        const disableWhole =
-            disableDueToIosReview || disableDueToTwoFA || (disable_battery ?? false);
-
-        return {
-            isBeta: battery_beta ?? false,
-            disableWhole,
-            disableOperations: disableWhole ? true : disable_battery_send ?? false
-        };
-    }, [
-        battery_beta,
-        disable_battery,
-        disable_battery_send,
-        network,
-        disableDueToTwoFA,
-        disableDueToIosReview
-    ]);
+    return useMemo(() => new BigNumber(batteryMeanFees), [batteryMeanFees]);
 };
 
 /**
@@ -384,7 +360,7 @@ export const useBatteryShouldBeReservedAmount = () => {
             return undefined;
         }
 
-        const configReservedAmount = new BigNumber(config.batteryReservedAmount || 0.065);
+        const configReservedAmount = new BigNumber(config.batteryReservedAmount);
 
         const tonUnitsToReserve = configReservedAmount.minus(
             balance.tonUnitsReserved.relativeAmount
@@ -432,35 +408,7 @@ export const useBatteryPacks = () => {
     const rate = useBatteryUnitTonRate();
     const config = useActiveConfig();
 
-    const configPackages = useMemo<
-        {
-            value: number;
-            image: string;
-        }[]
-    >(() => {
-        if (!config.battery_packages) {
-            return [
-                {
-                    value: 1000,
-                    image: 'https://wallet.tonkeeper.com/img/battery/battery-max.png'
-                },
-                {
-                    value: 400,
-                    image: 'https://wallet.tonkeeper.com/img/battery/battery-100.png'
-                },
-                {
-                    value: 250,
-                    image: 'https://wallet.tonkeeper.com/img/battery/battery-75.png'
-                },
-                {
-                    value: 150,
-                    image: 'https://wallet.tonkeeper.com/img/battery/battery-25.png'
-                }
-            ];
-        }
-
-        return config.battery_packages;
-    }, [config.battery_packages]);
+    const configPackages = config.battery_packages;
 
     return useMemo(() => {
         const shouldUseSvgImages = configPackages.every(p =>

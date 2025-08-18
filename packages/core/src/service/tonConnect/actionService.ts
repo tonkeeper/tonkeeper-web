@@ -6,7 +6,7 @@ export const replyHttpBadRequestResponse = async ({
     connection,
     request: { id, method },
     bridgeEndpoint
-}: TonConnectAppRequest<'http'> & { bridgeEndpoint: string | undefined }) => {
+}: TonConnectAppRequest<'http'> & { bridgeEndpoint: string }) => {
     await sendEventToBridge({
         response: sendBadRequestResponse(id, method),
         sessionKeyPair: connection.sessionKeyPair,
@@ -21,7 +21,7 @@ export const replyHttpDisconnectResponse = async ({
     bridgeEndpoint
 }: Pick<TonConnectAppRequest<'http'>, 'connection'> & {
     request: Pick<TonConnectAppRequest<'http'>['request'], 'id'>;
-    bridgeEndpoint: string | undefined;
+    bridgeEndpoint: string;
 }) => {
     await sendEventToBridge({
         response: disconnectResponse(id),

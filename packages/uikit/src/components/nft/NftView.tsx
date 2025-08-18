@@ -181,7 +181,7 @@ export const NftPreview: FC<{
     const config = useActiveConfig();
     const sdk = useAppSdk();
 
-    const explorerUrl = config.NFTOnExplorerUrl ?? 'https://tonviewer.com/nft/%s';
+    const explorerUrl = config.NFTOnExplorerUrl;
 
     return (
         <NotificationBlock>

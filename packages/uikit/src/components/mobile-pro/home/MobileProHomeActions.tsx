@@ -12,8 +12,8 @@ import { hexToRGBA } from '../../../libs/css';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../../state/wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../ios/HideOnReview';
-import { CountryFeature, useIsFeatureAvailableForRegulatoryState } from '../../../state/country';
 import { useOpenBrowserTab } from '../../../state/dapp-browser';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../../state/tonendpoint';
 
 const Grid = styled.div`
     display: grid;
@@ -125,7 +125,7 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
 
     const isReadOnly = useIsActiveWalletWatchOnly();
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
-    const swapAvailable = useIsFeatureAvailableForRegulatoryState(CountryFeature.swap);
+    const swapAvailable = useIsFeatureEnabled(FLAGGED_FEATURE.SWAPS);
 
     return (
         <Grid className={className}>

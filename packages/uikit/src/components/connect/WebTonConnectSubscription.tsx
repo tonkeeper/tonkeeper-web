@@ -22,11 +22,9 @@ import { TonConnectRequestNotification } from './TonConnectRequestNotification';
 import { useAppContext } from '../../hooks/appContext';
 
 const useUnSupportMethodMutation = () => {
-    return useMutation<
-        void,
-        Error,
-        TonConnectAppRequest<'http'> & { bridgeEndpoint: string | undefined }
-    >(replyHttpBadRequestResponse);
+    return useMutation<void, Error, TonConnectAppRequest<'http'> & { bridgeEndpoint: string }>(
+        replyHttpBadRequestResponse
+    );
 };
 
 const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';

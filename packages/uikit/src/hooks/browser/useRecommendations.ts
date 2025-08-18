@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Recommendations } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 import { QueryKey } from '../../libs/queryKey';
-import { useUserCountry } from '../../state/country';
 import { useAppContext } from '../appContext';
 
 function shuffle<T>(array: T[]) {
@@ -10,7 +9,7 @@ function shuffle<T>(array: T[]) {
     // While there remain elements to shuffle...
     while (currentIndex != 0) {
         // Pick a remaining element...
-        let randomIndex = Math.floor(Math.random() * currentIndex);
+        const randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex--;
 
         // And swap it with the current element.

@@ -13,7 +13,6 @@ import { SessionCrypto } from './protocol';
 import { AccountConnectionHttp } from './connectionService';
 import { removeLastSlash } from '../../utils/url';
 
-const defaultBridgeEndpoint = 'https://bridge.tonapi.io';
 const defaultTtl = 300;
 
 export const sendEventToBridge = async <T extends RpcMethod>({
@@ -27,12 +26,12 @@ export const sendEventToBridge = async <T extends RpcMethod>({
     sessionKeyPair: KeyPair;
     clientSessionId: string;
     ttl?: number;
-    bridgeEndpoint: string | undefined;
+    bridgeEndpoint: string;
 }) => {
     const sessionCrypto = new SessionCrypto(sessionKeyPair);
-    const url = `${removeLastSlash(
-        bridgeEndpoint ?? defaultBridgeEndpoint
-    )}/bridge/message?client_id=${sessionCrypto.sessionId}&to=${clientSessionId}&ttl=${ttl}`;
+    const url = `${removeLastSlash(bridgeEndpoint)}/bridge/message?client_id=${
+        sessionCrypto.sessionId
+    }&to=${clientSessionId}&ttl=${ttl}`;
 
     const encodedResponse = sessionCrypto.encrypt(
         JSON.stringify(response),
@@ -70,7 +69,7 @@ export const subscribeTonConnect = ({
     handleMessage: (params: TonConnectAppRequest<'http'>) => void;
     lastEventId?: string;
     connections?: AccountConnectionHttp[];
-    bridgeEndpoint: string | undefined;
+    bridgeEndpoint: string;
 }) => {
     if (!connections || connections.length === 0) {
         return () => {};
@@ -80,9 +79,7 @@ export const subscribeTonConnect = ({
         .map(item => new SessionCrypto(item.sessionKeyPair).sessionId)
         .join(',');
 
-    let url = `${removeLastSlash(
-        bridgeEndpoint ?? defaultBridgeEndpoint
-    )}/bridge/events?client_id=${walletSessionIds}`;
+    let url = `${removeLastSlash(bridgeEndpoint)}/bridge/events?client_id=${walletSessionIds}`;
 
     if (lastEventId) {
         url += `&last_event_id=${lastEventId}`;

@@ -11,11 +11,7 @@ import {
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import styled from 'styled-components';
 import { BatteryInfoHeading } from '../../components/settings/battery/BatteryInfoHeading';
-import {
-    useBatteryBalance,
-    useBatteryEnabledConfig,
-    useProvideBatteryAuth
-} from '../../state/battery';
+import { useBatteryBalance, useCanUseBattery, useProvideBatteryAuth } from '../../state/battery';
 import { GearIconEmpty, SpinnerRing } from '../../components/Icon';
 import { BuyBatteryMethods } from '../../components/settings/battery/BuyBatteryMethods';
 import { BatterySettingsNotification } from '../../components/settings/battery/BatterySettingsNotification';
@@ -35,10 +31,9 @@ import { QueryKey } from '../../libs/queryKey';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 export const BatteryPage = () => {
-    const account = useActiveAccount();
-    const { disableWhole } = useBatteryEnabledConfig();
+    const canUseBattery = useCanUseBattery();
 
-    if ((account.type !== 'mnemonic' && account.type !== 'mam') || disableWhole) {
+    if (!canUseBattery) {
         return <Navigate to={AppRoute.home} />;
     }
 
