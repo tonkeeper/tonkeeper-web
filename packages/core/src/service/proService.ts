@@ -248,12 +248,9 @@ export const saveIapPurchase = async (
     token: string
 ): Promise<{ ok: boolean }> => {
     try {
-        return await IapService.activateIapPurchase(
-            {
-                original_transaction_id: originalTransactionId
-            },
-            `Bearer ${token}`
-        );
+        return await IapService.activateIapPurchase(`Bearer ${token}`, {
+            original_transaction_id: originalTransactionId
+        });
     } catch (e) {
         return {
             ok: false
