@@ -12,13 +12,11 @@ import {
 import { useMemo } from 'react';
 import { useAppContext } from '../hooks/appContext';
 import { QueryKey, TonkeeperApiKey } from '../libs/queryKey';
-import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
 import { useToQueryKeyPart } from '../hooks/useToQueryKeyPart';
 import { useActiveConfig } from './wallet';
 import { useUserCountry } from './country';
 
 export const useTonendpoint = ({
-    targetEnv,
     build,
     network = Network.MAINNET,
     lang = Language.EN,
@@ -26,7 +24,6 @@ export const useTonendpoint = ({
     deviceCountryCode,
     storeCountryCode
 }: {
-    targetEnv: TargetEnv;
     build: string;
     network?: Network;
     lang?: Language;
@@ -39,12 +36,11 @@ export const useTonendpoint = ({
             build,
             network,
             lang: localizationText(lang),
-            targetEnv,
             platform,
             device_country_code: deviceCountryCode ?? undefined,
             store_country_code: storeCountryCode ?? undefined
         });
-    }, [targetEnv, build, network, lang, platform, deviceCountryCode, storeCountryCode]);
+    }, [build, network, lang, platform, deviceCountryCode, storeCountryCode]);
 };
 
 export interface ServerConfig {
@@ -75,7 +71,7 @@ export const useTonendpointBuyMethods = () => {
     return useQuery<TonendpoinFiatCategory, Error>(
         [QueryKey.tonkeeperApi, TonkeeperApiKey.fiat, tonendpoint.params.lang],
         async () => {
-            const methods = await tonendpoint.getFiatMethods();
+            const methods = await tonendpoint.fiatMethods();
             const buy = methods.categories[0];
 
             const layout = methods.layoutByCountry.find(item => item.countryCode === countryCode);
@@ -134,14 +130,18 @@ export enum FLAGGED_FEATURE {
     GASLESS = 'gasless',
     SWAPS = 'swaps',
     TRON = 'tron',
-    TWO_FA = '2fa'
+    TWO_FA = '2fa',
+    ONRAMP = 'onramp',
+    DAPPS_LIST = 'dapps_list'
 }
 const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = {
     battery: 'disable_battery',
     gasless: 'disable_gaseless',
     swaps: 'disable_swap',
     tron: 'disable_tron',
-    '2fa': 'disable_2fa'
+    '2fa': 'disable_2fa',
+    onramp: 'disable_exchange_methods',
+    dapps_list: 'disable_dapps'
 };
 
 export function useIsFeatureEnabled(feature: FLAGGED_FEATURE) {

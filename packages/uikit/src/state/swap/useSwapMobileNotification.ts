@@ -6,14 +6,16 @@ import { useAppContext } from '../../hooks/appContext';
 import { generateStonfiSwapLink } from '../stonfi';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useAtom } from '../../libs/useAtom';
+import { useActiveConfig } from '../wallet';
 
 const swapMobileNotificationOpen$ = atom(false);
 export const useSwapMobileNotification = () => {
     const [isOpen, _setIsOpen] = useAtom(swapMobileNotificationOpen$);
     const { isSwapsEnabled } = useSwapsConfig();
     const sdk = useAppSdk();
+    const config = useActiveConfig();
 
-    const { tonendpoint, env } = useAppContext();
+    const { env } = useAppContext();
 
     const setIsOpen = useCallback(
         (val: boolean) => {
@@ -21,7 +23,7 @@ export const useSwapMobileNotification = () => {
                 const swapLink = generateStonfiSwapLink(
                     swapFromAsset$.value.address,
                     swapToAsset$.value.address,
-                    tonendpoint.targetEnv,
+                    config.tonkeeper_utm_track,
                     env?.stonfiReferralAddress
                 );
                 sdk.openPage(swapLink);
@@ -29,7 +31,7 @@ export const useSwapMobileNotification = () => {
                 _setIsOpen(val);
             }
         },
-        [_setIsOpen, isSwapsEnabled, sdk, tonendpoint.targetEnv, env?.stonfiReferralAddress]
+        [_setIsOpen, isSwapsEnabled, sdk, config.tonkeeper_utm_track, env?.stonfiReferralAddress]
     );
 
     return [isOpen, setIsOpen] as const;

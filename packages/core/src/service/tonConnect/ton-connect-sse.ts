@@ -38,7 +38,6 @@ type Listeners = {
 export const createBridgeEndpointFetcher =
     ({
         platform,
-        targetEnv,
         onError,
         build
     }: {
@@ -49,18 +48,12 @@ export const createBridgeEndpointFetcher =
     }) =>
     async () => {
         try {
-            const tonendpoint = new Tonendpoint(
-                {
-                    platform,
-                    lang: 'en',
-                    build,
-                    network: Network.MAINNET,
-                    targetEnv
-                },
-                {
-                    fetchApi: fetch
-                }
-            );
+            const tonendpoint = new Tonendpoint({
+                platform,
+                lang: 'en',
+                build,
+                network: Network.MAINNET
+            });
             const config = await getServerConfig(tonendpoint, Network.MAINNET);
             return config.ton_connect_bridge;
         } catch (e) {

@@ -126,6 +126,7 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
     const isReadOnly = useIsActiveWalletWatchOnly();
     const isTestnet = useActiveTonNetwork() === Network.TESTNET;
     const swapAvailable = useIsFeatureEnabled(FLAGGED_FEATURE.SWAPS);
+    const buyAvailable = useIsFeatureEnabled(FLAGGED_FEATURE.ONRAMP);
 
     return (
         <Grid className={className}>
@@ -173,7 +174,7 @@ export const MobileProHomeActions: FC<{ className?: string }> = ({ className }) 
                     <VerticalDividerCentralPart />
                     <VerticalDividerBottomPart />
                 </VerticalDivider>
-                <ActionCell onClick={onBuy}>
+                <ActionCell onClick={onBuy} $disabled={!buyAvailable}>
                     <PlusIcon />
                     <Label2>{t('wallet_buy')}</Label2>
                 </ActionCell>

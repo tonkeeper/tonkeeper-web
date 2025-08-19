@@ -171,23 +171,23 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                <HideOnReview>
-                    <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
-                        {swapAsset && (
-                            <ButtonStyled size="small" onClick={onSwap}>
-                                <SwapIcon />
-                                {t('wallet_swap')}
-                            </ButtonStyled>
-                        )}
-                    </IfFeatureEnabled>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
+                    {swapAsset && (
+                        <ButtonStyled size="small" onClick={onSwap}>
+                            <SwapIcon />
+                            {t('wallet_swap')}
+                        </ButtonStyled>
+                    )}
+                </IfFeatureEnabled>
 
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
                     {canBuy && (
                         <ButtonStyled size="small" onClick={onOpen}>
                             <PlusIcon />
                             {t('wallet_buy')}
                         </ButtonStyled>
                     )}
-                </HideOnReview>
+                </IfFeatureEnabled>
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </CoinHeaderStyled>

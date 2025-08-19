@@ -21,7 +21,7 @@ export function useRecommendations() {
     const { tonendpoint } = useAppContext();
 
     return useQuery<Recommendations, Error>([QueryKey.featuredRecommendations], async () => {
-        const data: Recommendations = await tonendpoint.getAppsPopular();
+        const data: Recommendations = await tonendpoint.appsPopular();
         // TODO: Remove mobile hack
         data.categories = data.categories.filter(item => item.id !== 'featured');
 

@@ -20,7 +20,6 @@ export const tonConnectSSE = new TonConnectSSE({
     },
     bridgeEndpointFetcher: createBridgeEndpointFetcher({
         platform: 'desktop',
-        targetEnv: 'desktop',
         build: packageJson.version,
         onError: e => log.error(e)
     }),
