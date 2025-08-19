@@ -18,12 +18,10 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
     useEffect(() => {
         if (isReadyRef.current || !sdk || !api) return;
 
-        const strategy = new CryptoSubscriptionStrategy(sdk.storage, {
+        sdk.subscriptionStrategy = new CryptoSubscriptionStrategy(sdk.storage, {
             api,
             onProConfirmOpen
         });
-
-        sdk.setSubscriptionStrategy(strategy);
 
         isReadyRef.current = true;
     }, [api, sdk]);
