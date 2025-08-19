@@ -188,7 +188,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     dappBrowser = CapacitorDappBrowser;
 
-    userIdentity = new UserIdentityService(capacitorStorage);
+    userIdentity = new CapacitorUserIdentityService(capacitorStorage);
 
     subscriptionStrategy = Subscription;
 }
