@@ -5,7 +5,7 @@ const TonkeeperLottieIcon = React.lazy(() => import('./lottie/TonkeeperLottie'))
 
 export const DarkThemeContext = React.createContext<boolean>(true);
 
-const TonkeeperSvgIcon: FC<{ size?: string }> = ({ size = '128' }) => {
+export const TonkeeperSvgIcon: FC<{ size?: string }> = ({ size = '128' }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

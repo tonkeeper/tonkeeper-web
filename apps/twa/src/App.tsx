@@ -62,6 +62,8 @@ import { SwapScreen } from './components/swap/SwapNotification';
 import { TwaSendNotification } from './components/transfer/SendNotifications';
 import { TwaAppSdk } from './libs/appSdk';
 import { useAnalytics, useTwaAppViewport } from './libs/hooks';
+import { RegionIsNotSupported } from "./components/RegionIsNotSupported";
+import { TonendpointConfig } from "@tonkeeper/core/dist/tonkeeperApi/tonendpoint";
 
 const Initialize = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import/Initialize'));
 const ImportRouter = React.lazy(() => import('@tonkeeper/uikit/dist/pages/import'));
@@ -288,6 +290,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
                             lock={lock}
                             showQrScan={showQrScan}
                             sdk={sdk}
+                            config={config}
                         />
                         <CopyNotification />
                         <ModalsRoot />
@@ -332,7 +335,8 @@ const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
     showQrScan: boolean;
-}> = ({ activeAccount, lock, showQrScan, sdk }) => {
+    config: TonendpointConfig
+}> = ({ activeAccount, lock, showQrScan, sdk, config }) => {
     const location = useLocation();
     useWindowsScroll();
     useTrackLocation();
@@ -344,6 +348,10 @@ const Content: FC<{
                 <Unlock />
             </FullSizeWrapper>
         );
+    }
+
+    if (config.flags?.disable_twa) {
+      return <RegionIsNotSupported />
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {

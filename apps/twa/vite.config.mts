@@ -1,9 +1,29 @@
 import react from '@vitejs/plugin-react';
 import * as path from 'path';
 import { defineConfig } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import { injectCSP, metaTagCspConfig } from "@tonkeeper/core/dist/utils/csp.mjs";
+
+
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+      nodePolyfills({
+        globals: {
+          Buffer: true,
+          global: true,
+          process: true
+        },
+        include: ['stream', 'buffer', 'crypto']
+      }),
+      react(),
+      injectCSP(metaTagCspConfig)
+    ],
+    server: {
+      allowedHosts: [
+        '.ngrok-free.app'
+      ]
+    },
     resolve: {
         alias: {
             react: path.resolve(__dirname, './node_modules/react'),
