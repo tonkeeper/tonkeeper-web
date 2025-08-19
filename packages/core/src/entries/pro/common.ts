@@ -61,8 +61,8 @@ export interface ISubscriptionFormData {
 }
 
 export interface ICryptoStrategyConfig {
-    api?: APIConfig;
-    onProConfirmOpen?: (p?: {
+    api: APIConfig;
+    onProConfirmOpen: (p?: {
         confirmState: IConfirmState | null;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;

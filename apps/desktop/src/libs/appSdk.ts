@@ -6,7 +6,6 @@ import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
-import { ICryptoSubscriptionStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {
@@ -39,14 +38,8 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
 
     keychain = new KeychainDesktop(this.biometry, this.storage);
 
-    subscriptionStrategy?: ICryptoSubscriptionStrategy = undefined;
-
     constructor() {
         super(new DesktopStorage());
-    }
-
-    setSubscriptionStrategy(strategy: ICryptoSubscriptionStrategy) {
-        this.subscriptionStrategy = strategy;
     }
 
     copyToClipboard = (value: string, notification?: string) => {

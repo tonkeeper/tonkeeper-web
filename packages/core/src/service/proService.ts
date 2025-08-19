@@ -160,19 +160,6 @@ export const authViaSeedPhrase = async (api: APIConfig, authData: ProAuthViaSeed
     return result.auth_token;
 };
 
-export const logoutTonConsole = async (authService: IProAuthTokenService) => {
-    try {
-        const mainToken = await authService.getToken();
-
-        if (mainToken) {
-            await AuthService.logout(`Bearer ${mainToken}`);
-            await authService.deleteToken();
-        }
-    } finally {
-        await authService.deleteToken();
-    }
-};
-
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
     const { items } = await TiersService.getTiers(localizationText(lang) as Lang, promoCode);
 

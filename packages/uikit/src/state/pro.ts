@@ -18,7 +18,6 @@ import {
     authViaTonConnect,
     getBackupState,
     getProSupportUrl,
-    logoutTonConsole,
     ProAuthViaSeedPhraseParams,
     setBackupState,
     startProServiceTrial
@@ -58,7 +57,7 @@ export const useSupport = () => {
 
     return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
-        async () => getProSupportUrl(await sdk.authService.getToken()),
+        async () => getProSupportUrl(await sdk.subscriptionStrategy.getToken()),
         {
             initialData: {
                 url: mainnetConfig.directSupportUrl ?? '',
@@ -100,9 +99,7 @@ export const useProState = () => {
             return subscription;
         },
         {
-            keepPreviousData: true,
             suspense: true,
-            enabled: !!sdk.subscriptionStrategy,
             refetchInterval: s => (s?.status === CryptoSubscriptionStatuses.PENDING ? 1000 : false)
         }
     );
@@ -210,7 +207,7 @@ export const useProLogout = () => {
     const client = useQueryClient();
 
     return useMutation(async () => {
-        await logoutTonConsole(sdk.authService);
+        await sdk.subscriptionStrategy.logout();
 
         await client.invalidateQueries([QueryKey.pro]);
     });
@@ -284,8 +281,8 @@ export const useActivateTrialMutation = () => {
             language
         );
 
-        await sdk.authService.setToken(token);
-        await sdk.storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
+        await sdk.subscriptionStrategy.activateTrial(token);
+
         await client.invalidateQueries([QueryKey.pro]);
 
         return token;

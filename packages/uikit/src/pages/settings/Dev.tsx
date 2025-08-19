@@ -41,7 +41,7 @@ const CookieSettings = () => {
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
 
-        await sdk.authService.deleteToken();
+        await sdk.subscriptionStrategy.logout();
 
         await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
 

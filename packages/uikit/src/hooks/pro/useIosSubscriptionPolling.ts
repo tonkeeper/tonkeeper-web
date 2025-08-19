@@ -21,7 +21,7 @@ export const useIosSubscriptionPolling = (intervalMs = 10000) => {
 
         let isMounted = true;
         const resaveIosPurchase = async () => {
-            const mainToken = await sdk.authService.getToken();
+            const mainToken = await sdk.subscriptionStrategy.getToken();
 
             if (!mainToken) return;
 

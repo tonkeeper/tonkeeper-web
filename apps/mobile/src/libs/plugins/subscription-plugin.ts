@@ -2,7 +2,7 @@ import { registerPlugin } from '@capacitor/core';
 import {
     IDisplayPlan,
     IIosPurchaseResult,
-    IIosSubscriptionStrategy,
+    IIosSubscriptionStrategy as IIosStrategy,
     ISubscriptionFormData,
     IOriginalTransactionInfo,
     IProductInfo,
@@ -22,7 +22,8 @@ import {
     getNormalizedSubscription,
     saveIapPurchase
 } from '@tonkeeper/core/dist/service/proService';
-import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { BaseSubscriptionStrategy as BaseStrategy } from '@tonkeeper/core/dist/BaseSubscriptionStrategy';
+import { IStorage } from '@tonkeeper/core/dist/Storage';
 
 interface ISubscriptionPlugin {
     subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult>;
@@ -102,10 +103,12 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
     })
 });
 
-export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
+export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrategy {
     public source = SubscriptionSource.IOS as const;
 
-    constructor(private sdk: IAppSdk) {}
+    public constructor(storage: IStorage) {
+        super(storage);
+    }
 
     async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
         const productId = formData.selectedPlan.id;
@@ -140,24 +143,30 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         return PurchaseStatuses.SUCCESS;
     }
 
-    async getAllProductsInfo(): Promise<NormalizedProPlans> {
-        try {
-            const productIds = Object.values(ProductIds);
-            const { products } = await SubscriptionPlugin.getAllProductsInfo({ productIds });
+    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
+        const mainToken = await this.authTokenService.getToken();
 
-            const normalizedPlans: IDisplayPlan[] = products.map(plan => ({
-                id: plan.id,
-                displayName: plan.displayName,
-                displayPrice: plan.displayPrice,
-                subscriptionPeriod: plan?.subscriptionPeriod || 'month',
-                formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
-            }));
+        const [currentSubscription, targetSubscription] = await Promise.all([
+            getNormalizedSubscription(this.storage, mainToken),
+            getNormalizedSubscription(this.storage, tempToken)
+        ]);
 
-            return { plans: normalizedPlans, verifiedPromoCode: undefined };
-        } catch (e) {
-            console.error('Failed to fetch products info:', e);
-            return { plans: undefined, verifiedPromoCode: undefined };
+        const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
+
+        const shouldPromoteToken =
+            tempToken &&
+            bestSubscription === targetSubscription &&
+            isProSubscription(bestSubscription);
+
+        if (shouldPromoteToken) {
+            await this.authTokenService.setToken(tempToken);
         }
+
+        return bestSubscription;
+    }
+
+    async manageSubscriptions(): Promise<void> {
+        return SubscriptionPlugin.manageSubscriptions();
     }
 
     async getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]> {
@@ -170,32 +179,18 @@ export class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         return SubscriptionPlugin.getOriginalTransactionId();
     }
 
-    async manageSubscriptions(): Promise<void> {
-        return SubscriptionPlugin.manageSubscriptions();
-    }
+    async getAllProductsInfoCore(): Promise<NormalizedProPlans> {
+        const productIds = Object.values(ProductIds);
+        const { products } = await SubscriptionPlugin.getAllProductsInfo({ productIds });
 
-    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
-        const storage = this.sdk.storage;
-        const authService = this.sdk.authService;
+        const normalizedPlans: IDisplayPlan[] = products.map(plan => ({
+            id: plan.id,
+            displayName: plan.displayName,
+            displayPrice: plan.displayPrice,
+            subscriptionPeriod: plan?.subscriptionPeriod || 'month',
+            formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
+        }));
 
-        const mainToken = await authService.getToken();
-
-        const [currentSubscription, targetSubscription] = await Promise.all([
-            getNormalizedSubscription(storage, mainToken),
-            getNormalizedSubscription(storage, tempToken)
-        ]);
-
-        const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
-
-        const shouldPromoteToken =
-            tempToken &&
-            bestSubscription === targetSubscription &&
-            isProSubscription(bestSubscription);
-
-        if (shouldPromoteToken) {
-            await authService.setToken(tempToken);
-        }
-
-        return bestSubscription;
+        return { plans: normalizedPlans, verifiedPromoCode: undefined };
     }
 }

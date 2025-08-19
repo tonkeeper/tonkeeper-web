@@ -39,6 +39,9 @@ export interface IBaseSubscription {
 
 export interface IBaseSubscriptionStrategy {
     source: SubscriptionSource;
+    logout(): Promise<void>;
+    getToken(): Promise<string | null>;
+    activateTrial(token: string): Promise<void>;
     subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses>;
     getSubscription(tempToken: string | null): Promise<ProSubscription>;
     getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;

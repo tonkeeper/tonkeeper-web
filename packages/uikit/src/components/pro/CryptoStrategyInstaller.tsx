@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect } from 'react';
+import { FC, ReactNode, Suspense, useEffect, useRef } from 'react';
 import { CryptoSubscriptionStrategy } from '@tonkeeper/core/dist/CryptoSubscriptionStrategy';
 
 import { useAppSdk } from '../../hooks/appSdk';
@@ -12,16 +12,21 @@ interface Props {
 export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
     const sdk = useAppSdk();
     const api = useActiveApi();
+    const isReadyRef = useRef(false);
     const { onOpen: onProConfirmOpen } = useProConfirmNotification();
 
     useEffect(() => {
-        const strategy = new CryptoSubscriptionStrategy(sdk, {
+        if (isReadyRef.current || !sdk || !api) return;
+
+        const strategy = new CryptoSubscriptionStrategy(sdk.storage, {
             api,
             onProConfirmOpen
         });
 
         sdk.setSubscriptionStrategy(strategy);
-    }, []);
 
-    return <>{children}</>;
+        isReadyRef.current = true;
+    }, [api, sdk]);
+
+    return <Suspense fallback={null}>{children}</Suspense>;
 };

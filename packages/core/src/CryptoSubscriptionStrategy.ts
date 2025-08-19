@@ -3,7 +3,7 @@ import {
     CryptoSubscriptionStatuses,
     ICryptoPendingSubscription,
     ICryptoStrategyConfig,
-    ICryptoSubscriptionStrategy,
+    ICryptoSubscriptionStrategy as ICryptoStrategy,
     IDisplayPlan,
     isPendingSubscription,
     isTonWalletStandard,
@@ -15,7 +15,6 @@ import {
     PurchaseStatuses
 } from './entries/pro';
 import { SubscriptionSource } from './pro';
-import { IAppSdk } from './AppSdk';
 import {
     createProServiceInvoice,
     createRecipient,
@@ -26,14 +25,17 @@ import { AppKey } from './Keys';
 import { IStorage } from './Storage';
 import { Language } from './entries/language';
 import { getFormattedProPrice, pickBestSubscription } from './utils/pro';
+import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStrategy';
 
-export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
+export class CryptoSubscriptionStrategy extends BaseStrategy implements ICryptoStrategy {
     public source = SubscriptionSource.CRYPTO as const;
 
-    private readonly config: ICryptoStrategyConfig = {};
+    constructor(storage: IStorage, private readonly config: ICryptoStrategyConfig) {
+        super(storage);
+    }
 
-    constructor(private sdk: IAppSdk, config: ICryptoStrategyConfig) {
-        this.config = { ...config };
+    async getToken(): Promise<string | null> {
+        return this.authTokenService.getToken();
     }
 
     async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
@@ -78,7 +80,7 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
                     }
                 };
 
-                await this.sdk.storage.set<ICryptoPendingSubscription>(
+                await this.storage.set<ICryptoPendingSubscription>(
                     AppKey.PRO_PENDING_SUBSCRIPTION,
                     pendingSubscription
                 );
@@ -101,49 +103,26 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
         });
     }
 
-    async getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans> {
-        try {
-            const verifiedPromoCode = promoCode !== '' ? promoCode : undefined;
-            const plans = await getProServiceTiers(lang, verifiedPromoCode);
-
-            const normalizedPlans: IDisplayPlan[] = plans.map(plan => ({
-                id: String(plan.id),
-                displayName: plan.name,
-                displayPrice: plan.amount,
-                subscriptionPeriod: 'year',
-                formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
-            }));
-
-            return { plans: normalizedPlans, verifiedPromoCode };
-        } catch (e) {
-            console.error('Failed to fetch products info:', e);
-            return { plans: undefined, verifiedPromoCode: undefined };
-        }
-    }
-
     private async clearPendingSubscription(storage: IStorage) {
         await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
     }
 
     async getSubscription(tempToken: string | null): Promise<ProSubscription> {
-        const storage = this.sdk.storage;
-        const authService = this.sdk.authService;
-
-        const pendingSubscription: ICryptoPendingSubscription | null = await storage.get(
+        const pendingSubscription: ICryptoPendingSubscription | null = await this.storage.get(
             AppKey.PRO_PENDING_SUBSCRIPTION
         );
 
-        const mainToken = await authService.getToken();
+        const mainToken = await this.authTokenService.getToken();
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
 
         const [currentSubscription, targetSubscription] = await Promise.all([
-            getNormalizedSubscription(storage, mainToken),
-            getNormalizedSubscription(storage, targetToken)
+            getNormalizedSubscription(this.storage, mainToken),
+            getNormalizedSubscription(this.storage, targetToken)
         ]);
 
         if (tempToken && isValidSubscription(targetSubscription)) {
-            await authService.setToken(tempToken);
-            await this.clearPendingSubscription(storage);
+            await this.authTokenService.setToken(tempToken);
+            await this.clearPendingSubscription(this.storage);
 
             return targetSubscription;
         }
@@ -158,9 +137,24 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
         const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
 
         if (isValidSubscription(bestSubscription)) {
-            await this.clearPendingSubscription(storage);
+            await this.clearPendingSubscription(this.storage);
         }
 
         return bestSubscription;
+    }
+
+    async getAllProductsInfoCore(lang?: Language, promoCode?: string): Promise<NormalizedProPlans> {
+        const verifiedPromoCode = promoCode !== '' ? promoCode : undefined;
+        const plans = await getProServiceTiers(lang, verifiedPromoCode);
+
+        const normalizedPlans: IDisplayPlan[] = plans.map(plan => ({
+            id: String(plan.id),
+            displayName: plan.name,
+            displayPrice: plan.amount,
+            subscriptionPeriod: 'year',
+            formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
+        }));
+
+        return { plans: normalizedPlans, verifiedPromoCode };
     }
 }
