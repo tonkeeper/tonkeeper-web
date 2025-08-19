@@ -82,7 +82,7 @@ import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { DesktopMobileAppBanner } from '@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner';
-import { CryptoSubscriptionStrategy } from '@tonkeeper/core/dist/CryptoSubscriptionStrategy';
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -121,9 +121,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new DesktopAppSdk();
-const strategy = new CryptoSubscriptionStrategy(sdk);
-
-sdk.setSubscriptionStrategy(strategy);
 
 const TARGET_ENV = 'desktop';
 
@@ -343,10 +340,12 @@ export const Loader: FC = () => {
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} />
-            <CopyNotification hideSimpleCopyNotifications />
-            <QrScanner />
-            <ModalsRoot />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification hideSimpleCopyNotifications />
+                <QrScanner />
+                <ModalsRoot />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };

@@ -60,9 +60,9 @@ export interface ISubscriptionFormData {
     selectedPlan: IDisplayPlan;
 }
 
-export interface ISubscriptionConfig {
+export interface ICryptoStrategyConfig {
     api?: APIConfig;
-    onOpen?: (p?: {
+    onProConfirmOpen?: (p?: {
         confirmState: IConfirmState | null;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;

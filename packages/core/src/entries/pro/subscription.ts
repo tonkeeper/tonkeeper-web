@@ -9,7 +9,6 @@ import {
     IIosPurchaseResult,
     IOriginalTransactionInfo,
     ITokenizedWalletAuth,
-    ISubscriptionConfig,
     ISubscriptionFormData,
     NormalizedProPlans,
     ITelegramAuth,
@@ -40,10 +39,7 @@ export interface IBaseSubscription {
 
 export interface IBaseSubscriptionStrategy {
     source: SubscriptionSource;
-    subscribe(
-        formData: ISubscriptionFormData,
-        config: ISubscriptionConfig
-    ): Promise<PurchaseStatuses>;
+    subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses>;
     getSubscription(tempToken: string | null): Promise<ProSubscription>;
     getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;
 }

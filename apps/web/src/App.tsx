@@ -43,7 +43,7 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { BrowserRouter } from 'react-router-dom';
-import { CryptoSubscriptionStrategy } from '@tonkeeper/core/dist/CryptoSubscriptionStrategy';
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -58,9 +58,6 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
-const strategy = new CryptoSubscriptionStrategy(sdk);
-
-sdk.setSubscriptionStrategy(strategy);
 
 const TARGET_ENV = 'web';
 
@@ -211,12 +208,14 @@ const Loader: FC = () => {
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
-            <CopyNotification hideSimpleCopyNotifications={!standalone} />
-            <Suspense>
-                <QrScanner />
-            </Suspense>
-            <ModalsRoot />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
+                <CopyNotification hideSimpleCopyNotifications={!standalone} />
+                <Suspense>
+                    <QrScanner />
+                </Suspense>
+                <ModalsRoot />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };

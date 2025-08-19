@@ -2,11 +2,11 @@ import {
     AuthTypes,
     CryptoSubscriptionStatuses,
     ICryptoPendingSubscription,
+    ICryptoStrategyConfig,
     ICryptoSubscriptionStrategy,
     IDisplayPlan,
     isPendingSubscription,
     isTonWalletStandard,
-    ISubscriptionConfig,
     ISubscriptionFormData,
     isValidSubscription,
     NormalizedProPlans,
@@ -30,19 +30,20 @@ import { getFormattedProPrice, pickBestSubscription } from './utils/pro';
 export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
     public source = SubscriptionSource.CRYPTO as const;
 
-    constructor(private sdk: IAppSdk) {}
+    private readonly config: ICryptoStrategyConfig = {};
 
-    async subscribe(
-        formData: ISubscriptionFormData,
-        config: ISubscriptionConfig
-    ): Promise<PurchaseStatuses> {
-        const { onOpen, api } = config;
+    constructor(private sdk: IAppSdk, config: ICryptoStrategyConfig) {
+        this.config = { ...config };
+    }
+
+    async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
+        const { onProConfirmOpen, api } = this.config;
         const { wallet, selectedPlan, tempToken, promoCode } = formData;
         const { id, formattedDisplayPrice, displayName } = selectedPlan;
 
         const tierId = Number(id);
 
-        if (!tierId || !onOpen || !api || !wallet) {
+        if (!tierId || !onProConfirmOpen || !api || !wallet) {
             throw new Error(PurchaseErrors.PURCHASE_FAILED);
         }
 
@@ -52,7 +53,7 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
 
         const result = await createProServiceInvoice(tempToken, { tierId, promoCode });
 
-        if (result.ok === false) {
+        if (!result.ok) {
             throw new Error(result.data);
         }
 
@@ -85,7 +86,7 @@ export class CryptoSubscriptionStrategy implements ICryptoSubscriptionStrategy {
                 resolve(PurchaseStatuses.PENDING);
             };
 
-            onOpen({
+            onProConfirmOpen({
                 confirmState: {
                     invoice,
                     wallet,

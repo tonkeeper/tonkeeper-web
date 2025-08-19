@@ -38,7 +38,6 @@ import {
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
-import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
 import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 export const useTrialAvailability = () => {
@@ -103,6 +102,7 @@ export const useProState = () => {
         {
             keepPreviousData: true,
             suspense: true,
+            enabled: !!sdk.subscriptionStrategy,
             refetchInterval: s => (s?.status === CryptoSubscriptionStatuses.PENDING ? 1000 : false)
         }
     );
@@ -253,19 +253,14 @@ export const useOriginalTransactionInfo = () => {
 
 export const useProPurchaseMutation = () => {
     const sdk = useAppSdk();
-    const api = useActiveApi();
     const client = useQueryClient();
-    const { onOpen } = useProConfirmNotification();
 
     return useMutation<PurchaseStatuses, Error, ISubscriptionFormData>(async formData => {
         if (!sdk.subscriptionStrategy) {
             throw new Error('Missing subscription strategy!');
         }
 
-        const status = await sdk.subscriptionStrategy.subscribe(formData, {
-            api,
-            onOpen
-        });
+        const status = await sdk.subscriptionStrategy.subscribe(formData);
 
         if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {
             await client.invalidateQueries([QueryKey.pro]);
