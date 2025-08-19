@@ -101,7 +101,7 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new CapacitorAppSdk();
-const strategy = new IosSubscriptionStrategy(sdk);
+const strategy = new IosSubscriptionStrategy(sdk.storage);
 
 sdk.setSubscriptionStrategy(strategy);
 

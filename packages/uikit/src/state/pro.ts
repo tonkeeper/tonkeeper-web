@@ -99,6 +99,7 @@ export const useProState = () => {
             return subscription;
         },
         {
+            keepPreviousData: true,
             suspense: true,
             refetchInterval: s => (s?.status === CryptoSubscriptionStatuses.PENDING ? 1000 : false)
         }
