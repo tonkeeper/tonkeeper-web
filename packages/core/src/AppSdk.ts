@@ -128,14 +128,13 @@ export interface InternetConnectionService {
 
 export interface IAppSdk {
     storage: IStorage;
-    readonly subscriptionStrategy: SubscriptionStrategy;
+    subscriptionStrategy: SubscriptionStrategy;
 
     nativeBackButton?: NativeBackButton;
     keychain?: IKeychainService;
     cookie?: CookieService;
     biometry?: BiometryService;
 
-    setSubscriptionStrategy(strategy: SubscriptionStrategy): void;
     topMessage: (text: string) => void;
     pasteFromClipboard: () => Promise<string>;
     copyToClipboard: (value: string, notification?: string) => void;
@@ -237,8 +236,6 @@ export interface KeyboardService {
 export abstract class BaseApp implements IAppSdk {
     uiEvents = new EventEmitter();
 
-    private _subscriptionStrategy?: SubscriptionStrategy;
-
     constructor(public storage: IStorage) {
         this.userIdentity = new UserIdentityService(storage);
     }
@@ -267,17 +264,7 @@ export abstract class BaseApp implements IAppSdk {
 
     nativeBackButton?: NativeBackButton | undefined;
 
-    get subscriptionStrategy(): SubscriptionStrategy {
-        if (!this._subscriptionStrategy) {
-            throw new Error('SubscriptionStrategy is not installed');
-        }
-
-        return this._subscriptionStrategy;
-    }
-
-    setSubscriptionStrategy(strategy: SubscriptionStrategy): void {
-        this._subscriptionStrategy = strategy;
-    }
+    subscriptionStrategy!: SubscriptionStrategy;
 
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
