@@ -15,6 +15,7 @@ tunnels:
 
 link <YOUR NGROK DOMAIN> to your test tg bot mini app in botfather
 @tonkeeper_test_dont_use_localbot
+@@tonkeeper_test_dont_use_dev_bot
 
 1. `yarn start`
 2. `yarn ngrok`
