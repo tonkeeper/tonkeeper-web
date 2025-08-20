@@ -52,7 +52,6 @@ const queryClient = new QueryClient({
 provideMockInjectionContext();
 
 const sdk = new WidgetAppSdk();
-const TARGET_ENV = 'swap_widget_web';
 
 const queryParams = new URLSearchParams(new URL(window.location.href).search);
 
@@ -194,7 +193,6 @@ const Loader: FC = () => {
     const { i18n } = useTranslation();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang,
         platform: 'swap_widget_web'

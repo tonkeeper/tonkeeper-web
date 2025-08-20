@@ -57,7 +57,6 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
-const TARGET_ENV = 'web';
 
 export const App: FC = () => {
     return (
@@ -143,7 +142,6 @@ const Loader: FC = () => {
     const { i18n } = useTranslation();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang,
         platform: 'web'

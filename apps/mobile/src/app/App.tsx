@@ -191,7 +191,6 @@ export const Loader: FC = () => {
     const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: CAPACITOR_APPLICATION_ID,
         build: sdk.version,
         network,
         lang,

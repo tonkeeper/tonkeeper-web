@@ -18,7 +18,6 @@ import {
     Tonendpoint
 } from '../../tonkeeperApi/tonendpoint';
 import { Network } from '../../entries/network';
-import { TargetEnv } from '../../AppSdk';
 
 type Logger = {
     info: (message: string) => void;
@@ -42,7 +41,6 @@ export const createBridgeEndpointFetcher =
         build
     }: {
         platform: BootParams['platform'];
-        targetEnv: TargetEnv;
         build: BootParams['build'];
         onError: (e: unknown) => void;
     }) =>

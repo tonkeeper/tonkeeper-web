@@ -104,7 +104,6 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new ExtensionAppSdk();
-const TARGET_ENV = 'extension';
 connectToBackground();
 
 const ExtensionGlobalStyle = createGlobalStyle`
@@ -218,7 +217,6 @@ export const Loader: FC = React.memo(() => {
 
     const lock = useLock(sdk);
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang: localizationFrom(browser.i18n.getUILanguage()),
         platform: 'extension'

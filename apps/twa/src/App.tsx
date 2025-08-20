@@ -239,7 +239,6 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const network = useActiveTonNetwork();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         network,
         lang,
