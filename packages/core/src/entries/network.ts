@@ -22,14 +22,13 @@ export const getTonClientV2 = (config: TonendpointConfig) => {
     });
 };
 
-export const getApiConfig = (config: TonendpointConfig, TonConsoleBase = '') => {
-    // Global config
-    if (TonConsoleBase) {
-        TonConsoleApi.BASE = TonConsoleBase;
-        TonConsoleApi.WITH_CREDENTIALS = false;
-        TonConsoleApi.CREDENTIALS = 'omit';
-    }
+export const setProApiUrl = (url: string) => {
+    TonConsoleApi.BASE = url;
+    TonConsoleApi.WITH_CREDENTIALS = false;
+    TonConsoleApi.CREDENTIALS = 'omit';
+};
 
+export const getApiConfig = (config: TonendpointConfig) => {
     return {
         tonApiV2: getTonClientV2(config)
     };

@@ -43,8 +43,6 @@ export const useAppWidth = () => {
     }, []);
 };
 
-declare const REACT_APP_APTABASE: string;
-
 export const useAnalytics = (
     version: string,
     config: TonendpointConfig | undefined,
@@ -57,9 +55,13 @@ export const useAnalytics = (
     return useQuery<Analytics>(
         [QueryKey.analytics, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
+                return;
+            }
+
             const tracker = new Aptabase({
-                host: config!.aptabaseEndpoint,
-                key: config!.aptabaseKey ?? REACT_APP_APTABASE,
+                host: config.aptabaseEndpoint,
+                key: config.aptabaseKey,
                 appVersion: version,
                 userIdentity: sdk.userIdentity
             });
@@ -75,6 +77,6 @@ export const useAnalytics = (
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount !== undefined && config !== undefined }
+        { enabled: accounts != null && activeAccount !== undefined }
     );
 };

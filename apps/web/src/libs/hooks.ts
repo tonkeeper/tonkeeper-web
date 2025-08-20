@@ -54,12 +54,16 @@ export const useAnalytics = (activeAccount: Account | undefined, accounts: Accou
     const network = useActiveTonNetwork();
     const sdk = useAppSdk();
 
-    return useQuery<Analytics>(
+    return useQuery<Analytics | undefined>(
         [QueryKey.analytics, network, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
+              return;
+            }
+
             const tracker = new Aptabase({
-                  host: config!.aptabaseEndpoint,
-                  key: config!.aptabaseKey ?? import.meta.env.VITE_APP_APTABASE,
+                  host: config.aptabaseEndpoint,
+                  key: config.aptabaseKey,
                   appVersion: version,
                   userIdentity: sdk.userIdentity
             });
@@ -74,7 +78,7 @@ export const useAnalytics = (activeAccount: Account | undefined, accounts: Accou
 
             return tracker;
         },
-        { enabled: accounts != null && activeAccount != null && config != undefined }
+        { enabled: accounts != null && activeAccount != null  }
     );
 };
 

@@ -31,11 +31,14 @@ export interface TonendpointConfig {
     tonApiV2Key?: string;
     tonapiIOEndpoint: string;
     tron_api_url: string;
+    tron_api_key?: string;
     tonkeeper_api_url: string;
+    pro_api_url: string;
 
     aptabaseEndpoint: string;
     aptabaseKey?: string;
     tonkeeper_utm_track: string;
+    stonfi_direct_link_referral_address?: string;
 
     exchangePostUrl?: string;
     mercuryoSecret?: string;
@@ -89,6 +92,7 @@ export interface TonendpointConfig {
 
     pro_mobile_app_appstore_link?: string;
     pro_landing_url?: string;
+    pro_trial_tg_bot_id?: string;
 
     pro_terms_of_use: string;
     privacy_policy: string;
@@ -113,6 +117,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     tron_api_url: 'https://api.trongrid.io',
     batteryHost: 'https://battery.tonkeeper.com',
     tonkeeper_api_url: 'https://api.tonkeeper.com',
+    pro_api_url: 'https://pro.tonconsole.com',
     batteryMeanFees: '0.0026',
     batteryReservedAmount: '0.065',
     disable_battery: false,

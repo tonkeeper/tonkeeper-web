@@ -289,9 +289,6 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideFireblocks: true,
         defaultWalletVersion: WalletVersion.V5R1,
         browserLength: 4,
-        env: {
-            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        },
         tracker: tracker?.track
     };
 

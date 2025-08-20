@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from "@tonkeeper/core/dist/entries/network";
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -43,6 +43,7 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { BrowserRouter } from 'react-router-dom';
+import { localesList } from "@tonkeeper/locales/localesList";
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -72,7 +73,6 @@ const Providers: FC<PropsWithChildren> = () => {
     const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -80,7 +80,7 @@ const Providers: FC<PropsWithChildren> = () => {
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as any,
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -176,11 +176,11 @@ const Loader: FC = () => {
         return <Loading />;
     }
 
+    // set api url synchronously
+    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            serverConfig.mainnetConfig,
-            import.meta.env.VITE_APP_TONCONSOLE_HOST
-        ),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
         testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
@@ -193,11 +193,6 @@ const Loader: FC = () => {
         defaultWalletVersion: WalletVersion.V5R1,
         hideMultisig: isMobile,
         hideFireblocks: true,
-        env: {
-            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
-            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        },
         tracker: tracker?.track
     };
 

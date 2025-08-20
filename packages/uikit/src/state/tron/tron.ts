@@ -1,8 +1,12 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAppContext } from '../../hooks/appContext';
 import { QueryKey } from '../../libs/queryKey';
 import { DefaultRefetchInterval, FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
-import { useActiveAccount, useActiveTonWalletConfig, useAddTronToAccount } from '../wallet';
+import {
+    useActiveAccount,
+    useActiveConfig,
+    useActiveTonWalletConfig,
+    useAddTronToAccount
+} from '../wallet';
 import { useEffect, useMemo } from 'react';
 import { isAccountTronCompatible } from '@tonkeeper/core/dist/entries/account';
 import { TronWallet } from '@tonkeeper/core/dist/entries/tron/tron-wallet';
@@ -59,10 +63,9 @@ export const useAutoMarkTronFeatureAsSeen = () => {
 };
 
 export const useTronApi = () => {
-    const appContext = useAppContext();
-    const apiKey = appContext.env?.tronApiKey;
-
-    const apiUrl = appContext.mainnetConfig.tron_api_url;
+    const config = useActiveConfig();
+    const apiKey = config.tron_api_key;
+    const apiUrl = config.tron_api_url;
     const batteryApi = useBatteryApi();
 
     return useMemo(() => new TronApi({ baseURL: apiUrl, apiKey }, batteryApi), [apiKey, apiUrl]);

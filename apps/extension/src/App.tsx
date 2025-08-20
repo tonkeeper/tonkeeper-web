@@ -263,9 +263,6 @@ export const Loader: FC = React.memo(() => {
         hideMultisig: true,
         hideFireblocks: true,
         defaultWalletVersion: WalletVersion.V5R1,
-        env: {
-            tronApiKey: process.env.REACT_APP_TRON_API_KEY
-        },
         tracker: tracker?.track
     };
 

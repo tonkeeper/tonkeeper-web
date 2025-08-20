@@ -35,7 +35,7 @@ export const useAnalytics = (
     accounts?: Account[]
 ) => {
     const network = useActiveTonNetwork();
-    return useQuery<Analytics>(
+    return useQuery<Analytics | undefined>(
         [
             QueryKey.analytics,
             activeAccount,
@@ -45,7 +45,11 @@ export const useAnalytics = (
             config?.aptabaseKey
         ],
         async () => {
-            const tracker = new AptabaseExtension(config!.aptabaseEndpoint, config!.aptabaseKey);
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
+                return;
+            }
+
+            const tracker = new AptabaseExtension(config.aptabaseEndpoint, config.aptabaseKey);
 
             tracker.init({
                 application: extensionType ?? 'Extension',

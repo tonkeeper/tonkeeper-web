@@ -1,7 +1,7 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -48,6 +48,7 @@ import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
 import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
 import { queryClient } from '../libs/query-client';
+import { localesList } from '@tonkeeper/locales/localesList';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -101,15 +102,12 @@ const GlobalStyle = createGlobalStyle`
 
 const sdk = new CapacitorAppSdk();
 
-const langs = import.meta.env.VITE_APP_LOCALES;
-
 export const Providers = () => {
     const { t: tSimple, i18n } = useTranslation();
 
     const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = langs.split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -119,7 +117,7 @@ export const Providers = () => {
                     await i18n.changeLanguage(lang);
                 },
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -237,8 +235,11 @@ export const Loader: FC = () => {
         return null;
     }
 
+    // set api url synchronously
+    setProApiUrl(config.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
-        mainnetApi: getApiConfig(config.mainnetConfig, import.meta.env.VITE_APP_TONCONSOLE_HOST),
+        mainnetApi: getApiConfig(config.mainnetConfig),
         testnetApi: getApiConfig(config.testnetConfig),
         fiat,
         mainnetConfig: config.mainnetConfig,
@@ -249,11 +250,6 @@ export const Loader: FC = () => {
         proFeatures: true,
         experimental: true,
         ios: false,
-        env: {
-            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
-            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        },
         defaultWalletVersion: WalletVersion.V5R1,
         tracker: tracker?.track
     };

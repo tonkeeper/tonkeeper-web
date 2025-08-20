@@ -39,6 +39,7 @@ import {
 } from './libs/tonkeeper-injection-context';
 import { Address } from '@ton/core';
 import { defaultLanguage } from './i18n';
+import { localesList } from '@tonkeeper/locales/localesList';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -74,8 +75,7 @@ const queryParamLangKey = (supportedLanguages: string[]) => {
 };
 
 export const App: FC = () => {
-    const languages = (import.meta.env.VITE_APP_LOCALES ?? defaultLanguage).split(',');
-    const queryParamsLang = queryParamLangKey(languages);
+    const queryParamsLang = queryParamLangKey(localesList);
 
     const { t: tSimple, i18n } = useTranslation();
 
@@ -95,7 +95,7 @@ export const App: FC = () => {
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as unknown as (lang: string) => Promise<void>,
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -225,10 +225,7 @@ const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            serverConfig.mainnetConfig,
-            import.meta.env.VITE_APP_TONCONSOLE_HOST
-        ),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
         testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
@@ -240,10 +237,6 @@ const Loader: FC = () => {
         ios,
         defaultWalletVersion: WalletVersion.V5R1,
         hideMultisig: true,
-        env: {
-            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
-        },
         tracker: tracker?.track
     };
 

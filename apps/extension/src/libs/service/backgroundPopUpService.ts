@@ -66,7 +66,7 @@ popUpEventEmitter.on('userProperties', message => {
     const { aptabaseEndpoint, aptabaseKey, ...restParams } = message.params;
     aptabase = new Aptabase({
         host: aptabaseEndpoint,
-        key: aptabaseKey ?? process.env.REACT_APP_APTABASE!,
+        key: aptabaseKey,
         appVersion: browser.runtime.getManifest().version,
         userIdentity
     });

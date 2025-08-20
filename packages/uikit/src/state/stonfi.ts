@@ -1,16 +1,14 @@
-import { useAppContext } from '../hooks/appContext';
 import { isTon, TonAssetAddress } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { useActiveConfig } from './wallet';
 
 export const useStonfiSwapLink = (fromToken: TonAssetAddress, toToken: TonAssetAddress): string => {
-    const { env } = useAppContext();
     const config = useActiveConfig();
 
     return generateStonfiSwapLink(
         fromToken,
         toToken,
         config.tonkeeper_utm_track,
-        env?.stonfiReferralAddress
+        config.stonfi_direct_link_referral_address
     );
 };
 

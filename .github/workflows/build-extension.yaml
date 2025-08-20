@@ -25,11 +25,6 @@ jobs:
               with:
                   cmd: install
 
-            - name: Provide ENV
-              run: |
-                echo "REACT_APP_APTABASE=${{ secrets.VITE_APP_APTABASE }}" >> apps/extension/.env
-                echo "REACT_APP_APTABASE_HOST=https://anonymous-analytics.tonkeeper.com" >> apps/extension/.env
-
             - name: Run build
               uses: borales/actions-yarn@v5
               with:
