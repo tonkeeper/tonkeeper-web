@@ -152,13 +152,6 @@ const DeleteAllContent: FC<{ onClose: (action: () => void) => void }> = ({ onClo
                         {t('I_have_a_backup_copy_of_recovery_phrase')}
                     </Checkbox>
                 </DisclaimerText>
-                <DisclaimerLink
-                    onClick={() =>
-                        onClose(() => navigate(AppRoute.settings + SettingsRoute.recovery))
-                    }
-                >
-                    {t('Back_up_now')}
-                </DisclaimerLink>
             </DisclaimerBlock>
             <Button
                 disabled={!checked}
