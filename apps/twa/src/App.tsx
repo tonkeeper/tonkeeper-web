@@ -242,7 +242,7 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         build: sdk.version,
         network,
         lang,
-        platform: 'web'
+        platform: 'twa'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 

@@ -3,7 +3,14 @@ import { removeLastSlash } from '../utils/url';
 import { intlLocale } from '../entries/language';
 
 export interface BootParams {
-    platform: 'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'swap_widget_web';
+    platform:
+        | 'web'
+        | 'desktop'
+        | 'tablet'
+        | 'extension'
+        | 'pro_mobile_ios'
+        | 'swap_widget_web'
+        | 'twa';
     lang: 'en' | 'ru' | string;
     build: string;
     network: Network;
