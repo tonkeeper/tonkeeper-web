@@ -31,12 +31,10 @@ import { batteryImagesMap, FallbackBatteryIcon } from '../components/settings/ba
 import { isStandardTonWallet, TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { useTwoFAWalletConfig } from './two-fa';
 import { Network } from '@tonkeeper/core/dist/entries/network';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from './tonendpoint';
 
-export const useCanUseBattery = () => {
+const useIsAccountSuitableForBattery = () => {
     const network = useActiveTonNetwork();
-    const {
-        flags: { disable_battery: disableBatteryFlag }
-    } = useActiveConfig();
     const { data: twoFAWalletConfig } = useTwoFAWalletConfig();
     const account = useActiveAccount();
 
@@ -48,7 +46,30 @@ export const useCanUseBattery = () => {
             twoFAWalletConfig?.status === 'active' || twoFAWalletConfig?.status === 'disabling';
     }
 
-    return isAccountSuitable && !disableDueToTwoFA && !disableBatteryFlag;
+    return isAccountSuitable && !disableDueToTwoFA;
+};
+
+const useCanSpendBattery = () => {
+    const batteryEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.BATTERY);
+    const { data: balance } = useBatteryBalance();
+
+    if (batteryEnabled) {
+        return true;
+    }
+
+    return balance?.batteryUnitsBalance.gt(0);
+};
+
+export const useCanSeeBattery = () => {
+    const isAccountSuitable = useIsAccountSuitableForBattery();
+    const canViewOrSpend = useCanSpendBattery();
+    return isAccountSuitable && canViewOrSpend;
+};
+
+export const useCanBuyBattery = () => {
+    const isAccountSuitable = useIsAccountSuitableForBattery();
+    const batteryEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.BATTERY);
+    return isAccountSuitable && batteryEnabled;
 };
 
 export const useBatteryApi = () => {

@@ -22,7 +22,7 @@ import {
     useBatteryServiceConfig,
     useBatteryUnitTonRate,
     useRequestBatteryAuthToken,
-    useCanUseBattery
+    useCanSeeBattery
 } from '../../state/battery';
 import { getTronSigner, useGetAccountSigner } from '../../state/mnemonic';
 import { useCallback, useMemo } from 'react';
@@ -94,7 +94,7 @@ export const useAvailableSendersChoices = (
     const account = useActiveAccount();
     const { batteryReservedAmount } = useActiveConfig();
     const gaslessConfig = useGaslessConfig();
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
     const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const [walletInfo] = useAssets();
     const { data: twoFaConfig, isEnabled: isTwoFAEnabled } = useTwoFAWalletConfig();
@@ -200,7 +200,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const { data: batteryAuthToken } = useBatteryAuthToken();
     const account = useActiveAccount();
     const batteryConfig = useBatteryServiceConfig();
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
     const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const { data: twoFaConfig } = useTwoFAWalletConfig();
     const batteryUnitTonRate = useBatteryUnitTonRate();

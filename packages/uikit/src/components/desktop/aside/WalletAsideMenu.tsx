@@ -28,7 +28,7 @@ import {
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
+import { useBatteryBalance, useCanSeeBattery } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv } from '../../shared/TargetEnv';
@@ -105,7 +105,7 @@ export const WalletAsideMenu = () => {
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
 
     const menuController = useMenuController('wallet-nav');
     useEffect(() => {

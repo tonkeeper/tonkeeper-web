@@ -21,7 +21,7 @@ import { useActiveAccount, useActiveTonNetwork, useIsActiveWalletWatchOnly } fro
 import { useIsActiveAccountMultisig, useUnviewedAccountOrdersNumber } from '../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useBatteryBalance, useCanUseBattery } from '../state/battery';
+import { useBatteryBalance, useCanSeeBattery } from '../state/battery';
 import { RoundedBadge } from '../components/shared/Badge';
 import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
 import { HideOnReview } from '../components/ios/HideOnReview';
@@ -95,7 +95,7 @@ export const MobileProHomePage = () => {
     const showMultisigs = isAccountCanManageMultisigs(account);
     const network = useActiveTonNetwork();
     const isTestnet = network === Network.TESTNET;
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
 
     return (
         <DesktopViewPageLayout id={mobileProHomePageId}>

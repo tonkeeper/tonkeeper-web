@@ -26,7 +26,7 @@ import {
     isAccountVersionEditable,
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
-import { useCanUseBattery } from '../../state/battery';
+import { useCanSeeBattery } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { useNavigate } from '../../hooks/router/useNavigate';
@@ -38,7 +38,7 @@ const SingleAccountSettings = () => {
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
     const { onOpen: rename } = useRenameNotification();
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
     const twoFAEnabled = useCanViewTwoFA();
     const canUseTron = useCanUseTronForActiveWallet();
 
@@ -190,7 +190,7 @@ const MultipleAccountSettings = () => {
     const { data: nft } = useWalletNftList();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
     const twoFAEnabled = useCanViewTwoFA();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
