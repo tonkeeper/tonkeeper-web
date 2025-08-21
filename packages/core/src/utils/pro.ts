@@ -1,4 +1,3 @@
-import { UserInfo } from './types';
 import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
 import { isStandardTonWallet } from '../entries/wallet';
@@ -16,6 +15,7 @@ import {
     isProductId,
     isProSubscription,
     isValidSubscription,
+    IUserInfo,
     ProductIds,
     ProSubscription,
     TelegramSubscriptionStatuses
@@ -176,7 +176,7 @@ export const normalizeSubscription = (
     return null;
 };
 
-export const findAuthorizedWallet = async (user: UserInfo, storage: IStorage) => {
+export const findAuthorizedWallet = async (user: IUserInfo, storage: IStorage) => {
     if (!user.pub_key || !user.version) return null;
     const wallets = (await accountsStorage(storage).getAccounts())
         .filter(a => getNetworkByAccount(a) === Network.MAINNET)

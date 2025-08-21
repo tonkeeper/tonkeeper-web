@@ -4,7 +4,7 @@ import {
     PurchaseErrors,
     PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
-import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
@@ -23,7 +23,7 @@ export const useProPurchaseController = () => {
     const { t } = useTranslation();
     const toast = useToast();
     const navigate = useNavigate();
-    const targetAuth = useAtomValue(tokenizedWalletAuthAtom);
+    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const { onClose: onCurrentClose } = useProPurchaseNotification();
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
 

@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { useLocation } from 'react-router-dom';
 
@@ -41,6 +41,7 @@ import { Badge } from '../../shared';
 import { createMultiTap } from '@tonkeeper/core/dist/utils/common';
 import { useToast } from '../../../hooks/useNotification';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { useDevMenuVisibility, useMutateDevMenuVisibility } from '../../../state/dev';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -127,7 +128,8 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { data: support } = useSupport();
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
-    const { isOpen: isDevMenuVisible, onOpen: setIsDevMenuVisible } = useDisclosure(false);
+    const { data: isDevMenuVisible } = useDevMenuVisibility();
+    const { mutate: setIsDevMenuVisible } = useMutateDevMenuVisibility();
 
     const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
 
@@ -144,16 +146,6 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
 
         onProPurchaseOpen();
     };
-
-    useEffect(() => {
-        (async () => {
-            const isDevVisible = Boolean(await sdk.storage.get(AppKey.IS_DEV_MENU_VISIBLE));
-
-            if (isDevVisible) {
-                setIsDevMenuVisible();
-            }
-        })();
-    }, []);
 
     const onFiveTaps = createMultiTap(async () => {
         setIsDevMenuVisible();

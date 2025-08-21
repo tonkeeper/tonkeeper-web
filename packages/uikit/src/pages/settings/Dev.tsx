@@ -33,6 +33,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
+import { useDevMenuVisibility } from '../../state/dev';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -244,19 +245,19 @@ export const DevSettingsLogs = () => {
 };
 
 export const DevSettings = React.memo(() => {
-    const sdk = useAppSdk();
     const navigate = useNavigate();
     const isProDisplay = useIsFullWidthMode();
+    const { data: isDevVisible, isLoading } = useDevMenuVisibility();
 
     useEffect(() => {
-        (async () => {
-            const isDevVisible = Boolean(await sdk.storage.get(AppKey.IS_DEV_MENU_VISIBLE));
+        if (!isLoading && !isDevVisible) {
+            navigate(AppRoute.home);
+        }
+    }, [isLoading, isDevVisible, navigate]);
 
-            if (!isDevVisible) {
-                navigate(AppRoute.home);
-            }
-        })();
-    }, []);
+    if (isLoading) return null;
+
+    if (!isDevVisible) return null;
 
     if (isProDisplay) {
         return (

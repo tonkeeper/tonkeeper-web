@@ -37,7 +37,7 @@ import {
 import { useActiveApi } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
-import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -90,7 +90,7 @@ export const useProState = () => {
             }
 
             const subscription = await sdk.subscriptionStrategy.getSubscription(
-                tokenizedWalletAuthAtom?.value?.tempToken ?? null
+                subscriptionFormTempAuth$?.value?.tempToken ?? null
             );
 
             await setBackupState(sdk.storage, subscription);
@@ -141,7 +141,7 @@ export const useSelectWalletForProMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
 
-    const [, setTargetAuth] = useAtom(tokenizedWalletAuthAtom);
+    const [, setTargetAuth] = useAtom(subscriptionFormTempAuth$);
     const accountsStorage = useAccountsStorage();
 
     return useMutation<void, Error, string>(async walletId => {
@@ -182,7 +182,7 @@ export const useAutoAuthMutation = () => {
     const api = useActiveApi();
     const { data: subscription } = useProState();
     const client = useQueryClient();
-    const [, setTargetAuth] = useAtom(tokenizedWalletAuthAtom);
+    const [, setTargetAuth] = useAtom(subscriptionFormTempAuth$);
 
     return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {

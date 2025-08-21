@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
     isPaidActiveSubscription,
@@ -30,6 +30,7 @@ import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscri
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 import { usePreloadImages } from '../../../hooks/usePreloadImages';
 import { useAppContext } from '../../../hooks/appContext';
+import { getAllCarouselImages } from '../../../libs/pro';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -167,18 +168,9 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
-    usePreloadImages([
-        `${baseSlideUrl}eng/1.png`,
-        `${baseSlideUrl}eng/2.png`,
-        `${baseSlideUrl}eng/3.png`,
-        `${baseSlideUrl}eng/4.png`,
-        `${baseSlideUrl}eng/5.png`,
-        `${baseSlideUrl}ru/1.png`,
-        `${baseSlideUrl}ru/2.png`,
-        `${baseSlideUrl}ru/3.png`,
-        `${baseSlideUrl}ru/4.png`,
-        `${baseSlideUrl}ru/5.png`
-    ]);
+    const carouselImages = useMemo(() => getAllCarouselImages(baseSlideUrl), [baseSlideUrl]);
+
+    usePreloadImages(carouselImages);
     useIosSubscriptionPolling();
     useSubscriptionEndingVerification();
 

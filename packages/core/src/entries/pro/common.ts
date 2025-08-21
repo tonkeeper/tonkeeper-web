@@ -91,3 +91,10 @@ export interface ISupportData {
     url: string;
     isPriority: boolean;
 }
+
+export interface IUserInfo {
+    pub_key?: string;
+    version?: string;
+    user_id?: number;
+    tg_id?: number;
+}

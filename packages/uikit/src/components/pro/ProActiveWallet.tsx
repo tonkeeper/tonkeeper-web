@@ -1,6 +1,6 @@
 import { type FC, ReactNode } from 'react';
 import styled from 'styled-components';
-import { tokenizedWalletAuthAtom } from '@tonkeeper/core/dist/ProAuthTokenService';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 import { Label2 } from '../Text';
 import { useProState } from '../../state/pro';
@@ -22,7 +22,7 @@ export const ProActiveWallet: FC<IProps> = props => {
     const { onDisconnect, isLoading, title, isCurrentSubscription } = props;
     const { t } = useTranslation();
     const { data: subscription } = useProState();
-    const targetAuth = useAtomValue(tokenizedWalletAuthAtom);
+    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const { account, wallet } = useControllableAccountAndWalletByWalletId(
         (() => {
             const currentAuth = subscription?.auth;

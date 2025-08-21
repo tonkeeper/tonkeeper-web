@@ -61,7 +61,7 @@ export const PromoNotificationCarousel = () => {
 
                 <ItemGroupStyled ref={containerRef}>
                     {META_DATA_MAP.map((localProps, idx) => {
-                        const { id, titleKey, subtitleKey, badgeComponent } = localProps;
+                        const { id, titleKey, src, subtitleKey, badgeComponent } = localProps;
 
                         const locText = localizationText(lang);
                         const langKey = locText === 'ru' ? 'ru' : 'eng';
@@ -70,7 +70,7 @@ export const PromoNotificationCarousel = () => {
                             <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
                                 <ImageWrapper isActive={observedSlide === idx}>
                                     <SlideImage
-                                        src={`${baseSlideUrl}${langKey}/${idx + 1}.png`}
+                                        src={`${baseSlideUrl}${src[langKey]}`}
                                         alt={titleKey}
                                     />
                                 </ImageWrapper>
@@ -138,14 +138,14 @@ const LocalBadge = () => {
     );
 };
 
-const META_DATA_MAP = [
+export const META_DATA_MAP = [
     {
         id: FeatureSlideNames.MAIN,
         titleKey: 'tonkeeper_pro_subscription',
         subtitleKey: 'promo_subtitle_subscription',
         src: {
-            ru: '/ru/1.png',
-            en: '/eng/1.png'
+            ru: 'ru/1.png',
+            eng: 'eng/1.png'
         }
     },
     {
@@ -153,8 +153,8 @@ const META_DATA_MAP = [
         titleKey: 'promo_title_multisig_wallets',
         subtitleKey: 'promo_subtitle_multisig_wallets',
         src: {
-            ru: '/ru/2.png',
-            en: '/eng/2.png'
+            ru: 'ru/2.png',
+            eng: 'eng/2.png'
         }
     },
     {
@@ -162,8 +162,8 @@ const META_DATA_MAP = [
         titleKey: 'promo_title_multi_wallet_accounts',
         subtitleKey: 'promo_subtitle_multi_wallet_accounts',
         src: {
-            ru: '/ru/3.png',
-            en: '/eng/3.png'
+            ru: 'ru/3.png',
+            eng: 'eng/3.png'
         }
     },
     {
@@ -172,8 +172,8 @@ const META_DATA_MAP = [
         badgeComponent: <LocalBadge />,
         subtitleKey: 'promo_subtitle_multisend',
         src: {
-            ru: '/ru/4.png',
-            en: '/eng/4.png'
+            ru: 'ru/4.png',
+            eng: 'eng/4.png'
         }
     },
     {
@@ -181,8 +181,8 @@ const META_DATA_MAP = [
         titleKey: 'pro_feature_priority_support_title',
         subtitleKey: 'promo_subtitle_support',
         src: {
-            ru: '/ru/5.png',
-            en: '/eng/5.png'
+            ru: 'ru/5.png',
+            eng: 'eng/5.png'
         }
     }
 ];
