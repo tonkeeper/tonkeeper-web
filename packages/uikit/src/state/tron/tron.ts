@@ -22,13 +22,23 @@ import { useGlobalPreferences, useMutateGlobalPreferences } from '../global-pref
 import { useToggleHideJettonMutation } from '../jetton';
 
 export const useIsTronEnabledForActiveWallet = () => {
-    const isTronEnabled = useIsTronEnabledGlobally();
     const tronWallet = useActiveTronWallet();
     const { data } = useActiveTonWalletConfig();
 
-    return Boolean(
-        isTronEnabled && tronWallet && data && !data.hiddenTokens.includes(TRON_USDT_ASSET.address)
-    );
+    return Boolean(tronWallet && data && !data.hiddenTokens.includes(TRON_USDT_ASSET.address));
+};
+
+export const useCanReceiveTron = () => {
+    const isTronEnabledForWallet = useIsTronEnabledForActiveWallet();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const { data: balance } = useTronBalances();
+    const tronWallet = useActiveTronWallet();
+
+    if (!isTronEnabledGlobally) {
+        return balance?.usdt?.weiAmount.gt(0) && isTronEnabledForWallet && tronWallet;
+    }
+
+    return isTronEnabledForWallet && tronWallet;
 };
 
 export const useToggleIsTronEnabledForActiveWallet = () => {

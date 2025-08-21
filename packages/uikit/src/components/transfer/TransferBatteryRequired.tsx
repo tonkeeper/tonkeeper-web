@@ -20,6 +20,8 @@ import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { BatteryChargingIcon } from '../settings/battery/BatteryIcons';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { handleSubmit } from '../../libs/form';
+import { IfFeatureEnabled } from '../shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
 export const TransferBatteryRequired: FC<{
     onBack: () => void;
@@ -57,9 +59,11 @@ export const TransferBatteryRequired: FC<{
             {!shouldHideHeaderAndFooter && (
                 <NotificationFooterPortal>
                     <NotificationFooter>
-                        <ChargeBatteryButton primary fullWidth onClick={onCharge}>
-                            {t('transfer_battery_required_button')}
-                        </ChargeBatteryButton>
+                        <IfFeatureEnabled feature={FLAGGED_FEATURE.BATTERY}>
+                            <ChargeBatteryButton primary fullWidth onClick={onCharge}>
+                                {t('transfer_battery_required_button')}
+                            </ChargeBatteryButton>
+                        </IfFeatureEnabled>
                     </NotificationFooter>
                 </NotificationFooterPortal>
             )}

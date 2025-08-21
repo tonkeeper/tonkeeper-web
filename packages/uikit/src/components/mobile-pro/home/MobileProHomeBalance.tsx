@@ -8,7 +8,7 @@ import React, { FC } from 'react';
 import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
 import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { useIsTronEnabledForActiveWallet } from '../../../state/tron/tron';
+import { useCanReceiveTron } from '../../../state/tron/tron';
 import { AddressMultiChain } from '../../home/Balance';
 import { ChevronDownIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
@@ -76,7 +76,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     const { data: balance, isLoading } = useWalletTotalBalance();
     const fiat = useUserFiat();
     const activeAccount = useActiveAccount();
-    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const isTronEnabled = useCanReceiveTron();
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { isConnected } = useInternetConnection();

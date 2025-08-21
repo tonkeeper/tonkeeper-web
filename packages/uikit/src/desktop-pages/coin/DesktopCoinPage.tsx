@@ -30,7 +30,6 @@ import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoi
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { HideOnReview } from '../../components/ios/HideOnReview';
 import {
     KNOWN_TON_ASSETS,
     TON_ASSET,
@@ -40,7 +39,7 @@ import {
     jettonToTonAssetAmount,
     tonAssetAddressFromString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
+import { useCanReceiveTron, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
@@ -70,7 +69,7 @@ export const DesktopCoinPage = () => {
         }
     }, [name]);
 
-    const canUseTron = useActiveTronWallet();
+    const canUseTron = useCanReceiveTron();
 
     if (!name) return <></>;
 
@@ -575,9 +574,9 @@ export const TronUSDTPage = () => {
                     </ButtonStyled>
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
-            <HideOnReview>
+            <IfFeatureEnabled feature={FLAGGED_FEATURE.BATTERY}>
                 <TronUseBatteryBanner />
-            </HideOnReview>
+            </IfFeatureEnabled>
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />

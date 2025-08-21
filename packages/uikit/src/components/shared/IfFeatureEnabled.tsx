@@ -6,5 +6,5 @@ export const IfFeatureEnabled: FC<
 > = ({ children, feature, applied }) => {
     const isEnabled = useIsFeatureEnabled(feature);
 
-    return isEnabled || !applied ? <>{children}</> : null;
+    return isEnabled || applied === false ? <>{children}</> : null;
 };
