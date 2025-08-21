@@ -53,7 +53,7 @@ export const NftDetails: FC<{ nftItem: NftItem; kind: NFTKind }> = React.memo(({
     const address = Address.parse(item.address).toString();
 
     const network = useActiveTonNetwork();
-    const url = config.NFTOnExplorerUrl ?? 'https://tonviewer.com/nft/%s';
+    const url = config.NFTOnExplorerUrl;
     const nftAddress = formatAddress(address, network, true);
 
     return (

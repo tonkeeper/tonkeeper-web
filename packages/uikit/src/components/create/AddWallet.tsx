@@ -5,7 +5,7 @@ import { useTranslation } from '../../hooks/translation';
 import { Body2, Body3Class, Label1, Label2Class } from '../Text';
 import { BorderSmallResponsive } from '../shared/Styles';
 import { Badge } from '../shared';
-import { useAccountsState, useActiveAccountQuery } from '../../state/wallet';
+import { useAccountsState, useActiveAccountQuery, useActiveConfig } from '../../state/wallet';
 import {
     WalletFireblocksIcon,
     WalletImportIcon,
@@ -107,6 +107,7 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
     const { hideMam, hideSigner, hideLedger, hideKeystone, hideMultisig, hideFireblocks } =
         useAppContext();
     const hideAllHardwareWallets = hideSigner && hideLedger && hideKeystone;
+    const signerDisabled = useActiveConfig().flags.disable_signer;
 
     const accounts = useAccountsState();
     const { data: activeAccount } = useActiveAccountQuery();
@@ -207,7 +208,7 @@ export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }>
                 <>
                     <GroupsDivider>{t('add_wallet_group_hardware_title')}</GroupsDivider>
                     <AddMethodsGroup>
-                        {!hideSigner && (
+                        {!hideSigner && !signerDisabled && (
                             <AddMethod onClick={() => onSelect('signer')}>
                                 <ButtonIcon>
                                     <WalletSignerIcon />

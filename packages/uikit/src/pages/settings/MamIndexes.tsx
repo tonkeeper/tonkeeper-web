@@ -224,7 +224,7 @@ export const MAMIndexesPageContent: FC<{
 
     const canHide = account.derivations.length > 1;
 
-    const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro || 3;
+    const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro;
     const showByProButton =
         !isValidSubscription(subscription) &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;

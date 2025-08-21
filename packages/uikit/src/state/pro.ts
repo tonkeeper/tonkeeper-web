@@ -34,7 +34,7 @@ import {
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useActiveApi } from './wallet';
+import { useActiveApi, useActiveConfig } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
@@ -42,11 +42,13 @@ import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenServ
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
     const platform = useAppTargetEnv();
+    const config = useActiveConfig();
 
-    return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability], async () => {
+    return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id], async () => {
         const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+        const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
 
-        return platform !== 'tablet' && !isUsedTrial;
+        return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
     });
 };
 
@@ -270,20 +272,23 @@ export const useProPurchaseMutation = () => {
 
 export const useActivateTrialMutation = () => {
     const sdk = useAppSdk();
-    const ctx = useAppContext();
+    const config = useActiveConfig();
     const client = useQueryClient();
     const {
         i18n: { language }
     } = useTranslation();
 
     return useMutation<string, Error>(async () => {
+        if (config.pro_trial_tg_bot_id === undefined) {
+            throw new Error('Pro trial tg bot id is not set');
+        }
+
         const token = await startProServiceTrial(
-            (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
+            config.pro_trial_tg_bot_id,
             language
         );
 
         await sdk.subscriptionStrategy.activateTrial(token);
-
         await client.invalidateQueries([QueryKey.pro]);
 
         return token;

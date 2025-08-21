@@ -9,7 +9,6 @@ import {
     useActiveConfig,
     useActiveWallet
 } from './wallet';
-import { useDevSettings } from './dev';
 import { AccountId, Account } from '@tonkeeper/core/dist/entries/account';
 import { AuthApi, Configuration } from '@tonkeeper/core/dist/2faApi';
 import { useEffect, useMemo } from 'react';
@@ -20,6 +19,7 @@ import { TonWalletStandard, WalletId, WalletVersion } from '@tonkeeper/core/dist
 import { useNotifyErrorHandle, useToast } from '../hooks/useNotification';
 import { useTranslation } from '../hooks/translation';
 import { getMultisigSignerInfo } from './multisig';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from './tonendpoint';
 
 export type TwoFATgBotBoundingWalletConfig = {
     status: 'tg-bot-bounding';
@@ -54,17 +54,8 @@ export type TwoFAWalletConfig =
 const twoFaWalletConfigStorageKey = (walletId: string) =>
     AppKey.TWO_FA_WALLET_CONFIG + '::' + walletId;
 
-export const useIsTwoFAEnabledGlobally = () => {
-    const config = useActiveConfig();
-    if (config.flags?.disable_2fa) {
-        return false;
-    } else {
-        return true;
-    }
-};
-
 export const useCanViewTwoFA = () => {
-    const isEnabled = useIsTwoFAEnabledGlobally();
+    const isEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TWO_FA);
     const { data } = useTwoFAWalletConfig();
     const account = useActiveAccount();
 
@@ -88,7 +79,7 @@ export const useTwoFAServiceConfig = () => {
     const config = useActiveConfig();
 
     return useMemo(() => {
-        if (!config['2fa_public_key'] || !config['2fa_api_url']) {
+        if (!config['2fa_public_key'] || !config['2fa_api_url'] || !config['2fa_bot_url']) {
             throw new Error('2fa_public_key not found');
         }
 
@@ -97,9 +88,9 @@ export const useTwoFAServiceConfig = () => {
         return {
             baseUrl: config['2fa_api_url'],
             servicePubKey,
-            confirmMessageTGTtlSeconds: config['2fa_tg_confirm_send_message_ttl_seconds'] ?? 600,
-            confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'] ?? 600,
-            botUrl: config['2fa_bot_url'] ?? 'https://t.me/tonkeeper'
+            confirmMessageTGTtlSeconds: config['2fa_tg_confirm_send_message_ttl_seconds'],
+            confirmConnectionTGTtlSeconds: config['2fa_tg_linked_ttl_seconds'],
+            botUrl: config['2fa_bot_url']
         };
     }, [config]);
 };

@@ -22,7 +22,7 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { SelectDropDown } from '../fields/Select';
 import { TON_ASSET, TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { ChevronDownIcon, CopyIcon, DoneIcon } from '../Icon';
-import { useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
+import { useCanReceiveTron } from '../../state/tron/tron';
 import { BatteryBalanceIcon } from '../settings/battery/BatteryInfoHeading';
 import { useBatteryBalance } from '../../state/battery';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
@@ -116,7 +116,7 @@ export const Balance: FC<{
     const client = useQueryClient();
     const network = getNetworkByAccount(account);
 
-    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const isTronEnabled = useCanReceiveTron();
 
     const { data: total } = useWalletTotalBalance();
     const { data: batteryBalance } = useBatteryBalance();

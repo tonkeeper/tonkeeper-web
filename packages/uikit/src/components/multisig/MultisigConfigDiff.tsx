@@ -2,7 +2,6 @@ import { FC } from 'react';
 import { styled } from 'styled-components';
 import { Body2 } from '../Text';
 import { useAppSdk } from '../../hooks/appSdk';
-import { useAppContext } from '../../hooks/appContext';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useTranslation } from '../../hooks/translation';
 import { MultisigConfig } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/multisig-encoder';
@@ -39,7 +38,7 @@ export const MultisigConfigDiff: FC<{
     const config = useActiveConfig();
 
     const onOpenTonviewer = (address: string) => {
-        const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
+        const explorerUrl = config.accountExplorer;
 
         sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
     };
