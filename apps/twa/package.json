@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/twa",
-    "version": "3.20.2",
+    "version": "3.20.3",
     "author": "Ton APPS UK Limited <support@tonkeeper.com>",
     "description": "Your telegram mini app wallet on The Open Network",
     "dependencies": {
@@ -54,7 +54,7 @@
         "build": "tsc && yarn locales && vite build",
         "generate:twaApi": "rm -fr src/twaApi && docker build -f task/Dockerfile.twaApi . -t twaapisdk && docker run --rm --user=$(id -u):$(id -g) -v \"$PWD\":/local twaapisdk",
         "analyze": "source-map-explorer 'build/static/js/*.js'",
-        "deploy": "yarn build && npx wrangler pages deploy dist/",
+        "deploy": "yarn build && npx wrangler pages deploy dist/ --project-name=tonkeeper-telegram",
         "deploy:dev": "yarn build && npx wrangler pages deploy dist/ --project-name=tonkeeper-twa-dev",
         "build:twa": "yarn build"
     },
