@@ -137,7 +137,10 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
                     <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                         <IfFeatureEnabled
                             feature={FLAGGED_FEATURE.ETHENA}
-                            applied={eqAddresses(address, KNOWN_TON_ASSETS.USDe)}
+                            applied={
+                                eqAddresses(address, KNOWN_TON_ASSETS.USDe) ||
+                                eqAddresses(address, KNOWN_TON_ASSETS.tsUSDe)
+                            }
                         >
                             {swapAsset && <SwapAction fromAsset={swapAsset} />}
                         </IfFeatureEnabled>

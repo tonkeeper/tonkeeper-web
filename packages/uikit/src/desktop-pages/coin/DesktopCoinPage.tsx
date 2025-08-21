@@ -178,7 +178,10 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                 <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                     <IfFeatureEnabled
                         feature={FLAGGED_FEATURE.ETHENA}
-                        applied={eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.USDe)}
+                        applied={
+                            eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.USDe) ||
+                            eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.tsUSDe)
+                        }
                     >
                         {swapAsset && (
                             <ButtonStyled size="small" onClick={onSwap}>
