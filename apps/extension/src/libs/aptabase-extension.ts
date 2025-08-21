@@ -5,10 +5,7 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AnalyticsEvent } from '@tonkeeper/core/dist/analytics';
 
 export class AptabaseExtension implements Analytics {
-    constructor(
-        private readonly aptabaseEndpoint: string,
-        private readonly aptabaseKey: string | undefined
-    ) {
+    constructor(private readonly aptabaseEndpoint: string, private readonly aptabaseKey: string) {
         this.track = this.track.bind(this);
     }
 
