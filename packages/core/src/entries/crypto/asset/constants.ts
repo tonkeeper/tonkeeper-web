@@ -55,5 +55,6 @@ export const TON_USDT_ASSET = {
 } satisfies TonAsset;
 
 export const KNOWN_TON_ASSETS = {
-    jUSDT: Address.parse('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA')
+    jUSDT: Address.parse('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA'),
+    USDe: Address.parse('UQAIb6KmdfdDR7CN1GBqVJuP25iCnLKCvBlJ07Evuu2dzKOa')
 };

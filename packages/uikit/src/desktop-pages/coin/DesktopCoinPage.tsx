@@ -31,7 +31,11 @@ import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wal
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    KNOWN_TON_ASSETS,
+    TON_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     jettonToTonAssetAmount,
     tonAssetAddressFromString
@@ -172,12 +176,17 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     {t('wallet_receive')}
                 </ButtonStyled>
                 <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
-                    {swapAsset && (
-                        <ButtonStyled size="small" onClick={onSwap}>
-                            <SwapIcon />
-                            {t('wallet_swap')}
-                        </ButtonStyled>
-                    )}
+                    <IfFeatureEnabled
+                        feature={FLAGGED_FEATURE.ETHENA}
+                        applied={eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.USDe)}
+                    >
+                        {swapAsset && (
+                            <ButtonStyled size="small" onClick={onSwap}>
+                                <SwapIcon />
+                                {t('wallet_swap')}
+                            </ButtonStyled>
+                        )}
+                    </IfFeatureEnabled>
                 </IfFeatureEnabled>
 
                 <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
@@ -385,9 +394,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     }, [assets, t, token]);
 
     const { mainnetConfig } = useAppContext();
-    const tonviewer = mainnetConfig.accountExplorer
-        ? new URL(mainnetConfig.accountExplorer).origin
-        : 'https://tonviewer.com';
+    const tonviewer = new URL(mainnetConfig.accountExplorer).origin;
 
     if (asset === undefined) {
         return <Redirect to={AppRoute.home} />;

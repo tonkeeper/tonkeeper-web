@@ -31,6 +31,8 @@ import EmptyActivity from '../../components/activity/EmptyActivity';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 import { FLAGGED_FEATURE } from '../../state/tonendpoint';
+import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
+import { KNOWN_TON_ASSETS } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const MobileAssetHistory: FC<{
     assetAddress: string;
@@ -112,7 +114,8 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
     const isReadOnly = useIsActiveWalletWatchOnly();
     const { data: swapAssets } = useAllSwapAssets();
 
-    const jettonAddressRaw = Address.parse(jettonAddress).toRawString();
+    const address = Address.parse(jettonAddress);
+    const jettonAddressRaw = address.toRawString();
     const swapAsset = isReadOnly
         ? undefined
         : swapAssets?.find(a => tonAssetAddressToString(a.address) === jettonAddressRaw);
@@ -132,7 +135,12 @@ export const JettonContent: FC<{ jettonAddress: string }> = ({ jettonAddress }) 
                     )}
                     <ReceiveAction jetton={info.metadata.address} />
                     <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
-                        {swapAsset && <SwapAction fromAsset={swapAsset} />}
+                        <IfFeatureEnabled
+                            feature={FLAGGED_FEATURE.ETHENA}
+                            applied={eqAddresses(address, KNOWN_TON_ASSETS.USDe)}
+                        >
+                            {swapAsset && <SwapAction fromAsset={swapAsset} />}
+                        </IfFeatureEnabled>
                     </IfFeatureEnabled>
                 </ActionsRow>
 

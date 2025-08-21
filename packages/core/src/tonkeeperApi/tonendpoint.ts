@@ -31,6 +31,7 @@ export interface TonendpointConfig {
         disable_signer: boolean;
         disable_exchange_methods: boolean;
         disable_dapps: boolean;
+        disable_usde: boolean;
     };
 
     ton_connect_bridge: string;
@@ -116,7 +117,8 @@ export const defaultTonendpointConfig: TonendpointConfig = {
         disable_2fa: false,
         disable_signer: false,
         disable_exchange_methods: false,
-        disable_dapps: false
+        disable_dapps: false,
+        disable_usde: false
     },
     ton_connect_bridge: 'https://bridge.tonapi.io',
     tonapiV2Endpoint: 'https://keeper.tonapi.io',
