@@ -24,7 +24,7 @@ import { TON_ASSET, TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/a
 import { ChevronDownIcon, CopyIcon, DoneIcon } from '../Icon';
 import { useCanReceiveTron } from '../../state/tron/tron';
 import { BatteryBalanceIcon } from '../settings/battery/BatteryInfoHeading';
-import { useBatteryBalance } from '../../state/battery';
+import { useBatteryBalance, useCanSeeBattery } from '../../state/battery';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
 
@@ -120,6 +120,7 @@ export const Balance: FC<{
 
     const { data: total } = useWalletTotalBalance();
     const { data: batteryBalance } = useBatteryBalance();
+    const canSeeBattery = useCanSeeBattery();
 
     const navigate = useNavigate();
 
@@ -141,7 +142,7 @@ export const Balance: FC<{
             <Amount>
                 <span>{formatFiatCurrency(fiat, total || 0)}</span>
                 <NetworkBadge network={network} />
-                {!!batteryBalance && (
+                {!!batteryBalance && canSeeBattery && (
                     <BatteryBalanceIconStyled
                         onClick={() => navigate(AppRoute.settings + WalletSettingsRoute.battery)}
                         balance={batteryBalance}
