@@ -17,7 +17,6 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { QueryKey } from '../libs/queryKey';
-import { useTonenpointConfig } from './tonendpoint';
 import {
     useActiveApi,
     useActiveTonNetwork,
@@ -34,18 +33,16 @@ export const useMarkNftAsSpam = () => {
     const wallet = useActiveWallet();
     const sdk = useAppSdk();
     const { mutateAsync } = useMutateActiveTonWalletConfig();
-    const { tonendpoint } = useAppContext();
-    const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { mainnetConfig } = useAppContext();
     const { t } = useTranslation();
     const network = useActiveTonNetwork();
     return useMutation<void, Error, NftWithCollectionId>(async nft => {
         let config = await getActiveWalletConfig(sdk, wallet.rawAddress, network);
 
         const address = nft.collection?.address || nft.address;
-        const tonendpointConfig = serverConfig?.mainnetConfig;
 
-        if (!config.spamNfts.includes(address) && tonendpointConfig?.scam_api_url) {
-            let baseUrl = tonendpointConfig?.scam_api_url;
+        if (!config.spamNfts.includes(address) && mainnetConfig?.scam_api_url) {
+            let baseUrl = mainnetConfig?.scam_api_url;
             if (baseUrl.endsWith('/')) {
                 baseUrl = baseUrl.slice(0, baseUrl.length - 1);
             }

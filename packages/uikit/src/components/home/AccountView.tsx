@@ -37,7 +37,7 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { Address } from '@ton/core';
 import { Tabs } from '../Tabs';
-import { useActiveTronWallet, useIsTronEnabledForActiveWallet } from '../../state/tron/tron';
+import { useActiveTronWallet, useCanReceiveTron } from '../../state/tron/tron';
 
 const CopyBlock = styled.div`
     display: flex;
@@ -291,7 +291,7 @@ export const ReceiveContent: FC<{
     const isTon = active === BLOCKCHAIN_NAME.TON;
     const nodeRef = isTon ? tonRef : tronRef;
 
-    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const isTronEnabled = useCanReceiveTron();
 
     return (
         <FullHeightBlockResponsive standalone={standalone}>

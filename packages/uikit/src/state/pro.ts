@@ -41,7 +41,7 @@ import {
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useActiveApi } from './wallet';
+import { useActiveApi, useActiveConfig } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
@@ -82,13 +82,18 @@ export const useFreeProAccessAvailable = () => {
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
     const platform = useAppTargetEnv();
+    const config = useActiveConfig();
 
-    return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability], async () => {
-        const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-        const isMobilePromo = Boolean(await sdk.storage.get(AppKey.PRO_FREE_ACCESS_ACTIVE));
+    return useQuery<boolean, Error>(
+        [QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id],
+        async () => {
+            const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+            const isMobilePromo = Boolean(await sdk.storage.get(AppKey.PRO_FREE_ACCESS_ACTIVE));
+            const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
 
-        return platform !== 'tablet' && !isMobilePromo && !isUsedTrial;
-    });
+            return platform !== 'tablet' && !isMobilePromo && !isUsedTrial && botIdIsSet;
+        }
+    );
 };
 
 export const useSupport = () => {
@@ -183,12 +188,8 @@ export const useProState = () => {
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            const isFreeMobileTrialActive = Boolean(
-                await sdk.storage.get<boolean>(AppKey.PRO_FREE_ACCESS_ACTIVE)
-            );
-
             const { validUntil } = isFreeProAccessAvailable ?? {};
-            const isPromo = env === 'mobile' && isFreeMobileTrialActive && validUntil;
+            const isPromo = env === 'mobile' && validUntil;
             const promoExpirationDate = isPromo && validUntil > new Date() ? validUntil : null;
 
             const state = await getProState({ authService, sdk, promoExpirationDate });
@@ -375,7 +376,7 @@ export const useProPurchaseMutation = () => {
 
 export const useActivateTrialMutation = () => {
     const sdk = useAppSdk();
-    const ctx = useAppContext();
+    const config = useActiveConfig();
     const client = useQueryClient();
     const {
         i18n: { language }
@@ -384,9 +385,13 @@ export const useActivateTrialMutation = () => {
     const authService = useProAuthTokenService();
 
     return useMutation<boolean, Error>(async () => {
+        if (config.pro_trial_tg_bot_id === undefined) {
+            throw new Error('Pro trial tg bot id is not set');
+        }
+
         const result = await startProServiceTrial(
             authService,
-            (ctx.env as { tgAuthBotId: string }).tgAuthBotId,
+            config.pro_trial_tg_bot_id,
             language
         );
 

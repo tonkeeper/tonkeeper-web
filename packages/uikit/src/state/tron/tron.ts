@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useAppContext } from '../../hooks/appContext';
 import { QueryKey } from '../../libs/queryKey';
-import { DefaultRefetchInterval } from '../tonendpoint';
+import { DefaultRefetchInterval, FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
 import {
     useActiveAccount,
     useActiveConfig,
@@ -28,7 +27,6 @@ import {
 } from '../battery';
 import { useGlobalPreferences, useMutateGlobalPreferences } from '../global-preferences';
 import { useToggleHideJettonMutation } from '../jetton';
-import { useIsOnIosReview } from '../../hooks/ios';
 import { useFormatFiat, useRate } from '../rates';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronTrxSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-trx-sender';
@@ -36,13 +34,23 @@ import { TronTrc20Encoder } from '@tonkeeper/core/dist/service/tron-blockchain/e
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 export const useIsTronEnabledForActiveWallet = () => {
-    const isTronEnabled = useIsTronEnabledGlobally();
     const tronWallet = useActiveTronWallet();
     const { data } = useActiveTonWalletConfig();
 
-    return Boolean(
-        isTronEnabled && tronWallet && data && !data.hiddenTokens.includes(TRON_USDT_ASSET.address)
-    );
+    return Boolean(tronWallet && data && !data.hiddenTokens.includes(TRON_USDT_ASSET.address));
+};
+
+export const useCanReceiveTron = () => {
+    const isTronEnabledForWallet = useIsTronEnabledForActiveWallet();
+    const isTronEnabledGlobally = useIsTronEnabledGlobally();
+    const { data: balance } = useTronBalances();
+    const tronWallet = useActiveTronWallet();
+
+    if (!isTronEnabledGlobally) {
+        return balance?.usdt?.weiAmount.gt(0) && isTronEnabledForWallet && tronWallet;
+    }
+
+    return isTronEnabledForWallet && tronWallet;
 };
 
 export const useToggleIsTronEnabledForActiveWallet = () => {
@@ -77,20 +85,16 @@ export const useAutoMarkTronFeatureAsSeen = () => {
 };
 
 export const useTronApi = () => {
-    const appContext = useAppContext();
-    const apiKey = appContext.env?.tronApiKey;
-
-    const apiUrl = appContext.mainnetConfig.tron_api_url || 'https://api.trongrid.io';
+    const config = useActiveConfig();
+    const apiKey = config.tron_api_key;
+    const apiUrl = config.tron_api_url;
     const batteryApi = useBatteryApi();
 
     return useMemo(() => new TronApi({ baseURL: apiUrl, apiKey }, batteryApi), [apiKey, apiUrl]);
 };
 
 export const useIsTronEnabledGlobally = () => {
-    const config = useActiveConfig();
-    const isOnReview = useIsOnIosReview();
-
-    return !config.flags?.disable_tron && !isOnReview;
+    return useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 };
 
 export const useCanUseTronForActiveWallet = () => {
