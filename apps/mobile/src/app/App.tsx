@@ -38,7 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { createGlobalStyle, css } from 'styled-components';
 import { CapacitorAppSdk } from '../libs/appSdk';
 import { CAPACITOR_APPLICATION_ID } from '../libs/aplication-id';
-import { useAnalytics, useAppHeight, useDeviceCountryInfo } from '../libs/hooks';
+import { useAnalytics, useAppHeight } from '../libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { CapacitorNotifications } from '../libs/capacitorNotifications';
@@ -49,6 +49,7 @@ import { WideContent } from './app-content/WideContent';
 import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
 import { queryClient } from '../libs/query-client';
 import { localesList } from '@tonkeeper/locales/localesList';
+import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -182,7 +183,7 @@ export const Loader: FC = () => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
-    const { data: countryInfo } = useDeviceCountryInfo();
+    const { data: countryInfo } = useAppCountryInfo();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();

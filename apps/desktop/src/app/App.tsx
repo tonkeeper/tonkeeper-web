@@ -83,6 +83,7 @@ import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/m
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { DesktopMobileAppBanner } from '@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner';
 import { localesList } from '@tonkeeper/locales/localesList';
+import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -260,6 +261,7 @@ export const Loader: FC = () => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
+    const { data: countryInfo } = useAppCountryInfo();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -268,7 +270,9 @@ export const Loader: FC = () => {
     const tonendpoint = useTonendpoint({
         build: sdk.version,
         lang,
-        platform: 'desktop'
+        platform: 'desktop',
+        deviceCountryCode: countryInfo?.deviceCountryCode,
+        storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 

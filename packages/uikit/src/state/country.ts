@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { QueryKey } from '../libs/queryKey';
 import { useAppContext } from '../hooks/appContext';
+import { useAppSdk } from '../hooks/appSdk';
 
 export const useUserCountry = () => {
     const { tonendpoint } = useAppContext();
@@ -14,4 +15,12 @@ export const useUserCountry = () => {
             keepPreviousData: true
         }
     );
+};
+
+export const useAppCountryInfo = () => {
+    const sdk = useAppSdk();
+    return useQuery([QueryKey.appCountryInfo], async () => sdk.getAppCountryInfo(), {
+        suspense: true,
+        staleTime: Infinity
+    });
 };
