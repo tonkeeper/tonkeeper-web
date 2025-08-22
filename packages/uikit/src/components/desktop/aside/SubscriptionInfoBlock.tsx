@@ -28,6 +28,7 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
+import { useProRecurrentNotification } from '../../modals/ProRecurrentNotificationControlled';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -148,6 +149,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
     const navigate = useNavigate();
+    const { onOpen: onRecurrentOpen } = useProRecurrentNotification();
 
     const onRefresh = () => {
         if (rotate) {
@@ -224,7 +226,14 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 <Divider />
             </NotForTargetEnv>
             <BlockWrapper>
-                {button}
+                <ButtonsStyled>
+                    {button}
+                    <Divider />
+                    <Button secondary onClick={() => onRecurrentOpen()}>
+                        {t('get_tonkeeper_pro')}
+                    </Button>
+                </ButtonsStyled>
+
                 <NotForTargetEnv env="mobile">
                     <IconButtonTransparentBackground
                         onClick={onRefresh}
@@ -237,3 +246,10 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         </Container>
     );
 };
+
+const ButtonsStyled = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 8px;
+`;
