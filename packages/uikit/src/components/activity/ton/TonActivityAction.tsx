@@ -5,7 +5,7 @@ import React, { FC, useMemo } from 'react';
 import {
     ActivityIcon,
     ContractDeployIcon,
-    PurchaseIcon,
+    PurchaseIcon28,
     SentIcon
 } from '../../../components/activity/ActivityIcons';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -287,7 +287,7 @@ export const PurchaseAction: FC<{
     return (
         <ListItemGrid>
             <ActivityIcon status={action.status}>
-                <PurchaseIcon />
+                <PurchaseIcon28 />
             </ActivityIcon>
             <Description>
                 <FirstLine>
