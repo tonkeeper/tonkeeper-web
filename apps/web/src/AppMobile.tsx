@@ -69,8 +69,6 @@ const SwapMobileNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/pages/swap/SwapMobileNotification')
 );
 
-const ExtensionMobileAppBannerNotification = React.lazy(() => import("@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification"));
-
 const FullSizeWrapper = styled(Container)<{ standalone: boolean }>`
     ${props =>
         props.standalone
@@ -239,7 +237,6 @@ const Notifications = () => {
             <ConnectLedgerNotification />
             <SwapMobileNotification />
             <PairKeystoneNotification />
-            <ExtensionMobileAppBannerNotification />
         </Suspense>
     );
 };

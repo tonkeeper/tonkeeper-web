@@ -89,9 +89,6 @@ const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
 
-const ExtensionMobileAppBannerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
-);
 const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
@@ -384,7 +381,6 @@ export const Content: FC<{
                 <ConnectLedgerNotification />
                 <SwapMobileNotification />
                 <PairKeystoneNotification />
-                <ExtensionMobileAppBannerNotification />
             </Suspense>
         </Wrapper>
     );
