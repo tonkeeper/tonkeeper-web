@@ -14,7 +14,7 @@ import { getMultiPayloadSigner, getTronSigner } from '../../../state/mnemonic';
 import { TronBatterySender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-battery-sender';
 import { TronTrxSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-trx-sender';
 import { TronTonSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-ton-sender';
-import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { assertUnreachable, notNullish } from '@tonkeeper/core/dist/utils/types';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useQuery } from '@tanstack/react-query';
 import { useToQueryKeyPart } from '../../useToQueryKeyPart';
@@ -26,6 +26,7 @@ import {
     TransactionFeeTronAsset
 } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { TronNotEnoughBalanceEstimationError } from '@tonkeeper/core/dist/errors/TronNotEnoughBalanceEstimationError';
+import { pTimeout } from '@tonkeeper/core/dist/utils/common';
 
 export enum TRON_SENDER_TYPE {
     TRX = 'tron-trx',
@@ -47,6 +48,8 @@ export type TronSenderOption =
           isEnoughBalance: boolean;
           fee: TransactionFeeTonAssetRelayed;
       };
+
+const preEstimationTimeoutMS = 8000;
 
 export const useAvailableTronSendersChoices = (receiver: string, assetAmount: AssetAmount) => {
     const batteryTronSender = useTronEstimationBatterySender();
@@ -70,72 +73,83 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             if (!isTronAsset(assetAmount.asset)) {
                 return [];
             }
-            const options: TronSenderOption[] = [];
+            const optionsGetters: (() => Promise<TronSenderOption | undefined>)[] = [];
 
             if (batteryTronSender) {
-                try {
-                    const { fee } = await batteryTronSender.estimate(
-                        receiver,
-                        assetAmount as AssetAmount<TronAsset>
-                    );
-                    options.push({
-                        type: TRON_SENDER_TYPE.BATTERY,
-                        isEnoughBalance: true,
-                        fee
-                    });
-                } catch (e: unknown) {
-                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
-                        options.push({
+                optionsGetters.push(async () => {
+                    try {
+                        const { fee } = await pTimeout(
+                            batteryTronSender.estimate(
+                                receiver,
+                                assetAmount as AssetAmount<TronAsset>
+                            ),
+                            preEstimationTimeoutMS
+                        );
+                        return {
                             type: TRON_SENDER_TYPE.BATTERY,
-                            isEnoughBalance: false,
-                            fee: e.fee as TransactionFeeBattery
-                        });
+                            isEnoughBalance: true,
+                            fee
+                        };
+                    } catch (e: unknown) {
+                        if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                            return {
+                                type: TRON_SENDER_TYPE.BATTERY,
+                                isEnoughBalance: false,
+                                fee: e.fee as TransactionFeeBattery
+                            };
+                        }
+                        console.debug(e);
                     }
-                    console.debug(e);
-                }
+                });
             }
 
             if (tronTonSender) {
-                try {
-                    const { fee } = await tronTonSender.estimate(
-                        receiver,
-                        assetAmount as AssetAmount<TronAsset>
-                    );
-                    options.push({
-                        type: TRON_SENDER_TYPE.TON_ASSET,
-                        isEnoughBalance: true,
-                        fee
-                    });
-                } catch (e) {
-                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
-                        options.push({
+                optionsGetters.push(async () => {
+                    try {
+                        const { fee } = await pTimeout(
+                            tronTonSender.estimate(receiver, assetAmount as AssetAmount<TronAsset>),
+                            preEstimationTimeoutMS
+                        );
+                        return {
                             type: TRON_SENDER_TYPE.TON_ASSET,
-                            isEnoughBalance: false,
-                            fee: e.fee as TransactionFeeTonAssetRelayed
-                        });
+                            isEnoughBalance: true,
+                            fee
+                        };
+                    } catch (e) {
+                        if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                            return {
+                                type: TRON_SENDER_TYPE.TON_ASSET,
+                                isEnoughBalance: false,
+                                fee: e.fee as TransactionFeeTonAssetRelayed
+                            };
+                        }
+                        console.debug(e);
                     }
-                    console.debug(e);
-                }
+                });
             }
 
             if (tronTrxSender) {
-                try {
-                    const { fee } = await tronTrxSender.estimate(
-                        receiver,
-                        assetAmount as AssetAmount<TronAsset>
-                    );
-                    options.push({ type: TRON_SENDER_TYPE.TRX, isEnoughBalance: true, fee });
-                } catch (e) {
-                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
-                        options.push({
-                            type: TRON_SENDER_TYPE.TRX,
-                            isEnoughBalance: false,
-                            fee: e.fee as TransactionFeeTronAsset
-                        });
+                optionsGetters.push(async () => {
+                    try {
+                        const { fee } = await pTimeout(
+                            tronTrxSender.estimate(receiver, assetAmount as AssetAmount<TronAsset>),
+                            preEstimationTimeoutMS
+                        );
+                        return { type: TRON_SENDER_TYPE.TRX, isEnoughBalance: true, fee };
+                    } catch (e) {
+                        if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                            return {
+                                type: TRON_SENDER_TYPE.TRX,
+                                isEnoughBalance: false,
+                                fee: e.fee as TransactionFeeTronAsset
+                            };
+                        }
+                        console.debug(e);
                     }
-                    console.debug(e);
-                }
+                });
             }
+
+            const options = (await Promise.all(optionsGetters.map(o => o()))).filter(notNullish);
 
             return options
                 .filter(o => o.isEnoughBalance)

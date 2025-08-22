@@ -472,6 +472,7 @@
   "select_networks_modal_ton_title": "TON assets",
   "select_networks_modal_tron_description": "Use USD₮ TRC20 without TRX. Fees are covered by Tonkeeper Battery.",
   "send_change_fee_payment_method": "Change Payment Method",
+  "send_confirm_tron_no_enough_balance_for_fee_error": "Not enough funds to cover the blockchain fee",
   "settings_account_enable_tron_description": "Use USD₮ TRC20 without TRX. Fees are covered by Tonkeeper Battery.",
   "settings_account_enable_tron_title": "Add USD₮ TRC20 by default to new wallets in this account",
   "settings_backup_account": "Backup Account",

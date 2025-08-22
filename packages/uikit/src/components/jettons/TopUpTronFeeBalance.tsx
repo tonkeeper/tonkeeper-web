@@ -115,12 +115,12 @@ export const TopUpTronFeeBalance: FC<{ isOpen: boolean; onClose: () => void }> =
 }) => {
     return (
         <NotificationStyled isOpen={isOpen} handleClose={onClose}>
-            {() => <TopUpTronFeeBalanceContent />}
+            {() => <TopUpTronFeeBalanceContent onClose={onClose} />}
         </NotificationStyled>
     );
 };
 
-const TopUpTronFeeBalanceContent = () => {
+const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) => {
     const { t } = useTranslation();
     const { mainnetConfig } = useAppContext();
     const sdk = useAppSdk();
@@ -160,11 +160,12 @@ const TopUpTronFeeBalanceContent = () => {
                     <Button
                         primary
                         size="small"
-                        onClick={() =>
+                        onClick={() => {
+                            onClose();
                             navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
                                 disableMobileAnimation: true
-                            })
-                        }
+                            });
+                        }}
                         fullWidth
                     >
                         {t('topup_tron_fee_top_up')}

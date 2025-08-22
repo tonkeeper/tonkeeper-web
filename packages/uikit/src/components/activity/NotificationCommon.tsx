@@ -43,7 +43,8 @@ import { NotificationFooter, NotificationFooterPortal } from '../Notification';
 import { Image } from '../shared/Image';
 import {
     AllChainsSenderOptions,
-    AllChainsSenderType
+    AllChainsSenderType,
+    isTronSenderOption
 } from '../../hooks/blockchain/sender/sender-type';
 import {
     TonSenderChoiceUserAvailable,
@@ -490,6 +491,10 @@ export const ActionFeeDetailsUniversal: FC<
 > = ({ fee, className, ...rest }) => {
     const { t } = useTranslation();
 
+    const noAvailableTronOptions = rest.availableSendersOptions?.every(
+        choice => isTronSenderOption(choice) && !choice.isEnoughBalance
+    );
+
     return (
         <ListItem hover={false} className={className}>
             <ListItemPayload>
@@ -503,7 +508,7 @@ export const ActionFeeDetailsUniversal: FC<
                 </FeeLabelColumn>
                 {fee ? (
                     <ActionFeeDetailsUniversalValue fee={fee} />
-                ) : fee === null ? (
+                ) : fee === null || noAvailableTronOptions ? (
                     <>—</>
                 ) : (
                     <SpinnerIcon />

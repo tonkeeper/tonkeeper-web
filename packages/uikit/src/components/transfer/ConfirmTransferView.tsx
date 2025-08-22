@@ -1,10 +1,13 @@
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { RecipientData } from '@tonkeeper/core/dist/entries/send';
-import React, { FC, PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import React, { FC, PropsWithChildren, useCallback, useEffect, useMemo, useState } from 'react';
 import { useEstimateTransfer } from '../../hooks/blockchain/useEstimateTransfer';
 import { useSendTransfer } from '../../hooks/blockchain/useSendTransfer';
-import { ConfirmView } from './ConfirmView';
-import { useAvailableTonSendersChoices } from '../../hooks/blockchain/useSender';
+import { ConfirmView, ConfirmViewButtonsSlot } from './ConfirmView';
+import {
+    TonSenderChoiceUserAvailable,
+    useAvailableTonSendersChoices
+} from '../../hooks/blockchain/useSender';
 import {
     TonAsset,
     tonAssetAddressToString
@@ -18,8 +21,17 @@ import { isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useQuery } from '@tanstack/react-query';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { useActiveApi } from '../../state/wallet';
-import { useAvailableTronSendersChoices } from '../../hooks/blockchain/sender/useTronSender';
-import { AllChainsSenderType } from '../../hooks/blockchain/sender/sender-type';
+import {
+    TronSenderOption,
+    useAvailableTronSendersChoices
+} from '../../hooks/blockchain/sender/useTronSender';
+import { AllChainsSenderType, isTronSenderOption } from '../../hooks/blockchain/sender/sender-type';
+import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
+import { Button } from '../fields/Button';
+import styled from 'styled-components';
+import { ExclamationMarkCircleIcon } from '../Icon';
+import { Label2 } from '../Text';
+import { useTranslation } from '../../hooks/translation';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -34,6 +46,24 @@ const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     return AssetAmount.fromRelativeAmount({ asset: asset, amount: relativeAmount });
 };
 
+const ExclamationMarkCircleIconStyled = styled(ExclamationMarkCircleIcon)`
+    min-width: 32px;
+    min-height: 32px;
+    color: ${p => p.theme.accentRed};
+`;
+
+const TopUpFeeBanner = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
+`;
+
+const ErrorLabel = styled(Label2)`
+    color: ${p => p.theme.accentRed};
+`;
+
 export const ConfirmTransferView: FC<
     PropsWithChildren<{
         recipient: RecipientData;
@@ -44,6 +74,9 @@ export const ConfirmTransferView: FC<
         fitContent?: boolean;
     }>
 > = ({ isMax, assetAmount, ...rest }) => {
+    const { t } = useTranslation();
+    const { onOpen: openTopUpTronFeeBalanceNotification } = useTopUpTronFeeBalanceNotification();
+
     const api = useActiveApi();
     const operationType = useMemo(() => {
         return {
@@ -56,14 +89,45 @@ export const ConfirmTransferView: FC<
      * for MAX button jettons gasless
      */
     const [assetAmountPatched, setAssetAmountPatched] = useState<AssetAmount>(assetAmount);
+    const isTonBlockchainAssetTransfer = isTonAsset(assetAmount.asset);
 
     const { data: availableTonSendersChoices } = useAvailableTonSendersChoices(operationType);
     const { data: availableTronSendersChoices } = useAvailableTronSendersChoices(
         rest.recipient.address.address,
         assetAmount
     );
+    const availableSenderChoices = isTonBlockchainAssetTransfer
+        ? availableTonSendersChoices
+        : availableTronSendersChoices;
 
-    const [selectedSenderType, onSenderTypeChange] = useState<AllChainsSenderType>();
+    const [selectedSenderType, setSelectedSenderType] = useState<AllChainsSenderType>();
+
+    const onSenderTypeChange = useCallback(
+        (type: AllChainsSenderType) => {
+            const choice = (
+                availableSenderChoices as
+                    | (TonSenderChoiceUserAvailable | TronSenderOption)[]
+                    | undefined
+            )?.find(c => c.type === type);
+
+            if (!choice) {
+                return;
+            }
+
+            if (!isTronSenderOption(choice) || choice.isEnoughBalance) {
+                return setSelectedSenderType(type);
+            }
+
+            if (
+                !choice.isEnoughBalance &&
+                (availableSenderChoices as TronSenderOption[]).some(c => c.isEnoughBalance)
+            ) {
+                rest.onClose();
+                openTopUpTronFeeBalanceNotification();
+            }
+        },
+        [availableSenderChoices, openTopUpTronFeeBalanceNotification, rest.onClose]
+    );
 
     const estimation = useEstimateTransfer({
         recipient: rest.recipient,
@@ -79,7 +143,6 @@ export const ConfirmTransferView: FC<
         senderType: selectedSenderType!
     });
 
-    const isTonBlockchainAssetTransfer = isTonAsset(assetAmount.asset);
     useEffect(() => {
         if (!mutation.isIdle || !isTonBlockchainAssetTransfer || selectedSenderType) {
             return;
@@ -155,6 +218,10 @@ export const ConfirmTransferView: FC<
         );
     }, [isMax, assetAmount, selectedSenderType, assetWeiBalance?.toFixed(0), tokenToTonRate.data]);
 
+    const noAvailableTronSenders = (
+        availableSenderChoices as (TonSenderChoiceUserAvailable | TronSenderOption)[]
+    )?.every(c => isTronSenderOption(c) && !c.isEnoughBalance);
+
     return (
         <ConfirmView
             estimation={estimation}
@@ -163,11 +230,30 @@ export const ConfirmTransferView: FC<
             assetAmount={assetAmountPatched}
             selectedSenderType={selectedSenderType}
             onSenderTypeChange={onSenderTypeChange}
-            availableSendersOptions={
-                isTonBlockchainAssetTransfer
-                    ? availableTonSendersChoices
-                    : availableTronSendersChoices
-            }
-        />
+            availableSendersOptions={availableSenderChoices}
+        >
+            {noAvailableTronSenders && (
+                <ConfirmViewButtonsSlot>
+                    <TopUpFeeBanner>
+                        <ExclamationMarkCircleIconStyled />
+                        <ErrorLabel>
+                            {t('send_confirm_tron_no_enough_balance_for_fee_error')}
+                        </ErrorLabel>
+                        <Button
+                            size="large"
+                            marginTop
+                            primary
+                            fullWidth
+                            onClick={() => {
+                                rest.onClose();
+                                openTopUpTronFeeBalanceNotification();
+                            }}
+                        >
+                            {t('tron_fee_banner_fee_options')}
+                        </Button>
+                    </TopUpFeeBanner>
+                </ConfirmViewButtonsSlot>
+            )}
+        </ConfirmView>
     );
 };

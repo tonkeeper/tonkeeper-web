@@ -2,14 +2,12 @@ import { BorderSmallResponsive } from '../shared/Styles';
 import styled, { css } from 'styled-components';
 import { Body2, Body2Class, Body3, Body3Class, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
-import { useDisclosure } from '../../hooks/useDisclosure';
 import {
     useTrc20TransferDefaultFees,
     useTrc20TransfersNumberAvailable,
     useTronBalances
 } from '../../state/tron/tron';
 import { Button, ButtonFlat } from '../fields/Button';
-import { TopUpTronFeeBalance } from './TopUpTronFeeBalance';
 import { InfoCircleIcon } from '../Icon';
 import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { Skeleton } from '../shared/Skeleton';
@@ -23,6 +21,7 @@ import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { DropDown } from '../DropDown';
+import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
 
 const TronTopUpUSDTWrapper = styled.div`
     background-color: ${p => p.theme.backgroundContent};
@@ -134,7 +133,7 @@ const DropDownStyled = styled(DropDown)`
 
 export const TronFeeBanner = () => {
     const { t } = useTranslation();
-    const { isOpen, onClose, onOpen } = useDisclosure();
+    const { onOpen } = useTopUpTronFeeBalanceNotification();
     const { total } = useTrc20TransfersNumberAvailable();
 
     if (total === undefined) {
@@ -155,7 +154,6 @@ export const TronFeeBanner = () => {
                     </Button>
                 </TronTopUpUSDTWrapper>
                 <SmallDivider />
-                <TopUpTronFeeBalance isOpen={isOpen} onClose={onClose} />
             </>
         );
     }
@@ -183,7 +181,6 @@ export const TronFeeBanner = () => {
                 </ButtonFlatStyled>
             </TransfersNumberStatusWrapper>
             <SmallDivider />
-            <TopUpTronFeeBalance isOpen={isOpen} onClose={onClose} />
         </>
     );
 };

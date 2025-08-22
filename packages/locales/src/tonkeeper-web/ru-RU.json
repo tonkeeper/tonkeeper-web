@@ -459,6 +459,7 @@
   "select_networks_modal_ton_title": "Токены в TON",
   "select_networks_modal_tron_description": "Используйте USD₮ TRC20 без TRX. Комиссии покрываются Tonkeeper Battery.",
   "send_change_fee_payment_method": "Изменить способ оплаты",
+  "send_confirm_tron_no_enough_balance_for_fee_error": "Недостаточно средств для оплаты комиссии блокчейна",
   "settings_account_enable_tron_description": "Используйте USD₮ TRC20 без TRX. Комиссии покрываются Tonkeeper Battery.",
   "settings_account_enable_tron_title": "Добавить USD₮ TRC20 по умолчанию в новые кошельки в этом аккаунте",
   "settings_backup_account": "Резервная копия аккаунта",
