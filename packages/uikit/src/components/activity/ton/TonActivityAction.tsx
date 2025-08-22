@@ -1,11 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress, seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
-import { FC } from 'react';
-import { ListItemPayload } from '../../../components/List';
+import React, { FC, useMemo } from 'react';
 import {
     ActivityIcon,
     ContractDeployIcon,
+    PurchaseIcon,
     SentIcon
 } from '../../../components/activity/ActivityIcons';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -39,6 +39,8 @@ import {
 } from './StakeActivity';
 import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
+import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -256,10 +258,95 @@ const DomainRenewAction: FC<{
     );
 };
 
+export const PurchaseAction: FC<{
+    action: Action;
+    date: string;
+}> = ({ action, date }) => {
+    const { purchase } = action;
+    const { t } = useTranslation();
+
+    const tokenAmount = useMemo(() => {
+        if (!purchase) {
+            return '';
+        }
+
+        return new AssetAmount({
+            weiAmount: purchase.amount.value,
+            asset: {
+                id: '',
+                decimals: purchase.amount.decimals,
+                symbol: purchase.amount.tokenName
+            }
+        }).stringAssetRelativeAmount;
+    }, [purchase?.amount]);
+
+    if (!purchase) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon status={action.status}>
+                <PurchaseIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{t('transaction_type_purchase')}</FirstLabel>
+                    <AmountText>-&thinsp;{tokenAmount}</AmountText>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText>
+                        {t('transaction_type_purchase_description', {
+                            invoice: purchase.invoiceId
+                        })}
+                    </SecondaryText>
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+            <FailedNote status={action.status} />
+        </ListItemGrid>
+    );
+};
+
+export const SimplePreviewAction: FC<{
+    action: Action;
+    date: string;
+    isScam: boolean;
+}> = ({ action, date, isScam }) => {
+    const { t } = useTranslation();
+    const { simplePreview } = action;
+
+    if (!simplePreview) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon status={action.status}>
+                <ContractDeployIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{isScam ? t('spam_action') : simplePreview.name}</FirstLabel>
+                    {simplePreview.value && !isScam && (
+                        <AmountText>{simplePreview.value}</AmountText>
+                    )}
+                </FirstLine>
+                <SecondLine>
+                    {!isScam && <SecondaryText>{simplePreview.description}</SecondaryText>}
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+            <FailedNote status={action.status} />
+        </ListItemGrid>
+    );
+};
+
 export const ActivityAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
+    // eslint-disable-next-line complexity
 }> = ({ action, isScam, date }) => {
     const { t } = useTranslation();
 
@@ -298,11 +385,16 @@ export const ActivityAction: FC<{
             return <DomainRenewAction action={action} date={date} />;
         case 'ExtraCurrencyTransfer':
             return <ExtraCurrencyTransferAction action={action} date={date} isScam={isScam} />;
+        case 'Purchase':
+            return <PurchaseAction action={action} date={date} />;
+        case 'ElectionsDepositStake':
+        case 'ElectionsRecoverStake':
+            return <SimplePreviewAction action={action} date={date} isScam={isScam} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {
-            console.log(action);
-            return <ListItemPayload>{action.simplePreview.name}</ListItemPayload>;
+            assertUnreachableSoft(action.type);
+            return <SimplePreviewAction action={action} date={date} isScam={isScam} />;
         }
     }
 };

@@ -504,6 +504,7 @@
   "signDataCellDisclaimer": "This is a decoded code. Review it and sign if you agree.",
   "signDataError": "Invalid sing data parameters.",
   "signDataTextDisclaimer": "Carefully review the message, and if you agree, sign data.",
+  "simple_preview_account": "Blockchain Account",
   "sk_input_label": "Private key in hex format without 0x beginning. Length is 64 or 128 chars.",
   "sk_input_label_fireblocks": "Private key in hex format without 0x beginning. Length is 64 chars.",
   "soon": "soon",
