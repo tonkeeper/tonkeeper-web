@@ -4,7 +4,7 @@ import {
     isTon,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { intlLocale, localizationText } from '@tonkeeper/core/dist/entries/language';
+import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvent, AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useAtom } from '../libs/useAtom';
@@ -22,7 +22,7 @@ import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/const
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useBatteryAuthToken } from './battery';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
-import { useUserLanguage } from './language';
+import { useTranslation } from '../hooks/translation';
 import { TronTonSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-ton-sender';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
@@ -153,7 +153,9 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
     const tronApi = useTronApi();
     const tronWallet = useActiveTronWallet();
     const { data: batteryAuthToken } = useBatteryAuthToken();
-    const { data: language } = useUserLanguage();
+    const {
+        i18n: { language }
+    } = useTranslation();
 
     const query = useInfiniteQuery({
         queryKey: [
@@ -205,8 +207,7 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
                           onlyInitiator,
                           filterSpam,
                           twoFaPluginAddress: twoFaPlugin,
-                          acceptLanguage:
-                              language !== undefined ? localizationText(language) : undefined
+                          acceptLanguage: language.replaceAll('_', '-').split('-')[0]
                       }),
                 assetTonApiId
                     ? emptyResult
