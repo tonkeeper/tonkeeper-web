@@ -10,33 +10,27 @@ import StoreKit
     ]
 
     @objc func getInfo(_ call: CAPPluginCall) {
-            var deviceCountry: String? = nil
-            if #available(iOS 16.0, *) {
-                deviceCountry = Locale.current.region?.identifier
-            } else {
-                deviceCountry = (Locale.current as NSLocale).object(forKey: .countryCode) as? String
-            }
-
-            if #available(iOS 15.0, *) {
-                Task {
-                    let storeCountry: String?
-                    do {
-                        let storefront = try await AppStore.currentStorefront
-                        storeCountry = storefront.countryCode
-                    } catch {
-                        storeCountry = nil
-                    }
-
-                    call.resolve([
-                        "deviceCountryCode": deviceCountry ?? NSNull(),
-                        "storeCountryCode": storeCountry ?? NSNull()
-                    ])
-                }
-            } else {
-                call.resolve([
-                    "deviceCountryCode": deviceCountry ?? NSNull(),
-                    "storeCountryCode": NSNull()
-                ])
-            }
+        var deviceCountry: String? = nil
+        if #available(iOS 16.0, *) {
+            deviceCountry = Locale.current.region?.identifier
+        } else {
+            deviceCountry = (Locale.current as NSLocale).object(forKey: .countryCode) as? String
         }
+
+        func finish(_ storeCode: String?) {
+            call.resolve([
+                "deviceCountryCode": deviceCountry ?? NSNull(),
+                "storeCountryCode": storeCode ?? NSNull()
+            ])
+        }
+
+        if #available(iOS 15.0, *) {
+            Task {
+                let storeCode = await Storefront.current?.countryCode
+                finish(storeCode)
+            }
+        } else {
+            finish(nil)
+        }
+    }
 }
