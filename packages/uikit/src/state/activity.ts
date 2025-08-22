@@ -4,7 +4,7 @@ import {
     isTon,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { intlLocale } from '@tonkeeper/core/dist/entries/language';
+import { intlLocale, localizationText } from '@tonkeeper/core/dist/entries/language';
 import { AccountEvent, AccountEvents, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { Dispatch, SetStateAction, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useAtom } from '../libs/useAtom';
@@ -22,6 +22,7 @@ import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/const
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useBatteryAuthToken } from './battery';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { useUserLanguage } from './language';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -151,6 +152,7 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
     const tronApi = useTronApi();
     const tronWallet = useActiveTronWallet();
     const { data: batteryAuthToken } = useBatteryAuthToken();
+    const { data: language } = useUserLanguage();
 
     const query = useInfiniteQuery({
         queryKey: [
@@ -162,7 +164,8 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
             filterSpam,
             twoFaPlugin,
             tronWallet,
-            batteryAuthToken
+            batteryAuthToken,
+            language
         ],
         queryFn: async ({ pageParam = undefined }) => {
             let assetTonApiId: string | undefined;
@@ -200,7 +203,9 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
                           wallet,
                           onlyInitiator,
                           filterSpam,
-                          twoFaPluginAddress: twoFaPlugin
+                          twoFaPluginAddress: twoFaPlugin,
+                          acceptLanguage:
+                              language !== undefined ? localizationText(language) : undefined
                       }),
                 assetTonApiId
                     ? emptyResult
@@ -309,7 +314,8 @@ async function fetchTonActivity({
     wallet,
     onlyInitiator,
     filterSpam,
-    twoFaPluginAddress
+    twoFaPluginAddress,
+    acceptLanguage
 }: {
     pageParam?: number;
     assetTonApiId?: string;
@@ -318,6 +324,7 @@ async function fetchTonActivity({
     onlyInitiator: boolean;
     filterSpam: boolean;
     twoFaPluginAddress?: string;
+    acceptLanguage: string | undefined;
 }) {
     if (pageParam === 0) {
         return {
@@ -333,7 +340,8 @@ async function fetchTonActivity({
             limit: 20,
             beforeLt: pageParam,
             subjectOnly: true,
-            initiator: onlyInitiator ? onlyInitiator : undefined
+            initiator: onlyInitiator ? onlyInitiator : undefined,
+            acceptLanguage
         });
     } else {
         if (seeIfValidTonAddress(assetTonApiId)) {
@@ -341,7 +349,8 @@ async function fetchTonActivity({
                 accountId: wallet.rawAddress,
                 jettonId: assetTonApiId!,
                 limit: 20,
-                beforeLt: pageParam
+                beforeLt: pageParam,
+                acceptLanguage
             });
         } else if (assetTonApiId === 'TON') {
             tonActivity = await new AccountsApi(api.tonApiV2).getAccountEvents({
@@ -349,7 +358,8 @@ async function fetchTonActivity({
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true,
-                initiator: onlyInitiator ? onlyInitiator : undefined
+                initiator: onlyInitiator ? onlyInitiator : undefined,
+                acceptLanguage
             });
 
             tonActivity.events = tonActivity.events.filter(event => {
@@ -362,7 +372,8 @@ async function fetchTonActivity({
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true,
-                initiator: onlyInitiator ? onlyInitiator : undefined
+                initiator: onlyInitiator ? onlyInitiator : undefined,
+                acceptLanguage
             });
 
             tonActivity.events = tonActivity.events.filter(event => {
