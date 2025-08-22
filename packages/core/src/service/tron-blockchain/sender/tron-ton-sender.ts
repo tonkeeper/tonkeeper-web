@@ -1,7 +1,7 @@
 import { TronApi, TronResources } from '../../../tronApi';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TronAsset } from '../../../entries/crypto/asset/tron-asset';
-import { OpenedSignerProvider } from '../../../entries/signer';
+import { MultiTransactionsSigner } from '../../../entries/signer';
 import { TronWallet } from '../../../entries/tron/tron-wallet';
 import { TronEstimation } from '../../../entries/send';
 import { errorMessage } from '../../../utils/types';
@@ -42,7 +42,7 @@ export class TronTonSender implements ITronSender {
         batteryConfig: BatteryConfiguration,
         private tronWalletInfo: TronWallet,
         private tonWalletInfo: TonWalletStandard,
-        private usingOpenedSigner: OpenedSignerProvider
+        private multiTransactionsSigner: MultiTransactionsSigner
     ) {
         this.batteryApi = new BatteryApi(batteryConfig);
         this.trc20Encoder = new TronTrc20Encoder({
@@ -58,29 +58,34 @@ export class TronTonSender implements ITronSender {
 
         await this.checkBalanceIsEnough(estimation.fee.extra);
 
-        let signedTronTx: Transaction & SignedTransaction;
-        let signedTonTx: Cell;
-        await this.usingOpenedSigner(async ({ cellSigner, tronSigner }) => {
-            const fee = estimation.fee as TransactionFeeTonAssetRelayed;
-            signedTronTx = await tronSigner(
-                await this.trc20Encoder.encodeTransferTransaction(to, assetAmount)
-            );
-
-            const tonTransfer = await new TonEncoder(this.tonApi).encodeTransfer({
-                to: fee.sendToAddress,
-                weiAmount: fee.extra.weiAmount,
-                payload: {
-                    type: 'comment',
-                    value: TronTonSender.identifyingComment
-                }
-            });
-
-            signedTonTx = await new WalletMessageSender(
-                this.tonApi,
-                this.tonWalletInfo,
-                cellSigner
-            ).toExternal(tonTransfer);
+        const fee = estimation.fee as TransactionFeeTonAssetRelayed;
+        const tronTxToSign = await this.trc20Encoder.encodeTransferTransaction(to, assetAmount);
+        const tonTransferToSign = await new TonEncoder(this.tonApi).encodeTransfer({
+            to: fee.sendToAddress,
+            weiAmount: fee.extra.weiAmount,
+            payload: {
+                type: 'comment',
+                value: TronTonSender.identifyingComment
+            }
         });
+
+        let signedTronTx: (Transaction & SignedTransaction) | undefined;
+        const tonSigner = async (cell: Cell) => {
+            const signed = await this.multiTransactionsSigner([tronTxToSign, cell]);
+            signedTronTx = signed[0] as Transaction & SignedTransaction;
+            return signed[1] as Buffer;
+        };
+        tonSigner.type = 'cell' as const;
+
+        const signedTonTx = await new WalletMessageSender(
+            this.tonApi,
+            this.tonWalletInfo,
+            tonSigner
+        ).toExternal(tonTransferToSign);
+
+        if (!signedTronTx) {
+            throw new Error('Tron transaction is not signed');
+        }
 
         try {
             await this.batteryApi.tronSend({

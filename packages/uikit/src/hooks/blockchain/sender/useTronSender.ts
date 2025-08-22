@@ -10,7 +10,7 @@ import { useAppSdk } from '../../appSdk';
 import { isAccountTronCompatible } from '@tonkeeper/core/dist/entries/account';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import { useCallback, useMemo } from 'react';
-import { getOpenedSignerProvider, getTronSigner } from '../../../state/mnemonic';
+import { getMultiPayloadSigner, getTronSigner } from '../../../state/mnemonic';
 import { TronBatterySender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-battery-sender';
 import { TronTrxSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-trx-sender';
 import { TronTonSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-ton-sender';
@@ -191,7 +191,7 @@ const useGetTronTonSender = () => {
         if (!activeTonWallet) {
             throw new Error('Ton wallet does not support trc20 fee covering');
         }
-        const signer = getOpenedSignerProvider(sdk, tronApi, activeAccount);
+        const signer = getMultiPayloadSigner(sdk, tronApi, activeAccount);
         return new TronTonSender(
             tronApi,
             tonApi,
