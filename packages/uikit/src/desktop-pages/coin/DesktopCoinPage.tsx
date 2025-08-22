@@ -472,6 +472,10 @@ const AssetTitle = styled.div`
         `}
 `;
 
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    min-height: 100%;
+`;
+
 export const TronUSDTPage = () => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -509,7 +513,7 @@ export const TronUSDTPage = () => {
     const { data: rate } = useUSDTRate();
 
     return (
-        <DesktopViewPageLayout ref={ref}>
+        <DesktopViewPageLayoutStyled ref={ref}>
             <DesktopViewHeader backButton borderBottom={true}>
                 <DesktopViewHeaderContent
                     title={
@@ -577,6 +581,6 @@ export const TronUSDTPage = () => {
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
-        </DesktopViewPageLayout>
+        </DesktopViewPageLayoutStyled>
     );
 };
