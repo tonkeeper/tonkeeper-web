@@ -182,7 +182,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     connectionService = new CapacitorConnectionService();
 
-    signerReturnUrl = 'tonkeeper://'; // TODO replace with 'tonkeeper-pro://'; once signer is fixed
+    signerReturnUrl = 'tonkeeper-pro://';
 
     keyboard = new CapacitorKeyboardService();
 
