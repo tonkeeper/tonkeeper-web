@@ -19,6 +19,7 @@ import { ProPurchaseNotificationControlled } from './modals/ProPurchaseNotificat
 import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
 import { ProAuthNotificationControlled } from './modals/ProAuthNotificationControlled';
 import { ProConfirmNotificationControlled } from './modals/ProConfirmNotificationControlled';
+import { ProRecurrentNotificationControlled } from './modals/ProRecurrentNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -44,6 +45,7 @@ export const ModalsRoot = () => {
             <ProFeaturesNotificationControlled />
             <ProEndingNotificationControlled />
             <ProConfirmNotificationControlled />
+            <ProRecurrentNotificationControlled />
         </>
     );
 };
