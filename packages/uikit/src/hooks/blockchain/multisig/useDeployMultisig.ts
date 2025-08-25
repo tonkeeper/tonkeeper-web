@@ -28,14 +28,17 @@ import {
 import { useTwoFAApi, useTwoFAServiceConfig, useTwoFAWalletConfig } from '../../../state/two-fa';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 import { useConfirmTwoFANotification } from '../../../components/modals/ConfirmTwoFANotificationControlled';
-import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import {
+    TransactionFeeBattery,
+    TransactionFeeTonAsset
+} from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 
 export const useDeployMultisig = (
     params:
         | {
               multisigConfig: MultisigConfig;
               fromWallet: WalletId;
-              fee: TransactionFee;
+              fee: TransactionFeeTonAsset | TransactionFeeBattery;
           }
         | undefined
 ) => {

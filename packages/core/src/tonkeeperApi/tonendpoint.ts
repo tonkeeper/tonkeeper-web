@@ -58,6 +58,7 @@ export interface TonendpointConfig {
     supportLink?: string;
     tonkeeperNewsUrl?: string;
     scam_api_url?: string;
+    faq_tron_fee_url?: string;
 
     accountExplorer: string;
     transactionExplorer: string;

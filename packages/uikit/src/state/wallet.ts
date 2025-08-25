@@ -89,6 +89,8 @@ import { useSecurityCheck } from './password';
 import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -1152,6 +1154,21 @@ export const useWalletAccountInfo = () => {
             accountId: wallet.rawAddress
         });
     });
+};
+
+export const useTonBalance = () => {
+    const { data: tonAccountInfo, ...rest } = useWalletAccountInfo();
+    const tonBalance = useMemo(() => {
+        if (!tonAccountInfo) {
+            return undefined;
+        }
+        return new AssetAmount({ weiAmount: tonAccountInfo.balance, asset: TON_ASSET });
+    }, [tonAccountInfo]);
+
+    return {
+        data: tonBalance,
+        ...rest
+    };
 };
 
 export const useActiveTonNetwork = () => {

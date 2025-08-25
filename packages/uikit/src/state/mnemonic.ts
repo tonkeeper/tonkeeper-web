@@ -10,7 +10,12 @@ import {
     AccountSecret
 } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
-import { CellSigner, Signer, TronSigner } from '@tonkeeper/core/dist/entries/signer';
+import {
+    CellSigner,
+    MultiTransactionsSigner,
+    Signer,
+    TronSigner
+} from '@tonkeeper/core/dist/entries/signer';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
@@ -430,6 +435,79 @@ export const getTronSigner = (sdk: IAppSdk, tronApi: TronApi, account: Account):
                 assertUnreachable(account);
             }
         }
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+const closedSigner = () => {
+    throw new Error('Call outside of callback is not allowed');
+};
+closedSigner.type = 'cell' as const;
+
+export const getMultiPayloadSigner = (
+    sdk: IAppSdk,
+    tronApi: TronApi,
+    account: Account
+): MultiTransactionsSigner => {
+    try {
+        if (!isAccountTronCompatible(account)) {
+            throw new Error("Account doesn't support tron");
+        }
+
+        const wallet = account.activeTronWallet;
+
+        if (!wallet) {
+            throw new Error('Wallet not found');
+        }
+
+        return async (txs: (Transaction | Cell)[]) => {
+            let tonMnemonic: string[];
+            let tonMnemonicType: MnemonicType | undefined;
+
+            switch (account.type) {
+                case 'mam': {
+                    tonMnemonic = await getMAMWalletMnemonic(
+                        sdk,
+                        account.id,
+                        account.activeTonWallet.id
+                    );
+                    tonMnemonicType = 'ton';
+                    break;
+                }
+                case 'mnemonic': {
+                    const secret = await getAccountSecret(sdk, account.id);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    tonMnemonic = secret.mnemonic;
+                    tonMnemonicType = account.mnemonicType;
+                    break;
+                }
+                default: {
+                    assertUnreachable(account);
+                }
+            }
+
+            const tonKeyPair = await mnemonicToKeypair(tonMnemonic, tonMnemonicType);
+            const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, tonMnemonicType);
+            const { TronWeb } = await import('tronweb');
+            const tronWeb = new TronWeb({
+                fullHost: tronApi.tronGridBaseUrl,
+                privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
+            });
+
+            return Promise.all(
+                txs.map(tx => {
+                    if (tx instanceof Cell) {
+                        return sign(tx.hash(), tonKeyPair.secretKey);
+                    } else {
+                        return tronWeb.trx.sign(tx);
+                    }
+                })
+            );
+        };
     } catch (e) {
         console.error(e);
         throw e;
