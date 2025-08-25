@@ -16,15 +16,17 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
     const { onOpen: onProConfirmOpen } = useProConfirmNotification();
 
     useEffect(() => {
-        if (sdk?.subscriptionStrategy || !sdk || !api) return;
+        if (!sdk || !api) return;
 
-        sdk.subscriptionStrategy = new CryptoSubscriptionStrategy(sdk.storage, {
-            api,
-            onProConfirmOpen
-        });
+        if (!sdk.subscriptionStrategy) {
+            sdk.subscriptionStrategy = new CryptoSubscriptionStrategy(sdk.storage, {
+                api,
+                onProConfirmOpen
+            });
+        }
 
         setIsReady(true);
-    }, [api, sdk]);
+    }, [sdk, api]);
 
     return isReady ? <>{children}</> : null;
 };
