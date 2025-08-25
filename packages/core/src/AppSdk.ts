@@ -126,6 +126,11 @@ export interface InternetConnectionService {
     retry: () => Promise<boolean>;
 }
 
+export interface AppCountryInfo {
+    deviceCountryCode: string | null;
+    storeCountryCode: string | null;
+}
+
 export interface IAppSdk {
     storage: IStorage;
     subscriptionStrategy: SubscriptionStrategy;
@@ -192,6 +197,8 @@ export interface IAppSdk {
         open(): Promise<void>;
         close(): Promise<void>;
     };
+
+    getAppCountryInfo(): Promise<AppCountryInfo>;
 }
 
 export interface IDappBrowser {
@@ -327,6 +334,13 @@ export abstract class BaseApp implements IAppSdk {
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     userIdentity: UserIdentity;
+
+    async getAppCountryInfo(): Promise<AppCountryInfo> {
+        return {
+            deviceCountryCode: null,
+            storeCountryCode: null
+        };
+    }
 }
 
 class WebKeyboardService implements KeyboardService {

@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -89,9 +89,6 @@ const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
 
-const ExtensionMobileAppBannerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
-);
 const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
@@ -246,6 +243,9 @@ export const Loader: FC = React.memo(() => {
         );
     }
 
+    // set api url synchronously
+    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),
         testnetApi: getApiConfig(serverConfig.testnetConfig),
@@ -381,7 +381,6 @@ export const Content: FC<{
                 <ConnectLedgerNotification />
                 <SwapMobileNotification />
                 <PairKeystoneNotification />
-                <ExtensionMobileAppBannerNotification />
             </Suspense>
         </Wrapper>
     );

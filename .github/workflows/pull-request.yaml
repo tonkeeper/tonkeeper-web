@@ -126,69 +126,6 @@ jobs:
             environment: ${{ github.head_ref }}
         secrets: inherit
 
-    twa-build:
-        name: twa-build
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Yarn cache
-              uses: actions/cache@v4
-              with:
-                  path: ./.yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:twa
-
-            - name: Publish TWA to Cloudflare Pages
-              id: deploy
-              uses: cloudflare/wrangler-action@v3
-              with:
-                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command:
-                      pages deploy apps/twa/dist --project-name=tonkeeper-telegram
-                      --branch=feature/twa
-
-            - name: Summary
-              run: |
-                  echo '### Successful TWA deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
-                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
-                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
-
-            - name: Comment PR
-              uses: thollander/actions-comment-pull-request@v3
-              with:
-                  message: |
-                      ### Successful TWA deployment 🚀🚀🚀
-                      Well done!
-                      Link to test environment:
-                      https://t.me/tonkeeperdevbot
-                  comment-tag: twa_deploy
-
     extension-build:
         name: extension-build
         runs-on: macos-14
@@ -244,16 +181,3 @@ jobs:
     ipad-build:
         uses: ./.github/workflows/ipad-build.yaml
         secrets: inherit
-
-    #    swap-widget-build:
-    #        uses: ./.github/workflows/swap-widget-build.yaml
-    #        with:
-    #            environment: ${{ github.head_ref }}
-    #        secrets: inherit
-
-    # web-tests:
-    #     needs: web-build
-    #     uses: ./.github/workflows/web-tests.yaml
-    #     with:
-    #         base-url: ${{ needs.web-build.outputs.deployment-url }}
-    #     secrets: inherit

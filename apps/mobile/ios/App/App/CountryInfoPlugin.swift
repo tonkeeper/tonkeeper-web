@@ -10,22 +10,27 @@ import StoreKit
     ]
 
     @objc func getInfo(_ call: CAPPluginCall) {
-            var deviceCountry: String? = nil
+        var deviceCountry: String? = nil
+        if #available(iOS 16.0, *) {
+            deviceCountry = Locale.current.region?.identifier
+        } else {
+            deviceCountry = (Locale.current as NSLocale).object(forKey: .countryCode) as? String
+        }
 
-            if #available(iOS 16.0, *) {
-                deviceCountry = Locale.current.region?.identifier
-            } else {
-                deviceCountry = (Locale.current as NSLocale).object(forKey: .countryCode) as? String
-            }
-
-            var storeCountry: String? = nil
-            if #available(iOS 13.0, *) {
-                storeCountry = SKPaymentQueue.default().storefront?.countryCode
-            }
-
+        func finish(_ storeCode: String?) {
             call.resolve([
                 "deviceCountryCode": deviceCountry ?? NSNull(),
-                "storeCountryCode": storeCountry ?? NSNull()
+                "storeCountryCode": storeCode ?? NSNull()
             ])
         }
+
+        if #available(iOS 15.0, *) {
+            Task {
+                let storeCode = await Storefront.current?.countryCode
+                finish(storeCode)
+            }
+        } else {
+            finish(nil)
+        }
+    }
 }
