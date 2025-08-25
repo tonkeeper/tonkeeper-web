@@ -231,8 +231,8 @@ export const createRecipient = async (
 };
 
 export const saveIapPurchase = async (
-    originalTransactionId: string,
-    token: string
+    token: string,
+    originalTransactionId: string
 ): Promise<{ ok: boolean }> => {
     try {
         return await IapService.activateIapPurchase(`Bearer ${token}`, {

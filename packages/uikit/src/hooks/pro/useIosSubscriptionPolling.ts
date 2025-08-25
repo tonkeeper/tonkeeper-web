@@ -25,7 +25,7 @@ export const useIosSubscriptionPolling = (intervalMs = 10000) => {
 
             if (!mainToken) return;
 
-            const result = await saveIapPurchase(String(originalTransactionId), mainToken);
+            const result = await saveIapPurchase(mainToken, String(originalTransactionId));
 
             if (result.ok && isMounted) {
                 void refetch();
