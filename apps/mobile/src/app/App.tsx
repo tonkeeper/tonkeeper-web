@@ -1,7 +1,7 @@
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -48,6 +48,8 @@ import { IonReactRouter } from '@ionic/react-router';
 import { WideContent } from './app-content/WideContent';
 import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/PublishNotification';
 import { queryClient } from '../libs/query-client';
+import { localesList } from '@tonkeeper/locales/localesList';
+import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -101,15 +103,12 @@ const GlobalStyle = createGlobalStyle`
 
 const sdk = new CapacitorAppSdk();
 
-const langs = import.meta.env.VITE_APP_LOCALES;
-
 export const Providers = () => {
     const { t: tSimple, i18n } = useTranslation();
 
     const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = langs.split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -119,7 +118,7 @@ export const Providers = () => {
                     await i18n.changeLanguage(lang);
                 },
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -184,23 +183,30 @@ export const Loader: FC = () => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
+    const { data: countryInfo } = useAppCountryInfo();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
     const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: CAPACITOR_APPLICATION_ID,
         build: sdk.version,
         network,
         lang,
-        platform: CAPACITOR_APPLICATION_ID === 'tablet' ? 'tablet' : 'pro_mobile_ios'
+        platform: CAPACITOR_APPLICATION_ID === 'tablet' ? 'tablet' : 'pro_mobile_ios',
+        deviceCountryCode: countryInfo?.deviceCountryCode,
+        storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
 
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(sdk.version, activeAccount!, accounts);
+    const { data: tracker } = useAnalytics(
+        sdk.version,
+        config?.mainnetConfig,
+        activeAccount!,
+        accounts
+    );
 
     useEffect(() => {
         if (lang && i18n.language !== localizationText(lang)) {
@@ -230,13 +236,12 @@ export const Loader: FC = () => {
         return null;
     }
 
+    // set api url synchronously
+    setProApiUrl(config.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            config.mainnetConfig,
-            Network.MAINNET,
-            import.meta.env.VITE_APP_TONCONSOLE_HOST
-        ),
-        testnetApi: getApiConfig(config.mainnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(config.mainnetConfig),
+        testnetApi: getApiConfig(config.testnetConfig),
         fiat,
         mainnetConfig: config.mainnetConfig,
         testnetConfig: config.testnetConfig,
@@ -246,11 +251,6 @@ export const Loader: FC = () => {
         proFeatures: true,
         experimental: true,
         ios: false,
-        env: {
-            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
-            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        },
         defaultWalletVersion: WalletVersion.V5R1,
         tracker: tracker?.track
     };

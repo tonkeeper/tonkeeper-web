@@ -19,9 +19,12 @@ import {
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
 import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
 import { TonConnectRequestNotification } from './TonConnectRequestNotification';
+import { useAppContext } from '../../hooks/appContext';
 
 const useUnSupportMethodMutation = () => {
-    return useMutation<void, Error, TonConnectAppRequest<'http'>>(replyHttpBadRequestResponse);
+    return useMutation<void, Error, TonConnectAppRequest<'http'> & { bridgeEndpoint: string }>(
+        replyHttpBadRequestResponse
+    );
 };
 
 const BROADCAST_TAG = 'TK_WEB::TON_CONNECT';
@@ -38,6 +41,8 @@ const WebTonConnectSubscription = () => {
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
 
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
+
+    const { mainnetConfig } = useAppContext();
 
     useEffect(() => {
         const openNotification = (clientSessionId: string, value: TonConnectAppRequestPayload) => {
@@ -61,7 +66,10 @@ const WebTonConnectSubscription = () => {
             switch (params.request.method) {
                 case 'disconnect': {
                     return disconnect(params.connection).then(() =>
-                        replyHttpDisconnectResponse({ ...params })
+                        replyHttpDisconnectResponse({
+                            ...params,
+                            bridgeEndpoint: mainnetConfig.ton_connect_bridge
+                        })
                     );
                 }
                 case 'sendTransaction': {
@@ -85,7 +93,10 @@ const WebTonConnectSubscription = () => {
                     return openNotification(params.connection.clientSessionId, value);
                 }
                 default: {
-                    return badRequestResponse(params);
+                    return badRequestResponse({
+                        ...params,
+                        bridgeEndpoint: mainnetConfig.ton_connect_bridge
+                    });
                 }
             }
         };
@@ -113,13 +124,22 @@ const WebTonConnectSubscription = () => {
             storage: sdk.storage,
             handleMessage,
             connections: appConnections?.flatMap(i => i.connections),
-            lastEventId
+            lastEventId,
+            bridgeEndpoint: mainnetConfig.ton_connect_bridge
         });
 
         return () => {
             close();
         };
-    }, [sdk, appConnections, lastEventId, disconnect, setRequest, badRequestResponse]);
+    }, [
+        sdk,
+        appConnections,
+        lastEventId,
+        disconnect,
+        setRequest,
+        badRequestResponse,
+        mainnetConfig.ton_connect_bridge
+    ]);
 
     const handleClose = useCallback(() => {
         if (!request) return;
@@ -155,12 +175,13 @@ const WebTonConnectSubscription = () => {
                 if (item.type === 'http') {
                     replyHttpDisconnectResponse({
                         connection: item,
-                        request: { id: (Date.now() + index).toString() }
+                        request: { id: (Date.now() + index).toString() },
+                        bridgeEndpoint: mainnetConfig.ton_connect_bridge
                     });
                 }
             });
         });
-    }, []);
+    }, [mainnetConfig.ton_connect_bridge]);
 
     return <TonConnectRequestNotification request={request} handleClose={handleClose} />;
 };

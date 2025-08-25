@@ -5,11 +5,11 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
 import {
-    TonAsset,
     isTon,
+    shouldHideTonJettonImageCorners,
+    TonAsset,
     tonAssetAddressFromString,
-    tonAssetAddressToString,
-    shouldHideTonJettonImageCorners
+    tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { JettonsApi, JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
@@ -26,13 +26,17 @@ import { useRate } from '../rates';
 import { useSwapsConfig } from './useSwapsConfig';
 import { useActiveApi } from '../wallet';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../tonendpoint';
+import { eqAddresses } from '@tonkeeper/core/src/utils/address';
+import { KNOWN_TON_ASSETS } from '@tonkeeper/core/src/entries/crypto/asset/constants';
 
 export function useAllSwapAssets() {
     const { swapService } = useSwapsConfig();
     const { data: customAssets } = useUserCustomSwapAssets();
+    const enabledUSDe = useIsFeatureEnabled(FLAGGED_FEATURE.ETHENA);
 
     return useQuery<TonAsset[]>({
-        queryKey: [QueryKey.swapAllAssets, customAssets],
+        queryKey: [QueryKey.swapAllAssets, customAssets, enabledUSDe],
         queryFn: async () => {
             try {
                 const assets = await swapService.swapAssets();
@@ -56,7 +60,15 @@ export function useAllSwapAssets() {
                     })
                     .filter(asset => !(customAssets || []).some(ca => ca.id === asset.id));
 
-                return (fetchedAssets as TonAsset[]).concat(customAssets || []);
+                let result = (fetchedAssets as TonAsset[]).concat(customAssets || []);
+                if (!enabledUSDe) {
+                    result = result.filter(
+                        asset =>
+                            !eqAddresses(KNOWN_TON_ASSETS.USDe, asset.address) &&
+                            !eqAddresses(KNOWN_TON_ASSETS.tsUSDe, asset.address)
+                    );
+                }
+                return result;
             } catch (e) {
                 console.error(e);
                 return [];

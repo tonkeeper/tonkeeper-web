@@ -1,5 +1,5 @@
 import { ActionStatusEnum } from '@tonkeeper/core/dist/tonApiV2';
-import React, { FC } from 'react';
+import React, { FC, PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
@@ -13,7 +13,7 @@ export const Amount = styled(Body1)`
     color: ${props => props.theme.textSecondary};
 `;
 
-const Span = styled(Label1)`
+export const Spam = styled(Label1)`
     user-select: none;
     color: ${props => props.theme.textPrimary};
     background: ${props => props.theme.accentOrange};
@@ -23,21 +23,24 @@ const Span = styled(Label1)`
     display: inline-block;
 `;
 
-export const ActivityDetailsHeader: FC<{
-    amount: string | number;
-    decimals?: number;
-    symbol: string;
-    total?: string;
-    timestamp: number;
-    isScam?: boolean;
-    kind: 'received' | 'send';
-    status?: ActionStatusEnum;
-}> = ({ amount, decimals, symbol, total, timestamp, isScam, kind, status }) => {
+export const ActivityDetailsHeader: FC<
+    PropsWithChildren<{
+        amount: string | number;
+        decimals?: number;
+        symbol: string;
+        total?: string;
+        timestamp: number;
+        isScam?: boolean;
+        kind: 'received' | 'send';
+        status?: ActionStatusEnum;
+    }>
+> = ({ amount, decimals, symbol, total, timestamp, isScam, kind, status, children }) => {
     const format = useFormatCoinValue();
     const { t } = useTranslation();
     return (
         <div>
-            {isScam && <Span>{t('spam_action')}</Span>}
+            {isScam && <Spam>{t('spam_action')}</Spam>}
+            {!!children && <Title>{children}</Title>}
             <Title>
                 {kind === 'received' ? '+' : '-'}&thinsp;
                 {format(amount, decimals)} {symbol}
@@ -54,7 +57,7 @@ const LabelRight = styled(Label1)`
     box-sizing: border-box;
     text-align: right;
 
-    word-break: break-all;
+    word-break: break-word;
 
     white-space: break-spaces;
     overflow: hidden;

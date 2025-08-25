@@ -13,25 +13,23 @@ export const switchNetwork = (current: Network): Network => {
     return current === Network.MAINNET ? Network.TESTNET : Network.MAINNET;
 };
 
-export const getTonClientV2 = (config: TonendpointConfig, current?: Network) => {
+export const getTonClientV2 = (config: TonendpointConfig) => {
     return new ConfigurationV2({
-        basePath:
-            current === Network.MAINNET ? 'https://keeper.tonapi.io' : 'https://testnet.tonapi.io',
+        basePath: config.tonapiV2Endpoint,
         headers: {
             Authorization: `Bearer ${config.tonApiV2Key}`
         }
     });
 };
 
-export const getApiConfig = (config: TonendpointConfig, network: Network, TonConsoleBase = '') => {
-    // Global config
-    if (TonConsoleBase) {
-        TonConsoleApi.BASE = TonConsoleBase;
-        TonConsoleApi.WITH_CREDENTIALS = false;
-        TonConsoleApi.CREDENTIALS = 'omit';
-    }
+export const setProApiUrl = (url: string) => {
+    TonConsoleApi.BASE = url;
+    TonConsoleApi.WITH_CREDENTIALS = false;
+    TonConsoleApi.CREDENTIALS = 'omit';
+};
 
+export const getApiConfig = (config: TonendpointConfig) => {
     return {
-        tonApiV2: getTonClientV2(config, network)
+        tonApiV2: getTonClientV2(config)
     };
 };

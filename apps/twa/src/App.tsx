@@ -239,11 +239,10 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const network = useActiveTonNetwork();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         network,
         lang,
-        platform: 'web'
+        platform: 'twa'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
@@ -271,8 +270,8 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
     const showQrScan = seeIfShowQrScanner(sdk.launchParams.platform);
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
-        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,
@@ -290,9 +289,6 @@ export const Loader: FC<{ sdk: TwaAppSdk }> = ({ sdk }) => {
         hideFireblocks: true,
         defaultWalletVersion: WalletVersion.V5R1,
         browserLength: 4,
-        env: {
-            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        },
         tracker: tracker?.track
     };
 

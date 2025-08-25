@@ -63,14 +63,15 @@ let aptabase: Aptabase;
 const userIdentity = new UserIdentityService(new ExtensionStorage());
 
 popUpEventEmitter.on('userProperties', message => {
+    const { aptabaseEndpoint, aptabaseKey, ...restParams } = message.params;
     aptabase = new Aptabase({
-        host: process.env.REACT_APP_APTABASE_HOST!,
-        key: process.env.REACT_APP_APTABASE!,
+        host: aptabaseEndpoint,
+        key: aptabaseKey,
         appVersion: browser.runtime.getManifest().version,
         userIdentity
     });
 
-    aptabase.init(message.params);
+    aptabase.init(restParams);
 });
 
 popUpEventEmitter.on('trackEvent', message => {
