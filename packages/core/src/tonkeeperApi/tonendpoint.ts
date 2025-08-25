@@ -94,6 +94,7 @@ export interface TonendpointConfig {
     '2fa_bot_url'?: string;
 
     pro_mobile_app_appstore_link?: string;
+    pro_media_base_url?: string;
     pro_landing_url?: string;
     pro_trial_tg_bot_id?: string;
 
