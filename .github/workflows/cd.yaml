@@ -34,12 +34,6 @@ jobs:
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
-            REACT_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-            REACT_APP_TONCONSOLE_API: https://pro.tonconsole.com
-            REACT_APP_TG_BOT_ORIGIN: https://tonkeeper.com
-            REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
-            REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-            REACT_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             DEBUG: electron*
 
@@ -100,12 +94,6 @@ jobs:
             environment: 'main'
         secrets: inherit
 
-    # swap-widget-build:
-    #     uses: ./.github/workflows/swap-widget-build.yaml
-    #     with:
-    #         environment: 'main'
-    #     secrets: inherit
-
     # web-tests:
     #     needs: web-build
     #     uses: ./.github/workflows/web-tests.yaml
@@ -136,11 +124,6 @@ jobs:
               uses: borales/actions-yarn@v5
               with:
                   cmd: install
-
-            - name: Provide ENV
-              run: |
-                echo "REACT_APP_APTABASE=${{ secrets.VITE_APP_APTABASE }}" >> apps/extension/.env
-                echo "REACT_APP_APTABASE_HOST=https://anonymous-analytics.tonkeeper.com" >> apps/extension/.env
 
             - name: Run build
               uses: borales/actions-yarn@v5

@@ -32,11 +32,6 @@ export interface IAppContext {
     hideBrowser?: boolean;
     hideFireblocks?: boolean;
     browserLength?: number;
-    env?: {
-        tgAuthBotId?: string;
-        stonfiReferralAddress?: string;
-        tronApiKey?: string;
-    };
     defaultWalletVersion: WalletVersion;
     tracker: AnalyticsTracker | undefined;
 }

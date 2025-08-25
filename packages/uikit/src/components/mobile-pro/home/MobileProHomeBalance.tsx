@@ -8,14 +8,14 @@ import React, { FC } from 'react';
 import { AccountAndWalletBadgesGroup } from '../../account/AccountBadge';
 import { useActiveAccount, useActiveTonNetwork } from '../../../state/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { useIsTronEnabledForActiveWallet } from '../../../state/tron/tron';
+import { useCanReceiveTron } from '../../../state/tron/tron';
 import { AddressMultiChain } from '../../home/Balance';
 import { ChevronDownIcon } from '../../Icon';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useInternetConnection } from '../../../hooks/useInternetConnection';
 import { AppRoute, WalletSettingsRoute } from '../../../libs/routes';
-import { useBatteryBalance, useBatteryEnabledConfig } from '../../../state/battery';
+import { useBatteryBalance, useCanSeeBattery } from '../../../state/battery';
 import { useNavigate } from '../../../hooks/router/useNavigate';
 import { BatteryBalanceIcon } from '../../settings/battery/BatteryInfoHeading';
 
@@ -76,14 +76,14 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
     const { data: balance, isLoading } = useWalletTotalBalance();
     const fiat = useUserFiat();
     const activeAccount = useActiveAccount();
-    const isTronEnabled = useIsTronEnabledForActiveWallet();
+    const isTronEnabled = useCanReceiveTron();
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { isConnected } = useInternetConnection();
     const network = useActiveTonNetwork();
     const { data: batteryBalance } = useBatteryBalance();
     const navigate = useNavigate();
-    const { disableWhole: disableWholeBattery } = useBatteryEnabledConfig();
+    const canUseBattery = useCanSeeBattery();
 
     let content;
 
@@ -92,7 +92,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
             <AddressMultiChain top="80px">
                 <Row>
                     <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
-                    {batteryBalance?.batteryUnitsBalance.gt(0) && !disableWholeBattery && (
+                    {batteryBalance?.batteryUnitsBalance.gt(0) && canUseBattery && (
                         <BatteryBalanceIcon
                             onClick={e => {
                                 e.stopPropagation();
@@ -122,7 +122,7 @@ export const MobileProHomeBalance: FC<{ className?: string }> = ({ className }) 
             <ClickWrapper onClick={() => isConnected && sdk.copyToClipboard(userFriendlyAddress)}>
                 <Row>
                     <BalanceText>{formatFiatCurrency(fiat, balance || 0)}</BalanceText>
-                    {batteryBalance?.batteryUnitsBalance.gt(0) && !disableWholeBattery && (
+                    {batteryBalance?.batteryUnitsBalance.gt(0) && canUseBattery && (
                         <BatteryBalanceIcon
                             onClick={e => {
                                 e.stopPropagation();

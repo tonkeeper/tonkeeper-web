@@ -13,6 +13,9 @@ import { useAppTargetEnv } from '../../hooks/appSdk';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { useTranslation } from '../../hooks/translation';
 import { useTrackDappBrowserOpened } from '../../hooks/analytics/events-hooks';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { Navigate } from '../../components/shared/Navigate';
+import { AppRoute } from '../../libs/routes';
 
 const PromotionsCarouselStyled = styled(PromotionsCarousel)`
     margin-top: 1rem;
@@ -42,8 +45,13 @@ export const DesktopBrowserRecommendationsPage: FC = () => {
     const { t } = useTranslation();
     const { data } = useRecommendations();
     const targetEnv = useAppTargetEnv();
+    const dappsListEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.DAPPS_LIST);
 
     useTrackDappBrowserOpened();
+
+    if (!dappsListEnabled) {
+        return <Navigate to={AppRoute.home} />;
+    }
 
     if (!data) {
         return null;

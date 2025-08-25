@@ -28,3 +28,22 @@ export const useMutateDevSettings = () => {
         await client.invalidateQueries([AppKey.DEV_SETTINGS]);
     });
 };
+
+export const useDevMenuVisibility = () => {
+    const sdk = useAppSdk();
+
+    return useQuery([AppKey.IS_DEV_MENU_VISIBLE], async () =>
+        Boolean(await sdk.storage.get(AppKey.IS_DEV_MENU_VISIBLE))
+    );
+};
+
+export const useMutateDevMenuVisibility = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation(async () => {
+        await sdk.storage.set(AppKey.IS_DEV_MENU_VISIBLE, true);
+
+        await client.invalidateQueries([AppKey.IS_DEV_MENU_VISIBLE]);
+    });
+};

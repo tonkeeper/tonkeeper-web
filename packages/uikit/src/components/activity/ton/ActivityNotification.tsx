@@ -1,11 +1,13 @@
 import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV2';
 import React, { FC, useCallback } from 'react';
 import { Notification } from '../../Notification';
-import { ActionDetailsBlock, ErrorActivityNotification, Title } from '../NotificationCommon';
+import { ErrorActivityNotification } from '../NotificationCommon';
 import {
     AuctionBidActionDetails,
     DomainRenewActionDetails,
     ExtraCurrencyTransferNotification,
+    PurchaseActionNotification,
+    SimplePreviewActionNotification,
     SmartContractExecActionDetails,
     TonTransferActionNotification
 } from './TonActivityActionDetails';
@@ -27,7 +29,6 @@ import { TronHistoryItem } from '@tonkeeper/core/dist/tronApi';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { useTranslation } from '../../../hooks/translation';
 import { TronTransferActionNotification } from '../tron/TronActivityActionDetails';
-import { Label2 } from '../../Text';
 
 export interface ActionData {
     isScam: boolean;
@@ -52,9 +53,8 @@ export interface ActivityNotificationDataTron {
 
 export type ActivityNotificationData = ActivityNotificationDataTon | ActivityNotificationDataTron;
 
+// eslint-disable-next-line complexity
 const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
-    const { t } = useTranslation();
-
     switch (props.action.type) {
         case 'TonTransfer':
             return <TonTransferActionNotification {...props} />;
@@ -90,21 +90,16 @@ const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
             return <NftPurchaseActionDetails {...props} />;
         case 'ExtraCurrencyTransfer':
             return <ExtraCurrencyTransferNotification {...props} />;
+        case 'Purchase':
+            return <PurchaseActionNotification {...props} />;
         case 'Unknown':
             return <ErrorActivityNotification event={props.event} />;
+        case 'ElectionsDepositStake':
+        case 'ElectionsRecoverStake':
+            return <SimplePreviewActionNotification {...props} />;
         default: {
-            console.log(props);
-            return (
-                <ActionDetailsBlock event={props.event}>
-                    <Title>
-                        {props.action.simplePreview.name ??
-                            t('txActions_signRaw_types_unknownTransaction')}
-                    </Title>
-                    {!!props.action.simplePreview.description && (
-                        <Label2>{props.action.simplePreview.description}</Label2>
-                    )}
-                </ActionDetailsBlock>
-            );
+            assertUnreachableSoft(props.action.type);
+            return <SimplePreviewActionNotification {...props} />;
         }
     }
 };

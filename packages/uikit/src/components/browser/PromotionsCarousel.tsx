@@ -34,7 +34,7 @@ export const PromotionsCarousel: FC<
     >
 > = ({ apps, onClickApp, className, ...rest }) => {
     const config = useActiveConfig();
-    const speed = config.featured_play_interval || 1000 * 10;
+    const speed = config.featured_play_interval;
 
     return (
         <Carousel

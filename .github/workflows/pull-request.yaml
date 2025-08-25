@@ -1,14 +1,5 @@
 name: PR
 on:
-    workflow_dispatch:
-      inputs:
-        tonconsole_env:
-          type: choice
-          description: Tonconsole host
-          options:
-            - dev
-            - prod
-          default: prod
     pull_request:
 
 env:
@@ -18,23 +9,7 @@ permissions:
     pull-requests: write
 
 jobs:
-    init:
-        runs-on: ubuntu-latest
-        outputs:
-            tonconsole_env: ${{ steps.set.outputs.tonconsole_env }}
-        steps:
-        -   id: set
-            run: |
-                if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-                    ENV_VALUE="${{ github.event.inputs.tonconsole_env }}"
-                else
-                    ENV_VALUE="prod"
-                fi
-                    echo "tonconsole_env = $ENV_VALUE"
-                    echo "tonconsole_env=$ENV_VALUE" >> $GITHUB_OUTPUT
-
     desktop-build:
-        needs: init
         name: desktop-build
         strategy:
             matrix:
@@ -70,12 +45,6 @@ jobs:
             APPLE_API_KEY: ${{ github.workspace }}/AuthKey.p8
             APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
             APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
-            REACT_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-            REACT_APP_TONCONSOLE_API: ${{ needs.init.outputs.tonconsole_env == 'dev' && 'https://dev-pro.tonconsole.com' || 'https://pro.tonconsole.com' }}
-            REACT_APP_TG_BOT_ORIGIN: https://tonkeeper.com
-            REACT_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
-            REACT_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-            REACT_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
             DEBUG: electron*
 
         steps:
@@ -152,81 +121,10 @@ jobs:
                   rm ${{ github.workspace }}/AuthKey.p8
 
     web-build:
-        needs: init
         uses: ./.github/workflows/web-build.yaml
         with:
             environment: ${{ github.head_ref }}
-            tonconsole_env: ${{ needs.init.outputs.tonconsole_env }}
         secrets: inherit
-
-    twa-build:
-        name: twa-build
-        runs-on: ubuntu-latest
-        timeout-minutes: 10
-
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Yarn cache
-              uses: actions/cache@v4
-              with:
-                  path: ./.yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build
-              uses: borales/actions-yarn@v5
-              env:
-                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
-                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
-                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
-                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
-              with:
-                  cmd: build:twa
-
-            - name: Publish TWA to Cloudflare Pages
-              id: deploy
-              uses: cloudflare/wrangler-action@v3
-              with:
-                  apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-                  accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-                  command:
-                      pages deploy apps/twa/dist --project-name=tonkeeper-telegram
-                      --branch=feature/twa
-
-            - name: Summary
-              run: |
-                  echo '### Successful TWA deployment! 🚀🚀🚀' >> $GITHUB_STEP_SUMMARY
-                  echo 'Well done!' >> $GITHUB_STEP_SUMMARY
-                  echo 'Link to test environment:' >> $GITHUB_STEP_SUMMARY
-                  echo 'https://t.me/tonkeeperdevbot' >> $GITHUB_STEP_SUMMARY
-
-            - name: Comment PR
-              uses: thollander/actions-comment-pull-request@v3
-              with:
-                  message: |
-                      ### Successful TWA deployment 🚀🚀🚀
-                      Well done!
-                      Link to test environment:
-                      https://t.me/tonkeeperdevbot
-                  comment-tag: twa_deploy
 
     extension-build:
         name: extension-build
@@ -259,11 +157,6 @@ jobs:
               with:
                   cmd: install
 
-            - name: Provide ENV
-              run: |
-                echo "REACT_APP_APTABASE=${{ secrets.VITE_APP_APTABASE }}" >> apps/extension/.env
-                echo "REACT_APP_APTABASE_HOST=https://anonymous-analytics.tonkeeper.com" >> apps/extension/.env
-
             - name: Run build
               uses: borales/actions-yarn@v5
               with:
@@ -286,21 +179,5 @@ jobs:
                       ${{ github.workspace }}/apps/extension/dist/firefox
 
     ipad-build:
-        needs: init
         uses: ./.github/workflows/ipad-build.yaml
-        with:
-            tonconsole_env: ${{ needs.init.outputs.tonconsole_env }}
         secrets: inherit
-
-    swap-widget-build:
-        uses: ./.github/workflows/swap-widget-build.yaml
-        with:
-            environment: ${{ github.head_ref }}
-        secrets: inherit
-
-    # web-tests:
-    #     needs: web-build
-    #     uses: ./.github/workflows/web-tests.yaml
-    #     with:
-    #         base-url: ${{ needs.web-build.outputs.deployment-url }}
-    #     secrets: inherit

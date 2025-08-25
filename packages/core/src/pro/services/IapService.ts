@@ -8,11 +8,13 @@ import { request as __request } from '../core/request';
 export class IapService {
     /**
      * Activate Pro subscription via IAP purchase
+     * @param authorization
      * @param requestBody Data that is expected
      * @returns any Ok
      * @throws ApiError
      */
     public static activateIapPurchase(
+        authorization: string,
         requestBody: {
             original_transaction_id: string;
         },
@@ -23,6 +25,9 @@ export class IapService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/iap',
+            headers: {
+                'Authorization': authorization,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {

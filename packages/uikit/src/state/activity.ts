@@ -22,6 +22,7 @@ import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/const
 import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { useBatteryAuthToken } from './battery';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
+import { useTranslation } from '../hooks/translation';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -151,6 +152,9 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
     const tronApi = useTronApi();
     const tronWallet = useActiveTronWallet();
     const { data: batteryAuthToken } = useBatteryAuthToken();
+    const {
+        i18n: { language }
+    } = useTranslation();
 
     const query = useInfiniteQuery({
         queryKey: [
@@ -162,7 +166,8 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
             filterSpam,
             twoFaPlugin,
             tronWallet,
-            batteryAuthToken
+            batteryAuthToken,
+            language
         ],
         queryFn: async ({ pageParam = undefined }) => {
             let assetTonApiId: string | undefined;
@@ -200,7 +205,8 @@ export const useFetchFilteredActivity = (assetAddress?: string) => {
                           wallet,
                           onlyInitiator,
                           filterSpam,
-                          twoFaPluginAddress: twoFaPlugin
+                          twoFaPluginAddress: twoFaPlugin,
+                          acceptLanguage: language.replaceAll('_', '-').split('-')[0]
                       }),
                 assetTonApiId
                     ? emptyResult
@@ -309,7 +315,8 @@ async function fetchTonActivity({
     wallet,
     onlyInitiator,
     filterSpam,
-    twoFaPluginAddress
+    twoFaPluginAddress,
+    acceptLanguage
 }: {
     pageParam?: number;
     assetTonApiId?: string;
@@ -318,6 +325,7 @@ async function fetchTonActivity({
     onlyInitiator: boolean;
     filterSpam: boolean;
     twoFaPluginAddress?: string;
+    acceptLanguage: string | undefined;
 }) {
     if (pageParam === 0) {
         return {
@@ -333,7 +341,8 @@ async function fetchTonActivity({
             limit: 20,
             beforeLt: pageParam,
             subjectOnly: true,
-            initiator: onlyInitiator ? onlyInitiator : undefined
+            initiator: onlyInitiator ? onlyInitiator : undefined,
+            acceptLanguage
         });
     } else {
         if (seeIfValidTonAddress(assetTonApiId)) {
@@ -341,7 +350,8 @@ async function fetchTonActivity({
                 accountId: wallet.rawAddress,
                 jettonId: assetTonApiId!,
                 limit: 20,
-                beforeLt: pageParam
+                beforeLt: pageParam,
+                acceptLanguage
             });
         } else if (assetTonApiId === 'TON') {
             tonActivity = await new AccountsApi(api.tonApiV2).getAccountEvents({
@@ -349,7 +359,8 @@ async function fetchTonActivity({
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true,
-                initiator: onlyInitiator ? onlyInitiator : undefined
+                initiator: onlyInitiator ? onlyInitiator : undefined,
+                acceptLanguage
             });
 
             tonActivity.events = tonActivity.events.filter(event => {
@@ -362,7 +373,8 @@ async function fetchTonActivity({
                 limit: 20,
                 beforeLt: pageParam,
                 subjectOnly: true,
-                initiator: onlyInitiator ? onlyInitiator : undefined
+                initiator: onlyInitiator ? onlyInitiator : undefined,
+                acceptLanguage
             });
 
             tonActivity.events = tonActivity.events.filter(event => {

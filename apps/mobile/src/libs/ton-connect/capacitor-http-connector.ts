@@ -1,10 +1,14 @@
-import { TonConnectSSE } from '@tonkeeper/core/dist/service/tonConnect/ton-connect-sse';
+import {
+    createBridgeEndpointFetcher,
+    TonConnectSSE
+} from '@tonkeeper/core/dist/service/tonConnect/ton-connect-sse';
 import { AccountConnection } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
 import { TonConnectAppRequestPayload } from '@tonkeeper/core/dist/entries/tonConnect';
 import { App } from '@capacitor/app';
 import { isSignerLink } from '@tonkeeper/uikit/dist/state/signer';
 import { atom, subject } from '@tonkeeper/core/dist/entries/atom';
 import { capacitorStorage } from '../appSdk';
+import packageJson from '../../../package.json';
 
 const tonConnectDisconnect$ = subject<AccountConnection>();
 const tonConnectRequest$ = subject<TonConnectAppRequestPayload>();
@@ -17,7 +21,12 @@ export const tonConnectSSE = new TonConnectSSE({
     listeners: {
         onDisconnect: connection => tonConnectDisconnect$.next(connection),
         onRequest: params => tonConnectRequest$.next(params)
-    }
+    },
+    bridgeEndpointFetcher: createBridgeEndpointFetcher({
+        platform: 'pro_mobile_ios',
+        build: packageJson.version,
+        onError: e => console.error(e)
+    })
 });
 export const subscribeToHttpTonConnectDisconnect = (
     listener: (connection: AccountConnection) => void

@@ -13,8 +13,6 @@ import {
     JettonTransferDesktopAction
 } from './JettonDesktopActions';
 import { ContractDeployDesktopAction } from './ContractDeployAction';
-import { Body2 } from '../../../Text';
-import { HistoryGridCellFillRow } from './HistoryGrid';
 import { SmartContractExecDesktopAction } from './SmartContractExecDesktopAction';
 import { AuctionBidDesktopAction } from './AuctionDesktopActions';
 import {
@@ -24,11 +22,15 @@ import {
 } from './StakeActions';
 import { DomainRenewDesktopAction } from './DnsActions';
 import { UnknownDesktopAction } from './UnknownAction';
+import { SimplePreviewDesktopAction } from './SimplePreviewDesktopAction';
+import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
+import { PurchaseDesktopAction } from './PurchaseDesktopAction';
 
 export const HistoryAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
+    // eslint-disable-next-line complexity
 }> = ({ action, isScam }) => {
     switch (action.type) {
         case 'TonTransfer':
@@ -61,17 +63,18 @@ export const HistoryAction: FC<{
             return <DomainRenewDesktopAction action={action} />;
         case 'ExtraCurrencyTransfer':
             return <ExtraCurrencyTransferDesktopAction action={action} isScam={isScam} />;
+        case 'Purchase':
+            return <PurchaseDesktopAction action={action} />;
         case 'Unknown':
             return <UnknownDesktopAction action={action} />;
+        case 'ElectionsDepositStake':
+        case 'ElectionsRecoverStake':
+        case 'Subscribe':
+        case 'UnSubscribe':
+            return <SimplePreviewDesktopAction action={action} isScam={isScam} />;
         default: {
-            console.error(action);
-            return (
-                <>
-                    <HistoryGridCellFillRow>
-                        <Body2>{action.simplePreview.name}</Body2>
-                    </HistoryGridCellFillRow>
-                </>
-            );
+            assertUnreachableSoft(action.type);
+            return <SimplePreviewDesktopAction action={action} isScam={isScam} />;
         }
     }
 };

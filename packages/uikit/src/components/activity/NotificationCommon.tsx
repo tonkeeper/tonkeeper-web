@@ -164,10 +164,11 @@ export const ActionRecipientAddress: FC<{ address: string; name?: string; label?
     );
 };
 
-export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: boolean }> = ({
-    recipient,
-    bounced
-}) => {
+export const ActionRecipientDetails: FC<{
+    recipient: AccountAddress;
+    bounced?: boolean;
+    customLabel?: string;
+}> = ({ recipient, bounced, customLabel }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const network = useActiveTonNetwork();
@@ -177,7 +178,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
             {recipient.name && (
                 <ListItem onClick={() => sdk.copyToClipboard(recipient.name!)}>
                     <ListItemPayload>
-                        <Label>{t('transaction_recipient')}</Label>
+                        <Label>{customLabel ?? t('transaction_recipient')}</Label>
                         <Label1>{recipient.name}</Label1>
                     </ListItemPayload>
                 </ListItem>
@@ -185,6 +186,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
             <ActionRecipientAddress
                 address={formatAddress(recipient.address, network, bounced)}
                 name={recipient.name}
+                label={customLabel}
             />
         </>
     );
@@ -600,7 +602,7 @@ export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> 
     children
 }) => {
     const config = useActiveConfig();
-    const url = config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
+    const url = config.transactionExplorer;
     return (
         <CommonActionDetailsBlock url={url} eventId={event.eventId}>
             {children}

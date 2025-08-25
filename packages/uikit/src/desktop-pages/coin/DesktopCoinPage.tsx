@@ -26,17 +26,20 @@ import { useAssets } from '../../state/home';
 import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
-import { useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { HideOnReview } from '../../components/ios/HideOnReview';
-import { TON_ASSET, TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    KNOWN_TON_ASSETS,
+    TON_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import {
     jettonToTonAssetAmount,
     tonAssetAddressFromString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
+import { useCanReceiveTron, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
@@ -51,11 +54,10 @@ import { Link } from '../../components/shared/Link';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
-import { HideForRegulatoryState } from '../../components/HideForState';
-import { CountryFeature } from '../../state/country';
 import { Redirect } from 'react-router-dom';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { Image } from '../../components/shared/Image';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -67,7 +69,7 @@ export const DesktopCoinPage = () => {
         }
     }, [name]);
 
-    const canUseTron = useActiveTronWallet();
+    const canUseTron = useCanReceiveTron();
 
     if (!name) return <></>;
 
@@ -172,23 +174,31 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                <HideOnReview>
-                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
+                    <IfFeatureEnabled
+                        feature={FLAGGED_FEATURE.ETHENA}
+                        applied={
+                            eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.USDe) ||
+                            eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.tsUSDe)
+                        }
+                    >
                         {swapAsset && (
                             <ButtonStyled size="small" onClick={onSwap}>
                                 <SwapIcon />
                                 {t('wallet_swap')}
                             </ButtonStyled>
                         )}
-                    </HideForRegulatoryState>
+                    </IfFeatureEnabled>
+                </IfFeatureEnabled>
 
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
                     {canBuy && (
                         <ButtonStyled size="small" onClick={onOpen}>
                             <PlusIcon />
                             {t('wallet_buy')}
                         </ButtonStyled>
                     )}
-                </HideOnReview>
+                </IfFeatureEnabled>
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </CoinHeaderStyled>
@@ -386,9 +396,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     }, [assets, t, token]);
 
     const { mainnetConfig } = useAppContext();
-    const tonviewer = mainnetConfig.accountExplorer
-        ? new URL(mainnetConfig.accountExplorer).origin
-        : 'https://tonviewer.com';
+    const tonviewer = new URL(mainnetConfig.accountExplorer).origin;
 
     if (asset === undefined) {
         return <Redirect to={AppRoute.home} />;
@@ -566,9 +574,9 @@ export const TronUSDTPage = () => {
                     </ButtonStyled>
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
-            <HideOnReview>
+            <IfFeatureEnabled feature={FLAGGED_FEATURE.BATTERY}>
                 <TronUseBatteryBanner />
-            </HideOnReview>
+            </IfFeatureEnabled>
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />

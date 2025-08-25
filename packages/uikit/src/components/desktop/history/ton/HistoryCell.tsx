@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import { hexToRGBA } from '../../../../libs/css';
 import { useTranslation } from '../../../../hooks/translation';
 import { ArrowDownIcon, ArrowUpIcon, XMarkCircleIcon } from '../../../Icon';
-import { FC, ReactNode } from 'react';
+import { FC, PropsWithChildren, ReactNode } from 'react';
 import { Body2, Body2Class } from '../../../Text';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import { useFormatCoinValue } from '../../../../hooks/balance';
@@ -29,11 +29,14 @@ export const HistoryCellActionGeneric: FC<{
     icon: ReactNode;
     children: ReactNode;
     isFailed: boolean;
-}> = ({ icon, children, isFailed }) => {
+    isScam?: boolean;
+}> = ({ icon, children, isFailed, isScam }) => {
+    const { t } = useTranslation();
     return (
         <HistoryCellAction>
             {isFailed ? <XMarkCircleIcon color="accentRed" /> : icon}
-            <Body2>{children}</Body2>
+            <Body2>{isScam ? t('spam_action') : children}</Body2>
+            {isScam && !isFailed && <HistoryBadgeScam />}
             {isFailed && <HistoryBadgeFailed />}
         </HistoryCellAction>
     );
@@ -168,17 +171,14 @@ const HistoryCellAmountStyled = styled(Body2).attrs({ className: 'grid-area-amou
     white-space: nowrap;
 `;
 
-export const HistoryCellAmount: FC<{
-    amount: string | number;
-    symbol: string;
-    decimals: number;
-    color?: string;
-    isNegative?: boolean;
-    isFailed?: boolean;
-    isSpam?: boolean;
-}> = ({ amount, symbol, decimals, color, isNegative, isFailed, isSpam }) => {
-    const format = useFormatCoinValue();
-
+export const HistoryCellAmountContent: FC<
+    PropsWithChildren<{
+        color?: string;
+        isFailed?: boolean;
+        isSpam?: boolean;
+        isNegative?: boolean;
+    }>
+> = ({ children, isNegative, color, isFailed, isSpam }) => {
     const finalColor = color
         ? color
         : isSpam
@@ -189,11 +189,25 @@ export const HistoryCellAmount: FC<{
         ? 'accentGreen'
         : 'textPrimary';
 
+    return <HistoryCellAmountStyled color={finalColor}>{children}</HistoryCellAmountStyled>;
+};
+
+export const HistoryCellAmount: FC<{
+    amount: string | number;
+    symbol: string;
+    decimals: number;
+    color?: string;
+    isNegative?: boolean;
+    isFailed?: boolean;
+    isSpam?: boolean;
+}> = ({ amount, symbol, decimals, ...rest }) => {
+    const format = useFormatCoinValue();
+
     return (
-        <HistoryCellAmountStyled color={finalColor}>
-            {isNegative ? '−' : '+'}&nbsp;
-            {format(amount, decimals)}&nbsp;{sanitizeJetton(symbol, isSpam)}
-        </HistoryCellAmountStyled>
+        <HistoryCellAmountContent {...rest}>
+            {rest.isNegative ? '−' : '+'}&nbsp;
+            {format(amount, decimals)}&nbsp;{sanitizeJetton(symbol, rest.isSpam)}
+        </HistoryCellAmountContent>
     );
 };
 

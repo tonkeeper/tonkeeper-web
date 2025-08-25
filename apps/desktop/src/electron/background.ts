@@ -98,6 +98,10 @@ export const handleBackgroundMessage = async (message: Message): Promise<unknown
         case 'clean-cookie': {
             return cookieJar.removeAllCookies();
         }
+        case 'get-device-country': {
+            const locale = app.getLocale();
+            return locale.replaceAll('_', '-').split('-')[0] || null;
+        }
         default:
             throw new Error(`Unknown message: ${JSON.stringify(message)}`);
     }

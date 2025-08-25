@@ -5,19 +5,7 @@ on:
             environment:
                 required: true
                 type: string
-            tonconsole_env:
-              required: false
-              type: string
-              default: prod
         secrets:
-            REACT_APP_MEASUREMENT_ID:
-                required: true
-            VITE_APP_APTABASE:
-                required: true
-            REACT_APP_TG_BOT_ID:
-                required: true
-            REACT_APP_STONFI_REFERRAL_ADDRESS:
-                required: true
             CLOUDFLARE_API_TOKEN:
                 required: true
             CLOUDFLARE_ACCOUNT_ID:
@@ -65,14 +53,6 @@ jobs:
 
             - name: Run build
               uses: borales/actions-yarn@v5
-              env:
-                  VITE_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
-                  VITE_APP_APTABASE: ${{ secrets.VITE_APP_APTABASE }}
-                  VITE_APP_APTABASE_HOST: https://anonymous-analytics.tonkeeper.com
-                  VITE_APP_LOCALES: en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn
-                  VITE_APP_TONCONSOLE_HOST: ${{ inputs.tonconsole_env == 'dev' && 'https://dev-pro.tonconsole.com' || 'https://pro.tonconsole.com' }}
-                  VITE_APP_TG_BOT_ID: ${{ secrets.REACT_APP_TG_BOT_ID }}
-                  VITE_APP_STONFI_REFERRAL_ADDRESS: ${{ secrets.REACT_APP_STONFI_REFERRAL_ADDRESS }}
               with:
                   cmd: build:web
 

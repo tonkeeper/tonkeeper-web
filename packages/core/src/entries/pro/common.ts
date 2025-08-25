@@ -1,13 +1,11 @@
 import { APIConfig } from '../apis';
-import { IAppSdk } from '../../AppSdk';
 import { RecipientData } from '../send';
 import { TonWalletStandard } from '../wallet';
 import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
-import { ProAuthTokenService } from '../../service/proService';
 import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
 
-export interface ProStateWallet {
+export interface IProStateWallet {
     publicKey: string;
     rawAddress: string;
 }
@@ -48,7 +46,7 @@ export interface IOriginalTransactionInfo {
     environment: IosEnvironmentTypes;
 }
 
-export interface ConfirmState {
+export interface IConfirmState {
     invoice: InvoicesInvoice;
     recipient: RecipientData;
     assetAmount: AssetAmount;
@@ -56,28 +54,31 @@ export interface ConfirmState {
 }
 
 export interface ISubscriptionFormData {
-    selectedPlan: IDisplayPlan;
+    wallet?: IProStateWallet;
+    tempToken: string;
     promoCode?: string;
+    selectedPlan: IDisplayPlan;
 }
 
-export interface ISubscriptionConfig {
-    sdk?: IAppSdk;
-    api?: APIConfig;
-    authService?: ProAuthTokenService;
-    onOpen?: (p?: {
-        confirmState: ConfirmState | null;
+export interface ICryptoStrategyConfig {
+    api: APIConfig;
+    onProConfirmOpen: (p?: {
+        confirmState: IConfirmState | null;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;
     }) => void;
-    wallet?: ProStateWallet | null;
 }
 
-export interface WalletAuth {
+export interface IWalletAuth {
     type: AuthTypes.WALLET;
-    wallet: ProStateWallet;
+    wallet: IProStateWallet;
 }
 
-export interface TelegramAuth {
+export interface ITokenizedWalletAuth extends IWalletAuth {
+    tempToken: string;
+}
+
+export interface ITelegramAuth {
     type: AuthTypes.TELEGRAM;
 }
 
@@ -89,4 +90,11 @@ export type NormalizedProPlans = {
 export interface ISupportData {
     url: string;
     isPriority: boolean;
+}
+
+export interface IUserInfo {
+    pub_key?: string;
+    version?: string;
+    user_id?: number;
+    tg_id?: number;
 }

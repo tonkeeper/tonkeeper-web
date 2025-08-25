@@ -78,7 +78,6 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
         onClose();
 
         if (
-            subscription &&
             isSameAuth &&
             !isTelegramSubscription(subscription) &&
             isValidSubscription(subscription)

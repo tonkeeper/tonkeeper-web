@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationFrom } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { InnerBody, useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
@@ -89,9 +89,6 @@ const PairKeystoneNotification = React.lazy(
     () => import('@tonkeeper/uikit/dist/components/PairKeystoneNotification')
 );
 
-const ExtensionMobileAppBannerNotification = React.lazy(
-    () => import('@tonkeeper/uikit/dist/components/pro/ExtensionMobileAppBannerNotification')
-);
 const ConnectLedgerPage = React.lazy(() => import('./components/ConnectLedgerPage'));
 
 const queryClient = new QueryClient({
@@ -104,7 +101,6 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new ExtensionAppSdk();
-const TARGET_ENV = 'extension';
 connectToBackground();
 
 const ExtensionGlobalStyle = createGlobalStyle`
@@ -218,14 +214,17 @@ export const Loader: FC = React.memo(() => {
 
     const lock = useLock(sdk);
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang: localizationFrom(browser.i18n.getUILanguage()),
         platform: 'extension'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
-    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts);
+    const { data: tracker } = useAnalytics(
+        serverConfig?.mainnetConfig,
+        activeAccount || undefined,
+        accounts
+    );
 
     if (
         activeWalletLoading ||
@@ -244,9 +243,12 @@ export const Loader: FC = React.memo(() => {
         );
     }
 
+    // set api url synchronously
+    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
-        mainnetApi: getApiConfig(serverConfig.mainnetConfig, Network.MAINNET),
-        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,
@@ -261,9 +263,6 @@ export const Loader: FC = React.memo(() => {
         hideMultisig: true,
         hideFireblocks: true,
         defaultWalletVersion: WalletVersion.V5R1,
-        env: {
-            tronApiKey: process.env.REACT_APP_TRON_API_KEY
-        },
         tracker: tracker?.track
     };
 
@@ -382,7 +381,6 @@ export const Content: FC<{
                 <ConnectLedgerNotification />
                 <SwapMobileNotification />
                 <PairKeystoneNotification />
-                <ExtensionMobileAppBannerNotification />
             </Suspense>
         </Wrapper>
     );

@@ -25,6 +25,7 @@ class CustomViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(BluetoothPlugin())
         bridge?.registerPluginInstance(DappBrowserPlugin())
         bridge?.registerPluginInstance(SubscriptionPlugin())
+        bridge?.registerPluginInstance(CountryInfoPlugin())
 
         if let webView = self.bridge?.webView {
             makeWebViewTransparent(webView)

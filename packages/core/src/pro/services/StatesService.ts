@@ -10,13 +10,19 @@ import { request as __request } from '../core/request';
 export class StatesService {
     /**
      * Get user UI state
+     * @param authorization
      * @returns State State
      * @throws ApiError
      */
-    public static getState(): CancelablePromise<State> {
+    public static getState(
+        authorization: string,
+    ): CancelablePromise<State> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/state',
+            headers: {
+                'Authorization': authorization,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
@@ -27,11 +33,13 @@ export class StatesService {
     }
     /**
      * Update user UI state
+     * @param authorization
      * @param requestBody Data that is expected
      * @returns Ok Ok
      * @throws ApiError
      */
     public static updateState(
+        authorization: string,
         requestBody?: {
             state: string;
         },
@@ -39,6 +47,9 @@ export class StatesService {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/v1/services/pro/state',
+            headers: {
+                'Authorization': authorization,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -51,13 +62,19 @@ export class StatesService {
     }
     /**
      * Delete user UI state
+     * @param authorization
      * @returns Ok Ok
      * @throws ApiError
      */
-    public static deleteState(): CancelablePromise<Ok> {
+    public static deleteState(
+        authorization: string,
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/services/pro/state',
+            headers: {
+                'Authorization': authorization,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,

@@ -184,7 +184,7 @@ const CreateMultisigAwaitDeployPage: FC<{
     }, []);
 
     const { t } = useTranslation();
-    const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
+    const explorerUrl = config.accountExplorer;
 
     return (
         <ContentWrapper>

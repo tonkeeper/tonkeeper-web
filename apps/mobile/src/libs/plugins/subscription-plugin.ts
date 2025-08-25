@@ -2,13 +2,14 @@ import { registerPlugin } from '@capacitor/core';
 import {
     IDisplayPlan,
     IIosPurchaseResult,
-    IIosSubscriptionStrategy,
+    IIosSubscriptionStrategy as IIosStrategy,
     ISubscriptionFormData,
     IOriginalTransactionInfo,
     IProductInfo,
     NormalizedProPlans,
-    ISubscriptionConfig,
-    isProductId
+    isProductId,
+    ProSubscription,
+    isProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 import {
     IosEnvironmentTypes,
@@ -16,8 +17,13 @@ import {
     ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
-import { ProAuthTokenType, saveIapPurchase } from '@tonkeeper/core/dist/service/proService';
+import { getFormattedProPrice, pickBestSubscription } from '@tonkeeper/core/dist/utils/pro';
+import {
+    getNormalizedSubscription,
+    saveIapPurchase
+} from '@tonkeeper/core/dist/service/proService';
+import { BaseSubscriptionStrategy as BaseStrategy } from '@tonkeeper/core/dist/BaseSubscriptionStrategy';
+import { IStorage } from '@tonkeeper/core/dist/Storage';
 
 interface ISubscriptionPlugin {
     subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult>;
@@ -62,30 +68,6 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                 }, 1000);
             });
         },
-        async getCurrentSubscriptionInfo(): Promise<{ subscriptions: IIosPurchaseResult[] }> {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    const now = new Date();
-                    const expiration = new Date(now);
-                    expiration.setMonth(now.getMonth() + 1);
-
-                    resolve({
-                        subscriptions: [
-                            {
-                                status: PurchaseStatuses.SUCCESS,
-                                originalTransactionId: 2000000953417084,
-                                environment: IosEnvironmentTypes.SANDBOX,
-                                productId: ProductIds.MONTHLY,
-                                purchaseDate: now.toISOString(),
-                                expirationDate: expiration.toISOString(),
-                                revocationDate: null,
-                                isUpgraded: false
-                            }
-                        ]
-                    });
-                }, 1000);
-            });
-        },
         async getAllProductsInfo(): Promise<{ products: IProductInfo[] }> {
             return new Promise(resolve =>
                 setTimeout(
@@ -121,19 +103,15 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
     })
 });
 
-class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
+export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrategy {
     public source = SubscriptionSource.IOS as const;
 
-    async subscribe(
-        formData: ISubscriptionFormData,
-        config: ISubscriptionConfig
-    ): Promise<PurchaseStatuses> {
-        const productId = formData.selectedPlan.id;
-        const authService = config.authService;
+    public constructor(storage: IStorage) {
+        super(storage);
+    }
 
-        if (!authService) {
-            throw new Error('Missing authService');
-        }
+    async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
+        const productId = formData.selectedPlan.id;
 
         if (!isProductId(productId)) {
             throw new Error('Missing product id for this product');
@@ -153,8 +131,9 @@ class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
             throw new Error('Failed to subscribe');
         }
 
-        const savingResult = await authService.withTokenContext(ProAuthTokenType.TEMP, () =>
-            saveIapPurchase(String(originalTransactionId))
+        const savingResult = await saveIapPurchase(
+            formData.tempToken,
+            String(originalTransactionId)
         );
 
         if (!savingResult.ok) {
@@ -164,24 +143,30 @@ class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         return PurchaseStatuses.SUCCESS;
     }
 
-    async getAllProductsInfo(): Promise<NormalizedProPlans> {
-        try {
-            const productIds = Object.values(ProductIds);
-            const { products } = await SubscriptionPlugin.getAllProductsInfo({ productIds });
+    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
+        const mainToken = await this.authTokenService.getToken();
 
-            const normalizedPlans: IDisplayPlan[] = products.map(plan => ({
-                id: plan.id,
-                displayName: plan.displayName,
-                displayPrice: plan.displayPrice,
-                subscriptionPeriod: plan?.subscriptionPeriod || 'month',
-                formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
-            }));
+        const [currentSubscription, targetSubscription] = await Promise.all([
+            getNormalizedSubscription(this.storage, mainToken),
+            getNormalizedSubscription(this.storage, tempToken)
+        ]);
 
-            return { plans: normalizedPlans, verifiedPromoCode: undefined };
-        } catch (e) {
-            console.error('Failed to fetch products info:', e);
-            return { plans: undefined, verifiedPromoCode: undefined };
+        const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
+
+        const shouldPromoteToken =
+            tempToken &&
+            bestSubscription === targetSubscription &&
+            isProSubscription(bestSubscription);
+
+        if (shouldPromoteToken) {
+            await this.authTokenService.setToken(tempToken);
         }
+
+        return bestSubscription;
+    }
+
+    async manageSubscriptions(): Promise<void> {
+        return SubscriptionPlugin.manageSubscriptions();
     }
 
     async getCurrentSubscriptionInfo(): Promise<IIosPurchaseResult[]> {
@@ -194,9 +179,18 @@ class IosSubscriptionStrategy implements IIosSubscriptionStrategy {
         return SubscriptionPlugin.getOriginalTransactionId();
     }
 
-    async manageSubscriptions(): Promise<void> {
-        return SubscriptionPlugin.manageSubscriptions();
+    async getAllProductsInfoCore(): Promise<NormalizedProPlans> {
+        const productIds = Object.values(ProductIds);
+        const { products } = await SubscriptionPlugin.getAllProductsInfo({ productIds });
+
+        const normalizedPlans: IDisplayPlan[] = products.map(plan => ({
+            id: plan.id,
+            displayName: plan.displayName,
+            displayPrice: plan.displayPrice,
+            subscriptionPeriod: plan?.subscriptionPeriod || 'month',
+            formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
+        }));
+
+        return { plans: normalizedPlans, verifiedPromoCode: undefined };
     }
 }
-
-export const Subscription = new IosSubscriptionStrategy();

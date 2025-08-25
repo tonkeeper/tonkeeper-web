@@ -227,3 +227,37 @@ export const maxOneCall = <A extends unknown[], R>(fn: (...args: A) => R): ((...
         return fn(...args);
     };
 };
+
+type MultiTapOptions = {
+    intervalMs?: number;
+    requiredCount?: number;
+    resetAfterTrigger?: boolean;
+};
+
+export function createMultiTap(callback: () => void, config: MultiTapOptions = {}) {
+    const { requiredCount = 5, intervalMs = 500, resetAfterTrigger = true } = config;
+
+    let tapsCount = 0;
+    let lastTapTime = 0;
+
+    return function trigger() {
+        const now = Date.now();
+
+        if (now - lastTapTime <= intervalMs) {
+            tapsCount += 1;
+        } else {
+            tapsCount = 1;
+        }
+
+        lastTapTime = now;
+
+        if (tapsCount >= requiredCount) {
+            callback();
+
+            if (resetAfterTrigger) {
+                tapsCount = 0;
+                lastTapTime = 0;
+            }
+        }
+    };
+}

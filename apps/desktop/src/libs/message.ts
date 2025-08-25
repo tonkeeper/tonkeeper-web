@@ -76,6 +76,10 @@ export interface TonConnectSendDisconnectMessage {
     connection: AccountConnectionHttp | AccountConnectionHttp[];
 }
 
+export interface GetDeviceCountry {
+    king: 'get-device-country';
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
@@ -92,4 +96,5 @@ export type Message =
     | PromptTouchIdMessage
     | GetPreferredSystemLanguagesMessage
     | TonConnectSendDisconnectMessage
-    | CleanCookieMessage;
+    | CleanCookieMessage
+    | GetDeviceCountry;

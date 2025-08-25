@@ -19,9 +19,9 @@ import { Navigate } from '../../components/shared/Navigate';
 import { NotForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { QueryKey } from '../../libs/queryKey';
-import { HideForRegulatoryState } from '../../components/HideForState';
-import { CountryFeature } from '../../state/country';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
 const SwapPageWrapper = styled(DesktopViewPageLayout)`
     overflow-y: auto;
@@ -95,11 +95,11 @@ const DesktopSwapPageContent = () => {
 export const DesktopSwapPage = () => {
     return (
         <HideOnReview>
-            <HideForRegulatoryState feature={CountryFeature.swap}>
+            <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                 <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swaps page')}>
                     <DesktopSwapPageContent />
                 </ErrorBoundary>
-            </HideForRegulatoryState>
+            </IfFeatureEnabled>
         </HideOnReview>
     );
 };

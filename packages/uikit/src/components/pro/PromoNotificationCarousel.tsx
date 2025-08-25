@@ -2,17 +2,6 @@ import { css, styled } from 'styled-components';
 import { FC, Fragment, useEffect, useRef, useState } from 'react';
 import { CarouselItem, CarouselRootProvider, CarouselItemGroup, useCarousel } from '@ark-ui/react';
 
-import {
-    MainPromoEnIcon,
-    MainPromoRuIcon,
-    MultiSendPromoEnIcon,
-    MultiSendPromoRuIcon,
-    MultiSigPromoEnIcon,
-    MultiWalletPromoEnIcon,
-    MultiWalletPromoRuIcon,
-    SupportPromoEnIcon,
-    SupportPromoRuIcon
-} from './icons';
 import { Badge } from '../shared';
 import { Body2Class, Label1, Label1Class } from '../Text';
 import { FeatureSlideNames } from '../../enums/pro';
@@ -20,12 +9,12 @@ import { useTranslation } from '../../hooks/translation';
 import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
 import { useUserLanguage } from '../../state/language';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-
-const CAROUSEL_TRIGGER_WIDTH = '40px';
+import { useAppContext } from '../../hooks/appContext';
 
 export const PromoNotificationCarousel = () => {
     const { t } = useTranslation();
     const { data: lang } = useUserLanguage();
+    const { mainnetConfig } = useAppContext();
     const [observedSlide, setObservedSlide] = useState(FeatureSlideNames.MAIN);
 
     const carousel = useCarousel({
@@ -34,6 +23,8 @@ export const PromoNotificationCarousel = () => {
 
     const containerRef = useRef<HTMLDivElement>(null);
     const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+    const baseSlideUrl = mainnetConfig.pro_media_base_url;
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -68,59 +59,64 @@ export const PromoNotificationCarousel = () => {
             <RelativeWrapper>
                 <GradientLayer $page={observedSlide} $total={META_DATA_MAP.length} />
 
-                <SwipeButton
-                    data-swipe-button
-                    type="button"
-                    position="left"
-                    onClick={() => carousel.scrollPrev(true)}
-                    isVisible={carousel.canScrollPrev}
-                >
-                    <ChevronLeftIconStyled />
-                </SwipeButton>
-
                 <ItemGroupStyled ref={containerRef}>
                     {META_DATA_MAP.map((localProps, idx) => {
-                        const { id, content, titleKey, subtitleKey, badgeComponent } = localProps;
+                        const { id, titleKey, src, subtitleKey, badgeComponent } = localProps;
 
                         const locText = localizationText(lang);
-                        const langKey = ['ru', 'en'].includes(locText) ? locText : 'en';
+                        const langKey = locText === 'ru' ? 'ru' : 'eng';
 
                         return (
                             <Slide index={id} key={id} ref={el => (slideRefs.current[idx] = el)}>
                                 <ImageWrapper isActive={observedSlide === idx}>
-                                    {content[langKey as 'en' | 'ru']}
+                                    <SlideImage
+                                        src={`${baseSlideUrl}${src[langKey]}`}
+                                        alt={titleKey}
+                                    />
                                 </ImageWrapper>
 
-                                <DescriptionBlock>
-                                    <LocalBadgedTitleStyled
-                                        titleKey={titleKey}
-                                        badgeComponent={badgeComponent}
-                                    />
-                                    <SubTitle>
-                                        {t(subtitleKey)
-                                            .split('%')
-                                            .map(line => (
-                                                <Fragment key={line}>
-                                                    {line}
-                                                    <br />
-                                                </Fragment>
-                                            ))}
-                                    </SubTitle>
-                                </DescriptionBlock>
+                                <DescriptionBlockWrapper>
+                                    <SwipeButton
+                                        data-swipe-button
+                                        type="button"
+                                        margin="left"
+                                        onClick={() => carousel.scrollPrev(true)}
+                                        isVisible={carousel.canScrollPrev}
+                                    >
+                                        <ChevronLeftIconStyled />
+                                    </SwipeButton>
+
+                                    <DescriptionBlock>
+                                        <LocalBadgedTitleStyled
+                                            titleKey={titleKey}
+                                            badgeComponent={badgeComponent}
+                                        />
+                                        <SubTitle>
+                                            {t(subtitleKey)
+                                                .split('%')
+                                                .map(line => (
+                                                    <Fragment key={line}>
+                                                        {line}
+                                                        <br />
+                                                    </Fragment>
+                                                ))}
+                                        </SubTitle>
+                                    </DescriptionBlock>
+
+                                    <SwipeButton
+                                        data-swipe-button
+                                        type="button"
+                                        margin="right"
+                                        onClick={() => carousel.scrollNext(true)}
+                                        isVisible={carousel.canScrollNext}
+                                    >
+                                        <ChevronRightIconStyled />
+                                    </SwipeButton>
+                                </DescriptionBlockWrapper>
                             </Slide>
                         );
                     })}
                 </ItemGroupStyled>
-
-                <SwipeButton
-                    data-swipe-button
-                    type="button"
-                    position="right"
-                    onClick={() => carousel.scrollNext(true)}
-                    isVisible={carousel.canScrollNext}
-                >
-                    <ChevronRightIconStyled />
-                </SwipeButton>
             </RelativeWrapper>
 
             <DotsWrapper>
@@ -142,32 +138,32 @@ const LocalBadge = () => {
     );
 };
 
-const META_DATA_MAP = [
+export const META_DATA_MAP = [
     {
         id: FeatureSlideNames.MAIN,
         titleKey: 'tonkeeper_pro_subscription',
         subtitleKey: 'promo_subtitle_subscription',
-        content: {
-            ru: <MainPromoRuIcon />,
-            en: <MainPromoEnIcon />
+        src: {
+            ru: 'ru/1.png',
+            eng: 'eng/1.png'
         }
     },
     {
         id: FeatureSlideNames.MULTI_SIG,
         titleKey: 'promo_title_multisig_wallets',
         subtitleKey: 'promo_subtitle_multisig_wallets',
-        content: {
-            ru: <MultiSigPromoEnIcon />,
-            en: <MultiSigPromoEnIcon />
+        src: {
+            ru: 'ru/2.png',
+            eng: 'eng/2.png'
         }
     },
     {
         id: FeatureSlideNames.MULTI_WALLET,
         titleKey: 'promo_title_multi_wallet_accounts',
         subtitleKey: 'promo_subtitle_multi_wallet_accounts',
-        content: {
-            ru: <MultiWalletPromoRuIcon />,
-            en: <MultiWalletPromoEnIcon />
+        src: {
+            ru: 'ru/3.png',
+            eng: 'eng/3.png'
         }
     },
     {
@@ -175,18 +171,18 @@ const META_DATA_MAP = [
         titleKey: 'promo_title_multisend',
         badgeComponent: <LocalBadge />,
         subtitleKey: 'promo_subtitle_multisend',
-        content: {
-            ru: <MultiSendPromoRuIcon />,
-            en: <MultiSendPromoEnIcon />
+        src: {
+            ru: 'ru/4.png',
+            eng: 'eng/4.png'
         }
     },
     {
         id: FeatureSlideNames.SUPPORT,
         titleKey: 'pro_feature_priority_support_title',
         subtitleKey: 'promo_subtitle_support',
-        content: {
-            ru: <SupportPromoRuIcon />,
-            en: <SupportPromoEnIcon />
+        src: {
+            ru: 'ru/5.png',
+            eng: 'eng/5.png'
         }
     }
 ];
@@ -289,21 +285,18 @@ const Slide = styled(CarouselItem)`
     z-index: 1;
 `;
 
-const SwipeButton = styled.button<{ position: 'left' | 'right'; isVisible: boolean }>`
-    width: ${CAROUSEL_TRIGGER_WIDTH};
-    aspect-ratio: 1 / 1;
-    color: ${props => props.theme.textTertiary};
+const SwipeButton = styled.button<{ margin: 'left' | 'right'; isVisible: boolean }>`
     display: none;
-    justify-content: center;
     align-items: center;
-    position: absolute;
-    z-index: 2;
+    justify-content: center;
+    ${props => (props.margin === 'left' ? 'margin-left: 12px;' : 'margin-right: 12px;')};
+    width: 40px;
+    aspect-ratio: 1 / 1;
     border: none;
-    cursor: unset;
-    bottom: 36px;
-    transform: translateY(-50%);
-    ${props => (props.position === 'left' ? 'left: 12px;' : 'right: 12px;')};
+    color: ${props => props.theme.textTertiary};
     transition: opacity 0.3s ease-in-out, color 0.3s ease;
+    cursor: unset;
+    z-index: 2;
 
     @media (pointer: fine) {
         display: flex;
@@ -337,12 +330,12 @@ const ImageWrapper = styled.div<{ isActive: boolean }>`
     @media (min-width: 550px) {
         max-height: 40dvh;
     }
+`;
 
-    & > svg {
-        margin: 40px;
-        height: calc(100% - 80px);
-        aspect-ratio: 1;
-    }
+const SlideImage = styled.img`
+    height: calc(100% - 80px);
+    aspect-ratio: 1;
+    pointer-events: none;
 `;
 
 const DotsWrapper = styled.div`
@@ -360,7 +353,7 @@ const Dot = styled.div<{ isActive: boolean }>`
 `;
 
 const SubTitle = styled.span`
-    ${Label1Class}
+    ${Label1Class};
     text-align: center;
     text-wrap: balance;
     color: ${p => p.theme.textSecondary};
@@ -375,8 +368,11 @@ const DescriptionBlock = styled.div`
     flex-direction: column;
     align-items: center;
     margin: 32px 0 28px;
+`;
 
-    @media (pointer: fine) {
-        max-width: calc(100% - (${CAROUSEL_TRIGGER_WIDTH} * 2));
-    }
+const DescriptionBlockWrapper = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 `;

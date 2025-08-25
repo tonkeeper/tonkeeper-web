@@ -40,7 +40,7 @@ export const ProWalletListItem: FC<IProWalletListItemProps> = props => {
             </ListItemStyled>
         );
     }
-    const address = toShortValue(formatAddress(wallet.rawAddress, network)).slice(4);
+    const address = toShortValue(formatAddress(wallet.rawAddress, network));
     const { name, emoji } = getAccountWalletNameAndEmoji(account, wallet.id);
 
     return (

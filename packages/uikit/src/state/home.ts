@@ -17,7 +17,7 @@ import {
     TonAsset
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { packAssetId } from '@tonkeeper/core/dist/entries/crypto/asset/basic-asset';
-import { useTronBalances } from './tron/tron';
+import { useIsTronEnabledGlobally, useTronBalances } from './tron/tron';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { Address } from '@ton/core';
 import { QueryKey } from '../libs/queryKey';
@@ -58,6 +58,7 @@ export const useAllChainsAssetsWithPrice = () => {
     const { data: config } = useActiveTonWalletConfig();
     const fiat = useUserFiat();
     const { data: usdtRate } = useUSDTRate();
+    const isTronEnabled = useIsTronEnabledGlobally();
 
     return useMemo<{
         assets: { assetAmount: AssetAmount; price?: BigNumber; isPinned?: boolean }[] | undefined;
@@ -65,7 +66,7 @@ export const useAllChainsAssetsWithPrice = () => {
     }>(() => {
         if (!assets || !config || !usdtRate) return { assets: undefined, error: undefined };
 
-        const result: { assetAmount: AssetAmount; price?: BigNumber; isPinned?: boolean }[] = [
+        let result: { assetAmount: AssetAmount; price?: BigNumber; isPinned?: boolean }[] = [
             {
                 assetAmount: new AssetAmount({
                     asset: TON_ASSET,
@@ -127,8 +128,12 @@ export const useAllChainsAssetsWithPrice = () => {
                 });
             });
 
+        if (!isTronEnabled && assets.tron?.usdt.weiAmount.isZero()) {
+            result = result.filter(i => i.assetAmount.asset.id !== TRON_USDT_ASSET.id);
+        }
+
         return { assets: result, error: error ?? jettonError ?? undefined };
-    }, [assets, error, jettonError, config, fiat]);
+    }, [assets, error, jettonError, config, fiat, isTronEnabled]);
 };
 
 export const useAssetWeiBalance = (asset: AssetIdentification) => {

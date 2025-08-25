@@ -19,6 +19,7 @@
 		B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */; };
 		B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */; };
 		B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */; };
+		B35BF13C2E5375DA00D0FD8A /* CountryInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B35BF13B2E5375DA00D0FD8A /* CountryInfoPlugin.swift */; };
 		B38DE39B2DEA1BC200215137 /* injected.js in Resources */ = {isa = PBXBuildFile; fileRef = B38DE39A2DEA1BC200215137 /* injected.js */; };
 		B3BD508B2DB7A7500009E6E7 /* DeepLinkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3BD508A2DB7A7500009E6E7 /* DeepLinkPlugin.swift */; };
 		B3E0A8272D03497E0089241A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B3E0A8262D03497E0089241A /* GoogleService-Info.plist */; };
@@ -42,6 +43,7 @@
 		B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewController.swift; sourceTree = "<group>"; };
 		B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricPlugin.swift; sourceTree = "<group>"; };
 		B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoragePlugin.swift; sourceTree = "<group>"; };
+		B35BF13B2E5375DA00D0FD8A /* CountryInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryInfoPlugin.swift; sourceTree = "<group>"; };
 		B38DE39A2DEA1BC200215137 /* injected.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = injected.js; sourceTree = "<group>"; };
 		B3BD508A2DB7A7500009E6E7 /* DeepLinkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkPlugin.swift; sourceTree = "<group>"; };
 		B3CCE8EB2CFDE9B40083D875 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				B3F1263A2DE46D9700B2D403 /* DappBrowser.swift */,
 				B38DE39A2DEA1BC200215137 /* injected.js */,
 				24879CC32E00A58900492642 /* SubscriptionPlugin.swift */,
+				B35BF13B2E5375DA00D0FD8A /* CountryInfoPlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -246,6 +249,7 @@
 				B3F1263B2DE46D9700B2D403 /* DappBrowser.swift in Sources */,
 				B3BD508B2DB7A7500009E6E7 /* DeepLinkPlugin.swift in Sources */,
 				B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */,
+				B35BF13C2E5375DA00D0FD8A /* CountryInfoPlugin.swift in Sources */,
 				B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */,
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */,

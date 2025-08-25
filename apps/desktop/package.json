@@ -1,7 +1,7 @@
 {
     "name": "@tonkeeper/desktop",
     "license": "Apache-2.0",
-    "version": "4.2.2",
+    "version": "4.2.5",
     "description": "Your desktop wallet on The Open Network",
     "main": ".webpack/main",
     "repository": {
@@ -52,7 +52,6 @@
         "@typescript-eslint/parser": "^5.0.0",
         "@vercel/webpack-asset-relocator-loader": "1.7.3",
         "css-loader": "^6.0.0",
-        "dotenv": "^16.3.1",
         "electron": "^32.3.3",
         "eslint": "^8.0.1",
         "eslint-plugin-import": "^2.25.0",

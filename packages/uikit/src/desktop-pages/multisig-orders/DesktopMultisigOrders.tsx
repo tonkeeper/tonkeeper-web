@@ -162,7 +162,7 @@ const useOpenTonviewer = (address: string) => {
     const config = useActiveConfig();
 
     return useCallback(() => {
-        const explorerUrl = config.accountExplorer ?? 'https://tonviewer.com/%s';
+        const explorerUrl = config.accountExplorer;
 
         sdk.openPage(explorerUrl.replace('%s', formatAddress(address)));
     }, []);

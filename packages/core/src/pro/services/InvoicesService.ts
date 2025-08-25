@@ -11,11 +11,13 @@ import { request as __request } from '../core/request';
 export class InvoicesService {
     /**
      * Create Pro subscription invoice
+     * @param authorization
      * @param requestBody Data that is expected
      * @returns Invoice Invoice created successfully
      * @throws ApiError
      */
     public static createInvoice(
+        authorization: string,
         requestBody?: {
             tier_id: number;
             promo_code?: string;
@@ -24,6 +26,9 @@ export class InvoicesService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/invoice',
+            headers: {
+                'Authorization': authorization,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {
@@ -37,17 +42,22 @@ export class InvoicesService {
     /**
      * Get invoice details
      * @param id Invoice ID
+     * @param authorization
      * @returns Invoice Invoice details retrieved successfully
      * @throws ApiError
      */
     public static getInvoice(
         id: string,
+        authorization: string,
     ): CancelablePromise<Invoice> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/invoice/{id}',
             path: {
                 'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
             },
             errors: {
                 400: `Something went wrong on client side`,

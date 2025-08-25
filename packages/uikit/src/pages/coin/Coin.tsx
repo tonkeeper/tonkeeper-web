@@ -8,10 +8,13 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { ExtraCurrencyPage } from './ExtraCurrency';
+import { useCanReceiveTron } from '../../state/tron/tron';
+import { Navigate } from '../../components/shared/Navigate';
 
 const CoinPage = () => {
     const navigate = useNavigate();
     const { name } = useParams();
+    const canUseTron = useCanReceiveTron();
 
     useEffect(() => {
         if (!name) {
@@ -22,6 +25,9 @@ const CoinPage = () => {
     if (!name) return <></>;
 
     if (name === TRON_USDT_ASSET.id) {
+        if (!canUseTron) {
+            return <Navigate to={AppRoute.home} />;
+        }
         return <TronUsdtContent />;
     } else if (name === 'ton') {
         return <TonPage />;

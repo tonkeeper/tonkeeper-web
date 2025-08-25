@@ -1,4 +1,7 @@
+import { FC } from 'react';
 import styled from 'styled-components';
+import { useLocation } from 'react-router-dom';
+
 import { AsideMenuItem } from '../../shared/AsideItem';
 import { Body2, Body3, Label2, Label2Class } from '../../Text';
 import {
@@ -16,13 +19,11 @@ import {
     TonkeeperProOutlineIcon,
     TonkeeperSkeletIcon
 } from '../../Icon';
-import { useLocation } from 'react-router-dom';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useTranslation } from '../../../hooks/translation';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useAppContext } from '../../../hooks/appContext';
 import { DeleteAllNotification } from '../../settings/DeleteAccountNotification';
-import React, { FC } from 'react';
 import { useDisclosure } from '../../../hooks/useDisclosure';
 import { capitalize, getLanguageName } from '../../../libs/common';
 import { Skeleton } from '../../shared/Skeleton';
@@ -37,6 +38,10 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { isProSubscription, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { Badge } from '../../shared';
+import { createMultiTap } from '@tonkeeper/core/dist/utils/common';
+import { useToast } from '../../../hooks/useNotification';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { useDevMenuVisibility, useMutateDevMenuVisibility } from '../../../state/dev';
 
 const PreferencesAsideContainer = styled.div`
     width: fit-content;
@@ -115,6 +120,7 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
     const sdk = useAppSdk();
+    const toast = useToast();
     const config = useActiveConfig();
     const { isOpen, onClose, onOpen } = useDisclosure();
     const { data: subscription } = useProState();
@@ -122,6 +128,8 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
     const { data: support } = useSupport();
     const { fiat } = useAppContext();
     const wallets = useAccountsState();
+    const { data: isDevMenuVisible } = useDevMenuVisibility();
+    const { mutate: setIsDevMenuVisible } = useMutateDevMenuVisibility();
 
     const { onOpen: onProPurchaseOpen } = useProFeaturesNotification();
 
@@ -138,6 +146,12 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
 
         onProPurchaseOpen();
     };
+
+    const onFiveTaps = createMultiTap(async () => {
+        setIsDevMenuVisible();
+        await sdk.storage.set<boolean>(AppKey.IS_DEV_MENU_VISIBLE, true);
+        toast('Dev Menu activated!');
+    });
 
     return (
         <PreferencesAsideContainer className={className}>
@@ -279,16 +293,18 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                     </AsideMenuItemStyled>
                 </NotForTargetEnv>
             </AsideMenuItemsBlock>
-            <AsideMenuItemsBlock>
-                <NavLink to={AppRoute.settings + SettingsRoute.dev}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive}>
-                            <CodeIcon />
-                            <Label2>{t('preferences_aside_dev_menu')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-            </AsideMenuItemsBlock>
+            {isDevMenuVisible && (
+                <AsideMenuItemsBlock>
+                    <NavLink to={AppRoute.settings + SettingsRoute.dev}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive}>
+                                <CodeIcon />
+                                <Label2>{t('preferences_aside_dev_menu')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                </AsideMenuItemsBlock>
+            )}
             <AsideMenuItemsBlock>
                 <AsideMenuItemStyled onClick={onOpen} isSelected={false}>
                     <ExitIcon />
@@ -303,12 +319,13 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
             <AsideMenuItemsBlock>
                 <AsideMenuItemVersion
                     isSelected={false}
-                    onClick={() =>
+                    onClick={() => {
+                        onFiveTaps();
                         sdk.copyToClipboard(
                             `Tonkeeper Pro for ${sdk.targetEnv} v${sdk.version}`,
                             t('copied')
-                        )
-                    }
+                        );
+                    }}
                 >
                     <TonkeeperProOutlineIcon />
                     <Body2>Tonkeeper Pro {sdk.version}</Body2>

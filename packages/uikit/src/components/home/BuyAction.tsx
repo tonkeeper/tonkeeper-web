@@ -8,7 +8,7 @@ import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
 import { useUserCountry } from '../../state/country';
-import { useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
 import {
     Notification,
@@ -25,6 +25,7 @@ import { BuyIcon, SellIcon } from './HomeIcons';
 import { useActiveConfig } from '../../state/wallet';
 import { HideOnReview } from '../ios/HideOnReview';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
+import { IfFeatureEnabled } from '../shared/IfFeatureEnabled';
 
 const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ items, kind }) => {
     return (
@@ -141,10 +142,10 @@ export const BuyAction: FC = () => {
     }, [searchParams, setSearchParams]);
 
     return (
-        <HideOnReview>
+        <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
             <Action icon={<BuyIcon />} title={'wallet_buy'} action={toggle} />
             <BuyNotification buy={buy} open={open} handleClose={toggle} />
-        </HideOnReview>
+        </IfFeatureEnabled>
     );
 };
 

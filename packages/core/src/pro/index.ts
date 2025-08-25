@@ -8,6 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AppTier } from './models/AppTier';
+export type { authorization } from './models/authorization';
 export { CryptoCurrency } from './models/CryptoCurrency';
 export { Currencies } from './models/Currencies';
 export type { DashboardCellAddress } from './models/DashboardCellAddress';

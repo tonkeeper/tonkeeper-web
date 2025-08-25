@@ -33,6 +33,8 @@ import {
 } from '@tonkeeper/uikit/dist/hooks/analytics/events-hooks';
 import { AnalyticsEventDappClick } from '@tonkeeper/core/dist/analytics';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
+import { FLAGGED_FEATURE } from '@tonkeeper/uikit/dist/state/tonendpoint';
+import { IfFeatureEnabled } from '@tonkeeper/uikit/dist/components/shared/IfFeatureEnabled';
 
 const InputWrapper = styled.form<{ $keyboardShift: number }>`
     padding: 16px 16px 8px;
@@ -234,27 +236,31 @@ export const MobileDappBrowserNewTab = () => {
                     )}
                 </Header>
                 <PageBody>
-                    <InactiveSearchContent recommendations={data} onClickApp={onSelectApp} />
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.DAPPS_LIST}>
+                        <InactiveSearchContent recommendations={data} onClickApp={onSelectApp} />
 
-                    <AnimatePresence>
-                        {isSearching && (
-                            <MotionDiv
-                                key="new-tab-content-active"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                            >
-                                <ActiveSearchContent
-                                    relevantApps={relevantApps}
-                                    onClickApp={onSelectApp}
-                                    topLevelPromotedApps={data.apps}
-                                    query={inputValue}
-                                    onSelectSearchRecommendations={onSelectSearchRecommendations}
-                                />
-                            </MotionDiv>
-                        )}
-                    </AnimatePresence>
+                        <AnimatePresence>
+                            {isSearching && (
+                                <MotionDiv
+                                    key="new-tab-content-active"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                >
+                                    <ActiveSearchContent
+                                        relevantApps={relevantApps}
+                                        onClickApp={onSelectApp}
+                                        topLevelPromotedApps={data.apps}
+                                        query={inputValue}
+                                        onSelectSearchRecommendations={
+                                            onSelectSearchRecommendations
+                                        }
+                                    />
+                                </MotionDiv>
+                            )}
+                        </AnimatePresence>
+                    </IfFeatureEnabled>
                 </PageBody>
                 <InputWrapper onSubmit={handleSubmit(onSubmit)} $keyboardShift={keyboardShift}>
                     <Input
