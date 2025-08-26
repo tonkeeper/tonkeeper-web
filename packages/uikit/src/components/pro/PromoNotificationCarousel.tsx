@@ -371,8 +371,12 @@ const DescriptionBlock = styled.div`
 `;
 
 const DescriptionBlockWrapper = styled.div`
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr;
     align-items: center;
     width: 100%;
+
+    @media (pointer: fine) {
+        grid-template-columns: 52px 1fr 52px;
+    }
 `;
