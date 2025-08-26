@@ -41,7 +41,7 @@ export const ProActiveWallet: FC<IProps> = props => {
         })()
     );
 
-    if (subscription && isTelegramSubscription(subscription)) {
+    if (isCurrentSubscription && isTelegramSubscription(subscription)) {
         return null;
     }
 
