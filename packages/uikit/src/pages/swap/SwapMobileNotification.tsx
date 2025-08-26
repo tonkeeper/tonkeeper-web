@@ -8,16 +8,16 @@ import { SwapSettingsButton } from '../../components/swap/icon-buttons/SwapSetti
 import { SwapRefreshButton } from '../../components/swap/icon-buttons/SwapRefreshButton';
 import { useTranslation } from '../../hooks/translation';
 import { HideOnReview } from '../../components/ios/HideOnReview';
-import { HideForRegulatoryState } from '../../components/HideForState';
-import { CountryFeature } from '../../state/country';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
 const SwapMobileNotification = () => {
     const [isOpen, setIsOpen] = useSwapMobileNotification();
 
     return (
         <HideOnReview>
-            <HideForRegulatoryState feature={CountryFeature.swap}>
+            <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                 <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to display Swap page')}>
                     <Notification
                         isOpen={isOpen}
@@ -27,7 +27,7 @@ const SwapMobileNotification = () => {
                         {() => <NotificationContent />}
                     </Notification>
                 </ErrorBoundary>
-            </HideForRegulatoryState>
+            </IfFeatureEnabled>
         </HideOnReview>
     );
 };

@@ -126,8 +126,15 @@ export interface InternetConnectionService {
     retry: () => Promise<boolean>;
 }
 
+export interface AppCountryInfo {
+    deviceCountryCode: string | null;
+    storeCountryCode: string | null;
+}
+
 export interface IAppSdk {
     storage: IStorage;
+    subscriptionStrategy: SubscriptionStrategy;
+
     nativeBackButton?: NativeBackButton;
     keychain?: IKeychainService;
     cookie?: CookieService;
@@ -191,7 +198,7 @@ export interface IAppSdk {
         close(): Promise<void>;
     };
 
-    subscriptionStrategy?: SubscriptionStrategy;
+    getAppCountryInfo(): Promise<AppCountryInfo>;
 }
 
 export interface IDappBrowser {
@@ -240,7 +247,31 @@ export abstract class BaseApp implements IAppSdk {
         this.userIdentity = new UserIdentityService(storage);
     }
 
+    keychain?: IKeychainService | undefined;
+
+    cookie?: CookieService | undefined;
+
+    biometry?: BiometryService | undefined;
+
+    notifications?: NotificationService | undefined;
+
+    storeUrl?: string | undefined;
+
+    signerReturnUrl?: string | undefined;
+
+    logger?: { read(): Promise<string>; clear(): Promise<void> } | undefined;
+
+    dappBrowser?: IDappBrowser | undefined;
+
+    linksInterceptorAvailable?: boolean | undefined;
+
+    ledgerConnectionPage?:
+        | { isOpened: ReadonlyAtom<boolean>; open(): Promise<void>; close(): Promise<void> }
+        | undefined;
+
     nativeBackButton?: NativeBackButton | undefined;
+
+    subscriptionStrategy!: SubscriptionStrategy;
 
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
@@ -303,6 +334,13 @@ export abstract class BaseApp implements IAppSdk {
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     userIdentity: UserIdentity;
+
+    async getAppCountryInfo(): Promise<AppCountryInfo> {
+        return {
+            deviceCountryCode: null,
+            storeCountryCode: null
+        };
+    }
 }
 
 class WebKeyboardService implements KeyboardService {

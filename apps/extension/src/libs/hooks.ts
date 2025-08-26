@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import { extensionType } from './appSdk';
 import { AptabaseExtension } from './aptabase-extension';
 import { Account } from '@tonkeeper/core/dist/entries/account';
-import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
 import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 export const useAppWidth = () => {
     useEffect(() => {
@@ -29,13 +29,27 @@ export const useAppWidth = () => {
     }, []);
 };
 
-export const useAnalytics = (activeAccount?: Account, accounts?: Account[]) => {
-    const sdk = useAppSdk();
+export const useAnalytics = (
+    config: TonendpointConfig | undefined,
+    activeAccount?: Account,
+    accounts?: Account[]
+) => {
     const network = useActiveTonNetwork();
-    return useQuery<Analytics>(
-        [QueryKey.analytics, activeAccount, accounts, network],
+    return useQuery<Analytics | undefined>(
+        [
+            QueryKey.analytics,
+            activeAccount,
+            accounts,
+            network,
+            config?.aptabaseEndpoint,
+            config?.aptabaseKey
+        ],
         async () => {
-            const tracker = new AptabaseExtension();
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
+                return;
+            }
+
+            const tracker = new AptabaseExtension(config.aptabaseEndpoint, config.aptabaseKey);
 
             tracker.init({
                 application: extensionType ?? 'Extension',
@@ -47,6 +61,6 @@ export const useAnalytics = (activeAccount?: Account, accounts?: Account[]) => {
 
             return tracker;
         },
-        { enabled: accounts != undefined && activeAccount != undefined }
+        { enabled: accounts != undefined && activeAccount != undefined && config != undefined }
     );
 };

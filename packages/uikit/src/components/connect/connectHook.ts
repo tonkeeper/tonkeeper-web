@@ -35,6 +35,7 @@ import { useActiveApi, useActiveWallet } from '../../state/wallet';
 import { useBatteryServiceConfig } from '../../state/battery';
 import { useGaslessConfig } from '../../state/gasless';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { useAppContext } from '../../hooks/appContext';
 
 export const useProcessOpenedLink = (options?: {
     hideLoadingToast?: boolean;
@@ -128,6 +129,7 @@ export const useProcessOpenedLink = (options?: {
 export const useCompleteHttpConnection = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { mainnetConfig } = useAppContext();
 
     return useMutation<
         undefined,
@@ -149,7 +151,8 @@ export const useCompleteHttpConnection = () => {
             await sendEventToBridge({
                 response: connectErrorResponse(result ?? tonConnectUserRejectError()),
                 sessionKeyPair: params.sessionKeyPair,
-                clientSessionId: params.clientSessionId
+                clientSessionId: params.clientSessionId,
+                bridgeEndpoint: mainnetConfig.ton_connect_bridge
             });
         } else {
             const response = await saveWalletTonConnect({
@@ -164,7 +167,8 @@ export const useCompleteHttpConnection = () => {
             await sendEventToBridge({
                 response,
                 sessionKeyPair: params.sessionKeyPair,
-                clientSessionId: params.clientSessionId
+                clientSessionId: params.clientSessionId,
+                bridgeEndpoint: mainnetConfig.ton_connect_bridge
             });
 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
@@ -241,11 +245,14 @@ export interface ResponseSendProps {
 }
 
 export const useTonConnectHttpResponseMutation = () => {
+    const { mainnetConfig } = useAppContext();
+
     return useMutation<void, Error, ResponseSendProps>(async ({ connection, response }) => {
         return sendEventToBridge({
             response,
             sessionKeyPair: connection.sessionKeyPair,
-            clientSessionId: connection.clientSessionId
+            clientSessionId: connection.clientSessionId,
+            bridgeEndpoint: mainnetConfig.ton_connect_bridge
         });
     });
 };

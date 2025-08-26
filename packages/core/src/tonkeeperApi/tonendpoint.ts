@@ -1,77 +1,83 @@
-import { TargetEnv } from '../AppSdk';
-import { intlLocale } from '../entries/language';
 import { Network } from '../entries/network';
-import { DAppTrack } from '../service/urlService';
-import { FetchAPI } from '../tonApiV2';
-import { assertUnreachable } from '../utils/types';
+import { removeLastSlash } from '../utils/url';
+import { intlLocale } from '../entries/language';
 
 export interface BootParams {
-    platform: 'web' | 'desktop' | 'tablet' | 'extension' | 'pro_mobile_ios' | 'swap_widget_web';
+    platform:
+        | 'web'
+        | 'desktop'
+        | 'tablet'
+        | 'extension'
+        | 'pro_mobile_ios'
+        | 'swap_widget_web'
+        | 'twa';
     lang: 'en' | 'ru' | string;
-    build: string; // "2.8.0"
+    build: string;
     network: Network;
-    countryCode?: string | null;
-}
-interface BootOptions {
-    fetchApi?: FetchAPI;
-    basePath?: string;
+    store_country_code?: string;
+    device_country_code?: string;
 }
 
 type TonendpointResponse<Data> = { success: false } | { success: true; data: Data };
 
 export interface TonendpointConfig {
-    flags?: { [key: string]: boolean };
-    tonendpoint: string;
+    flags: {
+        disable_staking: boolean;
+        disable_tron: boolean;
+        disable_battery: boolean;
+        disable_gaseless: boolean;
+        disable_swap: boolean;
+        disable_2fa: boolean;
+        disable_signer: boolean;
+        disable_exchange_methods: boolean;
+        disable_dapps: boolean;
+        disable_usde: boolean;
+    };
 
+    ton_connect_bridge: string;
+    tonapiV2Endpoint: string;
     tonApiV2Key?: string;
-    tonapiIOEndpoint?: string;
+    tonapiIOEndpoint: string;
+    tron_api_url: string;
+    tron_api_key?: string;
+    tonkeeper_api_url: string;
+    pro_api_url: string;
+
+    aptabaseEndpoint: string;
+    aptabaseKey?: string;
+    tonkeeper_utm_track: string;
+    stonfi_direct_link_referral_address?: string;
 
     exchangePostUrl?: string;
-    supportLink?: string;
-    tonkeeperNewsUrl?: string;
-    mam_learn_more_url?: string;
-
     mercuryoSecret?: string;
+    mercuryo_otc_id?: string;
+    featured_play_interval: number;
 
     directSupportUrl?: string;
     faq_url?: string;
+    supportLink?: string;
+    tonkeeperNewsUrl?: string;
+    scam_api_url?: string;
 
-    accountExplorer?: string;
-    transactionExplorer?: string;
-    NFTOnExplorerUrl?: string;
-
-    featured_play_interval?: number;
+    accountExplorer: string;
+    transactionExplorer: string;
+    NFTOnExplorerUrl: string;
 
     web_swaps_url?: string;
     web_swaps_referral_address?: string;
 
-    mercuryo_otc_id?: string;
-
-    scam_api_url?: string;
-
-    mam_max_wallets_without_pro?: number;
-
-    /**
-     * @deprecated use ton api
-     */
-    tonEndpoint: string;
-    /**
-     * @deprecated use ton api
-     */
-    tonEndpointAPIKey?: string;
+    mam_learn_more_url?: string;
+    mam_max_wallets_without_pro: number;
 
     multisig_help_url?: string;
-
     multisig_about_url?: string;
 
-    batteryHost?: string;
-    batteryMeanFees?: string;
+    batteryHost: string;
+    batteryMeanFees: string;
     batteryRefundEndpoint?: string;
-    batteryReservedAmount?: string;
-    battery_beta?: boolean;
-    disable_battery?: boolean;
-    disable_battery_send?: boolean;
-    battery_packages?: {
+    batteryReservedAmount: string;
+    disable_battery: boolean;
+    battery_packages: {
         value: number;
         image: string;
     }[];
@@ -83,128 +89,126 @@ export interface TonendpointConfig {
 
     '2fa_public_key'?: string;
     '2fa_api_url'?: string;
-    '2fa_tg_confirm_send_message_ttl_seconds'?: number;
-    '2fa_tg_linked_ttl_seconds'?: number;
+    '2fa_tg_confirm_send_message_ttl_seconds': number;
+    '2fa_tg_linked_ttl_seconds': number;
     '2fa_bot_url'?: string;
 
-    tron_api_url?: string;
-
-    enhanced_acs_pmob?: {
-        code?: string;
-        acs_until?: number;
-    };
-
     pro_mobile_app_appstore_link?: string;
+    pro_media_base_url?: string;
     pro_landing_url?: string;
-    pro_terms_of_use?: string;
-    privacy_policy?: string;
-    terms_of_use?: string;
+    pro_trial_tg_bot_id?: string;
+
+    pro_terms_of_use: string;
+    privacy_policy: string;
+    terms_of_use: string;
 }
+
+export const defaultTonendpointConfig: TonendpointConfig = {
+    flags: {
+        disable_staking: false,
+        disable_tron: false,
+        disable_battery: false,
+        disable_gaseless: false,
+        disable_swap: false,
+        disable_2fa: false,
+        disable_signer: false,
+        disable_exchange_methods: false,
+        disable_dapps: false,
+        disable_usde: false
+    },
+    ton_connect_bridge: 'https://bridge.tonapi.io',
+    tonapiV2Endpoint: 'https://keeper.tonapi.io',
+    tonapiIOEndpoint: 'https://keeper.tonapi.io',
+    tron_api_url: 'https://api.trongrid.io',
+    batteryHost: 'https://battery.tonkeeper.com',
+    tonkeeper_api_url: 'https://api.tonkeeper.com',
+    pro_api_url: 'https://pro.tonconsole.com',
+    batteryMeanFees: '0.0026',
+    batteryReservedAmount: '0.065',
+    disable_battery: false,
+    battery_packages: [
+        {
+            value: 1000,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-max.png'
+        },
+        {
+            value: 400,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-100.png'
+        },
+        {
+            value: 250,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-75.png'
+        },
+        {
+            value: 150,
+            image: 'https://wallet.tonkeeper.com/img/battery/battery-25.png'
+        }
+    ],
+    accountExplorer: 'https://tonviewer.com/%s',
+    transactionExplorer: 'https://tonviewer.com/transaction/%s',
+    NFTOnExplorerUrl: 'https://tonviewer.com/nft/%s',
+    featured_play_interval: 1000 * 10,
+    mam_max_wallets_without_pro: 3,
+    '2fa_tg_confirm_send_message_ttl_seconds': 600,
+    '2fa_tg_linked_ttl_seconds': 600,
+    pro_terms_of_use: 'https://tonkeeper.com/pro-terms',
+    privacy_policy: 'https://tonkeeper.com/privacy',
+    terms_of_use: 'https://tonkeeper.com/terms',
+    aptabaseEndpoint: 'https://anonymous-analytics.tonkeeper.com',
+    tonkeeper_utm_track: ''
+};
 
 interface CountryIP {
     ip: string;
     country: string;
 }
 
-const defaultTonendpoint = 'https://api.tonkeeper.com';
-
-export const defaultTonendpointConfig: TonendpointConfig = {
-    tonendpoint: defaultTonendpoint,
-    tonEndpoint: '',
-    flags: {}
-};
-
-const defaultFetch: FetchAPI = (input, init) => window.fetch(input, init);
-
 export class Tonendpoint {
     public params: BootParams;
 
-    public fetchApi: FetchAPI;
+    private tonkeeperApiUrl = defaultTonendpointConfig.tonkeeper_api_url;
 
-    public basePath: string;
+    private readonly bootPath = 'https://boot.tonkeeper.com';
 
-    public readonly targetEnv: TargetEnv;
-
-    constructor(
-        {
-            lang,
-            build,
-            network,
-            platform,
-            countryCode,
-            targetEnv
-        }: BootParams & { targetEnv: TargetEnv },
-        { fetchApi = defaultFetch, basePath = defaultTonendpoint }: BootOptions
-    ) {
-        this.targetEnv = targetEnv;
-        this.params = { lang, build, network, platform, countryCode };
-        this.fetchApi = fetchApi;
-        this.basePath = basePath;
+    constructor({
+        lang,
+        build,
+        network,
+        platform,
+        store_country_code,
+        device_country_code
+    }: BootParams) {
+        this.params = { lang, build, network, platform, store_country_code, device_country_code };
     }
 
-    setCountryCode = (countryCode?: string | null | undefined) => {
-        this.params.countryCode = countryCode;
-    };
-
-    toSearchParams = (
-        rewriteParams?: Partial<BootParams>,
-        additionalParams?: Record<string, string | number>
-    ) => {
-        const params = new URLSearchParams({
-            lang: intlLocale(rewriteParams?.lang ?? this.params.lang),
-            build: rewriteParams?.build ?? this.params.build,
-            chainName:
-                (rewriteParams?.network ?? this.params.network) === Network.TESTNET
-                    ? 'testnet'
-                    : 'mainnet',
-            platform: rewriteParams?.platform ?? this.params.platform
-        });
-        const countryCode = rewriteParams?.countryCode ?? this.params.countryCode;
-
-        if (countryCode) {
-            params.append('countryCode', countryCode);
-        }
-
-        if (!additionalParams) {
-            return params.toString();
-        }
-
-        for (const key in additionalParams) {
-            params.append(key, additionalParams[key].toString());
-        }
-        return params.toString();
-    };
-
     boot = async (network: Network): Promise<TonendpointConfig> => {
-        const response = await this.fetchApi(
-            `https://boot.tonkeeper.com/keys?${this.toSearchParams({ network })}`,
-            {
-                method: 'GET'
-            }
-        );
+        const response = await fetch(`${this.bootPath}/keys?${this.toSearchParams({ network })}`);
 
-        return response.json();
+        const result: TonendpointConfig = await response.json();
+        if (result.tonkeeper_api_url) {
+            this.tonkeeperApiUrl = removeLastSlash(result.tonkeeper_api_url);
+        }
+        return result;
     };
 
     country = async (): Promise<CountryIP> => {
-        const response = await this.fetchApi('https://boot.tonkeeper.com/my/ip', {
+        const response = await fetch(`${this.tonkeeperApiUrl}/my/ip`, {
             method: 'GET'
         });
 
         return response.json();
     };
 
-    GET = async <Data>(
-        path: string,
-        rewriteParams?: Partial<BootParams>,
-        additionalParams?: Record<string, string | number>
-    ): Promise<Data> => {
-        const response = await this.fetchApi(
-            `${this.basePath}${path}?${this.toSearchParams(rewriteParams, additionalParams)}`,
-            {
-                method: 'GET'
-            }
-        );
+    fiatMethods = (): Promise<TonendpoinFiatMethods> => {
+        return this.GET('/fiat/methods');
+    };
+
+    appsPopular = (): Promise<Recommendations> => {
+        return this.GET('/apps/popular');
+    };
+
+    private GET = async <Data>(path: string): Promise<Data> => {
+        const response = await fetch(`${this.tonkeeperApiUrl}${path}?${this.toSearchParams()}`);
 
         const result: TonendpointResponse<Data> = await response.json();
         if (!result.success) {
@@ -214,29 +218,30 @@ export class Tonendpoint {
         return result.data;
     };
 
-    getFiatMethods = (): Promise<TonendpoinFiatMethods> => {
-        return this.GET('/fiat/methods');
-    };
+    private toSearchParams = (rewriteParams?: Partial<BootParams>) => {
+        const params = new URLSearchParams({
+            lang: intlLocale(rewriteParams?.lang ?? this.params.lang),
+            build: rewriteParams?.build ?? this.params.build,
+            chainName:
+                (rewriteParams?.network ?? this.params.network) === Network.TESTNET
+                    ? 'testnet'
+                    : 'mainnet',
+            platform: rewriteParams?.platform ?? this.params.platform
+        });
 
-    getAppsPopular = (): Promise<Recommendations> => {
-        return this.GET('/apps/popular', {}, { track: this.getTrack() });
-    };
-
-    getTrack = (): DAppTrack => {
-        switch (this.targetEnv) {
-            case 'desktop':
-                return 'desktop';
-            case 'twa':
-                return 'twa';
-            case 'extension':
-            case 'web':
-            case 'tablet':
-            case 'mobile':
-            case 'swap_widget_web':
-                return 'extension';
-            default:
-                assertUnreachable(this.targetEnv);
+        const device_country_code =
+            rewriteParams?.device_country_code ?? this.params.device_country_code;
+        if (device_country_code) {
+            params.append('device_country_code', device_country_code);
         }
+
+        const store_country_code =
+            rewriteParams?.store_country_code ?? this.params.store_country_code;
+        if (store_country_code) {
+            params.append('store_country_code', store_country_code);
+        }
+
+        return params.toString();
     };
 }
 
@@ -247,8 +252,12 @@ export const getServerConfig = async (
     const result = await tonendpoint.boot(network);
 
     return {
-        flags: {},
-        ...result
+        ...defaultTonendpointConfig,
+        ...result,
+        flags: {
+            ...defaultTonendpointConfig.flags,
+            ...result.flags
+        }
     };
 };
 

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { useWindowsScroll } from '@tonkeeper/uikit/dist/components/Body';
 import ConnectLedgerNotification from '@tonkeeper/uikit/dist/components/ConnectLedgerNotification';
@@ -82,6 +82,9 @@ import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { DesktopMobileAppBanner } from '@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner';
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
+import { localesList } from '@tonkeeper/locales/localesList';
+import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -120,14 +123,6 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const sdk = new DesktopAppSdk();
-const TARGET_ENV = 'desktop';
-
-const langs = 'en,zh_TW,zh_CN,id,ru,it,es,uk,tr,bg,uz,bn';
-
-declare const REACT_APP_TONCONSOLE_API: string;
-declare const REACT_APP_TG_BOT_ID: string;
-declare const REACT_APP_STONFI_REFERRAL_ADDRESS: string;
-declare const REACT_APP_TRON_API_KEY: string;
 
 export const Providers = () => {
     const { t: tSimple, i18n } = useTranslation();
@@ -135,7 +130,6 @@ export const Providers = () => {
     const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = langs.split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -143,7 +137,7 @@ export const Providers = () => {
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as any,
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -268,22 +262,29 @@ export const Loader: FC = () => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
+    const { data: countryInfo } = useAppCountryInfo();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
     const { data: fiat } = useUserFiatQuery();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang,
-        platform: 'desktop'
+        platform: 'desktop',
+        deviceCountryCode: countryInfo?.deviceCountryCode,
+        storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
 
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(sdk.version, activeAccount, accounts);
+    const { data: tracker } = useAnalytics(
+        sdk.version,
+        serverConfig?.mainnetConfig,
+        activeAccount,
+        accounts
+    );
 
     useEffect(() => {
         if (lang && i18n.language !== localizationText(lang)) {
@@ -311,13 +312,12 @@ export const Loader: FC = () => {
         return <Loading />;
     }
 
+    // set api url synchronously
+    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            serverConfig.mainnetConfig,
-            Network.MAINNET,
-            REACT_APP_TONCONSOLE_API
-        ),
-        testnetApi: getApiConfig(serverConfig.testnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,
@@ -327,21 +327,18 @@ export const Loader: FC = () => {
         proFeatures: true,
         experimental: true,
         ios: false,
-        env: {
-            tgAuthBotId: REACT_APP_TG_BOT_ID,
-            stonfiReferralAddress: REACT_APP_STONFI_REFERRAL_ADDRESS,
-            tronApiKey: REACT_APP_TRON_API_KEY
-        },
         defaultWalletVersion: WalletVersion.V5R1,
         tracker: tracker?.track
     };
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} />
-            <CopyNotification hideSimpleCopyNotifications />
-            <QrScanner />
-            <ModalsRoot />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification hideSimpleCopyNotifications />
+                <QrScanner />
+                <ModalsRoot />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };
@@ -395,7 +392,6 @@ export const Content: FC<{
                 </Switch>
             </WideContent>
             <BackgroundElements />
-            <DesktopMobileAppBanner />
         </WideLayout>
     );
 };

@@ -42,6 +42,7 @@ export class DashboardsService {
      * Get dashboard analytics data
      * @param lang Lang
      * @param currency Currency
+     * @param authorization
      * @param requestBody Data that is expected
      * @returns any Dashboard data
      * @throws ApiError
@@ -49,6 +50,7 @@ export class DashboardsService {
     public static getDashboardData(
         lang?: Lang,
         currency?: Currencies,
+        authorization?: string,
         requestBody?: {
             accounts: Array<string>;
             columns: Array<string>;
@@ -59,6 +61,9 @@ export class DashboardsService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/dashboard/data',
+            headers: {
+                'Authorization': authorization,
+            },
             query: {
                 'lang': lang,
                 'currency': currency,
