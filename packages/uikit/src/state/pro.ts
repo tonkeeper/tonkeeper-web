@@ -44,12 +44,15 @@ export const useTrialAvailability = () => {
     const platform = useAppTargetEnv();
     const config = useActiveConfig();
 
-    return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id], async () => {
-        const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-        const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
+    return useQuery<boolean, Error>(
+        [QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id],
+        async () => {
+            const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+            const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
 
-        return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
-    });
+            return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
+        }
+    );
 };
 
 export const useSupport = () => {
@@ -88,7 +91,7 @@ export const useProState = () => {
         [QueryKey.pro],
         async () => {
             if (!sdk.subscriptionStrategy) {
-                throw new Error('Missing SubscriptionStrategy');
+                return null;
             }
 
             const subscription = await sdk.subscriptionStrategy.getSubscription(
@@ -283,10 +286,7 @@ export const useActivateTrialMutation = () => {
             throw new Error('Pro trial tg bot id is not set');
         }
 
-        const token = await startProServiceTrial(
-            config.pro_trial_tg_bot_id,
-            language
-        );
+        const token = await startProServiceTrial(config.pro_trial_tg_bot_id, language);
 
         await sdk.subscriptionStrategy.activateTrial(token);
         await client.invalidateQueries([QueryKey.pro]);
