@@ -252,15 +252,17 @@ export const PreferencesAsideMenu: FC<{ className?: string }> = ({ className }) 
                         </PriorityButtonContent>
                     </AsideMenuItemStyled>
                     <HideOnReview>
-                        <AsideMenuItemStyled
-                            onClick={() =>
-                                config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
-                            }
-                            isSelected={false}
-                        >
-                            <TelegramIcon />
-                            <Label2>{t('settings_news')}</Label2>
-                        </AsideMenuItemStyled>
+                        {config.tonkeeperNewsUrl && (
+                            <AsideMenuItemStyled
+                                onClick={() =>
+                                    config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
+                                }
+                                isSelected={false}
+                            >
+                                <TelegramIcon />
+                                <Label2>{t('settings_news')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
                     </HideOnReview>
                 </AsideMenuItemsBlock>
             </ForTargetEnv>
