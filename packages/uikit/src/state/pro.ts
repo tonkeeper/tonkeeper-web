@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
@@ -11,24 +10,18 @@ import {
     ISubscriptionFormData,
     NormalizedProPlans,
     ProSubscription,
-    PurchaseStatuses,
-    WalletAuth
+    PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
 import {
     authViaSeedPhrase,
     authViaTonConnect,
     getBackupState,
-    getProState,
     getProSupportUrl,
-    logoutTonConsole,
-    ProAuthTokenService,
-    ProAuthTokenType,
     ProAuthViaSeedPhraseParams,
     setBackupState,
     startProServiceTrial
 } from '@tonkeeper/core/dist/service/proService';
-import { OpenAPI } from '@tonkeeper/core/dist/pro';
 import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
@@ -44,40 +37,7 @@ import {
 import { useActiveApi, useActiveConfig } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
-import { atom } from '@tonkeeper/core/dist/entries/atom';
-import { useProConfirmNotification } from '../components/modals/ProConfirmNotificationControlled';
-
-type FreeProAccess = {
-    code: string;
-    validUntil: Date;
-};
-
-export const selectedTargetAuth = atom<WalletAuth | null>(null);
-
-export const useFreeProAccessAvailable = () => {
-    const { mainnetConfig } = useAppContext();
-    const env = useAppTargetEnv();
-
-    return useMemo<FreeProAccess | null>(() => {
-        if (!mainnetConfig.enhanced_acs_pmob || env !== 'mobile') {
-            return null;
-        }
-        const data = mainnetConfig.enhanced_acs_pmob;
-        if (!data.code || !data.acs_until) {
-            return null;
-        }
-
-        const validUntil = new Date(data.acs_until * 1000);
-        if (validUntil < new Date()) {
-            return null;
-        }
-
-        return {
-            code: data.code,
-            validUntil
-        };
-    }, [mainnetConfig.enhanced_acs_pmob, env]);
-};
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -88,21 +48,21 @@ export const useTrialAvailability = () => {
         [QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id],
         async () => {
             const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-            const isMobilePromo = Boolean(await sdk.storage.get(AppKey.PRO_FREE_ACCESS_ACTIVE));
             const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
 
-            return platform !== 'tablet' && !isMobilePromo && !isUsedTrial && botIdIsSet;
+            return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
         }
     );
 };
 
 export const useSupport = () => {
+    const sdk = useAppSdk();
     const { mainnetConfig } = useAppContext();
     const { data: subscription } = useProState();
 
     return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
-        getProSupportUrl,
+        async () => getProSupportUrl(await sdk.subscriptionStrategy.getToken()),
         {
             initialData: {
                 url: mainnetConfig.directSupportUrl ?? '',
@@ -123,81 +83,25 @@ export const useProBackupState = () => {
     );
 };
 
-export const useProAuthTokenService = (): ProAuthTokenService => {
-    const storage = useAppSdk().storage;
-
-    const keyMap: Record<ProAuthTokenType, AppKey> = {
-        [ProAuthTokenType.MAIN]: AppKey.PRO_AUTH_TOKEN,
-        [ProAuthTokenType.TEMP]: AppKey.PRO_TEMP_AUTH_TOKEN
-    };
-
-    return {
-        async attachToken(type = ProAuthTokenType.MAIN) {
-            const token = await storage.get<string>(keyMap[type]);
-
-            OpenAPI.TOKEN = token ?? undefined;
-        },
-
-        async setToken(type: ProAuthTokenType, token: string | null) {
-            await storage.set(keyMap[type], token);
-
-            if (type === ProAuthTokenType.MAIN) {
-                OpenAPI.TOKEN = token ?? undefined;
-            }
-        },
-
-        async getToken(type: ProAuthTokenType): Promise<string | null> {
-            return storage.get<string>(keyMap[type]);
-        },
-
-        async promoteToken(from: ProAuthTokenType, to: ProAuthTokenType) {
-            const token = await storage.get<string>(keyMap[from]);
-
-            if (token) {
-                await storage.set(keyMap[to], token);
-                await storage.delete(keyMap[from]);
-
-                if (to === ProAuthTokenType.MAIN) {
-                    OpenAPI.TOKEN = token;
-                }
-            }
-        },
-
-        async withTokenContext<T>(type: ProAuthTokenType, fn: () => Promise<T>): Promise<T> {
-            const originalToken = OpenAPI.TOKEN;
-
-            const token = await storage.get<string>(keyMap[type]);
-            OpenAPI.TOKEN = token ?? undefined;
-
-            try {
-                return await fn();
-            } finally {
-                OpenAPI.TOKEN = originalToken;
-            }
-        }
-    };
-};
-
 export const useProState = () => {
     const sdk = useAppSdk();
-    const env = useAppTargetEnv();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
-    const isFreeProAccessAvailable = useFreeProAccessAvailable();
 
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            const { validUntil } = isFreeProAccessAvailable ?? {};
-            const isPromo = env === 'mobile' && validUntil;
-            const promoExpirationDate = isPromo && validUntil > new Date() ? validUntil : null;
+            if (!sdk.subscriptionStrategy) {
+                return null;
+            }
 
-            const state = await getProState({ authService, sdk, promoExpirationDate });
+            const subscription = await sdk.subscriptionStrategy.getSubscription(
+                subscriptionFormTempAuth$?.value?.tempToken ?? null
+            );
 
-            await setBackupState(sdk.storage, state);
+            await setBackupState(sdk.storage, subscription);
             await client.invalidateQueries([QueryKey.proBackup]);
 
-            return state;
+            return subscription;
         },
         {
             keepPreviousData: true,
@@ -242,9 +146,8 @@ export const useSelectWalletForProMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
 
-    const [, setTargetAuth] = useAtom(selectedTargetAuth);
+    const [, setTargetAuth] = useAtom(subscriptionFormTempAuth$);
     const accountsStorage = useAccountsStorage();
-    const authService = useProAuthTokenService();
 
     return useMutation<void, Error, string>(async walletId => {
         const accounts = (await accountsStorage.getAccounts()).filter(isAccountTonWalletStandard);
@@ -264,8 +167,7 @@ export const useSelectWalletForProMutation = () => {
             throw new Error("Can't use non-standard ton wallet for pro auth");
         }
 
-        await authViaTonConnect(
-            authService,
+        const tempToken = await authViaTonConnect(
             api,
             wallet,
             signTonConnectOver({ sdk, accountId: account.id, wallet, t })
@@ -273,7 +175,8 @@ export const useSelectWalletForProMutation = () => {
 
         setTargetAuth({
             type: AuthTypes.WALLET,
-            wallet
+            wallet,
+            tempToken
         });
 
         await client.invalidateQueries([QueryKey.pro]);
@@ -284,13 +187,19 @@ export const useAutoAuthMutation = () => {
     const api = useActiveApi();
     const { data: subscription } = useProState();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
+    const [, setTargetAuth] = useAtom(subscriptionFormTempAuth$);
 
     return useMutation<void, Error, ProAuthViaSeedPhraseParams>(async authData => {
         try {
             if (isPaidActiveSubscription(subscription)) return;
 
-            await authViaSeedPhrase(api, authService, authData);
+            const tempToken = await authViaSeedPhrase(api, authData);
+
+            setTargetAuth({
+                type: AuthTypes.WALLET,
+                wallet: authData.wallet,
+                tempToken
+            });
 
             await client.invalidateQueries([QueryKey.pro]);
         } catch (e) {
@@ -300,11 +209,11 @@ export const useAutoAuthMutation = () => {
 };
 
 export const useProLogout = () => {
+    const sdk = useAppSdk();
     const client = useQueryClient();
-    const authService = useProAuthTokenService();
 
     return useMutation(async () => {
-        await logoutTonConsole(authService);
+        await sdk.subscriptionStrategy.logout();
 
         await client.invalidateQueries([QueryKey.pro]);
     });
@@ -347,24 +256,14 @@ export const useOriginalTransactionInfo = () => {
 
 export const useProPurchaseMutation = () => {
     const sdk = useAppSdk();
-    const api = useActiveApi();
     const client = useQueryClient();
-    const { onOpen } = useProConfirmNotification();
-    const [targetAuth] = useAtom(selectedTargetAuth);
-    const authService = useProAuthTokenService();
 
     return useMutation<PurchaseStatuses, Error, ISubscriptionFormData>(async formData => {
         if (!sdk.subscriptionStrategy) {
             throw new Error('Missing subscription strategy!');
         }
 
-        const status = await sdk.subscriptionStrategy.subscribe(formData, {
-            authService,
-            api,
-            onOpen,
-            sdk,
-            wallet: targetAuth?.wallet
-        });
+        const status = await sdk.subscriptionStrategy.subscribe(formData);
 
         if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {
             await client.invalidateQueries([QueryKey.pro]);
@@ -382,26 +281,16 @@ export const useActivateTrialMutation = () => {
         i18n: { language }
     } = useTranslation();
 
-    const authService = useProAuthTokenService();
-
-    return useMutation<boolean, Error>(async () => {
+    return useMutation<string, Error>(async () => {
         if (config.pro_trial_tg_bot_id === undefined) {
             throw new Error('Pro trial tg bot id is not set');
         }
 
-        const result = await startProServiceTrial(
-            authService,
-            config.pro_trial_tg_bot_id,
-            language
-        );
+        const token = await startProServiceTrial(config.pro_trial_tg_bot_id, language);
 
-        if (!result) {
-            throw new Error('Failed to activate trial');
-        }
-
-        await sdk.storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
+        await sdk.subscriptionStrategy.activateTrial(token);
         await client.invalidateQueries([QueryKey.pro]);
 
-        return result;
+        return token;
     });
 };

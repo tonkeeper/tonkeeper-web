@@ -1,11 +1,11 @@
-import { ConfirmState } from '@tonkeeper/core/dist/entries/pro';
+import { IConfirmState } from '@tonkeeper/core/dist/entries/pro';
 
 import { createModalControl } from './createModalControl';
 import { ProConfirmNotification } from '../desktop/pro/ProConfirmNotification';
 import { useAtom } from '../../libs/useAtom';
 
 interface IConfirmAtomParams {
-    confirmState: ConfirmState | null;
+    confirmState: IConfirmState | null;
     onConfirm?: (success?: boolean) => void;
     onCancel?: () => void;
 }

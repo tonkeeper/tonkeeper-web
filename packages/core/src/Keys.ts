@@ -43,13 +43,10 @@ export enum AppKey {
     PRO_BACKUP = 'pro_backup',
     PRO_USED_TRIAL = 'pro_used_trial',
     PRO_AUTH_TOKEN = 'pro_auth_token',
-    PRO_TEMP_AUTH_TOKEN = 'pro_temp_auth_token',
-    /**
-     * @deprecated
-     */
-    PRO_FREE_ACCESS_ACTIVE = 'pro_free_access_active',
     PRO_PENDING_SUBSCRIPTION = 'pro_pending_subscription',
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
+
+    IS_DEV_MENU_VISIBLE = 'is_dev_menu_visible',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',

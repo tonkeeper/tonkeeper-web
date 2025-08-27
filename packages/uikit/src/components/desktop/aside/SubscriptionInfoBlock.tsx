@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
     isPaidActiveSubscription,
@@ -28,6 +28,9 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscriptionEndingVerification';
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
+import { usePreloadImages } from '../../../hooks/usePreloadImages';
+import { useAppContext } from '../../../hooks/appContext';
+import { getAllCarouselImages } from '../../../libs/pro';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -139,6 +142,7 @@ const ProButtonPanel = styled(Button)`
 
 export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className }) => {
     const { t } = useTranslation();
+    const { mainnetConfig } = useAppContext();
     const { data: subscription, isLoading: isProStateLoading } = useProState();
     const { onOpen } = useProFeaturesNotification();
     const { mutate: invalidateActiveWalletQueries, isLoading: isInvalidating } =
@@ -148,6 +152,8 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
     const navigate = useNavigate();
+
+    const baseSlideUrl = mainnetConfig.pro_media_base_url;
 
     const onRefresh = () => {
         if (rotate) {
@@ -162,6 +168,9 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
+    const carouselImages = useMemo(() => getAllCarouselImages(baseSlideUrl), [baseSlideUrl]);
+
+    usePreloadImages(carouselImages);
     useIosSubscriptionPolling();
     useSubscriptionEndingVerification();
 
@@ -181,7 +190,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         </Button>
     );
 
-    if (subscription && isValidSubscription(subscription)) {
+    if (isValidSubscription(subscription)) {
         button = (
             <DropDown
                 containerClassName="pro-subscription-dd-container"

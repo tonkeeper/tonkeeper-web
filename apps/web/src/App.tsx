@@ -44,6 +44,7 @@ import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { BrowserRouter } from 'react-router-dom';
 import { localesList } from "@tonkeeper/locales/localesList";
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -198,12 +199,14 @@ const Loader: FC = () => {
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
-            <CopyNotification hideSimpleCopyNotifications={!standalone} />
-            <Suspense>
-                <QrScanner />
-            </Suspense>
-            <ModalsRoot />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
+                <CopyNotification hideSimpleCopyNotifications={!standalone} />
+                <Suspense>
+                    <QrScanner />
+                </Suspense>
+                <ModalsRoot />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };

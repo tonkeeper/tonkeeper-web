@@ -14,7 +14,7 @@ import {
 
 import { useTranslation } from '../translation';
 import { useDateTimeFormat } from '../useDateTimeFormat';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
+import { getFormattedProPrice, SUBSCRIPTION_PERIODS_MAP } from '@tonkeeper/core/dist/utils/pro';
 
 export const useProStatusDetailsDisplayData = (subscription: ProSubscription | undefined) => {
     const { t } = useTranslation();
@@ -41,11 +41,18 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
         }
 
         if (isIosSub && hasIosPrice(subscription)) {
-            const { price, priceMultiplier, currency } = subscription;
+            const { price, priceMultiplier, currency, productId } = subscription;
 
             if (!price || !currency) return '-';
 
-            return `${currency} ${(price / priceMultiplier).toFixed(2)}`;
+            const proPeriod = SUBSCRIPTION_PERIODS_MAP.get(productId);
+            let proPeriodTranslated = '';
+
+            if (proPeriod) {
+                proPeriodTranslated = ` / ${t(proPeriod)}`;
+            }
+
+            return `${currency} ${(price / priceMultiplier).toFixed(2)}` + proPeriodTranslated;
         }
 
         return 'free';
@@ -54,19 +61,11 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
     const getExpirationDate = () => {
         try {
             if (isValidSub && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                });
+                return formatDate(subscription.nextChargeDate, { dateStyle: 'long' });
             }
 
             if (isExpiredSub && subscription.expiresDate) {
-                return formatDate(subscription.expiresDate, {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric'
-                });
+                return formatDate(subscription.expiresDate, { dateStyle: 'long' });
             }
 
             return '-';
@@ -144,11 +143,13 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
         },
         [t('price')]: {
             isVisible: getPrice(),
-            value: getPrice()
+            value: getPrice(),
+            textTransform: 'unset'
         },
         [t('type')]: {
             isVisible: getPaymentType(),
-            value: getPaymentType()
+            value: getPaymentType(),
+            textTransform: 'unset'
         },
         [t('promo_code')]: {
             isVisible: getPromoCode(),

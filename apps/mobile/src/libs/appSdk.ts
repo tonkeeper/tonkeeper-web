@@ -13,7 +13,7 @@ import {
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
-import { Biometric, Subscription } from './plugins';
+import { Biometric } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
 import { Device } from '@capacitor/device';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
@@ -29,6 +29,7 @@ import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { CapacitorFileLogger } from './logger';
 import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
+import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
 import { CountryInfo } from './plugins/country-info-plugin';
 
 async function waitAppIsActive(): Promise<void> {
@@ -90,6 +91,8 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     biometry = new BiometryServiceCapacitor(this.topMessage.bind(this));
 
     keychain = new KeychainCapacitor(this.biometry, this.storage);
+
+    subscriptionStrategy = new IosSubscriptionStrategy(this.storage);
 
     constructor() {
         super(capacitorStorage);
@@ -191,8 +194,6 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     dappBrowser = CapacitorDappBrowser;
 
     userIdentity = new CapacitorUserIdentityService(capacitorStorage);
-
-    subscriptionStrategy = Subscription;
 
     async getAppCountryInfo(): Promise<AppCountryInfo> {
         return CountryInfo.getInfo();

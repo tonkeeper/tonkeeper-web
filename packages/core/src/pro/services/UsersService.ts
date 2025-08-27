@@ -9,10 +9,13 @@ import { request as __request } from '../core/request';
 export class UsersService {
     /**
      * Get authenticated user information
+     * @param authorization
      * @returns any Info
      * @throws ApiError
      */
-    public static getUserInfo(): CancelablePromise<{
+    public static getUserInfo(
+        authorization: string,
+    ): CancelablePromise<{
         pub_key?: string;
         version?: string;
         user_id?: number;
@@ -21,6 +24,9 @@ export class UsersService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/user/info',
+            headers: {
+                'Authorization': authorization,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
@@ -31,13 +37,19 @@ export class UsersService {
     }
     /**
      * Verify Pro subscription status
+     * @param authorization
      * @returns SubscriptionVerification Subscription verification successful
      * @throws ApiError
      */
-    public static verifySubscription(): CancelablePromise<SubscriptionVerification> {
+    public static verifySubscription(
+        authorization: string,
+    ): CancelablePromise<SubscriptionVerification> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/services/pro/verify',
+            headers: {
+                'Authorization': authorization,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,
