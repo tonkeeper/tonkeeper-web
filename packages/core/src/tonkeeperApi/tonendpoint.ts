@@ -39,7 +39,6 @@ export interface TonendpointConfig {
     tonApiV2Key?: string;
     tonapiIOEndpoint: string;
     tron_api_url: string;
-    tron_api_key?: string;
     tonkeeper_api_url: string;
     pro_api_url: string;
 

@@ -271,7 +271,10 @@ export function cachedAsync<TArgs extends unknown[], TResult>(
     let entry: Entry | null = null;
 
     const isExpired = (e: Entry | null, keyNow: string) =>
-        !e || e.key !== keyNow || (ttlMs !== Infinity && Date.now() - e.createdAt >= ttlMs);
+        !e ||
+        e.key !== keyNow ||
+        ttlMs === 0 ||
+        (ttlMs !== Infinity && Date.now() - e.createdAt >= ttlMs);
 
     return (...args: TArgs): Promise<TResult> => {
         const keyNow = toCacheKey(args);
@@ -366,4 +369,36 @@ function fnv1a32(str: string): string {
         h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
     }
     return h.toString(16).padStart(8, '0');
+}
+
+export function withRetry<TArgs extends unknown[], TResult>(
+    handler: (...args: TArgs) => Promise<TResult>,
+    options: {
+        maxRetries: number;
+        shouldRetry?: (error: unknown, attempt: number) => boolean | Promise<boolean>;
+        delayMs?: number;
+    }
+): (...args: TArgs) => Promise<TResult> {
+    return async (...args: TArgs): Promise<TResult> => {
+        let attempt = 0;
+        let lastError: unknown;
+
+        while (attempt <= options.maxRetries) {
+            try {
+                return await handler(...args);
+            } catch (err) {
+                lastError = err;
+                const should = !options.shouldRetry || (await options.shouldRetry(err, attempt));
+                if (!should || attempt === options.maxRetries) {
+                    throw err;
+                }
+                if (options.delayMs) {
+                    await delay(options.delayMs);
+                }
+            }
+            attempt++;
+        }
+
+        throw lastError;
+    };
 }

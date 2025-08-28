@@ -5,7 +5,7 @@ import { AssetAmount } from '../entries/crypto/asset/asset-amount';
 import { notNullish } from '../utils/types';
 import { Configuration, DefaultApi } from '../batteryApi';
 import { TronTransactionFee } from '../entries/crypto/transaction-fee';
-import { cachedAsync } from '../utils/common';
+import { cachedAsync, withRetry } from '../utils/common';
 import type { SignedTransaction } from 'tronweb/src/types/Transaction';
 
 const removeTrailingSlash = (str: string) => str.replace(/\/$/, '');
@@ -53,31 +53,52 @@ export type EstimateResourcesRequest = {
     data: string;
 };
 
+const maxRetries = 5;
+
+const defaultRetryConfig = {
+    maxRetries: maxRetries,
+    delayMs: 3000
+};
+
+const defaultCacheTime = 5000;
+
+function decorateApi<TArgs extends unknown[], TResult>(
+    fn: (...args: TArgs) => Promise<TResult>,
+    overrideConfig?: {
+        cacheTime?: number;
+        maxRetries?: number;
+        shouldRetry?: (error: unknown) => boolean;
+        delayMs?: number;
+    }
+) {
+    const { cacheTime, ...retryConfig } = overrideConfig ?? {};
+
+    return cachedAsync(
+        cacheTime ?? defaultCacheTime,
+        withRetry(fn, { ...defaultRetryConfig, ...retryConfig })
+    );
+}
+
 export class TronApi {
     readonly tronGridBaseUrl: string;
 
     private readonly batteryApi: DefaultApi;
 
-    private safetyMargin: number | undefined;
-
     get headers() {
         return {
-            ...(this.trongrid.apiKey && {
-                'TRON-PRO-API-KEY': this.trongrid.apiKey
-            }),
             'Content-Type': 'application/json'
         };
     }
 
     constructor(
-        private readonly trongrid: { baseURL: string; readonly apiKey?: string },
+        trongrid: { baseURL: string; readonly apiKey?: string },
         batteryConfig: Configuration
     ) {
         this.tronGridBaseUrl = removeTrailingSlash(trongrid.baseURL);
         this.batteryApi = new DefaultApi(batteryConfig);
     }
 
-    public getBalances = cachedAsync(5000, async (address: string) => {
+    public getBalances = decorateApi(async (address: string) => {
         const res = await (
             await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
                 headers: this.headers
@@ -128,7 +149,7 @@ export class TronApi {
         };
     });
 
-    public getAccountBandwidth = cachedAsync(5000, async (address: string): Promise<number> => {
+    public getAccountBandwidth = decorateApi(async (address: string): Promise<number> => {
         const res = await (
             await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
                 headers: this.headers
@@ -147,8 +168,7 @@ export class TronApi {
         return info.free_net_usage || 0;
     });
 
-    public estimateResources = cachedAsync(
-        5000,
+    public estimateResources = decorateApi(
         async (params: EstimateResourcesRequest): Promise<TronResources> => {
             try {
                 const response = await (
@@ -203,64 +223,72 @@ export class TronApi {
         }
     );
 
-    async broadcastSignedTransaction(signedTx: SignedTransaction) {
-        const res = await fetch(`${this.tronGridBaseUrl}/wallet/broadcasttransaction`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(signedTx)
-        });
+    public broadcastSignedTransaction = decorateApi(
+        async (signedTx: SignedTransaction) => {
+            const res = await fetch(`${this.tronGridBaseUrl}/wallet/broadcasttransaction`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(signedTx)
+            });
 
-        const json = await res.json();
+            const json = await res.json();
 
-        if (!json.result) {
-            console.error('Broadcast failed:', json);
-            throw new Error(json.message || 'Broadcast failed');
-        }
-    }
+            if (!json.result) {
+                console.error('Broadcast failed:', json);
+                throw new Error(json.message || 'Broadcast failed');
+            }
+        },
+        { cacheTime: 0, maxRetries: 3 }
+    );
 
-    public getResourcePrices = cachedAsync(Infinity, async (): Promise<TronResourcePrices> => {
-        const res = await fetch(`${this.tronGridBaseUrl}/wallet/getchainparameters`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
+    public getResourcePrices = decorateApi(
+        async (): Promise<TronResourcePrices> => {
+            const res = await fetch(`${this.tronGridBaseUrl}/wallet/getchainparameters`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-        const data = await res.json();
-        const params: { key: string; value: string | number }[] = Array.isArray(data.chainParameter)
-            ? data.chainParameter
-            : [];
+            const data = await res.json();
+            const params: { key: string; value: string | number }[] = Array.isArray(
+                data.chainParameter
+            )
+                ? data.chainParameter
+                : [];
 
-        const getValue = (key: string): number | undefined => {
-            const param = params.find(p => p.key === key);
-            return param && typeof param.value === 'number' ? param.value : undefined;
-        };
+            const getValue = (key: string): number | undefined => {
+                const param = params.find(p => p.key === key);
+                return param && typeof param.value === 'number' ? param.value : undefined;
+            };
 
-        const energySun = getValue('getEnergyFee');
-        const bandwidthSun = getValue('getTransactionFee');
+            const energySun = getValue('getEnergyFee');
+            const bandwidthSun = getValue('getTransactionFee');
 
-        if (!energySun || !bandwidthSun) {
-            throw new Error('Missing or invalid energy or bandwidth price in chain parameters');
-        }
+            if (!energySun || !bandwidthSun) {
+                throw new Error('Missing or invalid energy or bandwidth price in chain parameters');
+            }
 
-        return {
-            energy: new AssetAmount({ weiAmount: energySun, asset: TRON_TRX_ASSET }),
-            bandwidth: new AssetAmount({ weiAmount: bandwidthSun, asset: TRON_TRX_ASSET })
-        };
-    });
+            return {
+                energy: new AssetAmount({ weiAmount: energySun, asset: TRON_TRX_ASSET }),
+                bandwidth: new AssetAmount({ weiAmount: bandwidthSun, asset: TRON_TRX_ASSET })
+            };
+        },
+        { cacheTime: Infinity }
+    );
 
     public async applyResourcesSafetyMargin(resources: TronResources) {
         const { energy, bandwidth } = resources;
 
-        if (this.safetyMargin === undefined) {
-            const config = await this.batteryApi.getTronConfig();
-            const backendMargin = parseInt(config.safetyMarginPercent);
-            this.safetyMargin = (isFinite(backendMargin) ? backendMargin : 3) / 100;
-        }
+        const config = await this.getTronConfig();
+        const backendMargin = parseInt(config.safetyMarginPercent);
+        const safetyMargin = (isFinite(backendMargin) ? backendMargin : 3) / 100;
 
         return {
-            energy: Math.ceil(energy * (1 + this.safetyMargin)),
-            bandwidth: Math.ceil(bandwidth * (1 + this.safetyMargin))
+            energy: Math.ceil(energy * (1 + safetyMargin)),
+            bandwidth: Math.ceil(bandwidth * (1 + safetyMargin))
         };
     }
+
+    private getTronConfig = decorateApi(() => this.batteryApi.getTronConfig());
 
     public async getTransfersHistory(
         address: string,
@@ -284,76 +312,80 @@ export class TronApi {
             .sort((a, b) => b.timestamp - a.timestamp);
     }
 
-    private async getBlockchainTransfersHistory(
-        address: string,
-        options?: {
-            limit?: number;
-            maxTimestamp?: number;
-            onlyInitiator?: boolean;
-            filterSpam?: boolean;
+    private getBlockchainTransfersHistory = decorateApi(
+        async (
+            address: string,
+            options?: {
+                limit?: number;
+                maxTimestamp?: number;
+                onlyInitiator?: boolean;
+                filterSpam?: boolean;
+            }
+        ): Promise<TronHistoryItem[]> => {
+            const url = new URL(
+                `${this.tronGridBaseUrl}/v1/accounts/${address}/transactions/trc20`
+            );
+
+            if (options?.limit !== undefined) {
+                url.searchParams.set('limit', options.limit.toString());
+            }
+
+            if (options?.maxTimestamp !== undefined) {
+                url.searchParams.set('max_timestamp', options.maxTimestamp.toString());
+            }
+
+            if (options?.onlyInitiator === true) {
+                url.searchParams.set('only_from', 'true');
+            }
+
+            const response = await (
+                await fetch(url, {
+                    method: 'GET',
+                    headers: this.headers
+                })
+            ).json();
+
+            if (!response?.success || !response?.data || !Array.isArray(response.data)) {
+                throw new Error('Error fetching transfers history');
+            }
+
+            return response.data
+                .map((item: TronTokenDTO) => {
+                    if (item.type !== 'Transfer') {
+                        return null;
+                    }
+                    if (item.token_info?.address !== TRON_USDT_ASSET.address) {
+                        return null;
+                    }
+
+                    const assetAmount = new AssetAmount({
+                        weiAmount: item.value,
+                        asset: TRON_USDT_ASSET
+                    });
+
+                    const isScam = item.to === address && assetAmount.relativeAmount.lt(1);
+
+                    if (options?.filterSpam && isScam) {
+                        return null;
+                    }
+
+                    return {
+                        type: 'asset-transfer',
+                        assetAmount,
+                        timestamp: item.block_timestamp,
+                        transactionHash: item.transaction_id,
+                        from: item.from,
+                        to: item.to,
+                        isScam,
+                        isFailed: false,
+                        inProgress: false
+                    } satisfies TronHistoryItemTransferAsset;
+                })
+                .filter(notNullish);
         }
-    ): Promise<TronHistoryItem[]> {
-        const url = new URL(`${this.tronGridBaseUrl}/v1/accounts/${address}/transactions/trc20`);
+    );
 
-        if (options?.limit !== undefined) {
-            url.searchParams.set('limit', options.limit.toString());
-        }
-
-        if (options?.maxTimestamp !== undefined) {
-            url.searchParams.set('max_timestamp', options.maxTimestamp.toString());
-        }
-
-        if (options?.onlyInitiator === true) {
-            url.searchParams.set('only_from', 'true');
-        }
-
-        const response = await (
-            await fetch(url, {
-                method: 'GET',
-                headers: this.headers
-            })
-        ).json();
-
-        if (!response?.success || !response?.data || !Array.isArray(response.data)) {
-            throw new Error('Error fetching transfers history');
-        }
-
-        return response.data
-            .map((item: TronTokenDTO) => {
-                if (item.type !== 'Transfer') {
-                    return null;
-                }
-                if (item.token_info?.address !== TRON_USDT_ASSET.address) {
-                    return null;
-                }
-
-                const assetAmount = new AssetAmount({
-                    weiAmount: item.value,
-                    asset: TRON_USDT_ASSET
-                });
-
-                const isScam = item.to === address && assetAmount.relativeAmount.lt(1);
-
-                if (options?.filterSpam && isScam) {
-                    return null;
-                }
-
-                return {
-                    type: 'asset-transfer',
-                    assetAmount,
-                    timestamp: item.block_timestamp,
-                    transactionHash: item.transaction_id,
-                    from: item.from,
-                    to: item.to,
-                    isScam,
-                    isFailed: false,
-                    inProgress: false
-                } satisfies TronHistoryItemTransferAsset;
-            })
-            .filter(notNullish);
-    }
-
-    private async getUSDTBalance(of: string) {
+    private getUSDTBalance = decorateApi(async (of: string) => {
         try {
             const abi = [
                 {
@@ -396,7 +428,7 @@ export class TronApi {
             console.error('Error estimating energy:', error);
             return '0';
         }
-    }
+    });
 
     private async getBatteryTransfersHistory(
         options?: {

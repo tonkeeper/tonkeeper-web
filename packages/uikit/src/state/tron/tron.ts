@@ -87,16 +87,14 @@ export const useAutoMarkTronFeatureAsSeen = () => {
 
 const cachedTronApi = cachedSync(
     Infinity,
-    (baseURL: string, apiKey: string | undefined, batteryApi: BatteryConfiguration) =>
-        new TronApi({ baseURL, apiKey }, batteryApi)
+    (baseURL: string, batteryApi: BatteryConfiguration) => new TronApi({ baseURL }, batteryApi)
 );
 export const useTronApi = () => {
     const config = useActiveConfig();
-    const apiKey = config.tron_api_key;
     const apiUrl = config.tron_api_url;
     const batteryApi = useBatteryApi();
 
-    return cachedTronApi(apiUrl, apiKey, batteryApi);
+    return cachedTronApi(apiUrl, batteryApi);
 };
 
 export const useIsTronEnabledGlobally = () => {
