@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
 import { Notification } from '../Notification';
-import { Body3, Label2 } from '../Text';
+import { Body2Class, Body3, Label1Class, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { useTranslation } from '../../hooks/translation';
 import { Image } from '../shared/Image';
@@ -15,6 +15,7 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useTrc20TransferDefaultFees } from '../../state/tron/tron';
 import { Skeleton } from '../shared/Skeleton';
+import { ChevronRightIcon } from '../Icon';
 
 const NotificationStyled = styled(Notification)`
     max-width: 648px;
@@ -54,10 +55,41 @@ const BatteryIcon = () => {
     );
 };
 
+const isMobile = '@media (max-width: 768px)';
+
 const Cards = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
+
+    ${isMobile} {
+        grid-template: repeat(3, 1fr) / 1fr;
+        width: 100%;
+    }
+`;
+
+const CardTitle = styled(Label2)`
+    ${isMobile} {
+        ${Label1Class};
+    }
+`;
+
+const CardSubtitle = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+    ${isMobile} {
+        ${Body2Class};
+    }
+`;
+
+const MobileBlockWrapper = styled.div`
+    display: contents;
+
+    ${isMobile} {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
 `;
 
 const MethodImage = styled(Image)`
@@ -68,6 +100,7 @@ const MethodImage = styled(Image)`
 `;
 
 const MethodCard = styled.div`
+    position: relative;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -76,6 +109,14 @@ const MethodCard = styled.div`
     background: ${props => props.theme.backgroundContent};
     align-items: center;
     gap: 12px;
+
+    ${isMobile} {
+        flex-direction: row;
+        gap: 12px;
+        justify-content: flex-start;
+        padding: 16px 12px;
+        text-align: start;
+    }
 `;
 
 const MethodInfo = styled.div`
@@ -85,13 +126,27 @@ const MethodInfo = styled.div`
     align-items: center;
     gap: 2px;
 
-    > ${Body3} {
-        color: ${props => props.theme.textSecondary};
+    ${isMobile} {
+        align-items: flex-start;
+    }
+`;
+const ActionButton = styled(Button)`
+    ${isMobile} {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        height: unset;
     }
 `;
 
-const MethodPrice = styled(Body3)`
-    color: ${props => props.theme.textSecondary};
+const ChevronButton = styled(ChevronRightIcon)`
+    display: none;
+
+    ${isMobile} {
+        display: block;
+        flex-shrink: 0;
+        color: ${p => p.theme.iconTertiary};
+    }
 `;
 
 const FooterNote = styled(Body3)`
@@ -139,75 +194,84 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
 
     return (
         <Content>
-            <Label2>{t('topup_tron_fee_title')}</Label2>
+            <CardTitle>{t('topup_tron_fee_title')}</CardTitle>
 
             <Cards>
                 <MethodCard>
                     <BatteryIcon />
-                    <MethodInfo>
-                        <Label2>{t('battery_title')}</Label2>
-                        <Body3>{t('topup_tron_fee_battery_description')}</Body3>
-                    </MethodInfo>
-                    {batterySenderFee.fiatAmount ? (
-                        <MethodPrice>
-                            {t('topup_tron_fee_price_per_transfer', {
-                                fiat: batterySenderFee.fiatAmount
-                            })}
-                        </MethodPrice>
-                    ) : (
-                        <Skeleton height="14px" marginTop="2px" width="100px" />
-                    )}
-                    <Button
-                        primary
-                        size="small"
-                        onClick={() => {
-                            onClose();
-                            navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
-                                disableMobileAnimation: true
-                            });
-                        }}
-                        fullWidth
-                    >
-                        {t('topup_tron_fee_top_up')}
-                    </Button>
+                    <MobileBlockWrapper>
+                        <MethodInfo>
+                            <CardTitle>{t('battery_title')}</CardTitle>
+                            <CardSubtitle>{t('topup_tron_fee_battery_description')}</CardSubtitle>
+                        </MethodInfo>
+                        {batterySenderFee.fiatAmount ? (
+                            <CardSubtitle>
+                                {t('topup_tron_fee_price_per_transfer', {
+                                    fiat: batterySenderFee.fiatAmount
+                                })}
+                            </CardSubtitle>
+                        ) : (
+                            <Skeleton height="14px" marginTop="2px" width="100px" />
+                        )}
+                        <ActionButton
+                            primary
+                            size="small"
+                            onClick={() => {
+                                onClose();
+                                navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+                                    disableMobileAnimation: true
+                                });
+                            }}
+                            fullWidth
+                        >
+                            {t('topup_tron_fee_top_up')}
+                        </ActionButton>
+                    </MobileBlockWrapper>
+                    <ChevronButton />
                 </MethodCard>
                 <MethodCard>
                     <MethodImage src={TON_ASSET.image} />
-                    <MethodInfo>
-                        <Label2>{TON_ASSET.symbol}</Label2>
-                        <Body3>{t('topup_tron_fee_ton_description')}</Body3>
-                    </MethodInfo>
-                    {tonSenderFee.fiatAmount ? (
-                        <MethodPrice>
-                            {t('topup_tron_fee_price_per_transfer', {
-                                fiat: tonSenderFee.fiatAmount
-                            })}
-                        </MethodPrice>
-                    ) : (
-                        <Skeleton height="14px" marginTop="2px" width="100px" />
-                    )}
-                    <Button size="small" onClick={() => onTopupToken('ton')} fullWidth>
-                        {t('topup_tron_fee_top_up')}
-                    </Button>
+                    <MobileBlockWrapper>
+                        <MethodInfo>
+                            <CardTitle>{TON_ASSET.symbol}</CardTitle>
+                            <CardSubtitle>{t('topup_tron_fee_ton_description')}</CardSubtitle>
+                        </MethodInfo>
+                        {tonSenderFee.fiatAmount ? (
+                            <CardSubtitle>
+                                {t('topup_tron_fee_price_per_transfer', {
+                                    fiat: tonSenderFee.fiatAmount
+                                })}
+                            </CardSubtitle>
+                        ) : (
+                            <Skeleton height="14px" marginTop="2px" width="100px" />
+                        )}
+                        <ActionButton size="small" onClick={() => onTopupToken('ton')} fullWidth>
+                            {t('topup_tron_fee_top_up')}
+                        </ActionButton>
+                    </MobileBlockWrapper>
+                    <ChevronButton />
                 </MethodCard>
                 <MethodCard>
                     <MethodImage src={TRON_TRX_ASSET.image} />
-                    <MethodInfo>
-                        <Label2>{TRON_TRX_ASSET.symbol}</Label2>
-                        <Body3>{t('topup_tron_fee_trx_description')}</Body3>
-                    </MethodInfo>
-                    {trxSenderFee.fiatAmount ? (
-                        <MethodPrice>
-                            {t('topup_tron_fee_price_per_transfer', {
-                                fiat: trxSenderFee.fiatAmount
-                            })}
-                        </MethodPrice>
-                    ) : (
-                        <Skeleton height="14px" marginTop="2px" width="100px" />
-                    )}
-                    <Button size="small" onClick={() => onTopupToken('trx')} fullWidth>
-                        {t('topup_tron_fee_top_up')}
-                    </Button>
+                    <MobileBlockWrapper>
+                        <MethodInfo>
+                            <CardTitle>{TRON_TRX_ASSET.symbol}</CardTitle>
+                            <CardSubtitle>{t('topup_tron_fee_trx_description')}</CardSubtitle>
+                        </MethodInfo>
+                        {trxSenderFee.fiatAmount ? (
+                            <CardSubtitle>
+                                {t('topup_tron_fee_price_per_transfer', {
+                                    fiat: trxSenderFee.fiatAmount
+                                })}
+                            </CardSubtitle>
+                        ) : (
+                            <Skeleton height="14px" marginTop="2px" width="100px" />
+                        )}
+                        <ActionButton size="small" onClick={() => onTopupToken('trx')} fullWidth>
+                            {t('topup_tron_fee_top_up')}
+                        </ActionButton>
+                    </MobileBlockWrapper>
+                    <ChevronButton />
                 </MethodCard>
             </Cards>
 
