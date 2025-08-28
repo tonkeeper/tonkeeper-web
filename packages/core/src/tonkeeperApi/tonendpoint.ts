@@ -94,12 +94,8 @@ export interface TonendpointConfig {
     '2fa_tg_linked_ttl_seconds': number;
     '2fa_bot_url'?: string;
 
-    enhanced_acs_pmob?: {
-        code?: string;
-        acs_until?: number;
-    };
-
     pro_mobile_app_appstore_link?: string;
+    pro_media_base_url?: string;
     pro_landing_url?: string;
     pro_trial_tg_bot_id?: string;
 

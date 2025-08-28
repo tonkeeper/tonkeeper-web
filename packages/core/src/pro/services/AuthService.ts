@@ -52,16 +52,22 @@ export class AuthService {
     }
     /**
      * Logout user session
+     * @param authorization
      * @returns any Ok
      * @throws ApiError
      */
-    public static logout(): CancelablePromise<{
+    public static logout(
+        authorization: string,
+    ): CancelablePromise<{
         ok: boolean;
         auth_token?: string;
     }> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/logout',
+            headers: {
+                'Authorization': authorization,
+            },
             errors: {
                 400: `Something went wrong on client side`,
                 403: `Access token is missing or invalid`,

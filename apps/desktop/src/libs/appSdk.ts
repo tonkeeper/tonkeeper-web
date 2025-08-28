@@ -12,7 +12,6 @@ import { sendBackground } from './backgroudService';
 import { DesktopStorage } from './storage';
 import { KeychainDesktop } from './keychain';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
-import { Subscription } from '@tonkeeper/core/CryptoSubscriptionStrategy';
 
 export class CookieDesktop implements CookieService {
     cleanUp = async () => {
@@ -74,8 +73,6 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
         // eslint-disable-next-line no-self-assign
         window.location.href = window.location.href;
     };
-
-    subscriptionStrategy = Subscription;
 
     async getAppCountryInfo(): Promise<AppCountryInfo> {
         const deviceCountryCode: string = await sendBackground({ king: 'get-device-country' });

@@ -1,4 +1,10 @@
-import { isCryptoStrategy, PurchaseStatuses } from '@tonkeeper/core/dist/entries/pro';
+import {
+    isCryptoStrategy,
+    isPurchaseError,
+    PurchaseErrors,
+    PurchaseStatuses
+} from '@tonkeeper/core/dist/entries/pro';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
@@ -10,12 +16,14 @@ import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../router/useNavigate';
 import { useExistingIosSubscription } from './useExistingIosSubscription';
+import { useAtomValue } from '../../libs/useAtom';
 
 export const useProPurchaseController = () => {
     const sdk = useAppSdk();
     const { t } = useTranslation();
     const toast = useToast();
     const navigate = useNavigate();
+    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const { onClose: onCurrentClose } = useProPurchaseNotification();
     const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
 
@@ -37,9 +45,9 @@ export const useProPurchaseController = () => {
         mutateAsync: startPurchasing,
         isLoading: isPurchasing,
         isSuccess: isPurchasingSuccess,
-        isError: isPurchasingError
+        isError: isPurchasingError,
+        error: purchaseError
     } = useProPurchaseMutation();
-    useNotifyError(isPurchasingError && new Error(t('purchase_failed')));
 
     const {
         mutateAsync: handleLogOut,
@@ -55,6 +63,20 @@ export const useProPurchaseController = () => {
     } = useManageSubscription();
     useManageSubscription();
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
+
+    useEffect(() => {
+        if (!isPurchasingError) return;
+
+        const errorMessage = purchaseError?.message;
+
+        if (isPurchaseError(errorMessage)) {
+            toast(t(errorMessage));
+
+            return;
+        }
+
+        toast(t(PurchaseErrors.PURCHASE_FAILED));
+    }, [isPurchasingError]);
 
     useEffect(() => {
         if (!isPurchasingSuccess) return;
@@ -82,9 +104,15 @@ export const useProPurchaseController = () => {
     const onSubmit = async () => {
         const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
 
+        if (!targetAuth) return;
         if (!selectedPlan) return;
 
-        await startPurchasing({ selectedPlan, promoCode: verifiedPromoCode });
+        await startPurchasing({
+            selectedPlan,
+            wallet: targetAuth.wallet,
+            tempToken: targetAuth.tempToken,
+            promoCode: verifiedPromoCode
+        });
     };
 
     return {

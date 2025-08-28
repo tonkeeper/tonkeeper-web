@@ -45,11 +45,16 @@ export const SettingsSocialList: FC = React.memo(() => {
                     config.pro_mobile_app_appstore_link &&
                     sdk.openPage(config.pro_mobile_app_appstore_link)
             },
-            {
-                name: t('settings_news'),
-                icon: <TelegramIcon />,
-                action: () => config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
-            },
+            ...(config.tonkeeperNewsUrl
+                ? [
+                      {
+                          name: t('settings_news'),
+                          icon: <TelegramIcon />,
+                          action: () =>
+                              config.tonkeeperNewsUrl && sdk.openPage(config.tonkeeperNewsUrl)
+                      }
+                  ]
+                : []),
             {
                 name: t('settings_contact_support'),
                 icon: <ContactSupportIcon />,

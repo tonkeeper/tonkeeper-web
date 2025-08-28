@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { ConfirmState } from '@tonkeeper/core/dist/entries/pro';
+import { IConfirmState } from '@tonkeeper/core/dist/entries/pro';
 
 import { Notification } from '../../Notification';
 import { FC, PropsWithChildren } from 'react';
@@ -11,7 +11,7 @@ import { fallbackRenderOver } from '../../Error';
 
 interface IProConfirmNotificationProps {
     onClose: () => void;
-    confirmState: ConfirmState | null;
+    confirmState: IConfirmState | null;
     onConfirm?: (success?: boolean) => void;
     onCancel?: () => void;
 }
@@ -56,7 +56,7 @@ const ProConfirmNotificationContent: FC<
             onBack?: () => void;
             onClose: (confirmed?: boolean) => void;
             fitContent?: boolean;
-        } & ConfirmState
+        } & IConfirmState
     >
 > = ({ ...rest }) => {
     const estimation = useEstimateTransfer({
