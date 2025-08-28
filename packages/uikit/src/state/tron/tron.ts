@@ -31,7 +31,6 @@ import { useFormatFiat, useRate } from '../rates';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronTrxSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-trx-sender';
 import { TronTrc20Encoder } from '@tonkeeper/core/dist/service/tron-blockchain/encoder/tron-trc20-encoder';
-import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 export const useIsTronEnabledForActiveWallet = () => {
     const tronWallet = useActiveTronWallet();
@@ -165,24 +164,37 @@ const useTrc20TrxDefaultFee = () => {
 };
 
 export const useTrc20TransferDefaultFees = () => {
-    const tonMeanPriceTronUsdt = 440000000; // TODO: get this from config
     const { meanPrices: batteryMeanPricesCharges } = useBatteryServiceConfig();
+    const tonMeanPriceTronUsdt = useMemo(
+        () =>
+            AssetAmount.fromRelativeAmount({
+                asset: TON_ASSET,
+                amount: batteryMeanPricesCharges.tonMeanPriceTronUsdt ?? 0
+            }),
+        [batteryMeanPricesCharges.tonMeanPriceTronUsdt]
+    );
     const batteryUnitTonRate = useBatteryUnitTonRate();
     const { data: tonRate } = useRate(tonAssetAddressToString(TON_ASSET.address));
 
     const chargesPerTransfer = batteryMeanPricesCharges.batteryMeanPriceTronUsdt;
     const { fiatAmount: batteryFiatFee } = useFormatFiat(
         tonRate,
-        batteryUnitTonRate.multipliedBy(chargesPerTransfer!)
+        !chargesPerTransfer ? undefined : batteryUnitTonRate.multipliedBy(chargesPerTransfer)
     );
+
     const { fiatAmount: tonFiatFee } = useFormatFiat(
         tonRate,
-        shiftedDecimals(tonMeanPriceTronUsdt, TON_ASSET.decimals)
+        tonMeanPriceTronUsdt.relativeAmount.isZero()
+            ? undefined
+            : tonMeanPriceTronUsdt.relativeAmount
     );
 
     const { data: trc20TrxDefaultFee } = useTrc20TrxDefaultFee();
     const { data: tronRate } = useRate(TRON_TRX_ASSET.address);
-    const { fiatAmount: tronFiatFee } = useFormatFiat(tronRate, trc20TrxDefaultFee?.relativeAmount);
+    const { fiatAmount: tronFiatFee } = useFormatFiat(
+        tronRate,
+        trc20TrxDefaultFee?.relativeAmount.isZero() ? undefined : trc20TrxDefaultFee?.relativeAmount
+    );
 
     return useMemo(() => {
         return {
@@ -228,7 +240,9 @@ export const useTrc20TransfersNumberAvailable = () => {
         if (tonBalance === undefined || !tonSenderFee.ton) {
             return undefined;
         }
-        return Math.floor(tonBalance.weiAmount.div(tonSenderFee.ton).toNumber());
+        return tonSenderFee.ton.weiAmount.isZero()
+            ? 0
+            : Math.floor(tonBalance.weiAmount.div(tonSenderFee.ton.weiAmount).toNumber());
     }, [tonBalance, tonSenderFee.ton]);
 
     const trxTransfers = useMemo(() => {
