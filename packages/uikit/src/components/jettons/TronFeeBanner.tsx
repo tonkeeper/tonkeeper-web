@@ -13,7 +13,7 @@ import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { Skeleton } from '../shared/Skeleton';
 import { useBatteryBalance } from '../../state/battery';
 import { Dot } from '../Dot';
-import { useTonBalance } from '../../state/wallet';
+import { useActiveConfig, useTonBalance } from '../../state/wallet';
 import { FC } from 'react';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TON_ASSET, TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
@@ -22,6 +22,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { DropDown } from '../DropDown';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
+import { ExternalLink } from '../shared/ExternalLink';
 
 const TronTopUpUSDTWrapper = styled.div`
     background-color: ${p => p.theme.backgroundContent};
@@ -211,6 +212,10 @@ const TableRow = styled.div`
     }
 `;
 
+const TableRowDisclaimer = styled(TableRow)`
+    display: block;
+`;
+
 const TextSkeleton = () => <Skeleton width="100px" height="14px" marginTop="2px" />;
 const RefillButton = styled(ButtonFlat)`
     ${Body3Class};
@@ -241,6 +246,7 @@ const FeeTable = () => {
     const { data: batteryBalance } = useBatteryBalance();
     const { data: tonBalance } = useTonBalance();
     const { data: tronBalances } = useTronBalances();
+    const { faq_tron_fee_url } = useActiveConfig();
 
     const onRefillToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -285,6 +291,15 @@ const FeeTable = () => {
                 fiatPerTransfer={trxSenderFee.fiatAmount}
                 onRefill={() => onRefillToken('trx')}
             />
+            {!!faq_tron_fee_url && (
+                <TableRowDisclaimer>
+                    <TableSecondLineText>{t('tron_fee_table_disclaimer')}</TableSecondLineText>
+                    &nbsp;
+                    <ExternalLink colored href={faq_tron_fee_url}>
+                        {t('learn_more')}
+                    </ExternalLink>
+                </TableRowDisclaimer>
+            )}
         </TableWrapper>
     );
 };
