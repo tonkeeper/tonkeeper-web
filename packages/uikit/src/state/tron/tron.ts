@@ -31,6 +31,8 @@ import { useFormatFiat, useRate } from '../rates';
 import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { TronTrxSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-trx-sender';
 import { TronTrc20Encoder } from '@tonkeeper/core/dist/service/tron-blockchain/encoder/tron-trc20-encoder';
+import { cachedSync } from '@tonkeeper/core/dist/utils/common';
+import { Configuration as BatteryConfiguration } from '@tonkeeper/core/dist/batteryApi';
 
 export const useIsTronEnabledForActiveWallet = () => {
     const tronWallet = useActiveTronWallet();
@@ -83,13 +85,18 @@ export const useAutoMarkTronFeatureAsSeen = () => {
     }, [mutate, globalPreferences.highlightFeatures, globalPreferences.highlightFeatures.tron]);
 };
 
+const cachedTronApi = cachedSync(
+    Infinity,
+    (baseURL: string, apiKey: string | undefined, batteryApi: BatteryConfiguration) =>
+        new TronApi({ baseURL, apiKey }, batteryApi)
+);
 export const useTronApi = () => {
     const config = useActiveConfig();
     const apiKey = config.tron_api_key;
     const apiUrl = config.tron_api_url;
     const batteryApi = useBatteryApi();
 
-    return useMemo(() => new TronApi({ baseURL: apiUrl, apiKey }, batteryApi), [apiKey, apiUrl]);
+    return cachedTronApi(apiUrl, apiKey, batteryApi);
 };
 
 export const useIsTronEnabledGlobally = () => {
