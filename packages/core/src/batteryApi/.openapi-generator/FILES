@@ -12,6 +12,7 @@ models/AccountStatus.ts
 models/Action.ts
 models/ActionPhase.ts
 models/ActionSimplePreview.ts
+models/AddExtensionAction.ts
 models/AndroidBatteryPurchaseRequest.ts
 models/AndroidBatteryPurchaseRequestPurchasesInner.ts
 models/AndroidBatteryPurchaseStatus.ts
@@ -37,6 +38,7 @@ models/CreatePromoCampaignRequestParticipantsInner.ts
 models/CreditPhase.ts
 models/CurrencyType.ts
 models/DepositStakeAction.ts
+models/DepositTokenStakeAction.ts
 models/DomainRenewAction.ts
 models/EcPreview.ts
 models/ElectionsDepositStakeAction.ts
@@ -88,6 +90,7 @@ models/PromoCodeBatteryPurchaseRequest.ts
 models/PromoCodeBatteryPurchaseStatus.ts
 models/PromoCodeBatteryPurchaseStatusError.ts
 models/PromoUsed.ts
+models/Protocol.ts
 models/PurchaseAction.ts
 models/Purchases.ts
 models/PurchasesPurchasesInner.ts
@@ -97,11 +100,13 @@ models/RechargeMethods.ts
 models/RechargeMethodsMethodsInner.ts
 models/Refund.ts
 models/RelayerSendingEstimation.ts
+models/RemoveExtensionAction.ts
 models/RequestRefundRequest.ts
 models/ResetUserBalanceRequest.ts
 models/Risk.ts
 models/Sale.ts
 models/SentTronTx.ts
+models/SetSignatureAllowedAction.ts
 models/SmartContractAction.ts
 models/StateInit.ts
 models/Status.ts
@@ -126,5 +131,6 @@ models/UnSubscriptionAction.ts
 models/VerifyPurchasePromo200Response.ts
 models/WithdrawStakeAction.ts
 models/WithdrawStakeRequestAction.ts
+models/WithdrawTokenStakeRequestAction.ts
 models/index.ts
 runtime.ts
