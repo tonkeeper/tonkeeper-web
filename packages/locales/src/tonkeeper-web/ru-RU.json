@@ -577,6 +577,7 @@
   "tron_battery_required_banner_button": "Зарядить батарейку",
   "tron_battery_required_banner_description": "Заряды батареи используются для покрытия комиссий за транзакции, что делает переводы проще и дешевле.",
   "tron_battery_required_banner_title": "Для USD₮ TRC20 требуется Tonkeeper Battery",
+  "tron_fee_banner_available_fee_options": "Доступные варианты",
   "tron_fee_banner_available_label": "Доступно ≈ {transfers} переводов TRC20",
   "tron_fee_banner_fee_options": "Способы оплаты комиссии",
   "tron_fee_start_banner_button": "Пополнить",

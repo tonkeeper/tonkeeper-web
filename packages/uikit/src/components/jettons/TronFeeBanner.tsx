@@ -1,6 +1,6 @@
 import { BorderSmallResponsive } from '../shared/Styles';
-import styled, { css } from 'styled-components';
-import { Body2, Body2Class, Body3, Body3Class, Label2 } from '../Text';
+import styled, { css, useTheme } from 'styled-components';
+import { Body1Class, Body2, Body2Class, Body3, Body3Class, Label1Class, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useTrc20TransferDefaultFees,
@@ -9,7 +9,6 @@ import {
 } from '../../state/tron/tron';
 import { Button, ButtonFlat } from '../fields/Button';
 import { InfoCircleIcon } from '../Icon';
-import { ForTargetEnv, NotForTargetEnv } from '../shared/TargetEnv';
 import { Skeleton } from '../shared/Skeleton';
 import { useBatteryBalance } from '../../state/battery';
 import { Dot } from '../Dot';
@@ -23,6 +22,9 @@ import { useNavigate } from '../../hooks/router/useNavigate';
 import { DropDown } from '../DropDown';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
 import { ExternalLink } from '../shared/ExternalLink';
+import { IconButtonTransparentBackground } from '../fields/IconButton';
+import { Notification } from '../Notification';
+import { useDisclosure } from '../../hooks/useDisclosure';
 
 const TronTopUpUSDTWrapper = styled.div`
     background-color: ${p => p.theme.backgroundContent};
@@ -39,7 +41,7 @@ const TronTopUpUSDTWrapper = styled.div`
     }
 
     ${p =>
-        p.theme.proDisplayType === 'mobile' &&
+        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
         css`
             gap: 16px;
             flex-direction: column;
@@ -48,6 +50,12 @@ const TronTopUpUSDTWrapper = styled.div`
                 width: 100%;
                 box-sizing: border-box;
             }
+        `}
+
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            margin: 16px 0;
         `}
 `;
 
@@ -65,6 +73,12 @@ const SmallDivider = styled.div`
     width: 100%;
     height: 1px;
     background-color: ${p => p.theme.separatorCommon};
+
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            display: none;
+        `}
 `;
 
 const TransfersNumberStatusWrapper = styled.div`
@@ -78,7 +92,7 @@ const TransfersNumberStatusWrapper = styled.div`
     grid-template-areas: 'a b c';
 
     ${p =>
-        p.theme.proDisplayType === 'mobile' &&
+        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
         css`
             ${Body2Class};
             padding: 16px;
@@ -87,6 +101,15 @@ const TransfersNumberStatusWrapper = styled.div`
             grid-template-areas:
                 'a b'
                 'c b';
+        `}
+
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            ${Label1Class};
+            background-color: ${p.theme.backgroundContent};
+            border-radius: ${p.theme.cornerSmall};
+            margin: 16px 0;
         `}
 
     > *:first-child {
@@ -106,11 +129,17 @@ const ButtonFlatStyled = styled(ButtonFlat)`
     color: ${p => p.theme.textSecondary};
 
     ${p =>
-        p.theme.proDisplayType === 'mobile' &&
+        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
         css`
             ${Body2Class};
             justify-self: start;
             color: ${p.theme.accentBlue};
+        `}
+
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            ${Body1Class};
         `}
 `;
 
@@ -134,8 +163,10 @@ const DropDownStyled = styled(DropDown)`
 
 export const TronFeeBanner = () => {
     const { t } = useTranslation();
-    const { onOpen } = useTopUpTronFeeBalanceNotification();
+    const { onOpen: openTopUpNotification } = useTopUpTronFeeBalanceNotification();
     const { total } = useTrc20TransfersNumberAvailable();
+    const { isOpen, onClose, onOpen: openFeeTable } = useDisclosure();
+    const theme = useTheme();
 
     if (total === undefined) {
         return null;
@@ -150,7 +181,7 @@ export const TronFeeBanner = () => {
                         <Body2>{t('tron_fee_start_banner_description')}</Body2>
                     </TextContainer>
 
-                    <Button size="small" onClick={onOpen}>
+                    <Button size="small" onClick={openTopUpNotification}>
                         {t('tron_fee_start_banner_button')}
                     </Button>
                 </TronTopUpUSDTWrapper>
@@ -159,12 +190,14 @@ export const TronFeeBanner = () => {
         );
     }
 
+    const showDropDown = theme.proDisplayType === 'desktop';
+
     return (
         <>
             <TransfersNumberStatusWrapper>
                 <span>{t('tron_fee_banner_available_label', { transfers: total })}</span>
                 <InfoWrapper>
-                    <NotForTargetEnv env="mobile">
+                    {showDropDown ? (
                         <DropDownStyled
                             payload={() => <FeeTable />}
                             trigger="click"
@@ -172,24 +205,41 @@ export const TronFeeBanner = () => {
                         >
                             <InfoCircleIcon />
                         </DropDownStyled>
-                    </NotForTargetEnv>
-                    <ForTargetEnv env="mobile">
-                        <InfoCircleIcon />
-                    </ForTargetEnv>
+                    ) : (
+                        <MobileIconButton onClick={openFeeTable}>
+                            <InfoCircleIcon />
+                        </MobileIconButton>
+                    )}
                 </InfoWrapper>
-                <ButtonFlatStyled onClick={onOpen}>
+                <ButtonFlatStyled onClick={openTopUpNotification}>
                     {t('tron_fee_banner_fee_options')}
                 </ButtonFlatStyled>
             </TransfersNumberStatusWrapper>
             <SmallDivider />
+            <Notification
+                title={t('tron_fee_banner_available_fee_options')}
+                isOpen={isOpen}
+                handleClose={onClose}
+            >
+                {() => <FeeTable />}
+            </Notification>
         </>
     );
 };
 
+const MobileIconButton = styled(IconButtonTransparentBackground)`
+    padding: 8px;
+
+    > svg {
+        width: 16px;
+        height: 16px;
+    }
+`;
+
 const TableWrapper = styled.div`
     border-radius: ${p => p.theme.corner2xSmall};
     background-color: ${p =>
-        p.theme.prodisplayType === 'mobile'
+        p.theme.prodisplayType === 'mobile' || p.theme.displayType === 'compact'
             ? p.theme.backgroundContent
             : p.theme.backgroundContentTint};
 `;
@@ -229,11 +279,32 @@ const TableFirsLineText = styled.span`
         css`
             ${Body2Class};
         `}
+
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            ${Body1Class};
+        `}
 }
 `;
 
 const TableSecondLineText = styled(Body3)`
     color: ${p => p.theme.textSecondary};
+
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            ${Body2Class};
+        `}
+`;
+
+const FooterLinkText = styled(Body3)`
+    white-space: nowrap;
+    ${p =>
+        p.theme.displayType === 'compact' &&
+        css`
+            ${Body2Class};
+        `}
 `;
 
 const FeeTable = () => {
@@ -296,7 +367,7 @@ const FeeTable = () => {
                     <TableSecondLineText>{t('tron_fee_table_disclaimer')}</TableSecondLineText>
                     &nbsp;
                     <ExternalLink colored href={faq_tron_fee_url}>
-                        {t('learn_more')}
+                        <FooterLinkText>{t('learn_more')}</FooterLinkText>
                     </ExternalLink>
                 </TableRowDisclaimer>
             )}

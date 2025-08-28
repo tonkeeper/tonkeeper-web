@@ -599,6 +599,7 @@
   "tron_battery_required_banner_button": "Charge Battery",
   "tron_battery_required_banner_description": "Battery charges are used to cover transaction fees, making transfers simpler and more cost-effective.",
   "tron_battery_required_banner_title": "Tonkeeper Battery required for USD₮ TRC20",
+  "tron_fee_banner_available_fee_options": "Available Options",
   "tron_fee_banner_available_label": "Available ≈ {transfers} TRC20 transfers",
   "tron_fee_banner_fee_options": "Fee Payment Options",
   "tron_fee_start_banner_button": "Refill",
