@@ -42,6 +42,7 @@ import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
+import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -86,6 +87,7 @@ export const ConfirmTransferView: FC<
 > = ({ isMax, assetAmount, ...rest }) => {
     const { t } = useTranslation();
     const { onOpen: openTopUpTronFeeBalanceNotification } = useTopUpTronFeeBalanceNotification();
+    const { onOpen: openConfirmDiscardNotification } = useConfirmDiscardNotification();
 
     const api = useActiveApi();
     const operationType = useMemo(() => {
@@ -130,37 +132,40 @@ export const ConfirmTransferView: FC<
                 return setSelectedSenderType(type);
             }
 
-            if (
-                !choice.isEnoughBalance &&
-                (availableSenderChoices as TronSenderOption[]).some(c => c.isEnoughBalance)
-            ) {
-                rest.onClose();
-                if (choice.type === TRON_SENDER_TYPE.TRX) {
-                    sdk.uiEvents.emit('receive', {
-                        method: 'receive',
-                        params: {
-                            chain: BLOCKCHAIN_NAME.TRON,
-                            jetton: TRON_TRX_ASSET.id
+            if (!choice.isEnoughBalance) {
+                openConfirmDiscardNotification({
+                    onClose(isDiscarded: boolean) {
+                        if (isDiscarded) {
+                            rest.onClose();
+                            if (choice.type === TRON_SENDER_TYPE.TRX) {
+                                sdk.uiEvents.emit('receive', {
+                                    method: 'receive',
+                                    params: {
+                                        chain: BLOCKCHAIN_NAME.TRON,
+                                        jetton: TRON_TRX_ASSET.id
+                                    }
+                                });
+                            } else if (choice.type === TRON_SENDER_TYPE.TON_ASSET) {
+                                sdk.uiEvents.emit('receive', {
+                                    method: 'receive',
+                                    params: {
+                                        chain: BLOCKCHAIN_NAME.TON,
+                                        jetton: TON_ASSET.id
+                                    }
+                                });
+                            } else if (choice.type === TRON_SENDER_TYPE.BATTERY) {
+                                navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+                                    disableMobileAnimation: true
+                                });
+                            } else {
+                                assertUnreachableSoft(choice);
+                            }
                         }
-                    });
-                } else if (choice.type === TRON_SENDER_TYPE.TON_ASSET) {
-                    sdk.uiEvents.emit('receive', {
-                        method: 'receive',
-                        params: {
-                            chain: BLOCKCHAIN_NAME.TON,
-                            jetton: TON_ASSET.id
-                        }
-                    });
-                } else if (choice.type === TRON_SENDER_TYPE.BATTERY) {
-                    navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
-                        disableMobileAnimation: true
-                    });
-                } else {
-                    assertUnreachableSoft(choice);
-                }
+                    }
+                });
             }
         },
-        [availableSenderChoices, navigate, rest.onClose]
+        [availableSenderChoices, navigate, rest.onClose, openConfirmDiscardNotification]
     );
 
     const estimation = useEstimateTransfer({
@@ -183,7 +188,7 @@ export const ConfirmTransferView: FC<
         }
 
         if (availableTonSendersChoices) {
-            onSenderTypeChange(availableTonSendersChoices[0].type);
+            setSelectedSenderType(availableTonSendersChoices[0].type);
         }
     }, [
         selectedSenderType,
@@ -196,8 +201,9 @@ export const ConfirmTransferView: FC<
             return;
         }
 
-        if (availableTronSendersChoices) {
-            onSenderTypeChange(availableTronSendersChoices[0].type);
+        const choice = availableTronSendersChoices?.[0];
+        if (choice?.isEnoughBalance) {
+            return setSelectedSenderType(choice.type);
         }
     }, [
         selectedSenderType,
