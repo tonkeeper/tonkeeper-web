@@ -133,7 +133,8 @@ export enum FLAGGED_FEATURE {
     TWO_FA = '2fa',
     ONRAMP = 'onramp',
     DAPPS_LIST = 'dapps_list',
-    ETHENA = 'ethena'
+    ETHENA = 'ethena',
+    RUB = 'rub'
 }
 const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = {
     battery: 'disable_battery',
@@ -143,7 +144,8 @@ const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = 
     '2fa': 'disable_2fa',
     onramp: 'disable_exchange_methods',
     dapps_list: 'disable_dapps',
-    ethena: 'disable_usde'
+    ethena: 'disable_usde',
+    rub: 'disable_RUB'
 };
 
 export function useIsFeatureEnabled(feature: FLAGGED_FEATURE) {
