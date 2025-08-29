@@ -1,4 +1,4 @@
-import React, { FC, Suspense, useRef } from 'react';
+import React, { FC, Suspense } from 'react';
 import { InnerBody } from '../../components/Body';
 import { ActivityHeader } from '../../components/Header';
 import { ActivitySkeletonPage, SkeletonListWithImages } from '../../components/Skeleton';
@@ -7,13 +7,12 @@ import { useAppContext } from '../../hooks/appContext';
 import { useFetchNext } from '../../hooks/useFetchNext';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { MobileActivityList } from '../../components/activity/MobileActivityList';
+import { mergeRefs } from '../../libs/common';
 
 const EmptyActivity = React.lazy(() => import('../../components/activity/EmptyActivity'));
 
 const Activity: FC = () => {
     const { standalone } = useAppContext();
-
-    const ref = useRef<HTMLDivElement>(null);
 
     const {
         refetch,
@@ -24,11 +23,16 @@ const Activity: FC = () => {
         data: activity
     } = useFetchFilteredActivity();
 
-    useScrollMonitor(refetch, 5000, ref);
+    const scrollRef = useScrollMonitor(refetch, 5000);
 
     const isFetchingNextPage = isActivityFetchingNextPage;
 
-    useFetchNext(hasActivityNextPage, isFetchingNextPage, fetchActivityNextPage, standalone, ref);
+    const fetchNextRef = useFetchNext(
+        hasActivityNextPage,
+        isFetchingNextPage,
+        fetchActivityNextPage,
+        standalone
+    );
 
     if (!isActivityFetched || !activity) {
         return <ActivitySkeletonPage />;
@@ -45,7 +49,7 @@ const Activity: FC = () => {
     return (
         <>
             <ActivityHeader />
-            <InnerBody ref={ref}>
+            <InnerBody ref={mergeRefs<HTMLDivElement>(scrollRef, fetchNextRef)}>
                 <MobileActivityList items={activity} />
                 {isFetchingNextPage && <SkeletonListWithImages size={3} />}
             </InnerBody>

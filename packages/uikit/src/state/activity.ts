@@ -519,8 +519,9 @@ export const useScrollMonitor = (
     const [element, setElement] = useState(elementRef?.current);
 
     useEffect(() => {
+        const el = element ?? elementRef?.current;
         const handleScroll = debounce(() => {
-            if (element && element.scrollTop < 5) {
+            if (el && el.scrollTop < 5) {
                 setIsAtTop(true);
             } else {
                 setIsAtTop(false);
@@ -528,9 +529,9 @@ export const useScrollMonitor = (
         }, 20);
 
         handleScroll();
-        element?.addEventListener('scroll', handleScroll);
+        el?.addEventListener('scroll', handleScroll);
         return () => {
-            element?.removeEventListener('scroll', handleScroll);
+            el?.removeEventListener('scroll', handleScroll);
         };
     }, [element]);
 

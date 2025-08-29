@@ -2,7 +2,7 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, RefCallback, useEffect, useMemo, useRef } from 'react';
+import { FC, RefCallback, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Body3, Label2, Num3 } from '../../components/Text';
@@ -497,7 +497,6 @@ export const TronUSDTPage = () => {
         return balances.usdt;
     }, [balances]);
 
-    const ref = useRef<HTMLDivElement>(null);
     const {
         fetchNextPage,
         hasNextPage,
@@ -506,14 +505,14 @@ export const TronUSDTPage = () => {
         refetch
     } = useFetchFilteredActivity(TRON_USDT_ASSET.address);
 
-    useScrollMonitor(refetch, 5000, ref);
+    const setScrollRef = useScrollMonitor(refetch, 5000);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
+    const setFetchNextRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
 
     const { data: rate } = useUSDTRate();
 
     return (
-        <DesktopViewPageLayoutStyled ref={ref}>
+        <DesktopViewPageLayoutStyled ref={mergeRefs<HTMLDivElement>(setScrollRef, setFetchNextRef)}>
             <DesktopViewHeader backButton borderBottom={true}>
                 <DesktopViewHeaderContent
                     title={
