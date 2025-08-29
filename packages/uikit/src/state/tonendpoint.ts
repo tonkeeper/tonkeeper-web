@@ -147,7 +147,7 @@ const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = 
     dapps_list: 'disable_dapps',
     ethena: 'disable_usde',
     nft: 'disable_nfts',
-    rub: 'disable_RUB'
+    rub: 'disable_rub'
 };
 
 export function useIsFeatureEnabled(feature: FLAGGED_FEATURE) {
