@@ -91,18 +91,24 @@ export const useProState = () => {
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            const subscription = await sdk.subscriptionService.getSubscription(
-                subscriptionFormTempAuth$?.value?.tempToken ?? null
-            );
+            try {
+                const subscription = await sdk.subscriptionService.getSubscription(
+                    subscriptionFormTempAuth$?.value?.tempToken ?? null
+                );
 
-            await setBackupState(sdk.storage, subscription);
-            await client.invalidateQueries([QueryKey.proBackup]);
+                await setBackupState(sdk.storage, subscription);
+                await client.invalidateQueries([QueryKey.proBackup]);
 
-            return subscription;
+                return subscription;
+            } catch (e) {
+                console.error('Pro state failed: ', e);
+
+                return null;
+            }
         },
         {
-            keepPreviousData: true,
             suspense: true,
+            keepPreviousData: true,
             refetchInterval: s => (s?.status === CryptoSubscriptionStatuses.PENDING ? 1000 : false)
         }
     );
