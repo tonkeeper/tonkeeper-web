@@ -10,12 +10,12 @@ import {
     IOriginalTransactionInfo,
     ITokenizedWalletAuth,
     ISubscriptionFormData,
-    NormalizedProPlans,
+    IDisplayPlan,
     ITelegramAuth,
     IWalletAuth
 } from './common';
-import { Language } from '../language';
 import { CryptoCurrency, SubscriptionSource } from '../../pro';
+import { Language } from '../language';
 
 export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
 
@@ -39,12 +39,8 @@ export interface IBaseSubscription {
 
 export interface IBaseSubscriptionStrategy {
     source: SubscriptionSource;
-    logout(): Promise<void>;
-    getToken(): Promise<string | null>;
-    activateTrial(token: string): Promise<void>;
     subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses>;
-    getSubscription(tempToken: string | null): Promise<ProSubscription>;
-    getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;
+    getAllProductsInfoCore(lang?: Language): Promise<IDisplayPlan[]>;
 }
 
 // IOS Subscription Types
@@ -144,4 +140,19 @@ export interface ITelegramActiveSubscription extends IBaseTelegramSubscription {
 export interface ITelegramExpiredSubscription extends IBaseTelegramSubscription {
     status: TelegramSubscriptionStatuses.EXPIRED;
     valid: false;
+}
+
+export interface ISubscriptionService {
+    getAvailableSources(): ReadonlyArray<SubscriptionSource>;
+    getStrategy(source: SubscriptionSource): SubscriptionStrategy | undefined;
+    addStrategy(strategy: SubscriptionStrategy): void;
+    logout(): Promise<void>;
+    getSubscription(tempToken: string | null): Promise<ProSubscription>;
+    getToken(): Promise<string | null>;
+    subscribe(
+        source: SubscriptionSource,
+        formData: ISubscriptionFormData
+    ): Promise<PurchaseStatuses>;
+    activateTrial(token: string): Promise<void>;
+    getAllProductsInfo(source: SubscriptionSource, lang?: Language): Promise<IDisplayPlan[]>;
 }

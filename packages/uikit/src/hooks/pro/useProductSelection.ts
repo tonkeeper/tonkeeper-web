@@ -1,46 +1,37 @@
-import {
-    IDisplayPlan,
-    isCryptoStrategy,
-    NormalizedProPlans
-} from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { getSkeletonProducts } from '../../libs/pro';
-import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
 import { useEffect, useState } from 'react';
 import { useProPlans } from '../../state/pro';
 import { useNotifyError } from '../useNotification';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
-const CRYPTO_SKELETON_PRODUCTS_QTY = 1;
-const IOS_SKELETON_PRODUCTS_QTY = 1;
+const SKELETON_PRODUCTS_QTY = 1;
 
-export const getFilteredDisplayPlans = (proPlans?: NormalizedProPlans) => {
-    const { plans = [] } = proPlans ?? {};
+export const getFilteredDisplayPlans = (proPlans?: IDisplayPlan[]) => {
+    if (!proPlans) return [];
 
-    return plans.filter(plan => plan.formattedDisplayPrice !== '-');
+    return proPlans.filter(plan => plan.formattedDisplayPrice !== '-');
 };
 
-export const getProductsForRender = (displayPlans: IDisplayPlan[], isCrypto: boolean) => {
-    return displayPlans.length
-        ? displayPlans
-        : getSkeletonProducts(isCrypto ? CRYPTO_SKELETON_PRODUCTS_QTY : IOS_SKELETON_PRODUCTS_QTY);
+export const getProductsForRender = (displayPlans: IDisplayPlan[]) => {
+    return displayPlans.length ? displayPlans : getSkeletonProducts(SKELETON_PRODUCTS_QTY);
 };
 
 export const useProductSelection = () => {
-    const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    const [promoCode, setPromoCode] = useState('');
+    const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(
+        SubscriptionSource.CRYPTO
+    );
     const [selectedPlanId, setSelectedPlanId] = useState('');
 
-    const { data: proPlans, isLoading, isError } = useProPlans(promoCode);
+    const { data: proPlans, isLoading, isError } = useProPlans(selectedSource);
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
-    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
-
-    const { verifiedPromoCode } = proPlans ?? {};
     const displayPlans = getFilteredDisplayPlans(proPlans);
-    const productsForRender = getProductsForRender(displayPlans, isCrypto);
+    const productsForRender = getProductsForRender(displayPlans);
 
     useEffect(() => {
         if (productsForRender.length < 1 || !productsForRender[0].displayPrice) {
@@ -57,11 +48,10 @@ export const useProductSelection = () => {
     return {
         plans: displayPlans,
         productsForRender,
+        selectedSource,
         selectedPlanId,
-        promoCode,
-        setPromoCode: (newPromo: string) => setPromoCode(newPromo.toLowerCase()),
-        verifiedPromoCode,
-        setSelectedPlanId,
-        isLoading
+        onSourceSelect: setSelectedSource,
+        onPlanIdSelect: setSelectedPlanId,
+        isSelectionLoading: isLoading
     };
 };

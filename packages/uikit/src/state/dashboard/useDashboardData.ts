@@ -58,7 +58,7 @@ export function useDashboardData() {
                     fetchResult = await getDashboardData(queryToFetch, {
                         currency: fiat,
                         lang: language,
-                        token: await sdk.subscriptionStrategy.getToken()
+                        token: await sdk.subscriptionService.getToken()
                     });
                 }
 

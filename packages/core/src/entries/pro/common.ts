@@ -1,9 +1,10 @@
-import { APIConfig } from '../apis';
 import { RecipientData } from '../send';
 import { TonWalletStandard } from '../wallet';
 import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
 import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
+import { SubscriptionSource } from '../../pro';
+import { SubscriptionStrategy } from './subscription';
 
 export interface IProStateWallet {
     publicKey: string;
@@ -14,7 +15,7 @@ export interface IDisplayPlan {
     id: string;
     displayName: string;
     displayPrice: string;
-    subscriptionPeriod?: string;
+    subscriptionPeriod: string;
     formattedDisplayPrice: string;
 }
 
@@ -56,17 +57,11 @@ export interface IConfirmState {
 export interface ISubscriptionFormData {
     wallet?: IProStateWallet;
     tempToken: string;
-    promoCode?: string;
     selectedPlan: IDisplayPlan;
 }
 
-export interface ICryptoStrategyConfig {
-    api: APIConfig;
-    onProConfirmOpen: (p?: {
-        confirmState: IConfirmState | null;
-        onConfirm?: (success?: boolean) => void;
-        onCancel?: () => void;
-    }) => void;
+export interface ISubscriptionServiceConfig {
+    initialStrategyMap?: Map<SubscriptionSource, SubscriptionStrategy>;
 }
 
 export interface IWalletAuth {
@@ -81,11 +76,6 @@ export interface ITokenizedWalletAuth extends IWalletAuth {
 export interface ITelegramAuth {
     type: AuthTypes.TELEGRAM;
 }
-
-export type NormalizedProPlans = {
-    plans: IDisplayPlan[] | undefined;
-    verifiedPromoCode: string | undefined;
-};
 
 export interface ISupportData {
     url: string;

@@ -166,23 +166,15 @@ export const getProServiceTiers = async (lang?: Language | undefined, promoCode?
     return items;
 };
 
-interface IProServiceInvoiceData {
-    tierId: number;
-    promoCode?: string;
-}
-
 type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };
 
 export const createProServiceInvoice = async (
     tempToken: string,
-    data: IProServiceInvoiceData
+    tierId: number
 ): Promise<ProServiceInvoiceResponse> => {
-    const { promoCode, tierId } = data;
-
     try {
         const invoice = await InvoicesService.createInvoice(`Bearer ${tempToken}`, {
-            tier_id: tierId,
-            promo_code: promoCode
+            tier_id: tierId
         });
 
         return {

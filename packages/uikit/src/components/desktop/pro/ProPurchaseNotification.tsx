@@ -1,4 +1,4 @@
-import { FC, useId } from 'react';
+import { FC, useId, useMemo } from 'react';
 import { styled } from 'styled-components';
 
 import {
@@ -7,14 +7,12 @@ import {
     NotificationFooter,
     NotificationFooterPortal
 } from '../../Notification';
-import { useDisclosure } from '../../../hooks/useDisclosure';
 import { useTranslation } from '../../../hooks/translation';
 import { useProPurchaseController } from '../../../hooks/pro/useProPurchaseController';
 import { handleSubmit } from '../../../libs/form';
 import { ProSubscriptionLightHeader } from '../../pro/ProSubscriptionLightHeader';
 import { ProActiveWallet } from '../../pro/ProActiveWallet';
 import { ProChooseSubscriptionPlan } from '../../pro/ProChooseSubscriptionPlan';
-import { ProPromoCodeInput } from '../../pro/ProPromoCodeInput';
 import { ProFeaturesList } from '../../pro/ProFeaturesList';
 import { Button } from '../../fields/Button';
 import { Body3, Label2 } from '../../Text';
@@ -22,6 +20,12 @@ import { ProLegalNote } from '../../pro/ProLegalNote';
 import { useProAuthNotification } from '../../modals/ProAuthNotificationControlled';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
+import { ProChoosePaymentMethod } from '../../pro/ProChoosePaymentMethod';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { useAppSdk } from '../../../hooks/appSdk';
+import { useProductSelection } from '../../../hooks/pro/useProductSelection';
+import { useAtomValue } from '../../../libs/useAtom';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
@@ -49,21 +53,55 @@ type ContentProps = Pick<IProPurchaseNotificationProps, 'onClose'>;
 export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCurrentClose }) => {
     const formId = useId();
     const { t } = useTranslation();
-    const { states, methods } = useProPurchaseController();
+    const sdk = useAppSdk();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
-    const { isOpen: isPromoShown, onOpen: showPromo } = useDisclosure(false);
+    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
 
-    const { isCrypto, isLoading, isLoggingOut, promoCode, productsForRender, verifiedPromoCode } =
-        states;
+    const { states, methods } = useProPurchaseController();
+    const { onLogout, onManage, onPurchase } = methods;
+    const { isPurchasing, isManageLoading, isLoggingOut } = states;
 
-    const { onSubmit, onLogout, setPromoCode, selectedPlanId, setSelectedPlanId, onManage } =
-        methods;
+    const {
+        plans,
+        selectedSource,
+        selectedPlanId,
+        onPlanIdSelect,
+        onSourceSelect,
+        productsForRender,
+        isSelectionLoading
+    } = useProductSelection();
+
+    const isGlobalLoading = isSelectionLoading || isPurchasing || isLoggingOut || isManageLoading;
 
     const handleDisconnect = async () => {
         await onLogout();
         onCurrentClose();
         onProAuthOpen();
     };
+
+    const handleSourceSelection = (source: SubscriptionSource) => {
+        if (isGlobalLoading) return;
+
+        onSourceSelect(source);
+    };
+
+    const onSubmit = async () => {
+        const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
+
+        if (!targetAuth) return;
+        if (!selectedPlan) return;
+
+        await onPurchase({
+            selectedPlan,
+            wallet: targetAuth.wallet,
+            tempToken: targetAuth.tempToken
+        });
+    };
+
+    const availableSources = useMemo(
+        () => sdk.subscriptionService.getAvailableSources(),
+        [sdk.subscriptionService]
+    );
 
     return (
         <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
@@ -78,23 +116,20 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
                 onDisconnect={handleDisconnect}
             />
 
+            {availableSources.length > 1 && (
+                <ProChoosePaymentMethod
+                    isLoading={isGlobalLoading}
+                    sources={availableSources}
+                    selectedSource={selectedSource}
+                    onSourceSelect={handleSourceSelection}
+                />
+            )}
+
             <ProChooseSubscriptionPlan
-                isEnterPromoVisible={isCrypto && !isPromoShown}
-                onPromoInputShow={showPromo}
-                isLoading={isLoading}
+                isLoading={isGlobalLoading}
                 selectedPlanId={selectedPlanId}
-                onPlanIdSelection={setSelectedPlanId}
+                onPlanIdSelection={onPlanIdSelect}
                 productsForRender={productsForRender}
-                promoCodeNode={
-                    isCrypto &&
-                    isPromoShown && (
-                        <ProPromoCodeInput
-                            value={promoCode}
-                            onChange={setPromoCode}
-                            promoCode={verifiedPromoCode}
-                        />
-                    )
-                }
             />
 
             <ProFeaturesList />
@@ -108,11 +143,12 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
                             size="large"
                             type="submit"
                             form={formId}
-                            loading={isLoading}
+                            loading={isGlobalLoading}
                         >
                             <Label2>{t('continue_with_tonkeeper_pro')}</Label2>
                         </Button>
-                        <ProLegalNote onManage={onManage} />
+
+                        <ProLegalNote selectedSource={selectedSource} onManage={onManage} />
                     </PurchaseButtonWrapper>
                 </NotificationFooter>
             </NotificationFooterPortal>

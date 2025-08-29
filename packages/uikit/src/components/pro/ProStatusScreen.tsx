@@ -4,7 +4,6 @@ import {
     isIosAutoRenewableSubscription,
     isIosCanceledSubscription,
     isIosExpiredSubscription,
-    isIosStrategy,
     isTelegramSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -50,7 +49,7 @@ export const ProStatusScreen = () => {
     } = useManageSubscription();
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
-    const isIosEnvironment = isIosStrategy(sdk.subscriptionStrategy);
+    const isIosEnvironment = sdk.targetEnv === 'mobile' || sdk.targetEnv === 'tablet';
 
     const isTelegram = isTelegramSubscription(subscription);
 
@@ -99,7 +98,13 @@ export const ProStatusScreen = () => {
             <ProStatusDetailsList />
 
             {isIosAutoRenewable && (
-                <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
+                <Body3Styled>
+                    {t(
+                        isIosAutoRenewable
+                            ? 'subscription_renews_automatically'
+                            : 'subscription_renews_crypto'
+                    )}
+                </Body3Styled>
             )}
 
             <ButtonsBlockStyled>

@@ -31,6 +31,8 @@ import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
 import { CountryInfo } from './plugins/country-info-plugin';
+import { SubscriptionService } from '@tonkeeper/core/SubscriptionService';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -92,7 +94,9 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     keychain = new KeychainCapacitor(this.biometry, this.storage);
 
-    subscriptionStrategy = new IosSubscriptionStrategy(this.storage);
+    subscriptionService = new SubscriptionService(this.storage, {
+        initialStrategyMap: new Map([[SubscriptionSource.IOS, new IosSubscriptionStrategy()]])
+    });
 
     constructor() {
         super(capacitorStorage);

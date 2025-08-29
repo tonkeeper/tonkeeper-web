@@ -2,13 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    IDisplayPlan,
     IIosPurchaseResult,
     IOriginalTransactionInfo,
-    ISupportData,
     isIosStrategy,
     isPaidActiveSubscription,
     ISubscriptionFormData,
-    NormalizedProPlans,
+    ISupportData,
     ProSubscription,
     PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
@@ -38,18 +38,22 @@ import { useActiveApi, useActiveConfig } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
     const platform = useAppTargetEnv();
     const config = useActiveConfig();
 
-    return useQuery<boolean, Error>([QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id], async () => {
-        const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-        const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
+    return useQuery<boolean, Error>(
+        [QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id],
+        async () => {
+            const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
+            const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
 
-        return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
-    });
+            return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
+        }
+    );
 };
 
 export const useSupport = () => {
@@ -59,7 +63,7 @@ export const useSupport = () => {
 
     return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, subscription?.valid],
-        async () => getProSupportUrl(await sdk.subscriptionStrategy.getToken()),
+        async () => getProSupportUrl(await sdk.subscriptionService.getToken()),
         {
             initialData: {
                 url: mainnetConfig.directSupportUrl ?? '',
@@ -87,11 +91,7 @@ export const useProState = () => {
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            if (!sdk.subscriptionStrategy) {
-                throw new Error('Missing SubscriptionStrategy');
-            }
-
-            const subscription = await sdk.subscriptionStrategy.getSubscription(
+            const subscription = await sdk.subscriptionService.getSubscription(
                 subscriptionFormTempAuth$?.value?.tempToken ?? null
             );
 
@@ -114,11 +114,13 @@ export const useCurrentSubscriptionInfo = () => {
     return useQuery<IIosPurchaseResult[], Error>(
         [QueryKey.currentIosSubscriptionInfo],
         async () => {
-            if (!isIosStrategy(sdk.subscriptionStrategy)) {
+            const iosStrategy = sdk.subscriptionService.getStrategy(SubscriptionSource.IOS);
+
+            if (!isIosStrategy(iosStrategy)) {
                 throw new Error('This is not an iOS subscription strategy');
             }
 
-            const result = await sdk.subscriptionStrategy.getCurrentSubscriptionInfo();
+            const result = await iosStrategy.getCurrentSubscriptionInfo();
 
             return result || [];
         }
@@ -129,11 +131,13 @@ export const useManageSubscription = () => {
     const sdk = useAppSdk();
 
     return useMutation<void, Error, void>(async () => {
-        if (!isIosStrategy(sdk.subscriptionStrategy)) {
+        const iosStrategy = sdk.subscriptionService.getStrategy(SubscriptionSource.IOS);
+
+        if (!isIosStrategy(iosStrategy)) {
             throw new Error('This is not an iOS subscription strategy');
         }
 
-        await sdk.subscriptionStrategy.manageSubscriptions();
+        await iosStrategy.manageSubscriptions();
     });
 };
 
@@ -210,26 +214,22 @@ export const useProLogout = () => {
     const client = useQueryClient();
 
     return useMutation(async () => {
-        await sdk.subscriptionStrategy.logout();
+        await sdk.subscriptionService.logout();
 
         await client.invalidateQueries([QueryKey.pro]);
     });
 };
 
-export const useProPlans = (promoCode?: string) => {
+export const useProPlans = (source: SubscriptionSource) => {
     const sdk = useAppSdk();
     const { data: lang } = useUserLanguage();
 
-    return useQuery<NormalizedProPlans, Error>(
-        [QueryKey.pro, QueryKey.plans, lang, promoCode ?? null],
-        async () => {
-            const strategy = sdk.subscriptionStrategy;
-
-            if (!strategy) {
-                throw new Error('pro_subscription_load_failed');
-            }
-
-            return strategy.getAllProductsInfo(lang, promoCode);
+    return useQuery<IDisplayPlan[], Error>(
+        [QueryKey.pro, QueryKey.plans, lang, source],
+        async () => sdk.subscriptionService.getAllProductsInfo(source, lang),
+        {
+            initialData: [],
+            staleTime: 0
         }
     );
 };
@@ -240,11 +240,13 @@ export const useOriginalTransactionInfo = () => {
     return useQuery<IOriginalTransactionInfo | null, Error>(
         [QueryKey.originalTransactionId],
         async () => {
-            if (!isIosStrategy(sdk.subscriptionStrategy)) {
+            const iosStrategy = sdk.subscriptionService.getStrategy(SubscriptionSource.IOS);
+
+            if (!isIosStrategy(iosStrategy)) {
                 throw new Error('This is not an iOS subscription strategy');
             }
 
-            const originalTxInfo = await sdk.subscriptionStrategy.getOriginalTransactionId();
+            const originalTxInfo = await iosStrategy.getOriginalTransactionId();
 
             return originalTxInfo || null;
         }
@@ -256,11 +258,8 @@ export const useProPurchaseMutation = () => {
     const client = useQueryClient();
 
     return useMutation<PurchaseStatuses, Error, ISubscriptionFormData>(async formData => {
-        if (!sdk.subscriptionStrategy) {
-            throw new Error('Missing subscription strategy!');
-        }
-
-        const status = await sdk.subscriptionStrategy.subscribe(formData);
+        // TODO Add source
+        const status = await sdk.subscriptionService.subscribe(SubscriptionSource.CRYPTO, formData);
 
         if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {
             await client.invalidateQueries([QueryKey.pro]);
@@ -283,12 +282,9 @@ export const useActivateTrialMutation = () => {
             throw new Error('Pro trial tg bot id is not set');
         }
 
-        const token = await startProServiceTrial(
-            config.pro_trial_tg_bot_id,
-            language
-        );
+        const token = await startProServiceTrial(config.pro_trial_tg_bot_id, language);
 
-        await sdk.subscriptionStrategy.activateTrial(token);
+        await sdk.subscriptionService.activateTrial(token);
         await client.invalidateQueries([QueryKey.pro]);
 
         return token;

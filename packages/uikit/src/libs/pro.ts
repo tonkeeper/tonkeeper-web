@@ -6,6 +6,7 @@ export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
         id: String(index),
         displayName: '',
         displayPrice: '',
+        subscriptionPeriod: '',
         formattedDisplayPrice: ''
     }));
 

@@ -1,4 +1,4 @@
-import { FC, useId } from 'react';
+import { FC, useId, useMemo } from 'react';
 import { styled } from 'styled-components';
 
 import {
@@ -24,6 +24,11 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { useRate } from '../../../state/rates';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
+import { useAppContext } from '../../../hooks/appContext';
+import { getFiatEquivalent } from '../../../hooks/balance';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -65,7 +70,12 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
-    const { data: products, isError, isLoading: isProPlanLoading, refetch } = useProPlans();
+    const {
+        data: displayPlans,
+        isError,
+        isLoading: isProPlanLoading,
+        refetch
+    } = useProPlans(SubscriptionSource.CRYPTO);
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
     const handleProAuth = () => {
@@ -87,7 +97,6 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     };
 
     const { removeButtonsBlock } = onOpenProps ?? {};
-    const displayPlans = products?.plans ?? [];
     const isButtonsBlockVisible = !removeButtonsBlock && !isValidSubscription(subscription);
 
     return (
@@ -128,11 +137,24 @@ interface IButtonBlock {
 
 const ButtonsBlock: FC<IButtonBlock> = props => {
     const { formId, onTrial, className, isError, isLoading, displayPlans } = props;
+
+    const { fiat } = useAppContext();
+    const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
     const { t } = useTranslation();
 
     const filteredPlan = displayPlans?.filter(p => p.formattedDisplayPrice !== '-')?.[0];
 
-    const { formattedDisplayPrice, subscriptionPeriod } = filteredPlan || {};
+    const { displayPrice, subscriptionPeriod } = filteredPlan || {};
+
+    const fiatEquivalent: string = useMemo(
+        () =>
+            getFiatEquivalent({
+                amount: displayPrice,
+                fiat,
+                ratePrice: rate?.prices
+            }),
+        [displayPrice, fiat, rate?.prices]
+    );
 
     return (
         <div className={className}>
@@ -142,11 +164,11 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
                 size="large"
                 type="submit"
                 form={formId}
-                loading={isLoading}
+                loading={!isError && (!fiatEquivalent || isLoading || isRateLoading)}
             >
                 <Label2>
-                    {t(isError ? 'try_again' : 'continue_for')}
-                    {!isError && ` ${formattedDisplayPrice} / ${subscriptionPeriod}`}
+                    {t(isError ? 'try_again' : 'continue_from')}
+                    {!isError && ` ${fiatEquivalent} / ${t(subscriptionPeriod)}`}
                 </Label2>
                 {!isError && <Body3>{t('restore_subscription')}</Body3>}
             </SubmitButtonStyled>
