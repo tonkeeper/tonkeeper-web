@@ -48,7 +48,7 @@ export const useTrialAvailability = () => {
         [QueryKey.pro, QueryKey.trialAvailability, config.pro_trial_tg_bot_id],
         async () => {
             const isUsedTrial = Boolean(await sdk.storage.get(AppKey.PRO_USED_TRIAL));
-            const botIdIsSet = config.pro_trial_tg_bot_id !== undefined;
+            const botIdIsSet = !!config.pro_trial_tg_bot_id;
 
             return platform !== 'tablet' && !isUsedTrial && botIdIsSet;
         }
