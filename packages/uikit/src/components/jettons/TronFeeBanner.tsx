@@ -389,7 +389,9 @@ const TableRowTemplate: FC<{
             {transfersNumber === undefined ? (
                 <TextSkeleton />
             ) : (
-                <TableFirsLineText>{transfersNumber}</TableFirsLineText>
+                <TableFirsLineText>
+                    {t('tron_fee_table_transfers', { transfers: transfersNumber })}
+                </TableFirsLineText>
             )}
             {formattedBalance === undefined ? (
                 <TextSkeleton />
