@@ -115,18 +115,20 @@ export const MobileProHomePage = () => {
                 </MenuItem>
                 <Divider />
                 <HideOnReview>
-                    <MenuItem to={AppRoute.purchases}>
-                        <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
-                    <MenuItem to={AppRoute.dns}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.NFT}>
+                        <MenuItem to={AppRoute.purchases}>
+                            <SaleBadgeIcon />
+                            <Label2>{t('wallet_aside_collectibles')}</Label2>
+                            <ChevronRightIcon />
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem to={AppRoute.dns}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
+                            <ChevronRightIcon />
+                        </MenuItem>
+                        <Divider />
+                    </IfFeatureEnabled>
                     <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                         {!isReadOnly && !isTestnet && (
                             <>
@@ -155,12 +157,14 @@ export const MobileProHomePage = () => {
                             <Divider />
                         </>
                     )}
-                    {canUseBattery && (
-                        <>
-                            <BatterySettingsListItem />
-                            <Divider />
-                        </>
-                    )}
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.BATTERY}>
+                        {canUseBattery && (
+                            <>
+                                <BatterySettingsListItem />
+                                <Divider />
+                            </>
+                        )}
+                    </IfFeatureEnabled>
                 </HideOnReview>
                 <MenuItem to={AppRoute.walletSettings}>
                     <SettingsSmoothIcon />

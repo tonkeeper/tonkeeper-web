@@ -32,6 +32,7 @@ export interface TonendpointConfig {
         disable_exchange_methods: boolean;
         disable_dapps: boolean;
         disable_usde: boolean;
+        disable_nfts: boolean;
         disable_RUB: boolean;
     };
 
@@ -116,6 +117,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
         disable_exchange_methods: false,
         disable_dapps: false,
         disable_usde: false,
+        disable_nfts: false,
         disable_RUB: false
     },
     ton_connect_bridge: 'https://bridge.tonapi.io',

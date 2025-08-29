@@ -134,6 +134,7 @@ export enum FLAGGED_FEATURE {
     ONRAMP = 'onramp',
     DAPPS_LIST = 'dapps_list',
     ETHENA = 'ethena',
+    NFT = 'nft',
     RUB = 'rub'
 }
 const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = {
@@ -145,6 +146,7 @@ const flagsMapping: Record<FLAGGED_FEATURE, keyof TonendpointConfig['flags']> = 
     onramp: 'disable_exchange_methods',
     dapps_list: 'disable_dapps',
     ethena: 'disable_usde',
+    nft: 'disable_nfts',
     rub: 'disable_RUB'
 };
 

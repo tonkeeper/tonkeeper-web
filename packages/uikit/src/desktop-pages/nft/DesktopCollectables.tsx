@@ -3,6 +3,9 @@ import { useWalletFilteredNftList } from '../../state/nft';
 import { useMemo } from 'react';
 import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { DesktopNFTS } from './DesktopNft';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { Navigate } from '../../components/shared/Navigate';
+import { AppRoute } from '../../libs/routes';
 
 export const DesktopCollectables = () => {
     const { t } = useTranslation();
@@ -16,6 +19,11 @@ export const DesktopCollectables = () => {
             ),
         [nfts]
     );
+
+    const isEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
+    if (!isEnabled) {
+        return <Navigate to={AppRoute.home} />;
+    }
 
     return (
         <DesktopNFTS

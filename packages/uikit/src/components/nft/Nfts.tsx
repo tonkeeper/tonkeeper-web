@@ -8,6 +8,7 @@ import { toDaysLeft } from '../../hooks/dateFormat';
 import { FireBadgeIcon, SaleIcon } from '../Icon';
 import { NftCollectionBody3, NftHeaderLabel2 } from './NftHeader';
 import { useNftDNSExpirationDate } from '../../state/nft';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const Grid = styled.div`
     display: grid;
@@ -149,6 +150,12 @@ export const NftsList: FC<{ nfts: NFT[] | undefined; className?: string }> = ({
     className
 }) => {
     const sdk = useAppSdk();
+    const isEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
+
+    if (!isEnabled) {
+        return null;
+    }
+
     return (
         <Grid className={className}>
             {(nfts ?? []).map(item => {

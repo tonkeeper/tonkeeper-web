@@ -137,22 +137,24 @@ export const WalletAsideMenu = () => {
             </NavLink>
 
             <HideOnReview>
-                <NavLink to={AppRoute.purchases} disableMobileAnimation onClick={hideBrowser}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
-                            <SaleBadgeIcon />
-                            <Label2>{t('wallet_aside_collectibles')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-                <NavLink to={AppRoute.dns} disableMobileAnimation onClick={hideBrowser}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
-                            <SparkIcon />
-                            <Label2>{t('wallet_aside_domains')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.NFT}>
+                    <NavLink to={AppRoute.purchases} disableMobileAnimation onClick={hideBrowser}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                                <SaleBadgeIcon />
+                                <Label2>{t('wallet_aside_collectibles')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                    <NavLink to={AppRoute.dns} disableMobileAnimation onClick={hideBrowser}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                                <SparkIcon />
+                                <Label2>{t('wallet_aside_domains')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                </IfFeatureEnabled>
                 <SwapItem />
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (

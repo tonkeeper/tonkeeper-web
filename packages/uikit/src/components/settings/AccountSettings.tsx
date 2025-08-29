@@ -30,6 +30,7 @@ import { useCanSeeBattery } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -41,6 +42,8 @@ const SingleAccountSettings = () => {
     const canUseBattery = useCanSeeBattery();
     const twoFAEnabled = useCanViewTwoFA();
     const canUseTron = useCanUseTronForActiveWallet();
+
+    const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -134,7 +137,7 @@ const SingleAccountSettings = () => {
             });
         }
 
-        if (nft?.length) {
+        if (nft?.length && isNftEnabled) {
             items.push({
                 name: t('settings_collectibles_list'),
                 icon: <SaleBadgeIcon />,
@@ -172,7 +175,7 @@ const SingleAccountSettings = () => {
         }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron]);
+    }, [t, navigate, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron, isNftEnabled]);
 
     return (
         <>
@@ -198,6 +201,8 @@ const MultipleAccountSettings = () => {
     const wallet = account.activeTonWallet;
 
     const canUseTron = useCanUseTronForActiveWallet();
+
+    const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -293,7 +298,7 @@ const MultipleAccountSettings = () => {
             });
         }
 
-        if (nft?.length) {
+        if (nft?.length && isNftEnabled) {
             items.push({
                 name: t('settings_collectibles_list'),
                 icon: <SaleBadgeIcon />,
@@ -336,7 +341,18 @@ const MultipleAccountSettings = () => {
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron]);
+    }, [
+        t,
+        navigate,
+        wallet,
+        account,
+        jettons,
+        nft,
+        twoFAEnabled,
+        canUseBattery,
+        canUseTron,
+        isNftEnabled
+    ]);
 
     return (
         <>
