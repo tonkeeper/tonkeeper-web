@@ -190,7 +190,7 @@ export const TronFeeBanner = () => {
         );
     }
 
-    const showDropDown = theme.proDisplayType === 'desktop';
+    const showDropDown = theme.displayType === 'full-width' && theme.proDisplayType === 'desktop';
 
     return (
         <>
