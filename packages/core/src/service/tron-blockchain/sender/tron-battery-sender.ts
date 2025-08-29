@@ -69,8 +69,8 @@ export class TronBatterySender implements ITronSender {
             )
         );
 
-        /* const bandwidhAvailable = await this.tronApi.getAccountBandwidth(this.walletInfo.address);
-      resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);*/
+        const bandwidhAvailable = await this.tronApi.getAccountBandwidth(this.walletInfo.address);
+        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
 
         const estimation = await this.batteryApi.tronEstimate({
             wallet: this.walletInfo.address,

@@ -151,21 +151,27 @@ export class TronApi {
 
     public getAccountBandwidth = decorateApi(async (address: string): Promise<number> => {
         const res = await (
-            await fetch(`${this.tronGridBaseUrl}/v1/accounts/${address}`, {
-                headers: this.headers
+            await fetch(`${this.tronGridBaseUrl}/wallet/getaccountnet`, {
+                headers: this.headers,
+                method: 'post',
+                body: JSON.stringify({
+                    address,
+                    visible: true
+                })
             })
         ).json();
 
-        if (!res?.success || !res?.data) {
-            throw new Error('Fetch tron balances failed');
-        }
-
-        const info = res?.data?.[0];
-        if (!info) {
+        if (!res.freeNetLimit) {
             return 0;
         }
 
-        return info.free_net_usage || 0;
+        const freeNetLimit = Number(res.freeNetLimit);
+        const freeNetUsed = Number(res.freeNetUsed ?? 0);
+        if (!isFinite(freeNetLimit) || !isFinite(freeNetUsed)) {
+            return 0;
+        }
+
+        return Math.max(0, freeNetLimit - freeNetUsed);
     });
 
     public estimateResources = decorateApi(

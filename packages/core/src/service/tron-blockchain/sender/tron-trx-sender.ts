@@ -62,6 +62,9 @@ export class TronTrxSender implements ITronSender {
             )
         );
 
+        const bandwidhAvailable = await this.tronApi.getAccountBandwidth(this.walletInfo.address);
+        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
+
         const extra = await this.getBurnTrxAmountForResources(resources);
         const fee = {
             type: 'tron-asset' as const,
