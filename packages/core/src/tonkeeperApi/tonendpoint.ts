@@ -172,7 +172,19 @@ export class Tonendpoint {
 
     private tonkeeperApiUrl = defaultTonendpointConfig.tonkeeper_api_url;
 
-    private readonly bootPath = 'https://boot.tonkeeper.com';
+    private readonly primaryBootPath = 'https://boot.tonkeeper.com';
+
+    private readonly fallbackBootPath = 'https://block.tonkeeper.com';
+
+    private switchToFallbackBootPath = false;
+
+    private get bootPath() {
+        if (this.switchToFallbackBootPath) {
+            return this.fallbackBootPath;
+        }
+
+        return this.primaryBootPath;
+    }
 
     constructor({
         lang,
@@ -186,7 +198,18 @@ export class Tonendpoint {
     }
 
     boot = async (network: Network): Promise<TonendpointConfig> => {
-        const response = await fetch(`${this.bootPath}/keys?${this.toSearchParams({ network })}`);
+        let response;
+        try {
+            response = await this.fetchBoot(network);
+        } catch (e) {
+            if (this.switchToFallbackBootPath) {
+                throw e;
+            }
+
+            console.error(e);
+            this.switchToFallbackBootPath = true;
+            response = await this.fetchBoot(network);
+        }
 
         const result: TonendpointConfig = await response.json();
         if (result.tonkeeper_api_url) {
@@ -210,6 +233,10 @@ export class Tonendpoint {
     appsPopular = (): Promise<Recommendations> => {
         return this.GET('/apps/popular');
     };
+
+    private fetchBoot(network: Network) {
+        return fetch(`${this.bootPath}/keys?${this.toSearchParams({ network })}`);
+    }
 
     private GET = async <Data>(path: string): Promise<Data> => {
         const response = await fetch(`${this.tonkeeperApiUrl}${path}?${this.toSearchParams()}`);
