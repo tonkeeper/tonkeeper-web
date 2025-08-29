@@ -4,15 +4,15 @@ import { TronAsset } from '../../../entries/crypto/asset/tron-asset';
 import { TronSigner } from '../../../entries/signer';
 import { TronWallet } from '../../../entries/tron/tron-wallet';
 import { TronEstimation } from '../../../entries/send';
-import { ITronSender } from './I-tron-sender';
+import { BaseTronSender, ITronSender } from './I-tron-sender';
 
 import { TronTrc20Encoder } from '../encoder/tron-trc20-encoder';
 import { TRON_TRX_ASSET } from '../../../entries/crypto/asset/constants';
 import { TransactionFeeTronAsset } from '../../../entries/crypto/transaction-fee';
 import { TronNotEnoughBalanceEstimationError } from '../../../errors/TronNotEnoughBalanceEstimationError';
 
-export class TronTrxSender implements ITronSender {
-    private trc20Encoder: TronTrc20Encoder;
+export class TronTrxSender extends BaseTronSender implements ITronSender {
+    protected trc20Encoder: TronTrc20Encoder;
 
     public static async getBurnTrxAmountForResources(tronApi: TronApi, resources: TronResources) {
         const resourcesTrxPrice = await tronApi.getResourcePrices();
@@ -28,12 +28,13 @@ export class TronTrxSender implements ITronSender {
     }
 
     constructor(
-        private tronApi: TronApi,
-        private walletInfo: TronWallet,
+        protected tronApi: TronApi,
+        protected tronWallet: TronWallet,
         private tronSigner: TronSigner
     ) {
+        super();
         this.trc20Encoder = new TronTrc20Encoder({
-            walletAddress: this.walletInfo.address,
+            walletAddress: this.tronWallet.address,
             tronGridBaseUrl: this.tronApi.tronGridBaseUrl
         });
     }
@@ -46,6 +47,8 @@ export class TronTrxSender implements ITronSender {
             await this.trc20Encoder.encodeTransferTransaction(to, assetAmount)
         );
 
+        await this.checkBandwidthIsEnough(estimation.resources.bandwidth, signedTx.raw_data_hex);
+
         await this.tronApi.broadcastSignedTransaction(signedTx);
     }
 
@@ -56,14 +59,7 @@ export class TronTrxSender implements ITronSender {
         fee: TransactionFeeTronAsset;
         resources: TronResources;
     }> {
-        const resources = await this.tronApi.applyResourcesSafetyMargin(
-            await this.tronApi.estimateResources(
-                await this.trc20Encoder.encodeTransferEstimateRequest(to, assetAmount)
-            )
-        );
-
-        const bandwidhAvailable = await this.tronApi.getAccountBandwidth(this.walletInfo.address);
-        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
+        const resources = await this.estimateTransferResources(to, assetAmount);
 
         const extra = await this.getBurnTrxAmountForResources(resources);
         const fee = {
@@ -86,7 +82,7 @@ export class TronTrxSender implements ITronSender {
         trxRequired: AssetAmount<TronAsset>,
         fee?: TransactionFeeTronAsset
     ) {
-        const balance = await this.tronApi.getBalances(this.walletInfo.address);
+        const balance = await this.tronApi.getBalances(this.tronWallet.address);
         if (trxRequired.weiAmount.gt(balance.trx)) {
             throw new TronNotEnoughBalanceEstimationError('Not enough balance', fee);
         }

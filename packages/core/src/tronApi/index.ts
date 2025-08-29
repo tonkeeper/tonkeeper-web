@@ -208,18 +208,7 @@ export class TronApi {
                     throw new Error('Transaction data missing in response');
                 }
 
-                /**
-                 * https://developers.tron.network/docs/faq#5-how-to-calculate-the-bandwidth-and-energy-consumed-when-callingdeploying-a-contract
-                 */
-                const DATA_HEX_PROTOBUF_EXTRA = 9;
-                const MAX_RESULT_SIZE_IN_TX = 64;
-                const A_SIGNATURE = 67;
-
-                const bandwidth =
-                    Buffer.from(response.transaction.raw_data_hex, 'hex').length +
-                    DATA_HEX_PROTOBUF_EXTRA +
-                    MAX_RESULT_SIZE_IN_TX +
-                    A_SIGNATURE;
+                const bandwidth = this.estimateBandwidth(response.transaction.raw_data_hex);
 
                 return { energy, bandwidth };
             } catch (error) {
@@ -228,6 +217,22 @@ export class TronApi {
             }
         }
     );
+
+    public estimateBandwidth(transactionRawDataHex: string) {
+        /**
+         * https://developers.tron.network/docs/faq#5-how-to-calculate-the-bandwidth-and-energy-consumed-when-callingdeploying-a-contract
+         */
+        const DATA_HEX_PROTOBUF_EXTRA = 9;
+        const MAX_RESULT_SIZE_IN_TX = 64;
+        const A_SIGNATURE = 67;
+
+        return (
+            Buffer.from(transactionRawDataHex, 'hex').length +
+            DATA_HEX_PROTOBUF_EXTRA +
+            MAX_RESULT_SIZE_IN_TX +
+            A_SIGNATURE
+        );
+    }
 
     public broadcastSignedTransaction = decorateApi(
         async (signedTx: SignedTransaction) => {

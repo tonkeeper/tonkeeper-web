@@ -6,7 +6,7 @@ import { TronWallet } from '../../../entries/tron/tron-wallet';
 import { TronEstimation } from '../../../entries/send';
 import { errorMessage } from '../../../utils/types';
 import { NotEnoughBatteryBalanceError } from '../../../errors/NotEnoughBatteryBalanceError';
-import { ITronSender } from './I-tron-sender';
+import { BaseTronSender, ITronSender } from './I-tron-sender';
 import {
     Configuration as BatteryConfiguration,
     DefaultApi as BatteryApi
@@ -24,12 +24,12 @@ import { AccountsApi } from '../../../tonApiV2';
 import { TronNotEnoughBalanceEstimationError } from '../../../errors/TronNotEnoughBalanceEstimationError';
 import { TonAsset } from '../../../entries/crypto/asset/ton-asset';
 
-export class TronTonSender implements ITronSender {
+export class TronTonSender extends BaseTronSender implements ITronSender {
     public static identifyingComment = 'Tron gas fee';
 
     private batteryApi: BatteryApi;
 
-    private trc20Encoder: TronTrc20Encoder;
+    protected trc20Encoder: TronTrc20Encoder;
 
     private tonTransferOwnFee = AssetAmount.fromRelativeAmount({
         amount: 0.01,
@@ -37,16 +37,17 @@ export class TronTonSender implements ITronSender {
     });
 
     constructor(
-        private tronApi: TronApi,
+        protected tronApi: TronApi,
         private tonApi: APIConfig,
         batteryConfig: BatteryConfiguration,
-        private tronWalletInfo: TronWallet,
+        protected tronWallet: TronWallet,
         private tonWalletInfo: TonWalletStandard,
         private multiTransactionsSigner: MultiTransactionsSigner
     ) {
+        super();
         this.batteryApi = new BatteryApi(batteryConfig);
         this.trc20Encoder = new TronTrc20Encoder({
-            walletAddress: this.tronWalletInfo.address,
+            walletAddress: this.tronWallet.address,
             tronGridBaseUrl: this.tronApi.tronGridBaseUrl
         });
     }
@@ -87,11 +88,16 @@ export class TronTonSender implements ITronSender {
             throw new Error('Tron transaction is not signed');
         }
 
+        await this.checkBandwidthIsEnough(
+            estimation.resources.bandwidth,
+            signedTronTx.raw_data_hex
+        );
+
         try {
             await this.batteryApi.tronSend({
                 tronSendRequest: {
                     tx: Buffer.from(JSON.stringify(signedTronTx!)).toString('base64'),
-                    wallet: this.tronWalletInfo.address,
+                    wallet: this.tronWallet.address,
                     energy: estimation.resources.energy,
                     bandwidth: estimation.resources.bandwidth,
                     instantFeeTx: signedTonTx!.toBoc().toString('base64')
@@ -117,19 +123,10 @@ export class TronTonSender implements ITronSender {
         fee: TransactionFeeTonAssetRelayed;
         resources: TronResources;
     }> {
-        const resources = await this.tronApi.applyResourcesSafetyMargin(
-            await this.tronApi.estimateResources(
-                await this.trc20Encoder.encodeTransferEstimateRequest(to, assetAmount)
-            )
-        );
-
-        const bandwidhAvailable = await this.tronApi.getAccountBandwidth(
-            this.tronWalletInfo.address
-        );
-        resources.bandwidth = Math.max(0, resources.bandwidth - bandwidhAvailable);
+        const resources = await this.estimateTransferResources(to, assetAmount);
 
         const estimation = await this.batteryApi.tronEstimate({
-            wallet: this.tronWalletInfo.address,
+            wallet: this.tronWallet.address,
             ...resources
         });
 
