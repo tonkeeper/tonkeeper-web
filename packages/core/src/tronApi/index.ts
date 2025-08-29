@@ -363,7 +363,7 @@ export class TronApi {
                         asset: TRON_USDT_ASSET
                     });
 
-                    const isScam = item.to === address && assetAmount.relativeAmount.lt(1);
+                    const isScam = item.to === address && assetAmount.relativeAmount.lt(0.01);
 
                     if (options?.filterSpam && isScam) {
                         return null;
