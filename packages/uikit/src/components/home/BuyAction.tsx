@@ -67,15 +67,19 @@ const ActionNotification: FC<{
                 </NotificationHeader>
             </NotificationHeaderPortal>
             <BuyList items={item.items} kind={kind} />
-            <OtherBlock>
-                <OtherLink
-                    onClick={() => config.exchangePostUrl && sdk.openPage(config.exchangePostUrl)}
-                >
-                    {kind === 'buy'
-                        ? t('exchange_modal_other_ways_to_buy')
-                        : t('exchange_other_ways')}
-                </OtherLink>
-            </OtherBlock>
+            {!!config.exchangePostUrl && (
+                <OtherBlock>
+                    <OtherLink
+                        onClick={() =>
+                            config.exchangePostUrl && sdk.openPage(config.exchangePostUrl)
+                        }
+                    >
+                        {kind === 'buy'
+                            ? t('exchange_modal_other_ways_to_buy')
+                            : t('exchange_other_ways')}
+                    </OtherLink>
+                </OtherBlock>
+            )}
         </Block>
     );
 };
