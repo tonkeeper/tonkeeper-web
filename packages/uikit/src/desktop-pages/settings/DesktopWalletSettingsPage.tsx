@@ -7,12 +7,13 @@ import {
     ExitIcon,
     KeyIcon,
     LockIcon,
-    NotificationOutlineIcon, PinIconOutline,
+    NotificationOutlineIcon,
+    PinIconOutline,
     SaleBadgeIcon,
     SwitchIcon,
     TrashBinIcon,
     UnpinIconOutline
-} from "../../components/Icon";
+} from '../../components/Icon';
 import { Body3, Label2, Label2Class } from '../../components/Text';
 import {
     DesktopViewDivider,
@@ -57,8 +58,9 @@ import {
 import { Switch } from '../../components/fields/Switch';
 import { hexToRGBA, hover } from '../../libs/css';
 import { Badge } from '../../components/shared/Badge';
-import { HideOnReview } from '../../components/ios/HideOnReview';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../state/tonendpoint';
 
 const SettingsListBlock = styled.div`
     padding: 0.5rem 0;
@@ -243,14 +245,14 @@ export const DesktopWalletSettingsPage = () => {
                         <Label2>{t('settings_jettons_list')}</Label2>
                     </SettingsListItem>
                 </LinkStyled>
-                <HideOnReview>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.NFT}>
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.nft}>
                         <SettingsListItem>
                             <SaleBadgeIcon />
                             <Label2>{t('settings_collectibles_list')}</Label2>
                         </SettingsListItem>
                     </LinkStyled>
-                </HideOnReview>
+                </IfFeatureEnabled>
                 {notificationsAvailable && (
                     <LinkStyled to={AppRoute.walletSettings + WalletSettingsRoute.notification}>
                         <SettingsListItem>
