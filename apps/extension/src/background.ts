@@ -10,9 +10,28 @@ import {
 } from './libs/service/backgroundDAppService';
 import { handlePopUpConnection } from './libs/service/backgroundPopUpService';
 import { subscriptionProxyNotifications } from './libs/service/backgroundProxyService';
-import { popupManager } from './libs/background/popup-manager';
+import { customPopupManager } from './libs/background/custom-popup-manager';
 
-browser.action.onClicked.addListener(() => popupManager.openPopup('icon-click'));
+async function getIsFullscreen() {
+    try {
+        const win = await browser.windows.getLastFocused();
+        return win?.state === 'fullscreen';
+    } catch {
+        return false;
+    }
+}
+
+browser.runtime.onMessage.addListener(async msg => {
+    if (msg?.type === 'DECIDE_MODE') {
+        const fullscreen = await getIsFullscreen();
+        if (!fullscreen) {
+            customPopupManager.openPopup('icon-click');
+            return { isFullscreen: false };
+        }
+        await customPopupManager.closePopupOpenedByOpener('icon-click');
+        return { isFullscreen: true };
+    }
+});
 
 browser.runtime.onConnect.addListener(port => {
     if (port.name === 'TonkeeperUI') {

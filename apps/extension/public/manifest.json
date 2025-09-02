@@ -6,7 +6,8 @@
     "version": "3.0.0",
     "manifest_version": 3,
     "action": {
-        "default_title": "__MSG_actionTitle__"
+        "default_title": "__MSG_actionTitle__",
+        "default_popup": "index.html?source=default_popup"
     },
     "icons": {
         "16": "logo-16x16.png",

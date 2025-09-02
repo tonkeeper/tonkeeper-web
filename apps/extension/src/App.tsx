@@ -111,9 +111,11 @@ const ExtensionGlobalStyle = createGlobalStyle`
   }
 `;
 
-export const App: FC = () => {
+export const App: FC<{ isPopupInSeparateWindow: boolean }> = ({ isPopupInSeparateWindow }) => {
     const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
     const t = useTWithReplaces(browserT);
+
+    sdk.addWalletPage.isPopupInSeparateWindow = isPopupInSeparateWindow;
 
     const translation = useMemo(() => {
         const client: I18nContext = {
