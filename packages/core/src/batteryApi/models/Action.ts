@@ -27,6 +27,83 @@ import {
     ExtraCurrencyTransferActionToJSON,
     ExtraCurrencyTransferActionToJSONTyped,
 } from './ExtraCurrencyTransferAction';
+import type { DepositStakeAction } from './DepositStakeAction';
+import {
+    DepositStakeActionFromJSON,
+    DepositStakeActionFromJSONTyped,
+    DepositStakeActionToJSON,
+    DepositStakeActionToJSONTyped,
+} from './DepositStakeAction';
+import type { WithdrawStakeAction } from './WithdrawStakeAction';
+import {
+    WithdrawStakeActionFromJSON,
+    WithdrawStakeActionFromJSONTyped,
+    WithdrawStakeActionToJSON,
+    WithdrawStakeActionToJSONTyped,
+} from './WithdrawStakeAction';
+import type { NftItemTransferAction } from './NftItemTransferAction';
+import {
+    NftItemTransferActionFromJSON,
+    NftItemTransferActionFromJSONTyped,
+    NftItemTransferActionToJSON,
+    NftItemTransferActionToJSONTyped,
+} from './NftItemTransferAction';
+import type { NftPurchaseAction } from './NftPurchaseAction';
+import {
+    NftPurchaseActionFromJSON,
+    NftPurchaseActionFromJSONTyped,
+    NftPurchaseActionToJSON,
+    NftPurchaseActionToJSONTyped,
+} from './NftPurchaseAction';
+import type { DepositTokenStakeAction } from './DepositTokenStakeAction';
+import {
+    DepositTokenStakeActionFromJSON,
+    DepositTokenStakeActionFromJSONTyped,
+    DepositTokenStakeActionToJSON,
+    DepositTokenStakeActionToJSONTyped,
+} from './DepositTokenStakeAction';
+import type { SubscriptionAction } from './SubscriptionAction';
+import {
+    SubscriptionActionFromJSON,
+    SubscriptionActionFromJSONTyped,
+    SubscriptionActionToJSON,
+    SubscriptionActionToJSONTyped,
+} from './SubscriptionAction';
+import type { WithdrawStakeRequestAction } from './WithdrawStakeRequestAction';
+import {
+    WithdrawStakeRequestActionFromJSON,
+    WithdrawStakeRequestActionFromJSONTyped,
+    WithdrawStakeRequestActionToJSON,
+    WithdrawStakeRequestActionToJSONTyped,
+} from './WithdrawStakeRequestAction';
+import type { RemoveExtensionAction } from './RemoveExtensionAction';
+import {
+    RemoveExtensionActionFromJSON,
+    RemoveExtensionActionFromJSONTyped,
+    RemoveExtensionActionToJSON,
+    RemoveExtensionActionToJSONTyped,
+} from './RemoveExtensionAction';
+import type { JettonTransferAction } from './JettonTransferAction';
+import {
+    JettonTransferActionFromJSON,
+    JettonTransferActionFromJSONTyped,
+    JettonTransferActionToJSON,
+    JettonTransferActionToJSONTyped,
+} from './JettonTransferAction';
+import type { ContractDeployAction } from './ContractDeployAction';
+import {
+    ContractDeployActionFromJSON,
+    ContractDeployActionFromJSONTyped,
+    ContractDeployActionToJSON,
+    ContractDeployActionToJSONTyped,
+} from './ContractDeployAction';
+import type { JettonBurnAction } from './JettonBurnAction';
+import {
+    JettonBurnActionFromJSON,
+    JettonBurnActionFromJSONTyped,
+    JettonBurnActionToJSON,
+    JettonBurnActionToJSONTyped,
+} from './JettonBurnAction';
 import type { PurchaseAction } from './PurchaseAction';
 import {
     PurchaseActionFromJSON,
@@ -76,48 +153,20 @@ import {
     GasRelayActionToJSON,
     GasRelayActionToJSONTyped,
 } from './GasRelayAction';
-import type { DepositStakeAction } from './DepositStakeAction';
+import type { AddExtensionAction } from './AddExtensionAction';
 import {
-    DepositStakeActionFromJSON,
-    DepositStakeActionFromJSONTyped,
-    DepositStakeActionToJSON,
-    DepositStakeActionToJSONTyped,
-} from './DepositStakeAction';
-import type { WithdrawStakeAction } from './WithdrawStakeAction';
+    AddExtensionActionFromJSON,
+    AddExtensionActionFromJSONTyped,
+    AddExtensionActionToJSON,
+    AddExtensionActionToJSONTyped,
+} from './AddExtensionAction';
+import type { SetSignatureAllowedAction } from './SetSignatureAllowedAction';
 import {
-    WithdrawStakeActionFromJSON,
-    WithdrawStakeActionFromJSONTyped,
-    WithdrawStakeActionToJSON,
-    WithdrawStakeActionToJSONTyped,
-} from './WithdrawStakeAction';
-import type { NftItemTransferAction } from './NftItemTransferAction';
-import {
-    NftItemTransferActionFromJSON,
-    NftItemTransferActionFromJSONTyped,
-    NftItemTransferActionToJSON,
-    NftItemTransferActionToJSONTyped,
-} from './NftItemTransferAction';
-import type { NftPurchaseAction } from './NftPurchaseAction';
-import {
-    NftPurchaseActionFromJSON,
-    NftPurchaseActionFromJSONTyped,
-    NftPurchaseActionToJSON,
-    NftPurchaseActionToJSONTyped,
-} from './NftPurchaseAction';
-import type { SubscriptionAction } from './SubscriptionAction';
-import {
-    SubscriptionActionFromJSON,
-    SubscriptionActionFromJSONTyped,
-    SubscriptionActionToJSON,
-    SubscriptionActionToJSONTyped,
-} from './SubscriptionAction';
-import type { WithdrawStakeRequestAction } from './WithdrawStakeRequestAction';
-import {
-    WithdrawStakeRequestActionFromJSON,
-    WithdrawStakeRequestActionFromJSONTyped,
-    WithdrawStakeRequestActionToJSON,
-    WithdrawStakeRequestActionToJSONTyped,
-} from './WithdrawStakeRequestAction';
+    SetSignatureAllowedActionFromJSON,
+    SetSignatureAllowedActionFromJSONTyped,
+    SetSignatureAllowedActionToJSON,
+    SetSignatureAllowedActionToJSONTyped,
+} from './SetSignatureAllowedAction';
 import type { SmartContractAction } from './SmartContractAction';
 import {
     SmartContractActionFromJSON,
@@ -132,13 +181,6 @@ import {
     ActionSimplePreviewToJSON,
     ActionSimplePreviewToJSONTyped,
 } from './ActionSimplePreview';
-import type { JettonTransferAction } from './JettonTransferAction';
-import {
-    JettonTransferActionFromJSON,
-    JettonTransferActionFromJSONTyped,
-    JettonTransferActionToJSON,
-    JettonTransferActionToJSONTyped,
-} from './JettonTransferAction';
 import type { AuctionBidAction } from './AuctionBidAction';
 import {
     AuctionBidActionFromJSON,
@@ -146,20 +188,6 @@ import {
     AuctionBidActionToJSON,
     AuctionBidActionToJSONTyped,
 } from './AuctionBidAction';
-import type { ContractDeployAction } from './ContractDeployAction';
-import {
-    ContractDeployActionFromJSON,
-    ContractDeployActionFromJSONTyped,
-    ContractDeployActionToJSON,
-    ContractDeployActionToJSONTyped,
-} from './ContractDeployAction';
-import type { JettonBurnAction } from './JettonBurnAction';
-import {
-    JettonBurnActionFromJSON,
-    JettonBurnActionFromJSONTyped,
-    JettonBurnActionToJSON,
-    JettonBurnActionToJSONTyped,
-} from './JettonBurnAction';
 import type { TonTransferAction } from './TonTransferAction';
 import {
     TonTransferActionFromJSON,
@@ -167,6 +195,13 @@ import {
     TonTransferActionToJSON,
     TonTransferActionToJSONTyped,
 } from './TonTransferAction';
+import type { WithdrawTokenStakeRequestAction } from './WithdrawTokenStakeRequestAction';
+import {
+    WithdrawTokenStakeRequestActionFromJSON,
+    WithdrawTokenStakeRequestActionFromJSONTyped,
+    WithdrawTokenStakeRequestActionToJSON,
+    WithdrawTokenStakeRequestActionToJSONTyped,
+} from './WithdrawTokenStakeRequestAction';
 
 /**
  * 
@@ -308,10 +343,40 @@ export interface Action {
     purchase?: PurchaseAction;
     /**
      * 
+     * @type {AddExtensionAction}
+     * @memberof Action
+     */
+    addExtension?: AddExtensionAction;
+    /**
+     * 
+     * @type {RemoveExtensionAction}
+     * @memberof Action
+     */
+    removeExtension?: RemoveExtensionAction;
+    /**
+     * 
+     * @type {SetSignatureAllowedAction}
+     * @memberof Action
+     */
+    setSignatureAllowedAction?: SetSignatureAllowedAction;
+    /**
+     * 
      * @type {GasRelayAction}
      * @memberof Action
      */
     gasRelay?: GasRelayAction;
+    /**
+     * 
+     * @type {DepositTokenStakeAction}
+     * @memberof Action
+     */
+    depositTokenStake?: DepositTokenStakeAction;
+    /**
+     * 
+     * @type {WithdrawTokenStakeRequestAction}
+     * @memberof Action
+     */
+    withdrawTokenStakeRequest?: WithdrawTokenStakeRequestAction;
     /**
      * 
      * @type {ActionSimplePreview}
@@ -351,6 +416,8 @@ export const ActionTypeEnum = {
     SmartContractExec: 'SmartContractExec',
     DomainRenew: 'DomainRenew',
     Purchase: 'Purchase',
+    DepositTokenStake: 'DepositTokenStake',
+    WithdrawTokenStakeRequest: 'WithdrawTokenStakeRequest',
     Unknown: 'Unknown'
 } as const;
 export type ActionTypeEnum = typeof ActionTypeEnum[keyof typeof ActionTypeEnum];
@@ -408,7 +475,12 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'smartContractExec': json['SmartContractExec'] == null ? undefined : SmartContractActionFromJSON(json['SmartContractExec']),
         'domainRenew': json['DomainRenew'] == null ? undefined : DomainRenewActionFromJSON(json['DomainRenew']),
         'purchase': json['Purchase'] == null ? undefined : PurchaseActionFromJSON(json['Purchase']),
+        'addExtension': json['AddExtension'] == null ? undefined : AddExtensionActionFromJSON(json['AddExtension']),
+        'removeExtension': json['RemoveExtension'] == null ? undefined : RemoveExtensionActionFromJSON(json['RemoveExtension']),
+        'setSignatureAllowedAction': json['SetSignatureAllowedAction'] == null ? undefined : SetSignatureAllowedActionFromJSON(json['SetSignatureAllowedAction']),
         'gasRelay': json['GasRelay'] == null ? undefined : GasRelayActionFromJSON(json['GasRelay']),
+        'depositTokenStake': json['DepositTokenStake'] == null ? undefined : DepositTokenStakeActionFromJSON(json['DepositTokenStake']),
+        'withdrawTokenStakeRequest': json['WithdrawTokenStakeRequest'] == null ? undefined : WithdrawTokenStakeRequestActionFromJSON(json['WithdrawTokenStakeRequest']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
         'baseTransactions': json['base_transactions'],
     };
@@ -447,7 +519,12 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'SmartContractExec': SmartContractActionToJSON(value['smartContractExec']),
         'DomainRenew': DomainRenewActionToJSON(value['domainRenew']),
         'Purchase': PurchaseActionToJSON(value['purchase']),
+        'AddExtension': AddExtensionActionToJSON(value['addExtension']),
+        'RemoveExtension': RemoveExtensionActionToJSON(value['removeExtension']),
+        'SetSignatureAllowedAction': SetSignatureAllowedActionToJSON(value['setSignatureAllowedAction']),
         'GasRelay': GasRelayActionToJSON(value['gasRelay']),
+        'DepositTokenStake': DepositTokenStakeActionToJSON(value['depositTokenStake']),
+        'WithdrawTokenStakeRequest': WithdrawTokenStakeRequestActionToJSON(value['withdrawTokenStakeRequest']),
         'simple_preview': ActionSimplePreviewToJSON(value['simplePreview']),
         'base_transactions': value['baseTransactions'],
     };

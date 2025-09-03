@@ -17,4 +17,5 @@ export const ToggleButtonItem = styled.button<{ active: boolean }>`
     background-color: ${p => (p.active ? p.theme.backgroundContentAttention : 'transparent')};
     padding: 6px 8px;
     transition: background-color 0.1s ease-in-out;
+    color: ${p => p.theme.textPrimary};
 `;

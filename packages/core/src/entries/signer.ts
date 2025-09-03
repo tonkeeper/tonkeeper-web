@@ -13,3 +13,7 @@ export type LedgerSigner = ((messages: LedgerTransaction[]) => Promise<Cell[]>) 
 export type Signer = CellSigner | LedgerSigner;
 
 export type TronSigner = (tx: Transaction) => Promise<Transaction & SignedTransaction>;
+
+export type MultiTransactionsSigner = (
+    txs: (Transaction | Cell)[]
+) => Promise<((Transaction & SignedTransaction) | Buffer)[]>;

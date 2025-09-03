@@ -3,7 +3,7 @@ import { getGlobalPreferences } from '@tonkeeper/core/dist/service/globalPrefere
 import { awaitPopupResponse } from './dApp/utils';
 import browser from 'webextension-polyfill';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
-import { popupManager } from '../background/popup-manager';
+import { customPopupManager } from '../background/custom-popup-manager';
 import ExtensionPlatform from './extension';
 import { showNotificationInPopup } from './backgroundPopUpService';
 
@@ -25,7 +25,7 @@ export async function processInterceptTonLink(origin: string, url: string) {
 
     const id = Date.now();
 
-    const closedPopupHandle = await popupManager.openPopup();
+    const closedPopupHandle = await customPopupManager.openPopup();
     try {
         showNotificationInPopup({
             kind: 'tonLinkIntercept',

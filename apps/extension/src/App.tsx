@@ -111,9 +111,11 @@ const ExtensionGlobalStyle = createGlobalStyle`
   }
 `;
 
-export const App: FC = () => {
+export const App: FC<{ isInCustomPopup: boolean }> = ({ isInCustomPopup }) => {
     const browserT = useCallback((key: string) => browser.i18n.getMessage(key), []);
     const t = useTWithReplaces(browserT);
+
+    sdk.addWalletPage.isInCustomPopup = isInCustomPopup;
 
     const translation = useMemo(() => {
         const client: I18nContext = {

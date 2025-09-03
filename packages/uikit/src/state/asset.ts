@@ -108,11 +108,15 @@ export function useAssetAmountFiatEquivalent(assetAmount: AssetAmount): {
     isLoading: boolean;
     data: BigNumber | undefined;
 } {
-    const { data: tokenRate, isLoading } = useRate(
-        assetAmount.asset.id === TRON_USDT_ASSET.id
-            ? 'USDT'
-            : legacyTonAssetId(assetAmount.asset as TonAsset, { userFriendly: true })
-    );
+    let assetId: string;
+    if (assetAmount.asset.id === TRON_USDT_ASSET.id) {
+        assetId = 'USDT';
+    } else if (assetAmount.asset.id === TRON_TRX_ASSET.id) {
+        assetId = 'TRX';
+    } else {
+        assetId = legacyTonAssetId(assetAmount.asset as TonAsset, { userFriendly: true });
+    }
+    const { data: tokenRate, isLoading } = useRate(assetId);
 
     return {
         isLoading,

@@ -16,6 +16,7 @@ import { MobileAssetHistory } from './Jetton';
 import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
 import styled from 'styled-components';
+import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
 
 const TronUsdtHeader: FC<{ assetAmount: AssetAmount<TronAsset> }> = ({ assetAmount }) => {
     const { data: rate } = useUSDTRate();
@@ -80,7 +81,7 @@ export const TronUsdtContent = () => {
                         }
                     />
                 </ActionsRow>
-
+                <TronFeeBanner />
                 <MobileAssetHistory assetAddress={TRON_USDT_ASSET.address} innerRef={ref} />
             </InnerBody>
         </>

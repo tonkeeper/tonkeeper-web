@@ -23,6 +23,7 @@ import { Asset, isTonAsset } from '@tonkeeper/core/dist/entries/crypto/asset/ass
 import { useBatteryAuthToken } from './battery';
 import { atom } from '@tonkeeper/core/dist/entries/atom';
 import { useTranslation } from '../hooks/translation';
+import { TronTonSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-ton-sender';
 
 export const formatActivityDate = (language: string, key: string, timestamp: number): string => {
     const date = new Date(timestamp);
@@ -401,7 +402,21 @@ async function fetchTonActivity({
         });
     }
 
+    tonActivity.events = tonActivity.events.filter(e => !isTonTransfer(e));
+
     return tonActivity;
+}
+
+function isTonTransfer(event: AccountEvent): boolean {
+    if (event.actions.length !== 1) {
+        return false;
+    }
+
+    if (event.actions[0].type !== 'TonTransfer' || !event.actions[0].tonTransfer) {
+        return false;
+    }
+
+    return event.actions[0].tonTransfer.comment === TronTonSender.identifyingComment;
 }
 
 function isScamEvent(e: AccountEvent): boolean {
@@ -504,8 +519,9 @@ export const useScrollMonitor = (
     const [element, setElement] = useState(elementRef?.current);
 
     useEffect(() => {
+        const el = element ?? elementRef?.current;
         const handleScroll = debounce(() => {
-            if (element && element.scrollTop < 5) {
+            if (el && el.scrollTop < 5) {
                 setIsAtTop(true);
             } else {
                 setIsAtTop(false);
@@ -513,9 +529,9 @@ export const useScrollMonitor = (
         }, 20);
 
         handleScroll();
-        element?.addEventListener('scroll', handleScroll);
+        el?.addEventListener('scroll', handleScroll);
         return () => {
-            element?.removeEventListener('scroll', handleScroll);
+            el?.removeEventListener('scroll', handleScroll);
         };
     }, [element]);
 

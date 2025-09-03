@@ -6,7 +6,12 @@ import { Suggestion } from './suggestion';
 import { Asset } from './crypto/asset/asset';
 import BigNumber from 'bignumber.js';
 import { TON_ASSET } from './crypto/asset/constants';
-import { TransactionFeeBattery, TransactionFeeTonAsset } from './crypto/transaction-fee';
+import {
+    TransactionFeeBattery,
+    TransactionFeeTonAsset,
+    TransactionFeeTonAssetRelayed,
+    TransactionFeeTronAsset
+} from './crypto/transaction-fee';
 import { TronResources } from '../tronApi';
 
 export type BaseRecipient = Suggestion | { address: string; bounce?: boolean };
@@ -83,7 +88,7 @@ export const isTonEstimationDetailed = (
 };
 
 export type TronEstimation = {
-    fee: TransactionFeeBattery;
+    fee: TransactionFeeBattery | TransactionFeeTronAsset | TransactionFeeTonAssetRelayed;
     resources: TronResources;
 };
 

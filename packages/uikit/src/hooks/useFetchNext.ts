@@ -8,12 +8,13 @@ export const useFetchNext = (
     standalone: boolean,
     ref?: React.RefObject<HTMLDivElement>
 ) => {
-    const [element, setElement] = useState<HTMLDivElement | Window | undefined | null>(
+    const [el, setElement] = useState<HTMLDivElement | Window | undefined | null>(
         standalone ? ref?.current : window
     );
     useEffect(() => {
         if (!hasNextPage) return;
 
+        const element = el ?? ref?.current;
         if (!element) return;
 
         const handler = throttle(() => {
@@ -39,7 +40,7 @@ export const useFetchNext = (
         return () => {
             element.removeEventListener('scroll', handler);
         };
-    }, [hasNextPage, standalone, element]);
+    }, [hasNextPage, standalone, el]);
 
     return setElement as Dispatch<SetStateAction<HTMLDivElement | null>>;
 };

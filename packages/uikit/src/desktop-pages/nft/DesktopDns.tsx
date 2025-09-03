@@ -4,6 +4,9 @@ import { KnownNFTDnsCollections } from '../../components/nft/NftView';
 import { useWalletFilteredNftList } from '../../state/nft';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { DesktopNFTS } from './DesktopNft';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { Navigate } from '../../components/shared/Navigate';
+import { AppRoute } from '../../libs/routes';
 
 export const DesktopDns = () => {
     const { t } = useTranslation();
@@ -17,6 +20,11 @@ export const DesktopDns = () => {
             ),
         [nfts]
     );
+
+    const isEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
+    if (!isEnabled) {
+        return <Navigate to={AppRoute.home} />;
+    }
 
     return (
         <HideOnReview>
