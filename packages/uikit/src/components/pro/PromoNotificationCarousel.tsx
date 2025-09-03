@@ -272,7 +272,7 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
         content: '';
         display: block;
         width: ${({ $total }) => `${$total * 100}%`};
-        aspect-ratio: 5 / 1;
+        aspect-ratio: ${p => p.$total} / 1;
         background: linear-gradient(
             70deg,
             #49a6f4 0%,
