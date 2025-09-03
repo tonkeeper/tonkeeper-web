@@ -71,7 +71,7 @@ export class ExtensionAppSdk extends BaseApp implements IAppSdk {
 }
 
 class AddWalletPageManage {
-    public isPopupInSeparateWindow: boolean | undefined;
+    public isInCustomPopup: boolean | undefined;
 
     private addWalletQuery = 'add_wallet';
 
@@ -94,7 +94,7 @@ class AddWalletPageManage {
     }
 
     public async open(selectedMethod: AddWalletMethod) {
-        if (this.isPopupInSeparateWindow || this.isOpenedAsSeparateTab) {
+        if (this.isInCustomPopup || this.isOpenedAsSeparateTab) {
             return;
         }
 

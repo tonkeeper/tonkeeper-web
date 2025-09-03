@@ -12,10 +12,22 @@ import { handlePopUpConnection } from './libs/service/backgroundPopUpService';
 import { subscriptionProxyNotifications } from './libs/service/backgroundProxyService';
 import { customPopupManager } from './libs/background/custom-popup-manager';
 
-async function getIsFullscreen() {
+async function getShouldOpenSystemPopup() {
     try {
-        const win = await browser.windows.getLastFocused();
-        return win?.state === 'fullscreen';
+        const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+
+        let win;
+        if (tab && tab.windowId !== undefined) {
+            win = await browser.windows.get(tab.windowId);
+        } else {
+            win = await browser.windows.getLastFocused();
+        }
+
+        const os = (await browser.runtime.getPlatformInfo()).os;
+
+        // macOS and linux browsers provide ugly behavior of custom popup when browser is opened in fullscreen mode.
+        // for these cases we open default popup
+        return win?.state === 'fullscreen' && os !== 'win';
     } catch {
         return false;
     }
@@ -23,13 +35,19 @@ async function getIsFullscreen() {
 
 browser.runtime.onMessage.addListener(async msg => {
     if (msg?.type === 'DECIDE_MODE') {
-        const fullscreen = await getIsFullscreen();
-        if (!fullscreen) {
+        const openCustomPopup = !(await getShouldOpenSystemPopup());
+        if (openCustomPopup) {
             customPopupManager.openPopup('icon-click');
-            return { isFullscreen: false };
+
+            // default popup will receive this and execute window.close inside to close itself
+            return { willOpenCustomPopup: true };
+        } else {
+            // default popup is already opened, we just need to close custom popup instances if any
+            await customPopupManager.closePopupOpenedByOpener('icon-click');
+
+            // default popup will receive this and proceed to render app inside
+            return { willOpenCustomPopup: false };
         }
-        await customPopupManager.closePopupOpenedByOpener('icon-click');
-        return { isFullscreen: true };
     }
 });
 
