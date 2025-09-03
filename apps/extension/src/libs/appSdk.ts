@@ -98,7 +98,6 @@ class AddWalletPageManage {
             return;
         }
 
-        window.close();
         const tab = await browser.tabs.create({
             url: `index.html#?${this.addWalletQuery}=${selectedMethod}`,
             active: true
@@ -106,6 +105,7 @@ class AddWalletPageManage {
 
         const tabWindow = await browser.windows.get(tab.windowId!);
         await browser.windows.update(tabWindow.id!, { focused: true });
+        window.close();
     }
 
     public close() {
