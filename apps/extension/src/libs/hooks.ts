@@ -45,7 +45,7 @@ export const useAnalytics = (
             config?.aptabaseKey
         ],
         async () => {
-            if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey || extensionType === 'FireFox') {
                 return;
             }
 
