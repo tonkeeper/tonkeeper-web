@@ -10,7 +10,7 @@ import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { useTonRawTransactionService } from '../useBlockchainService';
-import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 type SubscriptionEncodingParams = {
@@ -67,7 +67,7 @@ export const useEstimateDeploySubscriptionV5 = () => {
     const rawTx = useTonRawTransactionService();
 
     return useMutation<
-        { fee: TransactionFee; address: Address },
+        { fee: TransactionFeeTonAsset; address: Address },
         Error,
         SubscriptionEncodingParams
     >(async subscriptionParams => {
@@ -96,6 +96,6 @@ export const useEstimateDeploySubscriptionV5 = () => {
 
         const estimation = await rawTx.estimate(sender, actions);
 
-        return { fee: estimation.fee, address: extensionAddress };
+        return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
     });
 };

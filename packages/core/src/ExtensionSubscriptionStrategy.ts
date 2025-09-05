@@ -7,7 +7,7 @@ import {
     PurchaseErrors,
     PurchaseStatuses
 } from './entries/pro';
-import { SubscriptionExtension, SubscriptionSource } from './pro';
+import { SubscriptionSource } from './pro';
 import { getProExtensionData, getProServiceTiers } from './service/proService';
 import { Language } from './entries/language';
 import { getFormattedProPrice } from './utils/pro';
@@ -75,14 +75,14 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
         });
     }
 
-    async cancelSubscription(extensionData: SubscriptionExtension): Promise<PurchaseStatuses> {
+    async cancelSubscription(extensionContract: string): Promise<PurchaseStatuses> {
         const { onRemoveExtensionConfirmOpen } = this.config;
 
         return new Promise<PurchaseStatuses>(resolve => {
             onRemoveExtensionConfirmOpen({
-                extensionData,
+                extensionContract,
                 onConfirm: () => {
-                    resolve(PurchaseStatuses.PENDING);
+                    resolve(PurchaseStatuses.SUCCESS);
                 },
                 onCancel: () => {
                     resolve(PurchaseStatuses.CANCELED);

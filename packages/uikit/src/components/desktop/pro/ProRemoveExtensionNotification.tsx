@@ -25,7 +25,6 @@ import { ListItem, ListItemPayload } from '../../List';
 import { useTranslation } from '../../../hooks/translation';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ConfirmMainButtonProps } from '../../transfer/common';
-import { SubscriptionExtension } from '@tonkeeper/core/dist/pro';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
 import { getFiatEquivalent } from '../../../hooks/balance';
 import { useAppContext } from '../../../hooks/appContext';
@@ -41,13 +40,13 @@ const deployReserve = new AssetAmount({
 interface IProRecurrentNotificationProps {
     isOpen: boolean;
     onClose: () => void;
-    extensionData?: SubscriptionExtension;
+    extensionContract?: string;
     onConfirm?: (success?: boolean) => void;
     onCancel?: () => void;
 }
 
 export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> = props => {
-    const { isOpen, onConfirm, onClose, onCancel, extensionData } = props;
+    const { isOpen, onConfirm, onClose, onCancel, extensionContract } = props;
 
     return (
         <NotificationStyled
@@ -63,9 +62,9 @@ export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> 
                 <ErrorBoundary
                     fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
                 >
-                    {extensionData && (
+                    {extensionContract && (
                         <ProRemoveExtensionNotificationContent
-                            extensionData={extensionData}
+                            extensionContract={extensionContract}
                             onClose={confirmed => {
                                 onConfirm?.(confirmed);
                                 onClose();
@@ -82,14 +81,14 @@ const ProRemoveExtensionNotificationContent: FC<
     PropsWithChildren<{
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
-        extensionData: SubscriptionExtension;
+        extensionContract: string;
         fitContent?: boolean;
     }>
-> = ({ onClose, extensionData }) => {
+> = ({ onClose, extensionContract }) => {
     const { t } = useTranslation();
     const { fiat } = useAppContext();
     const formatDate = useDateTimeFormat();
-    const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
+    const { data: rate } = useRate(CryptoCurrency.TON);
 
     const removeMutation = useCancelSubscriptionV5();
     const activeWallet = useActiveWallet();
@@ -98,7 +97,7 @@ const ProRemoveExtensionNotificationContent: FC<
     const feeEquivalent: string = useMemo(
         () =>
             getFiatEquivalent({
-                amount: estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount,
+                amount: estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount ?? null,
                 fiat,
                 ratePrice: rate?.prices
             }),
@@ -110,14 +109,14 @@ const ProRemoveExtensionNotificationContent: FC<
 
         estimateFeeMutation.mutate({
             fromWallet: activeWallet.id,
-            extensionAddress: extensionData.contract
+            extensionContract
         });
     }, [activeWallet?.id]);
 
     const removeMutate = async () =>
         removeMutation.mutateAsync({
             fromWallet: activeWallet.id,
-            extensionAddress: extensionData.contract
+            extensionContract
         });
 
     return (

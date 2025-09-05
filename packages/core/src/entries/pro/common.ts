@@ -64,7 +64,7 @@ export interface IExtensionStrategyConfig {
         onCancel?: () => void;
     }) => void;
     onRemoveExtensionConfirmOpen: (p?: {
-        extensionData?: SubscriptionExtension;
+        extensionContract?: string;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;
     }) => void;

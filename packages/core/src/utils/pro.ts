@@ -86,20 +86,30 @@ export const normalizeSubscription = (
                     type: AuthTypes.WALLET,
                     wallet: authorizedWallet
                 },
-                subscriptionParams: dBStoredInfo
+                contract: dBStoredInfo.contract,
+                currency: dBStoredInfo.currency,
+                expiresDate: new Date(),
+                amount: dBStoredInfo.payment_per_period,
+                period: dBStoredInfo.period,
+                purchaseDate: toDate(dBStoredInfo.created_at)
             };
         }
 
         return {
             source,
-            status: ExtensionSubscriptionStatuses.CANCELLED,
+            status: ExtensionSubscriptionStatuses.EXPIRED,
             valid: false,
             nextChargeDate: new Date(),
             auth: {
                 type: AuthTypes.WALLET,
                 wallet: authorizedWallet
             },
-            subscriptionParams: dBStoredInfo
+            contract: dBStoredInfo.contract,
+            currency: dBStoredInfo.currency,
+            expiresDate: new Date(),
+            amount: dBStoredInfo.payment_per_period,
+            period: dBStoredInfo.period,
+            purchaseDate: toDate(dBStoredInfo.created_at)
         };
     }
 

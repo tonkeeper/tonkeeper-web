@@ -12,12 +12,12 @@ import {
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { useTonRawTransactionService } from '../useBlockchainService';
-import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 type CancelParams = {
     fromWallet: WalletId;
-    extensionAddress: string;
+    extensionContract: string;
 };
 
 export const useCancelSubscriptionV5 = () => {
@@ -40,7 +40,7 @@ export const useCancelSubscriptionV5 = () => {
 
         if (!signer) throw new Error('Signer not found');
 
-        const extensionAddress = Address.parse(subscriptionParams.extensionAddress);
+        const extensionAddress = Address.parse(subscriptionParams.extensionContract);
 
         const encoder = new SubscriptionV5Encoder(accountAndWallet.wallet);
 
@@ -65,7 +65,7 @@ export const useEstimateRemoveExtension = () => {
     const api = useActiveApi();
     const rawTx = useTonRawTransactionService();
 
-    return useMutation<{ fee: TransactionFee; address: Address }, Error, CancelParams>(
+    return useMutation<{ fee: TransactionFeeTonAsset; address: Address }, Error, CancelParams>(
         async subscriptionParams => {
             const account = accounts
                 .filter(isAccountTonWalletStandard)
@@ -76,7 +76,7 @@ export const useEstimateRemoveExtension = () => {
 
             const sender = new WalletMessageSender(api, wallet, estimationSigner);
 
-            const extensionAddress = Address.parse(subscriptionParams.extensionAddress);
+            const extensionAddress = Address.parse(subscriptionParams.extensionContract);
 
             const encoder = new SubscriptionV5Encoder(wallet);
 
@@ -91,7 +91,7 @@ export const useEstimateRemoveExtension = () => {
 
             const estimation = await rawTx.estimate(sender, actions);
 
-            return { fee: estimation.fee, address: extensionAddress };
+            return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
         }
     );
 };

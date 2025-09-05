@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import {
     isExpiredSubscription,
     isExtensionStrategy,
+    isExtensionSubscription,
     isIosAutoRenewableSubscription,
     isIosCanceledSubscription,
     isIosExpiredSubscription,
@@ -85,9 +86,9 @@ export const ProStatusScreen = () => {
     const handleCancel = async () => {
         const strategy = sdk.subscriptionService.getStrategy(SubscriptionSource.EXTENSION);
 
-        if (!isExtensionStrategy(strategy)) return;
+        if (!isExtensionStrategy(strategy) || !isExtensionSubscription(subscription)) return;
 
-        await strategy.cancelSubscription(subscription?.subscriptionParams);
+        await strategy.cancelSubscription(subscription?.contract);
     };
 
     return (

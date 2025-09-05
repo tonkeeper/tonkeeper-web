@@ -37,6 +37,7 @@ export enum CryptoSubscriptionStatuses {
 export enum ExtensionSubscriptionStatuses {
     NOT_INITIALIZED = 'not_initialized',
     ACTIVE = 'active',
+    EXPIRED = 'expired',
     CANCELLED = 'cancelled',
     INVALID = 'invalid'
 }

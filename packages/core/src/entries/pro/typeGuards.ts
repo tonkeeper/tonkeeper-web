@@ -1,6 +1,7 @@
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
     IosSubscriptionStatuses,
     ProductIds,
     PurchaseErrors,
@@ -19,7 +20,8 @@ import {
     IIosActiveSubscription,
     ICryptoActiveSubscription,
     ITelegramActiveSubscription,
-    IExtensionSubscriptionStrategy
+    IExtensionSubscriptionStrategy,
+    ExtensionSubscription
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
@@ -80,6 +82,8 @@ export function isExpiredSubscription(
             subscription.status === IosSubscriptionStatuses.EXPIRED) ||
             (subscription?.source === SubscriptionSource.CRYPTO &&
                 subscription.status === CryptoSubscriptionStatuses.EXPIRED) ||
+            (subscription?.source === SubscriptionSource.EXTENSION &&
+                subscription.status === ExtensionSubscriptionStatuses.EXPIRED) ||
             (subscription?.source === SubscriptionSource.TELEGRAM &&
                 subscription.status === TelegramSubscriptionStatuses.EXPIRED))
     );
@@ -93,7 +97,9 @@ export function isPaidActiveSubscription(
         ((value?.source === SubscriptionSource.IOS &&
             value.status === IosSubscriptionStatuses.ACTIVE) ||
             (value?.source === SubscriptionSource.CRYPTO &&
-                value.status === CryptoSubscriptionStatuses.ACTIVE))
+                value.status === CryptoSubscriptionStatuses.ACTIVE) ||
+            (value?.source === SubscriptionSource.EXTENSION &&
+                value.status === ExtensionSubscriptionStatuses.ACTIVE))
     );
 }
 
@@ -107,6 +113,10 @@ export function isCryptoSubscription(value: unknown): value is CryptoSubscriptio
 
 export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
+}
+
+export function isExtensionSubscription(value: unknown): value is ExtensionSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.EXTENSION;
 }
 
 export function isIosAutoRenewableSubscription(value: unknown): value is IIosActiveSubscription & {

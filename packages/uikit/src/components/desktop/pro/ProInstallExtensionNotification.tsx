@@ -93,7 +93,7 @@ const ProInstallExtensionNotificationContent: FC<
     const estimateFeeMutation = useEstimateDeploySubscriptionV5();
 
     const { fiat } = useAppContext();
-    const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
+    const { data: rate } = useRate(CryptoCurrency.TON);
 
     const fiatEquivalent: string = useMemo(
         () =>
@@ -108,7 +108,7 @@ const ProInstallExtensionNotificationContent: FC<
     const feeEquivalent: string = useMemo(
         () =>
             getFiatEquivalent({
-                amount: estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount,
+                amount: estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount ?? null,
                 fiat,
                 ratePrice: rate?.prices
             }),

@@ -15,7 +15,7 @@ import {
     ITelegramAuth,
     IWalletAuth
 } from './common';
-import { CryptoCurrency, SubscriptionExtension, SubscriptionSource } from '../../pro';
+import { CryptoCurrency, SubscriptionSource } from '../../pro';
 import { Language } from '../language';
 
 export type ProSubscription =
@@ -27,7 +27,7 @@ export type ProSubscription =
 
 export type IosSubscription = IIosActiveSubscription | IIosExpiredSubscription;
 
-export type ExtensionSubscription = IExtensionActiveSubscription | IExtensionCanceledSubscription;
+export type ExtensionSubscription = IExtensionActiveSubscription | IExtensionExpiredSubscription;
 
 export type CryptoSubscription =
     | ICryptoActiveSubscription
@@ -133,6 +133,15 @@ export interface ICryptoSubscriptionStrategy extends IBaseSubscriptionStrategy {
 }
 
 // Extension Subscription Types
+export interface IExtensionDBStoredInfo {
+    contract: string;
+    currency: CryptoCurrency;
+    expiresDate: Date;
+    amount: string;
+    period: number;
+    purchaseDate: Date;
+}
+
 export interface IBaseExtensionSubscription extends IBaseSubscription {
     source: SubscriptionSource.EXTENSION;
     status: ExtensionSubscriptionStatuses;
@@ -141,19 +150,21 @@ export interface IBaseExtensionSubscription extends IBaseSubscription {
 
 export interface IExtensionActiveSubscription
     extends IBaseExtensionSubscription,
-        ICryptoDBStoredInfo {
+        IExtensionDBStoredInfo {
     status: ExtensionSubscriptionStatuses.ACTIVE;
     valid: true;
 }
 
-export interface IExtensionCanceledSubscription extends IBaseExtensionSubscription {
-    status: ExtensionSubscriptionStatuses.CANCELLED;
+export interface IExtensionExpiredSubscription
+    extends IBaseExtensionSubscription,
+        IExtensionDBStoredInfo {
+    status: ExtensionSubscriptionStatuses.EXPIRED;
     valid: false;
 }
 
 export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {
     source: SubscriptionSource.EXTENSION;
-    cancelSubscription(extensionData: SubscriptionExtension): Promise<PurchaseStatuses>;
+    cancelSubscription(extensionContract: string): Promise<PurchaseStatuses>;
 }
 
 // Telegram Subscription Types
