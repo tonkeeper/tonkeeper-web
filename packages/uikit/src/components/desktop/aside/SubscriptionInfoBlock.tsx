@@ -31,7 +31,6 @@ import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscription
 import { usePreloadImages } from '../../../hooks/usePreloadImages';
 import { useAppContext } from '../../../hooks/appContext';
 import { getAllCarouselImages } from '../../../libs/pro';
-import { useProRecurrentNotification } from '../../modals/ProRecurrentNotificationControlled';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -153,7 +152,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const [rotate, setRotate] = useState(false);
     const [containerRef, { width }] = useElementSize();
     const navigate = useNavigate();
-    const { onOpen: onRecurrentOpen } = useProRecurrentNotification();
 
     const baseSlideUrl = mainnetConfig.pro_media_base_url;
 
@@ -235,14 +233,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
                 <Divider />
             </NotForTargetEnv>
             <BlockWrapper>
-                <ButtonsStyled>
-                    {button}
-                    <Divider />
-                    <Button secondary onClick={() => onRecurrentOpen()}>
-                        {t('get_tonkeeper_pro')}
-                    </Button>
-                </ButtonsStyled>
-
+                {button}
                 <NotForTargetEnv env="mobile">
                     <IconButtonTransparentBackground
                         onClick={onRefresh}
@@ -255,10 +246,3 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         </Container>
     );
 };
-
-const ButtonsStyled = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    gap: 8px;
-`;

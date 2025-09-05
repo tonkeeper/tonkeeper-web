@@ -75,7 +75,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         isError,
         isLoading: isProPlanLoading,
         refetch
-    } = useProPlans(SubscriptionSource.CRYPTO);
+    } = useProPlans(SubscriptionSource.EXTENSION);
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
     const handleProAuth = () => {
@@ -142,9 +142,7 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
     const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
     const { t } = useTranslation();
 
-    const filteredPlan = displayPlans?.filter(p => p.formattedDisplayPrice !== '-')?.[0];
-
-    const { displayPrice, subscriptionPeriod } = filteredPlan || {};
+    const { displayPrice, subscriptionPeriod } = displayPlans[0] || {};
 
     const fiatEquivalent: string = useMemo(
         () =>

@@ -1,10 +1,13 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 
-import { useAppSdk } from '../../hooks/appSdk';
-import { useActiveApi } from '../../state/wallet';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { CryptoSubscriptionStrategy } from '@tonkeeper/core/dist/CryptoSubscriptionStrategy';
 import { SubscriptionService } from '@tonkeeper/core/SubscriptionService';
+import { ExtensionSubscriptionStrategy } from '@tonkeeper/core/dist/ExtensionSubscriptionStrategy';
+
+import { useAppSdk } from '../../hooks/appSdk';
+import { useUserLanguage } from '../../state/language';
+import { useProInstallExtensionNotification } from '../modals/ProInstallExtensionNotificationControlled';
+import { useProRemoveExtensionNotification } from '../modals/ProRemoveExtensionNotificationControlled';
 
 interface Props {
     children: ReactNode;
@@ -12,26 +15,42 @@ interface Props {
 
 export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
     const sdk = useAppSdk();
-    const api = useActiveApi();
+    const { data: lang } = useUserLanguage();
+    const { onOpen: onProConfirmOpen } = useProInstallExtensionNotification();
+    const { onOpen: onRemoveExtensionConfirmOpen } = useProRemoveExtensionNotification();
+
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
-        if (!sdk || !api) return;
+        if (!sdk || lang === undefined) return;
 
         if (!sdk.subscriptionService) {
             sdk.subscriptionService = new SubscriptionService(sdk.storage, {
                 initialStrategyMap: new Map([
-                    [SubscriptionSource.CRYPTO, new CryptoSubscriptionStrategy()]
+                    [
+                        SubscriptionSource.EXTENSION,
+                        new ExtensionSubscriptionStrategy({
+                            lang,
+                            onProConfirmOpen,
+                            onRemoveExtensionConfirmOpen
+                        })
+                    ]
                 ])
             });
         }
 
-        if (!sdk.subscriptionService.getStrategy(SubscriptionSource.CRYPTO)) {
-            sdk.subscriptionService.addStrategy(new CryptoSubscriptionStrategy());
+        if (!sdk.subscriptionService.getStrategy(SubscriptionSource.EXTENSION)) {
+            sdk.subscriptionService.addStrategy(
+                new ExtensionSubscriptionStrategy({
+                    lang,
+                    onProConfirmOpen,
+                    onRemoveExtensionConfirmOpen
+                })
+            );
         }
 
         setIsReady(true);
-    }, [sdk, api]);
+    }, [sdk, lang]);
 
     return isReady ? <>{children}</> : null;
 };

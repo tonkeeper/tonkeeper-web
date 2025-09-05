@@ -3,11 +3,14 @@ import {
     Cell,
     beginCell,
     contractAddress,
-    MessageRelaxed,
     StateInit as TonStateInit,
-    toNano
+    toNano,
+    SendMode,
+    internal
 } from '@ton/core';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
+import { getTonkeeperQueryId } from '../utils';
+import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
 
 /**
  * https://raw.githubusercontent.com/tonkeeper/w5-subscriptions/refs/heads/main/build/NativeSubExt.compiled.json?token=GHSAT0AAAAAADG5JG3Q7377EGHFYEHIQ6AU2FIOINQ
@@ -25,174 +28,115 @@ const OP = {
 
 export type OutActionWalletV5Exported = OutActionWalletV5;
 
-export type WalletVersionCode = 51;
-
-export type DeployParams = {
-    wallet: Address;
-    walletVersion: WalletVersionCode;
+type DeployParams = {
     beneficiary: Address;
-    subscriptionId: bigint;
+    subscriptionId?: number;
     firstChargingDate: number;
-    paymentPerPeriodNano: bigint;
-    periodSecs: number;
-    gracePeriodSecs: number;
-    callerFeeNano: bigint;
+    paymentPerPeriod: bigint;
+    period: number;
+    gracePeriod: number;
+    callerFee: bigint;
     withdrawAddress: Address;
-    withdrawMsgBody?: Cell;
-    metadata?: Cell;
-    workchain?: number;
-    reserveNano: bigint;
-    sendMode?: number;
+    withdrawMsgBody?: string;
 };
 
-export type CreateResult = {
+type CreateResult = {
     actions: OutActionWalletV5[];
     extensionAddress: Address;
 };
 
-export type DestructParams = {
-    queryId?: bigint;
-    forwardNano?: bigint;
-    sendMode?: number;
-    bounce?: boolean;
-};
-
-export type DeployPreview = {
-    firstChargingDate: number;
-    paymentPerPeriodNano: bigint;
-    periodSecs: number;
-    gracePeriodSecs: number;
-    callerFeeNano: bigint;
-    withdrawAddress: Address;
-};
-
 interface IBuildStateDataParams {
     wallet: Address;
-    walletVersion: WalletVersionCode;
+    walletVersion: WalletVersion.V5R1;
     beneficiary: Address;
-    subscriptionId: bigint;
-    metadata?: Cell;
+    subscriptionId: number;
 }
 
 interface IEncodeDeployBodyParams {
     firstChargingDate: number;
-    paymentPerPeriodNano: bigint;
-    periodSecs: number;
-    gracePeriodSecs: number;
-    callerFeeNano: bigint;
+    paymentPerPeriod: bigint;
+    period: number;
+    gracePeriod: number;
+    callerFee: bigint;
     withdrawAddress: Address;
-    withdrawMsgBody: Cell;
-    metadata: Cell;
+    withdrawMsgBody?: string;
 }
 
+const MIN_RESERVE = toNano('0.05');
+
 export class SubscriptionV5Encoder {
-    constructor(private readonly defaultCodeBocBase64 = SUBSCRIPTION_V2_CODE_BOC) {}
+    constructor(
+        private readonly wallet: TonWalletStandard,
+        private readonly defaultCodeBocBase64 = SUBSCRIPTION_V2_CODE_BOC
+    ) {}
 
     encodeCreateSubscriptionV2(params: DeployParams): CreateResult {
         const code = Cell.fromBoc(Buffer.from(this.defaultCodeBocBase64, 'base64'))[0];
 
+        if (this.wallet.version !== WalletVersion.V5R1) {
+            throw new Error(`Unsupported wallet version: ${this.wallet.version}`);
+        }
+
         const stateData = this.buildStateData({
-            wallet: params.wallet,
-            walletVersion: params.walletVersion,
+            wallet: Address.parse(this.wallet.rawAddress),
+            walletVersion: this.wallet.version,
             beneficiary: params.beneficiary,
-            subscriptionId: params.subscriptionId,
-            metadata: params.metadata
+            subscriptionId: params.subscriptionId ?? Date.now()
         });
 
         const stateInit: TonStateInit = { code, data: stateData };
 
-        const extAddr = contractAddress(params.workchain ?? 0, stateInit);
+        const extAddr = contractAddress(0, stateInit);
+
+        const reserve =
+            params.firstChargingDate === 0 ? params.paymentPerPeriod + MIN_RESERVE : MIN_RESERVE;
 
         const body = this.encodeDeployBody({
             firstChargingDate: params.firstChargingDate,
-            paymentPerPeriodNano: params.paymentPerPeriodNano,
-            periodSecs: params.periodSecs,
-            gracePeriodSecs: params.gracePeriodSecs,
-            callerFeeNano: params.callerFeeNano,
+            paymentPerPeriod: params.paymentPerPeriod,
+            period: params.period,
+            gracePeriod: params.gracePeriod,
+            callerFee: params.callerFee,
             withdrawAddress: params.withdrawAddress,
-            withdrawMsgBody: params.withdrawMsgBody ?? Cell.EMPTY,
-            metadata: params.metadata ?? Cell.EMPTY
+            withdrawMsgBody: params.withdrawMsgBody
         });
 
-        const initMsg: MessageRelaxed = {
-            info: {
-                type: 'internal',
-                ihrDisabled: true,
-                bounce: true,
-                bounced: false,
-                dest: extAddr,
-                value: { coins: params.reserveNano },
-                ihrFee: 0n,
-                forwardFee: 0n,
-                createdAt: 0,
-                createdLt: 0n
-            },
+        const initMsg = internal({
+            to: extAddr,
+            bounce: true,
+            value: reserve,
             init: stateInit,
             body
-        };
+        });
 
         const actions: OutActionWalletV5[] = [
             { type: 'addExtension', address: extAddr },
-            { type: 'sendMsg', mode: params.sendMode ?? 3, outMsg: initMsg }
+            {
+                type: 'sendMsg',
+                mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                outMsg: initMsg
+            }
         ];
 
         return { actions, extensionAddress: extAddr };
     }
 
-    encodeDestructAction(ext: Address, params: DestructParams = {}): OutActionWalletV5[] {
+    encodeDestructAction(extension: Address): OutActionWalletV5[] {
         const body = beginCell()
             .storeUint(OP.DESTRUCT, 32)
-            .storeUint(params.queryId ?? BigInt(Date.now()), 64)
+            .storeUint(getTonkeeperQueryId(), 64)
             .endCell();
 
-        const outMsg: MessageRelaxed = {
-            info: {
-                type: 'internal',
-                ihrDisabled: true,
-                bounce: params.bounce ?? true,
-                bounced: false,
-                dest: ext,
-                value: { coins: params.forwardNano ?? toNano('0.05') },
-                ihrFee: 0n,
-                forwardFee: 0n,
-                createdAt: 0,
-                createdLt: 0n
-            },
+        const outMsg = internal({
+            to: extension,
+            bounce: true,
+            value: toNano('0.05'),
             body
-        };
+        });
 
-        return [{ type: 'sendMsg', mode: params.sendMode ?? 3, outMsg }];
-    }
-
-    extractDeployPreview(actions: OutActionWalletV5[]): DeployPreview | null {
-        const send = actions.find(a => a.type === 'sendMsg' && a.outMsg?.init) as
-            | (OutActionWalletV5 & { outMsg: MessageRelaxed & { init: TonStateInit } })
-            | undefined;
-
-        if (!send) return null;
-
-        const params = send.outMsg.body.beginParse();
-
-        const op = params.loadUint(32);
-
-        if (op !== OP.DEPLOY) return null;
-
-        params.loadUint(64);
-        const firstChargingDate = params.loadUint(32);
-        const paymentPerPeriodNano = params.loadCoins();
-        const periodSecs = params.loadUint(32);
-        const gracePeriodSecs = params.loadUint(32);
-        const callerFeeNano = params.loadCoins();
-        const withdrawAddress = params.loadAddress();
-
-        return {
-            firstChargingDate,
-            paymentPerPeriodNano,
-            periodSecs,
-            gracePeriodSecs,
-            callerFeeNano,
-            withdrawAddress: withdrawAddress!
-        };
+        return [
+            { type: 'sendMsg', mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS, outMsg }
+        ];
     }
 
     private buildStateData(params: IBuildStateDataParams): Cell {
@@ -212,28 +156,36 @@ export class SubscriptionV5Encoder {
             .storeUint(0, 32)
             .storeCoins(0)
             .storeAddress(params.wallet)
-            .storeUint(params.walletVersion, 8)
+            .storeUint(51, 8)
             .storeAddress(params.beneficiary)
             .storeUint(params.subscriptionId, 64)
             .storeCoins(0)
             .storeUint(0, 32)
             .storeRef(withdrawInfo)
-            .storeRef(params.metadata ?? beginCell().endCell())
+            .storeRef(Cell.EMPTY)
             .endCell();
     }
 
     private encodeDeployBody(params: IEncodeDeployBodyParams): Cell {
         return beginCell()
             .storeUint(OP.DEPLOY, 32)
-            .storeUint(BigInt(Date.now()), 64)
+            .storeUint(getTonkeeperQueryId(), 64)
             .storeUint(params.firstChargingDate, 32)
-            .storeCoins(params.paymentPerPeriodNano)
-            .storeUint(params.periodSecs, 32)
-            .storeUint(params.gracePeriodSecs, 32)
-            .storeCoins(params.callerFeeNano)
+            .storeCoins(params.paymentPerPeriod)
+            .storeUint(params.period, 32)
+            .storeUint(params.gracePeriod, 32)
+            .storeCoins(params.callerFee)
             .storeAddress(params.withdrawAddress)
-            .storeRef(params.withdrawMsgBody)
-            .storeRef(params.metadata)
+            .storeRef(this.encodeWithdrawMsgBody(params.withdrawMsgBody))
+            .storeRef(Cell.EMPTY)
             .endCell();
+    }
+
+    private encodeWithdrawMsgBody(message?: string): Cell {
+        if (!message) return Cell.EMPTY;
+
+        const boc = Buffer.from(message, 'hex');
+
+        return Cell.fromBoc(boc)[0];
     }
 }

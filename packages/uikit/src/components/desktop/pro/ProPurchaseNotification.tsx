@@ -92,9 +92,12 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         if (!selectedPlan) return;
 
         await onPurchase({
-            selectedPlan,
-            wallet: targetAuth.wallet,
-            tempToken: targetAuth.tempToken
+            source: selectedSource,
+            formData: {
+                selectedPlan,
+                wallet: targetAuth.wallet,
+                tempToken: targetAuth.tempToken
+            }
         });
     };
 

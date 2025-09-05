@@ -9,12 +9,6 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 const SKELETON_PRODUCTS_QTY = 1;
 
-export const getFilteredDisplayPlans = (proPlans?: IDisplayPlan[]) => {
-    if (!proPlans) return [];
-
-    return proPlans.filter(plan => plan.formattedDisplayPrice !== '-');
-};
-
 export const getProductsForRender = (displayPlans: IDisplayPlan[]) => {
     return displayPlans.length ? displayPlans : getSkeletonProducts(SKELETON_PRODUCTS_QTY);
 };
@@ -23,15 +17,14 @@ export const useProductSelection = () => {
     const { t } = useTranslation();
 
     const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(
-        SubscriptionSource.CRYPTO
+        SubscriptionSource.EXTENSION
     );
     const [selectedPlanId, setSelectedPlanId] = useState('');
 
-    const { data: proPlans, isLoading, isError } = useProPlans(selectedSource);
+    const { data: plans, isLoading, isError } = useProPlans(selectedSource);
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
-    const displayPlans = getFilteredDisplayPlans(proPlans);
-    const productsForRender = getProductsForRender(displayPlans);
+    const productsForRender = getProductsForRender(plans);
 
     useEffect(() => {
         if (productsForRender.length < 1 || !productsForRender[0].displayPrice) {
@@ -46,7 +39,7 @@ export const useProductSelection = () => {
     }, [productsForRender]);
 
     return {
-        plans: displayPlans,
+        plans,
         productsForRender,
         selectedSource,
         selectedPlanId,

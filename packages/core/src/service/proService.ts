@@ -31,15 +31,17 @@ import {
     DashboardCellString,
     DashboardColumnType,
     DashboardsService,
+    ExtensionsService,
     IapService,
     Invoice,
     InvoicesService,
+    SubscriptionExtension,
     SupportService,
     TiersService,
     UsersService
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
-import { IProStateWallet, ISupportData, ProSubscription, PurchaseErrors } from '../entries/pro';
+import { ISupportData, ProSubscription, PurchaseErrors } from '../entries/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -78,7 +80,10 @@ export const getNormalizedSubscription = async (storage: IStorage, token: string
 
     try {
         const user = await UsersService.getUserInfo(`Bearer ${token}`);
-        const authorizedWallet: IProStateWallet | null = await findAuthorizedWallet(user, storage);
+        const authorizedWallet: TonWalletStandard | null = await findAuthorizedWallet(
+            user,
+            storage
+        );
         const currentSubscriptionDTO = await UsersService.verifySubscription(`Bearer ${token}`);
 
         return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
@@ -160,10 +165,40 @@ export const authViaSeedPhrase = async (api: APIConfig, authData: ProAuthViaSeed
     return result.auth_token;
 };
 
-export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
-    const { items } = await TiersService.getTiers(localizationText(lang) as Lang, promoCode);
+export const getProServiceTiers = async (lang?: Language | undefined) => {
+    const { items } = await TiersService.getTiers(localizationText(lang) as Lang);
 
     return items;
+};
+
+type GetProExtensionDataResponse =
+    | { ok: true; data: SubscriptionExtension }
+    | { ok: false; data: PurchaseErrors };
+
+export const getProExtensionData = async (
+    tempToken: string,
+    lang: Language,
+    tierId: number
+): Promise<GetProExtensionDataResponse> => {
+    try {
+        const extensionData = await ExtensionsService.createSubscriptionExtension(
+            `Bearer ${tempToken}`,
+            localizationText(lang) as Lang,
+            {
+                tier_id: tierId
+            }
+        );
+
+        return {
+            ok: true,
+            data: extensionData
+        };
+    } catch {
+        return {
+            ok: false,
+            data: PurchaseErrors.PURCHASE_FAILED
+        };
+    }
 };
 
 type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };

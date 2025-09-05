@@ -9,7 +9,6 @@ import {
 import {
     ICryptoExpiredSubscription,
     CryptoSubscription,
-    ICryptoSubscriptionStrategy,
     IIosSubscriptionStrategy,
     IIosExpiredSubscription,
     IosSubscription,
@@ -19,11 +18,12 @@ import {
     TelegramSubscription,
     IIosActiveSubscription,
     ICryptoActiveSubscription,
-    ITelegramActiveSubscription
+    ITelegramActiveSubscription,
+    IExtensionSubscriptionStrategy
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
-import { IProStateWallet, IWalletAuth } from './common';
+import { IWalletAuth } from './common';
 
 export function isProductId(value: unknown): value is ProductIds {
     return typeof value === 'string' && Object.values(ProductIds).includes(value as ProductIds);
@@ -48,8 +48,8 @@ export function isIosStrategy(strategy?: unknown): strategy is IIosSubscriptionS
     return isStrategy(strategy) && strategy?.source === SubscriptionSource.IOS;
 }
 
-export function isCryptoStrategy(strategy: unknown): strategy is ICryptoSubscriptionStrategy {
-    return isStrategy(strategy) && strategy?.source === SubscriptionSource.CRYPTO;
+export function isExtensionStrategy(strategy: unknown): strategy is IExtensionSubscriptionStrategy {
+    return isStrategy(strategy) && strategy?.source === SubscriptionSource.EXTENSION;
 }
 
 export function isPendingSubscription(
@@ -145,8 +145,14 @@ export function isTelegramActiveSubscription(value: unknown): value is ITelegram
     );
 }
 
-export function isTonWalletStandard(wallet: IProStateWallet): wallet is TonWalletStandard {
-    return wallet !== null && typeof wallet === 'object' && 'id' in wallet;
+export function isTonWalletStandard(wallet: unknown): wallet is TonWalletStandard {
+    return (
+        wallet !== null &&
+        typeof wallet === 'object' &&
+        'id' in wallet &&
+        'version' in wallet &&
+        'publicKey' in wallet
+    );
 }
 
 export function hasIosPrice(

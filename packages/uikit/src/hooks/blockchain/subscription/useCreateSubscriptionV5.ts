@@ -1,28 +1,21 @@
 import { useMutation } from '@tanstack/react-query';
-import { Address, Cell, toNano } from '@ton/core';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { Address } from '@ton/core';
 import { useActiveApi, useAccountsState } from '../../../state/wallet';
 import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
+import { SubscriptionV5Encoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
+import { SubscriptionExtension } from '@tonkeeper/core/dist/pro';
+import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import {
-    DeployPreview,
-    SubscriptionV5Encoder
-} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
-import { TonEstimation } from '@tonkeeper/core/dist/entries/send';
-import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { useTonRawTransactionService } from '../useBlockchainService';
+import { TransactionFee } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
+import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
-interface ISubscriptionEncodingParams {
+type SubscriptionEncodingParams = {
     fromWallet: WalletId;
-    beneficiaryAddress: string;
-    periodSecs: number;
-    reserveTon: string;
-    paymentPerPeriodTon: string;
-    callerFeeTon: string;
-}
+} & SubscriptionExtension;
 
 export const useCreateSubscriptionV5 = () => {
     const sdk = useAppSdk();
@@ -31,7 +24,7 @@ export const useCreateSubscriptionV5 = () => {
         .filter(isAccountTonWalletStandard)
         .flatMap(account => account.allTonWallets.map(wallet => ({ wallet, account })));
 
-    return useMutation<boolean, Error, ISubscriptionEncodingParams>(async subscriptionParams => {
+    return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
         const accountAndWallet = wallets.find(w => w.wallet.id === subscriptionParams.fromWallet);
@@ -39,84 +32,70 @@ export const useCreateSubscriptionV5 = () => {
         if (!accountAndWallet) throw new Error('AccountAndWallet not found');
 
         const signer = await getSigner(sdk, accountAndWallet.account.id, {
-            walletId: accountAndWallet.wallet.id
+            walletId: subscriptionParams.fromWallet
         }).catch(() => null);
 
         if (!signer) throw new Error('Signer not found');
 
-        const beneficiary = Address.parse(subscriptionParams.beneficiaryAddress);
-
-        const encoder = new SubscriptionV5Encoder();
+        const encoder = new SubscriptionV5Encoder(accountAndWallet.wallet);
         const { actions, extensionAddress } = encoder.encodeCreateSubscriptionV2({
-            wallet: Address.parse(accountAndWallet.wallet.rawAddress),
-            walletVersion: 51,
-            beneficiary,
-            subscriptionId: BigInt(Date.now()),
-            firstChargingDate: 0,
-            paymentPerPeriodNano: toNano(subscriptionParams.paymentPerPeriodTon),
-            periodSecs: subscriptionParams.periodSecs,
-            gracePeriodSecs: 10 * 60,
-            callerFeeNano: toNano(subscriptionParams.callerFeeTon),
-            withdrawAddress: beneficiary,
-            withdrawMsgBody: Cell.EMPTY,
-            metadata: Cell.EMPTY,
-            reserveNano: toNano(subscriptionParams.reserveTon),
-            sendMode: 3
+            beneficiary: Address.parse(subscriptionParams.admin),
+            subscriptionId: subscriptionParams.subscription_id,
+            firstChargingDate: subscriptionParams.first_charging_date,
+            paymentPerPeriod: BigInt(subscriptionParams.payment_per_period),
+            period: subscriptionParams.period,
+            gracePeriod: subscriptionParams.grace_period,
+            callerFee: BigInt(subscriptionParams.caller_fee),
+            withdrawAddress: Address.parse(subscriptionParams.recipient),
+            withdrawMsgBody: subscriptionParams.withdraw_msg_body
         });
+
+        if (extensionAddress.toString() !== Address.parse(subscriptionParams.contract).toString()) {
+            throw new Error('Contract extension addresses do not match!');
+        }
 
         const sender = new WalletMessageSender(api, accountAndWallet.wallet, signer as CellSigner);
         await sender.send(actions);
-
-        await sdk.storage.set('EXT_ADDR', extensionAddress.toString());
 
         return true;
     });
 };
 
-export const useFakeFeeEstimation = () =>
-    useMutation<TonEstimation, Error>(async () => ({
-        fee: {
-            type: 'ton-asset' as const,
-            extra: new AssetAmount({ asset: TON_ASSET, weiAmount: 10_000 })
-        }
-    }));
+export const useEstimateDeploySubscriptionV5 = () => {
+    const accounts = useAccountsState();
+    const api = useActiveApi();
+    const rawTx = useTonRawTransactionService();
 
-export const useSubscriptionDataEmulation = () => {
-    const wallets = useAccountsState()
-        .filter(isAccountTonWalletStandard)
-        .flatMap(account => account.allTonWallets.map(wallet => ({ wallet, account })));
+    return useMutation<
+        { fee: TransactionFee; address: Address },
+        Error,
+        SubscriptionEncodingParams
+    >(async subscriptionParams => {
+        const account = accounts
+            .filter(isAccountTonWalletStandard)
+            .find(a => a.allTonWallets.some(w => w.id === subscriptionParams.fromWallet));
 
-    return useMutation<DeployPreview | null, Error, ISubscriptionEncodingParams>(
-        async subscriptionParams => {
-            if (!subscriptionParams) throw new Error('No params');
+        if (!account) throw new Error('Wallet not found');
 
-            const accountAndWallet = wallets.find(
-                w => w.wallet.id === subscriptionParams.fromWallet
-            );
+        const wallet = account.allTonWallets.find(w => w.id === subscriptionParams.fromWallet)!;
 
-            if (!accountAndWallet) throw new Error('AccountAndWallet not found');
+        const sender = new WalletMessageSender(api, wallet, estimationSigner);
 
-            const beneficiary = Address.parse(subscriptionParams.beneficiaryAddress);
+        const encoder = new SubscriptionV5Encoder(wallet);
+        const { actions, extensionAddress } = encoder.encodeCreateSubscriptionV2({
+            beneficiary: Address.parse(subscriptionParams.admin),
+            subscriptionId: subscriptionParams.subscription_id,
+            firstChargingDate: subscriptionParams.first_charging_date,
+            paymentPerPeriod: BigInt(subscriptionParams.payment_per_period),
+            period: subscriptionParams.period,
+            gracePeriod: subscriptionParams.grace_period,
+            callerFee: BigInt(subscriptionParams.caller_fee),
+            withdrawAddress: Address.parse(subscriptionParams.recipient),
+            withdrawMsgBody: subscriptionParams.withdraw_msg_body
+        });
 
-            const encoder = new SubscriptionV5Encoder();
-            const { actions } = encoder.encodeCreateSubscriptionV2({
-                wallet: Address.parse(accountAndWallet.wallet.rawAddress),
-                walletVersion: 51,
-                beneficiary,
-                subscriptionId: BigInt(Date.now()),
-                firstChargingDate: 0,
-                paymentPerPeriodNano: toNano(subscriptionParams.paymentPerPeriodTon),
-                periodSecs: subscriptionParams.periodSecs,
-                gracePeriodSecs: 3 * 60,
-                callerFeeNano: toNano(subscriptionParams.callerFeeTon),
-                withdrawAddress: beneficiary,
-                withdrawMsgBody: Cell.EMPTY,
-                metadata: Cell.EMPTY,
-                reserveNano: toNano(subscriptionParams.reserveTon),
-                sendMode: 3
-            });
+        const estimation = await rawTx.estimate(sender, actions);
 
-            return encoder.extractDeployPreview(actions);
-        }
-    );
+        return { fee: estimation.fee, address: extensionAddress };
+    });
 };

@@ -1,6 +1,6 @@
 import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
-import { isStandardTonWallet } from '../entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
@@ -10,8 +10,8 @@ import { walletVersionFromProServiceDTO } from '../service/proService';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
     IosSubscriptionStatuses,
-    IProStateWallet,
     isProductId,
     isProSubscription,
     isValidSubscription,
@@ -23,7 +23,7 @@ import {
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
-    authorizedWallet: IProStateWallet | null
+    authorizedWallet: TonWalletStandard | null
 ): ProSubscription => {
     const source = subscriptionDto?.source;
     const toDate = (ts: number) => new Date(ts * 1000);
@@ -66,6 +66,40 @@ export const normalizeSubscription = (
                 type: AuthTypes.TELEGRAM
             },
             expiresDate: toDate(dBStoredInfo.expires_date)
+        };
+    }
+
+    if (source === SubscriptionSource.EXTENSION && authorizedWallet) {
+        const dBStoredInfo = subscriptionDto?.extension;
+
+        if (dBStoredInfo === undefined) {
+            throw new Error('Missing crypto dBStoredInfo');
+        }
+
+        if (valid) {
+            return {
+                source,
+                status: ExtensionSubscriptionStatuses.ACTIVE,
+                valid: true,
+                nextChargeDate: new Date(),
+                auth: {
+                    type: AuthTypes.WALLET,
+                    wallet: authorizedWallet
+                },
+                subscriptionParams: dBStoredInfo
+            };
+        }
+
+        return {
+            source,
+            status: ExtensionSubscriptionStatuses.CANCELLED,
+            valid: false,
+            nextChargeDate: new Date(),
+            auth: {
+                type: AuthTypes.WALLET,
+                wallet: authorizedWallet
+            },
+            subscriptionParams: dBStoredInfo
         };
     }
 
@@ -192,10 +226,7 @@ export const findAuthorizedWallet = async (user: IUserInfo, storage: IStorage) =
 
     if (!actualWallet) return null;
 
-    return {
-        publicKey: actualWallet.publicKey,
-        rawAddress: actualWallet.rawAddress
-    };
+    return actualWallet;
 };
 
 export const isValidNanoString = (value: string): boolean => {

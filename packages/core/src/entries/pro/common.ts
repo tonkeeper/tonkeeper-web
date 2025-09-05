@@ -3,13 +3,9 @@ import { TonWalletStandard } from '../wallet';
 import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
 import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
-import { SubscriptionSource } from '../../pro';
+import { SubscriptionExtension, SubscriptionSource } from '../../pro';
 import { SubscriptionStrategy } from './subscription';
-
-export interface IProStateWallet {
-    publicKey: string;
-    rawAddress: string;
-}
+import { Language } from '../language';
 
 export interface IDisplayPlan {
     id: string;
@@ -55,18 +51,31 @@ export interface IConfirmState {
 }
 
 export interface ISubscriptionFormData {
-    wallet?: IProStateWallet;
+    wallet: TonWalletStandard;
     tempToken: string;
     selectedPlan: IDisplayPlan;
+}
+
+export interface IExtensionStrategyConfig {
+    lang: Language;
+    onProConfirmOpen: (p?: {
+        extensionData?: SubscriptionExtension;
+        onConfirm?: (success?: boolean) => void;
+        onCancel?: () => void;
+    }) => void;
+    onRemoveExtensionConfirmOpen: (p?: {
+        extensionData?: SubscriptionExtension;
+        onConfirm?: (success?: boolean) => void;
+        onCancel?: () => void;
+    }) => void;
 }
 
 export interface ISubscriptionServiceConfig {
     initialStrategyMap?: Map<SubscriptionSource, SubscriptionStrategy>;
 }
-
 export interface IWalletAuth {
     type: AuthTypes.WALLET;
-    wallet: IProStateWallet;
+    wallet: TonWalletStandard;
 }
 
 export interface ITokenizedWalletAuth extends IWalletAuth {

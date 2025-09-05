@@ -34,6 +34,13 @@ export enum CryptoSubscriptionStatuses {
     PENDING = 'pending'
 }
 
+export enum ExtensionSubscriptionStatuses {
+    NOT_INITIALIZED = 'not_initialized',
+    ACTIVE = 'active',
+    CANCELLED = 'cancelled',
+    INVALID = 'invalid'
+}
+
 export enum TelegramSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired'

@@ -22,22 +22,26 @@ export class SubscriptionService implements ISubscriptionService {
     private _authTokenService: IProAuthTokenService;
     private _strategiesMap: Map<SubscriptionSource, SubscriptionStrategy>;
 
-    constructor(public storage: IStorage, config: ISubscriptionServiceConfig) {
+    constructor(private _storage: IStorage, config: ISubscriptionServiceConfig) {
         this._strategiesMap = config.initialStrategyMap ?? new Map();
-        this._authTokenService = new ProAuthTokenService(storage);
+        this._authTokenService = new ProAuthTokenService(this._storage);
     }
 
     async subscribe(
         source: SubscriptionSource,
         formData: ISubscriptionFormData
     ): Promise<PurchaseStatuses> {
-        const strategy = this._strategiesMap.get(source)!;
+        const strategy = this._strategiesMap.get(source);
+
+        if (!strategy) {
+            throw new Error(`No subscription found for ${source}`);
+        }
 
         return strategy.subscribe(formData);
     }
 
     async getSubscription(tempToken: string | null): Promise<ProSubscription> {
-        const pendingSubscription: ICryptoPendingSubscription | null = await this.storage.get(
+        const pendingSubscription: ICryptoPendingSubscription | null = await this._storage.get(
             AppKey.PRO_PENDING_SUBSCRIPTION
         );
 
@@ -45,13 +49,13 @@ export class SubscriptionService implements ISubscriptionService {
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
 
         const [currentSubscription, targetSubscription] = await Promise.all([
-            getNormalizedSubscription(this.storage, mainToken),
-            getNormalizedSubscription(this.storage, targetToken)
+            getNormalizedSubscription(this._storage, mainToken),
+            getNormalizedSubscription(this._storage, targetToken)
         ]);
 
         if (tempToken && isValidSubscription(targetSubscription)) {
             await this._authTokenService.setToken(tempToken);
-            await this._clearPendingSubscription(this.storage);
+            await this._clearPendingSubscription(this._storage);
 
             return targetSubscription;
         }
@@ -66,7 +70,7 @@ export class SubscriptionService implements ISubscriptionService {
         const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
 
         if (isValidSubscription(bestSubscription)) {
-            await this._clearPendingSubscription(this.storage);
+            await this._clearPendingSubscription(this._storage);
         }
 
         return bestSubscription;
@@ -98,7 +102,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     async activateTrial(token: string) {
         await this._authTokenService.setToken(token);
-        await this.storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
+        await this._storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
     }
 
     async logout() {
@@ -116,8 +120,8 @@ export class SubscriptionService implements ISubscriptionService {
 
     getAvailableSources(): ReadonlyArray<SubscriptionSource> {
         return Array.from(this._strategiesMap.keys()).sort((a, b) => {
-            if (a === SubscriptionSource.CRYPTO) return -1;
-            if (b === SubscriptionSource.CRYPTO) return 1;
+            if (a === SubscriptionSource.EXTENSION) return -1;
+            if (b === SubscriptionSource.EXTENSION) return 1;
 
             return 0;
         });
@@ -128,6 +132,8 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     addStrategy(strategy: SubscriptionStrategy) {
+        if (this._strategiesMap.has(strategy.source)) return;
+
         this._strategiesMap.set(strategy.source, strategy);
     }
 }

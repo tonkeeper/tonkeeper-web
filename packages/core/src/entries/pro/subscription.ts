@@ -1,5 +1,6 @@
 import {
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
     IosSubscriptionStatuses,
     ProductIds,
     PurchaseStatuses,
@@ -14,12 +15,19 @@ import {
     ITelegramAuth,
     IWalletAuth
 } from './common';
-import { CryptoCurrency, SubscriptionSource } from '../../pro';
+import { CryptoCurrency, SubscriptionExtension, SubscriptionSource } from '../../pro';
 import { Language } from '../language';
 
-export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
+export type ProSubscription =
+    | IosSubscription
+    | ExtensionSubscription
+    | CryptoSubscription
+    | TelegramSubscription
+    | null;
 
 export type IosSubscription = IIosActiveSubscription | IIosExpiredSubscription;
+
+export type ExtensionSubscription = IExtensionActiveSubscription | IExtensionCanceledSubscription;
 
 export type CryptoSubscription =
     | ICryptoActiveSubscription
@@ -28,7 +36,10 @@ export type CryptoSubscription =
 
 export type TelegramSubscription = ITelegramActiveSubscription | ITelegramExpiredSubscription;
 
-export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
+export type SubscriptionStrategy =
+    | IIosSubscriptionStrategy
+    | ICryptoSubscriptionStrategy
+    | IExtensionSubscriptionStrategy;
 
 export interface IBaseSubscription {
     source: SubscriptionSource;
@@ -119,6 +130,30 @@ export interface ICryptoPendingSubscription extends IBaseCryptoSubscription {
 
 export interface ICryptoSubscriptionStrategy extends IBaseSubscriptionStrategy {
     source: SubscriptionSource.CRYPTO;
+}
+
+// Extension Subscription Types
+export interface IBaseExtensionSubscription extends IBaseSubscription {
+    source: SubscriptionSource.EXTENSION;
+    status: ExtensionSubscriptionStatuses;
+    auth: IWalletAuth;
+}
+
+export interface IExtensionActiveSubscription
+    extends IBaseExtensionSubscription,
+        ICryptoDBStoredInfo {
+    status: ExtensionSubscriptionStatuses.ACTIVE;
+    valid: true;
+}
+
+export interface IExtensionCanceledSubscription extends IBaseExtensionSubscription {
+    status: ExtensionSubscriptionStatuses.CANCELLED;
+    valid: false;
+}
+
+export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {
+    source: SubscriptionSource.EXTENSION;
+    cancelSubscription(extensionData: SubscriptionExtension): Promise<PurchaseStatuses>;
 }
 
 // Telegram Subscription Types
