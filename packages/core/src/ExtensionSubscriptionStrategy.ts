@@ -1,5 +1,8 @@
 import {
+    AuthTypes,
+    ExtensionSubscriptionStatuses,
     IDisplayPlan,
+    IExtensionPendingSubscription,
     IExtensionStrategyConfig,
     IExtensionSubscriptionStrategy as IExtensionStrategy,
     isTonWalletStandard,
@@ -12,6 +15,7 @@ import { getProExtensionData, getProServiceTiers } from './service/proService';
 import { Language } from './entries/language';
 import { getFormattedProPrice } from './utils/pro';
 import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStrategy';
+import { AppKey } from './Keys';
 
 export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExtensionStrategy {
     public source = SubscriptionSource.EXTENSION as const;
@@ -21,7 +25,7 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
     }
 
     async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
-        const { onProConfirmOpen, lang } = this.config;
+        const { onProConfirmOpen, lang, onDataStore } = this.config;
         const { wallet, selectedPlan, tempToken } = formData;
 
         const tierId = Number(selectedPlan.id);
@@ -44,23 +48,23 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
             const onConfirm = async (success?: boolean) => {
                 if (!success) return resolve(PurchaseStatuses.CANCELED);
 
-                // const pendingSubscription: ICryptoPendingSubscription = {
-                //     source: SubscriptionSource.CRYPTO,
-                //     status: CryptoSubscriptionStatuses.PENDING,
-                //     valid: false,
-                //     displayName,
-                //     displayPrice: formattedDisplayPrice,
-                //     auth: {
-                //         type: AuthTypes.WALLET,
-                //         wallet,
-                //         tempToken
-                //     }
-                // };
-                //
-                // await this.storage.set<ICryptoPendingSubscription>(
-                //     AppKey.PRO_PENDING_SUBSCRIPTION,
-                //     pendingSubscription
-                // );
+                const pendingSubscription: IExtensionPendingSubscription = {
+                    source: SubscriptionSource.EXTENSION,
+                    status: ExtensionSubscriptionStatuses.PENDING,
+                    valid: false,
+                    displayName: 'displayName',
+                    displayPrice: extension.data.payment_per_period,
+                    auth: {
+                        type: AuthTypes.WALLET,
+                        wallet,
+                        tempToken
+                    }
+                };
+
+                await onDataStore<IExtensionPendingSubscription>(
+                    AppKey.PRO_PENDING_SUBSCRIPTION,
+                    pendingSubscription
+                );
 
                 resolve(PurchaseStatuses.PENDING);
             };

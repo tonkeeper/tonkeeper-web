@@ -21,7 +21,8 @@ import {
     ICryptoActiveSubscription,
     ITelegramActiveSubscription,
     IExtensionSubscriptionStrategy,
-    ExtensionSubscription
+    ExtensionSubscription,
+    IExtensionActiveSubscription
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
@@ -56,11 +57,15 @@ export function isExtensionStrategy(strategy: unknown): strategy is IExtensionSu
 
 export function isPendingSubscription(
     subscription: unknown
-): subscription is CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING } {
+): subscription is
+    | (CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING })
+    | (ExtensionSubscription & { status: ExtensionSubscriptionStatuses.PENDING }) {
     return (
         isProSubscription(subscription) &&
-        subscription?.source === SubscriptionSource.CRYPTO &&
-        subscription.status === CryptoSubscriptionStatuses.PENDING
+        ((subscription?.source === SubscriptionSource.CRYPTO &&
+            subscription.status === CryptoSubscriptionStatuses.PENDING) ||
+            (subscription?.source === SubscriptionSource.EXTENSION &&
+                subscription.status === ExtensionSubscriptionStatuses.PENDING))
     );
 }
 
@@ -119,6 +124,12 @@ export function isExtensionSubscription(value: unknown): value is ExtensionSubsc
     return isProSubscription(value) && value?.source === SubscriptionSource.EXTENSION;
 }
 
+export function isExtensionActiveSubscription(
+    value: unknown
+): value is IExtensionActiveSubscription {
+    return isExtensionSubscription(value) && value?.status === ExtensionSubscriptionStatuses.ACTIVE;
+}
+
 export function isIosAutoRenewableSubscription(value: unknown): value is IIosActiveSubscription & {
     autoRenewStatus: true;
 } {
@@ -148,11 +159,7 @@ export function isTelegramSubscription(value: unknown): value is TelegramSubscri
 }
 
 export function isTelegramActiveSubscription(value: unknown): value is ITelegramActiveSubscription {
-    return (
-        isTelegramSubscription(value) &&
-        value?.source === SubscriptionSource.TELEGRAM &&
-        value?.status === TelegramSubscriptionStatuses.ACTIVE
-    );
+    return isTelegramSubscription(value) && value?.status === TelegramSubscriptionStatuses.ACTIVE;
 }
 
 export function isTonWalletStandard(wallet: unknown): wallet is TonWalletStandard {

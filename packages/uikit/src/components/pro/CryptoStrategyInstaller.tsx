@@ -31,6 +31,7 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
                         SubscriptionSource.EXTENSION,
                         new ExtensionSubscriptionStrategy({
                             lang,
+                            onDataStore: sdk.storage.set,
                             onProConfirmOpen,
                             onRemoveExtensionConfirmOpen
                         })
@@ -43,6 +44,7 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
             sdk.subscriptionService.addStrategy(
                 new ExtensionSubscriptionStrategy({
                     lang,
+                    onDataStore: sdk.storage.set,
                     onProConfirmOpen,
                     onRemoveExtensionConfirmOpen
                 })

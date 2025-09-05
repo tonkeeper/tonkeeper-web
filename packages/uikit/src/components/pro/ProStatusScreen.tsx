@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import {
     isExpiredSubscription,
+    isExtensionActiveSubscription,
     isExtensionStrategy,
     isExtensionSubscription,
     isIosAutoRenewableSubscription,
@@ -56,6 +57,8 @@ export const ProStatusScreen = () => {
 
     const isTelegram = isTelegramSubscription(subscription);
 
+    const isExtension = isExtensionSubscription(subscription);
+
     const isProActive = isValidSubscription(subscription);
     const isProExpired = isExpiredSubscription(subscription);
 
@@ -86,7 +89,7 @@ export const ProStatusScreen = () => {
     const handleCancel = async () => {
         const strategy = sdk.subscriptionService.getStrategy(SubscriptionSource.EXTENSION);
 
-        if (!isExtensionStrategy(strategy) || !isExtensionSubscription(subscription)) return;
+        if (!isExtensionStrategy(strategy) || !isExtensionActiveSubscription(subscription)) return;
 
         await strategy.cancelSubscription(subscription?.contract);
     };
@@ -148,7 +151,7 @@ export const ProStatusScreen = () => {
                     </Button>
                 )}
 
-                {subscription?.source === SubscriptionSource.EXTENSION && (
+                {isExtension && (
                     <CancelButtonStyled
                         secondary
                         color="red"

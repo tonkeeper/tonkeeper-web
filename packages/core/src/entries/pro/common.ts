@@ -58,6 +58,7 @@ export interface ISubscriptionFormData {
 
 export interface IExtensionStrategyConfig {
     lang: Language;
+    onDataStore: <R>(key: string, value: R) => Promise<R | null>;
     onProConfirmOpen: (p?: {
         extensionData?: SubscriptionExtension;
         onConfirm?: (success?: boolean) => void;

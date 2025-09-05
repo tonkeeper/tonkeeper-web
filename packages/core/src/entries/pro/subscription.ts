@@ -27,7 +27,10 @@ export type ProSubscription =
 
 export type IosSubscription = IIosActiveSubscription | IIosExpiredSubscription;
 
-export type ExtensionSubscription = IExtensionActiveSubscription | IExtensionExpiredSubscription;
+export type ExtensionSubscription =
+    | IExtensionActiveSubscription
+    | IExtensionExpiredSubscription
+    | IExtensionPendingSubscription;
 
 export type CryptoSubscription =
     | ICryptoActiveSubscription
@@ -160,6 +163,13 @@ export interface IExtensionExpiredSubscription
         IExtensionDBStoredInfo {
     status: ExtensionSubscriptionStatuses.EXPIRED;
     valid: false;
+}
+
+export interface IExtensionPendingSubscription extends IBaseExtensionSubscription {
+    status: ExtensionSubscriptionStatuses.PENDING;
+    auth: ITokenizedWalletAuth;
+    displayName?: string;
+    displayPrice?: string;
 }
 
 export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {

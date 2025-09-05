@@ -39,7 +39,8 @@ export enum ExtensionSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired',
     CANCELLED = 'cancelled',
-    INVALID = 'invalid'
+    INVALID = 'invalid',
+    PENDING = 'pending'
 }
 
 export enum TelegramSubscriptionStatuses {
