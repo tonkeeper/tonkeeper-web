@@ -23,7 +23,7 @@ import { awaitPopupResponse } from './utils';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import browser from 'webextension-polyfill';
-import { popupManager } from '../../background/popup-manager';
+import { customPopupManager } from '../../background/custom-popup-manager';
 import ExtensionPlatform from '../extension';
 import { showNotificationInPopup } from '../backgroundPopUpService';
 
@@ -85,7 +85,7 @@ const connectWithNotification = async (
     data: ConnectRequest,
     logo: string
 ): Promise<TonConnectEventPayload> => {
-    const closedPopupHandle = await popupManager.openPopup();
+    const closedPopupHandle = await customPopupManager.openPopup();
     showNotificationInPopup({
         kind: 'tonConnectRequest',
         id,
@@ -158,7 +158,7 @@ export const tonConnectTransaction = async (
 
     await delay(200);
 
-    const closedPopupHandle = await popupManager.openPopup();
+    const closedPopupHandle = await customPopupManager.openPopup();
     showNotificationInPopup({
         kind: 'tonConnectSend',
         id,
@@ -202,7 +202,7 @@ export const tonConnectSignData = async (
 
     await delay(200);
 
-    const closedPopupHandle = await popupManager.openPopup();
+    const closedPopupHandle = await customPopupManager.openPopup();
     showNotificationInPopup({
         kind: 'tonConnectSign',
         id,

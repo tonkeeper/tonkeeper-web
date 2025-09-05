@@ -82,7 +82,9 @@ export enum QueryKey {
     isOnReview = 'isOnReview',
     browserTabs = 'browserTabs',
     searchEngineRecommendations = 'searchEngineRecommendations',
-    appCountryInfo = 'appCountryInfo'
+    appCountryInfo = 'appCountryInfo',
+
+    trc20TrxDefaultFee = 'trc20TrxDefaultFee'
 }
 
 export enum JettonKey {

@@ -10,9 +10,46 @@ import {
 } from './libs/service/backgroundDAppService';
 import { handlePopUpConnection } from './libs/service/backgroundPopUpService';
 import { subscriptionProxyNotifications } from './libs/service/backgroundProxyService';
-import { popupManager } from './libs/background/popup-manager';
+import { customPopupManager } from './libs/background/custom-popup-manager';
 
-browser.action.onClicked.addListener(() => popupManager.openPopup('icon-click'));
+async function getShouldOpenSystemPopup() {
+    try {
+        const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+
+        let win;
+        if (tab && tab.windowId !== undefined) {
+            win = await browser.windows.get(tab.windowId);
+        } else {
+            win = await browser.windows.getLastFocused();
+        }
+
+        const os = (await browser.runtime.getPlatformInfo()).os;
+
+        // macOS and linux browsers provide ugly behavior of custom popup when browser is opened in fullscreen mode.
+        // for these cases we open default popup
+        return win?.state === 'fullscreen' && os !== 'win';
+    } catch {
+        return false;
+    }
+}
+
+browser.runtime.onMessage.addListener(async msg => {
+    if (msg?.type === 'DECIDE_MODE') {
+        const openCustomPopup = !(await getShouldOpenSystemPopup());
+        if (openCustomPopup) {
+            customPopupManager.openPopup('icon-click');
+
+            // default popup will receive this and execute window.close inside to close itself
+            return { willOpenCustomPopup: true };
+        } else {
+            // default popup is already opened, we just need to close custom popup instances if any
+            await customPopupManager.closePopupOpenedByOpener('icon-click');
+
+            // default popup will receive this and proceed to render app inside
+            return { willOpenCustomPopup: false };
+        }
+    }
+});
 
 browser.runtime.onConnect.addListener(port => {
     if (port.name === 'TonkeeperUI') {

@@ -1,7 +1,7 @@
 import { Notification } from '../Notification';
 import { createModalControl } from './createModalControl';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AddWalletContent, AddWalletMethod } from '../create/AddWallet';
+import { AddWalletContent } from '../create/AddWallet';
 import styled, { css } from 'styled-components';
 import { Body1, Body2Class, H2, Label2Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
@@ -23,6 +23,7 @@ import { useSecurityCheck } from '../../state/password';
 import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { ImportBySKWallet } from '../../pages/import/ImportBySKWallet';
 import { useProFeaturesNotification } from './ProFeaturesNotificationControlled';
+import { AddWalletMethod } from '@tonkeeper/core/dist/entries/wallet';
 
 const { hook, paramsControl } = createModalControl<{ walletType?: AddWalletMethod } | undefined>();
 
@@ -30,10 +31,10 @@ export const useAddWalletNotification = () => {
     const { mutateAsync: securityCheck } = useSecurityCheck();
     const { onOpen: onOpenHook, ...rest } = hook();
 
-    const onOpen = useCallback<typeof onOpenHook>(
-        async p => {
+    const onOpen = useCallback(
+        async (p?: { walletType?: AddWalletMethod; skipSecurityCheck?: boolean } | undefined) => {
             try {
-                if (p?.walletType) {
+                if (p?.walletType && !p.skipSecurityCheck) {
                     await securityCheck();
                 }
 
@@ -91,12 +92,19 @@ const doesMethodRequirePro = (method: AddWalletMethod | undefined): boolean => {
 export const AddWalletNotificationControlled = () => {
     const { onOpen: openBuyPro } = useProFeaturesNotification();
     const { data: subscription } = useProState();
-    const { isOpen, onClose } = useAddWalletNotification();
+    const { isOpen, onClose, onOpen } = useAddWalletNotification();
     const [params] = useAtom(paramsControl);
     const { t } = useTranslation();
     const [selectedMethod, setSelectedMethod] = useState<AddWalletMethod | undefined>(
         params?.walletType
     );
+
+    useEffect(() => {
+        const walletType = sdk.addWalletPage?.getAutoMountMethod();
+        if (walletType) {
+            onOpen({ walletType, skipSecurityCheck: true });
+        }
+    }, []);
 
     useEffect(() => {
         if (!isOpen) {
@@ -108,12 +116,16 @@ export const AddWalletNotificationControlled = () => {
             return;
         }
 
+        if (params?.walletType) {
+            sdk.addWalletPage?.open(params.walletType);
+        }
         setSelectedMethod(params?.walletType);
     }, [isOpen, params?.walletType, subscription]);
 
     const sdk = useAppSdk();
 
     const onCloseCallback = useCallback(() => {
+        sdk.addWalletPage?.close();
         onClose();
     }, [onClose, setSelectedMethod, sdk]);
 
@@ -125,6 +137,7 @@ export const AddWalletNotificationControlled = () => {
                 return;
             }
 
+            sdk.addWalletPage?.open(method);
             setSelectedMethod(method);
         };
     }, [subscription, openBuyPro, setSelectedMethod, sdk]);

@@ -20,6 +20,7 @@ import {
 import { ChevronRightIcon } from '../Icon';
 import { useSecurityCheck } from '../../state/password';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
+import { AddWalletMethod } from '@tonkeeper/core/src/entries/wallet';
 
 const AddMethod = styled.button`
     display: flex;
@@ -85,20 +86,6 @@ const GroupsDivider = styled(Body2)`
     color: ${p => p.theme.textSecondary};
     margin: 24px 0 16px;
 `;
-
-export const addWalletMethod = [
-    'multisig',
-    'create-standard',
-    'create-mam',
-    'import',
-    'watch-only',
-    'signer',
-    'keystone',
-    'ledger',
-    'testnet',
-    'sk_fireblocks'
-] as const;
-export type AddWalletMethod = (typeof addWalletMethod)[number];
 
 export const AddWalletContent: FC<{ onSelect: (path: AddWalletMethod) => void }> = ({
     onSelect: onSelectProp

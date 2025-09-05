@@ -11,12 +11,15 @@ import { usePreFetchRates } from '../../state/rates';
 
 import { useWalletFilteredNftList } from '../../state/nft';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const HomeAssets: FC<{
     assets: AssetAmount[];
     nfts: NFT[];
 }> = ({ assets, nfts }) => {
-    if (assets.length + nfts.length < 11 || assets.length < 4) {
+    const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
+
+    if (assets.length + nfts.length < 11 || assets.length < 4 || !isNftEnabled) {
         return <CompactView assets={assets} nfts={nfts} />;
     } else {
         return <TabsView assets={assets} nfts={nfts} />;

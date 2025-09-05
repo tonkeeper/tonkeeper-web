@@ -83,11 +83,15 @@ export const Label4 = styled.span`
     line-height: 14px;
 `;
 
-export const Body1 = styled.span`
+export const Body1Class = css`
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
+`;
+
+export const Body1 = styled.span`
+    ${Body1Class};
 `;
 
 export const Body1Body2Responsive = styled(Body1)<{ secondary?: boolean }>`

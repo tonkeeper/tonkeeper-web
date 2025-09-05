@@ -148,7 +148,7 @@ export async function parseTonTransaction(
             isFinite(parseInt(data.query.exp))
         ) {
             validUntil = parseInt(data.query.exp);
-            if (validUntil - 2000 < Date.now() / 1000) {
+            if (validUntil - 10 < Date.now() / 1000) {
                 throw new LinkExpiredError('Unsupported link: expired');
             }
         }

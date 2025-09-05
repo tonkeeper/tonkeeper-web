@@ -31,7 +31,7 @@ import {
     BATTERY_SENDER_CHOICE,
     EXTERNAL_SENDER_CHOICE,
     SenderChoice,
-    SenderChoiceUserAvailable,
+    TonSenderChoiceUserAvailable,
     useGetEstimationSender,
     useGetSender,
     useTonConnectAvailableSendersChoices
@@ -41,6 +41,7 @@ import { Sender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/dist/entries/send';
 import { ActionFeeDetailsUniversal, SelectSenderDropdown } from '../activity/NotificationCommon';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -177,7 +178,7 @@ const TonTransactionContent: FC<{
 
     const { data: availableSendersChoices, isLoading: isChoicesLoading } =
         useTonConnectAvailableSendersChoices(params);
-    const [selectedSenderType, onSenderTypeChange] = useState<SenderChoiceUserAvailable['type']>(
+    const [selectedSenderType, onSenderTypeChange] = useState<TonSenderChoiceUserAvailable['type']>(
         EXTERNAL_SENDER_CHOICE.type
     );
     useEffect(() => {
@@ -256,7 +257,8 @@ const TonTransactionContent: FC<{
                         <Header>{t('send_screen_steps_amount_insufficient_balance')}</Header>
                     </ErrorStyled>
                     <SelectSenderDropdown
-                        availableSendersChoices={availableSendersChoices}
+                        blockchain={BLOCKCHAIN_NAME.TON}
+                        availableSendersOptions={availableSendersChoices}
                         onSenderTypeChange={onSenderTypeChange}
                         selectedSenderType={selectedSenderType}
                     />
@@ -266,7 +268,8 @@ const TonTransactionContent: FC<{
             )}
             {!!estimate?.fee && (
                 <ActionFeeDetailsUniversalStyled
-                    availableSendersChoices={availableSendersChoices}
+                    blockchain={BLOCKCHAIN_NAME.TON}
+                    availableSendersOptions={availableSendersChoices}
                     selectedSenderType={selectedSenderType}
                     onSenderTypeChange={onSenderTypeChange}
                     fee={estimate.fee}

@@ -1,6 +1,6 @@
 import { css, styled } from 'styled-components';
-import { FC, Fragment, useEffect, useRef, useState } from 'react';
-import { CarouselItem, CarouselRootProvider, CarouselItemGroup, useCarousel } from '@ark-ui/react';
+import { FC, Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { CarouselItem, CarouselItemGroup, CarouselRootProvider, useCarousel } from '@ark-ui/react';
 
 import { Badge } from '../shared';
 import { Body2Class, Label1, Label1Class } from '../Text';
@@ -10,15 +10,17 @@ import { ChevronLeftIcon, ChevronRightIcon } from '../Icon';
 import { useUserLanguage } from '../../state/language';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
 import { useAppContext } from '../../hooks/appContext';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 export const PromoNotificationCarousel = () => {
     const { t } = useTranslation();
     const { data: lang } = useUserLanguage();
     const { mainnetConfig } = useAppContext();
     const [observedSlide, setObservedSlide] = useState(FeatureSlideNames.MAIN);
+    const metaData = useProCarouselMetaData();
 
     const carousel = useCarousel({
-        slideCount: META_DATA_MAP.length
+        slideCount: metaData.length
     });
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -57,10 +59,10 @@ export const PromoNotificationCarousel = () => {
     return (
         <CarouselWrapper value={carousel}>
             <RelativeWrapper>
-                <GradientLayer $page={observedSlide} $total={META_DATA_MAP.length} />
+                <GradientLayer $page={observedSlide} $total={metaData.length} />
 
                 <ItemGroupStyled ref={containerRef}>
-                    {META_DATA_MAP.map((localProps, idx) => {
+                    {metaData.map((localProps, idx) => {
                         const { id, titleKey, src, subtitleKey, badgeComponent } = localProps;
 
                         const locText = localizationText(lang);
@@ -120,7 +122,7 @@ export const PromoNotificationCarousel = () => {
             </RelativeWrapper>
 
             <DotsWrapper>
-                {META_DATA_MAP.map(({ id }) => (
+                {metaData.map(({ id }) => (
                     <Dot isActive={id === observedSlide} key={id} />
                 ))}
             </DotsWrapper>
@@ -138,7 +140,7 @@ const LocalBadge = () => {
     );
 };
 
-export const META_DATA_MAP = [
+const META_DATA_MAP = [
     {
         id: FeatureSlideNames.MAIN,
         titleKey: 'tonkeeper_pro_subscription',
@@ -186,6 +188,16 @@ export const META_DATA_MAP = [
         }
     }
 ];
+
+export const useProCarouselMetaData = () => {
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
+
+    // FeatureSlideNames.SUPPORT contains information about Tron transfers that are not available for some users due to region restrictions
+    return useMemo(
+        () => META_DATA_MAP.filter(item => item.id !== FeatureSlideNames.SUPPORT || isTronEnabled),
+        [isTronEnabled]
+    );
+};
 
 type LocalBadgedTitleProps = Pick<(typeof META_DATA_MAP)[number], 'titleKey' | 'badgeComponent'>;
 const LocalBadgedTitle: FC<LocalBadgedTitleProps & { className?: string }> = props => {
@@ -260,7 +272,7 @@ const GradientLayer = styled.div<{ $page: number; $total: number }>`
         content: '';
         display: block;
         width: ${({ $total }) => `${$total * 100}%`};
-        aspect-ratio: 5 / 1;
+        aspect-ratio: ${p => p.$total} / 1;
         background: linear-gradient(
             70deg,
             #49a6f4 0%,

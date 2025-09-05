@@ -5,7 +5,7 @@ import { APIConfig } from '../../../entries/apis';
 import { MessagePayloadParam, serializePayload, WalletOutgoingMessage } from './types';
 
 export class TonEncoder {
-    constructor(private readonly api: APIConfig, private readonly walletAddress: string) {}
+    constructor(private readonly api: APIConfig) {}
 
     encodeTransfer = async (
         transfer:

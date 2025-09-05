@@ -129,4 +129,4 @@ export class PopupManager {
     }
 }
 
-export const popupManager = new PopupManager();
+export const customPopupManager = new PopupManager();

@@ -19,6 +19,7 @@ import { ProPurchaseNotificationControlled } from './modals/ProPurchaseNotificat
 import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
 import { ProAuthNotificationControlled } from './modals/ProAuthNotificationControlled';
 import { ProConfirmNotificationControlled } from './modals/ProConfirmNotificationControlled';
+import { TopUpTronFeeBalanceNotificationControlled } from './modals/TopUpTronFeeBalanceNotificationControlled';
 import { ProInstallExtensionNotificationControlled } from './modals/ProInstallExtensionNotificationControlled';
 import { ProRemoveExtensionNotificationControlled } from './modals/ProRemoveExtensionNotificationControlled';
 
@@ -46,6 +47,7 @@ export const ModalsRoot = () => {
             <ProFeaturesNotificationControlled />
             <ProEndingNotificationControlled />
             <ProConfirmNotificationControlled />
+            <TopUpTronFeeBalanceNotificationControlled />
             <ProInstallExtensionNotificationControlled />
             <ProRemoveExtensionNotificationControlled />
         </>

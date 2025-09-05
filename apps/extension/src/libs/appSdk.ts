@@ -1,4 +1,4 @@
-import { BaseApp } from '@tonkeeper/core/dist/AppSdk';
+import { BaseApp, IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import browser from 'webextension-polyfill';
 import packageJson from '../../package.json';
@@ -7,11 +7,12 @@ import { checkForError } from './utils';
 import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 import { atom, mapAtom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
+import { addWalletMethod, AddWalletMethod } from '@tonkeeper/core/dist/entries/wallet';
 
 export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
     process.env.REACT_APP_EXTENSION_TYPE;
 
-export class ExtensionAppSdk extends BaseApp {
+export class ExtensionAppSdk extends BaseApp implements IAppSdk {
     constructor() {
         super(new ExtensionStorage());
     }
@@ -65,6 +66,53 @@ export class ExtensionAppSdk extends BaseApp {
     linksInterceptorAvailable = true;
 
     ledgerConnectionPage = LedgerConnectionPageManage.create();
+
+    addWalletPage = new AddWalletPageManage();
+}
+
+class AddWalletPageManage {
+    public isInCustomPopup: boolean | undefined;
+
+    private addWalletQuery = 'add_wallet';
+
+    private get selectedMethod(): AddWalletMethod | null {
+        const hash = window.location.hash;
+        const urlParams = new URLSearchParams(hash.substring(1));
+        const query = urlParams.get(this.addWalletQuery);
+        if (query && addWalletMethod.includes(query as AddWalletMethod)) {
+            return query as AddWalletMethod;
+        }
+        return null;
+    }
+
+    private get isOpenedAsSeparateTab(): boolean {
+        return !!this.selectedMethod;
+    }
+
+    public getAutoMountMethod(): AddWalletMethod | null {
+        return this.selectedMethod;
+    }
+
+    public async open(selectedMethod: AddWalletMethod) {
+        if (this.isInCustomPopup || this.isOpenedAsSeparateTab) {
+            return;
+        }
+
+        const tab = await browser.tabs.create({
+            url: `index.html#?${this.addWalletQuery}=${selectedMethod}`,
+            active: true
+        });
+
+        const tabWindow = await browser.windows.get(tab.windowId!);
+        await browser.windows.update(tabWindow.id!, { focused: true });
+        window.close();
+    }
+
+    public close() {
+        if (this.isOpenedAsSeparateTab) {
+            window.close();
+        }
+    }
 }
 
 class LedgerConnectionPageManage {

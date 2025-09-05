@@ -208,3 +208,17 @@ export interface AccountWallet {
     wallet: TonWalletStandard;
     account: Account;
 }
+
+export const addWalletMethod = [
+    'multisig',
+    'create-standard',
+    'create-mam',
+    'import',
+    'watch-only',
+    'signer',
+    'keystone',
+    'ledger',
+    'testnet',
+    'sk_fireblocks'
+] as const;
+export type AddWalletMethod = (typeof addWalletMethod)[number];

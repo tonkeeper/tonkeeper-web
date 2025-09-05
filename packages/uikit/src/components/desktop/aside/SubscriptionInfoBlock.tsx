@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
     isPaidActiveSubscription,
@@ -30,7 +30,7 @@ import { useSubscriptionEndingVerification } from '../../../hooks/pro/useSubscri
 import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscriptionPolling';
 import { usePreloadImages } from '../../../hooks/usePreloadImages';
 import { useAppContext } from '../../../hooks/appContext';
-import { getAllCarouselImages } from '../../../libs/pro';
+import { useAllCarouselImages } from '../../../libs/pro';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -153,8 +153,6 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const [containerRef, { width }] = useElementSize();
     const navigate = useNavigate();
 
-    const baseSlideUrl = mainnetConfig.pro_media_base_url;
-
     const onRefresh = () => {
         if (rotate) {
             return;
@@ -168,8 +166,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
         invalidateGlobalQueries();
     };
 
-    const carouselImages = useMemo(() => getAllCarouselImages(baseSlideUrl), [baseSlideUrl]);
-
+    const carouselImages = useAllCarouselImages(mainnetConfig.pro_media_base_url);
     usePreloadImages(carouselImages);
     useIosSubscriptionPolling();
     useSubscriptionEndingVerification();

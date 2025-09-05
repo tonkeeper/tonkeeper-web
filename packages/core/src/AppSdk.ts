@@ -4,7 +4,7 @@ import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
-import { TonContract, TonWalletStandard } from './entries/wallet';
+import { AddWalletMethod, TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
@@ -196,6 +196,12 @@ export interface IAppSdk {
         isOpened: ReadonlyAtom<boolean>;
         open(): Promise<void>;
         close(): Promise<void>;
+    };
+
+    addWalletPage?: {
+        getAutoMountMethod(): AddWalletMethod | null;
+        open(selectedMethod?: AddWalletMethod): Promise<void>;
+        close(): void;
     };
 
     getAppCountryInfo(): Promise<AppCountryInfo>;
