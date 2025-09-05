@@ -31,7 +31,7 @@ import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
 import { CountryInfo } from './plugins/country-info-plugin';
-import { SubscriptionService } from '@tonkeeper/core/SubscriptionService';
+import { SubscriptionService } from '@tonkeeper/core/dist/SubscriptionService';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 async function waitAppIsActive(): Promise<void> {

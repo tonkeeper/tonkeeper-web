@@ -1,7 +1,7 @@
 import { FC, ReactNode, useEffect, useState } from 'react';
 
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { SubscriptionService } from '@tonkeeper/core/SubscriptionService';
+import { SubscriptionService } from '@tonkeeper/core/dist/SubscriptionService';
 import { ExtensionSubscriptionStrategy } from '@tonkeeper/core/dist/ExtensionSubscriptionStrategy';
 
 import { useAppSdk } from '../../hooks/appSdk';

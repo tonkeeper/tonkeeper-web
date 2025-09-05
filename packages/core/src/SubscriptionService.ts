@@ -10,17 +10,18 @@ import {
     ProSubscription,
     PurchaseStatuses,
     SubscriptionStrategy
-} from './src/entries/pro';
-import { AuthService, SubscriptionSource } from './src/pro';
-import { getNormalizedSubscription, IProAuthTokenService } from './src/service/proService';
-import { IStorage } from './src/Storage';
-import { ProAuthTokenService, subscriptionFormTempAuth$ } from './src/ProAuthTokenService';
-import { AppKey } from './src/Keys';
-import { pickBestSubscription } from './src/utils/pro';
-import { Language } from './src/entries/language';
+} from './entries/pro';
+import { AuthService, SubscriptionSource } from './pro';
+import { getNormalizedSubscription, IProAuthTokenService } from './service/proService';
+import { IStorage } from './Storage';
+import { ProAuthTokenService, subscriptionFormTempAuth$ } from './ProAuthTokenService';
+import { AppKey } from './Keys';
+import { pickBestSubscription } from './utils/pro';
+import { Language } from './entries/language';
 
 export class SubscriptionService implements ISubscriptionService {
     private _authTokenService: IProAuthTokenService;
+
     private _strategiesMap: Map<SubscriptionSource, SubscriptionStrategy>;
 
     constructor(private _storage: IStorage, config: ISubscriptionServiceConfig) {
