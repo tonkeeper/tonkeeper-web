@@ -1,6 +1,7 @@
 import {
     ICryptoPendingSubscription,
     IDisplayPlan,
+    IExtensionPendingSubscription,
     isPendingSubscription,
     ISubscriptionFormData,
     ISubscriptionService,
@@ -13,7 +14,7 @@ import {
 import { AuthService, SubscriptionSource } from './src/pro';
 import { getNormalizedSubscription, IProAuthTokenService } from './src/service/proService';
 import { IStorage } from './src/Storage';
-import { ProAuthTokenService } from './src/ProAuthTokenService';
+import { ProAuthTokenService, subscriptionFormTempAuth$ } from './src/ProAuthTokenService';
 import { AppKey } from './src/Keys';
 import { pickBestSubscription } from './src/utils/pro';
 import { Language } from './src/entries/language';
@@ -40,11 +41,13 @@ export class SubscriptionService implements ISubscriptionService {
         return strategy.subscribe(formData);
     }
 
-    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
-        const pendingSubscription: ICryptoPendingSubscription | null = await this._storage.get(
-            AppKey.PRO_PENDING_SUBSCRIPTION
-        );
+    async getSubscription(): Promise<ProSubscription> {
+        const pendingSubscription:
+            | ICryptoPendingSubscription
+            | IExtensionPendingSubscription
+            | null = await this._storage.get(AppKey.PRO_PENDING_SUBSCRIPTION);
 
+        const tempToken = subscriptionFormTempAuth$?.value?.tempToken;
         const mainToken = await this._authTokenService.getToken();
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
 
@@ -111,7 +114,6 @@ export class SubscriptionService implements ISubscriptionService {
 
             if (mainToken) {
                 await AuthService.logout(`Bearer ${mainToken}`);
-                await this._authTokenService.deleteToken();
             }
         } finally {
             await this._authTokenService.deleteToken();

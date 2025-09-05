@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import {
     AuthTypes,
     ExtensionSubscriptionStatuses,
@@ -16,6 +17,8 @@ import { Language } from './entries/language';
 import { getFormattedProPrice } from './utils/pro';
 import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStrategy';
 import { AppKey } from './Keys';
+import { AssetAmount } from './entries/crypto/asset/asset-amount';
+import { TON_ASSET } from './entries/crypto/asset/constants';
 
 export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExtensionStrategy {
     public source = SubscriptionSource.EXTENSION as const;
@@ -53,7 +56,10 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
                     status: ExtensionSubscriptionStatuses.PENDING,
                     valid: false,
                     displayName: 'displayName',
-                    displayPrice: extension.data.payment_per_period,
+                    displayPrice: new AssetAmount({
+                        asset: TON_ASSET,
+                        weiAmount: new BigNumber(extension.data.payment_per_period)
+                    }).toStringAssetRelativeAmount(2),
                     auth: {
                         type: AuthTypes.WALLET,
                         wallet,

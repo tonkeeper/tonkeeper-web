@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { useActiveApi, useAccountsState } from '../../../state/wallet';
-import { isAccountTonWalletStandard } from '@tonkeeper/core/dist/entries/account';
+import { useActiveApi, useAccountWallets } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { SubscriptionV5Encoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
@@ -12,6 +11,7 @@ import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
 import { useTonRawTransactionService } from '../useBlockchainService';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 
 type SubscriptionEncodingParams = {
     fromWallet: WalletId;
@@ -20,19 +20,19 @@ type SubscriptionEncodingParams = {
 export const useCreateSubscriptionV5 = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
-    const wallets = useAccountsState()
-        .filter(isAccountTonWalletStandard)
-        .flatMap(account => account.allTonWallets.map(wallet => ({ wallet, account })));
+    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
-        const accountAndWallet = wallets.find(w => w.wallet.id === subscriptionParams.fromWallet);
+        const accountAndWallet = accountsWallets.find(
+            w => w.wallet.id === subscriptionParams.fromWallet
+        );
 
         if (!accountAndWallet) throw new Error('AccountAndWallet not found');
 
         const signer = await getSigner(sdk, accountAndWallet.account.id, {
-            walletId: subscriptionParams.fromWallet
+            walletId: accountAndWallet.wallet.id
         }).catch(() => null);
 
         if (!signer) throw new Error('Signer not found');
@@ -62,22 +62,22 @@ export const useCreateSubscriptionV5 = () => {
 };
 
 export const useEstimateDeploySubscriptionV5 = () => {
-    const accounts = useAccountsState();
     const api = useActiveApi();
     const rawTx = useTonRawTransactionService();
+    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     return useMutation<
         { fee: TransactionFeeTonAsset; address: Address },
         Error,
         SubscriptionEncodingParams
     >(async subscriptionParams => {
-        const account = accounts
-            .filter(isAccountTonWalletStandard)
-            .find(a => a.allTonWallets.some(w => w.id === subscriptionParams.fromWallet));
+        const accountAndWallet = accountsWallets.find(
+            w => w.wallet.id === subscriptionParams.fromWallet
+        );
 
-        if (!account) throw new Error('Wallet not found');
+        const { wallet, account } = accountAndWallet ?? {};
 
-        const wallet = account.allTonWallets.find(w => w.id === subscriptionParams.fromWallet)!;
+        if (!account || !wallet) throw new Error('Account or Wallet not found');
 
         const sender = new WalletMessageSender(api, wallet, estimationSigner);
 

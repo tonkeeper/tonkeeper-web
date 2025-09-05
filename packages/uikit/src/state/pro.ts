@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
     IDisplayPlan,
     IIosPurchaseResult,
     IOriginalTransactionInfo,
@@ -26,7 +27,7 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk, useAppTargetEnv } from '../hooks/appSdk';
 import { useTranslation } from '../hooks/translation';
 import { useAccountsStorage } from '../hooks/useStorage';
-import { QueryKey } from '../libs/queryKey';
+import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { useUserLanguage } from './language';
 import { signTonConnectOver } from './mnemonic';
 import {
@@ -109,7 +110,11 @@ export const useProState = () => {
         {
             suspense: true,
             keepPreviousData: true,
-            refetchInterval: s => (s?.status === CryptoSubscriptionStatuses.PENDING ? 1000 : false)
+            refetchInterval: s =>
+                s?.status === CryptoSubscriptionStatuses.PENDING ||
+                s?.status === ExtensionSubscriptionStatuses.PENDING
+                    ? 1000
+                    : false
         }
     );
 };
@@ -222,7 +227,7 @@ export const useProLogout = () => {
     return useMutation(async () => {
         await sdk.subscriptionService.logout();
 
-        await client.invalidateQueries([QueryKey.pro]);
+        await client.invalidateQueries(anyOfKeysParts(QueryKey.pro));
     });
 };
 
