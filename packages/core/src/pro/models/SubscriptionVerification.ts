@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { CryptoCurrency } from './CryptoCurrency';
+import type { SubscriptionExtension } from './SubscriptionExtension';
 import type { SubscriptionSource } from './SubscriptionSource';
 export type SubscriptionVerification = {
     valid: boolean;
@@ -42,6 +43,7 @@ export type SubscriptionVerification = {
         status: SubscriptionVerification.status;
         auto_renew_status: boolean;
     };
+    extension?: SubscriptionExtension;
 };
 export namespace SubscriptionVerification {
     export enum status {
