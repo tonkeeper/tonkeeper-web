@@ -209,7 +209,7 @@ export const useAllWalletsTotalBalance = (network: Network) => {
             };
             const result = await getDashboardData(queryToFetch, {
                 currency: fiat,
-                token: await sdk.subscriptionStrategy.getToken()
+                token: await sdk.subscriptionService.getToken()
             });
 
             return result
@@ -239,7 +239,7 @@ export const useAccountTotalBalance = () => {
             };
             const result = await getDashboardData(queryToFetch, {
                 currency: fiat,
-                token: await sdk.subscriptionStrategy.getToken()
+                token: await sdk.subscriptionService.getToken()
             });
 
             const totalTonAssetsBalances = result

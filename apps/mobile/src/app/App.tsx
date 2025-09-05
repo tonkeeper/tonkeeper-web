@@ -50,6 +50,7 @@ import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/Publis
 import { queryClient } from '../libs/query-client';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 setupIonicReact({
     swipeBackEnabled: true,
@@ -257,11 +258,13 @@ export const Loader: FC = () => {
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} />
-            <CopyNotification />
-            <QrScanner />
-            <ModalsRoot />
-            <SignerPublishNotification />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} />
+                <CopyNotification />
+                <QrScanner />
+                <ModalsRoot />
+                <SignerPublishNotification />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };

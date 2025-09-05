@@ -1,28 +1,27 @@
 import { type FC } from 'react';
 import styled from 'styled-components';
-import { isCryptoStrategy } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body3, Body3Class } from '../Text';
-import { useAppSdk } from '../../hooks/appSdk';
 import { ExternalLink } from '../shared/ExternalLink';
 import { useTranslation } from '../../hooks/translation';
 import { useLegalLinks } from '../../state/legal';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 interface IProps {
     onManage: () => Promise<void>;
+    selectedSource: SubscriptionSource;
 }
 
-export const ProLegalNote: FC<IProps> = ({ onManage }) => {
-    const sdk = useAppSdk();
+export const ProLegalNote: FC<IProps> = ({ onManage, selectedSource }) => {
     const { t } = useTranslation();
 
-    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+    const isCrypto = selectedSource === SubscriptionSource.CRYPTO;
     const { termsLink, privacyLink } = useLegalLinks();
 
     return (
         <LegalNoteWrapper>
             <LegalNote>
-                {t(`pro_terms_privacy_restore_note${isCrypto ? '_crypto' : ''}`)}{' '}
+                {t(isCrypto ? 'pro_terms_privacy_crypto_note' : 'pro_terms_privacy_restore_note')}{' '}
             </LegalNote>
             <ExternalLinkStyled
                 onClick={e => {

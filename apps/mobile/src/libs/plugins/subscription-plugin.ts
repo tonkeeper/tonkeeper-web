@@ -6,10 +6,7 @@ import {
     ISubscriptionFormData,
     IOriginalTransactionInfo,
     IProductInfo,
-    NormalizedProPlans,
-    isProductId,
-    ProSubscription,
-    isProSubscription
+    isProductId
 } from '@tonkeeper/core/dist/entries/pro';
 import {
     IosEnvironmentTypes,
@@ -17,13 +14,9 @@ import {
     ProductIds
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { getFormattedProPrice, pickBestSubscription } from '@tonkeeper/core/dist/utils/pro';
-import {
-    getNormalizedSubscription,
-    saveIapPurchase
-} from '@tonkeeper/core/dist/service/proService';
+import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
+import { saveIapPurchase } from '@tonkeeper/core/dist/service/proService';
 import { BaseSubscriptionStrategy as BaseStrategy } from '@tonkeeper/core/dist/BaseSubscriptionStrategy';
-import { IStorage } from '@tonkeeper/core/dist/Storage';
 
 interface ISubscriptionPlugin {
     subscribe(options: { productId: ProductIds }): Promise<IIosPurchaseResult>;
@@ -85,7 +78,7 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
                                 }
                             ]
                         }),
-                    3000
+                    1000
                 )
             );
         },
@@ -105,10 +98,6 @@ const SubscriptionPlugin = registerPlugin<ISubscriptionPlugin>('Subscription', {
 
 export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrategy {
     public source = SubscriptionSource.IOS as const;
-
-    public constructor(storage: IStorage) {
-        super(storage);
-    }
 
     async subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses> {
         const productId = formData.selectedPlan.id;
@@ -143,28 +132,6 @@ export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrateg
         return PurchaseStatuses.SUCCESS;
     }
 
-    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
-        const mainToken = await this.authTokenService.getToken();
-
-        const [currentSubscription, targetSubscription] = await Promise.all([
-            getNormalizedSubscription(this.storage, mainToken),
-            getNormalizedSubscription(this.storage, tempToken)
-        ]);
-
-        const bestSubscription = pickBestSubscription(currentSubscription, targetSubscription);
-
-        const shouldPromoteToken =
-            tempToken &&
-            bestSubscription === targetSubscription &&
-            isProSubscription(bestSubscription);
-
-        if (shouldPromoteToken) {
-            await this.authTokenService.setToken(tempToken);
-        }
-
-        return bestSubscription;
-    }
-
     async manageSubscriptions(): Promise<void> {
         return SubscriptionPlugin.manageSubscriptions();
     }
@@ -179,18 +146,16 @@ export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrateg
         return SubscriptionPlugin.getOriginalTransactionId();
     }
 
-    async getAllProductsInfoCore(): Promise<NormalizedProPlans> {
+    async getAllProductsInfoCore(): Promise<IDisplayPlan[]> {
         const productIds = Object.values(ProductIds);
         const { products } = await SubscriptionPlugin.getAllProductsInfo({ productIds });
 
-        const normalizedPlans: IDisplayPlan[] = products.map(plan => ({
+        return products.map(plan => ({
             id: plan.id,
             displayName: plan.displayName,
             displayPrice: plan.displayPrice,
             subscriptionPeriod: plan?.subscriptionPeriod || 'month',
             formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
         }));
-
-        return { plans: normalizedPlans, verifiedPromoCode: undefined };
     }
 }

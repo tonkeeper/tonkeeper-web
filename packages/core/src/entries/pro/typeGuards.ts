@@ -1,6 +1,7 @@
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
     IosSubscriptionStatuses,
     ProductIds,
     PurchaseErrors,
@@ -9,7 +10,6 @@ import {
 import {
     ICryptoExpiredSubscription,
     CryptoSubscription,
-    ICryptoSubscriptionStrategy,
     IIosSubscriptionStrategy,
     IIosExpiredSubscription,
     IosSubscription,
@@ -19,11 +19,14 @@ import {
     TelegramSubscription,
     IIosActiveSubscription,
     ICryptoActiveSubscription,
-    ITelegramActiveSubscription
+    ITelegramActiveSubscription,
+    IExtensionSubscriptionStrategy,
+    ExtensionSubscription,
+    IExtensionActiveSubscription
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
-import { IProStateWallet, IWalletAuth } from './common';
+import { IWalletAuth } from './common';
 
 export function isProductId(value: unknown): value is ProductIds {
     return typeof value === 'string' && Object.values(ProductIds).includes(value as ProductIds);
@@ -48,17 +51,21 @@ export function isIosStrategy(strategy?: unknown): strategy is IIosSubscriptionS
     return isStrategy(strategy) && strategy?.source === SubscriptionSource.IOS;
 }
 
-export function isCryptoStrategy(strategy: unknown): strategy is ICryptoSubscriptionStrategy {
-    return isStrategy(strategy) && strategy?.source === SubscriptionSource.CRYPTO;
+export function isExtensionStrategy(strategy: unknown): strategy is IExtensionSubscriptionStrategy {
+    return isStrategy(strategy) && strategy?.source === SubscriptionSource.EXTENSION;
 }
 
 export function isPendingSubscription(
     subscription: unknown
-): subscription is CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING } {
+): subscription is
+    | (CryptoSubscription & { status: CryptoSubscriptionStatuses.PENDING })
+    | (ExtensionSubscription & { status: ExtensionSubscriptionStatuses.PENDING }) {
     return (
         isProSubscription(subscription) &&
-        subscription?.source === SubscriptionSource.CRYPTO &&
-        subscription.status === CryptoSubscriptionStatuses.PENDING
+        ((subscription?.source === SubscriptionSource.CRYPTO &&
+            subscription.status === CryptoSubscriptionStatuses.PENDING) ||
+            (subscription?.source === SubscriptionSource.EXTENSION &&
+                subscription.status === ExtensionSubscriptionStatuses.PENDING))
     );
 }
 
@@ -80,6 +87,8 @@ export function isExpiredSubscription(
             subscription.status === IosSubscriptionStatuses.EXPIRED) ||
             (subscription?.source === SubscriptionSource.CRYPTO &&
                 subscription.status === CryptoSubscriptionStatuses.EXPIRED) ||
+            (subscription?.source === SubscriptionSource.EXTENSION &&
+                subscription.status === ExtensionSubscriptionStatuses.EXPIRED) ||
             (subscription?.source === SubscriptionSource.TELEGRAM &&
                 subscription.status === TelegramSubscriptionStatuses.EXPIRED))
     );
@@ -93,7 +102,9 @@ export function isPaidActiveSubscription(
         ((value?.source === SubscriptionSource.IOS &&
             value.status === IosSubscriptionStatuses.ACTIVE) ||
             (value?.source === SubscriptionSource.CRYPTO &&
-                value.status === CryptoSubscriptionStatuses.ACTIVE))
+                value.status === CryptoSubscriptionStatuses.ACTIVE) ||
+            (value?.source === SubscriptionSource.EXTENSION &&
+                value.status === ExtensionSubscriptionStatuses.ACTIVE))
     );
 }
 
@@ -107,6 +118,16 @@ export function isCryptoSubscription(value: unknown): value is CryptoSubscriptio
 
 export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
+}
+
+export function isExtensionSubscription(value: unknown): value is ExtensionSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.EXTENSION;
+}
+
+export function isExtensionActiveSubscription(
+    value: unknown
+): value is IExtensionActiveSubscription {
+    return isExtensionSubscription(value) && value?.status === ExtensionSubscriptionStatuses.ACTIVE;
 }
 
 export function isIosAutoRenewableSubscription(value: unknown): value is IIosActiveSubscription & {
@@ -138,15 +159,17 @@ export function isTelegramSubscription(value: unknown): value is TelegramSubscri
 }
 
 export function isTelegramActiveSubscription(value: unknown): value is ITelegramActiveSubscription {
-    return (
-        isTelegramSubscription(value) &&
-        value?.source === SubscriptionSource.TELEGRAM &&
-        value?.status === TelegramSubscriptionStatuses.ACTIVE
-    );
+    return isTelegramSubscription(value) && value?.status === TelegramSubscriptionStatuses.ACTIVE;
 }
 
-export function isTonWalletStandard(wallet: IProStateWallet): wallet is TonWalletStandard {
-    return wallet !== null && typeof wallet === 'object' && 'id' in wallet;
+export function isTonWalletStandard(wallet: unknown): wallet is TonWalletStandard {
+    return (
+        wallet !== null &&
+        typeof wallet === 'object' &&
+        'id' in wallet &&
+        'version' in wallet &&
+        'publicKey' in wallet
+    );
 }
 
 export function hasIosPrice(

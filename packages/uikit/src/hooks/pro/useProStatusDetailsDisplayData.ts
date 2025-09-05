@@ -3,6 +3,7 @@ import {
     hasIosPrice,
     isCryptoSubscription,
     isExpiredSubscription,
+    isExtensionSubscription,
     isIosAutoRenewableSubscription,
     isIosCanceledSubscription,
     isIosSubscription,
@@ -24,6 +25,7 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
     const isCryptoSub = isCryptoSubscription(subscription);
     const isPendingSub = isPendingSubscription(subscription);
     const isExpiredSub = isExpiredSubscription(subscription);
+    const isExtensionSub = isExtensionSubscription(subscription);
 
     const isIosSub = isIosSubscription(subscription);
     const isCanceled = isIosCanceledSubscription(subscription);
@@ -37,6 +39,10 @@ export const useProStatusDetailsDisplayData = (subscription: ProSubscription | u
         }
 
         if (isCryptoSub) {
+            return getFormattedProPrice(subscription.amount, true);
+        }
+
+        if (isExtensionSub) {
             return getFormattedProPrice(subscription.amount, true);
         }
 

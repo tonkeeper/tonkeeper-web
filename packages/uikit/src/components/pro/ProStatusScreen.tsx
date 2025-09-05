@@ -1,10 +1,12 @@
 import styled from 'styled-components';
 import {
     isExpiredSubscription,
+    isExtensionActiveSubscription,
+    isExtensionStrategy,
+    isExtensionSubscription,
     isIosAutoRenewableSubscription,
     isIosCanceledSubscription,
     isIosExpiredSubscription,
-    isIosStrategy,
     isTelegramSubscription,
     isValidSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -26,6 +28,7 @@ import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationCon
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useEffect } from 'react';
 import { AppRoute } from '../../libs/routes';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 export const ProStatusScreen = () => {
     const sdk = useAppSdk();
@@ -50,9 +53,11 @@ export const ProStatusScreen = () => {
     } = useManageSubscription();
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
-    const isIosEnvironment = isIosStrategy(sdk.subscriptionStrategy);
+    const isIosEnvironment = sdk.targetEnv === 'mobile' || sdk.targetEnv === 'tablet';
 
     const isTelegram = isTelegramSubscription(subscription);
+
+    const isExtension = isExtensionSubscription(subscription);
 
     const isProActive = isValidSubscription(subscription);
     const isProExpired = isExpiredSubscription(subscription);
@@ -81,6 +86,14 @@ export const ProStatusScreen = () => {
         onProAuthOpen();
     };
 
+    const handleCancel = async () => {
+        const strategy = sdk.subscriptionService.getStrategy(SubscriptionSource.EXTENSION);
+
+        if (!isExtensionStrategy(strategy) || !isExtensionActiveSubscription(subscription)) return;
+
+        await strategy.cancelSubscription(subscription?.contract);
+    };
+
     return (
         <ProScreenContentWrapper onSubmit={handleSubmit(handleGetPro)}>
             <ProSubscriptionHeader
@@ -99,7 +112,13 @@ export const ProStatusScreen = () => {
             <ProStatusDetailsList />
 
             {isIosAutoRenewable && (
-                <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
+                <Body3Styled>
+                    {t(
+                        isIosAutoRenewable
+                            ? 'subscription_renews_automatically'
+                            : 'subscription_renews_crypto'
+                    )}
+                </Body3Styled>
             )}
 
             <ButtonsBlockStyled>
@@ -131,6 +150,19 @@ export const ProStatusScreen = () => {
                         <Label2>{t('renew')}</Label2>
                     </Button>
                 )}
+
+                {isExtension && (
+                    <CancelButtonStyled
+                        secondary
+                        color="red"
+                        fullWidth
+                        size="small"
+                        type="button"
+                        onClick={handleCancel}
+                    >
+                        <Label2>{t('cancel_subscription')}</Label2>
+                    </CancelButtonStyled>
+                )}
             </ButtonsBlockStyled>
         </ProScreenContentWrapper>
     );
@@ -158,4 +190,8 @@ const ButtonsBlockStyled = styled.div`
 const Body3Styled = styled(Body3)`
     margin-bottom: 16px;
     color: ${p => p.theme.textSecondary};
+`;
+
+const CancelButtonStyled = styled(Button)`
+    color: ${p => p.theme.accentRed};
 `;

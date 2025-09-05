@@ -5,7 +5,6 @@ import { useProEndingNotification } from '../../components/modals/ProEndingNotif
 import { useProState } from '../../state/pro';
 import {
     isIosAutoRenewableSubscription,
-    isIosStrategy,
     isProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
 
@@ -20,8 +19,7 @@ export const useSubscriptionEndingVerification = () => {
     const { data: subscription } = useProState();
 
     useEffect(() => {
-        // TODO Fix crypto flow first to remove this condition
-        if (!isIosStrategy(sdk.subscriptionStrategy)) return;
+        if (sdk.targetEnv !== 'mobile' && sdk.targetEnv !== 'tablet') return;
 
         if (!isProSubscription(subscription)) return;
         if (!subscription.nextChargeDate) return;

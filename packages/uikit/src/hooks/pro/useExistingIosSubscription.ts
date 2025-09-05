@@ -7,13 +7,14 @@ import { useProPurchaseNotification } from '../../components/modals/ProPurchaseN
 
 export const useExistingIosSubscription = () => {
     const sdk = useAppSdk();
-    const { data: currentSubInfo } = useCurrentSubscriptionInfo();
+    const { data: currentSubInfo, isError } = useCurrentSubscriptionInfo();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onClose: onCurrentClose } = useProPurchaseNotification();
 
     const { t } = useTranslation();
 
     useEffect(() => {
+        if (isError) return;
         if (!currentSubInfo || currentSubInfo.length < 1) return;
 
         const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
@@ -34,5 +35,5 @@ export const useExistingIosSubscription = () => {
                 onProAuthOpen();
             }
         })();
-    }, [currentSubInfo]);
+    }, [currentSubInfo, isError]);
 };
