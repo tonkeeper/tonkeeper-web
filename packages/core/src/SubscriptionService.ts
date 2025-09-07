@@ -14,7 +14,7 @@ import {
 import { AuthService, SubscriptionSource } from './pro';
 import { getNormalizedSubscription, IProAuthTokenService } from './service/proService';
 import { IStorage } from './Storage';
-import { ProAuthTokenService, subscriptionFormTempAuth$ } from './ProAuthTokenService';
+import { ProAuthTokenService } from './ProAuthTokenService';
 import { AppKey } from './Keys';
 import { pickBestSubscription } from './utils/pro';
 import { Language } from './entries/language';
@@ -42,13 +42,12 @@ export class SubscriptionService implements ISubscriptionService {
         return strategy.subscribe(formData);
     }
 
-    async getSubscription(): Promise<ProSubscription> {
+    async getSubscription(tempToken: string | null): Promise<ProSubscription> {
         const pendingSubscription:
             | ICryptoPendingSubscription
             | IExtensionPendingSubscription
             | null = await this._storage.get(AppKey.PRO_PENDING_SUBSCRIPTION);
 
-        const tempToken = subscriptionFormTempAuth$?.value?.tempToken;
         const mainToken = await this._authTokenService.getToken();
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
 
