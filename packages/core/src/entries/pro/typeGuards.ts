@@ -173,11 +173,12 @@ export function isTonWalletStandard(wallet: unknown): wallet is TonWalletStandar
 }
 
 export function hasIosPrice(
-    subscription: IosSubscription
+    subscription: unknown
 ): subscription is IIosActiveSubscription | IIosExpiredSubscription {
     return (
-        subscription.status === IosSubscriptionStatuses.ACTIVE ||
-        subscription.status === IosSubscriptionStatuses.EXPIRED
+        isIosSubscription(subscription) &&
+        (subscription.status === IosSubscriptionStatuses.ACTIVE ||
+            subscription.status === IosSubscriptionStatuses.EXPIRED)
     );
 }
 
