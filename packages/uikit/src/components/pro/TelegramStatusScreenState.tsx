@@ -77,10 +77,14 @@ export const TelegramStatusScreenState = ({ subscription }: IProps) => {
                             'trial'
                         )})`}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>
                         <Body2Styled>{getExpirationDate()}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('price')}</Body2RegularStyled>
                         <Body2Styled textTransform="unset">{t('free')}</Body2Styled>

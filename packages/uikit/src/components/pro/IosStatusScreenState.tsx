@@ -146,22 +146,30 @@ export const IosStatusScreenState = ({ subscription }: IProps) => {
                         <Body2RegularStyled>{t('status')}</Body2RegularStyled>
                         <Body2Styled color={getStatusColor()}>{t(subscription.status)}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>
                             {t(isAutoRenew ? 'renews' : 'ends')}
                         </Body2RegularStyled>
                         <Body2Styled>{getExpirationDate()}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('auto_renew')}</Body2RegularStyled>
                         <Body2Styled color={isCanceled ? 'accentOrange' : undefined}>
                             {t(isCanceled ? 'disabled' : 'enabled')}
                         </Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('price')}</Body2RegularStyled>
                         <Body2Styled textTransform="unset">{getPrice()}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('type')}</Body2RegularStyled>
                         <Body2Styled textTransform="unset">{t('in_app_purchase')}</Body2Styled>

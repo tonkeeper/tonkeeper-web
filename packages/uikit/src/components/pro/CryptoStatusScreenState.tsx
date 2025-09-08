@@ -123,27 +123,35 @@ export const CryptoStatusScreenState = ({ subscription }: IProps) => {
                         <Body2RegularStyled>{t('status')}</Body2RegularStyled>
                         <Body2Styled color={getStatusColor()}>{getStatusText()}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>
                         <Body2Styled>{getExpirationDate()}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('price')}</Body2RegularStyled>
                         <Body2Styled textTransform="unset">{getPrice()}</Body2Styled>
                     </ListItemPayloadStyled>
+                </ListItemStyled>
+                <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('type')}</Body2RegularStyled>
                         <Body2Styled textTransform="unset">{t('crypto_payment')}</Body2Styled>
                     </ListItemPayloadStyled>
-                    {subscription?.promoCode && (
+                </ListItemStyled>
+                {subscription?.promoCode && (
+                    <ListItemStyled hover={false}>
                         <ListItemPayloadStyled>
                             <Body2RegularStyled>{t('promo_code')}</Body2RegularStyled>
                             <Body2Styled textTransform="uppercase">
                                 {subscription.promoCode}
                             </Body2Styled>
                         </ListItemPayloadStyled>
-                    )}
-                </ListItemStyled>
+                    </ListItemStyled>
+                )}
             </ListBlock>
 
             <ButtonsBlockStyled>
