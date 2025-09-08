@@ -349,6 +349,7 @@ const signDataRequestPayloadTextSchema = z.object({
 export type SignDataRequestPayloadText = z.infer<typeof signDataRequestPayloadTextSchema>;
 
 export const sendRequestPayloadSchema = z.union([
+    transactionRequestPayloadSchema,
     signDataRequestPayloadTextSchema,
     signDataRequestPayloadBinarySchema,
     signDataRequestPayloadCellSchema
