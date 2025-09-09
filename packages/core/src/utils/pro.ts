@@ -85,14 +85,13 @@ export const normalizeSubscription = (
                 source,
                 status: ExtensionSubscriptionStatuses.ACTIVE,
                 valid: true,
-                nextChargeDate: new Date(),
+                nextChargeDate,
                 auth: {
                     type: AuthTypes.WALLET,
                     wallet: authorizedWallet
                 },
                 contract: dBStoredInfo.contract,
                 currency: dBStoredInfo.currency,
-                expiresDate: new Date(),
                 amount: dBStoredInfo.payment_per_period,
                 period: dBStoredInfo.period,
                 purchaseDate: toDate(dBStoredInfo.created_at),
@@ -104,14 +103,16 @@ export const normalizeSubscription = (
             source,
             status: ExtensionSubscriptionStatuses.EXPIRED,
             valid: false,
-            nextChargeDate: new Date(),
+            nextChargeDate,
             auth: {
                 type: AuthTypes.WALLET,
                 wallet: authorizedWallet
             },
             contract: dBStoredInfo.contract,
             currency: dBStoredInfo.currency,
-            expiresDate: new Date(),
+            expiresDate: dBStoredInfo?.expiration_date
+                ? toDate(dBStoredInfo.expiration_date)
+                : undefined,
             amount: dBStoredInfo.payment_per_period,
             period: dBStoredInfo.period,
             purchaseDate: toDate(dBStoredInfo.created_at),

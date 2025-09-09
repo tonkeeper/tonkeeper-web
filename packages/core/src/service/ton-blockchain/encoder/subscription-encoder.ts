@@ -77,6 +77,10 @@ export class SubscriptionV5Encoder {
             throw new Error(`Unsupported wallet version: ${this.wallet.version}`);
         }
 
+        if (params.paymentPerPeriod < toNano('0.1')) {
+            throw new Error("Subscription amount can't be less than 0.1 TON!");
+        }
+
         const stateData = this.buildStateData({
             wallet: Address.parse(this.wallet.rawAddress),
             walletVersion: this.wallet.version,

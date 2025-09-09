@@ -139,7 +139,7 @@ export interface ICryptoSubscriptionStrategy extends IBaseSubscriptionStrategy {
 export interface IExtensionDBStoredInfo {
     contract: string;
     currency: CryptoCurrency;
-    expiresDate: Date;
+    expiresDate?: Date;
     amount: string;
     period: number;
     purchaseDate: Date;

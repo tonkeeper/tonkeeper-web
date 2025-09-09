@@ -19,6 +19,10 @@ export type SubscriptionExtension = {
     caller_fee: string;
     grace_period: number;
     last_charging_date: number;
+    /**
+     * shows the subscription end date if the subscription is canceled
+     */
+    expiration_date?: number;
     created_at: number;
     withdraw_msg_body?: string;
     metadata: SubscriptionExtensionMetadata;
