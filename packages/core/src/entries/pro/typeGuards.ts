@@ -96,7 +96,7 @@ export function isExpiredSubscription(
 
 export function isPaidActiveSubscription(
     value: unknown
-): value is IIosActiveSubscription | ICryptoActiveSubscription {
+): value is IIosActiveSubscription | ICryptoActiveSubscription | IExtensionActiveSubscription {
     return (
         isProSubscription(value) &&
         ((value?.source === SubscriptionSource.IOS &&
@@ -118,16 +118,6 @@ export function isCryptoSubscription(value: unknown): value is CryptoSubscriptio
 
 export function isIosSubscription(value: unknown): value is IosSubscription {
     return isProSubscription(value) && value?.source === SubscriptionSource.IOS;
-}
-
-export function isExtensionSubscription(value: unknown): value is ExtensionSubscription {
-    return isProSubscription(value) && value?.source === SubscriptionSource.EXTENSION;
-}
-
-export function isExtensionActiveSubscription(
-    value: unknown
-): value is IExtensionActiveSubscription {
-    return isExtensionSubscription(value) && value?.status === ExtensionSubscriptionStatuses.ACTIVE;
 }
 
 export function isIosAutoRenewableSubscription(value: unknown): value is IIosActiveSubscription & {
@@ -160,6 +150,38 @@ export function isTelegramSubscription(value: unknown): value is TelegramSubscri
 
 export function isTelegramActiveSubscription(value: unknown): value is ITelegramActiveSubscription {
     return isTelegramSubscription(value) && value?.status === TelegramSubscriptionStatuses.ACTIVE;
+}
+
+export function isExtensionSubscription(value: unknown): value is ExtensionSubscription {
+    return isProSubscription(value) && value?.source === SubscriptionSource.EXTENSION;
+}
+
+export function isExtensionActiveSubscription(
+    value: unknown
+): value is IExtensionActiveSubscription {
+    return isExtensionSubscription(value) && value?.status === ExtensionSubscriptionStatuses.ACTIVE;
+}
+
+export function isExtensionCanceledSubscription(
+    value: unknown
+): value is IExtensionActiveSubscription & { isAutoRenewable: false } {
+    return (
+        isExtensionSubscription(value) &&
+        value.status === ExtensionSubscriptionStatuses.ACTIVE &&
+        !value.isAutoRenewable
+    );
+}
+
+export function isExtensionAutoRenewableSubscription(
+    value: unknown
+): value is IExtensionActiveSubscription & {
+    autoRenewStatus: true;
+} {
+    return (
+        isPaidActiveSubscription(value) &&
+        isExtensionSubscription(value) &&
+        value?.isAutoRenewable === true
+    );
 }
 
 export function isTonWalletStandard(wallet: unknown): wallet is TonWalletStandard {

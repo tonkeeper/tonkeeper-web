@@ -5,13 +5,17 @@ import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
-import { SubscriptionSource, SubscriptionVerification } from '../pro';
+import { SubscriptionExtensionStatus, SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
     ExtensionSubscriptionStatuses,
+    hasIosPrice,
     IosSubscriptionStatuses,
+    isExpiredSubscription,
+    isExtensionSubscription,
+    isPendingSubscription,
     isProductId,
     isProSubscription,
     isValidSubscription,
@@ -91,7 +95,8 @@ export const normalizeSubscription = (
                 expiresDate: new Date(),
                 amount: dBStoredInfo.payment_per_period,
                 period: dBStoredInfo.period,
-                purchaseDate: toDate(dBStoredInfo.created_at)
+                purchaseDate: toDate(dBStoredInfo.created_at),
+                isAutoRenewable: dBStoredInfo.status === SubscriptionExtensionStatus.ACTIVE
             };
         }
 
@@ -109,7 +114,8 @@ export const normalizeSubscription = (
             expiresDate: new Date(),
             amount: dBStoredInfo.payment_per_period,
             period: dBStoredInfo.period,
-            purchaseDate: toDate(dBStoredInfo.created_at)
+            purchaseDate: toDate(dBStoredInfo.created_at),
+            isAutoRenewable: false
         };
     }
 
@@ -281,4 +287,87 @@ export const pickBestSubscription = (
     if (isProSubscription(target)) return target;
 
     return null;
+};
+
+type Translator = (text: string, replaces?: Record<string, string | number>) => string;
+
+export const getStatusText = (subscription: ProSubscription, translator: Translator) => {
+    if (!subscription) return '-';
+
+    if (isPendingSubscription(subscription)) {
+        return `${translator('processing')}...`;
+    }
+
+    return `${translator(subscription.status)}`;
+};
+
+export const getStatusColor = (subscription: ProSubscription) => {
+    if (!subscription) return undefined;
+
+    if (isPendingSubscription(subscription)) {
+        return 'textSecondary';
+    }
+
+    if (isExpiredSubscription(subscription)) {
+        return 'accentOrange';
+    }
+
+    return undefined;
+};
+
+export const getExpirationDate = (
+    subscription: ProSubscription,
+    dateFormatter: (
+        date: string | number | Date,
+        options?:
+            | (Intl.DateTimeFormatOptions & {
+                  inputUnit?: 'seconds' | 'ms' | undefined;
+              })
+            | undefined
+    ) => string
+) => {
+    try {
+        if (isValidSubscription(subscription) && subscription.nextChargeDate) {
+            return dateFormatter(subscription.nextChargeDate, { dateStyle: 'long' });
+        }
+
+        if (isExpiredSubscription(subscription) && subscription.expiresDate) {
+            return dateFormatter(subscription.expiresDate, { dateStyle: 'long' });
+        }
+
+        return '-';
+    } catch (e) {
+        console.error('During formatDate error: ', e);
+
+        return '-';
+    }
+};
+
+export const getCryptoSubscriptionPrice = (subscription: ProSubscription) => {
+    if (!subscription || !isExtensionSubscription(subscription)) return '-';
+
+    if (isPendingSubscription(subscription)) {
+        return subscription.displayPrice;
+    }
+
+    return getFormattedProPrice(subscription.amount, true);
+};
+
+export const getIosSubscriptionPrice = (subscription: ProSubscription, translator: Translator) => {
+    if (!subscription) return '-';
+
+    if (!hasIosPrice(subscription)) return '-';
+
+    const { price, priceMultiplier, currency, productId } = subscription;
+
+    if (!price || !currency) return '-';
+
+    const proPeriod = SUBSCRIPTION_PERIODS_MAP.get(productId);
+    let proPeriodTranslated = '';
+
+    if (proPeriod) {
+        proPeriodTranslated = ` / ${translator(proPeriod)}`;
+    }
+
+    return `${currency} ${(price / priceMultiplier).toFixed(2)}` + proPeriodTranslated;
 };

@@ -2,9 +2,9 @@ import styled from 'styled-components';
 import {
     isExpiredSubscription,
     isExtensionActiveSubscription,
+    isExtensionAutoRenewableSubscription,
+    isExtensionCanceledSubscription,
     isExtensionStrategy,
-    isExtensionSubscription,
-    isPendingSubscription,
     isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -20,7 +20,12 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
+import {
+    getCryptoSubscriptionPrice,
+    getExpirationDate,
+    getStatusColor,
+    getStatusText
+} from '@tonkeeper/core/dist/utils/pro';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
@@ -53,57 +58,8 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
     const isProActive = isValidSubscription(subscription);
     const isProExpired = isExpiredSubscription(subscription);
 
-    const getPrice = () => {
-        if (!subscription || !isExtensionSubscription(subscription)) return '-';
-
-        if (isPendingSubscription(subscription)) {
-            return subscription.displayPrice;
-        }
-
-        return getFormattedProPrice(subscription.amount, true);
-    };
-
-    const getStatusColor = () => {
-        if (!subscription) return undefined;
-
-        if (isPendingSubscription(subscription)) {
-            return 'textSecondary';
-        }
-
-        if (isExpiredSubscription(subscription)) {
-            return 'accentOrange';
-        }
-
-        return undefined;
-    };
-
-    const getStatusText = () => {
-        if (!subscription) return '-';
-
-        if (isPendingSubscription(subscription)) {
-            return `${t('processing')}...`;
-        }
-
-        return `${t(subscription.status)}`;
-    };
-
-    const getExpirationDate = () => {
-        try {
-            if (isValidSubscription(subscription) && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, { dateStyle: 'long' });
-            }
-
-            if (isExpiredSubscription(subscription) && subscription.expiresDate) {
-                return formatDate(subscription.expiresDate, { dateStyle: 'long' });
-            }
-
-            return '-';
-        } catch (e) {
-            console.error('During formatDate error: ', e);
-
-            return '-';
-        }
-    };
+    const isCanceled = isExtensionCanceledSubscription(subscription);
+    const isAutoRenewable = isExtensionAutoRenewableSubscription(subscription);
 
     const handleDisconnect = async () => {
         await mutateProLogout();
@@ -139,19 +95,37 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor()}>{getStatusText()}</Body2Styled>
+                        <Body2Styled color={getStatusColor(subscription)}>
+                            {getStatusText(subscription, t)}
+                        </Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>
-                        <Body2Styled>{getExpirationDate()}</Body2Styled>
+                        <Body2RegularStyled>
+                            {isProExpired
+                                ? t('expiration_date')
+                                : t(isAutoRenewable ? 'renews' : 'ends')}
+                        </Body2RegularStyled>
+                        <Body2Styled>{getExpirationDate(subscription, formatDate)}</Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
+                {!isProExpired && (
+                    <ListItemStyled hover={false}>
+                        <ListItemPayloadStyled>
+                            <Body2RegularStyled>{t('auto_renew')}</Body2RegularStyled>
+                            <Body2Styled color={isCanceled ? 'accentOrange' : undefined}>
+                                {t(isCanceled ? 'disabled' : 'enabled')}
+                            </Body2Styled>
+                        </ListItemPayloadStyled>
+                    </ListItemStyled>
+                )}
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('price')}</Body2RegularStyled>
-                        <Body2Styled textTransform="unset">{getPrice()}</Body2Styled>
+                        <Body2Styled textTransform="unset">
+                            {getCryptoSubscriptionPrice(subscription)}
+                        </Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
@@ -162,7 +136,7 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
                 </ListItemStyled>
             </ListBlock>
 
-            <Body3Styled>{t('subscription_renews_crypto')}</Body3Styled>
+            {isAutoRenewable && <Body3Styled>{t('subscription_renews_crypto')}</Body3Styled>}
 
             <ButtonsBlockStyled>
                 <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>
@@ -174,20 +148,20 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
                         <Label2>{t('get_tonkeeper_pro')}</Label2>
                     </Button>
                 )}
-            </ButtonsBlockStyled>
 
-            {isProActive && (
-                <CancelButtonStyled
-                    secondary
-                    color="red"
-                    fullWidth
-                    size="small"
-                    type="button"
-                    onClick={handleCancel}
-                >
-                    <Label2>{t('cancel_subscription')}</Label2>
-                </CancelButtonStyled>
-            )}
+                {isProActive && (
+                    <CancelButtonStyled
+                        secondary
+                        color="red"
+                        fullWidth
+                        size="small"
+                        type="button"
+                        onClick={handleCancel}
+                    >
+                        <Label2>{t('cancel_subscription')}</Label2>
+                    </CancelButtonStyled>
+                )}
+            </ButtonsBlockStyled>
         </ProScreenContentWrapper>
     );
 };

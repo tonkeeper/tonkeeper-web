@@ -1,9 +1,5 @@
 import styled from 'styled-components';
-import {
-    isExpiredSubscription,
-    isValidSubscription,
-    ProSubscription
-} from '@tonkeeper/core/dist/entries/pro';
+import { isValidSubscription, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
@@ -14,6 +10,7 @@ import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { getExpirationDate, getStatusColor } from '@tonkeeper/core/dist/utils/pro';
 
 interface IProps {
     subscription: ProSubscription | undefined;
@@ -31,37 +28,6 @@ export const TelegramStatusScreenState = ({ subscription }: IProps) => {
 
     const isProActive = isValidSubscription(subscription);
 
-    const isValidSub = isValidSubscription(subscription);
-    const isExpiredSub = isExpiredSubscription(subscription);
-
-    const getExpirationDate = () => {
-        try {
-            if (isValidSub && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, { dateStyle: 'long' });
-            }
-
-            if (isExpiredSub && subscription.expiresDate) {
-                return formatDate(subscription.expiresDate, { dateStyle: 'long' });
-            }
-
-            return '-';
-        } catch (e) {
-            console.error('During formatDate error: ', e);
-
-            return '-';
-        }
-    };
-
-    const getStatusColor = () => {
-        if (!subscription) return undefined;
-
-        if (isExpiredSub) {
-            return 'accentOrange';
-        }
-
-        return undefined;
-    };
-
     return (
         <ProScreenContentWrapper onSubmit={handleSubmit(onProAuthOpen)}>
             <ProSubscriptionHeader
@@ -73,15 +39,15 @@ export const TelegramStatusScreenState = ({ subscription }: IProps) => {
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor()}>{`${t(subscription.status)} (${t(
-                            'trial'
-                        )})`}</Body2Styled>
+                        <Body2Styled color={getStatusColor(subscription)}>{`${t(
+                            subscription.status
+                        )} (${t('trial')})`}</Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>
-                        <Body2Styled>{getExpirationDate()}</Body2Styled>
+                        <Body2Styled>{getExpirationDate(subscription, formatDate)}</Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>

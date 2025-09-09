@@ -143,6 +143,7 @@ export interface IExtensionDBStoredInfo {
     amount: string;
     period: number;
     purchaseDate: Date;
+    isAutoRenewable: boolean;
 }
 
 export interface IBaseExtensionSubscription extends IBaseSubscription {

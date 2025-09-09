@@ -1,14 +1,18 @@
 import styled from 'styled-components';
 import {
-    hasIosPrice,
     isExpiredSubscription,
     isIosAutoRenewableSubscription,
     isIosCanceledSubscription,
     isIosExpiredSubscription,
-    isPendingSubscription,
     isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
+import {
+    getExpirationDate,
+    getIosSubscriptionPrice,
+    getStatusColor
+} from '@tonkeeper/core/dist/utils/pro';
+import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 
 import { SlidersIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
@@ -25,7 +29,6 @@ import { useManageSubscription, useProLogout } from '../../state/pro';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
-import { SUBSCRIPTION_PERIODS_MAP } from '@tonkeeper/core/dist/utils/pro';
 
 interface IProps {
     subscription: ProSubscription | undefined;
@@ -58,69 +61,17 @@ export const IosStatusScreenState = ({ subscription }: IProps) => {
         return null;
     }
 
-    const isIosEnvironment = sdk.targetEnv === 'mobile' || sdk.targetEnv === 'tablet';
-
-    const isProActive = isValidSubscription(subscription);
-    const isProExpired = isExpiredSubscription(subscription);
-
-    const isCanceled = isIosCanceledSubscription(subscription);
-    const isAutoRenew = isIosAutoRenewableSubscription(subscription);
-
-    const isIosExpired = isIosEnvironment && isIosExpiredSubscription(subscription);
-    const isIosCanceled = isIosEnvironment && isIosCanceledSubscription(subscription);
-    const isIosAutoRenewable = isIosEnvironment && isIosAutoRenewableSubscription(subscription);
-    const isIosActive = isIosCanceled || isIosAutoRenewable;
-
-    const getPrice = () => {
-        if (!subscription) return '-';
-
-        if (!hasIosPrice(subscription)) return '-';
-
-        const { price, priceMultiplier, currency, productId } = subscription;
-
-        if (!price || !currency) return '-';
-
-        const proPeriod = SUBSCRIPTION_PERIODS_MAP.get(productId);
-        let proPeriodTranslated = '';
-
-        if (proPeriod) {
-            proPeriodTranslated = ` / ${t(proPeriod)}`;
-        }
-
-        return `${currency} ${(price / priceMultiplier).toFixed(2)}` + proPeriodTranslated;
-    };
-
-    const getExpirationDate = () => {
-        try {
-            if (isValidSubscription(subscription) && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, { dateStyle: 'long' });
-            }
-
-            if (isExpiredSubscription(subscription) && subscription.expiresDate) {
-                return formatDate(subscription.expiresDate, { dateStyle: 'long' });
-            }
-
-            return '-';
-        } catch (e) {
-            console.error('During formatDate error: ', e);
-
-            return '-';
-        }
-    };
-
-    const getStatusColor = () => {
-        if (!subscription) return undefined;
-
-        if (isPendingSubscription(subscription)) {
-            return 'textSecondary';
-        }
-
-        if (isExpiredSubscription(subscription)) {
-            return 'accentOrange';
-        }
-
-        return undefined;
-    };
+    const {
+        isIosEnvironment,
+        isProActive,
+        isProExpired,
+        isCanceled,
+        isAutoRenew,
+        isIosExpired,
+        isIosCanceled,
+        isIosAutoRenewable,
+        isIosActive
+    } = getIosStatusFlags(sdk, subscription);
 
     const handleDisconnect = async () => {
         await mutateProLogout();
@@ -144,29 +95,37 @@ export const IosStatusScreenState = ({ subscription }: IProps) => {
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor()}>{t(subscription.status)}</Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>
-                            {t(isAutoRenew ? 'renews' : 'ends')}
-                        </Body2RegularStyled>
-                        <Body2Styled>{getExpirationDate()}</Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('auto_renew')}</Body2RegularStyled>
-                        <Body2Styled color={isCanceled ? 'accentOrange' : undefined}>
-                            {t(isCanceled ? 'disabled' : 'enabled')}
+                        <Body2Styled color={getStatusColor(subscription)}>
+                            {t(subscription.status)}
                         </Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
+                        <Body2RegularStyled>
+                            {isProExpired
+                                ? t('expiration_date')
+                                : t(isAutoRenew ? 'renews' : 'ends')}
+                        </Body2RegularStyled>
+                        <Body2Styled>{getExpirationDate(subscription, formatDate)}</Body2Styled>
+                    </ListItemPayloadStyled>
+                </ListItemStyled>
+                {!isProExpired && (
+                    <ListItemStyled hover={false}>
+                        <ListItemPayloadStyled>
+                            <Body2RegularStyled>{t('auto_renew')}</Body2RegularStyled>
+                            <Body2Styled color={isCanceled ? 'accentOrange' : undefined}>
+                                {t(isCanceled ? 'disabled' : 'enabled')}
+                            </Body2Styled>
+                        </ListItemPayloadStyled>
+                    </ListItemStyled>
+                )}
+                <ListItemStyled hover={false}>
+                    <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('price')}</Body2RegularStyled>
-                        <Body2Styled textTransform="unset">{getPrice()}</Body2Styled>
+                        <Body2Styled textTransform="unset">
+                            {getIosSubscriptionPrice(subscription, t)}
+                        </Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
@@ -213,6 +172,33 @@ export const IosStatusScreenState = ({ subscription }: IProps) => {
             </ButtonsBlockStyled>
         </ProScreenContentWrapper>
     );
+};
+
+const getIosStatusFlags = (sdk: IAppSdk, subscription: ProSubscription) => {
+    const isIosEnvironment = sdk.targetEnv === 'mobile' || sdk.targetEnv === 'tablet';
+
+    const isProActive = isValidSubscription(subscription);
+    const isProExpired = isExpiredSubscription(subscription);
+
+    const isCanceled = isIosCanceledSubscription(subscription);
+    const isAutoRenew = isIosAutoRenewableSubscription(subscription);
+
+    const isIosExpired = isIosEnvironment && isIosExpiredSubscription(subscription);
+    const isIosCanceled = isIosEnvironment && isIosCanceledSubscription(subscription);
+    const isIosAutoRenewable = isIosEnvironment && isIosAutoRenewableSubscription(subscription);
+    const isIosActive = isIosCanceled || isIosAutoRenewable;
+
+    return {
+        isIosEnvironment,
+        isProActive,
+        isProExpired,
+        isCanceled,
+        isAutoRenew,
+        isIosExpired,
+        isIosCanceled,
+        isIosAutoRenewable,
+        isIosActive
+    };
 };
 
 const ProScreenContentWrapper = styled.form`

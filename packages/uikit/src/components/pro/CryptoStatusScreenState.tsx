@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import {
     isCryptoSubscription,
     isExpiredSubscription,
-    isPendingSubscription,
     isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -17,7 +16,12 @@ import { useNotifyError } from '../../hooks/useNotification';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
+import {
+    getCryptoSubscriptionPrice,
+    getExpirationDate,
+    getStatusColor,
+    getStatusText
+} from '@tonkeeper/core/dist/utils/pro';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
@@ -52,58 +56,6 @@ export const CryptoStatusScreenState = ({ subscription }: IProps) => {
         onProAuthOpen();
     };
 
-    const getPrice = () => {
-        if (!subscription) return '-';
-
-        if (isPendingSubscription(subscription)) {
-            return subscription.displayPrice;
-        }
-
-        return getFormattedProPrice(subscription.amount, true);
-    };
-
-    const getStatusColor = () => {
-        if (!subscription) return undefined;
-
-        if (isPendingSubscription(subscription)) {
-            return 'textSecondary';
-        }
-
-        if (isExpiredSubscription(subscription)) {
-            return 'accentOrange';
-        }
-
-        return undefined;
-    };
-
-    const getStatusText = () => {
-        if (!subscription) return '-';
-
-        if (isPendingSubscription(subscription)) {
-            return `${t('processing')}...`;
-        }
-
-        return `${t(subscription.status)}`;
-    };
-
-    const getExpirationDate = () => {
-        try {
-            if (isValidSubscription(subscription) && subscription.nextChargeDate) {
-                return formatDate(subscription.nextChargeDate, { dateStyle: 'long' });
-            }
-
-            if (isExpiredSubscription(subscription) && subscription.expiresDate) {
-                return formatDate(subscription.expiresDate, { dateStyle: 'long' });
-            }
-
-            return '-';
-        } catch (e) {
-            console.error('During formatDate error: ', e);
-
-            return '-';
-        }
-    };
-
     return (
         <ProScreenContentWrapper onSubmit={handleSubmit(onProPurchaseOpen)}>
             <ProSubscriptionHeader
@@ -121,19 +73,23 @@ export const CryptoStatusScreenState = ({ subscription }: IProps) => {
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor()}>{getStatusText()}</Body2Styled>
+                        <Body2Styled color={getStatusColor(subscription)}>
+                            {getStatusText(subscription, t)}
+                        </Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>
-                        <Body2Styled>{getExpirationDate()}</Body2Styled>
+                        <Body2Styled>{getExpirationDate(subscription, formatDate)}</Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('price')}</Body2RegularStyled>
-                        <Body2Styled textTransform="unset">{getPrice()}</Body2Styled>
+                        <Body2Styled textTransform="unset">
+                            {getCryptoSubscriptionPrice(subscription)}
+                        </Body2Styled>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
                 <ListItemStyled hover={false}>
