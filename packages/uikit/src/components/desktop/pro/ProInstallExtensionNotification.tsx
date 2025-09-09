@@ -153,7 +153,7 @@ const ProInstallExtensionNotificationContent: FC<
                 <ProActiveWallet isLoading={false} disableRightElement />
                 <ListBlock margin={false} fullWidth>
                     <ListItemStyled hover={false}>
-                        <ListItemPayloadStyled>
+                        <ListItemPayloadStyled alignItems="start">
                             <Body2Styled>{t('price')}</Body2Styled>
                             <FiatEquivalentWrapper>
                                 <Label2>{price.toStringAssetRelativeAmount()}</Label2>
@@ -174,7 +174,7 @@ const ProInstallExtensionNotificationContent: FC<
                     </ListItemStyled>
 
                     <ListItemStyled hover={false}>
-                        <ListItemPayloadStyled>
+                        <ListItemPayloadStyled alignItems="start">
                             <Body2Styled>{t('swap_blockchain_fee')}</Body2Styled>
                             <FiatEquivalentWrapper>
                                 <Label2>
@@ -250,9 +250,11 @@ const ListItemStyled = styled(ListItem)`
     }
 `;
 
-const ListItemPayloadStyled = styled(ListItemPayload)`
+const ListItemPayloadStyled = styled(ListItemPayload)<{ alignItems?: string }>`
     padding-top: 10px;
     padding-bottom: 10px;
+
+    align-items: ${({ alignItems }) => alignItems ?? 'center'};
 `;
 
 const FiatEquivalentWrapper = styled.div`

@@ -7,7 +7,7 @@ import {
     NotificationFooter,
     NotificationFooterPortal
 } from '../../Notification';
-import { Body2, Body3, Label2 } from '../../Text';
+import { Label2 } from '../../Text';
 import { Button } from '../../fields/Button';
 import { handleSubmit } from '../../../libs/form';
 import { useTranslation } from '../../../hooks/translation';
@@ -156,7 +156,7 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
 
     return (
         <div className={className}>
-            <SubmitButtonStyled
+            <Button
                 primary
                 fullWidth
                 size="large"
@@ -168,13 +168,16 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
                     {t(isError ? 'try_again' : 'continue_from')}
                     {!isError && ` ${fiatEquivalent} / ${t(subscriptionPeriod)}`}
                 </Label2>
-                {!isError && <Body3>{t('restore_subscription')}</Body3>}
-            </SubmitButtonStyled>
+            </Button>
+
+            <Button fullWidth secondary type="submit" form={formId}>
+                <Label2>{t('restore_subscription')}</Label2>
+            </Button>
 
             <HideOnReview>
                 {onTrial && (
                     <Button fullWidth secondary onClick={onTrial}>
-                        <Body2>{t('start_free_trial')}</Body2>
+                        <Label2>{t('start_free_trial')}</Label2>
                     </Button>
                 )}
             </HideOnReview>
@@ -204,12 +207,6 @@ const ButtonsBlockStyled = styled(ButtonsBlock)`
     display: flex;
     flex-direction: column;
     gap: 8px;
-`;
-
-const SubmitButtonStyled = styled(Button)`
-    display: flex;
-    flex-direction: column;
-    gap: 0;
 `;
 
 const CloseButtonStyled = styled.button`
