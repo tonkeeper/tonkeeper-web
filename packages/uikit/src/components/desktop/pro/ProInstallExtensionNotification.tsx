@@ -31,6 +31,7 @@ import { useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { getFiatEquivalent } from '../../../hooks/balance';
 import { SpinnerIcon } from '../../Icon';
+import { secondsToUnitCount } from '@tonkeeper/core/dist/utils/pro';
 
 interface IProInstallExtensionProps {
     isOpen: boolean;
@@ -132,6 +133,12 @@ const ProInstallExtensionNotificationContent: FC<
             ...extensionData
         });
 
+    const {
+        unit: periodUnit,
+        count: periodCount,
+        form: periodForm
+    } = secondsToUnitCount(extensionData.period);
+
     return (
         <ConfirmView
             assetAmount={price}
@@ -163,8 +170,8 @@ const ProInstallExtensionNotificationContent: FC<
                         <ListItemPayloadStyled>
                             <Body2Styled>{t('interval')}</Body2Styled>
                             <Label2>
-                                {t('every_minute', {
-                                    number: extensionData.period / 60
+                                {t(`every_${periodUnit}_${periodForm}`, {
+                                    count: periodCount
                                 })}
                             </Label2>
                         </ListItemPayloadStyled>

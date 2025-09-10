@@ -13,6 +13,7 @@ import {
     ExtensionSubscriptionStatuses,
     hasIosPrice,
     IosSubscriptionStatuses,
+    isCryptoSubscription,
     isExpiredSubscription,
     isExtensionSubscription,
     isPendingSubscription,
@@ -345,7 +346,11 @@ export const getExpirationDate = (
 };
 
 export const getCryptoSubscriptionPrice = (subscription: ProSubscription) => {
-    if (!subscription || !isExtensionSubscription(subscription)) return '-';
+    if (
+        !subscription ||
+        !(isCryptoSubscription(subscription) || isExtensionSubscription(subscription))
+    )
+        return '-';
 
     if (isPendingSubscription(subscription)) {
         return subscription.displayPrice;
@@ -372,3 +377,83 @@ export const getIosSubscriptionPrice = (subscription: ProSubscription, translato
 
     return `${currency} ${(price / priceMultiplier).toFixed(2)}` + proPeriodTranslated;
 };
+
+type UnitKey = 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second';
+
+type Unit = { key: UnitKey; sec: number };
+
+const ALL_UNITS: readonly Unit[] = [
+    { key: 'year', sec: 365 * 24 * 60 * 60 },
+    { key: 'month', sec: 30 * 24 * 60 * 60 },
+    { key: 'week', sec: 7 * 24 * 60 * 60 },
+    { key: 'day', sec: 24 * 60 * 60 },
+    { key: 'hour', sec: 60 * 60 },
+    { key: 'minute', sec: 60 },
+    { key: 'second', sec: 1 }
+];
+
+type RuPluralForms = 'one' | 'few' | 'many' | 'other';
+
+function pluralRu(count: number): RuPluralForms {
+    const mod10 = count % 10;
+    const mod100 = count % 100;
+
+    if (mod10 === 1 && mod100 !== 11) return 'one';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return 'few';
+    if (mod10 === 0 || (mod10 >= 5 && mod10 <= 9) || (mod100 >= 11 && mod100 <= 14)) return 'many';
+
+    return 'other';
+}
+
+export interface FormatEveryPeriodOptions {
+    // (30 days in seconds) => allowApproxMonthsYears ? 1 month : 30 days
+    allowApproxMonthsYears?: boolean;
+
+    // minUnit: 'minute' (5) => "Every minute" // not "Every 5 seconds"
+    minUnit?: UnitKey;
+}
+
+interface ISecondsToUnitCountReturnType {
+    unit: UnitKey;
+    count: number;
+    form: RuPluralForms;
+}
+
+export function secondsToUnitCount(
+    seconds: number,
+    opts?: FormatEveryPeriodOptions
+): ISecondsToUnitCountReturnType {
+    const safeSeconds = Math.max(1, Math.trunc(seconds));
+
+    let units =
+        opts?.allowApproxMonthsYears ?? true
+            ? ALL_UNITS
+            : ALL_UNITS.filter(unit => unit.key !== 'month' && unit.key !== 'year');
+
+    if (opts?.minUnit) {
+        const index = units.findIndex(unit => unit.key === opts.minUnit);
+
+        if (index >= 0) units = units.slice(index);
+    }
+
+    const exact = units.find(unit => safeSeconds % unit.sec === 0);
+
+    if (exact) {
+        const count = Math.max(1, safeSeconds / exact.sec);
+
+        return {
+            unit: exact.key,
+            count,
+            form: pluralRu(count)
+        };
+    }
+
+    const candidate = units.find(unit => unit.sec <= safeSeconds) ?? units[units.length - 1];
+    const count = Math.floor(safeSeconds / candidate.sec);
+
+    if (count >= 1 && candidate.key !== 'second') {
+        return { unit: candidate.key, count, form: pluralRu(count) };
+    }
+
+    return { unit: 'second', count: safeSeconds, form: pluralRu(safeSeconds) };
+}
