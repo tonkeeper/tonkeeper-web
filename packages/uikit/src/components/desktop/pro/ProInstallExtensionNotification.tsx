@@ -18,7 +18,6 @@ import {
     ConfirmViewHeadingSlot
 } from '../../transfer/ConfirmView';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useActiveWallet } from '../../../state/wallet';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
@@ -32,12 +31,6 @@ import { useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { getFiatEquivalent } from '../../../hooks/balance';
 import { SpinnerIcon } from '../../Icon';
-
-const getSubscriptionPrice = (amountNano: string) =>
-    new AssetAmount({
-        asset: TON_ASSET,
-        weiAmount: new BigNumber(amountNano)
-    });
 
 interface IProInstallExtensionProps {
     isOpen: boolean;
@@ -125,7 +118,11 @@ const ProInstallExtensionNotificationContent: FC<
     }, [activeWallet?.id]);
 
     const price = useMemo(
-        () => getSubscriptionPrice(extensionData.payment_per_period),
+        () =>
+            new AssetAmount({
+                asset: TON_ASSET,
+                weiAmount: extensionData.payment_per_period
+            }),
         [extensionData?.payment_per_period]
     );
 
@@ -180,8 +177,13 @@ const ProInstallExtensionNotificationContent: FC<
                                 <Label2>
                                     {estimateFeeMutation.isLoading && <SpinnerIcon />}
                                     {estimateFeeMutation.error && <>—</>}
-                                    {estimateFeeMutation.data &&
-                                        estimateFeeMutation.data.fee.extra.toStringAssetRelativeAmount()}
+                                    {estimateFeeMutation?.data?.fee?.extra &&
+                                        new AssetAmount({
+                                            asset: TON_ASSET,
+                                            weiAmount: estimateFeeMutation.data.fee.extra.weiAmount
+                                                .minus(extensionData.payment_per_period)
+                                                .toString()
+                                        }).toStringAssetRelativeAmount()}
                                 </Label2>
                                 {!estimateFeeMutation.error && (
                                     <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>
@@ -259,4 +261,5 @@ const ListItemPayloadStyled = styled(ListItemPayload)<{ alignItems?: string }>`
 
 const FiatEquivalentWrapper = styled.div`
     display: grid;
+    justify-items: end;
 `;

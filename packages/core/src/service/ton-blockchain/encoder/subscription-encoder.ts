@@ -62,8 +62,6 @@ interface IEncodeDeployBodyParams {
     withdrawMsgBody?: string;
 }
 
-const MIN_RESERVE = toNano('0.05');
-
 export class SubscriptionV5Encoder {
     constructor(
         private readonly wallet: TonWalletStandard,
@@ -92,9 +90,6 @@ export class SubscriptionV5Encoder {
 
         const extAddr = contractAddress(0, stateInit);
 
-        const reserve =
-            params.firstChargingDate === 0 ? params.paymentPerPeriod + MIN_RESERVE : MIN_RESERVE;
-
         const body = this.encodeDeployBody({
             firstChargingDate: params.firstChargingDate,
             paymentPerPeriod: params.paymentPerPeriod,
@@ -108,7 +103,7 @@ export class SubscriptionV5Encoder {
         const initMsg = internal({
             to: extAddr,
             bounce: true,
-            value: reserve,
+            value: params.paymentPerPeriod,
             init: stateInit,
             body
         });
