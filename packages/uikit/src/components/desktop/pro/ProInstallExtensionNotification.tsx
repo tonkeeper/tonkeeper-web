@@ -19,7 +19,6 @@ import {
 } from '../../transfer/ConfirmView';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useActiveWallet } from '../../../state/wallet';
 import { ListBlock, ListItem, ListItemPayload } from '../../List';
 import { useTranslation } from '../../../hooks/translation';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
@@ -32,6 +31,8 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { getFiatEquivalent } from '../../../hooks/balance';
 import { SpinnerIcon } from '../../Icon';
 import { secondsToUnitCount } from '@tonkeeper/core/dist/utils/pro';
+import { useAtomValue } from '../../../libs/useAtom';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
 interface IProInstallExtensionProps {
     isOpen: boolean;
@@ -83,7 +84,7 @@ const ProInstallExtensionNotificationContent: FC<
 > = ({ onClose, extensionData }) => {
     const { t } = useTranslation();
     const deployMutation = useCreateSubscriptionV5();
-    const activeWallet = useActiveWallet();
+    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const estimateFeeMutation = useEstimateDeploySubscriptionV5();
 
     const { fiat } = useAppContext();
@@ -110,13 +111,13 @@ const ProInstallExtensionNotificationContent: FC<
     );
 
     useEffect(() => {
-        if (!activeWallet) return;
+        if (!targetAuth?.wallet) return;
 
         estimateFeeMutation.mutate({
-            fromWallet: activeWallet.id,
+            selectedWallet: targetAuth.wallet,
             ...extensionData
         });
-    }, [activeWallet?.id]);
+    }, [targetAuth?.wallet]);
 
     const price = useMemo(
         () =>
@@ -127,11 +128,16 @@ const ProInstallExtensionNotificationContent: FC<
         [extensionData?.payment_per_period]
     );
 
-    const deployMutate = async () =>
-        deployMutation.mutateAsync({
-            fromWallet: activeWallet.id,
+    const deployMutate = async () => {
+        if (!targetAuth?.wallet) {
+            throw new Error('Selected wallet is required!');
+        }
+
+        return deployMutation.mutateAsync({
+            selectedWallet: targetAuth.wallet,
             ...extensionData
         });
+    };
 
     const {
         unit: periodUnit,
