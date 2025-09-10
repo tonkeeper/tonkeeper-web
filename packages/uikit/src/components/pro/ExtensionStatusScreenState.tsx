@@ -75,7 +75,7 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
             return;
         }
 
-        await strategy.cancelSubscription(subscription?.contract);
+        await strategy.cancelSubscription(subscription.auth.wallet, subscription.contract);
     };
 
     return (
@@ -149,7 +149,7 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
                     </Button>
                 )}
 
-                {isProActive && (
+                {isAutoRenewable && (
                     <CancelButtonStyled
                         secondary
                         color="red"

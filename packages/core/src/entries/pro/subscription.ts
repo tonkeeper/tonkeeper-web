@@ -17,6 +17,7 @@ import {
 } from './common';
 import { CryptoCurrency, SubscriptionSource } from '../../pro';
 import { Language } from '../language';
+import { TonWalletStandard } from '../wallet';
 
 export type ProSubscription =
     | IosSubscription
@@ -175,7 +176,10 @@ export interface IExtensionPendingSubscription extends IBaseExtensionSubscriptio
 
 export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {
     source: SubscriptionSource.EXTENSION;
-    cancelSubscription(extensionContract: string): Promise<PurchaseStatuses>;
+    cancelSubscription(
+        wallet: TonWalletStandard,
+        extensionContract: string
+    ): Promise<PurchaseStatuses>;
 }
 
 // Telegram Subscription Types

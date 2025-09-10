@@ -65,6 +65,7 @@ export interface IExtensionStrategyConfig {
         onCancel?: () => void;
     }) => void;
     onRemoveExtensionConfirmOpen: (p?: {
+        wallet: TonWalletStandard;
         extensionContract?: string;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;

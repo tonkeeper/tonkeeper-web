@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { useActiveApi, useAccountWallets } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
@@ -16,7 +16,7 @@ import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/ut
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 
 type CancelParams = {
-    fromWallet: WalletId;
+    selectedWallet: TonWalletStandard;
     extensionContract: string;
 };
 
@@ -28,21 +28,24 @@ export const useCancelSubscriptionV5 = () => {
     return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
-        const accountAndWallet = accountsWallets.find(
-            w => w.wallet.id === subscriptionParams.fromWallet
+        const { selectedWallet, extensionContract } = subscriptionParams;
+
+        const accountWallet = accountsWallets.find(
+            accWallet => accWallet.wallet.id === selectedWallet.id
         );
+        const accountId = accountWallet?.account?.id;
 
-        if (!accountAndWallet) throw new Error('AccountAndWallet not found');
+        if (!accountId) throw new Error('Account id is required!');
 
-        const signer = await getSigner(sdk, accountAndWallet.account.id, {
-            walletId: accountAndWallet.wallet.id
+        const signer = await getSigner(sdk, accountId, {
+            walletId: selectedWallet.id
         }).catch(() => null);
 
         if (!signer) throw new Error('Signer not found');
 
-        const extensionAddress = Address.parse(subscriptionParams.extensionContract);
+        const extensionAddress = Address.parse(extensionContract);
 
-        const encoder = new SubscriptionV5Encoder(accountAndWallet.wallet);
+        const encoder = new SubscriptionV5Encoder(selectedWallet);
 
         const destruct = encoder.encodeDestructAction(extensionAddress);
 
@@ -53,7 +56,7 @@ export const useCancelSubscriptionV5 = () => {
 
         const actions = [...destruct, remove];
 
-        const sender = new WalletMessageSender(api, accountAndWallet.wallet, signer as CellSigner);
+        const sender = new WalletMessageSender(api, selectedWallet, signer as CellSigner);
         await sender.send(actions);
 
         return true;
@@ -63,23 +66,16 @@ export const useCancelSubscriptionV5 = () => {
 export const useEstimateRemoveExtension = () => {
     const api = useActiveApi();
     const rawTx = useTonRawTransactionService();
-    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     return useMutation<{ fee: TransactionFeeTonAsset; address: Address }, Error, CancelParams>(
         async subscriptionParams => {
-            const accountAndWallet = accountsWallets.find(
-                w => w.wallet.id === subscriptionParams.fromWallet
-            );
+            const { selectedWallet, extensionContract } = subscriptionParams;
 
-            const { wallet, account } = accountAndWallet ?? {};
+            const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
 
-            if (!account || !wallet) throw new Error('Account or Wallet not found');
+            const extensionAddress = Address.parse(extensionContract);
 
-            const sender = new WalletMessageSender(api, wallet, estimationSigner);
-
-            const extensionAddress = Address.parse(subscriptionParams.extensionContract);
-
-            const encoder = new SubscriptionV5Encoder(wallet);
+            const encoder = new SubscriptionV5Encoder(selectedWallet);
 
             const destruct = encoder.encodeDestructAction(extensionAddress);
 

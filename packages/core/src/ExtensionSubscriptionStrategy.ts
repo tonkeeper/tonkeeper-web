@@ -19,6 +19,7 @@ import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStra
 import { AppKey } from './Keys';
 import { AssetAmount } from './entries/crypto/asset/asset-amount';
 import { TON_ASSET } from './entries/crypto/asset/constants';
+import { TonWalletStandard } from './entries/wallet';
 
 export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExtensionStrategy {
     public source = SubscriptionSource.EXTENSION as const;
@@ -85,18 +86,18 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
         });
     }
 
-    async cancelSubscription(extensionContract: string): Promise<PurchaseStatuses> {
+    async cancelSubscription(
+        wallet: TonWalletStandard,
+        extensionContract: string
+    ): Promise<PurchaseStatuses> {
         const { onRemoveExtensionConfirmOpen } = this.config;
 
         return new Promise<PurchaseStatuses>(resolve => {
             onRemoveExtensionConfirmOpen({
+                wallet,
                 extensionContract,
-                onConfirm: () => {
-                    resolve(PurchaseStatuses.SUCCESS);
-                },
-                onCancel: () => {
-                    resolve(PurchaseStatuses.CANCELED);
-                }
+                onConfirm: () => resolve(PurchaseStatuses.SUCCESS),
+                onCancel: () => resolve(PurchaseStatuses.CANCELED)
             });
         });
     }
