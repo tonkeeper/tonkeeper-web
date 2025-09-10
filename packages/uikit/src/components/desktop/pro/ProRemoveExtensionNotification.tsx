@@ -31,6 +31,7 @@ import { useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { SpinnerIcon } from '../../Icon';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { hexToRGBA } from '../../../libs/css';
 
 const deployReserve = new AssetAmount({
     asset: TON_ASSET,
@@ -183,17 +184,16 @@ const ProRemoveExtensionNotificationContent: FC<
 export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
     const { t } = useTranslation();
     return (
-        <Button
+        <CancelButtonStyled
             fullWidth
             size="large"
-            secondary
             type="submit"
             disabled={isDisabled}
             loading={isLoading}
             onClick={onClick}
         >
-            {t('cancel_subscription')}
-        </Button>
+            <Label2>{t('cancel_subscription')}</Label2>
+        </CancelButtonStyled>
     );
 };
 
@@ -234,4 +234,14 @@ const ListItemPayloadStyled = styled(ListItemPayload)`
 
 const FiatEquivalentWrapper = styled.div`
     display: grid;
+`;
+
+const CancelButtonStyled = styled(Button)`
+    color: ${p => p.theme.accentRed};
+    background-color: ${({ theme }) => hexToRGBA(theme.accentRed, 0.16)};
+    transition: background-color 0.1s ease-in;
+
+    &:enabled:hover {
+        background-color: ${({ theme }) => hexToRGBA(theme.accentRed, 0.12)};
+    }
 `;
