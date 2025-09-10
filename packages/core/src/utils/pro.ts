@@ -11,6 +11,7 @@ import {
     AuthTypes,
     CryptoSubscriptionStatuses,
     ExtensionSubscriptionStatuses,
+    hasExpiresDate,
     hasIosPrice,
     IosSubscriptionStatuses,
     isCryptoSubscription,
@@ -93,6 +94,9 @@ export const normalizeSubscription = (
                 },
                 contract: dBStoredInfo.contract,
                 currency: dBStoredInfo.currency,
+                expiresDate: dBStoredInfo?.expiration_date
+                    ? toDate(dBStoredInfo.expiration_date)
+                    : undefined,
                 amount: dBStoredInfo.payment_per_period,
                 period: dBStoredInfo.period,
                 purchaseDate: toDate(dBStoredInfo.created_at),
@@ -333,7 +337,7 @@ export const getExpirationDate = (
             return dateFormatter(subscription.nextChargeDate, { dateStyle: 'long' });
         }
 
-        if (isExpiredSubscription(subscription) && subscription.expiresDate) {
+        if (hasExpiresDate(subscription)) {
             return dateFormatter(subscription.expiresDate, { dateStyle: 'long' });
         }
 

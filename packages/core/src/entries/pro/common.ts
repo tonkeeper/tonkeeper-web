@@ -65,8 +65,7 @@ export interface IExtensionStrategyConfig {
         onCancel?: () => void;
     }) => void;
     onRemoveExtensionConfirmOpen: (p?: {
-        wallet: TonWalletStandard;
-        extensionContract?: string;
+        cancelData: ICancelSubscriptionData;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;
     }) => void;
@@ -98,4 +97,10 @@ export interface IUserInfo {
     version?: string;
     user_id?: number;
     tg_id?: number;
+}
+
+export interface ICancelSubscriptionData {
+    wallet: TonWalletStandard;
+    extensionContract: string;
+    expiresDate: Date;
 }

@@ -204,6 +204,12 @@ export function hasIosPrice(
     );
 }
 
+export function hasExpiresDate(value: unknown): value is ProSubscription & {
+    expiresDate: Date;
+} {
+    return isProSubscription(value) && 'expiresDate' in value;
+}
+
 export function hasWalletAuth(value?: unknown): value is { auth: IWalletAuth } {
     return (
         isProSubscription(value) &&

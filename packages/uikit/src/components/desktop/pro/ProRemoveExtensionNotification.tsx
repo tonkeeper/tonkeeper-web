@@ -30,8 +30,9 @@ import { useAppContext } from '../../../hooks/appContext';
 import { useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { SpinnerIcon } from '../../Icon';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { hexToRGBA } from '../../../libs/css';
+import { useToast } from '../../../hooks/useNotification';
+import { ICancelSubscriptionData } from '@tonkeeper/core/dist/entries/pro';
 
 const deployReserve = new AssetAmount({
     asset: TON_ASSET,
@@ -41,14 +42,13 @@ const deployReserve = new AssetAmount({
 interface IProRecurrentNotificationProps {
     isOpen: boolean;
     onClose: () => void;
-    wallet?: TonWalletStandard;
-    extensionContract?: string;
+    cancelData?: ICancelSubscriptionData;
     onConfirm?: (success?: boolean) => void;
     onCancel?: () => void;
 }
 
 export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> = props => {
-    const { isOpen, onConfirm, onClose, onCancel, wallet, extensionContract } = props;
+    const { isOpen, onConfirm, onClose, onCancel, cancelData } = props;
 
     return (
         <NotificationStyled
@@ -64,10 +64,9 @@ export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> 
                 <ErrorBoundary
                     fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
                 >
-                    {extensionContract && wallet && (
+                    {cancelData && (
                         <ProRemoveExtensionNotificationContent
-                            wallet={wallet}
-                            extensionContract={extensionContract}
+                            cancelData={cancelData}
                             onClose={confirmed => {
                                 onConfirm?.(confirmed);
                                 onClose();
@@ -84,13 +83,13 @@ const ProRemoveExtensionNotificationContent: FC<
     PropsWithChildren<{
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
-        wallet: TonWalletStandard;
-        extensionContract: string;
+        cancelData: ICancelSubscriptionData;
         fitContent?: boolean;
     }>
-> = props => {
-    const { onClose, wallet: selectedWallet, extensionContract } = props;
+> = ({ onClose, cancelData }) => {
+    const { extensionContract, wallet: selectedWallet, expiresDate } = cancelData;
 
+    const toast = useToast();
     const { t } = useTranslation();
     const { fiat } = useAppContext();
     const formatDate = useDateTimeFormat();
@@ -108,6 +107,19 @@ const ProRemoveExtensionNotificationContent: FC<
             }),
         [estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount, fiat, rate?.prices]
     );
+
+    useEffect(() => {
+        if (!removeMutation.isSuccess) return;
+
+        toast(
+            `${t('extension_cancellation_success')} ${formatDate(expiresDate, {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                inputUnit: 'seconds'
+            })}`
+        );
+    }, [removeMutation.isSuccess]);
 
     useEffect(() => {
         estimateFeeMutation.mutate({
@@ -142,7 +154,7 @@ const ProRemoveExtensionNotificationContent: FC<
                     <ListItemPayloadStyled>
                         <Body2Styled>{t('will_be_active_until')}</Body2Styled>
                         <Label2>
-                            {formatDate(new Date(), {
+                            {formatDate(expiresDate, {
                                 day: 'numeric',
                                 month: 'short',
                                 year: 'numeric',
