@@ -117,6 +117,7 @@ export class SubscriptionService implements ISubscriptionService {
             }
         } finally {
             await this._authTokenService.deleteToken();
+            await this._clearPendingSubscription(this._storage);
         }
     }
 

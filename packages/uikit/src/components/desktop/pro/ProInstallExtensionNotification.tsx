@@ -194,8 +194,6 @@ const ProInstallExtensionNotificationContent: FC<
                                         new AssetAmount({
                                             asset: TON_ASSET,
                                             weiAmount: estimateFeeMutation.data.fee.extra.weiAmount
-                                                .minus(extensionData.payment_per_period)
-                                                .toString()
                                         }).toStringAssetRelativeAmount()}
                                 </Label2>
                                 {!estimateFeeMutation.error && (

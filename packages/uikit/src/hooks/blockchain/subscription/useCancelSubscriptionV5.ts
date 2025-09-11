@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { useActiveApi, useAccountWallets } from '../../../state/wallet';
@@ -14,6 +14,7 @@ import { useTonRawTransactionService } from '../useBlockchainService';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
+import { QueryKey } from '../../../libs/queryKey';
 
 type CancelParams = {
     selectedWallet: TonWalletStandard;
@@ -23,6 +24,7 @@ type CancelParams = {
 export const useCancelSubscriptionV5 = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
+    const client = useQueryClient();
     const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
@@ -58,6 +60,8 @@ export const useCancelSubscriptionV5 = () => {
 
         const sender = new WalletMessageSender(api, selectedWallet, signer as CellSigner);
         await sender.send(actions);
+
+        await client.invalidateQueries([QueryKey.pro]);
 
         return true;
     });

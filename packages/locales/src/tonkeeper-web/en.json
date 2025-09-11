@@ -198,6 +198,7 @@
   "expired": "Expired",
   "export_dot_csv": "Export .CSV",
   "export_trc_20_wallet": "Export TRC20 Wallet",
+  "extension_cancellation_success": "Auto-renewal has been successfully canceled! Your subscription will remain active until",
   "failed_connect_telegram": "Telegram connection failed!",
   "failed_subscriptions_loading": "Failed to load subscriptions",
   "failed_to_manage": "Failed to manage subscription",

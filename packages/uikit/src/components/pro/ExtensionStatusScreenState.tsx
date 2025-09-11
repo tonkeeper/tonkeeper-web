@@ -69,19 +69,23 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
     const handleCancel = async () => {
         const strategy = sdk.subscriptionService.getStrategy(SubscriptionSource.EXTENSION);
 
-        if (
-            !isExtensionStrategy(strategy) ||
-            !isExtensionActiveSubscription(subscription) ||
-            !subscription.expiresDate
-        ) {
+        if (!isExtensionStrategy(strategy) || !isExtensionActiveSubscription(subscription)) {
+            toast(t('cancel_failed'));
+
+            return;
+        }
+
+        const expiresDate = subscription.expiresDate || subscription.nextChargeDate;
+
+        if (!expiresDate) {
             toast(t('cancel_failed'));
 
             return;
         }
 
         await strategy.cancelSubscription({
+            expiresDate,
             wallet: subscription.auth.wallet,
-            expiresDate: subscription.expiresDate,
             extensionContract: subscription.contract
         });
     };

@@ -1,11 +1,11 @@
+import { useEffect, useMemo, useState } from 'react';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
-import { getSkeletonProducts } from '../../libs/pro';
-import { useTranslation } from '../translation';
-import { useEffect, useState } from 'react';
 import { useProPlans } from '../../state/pro';
+import { useTranslation } from '../translation';
 import { useNotifyError } from '../useNotification';
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { getSkeletonProducts } from '../../libs/pro';
 
 const SKELETON_PRODUCTS_QTY = 1;
 
@@ -24,18 +24,10 @@ export const useProductSelection = () => {
     const { data: plans, isLoading, isError } = useProPlans(selectedSource);
     useNotifyError(isError && new Error(t('failed_subscriptions_loading')));
 
-    const productsForRender = getProductsForRender(plans);
+    const productsForRender = useMemo(() => getProductsForRender(plans), [plans]);
 
     useEffect(() => {
-        if (productsForRender.length < 1 || !productsForRender[0].displayPrice) {
-            setSelectedPlanId('');
-
-            return;
-        }
-
-        if (!selectedPlanId) {
-            setSelectedPlanId(productsForRender[0].id);
-        }
+        setSelectedPlanId(productsForRender[0].id);
     }, [productsForRender]);
 
     return {

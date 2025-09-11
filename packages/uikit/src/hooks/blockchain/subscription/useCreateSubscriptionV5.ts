@@ -8,10 +8,10 @@ import { SubscriptionExtension } from '@tonkeeper/core/dist/pro';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { CellSigner } from '@tonkeeper/core/dist/entries/signer';
-import { useTonRawTransactionService } from '../useBlockchainService';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
+import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 
 type SubscriptionEncodingParams = {
     selectedWallet: TonWalletStandard;
@@ -78,7 +78,6 @@ export const useCreateSubscriptionV5 = () => {
 
 export const useEstimateDeploySubscriptionV5 = () => {
     const api = useActiveApi();
-    const rawTx = useTonRawTransactionService();
 
     return useMutation<
         { fee: TransactionFeeTonAsset; address: Address },
@@ -98,6 +97,7 @@ export const useEstimateDeploySubscriptionV5 = () => {
             selectedWallet
         } = subscriptionParams;
 
+        const rawTx = new TonRawTransactionService(api, selectedWallet);
         const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
 
         const encoder = new SubscriptionV5Encoder(selectedWallet);
