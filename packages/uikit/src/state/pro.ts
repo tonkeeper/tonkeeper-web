@@ -113,7 +113,7 @@ export const useProState = () => {
             refetchInterval: s =>
                 s?.status === CryptoSubscriptionStatuses.PENDING ||
                 s?.status === ExtensionSubscriptionStatuses.PENDING
-                    ? 1000
+                    ? 3000
                     : false
         }
     );

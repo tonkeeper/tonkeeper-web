@@ -100,15 +100,22 @@ const ProInstallExtensionNotificationContent: FC<
         [extensionData.payment_per_period, fiat, rate?.prices]
     );
 
-    const feeEquivalent: string = useMemo(
-        () =>
-            getFiatEquivalent({
-                amount: estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount ?? null,
-                fiat,
-                ratePrice: rate?.prices
-            }),
-        [estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount, fiat, rate?.prices]
-    );
+    const feeEquivalent: string = useMemo(() => {
+        if (!estimateFeeMutation?.data?.fee?.extra) return '';
+
+        return getFiatEquivalent({
+            amount: estimateFeeMutation.data.fee.extra.weiAmount
+                .minus(extensionData.payment_per_period)
+                .toString(),
+            fiat,
+            ratePrice: rate?.prices
+        });
+    }, [
+        fiat,
+        rate?.prices,
+        extensionData.payment_per_period,
+        estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount
+    ]);
 
     useEffect(() => {
         if (!targetAuth?.wallet) return;
@@ -193,8 +200,11 @@ const ProInstallExtensionNotificationContent: FC<
                                     {estimateFeeMutation?.data?.fee?.extra &&
                                         new AssetAmount({
                                             asset: TON_ASSET,
-                                            weiAmount: estimateFeeMutation.data.fee.extra.weiAmount
-                                        }).toStringAssetRelativeAmount()}
+                                            weiAmount:
+                                                estimateFeeMutation.data.fee.extra.weiAmount.minus(
+                                                    extensionData.payment_per_period
+                                                )
+                                        }).toStringAssetAbsoluteRelativeAmount()}
                                 </Label2>
                                 {!estimateFeeMutation.error && (
                                     <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>

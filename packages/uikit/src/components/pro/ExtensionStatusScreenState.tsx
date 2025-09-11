@@ -75,19 +75,7 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
             return;
         }
 
-        const expiresDate = subscription.expiresDate || subscription.nextChargeDate;
-
-        if (!expiresDate) {
-            toast(t('cancel_failed'));
-
-            return;
-        }
-
-        await strategy.cancelSubscription({
-            expiresDate,
-            wallet: subscription.auth.wallet,
-            extensionContract: subscription.contract
-        });
+        await strategy.cancelSubscription(subscription);
     };
 
     return (

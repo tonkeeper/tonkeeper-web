@@ -4,7 +4,7 @@ import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
 import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
 import { SubscriptionExtension, SubscriptionSource } from '../../pro';
-import { SubscriptionStrategy } from './subscription';
+import { IExtensionActiveSubscription, SubscriptionStrategy } from './subscription';
 import { Language } from '../language';
 
 export interface IDisplayPlan {
@@ -65,7 +65,7 @@ export interface IExtensionStrategyConfig {
         onCancel?: () => void;
     }) => void;
     onRemoveExtensionConfirmOpen: (p?: {
-        cancelData: ICancelSubscriptionData;
+        subscription: IExtensionActiveSubscription;
         onConfirm?: (success?: boolean) => void;
         onCancel?: () => void;
     }) => void;

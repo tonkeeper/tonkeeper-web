@@ -13,8 +13,7 @@ import {
     ISubscriptionFormData,
     IDisplayPlan,
     ITelegramAuth,
-    IWalletAuth,
-    ICancelSubscriptionData
+    IWalletAuth
 } from './common';
 import { CryptoCurrency, SubscriptionSource } from '../../pro';
 import { Language } from '../language';
@@ -172,11 +171,12 @@ export interface IExtensionPendingSubscription extends IBaseExtensionSubscriptio
     auth: ITokenizedWalletAuth;
     displayName?: string;
     displayPrice?: string;
+    isCanceling?: boolean;
 }
 
 export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {
     source: SubscriptionSource.EXTENSION;
-    cancelSubscription(cancelData: ICancelSubscriptionData): Promise<PurchaseStatuses>;
+    cancelSubscription(subscription: IExtensionActiveSubscription): Promise<PurchaseStatuses>;
 }
 
 // Telegram Subscription Types

@@ -2,6 +2,8 @@ import {
     ICryptoPendingSubscription,
     IDisplayPlan,
     IExtensionPendingSubscription,
+    isExtensionAutoRenewableSubscription,
+    isExtensionPendingCancelSubscription,
     isPendingSubscription,
     ISubscriptionFormData,
     ISubscriptionService,
@@ -56,6 +58,13 @@ export class SubscriptionService implements ISubscriptionService {
             getNormalizedSubscription(this._storage, targetToken)
         ]);
 
+        if (
+            isExtensionAutoRenewableSubscription(currentSubscription) &&
+            isExtensionPendingCancelSubscription(pendingSubscription)
+        ) {
+            return pendingSubscription;
+        }
+
         if (tempToken && isValidSubscription(targetSubscription)) {
             await this._authTokenService.setToken(tempToken);
             await this._clearPendingSubscription(this._storage);
@@ -63,7 +72,10 @@ export class SubscriptionService implements ISubscriptionService {
             return targetSubscription;
         }
 
-        if (isPendingSubscription(pendingSubscription)) {
+        if (
+            isPendingSubscription(pendingSubscription) &&
+            !isExtensionPendingCancelSubscription(pendingSubscription)
+        ) {
             return {
                 ...pendingSubscription,
                 valid: Boolean(currentSubscription?.valid)

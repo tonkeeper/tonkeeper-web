@@ -32,7 +32,7 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { SpinnerIcon } from '../../Icon';
 import { hexToRGBA } from '../../../libs/css';
 import { useToast } from '../../../hooks/useNotification';
-import { ICancelSubscriptionData } from '@tonkeeper/core/dist/entries/pro';
+import { IExtensionActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const deployReserve = new AssetAmount({
     asset: TON_ASSET,
@@ -42,13 +42,13 @@ const deployReserve = new AssetAmount({
 interface IProRecurrentNotificationProps {
     isOpen: boolean;
     onClose: () => void;
-    cancelData?: ICancelSubscriptionData;
+    subscription?: IExtensionActiveSubscription;
     onConfirm?: (success?: boolean) => void;
     onCancel?: () => void;
 }
 
 export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> = props => {
-    const { isOpen, onConfirm, onClose, onCancel, cancelData } = props;
+    const { isOpen, onConfirm, onClose, onCancel, subscription } = props;
 
     return (
         <NotificationStyled
@@ -64,9 +64,9 @@ export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> 
                 <ErrorBoundary
                     fallbackRender={fallbackRenderOver('Failed to display Pro Confirm modal')}
                 >
-                    {cancelData && (
+                    {subscription && (
                         <ProRemoveExtensionNotificationContent
-                            cancelData={cancelData}
+                            subscription={subscription}
                             onClose={confirmed => {
                                 onConfirm?.(confirmed);
                                 onClose();
@@ -83,11 +83,14 @@ const ProRemoveExtensionNotificationContent: FC<
     PropsWithChildren<{
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
-        cancelData: ICancelSubscriptionData;
+        subscription: IExtensionActiveSubscription;
         fitContent?: boolean;
     }>
-> = ({ onClose, cancelData }) => {
-    const { extensionContract, wallet: selectedWallet, expiresDate } = cancelData;
+> = ({ onClose, subscription }) => {
+    const { contract: extensionContract, auth, expiresDate, nextChargeDate } = subscription;
+
+    const selectedWallet = auth.wallet;
+    const finalExpiresDate = expiresDate ?? nextChargeDate;
 
     const toast = useToast();
     const { t } = useTranslation();
@@ -109,10 +112,10 @@ const ProRemoveExtensionNotificationContent: FC<
     );
 
     useEffect(() => {
-        if (!removeMutation.isSuccess) return;
+        if (!removeMutation.isSuccess || !finalExpiresDate) return;
 
         toast(
-            `${t('extension_cancellation_success')} ${formatDate(expiresDate, {
+            `${t('extension_cancellation_success')} ${formatDate(finalExpiresDate, {
                 day: 'numeric',
                 month: 'short',
                 year: 'numeric',
@@ -150,19 +153,21 @@ const ProRemoveExtensionNotificationContent: FC<
             </ConfirmViewHeadingSlot>
 
             <ConfirmViewDetailsSlot>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2Styled>{t('will_be_active_until')}</Body2Styled>
-                        <Label2>
-                            {formatDate(expiresDate, {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                                inputUnit: 'seconds'
-                            })}
-                        </Label2>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
+                {finalExpiresDate && (
+                    <ListItemStyled hover={false}>
+                        <ListItemPayloadStyled>
+                            <Body2Styled>{t('will_be_active_until')}</Body2Styled>
+                            <Label2>
+                                {formatDate(finalExpiresDate, {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                    inputUnit: 'seconds'
+                                })}
+                            </Label2>
+                        </ListItemPayloadStyled>
+                    </ListItemStyled>
+                )}
 
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>

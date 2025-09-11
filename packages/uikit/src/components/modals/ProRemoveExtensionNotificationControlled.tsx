@@ -1,11 +1,11 @@
-import { ICancelSubscriptionData } from '@tonkeeper/core/dist/entries/pro';
+import { IExtensionActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { useAtom } from '../../libs/useAtom';
 import { createModalControl } from './createModalControl';
 import { ProRemoveExtensionNotification } from '../desktop/pro/ProRemoveExtensionNotification';
 
 interface IConfirmAtomParams {
-    cancelData: ICancelSubscriptionData;
+    subscription: IExtensionActiveSubscription;
     onConfirm?: (success?: boolean) => void;
     onCancel?: () => void;
 }
@@ -16,7 +16,7 @@ export const useProRemoveExtensionNotification = hook;
 export const ProRemoveExtensionNotificationControlled = () => {
     const { isOpen, onClose } = useProRemoveExtensionNotification();
     const [params] = useAtom(paramsControl);
-    const { onConfirm, onCancel, cancelData } = params ?? {};
+    const { onConfirm, onCancel, subscription } = params ?? {};
 
     return (
         <ProRemoveExtensionNotification
@@ -24,7 +24,7 @@ export const ProRemoveExtensionNotificationControlled = () => {
             onConfirm={onConfirm}
             onCancel={onCancel}
             onClose={onClose}
-            cancelData={cancelData}
+            subscription={subscription}
         />
     );
 };

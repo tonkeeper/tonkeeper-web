@@ -2,8 +2,8 @@ import BigNumber from 'bignumber.js';
 import {
     AuthTypes,
     ExtensionSubscriptionStatuses,
-    ICancelSubscriptionData,
     IDisplayPlan,
+    IExtensionActiveSubscription,
     IExtensionPendingSubscription,
     IExtensionStrategyConfig,
     IExtensionSubscriptionStrategy as IExtensionStrategy,
@@ -79,20 +79,41 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
             onProConfirmOpen({
                 extensionData: extension.data,
                 onConfirm,
-                onCancel: () => {
-                    resolve(PurchaseStatuses.CANCELED);
-                }
+                onCancel: () => resolve(PurchaseStatuses.CANCELED)
             });
         });
     }
 
-    async cancelSubscription(cancelData: ICancelSubscriptionData): Promise<PurchaseStatuses> {
-        const { onRemoveExtensionConfirmOpen } = this.config;
+    async cancelSubscription(
+        subscription: IExtensionActiveSubscription
+    ): Promise<PurchaseStatuses> {
+        const { onRemoveExtensionConfirmOpen, onDataStore } = this.config;
 
         return new Promise<PurchaseStatuses>(resolve => {
             onRemoveExtensionConfirmOpen({
-                cancelData,
-                onConfirm: () => resolve(PurchaseStatuses.SUCCESS),
+                subscription,
+                onConfirm: async (success?: boolean) => {
+                    if (!success) return resolve(PurchaseStatuses.CANCELED);
+
+                    await onDataStore<IExtensionPendingSubscription>(
+                        AppKey.PRO_PENDING_SUBSCRIPTION,
+                        {
+                            ...subscription,
+                            status: ExtensionSubscriptionStatuses.PENDING,
+                            auth: {
+                                ...subscription.auth,
+                                tempToken: ExtensionSubscriptionStatuses.PENDING
+                            },
+                            displayPrice: new AssetAmount({
+                                asset: TON_ASSET,
+                                weiAmount: new BigNumber(subscription.amount)
+                            }).toStringAssetRelativeAmount(2),
+                            isCanceling: true
+                        }
+                    );
+
+                    resolve(PurchaseStatuses.PENDING);
+                },
                 onCancel: () => resolve(PurchaseStatuses.CANCELED)
             });
         });

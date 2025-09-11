@@ -22,7 +22,8 @@ import {
     ITelegramActiveSubscription,
     IExtensionSubscriptionStrategy,
     ExtensionSubscription,
-    IExtensionActiveSubscription
+    IExtensionActiveSubscription,
+    IExtensionPendingSubscription
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
@@ -181,6 +182,17 @@ export function isExtensionAutoRenewableSubscription(
         isPaidActiveSubscription(value) &&
         isExtensionSubscription(value) &&
         value?.isAutoRenewable === true
+    );
+}
+
+export function isExtensionPendingCancelSubscription(
+    subscription: unknown
+): subscription is IExtensionPendingSubscription & { isCanceling: true } {
+    return (
+        isProSubscription(subscription) &&
+        subscription?.source === SubscriptionSource.EXTENSION &&
+        subscription.status === ExtensionSubscriptionStatuses.PENDING &&
+        subscription.isCanceling === true
     );
 }
 
