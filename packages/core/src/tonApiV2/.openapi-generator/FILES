@@ -11,6 +11,7 @@ apis/JettonsApi.ts
 apis/LiteServerApi.ts
 apis/MultisigApi.ts
 apis/NFTApi.ts
+apis/PurchasesApi.ts
 apis/RatesApi.ts
 apis/StakingApi.ts
 apis/StorageApi.ts
@@ -25,6 +26,7 @@ models/AccountAddress.ts
 models/AccountEvent.ts
 models/AccountEvents.ts
 models/AccountInfoByStateInit.ts
+models/AccountPurchases.ts
 models/AccountStaking.ts
 models/AccountStakingInfo.ts
 models/AccountStatus.ts
@@ -83,6 +85,7 @@ models/BlockchainConfig79.ts
 models/BlockchainConfig7CurrenciesInner.ts
 models/BlockchainConfig8.ts
 models/BlockchainConfig9.ts
+models/BlockchainLibrary.ts
 models/BlockchainRawAccount.ts
 models/BlockchainRawAccountLibrariesInner.ts
 models/BouncePhaseType.ts
@@ -91,6 +94,7 @@ models/ComputeSkipReason.ts
 models/ConfigProposalSetup.ts
 models/ContractDeployAction.ts
 models/CreditPhase.ts
+models/CurrencyType.ts
 models/DecodedMessage.ts
 models/DecodedMessageExtInMsgDecoded.ts
 models/DecodedMessageExtInMsgDecodedWalletHighloadV2.ts
@@ -115,12 +119,16 @@ models/EmulateMessageToWalletRequest.ts
 models/EmulateMessageToWalletRequestParamsInner.ts
 models/EncryptedComment.ts
 models/Event.ts
+models/ExecGetMethodArg.ts
+models/ExecGetMethodArgType.ts
+models/ExecGetMethodWithBodyForBlockchainAccountRequest.ts
 models/ExtraCurrencies.ts
 models/ExtraCurrency.ts
 models/ExtraCurrencyTransferAction.ts
 models/FoundAccounts.ts
 models/FoundAccountsAddressesInner.ts
 models/GasLimitPrices.ts
+models/GasRelayAction.ts
 models/GaslessConfig.ts
 models/GaslessConfigGasJettonsInner.ts
 models/GaslessEstimateRequest.ts
@@ -134,6 +142,7 @@ models/GetAccountsRequest.ts
 models/GetAllRawShardsInfo200Response.ts
 models/GetChartRates200Response.ts
 models/GetMarketsRates200Response.ts
+models/GetOpenapiJsonDefaultResponse.ts
 models/GetOutMsgQueueSizes200Response.ts
 models/GetOutMsgQueueSizes200ResponseShardsInner.ts
 models/GetRates200Response.ts
@@ -164,7 +173,6 @@ models/GetStorageProviders200Response.ts
 models/GetTonConnectPayload200Response.ts
 models/ImagePreview.ts
 models/InitStateRaw.ts
-models/InlineObject.ts
 models/JettonBalance.ts
 models/JettonBalanceLock.ts
 models/JettonBridgeParams.ts
@@ -175,6 +183,8 @@ models/JettonHoldersAddressesInner.ts
 models/JettonInfo.ts
 models/JettonMetadata.ts
 models/JettonMintAction.ts
+models/JettonOperation.ts
+models/JettonOperations.ts
 models/JettonPreview.ts
 models/JettonQuantity.ts
 models/JettonSwapAction.ts
@@ -186,6 +196,7 @@ models/JettonsBalances.ts
 models/MarketTonRates.ts
 models/Message.ts
 models/MessageConsequences.ts
+models/Metadata.ts
 models/Method.ts
 models/MethodExecutionResult.ts
 models/MisbehaviourPunishmentConfig.ts
@@ -193,6 +204,7 @@ models/ModelError.ts
 models/MsgForwardPrices.ts
 models/Multisig.ts
 models/MultisigOrder.ts
+models/MultisigOrderChangingParameters.ts
 models/Multisigs.ts
 models/NftCollection.ts
 models/NftCollections.ts
@@ -200,6 +212,8 @@ models/NftItem.ts
 models/NftItemCollection.ts
 models/NftItemTransferAction.ts
 models/NftItems.ts
+models/NftOperation.ts
+models/NftOperations.ts
 models/NftPurchaseAction.ts
 models/Oracle.ts
 models/OracleBridgeParams.ts
@@ -207,6 +221,8 @@ models/PoolImplementation.ts
 models/PoolImplementationType.ts
 models/PoolInfo.ts
 models/Price.ts
+models/Purchase.ts
+models/PurchaseAction.ts
 models/RawBlockchainConfig.ts
 models/ReducedBlock.ts
 models/ReducedBlocks.ts
@@ -251,7 +267,11 @@ models/ValidatorsSet.ts
 models/ValidatorsSetListInner.ts
 models/ValueFlow.ts
 models/ValueFlowJettonsInner.ts
+models/Wallet.ts
 models/WalletDNS.ts
+models/WalletPlugin.ts
+models/WalletStats.ts
+models/Wallets.ts
 models/WithdrawStakeAction.ts
 models/WithdrawStakeRequestAction.ts
 models/WorkchainDescr.ts

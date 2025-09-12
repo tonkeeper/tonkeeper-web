@@ -51,7 +51,7 @@ export const connectLedger = async (transportType: 'wire' | 'bluetooth') => {
     return new TonTransport(transport);
 };
 
-const openTonAppTimeout = 30000;
+const openTonAppTimeout = 300; // TODO increase when ton ledger tonTransport.isAppOpen bug is fixed
 const openTonAppRetryEvery = 100;
 
 const isLedgerTonAppReady = async (tonTransport: TonTransport) => {
@@ -91,15 +91,9 @@ export const isTransportReady = (tonTransport: TonTransport) => {
 };
 
 async function connectWebHID() {
-    for (let i = 0; i < 10; i++) {
-        const [device] = await TransportWebHID.list();
+    const [device] = await TransportWebHID.list();
 
-        if (!device) {
-            await TransportWebHID.create();
-            await wait(100);
-            continue;
-        }
-
+    if (device) {
         if (device.opened) {
             return new TransportWebHID(device);
         } else {
@@ -107,7 +101,7 @@ async function connectWebHID() {
         }
     }
 
-    throw new Error('Failed to connect to Ledger with HID');
+    return TransportWebHID.create();
 }
 
 async function connectWebUSB() {

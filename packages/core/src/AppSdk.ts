@@ -4,13 +4,14 @@ import { BLOCKCHAIN_NAME } from './entries/crypto';
 import { EventEmitter, IEventEmitter } from './entries/eventEmitter';
 import { NFT } from './entries/nft';
 import { FavoriteSuggestion, LatestSuggestion } from './entries/suggestion';
-import { TonContract, TonWalletStandard } from './entries/wallet';
+import { AddWalletMethod, TonContract, TonWalletStandard } from './entries/wallet';
 import { KeystoneMessageType, KeystonePathInfo } from './service/keystone/types';
 import { LedgerTonProofRequest, LedgerTransaction } from './service/ledger/connector';
 import { TonTransferParams } from './service/deeplinkingService';
 import { atom, ReadonlyAtom, ReadonlySubject, Subject } from './entries/atom';
 import { BrowserTabBase, BrowserTabLive } from './service/dappBrowserService';
 import { UserIdentity, UserIdentityService } from './user-identity';
+import { SubscriptionStrategy } from './entries/pro';
 
 export type GetPasswordType = 'confirm' | 'unlock';
 
@@ -125,14 +126,22 @@ export interface InternetConnectionService {
     retry: () => Promise<boolean>;
 }
 
+export interface AppCountryInfo {
+    deviceCountryCode: string | null;
+    storeCountryCode: string | null;
+}
+
 export interface IAppSdk {
     storage: IStorage;
+    subscriptionStrategy: SubscriptionStrategy;
+
     nativeBackButton?: NativeBackButton;
     keychain?: IKeychainService;
     cookie?: CookieService;
     biometry?: BiometryService;
 
     topMessage: (text: string) => void;
+    pasteFromClipboard: () => Promise<string>;
     copyToClipboard: (value: string, notification?: string) => void;
     openPage: (
         url: string,
@@ -180,6 +189,22 @@ export interface IAppSdk {
     userIdentity: UserIdentity;
 
     dappBrowser?: IDappBrowser;
+
+    linksInterceptorAvailable?: boolean;
+
+    ledgerConnectionPage?: {
+        isOpened: ReadonlyAtom<boolean>;
+        open(): Promise<void>;
+        close(): Promise<void>;
+    };
+
+    addWalletPage?: {
+        getAutoMountMethod(): AddWalletMethod | null;
+        open(selectedMethod?: AddWalletMethod): Promise<void>;
+        close(): void;
+    };
+
+    getAppCountryInfo(): Promise<AppCountryInfo>;
 }
 
 export interface IDappBrowser {
@@ -228,11 +253,37 @@ export abstract class BaseApp implements IAppSdk {
         this.userIdentity = new UserIdentityService(storage);
     }
 
+    keychain?: IKeychainService | undefined;
+
+    cookie?: CookieService | undefined;
+
+    biometry?: BiometryService | undefined;
+
+    notifications?: NotificationService | undefined;
+
+    storeUrl?: string | undefined;
+
+    signerReturnUrl?: string | undefined;
+
+    logger?: { read(): Promise<string>; clear(): Promise<void> } | undefined;
+
+    dappBrowser?: IDappBrowser | undefined;
+
+    linksInterceptorAvailable?: boolean | undefined;
+
+    ledgerConnectionPage?:
+        | { isOpened: ReadonlyAtom<boolean>; open(): Promise<void>; close(): Promise<void> }
+        | undefined;
+
     nativeBackButton?: NativeBackButton | undefined;
+
+    subscriptionStrategy!: SubscriptionStrategy;
 
     topMessage = (text?: string) => {
         this.uiEvents.emit('copy', { method: 'copy', id: Date.now(), params: text });
     };
+
+    pasteFromClipboard = async () => navigator.clipboard.readText();
 
     copyToClipboard = (value: string, notification?: string) => {
         console.log(value, notification);
@@ -289,6 +340,13 @@ export abstract class BaseApp implements IAppSdk {
     authorizedOpenUrlProtocols = ['http:', 'https:', 'tg:', 'mailto:'];
 
     userIdentity: UserIdentity;
+
+    async getAppCountryInfo(): Promise<AppCountryInfo> {
+        return {
+            deviceCountryCode: null,
+            storeCountryCode: null
+        };
+    }
 }
 
 class WebKeyboardService implements KeyboardService {

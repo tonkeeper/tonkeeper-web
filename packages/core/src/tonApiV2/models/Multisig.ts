@@ -97,11 +97,11 @@ export function MultisigFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function MultisigToJSON(json: any): Multisig {
-    return MultisigToJSONTyped(json, false);
-}
+  export function MultisigToJSON(json: any): Multisig {
+      return MultisigToJSONTyped(json, false);
+  }
 
-export function MultisigToJSONTyped(value?: Multisig | null, ignoreDiscriminator: boolean = false): any {
+  export function MultisigToJSONTyped(value?: Multisig | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -7,9 +7,8 @@ import { useLocation } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useUserCountry } from '../../state/country';
-import { useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { ListBlock } from '../List';
 import {
     Notification,
@@ -26,7 +25,7 @@ import { BuyIcon, SellIcon } from './HomeIcons';
 import { useActiveConfig } from '../../state/wallet';
 import { HideOnReview } from '../ios/HideOnReview';
 import { useSearchParams } from '../../hooks/router/useSearchParams';
-import { useNavigate } from '../../hooks/router/useNavigate';
+import { IfFeatureEnabled } from '../shared/IfFeatureEnabled';
 
 const BuyList: FC<{ items: TonendpoinFiatItem[]; kind: 'buy' | 'sell' }> = ({ items, kind }) => {
     return (
@@ -68,15 +67,19 @@ const ActionNotification: FC<{
                 </NotificationHeader>
             </NotificationHeaderPortal>
             <BuyList items={item.items} kind={kind} />
-            <OtherBlock>
-                <OtherLink
-                    onClick={() => config.exchangePostUrl && sdk.openPage(config.exchangePostUrl)}
-                >
-                    {kind === 'buy'
-                        ? t('exchange_modal_other_ways_to_buy')
-                        : t('exchange_other_ways')}
-                </OtherLink>
-            </OtherBlock>
+            {!!config.exchangePostUrl && (
+                <OtherBlock>
+                    <OtherLink
+                        onClick={() =>
+                            config.exchangePostUrl && sdk.openPage(config.exchangePostUrl)
+                        }
+                    >
+                        {kind === 'buy'
+                            ? t('exchange_modal_other_ways_to_buy')
+                            : t('exchange_other_ways')}
+                    </OtherLink>
+                </OtherBlock>
+            )}
         </Block>
     );
 };
@@ -143,10 +146,10 @@ export const BuyAction: FC = () => {
     }, [searchParams, setSearchParams]);
 
     return (
-        <HideOnReview>
+        <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
             <Action icon={<BuyIcon />} title={'wallet_buy'} action={toggle} />
             <BuyNotification buy={buy} open={open} handleClose={toggle} />
-        </HideOnReview>
+        </IfFeatureEnabled>
     );
 };
 

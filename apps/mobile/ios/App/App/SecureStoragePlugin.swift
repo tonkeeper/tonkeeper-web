@@ -23,15 +23,21 @@ import Security
 
         let keychainQuery: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly,
-            kSecAttrAccount: id,
+            kSecAttrAccount: id
+        ]
+
+        let attributesToUpdate: [CFString: Any] = [
             kSecValueData: data
         ]
 
-        SecItemDelete(keychainQuery as CFDictionary)
+        var status = SecItemUpdate(keychainQuery as CFDictionary, attributesToUpdate as CFDictionary)
 
-
-        let status = SecItemAdd(keychainQuery as CFDictionary, nil)
+        if status == errSecItemNotFound {
+            var addQuery = keychainQuery
+            addQuery[kSecValueData] = data
+            addQuery[kSecAttrAccessible] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            status = SecItemAdd(addQuery as CFDictionary, nil)
+        }
 
         if status == errSecSuccess {
             call.resolve()

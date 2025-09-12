@@ -6,15 +6,11 @@ import browser from 'webextension-polyfill';
  *
  * @returns {Error|undefined}
  */
-export function checkForError() {
-  const { lastError } = browser.runtime;
-  if (!lastError) {
-    return undefined;
-  }
-  // if it quacks like an Error, its an Error
-  if (lastError.message) {
-    return lastError;
-  }
-  // repair incomplete error object (eg chromium v77)
-  return new Error(lastError.message);
+export function checkForError(): Error | undefined {
+    const { lastError } = browser.runtime;
+    if (!lastError) return undefined;
+
+    return lastError instanceof Error
+        ? lastError
+        : new Error(lastError.message || 'Unknown runtime error');
 }

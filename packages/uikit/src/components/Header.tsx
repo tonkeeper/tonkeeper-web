@@ -12,12 +12,7 @@ import styled, { createGlobalStyle, css } from 'styled-components';
 import { useTranslation } from '../hooks/translation';
 import { AppRoute, SettingsRoute, WalletSettingsRoute } from '../libs/routes';
 import { useUserCountry } from '../state/country';
-import {
-    useAccountsState,
-    useActiveAccount,
-    useActiveWallet,
-    useMutateActiveTonWallet
-} from '../state/wallet';
+import { useActiveAccount, useActiveWallet, useMutateActiveTonWallet } from '../state/wallet';
 import { DropDown } from './DropDown';
 import { DoneIcon, DownIcon, ExclamationMarkTriangleIcon, PlusIcon, SettingsIcon } from './Icon';
 import { ColumnText, Divider } from './Layout';
@@ -327,9 +322,6 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
     const { t } = useTranslation();
     const { data: twoFAConfig } = useTwoFAWalletConfig();
 
-    const accounts = useAccountsState();
-    const shouldShowIcon = accounts.length > 1;
-
     return (
         <>
             <Block center>
@@ -340,15 +332,13 @@ export const Header: FC<{ showQrScan?: boolean }> = ({ showQrScan = true }) => {
                     containerClassName="header-dd-container"
                 >
                     <TitleStyled>
-                        {shouldShowIcon && (
-                            <WalletEmoji
-                                emoji={
-                                    account.type === 'mam'
-                                        ? account.activeDerivation.emoji
-                                        : account.emoji
-                                }
-                            />
-                        )}
+                        <WalletEmoji
+                            emoji={
+                                account.type === 'mam'
+                                    ? account.activeDerivation.emoji
+                                    : account.emoji
+                            }
+                        />
                         <TitleName>
                             {account.type === 'mam' ? account.activeDerivation.name : account.name}
                         </TitleName>

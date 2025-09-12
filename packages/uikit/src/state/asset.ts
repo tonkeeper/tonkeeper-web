@@ -35,6 +35,7 @@ import { useTronBalances } from './tron/tron';
 import { useAccountsState, useActiveAccount, useWalletAccountInfo } from './wallet';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
+import { useAppSdk } from '../hooks/appSdk';
 
 export function useUserAssetBalance<
     T extends AssetIdentification = AssetIdentification,
@@ -92,7 +93,7 @@ export function useTonAssetImage({ blockchain, address }: AssetIdentification): 
     const { data: jettons } = useJettonList();
 
     if (id === TON_ASSET.id) {
-        return 'https://wallet.tonkeeper.com/img/toncoin.svg';
+        return TON_ASSET.image;
     }
 
     if (typeof address === 'string') {
@@ -107,11 +108,15 @@ export function useAssetAmountFiatEquivalent(assetAmount: AssetAmount): {
     isLoading: boolean;
     data: BigNumber | undefined;
 } {
-    const { data: tokenRate, isLoading } = useRate(
-        assetAmount.asset.id === TRON_USDT_ASSET.id
-            ? 'USDT'
-            : legacyTonAssetId(assetAmount.asset as TonAsset, { userFriendly: true })
-    );
+    let assetId: string;
+    if (assetAmount.asset.id === TRON_USDT_ASSET.id) {
+        assetId = 'USDT';
+    } else if (assetAmount.asset.id === TRON_TRX_ASSET.id) {
+        assetId = 'TRX';
+    } else {
+        assetId = legacyTonAssetId(assetAmount.asset as TonAsset, { userFriendly: true });
+    }
+    const { data: tokenRate, isLoading } = useRate(assetId);
 
     return {
         isLoading,
@@ -183,6 +188,7 @@ export const useWalletTotalBalance = () => {
 };
 
 export const useAllWalletsTotalBalance = (network: Network) => {
+    const sdk = useAppSdk();
     const fiat = useUserFiat();
     const allAccounts = useAccountsState();
     const allWalletsAddresses = useMemo(
@@ -202,7 +208,8 @@ export const useAllWalletsTotalBalance = (network: Network) => {
                 columns: ['total_balance']
             };
             const result = await getDashboardData(queryToFetch, {
-                currency: fiat
+                currency: fiat,
+                token: await sdk.subscriptionStrategy.getToken()
             });
 
             return result
@@ -213,6 +220,7 @@ export const useAllWalletsTotalBalance = (network: Network) => {
 };
 
 export const useAccountTotalBalance = () => {
+    const sdk = useAppSdk();
     const fiat = useUserFiat();
     const account = useActiveAccount();
     const allWalletsAddresses = useMemo(
@@ -230,7 +238,8 @@ export const useAccountTotalBalance = () => {
                 columns: ['total_balance']
             };
             const result = await getDashboardData(queryToFetch, {
-                currency: fiat
+                currency: fiat,
+                token: await sdk.subscriptionStrategy.getToken()
             });
 
             const totalTonAssetsBalances = result

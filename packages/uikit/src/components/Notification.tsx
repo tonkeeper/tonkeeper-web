@@ -32,6 +32,9 @@ import { IonContent, IonModal } from '@ionic/react';
 import { cn, iosKeyboardTransition } from '../libs/css';
 import { useKeyboardHeight } from '../hooks/keyboard/useKeyboardHeight';
 import { atom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
+import { TargetEnv } from '@tonkeeper/core/dist/AppSdk';
+
+const notificationMaxWidth = 650;
 
 const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
     background: transparent;
@@ -43,6 +46,7 @@ const NotificationContainer = styled(Container)<{ scrollbarWidth: number }>`
         css`
             min-height: 100%;
             height: 100%;
+            max-width: ${notificationMaxWidth}px;
         `}
 `;
 
@@ -54,7 +58,7 @@ const NotificationWrapper: FC<PropsWithChildren<{ entered: boolean; className?: 
     const sdk = useAppSdk();
 
     const scrollbarWidth = useMemo(() => {
-        return window.innerWidth > 550 ? sdk.getScrollbarWidth() : 0;
+        return window.innerWidth > notificationMaxWidth ? sdk.getScrollbarWidth() : 0;
     }, [sdk, entered]);
 
     return (
@@ -108,14 +112,15 @@ const GapAdjusted = styled(Gap)`
         `}
 `;
 
-const Overlay = styled.div<{ entered: boolean; paddingRight: number }>`
+const Overlay = styled.div<{ entered: boolean; paddingRight: number; $appTargetEnv: TargetEnv }>`
     position: fixed;
     left: 0;
     right: 0;
     height: 100%;
     top: 100%;
     transition: top 0.3s ease-in-out;
-    overflow-y: ${props => (props.entered ? 'scroll' : 'hidden')};
+    overflow-y: ${props =>
+        props.entered ? (props.$appTargetEnv === 'extension' ? 'auto' : 'scroll') : 'hidden'};
     padding-right: ${props => props.paddingRight}px;
     -webkit-overflow-scrolling: touch;
 `;
@@ -134,6 +139,7 @@ const OverlayWrapper = React.forwardRef<HTMLDivElement, PropsWithChildren<{ ente
                 entered={entered}
                 paddingRight={entered ? 0 : scrollbarWidth}
                 className="notification-overlay"
+                $appTargetEnv={sdk.targetEnv}
             >
                 {children}
             </Overlay>
@@ -301,7 +307,7 @@ const BackShadow = styled.div`
     ${p =>
         p.theme.displayType === 'full-width' &&
         css`
-            max-width: 550px;
+            max-width: ${notificationMaxWidth}px;
         `}
 `;
 
@@ -517,6 +523,7 @@ export const Notification: FC<{
     mobileFullScreen?: boolean;
     afterClose?: () => void;
     tag?: string;
+    onTopOfBrowser?: boolean;
 }> = props => {
     const targetEnv = useAppTargetEnv();
 
@@ -539,6 +546,7 @@ export const NotificationIonic: FC<{
     mobileFullScreen?: boolean;
     afterClose?: () => void;
     tag?: string;
+    onTopOfBrowser?: boolean;
 }> = ({
     children,
     isOpen,
@@ -550,7 +558,8 @@ export const NotificationIonic: FC<{
     disableHeightAnimation,
     mobileFullScreen,
     afterClose,
-    tag
+    tag,
+    onTopOfBrowser
 }) => {
     const [onBack, setOnBack] = useState<(() => void) | undefined>();
     const [onCloseInterceptor, setOnCloseInterceptor] = useState<OnCloseInterceptor>();
@@ -648,7 +657,11 @@ export const NotificationIonic: FC<{
                 initialBreakpoint={1}
                 breakpoints={[0, 1]}
                 handle={false}
-                className={cn(className, mobileFullScreen && 'modal-mobile-fullscreen')}
+                className={cn(
+                    className,
+                    mobileFullScreen && 'modal-mobile-fullscreen',
+                    onTopOfBrowser && 'on-top-of-browser'
+                )}
             >
                 <IonicModalContentStyled>
                     <HeightAnimation>
@@ -765,12 +778,13 @@ export const NotificationDesktopAndWeb: FC<{
     const nodeRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const closeOnEscapeKey = (e: KeyboardEvent) => (e.key === 'Escape' ? onClose() : null);
+        const closeOnEscapeKey = (e: KeyboardEvent) =>
+            e.key === 'Escape' && open ? onClose() : null;
         document.body.addEventListener('keydown', closeOnEscapeKey);
         return () => {
             document.body.removeEventListener('keydown', closeOnEscapeKey);
         };
-    }, [onClose]);
+    }, [onClose, open]);
 
     const Child = useMemo(() => {
         return children((_afterClose?: () => void) => {

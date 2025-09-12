@@ -2,11 +2,13 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import {
     AccountEvent,
     ActionStatusEnum,
+    CurrencyType,
     ExtraCurrencyTransferAction,
+    PurchaseAction,
     TonTransferAction
 } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { FC } from 'react';
+import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
 import { useTranslation } from '../../../hooks/translation';
 import { useFormatFiat, useRate } from '../../../state/rates';
@@ -15,6 +17,7 @@ import {
     ActivityDetailsHeader,
     Amount,
     FailedDetail,
+    Spam,
     TransferComment,
     TransferOpCode
 } from '../ActivityDetailsLayout';
@@ -31,6 +34,10 @@ import {
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 import { useActiveWallet } from '../../../state/wallet';
+import { sanitizeJetton } from '../../../libs/common';
+import { Address } from '@ton/core';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 
 const TonTransferActionContent: FC<{
     tonTransfer: TonTransferAction;
@@ -234,6 +241,128 @@ export const ExtraCurrencyTransferNotification: FC<ActionData> = ({
             isScam={isScam}
             timestamp={timestamp}
             status={action.status}
+        />
+    );
+};
+
+export const SimplePreviewActionNotification: FC<ActionData> = ({
+    action,
+    timestamp,
+    event,
+    isScam
+}) => {
+    const { t } = useTranslation();
+
+    const { simplePreview } = action;
+
+    if (!simplePreview) {
+        return <ErrorActivityNotification event={event} />;
+    }
+
+    const recipient = simplePreview.accounts[0];
+
+    return (
+        <ActionDetailsBlock event={event}>
+            <div>
+                {isScam && <Spam>{t('spam_action')}</Spam>}
+                <Title>{simplePreview.name}</Title>
+                {simplePreview.value && !isScam && <Amount>{simplePreview.value}</Amount>}
+                <ActionDate kind="call" timestamp={timestamp} />
+                <FailedDetail status={action.status} />
+            </div>
+            <ListBlock margin={false} fullWidth>
+                {recipient && (
+                    <ActionRecipientDetails
+                        recipient={recipient}
+                        customLabel={t('simple_preview_account')}
+                    />
+                )}
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
+                <TransferComment comment={isScam ? undefined : simplePreview.description} />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
+};
+
+const PurchaseActionContent: FC<{
+    purchase: PurchaseAction;
+    timestamp: number;
+    event: AccountEvent;
+    isScam: boolean;
+    currencyId: string;
+    status?: ActionStatusEnum;
+}> = ({ purchase, timestamp, event, isScam, status, currencyId }) => {
+    const { t } = useTranslation();
+    const { data } = useRate(currencyId);
+    const { fiatAmount } = useFormatFiat(
+        data,
+        formatDecimals(purchase.amount.value, purchase.amount.decimals)
+    );
+
+    return (
+        <ActionDetailsBlock event={event}>
+            <ActivityDetailsHeader
+                isScam={isScam}
+                amount={purchase.amount.value}
+                decimals={purchase.amount.decimals}
+                symbol={sanitizeJetton(purchase.amount.tokenName, isScam)}
+                total={fiatAmount}
+                timestamp={timestamp}
+                kind="send"
+                status={status}
+            >
+                {t('transaction_type_purchase')}
+            </ActivityDetailsHeader>
+            <ListBlock margin={false} fullWidth>
+                {<ActionRecipientDetails recipient={purchase.destination} />}
+                <ActionTransactionDetails eventId={event.eventId} />
+                <ActionExtraDetails extra={event.extra} />
+                <TransferComment
+                    comment={t('transaction_type_purchase_description', {
+                        invoice: purchase.invoiceId
+                    })}
+                />
+            </ListBlock>
+        </ActionDetailsBlock>
+    );
+};
+
+export const PurchaseActionNotification: FC<ActionData> = ({
+    action,
+    timestamp,
+    event,
+    isScam
+}) => {
+    const { purchase } = action;
+
+    if (!purchase) {
+        return <ErrorActivityNotification event={event} />;
+    }
+
+    let currencyId;
+    if (purchase.amount.currencyType === CurrencyType.Jetton) {
+        try {
+            currencyId = Address.parse(purchase.amount.jetton!).toRawString();
+        } catch (e) {
+            console.error(e);
+        }
+    } else if (purchase.amount.currencyType === CurrencyType.Native) {
+        currencyId = tonAssetAddressToString(TON_ASSET.address);
+    }
+
+    if (!currencyId) {
+        return <ErrorActivityNotification event={event} />;
+    }
+
+    return (
+        <PurchaseActionContent
+            purchase={purchase}
+            event={event}
+            isScam={isScam}
+            timestamp={timestamp}
+            status={action.status}
+            currencyId={currencyId}
         />
     );
 };

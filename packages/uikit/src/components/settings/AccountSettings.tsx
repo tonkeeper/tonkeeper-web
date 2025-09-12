@@ -1,6 +1,5 @@
 import { walletVersionText } from '@tonkeeper/core/dist/entries/wallet';
 import { useMemo, useState } from 'react';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
 import { SettingsRoute, WalletSettingsRoute, relative } from '../../libs/routes';
 import { useJettonList } from '../../state/jetton';
@@ -16,7 +15,6 @@ import {
     RecoveryPhraseIcon,
     SaleBadgeIcon,
     SecurityIcon,
-    SettingsProIcon,
     WalletsIcon,
     BatteryIcon,
     LockIcon,
@@ -28,10 +26,11 @@ import {
     isAccountVersionEditable,
     isMnemonicAndPassword
 } from '@tonkeeper/core/dist/entries/account';
-import { useBatteryEnabledConfig } from '../../state/battery';
+import { useCanSeeBattery } from '../../state/battery';
 import { useCanViewTwoFA } from '../../state/two-fa';
 import { useCanUseTronForActiveWallet } from '../../state/tron/tron';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const SingleAccountSettings = () => {
     const { t } = useTranslation();
@@ -39,11 +38,12 @@ const SingleAccountSettings = () => {
     const account = useActiveAccount();
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
-    const { proFeatures } = useAppContext();
     const { onOpen: rename } = useRenameNotification();
-    const batteryEnableConfig = useBatteryEnabledConfig();
+    const canUseBattery = useCanSeeBattery();
     const twoFAEnabled = useCanViewTwoFA();
     const canUseTron = useCanUseTronForActiveWallet();
+
+    const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
 
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
@@ -53,14 +53,6 @@ const SingleAccountSettings = () => {
                 action: () => navigate(relative(SettingsRoute.account))
             }
         ];
-
-        if (proFeatures) {
-            items.push({
-                name: t('tonkeeper_pro'),
-                icon: <SettingsProIcon />,
-                action: () => navigate(relative(SettingsRoute.pro))
-            });
-        }
 
         return items;
     }, [t]);
@@ -145,7 +137,7 @@ const SingleAccountSettings = () => {
             });
         }
 
-        if (nft?.length) {
+        if (nft?.length && isNftEnabled) {
             items.push({
                 name: t('settings_collectibles_list'),
                 icon: <SaleBadgeIcon />,
@@ -166,8 +158,7 @@ const SingleAccountSettings = () => {
             });
         }
 
-        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
-        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+        if (canUseBattery) {
             items.push({
                 name: t('battery_title'),
                 icon: <BatteryIcon />,
@@ -184,7 +175,7 @@ const SingleAccountSettings = () => {
         }
 
         return items;
-    }, [t, navigate, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
+    }, [t, navigate, account, jettons, nft, twoFAEnabled, canUseBattery, canUseTron, isNftEnabled]);
 
     return (
         <>
@@ -200,10 +191,9 @@ const MultipleAccountSettings = () => {
 
     const { data: jettons } = useJettonList();
     const { data: nft } = useWalletNftList();
-    const { proFeatures } = useAppContext();
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
-    const batteryEnableConfig = useBatteryEnabledConfig();
+    const canUseBattery = useCanSeeBattery();
     const twoFAEnabled = useCanViewTwoFA();
 
     const [deleteAccount, setDeleteAccount] = useState(false);
@@ -212,6 +202,8 @@ const MultipleAccountSettings = () => {
 
     const canUseTron = useCanUseTronForActiveWallet();
 
+    const isNftEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.NFT);
+
     const accountItems = useMemo(() => {
         const items: SettingsItem[] = [
             {
@@ -219,20 +211,7 @@ const MultipleAccountSettings = () => {
                 icon: <WalletsIcon />,
                 action: () => navigate(relative(SettingsRoute.account))
             }
-            // {
-            //   name: t('Subscriptions'),
-            //   icon: <SubscriptionIcon />,
-            //   action: () => navigate(relative(SettingsRoute.subscriptions)),
-            // },
         ];
-
-        if (proFeatures) {
-            items.push({
-                name: t('tonkeeper_pro'),
-                icon: <SettingsProIcon />,
-                action: () => navigate(relative(SettingsRoute.pro))
-            });
-        }
 
         return items;
     }, [wallet, t]);
@@ -319,7 +298,7 @@ const MultipleAccountSettings = () => {
             });
         }
 
-        if (nft?.length) {
+        if (nft?.length && isNftEnabled) {
             items.push({
                 name: t('settings_collectibles_list'),
                 icon: <SaleBadgeIcon />,
@@ -340,8 +319,7 @@ const MultipleAccountSettings = () => {
             });
         }
 
-        const canUseBattery = account.type === 'mnemonic' || account.type === 'mam';
-        if (canUseBattery && !batteryEnableConfig.disableWhole) {
+        if (canUseBattery) {
             items.push({
                 name: t('battery_title'),
                 icon: <BatteryIcon />,
@@ -363,7 +341,18 @@ const MultipleAccountSettings = () => {
             action: () => setDeleteAccount(true)
         });
         return items;
-    }, [t, navigate, wallet, account, jettons, nft, twoFAEnabled, batteryEnableConfig, canUseTron]);
+    }, [
+        t,
+        navigate,
+        wallet,
+        account,
+        jettons,
+        nft,
+        twoFAEnabled,
+        canUseBattery,
+        canUseTron,
+        isNftEnabled
+    ]);
 
     return (
         <>

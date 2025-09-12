@@ -16,28 +16,44 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { ChevronRightIcon, SpinnerIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import { Body1, Body2Class, H2, Label1, Label2 } from '../Text';
+import { Body1, Body2Class, Body3, H2, Label1, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
-import {
-    SenderChoiceUserAvailable,
-    SenderTypeUserAvailable
-} from '../../hooks/blockchain/useSender';
+
 import { SelectDropDown } from '../fields/Select';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useBatteryBalance } from '../../state/battery';
+import { useBatteryBalance, useBatteryUnitTonRate } from '../../state/battery';
 import {
     isTransactionFeeRefund,
     TransactionFee,
     TransactionFeeBattery,
-    TransactionFeeTonAsset
+    TransactionFeeTonAsset,
+    TransactionFeeTonAssetRelayed,
+    TransactionFeeTronAsset
 } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
-import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import {
+    TonAsset,
+    tonAssetAddressToString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
 import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import { Image } from '../shared/Image';
+import {
+    AllChainsSenderOptions,
+    AllChainsSenderType,
+    isTronSenderOption
+} from '../../hooks/blockchain/sender/sender-type';
+import {
+    TonSenderChoiceUserAvailable,
+    TonSenderTypeUserAvailable
+} from '../../hooks/blockchain/useSender';
+import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { TRON_SENDER_TYPE } from '../../hooks/blockchain/sender/useTronSender';
+import { Skeleton } from '../shared/Skeleton';
+import { Dot } from '../Dot';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -163,10 +179,11 @@ export const ActionRecipientAddress: FC<{ address: string; name?: string; label?
     );
 };
 
-export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: boolean }> = ({
-    recipient,
-    bounced
-}) => {
+export const ActionRecipientDetails: FC<{
+    recipient: AccountAddress;
+    bounced?: boolean;
+    customLabel?: string;
+}> = ({ recipient, bounced, customLabel }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const network = useActiveTonNetwork();
@@ -176,7 +193,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
             {recipient.name && (
                 <ListItem onClick={() => sdk.copyToClipboard(recipient.name!)}>
                     <ListItemPayload>
-                        <Label>{t('transaction_recipient')}</Label>
+                        <Label>{customLabel ?? t('transaction_recipient')}</Label>
                         <Label1>{recipient.name}</Label1>
                     </ListItemPayload>
                 </ListItem>
@@ -184,6 +201,7 @@ export const ActionRecipientDetails: FC<{ recipient: AccountAddress; bounced?: b
             <ActionRecipientAddress
                 address={formatAddress(recipient.address, network, bounced)}
                 name={recipient.name}
+                label={customLabel}
             />
         </>
     );
@@ -323,18 +341,26 @@ export const ActionExtraDetails: FC<{
         [extra]
     );
 
-    return <ActionFeeTonAssetDetails fee={fee} />;
+    return <ActionFeeTonAssetDetails extra={fee.extra} />;
 };
 
 export const ActionFeeDetails: FC<{
     fee: TransactionFee;
 }> = ({ fee }) => {
     if (fee.type === 'ton-asset') {
-        return <ActionFeeTonAssetDetails fee={fee} />;
+        return <ActionFeeTonAssetDetails extra={fee.extra} />;
     }
 
     if (fee.type === 'battery') {
         return <ActionFeeBatteryDetails fee={fee} />;
+    }
+
+    if (fee.type === 'tron-asset') {
+        return <ActionFeeTronAssetDetails fee={fee} />;
+    }
+
+    if (fee.type === 'ton-asset-relayed') {
+        return <ActionFeeTonAssetDetails extra={fee.extra} />;
     }
 
     assertUnreachableSoft(fee);
@@ -342,29 +368,44 @@ export const ActionFeeDetails: FC<{
 };
 
 export const ActionFeeTonAssetDetails: FC<{
-    fee: TransactionFeeTonAsset;
-}> = ({ fee }) => {
+    extra: AssetAmount<TonAsset>;
+}> = ({ extra }) => {
     const { t } = useTranslation();
 
     const feeAbs = useMemo(
-        () => new AssetAmount({ asset: fee.extra.asset, weiAmount: fee.extra.weiAmount.abs() }),
-        [fee.extra]
+        () => new AssetAmount({ asset: extra.asset, weiAmount: extra.weiAmount.abs() }),
+        [extra]
     );
 
-    const { data: rate } = useRate(tonAssetAddressToString(fee.extra.asset.address));
+    const { data: rate } = useRate(tonAssetAddressToString(extra.asset.address));
     const { fiatAmount } = useFormatFiat(rate, feeAbs.relativeAmount);
 
     return (
         <ListItem hover={false}>
             <ListItemPayload>
                 <Label>
-                    {fee.extra.relativeAmount.gt(0) ? t('txActions_refund') : t('transaction_fee')}
+                    {extra.relativeAmount.gt(0) ? t('txActions_refund') : t('transaction_fee')}
                 </Label>
                 <ColumnText
                     right
                     text={feeAbs.stringAssetRelativeAmount}
                     secondary={fiatAmount ? `≈ ${fiatAmount}` : undefined}
                 />
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+export const ActionFeeTronAssetDetails: FC<{
+    fee: TransactionFeeTronAsset;
+}> = ({ fee }) => {
+    const { t } = useTranslation();
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{t('transaction_fee')}</Label>
+                <ColumnText right text={fee.extra.stringAssetRelativeAmount} secondary={'TODO'} />
             </ListItemPayload>
         </ListItem>
     );
@@ -403,7 +444,7 @@ const TransparentButton = styled.button`
     padding: 0;
 `;
 
-const TokenImage = styled.img`
+const TokenImage = styled(Image)`
     width: 24px;
     height: 24px;
     border-radius: ${p => p.theme.cornerFull};
@@ -429,14 +470,30 @@ const BatteryIcon = () => {
     );
 };
 
-export const ActionFeeDetailsUniversal: FC<{
-    fee: TransactionFee | undefined | null;
-    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
-    selectedSenderType?: SenderTypeUserAvailable;
-    availableSendersChoices?: SenderChoiceUserAvailable[];
-    className?: string;
-}> = ({ fee, availableSendersChoices, onSenderTypeChange, selectedSenderType, className }) => {
+export type FeeDetailsPropsUniversal = {
+    onSenderTypeChange?: (type: AllChainsSenderType) => void;
+    selectedSenderType?: AllChainsSenderType;
+    availableSendersOptions?: AllChainsSenderOptions[];
+};
+
+export type FeeDetailsPropsTon = {
+    blockchain: BLOCKCHAIN_NAME.TON;
+    onSenderTypeChange?: (type: TonSenderTypeUserAvailable) => void;
+    selectedSenderType?: TonSenderTypeUserAvailable;
+    availableSendersOptions?: TonSenderChoiceUserAvailable[];
+};
+
+export const ActionFeeDetailsUniversal: FC<
+    {
+        fee: TransactionFee | undefined | null;
+        className?: string;
+    } & (FeeDetailsPropsTon | FeeDetailsPropsUniversal)
+> = ({ fee, className, ...rest }) => {
     const { t } = useTranslation();
+
+    const noAvailableTronOptions = rest.availableSendersOptions?.every(
+        choice => isTronSenderOption(choice) && !choice.isEnoughBalance
+    );
 
     return (
         <ListItem hover={false} className={className}>
@@ -447,15 +504,11 @@ export const ActionFeeDetailsUniversal: FC<{
                             ? t('txActions_refund')
                             : t('transaction_fee')}
                     </Label>
-                    <SelectSenderDropdown
-                        availableSendersChoices={availableSendersChoices}
-                        onSenderTypeChange={onSenderTypeChange}
-                        selectedSenderType={selectedSenderType}
-                    />
+                    <SelectSenderDropdown {...rest} />
                 </FeeLabelColumn>
                 {fee ? (
                     <ActionFeeDetailsUniversalValue fee={fee} />
-                ) : fee === null ? (
+                ) : fee === null || noAvailableTronOptions ? (
                     <>—</>
                 ) : (
                     <SpinnerIcon />
@@ -465,50 +518,40 @@ export const ActionFeeDetailsUniversal: FC<{
     );
 };
 
-export const SelectSenderDropdown: FC<{
-    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
-    selectedSenderType?: SenderTypeUserAvailable;
-    availableSendersChoices?: SenderChoiceUserAvailable[];
-    className?: string;
-}> = ({ onSenderTypeChange, selectedSenderType, availableSendersChoices, className }) => {
+const SelectDropDownStyled = styled(SelectDropDown)`
+    & .dd-select-container {
+        z-index: 1000;
+    }
+`;
+
+export const SelectSenderDropdown: FC<
+    {
+        className?: string;
+    } & (FeeDetailsPropsTon | FeeDetailsPropsUniversal)
+> = ({ onSenderTypeChange, selectedSenderType, availableSendersOptions, className }) => {
     const { t } = useTranslation();
-    if (!availableSendersChoices?.length || availableSendersChoices.length <= 1) {
+    if (!availableSendersOptions?.length || availableSendersOptions.length <= 1) {
         return null;
     }
 
     return (
-        <SelectDropDown
+        <SelectDropDownStyled
             left="0"
             bottom="0"
             className={className}
             payload={onClose => (
                 <DropDownContent>
-                    {availableSendersChoices.map(s => (
+                    {availableSendersOptions.map(s => (
                         <>
                             <DropDownItem
                                 onClick={() => {
                                     onClose();
-                                    onSenderTypeChange?.(s.type);
+                                    onSenderTypeChange?.(s.type as TonSenderTypeUserAvailable);
                                 }}
                                 key={s.type}
                                 isSelected={selectedSenderType === s.type}
                             >
-                                {s.type === 'battery' ? (
-                                    <>
-                                        <BatteryIcon />
-                                        <Label2>{t('battery_title')}</Label2>
-                                    </>
-                                ) : s.type === 'gasless' ? (
-                                    <>
-                                        <TokenImage src={s.asset.image} />
-                                        <Label2>{s.asset.symbol}</Label2>
-                                    </>
-                                ) : (
-                                    <>
-                                        <TokenImage src={TON_ASSET.image} />
-                                        <Label2>{TON_ASSET.symbol}</Label2>
-                                    </>
-                                )}
+                                <SenderDropdownItem sender={s} />
                             </DropDownItem>
                             <DropDownItemsDivider />
                         </>
@@ -520,7 +563,120 @@ export const SelectSenderDropdown: FC<{
                 {t('send_change_fee_payment_method')}
                 <ChevronRightIcon />
             </TransparentButton>
-        </SelectDropDown>
+        </SelectDropDownStyled>
+    );
+};
+
+const SenderText = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
+const Body3Secondary = styled(Body3)`
+    color: ${p => p.theme.textSecondary};
+`;
+
+const Body3Accent = styled(Body3)`
+    color: ${p => p.theme.textAccent};
+`;
+
+const RefillText = () => {
+    const { t } = useTranslation();
+    return (
+        <Body3>
+            <Body3Secondary>{t('select_fee_payment_method_not_enough_funds')}</Body3Secondary>
+            <Dot />
+            <Body3Accent>{t('select_fee_payment_method_refill')}</Body3Accent>
+        </Body3>
+    );
+};
+
+const SenderDropdownItem: FC<{ sender: AllChainsSenderOptions }> = ({ sender }) => {
+    const { t } = useTranslation();
+
+    switch (sender.type) {
+        case 'external':
+            return (
+                <>
+                    <TokenImage src={TON_ASSET.image} />
+                    <Label2>{TON_ASSET.symbol}</Label2>
+                </>
+            );
+        case 'gasless':
+            return (
+                <>
+                    <TokenImage src={sender.asset.image} noRadius={sender.asset.noImageCorners} />
+                    <Label2>{sender.asset.symbol}</Label2>
+                </>
+            );
+        case 'battery':
+            return (
+                <>
+                    <BatteryIcon />
+                    <Label2>{t('battery_title')}</Label2>
+                </>
+            );
+        case TRON_SENDER_TYPE.BATTERY:
+            return <SenderDropdownItemTronBattery {...sender} />;
+        case TRON_SENDER_TYPE.TRX:
+        case TRON_SENDER_TYPE.TON_ASSET:
+            return <SenderDropdownItemTronTrxOrTonAsset {...sender} />;
+        default:
+            assertUnreachableSoft(sender);
+            return null;
+    }
+};
+
+const SenderDropdownItemTronBattery: FC<{
+    isEnoughBalance: boolean;
+    fee: TransactionFeeBattery;
+}> = ({ fee, isEnoughBalance }) => {
+    const { t } = useTranslation();
+
+    const batteryUnitRate = useBatteryUnitTonRate();
+    const { data: tonRate } = useRate(tonAssetAddressToString(TON_ASSET.address));
+    const { fiatAmount } = useFormatFiat(tonRate, batteryUnitRate.multipliedBy(fee.charges));
+
+    return (
+        <>
+            <BatteryIcon />
+            <SenderText>
+                <Label2>{t('battery_title')}</Label2>
+                {fiatAmount ? (
+                    <Body3Secondary>
+                        ≈{fiatAmount} ({t('battery_charges', { charges: fee.charges })})
+                    </Body3Secondary>
+                ) : (
+                    <Skeleton height="14px" marginTop="2px" width="100px" />
+                )}
+                {!isEnoughBalance && <RefillText />}
+            </SenderText>
+        </>
+    );
+};
+
+const SenderDropdownItemTronTrxOrTonAsset: FC<{
+    isEnoughBalance: boolean;
+    fee: TransactionFeeTonAssetRelayed | TransactionFeeTronAsset;
+}> = ({ fee, isEnoughBalance }) => {
+    const { data: assetRate } = useRate(tonAssetAddressToString(fee.extra.asset.address));
+    const { fiatAmount } = useFormatFiat(assetRate, fee.extra.relativeAmount);
+
+    return (
+        <>
+            <TokenImage src={fee.extra.asset.image} />
+            <SenderText>
+                <Label2>{fee.extra.asset.symbol}</Label2>
+                {fiatAmount ? (
+                    <Body3Secondary>
+                        ≈{fiatAmount} ({fee.extra.stringAssetRelativeAmount})
+                    </Body3Secondary>
+                ) : (
+                    <Skeleton height="14px" marginTop="2px" width="100px" />
+                )}
+                {!isEnoughBalance && <RefillText />}
+            </SenderText>
+        </>
     );
 };
 
@@ -529,12 +685,19 @@ const ActionFeeDetailsUniversalValue: FC<{
 }> = ({ fee }) => {
     if (fee.type === 'battery') {
         return <ActionFeeDetailsUniversalBatteryValue fee={fee} />;
-    } else {
+    }
+
+    if (fee.type === 'ton-asset' || fee.type === 'tron-asset' || fee.type === 'ton-asset-relayed') {
         return <ActionFeeDetailsUniversalTokenValue fee={fee} />;
     }
+
+    assertUnreachableSoft(fee);
+    return null;
 };
 
-const ActionFeeDetailsUniversalTokenValue: FC<{ fee: TransactionFeeTonAsset }> = ({ fee }) => {
+const ActionFeeDetailsUniversalTokenValue: FC<{
+    fee: TransactionFeeTonAsset | TransactionFeeTronAsset | TransactionFeeTonAssetRelayed;
+}> = ({ fee }) => {
     const { fiat } = useAppContext();
     const { data: fiatAmountBN, isLoading } = useAssetAmountFiatEquivalent(fee.extra);
 
@@ -590,7 +753,7 @@ export const ActionDetailsBlock: FC<PropsWithChildren<{ event: AccountEvent }>> 
     children
 }) => {
     const config = useActiveConfig();
-    const url = config.transactionExplorer ?? 'https://tonviewer.com/transaction/%s';
+    const url = config.transactionExplorer;
     return (
         <CommonActionDetailsBlock url={url} eventId={event.eventId}>
             {children}

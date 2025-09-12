@@ -65,11 +65,11 @@ export function GetOutMsgQueueSizes200ResponseFromJSONTyped(json: any, ignoreDis
     };
 }
 
-export function GetOutMsgQueueSizes200ResponseToJSON(json: any): GetOutMsgQueueSizes200Response {
-    return GetOutMsgQueueSizes200ResponseToJSONTyped(json, false);
-}
+  export function GetOutMsgQueueSizes200ResponseToJSON(json: any): GetOutMsgQueueSizes200Response {
+      return GetOutMsgQueueSizes200ResponseToJSONTyped(json, false);
+  }
 
-export function GetOutMsgQueueSizes200ResponseToJSONTyped(value?: GetOutMsgQueueSizes200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetOutMsgQueueSizes200ResponseToJSONTyped(value?: GetOutMsgQueueSizes200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

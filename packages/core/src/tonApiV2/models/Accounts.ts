@@ -57,11 +57,11 @@ export function AccountsFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function AccountsToJSON(json: any): Accounts {
-    return AccountsToJSONTyped(json, false);
-}
+  export function AccountsToJSON(json: any): Accounts {
+      return AccountsToJSONTyped(json, false);
+  }
 
-export function AccountsToJSONTyped(value?: Accounts | null, ignoreDiscriminator: boolean = false): any {
+  export function AccountsToJSONTyped(value?: Accounts | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -43,6 +43,12 @@ export interface ConfigMeanPrices {
      * @memberof ConfigMeanPrices
      */
     batteryMeanPriceTronUsdt?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ConfigMeanPrices
+     */
+    tonMeanPriceTronUsdt?: number;
 }
 
 /**
@@ -69,6 +75,7 @@ export function ConfigMeanPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
         'batteryMeanPriceJetton': json['battery_mean_price_jetton'],
         'batteryMeanPriceNft': json['battery_mean_price_nft'],
         'batteryMeanPriceTronUsdt': json['battery_mean_price_tron_usdt'] == null ? undefined : json['battery_mean_price_tron_usdt'],
+        'tonMeanPriceTronUsdt': json['ton_mean_price_tron_usdt'] == null ? undefined : json['ton_mean_price_tron_usdt'],
     };
 }
 
@@ -87,6 +94,7 @@ export function ConfigMeanPricesFromJSONTyped(json: any, ignoreDiscriminator: bo
         'battery_mean_price_jetton': value['batteryMeanPriceJetton'],
         'battery_mean_price_nft': value['batteryMeanPriceNft'],
         'battery_mean_price_tron_usdt': value['batteryMeanPriceTronUsdt'],
+        'ton_mean_price_tron_usdt': value['tonMeanPriceTronUsdt'],
     };
 }
 

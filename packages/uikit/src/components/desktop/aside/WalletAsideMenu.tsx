@@ -28,16 +28,16 @@ import {
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { RoundedBadge } from '../../shared/Badge';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useBatteryBalance, useCanUseBattery } from '../../../state/battery';
+import { useBatteryBalance, useCanSeeBattery } from '../../../state/battery';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { NavLink } from '../../shared/NavLink';
 import { ForTargetEnv } from '../../shared/TargetEnv';
 import { useCallback, useEffect } from 'react';
 import { useMenuController } from '../../../hooks/ionic';
-import { HideForRegulatoryState } from '../../HideForState';
-import { CountryFeature } from '../../../state/country';
 import { WalletAsideMenuBrowserTabs } from './WalletAsideMenuBrowserTabs';
 import { useHideActiveBrowserTab, useIsBrowserOpened } from '../../../state/dapp-browser';
+import { IfFeatureEnabled } from '../../shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../../../state/tonendpoint';
 
 const WalletAsideContainer = styled.div`
     overflow: auto;
@@ -105,7 +105,7 @@ export const WalletAsideMenu = () => {
 
     const isCoinPageOpened = location.pathname.startsWith(AppRoute.coins);
 
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
 
     const menuController = useMenuController('wallet-nav');
     useEffect(() => {
@@ -137,22 +137,24 @@ export const WalletAsideMenu = () => {
             </NavLink>
 
             <HideOnReview>
-                <NavLink to={AppRoute.purchases} disableMobileAnimation onClick={hideBrowser}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
-                            <SaleBadgeIcon />
-                            <Label2>{t('wallet_aside_collectibles')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
-                <NavLink to={AppRoute.dns} disableMobileAnimation onClick={hideBrowser}>
-                    {({ isActive }) => (
-                        <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
-                            <SparkIcon />
-                            <Label2>{t('wallet_aside_domains')}</Label2>
-                        </AsideMenuItemStyled>
-                    )}
-                </NavLink>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.NFT}>
+                    <NavLink to={AppRoute.purchases} disableMobileAnimation onClick={hideBrowser}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                                <SaleBadgeIcon />
+                                <Label2>{t('wallet_aside_collectibles')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                    <NavLink to={AppRoute.dns} disableMobileAnimation onClick={hideBrowser}>
+                        {({ isActive }) => (
+                            <AsideMenuItemStyled isSelected={isActive && !isBrowserOpened}>
+                                <SparkIcon />
+                                <Label2>{t('wallet_aside_domains')}</Label2>
+                            </AsideMenuItemStyled>
+                        )}
+                    </NavLink>
+                </IfFeatureEnabled>
                 <SwapItem />
                 {isMultisig && !isTestnet && <MultisigOrdersMenuItem />}
                 {showMultisigs && !isTestnet && (
@@ -199,7 +201,7 @@ const SwapItem = () => {
     const isBrowserOpened = useIsBrowserOpened();
 
     return (
-        <HideForRegulatoryState feature={CountryFeature.swap}>
+        <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
             {!isReadOnly && !isTestnet && (
                 <NavLink to={AppRoute.swap} disableMobileAnimation onClick={hideBrowser}>
                     {({ isActive }) => (
@@ -210,7 +212,7 @@ const SwapItem = () => {
                     )}
                 </NavLink>
             )}
-        </HideForRegulatoryState>
+        </IfFeatureEnabled>
     );
 };
 

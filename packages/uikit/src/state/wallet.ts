@@ -19,7 +19,8 @@ import {
     isAccountTonWalletStandard,
     isAccountTronCompatible,
     isAccountVersionEditable,
-    isMnemonicAndPassword
+    isMnemonicAndPassword,
+    seeIfMainnnetAccount
 } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
@@ -28,7 +29,10 @@ import {
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
-    WalletVersion
+    WalletVersion,
+    AccountWallet,
+    getWalletsFromAccount,
+    WalletsTransform
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConfig,
@@ -82,9 +86,11 @@ import { isSignerLink } from './signer';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
 import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
-import { useMutateIsFreeProAccessActivate } from './pro';
 import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
+import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -113,6 +119,15 @@ export const useActiveAccount = () => {
 export const useActiveWallet = () => {
     const account = useActiveAccount();
     return account.activeTonWallet;
+};
+
+export const useAccountWallets = (transform?: WalletsTransform): AccountWallet[] => {
+    const accounts = useAccountsState().filter(
+        (acc): acc is AccountTonMnemonic | AccountMAM =>
+            seeIfMainnnetAccount(acc) && (acc.type === 'mnemonic' || acc.type === 'mam')
+    );
+
+    return accounts.flatMap(acc => getWalletsFromAccount(acc, transform));
 };
 
 export const useActiveStandardTonWallet = () => {
@@ -662,18 +677,18 @@ export const useCreateAccountTonSK = () => {
         AccountTonSK,
         Error,
         {
-            sk: string;
+            secret: SigningSecret;
             password?: string;
             versions: WalletVersion[];
             selectAccount?: boolean;
         }
-    >(async ({ sk, password, versions, selectAccount }) => {
+    >(async ({ secret, password, versions, selectAccount }) => {
         const accountSecret: AccountSecretSK = {
             type: 'sk',
-            sk
+            sk: secret.key
         };
         if (sdk.keychain) {
-            const account = await createStandardTonAccountBySK(context, sdk.storage, sk, {
+            const account = await createStandardTonAccountBySK(context, sdk.storage, secret, {
                 auth: {
                     kind: 'keychain'
                 },
@@ -697,7 +712,7 @@ export const useCreateAccountTonSK = () => {
         }
 
         const encryptedSK = await encryptWalletSecret(accountSecret, password);
-        const account = await createStandardTonAccountBySK(context, sdk.storage, sk, {
+        const account = await createStandardTonAccountBySK(context, sdk.storage, secret, {
             auth: {
                 kind: 'password',
                 encryptedSecret: encryptedSK
@@ -984,7 +999,6 @@ export const useMutateLogOut = () => {
     const { mutateAsync: removeBatteryAuthToken } = useRemoveBatteryAuthToken();
     const sdk = useAppSdk();
     const { mutateAsync: securityCheck } = useSecurityCheck();
-    const { mutateAsync: setIsFreeProAccessActivate } = useMutateIsFreeProAccessActivate();
 
     return useMutation<void, Error, AccountId>(async accountId => {
         await securityCheck();
@@ -1011,7 +1025,6 @@ export const useMutateLogOut = () => {
 
         if (newAccounts.length === 0) {
             await sdk.keychain?.resetSecuritySettings();
-            await setIsFreeProAccessActivate(false);
         }
 
         try {
@@ -1141,6 +1154,21 @@ export const useWalletAccountInfo = () => {
             accountId: wallet.rawAddress
         });
     });
+};
+
+export const useTonBalance = () => {
+    const { data: tonAccountInfo, ...rest } = useWalletAccountInfo();
+    const tonBalance = useMemo(() => {
+        if (!tonAccountInfo) {
+            return undefined;
+        }
+        return new AssetAmount({ weiAmount: tonAccountInfo.balance, asset: TON_ASSET });
+    }, [tonAccountInfo]);
+
+    return {
+        data: tonBalance,
+        ...rest
+    };
 };
 
 export const useActiveTonNetwork = () => {

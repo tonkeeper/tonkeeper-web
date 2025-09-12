@@ -12,9 +12,10 @@ import {
     seeIfBringToFrontLink
 } from '@tonkeeper/core/dist/service/deeplinkingService';
 import {
-    connectRejectResponse,
+    connectErrorResponse,
     parseTonConnect,
-    saveWalletTonConnect
+    saveWalletTonConnect,
+    tonConnectUserRejectError
 } from '@tonkeeper/core/dist/service/tonConnect/connectService';
 import {
     AccountConnectionHttp,
@@ -33,6 +34,8 @@ import { useTonTransactionNotification } from '../modals/TonTransactionNotificat
 import { useActiveApi, useActiveWallet } from '../../state/wallet';
 import { useBatteryServiceConfig } from '../../state/battery';
 import { useGaslessConfig } from '../../state/gasless';
+import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
+import { useAppContext } from '../../hooks/appContext';
 
 export const useProcessOpenedLink = (options?: {
     hideLoadingToast?: boolean;
@@ -116,7 +119,7 @@ export const useProcessOpenedLink = (options?: {
             return params;
         } catch (e) {
             if (!options?.hideErrorToast) {
-                notifyError(String(e));
+                notifyError(String(e).replace(/^Error ?: ?/, ''));
             }
             throw e;
         }
@@ -126,35 +129,46 @@ export const useProcessOpenedLink = (options?: {
 export const useCompleteHttpConnection = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { mainnetConfig } = useAppContext();
 
     return useMutation<
         undefined,
         Error,
         {
             params: TonConnectHttpConnectionParams;
-            result: {
-                replyItems: TonConnectEventPayload;
-                manifest: DAppManifest;
-                account: Account;
-                walletId: WalletId;
-            } | null;
+            result:
+                | {
+                      replyItems: TonConnectEventPayload;
+                      manifest: DAppManifest;
+                      account: Account;
+                      walletId: WalletId;
+                  }
+                | null
+                | TonConnectError;
         }
     >(async ({ params, result }) => {
-        if (result) {
+        if (!result || result instanceof TonConnectError) {
+            await sendEventToBridge({
+                response: connectErrorResponse(result ?? tonConnectUserRejectError()),
+                sessionKeyPair: params.sessionKeyPair,
+                clientSessionId: params.clientSessionId,
+                bridgeEndpoint: mainnetConfig.ton_connect_bridge
+            });
+        } else {
             const response = await saveWalletTonConnect({
                 storage: sdk.storage,
                 account: result.account,
                 walletId: result.walletId,
                 manifest: result.manifest,
                 params,
-                replyItems: result.replyItems.items,
-                appVersion: sdk.version
+                replyItems: result.replyItems
             });
 
             await sendEventToBridge({
                 response,
                 sessionKeyPair: params.sessionKeyPair,
-                clientSessionId: params.clientSessionId
+                clientSessionId: params.clientSessionId,
+                bridgeEndpoint: mainnetConfig.ton_connect_bridge
             });
 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
@@ -176,12 +190,6 @@ export const useCompleteHttpConnection = () => {
                     if (e instanceof Error) sdk.topMessage(e.message);
                 }
             }
-        } else {
-            await sendEventToBridge({
-                response: connectRejectResponse(),
-                sessionKeyPair: params.sessionKeyPair,
-                clientSessionId: params.clientSessionId
-            });
         }
         await client.invalidateQueries([QueryKey.tonConnectLastEventId]);
 
@@ -198,31 +206,33 @@ export const useCompleteInjectedConnection = () => {
         Error,
         {
             params: TonConnectInjectedConnectionParams;
-            result: {
-                replyItems: TonConnectEventPayload;
-                manifest: DAppManifest;
-                account: Account;
-                walletId: WalletId;
-            } | null;
+            result:
+                | {
+                      replyItems: TonConnectEventPayload;
+                      manifest: DAppManifest;
+                      account: Account;
+                      walletId: WalletId;
+                  }
+                | null
+                | TonConnectError;
             sendBridgeResponse: (result: ConnectEvent) => void;
         }
     >(async ({ params, result, sendBridgeResponse }) => {
-        if (result) {
+        if (!result || result instanceof TonConnectError) {
+            sendBridgeResponse(connectErrorResponse(result ?? tonConnectUserRejectError()));
+        } else {
             const response = await saveWalletTonConnect({
                 storage: sdk.storage,
                 account: result.account,
                 walletId: result.walletId,
                 manifest: result.manifest,
                 params,
-                replyItems: result.replyItems.items,
-                appVersion: sdk.version
+                replyItems: result.replyItems
             });
 
             sendBridgeResponse(response);
 
             await client.invalidateQueries([QueryKey.tonConnectConnection]);
-        } else {
-            sendBridgeResponse(connectRejectResponse());
         }
 
         return undefined;
@@ -235,11 +245,14 @@ export interface ResponseSendProps {
 }
 
 export const useTonConnectHttpResponseMutation = () => {
+    const { mainnetConfig } = useAppContext();
+
     return useMutation<void, Error, ResponseSendProps>(async ({ connection, response }) => {
         return sendEventToBridge({
             response,
             sessionKeyPair: connection.sessionKeyPair,
-            clientSessionId: connection.clientSessionId
+            clientSessionId: connection.clientSessionId,
+            bridgeEndpoint: mainnetConfig.ton_connect_bridge
         });
     });
 };

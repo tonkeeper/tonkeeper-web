@@ -1,5 +1,11 @@
 // eslint-disable-next-line max-classes-per-file
-import { BaseApp, IAppSdk, BiometryService, CookieService } from '@tonkeeper/core/dist/AppSdk';
+import {
+    BaseApp,
+    IAppSdk,
+    BiometryService,
+    CookieService,
+    AppCountryInfo
+} from '@tonkeeper/core/dist/AppSdk';
 import copyToClipboard from 'copy-to-clipboard';
 import packageJson from '../../package.json';
 import { sendBackground } from './backgroudService';
@@ -67,4 +73,12 @@ export class DesktopAppSdk extends BaseApp implements IAppSdk {
         // eslint-disable-next-line no-self-assign
         window.location.href = window.location.href;
     };
+
+    async getAppCountryInfo(): Promise<AppCountryInfo> {
+        const deviceCountryCode: string = await sendBackground({ king: 'get-device-country' });
+        return {
+            deviceCountryCode,
+            storeCountryCode: null
+        };
+    }
 }

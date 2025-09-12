@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig, setProApiUrl } from "@tonkeeper/core/dist/entries/network";
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -42,7 +42,9 @@ import { useAnalytics, useAppHeight, useLayout } from './libs/hooks';
 import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-preferences';
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from 'react-router-dom';
+import { localesList } from "@tonkeeper/locales/localesList";
+import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
 const DesktopView = React.lazy(() => import('./AppDesktop'));
@@ -57,12 +59,13 @@ const queryClient = new QueryClient({
 });
 
 const sdk = new BrowserAppSdk();
-const TARGET_ENV = 'web';
 
 export const App: FC = () => {
-    return <BrowserRouter>
-        <Providers />
-    </BrowserRouter>
+    return (
+        <BrowserRouter>
+            <Providers />
+        </BrowserRouter>
+    );
 };
 
 const Providers: FC<PropsWithChildren> = () => {
@@ -71,7 +74,6 @@ const Providers: FC<PropsWithChildren> = () => {
     const t = useTWithReplaces(tSimple);
 
     const translation = useMemo(() => {
-        const languages = (import.meta.env.VITE_APP_LOCALES ?? 'en').split(',');
         const client: I18nContext = {
             t,
             i18n: {
@@ -79,7 +81,7 @@ const Providers: FC<PropsWithChildren> = () => {
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as any,
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -105,7 +107,12 @@ const ThemeAndContent = () => {
     const isMobile = useLayout();
 
     return (
-        <UserThemeProvider isPro={data?.valid} isProSupported proDisplayType="desktop" displayType={isMobile ? 'compact' : 'full-width'}>
+        <UserThemeProvider
+            isPro={Boolean(data?.valid)}
+            isProSupported
+            proDisplayType="desktop"
+            displayType={isMobile ? 'compact' : 'full-width'}
+        >
             <DarkThemeContext.Provider value={!data?.valid}>
                 <GlobalStyle />
                 <HeaderGlobalStyle />
@@ -136,7 +143,6 @@ const Loader: FC = () => {
     const { i18n } = useTranslation();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang,
         platform: 'web'
@@ -145,7 +151,7 @@ const Loader: FC = () => {
 
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, sdk.version);
+    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, sdk.version, serverConfig?.mainnetConfig);
 
     useEffect(() => {
         if (activeAccount && lang && i18n.language !== localizationText(lang)) {
@@ -171,13 +177,12 @@ const Loader: FC = () => {
         return <Loading />;
     }
 
+    // set api url synchronously
+    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            serverConfig.mainnetConfig,
-            Network.MAINNET,
-            import.meta.env.VITE_APP_TONCONSOLE_HOST
-        ),
-        testnetApi: getApiConfig(serverConfig.mainnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,
@@ -188,22 +193,20 @@ const Loader: FC = () => {
         ios,
         defaultWalletVersion: WalletVersion.V5R1,
         hideMultisig: isMobile,
-        env: {
-            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS,
-            tronApiKey: import.meta.env.VITE_APP_TRON_API_KEY
-        },
+        hideFireblocks: true,
         tracker: tracker?.track
     };
 
     return (
         <AppContext.Provider value={context}>
-            <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
-            <CopyNotification hideSimpleCopyNotifications={!standalone} />
-            <Suspense>
-                <QrScanner />
-            </Suspense>
-            <ModalsRoot />
+            <CryptoStrategyInstaller>
+                <Content activeAccount={activeAccount} lock={lock} standalone={standalone} />
+                <CopyNotification hideSimpleCopyNotifications={!standalone} />
+                <Suspense>
+                    <QrScanner />
+                </Suspense>
+                <ModalsRoot />
+            </CryptoStrategyInstaller>
         </AppContext.Provider>
     );
 };

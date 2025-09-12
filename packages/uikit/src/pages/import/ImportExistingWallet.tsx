@@ -1,4 +1,4 @@
-import React, { FC, useContext, useMemo, useState } from 'react';
+import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { UpdateWalletName } from '../../components/create/WalletName';
 import { ImportMnemonicType, ImportWords, SelectMnemonicType } from '../../components/create/Words';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -46,6 +46,9 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { useTranslation } from '../../hooks/translation';
+import { useAutoAuthMutation } from '../../state/pro';
+import { tonProofSignerByTonMnemonic } from '../../hooks/accountUtils';
+import { maxOneCall } from '@tonkeeper/core/dist/utils/common';
 
 const useProcessMnemonic = () => {
     const context = useAppContext();
@@ -255,6 +258,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     const { mutateAsync: renameDerivations, isLoading: renameDerivationsLoading } =
         useMutateRenameAccountDerivations();
 
+    const { mutateAsync: tryAutoAuth } = useAutoAuthMutation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
     const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
@@ -413,6 +417,25 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         };
     }, [isMnemonicFormDirty, openConfirmDiscard, createdAccount, existingAccountAndWallet]);
     useSetNotificationOnCloseInterceptor(onCloseInterceptor);
+
+    useEffect(() => {
+        if (
+            createdAccount &&
+            mnemonic &&
+            (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') &&
+            selectNetworksPassed
+        ) {
+            void tryAutoAuth({
+                wallet: createdAccount.activeTonWallet,
+                signer: maxOneCall(
+                    tonProofSignerByTonMnemonic(
+                        mnemonic,
+                        selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                    )
+                )
+            });
+        }
+    }, [createdAccount, mnemonic, selectedMnemonicType, editNamePagePassed, selectNetworksPassed]);
 
     if (!mnemonic) {
         return (

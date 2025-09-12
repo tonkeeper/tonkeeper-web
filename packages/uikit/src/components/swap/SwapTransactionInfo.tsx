@@ -1,5 +1,5 @@
-import { css, styled } from 'styled-components';
-import { Body2Class, Body3, Body3Class } from "../Text";
+import { styled } from 'styled-components';
+import { Body3 } from '../Text';
 import { IconButton } from '../fields/IconButton';
 import { useState } from 'react';
 import { ChevronDownIcon, InfoCircleIcon } from '../Icon';
@@ -15,8 +15,8 @@ import { getDecimalSeparator } from '@tonkeeper/core/dist/utils/formatting';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { useSwapOptions } from '../../state/swap/useSwapOptions';
 import { useTranslation } from '../../hooks/translation';
-import { BorderSmallResponsive } from '../shared/Styles';
 import { Accordion } from '../shared/Accordion';
+import { TooltipHost, Tooltip } from '../shared/Tooltip';
 
 const TxInfoContainer = styled.div``;
 
@@ -48,41 +48,6 @@ const InfoRow = styled.div`
 
     > * {
         cursor: default;
-    }
-`;
-
-const Tooltip = styled.div<{ placement: 'top' | 'bottom' }>`
-    pointer-events: none;
-    transform: translate3d(0, -10px, 0);
-    z-index: 100;
-    left: 0;
-    right: 0;
-    transition: all 0.15s ease-in-out;
-    opacity: 0;
-    position: absolute;
-    background-color: ${p => p.theme.backgroundContentTint};
-    padding: 8px 12px;
-    ${BorderSmallResponsive};
-    ${Body3Class};
-
-    ${p =>
-        p.placement === 'top'
-            ? css`
-                  transform: translate3d(0, 10px, 0);
-                  bottom: 30px;
-              `
-            : css`
-                  transform: translate3d(0, -10px, 0);
-                  top: 30px;
-              `}
-`;
-
-const TooltipHost = styled.div`
-    cursor: pointer;
-
-    &:hover + ${Tooltip} {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
     }
 `;
 

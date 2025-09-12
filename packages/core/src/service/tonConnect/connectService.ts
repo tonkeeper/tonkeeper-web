@@ -17,6 +17,7 @@ import {
     SendTransactionRpcResponseError,
     SendTransactionRpcResponseSuccess,
     TonAddressItemReply,
+    TonConnectEventPayload,
     TonConnectNetwork,
     TonProofItemReplySuccess
 } from '../../entries/tonConnect';
@@ -36,7 +37,7 @@ import {
 } from './connectionService';
 import { SessionCrypto } from './protocol';
 import { Account, getAccountByWalletById, isAccountSupportTonConnect } from '../../entries/account';
-import { removeLastSlash } from '../../utils/common';
+import { eqOrigins, isLocalhost, originFromUrl } from '../../utils/url';
 
 export const tonConnectTonkeeperAppName = 'tonkeeper';
 export const tonConnectTonkeeperProAppName = 'tonkeeper-pro';
@@ -124,20 +125,12 @@ export const getTonConnectParams = async (
     };
 };
 
-const getManifestResponse = async (manifestUrl: string) => {
-    try {
-        return await fetch(manifestUrl);
-    } catch (e) {
-        /**
-         * Request file with CORS header;
-         */
-        return await fetch(`https://c.tonapi.io/json?url=${btoa(manifestUrl)}`);
-    }
+const fetchManifestFromProxy = async (manifestUrl: string) => {
+    return fetch(`https://c.tonapi.io/json?url=${btoa(manifestUrl)}&no-cache=true`);
 };
 
 export const getManifest = async (request: ConnectRequest) => {
-    // TODO: get fetch from context
-    const response = await getManifestResponse(request.manifestUrl);
+    const response = await fetchManifestFromProxy(request.manifestUrl);
 
     if (response.status !== 200) {
         throw new Error(`Failed to load Manifest: ${response.status}`);
@@ -482,8 +475,7 @@ export const saveWalletTonConnect = async (options: {
     account: Account;
     manifest: DAppManifest;
     params: TonConnectConnectionParams;
-    replyItems: ConnectItemReply[];
-    appVersion: string;
+    replyItems: TonConnectEventPayload;
     walletId: WalletId;
 }): Promise<ConnectEvent> => {
     const wallet =
@@ -502,30 +494,22 @@ export const saveWalletTonConnect = async (options: {
         params: options.params
     });
 
-    const maxMessages = getMaxMessages(options.account);
-
     return {
         id: Date.now(),
         event: 'connect',
-        payload: {
-            items: options.replyItems,
-            device: getDeviceInfo(
-                getBrowserPlatform(),
-                options.appVersion,
-                maxMessages,
-                options.params.appName
-            )
-        }
+        payload: options.replyItems
     };
 };
+export const tonConnectUserRejectError = () =>
+    new TonConnectError('Reject Request', CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR);
 
-export const connectRejectResponse = (): ConnectEvent => {
+export const connectErrorResponse = (error: { code: number; message: string }): ConnectEvent => {
     return {
         id: Date.now(),
         event: 'connect_error',
         payload: {
-            code: CONNECT_EVENT_ERROR_CODES.USER_REJECTS_ERROR,
-            message: 'Reject Request'
+            code: error.code,
+            message: error?.message
         }
     };
 };
@@ -571,18 +555,20 @@ export const sendBadRequestResponse = (
     };
 };
 
-export function eqOrigins(origin1: string, origin2: string | undefined): boolean {
-    return origin2 !== undefined && removeLastSlash(origin1) === removeLastSlash(origin2);
-}
-
-export function originFromUrl(url: string): string | undefined {
-    try {
-        const parsed = new URL(url);
-        return removeLastSlash(parsed.origin);
-    } catch (e) {
-        console.error(e);
-        return undefined;
+export function checkDappOriginMatchesManifest(params: {
+    origin: string;
+    manifestUrl: string;
+}): boolean {
+    const manifestOrigin = originFromUrl(params.manifestUrl);
+    if (!manifestOrigin) {
+        return false;
     }
+
+    if (isLocalhost(params.origin)) {
+        return true;
+    }
+
+    return eqOrigins(params.origin, manifestOrigin);
 }
 
 export async function checkTonConnectFromAndNetwork(

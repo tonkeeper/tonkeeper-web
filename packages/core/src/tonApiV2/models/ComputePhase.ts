@@ -108,11 +108,11 @@ export function ComputePhaseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function ComputePhaseToJSON(json: any): ComputePhase {
-    return ComputePhaseToJSONTyped(json, false);
-}
+  export function ComputePhaseToJSON(json: any): ComputePhase {
+      return ComputePhaseToJSONTyped(json, false);
+  }
 
-export function ComputePhaseToJSONTyped(value?: ComputePhase | null, ignoreDiscriminator: boolean = false): any {
+  export function ComputePhaseToJSONTyped(value?: ComputePhase | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

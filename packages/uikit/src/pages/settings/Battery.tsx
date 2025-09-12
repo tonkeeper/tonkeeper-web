@@ -2,7 +2,7 @@ import { FC, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { Body2 } from '../../components/Text';
-import { useActiveAccount, useActiveConfig } from '../../state/wallet';
+import { useActiveConfig } from '../../state/wallet';
 import {
     DesktopViewHeader,
     DesktopViewHeaderContent,
@@ -13,7 +13,8 @@ import styled from 'styled-components';
 import { BatteryInfoHeading } from '../../components/settings/battery/BatteryInfoHeading';
 import {
     useBatteryBalance,
-    useBatteryEnabledConfig,
+    useCanBuyBattery,
+    useCanSeeBattery,
     useProvideBatteryAuth
 } from '../../state/battery';
 import { GearIconEmpty, SpinnerRing } from '../../components/Icon';
@@ -35,10 +36,9 @@ import { QueryKey } from '../../libs/queryKey';
 import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 export const BatteryPage = () => {
-    const account = useActiveAccount();
-    const { disableWhole } = useBatteryEnabledConfig();
+    const canUseBattery = useCanSeeBattery();
 
-    if ((account.type !== 'mnemonic' && account.type !== 'mam') || disableWhole) {
+    if (!canUseBattery) {
         return <Navigate to={AppRoute.home} />;
     }
 
@@ -155,6 +155,7 @@ export const BatteryPageContent: FC = () => {
     const { batteryRefundEndpoint } = useActiveConfig();
     const [preselectedRechargeAsset, setPreselectedRechargeAsset] = useState<string | undefined>();
     const [asGift, setAsGift] = useState(false);
+    const canBuyBattery = useCanBuyBattery();
 
     const onMethodSelected = (value: { type: 'asset'; assetId: string } | { type: 'gift' }) => {
         if (value.type === 'asset') {
@@ -179,7 +180,7 @@ export const BatteryPageContent: FC = () => {
             <HeadingBlock>
                 <BatteryInfoHeading />
             </HeadingBlock>
-            <BuyBatteryMethods onMethodSelected={onMethodSelected} />
+            {canBuyBattery && <BuyBatteryMethods onMethodSelected={onMethodSelected} />}
             <RefundsBlock>
                 <Body2>{t('battery_packages_disclaimer')}</Body2>{' '}
                 {!!batteryRefundEndpoint && (

@@ -15,6 +15,7 @@ import {
 } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { useIsOnIosReview } from '../../hooks/ios';
+import { useLegalLinks } from '../../state/legal';
 
 const Icon = styled.span`
     display: flex;
@@ -35,6 +36,7 @@ export const Legal = React.memo(() => {
     const sdk = useAppSdk();
     const isProDisplay = useIsFullWidthMode();
     const isOnReview = useIsOnIosReview();
+    const { termsLink, privacyLink } = useLegalLinks();
 
     const items = useMemo<SettingsItem[]>(() => {
         const val = [
@@ -45,7 +47,7 @@ export const Legal = React.memo(() => {
                         <ChevronRightIcon />
                     </Icon>
                 ),
-                action: () => sdk.openPage('https://tonkeeper.com/privacy/')
+                action: () => sdk.openPage(privacyLink)
             }
         ];
 
@@ -57,7 +59,7 @@ export const Legal = React.memo(() => {
                         <ChevronRightIcon />
                     </Icon>
                 ),
-                action: () => sdk.openPage('https://tonkeeper.com/terms/')
+                action: () => sdk.openPage(termsLink)
             });
         }
 
@@ -73,7 +75,7 @@ export const Legal = React.memo(() => {
                         <ChevronRightIcon />
                     </Icon>
                 ),
-                action: () => sdk.openPage('https://tonkeeper.com/privacy/') // TODO: Update link
+                action: () => sdk.openPage(privacyLink)
             }
         ];
     }, [t]);

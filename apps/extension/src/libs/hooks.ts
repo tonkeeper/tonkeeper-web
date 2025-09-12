@@ -5,10 +5,9 @@ import { QueryKey } from '@tonkeeper/uikit/dist/libs/queryKey';
 import { useEffect } from 'react';
 import { extensionType } from './appSdk';
 import { AptabaseExtension } from './aptabase-extension';
-import { Account } from "@tonkeeper/core/dist/entries/account";
-import { useAppSdk } from "@tonkeeper/uikit/dist/hooks/appSdk";
-import { useActiveTonNetwork } from "@tonkeeper/uikit/dist/state/wallet";
-import { getUserOS } from "@tonkeeper/uikit/dist/libs/web";
+import { Account } from '@tonkeeper/core/dist/entries/account';
+import { useActiveTonNetwork } from '@tonkeeper/uikit/dist/state/wallet';
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 export const useAppWidth = () => {
     useEffect(() => {
@@ -31,26 +30,37 @@ export const useAppWidth = () => {
 };
 
 export const useAnalytics = (
+    config: TonendpointConfig | undefined,
     activeAccount?: Account,
-    accounts?: Account[],
+    accounts?: Account[]
 ) => {
-  const sdk = useAppSdk();
-  const network = useActiveTonNetwork();
-    return useQuery<Analytics>(
-        [QueryKey.analytics, activeAccount, accounts, network],
+    const network = useActiveTonNetwork();
+    return useQuery<Analytics | undefined>(
+        [
+            QueryKey.analytics,
+            activeAccount,
+            accounts,
+            network,
+            config?.aptabaseEndpoint,
+            config?.aptabaseKey
+        ],
         async () => {
-            const tracker = new AptabaseExtension();
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey || extensionType === 'FireFox') {
+                return;
+            }
+
+            const tracker = new AptabaseExtension(config.aptabaseEndpoint, config.aptabaseKey);
 
             tracker.init({
-              application: extensionType ?? 'Extension',
-              walletType: toWalletType(activeAccount?.activeTonWallet),
-              activeAccount: activeAccount!,
-              accounts: accounts!,
-              network
+                application: extensionType ?? 'Extension',
+                walletType: toWalletType(activeAccount?.activeTonWallet),
+                activeAccount: activeAccount!,
+                accounts: accounts!,
+                network
             });
 
             return tracker;
         },
-      { enabled: accounts != undefined && activeAccount != undefined }
+        { enabled: accounts != undefined && activeAccount != undefined && config != undefined }
     );
 };

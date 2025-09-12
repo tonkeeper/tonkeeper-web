@@ -20,7 +20,9 @@ import { Network } from '@tonkeeper/core/dist/entries/network';
 import { HideOnReview } from '../../ios/HideOnReview';
 import { useBuyNotification } from '../../modals/BuyNotificationControlled';
 import { TwoFARecoveryStartedBanner } from '../../settings/two-fa/TwoFARecoveryStartedBanner';
-import { ErrorBoundary } from "../../shared/ErrorBoundary";
+import { ErrorBoundary } from '../../shared/ErrorBoundary';
+import { FLAGGED_FEATURE } from '../../../state/tonendpoint';
+import { IfFeatureEnabled } from '../../shared/IfFeatureEnabled';
 
 const ButtonsContainer = styled.div`
     display: flex;
@@ -80,16 +82,14 @@ const DesktopWalletHeaderPayload = () => {
                             {t('wallet_send')}
                         </ButtonStyled>
                     )}
-                    <HideOnReview>
-                        {!isReadOnly && isStandardTonWallet(activeWallet) && (
-                            <LinkStyled to={AppProRoute.multiSend}>
-                                <ButtonStyled size="small">
-                                    <ArrowUpIcon />
-                                    {t('wallet_multi_send')}
-                                </ButtonStyled>
-                            </LinkStyled>
-                        )}
-                    </HideOnReview>
+                    {!isReadOnly && isStandardTonWallet(activeWallet) && (
+                        <LinkStyled to={AppProRoute.multiSend}>
+                            <ButtonStyled size="small">
+                                <ArrowUpIcon />
+                                {t('wallet_multi_send')}
+                            </ButtonStyled>
+                        </LinkStyled>
+                    )}
                     <ButtonStyled
                         size="small"
                         onClick={() => {
@@ -102,14 +102,16 @@ const DesktopWalletHeaderPayload = () => {
                         <ArrowDownIcon />
                         {t('wallet_receive')}
                     </ButtonStyled>
-                    <HideOnReview>
-                        {network !== Network.TESTNET && (
-                            <ButtonStyled size="small" onClick={onBuy}>
-                                <PlusIconSmall />
-                                {t('wallet_buy')}
-                            </ButtonStyled>
-                        )}
-                    </HideOnReview>
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
+                        <HideOnReview>
+                            {network !== Network.TESTNET && (
+                                <ButtonStyled size="small" onClick={onBuy}>
+                                    <PlusIconSmall />
+                                    {t('wallet_buy')}
+                                </ButtonStyled>
+                            )}
+                        </HideOnReview>
+                    </IfFeatureEnabled>
                 </ButtonsContainer>
             </DesktopRightPart>
         </DesktopHeaderContainer>

@@ -7,7 +7,8 @@ import {
     NotificationService,
     BiometryService,
     ConfirmOptions,
-    KeyboardService
+    KeyboardService,
+    AppCountryInfo
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
 import { CapacitorStorage } from './storage';
@@ -28,6 +29,8 @@ import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { CapacitorFileLogger } from './logger';
 import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
+import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
+import { CountryInfo } from './plugins/country-info-plugin';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -89,9 +92,21 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     keychain = new KeychainCapacitor(this.biometry, this.storage);
 
+    subscriptionStrategy = new IosSubscriptionStrategy(this.storage);
+
     constructor() {
         super(capacitorStorage);
     }
+
+    pasteFromClipboard = async () => {
+        const { value } = await Clipboard.read();
+
+        if (value || value === '') {
+            return value;
+        } else {
+            throw new Error('Paste from Clipboard failed!');
+        }
+    };
 
     copyToClipboard = async (value: string, notification?: string) => {
         await Clipboard.write({ string: value });
@@ -170,7 +185,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     connectionService = new CapacitorConnectionService();
 
-    signerReturnUrl = 'tonkeeper://'; // TODO replace with 'tonkeeper-pro://'; once signer is fixed
+    signerReturnUrl = 'tonkeeper-pro://';
 
     keyboard = new CapacitorKeyboardService();
 
@@ -178,7 +193,11 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     dappBrowser = CapacitorDappBrowser;
 
-    userIdentity = new UserIdentityService(capacitorStorage);
+    userIdentity = new CapacitorUserIdentityService(capacitorStorage);
+
+    async getAppCountryInfo(): Promise<AppCountryInfo> {
+        return CountryInfo.getInfo();
+    }
 }
 
 export const getCapacitorDeviceOS = async () => {

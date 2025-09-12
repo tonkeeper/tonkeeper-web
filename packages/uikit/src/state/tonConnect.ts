@@ -6,10 +6,8 @@ import {
 } from '@tonkeeper/core/dist/entries/tonConnect';
 import {
     createTonProofItem,
-    eqOrigins,
     getAppConnections,
     getInjectedDappConnection,
-    originFromUrl,
     tonConnectProofPayload,
     toTonAddressItemReply,
     toTonProofItemReply
@@ -40,6 +38,7 @@ import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../hooks/appContext';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
+import { eqOrigins, originFromUrl } from '@tonkeeper/core/dist/utils/url';
 import { useCallback, useMemo } from 'react';
 
 export const useAppTonConnectConnections = <T extends AccountConnection['type']>(

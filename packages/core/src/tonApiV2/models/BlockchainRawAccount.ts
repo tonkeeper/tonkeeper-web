@@ -20,6 +20,13 @@ import {
     AccountStatusToJSON,
     AccountStatusToJSONTyped,
 } from './AccountStatus';
+import type { ExtraCurrency } from './ExtraCurrency';
+import {
+    ExtraCurrencyFromJSON,
+    ExtraCurrencyFromJSONTyped,
+    ExtraCurrencyToJSON,
+    ExtraCurrencyToJSONTyped,
+} from './ExtraCurrency';
 import type { BlockchainRawAccountLibrariesInner } from './BlockchainRawAccountLibrariesInner';
 import {
     BlockchainRawAccountLibrariesInnerFromJSON,
@@ -55,10 +62,10 @@ export interface BlockchainRawAccount {
     balance: number;
     /**
      * 
-     * @type {{ [key: string]: string; }}
+     * @type {Array<ExtraCurrency>}
      * @memberof BlockchainRawAccount
      */
-    extraBalance?: { [key: string]: string; };
+    extraBalance?: Array<ExtraCurrency>;
     /**
      * 
      * @type {string}
@@ -135,7 +142,7 @@ export function BlockchainRawAccountFromJSONTyped(json: any, ignoreDiscriminator
         
         'address': json['address'],
         'balance': json['balance'],
-        'extraBalance': json['extra_balance'] == null ? undefined : json['extra_balance'],
+        'extraBalance': json['extra_balance'] == null ? undefined : ((json['extra_balance'] as Array<any>).map(ExtraCurrencyFromJSON)),
         'code': json['code'] == null ? undefined : json['code'],
         'data': json['data'] == null ? undefined : json['data'],
         'lastTransactionLt': json['last_transaction_lt'],
@@ -147,11 +154,11 @@ export function BlockchainRawAccountFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-export function BlockchainRawAccountToJSON(json: any): BlockchainRawAccount {
-    return BlockchainRawAccountToJSONTyped(json, false);
-}
+  export function BlockchainRawAccountToJSON(json: any): BlockchainRawAccount {
+      return BlockchainRawAccountToJSONTyped(json, false);
+  }
 
-export function BlockchainRawAccountToJSONTyped(value?: BlockchainRawAccount | null, ignoreDiscriminator: boolean = false): any {
+  export function BlockchainRawAccountToJSONTyped(value?: BlockchainRawAccount | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -160,7 +167,7 @@ export function BlockchainRawAccountToJSONTyped(value?: BlockchainRawAccount | n
         
         'address': value['address'],
         'balance': value['balance'],
-        'extra_balance': value['extraBalance'],
+        'extra_balance': value['extraBalance'] == null ? undefined : ((value['extraBalance'] as Array<any>).map(ExtraCurrencyToJSON)),
         'code': value['code'],
         'data': value['data'],
         'last_transaction_lt': value['lastTransactionLt'],

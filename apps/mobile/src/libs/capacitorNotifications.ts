@@ -6,7 +6,7 @@ import { Device } from '@capacitor/device';
 import { APIConfig } from '@tonkeeper/core/dist/entries/apis';
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { removeLastSlash } from '@tonkeeper/core/dist/utils/common';
+import { removeLastSlash } from '@tonkeeper/core/dist/utils/url';
 
 const requestPushPermission = async () => {
     const permission = await PushNotifications.requestPermissions();

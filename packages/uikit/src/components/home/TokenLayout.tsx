@@ -4,6 +4,7 @@ import styled, { css } from 'styled-components';
 import { useTranslation } from '../../hooks/translation';
 import { TokenRate } from '../../state/rates';
 import { Body2, Label1, Label4 } from '../Text';
+import { Image } from '../shared/Image';
 
 export const ListItemPayload = styled.div`
     flex-grow: 1;
@@ -22,7 +23,7 @@ export const ListItemPayload = styled.div`
         `}
 `;
 
-export const TokenLogo = styled.img`
+export const TokenLogo = styled(Image)`
     width: 44px;
     height: 44px;
     border-radius: ${props => props.theme.cornerFull};

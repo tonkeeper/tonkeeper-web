@@ -1,11 +1,13 @@
 import { AccountEvent, Action } from '@tonkeeper/core/dist/tonApiV2';
-import { FC, useCallback } from 'react';
+import React, { FC, useCallback } from 'react';
 import { Notification } from '../../Notification';
 import { ErrorActivityNotification } from '../NotificationCommon';
 import {
     AuctionBidActionDetails,
     DomainRenewActionDetails,
     ExtraCurrencyTransferNotification,
+    PurchaseActionNotification,
+    SimplePreviewActionNotification,
     SmartContractExecActionDetails,
     TonTransferActionNotification
 } from './TonActivityActionDetails';
@@ -51,6 +53,7 @@ export interface ActivityNotificationDataTron {
 
 export type ActivityNotificationData = ActivityNotificationDataTon | ActivityNotificationDataTron;
 
+// eslint-disable-next-line complexity
 const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
     switch (props.action.type) {
         case 'TonTransfer':
@@ -87,15 +90,16 @@ const ActivityContentTon: FC<ActivityNotificationDataTon> = props => {
             return <NftPurchaseActionDetails {...props} />;
         case 'ExtraCurrencyTransfer':
             return <ExtraCurrencyTransferNotification {...props} />;
+        case 'Purchase':
+            return <PurchaseActionNotification {...props} />;
         case 'Unknown':
             return <ErrorActivityNotification event={props.event} />;
+        case 'ElectionsDepositStake':
+        case 'ElectionsRecoverStake':
+            return <SimplePreviewActionNotification {...props} />;
         default: {
-            console.log(props);
-            return (
-                <ErrorActivityNotification event={props.event}>
-                    {props.action.type}
-                </ErrorActivityNotification>
-            );
+            assertUnreachableSoft(props.action.type);
+            return <SimplePreviewActionNotification {...props} />;
         }
     }
 };

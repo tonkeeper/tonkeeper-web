@@ -1,11 +1,11 @@
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { Action } from '@tonkeeper/core/dist/tonApiV2';
-import { formatAddress, seeIfAddressEqual, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC } from 'react';
-import { ListItemPayload } from '../../../components/List';
+import { formatAddress, seeIfAddressEqual } from '@tonkeeper/core/dist/utils/common';
+import React, { FC, useMemo } from 'react';
 import {
     ActivityIcon,
     ContractDeployIcon,
+    PurchaseIcon28,
     SentIcon
 } from '../../../components/activity/ActivityIcons';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -20,7 +20,9 @@ import {
     FirstLine,
     ListItemGrid,
     SecondLine,
-    SecondaryText
+    SecondaryText,
+    AddressText,
+    toAddressTextValue
 } from '../CommonAction';
 import { ContractDeployAction } from './ContractDeployAction';
 import {
@@ -37,6 +39,8 @@ import {
 } from './StakeActivity';
 import { SubscribeAction, UnSubscribeAction } from './SubscribeAction';
 import { useActiveTonNetwork, useActiveWallet } from '../../../state/wallet';
+import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 
 const TonTransferAction: FC<{
     action: Action;
@@ -57,10 +61,10 @@ const TonTransferAction: FC<{
         return (
             <ReceiveActivityAction
                 amount={format(tonTransfer.amount)}
-                sender={
-                    tonTransfer.sender.name ??
-                    toShortValue(formatAddress(tonTransfer.sender.address, network))
-                }
+                sender={toAddressTextValue(
+                    tonTransfer.sender.name,
+                    formatAddress(tonTransfer.sender.address, network)
+                )}
                 symbol={CryptoCurrency.TON}
                 date={date}
                 isScam={tonTransfer.sender.isScam || isScam}
@@ -73,10 +77,10 @@ const TonTransferAction: FC<{
         <SendActivityAction
             amount={format(tonTransfer.amount)}
             symbol={CryptoCurrency.TON}
-            recipient={
-                tonTransfer.recipient.name ??
-                toShortValue(formatAddress(tonTransfer.recipient.address, network))
-            }
+            recipient={toAddressTextValue(
+                tonTransfer.recipient.name,
+                formatAddress(tonTransfer.recipient.address, network)
+            )}
             date={date}
             isScam={isScam}
             comment={tonTransfer.comment}
@@ -107,10 +111,10 @@ const ExtraCurrencyTransferAction: FC<{
                     extraCurrencyTransfer.amount,
                     extraCurrencyTransfer.currency.decimals
                 )}
-                sender={
-                    extraCurrencyTransfer.sender.name ??
-                    toShortValue(formatAddress(extraCurrencyTransfer.sender.address, network))
-                }
+                sender={toAddressTextValue(
+                    extraCurrencyTransfer.sender.name,
+                    formatAddress(extraCurrencyTransfer.sender.address, network)
+                )}
                 symbol={extraCurrencyTransfer.currency.symbol}
                 date={date}
                 isScam={extraCurrencyTransfer.sender.isScam || isScam}
@@ -123,10 +127,10 @@ const ExtraCurrencyTransferAction: FC<{
         <SendActivityAction
             amount={format(extraCurrencyTransfer.amount, extraCurrencyTransfer.currency.decimals)}
             symbol={extraCurrencyTransfer.currency.symbol}
-            recipient={
-                extraCurrencyTransfer.recipient.name ??
-                toShortValue(formatAddress(extraCurrencyTransfer.recipient.address, network))
-            }
+            recipient={toAddressTextValue(
+                extraCurrencyTransfer.recipient.name,
+                formatAddress(extraCurrencyTransfer.recipient.address, network)
+            )}
             date={date}
             isScam={isScam}
             comment={extraCurrencyTransfer.comment}
@@ -160,9 +164,7 @@ export const SmartContractExecAction: FC<{
                     amount={<>+&thinsp;{format(smartContractExec.tonAttached)}</>}
                     green
                     entry={CryptoCurrency.TON}
-                    address={toShortValue(
-                        formatAddress(smartContractExec.contract.address, network)
-                    )}
+                    address={formatAddress(smartContractExec.contract.address, network)}
                     date={date}
                 />
                 <FailedNote status={action.status} />
@@ -178,9 +180,7 @@ export const SmartContractExecAction: FC<{
                     title={t('transactions_smartcontract_exec')}
                     amount={<>-&thinsp;{format(smartContractExec.tonAttached)}</>}
                     entry={CryptoCurrency.TON}
-                    address={toShortValue(
-                        formatAddress(smartContractExec.contract.address, network, true)
-                    )}
+                    address={formatAddress(smartContractExec.contract.address, network, true)}
                     date={date}
                 />
                 <FailedNote status={action.status} />
@@ -214,13 +214,13 @@ const AuctionBidAction: FC<{
                     <AmountText>{auctionBid.amount.tokenName}</AmountText>
                 </FirstLine>
                 <SecondLine>
-                    <SecondaryText>
-                        {(auctionBid.auctionType as string) !== ''
-                            ? auctionBid.auctionType
-                            : toShortValue(
-                                  formatAddress(auctionBid.auction.address, network, true)
-                              )}
-                    </SecondaryText>
+                    {(auctionBid.auctionType as string) !== '' ? (
+                        <SecondaryText>{auctionBid.auctionType}</SecondaryText>
+                    ) : (
+                        <AddressText>
+                            {formatAddress(auctionBid.auction.address, network, true)}
+                        </AddressText>
+                    )}
                     <SecondaryText>{date}</SecondaryText>
                 </SecondLine>
             </Description>
@@ -258,10 +258,95 @@ const DomainRenewAction: FC<{
     );
 };
 
+export const PurchaseAction: FC<{
+    action: Action;
+    date: string;
+}> = ({ action, date }) => {
+    const { purchase } = action;
+    const { t } = useTranslation();
+
+    const tokenAmount = useMemo(() => {
+        if (!purchase) {
+            return '';
+        }
+
+        return new AssetAmount({
+            weiAmount: purchase.amount.value,
+            asset: {
+                id: '',
+                decimals: purchase.amount.decimals,
+                symbol: purchase.amount.tokenName
+            }
+        }).stringAssetRelativeAmount;
+    }, [purchase?.amount]);
+
+    if (!purchase) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon status={action.status}>
+                <PurchaseIcon28 />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{t('transaction_type_purchase')}</FirstLabel>
+                    <AmountText>-&thinsp;{tokenAmount}</AmountText>
+                </FirstLine>
+                <SecondLine>
+                    <SecondaryText>
+                        {t('transaction_type_purchase_description', {
+                            invoice: purchase.invoiceId
+                        })}
+                    </SecondaryText>
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+            <FailedNote status={action.status} />
+        </ListItemGrid>
+    );
+};
+
+export const SimplePreviewAction: FC<{
+    action: Action;
+    date: string;
+    isScam: boolean;
+}> = ({ action, date, isScam }) => {
+    const { t } = useTranslation();
+    const { simplePreview } = action;
+
+    if (!simplePreview) {
+        return <ErrorAction />;
+    }
+
+    return (
+        <ListItemGrid>
+            <ActivityIcon status={action.status}>
+                <ContractDeployIcon />
+            </ActivityIcon>
+            <Description>
+                <FirstLine>
+                    <FirstLabel>{isScam ? t('spam_action') : simplePreview.name}</FirstLabel>
+                    {simplePreview.value && !isScam && (
+                        <AmountText>{simplePreview.value}</AmountText>
+                    )}
+                </FirstLine>
+                <SecondLine>
+                    {!isScam && <SecondaryText>{simplePreview.description}</SecondaryText>}
+                    <SecondaryText>{date}</SecondaryText>
+                </SecondLine>
+            </Description>
+            <FailedNote status={action.status} />
+        </ListItemGrid>
+    );
+};
+
 export const ActivityAction: FC<{
     action: Action;
     date: string;
     isScam: boolean;
+    // eslint-disable-next-line complexity
 }> = ({ action, isScam, date }) => {
     const { t } = useTranslation();
 
@@ -300,11 +385,16 @@ export const ActivityAction: FC<{
             return <DomainRenewAction action={action} date={date} />;
         case 'ExtraCurrencyTransfer':
             return <ExtraCurrencyTransferAction action={action} date={date} isScam={isScam} />;
+        case 'Purchase':
+            return <PurchaseAction action={action} date={date} />;
+        case 'ElectionsDepositStake':
+        case 'ElectionsRecoverStake':
+            return <SimplePreviewAction action={action} date={date} isScam={isScam} />;
         case 'Unknown':
             return <ErrorAction>{t('txActions_signRaw_types_unknownTransaction')}</ErrorAction>;
         default: {
-            console.log(action);
-            return <ListItemPayload>{action.simplePreview.description}</ListItemPayload>;
+            assertUnreachableSoft(action.type);
+            return <SimplePreviewAction action={action} date={date} isScam={isScam} />;
         }
     }
 };

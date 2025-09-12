@@ -3,7 +3,7 @@ import { InnerBody } from '../../components/Body';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppSdk, useIsCapacitorApp } from '../../hooks/appSdk';
-import { CloseIcon, SpinnerIcon, PlusIcon } from '../../components/Icon';
+import { CloseIcon, PlusIcon, SpinnerIcon } from '../../components/Icon';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
@@ -33,6 +33,7 @@ import { useAppContext } from '../../hooks/appContext';
 import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
+import { useDevMenuVisibility } from '../../state/dev';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -40,7 +41,11 @@ const CookieSettings = () => {
 
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
-        await sdk.storage.set(AppKey.PRO_AUTH_TOKEN, null);
+
+        await sdk.subscriptionStrategy.logout();
+
+        await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
+
         await client.invalidateQueries();
     });
 
@@ -86,6 +91,7 @@ const AddAccountBySK = () => {
                 <Notification isOpen={isOpen} handleClose={onClose} mobileFullScreen>
                     {() => (
                         <ImportBySKWallet
+                            signingAlgorithm="ed25519"
                             afterCompleted={() => {
                                 onClose();
                                 navigate('/');
@@ -239,7 +245,19 @@ export const DevSettingsLogs = () => {
 };
 
 export const DevSettings = React.memo(() => {
+    const navigate = useNavigate();
     const isProDisplay = useIsFullWidthMode();
+    const { data: isDevVisible, isLoading } = useDevMenuVisibility();
+
+    useEffect(() => {
+        if (!isLoading && !isDevVisible) {
+            navigate(AppRoute.home);
+        }
+    }, [isLoading, isDevVisible, navigate]);
+
+    if (isLoading) return null;
+
+    if (!isDevVisible) return null;
 
     if (isProDisplay) {
         return (

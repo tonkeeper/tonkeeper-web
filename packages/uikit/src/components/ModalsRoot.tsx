@@ -1,6 +1,5 @@
 import { WalletVersionSettingsNotification } from './modals/WalletVersionSettingsNotification';
 import { LedgerIndexesSettingsNotification } from './modals/LedgerIndexesSettingsNotification';
-import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
 import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotification';
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
@@ -15,13 +14,18 @@ import { PromptMobileProPinNotificationControlled } from './modals/PromptMobileP
 import { CheckDesktopPasswordControlled } from './modals/PromptDesktopPassword';
 import { TonTransactionNotificationControlled } from './modals/TonTransactionNotificationControlled';
 import { MAMTronMigrationNotification } from './modals/MAMTronMigrationNotificationControlled';
+import { ProEndingNotificationControlled } from './modals/ProEndingNotificationControlled';
+import { ProPurchaseNotificationControlled } from './modals/ProPurchaseNotificationControlled';
+import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificationControlled';
+import { ProAuthNotificationControlled } from './modals/ProAuthNotificationControlled';
+import { ProConfirmNotificationControlled } from './modals/ProConfirmNotificationControlled';
+import { TopUpTronFeeBalanceNotificationControlled } from './modals/TopUpTronFeeBalanceNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
         <>
             <WalletVersionSettingsNotification />
             <LedgerIndexesSettingsNotification />
-            <ProFeaturesNotificationControlled />
             <MAMIndexesSettingsNotification />
             <RenameNotificationControlled />
             <RecoveryNotificationControlled />
@@ -36,6 +40,12 @@ export const ModalsRoot = () => {
             <CheckDesktopPasswordControlled />
             <TonTransactionNotificationControlled />
             <MAMTronMigrationNotification />
+            <ProPurchaseNotificationControlled />
+            <ProAuthNotificationControlled />
+            <ProFeaturesNotificationControlled />
+            <ProEndingNotificationControlled />
+            <ProConfirmNotificationControlled />
+            <TopUpTronFeeBalanceNotificationControlled />
         </>
     );
 };

@@ -19,23 +19,19 @@ import {
     useBatteryApi,
     useBatteryAuthToken,
     useBatteryBalance,
-    useBatteryEnabledConfig,
     useBatteryServiceConfig,
     useBatteryUnitTonRate,
-    useRequestBatteryAuthToken
+    useRequestBatteryAuthToken,
+    useCanSeeBattery
 } from '../../state/battery';
-import { getTronSigner, useGetAccountSigner } from '../../state/mnemonic';
+import { useGetAccountSigner } from '../../state/mnemonic';
 import { useCallback, useMemo } from 'react';
 import {
     jettonToTonAsset,
     TonAsset,
     tonAssetAddressToString
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import {
-    Account,
-    AccountTonMultisig,
-    isAccountTronCompatible
-} from '@tonkeeper/core/dist/entries/account';
+import { Account, AccountTonMultisig } from '@tonkeeper/core/dist/entries/account';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { getMultisigSignerInfo } from '../../state/multisig';
 import { GaslessConfig, Multisig } from '@tonkeeper/core/dist/tonApiV2';
@@ -60,14 +56,12 @@ import {
 } from '../../state/two-fa';
 import { TwoFAMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender/two-fa-message-sender';
 import { useConfirmTwoFANotification } from '../../components/modals/ConfirmTwoFANotificationControlled';
-import { useTronApi } from '../../state/tron/tron';
-import { TronSender } from '@tonkeeper/core/dist/service/tron-blockchain/tron-sender';
-import { useAppSdk } from '../appSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import { QueryKey } from '../../libs/queryKey';
 import { useJettonList } from '../../state/jetton';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 export type SenderChoice =
     | { type: 'multisig'; ttlSeconds: number }
@@ -75,14 +69,14 @@ export type SenderChoice =
     | { type: 'battery' }
     | { type: 'gasless'; asset: TonAsset };
 
-export type SenderChoiceUserAvailable = Exclude<
+export type TonSenderChoiceUserAvailable = Exclude<
     SenderChoice,
     { type: 'multisig'; ttlSeconds: number }
 >;
 
-export type SenderTypeUserAvailable = SenderChoiceUserAvailable['type'];
+export type TonSenderTypeUserAvailable = TonSenderChoiceUserAvailable['type'];
 
-export const useAvailableSendersChoices = (
+export const useAvailableTonSendersChoices = (
     operation:
         | { type: 'transfer'; asset: TonAsset | TronAsset }
         | { type: 'multisend-transfer'; asset: TonAsset }
@@ -93,13 +87,14 @@ export const useAvailableSendersChoices = (
     const account = useActiveAccount();
     const { batteryReservedAmount } = useActiveConfig();
     const gaslessConfig = useGaslessConfig();
-    const batteryEnableConfig = useBatteryEnabledConfig();
+    const canUseBattery = useCanSeeBattery();
+    const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const [walletInfo] = useAssets();
     const { data: twoFaConfig, isEnabled: isTwoFAEnabled } = useTwoFAWalletConfig();
 
     const asset = 'asset' in operation ? operation.asset : undefined;
 
-    return useQuery<SenderChoiceUserAvailable[]>(
+    return useQuery<TonSenderChoiceUserAvailable[]>(
         [
             'available-sender-choices',
             operation.type,
@@ -109,9 +104,10 @@ export const useAvailableSendersChoices = (
             account.type,
             batteryReservedAmount,
             gaslessConfig,
-            batteryEnableConfig.disableOperations,
+            canUseBattery,
             walletInfo,
-            twoFaConfig
+            twoFaConfig,
+            isGaslessEnabled
         ],
         () => {
             if (asset?.blockchain === BLOCKCHAIN_NAME.TRON) {
@@ -136,12 +132,12 @@ export const useAvailableSendersChoices = (
                 batteryAvailable = !!config?.batterySettings.enabledForNfts;
             }
 
-            if (batteryEnableConfig.disableOperations) {
+            if (!canUseBattery) {
                 batteryAvailable = false;
             }
 
             const potentialSenders: {
-                choice: SenderChoiceUserAvailable;
+                choice: TonSenderChoiceUserAvailable;
                 priority: number;
             }[] = [{ choice: EXTERNAL_SENDER_CHOICE, priority: 2 }];
 
@@ -161,7 +157,7 @@ export const useAvailableSendersChoices = (
                 }
             }
 
-            if (isGaslessAvailable({ asset, account, gaslessConfig })) {
+            if (isGaslessEnabled && isGaslessAvailable({ asset, account, gaslessConfig })) {
                 if (
                     walletInfo!.ton.info.balance <
                     JettonEncoder.jettonTransferAmount + toNano(0.005)
@@ -197,31 +193,33 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
     const { data: batteryAuthToken } = useBatteryAuthToken();
     const account = useActiveAccount();
     const batteryConfig = useBatteryServiceConfig();
-    const batteryEnableConfig = useBatteryEnabledConfig();
+    const canUseBattery = useCanSeeBattery();
+    const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const { data: twoFaConfig } = useTwoFAWalletConfig();
     const batteryUnitTonRate = useBatteryUnitTonRate();
     const gaslessConfig = useGaslessConfig();
     const { data: jettons } = useJettonList();
 
-    return useQuery<SenderChoiceUserAvailable[]>(
+    return useQuery<TonSenderChoiceUserAvailable[]>(
         [
             'ton-connect-sender-choices',
             payload,
             account,
             batteryAuthToken,
-            batteryEnableConfig.disableOperations,
+            canUseBattery,
             batteryConfig,
             twoFaConfig?.status,
             batteryUnitTonRate,
             gaslessConfig.relayAddress,
             gaslessConfig.gasJettons,
-            jettons
+            jettons,
+            isGaslessEnabled
         ],
         async () => {
             if (account.type === 'ledger' || twoFaConfig?.status === 'active') {
                 return [EXTERNAL_SENDER_CHOICE];
             }
-            const choices: SenderChoiceUserAvailable[] = [EXTERNAL_SENDER_CHOICE];
+            const choices: TonSenderChoiceUserAvailable[] = [EXTERNAL_SENDER_CHOICE];
 
             const tonConnectService = new TonConnectTransactionService(
                 api,
@@ -242,7 +240,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             }
 
             if (
-                !batteryEnableConfig.disableOperations &&
+                canUseBattery &&
                 batteryAuthToken &&
                 isStandardTonWallet(account.activeTonWallet) &&
                 payload.messagesVariants?.battery
@@ -269,6 +267,7 @@ export const useTonConnectAvailableSendersChoices = (payload: TonConnectTransact
             }
 
             if (
+                isGaslessEnabled &&
                 payload.messagesVariants?.gasless &&
                 isStandardTonWallet(account.activeTonWallet) &&
                 payload.messagesVariants.gasless.options?.asset &&
@@ -333,6 +332,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
     const { data: twoFAConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
     const batteryUnitTonRate = useBatteryUnitTonRate();
     const client = useQueryClient();
+    const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
 
     const wallet = activeAccount.activeTonWallet;
 
@@ -418,6 +418,7 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
 
             if (senderChoice.type === 'gasless') {
                 if (
+                    !isGaslessEnabled ||
                     !isGaslessAvailable({
                         asset: senderChoice.asset,
                         account: activeAccount,
@@ -476,7 +477,8 @@ export const useGetEstimationSender = (senderChoice: SenderChoice = EXTERNAL_SEN
         gaslessConfig,
         twoFaApi,
         twoFAConfig,
-        batteryUnitTonRate
+        batteryUnitTonRate,
+        isGaslessEnabled
     ]);
 
     return senderChoice.type === 'multisig' ? multisigChoiceCallback : otherChoicesCallback;
@@ -493,6 +495,7 @@ export const useGetSender = () => {
     const { mutateAsync } = useRequestBatteryAuthToken();
     const accounts = useAccountsState();
     const gaslessConfig = useGaslessConfig();
+    const isGaslessEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.GASLESS);
     const twoFaApi = useTwoFAApi();
 
     const { data: twoFAConfig } = useTwoFAWalletConfigMayBeOfMultisigHost();
@@ -647,6 +650,7 @@ export const useGetSender = () => {
 
             if (senderChoice.type === 'gasless') {
                 if (
+                    !isGaslessEnabled ||
                     !isGaslessAvailable({
                         asset: senderChoice.asset,
                         account: activeAccount,
@@ -711,7 +715,8 @@ export const useGetSender = () => {
             closeTwoFaConfirmTelegram,
             twoFAServiceConfig.confirmMessageTGTtlSeconds,
             batteryUnitTonRate,
-            client
+            client,
+            isGaslessEnabled
         ]
     );
 };
@@ -731,41 +736,4 @@ const isGaslessAvailable = ({
         isStandardTonWallet(account.activeTonWallet) &&
         account.activeTonWallet.version === WalletVersion.V5R1
     );
-};
-
-export const useGetTronSender = () => {
-    const sdk = useAppSdk();
-    const tronApi = useTronApi();
-    const activeAccount = useActiveAccount();
-    const { mutateAsync: requestToken } = useRequestBatteryAuthToken();
-    const { data: authToken } = useBatteryAuthToken();
-
-    return useCallback(async () => {
-        const signer = getTronSigner(sdk, tronApi, activeAccount);
-
-        if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
-            throw new Error('Tron is not enabled for the active wallet');
-        }
-
-        const token = authToken ?? (await requestToken());
-
-        return new TronSender(tronApi, activeAccount.activeTronWallet, signer, token);
-    }, [tronApi, activeAccount]);
-};
-
-export const useGetTronEstimationSender = () => {
-    const tronApi = useTronApi();
-    const activeAccount = useActiveAccount();
-
-    return useCallback(() => {
-        const signer = (): Promise<never> => {
-            throw new Error('Unexpected call');
-        };
-
-        if (!isAccountTronCompatible(activeAccount) || !activeAccount.activeTronWallet) {
-            throw new Error('Tron is not enabled for the active wallet');
-        }
-
-        return new TronSender(tronApi, activeAccount.activeTronWallet, signer, '');
-    }, [tronApi]);
 };

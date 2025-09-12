@@ -16,7 +16,7 @@ import {
     useMutateActiveTonWallet
 } from '../../../state/wallet';
 import { fallbackRenderOver } from '../../Error';
-import { GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
+import { FolderIconOutline, GlobeIcon, PlusIcon, SlidersIcon, StatsIcon } from '../../Icon';
 import { ScrollContainer } from '../../ScrollContainer';
 import { Label2 } from '../../Text';
 import { AsideMenuItem } from '../../shared/AsideItem';
@@ -40,6 +40,7 @@ import { useMenuController } from '../../../hooks/ionic';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { useHideActiveBrowserTab } from '../../../state/dapp-browser';
+import { useManageFolderNotification } from '../../modals/ManageFolderNotificationControlled';
 
 const AsideContainer = styled.div<{ width: number }>`
     display: flex;
@@ -313,6 +314,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     const isResizing = useRef(false);
     const { data: uiPreferences } = useUserUIPreferences();
     const { mutate: mutateWidth } = useMutateUserUIPreferences();
+    const { onOpen: createNewFolder } = useManageFolderNotification();
 
     useLayoutEffect(() => {
         if (uiPreferences?.asideWidth) {
@@ -322,7 +324,7 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
     }, [uiPreferences?.asideWidth]);
 
     useEffect(() => {
-        const minWidth = 200;
+        const minWidth = 240;
         const maxWidth = 500;
         const onMouseUp = () => {
             document.body.style.cursor = 'unset';
@@ -398,6 +400,19 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_add_wallet')}</Label2>
                         </AsideMenuItem>
                         <AsideMenuItem
+                            isSelected={false}
+                            onClick={() => {
+                                menuController.close();
+                                hideBrowser();
+                                createNewFolder();
+                            }}
+                        >
+                            <IconWrapper>
+                                <FolderIconOutline />
+                            </IconWrapper>
+                            <Label2>{t('accounts_new_folder')}</Label2>
+                        </AsideMenuItem>
+                        <AsideMenuItem
                             onClick={() => handleNavigateClick(AppRoute.settings)}
                             isSelected={activeRoute === AppRoute.settings}
                         >
@@ -407,15 +422,11 @@ const AsideMenuPayload: FC<{ className?: string }> = ({ className }) => {
                             <Label2>{t('aside_settings')}</Label2>
                         </AsideMenuItem>
                     </AsideMenuBottomContent>
-                    <HideOnReview>
-                        <ErrorBoundary
-                            fallbackRender={fallbackRenderOver('Failed to load Pro State')}
-                        >
-                            <SubscriptionBlockWrapper>
-                                <SubscriptionInfoBlock />
-                            </SubscriptionBlockWrapper>
-                        </ErrorBoundary>
-                    </HideOnReview>
+                    <ErrorBoundary fallbackRender={fallbackRenderOver('Failed to load Pro State')}>
+                        <SubscriptionBlockWrapper>
+                            <SubscriptionInfoBlock />
+                        </SubscriptionBlockWrapper>
+                    </ErrorBoundary>
                 </AsideMenuBottom>
             </AsideContentContainer>
             <NotForTargetEnv env="mobile">

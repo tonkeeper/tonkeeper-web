@@ -1,6 +1,6 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
-import { keyPairFromSecretKey, sha256_sync, sign } from '@ton/crypto';
+import { sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
     AccountId,
@@ -10,7 +10,12 @@ import {
     AccountSecret
 } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
-import { CellSigner, Signer, TronSigner } from '@tonkeeper/core/dist/entries/signer';
+import {
+    CellSigner,
+    MultiTransactionsSigner,
+    Signer,
+    TronSigner
+} from '@tonkeeper/core/dist/entries/signer';
 import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
@@ -40,6 +45,7 @@ import { tonMnemonicToTronMnemonic } from '@tonkeeper/core/dist/service/walletSe
 import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
+import { signWithSecret } from '@tonkeeper/core/dist/service/sign';
 
 export const signDataOver = ({
     sdk,
@@ -91,8 +97,10 @@ export const signDataOver = ({
                 if (secret.type !== 'sk') {
                     throw new Error('Unexpected secret type');
                 }
-                const keyPair = keyPairFromSecretKey(Buffer.from(secret.sk, 'hex'));
-                return nacl.sign.detached(payload, new Uint8Array(keyPair.secretKey));
+                return signWithSecret(payload, {
+                    key: secret.sk,
+                    algorithm: account.signingAlgorithm
+                });
             }
             case 'watch-only': {
                 throw new TxConfirmationCustomError("Can't sign data over watch-only wallet");
@@ -169,11 +177,10 @@ export const signTonConnectOver = ({
                 if (secret.type !== 'sk') {
                     throw new Error('Unexpected secret type');
                 }
-                const keyPair = keyPairFromSecretKey(Buffer.from(secret.sk, 'hex'));
-                return nacl.sign.detached(
-                    Buffer.from(sha256_sync(bufferToSign)),
-                    keyPair.secretKey
-                );
+                return signWithSecret(sha256_sync(bufferToSign), {
+                    key: secret.sk,
+                    algorithm: account.signingAlgorithm
+                });
             }
             case 'watch-only': {
                 throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
@@ -349,9 +356,11 @@ export const getSigner = async (
                 if (secret.type !== 'sk') {
                     throw new Error('Unexpected secret type');
                 }
-                const callback = async (message: Cell) => {
-                    const keyPair = keyPairFromSecretKey(Buffer.from(secret.sk, 'hex'));
-                    return sign(message.hash(), keyPair.secretKey);
+                const callback = (message: Cell) => {
+                    return signWithSecret(message.hash(), {
+                        key: secret.sk,
+                        algorithm: account.signingAlgorithm
+                    });
                 };
                 callback.type = 'cell' as const;
                 return callback;
@@ -426,6 +435,79 @@ export const getTronSigner = (sdk: IAppSdk, tronApi: TronApi, account: Account):
                 assertUnreachable(account);
             }
         }
+    } catch (e) {
+        console.error(e);
+        throw e;
+    }
+};
+
+const closedSigner = () => {
+    throw new Error('Call outside of callback is not allowed');
+};
+closedSigner.type = 'cell' as const;
+
+export const getMultiPayloadSigner = (
+    sdk: IAppSdk,
+    tronApi: TronApi,
+    account: Account
+): MultiTransactionsSigner => {
+    try {
+        if (!isAccountTronCompatible(account)) {
+            throw new Error("Account doesn't support tron");
+        }
+
+        const wallet = account.activeTronWallet;
+
+        if (!wallet) {
+            throw new Error('Wallet not found');
+        }
+
+        return async (txs: (Transaction | Cell)[]) => {
+            let tonMnemonic: string[];
+            let tonMnemonicType: MnemonicType | undefined;
+
+            switch (account.type) {
+                case 'mam': {
+                    tonMnemonic = await getMAMWalletMnemonic(
+                        sdk,
+                        account.id,
+                        account.activeTonWallet.id
+                    );
+                    tonMnemonicType = 'ton';
+                    break;
+                }
+                case 'mnemonic': {
+                    const secret = await getAccountSecret(sdk, account.id);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    tonMnemonic = secret.mnemonic;
+                    tonMnemonicType = account.mnemonicType;
+                    break;
+                }
+                default: {
+                    assertUnreachable(account);
+                }
+            }
+
+            const tonKeyPair = await mnemonicToKeypair(tonMnemonic, tonMnemonicType);
+            const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, tonMnemonicType);
+            const { TronWeb } = await import('tronweb');
+            const tronWeb = new TronWeb({
+                fullHost: tronApi.tronGridBaseUrl,
+                privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
+            });
+
+            return Promise.all(
+                txs.map(tx => {
+                    if (tx instanceof Cell) {
+                        return sign(tx.hash(), tonKeyPair.secretKey);
+                    } else {
+                        return tronWeb.trx.sign(tx);
+                    }
+                })
+            );
+        };
     } catch (e) {
         console.error(e);
         throw e;

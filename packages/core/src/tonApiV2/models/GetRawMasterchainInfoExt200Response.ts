@@ -120,11 +120,11 @@ export function GetRawMasterchainInfoExt200ResponseFromJSONTyped(json: any, igno
     };
 }
 
-export function GetRawMasterchainInfoExt200ResponseToJSON(json: any): GetRawMasterchainInfoExt200Response {
-    return GetRawMasterchainInfoExt200ResponseToJSONTyped(json, false);
-}
+  export function GetRawMasterchainInfoExt200ResponseToJSON(json: any): GetRawMasterchainInfoExt200Response {
+      return GetRawMasterchainInfoExt200ResponseToJSONTyped(json, false);
+  }
 
-export function GetRawMasterchainInfoExt200ResponseToJSONTyped(value?: GetRawMasterchainInfoExt200Response | null, ignoreDiscriminator: boolean = false): any {
+  export function GetRawMasterchainInfoExt200ResponseToJSONTyped(value?: GetRawMasterchainInfoExt200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

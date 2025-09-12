@@ -2,7 +2,7 @@ import { BLOCKCHAIN_NAME, CryptoCurrency } from '@tonkeeper/core/dist/entries/cr
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import BigNumber from 'bignumber.js';
-import { FC, RefCallback, useEffect, useMemo, useRef } from 'react';
+import { FC, RefCallback, useEffect, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { ArrowDownIcon, ArrowUpIcon, LinkOutIcon, PlusIcon, SwapIcon } from '../../components/Icon';
 import { Body2, Body3, Label2, Num3 } from '../../components/Text';
@@ -20,22 +20,27 @@ import { formatFiatCurrency, useFormatCoinValue } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useFetchNext } from '../../hooks/useFetchNext';
-import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { AppRoute } from '../../libs/routes';
 import { useFetchFilteredActivity, useScrollMonitor } from '../../state/activity';
 import { useAssets } from '../../state/home';
 import { toTokenRate, useRate, useUSDTRate } from '../../state/rates';
 import { useAllSwapAssets } from '../../state/swap/useSwapAssets';
 import { useSwapFromAsset } from '../../state/swap/useSwapForm';
-import { useTonendpointBuyMethods } from '../../state/tonendpoint';
+import { FLAGGED_FEATURE, useTonendpointBuyMethods } from '../../state/tonendpoint';
 import { useActiveTonNetwork, useIsActiveWalletWatchOnly } from '../../state/wallet';
 import { OtherHistoryFilters } from '../../components/desktop/history/DesktopHistoryFilters';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { HideOnReview } from '../../components/ios/HideOnReview';
-import { TRON_USDT_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { tonAssetAddressFromString } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
-import { useActiveTronWallet, useTronBalances } from '../../state/tron/tron';
+import {
+    KNOWN_TON_ASSETS,
+    TON_ASSET,
+    TRON_USDT_ASSET
+} from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import {
+    jettonToTonAssetAmount,
+    tonAssetAddressFromString
+} from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
+import { useCanReceiveTron, useTronBalances } from '../../state/tron/tron';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import { BorderSmallResponsive } from '../../components/shared/Styles';
 import { useSendTransferNotification } from '../../components/modals/useSendTransferNotification';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { Navigate } from '../../components/shared/Navigate';
@@ -43,15 +48,14 @@ import { useParams } from '../../hooks/router/useParams';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
 import { mergeRefs } from '../../libs/common';
 import { ExternalLink } from '../../components/shared/ExternalLink';
-import { useBatteryBalance } from '../../state/battery';
-import { Link } from '../../components/shared/Link';
 import { QueryKey } from '../../libs/queryKey';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
 import { AssetBlockchainBadge } from '../../components/account/AccountBadge';
-import { HideForRegulatoryState } from '../../components/HideForState';
-import { CountryFeature } from '../../state/country';
 import { Redirect } from 'react-router-dom';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
+import { Image } from '../../components/shared/Image';
+import { IfFeatureEnabled } from '../../components/shared/IfFeatureEnabled';
+import { TronFeeBanner } from '../../components/jettons/TronFeeBanner';
 
 export const DesktopCoinPage = () => {
     const navigate = useNavigate();
@@ -63,7 +67,7 @@ export const DesktopCoinPage = () => {
         }
     }, [name]);
 
-    const canUseTron = useActiveTronWallet();
+    const canUseTron = useCanReceiveTron();
 
     if (!name) return <></>;
 
@@ -168,23 +172,31 @@ const CoinHeader: FC<{ token: string }> = ({ token }) => {
                     <ArrowDownIcon />
                     {t('wallet_receive')}
                 </ButtonStyled>
-                <HideOnReview>
-                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
+                    <IfFeatureEnabled
+                        feature={FLAGGED_FEATURE.ETHENA}
+                        applied={
+                            eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.USDe) ||
+                            eqAddresses(currentAssetAddress, KNOWN_TON_ASSETS.tsUSDe)
+                        }
+                    >
                         {swapAsset && (
                             <ButtonStyled size="small" onClick={onSwap}>
                                 <SwapIcon />
                                 {t('wallet_swap')}
                             </ButtonStyled>
                         )}
-                    </HideForRegulatoryState>
+                    </IfFeatureEnabled>
+                </IfFeatureEnabled>
 
+                <IfFeatureEnabled feature={FLAGGED_FEATURE.ONRAMP}>
                     {canBuy && (
                         <ButtonStyled size="small" onClick={onOpen}>
                             <PlusIcon />
                             {t('wallet_buy')}
                         </ButtonStyled>
                     )}
-                </HideOnReview>
+                </IfFeatureEnabled>
             </HeaderButtonsContainer>
             <BuyNotification buy={buy} open={isOpen} handleClose={onClose} />
         </CoinHeaderStyled>
@@ -232,62 +244,70 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
     const { data: rate } = useRate(token);
     const { fiat } = useAppContext();
 
-    const asset: { symbol: string; image: string; amount: string; fiatAmount: string } | undefined =
-        useMemo(() => {
-            if (!assets) {
+    const asset:
+        | {
+              symbol: string;
+              image: string;
+              amount: string;
+              fiatAmount: string;
+              noImageCorners?: boolean;
+          }
+        | undefined = useMemo(() => {
+        if (!assets) {
+            return undefined;
+        }
+
+        if (token === CryptoCurrency.TON) {
+            const amount = assets.ton.info.balance;
+            return {
+                image: TON_ASSET.image!,
+                symbol: TON_ASSET.symbol,
+                amount: format(amount),
+                fiatAmount: formatFiatCurrency(
+                    fiat,
+                    rate ? new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount)) : 0
+                )
+            };
+        }
+
+        if (seeIfValidTonAddress(token)) {
+            const jettonBalance = assets.ton.jettons.balances.find(b =>
+                eqAddresses(b.jetton.address, token)
+            );
+
+            if (!jettonBalance) {
                 return undefined;
             }
 
-            if (token === CryptoCurrency.TON) {
-                const amount = assets.ton.info.balance;
-                return {
-                    image: 'https://wallet.tonkeeper.com/img/toncoin.svg',
-                    symbol: 'TON',
-                    amount: format(amount),
-                    fiatAmount: formatFiatCurrency(
-                        fiat,
-                        rate ? new BigNumber(rate.prices).multipliedBy(shiftedDecimals(amount)) : 0
-                    )
-                };
-            }
+            const amount = jettonBalance.balance;
 
-            if (seeIfValidTonAddress(token)) {
-                const jettonBalance = assets.ton.jettons.balances.find(b =>
-                    eqAddresses(b.jetton.address, token)
-                );
-
-                if (!jettonBalance) {
-                    return undefined;
-                }
-
-                const amount = jettonBalance.balance;
-
-                return {
-                    image: jettonBalance.jetton.image,
-                    symbol: jettonBalance.jetton.symbol,
-                    amount: format(amount, jettonBalance.jetton.decimals),
-                    fiatAmount: formatFiatCurrency(
-                        fiat,
-                        jettonBalance.price
-                            ? shiftedDecimals(
-                                  jettonBalance.balance,
-                                  jettonBalance.jetton.decimals
-                              ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
-                            : 0
-                    )
-                };
-            }
-
-            const extra = assets.ton.info.extraBalance?.find(item => item.preview.symbol === token);
-
-            if (!extra) return undefined;
             return {
-                image: extra.preview.image,
-                symbol: extra.preview.symbol,
-                amount: format(extra.amount, extra.preview.decimals),
-                fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
+                image: jettonBalance.jetton.image,
+                symbol: jettonBalance.jetton.symbol,
+                amount: format(amount, jettonBalance.jetton.decimals),
+                fiatAmount: formatFiatCurrency(
+                    fiat,
+                    jettonBalance.price
+                        ? shiftedDecimals(
+                              jettonBalance.balance,
+                              jettonBalance.jetton.decimals
+                          ).multipliedBy(toTokenRate(jettonBalance.price, fiat).prices)
+                        : 0
+                ),
+                noImageCorners: jettonToTonAssetAmount(jettonBalance).asset.noImageCorners
             };
-        }, [assets, format, rate, fiat]);
+        }
+
+        const extra = assets.ton.info.extraBalance?.find(item => item.preview.symbol === token);
+
+        if (!extra) return undefined;
+        return {
+            image: extra.preview.image,
+            symbol: extra.preview.symbol,
+            amount: format(extra.amount, extra.preview.decimals),
+            fiatAmount: formatFiatCurrency(fiat, 0) // TODO: Extra Currency Rates
+        };
+    }, [assets, format, rate, fiat]);
 
     if (!asset) {
         return <></>;
@@ -295,7 +315,7 @@ const CoinInfo: FC<{ token: string }> = ({ token }) => {
 
     return (
         <CoinInfoWrapper>
-            <img src={asset.image} alt={asset.symbol} />
+            <Image src={asset.image} alt={asset.symbol} noRadius={asset.noImageCorners} />
             <CoinInfoAmounts>
                 <Num3>
                     {asset.amount}&nbsp;{asset.symbol}
@@ -374,9 +394,7 @@ const CoinPage: FC<{ token: string }> = ({ token }) => {
     }, [assets, t, token]);
 
     const { mainnetConfig } = useAppContext();
-    const tonviewer = mainnetConfig.accountExplorer
-        ? new URL(mainnetConfig.accountExplorer).origin
-        : 'https://tonviewer.com';
+    const tonviewer = new URL(mainnetConfig.accountExplorer).origin;
 
     if (asset === undefined) {
         return <Redirect to={AppRoute.home} />;
@@ -454,6 +472,10 @@ const AssetTitle = styled.div`
         `}
 `;
 
+const DesktopViewPageLayoutStyled = styled(DesktopViewPageLayout)`
+    min-height: 100%;
+`;
+
 export const TronUSDTPage = () => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
@@ -475,7 +497,6 @@ export const TronUSDTPage = () => {
         return balances.usdt;
     }, [balances]);
 
-    const ref = useRef<HTMLDivElement>(null);
     const {
         fetchNextPage,
         hasNextPage,
@@ -484,14 +505,14 @@ export const TronUSDTPage = () => {
         refetch
     } = useFetchFilteredActivity(TRON_USDT_ASSET.address);
 
-    useScrollMonitor(refetch, 5000, ref);
+    const setScrollRef = useScrollMonitor(refetch, 5000);
 
-    useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true, ref);
+    const setFetchNextRef = useFetchNext(hasNextPage, isFetchingNextPage, fetchNextPage, true);
 
     const { data: rate } = useUSDTRate();
 
     return (
-        <DesktopViewPageLayout ref={ref}>
+        <DesktopViewPageLayoutStyled ref={mergeRefs<HTMLDivElement>(setScrollRef, setFetchNextRef)}>
             <DesktopViewHeader backButton borderBottom={true}>
                 <DesktopViewHeaderContent
                     title={
@@ -554,91 +575,11 @@ export const TronUSDTPage = () => {
                     </ButtonStyled>
                 </HeaderButtonsContainer>
             </CoinHeaderStyled>
-            <HideOnReview>
-                <TronUseBatteryBanner />
-            </HideOnReview>
+            <TronFeeBanner />
             <HistorySubheader>{t('page_header_history')}</HistorySubheader>
             <HistoryContainer>
                 <DesktopHistory isFetchingNextPage={isFetchingNextPage} activity={activity} />
             </HistoryContainer>
-        </DesktopViewPageLayout>
-    );
-};
-
-const TronTopUpUSDTWrapper = styled.div`
-    background-color: ${p => p.theme.backgroundContent};
-    ${BorderSmallResponsive};
-    padding: 16px 14px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: space-between;
-    margin: 16px;
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-
-    ${p =>
-        p.theme.proDisplayType === 'mobile' &&
-        css`
-            gap: 16px;
-            flex-direction: column;
-
-            button {
-                width: 100%;
-                box-sizing: border-box;
-            }
-        `}
-`;
-
-const TextContainer = styled.div`
-    > * {
-        display: block;
-    }
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
-
-const SmallDivider = styled.div`
-    width: 100%;
-    height: 1px;
-    background-color: ${p => p.theme.separatorCommon};
-`;
-
-const LinkStyled = styled(Link)`
-    text-decoration: unset;
-    color: ${p => p.theme.textPrimary};
-    display: contents;
-`;
-
-const TronUseBatteryBanner = () => {
-    const { t } = useTranslation();
-    const { data: batteryBalance } = useBatteryBalance();
-
-    if (batteryBalance && batteryBalance.batteryUnitsBalance.gt(500)) {
-        return null;
-    }
-
-    return (
-        <>
-            <TronTopUpUSDTWrapper>
-                <TextContainer>
-                    <Label2>{t('tron_battery_required_banner_title')}</Label2>
-                    <Body2>{t('tron_battery_required_banner_description')}</Body2>
-                </TextContainer>
-                <LinkStyled
-                    to={AppRoute.walletSettings + WalletSettingsRoute.battery}
-                    replace={false}
-                >
-                    <Button primary size="small">
-                        {t('tron_battery_required_banner_button')}
-                    </Button>
-                </LinkStyled>
-            </TronTopUpUSDTWrapper>
-            <SmallDivider />
-        </>
+        </DesktopViewPageLayoutStyled>
     );
 };

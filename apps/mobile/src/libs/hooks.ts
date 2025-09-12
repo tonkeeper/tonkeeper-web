@@ -10,6 +10,7 @@ import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { useNavigate } from '@tonkeeper/uikit/src/hooks/router/useNavigate';
 import { useAppSdk } from '@tonkeeper/uikit/dist/hooks/appSdk';
+import { TonendpointConfig } from '@tonkeeper/core/dist/tonkeeperApi/tonendpoint';
 
 export const useAppHeight = () => {
     useEffect(() => {
@@ -46,16 +47,25 @@ export const useAppWidth = () => {
     }, []);
 };
 
-export const useAnalytics = (version: string, activeAccount?: Account, accounts?: Account[]) => {
+export const useAnalytics = (
+    version: string,
+    config: TonendpointConfig | undefined,
+    activeAccount?: Account,
+    accounts?: Account[]
+) => {
     const network = useActiveTonNetwork();
     const sdk = useAppSdk();
 
-    return useQuery<Analytics>(
-        [QueryKey.analytics],
+    return useQuery<Analytics | undefined>(
+        [QueryKey.analytics, config?.aptabaseEndpoint, config?.aptabaseKey],
         async () => {
+            if (!config?.aptabaseEndpoint || !config?.aptabaseKey) {
+                return;
+            }
+
             const tracker = new Aptabase({
-                host: import.meta.env.VITE_APP_APTABASE_HOST,
-                key: import.meta.env.VITE_APP_APTABASE,
+                host: config.aptabaseEndpoint,
+                key: config.aptabaseKey,
                 appVersion: version,
                 userIdentity: sdk.userIdentity
             });

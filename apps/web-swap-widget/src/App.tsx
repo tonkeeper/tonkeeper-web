@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, Network } from '@tonkeeper/core/dist/entries/network';
+import { getApiConfig } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { DarkThemeContext } from '@tonkeeper/uikit/dist/components/Icon';
@@ -39,6 +39,7 @@ import {
 } from './libs/tonkeeper-injection-context';
 import { Address } from '@ton/core';
 import { defaultLanguage } from './i18n';
+import { localesList } from '@tonkeeper/locales/localesList';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -52,7 +53,6 @@ const queryClient = new QueryClient({
 provideMockInjectionContext();
 
 const sdk = new WidgetAppSdk();
-const TARGET_ENV = 'swap_widget_web';
 
 const queryParams = new URLSearchParams(new URL(window.location.href).search);
 
@@ -75,8 +75,7 @@ const queryParamLangKey = (supportedLanguages: string[]) => {
 };
 
 export const App: FC = () => {
-    const languages = (import.meta.env.VITE_APP_LOCALES ?? defaultLanguage).split(',');
-    const queryParamsLang = queryParamLangKey(languages);
+    const queryParamsLang = queryParamLangKey(localesList);
 
     const { t: tSimple, i18n } = useTranslation();
 
@@ -96,7 +95,7 @@ export const App: FC = () => {
                 reloadResources: i18n.reloadResources,
                 changeLanguage: i18n.changeLanguage as unknown as (lang: string) => Promise<void>,
                 language: i18n.language,
-                languages: languages
+                languages: localesList
             }
         };
         return client;
@@ -194,7 +193,6 @@ const Loader: FC = () => {
     const { i18n } = useTranslation();
 
     const tonendpoint = useTonendpoint({
-        targetEnv: TARGET_ENV,
         build: sdk.version,
         lang,
         platform: 'swap_widget_web'
@@ -227,12 +225,8 @@ const Loader: FC = () => {
     }
 
     const context: IAppContext = {
-        mainnetApi: getApiConfig(
-            serverConfig.mainnetConfig,
-            Network.MAINNET,
-            import.meta.env.VITE_APP_TONCONSOLE_HOST
-        ),
-        testnetApi: getApiConfig(serverConfig.mainnetConfig, Network.TESTNET),
+        mainnetApi: getApiConfig(serverConfig.mainnetConfig),
+        testnetApi: getApiConfig(serverConfig.testnetConfig),
         fiat,
         mainnetConfig: serverConfig.mainnetConfig,
         testnetConfig: serverConfig.testnetConfig,
@@ -243,10 +237,6 @@ const Loader: FC = () => {
         ios,
         defaultWalletVersion: WalletVersion.V5R1,
         hideMultisig: true,
-        env: {
-            tgAuthBotId: import.meta.env.VITE_APP_TG_BOT_ID,
-            stonfiReferralAddress: import.meta.env.VITE_APP_STONFI_REFERRAL_ADDRESS
-        },
         tracker: tracker?.track
     };
 

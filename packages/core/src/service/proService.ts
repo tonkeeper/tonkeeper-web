@@ -9,30 +9,37 @@ import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { ProState, ProStateWallet, ProSubscription, ProSubscriptionInvalid } from '../entries/pro';
 import { RecipientData, TonRecipientData } from '../entries/send';
-import { TonWalletStandard, WalletVersion, isStandardTonWallet } from '../entries/wallet';
-import { AccountsApi } from '../tonApiV2';
 import {
-    FiatCurrencies as FiatCurrenciesGenerated,
-    InvoiceStatus,
-    InvoicesInvoice,
-    ProServiceDashboardCellAddress,
-    ProServiceDashboardCellNumericCrypto,
-    ProServiceDashboardCellNumericFiat,
-    ProServiceDashboardCellString,
-    ProServiceDashboardColumnType,
-    ProServiceService
-} from '../tonConsoleApi';
-import { delay } from '../utils/common';
+    backwardCompatibilityOnlyWalletVersions,
+    TonWalletStandard,
+    WalletVersion
+} from '../entries/wallet';
+import { AccountsApi } from '../tonApiV2';
 import { Flatten } from '../utils/types';
-import { accountsStorage } from './accountsStorage';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
-import { getNetworkByAccount } from '../entries/account';
-import { Network } from '../entries/network';
+import {
+    ApiError,
+    AuthService,
+    Currencies as CurrenciesGenerated,
+    DashboardCellAddress,
+    DashboardCellNumericCrypto,
+    DashboardCellNumericFiat,
+    DashboardCellString,
+    DashboardColumnType,
+    DashboardsService,
+    IapService,
+    Invoice,
+    InvoicesService,
+    SupportService,
+    TiersService,
+    UsersService
+} from '../pro';
+import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
+import { IProStateWallet, ISupportData, ProSubscription, PurchaseErrors } from '../entries/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -40,30 +47,7 @@ export const setBackupState = async (storage: IStorage, state: ProSubscription) 
 
 export const getBackupState = async (storage: IStorage) => {
     const backup = await storage.get<ProSubscription>(AppKey.PRO_BACKUP);
-    return backup ?? toEmptySubscription();
-};
-
-export const getProState = async (
-    authTokenService: ProAuthTokenService,
-    storage: IStorage
-): Promise<ProState> => {
-    try {
-        return await loadProState(authTokenService, storage);
-    } catch (e) {
-        console.error(e);
-        return {
-            subscription: toEmptySubscription(),
-            authorizedWallet: null
-        };
-    }
-};
-
-const toEmptySubscription = (): ProSubscriptionInvalid => {
-    return {
-        valid: false,
-        isTrial: false,
-        usedTrial: false
-    };
+    return backup ?? null;
 };
 
 export const walletVersionFromProServiceDTO = (value: string) => {
@@ -83,90 +67,33 @@ export const walletVersionFromProServiceDTO = (value: string) => {
     }
 };
 
-export type ProAuthTokenService = {
-    attachToken: () => Promise<void>;
-    onTokenUpdated: (token: string | null) => Promise<void>;
-};
+export interface IProAuthTokenService {
+    setToken(token: string): Promise<void>;
+    getToken(): Promise<string | null>;
+    deleteToken(): Promise<void>;
+}
 
-const loadProState = async (
-    authService: ProAuthTokenService,
-    storage: IStorage
-): Promise<ProState> => {
-    await authService.attachToken();
-    const user = await ProServiceService.proServiceGetUserInfo();
+export const getNormalizedSubscription = async (storage: IStorage, token: string | null) => {
+    if (!token) return null;
 
-    let authorizedWallet: ProStateWallet | null = null;
-    if (user.pub_key && user.version) {
-        const wallets = (await accountsStorage(storage).getAccounts())
-            .filter(a => getNetworkByAccount(a) === Network.MAINNET)
-            .flatMap(a => a.allTonWallets);
+    try {
+        const user = await UsersService.getUserInfo(`Bearer ${token}`);
+        const authorizedWallet: IProStateWallet | null = await findAuthorizedWallet(user, storage);
+        const currentSubscriptionDTO = await UsersService.verifySubscription(`Bearer ${token}`);
 
-        const actualWallet = wallets
-            .filter(isStandardTonWallet)
-            .find(
-                w =>
-                    w.publicKey === user.pub_key &&
-                    user.version &&
-                    w.version === walletVersionFromProServiceDTO(user.version)
-            );
-        if (!actualWallet) {
-            return {
-                authorizedWallet: null,
-                subscription: {
-                    isTrial: false,
-                    usedTrial: false,
-                    valid: false
-                }
-            };
-        }
-        authorizedWallet = {
-            publicKey: actualWallet.publicKey,
-            rawAddress: actualWallet.rawAddress
-        };
+        return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
+    } catch {
+        return null;
     }
-
-    const subscriptionDTO = await ProServiceService.proServiceVerify();
-
-    let subscription: ProSubscription;
-    if (subscriptionDTO.valid) {
-        if (subscriptionDTO.is_trial) {
-            subscription = {
-                type: 'trial-tg',
-                valid: true,
-                isTrial: true,
-                usedTrial: true,
-                trialUserId: user.tg_id!,
-                trialEndDate: new Date(subscriptionDTO.next_charge! * 1000)
-            };
-        } else {
-            subscription = {
-                valid: true,
-                isTrial: false,
-                usedTrial: subscriptionDTO.used_trial,
-                nextChargeDate: new Date(subscriptionDTO.next_charge! * 1000)
-            };
-        }
-    } else {
-        subscription = {
-            valid: false,
-            isTrial: false,
-            usedTrial: subscriptionDTO.used_trial
-        };
-    }
-    return {
-        subscription,
-        authorizedWallet
-    };
 };
 
 export const authViaTonConnect = async (
-    authService: ProAuthTokenService,
     api: APIConfig,
     wallet: TonWalletStandard,
     signProof: (bufferToSing: Buffer) => Promise<Uint8Array>
 ) => {
-    const domain = 'https://tonkeeper.com/';
-    const { payload } = await ProServiceService.proServiceAuthGeneratePayload();
+    const domain = 'tonkeeper';
+    const { payload } = await AuthService.authGeneratePayload();
 
     const timestamp = await getServerTime(api);
     const proofPayload = tonConnectProofPayload(timestamp, domain, wallet.rawAddress, payload);
@@ -177,7 +104,7 @@ export const authViaTonConnect = async (
         stateInit
     );
 
-    const result = await ProServiceService.proServiceTonConnectAuth({
+    const result = await AuthService.tonConnectAuth({
         address: wallet.rawAddress,
         proof: {
             timestamp: proof.timestamp,
@@ -188,40 +115,98 @@ export const authViaTonConnect = async (
         }
     });
 
-    if (!result.ok) {
+    if (!result.ok || !result.auth_token) {
         throw new Error('Unable to authorize');
     }
 
-    await authService.onTokenUpdated(result.auth_token);
+    return result.auth_token;
 };
 
-export const logoutTonConsole = async (authService: ProAuthTokenService) => {
-    const result = await ProServiceService.proServiceLogout();
-    if (!result.ok) {
-        throw new Error('Unable to logout');
+export interface ProAuthViaSeedPhraseParams {
+    wallet: TonWalletStandard;
+    signer: (b: Buffer) => Promise<Uint8Array | Buffer>;
+}
+
+export const authViaSeedPhrase = async (api: APIConfig, authData: ProAuthViaSeedPhraseParams) => {
+    const domain = 'tonkeeper';
+    const { wallet, signer } = authData;
+    const { payload } = await AuthService.authGeneratePayload();
+
+    const timestamp = await getServerTime(api);
+
+    const proofPayload = tonConnectProofPayload(timestamp, domain, wallet.rawAddress, payload);
+
+    const signature = await signer(proofPayload.bufferToSign);
+
+    const stateInit = walletStateInitFromState(wallet);
+
+    const proof = createTonProofItem(signature, proofPayload, stateInit);
+
+    const result = await AuthService.tonConnectAuth({
+        address: wallet.rawAddress,
+        proof: {
+            timestamp: proof.timestamp,
+            domain: proof.domain.value,
+            signature: proof.signature,
+            payload,
+            state_init: proof.stateInit
+        }
+    });
+
+    if (!result.ok || !result.auth_token) {
+        throw new Error('Unable to authorize');
     }
 
-    await authService.onTokenUpdated(null);
+    return result.auth_token;
 };
 
 export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
-    const { items } = await ProServiceService.getProServiceTiers(
-        localizationText(lang) as Lang,
-        promoCode
-    );
+    const { items } = await TiersService.getTiers(localizationText(lang) as Lang, promoCode);
+
     return items;
 };
 
-export const createProServiceInvoice = async (tierId: number, promoCode?: string) => {
-    return ProServiceService.createProServiceInvoice({
-        tier_id: tierId,
-        promo_code: promoCode
-    });
+interface IProServiceInvoiceData {
+    tierId: number;
+    promoCode?: string;
+}
+
+type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };
+
+export const createProServiceInvoice = async (
+    tempToken: string,
+    data: IProServiceInvoiceData
+): Promise<ProServiceInvoiceResponse> => {
+    const { promoCode, tierId } = data;
+
+    try {
+        const invoice = await InvoicesService.createInvoice(`Bearer ${tempToken}`, {
+            tier_id: tierId,
+            promo_code: promoCode
+        });
+
+        return {
+            ok: true,
+            data: invoice
+        };
+    } catch (e) {
+        if (e instanceof ApiError && e.status === 400) {
+            return {
+                ok: false,
+                data: PurchaseErrors.PROMOCODE_ALREADY_USED
+            };
+        }
+
+        return {
+            ok: false,
+            data: PurchaseErrors.PURCHASE_FAILED
+        };
+    }
 };
 
 export const createRecipient = async (
     api: APIConfig,
-    invoice: InvoicesInvoice
+    invoice: Invoice
 ): Promise<[RecipientData, AssetAmount]> => {
     const toAccount = await new AccountsApi(api.tonApiV2).getAccount({
         accountId: invoice.pay_to_address
@@ -245,43 +230,35 @@ export const createRecipient = async (
     return [recipient, asset];
 };
 
-export const retryProService = async (authService: ProAuthTokenService, storage: IStorage) => {
-    for (let i = 0; i < 10; i++) {
-        const state = await getProState(authService, storage);
-        if (state.subscription.valid) {
-            return;
-        }
-        await delay(5000);
+export const saveIapPurchase = async (
+    token: string,
+    originalTransactionId: string
+): Promise<{ ok: boolean }> => {
+    try {
+        return await IapService.activateIapPurchase(`Bearer ${token}`, {
+            original_transaction_id: originalTransactionId
+        });
+    } catch (e) {
+        return {
+            ok: false
+        };
     }
 };
 
-export const waitProServiceInvoice = async (invoice: InvoicesInvoice) => {
-    let updated = invoice;
-
-    do {
-        await delay(4000);
-        try {
-            updated = await ProServiceService.getProServiceInvoice(invoice.id);
-        } catch (e) {
-            console.warn(e);
-        }
-    } while (updated.status === InvoiceStatus.PENDING);
-};
-
-export async function startProServiceTrial(
-    authService: ProAuthTokenService,
-    botId: string,
-    lang?: string
-) {
+export async function startProServiceTrial(botId: string, lang?: string): Promise<string> {
     const tgData = await loginViaTG(botId, lang);
+
     if (!tgData) {
-        return false;
+        throw new Error('Unable to activate Trial');
     }
-    const result = await ProServiceService.proServiceTrial(tgData);
 
-    await authService.onTokenUpdated(result.auth_token);
+    const result = await TiersService.activateTrial(tgData);
 
-    return result.ok;
+    if (!result.ok || !result.auth_token) {
+        throw new Error('Unable to activate Trial');
+    }
+
+    return result.auth_token;
 }
 
 export async function getDashboardColumns(lang?: string): Promise<DashboardColumn[]> {
@@ -289,7 +266,7 @@ export async function getDashboardColumns(lang?: string): Promise<DashboardColum
         lang = Lang.EN;
     }
 
-    const result = await ProServiceService.proServiceDashboardColumns(lang as Lang);
+    const result = await DashboardsService.getDashboardColumns(lang as Lang);
     return result.items.map(item => ({
         id: item.id,
         name: item.name,
@@ -309,23 +286,26 @@ export async function getDashboardData(
         accounts: string[];
         columns: string[];
     },
-    options?: { lang?: string; currency?: FiatCurrencies }
+    options?: { lang?: string; currency?: FiatCurrencies; token: string | null }
 ): Promise<DashboardRow[]> {
+    const authToken = options?.token ? `Bearer ${options.token}` : undefined;
+
     let lang = Lang.EN;
     if (Object.values(Lang).includes(options?.lang as Lang)) {
         lang = options?.lang as Lang;
     }
 
-    let currency = FiatCurrenciesGenerated.USD;
+    let currency = CurrenciesGenerated.USD;
     if (
-        Object.values(FiatCurrenciesGenerated).includes(
-            options?.currency as FiatCurrenciesGenerated
+        Object.values(CurrenciesGenerated).includes(
+            options?.currency as unknown as CurrenciesGenerated
         )
     ) {
-        currency = options?.currency as FiatCurrenciesGenerated;
+        currency = options?.currency as unknown as CurrenciesGenerated;
     }
 
-    const result = await ProServiceService.proServiceDashboardData(lang, currency, query);
+    const result = await DashboardsService.getDashboardData(lang, currency, authToken, query);
+
     return result.items.map((row, index) => ({
         id: query.accounts[index],
         cells: row.map(mapDtoCellToCell)
@@ -333,13 +313,13 @@ export async function getDashboardData(
 }
 
 type DTOCell = Flatten<
-    Flatten<Awaited<ReturnType<typeof ProServiceService.proServiceDashboardData>>['items']>
+    Flatten<Awaited<ReturnType<typeof DashboardsService.getDashboardData>>['items']>
 >;
 
 function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
     switch (dtoCell.type) {
-        case ProServiceDashboardColumnType.STRING: {
-            const cell = dtoCell as ProServiceDashboardCellString;
+        case DashboardColumnType.STRING: {
+            const cell = dtoCell as DashboardCellString;
 
             return {
                 columnId: cell.column_id,
@@ -347,16 +327,16 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
                 value: cell.value
             };
         }
-        case ProServiceDashboardColumnType.ADDRESS: {
-            const cell = dtoCell as ProServiceDashboardCellAddress;
+        case DashboardColumnType.ADDRESS: {
+            const cell = dtoCell as DashboardCellAddress;
             return {
                 columnId: cell.column_id,
                 type: 'address',
                 raw: cell.raw
             };
         }
-        case ProServiceDashboardColumnType.NUMERIC_CRYPTO: {
-            const cell = dtoCell as ProServiceDashboardCellNumericCrypto;
+        case DashboardColumnType.NUMERIC_CRYPTO: {
+            const cell = dtoCell as DashboardCellNumericCrypto;
             return {
                 columnId: cell.column_id,
                 type: 'numeric_crypto',
@@ -366,16 +346,41 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
             };
         }
 
-        case ProServiceDashboardColumnType.NUMERIC_FIAT: {
-            const cell = dtoCell as ProServiceDashboardCellNumericFiat;
+        case DashboardColumnType.NUMERIC_FIAT: {
+            const cell = dtoCell as DashboardCellNumericFiat;
             return {
                 columnId: cell.column_id,
                 type: 'numeric_fiat',
                 value: new BigNumber(cell.value),
-                fiat: cell.fiat
+                fiat: cell.fiat as unknown as FiatCurrencies
             };
         }
         default:
             throw new Error('Unsupported cell type');
     }
 }
+
+export const getProSupportUrl = async (mainToken: string | null): Promise<ISupportData> => {
+    const falsyResponse = {
+        url: '',
+        isPriority: false
+    };
+
+    if (!mainToken) return falsyResponse;
+
+    try {
+        const { url, is_priority } = await SupportService.getProSupport(`Bearer ${mainToken}`);
+
+        return {
+            url,
+            isPriority: is_priority
+        };
+    } catch {
+        return falsyResponse;
+    }
+};
+
+export const backwardCompatibilityFilter = (wallets: ReadonlyArray<TonWalletStandard>) =>
+    wallets.filter(
+        (w: TonWalletStandard) => !backwardCompatibilityOnlyWalletVersions.includes(w?.version)
+    );

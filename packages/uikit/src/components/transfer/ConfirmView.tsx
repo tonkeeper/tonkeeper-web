@@ -32,19 +32,31 @@ import {
 } from '../Notification';
 import { Label2 } from '../Text';
 import { TransferComment } from '../activity/ActivityDetailsLayout';
-import { ActionFeeDetailsUniversal } from '../activity/NotificationCommon';
-import { Image, ImageMock, Info, SendingTitle, Title, UnverifiedTokenLabel } from './Confirm';
+import {
+    ActionFeeDetailsUniversal,
+    FeeDetailsPropsTon,
+    FeeDetailsPropsUniversal
+} from '../activity/NotificationCommon';
+import {
+    ConfirmViewImage,
+    ImageMock,
+    Info,
+    SendingTitle,
+    Title,
+    UnverifiedTokenLabel
+} from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
 import { UserCancelledError } from '../../libs/errors/UserCancelledError';
 import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
-import {
-    SenderChoiceUserAvailable,
-    SenderTypeUserAvailable
-} from '../../hooks/blockchain/useSender';
+
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
+import {
+    AllChainsSenderOptions,
+    AllChainsSenderType
+} from '../../hooks/blockchain/sender/sender-type';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -84,9 +96,9 @@ type ConfirmViewProps<T extends Asset> = PropsWithChildren<
         onBack?: () => void;
         onClose: (confirmed?: boolean) => void;
         fitContent?: boolean;
-        onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
-        availableSendersChoices?: SenderChoiceUserAvailable[];
-        selectedSenderType?: SenderTypeUserAvailable;
+        onSenderTypeChange?: (type: AllChainsSenderType) => void;
+        availableSendersOptions?: AllChainsSenderOptions[];
+        selectedSenderType?: AllChainsSenderType;
         estimation: {
             data: Pick<Estimation<T>, 'fee'> | undefined;
             isLoading: boolean;
@@ -106,7 +118,7 @@ export function ConfirmView<T extends Asset = Asset>({
     className,
     onSenderTypeChange,
     selectedSenderType,
-    availableSendersChoices,
+    availableSendersOptions,
     ...mutation
 }: ConfirmViewProps<T>) {
     const { mutateAsync, isLoading, reset } = mutation;
@@ -131,7 +143,7 @@ export function ConfirmView<T extends Asset = Asset>({
             <ConfirmViewDetailsFee
                 onSenderTypeChange={onSenderTypeChange}
                 selectedSenderType={selectedSenderType}
-                availableSendersChoices={availableSendersChoices}
+                availableSendersOptions={availableSendersOptions}
             />
             <ConfirmViewDetailsComment />
         </ConfirmViewDetailsSlot>
@@ -270,17 +282,21 @@ export const ConfirmViewHeading: FC<PropsWithChildren<{ className?: string; titl
         [TRON_USDT_ASSET.id]: t('txActions_USDT_transfer')
     };
 
-    title ||=
-        recipient && isTonRecipientData(recipient)
-            ? recipient.toAccount.name
-            : fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+    if (!title) {
+        if (recipient && isTonRecipientData(recipient) && recipient.toAccount.name) {
+            title = recipient.toAccount.name;
+        } else {
+            title =
+                fallbackTitles[assetAmount.asset.id] || t('txActions_signRaw_types_jettonTransfer');
+        }
+    }
 
     const icon =
         recipient && isTonRecipientData(recipient) ? recipient.toAccount.icon || image : image;
     return (
         <Info className={className}>
             {icon ? (
-                <Image $noBorders={assetAmount.asset.id === TRON_USDT_ASSET.id} full src={image} />
+                <ConfirmViewImage noRadius={assetAmount.asset.noImageCorners} full src={image} />
             ) : (
                 <ImageMock full />
             )}
@@ -322,19 +338,13 @@ export const ConfirmViewDetailsAmount: FC = () => {
     );
 };
 
-export const ConfirmViewDetailsFee: FC<{
-    onSenderTypeChange?: (type: SenderTypeUserAvailable) => void;
-    availableSendersChoices?: SenderChoiceUserAvailable[];
-    selectedSenderType?: SenderTypeUserAvailable;
-}> = ({ onSenderTypeChange, availableSendersChoices, selectedSenderType }) => {
+export const ConfirmViewDetailsFee: FC<FeeDetailsPropsUniversal | FeeDetailsPropsTon> = props => {
     const { estimation } = useConfirmViewContext();
 
     return (
         <ActionFeeDetailsUniversal
             fee={estimation.isLoading ? undefined : estimation.error ? null : estimation.data?.fee}
-            onSenderTypeChange={onSenderTypeChange}
-            availableSendersChoices={availableSendersChoices}
-            selectedSenderType={selectedSenderType}
+            {...props}
         />
     );
 };

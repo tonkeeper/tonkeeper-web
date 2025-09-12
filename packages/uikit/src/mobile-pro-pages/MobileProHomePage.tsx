@@ -21,15 +21,15 @@ import { useActiveAccount, useActiveTonNetwork, useIsActiveWalletWatchOnly } fro
 import { useIsActiveAccountMultisig, useUnviewedAccountOrdersNumber } from '../state/multisig';
 import { isAccountCanManageMultisigs } from '@tonkeeper/core/dist/entries/account';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { useBatteryBalance, useCanUseBattery } from '../state/battery';
+import { useBatteryBalance, useCanSeeBattery } from '../state/battery';
 import { RoundedBadge } from '../components/shared/Badge';
 import { MobileProHomeBalance } from '../components/mobile-pro/home/MobileProHomeBalance';
 import { HideOnReview } from '../components/ios/HideOnReview';
 import { PullToRefresh } from '../components/mobile-pro/PullToRefresh';
 import { DesktopViewHeader, DesktopViewPageLayout } from '../components/desktop/DesktopViewLayout';
 import { TwoFARecoveryStartedBanner } from '../components/settings/two-fa/TwoFARecoveryStartedBanner';
-import { CountryFeature } from '../state/country';
-import { HideForRegulatoryState } from '../components/HideForState';
+import { IfFeatureEnabled } from '../components/shared/IfFeatureEnabled';
+import { FLAGGED_FEATURE } from '../state/tonendpoint';
 
 const MobileProHomeActionsStyled = styled(MobileProHomeActions)`
     margin: 0 8px 16px;
@@ -95,7 +95,7 @@ export const MobileProHomePage = () => {
     const showMultisigs = isAccountCanManageMultisigs(account);
     const network = useActiveTonNetwork();
     const isTestnet = network === Network.TESTNET;
-    const canUseBattery = useCanUseBattery();
+    const canUseBattery = useCanSeeBattery();
 
     return (
         <DesktopViewPageLayout id={mobileProHomePageId}>
@@ -115,19 +115,21 @@ export const MobileProHomePage = () => {
                 </MenuItem>
                 <Divider />
                 <HideOnReview>
-                    <MenuItem to={AppRoute.purchases}>
-                        <SaleBadgeIcon />
-                        <Label2>{t('wallet_aside_collectibles')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
-                    <MenuItem to={AppRoute.dns}>
-                        <SparkIcon />
-                        <Label2>{t('wallet_aside_domains')}</Label2>
-                        <ChevronRightIcon />
-                    </MenuItem>
-                    <Divider />
-                    <HideForRegulatoryState feature={CountryFeature.swap}>
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.NFT}>
+                        <MenuItem to={AppRoute.purchases}>
+                            <SaleBadgeIcon />
+                            <Label2>{t('wallet_aside_collectibles')}</Label2>
+                            <ChevronRightIcon />
+                        </MenuItem>
+                        <Divider />
+                        <MenuItem to={AppRoute.dns}>
+                            <SparkIcon />
+                            <Label2>{t('wallet_aside_domains')}</Label2>
+                            <ChevronRightIcon />
+                        </MenuItem>
+                        <Divider />
+                    </IfFeatureEnabled>
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.SWAPS}>
                         {!isReadOnly && !isTestnet && (
                             <>
                                 <MenuItem to={AppRoute.swap}>
@@ -138,7 +140,7 @@ export const MobileProHomePage = () => {
                                 <Divider />
                             </>
                         )}
-                    </HideForRegulatoryState>
+                    </IfFeatureEnabled>
                     {isMultisig && !isTestnet && (
                         <>
                             <MultisigOrdersMenuItem />
@@ -155,12 +157,14 @@ export const MobileProHomePage = () => {
                             <Divider />
                         </>
                     )}
-                    {canUseBattery && (
-                        <>
-                            <BatterySettingsListItem />
-                            <Divider />
-                        </>
-                    )}
+                    <IfFeatureEnabled feature={FLAGGED_FEATURE.BATTERY}>
+                        {canUseBattery && (
+                            <>
+                                <BatterySettingsListItem />
+                                <Divider />
+                            </>
+                        )}
+                    </IfFeatureEnabled>
                 </HideOnReview>
                 <MenuItem to={AppRoute.walletSettings}>
                     <SettingsSmoothIcon />
