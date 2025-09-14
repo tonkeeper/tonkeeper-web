@@ -6,11 +6,22 @@ import {
     StateInit as TonStateInit,
     toNano,
     SendMode,
-    internal
+    internal,
+    storeStateInit
 } from '@ton/core';
+import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
 import { getTonkeeperQueryId } from '../utils';
 import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
+
+export type TonRawTransaction = {
+    to: Address;
+    value: bigint;
+    bounce?: boolean;
+    body?: Cell;
+    init?: TonStateInit;
+    sendMode?: SendMode;
+};
 
 /**
  * https://github.com/tonkeeper/w5-subscriptions/blob/main/build/NativeSubExt.compiled.json
@@ -26,6 +37,13 @@ const OP = {
     DESTRUCT: 0x64737472
 } as const;
 
+const DEFAULT_V4_SUB_WALLET_ID = 698983191;
+
+export enum EncodedResultKinds {
+    V4 = 'v4',
+    V5 = 'v5'
+}
+
 export type OutActionWalletV5Exported = OutActionWalletV5;
 
 type DeployParams = {
@@ -40,14 +58,41 @@ type DeployParams = {
     withdrawMsgBody?: string;
 };
 
-type CreateResult = {
+type CreateResultV5 = {
+    kind: EncodedResultKinds.V5;
     actions: OutActionWalletV5[];
     extensionAddress: Address;
 };
 
+type CreateResultV4 = {
+    kind: EncodedResultKinds.V4;
+    tx: TonRawTransaction;
+    extensionAddress: Address;
+    extStateInit: Cell;
+    deployBody: Cell;
+    sendAmount: bigint;
+};
+
+export type CreateResult = CreateResultV5 | CreateResultV4;
+
+interface IRemoveV4ExtensionOptions {
+    validUntil: number;
+    seqno: number;
+    extension: Address;
+    amount: bigint;
+}
+
+interface IDeployV4ExtensionOptions {
+    validUntil: number;
+    seqno: number;
+    sendAmount: bigint;
+    extStateInit: Cell;
+    deployBody: Cell;
+}
+
 interface IBuildStateDataParams {
     wallet: Address;
-    walletVersion: WalletVersion.V5R1;
+    walletVersion: WalletVersion;
     beneficiary: Address;
     subscriptionId: number;
 }
@@ -62,22 +107,25 @@ interface IEncodeDeployBodyParams {
     withdrawMsgBody?: string;
 }
 
+// TODO Rename it after review
 export class SubscriptionV5Encoder {
+    public static readonly DEFAULT_SIGNATURE_TTL_SECONDS = 180;
+
     constructor(
         private readonly wallet: TonWalletStandard,
         private readonly defaultCodeBocBase64 = SUBSCRIPTION_V2_CODE_BOC
     ) {}
 
     encodeCreateSubscriptionV2(params: DeployParams): CreateResult {
-        const code = Cell.fromBoc(Buffer.from(this.defaultCodeBocBase64, 'base64'))[0];
-
-        if (this.wallet.version !== WalletVersion.V5R1) {
-            throw new Error(`Unsupported wallet version: ${this.wallet.version}`);
+        if (this.wallet.version < WalletVersion.V4R2) {
+            throw new Error('Unsupported wallet version!');
         }
 
         if (params.paymentPerPeriod < toNano('0.1')) {
             throw new Error("Subscription amount can't be less than 0.1 TON!");
         }
+
+        const code = Cell.fromBoc(Buffer.from(this.defaultCodeBocBase64, 'base64'))[0];
 
         const stateData = this.buildStateData({
             wallet: Address.parse(this.wallet.rawAddress),
@@ -108,23 +156,46 @@ export class SubscriptionV5Encoder {
             body
         });
 
-        const actions: OutActionWalletV5[] = [
-            { type: 'addExtension', address: extAddr },
-            {
-                type: 'sendMsg',
-                mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-                outMsg: initMsg
-            }
-        ];
+        if (this.isV5()) {
+            const actions: OutActionWalletV5[] = [
+                { type: 'addExtension', address: extAddr },
+                {
+                    type: 'sendMsg',
+                    mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+                    outMsg: initMsg
+                }
+            ];
 
-        return { actions, extensionAddress: extAddr };
+            return { kind: EncodedResultKinds.V5, actions, extensionAddress: extAddr };
+        }
+
+        const extStateInit = beginCell().store(storeStateInit(stateInit)).endCell();
+
+        const tx: TonRawTransaction = {
+            to: extAddr,
+            value: params.paymentPerPeriod,
+            bounce: true,
+            init: stateInit,
+            body,
+            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
+        };
+
+        return {
+            kind: EncodedResultKinds.V4,
+            tx,
+            extensionAddress: extAddr,
+            extStateInit,
+            deployBody: body,
+            sendAmount: params.paymentPerPeriod
+        };
     }
 
     encodeDestructAction(extension: Address): OutActionWalletV5[] {
-        const body = beginCell()
-            .storeUint(OP.DESTRUCT, 32)
-            .storeUint(getTonkeeperQueryId(), 64)
-            .endCell();
+        if (!this.isV5()) {
+            throw new Error('encodeDestructAction(): only for v5 wallets. For v4 — build raw tx.');
+        }
+
+        const body = this.buildDestructBody();
 
         const outMsg = internal({
             to: extension,
@@ -138,13 +209,14 @@ export class SubscriptionV5Encoder {
         ];
     }
 
+    private isV5() {
+        return this.wallet.version >= WalletVersion.V5R1;
+    }
+
     private buildStateData(params: IBuildStateDataParams): Cell {
         const precompiled = beginCell().storeCoins(0).storeRef(beginCell().endCell()).endCell();
 
-        const withdrawInfo = beginCell()
-            .storeAddress(null)
-            .storeRef(beginCell().endCell())
-            .endCell();
+        const withdrawInfo = beginCell().storeAddress(null).storeRef(Cell.EMPTY).endCell();
 
         return beginCell()
             .storeMaybeRef(null)
@@ -155,7 +227,7 @@ export class SubscriptionV5Encoder {
             .storeUint(0, 32)
             .storeCoins(0)
             .storeAddress(params.wallet)
-            .storeUint(51, 8)
+            .storeUint(params.walletVersion >= WalletVersion.V5R1 ? 51 : 42, 8)
             .storeAddress(params.beneficiary)
             .storeUint(params.subscriptionId, 64)
             .storeCoins(0)
@@ -186,5 +258,79 @@ export class SubscriptionV5Encoder {
         const boc = Buffer.from(message, 'hex');
 
         return Cell.fromBoc(boc)[0];
+    }
+
+    private resolveV4WalletId(): number {
+        if (this.wallet.version < WalletVersion.V4R2 || this.wallet.version >= WalletVersion.V5R1) {
+            throw new Error('Only V4 wallets supported!');
+        }
+
+        try {
+            const pub = this.wallet.publicKey;
+
+            if (!pub) {
+                return DEFAULT_V4_SUB_WALLET_ID;
+            }
+
+            const w4 = WalletContractV4.create({
+                workchain: 0,
+                publicKey: Buffer.from(pub, 'hex')
+            });
+
+            return w4.walletId;
+        } catch {
+            return DEFAULT_V4_SUB_WALLET_ID;
+        }
+    }
+
+    public static computeValidUntil(
+        ttlSeconds: number = this.DEFAULT_SIGNATURE_TTL_SECONDS
+    ): number {
+        const nowSeconds = Math.floor(Date.now() / 1000);
+
+        return nowSeconds + ttlSeconds;
+    }
+
+    public buildV4RemoveExtensionUnsignedBody(options: IRemoveV4ExtensionOptions): Cell {
+        const { validUntil, seqno, extension, amount } = options;
+        const walletId = this.resolveV4WalletId();
+
+        return beginCell()
+            .storeUint(walletId, 32)
+            .storeUint(validUntil, 32)
+            .storeUint(seqno, 32)
+            .storeUint(3, 8)
+            .storeUint(0, 8)
+            .storeBuffer(extension.hash)
+            .storeCoins(amount)
+            .storeUint(getTonkeeperQueryId(), 64)
+            .endCell();
+    }
+
+    public buildV4DeployAndLinkUnsignedBody(options: IDeployV4ExtensionOptions): Cell {
+        const { validUntil, seqno, sendAmount, extStateInit, deployBody } = options;
+        const walletId = this.resolveV4WalletId();
+
+        return beginCell()
+            .storeUint(walletId, 32)
+            .storeUint(validUntil, 32)
+            .storeUint(seqno, 32)
+            .storeUint(1, 8)
+            .storeUint(0, 8)
+            .storeCoins(sendAmount)
+            .storeRef(extStateInit)
+            .storeRef(deployBody)
+            .endCell();
+    }
+
+    public buildV4SignedBody(signature: Buffer, unsigned: Cell): Cell {
+        return beginCell().storeBuffer(signature).storeSlice(unsigned.beginParse()).endCell();
+    }
+
+    public buildDestructBody(): Cell {
+        return beginCell()
+            .storeUint(OP.DESTRUCT, 32)
+            .storeUint(getTonkeeperQueryId(), 64)
+            .endCell();
     }
 }

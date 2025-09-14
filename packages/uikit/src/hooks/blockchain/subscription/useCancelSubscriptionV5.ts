@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Address } from '@ton/core';
-import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
+import { Address, toNano } from '@ton/core';
+import { TonWalletStandard, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
+import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { useActiveApi, useAccountWallets } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
@@ -10,7 +12,11 @@ import {
     type OutActionWalletV5Exported
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
-import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import {
+    estimationSigner,
+    externalMessage,
+    getWalletSeqNo
+} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { QueryKey } from '../../../libs/queryKey';
 import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
@@ -20,6 +26,9 @@ type CancelParams = {
     extensionContract: string;
 };
 
+const DEFAULT_V4_REMOVE_EXTENSION_AMOUNT = toNano('0.1');
+
+// TODO Rename it after review
 export const useCancelSubscriptionV5 = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
@@ -48,17 +57,43 @@ export const useCancelSubscriptionV5 = () => {
 
         const encoder = new SubscriptionV5Encoder(selectedWallet);
 
-        const destruct = encoder.encodeDestructAction(extensionAddress);
+        if (selectedWallet.version >= WalletVersion.V5R1) {
+            const destruct = encoder.encodeDestructAction(extensionAddress);
 
-        const remove: OutActionWalletV5Exported = {
-            type: 'removeExtension',
-            address: extensionAddress
-        };
+            const remove: OutActionWalletV5Exported = {
+                type: 'removeExtension',
+                address: extensionAddress
+            };
 
-        const actions = [...destruct, remove];
+            const actions = [...destruct, remove];
 
-        const sender = new WalletMessageSender(api, selectedWallet, signer);
-        await sender.send(actions);
+            const sender = new WalletMessageSender(api, selectedWallet, signer);
+            await sender.send(actions);
+
+            await client.invalidateQueries([QueryKey.pro]);
+
+            return true;
+        }
+
+        const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
+
+        const unsigned = encoder.buildV4RemoveExtensionUnsignedBody({
+            validUntil: SubscriptionV5Encoder.computeValidUntil(),
+            seqno,
+            extension: extensionAddress,
+            amount: DEFAULT_V4_REMOVE_EXTENSION_AMOUNT
+        });
+
+        const signature: Buffer = await signer(unsigned);
+
+        const body = encoder.buildV4SignedBody(signature, unsigned);
+
+        const walletContract = walletContractFromState(selectedWallet);
+        const externalCell = externalMessage(walletContract, seqno, body);
+
+        await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+            sendBlockchainMessageRequest: { boc: externalCell.toBoc().toString('base64') }
+        });
 
         await client.invalidateQueries([QueryKey.pro]);
 
@@ -73,23 +108,37 @@ export const useEstimateRemoveExtension = () => {
         async subscriptionParams => {
             const { selectedWallet, extensionContract } = subscriptionParams;
 
+            const extensionAddress = Address.parse(extensionContract);
             const rawTx = new TonRawTransactionService(api, selectedWallet);
             const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
 
-            const extensionAddress = Address.parse(extensionContract);
-
             const encoder = new SubscriptionV5Encoder(selectedWallet);
 
-            const destruct = encoder.encodeDestructAction(extensionAddress);
+            if (selectedWallet.version >= WalletVersion.V5R1) {
+                const destruct = encoder.encodeDestructAction(extensionAddress);
 
-            const remove: OutActionWalletV5Exported = {
-                type: 'removeExtension',
-                address: extensionAddress
+                const remove: OutActionWalletV5Exported = {
+                    type: 'removeExtension',
+                    address: extensionAddress
+                };
+
+                const actions = [...destruct, remove];
+
+                const estimation = await rawTx.estimate(sender, actions);
+
+                return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
+            }
+
+            const body = encoder.buildDestructBody();
+
+            const approximationTx = {
+                to: extensionAddress,
+                value: DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
+                bounce: true,
+                body
             };
 
-            const actions = [...destruct, remove];
-
-            const estimation = await rawTx.estimate(sender, actions);
+            const estimation = await rawTx.estimate(sender, approximationTx);
 
             return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
         }
