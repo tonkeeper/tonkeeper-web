@@ -227,7 +227,7 @@ export class SubscriptionV5Encoder {
             .storeUint(0, 32)
             .storeCoins(0)
             .storeAddress(params.wallet)
-            .storeUint(params.walletVersion >= WalletVersion.V5R1 ? 51 : 42, 8)
+            .storeUint(params.walletVersion >= WalletVersion.V5R1 ? 51 : 4, 8)
             .storeAddress(params.beneficiary)
             .storeUint(params.subscriptionId, 64)
             .storeCoins(0)
