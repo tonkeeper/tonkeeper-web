@@ -204,10 +204,10 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                             <CardTitle>{t('battery_title')}</CardTitle>
                             <CardSubtitle>{t('topup_tron_fee_battery_description')}</CardSubtitle>
                         </MethodInfo>
-                        {batterySenderFee.fiatAmount ? (
+                        {batterySenderFee.charges !== undefined ? (
                             <CardSubtitle>
-                                {t('topup_tron_fee_price_per_transfer', {
-                                    fiat: batterySenderFee.fiatAmount
+                                {t('topup_tron_fee_charges_per_transfer', {
+                                    charges: batterySenderFee.charges
                                 })}
                             </CardSubtitle>
                         ) : (

@@ -24,7 +24,7 @@ import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
 import { SelectDropDown } from '../fields/Select';
 import { DropDownContent, DropDownItem, DropDownItemsDivider } from '../DropDown';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { useBatteryBalance, useBatteryUnitTonRate } from '../../state/battery';
+import { useBatteryBalance } from '../../state/battery';
 import {
     isTransactionFeeRefund,
     TransactionFee,
@@ -633,22 +633,12 @@ const SenderDropdownItemTronBattery: FC<{
 }> = ({ fee, isEnoughBalance }) => {
     const { t } = useTranslation();
 
-    const batteryUnitRate = useBatteryUnitTonRate();
-    const { data: tonRate } = useRate(tonAssetAddressToString(TON_ASSET.address));
-    const { fiatAmount } = useFormatFiat(tonRate, batteryUnitRate.multipliedBy(fee.charges));
-
     return (
         <>
             <BatteryIcon />
             <SenderText>
                 <Label2>{t('battery_title')}</Label2>
-                {fiatAmount ? (
-                    <Body3Secondary>
-                        ≈{fiatAmount} ({t('battery_charges', { charges: fee.charges })})
-                    </Body3Secondary>
-                ) : (
-                    <Skeleton height="14px" marginTop="2px" width="100px" />
-                )}
+                <Body3Secondary>{t('battery_charges', { charges: fee.charges })}</Body3Secondary>
                 {!isEnoughBalance && <RefillText />}
             </SenderText>
         </>
@@ -669,7 +659,7 @@ const SenderDropdownItemTronTrxOrTonAsset: FC<{
                 <Label2>{fee.extra.asset.symbol}</Label2>
                 {fiatAmount ? (
                     <Body3Secondary>
-                        ≈{fiatAmount} ({fee.extra.stringAssetRelativeAmount})
+                        {fee.extra.stringAssetRelativeAmount} (≈ {fiatAmount})
                     </Body3Secondary>
                 ) : (
                     <Skeleton height="14px" marginTop="2px" width="100px" />

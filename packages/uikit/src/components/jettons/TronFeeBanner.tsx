@@ -341,7 +341,13 @@ const FeeTable = () => {
                         : undefined
                 }
                 transfersNumber={batteryTransfers}
-                fiatPerTransfer={batterySenderFee.fiatAmount}
+                fiatPerTransfer={
+                    batterySenderFee.charges !== undefined
+                        ? t('battery_charges', {
+                              charges: batterySenderFee.charges
+                          })
+                        : undefined
+                }
                 onRefill={() =>
                     navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
                         disableMobileAnimation: true
