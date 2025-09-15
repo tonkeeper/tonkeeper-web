@@ -297,6 +297,12 @@ export const Loader: FC = () => {
         window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
     }, []);
 
+    useEffect(() => {
+        if (!serverConfig?.mainnetConfig) return;
+
+        setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+    }, [serverConfig?.mainnetConfig]);
+
     if (
         activeWalletLoading ||
         isLangLoading ||
@@ -310,9 +316,6 @@ export const Loader: FC = () => {
     ) {
         return <Loading />;
     }
-
-    // set api url synchronously
-    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

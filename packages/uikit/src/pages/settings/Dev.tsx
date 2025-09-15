@@ -34,6 +34,9 @@ import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
 import { useDevMenuVisibility } from '../../state/dev';
+import { setProApiUrl } from '@tonkeeper/core/dist/entries/network';
+import { OpenAPI as TonConsoleApi } from '@tonkeeper/core/dist/pro';
+import { compareNumericStrings } from '@tonkeeper/core/dist/utils/common';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -139,6 +142,37 @@ const LogsSettings = () => {
                 <ListItem hover={false} onClick={() => navigate('.' + DevSettingsRoute.logs)}>
                     <ListItemPayload>
                         <Label1>Dev Logs</Label1>
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+        </HideOnReview>
+    );
+};
+
+const EnvironmentToggle = () => {
+    const sdk = useAppSdk();
+    const { mainnetConfig } = useAppContext();
+
+    const [isDevEnvironment, setIsDevEnvironment] = useState(
+        mainnetConfig.pro_dev_api_url === TonConsoleApi.BASE
+    );
+
+    if (compareNumericStrings(sdk.version, mainnetConfig.pro_apk_name ?? '')) {
+        return null;
+    }
+
+    const handleChange = (checked: boolean) => {
+        setIsDevEnvironment(checked);
+        setProApiUrl(checked ? mainnetConfig.pro_dev_api_url : mainnetConfig.pro_api_url);
+    };
+
+    return (
+        <HideOnReview>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false}>
+                    <ListItemPayload>
+                        <Label1>Is dev environment on?</Label1>
+                        <Switch checked={isDevEnvironment} onChange={handleChange} />
                     </ListItemPayload>
                 </ListItem>
             </ListBlockDesktopAdaptive>
@@ -271,6 +305,7 @@ export const DevSettings = React.memo(() => {
                 <AddAccountBySK />
                 <ReviewerSettings />
                 <LogsSettings />
+                <EnvironmentToggle />
             </DesktopWrapper>
         );
     }

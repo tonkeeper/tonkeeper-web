@@ -228,6 +228,12 @@ export const Loader: FC = React.memo(() => {
         accounts
     );
 
+    useEffect(() => {
+        if (!serverConfig?.mainnetConfig) return;
+
+        setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+    }, [serverConfig?.mainnetConfig]);
+
     if (
         activeWalletLoading ||
         isWalletsLoading ||
@@ -244,9 +250,6 @@ export const Loader: FC = React.memo(() => {
             </FullSizeWrapper>
         );
     }
-
-    // set api url synchronously
-    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

@@ -402,3 +402,10 @@ export function withRetry<TArgs extends unknown[], TResult>(
         throw lastError;
     };
 }
+
+export function compareNumericStrings(a: string, b: string): boolean {
+    const numA = Number((a.match(/\d+/g) || []).join(''));
+    const numB = Number((b.match(/\d+/g) || []).join(''));
+
+    return numA > numB;
+}

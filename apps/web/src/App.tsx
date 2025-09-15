@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Account } from '@tonkeeper/core/dist/entries/account';
 import { localizationText } from '@tonkeeper/core/dist/entries/language';
-import { getApiConfig, setProApiUrl } from "@tonkeeper/core/dist/entries/network";
+import { getApiConfig, setProApiUrl } from '@tonkeeper/core/dist/entries/network';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { CopyNotification } from '@tonkeeper/uikit/dist/components/CopyNotification';
 import { FooterGlobalStyle } from '@tonkeeper/uikit/dist/components/Footer';
@@ -43,7 +43,7 @@ import { useGlobalPreferencesQuery } from '@tonkeeper/uikit/dist/state/global-pr
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { useIsActiveAccountMultisig } from '@tonkeeper/uikit/dist/state/multisig';
 import { BrowserRouter } from 'react-router-dom';
-import { localesList } from "@tonkeeper/locales/localesList";
+import { localesList } from '@tonkeeper/locales/localesList';
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 const QrScanner = React.lazy(() => import('@tonkeeper/uikit/dist/components/QrScanner'));
@@ -151,7 +151,12 @@ const Loader: FC = () => {
 
     useAppHeight();
 
-    const { data: tracker } = useAnalytics(activeAccount || undefined, accounts, sdk.version, serverConfig?.mainnetConfig);
+    const { data: tracker } = useAnalytics(
+        activeAccount || undefined,
+        accounts,
+        sdk.version,
+        serverConfig?.mainnetConfig
+    );
 
     useEffect(() => {
         if (activeAccount && lang && i18n.language !== localizationText(lang)) {
@@ -162,6 +167,12 @@ const Loader: FC = () => {
     }, [activeAccount, i18n]);
 
     const isMobile = useLayout();
+
+    useEffect(() => {
+        if (!serverConfig?.mainnetConfig) return;
+
+        setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+    }, [serverConfig?.mainnetConfig]);
 
     if (
         isWalletsLoading ||
@@ -176,9 +187,6 @@ const Loader: FC = () => {
     ) {
         return <Loading />;
     }
-
-    // set api url synchronously
-    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

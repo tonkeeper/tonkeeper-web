@@ -223,6 +223,12 @@ export const Loader: FC = () => {
         }
     }, [config]);
 
+    useEffect(() => {
+        if (!config?.mainnetConfig) return;
+
+        setProApiUrl(config.mainnetConfig.pro_api_url);
+    }, [config?.mainnetConfig]);
+
     if (
         activeWalletLoading ||
         isLangLoading ||
@@ -236,9 +242,6 @@ export const Loader: FC = () => {
     ) {
         return null;
     }
-
-    // set api url synchronously
-    setProApiUrl(config.mainnetConfig.pro_api_url);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(config.mainnetConfig),
