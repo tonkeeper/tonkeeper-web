@@ -215,7 +215,8 @@ export class LedgerMessageSender implements ISender {
             payload: {
                 knownJetton: null,
                 type: 'jetton-transfer',
-                queryId: getTonkeeperQueryId(),
+                // temporary set to 0 because of ledger app 2.7.0 issue
+                queryId: BigInt(0), // getTonkeeperQueryId(),
                 amount: BigInt(amount.stringWeiAmount),
                 destination: Address.parse(to),
                 responseDestination: Address.parse(this.wallet.rawAddress),
