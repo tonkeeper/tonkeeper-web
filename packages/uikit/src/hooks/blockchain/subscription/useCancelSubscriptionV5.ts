@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Address, toNano } from '@ton/core';
+import { Address } from '@ton/core';
 import { TonWalletStandard, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
@@ -25,8 +25,6 @@ type CancelParams = {
     selectedWallet: TonWalletStandard;
     extensionContract: string;
 };
-
-const DEFAULT_V4_REMOVE_EXTENSION_AMOUNT = toNano('0.1');
 
 // TODO Rename it after review
 export const useCancelSubscriptionV5 = () => {
@@ -81,7 +79,7 @@ export const useCancelSubscriptionV5 = () => {
             validUntil: SubscriptionV5Encoder.computeValidUntil(),
             seqno,
             extension: extensionAddress,
-            amount: DEFAULT_V4_REMOVE_EXTENSION_AMOUNT
+            amount: SubscriptionV5Encoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT
         });
 
         const signature: Buffer = await signer(unsigned);
@@ -133,7 +131,7 @@ export const useEstimateRemoveExtension = () => {
 
             const approximationTx = {
                 to: extensionAddress,
-                value: DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
+                value: SubscriptionV5Encoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
                 bounce: true,
                 body
             };

@@ -11,7 +11,9 @@ import {
 } from '@ton/core';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
+
 import { getTonkeeperQueryId } from '../utils';
+import { assertUnreachable } from '../../../utils/types';
 import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
 
 export type TonRawTransaction = {
@@ -91,8 +93,6 @@ interface IDeployV4ExtensionOptions {
 }
 
 interface IBuildStateDataParams {
-    wallet: Address;
-    walletVersion: WalletVersion;
     beneficiary: Address;
     subscriptionId: number;
 }
@@ -111,25 +111,27 @@ interface IEncodeDeployBodyParams {
 export class SubscriptionV5Encoder {
     public static readonly DEFAULT_SIGNATURE_TTL_SECONDS = 180;
 
+    public static readonly MIN_EXTENSION_AMOUNT = toNano('0.1');
+
+    public static readonly DEFAULT_V4_REMOVE_EXTENSION_AMOUNT = toNano('0.015');
+
     constructor(
         private readonly wallet: TonWalletStandard,
         private readonly defaultCodeBocBase64 = SUBSCRIPTION_V2_CODE_BOC
     ) {}
 
     encodeCreateSubscriptionV2(params: DeployParams): CreateResult {
-        if (this.wallet.version < WalletVersion.V4R2) {
+        if (this.wallet.version < WalletVersion.V4R1) {
             throw new Error('Unsupported wallet version!');
         }
 
-        if (params.paymentPerPeriod < toNano('0.1')) {
+        if (params.paymentPerPeriod < SubscriptionV5Encoder.MIN_EXTENSION_AMOUNT) {
             throw new Error("Subscription amount can't be less than 0.1 TON!");
         }
 
         const code = Cell.fromBoc(Buffer.from(this.defaultCodeBocBase64, 'base64'))[0];
 
         const stateData = this.buildStateData({
-            wallet: Address.parse(this.wallet.rawAddress),
-            walletVersion: this.wallet.version,
             beneficiary: params.beneficiary,
             subscriptionId: params.subscriptionId ?? Date.now()
         });
@@ -192,7 +194,7 @@ export class SubscriptionV5Encoder {
 
     encodeDestructAction(extension: Address): OutActionWalletV5[] {
         if (!this.isV5()) {
-            throw new Error('encodeDestructAction(): only for v5 wallets. For v4 — build raw tx.');
+            throw new Error('Only V5 wallets supported!');
         }
 
         const body = this.buildDestructBody();
@@ -200,7 +202,7 @@ export class SubscriptionV5Encoder {
         const outMsg = internal({
             to: extension,
             bounce: true,
-            value: toNano('0.05'),
+            value: SubscriptionV5Encoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
             body
         });
 
@@ -209,8 +211,29 @@ export class SubscriptionV5Encoder {
         ];
     }
 
+    private resolveWalletKind(): EncodedResultKinds {
+        if (
+            this.wallet.version === WalletVersion.V3R1 ||
+            this.wallet.version === WalletVersion.V3R2
+        ) {
+            throw new Error('Unsupported wallet version!');
+        }
+
+        switch (this.wallet.version) {
+            case WalletVersion.V4R1:
+            case WalletVersion.V4R2:
+                return EncodedResultKinds.V4;
+            case WalletVersion.V5_BETA:
+            case WalletVersion.V5R1:
+                return EncodedResultKinds.V5;
+            default: {
+                return assertUnreachable(this.wallet.version);
+            }
+        }
+    }
+
     private isV5() {
-        return this.wallet.version >= WalletVersion.V5R1;
+        return this.resolveWalletKind() === EncodedResultKinds.V5;
     }
 
     private buildStateData(params: IBuildStateDataParams): Cell {
@@ -226,10 +249,10 @@ export class SubscriptionV5Encoder {
             .storeRef(precompiled)
             .storeUint(0, 32)
             .storeCoins(0)
-            .storeAddress(params.wallet)
-            .storeUint(params.walletVersion >= WalletVersion.V5R1 ? 51 : 4, 8)
+            .storeAddress(Address.parse(this.wallet.rawAddress))
+            .storeUint(this.isV5() ? 51 : 4, 8)
             .storeAddress(params.beneficiary)
-            .storeUint(params.subscriptionId, 64)
+            .storeUint(params.subscriptionId, 32)
             .storeCoins(0)
             .storeUint(0, 32)
             .storeRef(withdrawInfo)
