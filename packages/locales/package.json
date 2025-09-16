@@ -5,6 +5,8 @@
     "description": "Tonkeeper locales",
     "scripts": {
         "build": "ts-node ./task/build",
+        "find-unused": "ts-node ./task/find-unused-keys.ts",
+        "find-missing": "ts-node ./task/find-missing-keys.ts",
         "build:pkg": "yarn build"
     },
     "devDependencies": {
