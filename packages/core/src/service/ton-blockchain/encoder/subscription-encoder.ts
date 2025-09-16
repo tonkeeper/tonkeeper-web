@@ -16,15 +16,6 @@ import { getTonkeeperQueryId } from '../utils';
 import { assertUnreachable } from '../../../utils/types';
 import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
 
-export type TonRawTransaction = {
-    to: Address;
-    value: bigint;
-    bounce?: boolean;
-    body?: Cell;
-    init?: TonStateInit;
-    sendMode?: SendMode;
-};
-
 /**
  * https://github.com/tonkeeper/w5-subscriptions/blob/main/build/NativeSubExt.compiled.json
  */
@@ -60,6 +51,8 @@ type DeployParams = {
     withdrawMsgBody?: string;
 };
 
+export type CreateResult = CreateResultV5 | CreateResultV4;
+
 type CreateResultV5 = {
     kind: EncodedResultKinds.V5;
     actions: OutActionWalletV5[];
@@ -68,24 +61,18 @@ type CreateResultV5 = {
 
 type CreateResultV4 = {
     kind: EncodedResultKinds.V4;
-    tx: TonRawTransaction;
     extensionAddress: Address;
     extStateInit: Cell;
     deployBody: Cell;
     sendAmount: bigint;
 };
 
-export type CreateResult = CreateResultV5 | CreateResultV4;
-
 interface IRemoveV4ExtensionOptions {
-    validUntil: number;
     seqno: number;
-    extension: Address;
-    amount: bigint;
+    extensionAddress: Address;
 }
 
 interface IDeployV4ExtensionOptions {
-    validUntil: number;
     seqno: number;
     sendAmount: bigint;
     extStateInit: Cell;
@@ -137,7 +124,7 @@ export class SubscriptionEncoder {
 
         const stateInit: TonStateInit = { code, data: stateData };
 
-        const extAddr = contractAddress(0, stateInit);
+        const extensionAddress = contractAddress(0, stateInit);
 
         const body = this.encodeDeployBody({
             firstChargingDate: params.firstChargingDate,
@@ -150,7 +137,7 @@ export class SubscriptionEncoder {
         });
 
         const initMsg = internal({
-            to: extAddr,
+            to: extensionAddress,
             bounce: true,
             value: params.paymentPerPeriod,
             init: stateInit,
@@ -159,7 +146,7 @@ export class SubscriptionEncoder {
 
         if (this.isV5()) {
             const actions: OutActionWalletV5[] = [
-                { type: 'addExtension', address: extAddr },
+                { type: 'addExtension', address: extensionAddress },
                 {
                     type: 'sendMsg',
                     mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
@@ -167,24 +154,14 @@ export class SubscriptionEncoder {
                 }
             ];
 
-            return { kind: EncodedResultKinds.V5, actions, extensionAddress: extAddr };
+            return { kind: EncodedResultKinds.V5, actions, extensionAddress };
         }
 
         const extStateInit = beginCell().store(storeStateInit(stateInit)).endCell();
 
-        const tx: TonRawTransaction = {
-            to: extAddr,
-            value: params.paymentPerPeriod,
-            bounce: true,
-            init: stateInit,
-            body,
-            sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS
-        };
-
         return {
             kind: EncodedResultKinds.V4,
-            tx,
-            extensionAddress: extAddr,
+            extensionAddress,
             extStateInit,
             deployBody: body,
             sendAmount: params.paymentPerPeriod
@@ -212,17 +189,15 @@ export class SubscriptionEncoder {
 
     private resolveWalletKind(): EncodedResultKinds {
         if (
-            this.wallet.version === WalletVersion.V3R1 ||
-            this.wallet.version === WalletVersion.V3R2
+            this.wallet.version !== WalletVersion.V4R2 &&
+            this.wallet.version !== WalletVersion.V5R1
         ) {
             throw new Error('Unsupported wallet version!');
         }
 
         switch (this.wallet.version) {
-            case WalletVersion.V4R1:
             case WalletVersion.V4R2:
                 return EncodedResultKinds.V4;
-            case WalletVersion.V5_BETA:
             case WalletVersion.V5R1:
                 return EncodedResultKinds.V5;
             default: {
@@ -314,8 +289,11 @@ export class SubscriptionEncoder {
     }
 
     public buildV4RemoveExtensionUnsignedBody(options: IRemoveV4ExtensionOptions): Cell {
-        const { validUntil, seqno, extension, amount } = options;
+        const { seqno, extensionAddress } = options;
+
+        const amount = SubscriptionEncoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT;
         const walletId = this.resolveV4WalletId();
+        const validUntil = SubscriptionEncoder.computeValidUntil();
 
         return beginCell()
             .storeUint(walletId, 32)
@@ -323,15 +301,17 @@ export class SubscriptionEncoder {
             .storeUint(seqno, 32)
             .storeUint(3, 8)
             .storeUint(0, 8)
-            .storeBuffer(extension.hash)
+            .storeBuffer(extensionAddress.hash)
             .storeCoins(amount)
             .storeUint(getTonkeeperQueryId(), 64)
             .endCell();
     }
 
     public buildV4DeployAndLinkUnsignedBody(options: IDeployV4ExtensionOptions): Cell {
-        const { validUntil, seqno, sendAmount, extStateInit, deployBody } = options;
+        const { seqno, sendAmount, extStateInit, deployBody } = options;
+
         const walletId = this.resolveV4WalletId();
+        const validUntil = SubscriptionEncoder.computeValidUntil();
 
         return beginCell()
             .storeUint(walletId, 32)

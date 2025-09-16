@@ -7,7 +7,13 @@ import {
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import {
+    estimationSigner,
+    externalMessage,
+    getWalletSeqNo
+} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
+import { EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
 
 import { useActiveApi } from '../../../state/wallet';
 import { SubscriptionEncodingParams } from './commonTypes';
@@ -55,7 +61,21 @@ export const useEstimateDeploySubscription = () => {
         }
 
         if (result.kind === EncodedResultKinds.V4) {
-            estimation = await rawTx.estimate(sender, result.tx);
+            const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
+
+            const unsigned = encoder.buildV4DeployAndLinkUnsignedBody({
+                seqno,
+                sendAmount: result.sendAmount,
+                extStateInit: result.extStateInit,
+                deployBody: result.deployBody
+            });
+
+            const walletContract = walletContractFromState(selectedWallet);
+            const externalCell = externalMessage(walletContract, seqno, unsigned);
+
+            estimation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+                emulateMessageToWalletRequest: { boc: externalCell.toBoc().toString('base64') }
+            });
         }
 
         if (!estimation) {

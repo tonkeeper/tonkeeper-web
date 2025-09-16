@@ -7,7 +7,6 @@ import {
     EncodedResultKinds,
     SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { externalMessage, getWalletSeqNo } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
@@ -63,11 +62,11 @@ export const useCreateSubscription = () => {
             withdrawMsgBody: withdraw_msg_body
         });
 
-        if (Address.parse(contract).toString() !== result.extensionAddress.toString()) {
+        if (!result.extensionAddress.equals(Address.parse(contract))) {
             throw new Error('Contract extension addresses do not match!');
         }
 
-        if (selectedWallet.version >= WalletVersion.V5R1 && result.kind === EncodedResultKinds.V5) {
+        if (result.kind === EncodedResultKinds.V5) {
             const sender = new WalletMessageSender(api, selectedWallet, signer);
             await sender.send(result.actions);
 
@@ -78,7 +77,6 @@ export const useCreateSubscription = () => {
             const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
 
             const unsigned = encoder.buildV4DeployAndLinkUnsignedBody({
-                validUntil: SubscriptionEncoder.computeValidUntil(),
                 seqno,
                 sendAmount: result.sendAmount,
                 extStateInit: result.extStateInit,

@@ -44,7 +44,7 @@ export const useCancelSubscription = () => {
 
         const encoder = new SubscriptionEncoder(selectedWallet);
 
-        if (selectedWallet.version >= WalletVersion.V5R1) {
+        if (selectedWallet.version === WalletVersion.V5R1) {
             const destruct = encoder.encodeDestructAction(extensionAddress);
 
             const remove: OutActionWalletV5Exported = {
@@ -62,28 +62,30 @@ export const useCancelSubscription = () => {
             return true;
         }
 
-        const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
+        if (selectedWallet.version === WalletVersion.V4R2) {
+            const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
 
-        const unsigned = encoder.buildV4RemoveExtensionUnsignedBody({
-            validUntil: SubscriptionEncoder.computeValidUntil(),
-            seqno,
-            extension: extensionAddress,
-            amount: SubscriptionEncoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT
-        });
+            const unsigned = encoder.buildV4RemoveExtensionUnsignedBody({
+                seqno,
+                extensionAddress
+            });
 
-        const signature: Buffer = await signer(unsigned);
+            const signature: Buffer = await signer(unsigned);
 
-        const body = encoder.buildV4SignedBody(signature, unsigned);
+            const body = encoder.buildV4SignedBody(signature, unsigned);
 
-        const walletContract = walletContractFromState(selectedWallet);
-        const externalCell = externalMessage(walletContract, seqno, body);
+            const walletContract = walletContractFromState(selectedWallet);
+            const externalCell = externalMessage(walletContract, seqno, body);
 
-        await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-            sendBlockchainMessageRequest: { boc: externalCell.toBoc().toString('base64') }
-        });
+            await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
+                sendBlockchainMessageRequest: { boc: externalCell.toBoc().toString('base64') }
+            });
 
-        await client.invalidateQueries([QueryKey.pro]);
+            await client.invalidateQueries([QueryKey.pro]);
 
-        return true;
+            return true;
+        }
+
+        throw new Error('Unsupported wallet version flow');
     });
 };

@@ -3,12 +3,18 @@ import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/tran
 import { Address } from '@ton/core';
 import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import {
+    estimationSigner,
+    externalMessage,
+    getWalletSeqNo
+} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import {
     type OutActionWalletV5Exported,
     SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
+import { EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
 
 import { useActiveApi } from '../../../state/wallet';
 import { CancelParams } from './commonTypes';
@@ -26,7 +32,8 @@ export const useEstimateRemoveExtension = () => {
 
             const encoder = new SubscriptionEncoder(selectedWallet);
 
-            if (selectedWallet.version >= WalletVersion.V5R1) {
+            let estimation;
+            if (selectedWallet.version === WalletVersion.V5R1) {
                 const destruct = encoder.encodeDestructAction(extensionAddress);
 
                 const remove: OutActionWalletV5Exported = {
@@ -36,21 +43,30 @@ export const useEstimateRemoveExtension = () => {
 
                 const actions = [...destruct, remove];
 
-                const estimation = await rawTx.estimate(sender, actions);
+                estimation = await rawTx.estimate(sender, actions);
 
                 return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
             }
 
-            const body = encoder.buildDestructBody();
+            if (selectedWallet.version === WalletVersion.V4R2) {
+                const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
 
-            const approximationTx = {
-                to: extensionAddress,
-                value: SubscriptionEncoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
-                bounce: true,
-                body
-            };
+                const unsigned = encoder.buildV4RemoveExtensionUnsignedBody({
+                    seqno,
+                    extensionAddress
+                });
 
-            const estimation = await rawTx.estimate(sender, approximationTx);
+                const walletContract = walletContractFromState(selectedWallet);
+                const externalCell = externalMessage(walletContract, seqno, unsigned);
+
+                estimation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
+                    emulateMessageToWalletRequest: { boc: externalCell.toBoc().toString('base64') }
+                });
+            }
+
+            if (!estimation) {
+                throw new Error('Unsupported wallet version flow!');
+            }
 
             return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
         }
