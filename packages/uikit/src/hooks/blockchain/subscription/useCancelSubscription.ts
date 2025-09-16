@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { TonWalletStandard, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { useActiveApi, useAccountWallets } from '../../../state/wallet';
@@ -8,26 +8,15 @@ import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import {
-    SubscriptionV5Encoder,
+    SubscriptionEncoder,
     type OutActionWalletV5Exported
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
-import {
-    estimationSigner,
-    externalMessage,
-    getWalletSeqNo
-} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { externalMessage, getWalletSeqNo } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { QueryKey } from '../../../libs/queryKey';
-import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
+import { CancelParams } from './commonTypes';
 
-type CancelParams = {
-    selectedWallet: TonWalletStandard;
-    extensionContract: string;
-};
-
-// TODO Rename it after review
-export const useCancelSubscriptionV5 = () => {
+export const useCancelSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
     const client = useQueryClient();
@@ -53,7 +42,7 @@ export const useCancelSubscriptionV5 = () => {
 
         const extensionAddress = Address.parse(extensionContract);
 
-        const encoder = new SubscriptionV5Encoder(selectedWallet);
+        const encoder = new SubscriptionEncoder(selectedWallet);
 
         if (selectedWallet.version >= WalletVersion.V5R1) {
             const destruct = encoder.encodeDestructAction(extensionAddress);
@@ -76,10 +65,10 @@ export const useCancelSubscriptionV5 = () => {
         const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
 
         const unsigned = encoder.buildV4RemoveExtensionUnsignedBody({
-            validUntil: SubscriptionV5Encoder.computeValidUntil(),
+            validUntil: SubscriptionEncoder.computeValidUntil(),
             seqno,
             extension: extensionAddress,
-            amount: SubscriptionV5Encoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT
+            amount: SubscriptionEncoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT
         });
 
         const signature: Buffer = await signer(unsigned);
@@ -97,48 +86,4 @@ export const useCancelSubscriptionV5 = () => {
 
         return true;
     });
-};
-
-export const useEstimateRemoveExtension = () => {
-    const api = useActiveApi();
-
-    return useMutation<{ fee: TransactionFeeTonAsset; address: Address }, Error, CancelParams>(
-        async subscriptionParams => {
-            const { selectedWallet, extensionContract } = subscriptionParams;
-
-            const extensionAddress = Address.parse(extensionContract);
-            const rawTx = new TonRawTransactionService(api, selectedWallet);
-            const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
-
-            const encoder = new SubscriptionV5Encoder(selectedWallet);
-
-            if (selectedWallet.version >= WalletVersion.V5R1) {
-                const destruct = encoder.encodeDestructAction(extensionAddress);
-
-                const remove: OutActionWalletV5Exported = {
-                    type: 'removeExtension',
-                    address: extensionAddress
-                };
-
-                const actions = [...destruct, remove];
-
-                const estimation = await rawTx.estimate(sender, actions);
-
-                return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
-            }
-
-            const body = encoder.buildDestructBody();
-
-            const approximationTx = {
-                to: extensionAddress,
-                value: SubscriptionV5Encoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
-                bounce: true,
-                body
-            };
-
-            const estimation = await rawTx.estimate(sender, approximationTx);
-
-            return { fee: estimation.fee as TransactionFeeTonAsset, address: extensionAddress };
-        }
-    );
 };

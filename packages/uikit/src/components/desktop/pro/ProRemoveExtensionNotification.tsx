@@ -17,9 +17,9 @@ import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { toNano } from '@ton/core';
 import {
-    useCancelSubscriptionV5,
+    useCancelSubscription,
     useEstimateRemoveExtension
-} from '../../../hooks/blockchain/subscription/useCancelSubscriptionV5';
+} from '../../../hooks/blockchain/subscription';
 import { ListItem, ListItemPayload } from '../../List';
 import { useTranslation } from '../../../hooks/translation';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
@@ -98,7 +98,7 @@ const ProRemoveExtensionNotificationContent: FC<
     const formatDate = useDateTimeFormat();
     const { data: rate } = useRate(CryptoCurrency.TON);
 
-    const removeMutation = useCancelSubscriptionV5();
+    const removeMutation = useCancelSubscription();
     const estimateFeeMutation = useEstimateRemoveExtension();
 
     const feeEquivalent: string = useMemo(

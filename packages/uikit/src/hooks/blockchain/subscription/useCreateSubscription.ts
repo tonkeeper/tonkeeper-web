@@ -5,28 +5,17 @@ import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import {
     EncodedResultKinds,
-    SubscriptionV5Encoder
+    SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { SubscriptionExtension } from '@tonkeeper/core/dist/pro';
-import { TonWalletStandard, WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
+import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
-import {
-    estimationSigner,
-    externalMessage,
-    getWalletSeqNo
-} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import { externalMessage, getWalletSeqNo } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
-import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
+import { SubscriptionEncodingParams } from './commonTypes';
 
-type SubscriptionEncodingParams = {
-    selectedWallet: TonWalletStandard;
-} & SubscriptionExtension;
-
-// TODO Rename it after review
-export const useCreateSubscriptionV5 = () => {
+export const useCreateSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
     const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
@@ -43,7 +32,7 @@ export const useCreateSubscriptionV5 = () => {
             grace_period,
             caller_fee,
             recipient,
-            // contract,
+            contract,
             withdraw_msg_body,
             selectedWallet
         } = subscriptionParams;
@@ -61,7 +50,7 @@ export const useCreateSubscriptionV5 = () => {
 
         if (!signer || signer.type !== 'cell') throw new Error('Signer is incorrect!');
 
-        const encoder = new SubscriptionV5Encoder(selectedWallet);
+        const encoder = new SubscriptionEncoder(selectedWallet);
         const result = encoder.encodeCreateSubscriptionV2({
             beneficiary: Address.parse(admin),
             subscriptionId: subscription_id,
@@ -74,10 +63,9 @@ export const useCreateSubscriptionV5 = () => {
             withdrawMsgBody: withdraw_msg_body
         });
 
-        // TODO Ask Alexey weather v5r2 is hardcoded on his side
-        // if (Address.parse(contract).toString() !== result.extensionAddress.toString()) {
-        //     throw new Error('Contract extension addresses do not match!');
-        // }
+        if (Address.parse(contract).toString() !== result.extensionAddress.toString()) {
+            throw new Error('Contract extension addresses do not match!');
+        }
 
         if (selectedWallet.version >= WalletVersion.V5R1 && result.kind === EncodedResultKinds.V5) {
             const sender = new WalletMessageSender(api, selectedWallet, signer);
@@ -90,7 +78,7 @@ export const useCreateSubscriptionV5 = () => {
             const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
 
             const unsigned = encoder.buildV4DeployAndLinkUnsignedBody({
-                validUntil: SubscriptionV5Encoder.computeValidUntil(),
+                validUntil: SubscriptionEncoder.computeValidUntil(),
                 seqno,
                 sendAmount: result.sendAmount,
                 extStateInit: result.extStateInit,
@@ -112,63 +100,5 @@ export const useCreateSubscriptionV5 = () => {
         }
 
         throw new Error('Unsupported wallet version flow');
-    });
-};
-
-// TODO Rename it after review
-export const useEstimateDeploySubscriptionV5 = () => {
-    const api = useActiveApi();
-
-    return useMutation<
-        { fee: TransactionFeeTonAsset; address: Address },
-        Error,
-        SubscriptionEncodingParams
-    >(async subscriptionParams => {
-        const {
-            admin,
-            subscription_id,
-            first_charging_date,
-            payment_per_period,
-            period,
-            grace_period,
-            caller_fee,
-            recipient,
-            withdraw_msg_body,
-            selectedWallet
-        } = subscriptionParams;
-
-        const encoder = new SubscriptionV5Encoder(selectedWallet);
-        const result = encoder.encodeCreateSubscriptionV2({
-            beneficiary: Address.parse(admin),
-            subscriptionId: subscription_id,
-            firstChargingDate: first_charging_date,
-            paymentPerPeriod: BigInt(payment_per_period),
-            period,
-            gracePeriod: grace_period,
-            callerFee: BigInt(caller_fee),
-            withdrawAddress: Address.parse(recipient),
-            withdrawMsgBody: withdraw_msg_body
-        });
-
-        const rawTx = new TonRawTransactionService(api, selectedWallet);
-        const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
-
-        let estimation;
-        if (result.kind === EncodedResultKinds.V5) {
-            estimation = await rawTx.estimate(sender, result.actions);
-        }
-
-        if (result.kind === EncodedResultKinds.V4) {
-            estimation = await rawTx.estimate(sender, result.tx);
-        }
-
-        if (!estimation) {
-            throw new Error('Unsupported wallet version flow!');
-        }
-
-        return {
-            fee: estimation.fee as TransactionFeeTonAsset,
-            address: result.extensionAddress
-        };
     });
 };

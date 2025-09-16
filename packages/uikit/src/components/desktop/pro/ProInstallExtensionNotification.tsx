@@ -6,9 +6,9 @@ import { Button } from '../../fields/Button';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
 import {
-    useCreateSubscriptionV5,
-    useEstimateDeploySubscriptionV5
-} from '../../../hooks/blockchain/subscription/useCreateSubscriptionV5';
+    useCreateSubscription,
+    useEstimateDeploySubscription
+} from '../../../hooks/blockchain/subscription';
 import {
     ConfirmView,
     ConfirmViewAdditionalBottomSlot,
@@ -83,9 +83,9 @@ const ProInstallExtensionNotificationContent: FC<
     }>
 > = ({ onClose, extensionData }) => {
     const { t } = useTranslation();
-    const deployMutation = useCreateSubscriptionV5();
+    const deployMutation = useCreateSubscription();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
-    const estimateFeeMutation = useEstimateDeploySubscriptionV5();
+    const estimateFeeMutation = useEstimateDeploySubscription();
 
     const { fiat } = useAppContext();
     const { data: rate } = useRate(CryptoCurrency.TON);

@@ -107,8 +107,7 @@ interface IEncodeDeployBodyParams {
     withdrawMsgBody?: string;
 }
 
-// TODO Rename it after review
-export class SubscriptionV5Encoder {
+export class SubscriptionEncoder {
     public static readonly DEFAULT_SIGNATURE_TTL_SECONDS = 180;
 
     public static readonly MIN_EXTENSION_AMOUNT = toNano('0.1');
@@ -125,7 +124,7 @@ export class SubscriptionV5Encoder {
             throw new Error('Unsupported wallet version!');
         }
 
-        if (params.paymentPerPeriod < SubscriptionV5Encoder.MIN_EXTENSION_AMOUNT) {
+        if (params.paymentPerPeriod < SubscriptionEncoder.MIN_EXTENSION_AMOUNT) {
             throw new Error("Subscription amount can't be less than 0.1 TON!");
         }
 
@@ -202,7 +201,7 @@ export class SubscriptionV5Encoder {
         const outMsg = internal({
             to: extension,
             bounce: true,
-            value: SubscriptionV5Encoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
+            value: SubscriptionEncoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT,
             body
         });
 
