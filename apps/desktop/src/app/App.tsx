@@ -81,10 +81,10 @@ import { DesktopManageMultisigsPage } from '@tonkeeper/uikit/dist/desktop-pages/
 import { useGlobalSetup } from '@tonkeeper/uikit/dist/state/globalSetup';
 import { DesktopMultisigOrdersPage } from '@tonkeeper/uikit/dist/desktop-pages/multisig-orders/DesktopMultisigOrders';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
-import { DesktopMobileAppBanner } from '@tonkeeper/uikit/dist/components/pro/DesktopMobileAppBanner';
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
+import { SecureWalletNotification } from '@tonkeeper/uikit/dist/components/desktop/SecureWalletNotification';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -461,6 +461,7 @@ const BackgroundElements = () => {
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
+            <SecureWalletNotification />
         </>
     );
 };

@@ -20,7 +20,8 @@ export const CreatePassword: FC<{
     afterCreate: (password: string) => void;
     isLoading?: boolean;
     className?: string;
-}> = ({ afterCreate, isLoading, className }) => {
+    noTitle?: boolean;
+}> = ({ afterCreate, isLoading, className, noTitle }) => {
     const { t } = useTranslation();
     const sdk = useAppSdk();
 
@@ -55,7 +56,7 @@ export const CreatePassword: FC<{
     return (
         <CenterContainer className={className}>
             <Block onSubmit={onCreate}>
-                <H2>{t('Create_password')}</H2>
+                {!noTitle && <H2>{t('Create_password')}</H2>}
                 <Input
                     id="create-password"
                     ref={ref}
@@ -105,16 +106,11 @@ export const CreatePasswordNotification: FC<{
     const { t } = useTranslation();
 
     const Content = useCallback(() => {
-        return <CreatePassword afterCreate={handleClose} />;
+        return <CreatePassword afterCreate={handleClose} noTitle />;
     }, []);
 
     return (
-        <Notification
-            isOpen={isOpen}
-            handleClose={handleClose}
-            title={t('set_up_password')}
-            hideButton
-        >
+        <Notification title={t('set_up_password')} isOpen={isOpen} handleClose={handleClose}>
             {Content}
         </Notification>
     );
