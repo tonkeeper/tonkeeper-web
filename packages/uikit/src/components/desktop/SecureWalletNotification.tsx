@@ -33,7 +33,7 @@ const useLastReminedDate = () => {
     return [data, setLastReminedDate.mutateAsync] as const;
 };
 
-const reminderInterval = 7 * 24 * 60 * 60 * 1000; // every week
+const reminderInterval = 30 * 24 * 60 * 60 * 1000; // every 30 days
 export const SecureWalletNotification = () => {
     const [date, setDate] = useLastReminedDate();
     const { password: keychainPassword } = useKeychainSecuritySettings();
