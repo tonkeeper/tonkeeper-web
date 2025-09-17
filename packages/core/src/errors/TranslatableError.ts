@@ -1,4 +1,4 @@
-type TranslateFunction = (text: string, replaces?: Record<string, string | number>) => string;
+export type TranslateFunction = (text: string, replaces?: Record<string, string | number>) => string;
 
 export interface TranslatableError {
     translate?: string | ((t: TranslateFunction) => string);

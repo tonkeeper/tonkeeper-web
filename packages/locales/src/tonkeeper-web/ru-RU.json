@@ -99,6 +99,7 @@
   "confirm_error_insufficient_balance": "Баланса кошелька {balance} недостаточно. Требуемый минимальный баланс: {required}.",
   "confirm_error_insufficient_balance_light": "Недостаточно средств",
   "confirm_error_insufficient_battery_balance": "Недостаточный баланс Tonkeeper Battery",
+  "confirm_error_insufficient_host_wallet_balance": "Баланс Multisig signer-кошелька {wallet} недостаточен для оплаты комиссии блокчейна. Необхордим мин. баланс 0.5 TON.",
   "confirm_modal_transfer": "Перевод",
   "ConfirmPassword": "Введите пароль ещё раз",
   "confirm_sending_sign": "Подписать",
