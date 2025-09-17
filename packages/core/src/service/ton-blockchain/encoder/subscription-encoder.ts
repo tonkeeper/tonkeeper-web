@@ -72,16 +72,20 @@ type CreateResultV4 = {
     sendAmount: bigint;
 };
 
-interface IRemoveV4ExtensionOptions {
+export interface IRemoveV4ExtensionOptions {
     seqno: number;
+    validUntil: number;
+    wallet: TonWalletStandard;
     extensionAddress: Address;
 }
 
-interface IDeployV4ExtensionOptions {
+export interface IDeployV4ExtensionOptions {
     seqno: number;
+    validUntil: number;
     sendAmount: bigint;
     extStateInit: Cell;
     deployBody: Cell;
+    wallet: TonWalletStandard;
 }
 
 interface IBuildStateDataParams {
@@ -102,8 +106,6 @@ interface IEncodeDeployBodyParams {
 }
 
 export class SubscriptionEncoder {
-    public static readonly DEFAULT_SIGNATURE_TTL_SECONDS = 180;
-
     public static readonly MIN_EXTENSION_AMOUNT = toNano('0.1');
 
     public static readonly DEFAULT_V4_REMOVE_EXTENSION_AMOUNT = toNano('0.015');
@@ -272,13 +274,13 @@ export class SubscriptionEncoder {
         return Cell.fromBoc(boc)[0];
     }
 
-    private resolveV4WalletId(): number {
-        if (this.wallet.version < WalletVersion.V4R2 || this.wallet.version >= WalletVersion.V5R1) {
+    private static resolveV4WalletId(wallet: TonWalletStandard): number {
+        if (wallet.version < WalletVersion.V4R2 || wallet.version >= WalletVersion.V5R1) {
             throw new Error('Only V4 wallets supported!');
         }
 
         try {
-            const pub = this.wallet.publicKey;
+            const pub = wallet.publicKey;
 
             if (!pub) {
                 return DEFAULT_V4_SUB_WALLET_ID;
@@ -295,20 +297,11 @@ export class SubscriptionEncoder {
         }
     }
 
-    public static computeValidUntil(
-        ttlSeconds: number = this.DEFAULT_SIGNATURE_TTL_SECONDS
-    ): number {
-        const nowSeconds = Math.floor(Date.now() / 1000);
+    static buildV4RemoveExtensionUnsignedBody(options: IRemoveV4ExtensionOptions): Cell {
+        const { seqno, extensionAddress, wallet, validUntil } = options;
 
-        return nowSeconds + ttlSeconds;
-    }
-
-    public buildV4RemoveExtensionUnsignedBody(options: IRemoveV4ExtensionOptions): Cell {
-        const { seqno, extensionAddress } = options;
-
-        const amount = SubscriptionEncoder.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT;
-        const walletId = this.resolveV4WalletId();
-        const validUntil = SubscriptionEncoder.computeValidUntil();
+        const amount = this.DEFAULT_V4_REMOVE_EXTENSION_AMOUNT;
+        const walletId = this.resolveV4WalletId(wallet);
 
         return beginCell()
             .storeUint(walletId, 32)
@@ -322,11 +315,10 @@ export class SubscriptionEncoder {
             .endCell();
     }
 
-    public buildV4DeployAndLinkUnsignedBody(options: IDeployV4ExtensionOptions): Cell {
-        const { seqno, sendAmount, extStateInit, deployBody } = options;
+    static buildV4DeployAndLinkUnsignedBody(options: IDeployV4ExtensionOptions): Cell {
+        const { seqno, sendAmount, extStateInit, deployBody, wallet, validUntil } = options;
 
-        const walletId = this.resolveV4WalletId();
-        const validUntil = SubscriptionEncoder.computeValidUntil();
+        const walletId = this.resolveV4WalletId(wallet);
 
         return beginCell()
             .storeUint(walletId, 32)
@@ -340,7 +332,7 @@ export class SubscriptionEncoder {
             .endCell();
     }
 
-    public buildV4SignedBody(signature: Buffer, unsigned: Cell): Cell {
+    static buildV4SignedBody(signature: Buffer, unsigned: Cell): Cell {
         return beginCell().storeBuffer(signature).storeSlice(unsigned.beginParse()).endCell();
     }
 

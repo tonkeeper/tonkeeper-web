@@ -1,20 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Address } from '@ton/core';
 import { WalletVersion } from '@tonkeeper/core/dist/entries/wallet';
-import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
-import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
-import { useActiveApi, useAccountWallets } from '../../../state/wallet';
+import { useAccountWallets, useActiveApi } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
-import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import {
-    SubscriptionEncoder,
-    type OutActionWalletV5Exported
+    EncodedResultKinds,
+    type OutActionWalletV5Exported,
+    SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { externalMessage, getWalletSeqNo } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { QueryKey } from '../../../libs/queryKey';
 import { CancelParams } from './commonTypes';
+import {
+    ExtensionMessageSender,
+    V4ActionTypes
+} from '@tonkeeper/core/dist/service/ton-blockchain/sender/extension-message-sender';
 
 export const useCancelSubscription = () => {
     const sdk = useAppSdk();
@@ -44,6 +45,8 @@ export const useCancelSubscription = () => {
 
         const encoder = new SubscriptionEncoder(selectedWallet);
 
+        const sender = new ExtensionMessageSender(api, selectedWallet, signer);
+
         if (selectedWallet.version === WalletVersion.V5R1) {
             const destruct = encoder.encodeDestructAction(extensionAddress);
 
@@ -54,8 +57,7 @@ export const useCancelSubscription = () => {
 
             const actions = [...destruct, remove];
 
-            const sender = new WalletMessageSender(api, selectedWallet, signer);
-            await sender.send(actions);
+            await sender.send({ kind: EncodedResultKinds.V5, outgoing: actions });
 
             await client.invalidateQueries([QueryKey.pro]);
 
@@ -63,22 +65,12 @@ export const useCancelSubscription = () => {
         }
 
         if (selectedWallet.version === WalletVersion.V4R2) {
-            const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
-
-            const unsigned = encoder.buildV4RemoveExtensionUnsignedBody({
-                seqno,
-                extensionAddress
-            });
-
-            const signature: Buffer = await signer(unsigned);
-
-            const body = encoder.buildV4SignedBody(signature, unsigned);
-
-            const walletContract = walletContractFromState(selectedWallet);
-            const externalCell = externalMessage(walletContract, seqno, body);
-
-            await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-                sendBlockchainMessageRequest: { boc: externalCell.toBoc().toString('base64') }
+            await sender.send({
+                kind: EncodedResultKinds.V4,
+                outgoing: {
+                    actionType: V4ActionTypes.DESTRUCT,
+                    extensionAddress
+                }
             });
 
             await client.invalidateQueries([QueryKey.pro]);

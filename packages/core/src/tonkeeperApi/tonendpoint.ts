@@ -130,6 +130,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     batteryHost: 'https://battery.tonkeeper.com',
     tonkeeper_api_url: 'https://api.tonkeeper.com',
     pro_api_url: 'https://pro.tonconsole.com',
+    pro_dev_api_url: 'https://dev-pro.tonconsole.com',
     batteryMeanFees: '0.0026',
     batteryReservedAmount: '0.065',
     disable_battery: false,

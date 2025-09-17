@@ -5,18 +5,14 @@ import {
     EncodedResultKinds,
     SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
-import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import {
-    estimationSigner,
-    externalMessage,
-    getWalletSeqNo
-} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
-import { EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
+import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 import { SubscriptionEncodingParams } from './commonTypes';
 import { useActiveApi, useMetaEncryptionData } from '../../../state/wallet';
+import {
+    ExtensionMessageSender,
+    V4ActionTypes
+} from '@tonkeeper/core/dist/service/ton-blockchain/sender/extension-message-sender';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
@@ -61,40 +57,34 @@ export const useEstimateDeploySubscription = () => {
                 metaEncryptionMap[selectedWallet.rawAddress].encryptionPrivateKey
         });
 
-        const rawTx = new TonRawTransactionService(api, selectedWallet);
-        const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
+        const sender = new ExtensionMessageSender(api, selectedWallet, estimationSigner);
 
         let estimation;
         if (result.kind === EncodedResultKinds.V5) {
-            estimation = await rawTx.estimate(sender, result.actions);
+            estimation = await sender.estimate({
+                kind: result.kind,
+                outgoing: result.actions
+            });
         }
 
         if (result.kind === EncodedResultKinds.V4) {
-            const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
-
-            const unsigned = encoder.buildV4DeployAndLinkUnsignedBody({
-                seqno,
-                sendAmount: result.sendAmount,
-                extStateInit: result.extStateInit,
-                deployBody: result.deployBody
-            });
-
-            const body = encoder.buildV4SignedBody(Buffer.alloc(64), unsigned);
-
-            const walletContract = walletContractFromState(selectedWallet);
-            const externalCell = externalMessage(walletContract, seqno, body);
-
-            estimation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-                emulateMessageToWalletRequest: { boc: externalCell.toBoc().toString('base64') }
+            estimation = await sender.estimate({
+                kind: EncodedResultKinds.V4,
+                outgoing: {
+                    actionType: V4ActionTypes.DEPLOY,
+                    sendAmount: result.sendAmount,
+                    extStateInit: result.extStateInit,
+                    deployBody: result.deployBody
+                }
             });
         }
 
-        if (!estimation) {
+        if (!estimation || estimation.fee?.type !== 'ton-asset') {
             throw new Error('Unsupported wallet version flow!');
         }
 
         return {
-            fee: estimation.fee as TransactionFeeTonAsset,
+            fee: estimation.fee,
             address: result.extensionAddress
         };
     });
