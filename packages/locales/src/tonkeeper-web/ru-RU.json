@@ -262,6 +262,7 @@
   "IncorrectCurrentPassword": "Неверный текущий пароль.",
   "incorrect_wallet_type": "Неверный тип кошелька",
   "interval": "Период",
+  "keychain_read_error": "Не удалось получить данные из keychain",
   "learn_more": "Подробнее",
   "ledger_choose_wallets": "Выберите кошельки",
   "ledger_connect_header": "Подключить Ledger",

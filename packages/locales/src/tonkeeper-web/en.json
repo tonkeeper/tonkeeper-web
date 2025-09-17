@@ -265,6 +265,7 @@
   "IncorrectCurrentPassword": "Incorrect current password.",
   "incorrect_wallet_type": "Incorrect wallet type",
   "interval": "Interval",
+  "keychain_read_error": "Failed to get data from the keychain",
   "keystone_pair_subtitle": "A higher level of security with AIR-GAP hardware wallet",
   "keystone_pair_title": "Pair with Keystone",
   "keystone_sign_subtitle": "Please open Keystone and scan QR code with transaction",

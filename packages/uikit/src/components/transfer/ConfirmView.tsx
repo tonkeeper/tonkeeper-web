@@ -57,6 +57,7 @@ import {
     AllChainsSenderOptions,
     AllChainsSenderType
 } from '../../hooks/blockchain/sender/sender-type';
+import { KeychainGetError } from '@tonkeeper/core/dist/errors/KeychainError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -398,6 +399,9 @@ export const ConfirmViewButtons: FC<{
         let errorText;
 
         switch (true) {
+            case error instanceof KeychainGetError:
+                errorText = t('keychain_read_error');
+                break;
             case error instanceof TxConfirmationCustomError:
                 errorText = error.message;
                 break;
