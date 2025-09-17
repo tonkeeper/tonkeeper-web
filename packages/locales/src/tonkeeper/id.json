@@ -534,7 +534,6 @@
     "show": "Tampilkan"
   },
   "error_network": "Kesalahan jaringan",
-  "error_occurred": "Terjadi kesalahan",
   "exchange_method_dont_show_again": "Jangan tampilkan lagi",
   "exchange_method_open_warning": "Anda sedang membuka aplikasi eksternal yang tidak dioperasikan oleh Tonkeeper.",
   "exchange_modal": {

@@ -30,6 +30,7 @@ import { LedgerTransaction } from '../../ledger/connector';
 import { WalletMessageSender } from './wallet-message-sender';
 import { TonConnectEncoder } from '../encoder/ton-connect-encoder';
 import { ISender } from './ISender';
+import { UserCancelledError } from '../../../errors/UserCancelledError';
 
 export class LedgerMessageSender implements ISender {
     constructor(
@@ -290,16 +291,10 @@ export class LedgerMessageSender implements ISender {
             );
         } catch (e) {
             console.error(e);
-            if (typeof e === 'object' && e && 'name' in e && e.name === 'UserCancelledError') {
+            if (e instanceof UserCancelledError) {
                 throw e as Error;
             }
-            throw new LedgerError(
-                typeof e === 'string'
-                    ? e
-                    : typeof e === 'object' && e && 'message' in e
-                    ? (e.message as string)
-                    : 'Unknown error'
-            );
+            throw new LedgerError(e);
         }
 
         const externalMessages = transferCells.map((cell, index) =>

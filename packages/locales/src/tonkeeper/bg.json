@@ -541,7 +541,6 @@
     "show": "Показване"
   },
   "error_network": "Грешка в мрежата",
-  "error_occurred": "Възникна грешка",
   "exchange_method_dont_show_again": "Не показвай повече",
   "exchange_method_open_warning": "Отваряте външно приложение, което не е управлявано от Tonkeeper.",
   "exchange_modal": {

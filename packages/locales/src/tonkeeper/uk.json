@@ -540,7 +540,6 @@
     "show": "Показати"
   },
   "error_network": "Помилка мережі",
-  "error_occurred": "Сталася помилка",
   "exchange_method_dont_show_again": "Більше не показувати",
   "exchange_method_open_warning": "Ви відкриваєте зовнішній додаток, яким не керує Tonkeeper.",
   "exchange_modal": {

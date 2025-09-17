@@ -25,6 +25,7 @@ import { useParams } from '../../hooks/router/useParams';
 import { DesktopViewPageLayout } from '../../components/desktop/DesktopViewLayout';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import { BorderSmallResponsive } from '../../components/shared/Styles';
+import { KeychainGetError } from '@tonkeeper/core/dist/errors/KeychainError';
 
 export const ActiveRecovery = () => {
     const account = useActiveAccount();
@@ -52,6 +53,7 @@ export const Recovery = () => {
 const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId) => {
     const [secret, setSecret] = useState<AccountSecret | undefined>(undefined);
     const sdk = useAppSdk();
+    const { t } = useTranslation();
 
     useEffect(() => {
         (async () => {
@@ -68,6 +70,9 @@ const useSecret = (onBack: () => void, accountId: AccountId, walletId?: WalletId
                 setSecret(_secret);
             } catch (e) {
                 console.error(e);
+                if (e instanceof KeychainGetError) {
+                    sdk.topMessage(t(e.translate));
+                }
                 onBack();
             }
         })();

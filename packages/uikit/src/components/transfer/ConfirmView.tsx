@@ -47,17 +47,14 @@ import {
 } from './Confirm';
 import { AmountListItem, RecipientListItem } from './ConfirmListItem';
 import { ButtonBlock, ConfirmMainButton, ConfirmMainButtonProps, ResultButton } from './common';
-import { UserCancelledError } from '../../libs/errors/UserCancelledError';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 
-import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
-import { NotEnoughBatteryBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBatteryBalanceError';
 import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import {
     AllChainsSenderOptions,
     AllChainsSenderType
 } from '../../hooks/blockchain/sender/sender-type';
-import { KeychainGetError } from '@tonkeeper/core/dist/errors/KeychainError';
+import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
+import { UserCancelledError } from '@tonkeeper/core/dist/errors/UserCancelledError';
 
 type MutationProps = Pick<
     ReturnType<typeof useMutation<boolean, Error>>,
@@ -396,31 +393,18 @@ export const ConfirmViewButtons: FC<{
     }
 
     if (error && !(error instanceof UserCancelledError)) {
-        let errorText;
+        const defaultError = estimation
+            ? t('send_publish_tx_error')
+            : t('send_fee_estimation_error');
 
-        switch (true) {
-            case error instanceof KeychainGetError:
-                errorText = t('keychain_read_error');
-                break;
-            case error instanceof TxConfirmationCustomError:
-                errorText = error.message;
-                break;
-            case error instanceof NotEnoughBalanceError:
-                errorText = t('confirm_error_insufficient_balance_light');
-                break;
-            case error instanceof NotEnoughBatteryBalanceError:
-                errorText = t('confirm_error_insufficient_battery_balance');
-                break;
-            case error instanceof Error && error.message !== 'Response returned an error code':
-                errorText = error.message;
-                break;
-            default:
-                if (!estimation) {
-                    errorText = t('send_fee_estimation_error');
-                } else {
-                    errorText = t('send_publish_tx_error');
-                }
+        if (error instanceof Error && error.message === 'Response returned an error code') {
+            error.message = defaultError;
         }
+
+        const errorText = getErrorText(error, {
+            t,
+            defaultError
+        });
 
         return (
             <ResultErrorButtonStyled>

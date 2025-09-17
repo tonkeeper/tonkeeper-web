@@ -529,7 +529,6 @@
     "show": "عرض"
   },
   "error_network": "خطأ في الشبكة",
-  "error_occurred": "حدث خطأ",
   "exchange_method_dont_show_again": "عدم العرض مرة أخرى",
   "exchange_method_open_warning": "أنت بصدد فتح تطبيق خارجي لا تديره تونكيبر.",
   "exchange_modal": {

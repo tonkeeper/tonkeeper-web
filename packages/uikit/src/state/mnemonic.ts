@@ -36,7 +36,7 @@ import {
 import { delay } from '@tonkeeper/core/dist/utils/common';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import nacl from 'tweetnacl';
-import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import { getLedgerAccountPathByIndex } from '@tonkeeper/core/dist/service/ledger/utils';
 import { useAppSdk } from '../hooks/appSdk';
 import { useCallback } from 'react';
@@ -68,14 +68,21 @@ export const signDataOver = ({
         switch (account.type) {
             case 'ton-only': {
                 throw new TxConfirmationCustomError(
-                    'Signer linked by QR is not support sign data.'
+                    'Signer linked by QR is not support sign data.',
+                    'error_signer_doesnot_support_sign_data'
                 );
             }
             case 'ledger': {
-                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+                throw new TxConfirmationCustomError(
+                    t('ledger_operation_not_supported'),
+                    'ledger_operation_not_supported'
+                );
             }
             case 'keystone': {
-                throw new TxConfirmationCustomError("Can't sign data over Keystone wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't sign data over Keystone wallet",
+                    'error_keystone_doesnot_support_sign_data'
+                );
             }
             case 'testnet':
             case 'mnemonic': {
@@ -103,10 +110,16 @@ export const signDataOver = ({
                 });
             }
             case 'watch-only': {
-                throw new TxConfirmationCustomError("Can't sign data over watch-only wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't sign data over watch-only wallet",
+                    'error_watch_only_doesnot_support_sign_data'
+                );
             }
             case 'ton-multisig': {
-                throw new TxConfirmationCustomError("Can't sign data over multisig wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't sign data over multisig wallet",
+                    'error_multisig_doesnot_support_sign_data'
+                );
             }
             default: {
                 assertUnreachable(account);
@@ -136,11 +149,15 @@ export const signTonConnectOver = ({
         switch (account.type) {
             case 'ton-only': {
                 throw new TxConfirmationCustomError(
-                    'Signer linked by QR is not support sign buffer.'
+                    'Signer linked by QR is not support sign buffer.',
+                    'error_signer_doesnot_support_connect'
                 );
             }
             case 'ledger': {
-                throw new TxConfirmationCustomError(t('ledger_operation_not_supported'));
+                throw new TxConfirmationCustomError(
+                    t('ledger_operation_not_supported'),
+                    'ledger_operation_not_supported'
+                );
             }
             case 'keystone': {
                 const result = await pairKeystoneByNotification(
@@ -183,10 +200,16 @@ export const signTonConnectOver = ({
                 });
             }
             case 'watch-only': {
-                throw new TxConfirmationCustomError("Can't use tonconnect over watch-only wallet");
+                throw new TxConfirmationCustomError(
+                    "Can't use tonconnect over watch-only wallet",
+                    'error_watch_only_doesnot_support_connection'
+                );
             }
             case 'ton-multisig': {
-                throw new TxConfirmationCustomError("Can't use multisig wallet with this dApp");
+                throw new TxConfirmationCustomError(
+                    "Can't use multisig wallet with this dApp",
+                    'error_multisig_doesnot_support_connection'
+                );
             }
             default: {
                 assertUnreachable(account);

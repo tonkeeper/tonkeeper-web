@@ -88,6 +88,7 @@
   "Edit_jettons": "编辑",
   "Enable_storing_config": "启用存储配置",
   "enter_password": "输入密码",
+  "error_occurred": "发生了一个错误",
   "export_dot_csv": "导出 .CSV",
   "force_reload": "强制重新加载",
   "ge_header_history": " ",

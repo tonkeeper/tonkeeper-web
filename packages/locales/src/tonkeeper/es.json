@@ -542,7 +542,6 @@
     "show": "Mostrar"
   },
   "error_network": "Error de red",
-  "error_occurred": "Ocurrió un error",
   "exchange_method_dont_show_again": "No mostrar de nuevo",
   "exchange_method_open_warning": "Estás abriendo una aplicación externa que no es operada por Tonkeeper.",
   "exchange_modal": {

@@ -529,7 +529,6 @@
     "show": "প্রদর্শন"
   },
   "error_network": "নেটওয়ার্ক ত্রুটি",
-  "error_occurred": "একটি ত্রুটি ঘটেছে",
   "exchange_method_dont_show_again": "পুনরায় দেখাবেন না",
   "exchange_method_open_warning": "আপনি একটি বাইরের অ্যাপ খুলছেন যা Tonkeeper দ্বারা পরিচালিত নয়।",
   "exchange_modal": {

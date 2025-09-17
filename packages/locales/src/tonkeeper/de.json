@@ -530,7 +530,6 @@
     "show": "Zeigen"
   },
   "error_network": "Netzwerkfehler",
-  "error_occurred": "Ein Fehler ist aufgetreten",
   "exchange_method_dont_show_again": "Nicht mehr anzeigen",
   "exchange_method_open_warning": "Sie öffnen eine externe App, die nicht von Tonkeeper betrieben wird.",
   "exchange_modal": {

@@ -545,7 +545,6 @@
     "show": "顯示"
   },
   "error_network": "網絡錯誤",
-  "error_occurred": "發生錯誤",
   "exchange_method_dont_show_again": "不再顯示",
   "exchange_method_open_warning": "您正在開啟一個非由 Tonkeeper 操作的外部應用程式。",
   "exchange_modal": {

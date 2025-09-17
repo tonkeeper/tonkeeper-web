@@ -542,7 +542,6 @@
     "show": "Göster"
   },
   "error_network": "Ağ hatası",
-  "error_occurred": "Bir hata oluştu",
   "exchange_method_dont_show_again": "Tekrar gösterme",
   "exchange_method_open_warning": "Tonkeeper tarafından işletilmeyen harici bir uygulamayı açıyorsunuz.",
   "exchange_modal": {
