@@ -25,14 +25,17 @@ import {
 import { Network } from '@tonkeeper/core/dist/entries/network';
 import { AuthKeychain, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import {
+    AccountWallet,
+    getWalletsFromAccount,
+    IMetaEncryptionData,
+    IMutateEncryptionProps,
     isStandardTonWallet,
+    MetaEncryptionSerializedMap,
     TonWalletConfig,
     TonWalletStandard,
     WalletId,
-    WalletVersion,
-    AccountWallet,
-    getWalletsFromAccount,
-    WalletsTransform
+    WalletsTransform,
+    WalletVersion
 } from '@tonkeeper/core/dist/entries/wallet';
 import {
     AccountConfig,
@@ -74,7 +77,7 @@ import {
     seeIfMnemonicValid,
     walletSecretToString
 } from '@tonkeeper/core/dist/service/mnemonicService';
-import { useAccountsStateQuery, useAccountsState } from './accounts';
+import { useAccountsState, useAccountsStateQuery } from './accounts';
 import { useGlobalPreferences } from './global-preferences';
 import { useDeleteFolder } from './folders';
 import { useRemoveAccountTwoFAData } from './two-fa';
@@ -91,6 +94,15 @@ import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { AppKey } from '@tonkeeper/core/dist/Keys';
+import {
+    createEncryptionCertificate,
+    createEncryptionKey,
+    tonSeedPhraseToEd25519Seed
+} from '@tonkeeper/core/dist/service/meta';
+import nacl from 'tweetnacl';
+import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
+import { metaEncryptionMapSerializer, serializeMetaKey } from '@tonkeeper/core/dist/utils/metadata';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -1355,3 +1367,65 @@ export function getAccountWalletNameAndEmoji(account: Account, walletId?: Wallet
         emoji
     };
 }
+
+export const useMetaEncryptionData = () => {
+    const sdk = useAppSdk();
+
+    return useQuery<Record<string, IMetaEncryptionData> | null, Error>(
+        [QueryKey.metaEncryptionData],
+        async () => {
+            return sdk.storage
+                .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
+                .then(metaEncryptionMapSerializer);
+        }
+    );
+};
+
+export const useMutateMetaKeyAndCertificates = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
+
+    return useMutation<void, Error, IMutateEncryptionProps>(async ({ wallet, preparedSeed }) => {
+        let seedPrase = preparedSeed;
+
+        if (!seedPrase) {
+            const accountWallet = accountsWallets.find(
+                accWallet => accWallet.wallet.id === wallet.id
+            );
+            const accountId = accountWallet?.account?.id;
+
+            if (!accountId) throw new Error('Account id is required!');
+            const secret = await getAccountSecret(sdk, accountId);
+
+            if (secret.type !== 'mnemonic') {
+                throw new Error('Unable to get a seed phrase!');
+            }
+
+            seedPrase = walletSecretToString(secret);
+        }
+
+        const { walletMainEd22519Seed } = await tonSeedPhraseToEd25519Seed(seedPrase);
+
+        const { walletMetaEncryptionPrivateKey } = await createEncryptionKey(walletMainEd22519Seed);
+
+        const walletMainPrivateKey = nacl.sign.keyPair.fromSeed(walletMainEd22519Seed);
+
+        const { cert } = createEncryptionCertificate(
+            walletMetaEncryptionPrivateKey,
+            walletMainPrivateKey
+        );
+
+        const metaEncryptionMap =
+            (await sdk.storage.get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)) ?? {};
+
+        metaEncryptionMap[wallet.rawAddress] = serializeMetaKey({
+            encryptionPrivateKey: walletMetaEncryptionPrivateKey,
+            encryptionCertificate: cert
+        });
+
+        await sdk.storage.set(AppKey.META_ENCRYPTION_MAP, metaEncryptionMap);
+
+        await client.invalidateQueries({ queryKey: [QueryKey.metaEncryptionData] });
+    });
+};

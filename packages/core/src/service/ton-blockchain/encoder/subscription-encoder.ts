@@ -9,11 +9,14 @@ import {
     internal,
     storeStateInit
 } from '@ton/core';
+import nacl from 'tweetnacl';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
 
 import { getTonkeeperQueryId } from '../utils';
+import { encryptMeta } from '../../meta';
 import { assertUnreachable } from '../../../utils/types';
+import { SubscriptionExtensionMetadata } from '../../../pro';
 import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
 
 /**
@@ -49,6 +52,8 @@ type DeployParams = {
     callerFee: bigint;
     withdrawAddress: Address;
     withdrawMsgBody?: string;
+    metadata: SubscriptionExtensionMetadata;
+    walletMetaEncryptionPrivateKey: nacl.SignKeyPair;
 };
 
 export type CreateResult = CreateResultV5 | CreateResultV4;
@@ -92,6 +97,8 @@ interface IEncodeDeployBodyParams {
     callerFee: bigint;
     withdrawAddress: Address;
     withdrawMsgBody?: string;
+    metadata: SubscriptionExtensionMetadata;
+    walletMetaEncryptionPrivateKey: nacl.SignKeyPair;
 }
 
 export class SubscriptionEncoder {
@@ -106,7 +113,7 @@ export class SubscriptionEncoder {
         private readonly defaultCodeBocBase64 = SUBSCRIPTION_V2_CODE_BOC
     ) {}
 
-    encodeCreateSubscriptionV2(params: DeployParams): CreateResult {
+    async encodeCreateSubscriptionV2(params: DeployParams): Promise<CreateResult> {
         if (this.wallet.version < WalletVersion.V4R1) {
             throw new Error('Unsupported wallet version!');
         }
@@ -126,14 +133,16 @@ export class SubscriptionEncoder {
 
         const extensionAddress = contractAddress(0, stateInit);
 
-        const body = this.encodeDeployBody({
+        const body = await this.encodeDeployBody({
             firstChargingDate: params.firstChargingDate,
             paymentPerPeriod: params.paymentPerPeriod,
             period: params.period,
             gracePeriod: params.gracePeriod,
             callerFee: params.callerFee,
             withdrawAddress: params.withdrawAddress,
-            withdrawMsgBody: params.withdrawMsgBody
+            withdrawMsgBody: params.withdrawMsgBody,
+            metadata: params.metadata,
+            walletMetaEncryptionPrivateKey: params.walletMetaEncryptionPrivateKey
         });
 
         const initMsg = internal({
@@ -234,7 +243,13 @@ export class SubscriptionEncoder {
             .endCell();
     }
 
-    private encodeDeployBody(params: IEncodeDeployBodyParams): Cell {
+    private async encodeDeployBody(params: IEncodeDeployBodyParams): Promise<Cell> {
+        const metaCell = await encryptMeta(
+            JSON.stringify(params.metadata),
+            Address.parse(this.wallet.rawAddress),
+            params.walletMetaEncryptionPrivateKey.secretKey
+        );
+
         return beginCell()
             .storeUint(OP.DEPLOY, 32)
             .storeUint(getTonkeeperQueryId(), 64)
@@ -245,7 +260,7 @@ export class SubscriptionEncoder {
             .storeCoins(params.callerFee)
             .storeAddress(params.withdrawAddress)
             .storeRef(this.encodeWithdrawMsgBody(params.withdrawMsgBody))
-            .storeRef(Cell.EMPTY)
+            .storeRef(metaCell)
             .endCell();
     }
 

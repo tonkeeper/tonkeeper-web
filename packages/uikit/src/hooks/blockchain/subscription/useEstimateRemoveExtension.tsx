@@ -56,8 +56,10 @@ export const useEstimateRemoveExtension = () => {
                     extensionAddress
                 });
 
+                const body = encoder.buildV4SignedBody(Buffer.alloc(64), unsigned);
+
                 const walletContract = walletContractFromState(selectedWallet);
-                const externalCell = externalMessage(walletContract, seqno, unsigned);
+                const externalCell = externalMessage(walletContract, seqno, body);
 
                 estimation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
                     emulateMessageToWalletRequest: { boc: externalCell.toBoc().toString('base64') }
