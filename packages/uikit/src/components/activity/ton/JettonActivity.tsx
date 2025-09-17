@@ -1,4 +1,4 @@
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useFormatCoinValue } from '../../../hooks/balance';
@@ -44,7 +44,10 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
         return (
             <SendActivityAction
                 amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-                symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
+                symbol={sanitizeJetton(
+                    jettonTransfer.jetton.symbol,
+                    jettonTransfer.jetton.verification === JettonVerificationType.Blacklist
+                )}
                 recipient={toAddressTextValue(
                     jettonTransfer.recipient?.name,
                     formatAddress(
@@ -63,7 +66,10 @@ export const JettonTransferAction: FC<{ action: Action; date: string }> = ({ act
     return (
         <ReceiveActivityAction
             amount={format(jettonTransfer.amount, jettonTransfer.jetton.decimals)}
-            symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
+            symbol={sanitizeJetton(
+                jettonTransfer.jetton.symbol,
+                jettonTransfer.jetton.verification === JettonVerificationType.Blacklist
+            )}
             sender={toAddressTextValue(
                 jettonTransfer.sender?.name,
                 formatAddress(
@@ -164,7 +170,10 @@ export const JettonMintAction: FC<JettonActionProps> = ({ action, date }) => {
             <ColumnLayout
                 title={t('transaction_type_mint')}
                 amount={<>+&thinsp;{format(jettonMint.amount, jettonMint.jetton.decimals)}</>}
-                entry={sanitizeJetton(jettonMint.jetton.symbol, isScam)}
+                entry={sanitizeJetton(
+                    jettonMint.jetton.symbol,
+                    jettonMint.jetton.verification === JettonVerificationType.Blacklist
+                )}
                 address={formatAddress(jettonMint.jetton.address, network, true)}
                 date={date}
                 green={!isScam}
