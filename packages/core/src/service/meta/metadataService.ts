@@ -117,7 +117,7 @@ export const parseSnakeCells = (cell: Cell): Uint8Array => {
     let result = new Uint8Array(0);
     while (true) {
         const cs = c.beginParse();
-        if (cs.remainingBits % 8 != 0) {
+        if (cs.remainingBits % 8 !== 0) {
             throw new Error('Invalid cell');
         }
         const newResult = new Uint8Array(result.length + cs.remainingBits / 8);
@@ -127,7 +127,7 @@ export const parseSnakeCells = (cell: Cell): Uint8Array => {
         result = newResult;
         if (c.refs.length === 0) {
             break;
-        } else if (c.refs.length == 1) {
+        } else if (c.refs.length === 1) {
             c = c.refs[0];
         } else {
             throw new Error('Invalid cell');
