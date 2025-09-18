@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useEffect, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { styled } from 'styled-components';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 import { Body2, Body3, Label2 } from '../../Text';
@@ -74,18 +74,26 @@ export const ProInstallExtensionNotification: FC<IProInstallExtensionProps> = pr
     );
 };
 
-const ProInstallExtensionNotificationContent: FC<
-    PropsWithChildren<{
-        onBack?: () => void;
-        onClose: (confirmed?: boolean) => void;
-        extensionData: SubscriptionExtension;
-        fitContent?: boolean;
-    }>
-> = ({ onClose, extensionData }) => {
+interface IProInstallExtensionContentProps {
+    onBack?: () => void;
+    onClose: (confirmed?: boolean) => void;
+    extensionData: SubscriptionExtension;
+    fitContent?: boolean;
+}
+
+const ProInstallExtensionNotificationContent: FC<IProInstallExtensionContentProps> = ({
+    onClose,
+    extensionData
+}) => {
     const { t } = useTranslation();
     const deployMutation = useCreateSubscription();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const estimateFeeMutation = useEstimateDeploySubscription();
+    const {
+        data: estimation,
+        error: estimationError,
+        isLoading: isEstimating
+    } = estimateFeeMutation;
 
     const { fiat } = useAppContext();
     const { data: rate } = useRate(CryptoCurrency.TON);
@@ -101,21 +109,14 @@ const ProInstallExtensionNotificationContent: FC<
     );
 
     const feeEquivalent: string = useMemo(() => {
-        if (!estimateFeeMutation?.data?.fee?.extra) return '';
+        if (!estimation?.fee?.extra) return '';
 
         return getFiatEquivalent({
-            amount: estimateFeeMutation.data.fee.extra.weiAmount
-                .minus(extensionData.payment_per_period)
-                .toString(),
+            amount: estimation.fee.extra.stringWeiAmount,
             fiat,
             ratePrice: rate?.prices
         });
-    }, [
-        fiat,
-        rate?.prices,
-        extensionData.payment_per_period,
-        estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount
-    ]);
+    }, [fiat, rate?.prices, estimation?.fee?.extra?.stringWeiAmount]);
 
     useEffect(() => {
         if (!targetAuth?.wallet) return;
@@ -195,9 +196,9 @@ const ProInstallExtensionNotificationContent: FC<
                             <Body2Styled>{t('swap_blockchain_fee')}</Body2Styled>
                             <FiatEquivalentWrapper>
                                 <Label2>
-                                    {estimateFeeMutation.isLoading && <SpinnerIcon />}
-                                    {estimateFeeMutation.error && <>—</>}
-                                    {estimateFeeMutation?.data?.fee?.extra &&
+                                    {isEstimating && <SpinnerIcon />}
+                                    {estimationError && <>—</>}
+                                    {estimation?.fee?.extra &&
                                         new AssetAmount({
                                             asset: TON_ASSET,
                                             weiAmount:
@@ -206,7 +207,7 @@ const ProInstallExtensionNotificationContent: FC<
                                                 )
                                         }).toStringAssetAbsoluteRelativeAmount()}
                                 </Label2>
-                                {!estimateFeeMutation.error && (
+                                {!estimationError && (
                                     <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>
                                 )}
                             </FiatEquivalentWrapper>
@@ -226,8 +227,11 @@ const ProInstallExtensionNotificationContent: FC<
     );
 };
 
-export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
+export const ConfirmMainButton: ConfirmMainButtonProps = props => {
+    const { isLoading, isDisabled, onClick } = props;
+
     const { t } = useTranslation();
+
     return (
         <Button
             fullWidth

@@ -1,8 +1,10 @@
-import { Language } from './language';
+import nacl from 'tweetnacl';
+
 import { Network } from './network';
-import { DeprecatedAuthState } from './password';
+import { Language } from './language';
 import { WalletProxy } from './proxy';
 import { TronWallet } from './tron/tron-wallet';
+import { DeprecatedAuthState } from './password';
 import { Account, AccountMAM, AccountTonMnemonic } from './account';
 
 export enum WalletVersion {
@@ -222,3 +224,23 @@ export const addWalletMethod = [
     'sk_fireblocks'
 ] as const;
 export type AddWalletMethod = (typeof addWalletMethod)[number];
+
+export interface IMetaEncryptionData {
+    encryptionPrivateKey: nacl.SignKeyPair;
+    encryptionCertificate: Buffer;
+}
+
+export interface ISerializedMetaEncryptionData {
+    encryptionPrivateKey: {
+        publicKey: string;
+        secretKey: string;
+    };
+    encryptionCertificate: string;
+}
+
+export type MetaEncryptionSerializedMap = Record<string, ISerializedMetaEncryptionData>;
+
+export interface IMutateEncryptionProps {
+    wallet: TonWalletStandard;
+    preparedSeed?: string;
+}

@@ -7,8 +7,9 @@ import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
     useCreateAccountMAM,
-    useCreateAccountMnemonic,
     useMutateRenameAccount,
+    useCreateAccountMnemonic,
+    useMutateMetaKeyAndCertificates,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
 import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
@@ -259,6 +260,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         useMutateRenameAccountDerivations();
 
     const { mutateAsync: tryAutoAuth } = useAutoAuthMutation();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
     const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
@@ -425,6 +427,10 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
             (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') &&
             selectNetworksPassed
         ) {
+            void mutateMetaEncryptionKey({
+                wallet: createdAccount.activeTonWallet,
+                preparedSeed: mnemonic.join(' ')
+            });
             void tryAutoAuth({
                 wallet: createdAccount.activeTonWallet,
                 signer: maxOneCall(

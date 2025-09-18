@@ -1,4 +1,4 @@
-import React, { FC, PropsWithChildren, useEffect, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { styled } from 'styled-components';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 import { Body2, Body3, Label2 } from '../../Text';
@@ -79,14 +79,17 @@ export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> 
     );
 };
 
-const ProRemoveExtensionNotificationContent: FC<
-    PropsWithChildren<{
-        onBack?: () => void;
-        onClose: (confirmed?: boolean) => void;
-        subscription: IExtensionActiveSubscription;
-        fitContent?: boolean;
-    }>
-> = ({ onClose, subscription }) => {
+interface IProRemoveExtensionContent {
+    onBack?: () => void;
+    onClose: (confirmed?: boolean) => void;
+    subscription: IExtensionActiveSubscription;
+    fitContent?: boolean;
+}
+
+const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
+    onClose,
+    subscription
+}) => {
     const { contract: extensionContract, auth, expiresDate, nextChargeDate } = subscription;
 
     const selectedWallet = auth.wallet;
@@ -100,16 +103,21 @@ const ProRemoveExtensionNotificationContent: FC<
 
     const removeMutation = useCancelSubscription();
     const estimateFeeMutation = useEstimateRemoveExtension();
+    const {
+        data: estimation,
+        error: estimationError,
+        isLoading: isEstimating
+    } = estimateFeeMutation;
 
-    const feeEquivalent: string = useMemo(
-        () =>
-            getFiatEquivalent({
-                amount: estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount ?? null,
-                fiat,
-                ratePrice: rate?.prices
-            }),
-        [estimateFeeMutation?.data?.fee?.extra?.stringWeiAmount, fiat, rate?.prices]
-    );
+    const feeEquivalent: string = useMemo(() => {
+        if (!estimation?.fee?.extra) return '';
+
+        return getFiatEquivalent({
+            amount: estimation.fee.extra.stringWeiAmount,
+            fiat,
+            ratePrice: rate?.prices
+        });
+    }, [fiat, rate?.prices, estimation?.fee?.extra?.stringWeiAmount]);
 
     useEffect(() => {
         if (!removeMutation.isSuccess || !finalExpiresDate) return;
@@ -174,14 +182,12 @@ const ProRemoveExtensionNotificationContent: FC<
                         <Body2Styled>{t('swap_blockchain_fee')}</Body2Styled>
                         <FiatEquivalentWrapper>
                             <Label2>
-                                {estimateFeeMutation.isLoading && <SpinnerIcon />}
-                                {estimateFeeMutation.error && <>—</>}
-                                {estimateFeeMutation.data &&
-                                    estimateFeeMutation.data.fee.extra.toStringAssetRelativeAmount()}
+                                {isEstimating && <SpinnerIcon />}
+                                {estimationError && <>—</>}
+                                {estimation?.fee?.extra &&
+                                    estimation.fee.extra.toStringAssetRelativeAmount()}
                             </Label2>
-                            {!estimateFeeMutation.error && (
-                                <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>
-                            )}
+                            {!estimationError && <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>}
                         </FiatEquivalentWrapper>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
@@ -198,8 +204,11 @@ const ProRemoveExtensionNotificationContent: FC<
     );
 };
 
-export const ConfirmMainButton: ConfirmMainButtonProps = ({ isLoading, isDisabled, onClick }) => {
+export const ConfirmMainButton: ConfirmMainButtonProps = props => {
+    const { isLoading, isDisabled, onClick } = props;
+
     const { t } = useTranslation();
+
     return (
         <CancelButtonStyled
             fullWidth

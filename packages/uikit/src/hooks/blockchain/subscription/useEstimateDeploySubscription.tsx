@@ -5,21 +5,18 @@ import {
     EncodedResultKinds,
     SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { TonRawTransactionService } from '@tonkeeper/core/dist/service/ton-blockchain/ton-raw-transaction.service';
-import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import {
-    estimationSigner,
-    externalMessage,
-    getWalletSeqNo
-} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
-import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
-import { EmulationApi } from '@tonkeeper/core/dist/tonApiV2';
+import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
-import { useActiveApi } from '../../../state/wallet';
 import { SubscriptionEncodingParams } from './commonTypes';
+import { useActiveApi, useMetaEncryptionData } from '../../../state/wallet';
+import {
+    ExtensionMessageSender,
+    V4ActionTypes
+} from '@tonkeeper/core/dist/service/ton-blockchain/sender/extension-message-sender';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
+    const { data: metaEncryptionMap } = useMetaEncryptionData();
 
     return useMutation<
         { fee: TransactionFeeTonAsset; address: Address },
@@ -36,11 +33,16 @@ export const useEstimateDeploySubscription = () => {
             caller_fee,
             recipient,
             withdraw_msg_body,
-            selectedWallet
+            selectedWallet,
+            metadata
         } = subscriptionParams;
 
+        if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
+            throw new Error('walletMetaEncryptionPrivateKey is missed!');
+        }
+
         const encoder = new SubscriptionEncoder(selectedWallet);
-        const result = encoder.encodeCreateSubscriptionV2({
+        const result = await encoder.encodeCreateSubscriptionV2({
             beneficiary: Address.parse(admin),
             subscriptionId: subscription_id,
             firstChargingDate: first_charging_date,
@@ -49,41 +51,40 @@ export const useEstimateDeploySubscription = () => {
             gracePeriod: grace_period,
             callerFee: BigInt(caller_fee),
             withdrawAddress: Address.parse(recipient),
-            withdrawMsgBody: withdraw_msg_body
+            withdrawMsgBody: withdraw_msg_body,
+            metadata,
+            walletMetaEncryptionPrivateKey:
+                metaEncryptionMap[selectedWallet.rawAddress].encryptionPrivateKey
         });
 
-        const rawTx = new TonRawTransactionService(api, selectedWallet);
-        const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
+        const sender = new ExtensionMessageSender(api, selectedWallet, estimationSigner);
 
         let estimation;
         if (result.kind === EncodedResultKinds.V5) {
-            estimation = await rawTx.estimate(sender, result.actions);
+            estimation = await sender.estimate({
+                kind: result.kind,
+                outgoing: result.actions
+            });
         }
 
         if (result.kind === EncodedResultKinds.V4) {
-            const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
-
-            const unsigned = encoder.buildV4DeployAndLinkUnsignedBody({
-                seqno,
-                sendAmount: result.sendAmount,
-                extStateInit: result.extStateInit,
-                deployBody: result.deployBody
-            });
-
-            const walletContract = walletContractFromState(selectedWallet);
-            const externalCell = externalMessage(walletContract, seqno, unsigned);
-
-            estimation = await new EmulationApi(api.tonApiV2).emulateMessageToWallet({
-                emulateMessageToWalletRequest: { boc: externalCell.toBoc().toString('base64') }
+            estimation = await sender.estimate({
+                kind: EncodedResultKinds.V4,
+                outgoing: {
+                    actionType: V4ActionTypes.DEPLOY,
+                    sendAmount: result.sendAmount,
+                    extStateInit: result.extStateInit,
+                    deployBody: result.deployBody
+                }
             });
         }
 
-        if (!estimation) {
+        if (!estimation || estimation.fee?.type !== 'ton-asset') {
             throw new Error('Unsupported wallet version flow!');
         }
 
         return {
-            fee: estimation.fee as TransactionFeeTonAsset,
+            fee: estimation.fee,
             address: result.extensionAddress
         };
     });

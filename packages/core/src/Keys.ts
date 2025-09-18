@@ -18,6 +18,7 @@ export enum AppKey {
     ACCOUNT_CONFIG = 'account_config',
     GLOBAL_PREFERENCES_CONFIG = 'global_preferences_config',
     MULTISIG_VIEWED_ORDERS = 'viewed_multisig_orders',
+    META_ENCRYPTION_MAP = 'meta_encryption_map',
 
     THEME = 'theme',
     UI_PREFERENCES = 'ui_preferences',

@@ -1,22 +1,23 @@
 import { useMutation } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { useActiveApi, useAccountWallets } from '../../../state/wallet';
+import { useActiveApi, useAccountWallets, useMetaEncryptionData } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import {
     EncodedResultKinds,
     SubscriptionEncoder
 } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
-import { externalMessage, getWalletSeqNo } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
-import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
-import { walletContractFromState } from '@tonkeeper/core/dist/service/wallet/contractService';
 import { SubscriptionEncodingParams } from './commonTypes';
+import {
+    ExtensionMessageSender,
+    V4ActionTypes
+} from '@tonkeeper/core/dist/service/ton-blockchain/sender/extension-message-sender';
 
 export const useCreateSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
+    const { data: metaEncryptionMap } = useMetaEncryptionData();
     const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
@@ -33,7 +34,8 @@ export const useCreateSubscription = () => {
             recipient,
             contract,
             withdraw_msg_body,
-            selectedWallet
+            selectedWallet,
+            metadata
         } = subscriptionParams;
 
         const accountWallet = accountsWallets.find(
@@ -49,8 +51,13 @@ export const useCreateSubscription = () => {
 
         if (!signer || signer.type !== 'cell') throw new Error('Signer is incorrect!');
 
+        if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
+            throw new Error('walletMetaEncryptionPrivateKey is missed!');
+        }
+        const sender = new ExtensionMessageSender(api, selectedWallet, signer);
+
         const encoder = new SubscriptionEncoder(selectedWallet);
-        const result = encoder.encodeCreateSubscriptionV2({
+        const result = await encoder.encodeCreateSubscriptionV2({
             beneficiary: Address.parse(admin),
             subscriptionId: subscription_id,
             firstChargingDate: first_charging_date,
@@ -59,7 +66,10 @@ export const useCreateSubscription = () => {
             gracePeriod: grace_period,
             callerFee: BigInt(caller_fee),
             withdrawAddress: Address.parse(recipient),
-            withdrawMsgBody: withdraw_msg_body
+            withdrawMsgBody: withdraw_msg_body,
+            metadata,
+            walletMetaEncryptionPrivateKey:
+                metaEncryptionMap[selectedWallet.rawAddress].encryptionPrivateKey
         });
 
         if (!result.extensionAddress.equals(Address.parse(contract))) {
@@ -67,31 +77,23 @@ export const useCreateSubscription = () => {
         }
 
         if (result.kind === EncodedResultKinds.V5) {
-            const sender = new WalletMessageSender(api, selectedWallet, signer);
-            await sender.send(result.actions);
+            await sender.send({
+                kind: result.kind,
+                outgoing: result.actions
+            });
 
             return true;
         }
 
         if (result.kind === EncodedResultKinds.V4) {
-            const seqno = await getWalletSeqNo(api, selectedWallet.rawAddress);
-
-            const unsigned = encoder.buildV4DeployAndLinkUnsignedBody({
-                seqno,
-                sendAmount: result.sendAmount,
-                extStateInit: result.extStateInit,
-                deployBody: result.deployBody
-            });
-
-            const signature: Buffer = await signer(unsigned);
-
-            const body = encoder.buildV4SignedBody(signature, unsigned);
-
-            const walletContract = walletContractFromState(selectedWallet);
-            const externalCell = externalMessage(walletContract, seqno, body);
-
-            await new BlockchainApi(api.tonApiV2).sendBlockchainMessage({
-                sendBlockchainMessageRequest: { boc: externalCell.toBoc().toString('base64') }
+            await sender.send({
+                kind: EncodedResultKinds.V4,
+                outgoing: {
+                    actionType: V4ActionTypes.DEPLOY,
+                    sendAmount: result.sendAmount,
+                    extStateInit: result.extStateInit,
+                    deployBody: result.deployBody
+                }
             });
 
             return true;
