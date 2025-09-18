@@ -300,7 +300,7 @@
   "manage_unavailable": "Subscription management is temporarily unavailable",
   "Manage_wallets": "Manage Wallets",
   "manifest_mismatch_error": "The connection is blocked to protect you from phishing. The dApp with actual domain {actual} is trying to authorise as  {declared}. Recheck the dApp URL.",
-  "mata_encrypt_key_creation_failed": "Encryption key creation failed!",
+  "meta_encrypt_key_creation_failed": "Encryption key creation failed!",
   "Minimize": "Minimize",
   "MinPassword": "Must be at least 6 characters.",
   "month": "month",

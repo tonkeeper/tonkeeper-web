@@ -67,13 +67,13 @@ const MetaEncryptionNotificationContent = ({ onClose, onConfirm }: IMetaEncrypti
         isSuccess,
         mutateAsync: createMetaEncryption
     } = useMutateMetaKeyAndCertificates();
-    useNotifyError(isError && new Error(t('mata_encrypt_key_creation_failed')));
+    useNotifyError(isError && new Error(t('meta_encrypt_key_creation_failed')));
 
     const onSubmit = async () => {
         const wallet = targetAuth?.wallet;
 
         if (!wallet || !onConfirm) {
-            toast('mata_encrypt_key_creation_failed');
+            toast(t('meta_encrypt_key_creation_failed'));
 
             return;
         }

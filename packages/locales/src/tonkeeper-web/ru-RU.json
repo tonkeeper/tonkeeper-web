@@ -293,7 +293,7 @@
   "manage_unavailable": "Управление подпиской временно недоступно",
   "Manage_wallets": "Управление кошельками",
   "manifest_mismatch_error": "Соединение заблокировано в целях защиты от фишинга. DApp с фактическим доменом {actual} пытается авторизоваться как {declared}. Проверьте URL dApp.",
-  "mata_encrypt_key_creation_failed": "Не удалось создать ключ шифрования!",
+  "meta_encrypt_key_creation_failed": "Не удалось создать ключ шифрования!",
   "Minimize": "Свернуть",
   "MinPassword": "Должно быть не менее 6 символов.",
   "month": "месяц",

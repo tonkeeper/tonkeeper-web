@@ -121,7 +121,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
             const isCreated = await createMetaEncryption();
 
             if (!isCreated) {
-                toast(t('mata_encrypt_key_creation_failed'));
+                toast(t('meta_encrypt_key_creation_failed'));
 
                 return;
             }
