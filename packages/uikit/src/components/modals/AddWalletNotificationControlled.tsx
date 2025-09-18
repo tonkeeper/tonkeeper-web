@@ -121,7 +121,7 @@ export const AddWalletNotificationControlled = () => {
             sdk.addWalletPage?.open(params.walletType);
         }
         setSelectedMethod(params?.walletType);
-    }, [isOpen, params?.walletType, isSubscriptionValid]);
+    }, [isOpen, params?.walletType]);
 
     const sdk = useAppSdk();
 
