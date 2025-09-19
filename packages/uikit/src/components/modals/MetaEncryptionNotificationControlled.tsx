@@ -100,13 +100,15 @@ const MetaEncryptionNotificationContent = ({ onClose, onConfirm }: IMetaEncrypti
 
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    <Button primary fullWidth type="submit" form={formId} loading={isLoading}>
-                        <Label2>{t('create')}</Label2>
-                    </Button>
+                    <ButtonsBlockStyled>
+                        <Button primary fullWidth type="submit" form={formId} loading={isLoading}>
+                            <Label2>{t('create')}</Label2>
+                        </Button>
 
-                    <Button secondary fullWidth type="button" onClick={onClose}>
-                        <Label2>{t('cancel')}</Label2>
-                    </Button>
+                        <Button secondary fullWidth type="button" onClick={onClose}>
+                            <Label2>{t('cancel')}</Label2>
+                        </Button>
+                    </ButtonsBlockStyled>
                 </NotificationFooter>
             </NotificationFooterPortal>
         </ContentWrapper>
@@ -125,4 +127,12 @@ const Body2Styled = styled(Body2)`
     max-width: 350px;
     text-align: center;
     color: ${props => props.theme.textSecondary};
+`;
+
+const ButtonsBlockStyled = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
 `;
