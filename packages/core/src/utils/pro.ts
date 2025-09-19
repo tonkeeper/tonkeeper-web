@@ -16,6 +16,7 @@ import {
     IosSubscriptionStatuses,
     isCryptoSubscription,
     isExpiredSubscription,
+    isExtensionPendingCancelSubscription,
     isExtensionSubscription,
     isPendingSubscription,
     isProductId,
@@ -301,7 +302,9 @@ export const getStatusText = (subscription: ProSubscription, translator: Transla
     if (!subscription) return '-';
 
     if (isPendingSubscription(subscription)) {
-        return `${translator('processing')}...`;
+        return `${translator(
+            isExtensionPendingCancelSubscription(subscription) ? 'cancelling' : 'processing'
+        )}...`;
     }
 
     return `${translator(subscription.status)}`;

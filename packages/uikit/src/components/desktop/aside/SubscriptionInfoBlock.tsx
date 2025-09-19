@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
+    isExtensionPendingCancelSubscription,
     isPaidActiveSubscription,
     isPendingSubscription,
     isTelegramActiveSubscription,
@@ -218,7 +219,11 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
             >
                 <ProButtonPanel onClick={handleNavigateToSettingsPro}>
                     <SpinnerIcon />
-                    {t('processing')}
+                    {t(
+                        isExtensionPendingCancelSubscription(subscription)
+                            ? 'cancelling'
+                            : 'processing'
+                    )}
                 </ProButtonPanel>
             </DropDown>
         );
