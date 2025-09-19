@@ -1,38 +1,12 @@
 {
-  "about_risk_modal": {
-    "description": "ارزش کل توکن‌هایی که از کیف پول شما ارسال می‌شود. بازپرداخت در کل ارزش گنجانده نشده است.",
-    "description_with_nft": "ارزش کل توکن‌ها، بدون احتساب هزینه NFT، که از کیف پول شما ارسال می‌شود. بازپرداخت در کل ارزش گنجانده نشده است.",
-    "ok_button": "OK"
-  },
-  "about_ton": "TON یک بلاک چین لایه یکِ کاملا غیرمتمرکز است که توسط تلگرام برای میلیاردها کاربر طراحی شده است. دارای قابلیت تراکنش‌های فوق‌العاده سریع، کارمزدهای کم، برنامه‌های کاربردی ساده و سازگار با محیط زیست است.",
-  "access_confirmation_logout": "خارج شدن",
-  "access_confirmation_reset": "بازنشانی",
-  "access_confirmation_title": "رمز عبور را وارد کنید",
-  "access_confirmation_update_biometry": "برای استفاده از اثرانگشت، گذرواژه را وارد کنید",
-  "access_denied": "دسترسی رد شد",
-  "account_deleted": "اکانت حذف شد",
   "activityActionModal": {
-    "bid": "مزایده",
-    "burned": "سوخت",
-    "call_contract": "قرارداد تماس",
-    "deposit": "استیک",
-    "purchase": "خرید",
-    "received": "دریافت کرد",
-    "sent": "ارسال",
-    "swapped": "تعویض شد",
-    "time_on": "در {time}",
-    "withdraw": "لغو استیک",
     "withdrawal_request": "درخواست لغو استیک"
   },
   "activity": {
-    "buy_toncoin_btn": "خرید TON",
     "empty_transaction_caption": "اولین نقل و انتقال خود را انجام دهید!",
     "empty_transaction_title": "تاریخچه شما در اینجا نشان داده خواهد شد",
     "failed_transaction": "بی‌نتیجه",
-    "receive_btn": "دریافت",
-    "received": "دریافت کرد",
-    "screen_title": "تاریخچه",
-    "sent": "ارسال شد"
+    "screen_title": "تاریخچه"
   },
   "add_edit_favorite": {
     "address_label": "آدرس",
@@ -42,139 +16,177 @@
     "name_placeholder": "نام",
     "save": "ذخیره"
   },
-  "add_other_coins": "ارزهای دیگری اضافه کنید",
   "address_copied": "آدرس کپی شد",
   "add_wallet": "افزودن کیف پول",
   "add_wallet_modal": {
-    "create": {
-      "subtitle": "ساخت کیف پول جدید",
-      "title": "کیف پول جدید"
-    },
-    "import": {
-      "subtitle": "کیف پول را با 24 کلمه بازیابی پنهان وارد کنید",
-      "title": "کیف پول موجود"
-    },
-    "import_subtitle": "از میان گزینه های زیر انتخاب کنید.",
-    "import_title": "وارد کردن کیف پول",
-    "ledger": {
-      "subtitle": "ماژول سخت افزاری، بلوتوث، ویژگی های محدود TON",
-      "title": "جفت شدن با لجر - Ledger"
-    },
-    "other_options": "گزینه‌های دیگر",
-    "signer": {
-      "subtitle": "کاملاً آفلاین، دارای شکاف هوا، همه ویژگی‌های TON",
-      "title": "جفت شدن با ساینر - Signer"
-    },
-    "subtitle": "یک کیف پول جدید ایجاد کنید یا یک کیف پول موجود اضافه کنید.",
     "testnet": {
       "subtitle": "کیف پول با 24 کلمه بازیابی پنهان را به Testnet وارد کنید",
       "title": "حساب Testnet"
     },
-    "title": "افزودن کیف پول",
     "watch_only": {
       "subtitle": "برای نظارت بر فعالیت کیف پول بدون نیاز به عبارت بازیابی",
       "title": "حساب ناظر"
     }
   },
   "add_watch_only": {
-    "subtitle": "نظارت بر فعالیت کیف پول بدون عبارت بازیابی. هر گونه تراکنش از این کیف پول به شما اطلاع داده خواهد شد.",
-    "title": "تماشای حساب",
-    "wallet_not_found": "آدرس کیف پول پیدا نشد"
+    "title": "تماشای حساب"
   },
-  "all_regions": "همه مناطق",
-  "appearance_accent_name": {
-    "andromeda": "آندرومدا",
-    "arctic": "آرکتیک",
-    "azure": "آژور",
-    "coral": "کورال",
-    "cosmos": "کسمس",
-    "default": "تون کیپر",
-    "flamingo": "فلامینگو",
-    "fluid": "فلوید",
-    "galaxy": "گلکسی",
-    "iris": "آیریس",
-    "marine": "مارین",
-    "ocean": "اوشن",
-    "sky": "اسکای"
-  },
-  "appearance_confirm": "اعمال",
-  "appearance_description": "TON Diamonds ان‌اف‌تی کیف پول شما را رنگارنگ تر و منحصر به فردتر می کند.",
-  "appearance_title": "تم",
-  "app_name": "Tonkeeper",
   "approval": {
-    "accept": "تایید",
     "accepted": "نمایان",
-    "accepted_at_collection": "تایید شده در {date}",
-    "accepted_at_token": "تایید شده در {date}",
-    "accepted_collection": "کلکسیون تایید شده",
-    "accepted_token": "توکن تایید شده",
-    "approve_all": "تایید همه",
-    "approve_collection_many": "تایید توکن های ورودی از \"{collection}\" کلکسیون",
-    "approve_collection_one": "تایید توکن های وروری از \"{collection}\" کلکسیون",
-    "approve_many": "تایید {count} توکن های ورودی",
-    "approve_token": "تایید توکن ورودی \"{name}\"",
-    "approve_two_collections": "تایید توکن های ورودی از کلکسیون های\"{collection1}\" \"{collection2}\"",
-    "approve_two_tokens": "تایید توکن های ورودی \"{name1}\" و \"{name2}\"",
-    "blacklisted_collection": "کلکسیون در لیست سیاه قرار گرفت",
-    "blacklisted_token": "توکن در لیست سیاه قرار گرفت",
-    "decline": "رد کردن",
     "declined": "پنهان",
-    "declined_at_collection": "رد شده در {date}",
-    "declined_at_token": "رد شده در {date}",
-    "details_collection": "اطلاعات کلکسیون",
     "details_token": "اطلاعات توکن",
     "id_collection": "آی‌دی کلکسیون",
     "id_token": "آی‌دی توکن",
-    "manage_tokens": "مدیریت توکن ها",
-    "move_to_accepted": "انتقال به تایید شده ها",
-    "move_to_accepted_collection": "نمایش کلکسیون در کیف پول",
-    "move_to_accepted_token": "نمایش توکن در کیف پول",
-    "move_to_declined": "انتقال به رد شده ها",
-    "move_to_declined_collection": "پنهان سازی کلکسیون از کیف پول",
-    "move_to_declined_token": "پنهان سازی توکن از کیف پول",
     "name": "نام",
     "not_spam": "هرزنامه نیست",
-    "pending": "در انتظار",
-    "show_all": "نمایش همه",
-    "single_token": "توکن تکی",
     "spam": "هرزنامه",
-    "token_copied": "آی‌دی توکن کپی شد",
-    "token_count": {
-      "one": "{count} توکن",
-      "other": "{count} توکن"
+    "unverified_token": "توکن تایید نشده"
+  },
+  "balances_setup_wallet": "راه اندازی کیف پول",
+  "unused": {
+    "about_risk_modal": {
+      "description": "ارزش کل توکن‌هایی که از کیف پول شما ارسال می‌شود. بازپرداخت در کل ارزش گنجانده نشده است.",
+      "description_with_nft": "ارزش کل توکن‌ها، بدون احتساب هزینه NFT، که از کیف پول شما ارسال می‌شود. بازپرداخت در کل ارزش گنجانده نشده است.",
+      "ok_button": "OK"
     },
-    "unverified_token": "توکن تایید نشده",
-    "verify_collection": "تایید کلکسیون",
-    "verify_description_collection": "این کلکسیون ها از صادرکننده ناشناس هستند. برای شناسایی تقلبی ها، آی‌دی کلکسیون را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
-    "verify_description_token": "این توکن از صادرکننده ناشناس است. برای شناسایی تقلبی‌ها، آی‌دی را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
-    "verify_token": "تایید توکن",
-    "whitelisted_collection": "کلکسیون در لیست سفید",
-    "whitelisted_token": "توکن در لیست سفید"
-  },
-  "auth_failed": "احراز ناموفق",
-  "backup_check": {
-    "caption": "بیایید ببینیم آیا همه چیز را درست انجام داده اید یا خیر. کلمات {one}، {two}، و {three} را وارد کنید.",
-    "done_button": "تمام",
-    "title": "بررسی بکاپ"
-  },
-  "backup_screen": {
-    "backup_warning": "موجودی شما {totalFiat} است، و فقط با عبارت بازیابی که هنوز یادداشت نکرده اید محافظت می شود. از عبارت نسخه پشتیبان تهیه کنید تا در صورت بروز مشکل در دستگاه، از از‌دست دادن سرمایه خودداری کنید.",
-    "last_backup_time": "آخرین پشتیبانی گیری {time}",
-    "manual_backup_on": "پشتیبان گیری دستی روشن است",
-    "manual_button": "پشتیبان گیری به صورت دستی",
-    "manual_caption": "با نوشتن عبارت بازیابی، به صورت دستی از کیف پول خود نسخه پشتیبان تهیه کنید.",
-    "manual_title": "دستی",
-    "show_recovery_phrase": "نمایش عبارت بازیابی",
-    "title": "پشتیبان گیری"
-  },
-  "backup_warning": {
-    "cancel_button": "لغو",
-    "caption": "لطفاً قبل از مشاهده عبارت بازیابی، موارد زیر را به دقت بخوانید.",
-    "continue_button": "ادامه",
-    "p1": "هرگز عبارت بازیابی خود را در جای دیگری غیر از تون‌کیپر برای دسترسی به کیف پول خود وارد نکنید.",
-    "p2": "پشتیبانی تون‌کیپر هرگز عبارت بازیابی را درخواست نمی کند.",
-    "p3": "همه افراد با عبارت بازیابی شما می توانند به کیف پول شما دسترسی داشته باشند.",
-    "title": "توجه"
-  },
-  "balances_setup_wallet": "راه اندازی کیف پول"
+    "about_ton": "TON یک بلاک چین لایه یکِ کاملا غیرمتمرکز است که توسط تلگرام برای میلیاردها کاربر طراحی شده است. دارای قابلیت تراکنش‌های فوق‌العاده سریع، کارمزدهای کم، برنامه‌های کاربردی ساده و سازگار با محیط زیست است.",
+    "access_confirmation_logout": "خارج شدن",
+    "access_confirmation_reset": "بازنشانی",
+    "access_confirmation_title": "رمز عبور را وارد کنید",
+    "access_confirmation_update_biometry": "برای استفاده از اثرانگشت، گذرواژه را وارد کنید",
+    "access_denied": "دسترسی رد شد",
+    "account_deleted": "اکانت حذف شد",
+    "activityActionModal": {
+      "bid": "مزایده",
+      "burned": "سوخت",
+      "call_contract": "قرارداد تماس",
+      "deposit": "استیک",
+      "purchase": "خرید",
+      "received": "دریافت کرد",
+      "sent": "ارسال",
+      "swapped": "تعویض شد",
+      "time_on": "در {time}",
+      "withdraw": "لغو استیک"
+    },
+    "activity": {
+      "buy_toncoin_btn": "خرید TON",
+      "receive_btn": "دریافت",
+      "received": "دریافت کرد",
+      "sent": "ارسال شد"
+    },
+    "add_other_coins": "ارزهای دیگری اضافه کنید",
+    "add_wallet_modal": {
+      "create": {
+        "subtitle": "ساخت کیف پول جدید",
+        "title": "کیف پول جدید"
+      },
+      "import": {
+        "subtitle": "کیف پول را با 24 کلمه بازیابی پنهان وارد کنید",
+        "title": "کیف پول موجود"
+      },
+      "import_subtitle": "از میان گزینه های زیر انتخاب کنید.",
+      "import_title": "وارد کردن کیف پول",
+      "ledger": {
+        "subtitle": "ماژول سخت افزاری، بلوتوث، ویژگی های محدود TON",
+        "title": "جفت شدن با لجر - Ledger"
+      },
+      "other_options": "گزینه‌های دیگر",
+      "signer": {
+        "subtitle": "کاملاً آفلاین، دارای شکاف هوا، همه ویژگی‌های TON",
+        "title": "جفت شدن با ساینر - Signer"
+      },
+      "subtitle": "یک کیف پول جدید ایجاد کنید یا یک کیف پول موجود اضافه کنید.",
+      "title": "افزودن کیف پول"
+    },
+    "add_watch_only": {
+      "subtitle": "نظارت بر فعالیت کیف پول بدون عبارت بازیابی. هر گونه تراکنش از این کیف پول به شما اطلاع داده خواهد شد.",
+      "wallet_not_found": "آدرس کیف پول پیدا نشد"
+    },
+    "all_regions": "همه مناطق",
+    "appearance_accent_name": {
+      "andromeda": "آندرومدا",
+      "arctic": "آرکتیک",
+      "azure": "آژور",
+      "coral": "کورال",
+      "cosmos": "کسمس",
+      "default": "تون کیپر",
+      "flamingo": "فلامینگو",
+      "fluid": "فلوید",
+      "galaxy": "گلکسی",
+      "iris": "آیریس",
+      "marine": "مارین",
+      "ocean": "اوشن",
+      "sky": "اسکای"
+    },
+    "appearance_confirm": "اعمال",
+    "appearance_description": "TON Diamonds ان‌اف‌تی کیف پول شما را رنگارنگ تر و منحصر به فردتر می کند.",
+    "appearance_title": "تم",
+    "app_name": "Tonkeeper",
+    "approval": {
+      "accept": "تایید",
+      "accepted_at_collection": "تایید شده در {date}",
+      "accepted_at_token": "تایید شده در {date}",
+      "accepted_collection": "کلکسیون تایید شده",
+      "accepted_token": "توکن تایید شده",
+      "approve_all": "تایید همه",
+      "approve_collection_many": "تایید توکن های ورودی از \"{collection}\" کلکسیون",
+      "approve_collection_one": "تایید توکن های وروری از \"{collection}\" کلکسیون",
+      "approve_many": "تایید {count} توکن های ورودی",
+      "approve_token": "تایید توکن ورودی \"{name}\"",
+      "approve_two_collections": "تایید توکن های ورودی از کلکسیون های\"{collection1}\" \"{collection2}\"",
+      "approve_two_tokens": "تایید توکن های ورودی \"{name1}\" و \"{name2}\"",
+      "blacklisted_collection": "کلکسیون در لیست سیاه قرار گرفت",
+      "blacklisted_token": "توکن در لیست سیاه قرار گرفت",
+      "decline": "رد کردن",
+      "declined_at_collection": "رد شده در {date}",
+      "declined_at_token": "رد شده در {date}",
+      "details_collection": "اطلاعات کلکسیون",
+      "manage_tokens": "مدیریت توکن ها",
+      "move_to_accepted": "انتقال به تایید شده ها",
+      "move_to_accepted_collection": "نمایش کلکسیون در کیف پول",
+      "move_to_accepted_token": "نمایش توکن در کیف پول",
+      "move_to_declined": "انتقال به رد شده ها",
+      "move_to_declined_collection": "پنهان سازی کلکسیون از کیف پول",
+      "move_to_declined_token": "پنهان سازی توکن از کیف پول",
+      "pending": "در انتظار",
+      "show_all": "نمایش همه",
+      "single_token": "توکن تکی",
+      "token_copied": "آی‌دی توکن کپی شد",
+      "token_count": {
+        "one": "{count} توکن",
+        "other": "{count} توکن"
+      },
+      "verify_collection": "تایید کلکسیون",
+      "verify_description_collection": "این کلکسیون ها از صادرکننده ناشناس هستند. برای شناسایی تقلبی ها، آی‌دی کلکسیون را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
+      "verify_description_token": "این توکن از صادرکننده ناشناس است. برای شناسایی تقلبی‌ها، آی‌دی را با منبع رسمی صادرکننده تأیید کنید. بعداً می‌توانید نمایان بودن نشانه را در تنظیمات تغییر دهید.",
+      "verify_token": "تایید توکن",
+      "whitelisted_collection": "کلکسیون در لیست سفید",
+      "whitelisted_token": "توکن در لیست سفید"
+    },
+    "auth_failed": "احراز ناموفق",
+    "backup_check": {
+      "caption": "بیایید ببینیم آیا همه چیز را درست انجام داده اید یا خیر. کلمات {one}، {two}، و {three} را وارد کنید.",
+      "done_button": "تمام",
+      "title": "بررسی بکاپ"
+    },
+    "backup_screen": {
+      "backup_warning": "موجودی شما {totalFiat} است، و فقط با عبارت بازیابی که هنوز یادداشت نکرده اید محافظت می شود. از عبارت نسخه پشتیبان تهیه کنید تا در صورت بروز مشکل در دستگاه، از از‌دست دادن سرمایه خودداری کنید.",
+      "last_backup_time": "آخرین پشتیبانی گیری {time}",
+      "manual_backup_on": "پشتیبان گیری دستی روشن است",
+      "manual_button": "پشتیبان گیری به صورت دستی",
+      "manual_caption": "با نوشتن عبارت بازیابی، به صورت دستی از کیف پول خود نسخه پشتیبان تهیه کنید.",
+      "manual_title": "دستی",
+      "show_recovery_phrase": "نمایش عبارت بازیابی",
+      "title": "پشتیبان گیری"
+    },
+    "backup_warning": {
+      "cancel_button": "لغو",
+      "caption": "لطفاً قبل از مشاهده عبارت بازیابی، موارد زیر را به دقت بخوانید.",
+      "continue_button": "ادامه",
+      "p1": "هرگز عبارت بازیابی خود را در جای دیگری غیر از تون‌کیپر برای دسترسی به کیف پول خود وارد نکنید.",
+      "p2": "پشتیبانی تون‌کیپر هرگز عبارت بازیابی را درخواست نمی کند.",
+      "p3": "همه افراد با عبارت بازیابی شما می توانند به کیف پول شما دسترسی داشته باشند.",
+      "title": "توجه"
+    }
+  }
 }
