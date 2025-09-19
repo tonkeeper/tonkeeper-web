@@ -2,12 +2,12 @@ import { FiatCurrencies, FiatCurrencySymbolsConfig } from '@tonkeeper/core/dist/
 import { intlLocale } from '@tonkeeper/core/dist/entries/language';
 import React, { useMemo } from 'react';
 import { InnerBody } from '../../components/Body';
-import { CheckIcon } from '../../components/Icon';
+import { CheckIcon, SpinnerIcon } from '../../components/Icon';
 import { SubHeader } from '../../components/SubHeader';
 import { SettingsItem, SettingsList } from '../../components/settings/SettingsList';
 import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { useMutateUserFiat } from '../../state/fiat';
+import { useAllowedFiatCurrencies, useMutateUserFiat } from '../../state/fiat';
 import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 import {
     DesktopViewHeader,
@@ -15,7 +15,7 @@ import {
     DesktopViewPageLayout
 } from '../../components/desktop/DesktopViewLayout';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
-import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import styled from 'styled-components';
 
 export const FiatCurrency = () => {
     const { t, i18n } = useTranslation();
@@ -23,11 +23,14 @@ export const FiatCurrency = () => {
     const { fiat } = useAppContext();
     const { mutate } = useMutateUserFiat();
     const isProDisplay = useIsFullWidthMode();
-    const rubEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.RUB);
+    const { data: allowedCurrencies } = useAllowedFiatCurrencies();
 
-    const items = useMemo<SettingsItem[]>(() => {
+    const items = useMemo<SettingsItem[] | undefined>(() => {
+        if (!allowedCurrencies) {
+            return undefined;
+        }
         return Object.entries(FiatCurrencySymbolsConfig)
-            .filter(c => c[0] !== FiatCurrencies.RUB || rubEnabled)
+            .filter(c => allowedCurrencies.includes(c[0]))
             .map(([key]) => ({
                 name: key,
                 secondary:
@@ -39,7 +42,7 @@ export const FiatCurrency = () => {
                 icon: key === fiat ? <CheckIcon /> : undefined,
                 action: () => mutate(key as FiatCurrencies)
             }));
-    }, [mutate, fiat, i18n.language, rubEnabled]);
+    }, [mutate, fiat, i18n.language, allowedCurrencies]);
 
     if (isProDisplay) {
         return (
@@ -49,7 +52,13 @@ export const FiatCurrency = () => {
                         <DesktopViewHeaderContent title={t('settings_primary_currency')} />
                     </DesktopViewHeader>
                 </ForTargetEnv>
-                <SettingsList items={items} />
+                {items ? (
+                    <SettingsList items={items} />
+                ) : (
+                    <LoadingWrapper>
+                        <SpinnerIcon />
+                    </LoadingWrapper>
+                )}
             </DesktopViewPageLayout>
         );
     }
@@ -58,8 +67,22 @@ export const FiatCurrency = () => {
         <>
             <SubHeader title={t('settings_primary_currency')} />
             <InnerBody>
-                <SettingsList items={items} />
+                {items ? (
+                    <SettingsList items={items} />
+                ) : (
+                    <LoadingWrapper>
+                        <SpinnerIcon />
+                    </LoadingWrapper>
+                )}
             </InnerBody>
         </>
     );
 };
+
+const LoadingWrapper = styled.div`
+    margin-top: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: ${props => props.theme.iconTertiary};
+`;
