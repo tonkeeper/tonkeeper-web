@@ -8,7 +8,6 @@ import {
     externalMessage,
     userInputAddressIsBounceable,
     getServerTime,
-    getTonkeeperQueryId,
     getTTL,
     getWalletSeqNo,
     tonConnectAddressIsBounceable,
@@ -253,7 +252,8 @@ export class LedgerMessageSender implements ISender {
             sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
             payload: {
                 type: 'nft-transfer',
-                queryId: getTonkeeperQueryId(),
+                // temporary set to 0 because of ledger app 2.7.0 issue
+                queryId: BigInt(0), // getTonkeeperQueryId(),
                 newOwner: Address.parse(to),
                 responseDestination: Address.parse(this.wallet.rawAddress),
                 forwardAmount: NFTEncoder.nftTransferForwardAmount,
