@@ -108,6 +108,8 @@ interface IEncodeDeployBodyParams {
 export class SubscriptionEncoder {
     public static readonly MIN_EXTENSION_AMOUNT = toNano('0.1');
 
+    public static readonly DEFERRED_PAYMENT_DEPOSIT = toNano('0.06');
+
     public static readonly DEFAULT_V4_REMOVE_EXTENSION_AMOUNT = toNano('0.015');
 
     constructor(
@@ -135,6 +137,11 @@ export class SubscriptionEncoder {
 
         const extensionAddress = contractAddress(0, stateInit);
 
+        const deployValue =
+            params.firstChargingDate === 0
+                ? params.paymentPerPeriod
+                : SubscriptionEncoder.DEFERRED_PAYMENT_DEPOSIT + params.callerFee;
+
         const body = await this.encodeDeployBody({
             firstChargingDate: params.firstChargingDate,
             paymentPerPeriod: params.paymentPerPeriod,
@@ -150,7 +157,7 @@ export class SubscriptionEncoder {
         const initMsg = internal({
             to: extensionAddress,
             bounce: true,
-            value: params.paymentPerPeriod,
+            value: deployValue,
             init: stateInit,
             body
         });
