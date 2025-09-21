@@ -1,5 +1,6 @@
-import React, { FC } from 'react';
-import { Action, ActionTypeEnum } from '@tonkeeper/core/dist/tonApiV2';
+import React, { FC, ReactNode } from 'react';
+import { Action } from '@tonkeeper/core/dist/tonApiV2';
+
 import {
     ActionRow,
     ErrorRow,
@@ -10,42 +11,23 @@ import {
 } from './HistoryCell';
 import styled, { css } from 'styled-components';
 import { ContractDeployIcon } from '../../../activity/ActivityIcons';
-import { ExtensionChargeIcon, ExtensionUnsubscribedIcon } from '../HistoryIcons';
+import {
+    ExtensionChargeIcon,
+    ExtensionSubscribedIcon,
+    ExtensionUnsubscribedIcon
+} from '../HistoryIcons';
 
-const baseIconStyle = css`
-    color: ${p => p.theme.iconPrimary};
-    width: 16px;
-    height: 16px;
-`;
-
-const SimplePreviewIcon = styled(ContractDeployIcon)`
-    ${baseIconStyle}
-`;
-
-const ExtensionChargeIconStyled = styled(ExtensionChargeIcon)`
-    ${baseIconStyle}
-`;
-
-const ExtensionUnsubscribedIconStyled = styled(ExtensionUnsubscribedIcon)`
-    ${baseIconStyle}
-`;
-
-const getIcon = (type: ActionTypeEnum) => {
-    switch (type) {
-        case ActionTypeEnum.Subscribe:
-            return <ExtensionChargeIconStyled />;
-        case ActionTypeEnum.UnSubscribe:
-            return <ExtensionUnsubscribedIconStyled />;
-        default:
-            return <SimplePreviewIcon />;
-    }
-};
+enum ExtensionSimpleNames {
+    SUBSCRIBED = 'Subscribed',
+    UNSUBSCRIBED = 'Unsubscribed',
+    SUBSCRIPTION_CHARGE = 'Subscription Charge'
+}
 
 export const ExtensionDesktopActions: FC<{
     action: Action;
     isScam: boolean;
 }> = ({ action, isScam }) => {
-    const { type, simplePreview } = action;
+    const { simplePreview } = action;
 
     if (!simplePreview) {
         return <ErrorRow />;
@@ -56,7 +38,7 @@ export const ExtensionDesktopActions: FC<{
     return (
         <>
             <HistoryCellActionGeneric
-                icon={getIcon(type)}
+                icon={icons[simplePreview.name] ?? <SimplePreviewIcon />}
                 isFailed={action.status === 'failed'}
                 isScam={isScam}
             >
@@ -75,4 +57,32 @@ export const ExtensionDesktopActions: FC<{
             </ActionRow>
         </>
     );
+};
+
+const baseIconStyle = css`
+    color: ${p => p.theme.iconPrimary};
+    width: 16px;
+    height: 16px;
+`;
+
+const SimplePreviewIcon = styled(ContractDeployIcon)`
+    ${baseIconStyle}
+`;
+
+const ExtensionChargeIconStyled = styled(ExtensionChargeIcon)`
+    ${baseIconStyle}
+`;
+
+const ExtensionSubscribedIconStyled = styled(ExtensionSubscribedIcon)`
+    ${baseIconStyle}
+`;
+
+const ExtensionUnsubscribedIconStyled = styled(ExtensionUnsubscribedIcon)`
+    ${baseIconStyle}
+`;
+
+const icons: Record<string, ReactNode> = {
+    [ExtensionSimpleNames.SUBSCRIBED]: <ExtensionSubscribedIconStyled />,
+    [ExtensionSimpleNames.UNSUBSCRIBED]: <ExtensionUnsubscribedIconStyled />,
+    [ExtensionSimpleNames.SUBSCRIPTION_CHARGE]: <ExtensionChargeIconStyled />
 };
