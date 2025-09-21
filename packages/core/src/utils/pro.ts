@@ -41,7 +41,7 @@ export const normalizeSubscription = (
 
     const valid = subscriptionDto.valid;
     const nextChargeDate = subscriptionDto.next_charge
-        ? new Date(subscriptionDto.next_charge * 1000)
+        ? toDate(subscriptionDto.next_charge)
         : undefined;
 
     if (source === SubscriptionSource.TELEGRAM) {
@@ -78,6 +78,10 @@ export const normalizeSubscription = (
 
     if (source === SubscriptionSource.EXTENSION && authorizedWallet) {
         const dBStoredInfo = subscriptionDto?.extension;
+        const extensionExpiresDate = dBStoredInfo?.expiration_date
+            ? toDate(dBStoredInfo.expiration_date)
+            : undefined;
+        const extensionNextChargeDate = nextChargeDate ?? extensionExpiresDate;
 
         if (dBStoredInfo === undefined) {
             throw new Error('Missing crypto dBStoredInfo');
@@ -88,16 +92,14 @@ export const normalizeSubscription = (
                 source,
                 status: ExtensionSubscriptionStatuses.ACTIVE,
                 valid: true,
-                nextChargeDate,
+                nextChargeDate: extensionNextChargeDate,
                 auth: {
                     type: AuthTypes.WALLET,
                     wallet: authorizedWallet
                 },
                 contract: dBStoredInfo.contract,
                 currency: dBStoredInfo.currency,
-                expiresDate: dBStoredInfo?.expiration_date
-                    ? toDate(dBStoredInfo.expiration_date)
-                    : undefined,
+                expiresDate: extensionExpiresDate,
                 amount: dBStoredInfo.payment_per_period,
                 period: dBStoredInfo.period,
                 purchaseDate: toDate(dBStoredInfo.created_at),

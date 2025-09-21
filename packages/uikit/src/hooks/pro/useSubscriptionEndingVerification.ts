@@ -4,6 +4,7 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useProEndingNotification } from '../../components/modals/ProEndingNotificationControlled';
 import { useProState } from '../../state/pro';
 import {
+    isExtensionAutoRenewableSubscription,
     isIosAutoRenewableSubscription,
     isProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
@@ -15,8 +16,8 @@ enum ProEndingNotificationState {
 
 export const useSubscriptionEndingVerification = () => {
     const sdk = useAppSdk();
-    const { onOpen } = useProEndingNotification();
     const { data: subscription } = useProState();
+    const { onOpen } = useProEndingNotification();
 
     useEffect(() => {
         if (sdk.targetEnv !== 'mobile' && sdk.targetEnv !== 'tablet') return;
@@ -24,6 +25,7 @@ export const useSubscriptionEndingVerification = () => {
         if (!isProSubscription(subscription)) return;
         if (!subscription.nextChargeDate) return;
         if (isIosAutoRenewableSubscription(subscription)) return;
+        if (isExtensionAutoRenewableSubscription(subscription)) return;
 
         const targetTime = subscription.nextChargeDate.getTime();
         const diffDays = (targetTime - Date.now()) / (1000 * 60 * 60 * 24);
