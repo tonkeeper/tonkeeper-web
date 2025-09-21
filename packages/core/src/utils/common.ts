@@ -403,7 +403,7 @@ export function withRetry<TArgs extends unknown[], TResult>(
     };
 }
 
-export function compareNumericStrings(a: string, b: string): boolean {
+export function isFirstNumericStringGreater(a: string, b: string): boolean {
     const numA = Number((a.match(/\d+/g) || []).join(''));
     const numB = Number((b.match(/\d+/g) || []).join(''));
 

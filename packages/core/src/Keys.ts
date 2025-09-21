@@ -48,6 +48,7 @@ export enum AppKey {
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
 
     IS_DEV_MENU_VISIBLE = 'is_dev_menu_visible',
+    IS_DEV_ENVIRONMENT_ALLOWED = 'is_dev_environment_allowed',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',

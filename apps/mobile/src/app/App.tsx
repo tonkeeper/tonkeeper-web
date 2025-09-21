@@ -25,7 +25,7 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsStateQuery,
@@ -185,6 +185,7 @@ export const Loader: FC = () => {
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
     const { data: countryInfo } = useAppCountryInfo();
+    const { data: proApiUrl } = useProApiUrl();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -223,12 +224,6 @@ export const Loader: FC = () => {
         }
     }, [config]);
 
-    useEffect(() => {
-        if (!config?.mainnetConfig) return;
-
-        setProApiUrl(config.mainnetConfig.pro_api_url);
-    }, [config?.mainnetConfig]);
-
     if (
         activeWalletLoading ||
         isLangLoading ||
@@ -236,12 +231,16 @@ export const Loader: FC = () => {
         config === undefined ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
     ) {
         return null;
     }
+
+    // set api url synchronously
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(config.mainnetConfig),

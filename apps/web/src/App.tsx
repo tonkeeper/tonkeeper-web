@@ -25,7 +25,7 @@ import { UserThemeProvider } from '@tonkeeper/uikit/dist/providers/UserThemeProv
 import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import {
     useAccountsState,
@@ -134,6 +134,7 @@ const Loader: FC = () => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
+    const { data: proApiUrl } = useProApiUrl();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -181,12 +182,16 @@ const Loader: FC = () => {
         serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
     ) {
         return <Loading />;
     }
+
+    // set api url synchronously
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

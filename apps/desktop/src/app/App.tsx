@@ -64,7 +64,7 @@ import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -266,6 +266,7 @@ export const Loader: FC = () => {
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
     const { data: fiat } = useUserFiatQuery();
+    const { data: proApiUrl } = useProApiUrl();
 
     const tonendpoint = useTonendpoint({
         build: sdk.version,
@@ -297,12 +298,6 @@ export const Loader: FC = () => {
         window.backgroundApi.onRefresh(() => queryClient.invalidateQueries());
     }, []);
 
-    useEffect(() => {
-        if (!serverConfig?.mainnetConfig) return;
-
-        setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
-    }, [serverConfig?.mainnetConfig]);
-
     if (
         activeWalletLoading ||
         isLangLoading ||
@@ -310,12 +305,16 @@ export const Loader: FC = () => {
         serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
     ) {
         return <Loading />;
     }
+
+    // set api url synchronously
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

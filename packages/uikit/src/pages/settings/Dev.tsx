@@ -34,9 +34,8 @@ import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
 import { useDevMenuVisibility } from '../../state/dev';
-import { setProApiUrl } from '@tonkeeper/core/dist/entries/network';
-import { OpenAPI as TonConsoleApi } from '@tonkeeper/core/dist/pro';
-import { compareNumericStrings } from '@tonkeeper/core/dist/utils/common';
+import { useMutateProApiUrl, useProApiUrl } from '../../state/pro';
+import { isFirstNumericStringGreater } from '@tonkeeper/core/dist/utils/common';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -152,27 +151,26 @@ const LogsSettings = () => {
 const EnvironmentToggle = () => {
     const sdk = useAppSdk();
     const { mainnetConfig } = useAppContext();
+    const { data: proApiUrl } = useProApiUrl();
+    const { mutate: changeUrl } = useMutateProApiUrl();
 
-    const [isDevEnvironment, setIsDevEnvironment] = useState(
-        mainnetConfig.pro_dev_api_url === TonConsoleApi.BASE
-    );
-
-    if (compareNumericStrings(sdk.version, mainnetConfig.pro_apk_name ?? '')) {
+    if (
+        window?.location?.origin.includes('wallet') ||
+        isFirstNumericStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '')
+    ) {
         return null;
     }
-
-    const handleChange = (checked: boolean) => {
-        setIsDevEnvironment(checked);
-        setProApiUrl(checked ? mainnetConfig.pro_dev_api_url : mainnetConfig.pro_api_url);
-    };
 
     return (
         <HideOnReview>
             <ListBlockDesktopAdaptive>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        <Label1>Is dev environment on?</Label1>
-                        <Switch checked={isDevEnvironment} onChange={handleChange} />
+                        <Label1>Is dev-pro on?</Label1>
+                        <Switch
+                            onChange={changeUrl}
+                            checked={proApiUrl === mainnetConfig.pro_dev_api_url}
+                        />
                     </ListItemPayload>
                 </ListItem>
             </ListBlockDesktopAdaptive>

@@ -40,6 +40,7 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { isFirstNumericStringGreater } from '@tonkeeper/core/dist/utils/common';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -302,5 +303,37 @@ export const useActivateTrialMutation = () => {
         await client.invalidateQueries([QueryKey.pro]);
 
         return token;
+    });
+};
+
+export const useProApiUrl = () => {
+    const sdk = useAppSdk();
+    const { mainnetConfig } = useAppContext();
+
+    return useQuery(
+        [AppKey.IS_DEV_ENVIRONMENT_ALLOWED, sdk.version, mainnetConfig.pro_apk_name],
+        async () => {
+            if (
+                window?.location?.origin.includes('wallet') ||
+                isFirstNumericStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '')
+            ) {
+                return mainnetConfig.pro_api_url;
+            }
+
+            const isDevAllowed = Boolean(await sdk.storage.get(AppKey.IS_DEV_ENVIRONMENT_ALLOWED));
+
+            return isDevAllowed ? mainnetConfig.pro_dev_api_url : mainnetConfig.pro_api_url;
+        }
+    );
+};
+
+export const useMutateProApiUrl = () => {
+    const sdk = useAppSdk();
+    const client = useQueryClient();
+
+    return useMutation<void, Error, boolean>(async isDevAllowed => {
+        await sdk.storage.set(AppKey.IS_DEV_ENVIRONMENT_ALLOWED, isDevAllowed);
+
+        await client.invalidateQueries([AppKey.IS_DEV_ENVIRONMENT_ALLOWED]);
     });
 };

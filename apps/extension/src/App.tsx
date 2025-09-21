@@ -59,6 +59,7 @@ import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
 import { Notifications } from './components/Notifications';
+import { useProApiUrl } from '@tonkeeper/uikit/dist/state/pro';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -209,6 +210,7 @@ export const Loader: FC = React.memo(() => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
+    const { data: proApiUrl } = useProApiUrl();
 
     useEffect(() => {
         setLang(localizationFrom(browser.i18n.getUILanguage()));
@@ -228,18 +230,13 @@ export const Loader: FC = React.memo(() => {
         accounts
     );
 
-    useEffect(() => {
-        if (!serverConfig?.mainnetConfig) return;
-
-        setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
-    }, [serverConfig?.mainnetConfig]);
-
     if (
         activeWalletLoading ||
         isWalletsLoading ||
         !serverConfig ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
@@ -250,6 +247,9 @@ export const Loader: FC = React.memo(() => {
             </FullSizeWrapper>
         );
     }
+
+    // set api url synchronously
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),
