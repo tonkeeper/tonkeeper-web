@@ -9,6 +9,7 @@ import { useTranslation } from '../../hooks/translation';
 import { useIsPasswordSet, useMutateDeleteAll, useAccountsState } from '../../state/wallet';
 import { passwordStorage } from '@tonkeeper/core/dist/service/passwordService';
 import { useKeychainSecuritySettings, useMutateLookScreen } from '../../state/password';
+import { useInputFocusScroll } from '../../hooks/keyboard/useInputFocusScroll';
 
 const Block = styled.form<{ minHeight?: string }>`
     display: flex;
@@ -107,8 +108,11 @@ const PasswordUnlock: FC<{ minHeight?: string; logOutConfirmed?: () => void }> =
         }
     }, []);
 
+    const contentRef = useRef<HTMLFormElement>(null);
+    useInputFocusScroll(contentRef);
+
     return (
-        <Block minHeight={minHeight} onSubmit={onSubmit}>
+        <Block ref={contentRef} minHeight={minHeight} onSubmit={onSubmit}>
             <Logo>
                 <TonkeeperIcon />
             </Logo>
