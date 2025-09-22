@@ -41,6 +41,8 @@ import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { isFirstNumericStringGreater } from '@tonkeeper/core/dist/utils/common';
+import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
+import { ServerConfig } from './tonendpoint';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -306,23 +308,29 @@ export const useActivateTrialMutation = () => {
     });
 };
 
-export const useProApiUrl = () => {
+export const useProApiUrl = (mainnetConfig?: ServerConfig['mainnetConfig']) => {
     const sdk = useAppSdk();
-    const { mainnetConfig } = useAppContext();
 
     return useQuery(
-        [AppKey.IS_DEV_ENVIRONMENT_ALLOWED, sdk.version, mainnetConfig.pro_apk_name],
+        [AppKey.IS_DEV_ENVIRONMENT_ALLOWED, sdk.version, mainnetConfig?.pro_apk_name ?? ''],
         async () => {
-            if (
-                window?.location?.origin.includes('wallet') ||
-                isFirstNumericStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '')
-            ) {
+            if (!mainnetConfig) throw new Error('No mainnetConfig available');
+
+            const isDevVersion = isFirstNumericStringGreater(
+                sdk.version,
+                mainnetConfig.pro_apk_name ?? ''
+            );
+
+            if (isWalletInOrigin() || !isDevVersion) {
                 return mainnetConfig.pro_api_url;
             }
 
             const isDevAllowed = Boolean(await sdk.storage.get(AppKey.IS_DEV_ENVIRONMENT_ALLOWED));
 
             return isDevAllowed ? mainnetConfig.pro_dev_api_url : mainnetConfig.pro_api_url;
+        },
+        {
+            enabled: Boolean(mainnetConfig)
         }
     );
 };

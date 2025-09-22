@@ -210,7 +210,6 @@ export const Loader: FC = React.memo(() => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
-    const { data: proApiUrl } = useProApiUrl();
 
     useEffect(() => {
         setLang(localizationFrom(browser.i18n.getUILanguage()));
@@ -223,6 +222,7 @@ export const Loader: FC = React.memo(() => {
         platform: 'extension'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(serverConfig?.mainnetConfig);
 
     const { data: tracker } = useAnalytics(
         serverConfig?.mainnetConfig,

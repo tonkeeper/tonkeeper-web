@@ -266,7 +266,6 @@ export const Loader: FC = () => {
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
     const { data: fiat } = useUserFiatQuery();
-    const { data: proApiUrl } = useProApiUrl();
 
     const tonendpoint = useTonendpoint({
         build: sdk.version,
@@ -276,6 +275,7 @@ export const Loader: FC = () => {
         storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(serverConfig?.mainnetConfig);
 
     useAppHeight();
 

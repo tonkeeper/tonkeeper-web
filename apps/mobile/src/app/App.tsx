@@ -185,7 +185,6 @@ export const Loader: FC = () => {
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
     const { data: countryInfo } = useAppCountryInfo();
-    const { data: proApiUrl } = useProApiUrl();
 
     const lock = useLock(sdk);
     const { i18n } = useTranslation();
@@ -200,6 +199,7 @@ export const Loader: FC = () => {
         storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: config } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(config?.mainnetConfig);
 
     useAppHeight();
 

@@ -466,3 +466,6 @@ export function secondsToUnitCount(
 
     return { unit: 'second', count: safeSeconds, form: pluralRu(safeSeconds) };
 }
+
+// Should be used only for Pro Dev tools
+export const isWalletInOrigin = () => window?.location?.origin.includes('wallet');

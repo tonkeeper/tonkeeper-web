@@ -134,7 +134,6 @@ const Loader: FC = () => {
     const { data: devSettings } = useDevSettings();
     const { isLoading: globalPreferencesLoading } = useGlobalPreferencesQuery();
     const { isLoading: globalSetupLoading } = useGlobalSetup();
-    const { data: proApiUrl } = useProApiUrl();
 
     const [ios, standalone] = useMemo(() => {
         return [sdk.isIOs(), sdk.isStandalone()] as const;
@@ -149,6 +148,7 @@ const Loader: FC = () => {
         platform: 'web'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(serverConfig?.mainnetConfig);
 
     useAppHeight();
 
@@ -168,12 +168,6 @@ const Loader: FC = () => {
     }, [activeAccount, i18n]);
 
     const isMobile = useLayout();
-
-    useEffect(() => {
-        if (!serverConfig?.mainnetConfig) return;
-
-        setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
-    }, [serverConfig?.mainnetConfig]);
 
     if (
         isWalletsLoading ||

@@ -36,6 +36,7 @@ import { Switch } from '../../components/fields/Switch';
 import { useDevMenuVisibility } from '../../state/dev';
 import { useMutateProApiUrl, useProApiUrl } from '../../state/pro';
 import { isFirstNumericStringGreater } from '@tonkeeper/core/dist/utils/common';
+import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -151,15 +152,12 @@ const LogsSettings = () => {
 const EnvironmentToggle = () => {
     const sdk = useAppSdk();
     const { mainnetConfig } = useAppContext();
-    const { data: proApiUrl } = useProApiUrl();
     const { mutate: changeUrl } = useMutateProApiUrl();
+    const { data: proApiUrl } = useProApiUrl(mainnetConfig);
 
-    if (
-        window?.location?.origin.includes('wallet') ||
-        isFirstNumericStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '')
-    ) {
-        return null;
-    }
+    const isDevVersion = isFirstNumericStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '');
+
+    if (isWalletInOrigin() || !isDevVersion) return null;
 
     return (
         <HideOnReview>
