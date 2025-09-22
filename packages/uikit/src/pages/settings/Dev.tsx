@@ -35,7 +35,7 @@ import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
 import { useDevMenuVisibility } from '../../state/dev';
 import { useMutateProApiUrl, useProApiUrl } from '../../state/pro';
-import { isFirstNumericStringGreater } from '@tonkeeper/core/dist/utils/common';
+import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
 import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
 
 const CookieSettings = () => {
@@ -155,7 +155,7 @@ const EnvironmentToggle = () => {
     const { mutate: changeUrl } = useMutateProApiUrl();
     const { data: proApiUrl } = useProApiUrl(mainnetConfig);
 
-    const isDevVersion = isFirstNumericStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '');
+    const isDevVersion = isFirstSemverStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '');
 
     if (isWalletInOrigin() || !isDevVersion) return null;
 

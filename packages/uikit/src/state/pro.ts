@@ -40,7 +40,7 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { isFirstNumericStringGreater } from '@tonkeeper/core/dist/utils/common';
+import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
 import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
 import { ServerConfig } from './tonendpoint';
 
@@ -316,7 +316,7 @@ export const useProApiUrl = (mainnetConfig?: ServerConfig['mainnetConfig']) => {
         async () => {
             if (!mainnetConfig) throw new Error('No mainnetConfig available');
 
-            const isDevVersion = isFirstNumericStringGreater(
+            const isDevVersion = isFirstSemverStringGreater(
                 sdk.version,
                 mainnetConfig.pro_apk_name ?? ''
             );

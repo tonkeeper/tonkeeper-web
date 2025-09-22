@@ -403,9 +403,21 @@ export function withRetry<TArgs extends unknown[], TResult>(
     };
 }
 
-export function isFirstNumericStringGreater(a: string, b: string): boolean {
-    const numA = Number((a.match(/\d+/g) || []).join(''));
-    const numB = Number((b.match(/\d+/g) || []).join(''));
+export function isFirstSemverStringGreater(a: string, b: string): boolean {
+    const toParts = (str: string) => (str.match(/\d+/g) || []).map(n => Number(n));
 
-    return numA > numB;
+    const partsA = toParts(a);
+    const partsB = toParts(b);
+
+    const maxLength = Math.max(partsA.length, partsB.length);
+
+    for (let i = 0; i < maxLength; i++) {
+        const numA = partsA[i] ?? 0;
+        const numB = partsB[i] ?? 0;
+
+        if (numA > numB) return true;
+        if (numA < numB) return false;
+    }
+
+    return false;
 }
