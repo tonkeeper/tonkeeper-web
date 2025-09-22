@@ -23,6 +23,7 @@ import { TopUpTronFeeBalanceNotificationControlled } from './modals/TopUpTronFee
 import { ProInstallExtensionNotificationControlled } from './modals/ProInstallExtensionNotificationControlled';
 import { ProRemoveExtensionNotificationControlled } from './modals/ProRemoveExtensionNotificationControlled';
 import { MetaEncryptionNotificationControlled } from './modals/MetaEncryptionNotificationControlled';
+import { ProBalanceNotificationControlled } from './modals/ProBalanceNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -52,6 +53,7 @@ export const ModalsRoot = () => {
             <ProInstallExtensionNotificationControlled />
             <ProRemoveExtensionNotificationControlled />
             <MetaEncryptionNotificationControlled />
+            <ProBalanceNotificationControlled />
         </>
     );
 };

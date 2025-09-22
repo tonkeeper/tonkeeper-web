@@ -46,6 +46,7 @@ export enum AppKey {
     PRO_AUTH_TOKEN = 'pro_auth_token',
     PRO_PENDING_SUBSCRIPTION = 'pro_pending_subscription',
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
+    PRO_BALANCE_NOTIFICATION_STATE = 'pro_balance_notification_state',
 
     IS_DEV_MENU_VISIBLE = 'is_dev_menu_visible',
     IS_DEV_ENVIRONMENT_ALLOWED = 'is_dev_environment_allowed',
