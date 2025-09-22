@@ -115,21 +115,30 @@ export class LedgerMessageSender implements ISender {
     }) => {
         const { timestamp, seqno, contract } = await this.getTransferParameters();
 
-        const transfer = await this.sign({
-            to,
-            bounce,
-            amount: value,
-            seqno,
-            timeout: getTTL(timestamp),
-            sendMode: sendMode,
-            stateInit: init,
-            payload: body
-                ? {
-                      type: 'unsafe',
-                      message: body
-                  }
-                : undefined
-        });
+        let transfer: Cell;
+        try {
+            transfer = await this.sign({
+                to,
+                bounce,
+                amount: value,
+                seqno,
+                timeout: getTTL(timestamp),
+                sendMode: sendMode,
+                stateInit: init,
+                payload: body
+                    ? {
+                          type: 'unsafe',
+                          message: body
+                      }
+                    : undefined
+            });
+        } catch (e) {
+            console.error(e);
+            if (e instanceof UserCancelledError) {
+                throw e as Error;
+            }
+            throw new LedgerError(e);
+        }
 
         return this.toSenderObject(externalMessage(contract, seqno, transfer));
     };
