@@ -31,7 +31,7 @@ export const swapValue = (
     let assetIn: SwapAsset;
     let assetOut: SwapAsset;
 
-    if (jettonSwap.tonIn) {
+    if (jettonSwap.tonIn !== undefined) {
         assetIn = {
             amount: jettonSwap.tonIn,
             symbol: CryptoCurrency.TON,
@@ -45,7 +45,7 @@ export const swapValue = (
         };
     }
 
-    if (jettonSwap.tonOut) {
+    if (jettonSwap.tonOut !== undefined) {
         assetOut = {
             amount: jettonSwap.tonOut,
             symbol: CryptoCurrency.TON,
