@@ -11,7 +11,8 @@ import {
 
 enum ProEndingNotificationState {
     DAY = 'DAY',
-    WEEK = 'WEEK'
+    WEEK = 'WEEK',
+    EXPIRED = 'EXPIRED'
 }
 
 export const useSubscriptionEndingVerification = () => {
@@ -29,10 +30,14 @@ export const useSubscriptionEndingVerification = () => {
 
         const targetTime = subscription.nextChargeDate.getTime();
         const diffDays = (targetTime - Date.now()) / (1000 * 60 * 60 * 24);
+
+        const isExpired = diffDays <= 0;
         const isInDayPeriod = diffDays > 0 && diffDays <= 1;
         const isInWeekPeriod = diffDays > 1 && diffDays <= 7;
 
-        const shouldShow: ProEndingNotificationState | null = isInDayPeriod
+        const shouldShow: ProEndingNotificationState | null = isExpired
+            ? ProEndingNotificationState.EXPIRED
+            : isInDayPeriod
             ? ProEndingNotificationState.DAY
             : isInWeekPeriod
             ? ProEndingNotificationState.WEEK
@@ -41,15 +46,22 @@ export const useSubscriptionEndingVerification = () => {
         if (!shouldShow) return;
 
         (async () => {
-            const alreadyShown = await sdk.storage.get<ProEndingNotificationState | null>(
-                AppKey.PRO_ENDING_NOTIFICATION_STATE
-            );
+            let alreadyShown =
+                (await sdk.storage.get<
+                    ProEndingNotificationState | ProEndingNotificationState[] | null
+                >(AppKey.PRO_ENDING_NOTIFICATION_STATE)) ?? [];
 
-            if (alreadyShown === ProEndingNotificationState.DAY || alreadyShown === shouldShow) {
+            if (!Array.isArray(alreadyShown)) {
+                alreadyShown = [alreadyShown];
+            }
+
+            if (alreadyShown.includes(shouldShow)) {
                 return;
             }
 
-            await sdk.storage.set(AppKey.PRO_ENDING_NOTIFICATION_STATE, shouldShow);
+            const updated = [...(alreadyShown ?? []), shouldShow];
+            await sdk.storage.set(AppKey.PRO_ENDING_NOTIFICATION_STATE, updated);
+
             onOpen();
         })();
     }, [subscription]);
