@@ -1,4 +1,4 @@
-import { FC, useId, useMemo } from 'react';
+import { FC, useId } from 'react';
 import { styled } from 'styled-components';
 
 import {
@@ -25,10 +25,9 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useRate } from '../../../state/rates';
+import { useFormatFiat, useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { useAppContext } from '../../../hooks/appContext';
-import { getFiatEquivalent } from '../../../hooks/balance';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -138,21 +137,12 @@ interface IButtonBlock {
 const ButtonsBlock: FC<IButtonBlock> = props => {
     const { formId, onTrial, className, isError, isLoading, displayPlans } = props;
 
-    const { fiat } = useAppContext();
     const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
     const { t } = useTranslation();
 
     const { displayPrice, subscriptionPeriod } = displayPlans[0] || {};
 
-    const fiatEquivalent: string = useMemo(
-        () =>
-            getFiatEquivalent({
-                amount: displayPrice,
-                fiat,
-                ratePrice: rate?.prices
-            }),
-        [displayPrice, fiat, rate?.prices]
-    );
+    const { fiatAmount: fiatEquivalent } = useFormatFiat(rate, formatDecimals(displayPrice));
 
     return (
         <div className={className}>

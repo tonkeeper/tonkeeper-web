@@ -4,11 +4,10 @@ import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body3, Label2 } from '../Text';
-import { useRate } from '../../state/rates';
+import { useFormatFiat, useRate } from '../../state/rates';
 import { Skeleton } from '../shared/Skeleton';
-import { useAppContext } from '../../hooks/appContext';
 import { useTranslation } from '../../hooks/translation';
-import { getFiatEquivalent } from '../../hooks/balance';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 interface IProps extends IDisplayPlan {
     isLoading: boolean;
@@ -68,20 +67,10 @@ interface IFiatEquivalentProps {
 }
 
 const FiatEquivalent: FC<IFiatEquivalentProps> = ({ amount }) => {
-    const { fiat } = useAppContext();
-    const { data: rate, isLoading } = useRate(CryptoCurrency.TON);
+    const { data } = useRate(CryptoCurrency.TON);
+    const { fiatAmount } = useFormatFiat(data, formatDecimals(amount ?? 0));
 
-    if (!amount) return null;
-    if (!isLoading && !rate?.prices) return null;
-    if (isLoading) return <Skeleton width="80px" height="20px" />;
-
-    const inFiat = getFiatEquivalent({
-        fiat,
-        amount,
-        ratePrice: rate?.prices
-    });
-
-    return inFiat ? <Text>≈ {inFiat}</Text> : null;
+    return fiatAmount ? <Text>≈ {fiatAmount}</Text> : null;
 };
 
 const Text = styled(Body3)`

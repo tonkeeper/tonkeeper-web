@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo } from 'react';
+import React, { FC, useEffect } from 'react';
 import { styled } from 'styled-components';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 import { Body2, Body3, Label2 } from '../../Text';
@@ -25,14 +25,13 @@ import { useTranslation } from '../../../hooks/translation';
 import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ConfirmMainButtonProps } from '../../transfer/common';
 import { useDateTimeFormat } from '../../../hooks/useDateTimeFormat';
-import { getFiatEquivalent } from '../../../hooks/balance';
-import { useAppContext } from '../../../hooks/appContext';
-import { useRate } from '../../../state/rates';
+import { useFormatFiat, useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { SpinnerIcon } from '../../Icon';
 import { hexToRGBA } from '../../../libs/css';
 import { useToast } from '../../../hooks/useNotification';
 import { IExtensionActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 const deployReserve = new AssetAmount({
     asset: TON_ASSET,
@@ -97,7 +96,6 @@ const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
 
     const toast = useToast();
     const { t } = useTranslation();
-    const { fiat } = useAppContext();
     const formatDate = useDateTimeFormat();
     const { data: rate } = useRate(CryptoCurrency.TON);
 
@@ -109,15 +107,10 @@ const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
         isLoading: isEstimating
     } = estimateFeeMutation;
 
-    const feeEquivalent: string = useMemo(() => {
-        if (!estimation?.fee?.extra) return '';
-
-        return getFiatEquivalent({
-            amount: estimation.fee.extra.stringWeiAmount,
-            fiat,
-            ratePrice: rate?.prices
-        });
-    }, [fiat, rate?.prices, estimation?.fee?.extra?.stringWeiAmount]);
+    const { fiatAmount: feeEquivalent } = useFormatFiat(
+        rate,
+        formatDecimals(estimation?.fee?.extra?.stringWeiAmount ?? 0)
+    );
 
     useEffect(() => {
         if (!removeMutation.isSuccess || !finalExpiresDate) return;

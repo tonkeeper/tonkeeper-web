@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react';
 import BigNumber from 'bignumber.js';
 
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
-import { isValidNanoString } from '@tonkeeper/core/dist/utils/pro';
 import { AmountFormatter } from '@tonkeeper/core/dist/utils/AmountFormatter';
 import { formatDecimals, shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
@@ -53,30 +52,4 @@ export const formatFiatCurrency = (currency: FiatCurrencies, balance: BigNumber.
         ignoreZeroTruncate: false,
         decimals: 4
     });
-};
-
-interface IFiatEquivalentProps {
-    amount: string | null;
-    fiat: FiatCurrencies;
-    ratePrice: number | undefined;
-}
-
-export const getFiatEquivalent = ({ amount, ratePrice, fiat }: IFiatEquivalentProps) => {
-    if (!ratePrice || !fiat) return '';
-    if (!amount || !isValidNanoString(amount)) return '';
-
-    try {
-        const bigPrice = new BigNumber(ratePrice);
-        const bigAmount = new BigNumber(formatter.fromNano(amount));
-
-        if (bigPrice.isNaN() || bigAmount.isNaN()) return '';
-
-        const inFiat = formatter.format(bigPrice.multipliedBy(bigAmount));
-
-        return `${inFiat} ${fiat}`;
-    } catch (e) {
-        console.error('FiatEquivalent error: ', e);
-
-        return '';
-    }
 };

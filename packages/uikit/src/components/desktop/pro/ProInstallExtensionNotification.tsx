@@ -25,14 +25,13 @@ import { ProSubscriptionHeader } from '../../pro/ProSubscriptionHeader';
 import { ProActiveWallet } from '../../pro/ProActiveWallet';
 import { ConfirmMainButtonProps } from '../../transfer/common';
 import { SubscriptionExtension } from '@tonkeeper/core/dist/pro';
-import { useAppContext } from '../../../hooks/appContext';
-import { useRate } from '../../../state/rates';
+import { useFormatFiat, useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { getFiatEquivalent } from '../../../hooks/balance';
 import { SpinnerIcon } from '../../Icon';
 import { secondsToUnitCount } from '@tonkeeper/core/dist/utils/pro';
 import { useAtomValue } from '../../../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
+import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 interface IProInstallExtensionProps {
     isOpen: boolean;
@@ -95,28 +94,16 @@ const ProInstallExtensionNotificationContent: FC<IProInstallExtensionContentProp
         isLoading: isEstimating
     } = estimateFeeMutation;
 
-    const { fiat } = useAppContext();
     const { data: rate } = useRate(CryptoCurrency.TON);
 
-    const fiatEquivalent: string = useMemo(
-        () =>
-            getFiatEquivalent({
-                amount: extensionData.payment_per_period,
-                fiat,
-                ratePrice: rate?.prices
-            }),
-        [extensionData.payment_per_period, fiat, rate?.prices]
+    const { fiatAmount: fiatEquivalent } = useFormatFiat(
+        rate,
+        formatDecimals(extensionData.payment_per_period)
     );
-
-    const feeEquivalent: string = useMemo(() => {
-        if (!estimation?.fee?.extra) return '';
-
-        return getFiatEquivalent({
-            amount: estimation.fee.extra.stringWeiAmount,
-            fiat,
-            ratePrice: rate?.prices
-        });
-    }, [fiat, rate?.prices, estimation?.fee?.extra?.stringWeiAmount]);
+    const { fiatAmount: feeEquivalent } = useFormatFiat(
+        rate,
+        formatDecimals(estimation?.fee?.extra?.stringWeiAmount ?? 0)
+    );
 
     useEffect(() => {
         if (!targetAuth?.wallet) return;
