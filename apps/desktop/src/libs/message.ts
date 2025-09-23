@@ -1,4 +1,6 @@
 import { AccountConnectionHttp } from '@tonkeeper/core/dist/service/tonConnect/connectionService';
+import { ConfirmOptions } from '@tonkeeper/core/dist/AppSdk';
+import MessageBoxSyncOptions = Electron.MessageBoxSyncOptions;
 
 export interface GetStorageMessage {
     king: 'storage-get';
@@ -80,6 +82,11 @@ export interface GetDeviceCountry {
     king: 'get-device-country';
 }
 
+export interface ConfirmDialog {
+    king: 'show-confirm-dialog';
+    options: MessageBoxSyncOptions;
+}
+
 export type Message =
     | GetStorageMessage
     | SetStorageMessage
@@ -97,4 +104,5 @@ export type Message =
     | GetPreferredSystemLanguagesMessage
     | TonConnectSendDisconnectMessage
     | CleanCookieMessage
-    | GetDeviceCountry;
+    | GetDeviceCountry
+    | ConfirmDialog;

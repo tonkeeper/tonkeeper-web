@@ -93,8 +93,16 @@ const PasswordUnlock: FC<{ minHeight?: string; logOutConfirmed?: () => void }> =
     };
 
     const onLogOut = async () => {
+        const hasSeveralAccounts = wallets.length > 1;
         const confirm = await sdk.confirm({
-            message: t(wallets.length > 1 ? 'logout_on_unlock_many' : 'logout_on_unlock_one')
+            title: `🚧🚨🚨🚨🚧\n${t(
+                hasSeveralAccounts ? 'settings_reset_alert_title_all' : 'settings_reset_alert_title'
+            )}`,
+            message: t(hasSeveralAccounts ? 'logout_on_unlock_many' : 'logout_on_unlock_one'),
+            cancelButtonTitle: t('cancel'),
+            okButtonTitle: t('settings_reset'),
+            defaultButton: 'cancel',
+            type: 'warning'
         });
         if (confirm) {
             logOutConfirmed?.();

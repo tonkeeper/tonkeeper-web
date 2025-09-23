@@ -68,7 +68,7 @@ export abstract class MainWindow {
 
         ipcMain.handle('message', async (event, message: Message) => {
             try {
-                return await handleBackgroundMessage(message);
+                return await handleBackgroundMessage(this.mainWindow, message);
             } catch (e) {
                 return e;
             }
