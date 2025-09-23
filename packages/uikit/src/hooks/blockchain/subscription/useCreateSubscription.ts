@@ -52,7 +52,7 @@ export const useCreateSubscription = () => {
         if (!signer || signer.type !== 'cell') throw new Error('Signer is incorrect!');
 
         if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
-            throw new Error('walletMetaEncryptionPrivateKey is missed!');
+            throw new Error('walletMetaKeyPair is missed!');
         }
         const sender = new ExtensionMessageSender(api, selectedWallet, signer);
 
@@ -68,8 +68,7 @@ export const useCreateSubscription = () => {
             withdrawAddress: Address.parse(recipient),
             withdrawMsgBody: withdraw_msg_body,
             metadata,
-            walletMetaEncryptionPrivateKey:
-                metaEncryptionMap[selectedWallet.rawAddress].encryptionPrivateKey
+            walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
         });
 
         if (!result.extensionAddress.equals(Address.parse(contract))) {

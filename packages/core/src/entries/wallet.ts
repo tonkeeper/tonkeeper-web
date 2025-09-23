@@ -226,21 +226,16 @@ export const addWalletMethod = [
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
 export interface IMetaEncryptionData {
-    encryptionPrivateKey: nacl.SignKeyPair;
-    encryptionCertificate: Buffer;
+    keyPair: nacl.SignKeyPair;
+    certificate: Buffer;
 }
 
 export interface ISerializedMetaEncryptionData {
-    encryptionPrivateKey: {
+    keyPair: {
         publicKey: string;
         secretKey: string;
     };
-    encryptionCertificate: string;
+    certificate: string;
 }
 
 export type MetaEncryptionSerializedMap = Record<string, ISerializedMetaEncryptionData>;
-
-export interface IMutateEncryptionProps {
-    wallet: TonWalletStandard;
-    preparedSeed?: string;
-}

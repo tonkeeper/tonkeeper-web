@@ -38,7 +38,7 @@ export const useEstimateDeploySubscription = () => {
         } = subscriptionParams;
 
         if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
-            throw new Error('walletMetaEncryptionPrivateKey is missed!');
+            throw new Error('walletMetaKeyPair is missed!');
         }
 
         const encoder = new SubscriptionEncoder(selectedWallet);
@@ -53,8 +53,7 @@ export const useEstimateDeploySubscription = () => {
             withdrawAddress: Address.parse(recipient),
             withdrawMsgBody: withdraw_msg_body,
             metadata,
-            walletMetaEncryptionPrivateKey:
-                metaEncryptionMap[selectedWallet.rawAddress].encryptionPrivateKey
+            walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
         });
 
         const sender = new ExtensionMessageSender(api, selectedWallet, estimationSigner);

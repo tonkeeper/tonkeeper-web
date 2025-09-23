@@ -53,7 +53,7 @@ type DeployParams = {
     withdrawAddress: Address;
     withdrawMsgBody?: string;
     metadata: SubscriptionExtensionMetadata;
-    walletMetaEncryptionPrivateKey: nacl.SignKeyPair;
+    walletMetaKeyPair: nacl.SignKeyPair;
 };
 
 export type CreateResult = CreateResultV5 | CreateResultV4;
@@ -102,7 +102,7 @@ interface IEncodeDeployBodyParams {
     withdrawAddress: Address;
     withdrawMsgBody?: string;
     metadata: SubscriptionExtensionMetadata;
-    walletMetaEncryptionPrivateKey: nacl.SignKeyPair;
+    walletMetaKeyPair: nacl.SignKeyPair;
 }
 
 export class SubscriptionEncoder {
@@ -151,7 +151,7 @@ export class SubscriptionEncoder {
             withdrawAddress: params.withdrawAddress,
             withdrawMsgBody: params.withdrawMsgBody,
             metadata: params.metadata,
-            walletMetaEncryptionPrivateKey: params.walletMetaEncryptionPrivateKey
+            walletMetaKeyPair: params.walletMetaKeyPair
         });
 
         const initMsg = internal({
@@ -256,7 +256,7 @@ export class SubscriptionEncoder {
         const metaCell = await encryptMeta(
             JSON.stringify(params.metadata),
             Address.parse(this.wallet.rawAddress),
-            params.walletMetaEncryptionPrivateKey.secretKey
+            params.walletMetaKeyPair.secretKey
         );
 
         return beginCell()

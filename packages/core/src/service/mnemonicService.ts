@@ -1,7 +1,9 @@
+import { mnemonicToSeed } from 'bip39';
 import { TonKeychainRoot } from '@ton-keychain/core';
 import {
     keyPairFromSeed,
     mnemonicToPrivateKey,
+    mnemonicToSeed as tonMnemonicToSeed,
     mnemonicValidate as validateStandardTonMnemonic
 } from '@ton/crypto';
 import { MnemonicType } from '../entries/password';
@@ -9,6 +11,8 @@ import { decrypt, encrypt } from './cryptoService';
 import { deriveED25519Path } from './ed25519';
 import { assertUnreachable } from '../utils/types';
 import { AccountSecret } from '../entries/account';
+
+const TON_DERIVATION_PATH = "m/44'/607'/0'";
 
 export const decryptWalletSecret = async (
     encryptedSecret: string,
@@ -106,10 +110,9 @@ export const validateBip39Mnemonic = async (mnemonic: string[]) => {
 };
 
 async function bip39ToPrivateKey(mnemonic: string[]) {
-    const { mnemonicToSeed } = await import('bip39');
     const seed = await mnemonicToSeed(mnemonic.join(' '));
-    const TON_DERIVATION_PATH = "m/44'/607'/0'";
     const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
+
     return keyPairFromSeed(seedContainer.key);
 }
 
@@ -144,3 +147,47 @@ export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: Mnemo
 
     throw new Error('Invalid mnemonic');
 };
+
+const tonMnemonicToEd25519Seed = async (mnemonic: string[]) => {
+    const seed = await tonMnemonicToSeed(mnemonic, 'TON default seed');
+
+    return Buffer.from(seed.subarray(0, 32));
+};
+
+const bip39MnemonicToEd25519Seed = async (mnemonic: string[]) => {
+    const seed = await mnemonicToSeed(mnemonic.join(' '));
+    const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
+
+    return Buffer.from(seedContainer.key);
+};
+
+export async function mnemonicToEd25519Seed(mnemonic: string[], mnemonicType?: MnemonicType) {
+    if (mnemonicType) {
+        if (mnemonicType === 'ton') {
+            if (!(await validateStandardTonMnemonic(mnemonic))) {
+                throw new Error('Invalid mnemonic type: ton');
+            }
+
+            return tonMnemonicToEd25519Seed(mnemonic);
+        }
+
+        if (mnemonicType === 'bip39') {
+            if (!(await validateBip39Mnemonic(mnemonic))) {
+                throw new Error('Invalid mnemonic type: bip39');
+            }
+
+            return bip39MnemonicToEd25519Seed(mnemonic);
+        }
+
+        assertUnreachable(mnemonicType);
+    }
+
+    if (await validateStandardTonMnemonic(mnemonic)) {
+        return tonMnemonicToEd25519Seed(mnemonic);
+    }
+    if (await validateBip39Mnemonic(mnemonic)) {
+        return bip39MnemonicToEd25519Seed(mnemonic);
+    }
+
+    throw new Error('Invalid mnemonic');
+}

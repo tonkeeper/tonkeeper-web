@@ -28,7 +28,6 @@ import {
     AccountWallet,
     getWalletsFromAccount,
     IMetaEncryptionData,
-    IMutateEncryptionProps,
     isStandardTonWallet,
     MetaEncryptionSerializedMap,
     TonWalletConfig,
@@ -74,6 +73,7 @@ import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
 import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
 import {
     encryptWalletSecret,
+    mnemonicToEd25519Seed,
     seeIfMnemonicValid,
     walletSecretToString
 } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -97,8 +97,7 @@ import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import {
     createEncryptionCertificate,
-    createEncryptionKey,
-    tonSeedPhraseToEd25519Seed
+    createEncryptionKey
 } from '@tonkeeper/core/dist/service/meta';
 import nacl from 'tweetnacl';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
@@ -1386,8 +1385,15 @@ export const useMutateMetaKeyAndCertificates = () => {
     const client = useQueryClient();
     const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
-    return useMutation<void, Error, IMutateEncryptionProps>(async ({ wallet, preparedSeed }) => {
-        let seedPrase = preparedSeed;
+    return useMutation<
+        void,
+        Error,
+        {
+            wallet: TonWalletStandard;
+            mnemonic?: string[];
+        }
+    >(async ({ wallet, mnemonic }) => {
+        let seedPrase = mnemonic;
 
         if (!seedPrase) {
             const accountWallet = accountsWallets.find(
@@ -1402,26 +1408,23 @@ export const useMutateMetaKeyAndCertificates = () => {
                 throw new Error('Unable to get a seed phrase!');
             }
 
-            seedPrase = walletSecretToString(secret);
+            seedPrase = secret.mnemonic;
         }
 
-        const { walletMainEd22519Seed } = await tonSeedPhraseToEd25519Seed(seedPrase);
+        const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase);
 
-        const { walletMetaEncryptionPrivateKey } = await createEncryptionKey(walletMainEd22519Seed);
+        const keyPair = await createEncryptionKey(walletMainEd22519Seed);
 
         const walletMainPrivateKey = nacl.sign.keyPair.fromSeed(walletMainEd22519Seed);
 
-        const { cert } = createEncryptionCertificate(
-            walletMetaEncryptionPrivateKey,
-            walletMainPrivateKey
-        );
+        const certificate = createEncryptionCertificate(keyPair, walletMainPrivateKey);
 
         const metaEncryptionMap =
             (await sdk.storage.get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)) ?? {};
 
         metaEncryptionMap[wallet.rawAddress] = serializeMetaKey({
-            encryptionPrivateKey: walletMetaEncryptionPrivateKey,
-            encryptionCertificate: cert
+            keyPair,
+            certificate
         });
 
         await sdk.storage.set(AppKey.META_ENCRYPTION_MAP, metaEncryptionMap);

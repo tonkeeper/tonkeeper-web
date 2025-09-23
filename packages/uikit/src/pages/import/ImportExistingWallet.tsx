@@ -429,7 +429,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         ) {
             void mutateMetaEncryptionKey({
                 wallet: createdAccount.activeTonWallet,
-                preparedSeed: mnemonic.join(' ')
+                mnemonic
             });
             void tryAutoAuth({
                 wallet: createdAccount.activeTonWallet,
