@@ -317,11 +317,7 @@ export const Content: FC<{
     }
 
     if (lock) {
-        return (
-            <FullSizeWrapper standalone>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (pageView) {

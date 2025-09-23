@@ -208,6 +208,9 @@
     "open_signer": "Abrir firmador en este dispositivo"
   },
   "paste": "Pegar",
+  "purchases": {
+    "screen_title": "Compras"
+  },
   "receiveModal": {
     "copy": "Copiar"
   },
@@ -222,6 +225,7 @@
   "secret_words_caption": "Anote estas 24 palabras en el orden indicado a continuación y guárdelas en un lugar secreto y seguro.",
   "secret_words_title": "Tu frase de recuperación secreta",
   "security_change_passcode": "Cambiar código de acceso",
+  "select_wallet_for_authorization": "Seleccione una cartera para la autorización",
   "send_fee_estimation_error": "No se pudo calcular la comisión",
   "send_publish_tx_error": "No se pudo enviar la transacción",
   "send_screen_steps": {

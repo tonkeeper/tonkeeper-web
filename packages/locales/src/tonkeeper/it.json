@@ -1,4 +1,7 @@
 {
+  "activityActionModal": {
+    "withdrawal_request": "Richiesta di disinvestimento"
+  },
   "activity": {
     "empty_transaction_caption": "Effettua la tua prima transazione!",
     "empty_transaction_title": "Le tue attività verranno mostrate qui",
@@ -14,8 +17,72 @@
     "save": "Salva"
   },
   "address_copied": "Indirizzo copiato",
+  "add_wallet": "Aggiungi portafoglio",
+  "add_wallet_modal": {
+    "testnet": {
+      "subtitle": "Importa il portafoglio con 24 parole segrete di recupero su Testnet",
+      "title": "Account Testnet"
+    },
+    "watch_only": {
+      "subtitle": "Per monitorare l'attività del portafoglio senza frase di recupero",
+      "title": "Account di sola visualizzazione"
+    }
+  },
+  "add_watch_only": {
+    "title": "Account di osservazione"
+  },
+  "approval": {
+    "accepted": "Visibile",
+    "declined": "Rifiutato",
+    "details_token": "Dettagli del token",
+    "id_collection": "ID collezione",
+    "id_token": "ID del token",
+    "name": "Nome",
+    "not_spam": "Non è spam",
+    "spam": "Spam",
+    "unverified_token": "Token non verificato"
+  },
   "balances_setup_wallet": "Imposta wallet",
+  "battery": {
+    "other_ways": {
+      "by_crypto": {
+        "title": "Ricarica con {symbol}"
+      },
+      "gift": {
+        "subtitle": "Condividi con gli amici",
+        "title": "Batteria in regalo"
+      }
+    },
+    "packages": {
+      "disclaimer": "Una ricarica copre la commissione media di transazione. Alcune transazioni possono costare di più."
+    },
+    "please_wait": "La batteria si caricherà tra pochi minuti",
+    "promocode": {
+      "title": "Codice promozionale"
+    },
+    "recharge_by_crypto": {
+      "other": {
+        "subtitle": "Inserisci l'importo manualmente",
+        "title": "Altro"
+      },
+      "title": "Ricarica"
+    },
+    "title": "Batteria Tonkeeper",
+    "transactions": {
+      "description": "Le transazioni selezionate saranno pagate dalla batteria Tonkeeper.",
+      "settings": "Impostazioni batteria",
+      "title": "Transazioni",
+      "types": {
+        "nft": "trasferimenti NFT"
+      },
+      "type": {
+        "swap": "scambio",
+        "transfer": "trasferimento"
+      }
+    }
+  },
   "biometry": {
+    "default": "biometria",
     "ios": {
       "fingerprint": "Touch ID"
     }
@@ -26,16 +93,25 @@
       "refresh": "Aggiorna",
       "share": "Condividi"
     },
+    "apps_all": "Tutti",
+    "connected": "Connesso",
     "title": "Browser"
   },
   "cancel": "Cancella",
   "check_words_caption": "Per controllare se hai scritto correttamente la frase di recupero, inserisci {wordNum1}°, {wordNum2}° e {wordNum3}° parole.",
   "check_words_success": "Congratulazioni! Hai impostato il tuo wallet",
   "check_words_title": "Ok, controlliamo",
+  "choose_wallets": {
+    "subtitle": "Scegli i portafogli che desideri aggiungere.",
+    "title": "Scegli i portafogli"
+  },
   "confirm": "Conferma",
   "confirm_sending_fee": "Commissioni",
   "confirm_sending_submit": "Conferma e invia",
   "confirm_sending_title": "Conferma invio",
+  "confirmSendModal": {
+    "wallet": "Portafoglio:"
+  },
   "continue": "Prosegui",
   "copied": "Copiato",
   "create_pin_current_title": "Inserisci il passcode corrente",
@@ -45,9 +121,17 @@
   "create_wallet_generated": "Il tuo portafoglio è\nappena stato creato!",
   "create_wallet_generating": "Generazione del wallet...",
   "create_wallet_title": "Prendi una penna e un pezzo di carta",
+  "customize": "Personalizza",
+  "customize_modal": {
+    "subtitle": "Il nome e l’icona del portafoglio sono archiviati localmente sul tuo dispositivo.",
+    "title": "Personalizza il tuo portafoglio"
+  },
   "dns_address_linked": "Indirizzo collegato",
   "dns_address_unlinked": "Indirizzo scollegato",
   "dns_current_address": "Il tuo indirizzo attuale",
+  "dns_expiration_date": "Data di scadenza",
+  "dns_renew_toast_success": "Dominio rinnovato",
+  "dns_renew_until_btn": "Rinnova fino al {untilDate}",
   "exchange_method_dont_show_again": "Non mostrare nuovamente",
   "exchange_method_open_warning": "Stai aprendo un'app esterna non gestita da Tonkeeper.",
   "exchange_modal": {
@@ -55,6 +139,14 @@
   },
   "exchange_other_ways": "Altri modi per acquistare o vendere TON",
   "exchange_title": "Compra TON",
+  "import_add_wallet": "Aggiungi portafoglio",
+  "import_add_wallet_description": "Crea un nuovo portafoglio o aggiungine uno esistente.",
+  "import_existing_wallet": "Portafoglio esistente",
+  "import_existing_wallet_description": "Importa il portafoglio con 24 parole segrete di recupero",
+  "import_new_wallet": "Nuovo portafoglio",
+  "import_new_wallet_description": "Crea un nuovo portafoglio",
+  "import_signer": "Abbina con il firmatario",
+  "import_signer_description": "Completamente offline, air-gapped, tutte le funzionalità di TON",
   "import_wallet_caption": "Per ripristinare l'accesso al tuo wallet, inserisci le 24 parole di recupero segrete che ti sono state fornite quando hai creato il tuo wallet.",
   "import_wallet_title": "Inserisci la tua\nfrase di recupero",
   "import_wallet_wrong_words_err": "Frase errata",
@@ -68,12 +160,26 @@
   "jetton_id": "Token ID: {jettonAddress}",
   "jettons_list_title": "Token",
   "later": "Dopo",
+  "ledger": {
+    "operation_not_supported": "L’operazione non è disponibile per i wallet Ledger. Seleziona un altro wallet e riprova."
+  },
   "legal_font_license": "font Montserrat",
   "legal_header_title": "Legali",
   "legal_licenses_title": "Licenze",
   "legal_privacy": "Politica sulla Privacy",
   "legal_terms": "Termini di Servizio",
   "loading": "Caricamento",
+  "migration": {
+    "with_passcode": "Inserisci il codice di accesso"
+  },
+  "nft_about_collection": "Informazioni sulla collezione",
+  "nft_actions": {
+    "hide_and_report": "Nascondi e segnala spam",
+    "hide": {
+      "nft": "Nascondi NFT"
+    },
+    "view_on_explorer": "Visualizza su Tonviewer"
+  },
   "nft_collection": "Collezione",
   "nft_contract_address": "Indiurizzo Contratto",
   "nft_deploy_collection_title": "Crea Collezione NFT",
@@ -87,9 +193,30 @@
   "nft_owner_address": "Proprietario",
   "nft_single_nft": "NFT Singolo",
   "nft_transfer_nft": "Trasferisci",
+  "nft_transfer": {
+    "title": "Trasferimento NFT"
+  },
   "nft_transfer_title": "Trasferisci NFT",
   "nft_unlink_domain_button": "Collegato a '{{'address'}}'",
   "nft_view_in_explorer": "Visualizza nell'Explorer",
+  "notifications": {
+    "alert": {
+      "cancel": "Annulla"
+    }
+  },
+  "pairSigner": {
+    "open_signer": "Apri Signer su questo dispositivo"
+  },
+  "paste": "Incolla",
+  "purchases": {
+    "screen_title": "Acquisti"
+  },
+  "receiveModal": {
+    "copy": "Copia"
+  },
+  "recovery_phrase": {
+    "copy_button": "Copia"
+  },
   "reminder_notifications_caption": "Ricevi notifiche quando ricevi TON, token e NFT.",
   "reminder_notifications_enable_button": "Abilita notifiche",
   "reminder_notifications_later_button": "Dopo",
@@ -98,6 +225,7 @@
   "secret_words_caption": "Annota queste 24 parole nell'ordine indicato di seguito e conservale in un luogo segreto e sicuro.",
   "secret_words_title": "La tua Frase di Recupero",
   "security_change_passcode": "Cambia passcode",
+  "select_wallet_for_authorization": "Seleziona un portafoglio per l’autorizzazione",
   "send_fee_estimation_error": "Impossibile calcolare la commissione",
   "send_publish_tx_error": "Impossibile inviare la transazione",
   "send_screen_steps": {
@@ -116,7 +244,9 @@
       "remaining": "Rimanente: {amount}"
     },
     "comfirm": {
-      "comment_required_text": "È necessario includere memo o tag o commento quando si invia ad un exchange. "
+      "comment_required_text": "È necessario includere memo o tag o commento quando si invia ad un exchange. ",
+      "title": "Conferma azione",
+      "wallet": "Portafoglio"
     },
     "done": {
       "done_label": "Fatto",
@@ -137,12 +267,15 @@
   "settings_recovery_phrase": "Frase di Recupero",
   "settings_reset": "Disconnetti",
   "settings_reset_alert_title": "Disconnetto?",
+  "settings_reset_alert_title_all": "Disconnettersi da tutti i portafogli?",
   "settings_search_engine": "Cerca",
   "settings_security": "Sicurezza",
   "settings_support": "Supporto",
   "settings_title": "Impostazioni",
   "settings_version": "Versione",
   "settings_wallet_version": "Indirizzo Attivo",
+  "signer_scan_result": "Scansiona la transazione firmata",
+  "signer_scan_tx_description": "Per favore, apri Signer e scansiona la transazione con il codice QR",
   "spam_action": "Spam",
   "staking": {
     "deposit": "Deposito",
@@ -153,21 +286,77 @@
     },
     "withdraw": "Prelievo"
   },
+  "start_screen": {
+    "create_wallet_button": "Crea nuovo portafoglio",
+    "import_wallet_button": "Importa portafoglio esistente"
+  },
   "success": "Riuscito!",
+  "suspicious": {
+    "buttons": {
+      "not_spam": "Non è spam",
+      "report": "Segnala spam"
+    },
+    "label": {
+      "full": "NFT non verificato",
+      "short": "Non verificato"
+    },
+    "status_update": {
+      "hidden": {
+        "collection": "Collezione nascosta",
+        "nft": "NFT nascosto"
+      },
+      "spam": {
+        "collection": "Collezione contrassegnata come spam",
+        "nft": "NFT contrassegnato come spam"
+      }
+    }
+  },
+  "suspiciousNFTDetails": {
+    "buttons": {
+      "not_spam": "Non è spam",
+      "report": "Segnala spam"
+    },
+    "paragraphs": {
+      "p1": "Utilizzato per lo spam. Impiegato per l'invio su larga scala di messaggi indesiderati e spesso irrilevanti.",
+      "p2": "Utilizzato per truffe. Il nome, la descrizione o l'immagine dell'NFT possono indurre gli utenti in errore.",
+      "p3": "Sappiamo poco sull’autore e sulla storia di questo NFT."
+    },
+    "subtitle": "NFT potrebbe non essere sicuro da utilizzare per uno dei seguenti motivi.",
+    "title": "NFT non verificato"
+  },
   "swap_title": "Swap",
   "today": "Oggi",
+  "tokenDetails": {
+    "tonviewer_button": "Visualizza su Tonviewer"
+  },
   "tonkeeper_pro": "Tonkeeper Pro",
+  "tonkeeper_pro_description": "L'abbonamento a Tonkeeper Pro include una funzione di portafoglio estesa che offre un set di strumenti per la gestione delle criptovalute.",
   "ton_login_caption": "{name} sta richiedendo l'accesso all'indirizzo del tuo wallet",
   "ton_login_connect_button": "Collega wallet",
   "ton_login_notice": "Assicurati di controllare l'indirizzo del servizio prima di collegare il wallet.",
   "ton_login_success": "Fatto",
   "transaction_bid_dns": "Nome",
+  "transactionDetails": {
+    "comment": "Commento",
+    "operation": "Operazione",
+    "recipient": "Destinatario"
+  },
   "transaction_fee": "Commissioni",
   "transaction_hash": "Transazione",
   "transaction_merchant": "Negoziante",
   "transaction_receive_date": "Ricevuti il {date}",
   "transaction_recipient": "Destinatario",
   "transaction_recipient_address": "Indirizzo Destinatario",
+  "transactions": {
+    "burned": "Bruciato",
+    "failed": "Fallito",
+    "nft_purchase": "Acquisto di NFT",
+    "smartcontract_exec": "Chiama contratto",
+    "spam": "Spam",
+    "swap": "Scambia",
+    "unknown": "Sconosciuto",
+    "unknown_description": "È successo qualcosa, ma non siamo riusciti a riconoscerlo"
+  },
   "transaction_sender": "Mittente",
   "transaction_sender_address": "Indirizzo Mittente",
   "transaction_sent_date": "Inviati il {date}",
@@ -741,9 +930,11 @@
   },
   "wallet_buy": "Compra",
   "wallet": {
-    "collectibles_tab_lable": "Collezionabili"
+    "collectibles_tab_lable": "Collezionabili",
+    "scan_btn": "Scansiona"
   },
   "wallet_receive": "Ricevi",
+  "wallets": "Portafogli",
   "wallet_sell": "Vendi",
   "wallet_send": "Invia",
   "wallet_swap": "Swap",

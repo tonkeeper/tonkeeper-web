@@ -126,11 +126,7 @@ export const WideContent: FC<{
     }, [queryClient]);
 
     if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {

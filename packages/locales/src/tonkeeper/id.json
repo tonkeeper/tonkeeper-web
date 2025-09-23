@@ -208,6 +208,9 @@
     "open_signer": "Buka Penandatangan di perangkat ini"
   },
   "paste": "Tempel",
+  "purchases": {
+    "screen_title": "Pembelian"
+  },
   "receiveModal": {
     "copy": "Salin"
   },
@@ -222,6 +225,7 @@
   "secret_words_caption": "Catatlah 24 kata ini sesuai urutan yang diberikan di bawah ini dan simpan di tempat yang rahasia dan aman.",
   "secret_words_title": "Frasa Pemulihan Rahasia Anda",
   "security_change_passcode": "Ubah kode sandi",
+  "select_wallet_for_authorization": "Pilih Dompet untuk otorisasi",
   "send_fee_estimation_error": "Gagal menghitung biaya",
   "send_publish_tx_error": "Gagal mengirim transaksi",
   "send_screen_steps": {

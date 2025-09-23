@@ -146,6 +146,7 @@
   "import_new_wallet": "Новый кошелёк",
   "import_new_wallet_description": "Создать новый кошелёк",
   "import_signer": "Подключить Signer",
+  "import_signer_description": "Полностью офлайн, изолировано (air-gapped), все функции TON",
   "import_wallet_caption": "Чтобы восстановить доступ, введите 24 секретных слова, которые вы получили при создании кошелька.",
   "import_wallet_title": "Введите секретный ключ",
   "import_wallet_wrong_words_err": "Неправильный ключ",
@@ -207,6 +208,9 @@
     "open_signer": "Открыть на этом устройстве"
   },
   "paste": "Вставить",
+  "purchases": {
+    "screen_title": "Покупки"
+  },
   "receiveModal": {
     "copy": "Скопировать"
   },
@@ -221,6 +225,7 @@
   "secret_words_caption": "Запишите эти 24 слова ровно в таком же порядке и сохраните их в секретном, надёжном месте.",
   "secret_words_title": "Ваш секретный ключ",
   "security_change_passcode": "Поменять пин-код",
+  "select_wallet_for_authorization": "Выберите кошелёк для авторизации",
   "send_fee_estimation_error": "Ошибка подсчёта комиссии",
   "send_publish_tx_error": "Ошибка публикации транзакции",
   "send_screen_steps": {
@@ -269,6 +274,8 @@
   "settings_title": "Настройки",
   "settings_version": "Версия",
   "settings_wallet_version": "Текущий адрес",
+  "signer_scan_result": "Сканировать подписанную транзакцию",
+  "signer_scan_tx_description": "Пожалуйста, откройте Signer и отсканируйте QR-код с транзакцией",
   "spam_action": "Спам",
   "staking": {
     "deposit": "Депозит",

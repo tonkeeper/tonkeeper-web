@@ -43,6 +43,347 @@
     "unverified_token": "توکن تایید نشده"
   },
   "balances_setup_wallet": "راه اندازی کیف پول",
+  "battery": {
+    "other_ways": {
+      "by_crypto": {
+        "title": "شارژ مجدد با {symbol}"
+      },
+      "gift": {
+        "subtitle": "با دوستان به اشتراک بگذارید",
+        "title": "هدیه باتری"
+      }
+    },
+    "packages": {
+      "disclaimer": "یک بار شارژ هزینه متوسط تراکنش را پوشش می‌دهد. برخی تراکنش‌ها ممکن است هزینه بیشتری داشته باشند."
+    },
+    "please_wait": "باتری در عرض چند دقیقه شارژ خواهد شد",
+    "promocode": {
+      "title": "کد تخفیف"
+    },
+    "recharge_by_crypto": {
+      "other": {
+        "subtitle": "مقدار را به صورت دستی وارد کنید",
+        "title": "سایر"
+      },
+      "title": "شارژ مجدد"
+    },
+    "title": "باتری Tonkeeper",
+    "transactions": {
+      "description": "تراکنش‌های انتخاب‌شده توسط باتری Tonkeeper پرداخت خواهند شد.",
+      "settings": "تنظیمات باتری",
+      "title": "تراکنش‌ها",
+      "types": {
+        "nft": "انتقال NFT"
+      },
+      "type": {
+        "swap": "مبادله",
+        "transfer": "انتقال"
+      }
+    }
+  },
+  "biometry": {
+    "default": "بیومتریک",
+    "ios": {
+      "fingerprint": "تاچ آیدی"
+    }
+  },
+  "browser": {
+    "actions": {
+      "copy_link": "کپی کردن لینک",
+      "refresh": "به‌روزرسانی",
+      "share": "اشتراک‌گذاری"
+    },
+    "apps_all": "همه",
+    "connected": "متصل",
+    "title": "مرورگر"
+  },
+  "cancel": "لغو",
+  "check_words_caption": "برای اطمینان از اینکه عبارت بازیابی خود را به‌درستی نوشته‌اید، لطفاً کلمات %{wordNum1}، %{wordNum2} و %{wordNum3} را وارد کنید.",
+  "check_words_success": "تبریک می‌گوییم! کیف پول خود را راه‌اندازی کرده‌اید",
+  "check_words_title": "پس، بیایید بررسی کنیم",
+  "choose_wallets": {
+    "subtitle": "کیف پول‌هایی را انتخاب کنید که می‌خواهید اضافه کنید.",
+    "title": "کیف پول‌ها را انتخاب کنید"
+  },
+  "confirm": "تأیید",
+  "confirm_sending_fee": "کارمزد",
+  "confirm_sending_submit": "تأیید و ارسال",
+  "confirm_sending_title": "ارسال را تأیید کنید",
+  "confirmSendModal": {
+    "wallet": "کیف پول:"
+  },
+  "continue": "ادامه",
+  "copied": "کپی شد",
+  "create_pin_current_title": "رمز عبور فعلی را وارد کنید",
+  "create_pin_new_title": "رمز عبور جدید ایجاد کنید",
+  "create_pin_repeat_title": "دوباره گذرواژه را وارد کنید",
+  "create_wallet_caption": "ما به‌شدت توصیه می‌کنیم عبارت بازیابی خود را یادداشت کنید، زیرا این تنها راه دسترسی و بازیابی کیف پول شما در صورت گم‌کردن دستگاه است. این عبارت را برای خودتان ایمیل نکنید و از آن اسکرین‌شات نگیرید. نگهداری آفلاین آن امن‌تر است.",
+  "create_wallet_generated": "کیف پول شما\nهمین الان ایجاد شد!",
+  "create_wallet_generating": "در حال ایجاد کیف پول...",
+  "create_wallet_title": "یک خودکار و یک تکه کاغذ بردارید",
+  "customize": "سفارشی‌سازی",
+  "customize_modal": {
+    "subtitle": "نام و آیکون کیف پول به صورت محلی روی دستگاه شما ذخیره می‌شود.",
+    "title": "کیف پول خود را شخصی‌سازی کنید"
+  },
+  "dns_address_linked": "آدرس متصل شد",
+  "dns_address_unlinked": "آدرس لغو ارتباط شد",
+  "dns_current_address": "نشانی فعلی شما",
+  "dns_expiration_date": "تاریخ انقضا",
+  "dns_renew_toast_success": "دامنه تمدید شد",
+  "dns_renew_until_btn": "تمدید تا {untilDate}",
+  "exchange_method_dont_show_again": "دیگر نمایش نده",
+  "exchange_method_open_warning": "شما در حال باز کردن یک برنامه خارجی هستید که توسط Tonkeeper اداره نمی‌شود.",
+  "exchange_modal": {
+    "other_ways_to_buy": "روش‌های دیگر برای خرید"
+  },
+  "exchange_other_ways": "راه‌های دیگر خرید یا فروش TON",
+  "exchange_title": "خرید TON",
+  "import_add_wallet": "کیف پول اضافه کنید",
+  "import_add_wallet_description": "یک کیف پول جدید بسازید یا یک کیف پول موجود را اضافه کنید.",
+  "import_existing_wallet": "کیف پول موجود",
+  "import_existing_wallet_description": "کیف پول را با ۲۴ کلمه بازیابی مخفی وارد کنید",
+  "import_new_wallet": "کیف پول جدید",
+  "import_new_wallet_description": "کیف پول جدید بسازید",
+  "import_signer": "جفت شدن با امضاکننده (Signer)",
+  "import_signer_description": "کاملاً آفلاین، ایزوله‌شده (air-gapped)، با تمامی قابلیت‌های TON",
+  "import_wallet_caption": "برای بازیابی دسترسی به کیف پول خود، ۲۴ کلمه‌ی بازیابی مخفی را که هنگام ساختن کیف پول به شما داده شده وارد کنید.",
+  "import_wallet_title": "عبارت بازیابی خود را وارد کنید",
+  "import_wallet_wrong_words_err": "عبارت نادرست",
+  "info_about_inactive_back": "بازگشت",
+  "intro_continue_btn": "شروع کنید",
+  "intro_item1_caption": "به‌ لطف معماری منحصربه‌فرد The Open Network، تراکنش‌های TON در عرض چند ثانیه تسویه می‌شوند.",
+  "intro_item1_title": "سرعت در سطح جهانی",
+  "intro_item2_caption": "تون‌کیپر کلیدهای رمزنگاری شما را روی دستگاهتان ذخیره می‌کند. تمام معاملات از طریق پروتکل‌های غیرمتمرکز انجام می‌شوند تا رمزارز شما هرگز به دست صرافی‌های متمرکز نیافتد.",
+  "intro_item2_title": "امنیت سراسری",
+  "intro_title": "خوش آمدید\nبه ",
+  "jetton_id": "شناسه توکن: {jettonAddress}",
+  "jettons_list_title": "توکن‌ها",
+  "later": "بعداً",
+  "ledger": {
+    "operation_not_supported": "این عملیات برای کیف پول‌های Ledger در دسترس نیست. کیف پول دیگری را انتخاب کنید و دوباره تلاش کنید."
+  },
+  "legal_font_license": "فونت Montserrat",
+  "legal_header_title": "حقوقی",
+  "legal_licenses_title": "مجوزها",
+  "legal_privacy": "سیاست حفظ حریم خصوصی",
+  "legal_terms": "شرایط خدمات",
+  "loading": "در حال بارگذاری",
+  "migration": {
+    "with_passcode": "رمز عبور را وارد کنید"
+  },
+  "nft_about_collection": "درباره مجموعه",
+  "nft_actions": {
+    "hide_and_report": "مخفی کردن و گزارش اسپم",
+    "hide": {
+      "nft": "پنهان کردن NFT"
+    },
+    "view_on_explorer": "مشاهده در Tonviewer"
+  },
+  "nft_collection": "مجموعه",
+  "nft_contract_address": "آدرس قرارداد",
+  "nft_deploy_collection_title": "ایجاد کالکشن NFT",
+  "nft_details": "جزئیات",
+  "nft_link_domain_button": "اتصال دامنه",
+  "nft_link_username_button": "نام را پیوند دهید",
+  "nft_more": "بیشتر",
+  "nft_on_sale": "برای فروش",
+  "nft_on_sale_text": "NFT هم‌اکنون در بازار برای فروش قرار دارد. برای انتقال، ابتدا باید آن را از فروش خارج کنید.",
+  "nft_open_in_marketplace": "مشاهده در بازار NFT",
+  "nft_owner_address": "مالک",
+  "nft_single_nft": "NFT تک",
+  "nft_transfer_nft": "انتقال NFT",
+  "nft_transfer": {
+    "title": "انتقال NFT"
+  },
+  "nft_transfer_title": "انتقال NFT",
+  "nft_unlink_domain_button": "مرتبط با '{{'address'}}'",
+  "nft_view_in_explorer": "در مرورگر مشاهده کنید",
+  "notifications": {
+    "alert": {
+      "cancel": "لغو"
+    }
+  },
+  "pairSigner": {
+    "open_signer": "Signer را در این دستگاه باز کنید"
+  },
+  "paste": "چسباندن",
+  "purchases": {
+    "screen_title": "خریدها"
+  },
+  "receiveModal": {
+    "copy": "کپی"
+  },
+  "recovery_phrase": {
+    "copy_button": "کپی"
+  },
+  "reminder_notifications_caption": "هنگامی که TON، توکن‌ها و NFT دریافت می‌کنید، اعلان‌ها را دریافت کنید.",
+  "reminder_notifications_enable_button": "اعلان‌ها را فعال کنید",
+  "reminder_notifications_later_button": "بعداً",
+  "reminder_notifications_title": "اعلان‌های فوری دریافت کنید",
+  "scan_qr_title": "کد QR را اسکن کنید",
+  "secret_words_caption": "این ۲۴ کلمه را به همان ترتیبی که در زیر آمده است یادداشت کنید و در مکانی مخفی و امن نگهداری نمایید.",
+  "secret_words_title": "عبارت بازیابی شما",
+  "security_change_passcode": "تغییر رمز عبور",
+  "select_wallet_for_authorization": "کیف پول را برای تأیید انتخاب کنید",
+  "send_fee_estimation_error": "محاسبه کارمزد ناموفق بود",
+  "send_publish_tx_error": "ارسال تراکنش ناموفق بود",
+  "send_screen_steps": {
+    "address": {
+      "delete_alert_text": "آیا مطمئن هستید که می‌خواهید «{name}» را از علاقه‌مندی‌های خود حذف کنید؟",
+      "suggest_actions": {
+        "add": "افزودن به علاقه‌مندی‌ها",
+        "delete": "حذف",
+        "hide": "مخفی کردن"
+      },
+      "suggests_label": "علاقه‌مندی‌ها و موارد اخیر"
+    },
+    "amount": {
+      "insufficient_balance": "موجودی کافی نیست",
+      "max": "حداکثر",
+      "remaining": "موجود: {amount}"
+    },
+    "comfirm": {
+      "comment_required_text": "هنگام ارسال، حتماً یادداشت یا برچسب مربوط به صرافی را وارد کنید. بدون آن، وجوه واریز نمی‌شود و ممکن است از دست برود.",
+      "title": "تأیید عمل",
+      "wallet": "کیف پول"
+    },
+    "done": {
+      "done_label": "انجام شد",
+      "to": "به: {name}"
+    }
+  },
+  "send_sending_wrong_time_description": "تنظیم خودکار زمان و تاریخ را در تنظیمات دستگاه خود روشن کنید. سپس دوباره انتقال خود را امتحان کنید.",
+  "settings_backup_seed": "پشتیبان‌گیری",
+  "settings_contact_support": "با ما تماس بگیرید",
+  "settings_delete_account": "حذف حساب",
+  "settings_jettons_list": "توکن‌ها",
+  "settings_legal_documents": "اسناد حقوقی",
+  "settings_network_alert_title": "شبکه را انتخاب کنید",
+  "settings_news": "اخبار Tonkeeper",
+  "settings_notifications": "اعلان‌ها",
+  "settings_primary_currency": "ارز",
+  "settings_rate": "به Tonkeeper امتیاز دهید",
+  "settings_recovery_phrase": "عبارت بازیابی",
+  "settings_reset": "خروج",
+  "settings_reset_alert_title": "\uD83D\uDEA7 \uD83D\uDEA8 خروج از حساب؟ \uD83D\uDEA8 \uD83D\uDEA7",
+  "settings_reset_alert_title_all": "از همه کیف پول‌ها خارج شوید؟",
+  "settings_search_engine": "جستجو",
+  "settings_security": "امنیت",
+  "settings_support": "پشتیبانی",
+  "settings_title": "تنظیمات",
+  "settings_version": "نسخه",
+  "settings_wallet_version": "نشانی فعال",
+  "signer_scan_result": "تراکنش امضا شده را اسکن کنید",
+  "signer_scan_tx_description": "لطفاً برنامه Signer را باز کنید و با استفاده از کد QR تراکنش را اسکن نمایید",
+  "spam_action": "هرزنامه",
+  "staking": {
+    "deposit": "واریز",
+    "details": {
+      "pool_address": {
+        "label": "نشانی استخر"
+      }
+    },
+    "withdraw": "برداشت"
+  },
+  "start_screen": {
+    "create_wallet_button": "ایجاد کیف پول جدید",
+    "import_wallet_button": "وارد کردن کیف پول موجود"
+  },
+  "success": "موفقیت!",
+  "suspicious": {
+    "buttons": {
+      "not_spam": "این اسپم نیست",
+      "report": "گزارش اسپم"
+    },
+    "label": {
+      "full": "NFT تأییدنشده",
+      "short": "تأیید نشده"
+    },
+    "status_update": {
+      "hidden": {
+        "collection": "مجموعه پنهان شده",
+        "nft": "NFT مخفی"
+      },
+      "spam": {
+        "collection": "مجموعه به عنوان اسپم علامت‌گذاری شد",
+        "nft": "NFT به عنوان اسپم علامت‌گذاری شد"
+      }
+    }
+  },
+  "suspiciousNFTDetails": {
+    "buttons": {
+      "not_spam": "این اسپم نیست",
+      "report": "گزارش اسپم"
+    },
+    "paragraphs": {
+      "p1": "برای اسپم استفاده می‌شود. برای ارسال پیام‌های ناخواسته و اغلب بی‌ربط در مقیاس وسیع به کار می‌رود.",
+      "p2": "برای کلاهبرداری استفاده می‌شود. نام، توضیحات یا تصویر NFT می‌تواند کاربران را به اشتباه بیندازد.",
+      "p3": "ما اطلاعات کمی درباره نویسنده و تاریخچه این NFT داریم."
+    },
+    "subtitle": "NFT ممکن است به یکی از دلایل زیر امن نباشد.",
+    "title": "NFT تاییدنشده"
+  },
+  "swap_title": "مبادله",
+  "today": "امروز",
+  "tokenDetails": {
+    "tonviewer_button": "مشاهده در Tonviewer"
+  },
+  "tonkeeper_pro": "تون‌کیپر پرو",
+  "tonkeeper_pro_description": "اشتراک Tonkeeper Pro با ویژگی کیف پول توسعه‌یافته ارائه می‌شود که مجموعه‌ای از ابزارها برای مدیریت رمزارز فراهم می‌کند.",
+  "ton_login_caption": "{name} در حال درخواست دسترسی به آدرس کیف پول شما است",
+  "ton_login_connect_button": "اتصال کیف پول",
+  "ton_login_notice": "قبل از اتصال کیف پول، حتماً آدرس سرویس را بررسی کنید.",
+  "ton_login_success": "انجام شد",
+  "transaction_bid_dns": "نام",
+  "transactionDetails": {
+    "comment": "نظر",
+    "operation": "عملیات",
+    "recipient": "گیرنده"
+  },
+  "transaction_fee": "هزینه",
+  "transaction_hash": "تراکنش",
+  "transaction_merchant": "تاجر",
+  "transaction_receive_date": "دریافت شده در {date}",
+  "transaction_recipient": "گیرنده",
+  "transaction_recipient_address": "آدرس گیرنده",
+  "transactions": {
+    "burned": "سوزانده شده",
+    "failed": "ناموفق",
+    "nft_purchase": "خرید NFT",
+    "smartcontract_exec": "فراخوانی قرارداد",
+    "spam": "اسپم",
+    "swap": "مبادله",
+    "unknown": "ناشناخته",
+    "unknown_description": "چیزی اتفاق افتاد اما ما نتوانستیم آن را تشخیص دهیم"
+  },
+  "transaction_sender": "فرستنده",
+  "transaction_sender_address": "نشانی فرستنده",
+  "transaction_sent_date": "ارسال شده در {date}",
+  "transaction_type_bid": "پیشنهاد",
+  "transaction_type_contract_deploy": "استقرار قرارداد",
+  "transaction_type_pending": "در انتظار",
+  "transaction_type_receive": "دریافت شد",
+  "transaction_type_sent": "ارسال شد",
+  "transaction_type_subscription": "اشتراک فعال شد",
+  "transaction_type_unsubscription": "لغو اشتراک",
+  "transaction_type_wallet_initialized": "کیف پول راه‌اندازی شد",
+  "txActions": {
+    "amount": "مقدار",
+    "fee": "کارمزد",
+    "refund": "بازپرداخت",
+    "signRaw": {
+      "comment": "نظر",
+      "recipient": "دریافت‌کننده",
+      "title": "تأیید تراکنش",
+      "types": {
+        "jettonTransfer": "انتقال توکن",
+        "nftItemTransfer": "انتقال NFT",
+        "tonTransfer": "انتقال TON",
+        "unknownTransaction": "تراکنش ناشناخته"
+      }
+    }
+  },
   "unused": {
     "about_risk_modal": {
       "description": "ارزش کل توکن‌هایی که از کیف پول شما ارسال می‌شود. بازپرداخت در کل ارزش گنجانده نشده است.",
@@ -188,5 +529,17 @@
       "p3": "همه افراد با عبارت بازیابی شما می توانند به کیف پول شما دسترسی داشته باشند.",
       "title": "توجه"
     }
-  }
+  },
+  "wallet_buy": "خرید",
+  "wallet": {
+    "collectibles_tab_lable": "کلکسیون‌ها",
+    "scan_btn": "اسکن"
+  },
+  "wallet_receive": "دریافت",
+  "wallets": "کیف پول‌ها",
+  "wallet_sell": "فروش",
+  "wallet_send": "ارسال",
+  "wallet_swap": "مبادله",
+  "wallet_title": "کیف پول",
+  "yesterday": "دیروز"
 }

@@ -361,11 +361,7 @@ export const Content: FC<{
     useRealtimeUpdatesInvalidation();
 
     if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {

@@ -18,12 +18,102 @@
   },
   "address_copied": "पता कॉपी किया गया",
   "add_wallet": "बटुआ जोड़ें",
+  "add_wallet_modal": {
+    "testnet": {
+      "subtitle": "24 गुप्त रिकवरी शब्दों के साथ वॉलेट को टेस्टनेट में आयात करें",
+      "title": "Testnet खाता"
+    },
+    "watch_only": {
+      "subtitle": "पुनर्प्राप्ति वाक्यांश के बिना वॉलेट गतिविधि की निगरानी के लिए",
+      "title": "देखने के लिए खाता"
+    }
+  },
+  "add_watch_only": {
+    "title": "देखें खाता"
+  },
+  "approval": {
+    "accepted": "दृश्य",
+    "declined": "अस्वीकृत",
+    "details_token": "टोकन विवरण",
+    "id_collection": "कलेक्शन आईडी",
+    "id_token": "टोकन आईडी",
+    "name": "नाम",
+    "not_spam": "स्पैम नहीं है",
+    "spam": "स्पैम",
+    "unverified_token": "अप्रमाणित टोकन"
+  },
+  "balances_setup_wallet": "वॉलेट सेट करें",
+  "battery": {
+    "other_ways": {
+      "by_crypto": {
+        "title": "{symbol} से रीचार्ज करें"
+      },
+      "gift": {
+        "subtitle": "दोस्तों के साथ साझा करें",
+        "title": "बैटरी उपहार"
+      }
+    },
+    "packages": {
+      "disclaimer": "एक चार्ज औसत लेन-देन शुल्क को कवर करता है। कुछ लेन-देन की लागत अधिक हो सकती है।"
+    },
+    "please_wait": "बैटरी कुछ ही मिनटों में चार्ज हो जाएगी",
+    "promocode": {
+      "title": "प्रोमो कोड"
+    },
+    "recharge_by_crypto": {
+      "other": {
+        "subtitle": "राशि मैन्युअल रूप से दर्ज करें",
+        "title": "अन्य"
+      },
+      "title": "रीचार्ज"
+    },
+    "title": "Tonkeeper बैटरी",
+    "transactions": {
+      "description": "चयनित लेनदेन Tonkeeper बैटरी द्वारा किए जाएंगे।",
+      "settings": "बैटरी सेटिंग्स",
+      "title": "लेन-देन",
+      "types": {
+        "nft": "NFT ट्रांसफर"
+      },
+      "type": {
+        "swap": "अदला-बदली",
+        "transfer": "स्थानांतरण"
+      }
+    }
+  },
+  "biometry": {
+    "default": "बायोमेट्रिक्स",
+    "ios": {
+      "fingerprint": "टच आईडी"
+    }
+  },
+  "browser": {
+    "actions": {
+      "copy_link": "लिंक कॉपी करें",
+      "refresh": "रीफ़्रेश करें",
+      "share": "साझा करें"
+    },
+    "apps_all": "सभी",
+    "connected": "संपर्कित",
+    "title": "ब्राउज़र"
+  },
+  "cancel": "रद्द करें",
   "check_words_caption": "यह जांचने के लिए कि आपने अपना पुनर्प्राप्ति वाक्यांश सही ढंग से लिखा है या नहीं, कृपया %{wordNum1}th, %{wordNum2}th, और %{wordNum3}st words दर्ज करें.",
   "check_words_success": "बधाई! आपने अपना बटुआ सेट कर लिया है ",
   "check_words_title": "तो, चलो जाँच करें",
+  "choose_wallets": {
+    "subtitle": "वे वॉलेट चुनें जिन्हें आप जोड़ना चाहते हैं।",
+    "title": "वॉलेट चुनें"
+  },
+  "confirm": "पुष्टि करें",
   "confirm_sending_fee": "शुल्क",
   "confirm_sending_submit": "पुष्टि करें और भेजें",
   "confirm_sending_title": "भेजने की पुष्टि करें",
+  "confirmSendModal": {
+    "wallet": "वॉलेट:"
+  },
+  "continue": "जारी रखें",
+  "copied": "कॉपी किया गया",
   "create_pin_current_title": "वर्तमान पासकोड दर्ज करें",
   "create_pin_new_title": "नया पासकोड बनाएँ",
   "create_pin_repeat_title": "पासकोड पुनः दर्ज करें",
@@ -31,6 +121,11 @@
   "create_wallet_generated": "आपका बटुआ अभी बनाया गया है!",
   "create_wallet_generating": "बटुआ उत्पन्न करना ...",
   "create_wallet_title": "एक कलम और कागज का एक टुकड़ा पकड़ो",
+  "customize": "अनुकूलित करें",
+  "customize_modal": {
+    "subtitle": "वॉलेट का नाम और आइकन आपके डिवाइस पर स्थानीय रूप से संग्रहीत होते हैं।",
+    "title": "अपना वॉलेट कस्टमाइज़ करें"
+  },
   "dns_address_linked": "पता जुड़ा हुआ",
   "dns_address_unlinked": "पता अनलिंक",
   "dns_current_address": "आपका वर्तमान पता",
@@ -39,6 +134,9 @@
   "dns_renew_until_btn": "{जब तक नवीनीकृत करें}",
   "exchange_method_dont_show_again": "फिर से मत दिखाओ",
   "exchange_method_open_warning": "आप एक बाहरी ऐप खोल रहे हैं जो टोनकीपर द्वारा संचालित नहीं है।",
+  "exchange_modal": {
+    "other_ways_to_buy": "खरीदने के अन्य तरीके"
+  },
   "exchange_other_ways": "टन खरीदने या बेचने के अन्य तरीके",
   "exchange_title": "टन खरीदें",
   "import_add_wallet": "वॉलेट जोड़ें",
@@ -61,6 +159,158 @@
   "intro_title": "स्वागत है",
   "jetton_id": "टोकन आईडी: {jettonAddress}",
   "jettons_list_title": "टोकन",
+  "later": "बाद में",
+  "ledger": {
+    "operation_not_supported": "यह ऑपरेशन लेजर वॉलेट्स के लिए उपलब्ध नहीं है। कृपया कोई अन्य वॉलेट चुनें और पुनः प्रयास करें।"
+  },
+  "legal_font_license": "Montserrat फ़ॉन्ट",
+  "legal_header_title": "कानूनी",
+  "legal_licenses_title": "लाइसेंस",
+  "legal_privacy": "गोपनीयता नीति",
+  "legal_terms": "सेवा की शर्तें",
+  "loading": "लोड हो रहा है",
+  "migration": {
+    "with_passcode": "पासकोड दर्ज करें"
+  },
+  "nft_about_collection": "संग्रह के बारे में",
+  "nft_actions": {
+    "hide_and_report": "छुपाएँ और स्पैम रिपोर्ट करें",
+    "hide": {
+      "nft": "NFT छिपाएँ"
+    },
+    "view_on_explorer": "Tonviewer पर देखें"
+  },
+  "nft_collection": "संग्रह",
+  "nft_contract_address": "कॉन्ट्रैक्ट का पता",
+  "nft_deploy_collection_title": "NFT संग्रह बनाएं",
+  "nft_details": "विवरण",
+  "nft_link_domain_button": "डोमेन लिंक करें",
+  "nft_link_username_button": "नाम लिंक करें",
+  "nft_more": "अधिक",
+  "nft_on_sale": "बिक्री पर",
+  "nft_on_sale_text": "NFT अभी मार्केटप्लेस पर बिक्री के लिए है। ट्रांसफर के लिए, आपको पहले इसे बिक्री से हटा देना चाहिए।",
+  "nft_open_in_marketplace": "NFT मार्केट पर देखें",
+  "nft_owner_address": "मालिक",
+  "nft_single_nft": "एकल NFT",
+  "nft_transfer_nft": "NFT ट्रांसफर करें",
+  "nft_transfer": {
+    "title": "NFT स्थानांतरण"
+  },
+  "nft_transfer_title": "NFT स्थानांतरित करें",
+  "nft_unlink_domain_button": "'{{'address'}}' से जुड़ा हुआ",
+  "nft_view_in_explorer": "एक्सप्लोरर में देखें",
+  "notifications": {
+    "alert": {
+      "cancel": "रद्द करें"
+    }
+  },
+  "pairSigner": {
+    "open_signer": "इस डिवाइस पर Signer खोलें"
+  },
+  "paste": "चिपकाएं",
+  "purchases": {
+    "screen_title": "खरीदारी"
+  },
+  "receiveModal": {
+    "copy": "कॉपी करें"
+  },
+  "recovery_phrase": {
+    "copy_button": "कॉपी करें"
+  },
+  "reminder_notifications_caption": "जब आपको TON, टोकन और NFT प्राप्त हों, तो सूचनाएँ पाएं।",
+  "reminder_notifications_enable_button": "सूचनाएं सक्षम करें",
+  "reminder_notifications_later_button": "बाद में",
+  "reminder_notifications_title": "तुरंत सूचनाएँ प्राप्त करें",
+  "scan_qr_title": "QR कोड स्कैन करें",
+  "secret_words_caption": "इन 24 शब्दों को नीचे दिए गए क्रम में लिखें और उन्हें एक गुप्त, सुरक्षित जगह पर रखें।",
+  "secret_words_title": "आपकी पुनर्प्राप्ति वाक्यांश",
+  "security_change_passcode": "पासकोड बदलें",
+  "select_wallet_for_authorization": "प्राधिकरण के लिए वॉलेट चुनें",
+  "send_fee_estimation_error": "शुल्क की गणना करने में विफल",
+  "send_publish_tx_error": "लेन-देन भेजने में विफल",
+  "send_screen_steps": {
+    "address": {
+      "delete_alert_text": "क्या आप वाकई «{name}» को अपनी पसंदीदा सूची से हटाना चाहते हैं?",
+      "suggest_actions": {
+        "add": "पसंदीदा में जोड़ें",
+        "delete": "हटाएँ",
+        "hide": "छुपाएं"
+      },
+      "suggests_label": "मनपसंद और हालिया"
+    },
+    "amount": {
+      "insufficient_balance": "पर्याप्त शेष राशि नहीं है",
+      "max": "अधिकतम",
+      "remaining": "उपलब्ध: {amount}"
+    },
+    "comfirm": {
+      "comment_required_text": "भेजते समय, एक्सचेंज का मेमो या टैग अवश्य शामिल करें। इसके बिना, धनराशि जमा नहीं होगी और खो सकती है।",
+      "title": "क्रिया की पुष्टि करें",
+      "wallet": "वॉलेट"
+    },
+    "done": {
+      "done_label": "हो गया",
+      "to": "{name} को"
+    }
+  },
+  "send_sending_wrong_time_description": "अपने डिवाइस की सेटिंग्स में स्वतः समय और तारीख चालू करें। फिर अपना ट्रांसफर पुनः प्रयास करें।",
+  "settings_backup_seed": "बैकअप",
+  "settings_contact_support": "हमसे संपर्क करें",
+  "settings_delete_account": "खाता 삭제 करें",
+  "settings_jettons_list": "टोकन",
+  "settings_legal_documents": "कानूनी दस्तावेज़",
+  "settings_network_alert_title": "नेटवर्क चुनें",
+  "settings_news": "Tonkeeper समाचार",
+  "settings_notifications": "सूचनाएँ",
+  "settings_primary_currency": "मुद्रा",
+  "settings_rate": "Tonkeeper को रेट करें",
+  "settings_recovery_phrase": "रिकवरी वाक्यांश",
+  "settings_reset": "साइन आउट करें",
+  "settings_reset_alert_title": "\uD83D\uDEA7 \uD83D\uDEA8 साइन आउट करें? \uD83D\uDEA8 \uD83D\uDEA7",
+  "settings_reset_alert_title_all": "सभी वॉलेट से साइन आउट करें?",
+  "settings_search_engine": "खोजें",
+  "settings_security": "सुरक्षा",
+  "settings_support": "सहायता",
+  "settings_title": "सेटिंग्स",
+  "settings_version": "संस्करण",
+  "settings_wallet_version": "सक्रिय पता",
+  "signer_scan_result": "हस्ताक्षरित लेनदेन स्कैन करें",
+  "signer_scan_tx_description": "कृपया Signer खोलें और लेनदेन के साथ QR कोड स्कैन करें",
+  "spam_action": "स्पैम",
+  "staking": {
+    "deposit": "जमा",
+    "details": {
+      "pool_address": {
+        "label": "पूल पता"
+      }
+    },
+    "withdraw": "अन्स्‍टेक करें"
+  },
+  "start_screen": {
+    "create_wallet_button": "नया वॉलेट बनाएँ",
+    "import_wallet_button": "मौजूदा वॉलेट आयात करें"
+  },
+  "success": "सफलता!",
+  "suspicious": {
+    "buttons": {
+      "not_spam": "यह स्पैम नहीं है",
+      "report": "स्पैम की रिपोर्ट करें"
+    },
+    "label": {
+      "full": "अप्रमाणित NFT",
+      "short": "सत्यापित नहीं"
+    },
+    "status_update": {
+      "hidden": {
+        "collection": "संग्रह छिपाया गया है",
+        "nft": "NFT छुपा हुआ"
+      },
+      "spam": {
+        "collection": "संग्रह को स्पैम के रूप में चिह्नित किया गया",
+        "nft": "NFT को स्पैम के रूप में चिह्नित किया गया"
+      }
+    }
+  },
   "suspiciousNFTDetails": {
     "buttons": {
       "not_spam": "Not Spam",
@@ -86,12 +336,27 @@
   "ton_login_notice": "वॉलेट को जोड़ने से पहले सेवा पते की जांच करना सुनिश्चित करें।",
   "ton_login_success": "किया",
   "transaction_bid_dns": "नाम",
+  "transactionDetails": {
+    "comment": "टिप्पणी",
+    "operation": "ऑपरेशन",
+    "recipient": "प्राप्तकर्ता"
+  },
   "transaction_fee": "शुल्क",
   "transaction_hash": "लेनदेन",
   "transaction_merchant": "व्यापारी",
   "transaction_receive_date": "{दिनांक} पर प्राप्त",
   "transaction_recipient": "प्राप्तकर्ता",
   "transaction_recipient_address": "प्राप्तकर्ता पता",
+  "transactions": {
+    "burned": "जलाया गया",
+    "failed": "विफल",
+    "nft_purchase": "NFT खरीद",
+    "smartcontract_exec": "कॉन्ट्रैक्ट कॉल करें",
+    "spam": "स्पैम",
+    "swap": "स्वैप करें",
+    "unknown": "अज्ञात",
+    "unknown_description": "कुछ हुआ लेकिन हम उसे पहचान नहीं सके"
+  },
   "transaction_sender": "प्रेषक",
   "transaction_sender_address": "प्रेषक पता",
   "transaction_sent_date": "{दिनांक} पर भेजा गया",
@@ -103,6 +368,22 @@
   "transaction_type_subscription": "सदस्यता ली",
   "transaction_type_unsubscription": "सदस्यता समाप्त",
   "transaction_type_wallet_initialized": "वॉलेट इनिशियलाइज्ड",
+  "txActions": {
+    "amount": "राशि",
+    "fee": "शुल्क",
+    "refund": "वापसी",
+    "signRaw": {
+      "comment": "टिप्पणी",
+      "recipient": "प्राप्तकर्ता",
+      "title": "लेन-देन की पुष्टि करें",
+      "types": {
+        "jettonTransfer": "टोकन ट्रांसफर",
+        "nftItemTransfer": "NFT ट्रांसफ़र",
+        "tonTransfer": "TON ट्रांसफर",
+        "unknownTransaction": "अज्ञात लेनदेन"
+      }
+    }
+  },
   "unused": {
     "about_risk_modal": {
       "description": "तोकनों की कुल मूल्य जो आपके वॉलेट से भेजे जाएंगे। वापसी कुल मूल्य में शामिल नहीं है।",
@@ -276,6 +557,10 @@
     "watch_only": "केवल देखें"
   },
   "wallet_buy": "खरीदें",
+  "wallet": {
+    "collectibles_tab_lable": "संग्रहणीय वस्तुएँ",
+    "scan_btn": "स्कैन करें"
+  },
   "wallet_receive": "प्राप्त करें",
   "wallets": "वॉलेट्स",
   "wallet_sell": "बेचें",

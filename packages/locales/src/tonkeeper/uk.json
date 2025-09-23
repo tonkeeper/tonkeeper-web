@@ -208,6 +208,9 @@
     "open_signer": "Відкрити підписувач на цьому пристрої"
   },
   "paste": "Вставити",
+  "purchases": {
+    "screen_title": "Покупки"
+  },
   "receiveModal": {
     "copy": "Копіювати"
   },
@@ -222,6 +225,7 @@
   "secret_words_caption": "Запишіть ці 24 слова у вказаному порядку та збережіть у таємному, безпечному місці.",
   "secret_words_title": "Ваш секретний ключ",
   "security_change_passcode": "Змінити код доступу",
+  "select_wallet_for_authorization": "Виберіть гаманець для авторизації",
   "send_fee_estimation_error": "Не вдалося обчислити комісію",
   "send_publish_tx_error": "Не вдалося надіслати транзакцію",
   "send_screen_steps": {
