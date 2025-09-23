@@ -27,6 +27,7 @@ import {
     ProSubscription,
     TelegramSubscriptionStatuses
 } from '../entries/pro';
+import { toStructTimeLeft } from './date';
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
@@ -387,19 +388,15 @@ export const getIosSubscriptionPrice = (subscription: ProSubscription, translato
     return `${currency} ${(price / priceMultiplier).toFixed(2)}` + proPeriodTranslated;
 };
 
-type UnitKey = 'year' | 'month' | 'week' | 'day' | 'hour' | 'minute' | 'second';
-
-type Unit = { key: UnitKey; sec: number };
-
-const ALL_UNITS: readonly Unit[] = [
-    { key: 'year', sec: 365 * 24 * 60 * 60 },
-    { key: 'month', sec: 30 * 24 * 60 * 60 },
-    { key: 'week', sec: 7 * 24 * 60 * 60 },
-    { key: 'day', sec: 24 * 60 * 60 },
-    { key: 'hour', sec: 60 * 60 },
-    { key: 'minute', sec: 60 },
-    { key: 'second', sec: 1 }
-];
+export enum Units {
+    YEAR = 'year',
+    MONTH = 'month',
+    WEEK = 'week',
+    DAY = 'day',
+    HOUR = 'hour',
+    MINUTE = 'minute',
+    SECOND = 'second'
+}
 
 type RuPluralForms = 'one' | 'few' | 'many' | 'other';
 
@@ -419,11 +416,11 @@ export interface FormatEveryPeriodOptions {
     allowApproxMonthsYears?: boolean;
 
     // minUnit: 'minute' (5) => "Every minute" // not "Every 5 seconds"
-    minUnit?: UnitKey;
+    minUnit?: Units;
 }
 
 interface ISecondsToUnitCountReturnType {
-    unit: UnitKey;
+    unit: Units;
     count: number;
     form: RuPluralForms;
 }
@@ -434,37 +431,39 @@ export function secondsToUnitCount(
 ): ISecondsToUnitCountReturnType {
     const safeSeconds = Math.max(1, Math.trunc(seconds));
 
-    let units =
-        opts?.allowApproxMonthsYears ?? true
-            ? ALL_UNITS
-            : ALL_UNITS.filter(unit => unit.key !== 'month' && unit.key !== 'year');
+    const { days, hours, minutes, seconds: sec } = toStructTimeLeft(safeSeconds * 1000);
 
-    if (opts?.minUnit) {
-        const index = units.findIndex(unit => unit.key === opts.minUnit);
+    if (opts?.allowApproxMonthsYears === false) {
+        if (days > 0) return { unit: Units.DAY, count: days, form: pluralRu(days) };
+        if (hours > 0) return { unit: Units.HOUR, count: hours, form: pluralRu(hours) };
+        if (minutes > 0) return { unit: Units.MINUTE, count: minutes, form: pluralRu(minutes) };
 
-        if (index >= 0) units = units.slice(index);
+        return { unit: Units.SECOND, count: sec, form: pluralRu(sec) };
     }
 
-    const exact = units.find(unit => safeSeconds % unit.sec === 0);
+    if (days >= 365) {
+        const years = Math.floor(days / 365);
 
-    if (exact) {
-        const count = Math.max(1, safeSeconds / exact.sec);
-
-        return {
-            unit: exact.key,
-            count,
-            form: pluralRu(count)
-        };
+        return { unit: Units.YEAR, count: years, form: pluralRu(years) };
     }
 
-    const candidate = units.find(unit => unit.sec <= safeSeconds) ?? units[units.length - 1];
-    const count = Math.floor(safeSeconds / candidate.sec);
+    if (days >= 30) {
+        const months = Math.floor(days / 30);
 
-    if (count >= 1 && candidate.key !== 'second') {
-        return { unit: candidate.key, count, form: pluralRu(count) };
+        return { unit: Units.MONTH, count: months, form: pluralRu(months) };
     }
 
-    return { unit: 'second', count: safeSeconds, form: pluralRu(safeSeconds) };
+    if (days >= 7) {
+        const weeks = Math.floor(days / 7);
+
+        return { unit: Units.WEEK, count: weeks, form: pluralRu(weeks) };
+    }
+
+    if (days > 0) return { unit: Units.DAY, count: days, form: pluralRu(days) };
+    if (hours > 0) return { unit: Units.HOUR, count: hours, form: pluralRu(hours) };
+    if (minutes > 0) return { unit: Units.MINUTE, count: minutes, form: pluralRu(minutes) };
+
+    return { unit: Units.SECOND, count: sec, form: pluralRu(sec) };
 }
 
 // Should be used only for Pro Dev tools
