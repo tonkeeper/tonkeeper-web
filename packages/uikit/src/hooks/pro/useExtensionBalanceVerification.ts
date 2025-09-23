@@ -24,8 +24,6 @@ export const useExtensionBalanceVerification = () => {
             return;
         }
 
-        if (sdk.targetEnv !== 'mobile' && sdk.targetEnv !== 'tablet') return;
-
         if (!subscription.nextChargeDate) return;
         if (!isExtensionAutoRenewableSubscription(subscription)) return;
 

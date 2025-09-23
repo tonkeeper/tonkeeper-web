@@ -11,7 +11,6 @@ export const useIosSubscriptionPolling = (intervalMs = 10000) => {
     const { data: originalTxInfo } = useOriginalTransactionInfo();
 
     useEffect(() => {
-        if (sdk.targetEnv !== 'mobile' && sdk.targetEnv !== 'tablet') return;
         if (!hasWalletAuth(subscription)) return;
         if (isProSubscription(subscription)) return;
 
