@@ -2,7 +2,7 @@ export enum Language {
     EN = 0,
     RU = 1,
     IT = 2,
-    'zh_CN' = 3,
+    zh_CN = 3,
     TR = 4,
     BG = 5,
     ES = 6,
@@ -10,7 +10,11 @@ export enum Language {
     UK = 8,
     UZ = 9,
     BN = 10,
-    'zh_TW' = 11
+    zh_TW = 11,
+    FR = 12,
+    PA = 13,
+    PT = 14,
+    VI = 15
 }
 
 export const defaultLanguage: Language = Language.EN;
@@ -19,15 +23,19 @@ export const languages = [
     Language.EN,
     Language.RU,
     Language.IT,
-    Language['zh_TW'],
-    Language['zh_CN'],
+    Language.zh_TW,
+    Language.zh_CN,
     Language.TR,
     Language.BG,
     Language.ES,
     Language.ID,
     Language.UK,
     Language.UZ,
-    Language.BN
+    Language.BN,
+    Language.FR,
+    Language.PA,
+    Language.PT,
+    Language.VI
 ];
 
 export const localizationText = (lang?: Language) => {
@@ -38,9 +46,9 @@ export const localizationText = (lang?: Language) => {
             return 'ru';
         case Language.IT:
             return 'it';
-        case Language['zh_CN']:
+        case Language.zh_CN:
             return 'zh_CN';
-        case Language['zh_TW']:
+        case Language.zh_TW:
             return 'zh_TW';
         case Language.TR:
             return 'tr';
@@ -56,6 +64,14 @@ export const localizationText = (lang?: Language) => {
             return 'uz';
         case Language.BN:
             return 'bn';
+        case Language.FR:
+            return 'fr';
+        case Language.PA:
+            return 'pa';
+        case Language.PT:
+            return 'pt';
+        case Language.VI:
+            return 'vi';
         default:
             return 'en';
     }
@@ -70,9 +86,9 @@ export const localizationFrom = (lang: string) => {
         case 'it':
             return Language.IT;
         case 'zh_CN':
-            return Language['zh_CN'];
+            return Language.zh_CN;
         case 'zh_TW':
-            return Language['zh_TW'];
+            return Language.zh_TW;
         case 'tr':
             return Language.TR;
         case 'bg':
@@ -87,6 +103,14 @@ export const localizationFrom = (lang: string) => {
             return Language.UZ;
         case 'bn':
             return Language.BN;
+        case 'fr':
+            return Language.FR;
+        case 'pa':
+            return Language.PA;
+        case 'pt':
+            return Language.PT;
+        case 'vi':
+            return Language.VI;
         default:
             return Language.EN;
     }
