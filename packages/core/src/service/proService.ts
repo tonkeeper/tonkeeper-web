@@ -1,28 +1,21 @@
-import { Address } from '@ton/core';
 import BigNumber from 'bignumber.js';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
-import { BLOCKCHAIN_NAME } from '../entries/crypto';
-import { AssetAmount } from '../entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { RecipientData, TonRecipientData } from '../entries/send';
 import {
     backwardCompatibilityOnlyWalletVersions,
     TonWalletStandard,
     WalletVersion
 } from '../entries/wallet';
-import { AccountsApi } from '../tonApiV2';
 import { Flatten } from '../utils/types';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 import {
-    ApiError,
     AuthService,
     Currencies as CurrenciesGenerated,
     DashboardCellAddress,
@@ -33,8 +26,6 @@ import {
     DashboardsService,
     ExtensionsService,
     IapService,
-    Invoice,
-    InvoicesService,
     SubscriptionExtension,
     SupportService,
     TiersService,
@@ -176,13 +167,13 @@ type GetProExtensionDataResponse =
     | { ok: false; data: PurchaseErrors };
 
 export const getProExtensionData = async (
-    tempToken: string,
+    token: string,
     lang: Language,
     tierId: number
 ): Promise<GetProExtensionDataResponse> => {
     try {
         const extensionData = await ExtensionsService.createSubscriptionExtension(
-            `Bearer ${tempToken}`,
+            `Bearer ${token}`,
             localizationText(lang) as Lang,
             {
                 tier_id: tierId
@@ -199,62 +190,6 @@ export const getProExtensionData = async (
             data: PurchaseErrors.PURCHASE_FAILED
         };
     }
-};
-
-type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };
-
-export const createProServiceInvoice = async (
-    tempToken: string,
-    tierId: number
-): Promise<ProServiceInvoiceResponse> => {
-    try {
-        const invoice = await InvoicesService.createInvoice(`Bearer ${tempToken}`, {
-            tier_id: tierId
-        });
-
-        return {
-            ok: true,
-            data: invoice
-        };
-    } catch (e) {
-        if (e instanceof ApiError && e.status === 400) {
-            return {
-                ok: false,
-                data: PurchaseErrors.PROMOCODE_ALREADY_USED
-            };
-        }
-
-        return {
-            ok: false,
-            data: PurchaseErrors.PURCHASE_FAILED
-        };
-    }
-};
-
-export const createRecipient = async (
-    api: APIConfig,
-    invoice: Invoice
-): Promise<[RecipientData, AssetAmount]> => {
-    const toAccount = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: invoice.pay_to_address
-    });
-
-    const recipient: TonRecipientData = {
-        address: {
-            address: Address.parse(invoice.pay_to_address).toString({ bounceable: false }),
-            blockchain: BLOCKCHAIN_NAME.TON
-        },
-        comment: invoice.id,
-        done: true,
-        toAccount: toAccount
-    };
-
-    const asset = new AssetAmount({
-        asset: TON_ASSET,
-        weiAmount: new BigNumber(invoice.amount)
-    });
-
-    return [recipient, asset];
 };
 
 export const saveIapPurchase = async (
