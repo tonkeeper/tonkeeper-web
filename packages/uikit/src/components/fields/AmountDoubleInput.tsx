@@ -193,8 +193,15 @@ export const AmountDoubleInput = forwardRef<
     const inputValueToBN = (v: string) =>
         new BigNumber(removeGroupSeparator(v).replace(getDecimalSeparator(), '.'));
 
+    const activeCurrency = currencies.find(c => c.id === currencyAmount.activeCurrencyId)!;
+    const notActiveCurrency = currencies.find(c => c.id !== currencyAmount.activeCurrencyId)!;
+
     const onInput = (newValue: string) => {
-        const decimals = currencies.find(c => c.id === currencyAmount.activeCurrencyId)!.decimals;
+        const decimals = activeCurrency.decimals;
+
+        if (!decimals && (newValue.endsWith('.') || newValue.endsWith(','))) {
+            return;
+        }
 
         let inputValue = replaceTypedDecimalSeparator(newValue);
 
@@ -294,8 +301,14 @@ export const AmountDoubleInput = forwardRef<
         onInput(currencyAmount.inputValue);
     }, [currencies]);
 
-    const activeCurrency = currencies.find(c => c.id === currencyAmount.activeCurrencyId)!;
-    const notActiveCurrency = currencies.find(c => c.id !== currencyAmount.activeCurrencyId)!;
+    const zeroValue = () => {
+        const decimals = notActiveCurrency.decimals;
+        if (!decimals) {
+            return '0';
+        }
+
+        return `0${getDecimalSeparator()}00`;
+    };
 
     return (
         <AmountBlock ref={containerRef} className={className}>
@@ -313,7 +326,7 @@ export const AmountDoubleInput = forwardRef<
             <SecondCurrencyBlock onClick={onToggleCurrency}>
                 {(currencyAmount.activeCurrencyId === currencies[0].id
                     ? currencyAmount.value2
-                    : currencyAmount.value1) || `0${getDecimalSeparator()}00`}{' '}
+                    : currencyAmount.value1) || zeroValue()}
                 {notActiveCurrency.label}
             </SecondCurrencyBlock>
         </AmountBlock>
