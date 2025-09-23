@@ -96,8 +96,10 @@ export interface TonendpointConfig {
     '2fa_tg_linked_ttl_seconds': number;
     '2fa_bot_url'?: string;
 
+    /**
+     * It keeps the last release version, e.g. "v1.0.0"
+     */
     pro_apk_name?: string;
-    pro_apk_download_url?: string;
     pro_mobile_app_appstore_link?: string;
     pro_media_base_url?: string;
     pro_landing_url?: string;
