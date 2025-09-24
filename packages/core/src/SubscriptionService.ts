@@ -53,6 +53,10 @@ export class SubscriptionService implements ISubscriptionService {
         const mainToken = await this._authTokenService.getToken();
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
 
+        if (!mainToken && targetToken) {
+            await this._authTokenService.setToken(targetToken);
+        }
+
         const [currentSubscription, targetSubscription] = await Promise.all([
             getNormalizedSubscription(this._storage, mainToken),
             getNormalizedSubscription(this._storage, targetToken)
@@ -66,7 +70,7 @@ export class SubscriptionService implements ISubscriptionService {
         }
 
         if (tempToken && isValidSubscription(targetSubscription)) {
-            await this._authTokenService.setToken(tempToken);
+            await this._authTokenService.promoteToken(tempToken);
             await this._clearPendingSubscription(this._storage);
 
             return targetSubscription;
@@ -116,7 +120,7 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     async activateTrial(token: string) {
-        await this._authTokenService.setToken(token);
+        await this._authTokenService.promoteToken(token);
         await this._storage.set<boolean>(AppKey.PRO_USED_TRIAL, true);
     }
 

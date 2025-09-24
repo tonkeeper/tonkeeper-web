@@ -61,8 +61,9 @@ export const walletVersionFromProServiceDTO = (value: string) => {
 };
 
 export interface IProAuthTokenService {
-    setToken(token: string): Promise<void>;
     getToken(): Promise<string | null>;
+    setToken(token: string): Promise<void>;
+    promoteToken(token: string): Promise<void>;
     deleteToken(): Promise<void>;
 }
 

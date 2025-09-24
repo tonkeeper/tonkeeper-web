@@ -14,6 +14,10 @@ export class ProAuthTokenService {
 
     async setToken(token: string) {
         await this.storage.set(AppKey.PRO_AUTH_TOKEN, token);
+    }
+
+    async promoteToken(token: string) {
+        await this.storage.set(AppKey.PRO_AUTH_TOKEN, token);
         subscriptionFormTempAuth$.next(null);
     }
 

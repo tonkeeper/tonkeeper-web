@@ -119,9 +119,7 @@ export const normalizeSubscription = (
             },
             contract: dBStoredInfo.contract,
             currency: dBStoredInfo.currency,
-            expiresDate: dBStoredInfo?.expiration_date
-                ? toDate(dBStoredInfo.expiration_date)
-                : undefined,
+            expiresDate: extensionNextChargeDate,
             amount: dBStoredInfo.payment_per_period,
             period: dBStoredInfo.period,
             purchaseDate: toDate(dBStoredInfo.created_at),
