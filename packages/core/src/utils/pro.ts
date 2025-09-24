@@ -104,6 +104,8 @@ export const normalizeSubscription = (
                 amount: dBStoredInfo.payment_per_period,
                 period: dBStoredInfo.period,
                 purchaseDate: toDate(dBStoredInfo.created_at),
+                deployValue: dBStoredInfo.deploy_value,
+                destroyValue: dBStoredInfo.destroy_value,
                 isAutoRenewable: dBStoredInfo.status === SubscriptionExtensionStatus.ACTIVE
             };
         }
@@ -123,6 +125,8 @@ export const normalizeSubscription = (
             amount: dBStoredInfo.payment_per_period,
             period: dBStoredInfo.period,
             purchaseDate: toDate(dBStoredInfo.created_at),
+            deployValue: dBStoredInfo.deploy_value,
+            destroyValue: dBStoredInfo.destroy_value,
             isAutoRenewable: false
         };
     }

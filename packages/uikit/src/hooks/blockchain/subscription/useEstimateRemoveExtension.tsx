@@ -21,7 +21,7 @@ export const useEstimateRemoveExtension = () => {
 
     return useMutation<{ fee: TransactionFeeTonAsset; address: Address }, Error, CancelParams>(
         async subscriptionParams => {
-            const { selectedWallet, extensionContract } = subscriptionParams;
+            const { selectedWallet, extensionContract, destroyValue } = subscriptionParams;
 
             const extensionAddress = Address.parse(extensionContract);
 
@@ -31,7 +31,10 @@ export const useEstimateRemoveExtension = () => {
 
             let estimation;
             if (selectedWallet.version === WalletVersion.V5R1) {
-                const destruct = encoder.encodeDestructAction(extensionAddress);
+                const destruct = encoder.encodeDestructAction(
+                    extensionAddress,
+                    BigInt(destroyValue)
+                );
 
                 const remove: OutActionWalletV5Exported = {
                     type: 'removeExtension',

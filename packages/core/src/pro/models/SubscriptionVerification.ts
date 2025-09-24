@@ -17,6 +17,7 @@ export type SubscriptionVerification = {
     used_trial: boolean;
     next_charge?: number;
     auth_token: string;
+    tron_free_transfers: number;
     source: SubscriptionSource;
     crypto?: {
         amount: string;

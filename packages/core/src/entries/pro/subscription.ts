@@ -143,6 +143,8 @@ export interface IExtensionDBStoredInfo {
     amount: string;
     period: number;
     purchaseDate: Date;
+    deployValue: string;
+    destroyValue: string;
     isAutoRenewable: boolean;
 }
 

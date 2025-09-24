@@ -5,7 +5,9 @@
 import type { CryptoCurrency } from './CryptoCurrency';
 import type { SubscriptionExtensionMetadata } from './SubscriptionExtensionMetadata';
 import type { SubscriptionExtensionStatus } from './SubscriptionExtensionStatus';
+import type { SubscriptionExtensionVersion } from './SubscriptionExtensionVersion';
 export type SubscriptionExtension = {
+    version: SubscriptionExtensionVersion;
     status: SubscriptionExtensionStatus;
     contract: string;
     admin: string;
@@ -26,5 +28,13 @@ export type SubscriptionExtension = {
     created_at: number;
     withdraw_msg_body?: string;
     metadata: SubscriptionExtensionMetadata;
+    /**
+     * the amount of TON that needs to be attached to the message when deploying the subscription
+     */
+    deploy_value: string;
+    /**
+     * the amount of TON that needs to be attached to the message when destroying the subscription
+     */
+    destroy_value: string;
 };
 

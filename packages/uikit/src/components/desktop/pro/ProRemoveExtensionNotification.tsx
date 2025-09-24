@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { styled } from 'styled-components';
 import { Notification, NotificationFooter, NotificationFooterPortal } from '../../Notification';
 import { Body2, Body3, Label2 } from '../../Text';
@@ -13,9 +13,7 @@ import {
     ConfirmViewHeadingSlot
 } from '../../transfer/ConfirmView';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
-import BigNumber from 'bignumber.js';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
-import { toNano } from '@ton/core';
 import {
     useCancelSubscription,
     useEstimateRemoveExtension
@@ -32,11 +30,6 @@ import { hexToRGBA } from '../../../libs/css';
 import { useToast } from '../../../hooks/useNotification';
 import { IExtensionActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-
-const deployReserve = new AssetAmount({
-    asset: TON_ASSET,
-    weiAmount: new BigNumber(toNano('0.05').toString())
-});
 
 interface IProRecurrentNotificationProps {
     isOpen: boolean;
@@ -89,7 +82,13 @@ const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
     onClose,
     subscription
 }) => {
-    const { contract: extensionContract, auth, expiresDate, nextChargeDate } = subscription;
+    const {
+        contract: extensionContract,
+        auth,
+        expiresDate,
+        nextChargeDate,
+        destroyValue
+    } = subscription;
 
     const selectedWallet = auth.wallet;
     const finalExpiresDate = expiresDate ?? nextChargeDate;
@@ -128,15 +127,26 @@ const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
     useEffect(() => {
         estimateFeeMutation.mutate({
             selectedWallet,
-            extensionContract
+            extensionContract,
+            destroyValue
         });
     }, [selectedWallet]);
 
     const removeMutate = async () =>
         removeMutation.mutateAsync({
             selectedWallet,
-            extensionContract
+            extensionContract,
+            destroyValue
         });
+
+    const deployReserve = useMemo(
+        () =>
+            new AssetAmount({
+                asset: TON_ASSET,
+                weiAmount: destroyValue
+            }),
+        [destroyValue]
+    );
 
     return (
         <ConfirmView
@@ -176,11 +186,13 @@ const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
                         <FiatEquivalentWrapper>
                             <Label2>
                                 {isEstimating && <SpinnerIcon />}
-                                {estimationError && <>—</>}
+                                {!!estimationError && <>—</>}
                                 {estimation?.fee?.extra &&
                                     estimation.fee.extra.toStringAssetRelativeAmount()}
                             </Label2>
-                            {!estimationError && <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>}
+                            {!estimationError && !isEstimating && (
+                                <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>
+                            )}
                         </FiatEquivalentWrapper>
                     </ListItemPayloadStyled>
                 </ListItemStyled>
@@ -253,6 +265,7 @@ const ListItemPayloadStyled = styled(ListItemPayload)`
 
 const FiatEquivalentWrapper = styled.div`
     display: grid;
+    justify-items: end;
 `;
 
 const CancelButtonStyled = styled(Button)`

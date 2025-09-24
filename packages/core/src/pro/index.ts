@@ -30,6 +30,7 @@ export type { State } from './models/State';
 export type { SubscriptionExtension } from './models/SubscriptionExtension';
 export type { SubscriptionExtensionMetadata } from './models/SubscriptionExtensionMetadata';
 export { SubscriptionExtensionStatus } from './models/SubscriptionExtensionStatus';
+export { SubscriptionExtensionVersion } from './models/SubscriptionExtensionVersion';
 export { SubscriptionSource } from './models/SubscriptionSource';
 export { SubscriptionVerification } from './models/SubscriptionVerification';
 export type { Tier } from './models/Tier';

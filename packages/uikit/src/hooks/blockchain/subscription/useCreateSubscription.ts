@@ -35,6 +35,7 @@ export const useCreateSubscription = () => {
             contract,
             withdraw_msg_body,
             selectedWallet,
+            deploy_value,
             metadata
         } = subscriptionParams;
 
@@ -62,6 +63,7 @@ export const useCreateSubscription = () => {
             subscriptionId: subscription_id,
             firstChargingDate: first_charging_date,
             paymentPerPeriod: BigInt(payment_per_period),
+            deployValue: BigInt(deploy_value),
             period,
             gracePeriod: grace_period,
             callerFee: BigInt(caller_fee),

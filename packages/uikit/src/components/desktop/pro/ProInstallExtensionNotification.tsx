@@ -184,7 +184,7 @@ const ProInstallExtensionNotificationContent: FC<IProInstallExtensionContentProp
                             <FiatEquivalentWrapper>
                                 <Label2>
                                     {isEstimating && <SpinnerIcon />}
-                                    {estimationError && <>—</>}
+                                    {!!estimationError && <>—</>}
                                     {estimation?.fee?.extra &&
                                         new AssetAmount({
                                             asset: TON_ASSET,
@@ -194,7 +194,7 @@ const ProInstallExtensionNotificationContent: FC<IProInstallExtensionContentProp
                                                 )
                                         }).toStringAssetAbsoluteRelativeAmount()}
                                 </Label2>
-                                {!estimationError && (
+                                {!estimationError && !isEstimating && (
                                     <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>
                                 )}
                             </FiatEquivalentWrapper>

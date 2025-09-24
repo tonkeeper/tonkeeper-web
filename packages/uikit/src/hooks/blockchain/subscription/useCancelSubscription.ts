@@ -26,7 +26,7 @@ export const useCancelSubscription = () => {
     return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
-        const { selectedWallet, extensionContract } = subscriptionParams;
+        const { selectedWallet, extensionContract, destroyValue } = subscriptionParams;
 
         const accountWallet = accountsWallets.find(
             accWallet => accWallet.wallet.id === selectedWallet.id
@@ -48,7 +48,7 @@ export const useCancelSubscription = () => {
         const sender = new ExtensionMessageSender(api, selectedWallet, signer);
 
         if (selectedWallet.version === WalletVersion.V5R1) {
-            const destruct = encoder.encodeDestructAction(extensionAddress);
+            const destruct = encoder.encodeDestructAction(extensionAddress, BigInt(destroyValue));
 
             const remove: OutActionWalletV5Exported = {
                 type: 'removeExtension',
