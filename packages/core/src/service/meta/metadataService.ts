@@ -70,8 +70,12 @@ export const makeSnakeCells = (bytes: Uint8Array) => {
     return cells[0].endCell();
 };
 
-export const encryptMeta = async (meta: string, sender: Address, myPrivateKey: Uint8Array) => {
-    if (!meta.length) throw new Error('empty comment');
+export const encryptMeta = async (
+    meta: string | undefined,
+    sender: Address,
+    myPrivateKey: Uint8Array
+) => {
+    if (!meta?.length) throw new Error('empty comment');
 
     if (myPrivateKey.length === 64) {
         myPrivateKey = myPrivateKey.slice(0, 32);

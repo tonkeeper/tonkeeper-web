@@ -53,7 +53,7 @@ type DeployParams = {
     deployValue: bigint;
     withdrawAddress: Address;
     withdrawMsgBody?: string;
-    metadata: SubscriptionExtensionMetadata;
+    metadata?: SubscriptionExtensionMetadata;
     walletMetaKeyPair: nacl.SignKeyPair;
 };
 
@@ -102,7 +102,7 @@ interface IEncodeDeployBodyParams {
     callerFee: bigint;
     withdrawAddress: Address;
     withdrawMsgBody?: string;
-    metadata: SubscriptionExtensionMetadata;
+    metadata?: SubscriptionExtensionMetadata;
     walletMetaKeyPair: nacl.SignKeyPair;
 }
 

@@ -106,7 +106,9 @@ export const normalizeSubscription = (
                 purchaseDate: toDate(dBStoredInfo.created_at),
                 deployValue: dBStoredInfo.deploy_value,
                 destroyValue: dBStoredInfo.destroy_value,
-                isAutoRenewable: dBStoredInfo.status === SubscriptionExtensionStatus.ACTIVE
+                isAutoRenewable:
+                    dBStoredInfo.status === SubscriptionExtensionStatus.ACTIVE ||
+                    dBStoredInfo.status === SubscriptionExtensionStatus.FROZEN
             };
         }
 

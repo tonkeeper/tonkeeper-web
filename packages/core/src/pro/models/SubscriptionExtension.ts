@@ -27,7 +27,7 @@ export type SubscriptionExtension = {
     expiration_date?: number;
     created_at: number;
     withdraw_msg_body?: string;
-    metadata: SubscriptionExtensionMetadata;
+    metadata?: SubscriptionExtensionMetadata;
     /**
      * the amount of TON that needs to be attached to the message when deploying the subscription
      */

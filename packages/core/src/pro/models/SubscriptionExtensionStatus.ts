@@ -7,4 +7,5 @@ export enum SubscriptionExtensionStatus {
     ACTIVE = 'active',
     CANCELLED = 'cancelled',
     INVALID = 'invalid',
+    FROZEN = 'frozen',
 }
