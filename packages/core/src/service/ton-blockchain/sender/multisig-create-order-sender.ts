@@ -10,6 +10,9 @@ import { fromNano, internal, SendMode } from '@ton/core';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { estimateOrderByOutgoingMessage } from '../encoder/multisig-encoder/multisig-utils';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
+import { NotEnoughHostWalletBalanceError } from '../../../errors/NotEnoughHostWalletBalanceError';
+import { errorMessage } from '../../../utils/types';
+import { formatAddress } from '../../../utils/common';
 
 export class MultisigCreateOrderSender implements ISender {
     constructor(
@@ -58,12 +61,7 @@ export class MultisigCreateOrderSender implements ISender {
     private async wrapMessage(outgoing: WalletOutgoingMessage) {
         const timestamp = await getServerTime(this.api);
 
-        await assertBalanceEnough(
-            this.api,
-            new BigNumber(MultisigEncoder.createOrderAmount.toString()),
-            TON_ASSET,
-            this.hostWallet.rawAddress
-        );
+        await this.assertBalanceEnough(new BigNumber(MultisigEncoder.createOrderAmount.toString()));
 
         const multisigEncoder = new MultisigEncoder(this.api, this.hostWallet.rawAddress);
 
@@ -80,9 +78,20 @@ export class MultisigCreateOrderSender implements ISender {
         });
     }
 
+    private async assertBalanceEnough(required: BigNumber) {
+        try {
+            await assertBalanceEnough(this.api, required, TON_ASSET, this.hostWallet.rawAddress);
+        } catch (e) {
+            throw new NotEnoughHostWalletBalanceError(
+                errorMessage(e) ?? '',
+                formatAddress(this.hostWallet.rawAddress)
+            );
+        }
+    }
+
     private async checkTransactionPossibility() {
         const requiredBalance = new BigNumber(fromNano(MultisigEncoder.createOrderAmount) + 0.02);
 
-        await assertBalanceEnough(this.api, requiredBalance, TON_ASSET, this.hostWallet.rawAddress);
+        return this.assertBalanceEnough(requiredBalance);
     }
 }

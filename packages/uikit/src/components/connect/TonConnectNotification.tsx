@@ -15,7 +15,6 @@ import React, { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppSdk } from '../../hooks/appSdk';
 import { useTranslation } from '../../hooks/translation';
-import { TxConfirmationCustomError } from '../../libs/errors/TxConfirmationCustomError';
 import { QueryKey } from '../../libs/queryKey';
 import { useGetTonConnectConnectResponse } from '../../state/tonConnect';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
@@ -34,7 +33,8 @@ import { useTrackTonConnectConnectionRequest } from '../../hooks/analytics/event
 import { useAnalyticsTrack } from '../../hooks/analytics';
 import { AnalyticsEventTcConnect } from '@tonkeeper/core/dist/analytics';
 import { TonConnectError } from '@tonkeeper/core/dist/entries/exception';
-import { originFromUrl } from "@tonkeeper/core/dist/utils/url";
+import { originFromUrl } from '@tonkeeper/core/dist/utils/url';
+import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
 
 const Title = styled(H2)`
     text-align: center;
@@ -72,7 +72,7 @@ const Image = styled.img`
     border-radius: ${props => props.theme.cornerMedium};
 `;
 
-const LedgerError = styled(Body2)`
+const ErrorDescription = styled(Body2)`
     margin: 0.5rem 0;
     color: ${p => p.theme.accentRed};
 `;
@@ -214,11 +214,7 @@ const ConnectContent: FC<{
                 {done && error && (
                     <ResultButton>
                         <ExclamationMarkCircleIcon />
-                        <Label2>
-                            {error instanceof TxConfirmationCustomError
-                                ? error.message
-                                : t('error_occurred')}
-                        </Label2>
+                        <Label2>{getErrorText(error, { t })}</Label2>
                     </ResultButton>
                 )}
                 {!done && (
@@ -235,15 +231,17 @@ const ConnectContent: FC<{
                         {t('ton_login_connect_button')}
                     </Button>
                 )}
-                {cantConnectProof && <LedgerError>{t('operation_not_supported')}</LedgerError>}
-                {isReadOnly && <LedgerError>{t('operation_not_supported')}</LedgerError>}
+                {cantConnectProof && (
+                    <ErrorDescription>{t('operation_not_supported')}</ErrorDescription>
+                )}
+                {isReadOnly && <ErrorDescription>{t('operation_not_supported')}</ErrorDescription>}
                 {manifestUrlMismatch && (
-                    <LedgerError>
+                    <ErrorDescription>
                         {t('manifest_mismatch_error', {
                             actual: origin,
                             declared: originFromUrl(manifest.url) ?? manifest.url
                         })}
-                    </LedgerError>
+                    </ErrorDescription>
                 )}
             </>
             <Notes>{t('ton_login_notice')}</Notes>
@@ -392,11 +390,7 @@ export const TonConnectNotification: FC<{
     }, [origin, params, manifest, handleClose]);
 
     return (
-        <Notification
-            isOpen={manifest != null}
-            handleClose={modalCloseHandler}
-            onTopOfBrowser
-        >
+        <Notification isOpen={manifest != null} handleClose={modalCloseHandler} onTopOfBrowser>
             {Content}
         </Notification>
     );

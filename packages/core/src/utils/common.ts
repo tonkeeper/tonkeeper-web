@@ -402,3 +402,12 @@ export function withRetry<TArgs extends unknown[], TResult>(
         throw lastError;
     };
 }
+
+export function withTimeout<TArgs extends unknown[], TResult>(
+    handler: (...args: TArgs) => Promise<TResult>,
+    timeoutMs = 5000
+): (...args: TArgs) => Promise<TResult> {
+    return async (...args: TArgs): Promise<TResult> => {
+        return pTimeout(handler(...args), timeoutMs);
+    };
+}

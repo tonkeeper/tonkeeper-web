@@ -2,6 +2,16 @@ import { useAppSdk } from '../hooks/appSdk';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
+import { QueryKey } from '../libs/queryKey';
+import { useAppContext } from '../hooks/appContext';
+
+export const useAllowedFiatCurrencies = () => {
+    const { tonendpoint } = useAppContext();
+    return useQuery([QueryKey.allowedFiatCurrencies], async () => {
+        const result = await tonendpoint.supportedCurrencies();
+        return result.map(i => i.code);
+    });
+};
 
 export const useUserFiatQuery = () => {
     const sdk = useAppSdk();

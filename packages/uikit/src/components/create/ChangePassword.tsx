@@ -161,12 +161,7 @@ export const ChangePasswordNotification: FC<{
     }, []);
 
     return (
-        <Notification
-            isOpen={isOpen}
-            handleClose={handleClose}
-            title={t('Change_password')}
-            hideButton
-        >
+        <Notification isOpen={isOpen} handleClose={handleClose} title={t('Change_password')}>
             {Content}
         </Notification>
     );

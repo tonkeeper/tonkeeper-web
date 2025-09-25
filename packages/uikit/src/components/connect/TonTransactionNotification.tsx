@@ -16,12 +16,11 @@ import {
     NotificationTitleRow
 } from '../Notification';
 import { SkeletonListWithImages } from '../Skeleton';
-import { H2, Label2, Label3 } from '../Text';
+import { H2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { MainButton, ResultButton, TransferViewHeaderBlock } from '../transfer/common';
 import { EmulationList } from './EstimationLayout';
 import { useAccountsState, useActiveAccount } from '../../state/wallet';
-import { LedgerError } from '@tonkeeper/core/dist/errors/LedgerError';
 import { AccountAndWalletInfo } from '../account/AccountAndWalletInfo';
 import { useIsActiveAccountMultisig } from '../../state/multisig';
 import { MultisigOrderLifetimeMinutes } from '../../libs/multisig';
@@ -42,6 +41,7 @@ import { isTonEstimationDetailed, TonEstimationDetailed } from '@tonkeeper/core/
 import { ActionFeeDetailsUniversal, SelectSenderDropdown } from '../activity/NotificationCommon';
 import { NotEnoughBalanceError } from '@tonkeeper/core/dist/errors/NotEnoughBalanceError';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
+import { getErrorText } from '@tonkeeper/core/dist/errors/TranslatableError';
 
 const ButtonGap = styled.div`
     ${props =>
@@ -246,7 +246,6 @@ const TonTransactionContent: FC<{
     }
 
     const done = sendResult !== undefined;
-    const shouldUpdateLedger = sendError && sendError instanceof LedgerError;
 
     return (
         <NotificationBlock>
@@ -281,8 +280,7 @@ const TonTransactionContent: FC<{
                     {sendError ? (
                         <ResultButtonErrored>
                             <ExclamationMarkCircleIconStyled />
-                            <Label2>{t('error_occurred')}</Label2>
-                            {shouldUpdateLedger && <Label3>{t('update_ledger_error')}</Label3>}
+                            <Label2>{getErrorText(sendError, { t })}</Label2>
                         </ResultButtonErrored>
                     ) : done ? (
                         <ResultButton done>

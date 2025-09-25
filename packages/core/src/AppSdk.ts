@@ -237,6 +237,8 @@ export interface ConfirmOptions {
     message: string;
     okButtonTitle?: string;
     cancelButtonTitle?: string;
+    defaultButton?: 'ok' | 'cancel';
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning';
 }
 
 export interface KeyboardService {
