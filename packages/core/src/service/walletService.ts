@@ -4,6 +4,7 @@ import { Address } from '@ton/core';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { IStorage } from '../Storage';
 import {
+    AccountBip39Derivable,
     AccountId,
     AccountKeystone,
     AccountLedger,
@@ -19,6 +20,7 @@ import { APIConfig } from '../entries/apis';
 import { Network } from '../entries/network';
 import { AuthKeychain, AuthPassword, MnemonicType } from '../entries/password';
 import {
+    DerivationItem,
     DerivationItemNamed,
     sortWalletsByVersion,
     TonWalletStandard,
@@ -127,7 +129,8 @@ interface CreateWalletContext {
 
 export const tronWalletByTonMnemonic = async (
     mnemonic: string[],
-    mnemonicType: MnemonicType = 'ton'
+    mnemonicType: MnemonicType = 'ton',
+    derivation = 0
 ): Promise<TronWallet> => {
     if (mnemonicType === 'ton') {
         const tonAccount = await KeychainTonAccount.fromMnemonic(mnemonic);
@@ -141,7 +144,7 @@ export const tronWalletByTonMnemonic = async (
             undefined,
             "m/44'/195'/0'/0"
         );
-        const address = TronAddressUtils.hexToBase58(node.deriveChild(0).address);
+        const address = TronAddressUtils.hexToBase58(node.deriveChild(derivation).address);
         return {
             id: address,
             address
@@ -268,6 +271,73 @@ export const createStandardTonAccountByMnemonic = async (
               }
             : undefined
     });
+};
+
+export const createBip39DerivableAccountByMnemonic = async (
+    appContext: CreateWalletContext,
+    storage: IStorage,
+    mnemonic: string[],
+    options: {
+        auth: AuthPassword | Omit<AuthKeychain, 'keychainStoreKey'>;
+        generateTronWallet?: boolean;
+    }
+) => {
+    const keyPair = await mnemonicToKeypair(mnemonic, 'bip39', 0);
+
+    const publicKey = keyPair.publicKey.toString('hex');
+
+    let walletAuth: AuthPassword | AuthKeychain;
+    if (options.auth.kind === 'keychain') {
+        walletAuth = {
+            kind: 'keychain',
+            keychainStoreKey: publicKey
+        };
+    } else {
+        walletAuth = options.auth;
+    }
+
+    const { name, emoji } = await accountsStorage(storage).getNewAccountNameAndEmoji(publicKey);
+
+    const activeDerivationIndex = 0;
+    const derivationIndexes = [activeDerivationIndex];
+
+    const derivations: DerivationItem[] = await Promise.all(
+        derivationIndexes.map(async i => {
+            const tonWalletContract = walletContract(
+                publicKey,
+                appContext.defaultWalletVersion,
+                Network.MAINNET
+            );
+
+            const tonWallet = getTonWalletStandard(
+                {
+                    rawAddress: tonWalletContract.address.toRawString(),
+                    version: appContext.defaultWalletVersion
+                },
+                publicKey,
+                Network.MAINNET
+            );
+
+            return {
+                index: i,
+                tonWallets: [tonWallet],
+                activeTonWalletId: tonWallet.id,
+                tronWallet: options?.generateTronWallet
+                    ? await tronWalletByTonMnemonic(mnemonic, 'bip39', i)
+                    : undefined
+            };
+        })
+    );
+
+    return new AccountBip39Derivable(
+        createAccountId(Network.MAINNET, publicKey),
+        name,
+        emoji,
+        walletAuth,
+        activeDerivationIndex,
+        derivationIndexes,
+        derivations
+    );
 };
 
 export const createStandardTonAccountBySK = async (
@@ -693,6 +763,36 @@ export const mamAccountToMamAccountWithTron = async (
     );
 
     return new AccountMAM(
+        account.id,
+        account.name,
+        account.emoji,
+        account.auth,
+        account.activeDerivationIndex,
+        account.addedDerivationsIndexes,
+        derivations
+    );
+};
+
+export const bip39AccountToBip39AccountWithTron = async (
+    account: AccountBip39Derivable,
+    getAccountMnemonic: () => Promise<string[]>
+) => {
+    const derivations = await Promise.all(
+        account.allAvailableDerivations.map(async d => {
+            const tronWallet = await tronWalletByTonMnemonic(
+                await getAccountMnemonic(),
+                'bip39',
+                d.index
+            );
+
+            return {
+                ...d,
+                tronWallet
+            };
+        })
+    );
+
+    return new AccountBip39Derivable(
         account.id,
         account.name,
         account.emoji,

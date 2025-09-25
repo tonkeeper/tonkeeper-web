@@ -12,9 +12,6 @@ import { walletStateInitFromState } from '@tonkeeper/core/dist/service/wallet/co
 import { signTonConnectOver } from '../state/mnemonic';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { Network } from '@tonkeeper/core/dist/entries/network';
-import { mnemonicToKeypair } from '@tonkeeper/core/dist/service/mnemonicService';
-import nacl from 'tweetnacl';
-import { sha256_sync } from '@ton/crypto';
 import { TonWalletStandard } from '@tonkeeper/core/dist/entries/wallet';
 
 export function useAccountLabel(account: Account) {
@@ -26,13 +23,6 @@ export function useAccountLabel(account: Account) {
         ? toShortValue(formatAddress(tonWallets[0].rawAddress, network))
         : tonWallets.length + ' ' + t('wallets');
 }
-
-export const tonProofSignerByTonMnemonic = (mnemonic: string[], type: 'ton' | 'bip39') => {
-    return async (bufferToSign: Buffer) => {
-        const keyPair = await mnemonicToKeypair(mnemonic, type);
-        return nacl.sign.detached(Buffer.from(sha256_sync(bufferToSign)), keyPair.secretKey);
-    };
-};
 
 export const useSignTonProof = () => {
     const api = useActiveApi();

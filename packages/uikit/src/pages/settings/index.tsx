@@ -10,7 +10,7 @@ import { JettonsSettings } from './Jettons';
 import { LedgerIndexesPage } from './LedgerIndexes';
 import { Legal } from './Legal';
 import { Localization } from './Localization';
-import { MAMIndexesPage } from './MamIndexes';
+import { DerivableIndexesPage } from './DerivableIndexes';
 import { NFTSettings } from './Nft';
 import { Notifications } from './Notification';
 import { ActiveRecovery, Recovery } from './Recovery';
@@ -46,7 +46,7 @@ const SettingsRouter = () => {
                 path={path + WalletSettingsRoute.connectedApps}
                 component={ConnectedAppsSettings}
             />
-            <Route path={path + WalletSettingsRoute.derivations} component={MAMIndexesPage} />
+            <Route path={path + WalletSettingsRoute.derivations} component={DerivableIndexesPage} />
             <Route path={path + WalletSettingsRoute.battery} component={BatteryPage} />
             <Route path={path + WalletSettingsRoute.twoFa} component={TwoFAPage} />
             <Route path={path + WalletSettingsRoute.chains} component={ChainsPage} />

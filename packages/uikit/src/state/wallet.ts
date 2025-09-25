@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TonKeychainRoot } from '@ton-keychain/core';
 import {
     Account,
+    AccountBip39Derivable,
     AccountId,
     AccountMAM,
     AccountSecretMnemonic,
@@ -16,6 +17,7 @@ import {
     getAccountByWalletById,
     getNetworkByAccount,
     getWalletById,
+    isAccountDerivable,
     isAccountTonWalletStandard,
     isAccountTronCompatible,
     isAccountVersionEditable,
@@ -42,10 +44,11 @@ import {
     setAccountConfig,
     setActiveWalletConfig
 } from '@tonkeeper/core/dist/service/wallet/configService';
-import { walletContract } from '@tonkeeper/core/dist/service/wallet/contractService';
 import {
     accountBySignerLink,
+    bip39AccountToBip39AccountWithTron,
     checkMamAccountForDeprecatedTronAddress,
+    createBip39DerivableAccountByMnemonic,
     createMAMAccountByMnemonic,
     createMultisigTonAccount,
     createReadOnlyTonAccountByAddress,
@@ -58,8 +61,7 @@ import {
     getWalletAddress,
     mamAccountToMamAccountWithTron,
     parseSignerLink,
-    standardTonAccountToAccountWithTron,
-    tronWalletByTonMnemonic
+    standardTonAccountToAccountWithTron
 } from '@tonkeeper/core/dist/service/walletService';
 import { Account as TonapiAccount, AccountsApi } from '@tonkeeper/core/dist/tonApiV2';
 import { seeIfValidTonAddress } from '@tonkeeper/core/dist/utils/common';
@@ -72,6 +74,8 @@ import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret 
 import {
     encryptWalletSecret,
     seeIfMnemonicValid,
+    tonProofSignerByTonMnemonic,
+    validateBip39Mnemonic,
     walletSecretToString
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { useAccountsStateQuery, useAccountsState } from './accounts';
@@ -84,7 +88,6 @@ import { useNavigate } from '../hooks/router/useNavigate';
 import { AppRoute } from '../libs/routes';
 import { isSignerLink } from './signer';
 import { useRemoveBatteryAuthToken, useRequestBatteryAuthToken } from './battery';
-import { tonProofSignerByTonMnemonic } from '../hooks/accountUtils';
 import { useSecurityCheck } from './password';
 import { useMamTronMigrationNotification } from '../components/modals/MAMTronMigrationNotificationControlled';
 import { subject } from '@tonkeeper/core/dist/entries/atom';
@@ -238,7 +241,7 @@ export const useRemoveLedgerAccountDerivation = () => {
     );
 };
 
-export const useCreateMAMAccountDerivation = () => {
+export const useCreateDerivableAccountDerivation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     const sdk = useAppSdk();
@@ -251,7 +254,7 @@ export const useCreateMAMAccountDerivation = () => {
 
     return useMutation<void, Error, { accountId: AccountId }>(async ({ accountId }) => {
         const account = await storage.getAccount(accountId);
-        if (!account || account.type !== 'mam') {
+        if (!account || !isAccountDerivable(account)) {
             throw new Error('Account not found');
         }
         const newDerivationIndex = account.lastAddedIndex + 1;
@@ -262,42 +265,30 @@ export const useCreateMAMAccountDerivation = () => {
         }
         const mnemonic = secret.mnemonic;
 
-        const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
-        const tonAccount = await root.getTonAccount(newDerivationIndex);
-
-        const tonWallet = walletContract(
-            tonAccount.publicKey,
-            appContext.defaultWalletVersion,
-            network
-        );
-        const tonWallets: TonWalletStandard[] = [
-            {
-                id: tonWallet.address.toRawString(),
-                publicKey: tonAccount.publicKey,
-                version: appContext.defaultWalletVersion,
-                rawAddress: tonWallet.address.toRawString()
-            }
-        ];
-
         const isTronEnabledForAccount = (await getAccountConfig(sdk, accountId)).enableTron;
         const isTronEnabled = isTronEnabledGlobally && isTronEnabledForAccount;
 
-        await checkMamAccountForDeprecatedTronAddress(mnemonic, tronApi, openTronMigrationModal);
+        const { derivation, tonProofSigner } = await account.calculateNewDerivation(
+            mnemonic,
+            newDerivationIndex,
+            {
+                network,
+                defaultWalletVersion: appContext.defaultWalletVersion,
+                isTronEnabled,
+                checkAccountForDeprecatedTronAddress: () =>
+                    checkMamAccountForDeprecatedTronAddress(
+                        mnemonic,
+                        tronApi,
+                        openTronMigrationModal
+                    )
+            }
+        );
 
-        account.addDerivation({
-            name: account.getNewDerivationFallbackName(),
-            emoji: account.emoji,
-            index: newDerivationIndex,
-            tonWallets,
-            activeTonWalletId: tonWallets[0].id,
-            tronWallet: isTronEnabled
-                ? await tronWalletByTonMnemonic(tonAccount.mnemonics)
-                : undefined
-        });
+        account.addDerivation(derivation as DerivationItemNamed);
 
         authBattery({
-            signer: tonProofSignerByTonMnemonic(tonAccount.mnemonics, 'ton'),
-            wallet: tonWallets[0]
+            signer: tonProofSigner,
+            wallet: derivation.tonWallets[0]
         });
 
         await storage.updateAccountInState(account);
@@ -305,14 +296,14 @@ export const useCreateMAMAccountDerivation = () => {
     });
 };
 
-export const useHideMAMAccountDerivation = () => {
+export const useHideAccountDerivation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
         async ({ accountId, derivationIndex }) => {
             const account = await storage.getAccount(accountId);
 
-            if (!account || account.type !== 'mam') {
+            if (!account || !isAccountDerivable(account)) {
                 throw new Error('Account not found');
             }
 
@@ -323,14 +314,14 @@ export const useHideMAMAccountDerivation = () => {
     );
 };
 
-export const useEnableMAMAccountDerivation = () => {
+export const useEnableDerivableAccountDerivation = () => {
     const storage = useAccountsStorage();
     const client = useQueryClient();
     return useMutation<void, Error, { derivationIndex: number; accountId: AccountId }>(
         async ({ accountId, derivationIndex }) => {
             const account = await storage.getAccount(accountId);
 
-            if (!account || account.type !== 'mam') {
+            if (!account || !isAccountDerivable(account)) {
                 throw new Error('Account not found');
             }
 
@@ -564,6 +555,12 @@ export const useAddTronToAccount = () => {
                     openTronMigrationModal
                 );
                 break;
+            case 'bip39-derivable':
+                updatedAccount = await bip39AccountToBip39AccountWithTron(
+                    activeAccount,
+                    getMnemonic
+                );
+                break;
             default:
                 assertUnreachable(activeAccount);
         }
@@ -660,6 +657,94 @@ export const useCreateAccountMnemonic = () => {
 
         authBattery({
             signer: tonProofSignerByTonMnemonic(mnemonic, mnemonicType),
+            wallet: account.activeTonWallet
+        });
+
+        return account;
+    });
+};
+
+export const useCreateAccountBip39Derivable = () => {
+    const sdk = useAppSdk();
+    const context = useAppContext();
+    const { mutateAsync: addAccountToState } = useAddAccountToStateMutation();
+    const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
+    const isTronEnabled = useIsTronEnabledGlobally();
+    const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+
+    return useMutation<
+        AccountBip39Derivable,
+        Error,
+        {
+            mnemonic: string[];
+            password?: string;
+            selectAccount?: boolean;
+        }
+    >(async ({ mnemonic, password, selectAccount }) => {
+        const accountSecret: AccountSecretMnemonic = {
+            type: 'mnemonic',
+            mnemonic
+        };
+        const valid = await validateBip39Mnemonic(mnemonic);
+        if (!valid) {
+            throw new Error('Mnemonic is not valid.');
+        }
+
+        if (sdk.keychain) {
+            const account = await createBip39DerivableAccountByMnemonic(
+                context,
+                sdk.storage,
+                mnemonic,
+                {
+                    auth: {
+                        kind: 'keychain'
+                    },
+                    generateTronWallet: isTronEnabled
+                }
+            );
+
+            await sdk.keychain.setData(
+                (account.auth as AuthKeychain).keychainStoreKey,
+                walletSecretToString(accountSecret)
+            );
+
+            await addAccountToState(account);
+            if (selectAccount) {
+                await selectAccountMutation(account.id);
+            }
+
+            authBattery({
+                signer: tonProofSignerByTonMnemonic(mnemonic, 'bip39', 0),
+                wallet: account.activeTonWallet
+            });
+
+            return account;
+        }
+
+        if (!password) {
+            password = await getPasswordByNotification(sdk);
+        }
+
+        const account = await createBip39DerivableAccountByMnemonic(
+            context,
+            sdk.storage,
+            mnemonic,
+            {
+                auth: {
+                    kind: 'password',
+                    encryptedSecret: await encryptWalletSecret(accountSecret, password)
+                },
+                generateTronWallet: isTronEnabled
+            }
+        );
+
+        await addAccountToState(account);
+        if (selectAccount) {
+            await selectAccountMutation(account.id);
+        }
+
+        authBattery({
+            signer: tonProofSignerByTonMnemonic(mnemonic, 'bip39', 0),
             wallet: account.activeTonWallet
         });
 

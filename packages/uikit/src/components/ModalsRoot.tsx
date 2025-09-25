@@ -1,6 +1,6 @@
 import { WalletVersionSettingsNotification } from './modals/WalletVersionSettingsNotification';
 import { LedgerIndexesSettingsNotification } from './modals/LedgerIndexesSettingsNotification';
-import { MAMIndexesSettingsNotification } from './modals/MAMIndexesSettingsNotification';
+import { DerivableIndexesSettingsNotification } from './modals/DerivableIndexesSettingsNotification';
 import { RenameNotificationControlled } from './modals/RenameNotificationControlled';
 import { RecoveryNotificationControlled } from './modals/RecoveryNotificationControlled';
 import { AddWalletNotificationControlled } from './modals/AddWalletNotificationControlled';
@@ -26,7 +26,7 @@ export const ModalsRoot = () => {
         <>
             <WalletVersionSettingsNotification />
             <LedgerIndexesSettingsNotification />
-            <MAMIndexesSettingsNotification />
+            <DerivableIndexesSettingsNotification />
             <RenameNotificationControlled />
             <RecoveryNotificationControlled />
             <AddWalletNotificationControlled />

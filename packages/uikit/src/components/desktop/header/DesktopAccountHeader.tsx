@@ -7,7 +7,7 @@ import { PlusIconSmall } from '../../Icon';
 import { Button } from '../../fields/Button';
 import { useAccountTotalBalance } from '../../../state/asset';
 import { DesktopHeaderBalance, DesktopHeaderContainer } from './DesktopHeaderElements';
-import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
+import { useDerivableIndexesSettingsNotification } from '../../modals/DerivableIndexesSettingsNotification';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 
 const ButtonsContainer = styled.div`
@@ -39,7 +39,7 @@ const DesktopAccountHeaderPayload = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
 
-    const { onOpen: manageMAMIndexes } = useMAMIndexesSettingsNotification();
+    const { onOpen: manageMAMIndexes } = useDerivableIndexesSettingsNotification();
     const network = useActiveTonNetwork();
 
     return (

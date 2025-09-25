@@ -9,15 +9,20 @@ import {
 } from './password';
 import {
     DerivationItem,
+    DerivationItemNamed,
     TonContract,
     TonWalletStandard,
     WalletId,
-    DerivationItemNamed
+    WalletVersion
 } from './wallet';
 import { assertUnreachable } from '../utils/types';
 import { Network } from './network';
 import { TronWallet } from './tron/tron-wallet';
 import { SKSigningAlgorithm } from '../service/sign';
+import { walletContract } from '../service/wallet/contractService';
+import { tronWalletByTonMnemonic } from '../service/walletService';
+import { TonKeychainRoot } from '@ton-keychain/core';
+import { mnemonicToKeypair, tonProofSignerByTonMnemonic } from '../service/mnemonicService';
 
 /**
  * @deprecated
@@ -466,12 +471,12 @@ export class AccountTonOnly extends Clonable implements IAccountVersionsEditable
     }
 }
 
-export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
+abstract class AccountDerivable<T extends DerivationItem = DerivationItem> extends Clonable {
     static getNewDerivationFallbackName(index = 0) {
         return 'Wallet ' + (index + 1);
     }
 
-    public readonly type = 'mam';
+    abstract type: string;
 
     get derivations() {
         return this.addedDerivationsIndexes.map(
@@ -517,7 +522,7 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         public auth: AuthPassword | AuthKeychain,
         public activeDerivationIndex: number,
         public addedDerivationsIndexes: number[],
-        public allAvailableDerivations: DerivationItemNamed[]
+        public allAvailableDerivations: T[]
     ) {
         super();
 
@@ -548,7 +553,7 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         return this.allAvailableDerivations.find(d => d.tonWallets.some(w => w.id === id));
     }
 
-    updateDerivation(newDerivation: DerivationItemNamed) {
+    updateDerivation(newDerivation: T) {
         const indexToPaste = this.allAvailableDerivations.findIndex(
             d => d.index === newDerivation.index
         );
@@ -557,7 +562,7 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
         }
     }
 
-    addDerivation(derivation: DerivationItemNamed) {
+    addDerivation(derivation: T) {
         const derivationExists = this.derivations.find(d => d.index === derivation.index);
         if (derivationExists) {
             throw new Error('Derivation already exists');
@@ -611,6 +616,140 @@ export class AccountMAM extends Clonable implements IAccountTonWalletStandard {
 
     getNewDerivationFallbackName() {
         return 'Wallet ' + (this.lastAddedIndex + 2);
+    }
+
+    getDerivationName(index: number) {
+        const derivation = this.derivations.find(d => d.index === index);
+        if (!derivation) {
+            throw new Error('Derivation not found');
+        }
+        return 'name' in derivation ? String(derivation.name) : this.name;
+    }
+
+    getDerivationEmoji(index: number) {
+        const derivation = this.derivations.find(d => d.index === index);
+        if (!derivation) {
+            throw new Error('Derivation not found');
+        }
+        return 'emoji' in derivation ? String(derivation.emoji) : this.emoji;
+    }
+}
+
+export class AccountBip39Derivable extends AccountDerivable implements IAccountTonWalletStandard {
+    public readonly type = 'bip39-derivable';
+
+    public async calculateNewDerivation(
+        mnemonic: string[],
+        derivationIndex: number,
+        options: {
+            network: Network;
+            defaultWalletVersion: WalletVersion;
+            isTronEnabled: boolean;
+        }
+    ) {
+        const keyPair = await mnemonicToKeypair(mnemonic, 'bip39', derivationIndex);
+
+        const tonWallet = walletContract(
+            keyPair.publicKey,
+            options.defaultWalletVersion,
+            options.network
+        );
+        const tonWallets: TonWalletStandard[] = [
+            {
+                id: tonWallet.address.toRawString(),
+                publicKey: keyPair.publicKey.toString('hex'),
+                version: options.defaultWalletVersion,
+                rawAddress: tonWallet.address.toRawString()
+            }
+        ];
+
+        return {
+            derivation: {
+                index: derivationIndex,
+                tonWallets,
+                activeTonWalletId: tonWallets[0].id,
+                tronWallet: options.isTronEnabled
+                    ? await tronWalletByTonMnemonic(mnemonic, 'bip39', derivationIndex)
+                    : undefined
+            },
+            tonProofSigner: tonProofSignerByTonMnemonic(mnemonic, 'bip39', derivationIndex)
+        };
+    }
+
+    getDerivationName() {
+        return this.name;
+    }
+
+    getDerivationEmoji() {
+        return this.emoji;
+    }
+}
+
+export class AccountMAM
+    extends AccountDerivable<DerivationItemNamed>
+    implements IAccountTonWalletStandard {
+    public readonly type = 'mam';
+
+    public async calculateNewDerivation(
+        mnemonic: string[],
+        derivationIndex: number,
+        options: {
+            network: Network;
+            defaultWalletVersion: WalletVersion;
+            isTronEnabled: boolean;
+            checkAccountForDeprecatedTronAddress?: () => Promise<void>;
+        }
+    ) {
+        const root = await TonKeychainRoot.fromMnemonic(mnemonic, { allowLegacyMnemonic: true });
+        const tonAccount = await root.getTonAccount(derivationIndex);
+
+        const tonWallet = walletContract(
+            tonAccount.publicKey,
+            options.defaultWalletVersion,
+            options.network
+        );
+        const tonWallets: TonWalletStandard[] = [
+            {
+                id: tonWallet.address.toRawString(),
+                publicKey: tonAccount.publicKey,
+                version: options.defaultWalletVersion,
+                rawAddress: tonWallet.address.toRawString()
+            }
+        ];
+
+        await options.checkAccountForDeprecatedTronAddress?.();
+
+        return {
+            derivation: {
+                name: this.getNewDerivationFallbackName(),
+                emoji: this.emoji,
+                index: derivationIndex,
+                tonWallets,
+                activeTonWalletId: tonWallets[0].id,
+                tronWallet: options.isTronEnabled
+                    ? await tronWalletByTonMnemonic(tonAccount.mnemonics)
+                    : undefined
+            },
+            tonProofSigner: tonProofSignerByTonMnemonic(tonAccount.mnemonics, 'ton')
+        };
+    }
+
+    getDerivationName(index: number) {
+        const derivation = this.allAvailableDerivations.find(d => d.index === index);
+        if (!derivation) {
+            throw new Error('Derivation not found');
+        }
+
+        return derivation.name;
+    }
+
+    getDerivationEmoji(index: number) {
+        const derivation = this.allAvailableDerivations.find(d => d.index === index);
+        if (!derivation) {
+            throw new Error('Derivation not found');
+        }
+
+        return derivation.emoji;
     }
 }
 
@@ -712,7 +851,8 @@ export type AccountTonWalletStandard =
     | AccountVersionEditable
     | AccountLedger
     | AccountKeystone
-    | AccountMAM;
+    | AccountMAM
+    | AccountBip39Derivable;
 
 export type Account = AccountTonWalletStandard | AccountTonWatchOnly | AccountTonMultisig;
 
@@ -728,6 +868,7 @@ export function isAccountVersionEditable(account: Account): account is AccountVe
         case 'watch-only':
         case 'mam':
         case 'ton-multisig':
+        case 'bip39-derivable':
             return false;
         default:
             return assertUnreachable(account);
@@ -743,6 +884,7 @@ export function isAccountTonWalletStandard(account: Account): account is Account
         case 'mam':
         case 'testnet':
         case 'sk':
+        case 'bip39-derivable':
             return true;
         case 'watch-only':
         case 'ton-multisig':
@@ -762,6 +904,7 @@ export function isAccountSupportTonConnect(account: Account): boolean {
         case 'testnet':
         case 'sk':
         case 'ton-multisig':
+        case 'bip39-derivable':
             return true;
         case 'watch-only':
             return false;
@@ -777,6 +920,7 @@ export function isAccountCanManageMultisigs(account: Account): boolean {
         case 'mam':
         case 'ledger':
         case 'sk':
+        case 'bip39-derivable':
             return true;
         case 'watch-only':
         case 'ton-multisig':
@@ -796,6 +940,7 @@ export function isMnemonicAndPassword(
         case 'mnemonic':
         case 'testnet':
         case 'sk':
+        case 'bip39-derivable':
             return true;
         case 'ton-only':
         case 'ledger':
@@ -820,6 +965,7 @@ export function getNetworkByAccount(account: Account): Network {
         case 'ton-multisig':
         case 'keystone':
         case 'sk':
+        case 'bip39-derivable':
             return Network.MAINNET;
         default:
             assertUnreachable(account);
@@ -833,11 +979,33 @@ export function seeIfMainnnetAccount(account: Account): boolean {
 
 export function isAccountTronCompatible(
     account: Account
-): account is AccountTonMnemonic | AccountMAM {
+): account is AccountTonMnemonic | AccountMAM | AccountBip39Derivable {
     switch (account.type) {
         case 'mnemonic':
         case 'mam':
+        case 'bip39-derivable':
             return true;
+        case 'testnet':
+        case 'ton-only':
+        case 'ledger':
+        case 'watch-only':
+        case 'ton-multisig':
+        case 'keystone':
+        case 'sk':
+            return false;
+        default:
+            return assertUnreachable(account);
+    }
+}
+
+export function isAccountDerivable(
+    account: Account
+): account is AccountBip39Derivable | AccountMAM {
+    switch (account.type) {
+        case 'mam':
+        case 'bip39-derivable':
+            return true;
+        case 'mnemonic':
         case 'testnet':
         case 'ton-only':
         case 'ledger':
@@ -853,6 +1021,8 @@ export function isAccountTronCompatible(
 
 export function isAccountBip39(account: Account) {
     switch (account.type) {
+        case 'bip39-derivable':
+            return true;
         case 'testnet':
         case 'mnemonic':
             return account.mnemonicType === 'bip39';
@@ -886,7 +1056,8 @@ const prototypes = {
     'watch-only': AccountTonWatchOnly.prototype,
     mam: AccountMAM.prototype,
     'ton-multisig': AccountTonMultisig.prototype,
-    sk: AccountTonSK.prototype
+    sk: AccountTonSK.prototype,
+    'bip39-derivable': AccountBip39Derivable.prototype
 } as const;
 
 export function bindAccountToClass(accountStruct: Account): void {

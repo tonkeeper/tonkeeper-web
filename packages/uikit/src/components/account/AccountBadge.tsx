@@ -78,6 +78,19 @@ export const AccountBadge: FC<
         );
     }
 
+    if (accountType === 'bip39-derivable') {
+        return (
+            <Badge
+                size={size}
+                color="accentBlueConstant"
+                className={className}
+                marginLeft={marginLeft}
+            >
+                {children || 'bip39'}
+            </Badge>
+        );
+    }
+
     if (accountType === 'ton-multisig') {
         return (
             <Badge size={size} color="accentGreen" className={className} marginLeft={marginLeft}>
@@ -231,7 +244,12 @@ export const AccountAndWalletBadgesGroup: FC<{
         return <AccountBadge className={className} size={size} accountType={account.type} />;
     }
 
-    if (account.type === 'mnemonic' || account.type === 'testnet' || account.type === 'sk') {
+    if (
+        account.type === 'mnemonic' ||
+        account.type === 'testnet' ||
+        account.type === 'sk' ||
+        account.type === 'bip39-derivable'
+    ) {
         return null;
     }
 
