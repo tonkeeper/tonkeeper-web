@@ -94,6 +94,7 @@ import { subject } from '@tonkeeper/core/dist/entries/atom';
 import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { DerivationItemNamed } from '@tonkeeper/core/dist/entries/wallet';
 
 export { useAccountsStateQuery, useAccountsState };
 
