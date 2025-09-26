@@ -67,7 +67,21 @@ export const useSupport = () => {
 
     return useQuery<ISupportData, Error>(
         [QueryKey.pro, QueryKey.supportToken, mainnetConfig.directSupportUrl, subscription?.valid],
-        async () => getProSupportUrl(await sdk.subscriptionService.getToken()),
+        async () => {
+            const proUrl = await getProSupportUrl(await sdk.subscriptionService.getToken());
+
+            if (proUrl) {
+                return {
+                    url: proUrl,
+                    isPriority: true
+                };
+            }
+
+            return {
+                url: mainnetConfig.directSupportUrl ?? '',
+                isPriority: false
+            };
+        },
         {
             initialData: {
                 url: mainnetConfig.directSupportUrl ?? '',
