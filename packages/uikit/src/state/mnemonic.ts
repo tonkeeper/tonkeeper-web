@@ -7,7 +7,8 @@ import {
     isAccountTronCompatible,
     isMnemonicAndPassword,
     Account,
-    AccountSecret
+    AccountSecret,
+    AccountBip39Derivable
 } from '@tonkeeper/core/dist/entries/account';
 import { AuthPassword, MnemonicType } from '@tonkeeper/core/dist/entries/password';
 import {
@@ -91,6 +92,16 @@ export const signDataOver = ({
                     throw new Error('Unexpected secret type');
                 }
                 const keyPair = await mnemonicToKeypair(secret.mnemonic, account.mnemonicType);
+                return nacl.sign.detached(payload, new Uint8Array(keyPair.secretKey));
+            }
+            case 'bip39-derivable': {
+                const secret = await getAccountSecret(sdk, accountId);
+                if (secret.type !== 'mnemonic') {
+                    throw new Error('Unexpected secret type');
+                }
+                const w = wallet ?? account.activeTonWallet;
+                const derivationIndex = getBip39WalletDerivationIndex(account, 'ton', w.id);
+                const keyPair = await mnemonicToKeypair(secret.mnemonic, 'bip39', derivationIndex);
                 return nacl.sign.detached(payload, new Uint8Array(keyPair.secretKey));
             }
             case 'mam': {
@@ -184,6 +195,19 @@ export const signTonConnectOver = ({
                 const w = wallet ?? account.activeTonWallet;
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, w.id);
                 const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
+                return nacl.sign.detached(
+                    Buffer.from(sha256_sync(bufferToSign)),
+                    keyPair.secretKey
+                );
+            }
+            case 'bip39-derivable': {
+                const secret = await getAccountSecret(sdk, accountId);
+                if (secret.type !== 'mnemonic') {
+                    throw new Error('Unexpected secret type');
+                }
+                const w = wallet ?? account.activeTonWallet;
+                const derivationIndex = getBip39WalletDerivationIndex(account, 'ton', w.id);
+                const keyPair = await mnemonicToKeypair(secret.mnemonic, 'bip39', derivationIndex);
                 return nacl.sign.detached(
                     Buffer.from(sha256_sync(bufferToSign)),
                     keyPair.secretKey
@@ -374,6 +398,27 @@ export const getSigner = async (
                 callback.type = 'cell' as const;
                 return callback;
             }
+            case 'bip39-derivable': {
+                const secret = await getAccountSecret(sdk, account.id);
+                if (secret.type !== 'mnemonic') {
+                    throw new Error('Unexpected secret type');
+                }
+                const callback = async (message: Cell) => {
+                    const derivationIndex = getBip39WalletDerivationIndex(
+                        account,
+                        'ton',
+                        wallet!.id
+                    );
+                    const keyPair = await mnemonicToKeypair(
+                        secret.mnemonic,
+                        'bip39',
+                        derivationIndex
+                    );
+                    return sign(message.hash(), keyPair.secretKey);
+                };
+                callback.type = 'cell' as const;
+                return callback;
+            }
             case 'sk': {
                 const secret = await getAccountSecret(sdk, accountId);
                 if (secret.type !== 'sk') {
@@ -454,6 +499,30 @@ export const getTronSigner = (sdk: IAppSdk, tronApi: TronApi, account: Account):
                     return tronWeb.trx.sign(tx);
                 };
             }
+            case 'bip39-derivable': {
+                return async (tx: Transaction) => {
+                    const secret = await getAccountSecret(sdk, account.id);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    const derivationIndex = await getBip39WalletDerivationIndex(
+                        account,
+                        'tron',
+                        wallet.id
+                    );
+                    const tronMnemonic = await tonMnemonicToTronMnemonic(secret.mnemonic, 'bip39');
+                    const { TronWeb } = await import('tronweb');
+                    const tronWeb = new TronWeb({
+                        fullHost: tronApi.tronGridBaseUrl,
+                        privateKey: TronWeb.fromMnemonic(
+                            tronMnemonic.join(' '),
+                            `m/44'/195'/0'/0/${derivationIndex}`
+                        ).privateKey.slice(2)
+                    });
+
+                    return tronWeb.trx.sign(tx);
+                };
+            }
             default: {
                 assertUnreachable(account);
             }
@@ -488,6 +557,7 @@ export const getMultiPayloadSigner = (
         return async (txs: (Transaction | Cell)[]) => {
             let tonMnemonic: string[];
             let tonMnemonicType: MnemonicType | undefined;
+            let derivationIndex: number | undefined;
 
             switch (account.type) {
                 case 'mam': {
@@ -508,17 +578,34 @@ export const getMultiPayloadSigner = (
                     tonMnemonicType = account.mnemonicType;
                     break;
                 }
+                case 'bip39-derivable': {
+                    const secret = await getAccountSecret(sdk, account.id);
+                    if (secret.type !== 'mnemonic') {
+                        throw new Error('Unexpected secret type');
+                    }
+                    tonMnemonic = secret.mnemonic;
+                    tonMnemonicType = 'bip39';
+                    derivationIndex = getBip39WalletDerivationIndex(account, 'tron', wallet.id);
+                    break;
+                }
                 default: {
                     assertUnreachable(account);
                 }
             }
 
-            const tonKeyPair = await mnemonicToKeypair(tonMnemonic, tonMnemonicType);
+            const tonKeyPair = await mnemonicToKeypair(
+                tonMnemonic,
+                tonMnemonicType,
+                derivationIndex
+            );
             const tronMnemonic = await tonMnemonicToTronMnemonic(tonMnemonic, tonMnemonicType);
             const { TronWeb } = await import('tronweb');
             const tronWeb = new TronWeb({
                 fullHost: tronApi.tronGridBaseUrl,
-                privateKey: TronWeb.fromMnemonic(tronMnemonic.join(' ')).privateKey.slice(2)
+                privateKey: TronWeb.fromMnemonic(
+                    tronMnemonic.join(' '),
+                    `m/44'/195'/0'/0/${derivationIndex}`
+                ).privateKey.slice(2)
             });
 
             return Promise.all(
@@ -566,6 +653,21 @@ export const getMAMWalletMnemonic = async (
     const root = await TonKeychainRoot.fromMnemonic(secret.mnemonic, { allowLegacyMnemonic: true });
     const tonAccount = await root.getTonAccount(derivation.index);
     return tonAccount.mnemonics;
+};
+
+export const getBip39WalletDerivationIndex = (
+    account: AccountBip39Derivable,
+    type: 'ton' | 'tron',
+    walletId: string
+): number => {
+    const derivation = account.derivations.find(d =>
+        type === 'ton' ? d.activeTonWalletId === walletId : d.tronWallet?.id === walletId
+    );
+    if (!derivation) {
+        throw new Error('Derivation not found');
+    }
+
+    return derivation.index;
 };
 
 export const getSecretAndPassword = async (

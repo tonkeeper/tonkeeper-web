@@ -26,6 +26,7 @@ import { WalletEmoji } from '../../components/shared/emoji/WalletEmoji';
 import { useTranslation } from '../../hooks/translation';
 import {
     Account,
+    AccountBip39Derivable,
     AccountKeystone,
     AccountLedger,
     AccountMAM,
@@ -427,8 +428,8 @@ const AccountMnemonicRow: FC<{
     );
 };
 
-const AccountLedgerRow: FC<{
-    account: AccountLedger;
+const AccountDerivableRow: FC<{
+    account: AccountLedger | AccountBip39Derivable;
     dragHandleProps?: DraggableProvidedDragHandleProps | null | undefined;
     tabLevel: number;
 }> = ({ account, dragHandleProps, tabLevel }) => {
@@ -721,7 +722,8 @@ const AccountRow: FC<{
         case 'sk':
             return <AccountMnemonicRow account={account} {...rest} />;
         case 'ledger':
-            return <AccountLedgerRow account={account} {...rest} />;
+        case 'bip39-derivable':
+            return <AccountDerivableRow account={account} {...rest} />;
         case 'ton-only':
             return <AccountTonOnlyRow account={account} {...rest} />;
         case 'keystone':

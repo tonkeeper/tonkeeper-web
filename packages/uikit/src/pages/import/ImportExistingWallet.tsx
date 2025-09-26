@@ -6,6 +6,7 @@ import { FinalView } from './Password';
 import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
+    useCreateAccountBip39Derivable,
     useCreateAccountMAM,
     useCreateAccountMnemonic,
     useMutateRenameAccount,
@@ -13,6 +14,7 @@ import {
 } from '../../state/wallet';
 import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
 import {
+    AccountBip39Derivable,
     AccountMAM,
     AccountTonMnemonic,
     getAccountByWalletById
@@ -39,6 +41,7 @@ import { useUserFiat } from '../../state/fiat';
 import { mnemonicValidate } from '@ton/crypto';
 import {
     mnemonicToKeypair,
+    tonProofSignerByTonMnemonic,
     validateBip39Mnemonic
 } from '@tonkeeper/core/dist/service/mnemonicService';
 import { MnemonicType } from '@tonkeeper/core/dist/entries/password';
@@ -47,7 +50,6 @@ import { useIsTronEnabledGlobally } from '../../state/tron/tron';
 import { SelectWalletNetworks } from '../../components/create/SelectWalletNetworks';
 import { useTranslation } from '../../hooks/translation';
 import { useAutoAuthMutation } from '../../state/pro';
-import { tonProofSignerByTonMnemonic } from '../../hooks/accountUtils';
 import { maxOneCall } from '@tonkeeper/core/dist/utils/common';
 
 const useProcessMnemonic = () => {
@@ -71,6 +73,7 @@ const useProcessMnemonic = () => {
                 | undefined;
             bip39:
                 | { type: 'select-versions' }
+                | { type: 'create-derivable' }
                 | { type: 'exisiting'; account: Account; walletId: WalletId }
                 | undefined;
         },
@@ -192,7 +195,7 @@ const useProcessMnemonic = () => {
             }
 
             if (bip39 === undefined) {
-                const keyPair = await mnemonicToKeypair(mnemonic, 'bip39');
+                const keyPair = await mnemonicToKeypair(mnemonic, 'bip39', 0);
                 const publicKey = keyPair.publicKey.toString('hex');
                 const versions = await getStandardTonWalletVersions({
                     publicKey,
@@ -200,8 +203,11 @@ const useProcessMnemonic = () => {
                     appContext: context,
                     fiat
                 });
-                if (versions.some(v => v.tonBalance || v.hasJettons)) {
+                const nonEmptyVersions = versions.filter(v => v.tonBalance || v.hasJettons);
+                if (nonEmptyVersions.length > 1) {
                     bip39 = { type: 'select-versions' } as const;
+                } else if (nonEmptyVersions.length === 1) {
+                    bip39 = { type: 'create-derivable' } as const;
                 }
             }
         }
@@ -240,7 +246,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     const [mnemonic, setMnemonic] = useState<string[] | undefined>();
     const [createdAccount, setCreatedAccount] = useState<
-        AccountTonMnemonic | AccountMAM | undefined
+        AccountTonMnemonic | AccountMAM | AccountBip39Derivable | undefined
     >(undefined);
     const [existingAccountAndWallet, setExistingAccountAndWallet] = useState<
         | {
@@ -261,6 +267,8 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     const { mutateAsync: tryAutoAuth } = useAutoAuthMutation();
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
+    const { mutateAsync: createBip39Wallet, isLoading: isCreatingBip39Wallet } =
+        useCreateAccountBip39Derivable();
     const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
 
     const {
@@ -288,6 +296,13 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 });
                 setCreatedAccount(newAccountMam.account);
             }
+            if (typeToSet === 'bip39') {
+                const newAccBip39 = await createBip39Wallet({
+                    mnemonic: m,
+                    selectAccount: true
+                });
+                setCreatedAccount(newAccBip39);
+            }
             setSelectedMnemonicType(typeToSet);
         } else if (availableOptions.length === 1) {
             await onSelectMnemonicTypePure(availableOptions[0][0] as ImportMnemonicType, m, result);
@@ -313,6 +328,14 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 selectAccount: true
             });
             setCreatedAccount(newAccountMam.account);
+        }
+
+        if (acc.type === 'create-derivable') {
+            const newAccBip39 = await createBip39Wallet({
+                mnemonic: m,
+                selectAccount: true
+            });
+            setCreatedAccount(newAccBip39);
         }
 
         setSelectedMnemonicType(mnemonicType);
@@ -430,7 +453,8 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                 signer: maxOneCall(
                     tonProofSignerByTonMnemonic(
                         mnemonic,
-                        selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                        selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39',
+                        0
                     )
                 )
             });
@@ -488,7 +512,7 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
                         mnemonicType
                     }).then(setCreatedAccount);
                 }}
-                isLoading={isCreatingWallets}
+                isLoading={isCreatingWallets || isCreatingBip39Wallet}
             />
         );
     }

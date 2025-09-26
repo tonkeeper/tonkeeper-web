@@ -2,13 +2,15 @@ import { TonKeychainRoot } from '@ton-keychain/core';
 import {
     keyPairFromSeed,
     mnemonicToPrivateKey,
-    mnemonicValidate as validateStandardTonMnemonic
+    mnemonicValidate as validateStandardTonMnemonic,
+    sha256_sync
 } from '@ton/crypto';
 import { MnemonicType } from '../entries/password';
 import { decrypt, encrypt } from './cryptoService';
 import { deriveED25519Path } from './ed25519';
 import { assertUnreachable } from '../utils/types';
 import { AccountSecret } from '../entries/account';
+import nacl from 'tweetnacl';
 
 export const decryptWalletSecret = async (
     encryptedSecret: string,
@@ -105,15 +107,20 @@ export const validateBip39Mnemonic = async (mnemonic: string[]) => {
     return validBip39Mnemonic(mnemonic.join(' '));
 };
 
-async function bip39ToPrivateKey(mnemonic: string[]) {
+async function bip39ToPrivateKey(mnemonic: string[], derivationIndex = 0) {
     const { mnemonicToSeed } = await import('bip39');
     const seed = await mnemonicToSeed(mnemonic.join(' '));
-    const TON_DERIVATION_PATH = "m/44'/607'/0'";
+    //const TON_DERIVATION_PATH = `m/44'/607'/${derivationIndex}'`;
+    const TON_DERIVATION_PATH = "m/44'/607'/0'"; // TODO:bip39 temporary
     const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
     return keyPairFromSeed(seedContainer.key);
 }
 
-export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: MnemonicType) => {
+export const mnemonicToKeypair = async (
+    mnemonic: string[],
+    mnemonicType?: MnemonicType,
+    derivationIndex = 0
+) => {
     if (mnemonicType) {
         if (mnemonicType === 'ton') {
             if (!(await validateStandardTonMnemonic(mnemonic))) {
@@ -128,7 +135,7 @@ export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: Mnemo
                 throw new Error('Invalid mnemonic type: bip39');
             }
 
-            return bip39ToPrivateKey(mnemonic);
+            return bip39ToPrivateKey(mnemonic, derivationIndex);
         }
 
         assertUnreachable(mnemonicType);
@@ -143,4 +150,15 @@ export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: Mnemo
     }
 
     throw new Error('Invalid mnemonic');
+};
+
+export const tonProofSignerByTonMnemonic = (
+    mnemonic: string[],
+    type: 'ton' | 'bip39',
+    derivationIndex = 0
+) => {
+    return async (bufferToSign: Buffer) => {
+        const keyPair = await mnemonicToKeypair(mnemonic, type, derivationIndex);
+        return nacl.sign.detached(Buffer.from(sha256_sync(bufferToSign)), keyPair.secretKey);
+    };
 };

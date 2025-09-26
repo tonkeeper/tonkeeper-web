@@ -1,26 +1,26 @@
 import { Notification } from '../Notification';
 import { useAtom } from '../../libs/useAtom';
 import { useTranslation } from '../../hooks/translation';
-import { AccountId } from '@tonkeeper/core/dist/entries/account';
+import { AccountId, isAccountDerivable } from '@tonkeeper/core/dist/entries/account';
 import { createModalControl } from './createModalControl';
 import { useAccountState } from '../../state/wallet';
-import { MAMIndexesPageContent } from '../../pages/settings/MamIndexes';
+import { DerivableIndexesPageContent } from '../../pages/settings/DerivableIndexes';
 import styled from 'styled-components';
 
 const { hook, paramsControl } = createModalControl<{ accountId: AccountId }>();
 
-export const useMAMIndexesSettingsNotification = hook;
+export const useDerivableIndexesSettingsNotification = hook;
 
-const MAMIndexesPageContentStyled = styled(MAMIndexesPageContent)`
+const DerivableIndexesPageContentStyled = styled(DerivableIndexesPageContent)`
     margin: 0 -1rem;
 `;
 
-export const MAMIndexesSettingsNotification = () => {
-    const { isOpen, onClose } = useMAMIndexesSettingsNotification();
+export const DerivableIndexesSettingsNotification = () => {
+    const { isOpen, onClose } = useDerivableIndexesSettingsNotification();
     const { t } = useTranslation();
     const [params] = useAtom(paramsControl);
     const account = useAccountState(params?.accountId);
-    if (!account || account.type !== 'mam') {
+    if (!account || !isAccountDerivable(account)) {
         return null;
     }
 
@@ -30,7 +30,9 @@ export const MAMIndexesSettingsNotification = () => {
             isOpen={isOpen}
             handleClose={() => onClose()}
         >
-            {() => <MAMIndexesPageContentStyled afterWalletOpened={onClose} account={account} />}
+            {() => (
+                <DerivableIndexesPageContentStyled afterWalletOpened={onClose} account={account} />
+            )}
         </Notification>
     );
 };

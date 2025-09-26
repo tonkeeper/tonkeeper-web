@@ -14,12 +14,16 @@ import {
     useActiveAccountConfig,
     useMutateActiveAccountConfig
 } from '../../state/wallet';
-import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountBip39Derivable,
+    AccountMAM,
+    isAccountDerivable
+} from '@tonkeeper/core/dist/entries/account';
 import { useRenameNotification } from '../../components/modals/RenameNotificationControlled';
 import { useRecoveryNotification } from '../../components/modals/RecoveryNotificationControlled';
 import React, { FC, useEffect, useState } from 'react';
 import { useDeleteAccountNotification } from '../../components/modals/DeleteAccountNotificationControlled';
-import { useMAMIndexesSettingsNotification } from '../../components/modals/MAMIndexesSettingsNotification';
+import { useDerivableIndexesSettingsNotification } from '../../components/modals/DerivableIndexesSettingsNotification';
 import { DesktopAccountHeader } from '../../components/desktop/header/DesktopAccountHeader';
 import { Navigate } from '../../components/shared/Navigate';
 import { useIsTronEnabledGlobally } from '../../state/tron/tron';
@@ -70,7 +74,7 @@ const DesktopAccountSettingsPage: FC = () => {
         setTimeout(() => setWaiting(false), 200);
     }, []);
 
-    if (account.type !== 'mam') {
+    if (!isAccountDerivable(account)) {
         return waiting ? <></> : <Navigate to="../" />;
     }
 
@@ -90,11 +94,13 @@ const SignOutTextContainer = styled.div`
 
 export default DesktopAccountSettingsPage;
 
-const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ account }) => {
+const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM | AccountBip39Derivable }> = ({
+    account
+}) => {
     const { t } = useTranslation();
     const { onOpen: rename } = useRenameNotification();
     const { onOpen: recovery } = useRecoveryNotification();
-    const { onOpen: changeIndexes } = useMAMIndexesSettingsNotification();
+    const { onOpen: changeIndexes } = useDerivableIndexesSettingsNotification();
     const { onOpen: onDelete } = useDeleteAccountNotification();
 
     const canUseTron = useIsTronEnabledGlobally();
@@ -126,7 +132,9 @@ const DesktopAccountSettingsPageContent: FC<{ account: AccountMAM }> = ({ accoun
                         <KeyIcon />
                         <SettingsListText>
                             <Label2>{t('settings_backup_account')}</Label2>
-                            <Body3>{t('settings_backup_account_mam_description')}</Body3>
+                            {account.type === 'mam' && (
+                                <Body3>{t('settings_backup_account_mam_description')}</Body3>
+                            )}
                         </SettingsListText>
                     </SettingsListItem>
                     <SettingsListItem onClick={() => changeIndexes({ accountId: account.id })}>

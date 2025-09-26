@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { DesktopWalletSettingsPage } from './DesktopWalletSettingsPage';
 import { DesktopConnectedAppsSettings } from './DesktopConnectedAppsSettings';
 import { DesktopNftSettings } from './DesktopNftSettings';
-import { MAMIndexesPage } from '../../pages/settings/MamIndexes';
+import { DerivableIndexesPage } from '../../pages/settings/DerivableIndexes';
 import { LedgerIndexesPage } from '../../pages/settings/LedgerIndexes';
 import { BatteryPage } from '../../pages/settings/Battery';
 import { Notifications } from '../../pages/settings/Notification';
@@ -49,7 +49,7 @@ export const DesktopWalletSettingsRouting = () => {
             />
             <Route path={path + WalletSettingsRoute.jettons} component={JettonsSettings} />
             <Route path={path + WalletSettingsRoute.nft} component={DesktopNftSettings} />
-            <Route path={path + WalletSettingsRoute.derivations} component={MAMIndexesPage} />
+            <Route path={path + WalletSettingsRoute.derivations} component={DerivableIndexesPage} />
             <Route path={path + WalletSettingsRoute.battery} component={BatteryPage} />
             <Route path={path + WalletSettingsRoute.version} component={WalletVersionPage} />
             <Route path={path + WalletSettingsRoute.ledgerIndexes} component={LedgerIndexesPage} />

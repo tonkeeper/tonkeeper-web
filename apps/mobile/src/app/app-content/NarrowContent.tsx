@@ -27,7 +27,7 @@ import { IonContent, IonMenu, IonModal, IonRouterOutlet } from '@ionic/react';
 import { DesktopHistoryPage } from '@tonkeeper/uikit/dist/desktop-pages/history/DesktopHistoryPage';
 import { DesktopConnectedAppsSettings } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopConnectedAppsSettings';
 import { DesktopNftSettings } from '@tonkeeper/uikit/dist/desktop-pages/settings/DesktopNftSettings';
-import { MAMIndexesPage } from '@tonkeeper/uikit/dist/pages/settings/MamIndexes';
+import { DerivableIndexesPage } from 'packages/uikit/src/pages/settings/DerivableIndexes';
 import { BatteryPage } from '@tonkeeper/uikit/dist/pages/settings/Battery';
 import { WalletVersionPage } from '@tonkeeper/uikit/dist/pages/settings/Version';
 import { LedgerIndexesPage } from '@tonkeeper/uikit/dist/pages/settings/LedgerIndexes';
@@ -316,7 +316,7 @@ const NarrowContentAppRouting = () => {
                             />
                             <Route
                                 path={AppRoute.walletSettings + WalletSettingsRoute.derivations}
-                                component={MAMIndexesPage}
+                                component={DerivableIndexesPage}
                             />
                             <Route
                                 path={AppRoute.walletSettings + WalletSettingsRoute.battery}

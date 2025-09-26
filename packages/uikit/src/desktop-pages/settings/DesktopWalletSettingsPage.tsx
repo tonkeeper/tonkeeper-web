@@ -27,7 +27,7 @@ import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import {
     getAccountWalletNameAndEmoji,
     useActiveAccount,
-    useHideMAMAccountDerivation,
+    useHideAccountDerivation,
     useIsActiveWalletWatchOnly,
     useMutateActiveAccount
 } from '../../state/wallet';
@@ -130,7 +130,7 @@ export const DesktopWalletSettingsPage = () => {
     const account = useActiveAccount();
     const { onOpen: rename } = useRenameNotification();
     const { onOpen: recovery } = useRecoveryNotification();
-    const { mutateAsync: hideDerivation } = useHideMAMAccountDerivation();
+    const { mutateAsync: hideDerivation } = useHideAccountDerivation();
     const { onOpen: onDelete } = useDeleteAccountNotification();
 
     const isReadOnly = useIsActiveWalletWatchOnly();

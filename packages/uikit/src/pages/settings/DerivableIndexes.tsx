@@ -1,4 +1,8 @@
-import { AccountMAM } from '@tonkeeper/core/dist/entries/account';
+import {
+    AccountBip39Derivable,
+    AccountMAM,
+    isAccountDerivable
+} from '@tonkeeper/core/dist/entries/account';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
 import React, { FC, useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
@@ -12,9 +16,9 @@ import {
     useTonWalletsBalances,
     useMutateAccountActiveDerivation,
     useActiveAccount,
-    useCreateMAMAccountDerivation,
-    useHideMAMAccountDerivation,
-    useEnableMAMAccountDerivation,
+    useCreateDerivableAccountDerivation,
+    useHideAccountDerivation,
+    useEnableDerivableAccountDerivation,
     useActiveConfig
 } from '../../state/wallet';
 import { ListBlockDesktopAdaptive, ListItem } from '../../components/List';
@@ -63,12 +67,12 @@ const ButtonsContainer = styled.div`
     gap: 8px;
 `;
 
-export const MAMIndexesPage = () => {
+export const DerivableIndexesPage = () => {
     const { t } = useTranslation();
     const account = useActiveAccount();
     const isFullWidth = useIsFullWidthMode();
 
-    if (account.type !== 'mam') {
+    if (!isAccountDerivable(account)) {
         return <Navigate to="../" />;
     }
 
@@ -78,7 +82,7 @@ export const MAMIndexesPage = () => {
                 <DesktopViewHeader backButton>
                     <DesktopViewHeaderContent title={t('settings_mam_indexes')} />
                 </DesktopViewHeader>
-                <MAMIndexesPageContentStyled
+                <DerivableIndexesPageContentStyled
                     buttonWrapperClassName="mam-page-sticky-button-wrapper"
                     account={account}
                 />
@@ -90,7 +94,7 @@ export const MAMIndexesPage = () => {
         <>
             <SubHeader title={t('settings_mam_indexes')} />
             <InnerBody>
-                <MAMIndexesPageContent account={account} />
+                <DerivableIndexesPageContent account={account} />
             </InnerBody>
         </>
     );
@@ -134,9 +138,9 @@ const ListItemPayload = styled.div`
 
 const ContentWrapper = styled.div``;
 
-export const MAMIndexesPageContent: FC<{
+export const DerivableIndexesPageContent: FC<{
     afterWalletOpened?: () => void;
-    account: AccountMAM;
+    account: AccountMAM | AccountBip39Derivable;
     className?: string;
     buttonWrapperClassName?: string;
 }> = ({ afterWalletOpened, account, className, buttonWrapperClassName }) => {
@@ -157,13 +161,13 @@ export const MAMIndexesPageContent: FC<{
     );
 
     const { mutate: createDerivation, isLoading: isCreatingDerivationLoading } =
-        useCreateMAMAccountDerivation();
+        useCreateDerivableAccountDerivation();
 
     const { mutate: hideDerivation, isLoading: isHideDerivationLoading } =
-        useHideMAMAccountDerivation();
+        useHideAccountDerivation();
 
     const { mutate: enableDerivation, isLoading: isEnableDerivationLoading } =
-        useEnableMAMAccountDerivation();
+        useEnableDerivableAccountDerivation();
 
     const { onOpen: rename } = useRenameNotification();
 
@@ -227,6 +231,7 @@ export const MAMIndexesPageContent: FC<{
     const mamMaxWalletsWithoutPro = config.mam_max_wallets_without_pro;
     const showByProButton =
         !isValidSubscription(subscription) &&
+        account.type === 'mam' &&
         account.allAvailableDerivations.length >= mamMaxWalletsWithoutPro;
 
     return (
@@ -246,10 +251,15 @@ export const MAMIndexesPageContent: FC<{
                         <ListItem hover={false} key={balance.address}>
                             <ListItemPayload>
                                 <NameContainer>
-                                    <WalletEmoji containerSize="24px" emoji={derivation.emoji} />
+                                    <WalletEmoji
+                                        containerSize="24px"
+                                        emoji={account.getDerivationEmoji(derivation.index)}
+                                    />
                                     <TextContainer>
                                         <FirstLineContainer>
-                                            <Label2>{derivation.name}</Label2>
+                                            <Label2>
+                                                {account.getDerivationName(derivation.index)}
+                                            </Label2>
                                             <WalletIndexBadge>
                                                 #{derivationIndex + 1}
                                             </WalletIndexBadge>
@@ -325,7 +335,7 @@ export const MAMIndexesPageContent: FC<{
     );
 };
 
-const MAMIndexesPageContentStyled = styled(MAMIndexesPageContent)`
+const DerivableIndexesPageContentStyled = styled(DerivableIndexesPageContent)`
     .mam-page-sticky-button-wrapper {
         margin: 0;
         position: sticky;

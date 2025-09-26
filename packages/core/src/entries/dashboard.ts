@@ -122,6 +122,16 @@ function accountAndWalletToString(account: Account, walletId: WalletId): string 
             }
 
             return baseInfo + ' [' + (index + 1).toString() + ']';
+        case 'bip39-derivable': {
+            const derivation = account.derivations.find(d =>
+                d.tonWallets.some(w => w.id === walletId)
+            );
+            if (derivation === undefined) {
+                return baseInfo;
+            }
+
+            return baseInfo + ' [' + (derivation.index + 1).toString() + ']';
+        }
         case 'mam':
             const derivation = account.derivations.find(d =>
                 d.tonWallets.some(w => w.id === walletId)

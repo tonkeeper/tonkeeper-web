@@ -19,7 +19,8 @@ import {
     Account,
     getNetworkByAccount,
     AccountTonTestnet,
-    AccountTonSK
+    AccountTonSK,
+    AccountBip39Derivable
 } from '@tonkeeper/core/dist/entries/account';
 import { FC, forwardRef } from 'react';
 import { useIsHovered } from '../../../hooks/useIsHovered';
@@ -38,7 +39,7 @@ import {
 } from '../../account/AccountBadge';
 import { useWalletVersionSettingsNotification } from '../../modals/WalletVersionSettingsNotification';
 import { useLedgerIndexesSettingsNotification } from '../../modals/LedgerIndexesSettingsNotification';
-import { useMAMIndexesSettingsNotification } from '../../modals/MAMIndexesSettingsNotification';
+import { useDerivableIndexesSettingsNotification } from '../../modals/DerivableIndexesSettingsNotification';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { AppRoute } from '../../../libs/routes';
 import { useAsideActiveRoute } from '../../../hooks/desktop/useAsideActiveRoute';
@@ -372,15 +373,15 @@ export const AsideMenuAccountWatchOnly: FC<{
     );
 };
 
-export const AsideMenuAccountMAM: FC<{
-    account: AccountMAM;
+export const AsideMenuAccountDerivable: FC<{
+    account: AccountMAM | AccountBip39Derivable;
     mightBeHighlighted: boolean;
     selectedWalletId: WalletId;
     onClickWallet: (walletId: WalletId) => void;
 }> = ({ account, mightBeHighlighted, selectedWalletId, onClickWallet }) => {
     const { isHovered, ref } = useIsHovered<HTMLDivElement>();
     const network = getNetworkByAccount(account);
-    const { onOpen: openMAMIndexesSettings } = useMAMIndexesSettingsNotification();
+    const { onOpen: openDerivableIndexesSettings } = useDerivableIndexesSettingsNotification();
     const sortedDerivations = account.derivations.slice().sort(sortDerivationsByIndex);
 
     const location = useAsideActiveRoute();
@@ -416,7 +417,7 @@ export const AsideMenuAccountMAM: FC<{
                     onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
-                        openMAMIndexesSettings({ accountId: account.id });
+                        openDerivableIndexesSettings({ accountId: account.id });
                     }}
                     isShown={isHovered}
                 >
@@ -436,9 +437,9 @@ export const AsideMenuAccountMAM: FC<{
                             <WalletEmoji
                                 emojiSize="16px"
                                 containerSize="16px"
-                                emoji={derivation.emoji}
+                                emoji={account.getDerivationEmoji(derivation.index)}
                             />
-                            <Label2>{derivation.name}</Label2>
+                            <Label2>{account.getDerivationName(derivation.index)}</Label2>
                             <WalletIndexBadgeStyled size="s">
                                 {'#' + (derivation.index + 1)}
                             </WalletIndexBadgeStyled>
@@ -478,7 +479,8 @@ export const AsideMenuAccount: FC<{
         case 'watch-only':
             return <AsideMenuAccountWatchOnly account={account} {...rest} />;
         case 'mam':
-            return <AsideMenuAccountMAM account={account} {...rest} />;
+        case 'bip39-derivable':
+            return <AsideMenuAccountDerivable account={account} {...rest} />;
         case 'ton-multisig':
             return <AsideMenuAccountMultisig />;
         default:

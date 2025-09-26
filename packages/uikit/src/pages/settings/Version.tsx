@@ -94,7 +94,8 @@ export const WalletVersionPageContent: FC<{
         selectedAccount.type === 'keystone' ||
         selectedAccount.type === 'watch-only' ||
         selectedAccount.type === 'mam' ||
-        selectedAccount.type === 'ton-multisig'
+        selectedAccount.type === 'ton-multisig' ||
+        selectedAccount.type === 'bip39-derivable'
     ) {
         return <Navigate to="../" />;
     }
