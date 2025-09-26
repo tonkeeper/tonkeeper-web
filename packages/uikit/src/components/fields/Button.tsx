@@ -214,6 +214,10 @@ export const ButtonElement = styled.button<Omit<ButtonProps, 'loading'>>`
                 `corner${props.corner[0].toUpperCase() + props.corner.slice(1)}`
             ]};
         `}
+    
+    &:focus-visible {
+        outline: 1px solid ${props => props.theme.textPrimary};
+    }
 `;
 
 export const ButtonRow = styled.div`

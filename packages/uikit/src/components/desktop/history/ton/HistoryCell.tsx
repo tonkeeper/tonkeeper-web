@@ -9,6 +9,7 @@ import { useFormatCoinValue } from '../../../../hooks/balance';
 import { HistoryGridCell, HistoryGridCellFillRow } from './HistoryGrid';
 import { useActiveTonNetwork } from '../../../../state/wallet';
 import { sanitizeJetton } from '../../../../libs/common';
+import { JettonVerificationType } from '@tonkeeper/core/dist/tonApiV2';
 
 export const HistoryCellAction = styled(HistoryGridCell).attrs({ className: 'grid-area-action' })`
     display: flex;
@@ -200,13 +201,18 @@ export const HistoryCellAmount: FC<{
     isNegative?: boolean;
     isFailed?: boolean;
     isSpam?: boolean;
-}> = ({ amount, symbol, decimals, ...rest }) => {
+    jettonVerification?: JettonVerificationType;
+}> = ({ amount, symbol, decimals, jettonVerification, isSpam, ...rest }) => {
     const format = useFormatCoinValue();
 
     return (
-        <HistoryCellAmountContent {...rest}>
+        <HistoryCellAmountContent
+            {...rest}
+            isSpam={isSpam || jettonVerification === JettonVerificationType.Blacklist}
+        >
             {rest.isNegative ? '−' : '+'}&nbsp;
-            {format(amount, decimals)}&nbsp;{sanitizeJetton(symbol, rest.isSpam)}
+            {format(amount, decimals)}&nbsp;
+            {sanitizeJetton(symbol, jettonVerification === JettonVerificationType.Blacklist)}
         </HistoryCellAmountContent>
     );
 };

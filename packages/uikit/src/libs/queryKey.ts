@@ -30,6 +30,7 @@ export enum QueryKey {
     multisigWallets = 'multisigWallets',
     multisigSigners = 'multisigSigners',
     viewedMultisigOrders = 'viewedMultisigOrders',
+    allowedFiatCurrencies = 'allowedFiatCurrencies',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

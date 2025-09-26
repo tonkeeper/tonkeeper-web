@@ -94,9 +94,6 @@ const BatteryRechargeNotificationContent: FC<{
 }> = ({ preselectedAsset, onClose, asGift }) => {
     const [asset, setAsset] = useState(preselectedAsset);
     const unitToTonRate = useBatteryUnitTonRate();
-    useEffect(() => {
-        setAsset(preselectedAsset);
-    }, [preselectedAsset]);
 
     const [selectedPackId, setSelectedPackId] = useState<string | undefined>();
     const methods = useBatteryAvailableRechargeMethods();

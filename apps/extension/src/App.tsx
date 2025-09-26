@@ -59,6 +59,7 @@ import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
 import { Notifications } from './components/Notifications';
+import { CustomConfirmNotificationControlled } from '@tonkeeper/uikit/dist/components/modals/CustomConfirmControlled';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -276,6 +277,7 @@ export const Loader: FC = React.memo(() => {
                 <QrScanner />
             </Suspense>
             <ModalsRoot />
+            <CustomConfirmNotificationControlled />
         </AppContext.Provider>
     );
 });
@@ -317,11 +319,7 @@ export const Content: FC<{
     }
 
     if (lock) {
-        return (
-            <FullSizeWrapper standalone>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (pageView) {

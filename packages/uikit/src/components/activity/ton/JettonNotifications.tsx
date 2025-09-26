@@ -6,7 +6,8 @@ import {
     JettonBurnAction,
     JettonMintAction,
     JettonSwapAction,
-    JettonTransferAction
+    JettonTransferAction,
+    JettonVerificationType
 } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { FC, useMemo } from 'react';
@@ -52,7 +53,10 @@ const JettonTransferActionContent: FC<{
                 isScam={isScam}
                 amount={jettonTransfer.amount}
                 decimals={jettonTransfer.jetton.decimals}
-                symbol={sanitizeJetton(jettonTransfer.jetton.symbol, isScam)}
+                symbol={sanitizeJetton(
+                    jettonTransfer.jetton.symbol,
+                    jettonTransfer.jetton.verification === JettonVerificationType.Blacklist
+                )}
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind={kind}
@@ -112,7 +116,7 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
                     jettonSwap.jettonMasterIn?.decimals
                 )} ${sanitizeJetton(
                     jettonSwap.jettonMasterIn?.symbol,
-                    jettonSwap.jettonMasterOut?.verification === 'blacklist'
+                    jettonSwap.jettonMasterOut?.verification === JettonVerificationType.Blacklist
                 )}`
             );
         }
@@ -126,7 +130,7 @@ export const useSwapValue = (jettonSwap: JettonSwapAction | undefined) => {
                     jettonSwap.jettonMasterOut?.decimals
                 )} ${sanitizeJetton(
                     jettonSwap.jettonMasterOut?.symbol,
-                    jettonSwap.jettonMasterOut?.verification === 'blacklist'
+                    jettonSwap.jettonMasterOut?.verification === JettonVerificationType.Blacklist
                 )}`
             );
         }
@@ -196,7 +200,10 @@ const JettonMintActionContent: FC<{
                 isScam={isScam}
                 amount={jettonMint.amount}
                 decimals={jettonMint.jetton.decimals}
-                symbol={sanitizeJetton(jettonMint.jetton.symbol, isScam)}
+                symbol={sanitizeJetton(
+                    jettonMint.jetton.symbol,
+                    jettonMint.jetton.verification === JettonVerificationType.Blacklist
+                )}
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind="received"

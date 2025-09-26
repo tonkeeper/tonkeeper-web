@@ -4,6 +4,7 @@ import i18next from '../app/i18n';
 import { sendBackground } from './backgroudService';
 import { promptDesktopPasswordController } from '@tonkeeper/uikit/dist/components/modals/PromptDesktopPassword';
 import { BaseKeychainService } from '@tonkeeper/core/dist/base-keychain-service';
+import { KeychainGetError } from '@tonkeeper/core/dist/errors/KeychainError';
 
 export class KeychainDesktop extends BaseKeychainService implements IKeychainService {
     constructor(private biometryService: BiometryService, storage: IStorage) {
@@ -11,24 +12,50 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
     }
 
     setData = async (key: string, data: string) => {
-        return sendBackground<void>({ king: 'set-keychain', publicKey: key, mnemonic: data });
+        try {
+            await sendBackground<void>({ king: 'set-keychain', publicKey: key, mnemonic: data });
+            console.info(`[KEYCHAIN] (success) SET key "Wallet-${key}"`);
+        } catch (e) {
+            console.info(`[KEYCHAIN] (ERROR) SET key "Wallet-${key}"`, e);
+            throw e;
+        }
     };
 
     getData = async (key: string) => {
         await this.securityCheck();
-        const value = sendBackground<string | null>({ king: 'get-keychain', publicKey: key });
-        if (value === null) {
-            throw new Error('Mnemonic not found in keychain');
+        let value: string | null = null;
+        try {
+            value = await sendBackground<string | null>({ king: 'get-keychain', publicKey: key });
+        } catch (e) {
+            console.info(`[KEYCHAIN] (ERROR) GET key "Wallet-${key}"`, e);
+            throw new KeychainGetError();
         }
+
+        if (value == null) {
+            throw new KeychainGetError();
+        }
+        console.info(`[KEYCHAIN] (success) GET key "Wallet-${key}"`);
         return value;
     };
 
     removeData = async (key: string) => {
-        return sendBackground<void>({ king: 'remove-keychain', publicKey: key });
+        try {
+            await sendBackground<void>({ king: 'remove-keychain', publicKey: key });
+            console.info(`[KEYCHAIN] (success) DELETE key "Wallet-${key}"`);
+        } catch (e) {
+            console.info(`[KEYCHAIN] (ERROR) DELETE key "Wallet-${key}"`, e);
+            throw e;
+        }
     };
 
     clearStorage = async () => {
-        await sendBackground<void>({ king: 'clear-keychain' });
+        try {
+            await sendBackground<void>({ king: 'clear-keychain' });
+            console.info('[KEYCHAIN] (success) CLEAR all data');
+        } catch (e) {
+            console.info('[KEYCHAIN] (ERROR) CLEAR all data');
+            throw e;
+        }
         await this.resetSecuritySettings();
     };
 

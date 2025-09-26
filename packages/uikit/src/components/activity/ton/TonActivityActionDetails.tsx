@@ -5,7 +5,8 @@ import {
     CurrencyType,
     ExtraCurrencyTransferAction,
     PurchaseAction,
-    TonTransferAction
+    TonTransferAction,
+    TrustType
 } from '@tonkeeper/core/dist/tonApiV2';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import React, { FC } from 'react';
@@ -306,7 +307,10 @@ const PurchaseActionContent: FC<{
                 isScam={isScam}
                 amount={purchase.amount.value}
                 decimals={purchase.amount.decimals}
-                symbol={sanitizeJetton(purchase.amount.tokenName, isScam)}
+                symbol={sanitizeJetton(
+                    purchase.amount.tokenName,
+                    purchase.amount.verification === TrustType.Blacklist
+                )}
                 total={fiatAmount}
                 timestamp={timestamp}
                 kind="send"

@@ -8,6 +8,7 @@ import { isValidUrlProtocol } from '@tonkeeper/core/dist/utils/common';
 import { atom, mapAtom, ReadonlyAtom } from '@tonkeeper/core/dist/entries/atom';
 import { AppRoute } from '@tonkeeper/uikit/dist/libs/routes';
 import { addWalletMethod, AddWalletMethod } from '@tonkeeper/core/dist/entries/wallet';
+import { customConfirm } from '@tonkeeper/uikit/dist/components/modals/CustomConfirmControlled';
 
 export const extensionType: 'Chrome' | 'FireFox' | string | undefined =
     process.env.REACT_APP_EXTENSION_TYPE;
@@ -68,6 +69,8 @@ export class ExtensionAppSdk extends BaseApp implements IAppSdk {
     ledgerConnectionPage = LedgerConnectionPageManage.create();
 
     addWalletPage = new AddWalletPageManage();
+
+    confirm = customConfirm;
 }
 
 class AddWalletPageManage {

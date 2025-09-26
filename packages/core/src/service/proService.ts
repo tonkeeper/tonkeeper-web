@@ -39,7 +39,7 @@ import {
     UsersService
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
-import { IProStateWallet, ISupportData, ProSubscription, PurchaseErrors } from '../entries/pro';
+import { IProStateWallet, ProSubscription, PurchaseErrors } from '../entries/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -360,23 +360,15 @@ function mapDtoCellToCell(dtoCell: DTOCell): DashboardCell {
     }
 }
 
-export const getProSupportUrl = async (mainToken: string | null): Promise<ISupportData> => {
-    const falsyResponse = {
-        url: '',
-        isPriority: false
-    };
-
-    if (!mainToken) return falsyResponse;
+export const getProSupportUrl = async (mainToken: string | null): Promise<string | null> => {
+    if (!mainToken) return null;
 
     try {
         const { url, is_priority } = await SupportService.getProSupport(`Bearer ${mainToken}`);
 
-        return {
-            url,
-            isPriority: is_priority
-        };
+        return is_priority ? url : null;
     } catch {
-        return falsyResponse;
+        return null;
     }
 };
 

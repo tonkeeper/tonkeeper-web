@@ -33,7 +33,6 @@ export interface TonendpointConfig {
         disable_dapps: boolean;
         disable_usde: boolean;
         disable_nfts: boolean;
-        disable_rub: boolean;
     };
 
     ton_connect_bridge: string;
@@ -117,8 +116,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
         disable_exchange_methods: false,
         disable_dapps: false,
         disable_usde: false,
-        disable_nfts: false,
-        disable_rub: false
+        disable_nfts: false
     },
     ton_connect_bridge: 'https://bridge.tonapi.io',
     tonapiV2Endpoint: 'https://keeper.tonapi.io',
@@ -232,6 +230,12 @@ export class Tonendpoint {
 
     appsPopular = (): Promise<Recommendations> => {
         return this.GET('/apps/popular');
+    };
+
+    public supportedCurrencies = async (): Promise<{ code: string }[]> => {
+        const response = await fetch(`${this.tonkeeperApiUrl}/currencies?${this.toSearchParams()}`);
+
+        return response.json();
     };
 
     private fetchBoot(network: Network) {

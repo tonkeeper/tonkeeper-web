@@ -1,6 +1,6 @@
 {
     "name": "@tonkeeper/mobile",
-    "version": "4.2.8",
+    "version": "4.2.9",
     "license": "Apache-2.0",
     "description": "Your tablet wallet on The Open Network",
     "type": "module",

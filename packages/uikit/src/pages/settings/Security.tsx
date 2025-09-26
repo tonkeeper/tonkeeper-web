@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { InnerBody } from '../../components/Body';
 import {
     ListBlock,
@@ -8,7 +8,7 @@ import {
     ListItemPayload
 } from '../../components/List';
 import { SubHeader } from '../../components/SubHeader';
-import { Label1 } from '../../components/Text';
+import { Label1, Label2Class } from '../../components/Text';
 import { ChangePasswordNotification } from '../../components/create/ChangePassword';
 import { Switch } from '../../components/fields/Switch';
 import { KeyIcon, LockIcon } from '../../components/settings/SettingsIcons';
@@ -38,7 +38,8 @@ import { CreatePasswordNotification } from '../../components/create/CreatePasswo
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
 import { MobileProChangePinNotification } from '../../components/mobile-pro/pin/MobileProChangePin';
-import { CloseIcon } from '../../components/Icon';
+import { ChevronRightIcon } from '../../components/Icon';
+import { useSearchParams } from '../../hooks/router/useSearchParams';
 
 const LockSwitch = () => {
     const { t } = useTranslation();
@@ -53,7 +54,7 @@ const LockSwitch = () => {
             <ListBlockDesktopAdaptive>
                 <ListItem hover={false}>
                     <ListItemPayload>
-                        <Label1>{t('Lock_screen')}</Label1>
+                        <Label1Capitalised>{t('Lock_screen')}</Label1Capitalised>
                         <Switch checked={!!data} onChange={toggleLock} />
                     </ListItemPayload>
                 </ListItem>
@@ -66,6 +67,8 @@ const LockSwitch = () => {
 
 const Label1Capitalised = styled(Label1)`
     text-transform: capitalize;
+
+    ${p => p.theme.proDisplayType === 'desktop' && Label2Class}
 `;
 
 const TouchIdSwitch = () => {
@@ -151,12 +154,16 @@ const LockSwitchAdditionalSecurityPassword = () => {
     return (
         <ListItem hover={false}>
             <ListItemPayload>
-                <Label1>{t('Lock_screen')}</Label1>
+                <Label1Capitalised>{t('Lock_screen')}</Label1Capitalised>
                 <Switch checked={!!data} onChange={toggleLock} />
             </ListItemPayload>
         </ListItem>
     );
 };
+
+const ChevronRightIconStyled = styled(ChevronRightIcon)`
+    color: ${props => props.theme.iconTertiary};
+`;
 
 /**
  * Pin is always set here
@@ -170,7 +177,7 @@ const MobileProPassword = () => {
                 <ListItem hover={false} onClick={onOpen}>
                     <ListItemPayload $clickable>
                         <Label1Capitalised>{t('security_change_passcode')}</Label1Capitalised>
-                        <LockIcon />
+                        <ChevronRightIconStyled />
                     </ListItemPayload>
                 </ListItem>
                 <LockSwitchAdditionalSecurityPassword />
@@ -189,6 +196,14 @@ const DesktopAndTabletProPassword = () => {
     const sdk = useAppSdk();
     const { password: keychainPassword } = useKeychainSecuritySettings();
     const { isOpen, onClose, onOpen } = useDisclosure();
+    const [searchParams] = useSearchParams();
+
+    const autoOpenSetPassword = searchParams.get('open-password-notification');
+    useEffect(() => {
+        if (autoOpenSetPassword) {
+            onOpen();
+        }
+    }, [autoOpenSetPassword]);
 
     const onResetPassword = async () => {
         await sdk.keychain?.securityCheck();
@@ -203,7 +218,7 @@ const DesktopAndTabletProPassword = () => {
                         <Label1Capitalised>
                             {keychainPassword ? t('Change_password') : t('set_up_password')}
                         </Label1Capitalised>
-                        <LockIcon />
+                        <ChevronRightIconStyled />
                     </ListItemPayload>
                 </ListItem>
                 <LockSwitchAdditionalSecurityPassword />
@@ -211,7 +226,7 @@ const DesktopAndTabletProPassword = () => {
                     <ListItem hover={false} onClick={onResetPassword}>
                         <ListItemPayload $clickable>
                             <Label1Capitalised>{t('reset_secutiry_settings')}</Label1Capitalised>
-                            <CloseIcon />
+                            <ChevronRightIconStyled />
                         </ListItemPayload>
                     </ListItem>
                 )}
@@ -240,7 +255,6 @@ const ShowPhrases = () => {
     const isLedger = useIsActiveWalletLedger();
     const isKeystone = useIsActiveWalletKeystone();
     const isReadOnly = useIsActiveWalletWatchOnly();
-    const isFullWidthMode = useIsFullWidthMode();
 
     const items = useMemo(() => {
         const i: SettingsItem[] = [
@@ -253,7 +267,7 @@ const ShowPhrases = () => {
         return i;
     }, []);
 
-    if (isLedger || isKeystone || isReadOnly || isFullWidthMode) {
+    if (isLedger || isKeystone || isReadOnly) {
         return <></>;
     }
 
@@ -285,7 +299,6 @@ export const SecuritySettings = () => {
                 <LockSwitch />
                 <TouchIdSwitch />
                 <Password />
-                <ShowPhrases />
             </DesktopWrapper>
         );
     }

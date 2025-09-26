@@ -33,7 +33,7 @@ import {
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { Account, getNetworkByAccount } from '@tonkeeper/core/dist/entries/account';
 import { useAccountsState, useAccountsStateQuery, useActiveWallet } from './wallet';
-import { TxConfirmationCustomError } from '../libs/errors/TxConfirmationCustomError';
+import { TxConfirmationCustomError } from '@tonkeeper/core/dist/errors/TxConfirmationCustomError';
 import { getServerTime } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { getContextApiByNetwork } from '@tonkeeper/core/dist/service/walletService';
 import { useAppContext } from '../hooks/appContext';
@@ -176,7 +176,8 @@ export const useGetTonConnectConnectResponse = () => {
             if (item.name === 'ton_proof') {
                 if (!isStandardTonWallet(wallet)) {
                     throw new TxConfirmationCustomError(
-                        "Current wallet doesn't support connection to the service"
+                        "Current wallet doesn't support connection to the service",
+                        'error_current_wallet_doesnot_support_connection_to_service'
                     );
                 }
 
@@ -197,7 +198,8 @@ export const useGetTonConnectConnectResponse = () => {
                         wallet.version !== WalletVersion.V4R2
                     ) {
                         throw new TxConfirmationCustomError(
-                            "Current wallet doesn't support connection to the service"
+                            "Current wallet doesn't support connection to the service",
+                            'error_current_wallet_doesnot_support_connection_to_service'
                         );
                     }
 
