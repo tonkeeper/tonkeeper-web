@@ -59,6 +59,7 @@ import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
 import { Notifications } from './components/Notifications';
+import { CustomConfirmNotificationControlled } from "@tonkeeper/uikit/dist/components/modals/CustomConfirmControlled";
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
 const Browser = React.lazy(() => import('@tonkeeper/uikit/dist/pages/browser'));
@@ -379,6 +380,7 @@ export const Content: FC<{
                 <ConnectLedgerNotification />
                 <SwapMobileNotification />
                 <PairKeystoneNotification />
+                <CustomConfirmNotificationControlled />
             </Suspense>
         </Wrapper>
     );
