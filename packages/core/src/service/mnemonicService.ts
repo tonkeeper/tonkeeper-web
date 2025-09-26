@@ -110,7 +110,8 @@ export const validateBip39Mnemonic = async (mnemonic: string[]) => {
 async function bip39ToPrivateKey(mnemonic: string[], derivationIndex = 0) {
     const { mnemonicToSeed } = await import('bip39');
     const seed = await mnemonicToSeed(mnemonic.join(' '));
-    const TON_DERIVATION_PATH = `m/44'/607'/${derivationIndex}'`;
+    //const TON_DERIVATION_PATH = `m/44'/607'/${derivationIndex}'`;
+    const TON_DERIVATION_PATH = "m/44'/607'/0'"; // TODO:bip39 temporary
     const seedContainer = deriveED25519Path(TON_DERIVATION_PATH, seed.toString('hex'));
     return keyPairFromSeed(seedContainer.key);
 }

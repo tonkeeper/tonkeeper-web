@@ -317,6 +317,7 @@ export const createBip39DerivableAccountByMnemonic = async (
                 publicKey,
                 Network.MAINNET
             );
+            tonWallet.id = tonWallet.id + i; // TODO bip39 temporary
 
             return {
                 index: i,

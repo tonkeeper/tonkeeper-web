@@ -656,7 +656,7 @@ export class AccountBip39Derivable extends AccountDerivable implements IAccountT
         );
         const tonWallets: TonWalletStandard[] = [
             {
-                id: tonWallet.address.toRawString(),
+                id: tonWallet.address.toRawString() + derivationIndex, // TODO bip39 temporary
                 publicKey: keyPair.publicKey.toString('hex'),
                 version: options.defaultWalletVersion,
                 rawAddress: tonWallet.address.toRawString()
