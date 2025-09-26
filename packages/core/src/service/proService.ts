@@ -1,28 +1,21 @@
-import { Address } from '@ton/core';
 import BigNumber from 'bignumber.js';
 import { AppKey } from '../Keys';
 import { IStorage } from '../Storage';
 import { APIConfig } from '../entries/apis';
-import { BLOCKCHAIN_NAME } from '../entries/crypto';
-import { AssetAmount } from '../entries/crypto/asset/asset-amount';
-import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { DashboardCell, DashboardColumn, DashboardRow } from '../entries/dashboard';
 import { FiatCurrencies } from '../entries/fiat';
 import { Language, localizationText } from '../entries/language';
-import { RecipientData, TonRecipientData } from '../entries/send';
 import {
     backwardCompatibilityOnlyWalletVersions,
     TonWalletStandard,
     WalletVersion
 } from '../entries/wallet';
-import { AccountsApi } from '../tonApiV2';
 import { Flatten } from '../utils/types';
 import { loginViaTG } from './telegramOauth';
 import { createTonProofItem, tonConnectProofPayload } from './tonConnect/connectService';
 import { getServerTime } from './ton-blockchain/utils';
 import { walletStateInitFromState } from './wallet/contractService';
 import {
-    ApiError,
     AuthService,
     Currencies as CurrenciesGenerated,
     DashboardCellAddress,
@@ -31,15 +24,15 @@ import {
     DashboardCellString,
     DashboardColumnType,
     DashboardsService,
+    ExtensionsService,
     IapService,
-    Invoice,
-    InvoicesService,
+    SubscriptionExtension,
     SupportService,
     TiersService,
     UsersService
 } from '../pro';
 import { findAuthorizedWallet, normalizeSubscription } from '../utils/pro';
-import { IProStateWallet, ProSubscription, PurchaseErrors } from '../entries/pro';
+import { ProSubscription, PurchaseErrors } from '../entries/pro';
 
 export const setBackupState = async (storage: IStorage, state: ProSubscription) => {
     await storage.set(AppKey.PRO_BACKUP, state);
@@ -68,8 +61,9 @@ export const walletVersionFromProServiceDTO = (value: string) => {
 };
 
 export interface IProAuthTokenService {
-    setToken(token: string): Promise<void>;
     getToken(): Promise<string | null>;
+    setToken(token: string): Promise<void>;
+    promoteToken(token: string): Promise<void>;
     deleteToken(): Promise<void>;
 }
 
@@ -78,7 +72,10 @@ export const getNormalizedSubscription = async (storage: IStorage, token: string
 
     try {
         const user = await UsersService.getUserInfo(`Bearer ${token}`);
-        const authorizedWallet: IProStateWallet | null = await findAuthorizedWallet(user, storage);
+        const authorizedWallet: TonWalletStandard | null = await findAuthorizedWallet(
+            user,
+            storage
+        );
         const currentSubscriptionDTO = await UsersService.verifySubscription(`Bearer ${token}`);
 
         return normalizeSubscription(currentSubscriptionDTO, authorizedWallet);
@@ -160,74 +157,40 @@ export const authViaSeedPhrase = async (api: APIConfig, authData: ProAuthViaSeed
     return result.auth_token;
 };
 
-export const getProServiceTiers = async (lang?: Language | undefined, promoCode?: string) => {
-    const { items } = await TiersService.getTiers(localizationText(lang) as Lang, promoCode);
+export const getProServiceTiers = async (lang?: Language | undefined) => {
+    const { items } = await TiersService.getTiers(localizationText(lang) as Lang);
 
     return items;
 };
 
-interface IProServiceInvoiceData {
-    tierId: number;
-    promoCode?: string;
-}
+type GetProExtensionDataResponse =
+    | { ok: true; data: SubscriptionExtension }
+    | { ok: false; data: PurchaseErrors };
 
-type ProServiceInvoiceResponse = { ok: true; data: Invoice } | { ok: false; data: PurchaseErrors };
-
-export const createProServiceInvoice = async (
-    tempToken: string,
-    data: IProServiceInvoiceData
-): Promise<ProServiceInvoiceResponse> => {
-    const { promoCode, tierId } = data;
-
+export const getProExtensionData = async (
+    token: string,
+    lang: Language,
+    tierId: number
+): Promise<GetProExtensionDataResponse> => {
     try {
-        const invoice = await InvoicesService.createInvoice(`Bearer ${tempToken}`, {
-            tier_id: tierId,
-            promo_code: promoCode
-        });
+        const extensionData = await ExtensionsService.createSubscriptionExtension(
+            `Bearer ${token}`,
+            localizationText(lang) as Lang,
+            {
+                tier_id: tierId
+            }
+        );
 
         return {
             ok: true,
-            data: invoice
+            data: extensionData
         };
-    } catch (e) {
-        if (e instanceof ApiError && e.status === 400) {
-            return {
-                ok: false,
-                data: PurchaseErrors.PROMOCODE_ALREADY_USED
-            };
-        }
-
+    } catch {
         return {
             ok: false,
             data: PurchaseErrors.PURCHASE_FAILED
         };
     }
-};
-
-export const createRecipient = async (
-    api: APIConfig,
-    invoice: Invoice
-): Promise<[RecipientData, AssetAmount]> => {
-    const toAccount = await new AccountsApi(api.tonApiV2).getAccount({
-        accountId: invoice.pay_to_address
-    });
-
-    const recipient: TonRecipientData = {
-        address: {
-            address: Address.parse(invoice.pay_to_address).toString({ bounceable: false }),
-            blockchain: BLOCKCHAIN_NAME.TON
-        },
-        comment: invoice.id,
-        done: true,
-        toAccount: toAccount
-    };
-
-    const asset = new AssetAmount({
-        asset: TON_ASSET,
-        weiAmount: new BigNumber(invoice.amount)
-    });
-
-    return [recipient, asset];
 };
 
 export const saveIapPurchase = async (

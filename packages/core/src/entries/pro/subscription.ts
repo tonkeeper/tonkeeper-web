@@ -1,5 +1,6 @@
 import {
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
     IosSubscriptionStatuses,
     ProductIds,
     PurchaseStatuses,
@@ -10,16 +11,26 @@ import {
     IOriginalTransactionInfo,
     ITokenizedWalletAuth,
     ISubscriptionFormData,
-    NormalizedProPlans,
+    IDisplayPlan,
     ITelegramAuth,
     IWalletAuth
 } from './common';
-import { Language } from '../language';
 import { CryptoCurrency, SubscriptionSource } from '../../pro';
+import { Language } from '../language';
 
-export type ProSubscription = IosSubscription | CryptoSubscription | TelegramSubscription | null;
+export type ProSubscription =
+    | IosSubscription
+    | ExtensionSubscription
+    | CryptoSubscription
+    | TelegramSubscription
+    | null;
 
 export type IosSubscription = IIosActiveSubscription | IIosExpiredSubscription;
+
+export type ExtensionSubscription =
+    | IExtensionActiveSubscription
+    | IExtensionExpiredSubscription
+    | IExtensionPendingSubscription;
 
 export type CryptoSubscription =
     | ICryptoActiveSubscription
@@ -28,7 +39,10 @@ export type CryptoSubscription =
 
 export type TelegramSubscription = ITelegramActiveSubscription | ITelegramExpiredSubscription;
 
-export type SubscriptionStrategy = ICryptoSubscriptionStrategy | IIosSubscriptionStrategy;
+export type SubscriptionStrategy =
+    | IIosSubscriptionStrategy
+    | ICryptoSubscriptionStrategy
+    | IExtensionSubscriptionStrategy;
 
 export interface IBaseSubscription {
     source: SubscriptionSource;
@@ -39,12 +53,8 @@ export interface IBaseSubscription {
 
 export interface IBaseSubscriptionStrategy {
     source: SubscriptionSource;
-    logout(): Promise<void>;
-    getToken(): Promise<string | null>;
-    activateTrial(token: string): Promise<void>;
     subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses>;
-    getSubscription(tempToken: string | null): Promise<ProSubscription>;
-    getAllProductsInfo(lang?: Language, promoCode?: string): Promise<NormalizedProPlans>;
+    getAllProductsInfoCore(lang?: Language): Promise<IDisplayPlan[]>;
 }
 
 // IOS Subscription Types
@@ -125,6 +135,52 @@ export interface ICryptoSubscriptionStrategy extends IBaseSubscriptionStrategy {
     source: SubscriptionSource.CRYPTO;
 }
 
+// Extension Subscription Types
+export interface IExtensionDBStoredInfo {
+    contract: string;
+    currency: CryptoCurrency;
+    expiresDate?: Date;
+    amount: string;
+    period: number;
+    purchaseDate: Date;
+    deployValue: string;
+    destroyValue: string;
+    isAutoRenewable: boolean;
+}
+
+export interface IBaseExtensionSubscription extends IBaseSubscription {
+    source: SubscriptionSource.EXTENSION;
+    status: ExtensionSubscriptionStatuses;
+    auth: IWalletAuth;
+}
+
+export interface IExtensionActiveSubscription
+    extends IBaseExtensionSubscription,
+        IExtensionDBStoredInfo {
+    status: ExtensionSubscriptionStatuses.ACTIVE;
+    valid: true;
+}
+
+export interface IExtensionExpiredSubscription
+    extends IBaseExtensionSubscription,
+        IExtensionDBStoredInfo {
+    status: ExtensionSubscriptionStatuses.EXPIRED;
+    valid: false;
+}
+
+export interface IExtensionPendingSubscription extends IBaseExtensionSubscription {
+    status: ExtensionSubscriptionStatuses.PENDING;
+    auth: ITokenizedWalletAuth;
+    displayName?: string;
+    displayPrice?: string;
+    isCanceling?: boolean;
+}
+
+export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {
+    source: SubscriptionSource.EXTENSION;
+    cancelSubscription(subscription: IExtensionActiveSubscription): Promise<PurchaseStatuses>;
+}
+
 // Telegram Subscription Types
 export interface ITelegramDBStoredInfo {
     expiresDate: Date;
@@ -144,4 +200,19 @@ export interface ITelegramActiveSubscription extends IBaseTelegramSubscription {
 export interface ITelegramExpiredSubscription extends IBaseTelegramSubscription {
     status: TelegramSubscriptionStatuses.EXPIRED;
     valid: false;
+}
+
+export interface ISubscriptionService {
+    getAvailableSources(): ReadonlyArray<SubscriptionSource>;
+    getStrategy(source: SubscriptionSource): SubscriptionStrategy | undefined;
+    addStrategy(strategy: SubscriptionStrategy): void;
+    logout(): Promise<void>;
+    getSubscription(tempToken: string | null): Promise<ProSubscription>;
+    getToken(): Promise<string | null>;
+    subscribe(
+        source: SubscriptionSource,
+        formData: ISubscriptionFormData
+    ): Promise<PurchaseStatuses>;
+    activateTrial(token: string): Promise<void>;
+    getAllProductsInfo(source: SubscriptionSource, lang?: Language): Promise<IDisplayPlan[]>;
 }

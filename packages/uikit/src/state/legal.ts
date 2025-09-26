@@ -9,7 +9,7 @@ export const useLegalLinks = () => {
     const proTermsLink = mainnetConfig.pro_terms_of_use;
     const usualTermsLink = mainnetConfig?.terms_of_use;
 
-    const shouldUseProTerms = !!sdk.subscriptionStrategy;
+    const shouldUseProTerms = !!sdk.subscriptionService;
 
     return {
         termsLink: shouldUseProTerms ? proTermsLink : usualTermsLink,

@@ -34,6 +34,9 @@ import { HideOnReview } from '../../components/ios/HideOnReview';
 import { AppRoute, DevSettingsRoute } from '../../libs/routes';
 import { Switch } from '../../components/fields/Switch';
 import { useDevMenuVisibility } from '../../state/dev';
+import { useMutateProApiUrl, useProApiUrl } from '../../state/pro';
+import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
+import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -42,7 +45,7 @@ const CookieSettings = () => {
     const { mutate, isLoading } = useMutation(async () => {
         await sdk.cookie?.cleanUp();
 
-        await sdk.subscriptionStrategy.logout();
+        await sdk.subscriptionService.logout();
 
         await sdk.storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
 
@@ -139,6 +142,33 @@ const LogsSettings = () => {
                 <ListItem hover={false} onClick={() => navigate('.' + DevSettingsRoute.logs)}>
                     <ListItemPayload>
                         <Label1>Dev Logs</Label1>
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+        </HideOnReview>
+    );
+};
+
+const EnvironmentToggle = () => {
+    const sdk = useAppSdk();
+    const { mainnetConfig } = useAppContext();
+    const { mutate: changeUrl } = useMutateProApiUrl();
+    const { data: proApiUrl } = useProApiUrl(mainnetConfig);
+
+    const isDevVersion = isFirstSemverStringGreater(sdk.version, mainnetConfig.pro_apk_name ?? '');
+
+    if (isWalletInOrigin() || !isDevVersion) return null;
+
+    return (
+        <HideOnReview>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false}>
+                    <ListItemPayload>
+                        <Label1>Is dev-pro on?</Label1>
+                        <Switch
+                            onChange={changeUrl}
+                            checked={proApiUrl === mainnetConfig.pro_dev_api_url}
+                        />
                     </ListItemPayload>
                 </ListItem>
             </ListBlockDesktopAdaptive>
@@ -271,6 +301,7 @@ export const DevSettings = React.memo(() => {
                 <AddAccountBySK />
                 <ReviewerSettings />
                 <LogsSettings />
+                <EnvironmentToggle />
             </DesktopWrapper>
         );
     }

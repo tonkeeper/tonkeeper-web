@@ -1,6 +1,7 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
+    isExtensionPendingCancelSubscription,
     isPaidActiveSubscription,
     isPendingSubscription,
     isTelegramActiveSubscription,
@@ -31,6 +32,7 @@ import { useIosSubscriptionPolling } from '../../../hooks/pro/useIosSubscription
 import { usePreloadImages } from '../../../hooks/usePreloadImages';
 import { useAppContext } from '../../../hooks/appContext';
 import { useAllCarouselImages } from '../../../libs/pro';
+import { useExtensionBalanceVerification } from '../../../hooks/pro/useExtensionBalanceVerification';
 
 const Body3Block = styled(Body3)`
     display: block;
@@ -169,6 +171,7 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
     const carouselImages = useAllCarouselImages(mainnetConfig.pro_media_base_url);
     usePreloadImages(carouselImages);
     useIosSubscriptionPolling();
+    useExtensionBalanceVerification();
     useSubscriptionEndingVerification();
 
     const { mutate: hideBrowser } = useHideActiveBrowserTab();
@@ -218,7 +221,11 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
             >
                 <ProButtonPanel onClick={handleNavigateToSettingsPro}>
                     <SpinnerIcon />
-                    {t('processing')}
+                    {t(
+                        isExtensionPendingCancelSubscription(subscription)
+                            ? 'cancelling'
+                            : 'processing'
+                    )}
                 </ProButtonPanel>
             </DropDown>
         );

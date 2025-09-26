@@ -20,6 +20,10 @@ import { ProFeaturesNotificationControlled } from './modals/ProFeaturesNotificat
 import { ProAuthNotificationControlled } from './modals/ProAuthNotificationControlled';
 import { ProConfirmNotificationControlled } from './modals/ProConfirmNotificationControlled';
 import { TopUpTronFeeBalanceNotificationControlled } from './modals/TopUpTronFeeBalanceNotificationControlled';
+import { ProInstallExtensionNotificationControlled } from './modals/ProInstallExtensionNotificationControlled';
+import { ProRemoveExtensionNotificationControlled } from './modals/ProRemoveExtensionNotificationControlled';
+import { MetaEncryptionNotificationControlled } from './modals/MetaEncryptionNotificationControlled';
+import { ProBalanceNotificationControlled } from './modals/ProBalanceNotificationControlled';
 
 export const ModalsRoot = () => {
     return (
@@ -46,6 +50,10 @@ export const ModalsRoot = () => {
             <ProEndingNotificationControlled />
             <ProConfirmNotificationControlled />
             <TopUpTronFeeBalanceNotificationControlled />
+            <ProInstallExtensionNotificationControlled />
+            <ProRemoveExtensionNotificationControlled />
+            <MetaEncryptionNotificationControlled />
+            <ProBalanceNotificationControlled />
         </>
     );
 };

@@ -14,12 +14,19 @@ import { useAtomValue } from '../../libs/useAtom';
 interface IProps {
     title?: ReactNode;
     isCurrentSubscription?: ReactNode;
-    onDisconnect: () => Promise<void>;
+    onDisconnect?: () => Promise<void>;
     isLoading: boolean;
+    disableRightElement?: boolean;
 }
 
 export const ProActiveWallet: FC<IProps> = props => {
-    const { onDisconnect, isLoading, title, isCurrentSubscription } = props;
+    const {
+        onDisconnect,
+        isLoading,
+        title,
+        isCurrentSubscription,
+        disableRightElement = false
+    } = props;
     const { t } = useTranslation();
     const { data: subscription } = useProState();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
@@ -55,11 +62,13 @@ export const ProActiveWallet: FC<IProps> = props => {
                     account={account}
                     isLoading={isLoading}
                     rightElement={
-                        <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
-                            <Label2>
-                                {t(isCurrentSubscription ? 'disconnect' : 'edit_wallet')}
-                            </Label2>
-                        </ButtonStyled>
+                        disableRightElement ? null : (
+                            <ButtonStyled type="button" disabled={isLoading} onClick={onDisconnect}>
+                                <Label2>
+                                    {t(isCurrentSubscription ? 'disconnect' : 'edit_wallet')}
+                                </Label2>
+                            </ButtonStyled>
+                        )
                     }
                 />
             </ListBlock>
