@@ -128,6 +128,10 @@ export const Providers = () => {
         document.body.classList.add(CAPACITOR_APPLICATION_ID);
     }, []);
 
+    useEffect(() => {
+        console.log(new Date(), 'providers mounted');
+    }, []);
+
     return (
         <QueryClientProvider client={queryClient}>
             <Suspense fallback={<div></div>}>
@@ -144,6 +148,9 @@ export const Providers = () => {
 };
 
 export const App = () => {
+    useEffect(() => {
+        console.log(new Date(), 'app mounted');
+    }, []);
     return (
         <IonApp>
             <IonReactRouter>
@@ -222,6 +229,10 @@ export const Loader: FC = () => {
         }
     }, [config]);
 
+    useEffect(() => {
+        console.log(new Date(), 'Loader mounted');
+    }, []);
+
     if (
         activeWalletLoading ||
         isLangLoading ||
@@ -270,6 +281,9 @@ const Content: FC<{
     activeAccount?: Account | null;
     lock: boolean;
 }> = props => {
+    useEffect(() => {
+        console.log(new Date(), 'Content mounted');
+    }, []);
     if (CAPACITOR_APPLICATION_ID === 'mobile') {
         return <NarrowContent {...props} />;
     }
