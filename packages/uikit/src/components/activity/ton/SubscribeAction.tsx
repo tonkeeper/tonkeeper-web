@@ -1,10 +1,15 @@
-import { Action } from '@tonkeeper/core/dist/tonApiV2';
+import { Action, ActionTypeEnum } from '@tonkeeper/core/dist/tonApiV2';
 import { formatAddress } from '@tonkeeper/core/dist/utils/common';
 import React, { FC } from 'react';
 import { useTranslation } from '../../../hooks/translation';
 import { ListBlock } from '../../List';
 import { FailedDetail } from '../ActivityDetailsLayout';
-import { ActivityIcon, SubscribeIcon, UnsubscribeIcon } from '../ActivityIcons';
+import {
+    ActivityIcon,
+    SubscribeIcon,
+    SubscriptionChargeIcon,
+    UnsubscribeIcon
+} from '../ActivityIcons';
 import { ColumnLayout, ErrorAction, ListItemGrid, toAddressTextValue } from '../CommonAction';
 import {
     ActionBeneficiaryDetails,
@@ -17,6 +22,29 @@ import {
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 import { useActiveTonNetwork } from '../../../state/wallet';
+import { useFormatCoinValue } from '../../../hooks/balance';
+import { ExtensionActionTitles } from '../../desktop/history/ton/ExtensionDesktopActions';
+
+const getActionDetails = (action: Action) => {
+    if (action.type === ActionTypeEnum.UnSubscribe) {
+        return {
+            title: ExtensionActionTitles.UNSUBSCRIBED,
+            icon: <UnsubscribeIcon />
+        };
+    }
+
+    if (action.subscribe?.initial && action.subscribe?.amount === 0) {
+        return {
+            title: ExtensionActionTitles.SUBSCRIBED,
+            icon: <SubscribeIcon />
+        };
+    }
+
+    return {
+        title: ExtensionActionTitles.SUBSCRIPTION_CHARGE,
+        icon: <SubscriptionChargeIcon />
+    };
+};
 
 export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, event }) => {
     const { t } = useTranslation();
@@ -29,7 +57,7 @@ export const UnSubscribeActionDetails: FC<ActionData> = ({ action, timestamp, ev
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_unsubscription')}</Title>
+                <Title>{t(ExtensionActionTitles.UNSUBSCRIBED)}</Title>
                 <ActionDate kind="send" timestamp={timestamp} />
                 <FailedDetail status={action.status} />
             </div>
@@ -50,10 +78,12 @@ export const SubscribeActionDetails: FC<ActionData> = ({ action, timestamp, even
         return <ErrorActivityNotification event={event} />;
     }
 
+    const { title } = getActionDetails(action);
+
     return (
         <ActionDetailsBlock event={event}>
             <div>
-                <Title>{t('transaction_type_subscription')}</Title>
+                <Title>{t(title)}</Title>
                 <ActionDate kind="send" timestamp={timestamp} />
                 <FailedDetail status={action.status} />
             </div>
@@ -74,13 +104,14 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
     if (!unSubscribe) {
         return <ErrorAction />;
     }
+
+    const { title, icon } = getActionDetails(action);
+
     return (
         <ListItemGrid>
-            <ActivityIcon status={action.status}>
-                <UnsubscribeIcon />
-            </ActivityIcon>
+            <ActivityIcon status={action.status}>{icon}</ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_unsubscription')}
+                title={t(title)}
                 entry="-"
                 address={toAddressTextValue(
                     unSubscribe.beneficiary.name,
@@ -95,20 +126,22 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
 export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { subscribe } = action;
+    const format = useFormatCoinValue();
     const network = useActiveTonNetwork();
 
     if (!subscribe) {
         return <ErrorAction />;
     }
 
+    const amount = action.subscribe?.amount;
+    const { title, icon } = getActionDetails(action);
+
     return (
         <ListItemGrid>
-            <ActivityIcon status={action.status}>
-                <SubscribeIcon />
-            </ActivityIcon>
+            <ActivityIcon status={action.status}>{icon}</ActivityIcon>
             <ColumnLayout
-                title={t('transaction_type_subscription')}
-                entry="-"
+                title={t(title)}
+                entry={amount ? `- ${format(amount, 9)}` : ''}
                 address={
                     subscribe.beneficiary.name ??
                     formatAddress(subscribe.beneficiary.address, network)

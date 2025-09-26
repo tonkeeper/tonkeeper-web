@@ -17,7 +17,7 @@ import {
 import { useTranslation } from '../../../../hooks/translation';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 
-enum ExtensionSimpleNames {
+export enum ExtensionActionTitles {
     SUBSCRIBED = 'subscription_created',
     UNSUBSCRIBED = 'subscription_cancelled',
     SUBSCRIPTION_CHARGE = 'subscription_paid'
@@ -26,7 +26,7 @@ enum ExtensionSimpleNames {
 const getActionDetails = (action: Action) => {
     if (action.type === ActionTypeEnum.UnSubscribe) {
         return {
-            title: ExtensionSimpleNames.UNSUBSCRIBED,
+            title: ExtensionActionTitles.UNSUBSCRIBED,
             description: 'future_charges_stopped',
             icon: <ExtensionUnsubscribedIconStyled />
         };
@@ -34,14 +34,14 @@ const getActionDetails = (action: Action) => {
 
     if (action.subscribe?.initial && action.subscribe?.amount === 0) {
         return {
-            title: ExtensionSimpleNames.SUBSCRIBED,
+            title: ExtensionActionTitles.SUBSCRIBED,
             description: 'subscription_start',
             icon: <ExtensionSubscribedIconStyled />
         };
     }
 
     return {
-        title: ExtensionSimpleNames.SUBSCRIPTION_CHARGE,
+        title: ExtensionActionTitles.SUBSCRIPTION_CHARGE,
         description: 'recurring_payment',
         icon: <ExtensionChargeIconStyled />
     };
