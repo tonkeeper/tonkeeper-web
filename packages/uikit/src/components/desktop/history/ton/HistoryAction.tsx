@@ -53,7 +53,7 @@ export const HistoryAction: FC<{
         case 'JettonBurn':
             return <JettonBurnDesktopAction action={action} />;
         case 'JettonMint':
-            return <JettonMintDesktopAction action={action} />;
+            return <JettonMintDesktopAction action={action} isScam={isScam} />;
         case 'DepositStake':
             return <DepositStakeDesktopAction action={action} />;
         case 'WithdrawStake':

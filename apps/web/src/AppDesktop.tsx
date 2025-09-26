@@ -211,11 +211,7 @@ export const DesktopContent: FC<{
     const location = useLocation();
 
     if (lock) {
-        return (
-            <FullScreen>
-                <Unlock />
-            </FullScreen>
-        );
+        return <Unlock />;
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {

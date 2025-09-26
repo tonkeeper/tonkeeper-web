@@ -3029,7 +3029,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport@npm:^6.28.4, @ledgerhq/hw-transport@npm:^6.30.6":
+"@ledgerhq/hw-transport@npm:^6.30.6":
   version: 6.30.6
   resolution: "@ledgerhq/hw-transport@npm:6.30.6"
   dependencies:
@@ -3919,16 +3919,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton-community/ton-ledger@npm:^7.2.0-pre.3":
-  version: 7.2.0-pre.3
-  resolution: "@ton-community/ton-ledger@npm:7.2.0-pre.3"
+"@ton-community/ton-ledger@npm:^7.4.0-pre.0":
+  version: 7.4.0-pre.0
+  resolution: "@ton-community/ton-ledger@npm:7.4.0-pre.0"
   dependencies:
-    "@ledgerhq/hw-transport": "npm:^6.28.4"
+    "@ledgerhq/hw-transport": "npm:^6.31.4"
     "@ton/crypto": "npm:^3.2.0"
     teslabot: "npm:^1.5.0"
   peerDependencies:
     "@ton/core": ">=0.52.2"
-  checksum: 10/332ae8a7208471dbaca7f335c63d92b6eb9b0a617ef8ed267a7ea5ff51a1e6a765911a92f416fdbc8e7a29b2b927c1b62690c3464d3667332a1455176c3ef218
+  checksum: 10/5a27eea3cf3afbb5cb52ec821532d136009ecd5e4cad47f7a5252b88f19f3036b5acaf14c0d97e297e09d43ab77f505fb4d4b378d5ba309b43907918b80c0bc0
   languageName: node
   linkType: hard
 
@@ -4022,7 +4022,7 @@ __metadata:
     "@ledgerhq/hw-transport-webusb": "npm:^6.28.6"
     "@noble/curves": "npm:^1.9.2"
     "@noble/ed25519": "npm:^2.3.0"
-    "@ton-community/ton-ledger": "npm:^7.2.0-pre.3"
+    "@ton-community/ton-ledger": "npm:^7.4.0-pre.0"
     "@ton-keychain/core": "npm:^0.0.4"
     "@ton-keychain/trx": "npm:^0.0.7"
     "@ton/core": "npm:0.56.0"

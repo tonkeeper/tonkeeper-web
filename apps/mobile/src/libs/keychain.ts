@@ -7,6 +7,7 @@ import { BaseKeychainService } from '@tonkeeper/core/dist/base-keychain-service'
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
 import { promptDesktopPasswordController } from '@tonkeeper/uikit/dist/components/modals/PromptDesktopPassword';
 import { assertUnreachable } from '@tonkeeper/core/dist/utils/types';
+import { KeychainGetError } from '@tonkeeper/core/dist/errors/KeychainError';
 
 export class KeychainCapacitor extends BaseKeychainService implements IKeychainService {
     constructor(private biometryService: BiometryService, storage: IStorage) {
@@ -14,30 +15,52 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
     }
 
     setData = async (key: string, value: string) => {
-        await SecureStorage.storeData({
-            id: `Wallet-${key}`,
-            data: value
-        });
+        try {
+            await SecureStorage.storeData({
+                id: `Wallet-${key}`,
+                data: value
+            });
+            console.info(`[KEYCHAIN] (success) SET key "Wallet-${key}"`);
+        } catch (e) {
+            console.info(`[KEYCHAIN] (ERROR) SET key "Wallet-${key}"`, e);
+            throw e;
+        }
     };
 
     getData = async (key: string) => {
         await this.securityCheck();
-        const { data } = await SecureStorage.getData({
-            id: `Wallet-${key}`
-        });
-        return data;
+        try {
+            const { data } = await SecureStorage.getData({
+                id: `Wallet-${key}`
+            });
+            console.info(`[KEYCHAIN] (success) GET key "Wallet-${key}"`);
+            return data;
+        } catch (e) {
+            console.info(`[KEYCHAIN] (ERROR) GET key "Wallet-${key}"`, e);
+            throw new KeychainGetError();
+        }
     };
 
     removeData = async (key: string) => {
-        await SecureStorage.removeData({
-            id: `Wallet-${key}`
-        });
-        console.info(`Deleted password for account "${key}": Success`);
+        try {
+            await SecureStorage.removeData({
+                id: `Wallet-${key}`
+            });
+            console.info(`[KEYCHAIN] (success) DELETE key "Wallet-${key}"`);
+        } catch (e) {
+            console.info(`[KEYCHAIN] (ERROR) DELETE key "Wallet-${key}"`, e);
+            throw e;
+        }
     };
 
     clearStorage = async () => {
-        await SecureStorage.clearStorage();
-        console.info(`Clear keychain": Success`);
+        try {
+            await SecureStorage.clearStorage();
+            console.info('[KEYCHAIN] (success) CLEAR all data');
+        } catch (e) {
+            console.info('[KEYCHAIN] (ERROR) CLEAR all data');
+            throw e;
+        }
         await this.resetSecuritySettings();
     };
 

@@ -31,6 +31,7 @@ export enum QueryKey {
     multisigSigners = 'multisigSigners',
     viewedMultisigOrders = 'viewedMultisigOrders',
     metaEncryptionData = 'metaEncryptionData',
+    allowedFiatCurrencies = 'allowedFiatCurrencies',
 
     tonConnectConnection = 'tonConnectConnection',
     tonConnectLastEventId = 'tonConnectLastEventId',

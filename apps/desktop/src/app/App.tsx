@@ -84,6 +84,7 @@ import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/real
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
+import { SecureWalletNotification } from '@tonkeeper/uikit/dist/components/desktop/SecureWalletNotification';
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -362,11 +363,7 @@ export const Content: FC<{
     useRealtimeUpdatesInvalidation();
 
     if (lock) {
-        return (
-            <FullSizeWrapper>
-                <Unlock />
-            </FullSizeWrapper>
-        );
+        return <Unlock />;
     }
 
     if (!activeAccount || location.pathname.startsWith(AppRoute.import)) {
@@ -462,6 +459,7 @@ const BackgroundElements = () => {
             <PairSignerNotification />
             <ConnectLedgerNotification />
             <PairKeystoneNotification />
+            <SecureWalletNotification />
         </>
     );
 };

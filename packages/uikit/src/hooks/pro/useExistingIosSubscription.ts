@@ -26,7 +26,8 @@ export const useExistingIosSubscription = () => {
                 message: t('already_have_subscription', {
                     transactionId: String(originalTransactionId)
                 }),
-                okButtonTitle: t('choose_another_wallet')
+                okButtonTitle: t('choose_another_wallet'),
+                cancelButtonTitle: t('cancel')
             });
 
             onCurrentClose();

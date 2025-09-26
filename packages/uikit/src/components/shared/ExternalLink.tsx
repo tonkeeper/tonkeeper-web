@@ -78,6 +78,7 @@ export const ExternalLink: FC<
             className={className}
             $contents={contents}
             $colored={colored}
+            type="button"
         >
             {children}
         </ButtonStyled>

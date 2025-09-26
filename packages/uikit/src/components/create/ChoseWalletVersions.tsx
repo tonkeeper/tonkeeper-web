@@ -1,10 +1,11 @@
 import {
+    backwardCompatibilityOnlyWalletVersions,
     WalletVersion,
     WalletVersions,
     walletVersionText
 } from '@tonkeeper/core/dist/entries/wallet';
 import { formatAddress, toShortValue } from '@tonkeeper/core/dist/utils/common';
-import { FC, useEffect, useLayoutEffect, useState } from 'react';
+import { FC, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../../hooks/appContext';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -104,6 +105,21 @@ export const ChoseWalletVersions: FC<{
     const { defaultWalletVersion } = useAppContext();
 
     const { data: wallets } = useStandardTonWalletVersions(network, publicKey);
+    const filteredWallets = useMemo(
+        () =>
+            wallets?.filter(w => {
+                if (
+                    backwardCompatibilityOnlyWalletVersions.includes(w.version) &&
+                    !w.hasJettons &&
+                    w.tonBalance === 0
+                ) {
+                    return false;
+                }
+
+                return true;
+            }),
+        [wallets]
+    );
     const [checkedVersions, setCheckedVersions] = useState<WalletVersion[]>([]);
     const accountState = useAccountState(mayBeCreateAccountId(network, publicKey));
 
@@ -114,12 +130,12 @@ export const ChoseWalletVersions: FC<{
     }, []);
 
     useLayoutEffect(() => {
-        if (wallets) {
+        if (filteredWallets) {
             if (accountState && isAccountTonWalletStandard(accountState)) {
                 return setCheckedVersions(accountState.allTonWallets.map(w => w.version));
             }
 
-            const versionsToCheck = wallets
+            const versionsToCheck = filteredWallets
                 .filter(w => w.tonBalance || w.hasJettons)
                 .map(w => w.version);
             if (!versionsToCheck.length) {
@@ -127,7 +143,7 @@ export const ChoseWalletVersions: FC<{
             }
             setCheckedVersions(versionsToCheck);
         }
-    }, [wallets, accountState]);
+    }, [filteredWallets, accountState]);
 
     const toggleVersion = (version: WalletVersion, isChecked: boolean) => {
         setCheckedVersions(state =>
@@ -146,12 +162,12 @@ export const ChoseWalletVersions: FC<{
         <Wrapper onSubmit={handleSubmit(onSelect)}>
             <H2Label2Responsive>{t('choose_wallets_title')}</H2Label2Responsive>
             <Body>{t('choose_wallets_subtitle')}</Body>
-            {!wallets ? (
+            {!filteredWallets ? (
                 <SkeletonListStyled size={WalletVersions.length} />
             ) : (
                 <>
                     <ListBlockStyled>
-                        {wallets.map(wallet => (
+                        {filteredWallets.map(wallet => (
                             <ListItem hover={false} key={wallet.address.toRawString()}>
                                 <ListItemPayload>
                                     <TextContainer>
