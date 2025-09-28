@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
     isPurchaseError,
     PurchaseErrors,
@@ -5,13 +6,13 @@ import {
 } from '@tonkeeper/core/dist/entries/pro';
 
 import { useTranslation } from '../translation';
-import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
-import { useNotifyError, useToast } from '../useNotification';
-import { useEffect } from 'react';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../router/useNavigate';
+import { useTargetAuthUpdate } from './useTargetAuthUpdate';
+import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useNotifyError, useToast } from '../useNotification';
 import { useExistingIosSubscription } from './useExistingIosSubscription';
+import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
+import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 
 export const useProPurchaseController = () => {
     const { t } = useTranslation();
@@ -19,6 +20,7 @@ export const useProPurchaseController = () => {
     const navigate = useNavigate();
     const { onClose: onCurrentClose } = useProPurchaseNotification();
 
+    useTargetAuthUpdate();
     useExistingIosSubscription();
 
     const {
@@ -42,7 +44,6 @@ export const useProPurchaseController = () => {
         isLoading: isManageLoading,
         isError: isManageError
     } = useManageSubscription();
-    useManageSubscription();
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
     useEffect(() => {
