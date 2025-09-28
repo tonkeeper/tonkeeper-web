@@ -3,16 +3,10 @@ import { Address } from '@ton/core';
 import { useActiveApi, useAccountWallets, useMetaEncryptionData } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
-import {
-    EncodedResultKinds,
-    SubscriptionEncoder
-} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
+import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { SubscriptionEncodingParams } from './commonTypes';
-import {
-    ExtensionMessageSender,
-    V4ActionTypes
-} from '@tonkeeper/core/dist/service/ton-blockchain/sender/extension-message-sender';
+import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 
 export const useCreateSubscription = () => {
     const sdk = useAppSdk();
@@ -55,10 +49,11 @@ export const useCreateSubscription = () => {
         if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
             throw new Error('walletMetaKeyPair is missed!');
         }
-        const sender = new ExtensionMessageSender(api, selectedWallet, signer);
 
+        const sender = new WalletMessageSender(api, selectedWallet, signer);
         const encoder = new SubscriptionEncoder(selectedWallet);
-        const result = await encoder.encodeCreateSubscriptionV2({
+
+        const { extensionAddress, outgoingMsg } = await encoder.encodeCreateSubscriptionV2({
             beneficiary: Address.parse(admin),
             subscriptionId: subscription_id,
             firstChargingDate: first_charging_date,
@@ -73,33 +68,12 @@ export const useCreateSubscription = () => {
             walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
         });
 
-        if (!result.extensionAddress.equals(Address.parse(contract))) {
+        if (!extensionAddress.equals(Address.parse(contract))) {
             throw new Error('Contract extension addresses do not match!');
         }
 
-        if (result.kind === EncodedResultKinds.V5) {
-            await sender.send({
-                kind: result.kind,
-                outgoing: result.actions
-            });
+        await sender.send(outgoingMsg);
 
-            return true;
-        }
-
-        if (result.kind === EncodedResultKinds.V4) {
-            await sender.send({
-                kind: EncodedResultKinds.V4,
-                outgoing: {
-                    actionType: V4ActionTypes.DEPLOY,
-                    sendAmount: result.sendAmount,
-                    extStateInit: result.extStateInit,
-                    deployBody: result.deployBody
-                }
-            });
-
-            return true;
-        }
-
-        throw new Error('Unsupported wallet version flow');
+        return true;
     });
 };

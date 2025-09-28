@@ -33,7 +33,7 @@
         "@ton-keychain/trx": "^0.0.7",
         "@ton/core": "0.56.0",
         "@ton/crypto": "3.2.0",
-        "@ton/ton": "^15.1.0",
+        "@ton/ton": "https://github.com/p0lunin/ton-ton#build1",
         "aes-js": "^3.1.2",
         "bignumber.js": "^9.1.1",
         "bip39": "^3.1.0",

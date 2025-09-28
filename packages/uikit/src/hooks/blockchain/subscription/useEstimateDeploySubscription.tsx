@@ -1,18 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { Address } from '@ton/core';
-import {
-    EncodedResultKinds,
-    SubscriptionEncoder
-} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
+import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 import { SubscriptionEncodingParams } from './commonTypes';
 import { useActiveApi, useMetaEncryptionData } from '../../../state/wallet';
-import {
-    ExtensionMessageSender,
-    V4ActionTypes
-} from '@tonkeeper/core/dist/service/ton-blockchain/sender/extension-message-sender';
+import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
@@ -42,8 +36,10 @@ export const useEstimateDeploySubscription = () => {
             throw new Error('walletMetaKeyPair is missed!');
         }
 
+        const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
         const encoder = new SubscriptionEncoder(selectedWallet);
-        const result = await encoder.encodeCreateSubscriptionV2({
+
+        const { extensionAddress, outgoingMsg } = await encoder.encodeCreateSubscriptionV2({
             beneficiary: Address.parse(admin),
             subscriptionId: subscription_id,
             firstChargingDate: first_charging_date,
@@ -58,35 +54,11 @@ export const useEstimateDeploySubscription = () => {
             walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
         });
 
-        const sender = new ExtensionMessageSender(api, selectedWallet, estimationSigner);
-
-        let estimation;
-        if (result.kind === EncodedResultKinds.V5) {
-            estimation = await sender.estimate({
-                kind: result.kind,
-                outgoing: result.actions
-            });
-        }
-
-        if (result.kind === EncodedResultKinds.V4) {
-            estimation = await sender.estimate({
-                kind: EncodedResultKinds.V4,
-                outgoing: {
-                    actionType: V4ActionTypes.DEPLOY,
-                    sendAmount: result.sendAmount,
-                    extStateInit: result.extStateInit,
-                    deployBody: result.deployBody
-                }
-            });
-        }
-
-        if (!estimation || estimation.fee?.type !== 'ton-asset') {
-            throw new Error('Unsupported wallet version flow!');
-        }
+        const estimation = await sender.estimate(outgoingMsg);
 
         return {
             fee: estimation.fee,
-            address: result.extensionAddress
+            address: extensionAddress
         };
     });
 };
