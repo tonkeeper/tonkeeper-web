@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Multisig haqida ko'proq bilib oling",
   "no_multisig_orders_description": "Multisig hamyonining barcha ishtirokchilaridan barcha so‘rovlar ko‘rsatiladi.",
   "no_multisig_orders_heading": "Sizning multisig hamyoningizning so‘rovlari shu yerda ko‘rsatiladi",
-  "not_enough_balance_reminder": "Eslatma: { date } kuni obunangizni avtomatik tarzda muvaffaqiyatli yangilash uchun, Tonkeeper Pro xaridi uchun ishlatilgan hamyoningizda yetarli miqdorda TON bo‘lishi kerak.",
+  "not_enough_balance_reminder": "Eslatma: {date} kuni obunangizni avtomatik tarzda muvaffaqiyatli yangilash uchun, Tonkeeper Pro xaridi uchun ishlatilgan hamyoningizda yetarli miqdorda TON bo‘lishi kerak.",
   "ok": "Yaxshi",
   "Old_password": "Joriy parol",
   "on": "Yoqilgan",

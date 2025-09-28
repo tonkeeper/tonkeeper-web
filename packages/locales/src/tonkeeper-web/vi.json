@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Tìm hiểu thêm về multisig",
   "no_multisig_orders_description": "Tất cả các yêu cầu từ tất cả những người tham gia ví đa chữ ký đều được hiển thị.",
   "no_multisig_orders_heading": "Các yêu cầu từ ví multisig của bạn sẽ được hiển thị tại đây",
-  "not_enough_balance_reminder": "Nhắc nhở: Để tự động gia hạn thành công gói đăng ký của bạn vào ngày { date }, ví bạn đã sử dụng để mua Tonkeeper Pro phải có đủ số lượng TON.",
+  "not_enough_balance_reminder": "Nhắc nhở: Để tự động gia hạn thành công gói đăng ký của bạn vào ngày {date}, ví bạn đã sử dụng để mua Tonkeeper Pro phải có đủ số lượng TON.",
   "ok": "Đồng ý",
   "Old_password": "Mật khẩu hiện tại",
   "on": "Bật",

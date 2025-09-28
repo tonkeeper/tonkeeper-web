@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Multisig hakkında daha fazla bilgi edinin",
   "no_multisig_orders_description": "Çoklu imzalı cüzdanın tüm katılımcılarından gelen tüm istekler görüntülenir.",
   "no_multisig_orders_heading": "Çok imzalı cüzdanınızın talepleri burada gösterilecektir",
-  "not_enough_balance_reminder": "Hatırlatma: { date } tarihinde aboneliğinizin otomatik olarak başarıyla yenilenebilmesi için, Tonkeeper Pro satın alımında kullandığınız cüzdanınızda yeterli miktarda TON bulunmalıdır.",
+  "not_enough_balance_reminder": "Hatırlatma: {date} tarihinde aboneliğinizin otomatik olarak başarıyla yenilenebilmesi için, Tonkeeper Pro satın alımında kullandığınız cüzdanınızda yeterli miktarda TON bulunmalıdır.",
   "ok": "Tamam",
   "Old_password": "Güncel şifre",
   "on": "Açık",

@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Pelajari lebih lanjut tentang multisig",
   "no_multisig_orders_description": "Semua permintaan dari semua peserta dompet multisig ditampilkan.",
   "no_multisig_orders_heading": "Permintaan dompet multisig Anda akan ditampilkan di sini",
-  "not_enough_balance_reminder": "Pengingat: Agar langganan Anda berhasil diperpanjang secara otomatis pada { date }, dompet yang digunakan untuk membeli Tonkeeper Pro harus memiliki jumlah TON yang cukup.",
+  "not_enough_balance_reminder": "Pengingat: Agar langganan Anda berhasil diperpanjang secara otomatis pada {date}, dompet yang digunakan untuk membeli Tonkeeper Pro harus memiliki jumlah TON yang cukup.",
   "ok": "OK",
   "Old_password": "Kata sandi saat ini",
   "on": "Nyala",

@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "了解更多关于多重签名",
   "no_multisig_orders_description": "显示来自多签钱包所有参与者的所有请求。",
   "no_multisig_orders_heading": "您的多重签名钱包请求将在此显示",
-  "not_enough_balance_reminder": "提醒：为确保您的订阅在 { date } 成功自动续费，您用于购买 Tonkeeper Pro 的钱包中必须有足够的 TON。",
+  "not_enough_balance_reminder": "提醒：为确保您的订阅在 {date} 成功自动续费，您用于购买 Tonkeeper Pro 的钱包中必须有足够的 TON。",
   "ok": "确定",
   "Old_password": "当前密码",
   "on": "开",

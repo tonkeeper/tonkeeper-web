@@ -23,7 +23,8 @@ import {
     IExtensionSubscriptionStrategy,
     ExtensionSubscription,
     IExtensionActiveSubscription,
-    IExtensionPendingSubscription
+    IExtensionPendingSubscription,
+    IExtensionExpiredSubscription
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
@@ -81,6 +82,7 @@ export function isExpiredSubscription(
 ): subscription is
     | IIosExpiredSubscription
     | ICryptoExpiredSubscription
+    | IExtensionExpiredSubscription
     | ITelegramExpiredSubscription {
     return (
         isProSubscription(subscription) &&

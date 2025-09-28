@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Erfahren Sie mehr über Multisig",
   "no_multisig_orders_description": "Alle Anfragen von allen Teilnehmern der Multisig-Wallet werden angezeigt.",
   "no_multisig_orders_heading": "Die Anfragen Ihrer Multisig-Wallet werden hier angezeigt",
-  "not_enough_balance_reminder": "Erinnerung: Um Ihr Abonnement am { date } erfolgreich automatisch zu verlängern, muss Ihre für den Kauf von Tonkeeper Pro verwendete Wallet über eine ausreichende Menge TON verfügen.",
+  "not_enough_balance_reminder": "Erinnerung: Um Ihr Abonnement am {date} erfolgreich automatisch zu verlängern, muss Ihre für den Kauf von Tonkeeper Pro verwendete Wallet über eine ausreichende Menge TON verfügen.",
   "ok": "OK",
   "Old_password": "Aktuelles Passwort",
   "on": "Ein",

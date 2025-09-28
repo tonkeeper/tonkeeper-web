@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Saiba mais sobre multisig",
   "no_multisig_orders_description": "Todas as solicitações de todos os participantes da carteira multisig são exibidas.",
   "no_multisig_orders_heading": "As solicitações da sua carteira multisig serão exibidas aqui",
-  "not_enough_balance_reminder": "Lembrete: Para renovar automaticamente sua assinatura com sucesso em { date }, a carteira utilizada para comprar o Tonkeeper Pro deve ter uma quantidade suficiente de TON.",
+  "not_enough_balance_reminder": "Lembrete: Para renovar automaticamente sua assinatura com sucesso em {date}, a carteira utilizada para comprar o Tonkeeper Pro deve ter uma quantidade suficiente de TON.",
   "ok": "Ok",
   "Old_password": "Senha atual",
   "on": "Ligado",

@@ -379,7 +379,7 @@
   "no_multisig_learn_more": "Scopri di più su multisig",
   "no_multisig_orders_description": "Tutte le richieste di tutti i partecipanti al wallet multisig sono visualizzate.",
   "no_multisig_orders_heading": "Le richieste del tuo portafoglio multisig verranno mostrate qui",
-  "not_enough_balance_reminder": "Promemoria: Per rinnovare automaticamente con successo il tuo abbonamento il { date }, il wallet utilizzato per acquistare Tonkeeper Pro deve contenere una quantità sufficiente di TON.",
+  "not_enough_balance_reminder": "Promemoria: Per rinnovare automaticamente con successo il tuo abbonamento il {date}, il wallet utilizzato per acquistare Tonkeeper Pro deve contenere una quantità sufficiente di TON.",
   "ok": "OK",
   "Old_password": "Password attuale",
   "on": "Acceso",
