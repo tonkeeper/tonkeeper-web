@@ -15,7 +15,7 @@ interface IProps {
 export const ProLegalNote: FC<IProps> = ({ onManage, selectedSource }) => {
     const { t } = useTranslation();
 
-    const isCrypto = selectedSource === SubscriptionSource.CRYPTO;
+    const isCrypto = selectedSource === SubscriptionSource.EXTENSION;
     const { termsLink, privacyLink } = useLegalLinks();
 
     return (
