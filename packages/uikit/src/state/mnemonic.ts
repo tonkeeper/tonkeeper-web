@@ -1,6 +1,6 @@
 import { TonKeychainRoot } from '@ton-keychain/core';
 import { Cell } from '@ton/core';
-import { sha256_sync, sign } from '@ton/crypto';
+import { keyPairFromSeed, sha256_sync, sign } from '@ton/crypto';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
 import {
     AccountId,
@@ -16,7 +16,11 @@ import {
     Signer,
     TronSigner
 } from '@tonkeeper/core/dist/entries/signer';
-import { TonWalletStandard, WalletId } from '@tonkeeper/core/dist/entries/wallet';
+import {
+    MetaEncryptionSerializedMap,
+    TonWalletStandard,
+    WalletId
+} from '@tonkeeper/core/dist/entries/wallet';
 import { accountsStorage } from '@tonkeeper/core/dist/service/accountsStorage';
 import { KeystoneMessageType } from '@tonkeeper/core/dist/service/keystone/types';
 import {
@@ -26,6 +30,7 @@ import {
 } from '@tonkeeper/core/dist/service/ledger/connector';
 import {
     decryptWalletSecret,
+    mnemonicToEd25519Seed,
     mnemonicToKeypair,
     walletSecretFromString
 } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -46,6 +51,8 @@ import type { Transaction } from 'tronweb/src/types/Transaction';
 import { TronApi } from '@tonkeeper/core/dist/tronApi';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { signWithSecret } from '@tonkeeper/core/dist/service/sign';
+import { createEncryptionCertificate } from '@tonkeeper/core/dist/service/meta';
+import { serializeMetaKey } from '@tonkeeper/core/dist/utils/metadata';
 
 export const signDataOver = ({
     sdk,
@@ -797,4 +804,28 @@ export const useGetActiveAccountSecret = () => {
     return useCallback(async () => {
         return getAccountSecret(sdk, accountId);
     }, [sdk, accountId]);
+};
+
+export const createAndStoreMetaEncryptionKeys = async (
+    sdk: IAppSdk,
+    seedPrase: string[],
+    rawAddress: string
+) => {
+    const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase);
+
+    const keyPair = keyPairFromSeed(walletMainEd22519Seed);
+
+    const walletMainPrivateKey = keyPairFromSeed(walletMainEd22519Seed);
+
+    const certificate = createEncryptionCertificate(keyPair, walletMainPrivateKey);
+
+    const metaEncryptionMap =
+        (await sdk.storage.get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)) ?? {};
+
+    metaEncryptionMap[rawAddress] = serializeMetaKey({
+        keyPair,
+        certificate
+    });
+
+    await sdk.storage.set(AppKey.META_ENCRYPTION_MAP, metaEncryptionMap);
 };

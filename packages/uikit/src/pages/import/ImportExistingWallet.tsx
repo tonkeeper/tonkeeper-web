@@ -421,25 +421,23 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     useSetNotificationOnCloseInterceptor(onCloseInterceptor);
 
     useEffect(() => {
-        if (
-            createdAccount &&
-            mnemonic &&
-            (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') &&
-            selectNetworksPassed
-        ) {
+        if (createdAccount && mnemonic && selectNetworksPassed) {
             void mutateMetaEncryptionKey({
                 wallet: createdAccount.activeTonWallet,
                 mnemonic
             });
-            void tryAutoAuth({
-                wallet: createdAccount.activeTonWallet,
-                signer: maxOneCall(
-                    tonProofSignerByTonMnemonic(
-                        mnemonic,
-                        selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+
+            if (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') {
+                void tryAutoAuth({
+                    wallet: createdAccount.activeTonWallet,
+                    signer: maxOneCall(
+                        tonProofSignerByTonMnemonic(
+                            mnemonic,
+                            selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
+                        )
                     )
-                )
-            });
+                });
+            }
         }
     }, [createdAccount, mnemonic, selectedMnemonicType, editNamePagePassed, selectNetworksPassed]);
 

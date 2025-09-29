@@ -70,10 +70,14 @@ import { useAppContext } from '../hooks/appContext';
 import { useAppSdk } from '../hooks/appSdk';
 import { useAccountsStorage } from '../hooks/useStorage';
 import { anyOfKeysParts, QueryKey } from '../libs/queryKey';
-import { getAccountSecret, getPasswordByNotification, useGetActiveAccountSecret } from './mnemonic';
+import {
+    createAndStoreMetaEncryptionKeys,
+    getAccountSecret,
+    getPasswordByNotification,
+    useGetActiveAccountSecret
+} from './mnemonic';
 import {
     encryptWalletSecret,
-    mnemonicToEd25519Seed,
     seeIfMnemonicValid,
     walletSecretToString
 } from '@tonkeeper/core/dist/service/mnemonicService';
@@ -95,10 +99,8 @@ import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { createEncryptionCertificate } from '@tonkeeper/core/dist/service/meta';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
-import { metaEncryptionMapSerializer, serializeMetaKey } from '@tonkeeper/core/dist/utils/metadata';
-import { keyPairFromSeed } from '@ton/crypto';
+import { metaEncryptionMapSerializer } from '@tonkeeper/core/dist/utils/metadata';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -1392,13 +1394,13 @@ export const useMutateMetaKeyAndCertificates = () => {
     >(async ({ wallet, mnemonic }) => {
         let seedPrase = mnemonic;
 
-        if (!seedPrase) {
-            const accountWallet = accountsWallets.find(
-                accWallet => accWallet.wallet.id === wallet.id
-            );
-            const accountId = accountWallet?.account?.id;
+        const accountWallet = accountsWallets.find(accWallet => accWallet.wallet.id === wallet.id);
+        const accountId = accountWallet?.account?.id;
+        const accountType = accountWallet?.account?.type;
 
-            if (!accountId) throw new Error('Account id is required!');
+        if (!accountId) throw new Error('Account id is required!');
+
+        if (!seedPrase) {
             const secret = await getAccountSecret(sdk, accountId);
 
             if (secret.type !== 'mnemonic') {
@@ -1408,23 +1410,24 @@ export const useMutateMetaKeyAndCertificates = () => {
             seedPrase = secret.mnemonic;
         }
 
-        const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase);
+        if (accountType === 'mam') {
+            const limitedDerivations = accountWallet.account.derivations.slice(0, 10);
 
-        const keyPair = keyPairFromSeed(walletMainEd22519Seed);
+            for (const derivation of limitedDerivations) {
+                const root = await TonKeychainRoot.fromMnemonic(seedPrase, {
+                    allowLegacyMnemonic: true
+                });
+                const tonAccount = await root.getTonAccount(derivation.index);
 
-        const walletMainPrivateKey = keyPairFromSeed(walletMainEd22519Seed);
-
-        const certificate = createEncryptionCertificate(keyPair, walletMainPrivateKey);
-
-        const metaEncryptionMap =
-            (await sdk.storage.get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)) ?? {};
-
-        metaEncryptionMap[wallet.rawAddress] = serializeMetaKey({
-            keyPair,
-            certificate
-        });
-
-        await sdk.storage.set(AppKey.META_ENCRYPTION_MAP, metaEncryptionMap);
+                await createAndStoreMetaEncryptionKeys(
+                    sdk,
+                    tonAccount.mnemonics,
+                    derivation.activeTonWalletId
+                );
+            }
+        } else {
+            await createAndStoreMetaEncryptionKeys(sdk, seedPrase, wallet.rawAddress);
+        }
 
         await client.invalidateQueries({ queryKey: [QueryKey.metaEncryptionData] });
     });
