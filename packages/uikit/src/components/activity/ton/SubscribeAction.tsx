@@ -22,8 +22,9 @@ import {
 } from '../NotificationCommon';
 import { ActionData } from './ActivityNotification';
 import { useActiveTonNetwork } from '../../../state/wallet';
-import { useFormatCoinValue } from '../../../hooks/balance';
 import { ExtensionActionTitles } from '../../desktop/history/ton/ExtensionDesktopActions';
+import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 const getActionDetails = (action: Action) => {
     if (action.type === ActionTypeEnum.UnSubscribe) {
@@ -126,7 +127,6 @@ export const UnSubscribeAction: FC<{ action: Action; date: string }> = ({ action
 export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, date }) => {
     const { t } = useTranslation();
     const { subscribe } = action;
-    const format = useFormatCoinValue();
     const network = useActiveTonNetwork();
 
     if (!subscribe) {
@@ -141,7 +141,14 @@ export const SubscribeAction: FC<{ action: Action; date: string }> = ({ action, 
             <ActivityIcon status={action.status}>{icon}</ActivityIcon>
             <ColumnLayout
                 title={t(title)}
-                entry={amount ? `- ${format(amount, 9)}` : ''}
+                entry={
+                    amount
+                        ? `- ${new AssetAmount({
+                              asset: TON_ASSET,
+                              weiAmount: amount
+                          }).toStringAssetAbsoluteRelativeAmount()}`
+                        : ''
+                }
                 address={
                     subscribe.beneficiary.name ??
                     formatAddress(subscribe.beneficiary.address, network)
