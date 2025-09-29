@@ -10,6 +10,9 @@ import { atom } from '@tonkeeper/core/dist/entries/atom';
 const tcRequests$ = atom<string>(undefined);
 ipcRenderer.on('tc', (_event, value) => tcRequests$.next(value));
 
+const autoUpdateAvailable$ = atom<string>(undefined);
+ipcRenderer.on('app-update::ready', (_event, value) => autoUpdateAvailable$.next(value.version));
+
 contextBridge.exposeInMainWorld('backgroundApi', {
     platform: () => process.platform,
     arch: () => process.arch,
@@ -27,5 +30,11 @@ contextBridge.exposeInMainWorld('backgroundApi', {
         ipcRenderer.on('tonConnectRequest', (_event, value) => callback(value)),
     onTonConnectDisconnect: (callback: (value: AccountConnection) => void) =>
         ipcRenderer.on('disconnect', (_event, value) => callback(value)),
-    onRefresh: (callback: () => void) => ipcRenderer.on('refresh', _event => callback())
+    onRefresh: (callback: () => void) => ipcRenderer.on('refresh', _event => callback()),
+    onAutoUpdateAvailable: (callback: (version: string) => void) => {
+        autoUpdateAvailable$.subscribe(callback);
+        if (autoUpdateAvailable$.value !== undefined) {
+            callback(autoUpdateAvailable$.value);
+        }
+    }
 });

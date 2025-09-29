@@ -9,6 +9,7 @@ interface BackgroundApi {
     onTonConnectRequest: (callback: (value: TonConnectAppRequestPayload) => void) => void;
     onTonConnectDisconnect: (callback: (value: AccountConnection) => void) => void;
     onRefresh: (callback: () => void) => void;
+    onAutoUpdateAvailable: (callback: (version: string) => void) => void;
 }
 
 declare global {
