@@ -95,13 +95,10 @@ import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import {
-    createEncryptionCertificate,
-    createEncryptionKey
-} from '@tonkeeper/core/dist/service/meta';
-import nacl from 'tweetnacl';
+import { createEncryptionCertificate } from '@tonkeeper/core/dist/service/meta';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { metaEncryptionMapSerializer, serializeMetaKey } from '@tonkeeper/core/dist/utils/metadata';
+import { keyPairFromSeed } from '@ton/crypto';
 
 export { useAccountsStateQuery, useAccountsState };
 
@@ -1413,9 +1410,9 @@ export const useMutateMetaKeyAndCertificates = () => {
 
         const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase);
 
-        const keyPair = await createEncryptionKey(walletMainEd22519Seed);
+        const keyPair = keyPairFromSeed(walletMainEd22519Seed);
 
-        const walletMainPrivateKey = nacl.sign.keyPair.fromSeed(walletMainEd22519Seed);
+        const walletMainPrivateKey = keyPairFromSeed(walletMainEd22519Seed);
 
         const certificate = createEncryptionCertificate(keyPair, walletMainPrivateKey);
 

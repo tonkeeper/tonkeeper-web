@@ -7,8 +7,8 @@ import {
 export function serializeMetaKey(data: IMetaEncryptionData): ISerializedMetaEncryptionData {
     return {
         keyPair: {
-            publicKey: Buffer.from(data.keyPair.publicKey).toString('base64'),
-            secretKey: Buffer.from(data.keyPair.secretKey).toString('base64')
+            publicKey: data.keyPair.publicKey.toString('base64'),
+            secretKey: data.keyPair.secretKey.toString('base64')
         },
         certificate: data.certificate.toString('base64')
     };
@@ -17,8 +17,8 @@ export function serializeMetaKey(data: IMetaEncryptionData): ISerializedMetaEncr
 export function deserializeMetaKey(serialized: ISerializedMetaEncryptionData): IMetaEncryptionData {
     return {
         keyPair: {
-            publicKey: new Uint8Array(Buffer.from(serialized.keyPair.publicKey, 'base64')),
-            secretKey: new Uint8Array(Buffer.from(serialized.keyPair.secretKey, 'base64'))
+            publicKey: Buffer.from(serialized.keyPair.publicKey, 'base64'),
+            secretKey: Buffer.from(serialized.keyPair.secretKey, 'base64')
         },
         certificate: Buffer.from(serialized.certificate, 'base64')
     };

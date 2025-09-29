@@ -1,22 +1,14 @@
-import {
-    Address,
-    Cell,
-    beginCell,
-    contractAddress,
-    StateInit as TonStateInit,
-    toNano,
-    SendMode,
-    internal
-} from '@ton/core';
+import { Address, Cell, beginCell, StateInit as TonStateInit, Builder } from '@ton/core';
 import nacl from 'tweetnacl';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
 import { WalletV4ExtendedAction } from '@ton/ton/dist/wallets/v4/WalletContractV4Actions';
 
-import { getTonkeeperQueryId } from '../utils';
-import { encryptMeta } from '../../meta';
-import { assertUnreachable } from '../../../utils/types';
-import { SubscriptionExtensionMetadata } from '../../../pro';
-import { TonWalletStandard, WalletVersion } from '../../../entries/wallet';
+import { PayloadEncoderV4 } from './PayloadEncoderV4';
+import { PayloadEncoderV5 } from './PayloadEncoderV5';
+import { SubscriptionExtensionMetadata } from '../../../../pro';
+import { TonWalletStandard, WalletVersion } from '../../../../entries/wallet';
+import { getTonkeeperQueryId } from '../../utils';
+import { encryptMeta } from '../../../meta';
 
 /**
  * https://github.com/tonkeeper/w5-subscriptions/commit/d33b44a9957bd3cb864dfad233e2754156f94303
@@ -26,18 +18,12 @@ const SUBSCRIPTION_V2_CODE_BOC = Buffer.from(
     'hex'
 ).toString('base64');
 
-const OP = {
+export const OP = {
     DEPLOY: 0xf71783cb,
-    CRON_TRIGGER: 0x2114702d,
     DESTRUCT: 0x64737472
 } as const;
 
-const SUBSCRIPTION_PROTOCOL_TAG = { V4: 4, V5: 51 } as const;
-
-enum EncodedResultKinds {
-    V4 = 'v4',
-    V5 = 'v5'
-}
+export const SUBSCRIPTION_PROTOCOL_TAG = { V4: 4, V5: 51 } as const;
 
 type DeployParams = {
     beneficiary: Address;
@@ -54,7 +40,7 @@ type DeployParams = {
     walletMetaKeyPair: nacl.SignKeyPair;
 };
 
-type EncodedSubscriptionResult = {
+export type EncodedSubscriptionResult = {
     outgoingMsg: OutActionWalletV5[] | WalletV4ExtendedAction;
     extensionAddress: Address;
 };
@@ -76,35 +62,44 @@ interface IEncodeDeployBodyParams {
     walletMetaKeyPair: nacl.SignKeyPair;
 }
 
-function isSupportedVersion(
-    version: WalletVersion
-): version is WalletVersion.V4R2 | WalletVersion.V5R1 {
-    return version === WalletVersion.V4R2 || version === WalletVersion.V5R1;
+export interface IPayloadEncoder {
+    storeTag: (builder: Builder) => void;
+    encodeCreateSubscription(
+        body: Cell,
+        stateInit: TonStateInit,
+        deployValue: bigint
+    ): EncodedSubscriptionResult;
+    encodeDestructAction(extension: Address, destroyValue: bigint): EncodedSubscriptionResult;
 }
 
 export class SubscriptionEncoder {
-    public static readonly MIN_EXTENSION_AMOUNT = toNano('0.1');
+    private currentPayloadEncoder: IPayloadEncoder;
 
     constructor(
         private readonly wallet: TonWalletStandard,
         private readonly defaultCodeBocBase64 = SUBSCRIPTION_V2_CODE_BOC
-    ) {}
-
-    async encodeCreateSubscriptionV2(params: DeployParams): Promise<EncodedSubscriptionResult> {
-        if (params.paymentPerPeriod < SubscriptionEncoder.MIN_EXTENSION_AMOUNT) {
-            throw new Error("Subscription amount can't be less than 0.1 TON!");
+    ) {
+        switch (wallet.version) {
+            case WalletVersion.V4R2:
+                this.currentPayloadEncoder = new PayloadEncoderV4();
+                break;
+            case WalletVersion.V5R1:
+                this.currentPayloadEncoder = new PayloadEncoderV5();
+                break;
+            default:
+                throw new Error('Unsupported wallet version!');
         }
+    }
 
-        const code = Cell.fromBoc(Buffer.from(this.defaultCodeBocBase64, 'base64'))[0];
-
+    async encodeCreateSubscriptionV2(params: DeployParams) {
         const stateData = this.buildStateData({
             beneficiary: params.beneficiary,
             subscriptionId: params.subscriptionId ?? Date.now()
         });
 
-        const stateInit: TonStateInit = { code, data: stateData };
+        const code = Cell.fromBoc(Buffer.from(this.defaultCodeBocBase64, 'base64'))[0];
 
-        const extensionAddress = contractAddress(0, stateInit);
+        const stateInit = { code, data: stateData };
 
         const body = await this.encodeDeployBody({
             firstChargingDate: params.firstChargingDate,
@@ -118,92 +113,19 @@ export class SubscriptionEncoder {
             walletMetaKeyPair: params.walletMetaKeyPair
         });
 
-        const initMsg = internal({
-            to: extensionAddress,
-            bounce: true,
-            value: params.deployValue,
-            init: stateInit,
-            body
-        });
-
-        if (this.isV5()) {
-            const actions: OutActionWalletV5[] = [
-                { type: 'addExtension', address: extensionAddress },
-                {
-                    type: 'sendMsg',
-                    mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-                    outMsg: initMsg
-                }
-            ];
-
-            return { outgoingMsg: actions, extensionAddress };
-        } else {
-            const action: WalletV4ExtendedAction = {
-                type: 'addAndDeployPlugin',
-                workchain: 0,
-                stateInit,
-                body,
-                forwardAmount: params.deployValue
-            };
-
-            return { outgoingMsg: action, extensionAddress };
-        }
+        return this.currentPayloadEncoder.encodeCreateSubscription(
+            body,
+            stateInit,
+            params.deployValue
+        );
     }
 
-    encodeDestructAction(extension: Address, destroyValue: bigint): EncodedSubscriptionResult {
-        if (this.isV5()) {
-            const body = this.buildDestructBody();
-
-            const outMsg = internal({
-                to: extension,
-                bounce: true,
-                value: destroyValue,
-                body
-            });
-
-            const actions: OutActionWalletV5[] = [
-                {
-                    type: 'sendMsg',
-                    mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
-                    outMsg
-                },
-                { type: 'removeExtension', address: extension }
-            ];
-
-            return { outgoingMsg: actions, extensionAddress: extension };
-        } else {
-            const action: WalletV4ExtendedAction = {
-                type: 'removePlugin',
-                address: extension,
-                forwardAmount: destroyValue
-            };
-
-            return { outgoingMsg: action, extensionAddress: extension };
-        }
-    }
-
-    private resolveWalletKind(): EncodedResultKinds {
-        if (!isSupportedVersion(this.wallet.version)) {
-            throw new Error('Unsupported wallet version!');
-        }
-
-        switch (this.wallet.version) {
-            case WalletVersion.V4R2:
-                return EncodedResultKinds.V4;
-            case WalletVersion.V5R1:
-                return EncodedResultKinds.V5;
-            default:
-                return assertUnreachable(this.wallet.version);
-        }
-    }
-
-    private isV5() {
-        return this.resolveWalletKind() === EncodedResultKinds.V5;
+    encodeDestructAction(extension: Address, destroyValue: bigint) {
+        return this.currentPayloadEncoder.encodeDestructAction(extension, destroyValue);
     }
 
     private buildStateData(params: IBuildStateDataParams): Cell {
         const precompiled = beginCell().storeCoins(0).storeRef(beginCell().endCell()).endCell();
-
         const withdrawInfo = beginCell().storeAddress(null).storeRef(Cell.EMPTY).endCell();
 
         return beginCell()
@@ -215,7 +137,7 @@ export class SubscriptionEncoder {
             .storeUint(0, 32)
             .storeCoins(0)
             .storeAddress(Address.parse(this.wallet.rawAddress))
-            .storeUint(this.isV5() ? SUBSCRIPTION_PROTOCOL_TAG.V5 : SUBSCRIPTION_PROTOCOL_TAG.V4, 8)
+            .store(this.currentPayloadEncoder.storeTag)
             .storeAddress(params.beneficiary)
             .storeUint(params.subscriptionId, 32)
             .storeCoins(0)
@@ -229,7 +151,7 @@ export class SubscriptionEncoder {
         const metaCell = await encryptMeta(
             JSON.stringify(params.metadata),
             Address.parse(this.wallet.rawAddress),
-            params.walletMetaKeyPair.secretKey
+            Buffer.from(params.walletMetaKeyPair.secretKey)
         );
 
         return beginCell()
@@ -252,12 +174,5 @@ export class SubscriptionEncoder {
         const boc = Buffer.from(message, 'hex');
 
         return Cell.fromBoc(boc)[0];
-    }
-
-    public buildDestructBody(): Cell {
-        return beginCell()
-            .storeUint(OP.DESTRUCT, 32)
-            .storeUint(getTonkeeperQueryId(), 64)
-            .endCell();
     }
 }

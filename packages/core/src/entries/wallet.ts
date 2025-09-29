@@ -1,11 +1,10 @@
-import nacl from 'tweetnacl';
-
 import { Network } from './network';
 import { Language } from './language';
 import { WalletProxy } from './proxy';
 import { TronWallet } from './tron/tron-wallet';
 import { DeprecatedAuthState } from './password';
 import { Account, AccountMAM, AccountTonMnemonic } from './account';
+import { KeyPair } from '@ton/crypto';
 
 export enum WalletVersion {
     V3R1 = 0,
@@ -226,7 +225,7 @@ export const addWalletMethod = [
 export type AddWalletMethod = (typeof addWalletMethod)[number];
 
 export interface IMetaEncryptionData {
-    keyPair: nacl.SignKeyPair;
+    keyPair: KeyPair;
     certificate: Buffer;
 }
 

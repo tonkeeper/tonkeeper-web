@@ -1,9 +1,10 @@
 import * as aesjs from 'aes-js';
+import { hmac_sha512 } from '@ton/crypto';
 import { Address, beginCell, Builder, Cell } from '@ton/core';
 
-const getRandomPrefix = (dataLength: number, minPadding: number) => {
+const getRandomPrefix = (dataLength: number, minPadding: number): Buffer => {
     const prefixLength = ((minPadding + 15 + dataLength) & -16) - dataLength;
-    const prefix = crypto.getRandomValues(new Uint8Array(prefixLength));
+    const prefix = Buffer.from(crypto.getRandomValues(new Uint8Array(prefixLength)));
     prefix[0] = prefixLength;
 
     if ((prefixLength + dataLength) % 16 !== 0) throw new Error();
@@ -11,23 +12,7 @@ const getRandomPrefix = (dataLength: number, minPadding: number) => {
     return prefix;
 };
 
-const hmac_sha512 = async (key: Uint8Array, data: Uint8Array) => {
-    const hmacAlgo = { name: 'HMAC', hash: 'SHA-512' } as const;
-    const keyBuffer = new ArrayBuffer(key.length);
-    new Uint8Array(keyBuffer).set(key);
-    const dataBuffer = new ArrayBuffer(data.length);
-    new Uint8Array(dataBuffer).set(data);
-
-    const hmacKey = await crypto.subtle.importKey('raw', keyBuffer, hmacAlgo, false, ['sign']);
-    const signature = await crypto.subtle.sign(hmacAlgo, hmacKey, dataBuffer);
-    const result = new Uint8Array(signature);
-
-    if (result.length !== 512 / 8) throw new Error();
-
-    return result;
-};
-
-const combineSecrets = async (a: Uint8Array, b: Uint8Array) => {
+const combineSecrets = async (a: Buffer, b: Buffer): Promise<Buffer> => {
     return hmac_sha512(a, b);
 };
 
@@ -73,45 +58,30 @@ export const makeSnakeCells = (bytes: Uint8Array) => {
 export const encryptMeta = async (
     meta: string | undefined,
     sender: Address,
-    myPrivateKey: Uint8Array
+    myPrivateKey: Buffer
 ) => {
     if (!meta?.length) throw new Error('empty comment');
 
     if (myPrivateKey.length === 64) {
-        myPrivateKey = myPrivateKey.slice(0, 32);
+        myPrivateKey = myPrivateKey.subarray(0, 32);
     }
 
-    const metaBytes = new TextEncoder().encode(meta);
-
-    const salt = new TextEncoder().encode(
-        sender.toString({
-            urlSafe: true,
-            bounceable: true,
-            testOnly: false
-        })
-    );
+    const metaBytes = Buffer.from(meta, 'utf8');
+    const salt = Buffer.from(sender.hash);
 
     const prefix = getRandomPrefix(metaBytes.length, 16);
-
-    const data = new Uint8Array(prefix.length + metaBytes.length);
-    data.set(prefix, 0);
-    data.set(metaBytes, prefix.length);
+    const data = Buffer.concat([prefix, metaBytes]);
 
     const dataHash = await combineSecrets(salt, data);
-    const msgKey = dataHash.slice(0, 16);
+    const msgKey = dataHash.subarray(0, 16);
 
     const cbcStateSecret = await combineSecrets(myPrivateKey, msgKey);
     const aesCbc = await getAesCbcState(cbcStateSecret);
 
-    const encrypted = aesCbc.encrypt(data);
+    const encrypted = Buffer.from(aesCbc.encrypt(data));
 
-    const encryptedMeta = new Uint8Array(16 + encrypted.length);
-    encryptedMeta.set(msgKey, 0);
-    encryptedMeta.set(encrypted, 16);
-
-    const payload = new Uint8Array(encryptedMeta.length + 1);
-    payload[0] = 0x01;
-    payload.set(encryptedMeta, 1);
+    const encryptedMeta = Buffer.concat([msgKey, encrypted]);
+    const payload = Buffer.concat([Buffer.from([0x01]), encryptedMeta]);
 
     return makeSnakeCells(payload);
 };
@@ -143,47 +113,39 @@ export const parseSnakeCells = (cell: Cell): Uint8Array => {
 export const decryptMeta = async (
     cell: Cell,
     sender: Address,
-    privKey: Uint8Array
+    privKey: Buffer
 ): Promise<string> => {
     if (privKey.length === 64) {
-        privKey = privKey.slice(0, 32);
+        privKey = privKey.subarray(0, 32);
     }
 
-    const payload = parseSnakeCells(cell);
+    const payload = Buffer.from(parseSnakeCells(cell));
 
     if (payload.length === 0 || payload[0] !== 0x01) {
         throw new Error('Invalid encrypted meta format');
     }
 
-    const encryptedMeta = payload.slice(1);
+    const encryptedMeta = payload.subarray(1);
 
     if (encryptedMeta.length < 16 || encryptedMeta.length % 16 !== 0) {
         throw new Error('Invalid encrypted meta length');
     }
 
-    const msgKey = encryptedMeta.slice(0, 16);
-    const encryptedData = encryptedMeta.slice(16);
+    const msgKey = encryptedMeta.subarray(0, 16);
+    const encryptedData = encryptedMeta.subarray(16);
 
-    const salt = new TextEncoder().encode(
-        sender.toString({
-            urlSafe: true,
-            bounceable: true,
-            testOnly: false
-        })
-    );
+    const salt = Buffer.from(sender.hash);
 
     const cbcStateSecret = await combineSecrets(privKey, msgKey);
     const aesCbc = await getAesCbcState(cbcStateSecret);
 
-    const decryptedData = aesCbc.decrypt(encryptedData);
+    const decryptedData = Buffer.from(aesCbc.decrypt(encryptedData));
 
     const dataHash = await combineSecrets(salt, decryptedData);
-    const expectedMsgKey = dataHash.slice(0, 16);
+    const expectedMsgKey = dataHash.subarray(0, 16);
 
-    for (let i = 0; i < 16; i++) {
-        if (msgKey[i] !== expectedMsgKey[i]) {
-            throw new Error('Wrong message key');
-        }
+    if (!msgKey.equals(expectedMsgKey)) {
+        throw new Error('Wrong message key');
     }
 
     const prefixLength = decryptedData[0];
@@ -191,7 +153,7 @@ export const decryptMeta = async (
         throw new Error('Invalid prefix length');
     }
 
-    const metaBytes = decryptedData.slice(prefixLength);
+    const metaBytes = decryptedData.subarray(prefixLength);
 
-    return new TextDecoder().decode(metaBytes);
+    return metaBytes.toString('utf8');
 };
