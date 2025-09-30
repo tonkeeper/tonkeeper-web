@@ -127,12 +127,17 @@ export const useProState = () => {
         {
             suspense: true,
             keepPreviousData: true,
-            refetchInterval: s =>
-                s?.status === CryptoSubscriptionStatuses.PENDING ||
-                s?.status === ExtensionSubscriptionStatuses.PENDING ||
-                s?.status === ExtensionSubscriptionStatuses.CANCELLING
-                    ? 3000
-                    : false
+            refetchInterval: s => {
+                if (
+                    s?.status === CryptoSubscriptionStatuses.PENDING ||
+                    s?.status === ExtensionSubscriptionStatuses.PENDING ||
+                    s?.status === ExtensionSubscriptionStatuses.CANCELLING
+                ) {
+                    return 3000;
+                } else {
+                    return 2 * 60 * 1000;
+                }
+            }
         }
     );
 };
