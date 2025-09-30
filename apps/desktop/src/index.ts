@@ -1,7 +1,6 @@
 import { delay, hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 import { BrowserWindow, app, powerMonitor } from 'electron';
 import log from 'electron-log/main';
-import { updateElectronApp } from 'update-electron-app';
 import { MainWindow } from './electron/mainWindow';
 import {
     setDefaultProtocolClient,
@@ -88,8 +87,3 @@ app.on('activate', () => {
         MainWindow.openMainWindow();
     }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
-updateElectronApp({ logger: log });

@@ -1,5 +1,5 @@
 import { delay } from '@tonkeeper/core/dist/utils/common';
-import { BrowserWindow, Menu, ipcMain, autoUpdater } from 'electron';
+import { BrowserWindow, Menu, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
 import path from 'path';
 import { Cookie } from 'tough-cookie';
@@ -54,7 +54,7 @@ export abstract class MainWindow {
         Menu.setApplicationMenu(menu);
 
         const updater = new AutoUpdateManager(this.mainWindow, {
-            githubRepo: 'tonkeeper/tonkeeper-web'
+            githubRepo: 'tonkeeper/tonkeeper-web-update-test'
         });
 
         // and load the index.html of the app.
