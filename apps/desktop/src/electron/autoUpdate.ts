@@ -1,28 +1,26 @@
-import { app, autoUpdater, BrowserWindow } from 'electron';
+import { autoUpdater, BrowserWindow } from 'electron';
+import packageJson from '../../package.json';
 
 export class AutoUpdateManager {
-    private readonly githubRepo: string;
-
     private readonly channel = 'stable';
 
     private newAvailableVersion: string | undefined = undefined;
 
     private win: BrowserWindow;
 
-    constructor(win: BrowserWindow, opts: { githubRepo: string }) {
-        if (!opts.githubRepo || !opts.githubRepo.includes('/')) {
-            throw new Error('githubRepo must be "owner/repo" format');
-        }
+    // private feedBaseUrl = 'https://update.electronjs.org';
+    private feedBaseUrl = 'https://tonkeeper-web-updater-test.nkuznetsov.workers.dev';
+
+    constructor(win: BrowserWindow) {
         this.win = win;
-        this.githubRepo = opts.githubRepo;
 
         this.init();
     }
 
     private init() {
-        const feedURL = `https://update.electronjs.org/${
-            this.githubRepo
-        }/darwin/${app.getVersion()}/${this.channel}`;
+        const feedURL = `${this.feedBaseUrl}/${this.getRepoUrl()}/${process.platform}/${
+            packageJson.version
+        }/${this.channel}`;
         autoUpdater.setFeedURL({ url: feedURL });
         this.listenDownload();
 
@@ -30,6 +28,14 @@ export class AutoUpdateManager {
         setInterval(() => {
             autoUpdater.checkForUpdates();
         }, 15 * 60_000);
+    }
+
+    private getRepoUrl(): string {
+        return packageJson.repository.url
+            .replace(/^git\+/, '')
+            .replace(/^https:\/\/github\.com\//, '')
+            .replace(/\.git$/, '')
+            .trim();
     }
 
     public quitAndInstall() {

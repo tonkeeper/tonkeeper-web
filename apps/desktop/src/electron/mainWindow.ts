@@ -53,9 +53,7 @@ export abstract class MainWindow {
         const menu = Menu.buildFromTemplate(createAppMenu());
         Menu.setApplicationMenu(menu);
 
-        const updater = new AutoUpdateManager(this.mainWindow, {
-            githubRepo: 'tonkeeper/tonkeeper-web-update-test'
-        });
+        const updater = new AutoUpdateManager(this.mainWindow);
 
         // and load the index.html of the app.
         this.mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
