@@ -16,7 +16,7 @@ import {
     IosSubscriptionStatuses,
     isCryptoSubscription,
     isExpiredSubscription,
-    isExtensionPendingCancelSubscription,
+    isExtensionCancellingSubscription,
     isExtensionSubscription,
     isPendingSubscription,
     isProductId,
@@ -116,7 +116,7 @@ export const normalizeSubscription = (
             source,
             status: ExtensionSubscriptionStatuses.EXPIRED,
             valid: false,
-            nextChargeDate,
+            nextChargeDate: extensionNextChargeDate,
             auth: {
                 type: AuthTypes.WALLET,
                 wallet: authorizedWallet
@@ -309,9 +309,11 @@ export const getStatusText = (subscription: ProSubscription, translator: Transla
     if (!subscription) return '-';
 
     if (isPendingSubscription(subscription)) {
-        return `${translator(
-            isExtensionPendingCancelSubscription(subscription) ? 'cancelling' : 'processing'
-        )}...`;
+        return `${translator('processing')}...`;
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
+        return `${translator('cancelling')}...`;
     }
 
     return `${translator(subscription.status)}`;
@@ -321,6 +323,10 @@ export const getStatusColor = (subscription: ProSubscription) => {
     if (!subscription) return undefined;
 
     if (isPendingSubscription(subscription)) {
+        return 'textSecondary';
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
         return 'textSecondary';
     }
 
@@ -367,6 +373,10 @@ export const getCryptoSubscriptionPrice = (subscription: ProSubscription) => {
         return '-';
 
     if (isPendingSubscription(subscription)) {
+        return subscription.displayPrice;
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
         return subscription.displayPrice;
     }
 

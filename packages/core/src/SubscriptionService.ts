@@ -1,9 +1,10 @@
 import {
     ICryptoPendingSubscription,
     IDisplayPlan,
+    IExtensionCancellingSubscription,
     IExtensionPendingSubscription,
     isExtensionAutoRenewableSubscription,
-    isExtensionPendingCancelSubscription,
+    isExtensionCancellingSubscription,
     isPendingSubscription,
     ISubscriptionFormData,
     ISubscriptionService,
@@ -50,6 +51,9 @@ export class SubscriptionService implements ISubscriptionService {
             | IExtensionPendingSubscription
             | null = await this._storage.get(AppKey.PRO_PENDING_SUBSCRIPTION);
 
+        const cancellingSubscription: IExtensionCancellingSubscription | null =
+            await this._storage.get(AppKey.PRO_CANCELLING_SUBSCRIPTION);
+
         const mainToken = await this._authTokenService.getToken();
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
 
@@ -64,9 +68,9 @@ export class SubscriptionService implements ISubscriptionService {
 
         if (
             isExtensionAutoRenewableSubscription(currentSubscription) &&
-            isExtensionPendingCancelSubscription(pendingSubscription)
+            isExtensionCancellingSubscription(cancellingSubscription)
         ) {
-            return pendingSubscription;
+            return cancellingSubscription;
         }
 
         if (tempToken && isValidSubscription(targetSubscription)) {
@@ -76,10 +80,7 @@ export class SubscriptionService implements ISubscriptionService {
             return targetSubscription;
         }
 
-        if (
-            isPendingSubscription(pendingSubscription) &&
-            !isExtensionPendingCancelSubscription(pendingSubscription)
-        ) {
+        if (isPendingSubscription(pendingSubscription)) {
             return {
                 ...pendingSubscription,
                 valid: Boolean(currentSubscription?.valid)
@@ -97,6 +98,7 @@ export class SubscriptionService implements ISubscriptionService {
 
     private async _clearPendingSubscription(storage: IStorage) {
         await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
+        await storage.delete(AppKey.PRO_CANCELLING_SUBSCRIPTION);
     }
 
     async getAllProductsInfo(source: SubscriptionSource, lang?: Language): Promise<IDisplayPlan[]> {

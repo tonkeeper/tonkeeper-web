@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-    isExtensionPendingCancelSubscription,
+    isExtensionCancellingSubscription,
     isPaidActiveSubscription,
     isPendingSubscription,
     isTelegramActiveSubscription,
@@ -221,11 +221,26 @@ export const SubscriptionInfoBlock: FC<{ className?: string }> = ({ className })
             >
                 <ProButtonPanel onClick={handleNavigateToSettingsPro}>
                     <SpinnerIcon />
-                    {t(
-                        isExtensionPendingCancelSubscription(subscription)
-                            ? 'cancelling'
-                            : 'processing'
-                    )}
+                    {t('processing')}
+                </ProButtonPanel>
+            </DropDown>
+        );
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
+        button = (
+            <DropDown
+                containerClassName="pro-subscription-dd-container"
+                payload={() => (
+                    <DDContent width={width}>
+                        {t('create_multisig_await_deployment_description')}
+                    </DDContent>
+                )}
+                trigger="hover"
+            >
+                <ProButtonPanel onClick={handleNavigateToSettingsPro}>
+                    <SpinnerIcon />
+                    {t('cancelling')}
                 </ProButtonPanel>
             </DropDown>
         );

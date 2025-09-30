@@ -129,7 +129,8 @@ export const useProState = () => {
             keepPreviousData: true,
             refetchInterval: s =>
                 s?.status === CryptoSubscriptionStatuses.PENDING ||
-                s?.status === ExtensionSubscriptionStatuses.PENDING
+                s?.status === ExtensionSubscriptionStatuses.PENDING ||
+                s?.status === ExtensionSubscriptionStatuses.CANCELLING
                     ? 3000
                     : false
         }

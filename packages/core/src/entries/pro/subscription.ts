@@ -30,7 +30,8 @@ export type IosSubscription = IIosActiveSubscription | IIosExpiredSubscription;
 export type ExtensionSubscription =
     | IExtensionActiveSubscription
     | IExtensionExpiredSubscription
-    | IExtensionPendingSubscription;
+    | IExtensionPendingSubscription
+    | IExtensionCancellingSubscription;
 
 export type CryptoSubscription =
     | ICryptoActiveSubscription
@@ -173,7 +174,13 @@ export interface IExtensionPendingSubscription extends IBaseExtensionSubscriptio
     auth: ITokenizedWalletAuth;
     displayName?: string;
     displayPrice?: string;
-    isCanceling?: boolean;
+}
+
+export interface IExtensionCancellingSubscription extends IBaseExtensionSubscription {
+    status: ExtensionSubscriptionStatuses.CANCELLING;
+    auth: IWalletAuth;
+    displayName?: string;
+    displayPrice?: string;
 }
 
 export interface IExtensionSubscriptionStrategy extends IBaseSubscriptionStrategy {

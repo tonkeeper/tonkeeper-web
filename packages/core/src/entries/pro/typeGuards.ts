@@ -23,8 +23,8 @@ import {
     IExtensionSubscriptionStrategy,
     ExtensionSubscription,
     IExtensionActiveSubscription,
-    IExtensionPendingSubscription,
-    IExtensionExpiredSubscription
+    IExtensionExpiredSubscription,
+    IExtensionCancellingSubscription
 } from './subscription';
 import { TonWalletStandard } from '../wallet';
 import { SubscriptionSource } from '../../pro';
@@ -187,14 +187,13 @@ export function isExtensionAutoRenewableSubscription(
     );
 }
 
-export function isExtensionPendingCancelSubscription(
+export function isExtensionCancellingSubscription(
     subscription: unknown
-): subscription is IExtensionPendingSubscription & { isCanceling: true } {
+): subscription is IExtensionCancellingSubscription {
     return (
         isProSubscription(subscription) &&
         subscription?.source === SubscriptionSource.EXTENSION &&
-        subscription.status === ExtensionSubscriptionStatuses.PENDING &&
-        subscription.isCanceling === true
+        subscription.status === ExtensionSubscriptionStatuses.CANCELLING
     );
 }
 
@@ -221,7 +220,7 @@ export function hasIosPrice(
 export function hasExpiresDate(value: unknown): value is ProSubscription & {
     expiresDate: Date;
 } {
-    return isProSubscription(value) && 'expiresDate' in value;
+    return isProSubscription(value) && 'expiresDate' in value && !!value.expiresDate;
 }
 
 export function hasWalletAuth(value?: unknown): value is { auth: IWalletAuth } {

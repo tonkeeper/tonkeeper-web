@@ -45,6 +45,7 @@ export enum AppKey {
     PRO_USED_TRIAL = 'pro_used_trial',
     PRO_AUTH_TOKEN = 'pro_auth_token',
     PRO_PENDING_SUBSCRIPTION = 'pro_pending_subscription',
+    PRO_CANCELLING_SUBSCRIPTION = 'pro_cancelling_subscription',
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
     PRO_BALANCE_NOTIFICATION_STATE = 'pro_balance_notification_state',
 

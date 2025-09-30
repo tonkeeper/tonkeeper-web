@@ -21,8 +21,6 @@ export const useSubscriptionEndingVerification = () => {
     const { onOpen } = useProEndingNotification();
 
     useEffect(() => {
-        if (sdk.targetEnv !== 'mobile' && sdk.targetEnv !== 'tablet') return;
-
         if (!isProSubscription(subscription)) return;
         if (!subscription.nextChargeDate) return;
         if (isIosAutoRenewableSubscription(subscription)) return;

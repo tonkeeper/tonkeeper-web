@@ -4,6 +4,7 @@ import {
     ExtensionSubscriptionStatuses,
     IDisplayPlan,
     IExtensionActiveSubscription,
+    IExtensionCancellingSubscription,
     IExtensionPendingSubscription,
     IExtensionStrategyConfig,
     IExtensionSubscriptionStrategy as IExtensionStrategy,
@@ -95,20 +96,15 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
                 onConfirm: async (success?: boolean) => {
                     if (!success) return resolve(PurchaseStatuses.CANCELED);
 
-                    await onDataStore<IExtensionPendingSubscription>(
-                        AppKey.PRO_PENDING_SUBSCRIPTION,
+                    await onDataStore<IExtensionCancellingSubscription>(
+                        AppKey.PRO_CANCELLING_SUBSCRIPTION,
                         {
                             ...subscription,
-                            status: ExtensionSubscriptionStatuses.PENDING,
-                            auth: {
-                                ...subscription.auth,
-                                tempToken: ExtensionSubscriptionStatuses.PENDING
-                            },
+                            status: ExtensionSubscriptionStatuses.CANCELLING,
                             displayPrice: new AssetAmount({
                                 asset: TON_ASSET,
                                 weiAmount: new BigNumber(subscription.amount)
-                            }).toStringAssetRelativeAmount(2),
-                            isCanceling: true
+                            }).toStringAssetRelativeAmount(2)
                         }
                     );
 
