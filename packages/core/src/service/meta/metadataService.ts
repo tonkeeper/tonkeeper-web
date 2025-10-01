@@ -67,7 +67,14 @@ export const encryptMeta = async (
     }
 
     const metaBytes = Buffer.from(meta, 'utf8');
-    const salt = Buffer.from(sender.hash);
+    const salt = Buffer.from(
+        sender.toString({
+            urlSafe: true,
+            bounceable: true,
+            testOnly: false
+        }),
+        'utf-8'
+    );
 
     const prefix = getRandomPrefix(metaBytes.length, 16);
     const data = Buffer.concat([prefix, metaBytes]);
@@ -134,7 +141,14 @@ export const decryptMeta = async (
     const msgKey = encryptedMeta.subarray(0, 16);
     const encryptedData = encryptedMeta.subarray(16);
 
-    const salt = Buffer.from(sender.hash);
+    const salt = Buffer.from(
+        sender.toString({
+            urlSafe: true,
+            bounceable: true,
+            testOnly: false
+        }),
+        'utf-8'
+    );
 
     const cbcStateSecret = await combineSecrets(privKey, msgKey);
     const aesCbc = await getAesCbcState(cbcStateSecret);
