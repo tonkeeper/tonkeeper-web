@@ -1,6 +1,7 @@
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
-import { useActiveAccountQuery, useActiveApi } from '../state/wallet';
-import { beginCell, external, storeMessage, storeStateInit } from '@ton/core';
+import { decryptMeta } from '@tonkeeper/core/dist/service/meta/metadataService';
+import { useActiveAccountQuery, useActiveApi, useMetaEncryptionData } from '../state/wallet';
+import { Address, beginCell, Cell, external, storeMessage, storeStateInit } from '@ton/core';
 import { useGetAccountSigner } from '../state/mnemonic';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { useAppContext } from './appContext';
@@ -9,6 +10,7 @@ import { useAppSdk } from './appSdk';
 
 export const useDebuggingTools = () => {
     const api = useActiveApi();
+    const { data: metaEncryptionMap } = useMetaEncryptionData();
     const getSigner = useGetAccountSigner();
     const { data: activeAccount } = useActiveAccountQuery();
     const sdk = useAppSdk();
@@ -82,6 +84,35 @@ export const useDebuggingTools = () => {
 
                     await sdk.storage.delete('TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY');
                     console.log('TRON_MAM_ACCOUNTS_HAS_BEEN_MIGRATED_KEY reset');
+                },
+                async decodeMeta(encryptedMeta: string) {
+                    if (!this.checkKey()) {
+                        console.error('ERR: method is not supported');
+                        return;
+                    }
+
+                    try {
+                        const wallet = activeAccount!.activeTonWallet;
+                        const keyPair = metaEncryptionMap?.[wallet.rawAddress]?.keyPair;
+
+                        if (!keyPair) {
+                            console.error('ERR: no keyPair created!');
+                            return;
+                        }
+
+                        const cells = Cell.fromBoc(Buffer.from(encryptedMeta, 'hex'));
+                        const metaCell = cells[0];
+
+                        const data = await decryptMeta(
+                            metaCell,
+                            Address.parse(wallet.rawAddress),
+                            Buffer.from(keyPair.secretKey)
+                        );
+
+                        console.log('Decrypted Meta:\n', JSON.stringify(JSON.parse(data), null, 2));
+                    } catch (e) {
+                        console.error('ERR: ', e);
+                    }
                 }
             };
         }
