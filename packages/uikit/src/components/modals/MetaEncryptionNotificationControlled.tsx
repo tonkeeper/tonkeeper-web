@@ -15,9 +15,10 @@ import { Button } from '../fields/Button';
 import { Body2, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { handleSubmit } from '../../libs/form';
-import { useMutateMetaKeyAndCertificates } from '../../state/wallet';
+import { useAccountWallets, useMutateMetaKeyAndCertificates } from '../../state/wallet';
 import { useAtomValue } from '../../libs/useAtom';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
+import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 
 interface IAtomParams {
     onConfirm?: (success?: boolean) => void;
@@ -57,6 +58,7 @@ interface IMetaEncryptionProps {
 const MetaEncryptionNotificationContent = ({ onClose, onConfirm }: IMetaEncryptionProps) => {
     const formId = useId();
     const { t } = useTranslation();
+    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     const toast = useToast();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
@@ -71,14 +73,15 @@ const MetaEncryptionNotificationContent = ({ onClose, onConfirm }: IMetaEncrypti
 
     const onSubmit = async () => {
         const wallet = targetAuth?.wallet;
+        const accountWallet = accountsWallets.find(accWallet => accWallet.wallet.id === wallet?.id);
 
-        if (!wallet || !onConfirm) {
+        if (!wallet || !accountWallet?.account || !onConfirm) {
             toast(t('meta_encrypt_key_creation_failed'));
 
             return;
         }
 
-        await createMetaEncryption({ wallet });
+        await createMetaEncryption({ wallet, account: accountWallet.account });
     };
 
     useEffect(() => {
