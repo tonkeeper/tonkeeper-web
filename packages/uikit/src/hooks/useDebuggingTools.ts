@@ -13,7 +13,7 @@ import { useAppSdk } from './appSdk';
 
 export const useDebuggingTools = () => {
     const api = useActiveApi();
-    const { data: metaEncryptionMap, isLoading } = useMetaEncryptionData();
+    const { data: metaEncryptionMap } = useMetaEncryptionData();
     const getSigner = useGetAccountSigner();
     const { data: activeAccount } = useActiveAccountQuery();
     const sdk = useAppSdk();
@@ -152,7 +152,7 @@ export const useDebuggingTools = () => {
                 }
             };
         }
-    }, [api, activeAccount, getSigner, metaEncryptionMap, isLoading]);
+    }, [api, activeAccount, getSigner, metaEncryptionMap]);
 };
 
 export const useSwapWidgetDebuggingTools = () => {

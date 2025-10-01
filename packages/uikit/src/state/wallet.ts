@@ -1425,7 +1425,7 @@ export const useMutateMetaKeyAndCertificates = () => {
         }
 
         if (account.type === 'mam') {
-            const limitedDerivations = account.derivations.slice(0, 10);
+            const limitedDerivations = account.derivations.slice(0, 5);
 
             const root = await TonKeychainRoot.fromMnemonic(seedPrase, {
                 allowLegacyMnemonic: true
