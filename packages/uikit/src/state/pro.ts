@@ -137,7 +137,8 @@ export const useProState = () => {
                 } else {
                     return 2 * 60 * 1000;
                 }
-            }
+            },
+            refetchIntervalInBackground: true
         }
     );
 };
