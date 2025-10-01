@@ -9,7 +9,6 @@ import {
     useCreateAccountMAM,
     useMutateRenameAccount,
     useCreateAccountMnemonic,
-    useMutateMetaKeyAndCertificates,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
 import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
@@ -260,7 +259,6 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
         useMutateRenameAccountDerivations();
 
     const { mutateAsync: tryAutoAuth } = useAutoAuthMutation();
-    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const { mutateAsync: createWalletsAsync, isLoading: isCreatingWallets } =
         useCreateAccountMnemonic();
     const { mutateAsync: createAccountMam, isLoading: isCreatingMam } = useCreateAccountMAM();
@@ -421,23 +419,21 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
     useSetNotificationOnCloseInterceptor(onCloseInterceptor);
 
     useEffect(() => {
-        if (createdAccount && mnemonic && selectNetworksPassed) {
-            void mutateMetaEncryptionKey({
+        if (
+            mnemonic &&
+            createdAccount &&
+            selectNetworksPassed &&
+            (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39')
+        ) {
+            void tryAutoAuth({
                 wallet: createdAccount.activeTonWallet,
-                mnemonic
-            });
-
-            if (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') {
-                void tryAutoAuth({
-                    wallet: createdAccount.activeTonWallet,
-                    signer: maxOneCall(
-                        tonProofSignerByTonMnemonic(
-                            mnemonic,
-                            selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
-                        )
+                signer: maxOneCall(
+                    tonProofSignerByTonMnemonic(
+                        mnemonic,
+                        selectedMnemonicType === 'tonMnemonic' ? 'ton' : 'bip39'
                     )
-                });
-            }
+                )
+            });
         }
     }, [createdAccount, mnemonic, selectedMnemonicType, editNamePagePassed, selectNetworksPassed]);
 

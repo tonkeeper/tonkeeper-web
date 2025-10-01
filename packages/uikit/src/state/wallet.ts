@@ -99,7 +99,6 @@ import { SigningSecret } from '@tonkeeper/core/dist/service/sign';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
-import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
 import { metaEncryptionMapSerializer } from '@tonkeeper/core/dist/utils/metadata';
 
 export { useAccountsStateQuery, useAccountsState };
@@ -255,6 +254,7 @@ export const useCreateMAMAccountDerivation = () => {
     const appContext = useAppContext();
     const network = useActiveTonNetwork();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const tronApi = useTronApi();
     const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
@@ -308,6 +308,12 @@ export const useCreateMAMAccountDerivation = () => {
         authBattery({
             signer: tonProofSignerByTonMnemonic(tonAccount.mnemonics, 'ton'),
             wallet: tonWallets[0]
+        });
+
+        mutateMetaEncryptionKey({
+            wallet: account.activeTonWallet,
+            account,
+            mnemonic
         });
 
         await storage.updateAccountInState(account);
@@ -590,6 +596,7 @@ export const useCreateAccountMnemonic = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabled = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
 
     return useMutation<
         AccountTonMnemonic,
@@ -673,6 +680,12 @@ export const useCreateAccountMnemonic = () => {
             wallet: account.activeTonWallet
         });
 
+        mutateMetaEncryptionKey({
+            wallet: account.activeTonWallet,
+            account,
+            mnemonic
+        });
+
         return account;
     });
 };
@@ -745,6 +758,7 @@ export const useCreateAccountMAM = () => {
     const { mutateAsync: selectAccountMutation } = useMutateActiveAccount();
     const isTronEnabledGlobally = useIsTronEnabledGlobally();
     const { mutateAsync: authBattery } = useRequestBatteryAuthToken();
+    const { mutateAsync: mutateMetaEncryptionKey } = useMutateMetaKeyAndCertificates();
     const tronApi = useTronApi();
     const { onOpen: openTronMigrationModal } = useMamTronMigrationNotification();
 
@@ -838,6 +852,12 @@ export const useCreateAccountMAM = () => {
         }
 
         authBatteryForAllChildren(account);
+
+        mutateMetaEncryptionKey({
+            wallet: account.activeTonWallet,
+            account,
+            mnemonic
+        });
 
         return { account, childrenMnemonics };
     });
@@ -1382,26 +1402,20 @@ export const useMetaEncryptionData = () => {
 export const useMutateMetaKeyAndCertificates = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
-    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
 
     return useMutation<
         void,
         Error,
         {
             wallet: TonWalletStandard;
+            account: Account;
             mnemonic?: string[];
         }
-    >(async ({ wallet, mnemonic }) => {
+    >(async ({ wallet, account, mnemonic }) => {
         let seedPrase = mnemonic;
 
-        const accountWallet = accountsWallets.find(accWallet => accWallet.wallet.id === wallet.id);
-        const accountId = accountWallet?.account?.id;
-        const accountType = accountWallet?.account?.type;
-
-        if (!accountId) throw new Error('Account id is required!');
-
         if (!seedPrase) {
-            const secret = await getAccountSecret(sdk, accountId);
+            const secret = await getAccountSecret(sdk, account.id);
 
             if (secret.type !== 'mnemonic') {
                 throw new Error('Unable to get a seed phrase!');
@@ -1410,21 +1424,24 @@ export const useMutateMetaKeyAndCertificates = () => {
             seedPrase = secret.mnemonic;
         }
 
-        if (accountType === 'mam') {
-            const limitedDerivations = accountWallet.account.derivations.slice(0, 10);
+        if (account.type === 'mam') {
+            const limitedDerivations = account.derivations.slice(0, 10);
 
-            for (const derivation of limitedDerivations) {
-                const root = await TonKeychainRoot.fromMnemonic(seedPrase, {
-                    allowLegacyMnemonic: true
-                });
-                const tonAccount = await root.getTonAccount(derivation.index);
+            const root = await TonKeychainRoot.fromMnemonic(seedPrase, {
+                allowLegacyMnemonic: true
+            });
 
-                await createAndStoreMetaEncryptionKeys(
-                    sdk,
-                    tonAccount.mnemonics,
-                    derivation.activeTonWalletId
-                );
-            }
+            await Promise.all(
+                limitedDerivations.map(async derivation => {
+                    const tonAccount = await root.getTonAccount(derivation.index);
+
+                    return createAndStoreMetaEncryptionKeys(
+                        sdk,
+                        tonAccount.mnemonics,
+                        derivation.activeTonWalletId
+                    );
+                })
+            );
         } else {
             await createAndStoreMetaEncryptionKeys(sdk, seedPrase, wallet.rawAddress);
         }
