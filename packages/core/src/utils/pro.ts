@@ -29,12 +29,13 @@ import {
 } from '../entries/pro';
 import { toStructTimeLeft } from './date';
 
+const toDate = (ts: number) => new Date(ts * 1000);
+
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
     authorizedWallet: TonWalletStandard | null
 ): ProSubscription => {
     const source = subscriptionDto?.source;
-    const toDate = (ts: number) => new Date(ts * 1000);
 
     if (!source) {
         return null;

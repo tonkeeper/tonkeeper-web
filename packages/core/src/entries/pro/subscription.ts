@@ -17,6 +17,7 @@ import {
 } from './common';
 import { CryptoCurrency, SubscriptionSource } from '../../pro';
 import { Language } from '../language';
+import { DateSerialized } from '../../utils/date';
 
 export type ProSubscription =
     | IosSubscription
@@ -39,6 +40,13 @@ export type CryptoSubscription =
     | ICryptoPendingSubscription;
 
 export type TelegramSubscription = ITelegramActiveSubscription | ITelegramExpiredSubscription;
+
+export type DateSerializedPendingSubscription =
+    | DateSerialized<ICryptoPendingSubscription>
+    | DateSerialized<IExtensionPendingSubscription>
+    | null;
+
+export type PendingSubscription = ICryptoPendingSubscription | IExtensionPendingSubscription | null;
 
 export type SubscriptionStrategy =
     | IIosSubscriptionStrategy

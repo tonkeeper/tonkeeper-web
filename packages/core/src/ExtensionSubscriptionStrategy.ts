@@ -21,6 +21,7 @@ import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStra
 import { AppKey } from './Keys';
 import { AssetAmount } from './entries/crypto/asset/asset-amount';
 import { TON_ASSET } from './entries/crypto/asset/constants';
+import { DateSerialized, serializeDates } from './utils/date';
 
 export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExtensionStrategy {
     public source = SubscriptionSource.EXTENSION as const;
@@ -69,9 +70,9 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
                     }
                 };
 
-                await onDataStore<IExtensionPendingSubscription>(
+                await onDataStore<DateSerialized<IExtensionPendingSubscription>>(
                     AppKey.PRO_PENDING_SUBSCRIPTION,
-                    pendingSubscription
+                    serializeDates(pendingSubscription)
                 );
 
                 resolve(PurchaseStatuses.PENDING);
@@ -96,16 +97,16 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
                 onConfirm: async (success?: boolean) => {
                     if (!success) return resolve(PurchaseStatuses.CANCELED);
 
-                    await onDataStore<IExtensionCancellingSubscription>(
+                    await onDataStore<DateSerialized<IExtensionCancellingSubscription>>(
                         AppKey.PRO_CANCELLING_SUBSCRIPTION,
-                        {
+                        serializeDates({
                             ...subscription,
                             status: ExtensionSubscriptionStatuses.CANCELLING,
                             displayPrice: new AssetAmount({
                                 asset: TON_ASSET,
                                 weiAmount: new BigNumber(subscription.amount)
                             }).toStringAssetRelativeAmount(2)
-                        }
+                        })
                     );
 
                     resolve(PurchaseStatuses.PENDING);

@@ -1,8 +1,7 @@
 import {
-    ICryptoPendingSubscription,
+    DateSerializedPendingSubscription,
     IDisplayPlan,
     IExtensionCancellingSubscription,
-    IExtensionPendingSubscription,
     isExtensionAutoRenewableSubscription,
     isExtensionCancellingSubscription,
     isPendingSubscription,
@@ -10,6 +9,7 @@ import {
     ISubscriptionService,
     ISubscriptionServiceConfig,
     isValidSubscription,
+    PendingSubscription,
     ProSubscription,
     PurchaseStatuses,
     SubscriptionStrategy
@@ -21,6 +21,7 @@ import { ProAuthTokenService } from './ProAuthTokenService';
 import { AppKey } from './Keys';
 import { pickBestSubscription } from './utils/pro';
 import { Language } from './entries/language';
+import { DateSerialized, deserializeDates } from './utils/date';
 
 export class SubscriptionService implements ISubscriptionService {
     private _authTokenService: IProAuthTokenService;
@@ -46,13 +47,8 @@ export class SubscriptionService implements ISubscriptionService {
     }
 
     async getSubscription(tempToken: string | null): Promise<ProSubscription> {
-        const pendingSubscription:
-            | ICryptoPendingSubscription
-            | IExtensionPendingSubscription
-            | null = await this._storage.get(AppKey.PRO_PENDING_SUBSCRIPTION);
-
-        const cancellingSubscription: IExtensionCancellingSubscription | null =
-            await this._storage.get(AppKey.PRO_CANCELLING_SUBSCRIPTION);
+        const { pendingSubscription, cancellingSubscription } =
+            await this._getProcessingSubscriptions();
 
         const mainToken = await this._authTokenService.getToken();
         const targetToken = tempToken ?? pendingSubscription?.auth?.tempToken ?? null;
@@ -99,6 +95,21 @@ export class SubscriptionService implements ISubscriptionService {
     private async _clearPendingSubscription(storage: IStorage) {
         await storage.delete(AppKey.PRO_PENDING_SUBSCRIPTION);
         await storage.delete(AppKey.PRO_CANCELLING_SUBSCRIPTION);
+    }
+
+    private async _getProcessingSubscriptions() {
+        const pendingSubscriptionRaw: DateSerializedPendingSubscription = await this._storage.get(
+            AppKey.PRO_PENDING_SUBSCRIPTION
+        );
+
+        const cancellingSubscriptionRaw: DateSerialized<IExtensionCancellingSubscription> | null =
+            await this._storage.get(AppKey.PRO_CANCELLING_SUBSCRIPTION);
+
+        return {
+            pendingSubscription: deserializeDates<PendingSubscription>(pendingSubscriptionRaw),
+            cancellingSubscription:
+                deserializeDates<IExtensionCancellingSubscription>(cancellingSubscriptionRaw)
+        };
     }
 
     async getAllProductsInfo(source: SubscriptionSource, lang?: Language): Promise<IDisplayPlan[]> {

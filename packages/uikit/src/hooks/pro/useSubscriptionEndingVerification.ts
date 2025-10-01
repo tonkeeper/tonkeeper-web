@@ -4,6 +4,7 @@ import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useProEndingNotification } from '../../components/modals/ProEndingNotificationControlled';
 import { useProState } from '../../state/pro';
 import {
+    hasNextChargeDate,
     isExtensionAutoRenewableSubscription,
     isIosAutoRenewableSubscription,
     isProSubscription
@@ -21,8 +22,10 @@ export const useSubscriptionEndingVerification = () => {
     const { onOpen } = useProEndingNotification();
 
     useEffect(() => {
+        if (sdk.targetEnv !== 'mobile' && sdk.targetEnv !== 'tablet') return;
+
         if (!isProSubscription(subscription)) return;
-        if (!subscription.nextChargeDate) return;
+        if (!hasNextChargeDate(subscription)) return;
         if (isIosAutoRenewableSubscription(subscription)) return;
         if (isExtensionAutoRenewableSubscription(subscription)) return;
 
