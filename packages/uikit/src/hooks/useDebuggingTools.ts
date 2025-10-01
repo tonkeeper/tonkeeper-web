@@ -1,11 +1,14 @@
-import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
-import { decryptMeta } from '@tonkeeper/core/dist/service/meta/metadataService';
-import { useActiveAccountQuery, useActiveApi, useMetaEncryptionData } from '../state/wallet';
-import { Address, beginCell, Cell, external, storeMessage, storeStateInit } from '@ton/core';
-import { useGetAccountSigner } from '../state/mnemonic';
-import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
-import { useAppContext } from './appContext';
 import { useEffect } from 'react';
+
+import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
+import { IMetaEncryptionData } from '@tonkeeper/core/dist/entries/wallet';
+import { decryptMeta } from '@tonkeeper/core/dist/service/meta/metadataService';
+import { Address, beginCell, Cell, external, storeMessage, storeStateInit } from '@ton/core';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
+
+import { useActiveAccountQuery, useActiveApi, useMetaEncryptionData } from '../state/wallet';
+import { useGetAccountSigner } from '../state/mnemonic';
+import { useAppContext } from './appContext';
 import { useAppSdk } from './appSdk';
 
 export const useDebuggingTools = () => {
@@ -113,6 +116,39 @@ export const useDebuggingTools = () => {
                     } catch (e) {
                         console.error('ERR: ', e);
                     }
+                },
+                async getEncryptionMap() {
+                    if (!this.checkKey()) {
+                        console.error('ERR: method is not supported');
+                        return;
+                    }
+
+                    if (!metaEncryptionMap) {
+                        console.error('ERR: no metaEncryptionMap found');
+                        return;
+                    }
+
+                    function transformWalletsStatus(obj: Record<string, IMetaEncryptionData>) {
+                        const result: Record<string, string> = {};
+
+                        for (const [rawAddress, value] of Object.entries(obj)) {
+                            const friendly = Address.parse(rawAddress).toString({
+                                bounceable: false
+                            });
+
+                            const hasKey = !!value.keyPair;
+                            const hasCert = !!value.certificate;
+
+                            result[friendly] = hasKey && hasCert ? 'Success' : 'Failed';
+                        }
+
+                        return result;
+                    }
+
+                    console.log(
+                        'Meta Encryption Map:\n',
+                        JSON.stringify(transformWalletsStatus(metaEncryptionMap), null, 2)
+                    );
                 }
             };
         }
