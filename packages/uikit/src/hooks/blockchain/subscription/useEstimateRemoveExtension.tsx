@@ -1,12 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { Address } from '@ton/core';
-import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import {
+    assertBalanceEnough,
+    estimationSigner
+} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 
 import { useActiveApi } from '../../../state/wallet';
 import { CancelParams } from './commonTypes';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useEstimateRemoveExtension = () => {
     const api = useActiveApi();
@@ -14,6 +18,13 @@ export const useEstimateRemoveExtension = () => {
     return useMutation<{ fee: TransactionFeeTonAsset; address: Address }, Error, CancelParams>(
         async subscriptionParams => {
             const { selectedWallet, extensionContract, destroyValue } = subscriptionParams;
+
+            await assertBalanceEnough(
+                api,
+                BigInt(destroyValue),
+                TON_ASSET,
+                selectedWallet.rawAddress
+            );
 
             const extensionAddress = Address.parse(extensionContract);
 

@@ -186,13 +186,7 @@ const ProInstallExtensionNotificationContent: FC<IProInstallExtensionContentProp
                                     {isEstimating && <SpinnerIcon />}
                                     {!!estimationError && <>—</>}
                                     {estimation?.fee?.extra &&
-                                        new AssetAmount({
-                                            asset: TON_ASSET,
-                                            weiAmount:
-                                                estimateFeeMutation.data.fee.extra.weiAmount.minus(
-                                                    extensionData.payment_per_period
-                                                )
-                                        }).toStringAssetAbsoluteRelativeAmount()}
+                                        estimateFeeMutation.data.fee.extra.toStringAssetRelativeAmount()}
                                 </Label2>
                                 {!estimationError && !isEstimating && (
                                     <Body3Styled>{`≈ ${feeEquivalent}`}</Body3Styled>

@@ -2,11 +2,15 @@ import { useMutation } from '@tanstack/react-query';
 import { TransactionFeeTonAsset } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { Address } from '@ton/core';
 import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
-import { estimationSigner } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
+import {
+    assertBalanceEnough,
+    estimationSigner
+} from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 import { SubscriptionEncodingParams } from './commonTypes';
 import { useActiveApi, useMetaEncryptionData } from '../../../state/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
@@ -35,6 +39,13 @@ export const useEstimateDeploySubscription = () => {
         if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
             throw new Error('walletMetaKeyPair is missed!');
         }
+
+        await assertBalanceEnough(
+            api,
+            BigInt(payment_per_period) + BigInt(deploy_value),
+            TON_ASSET,
+            selectedWallet.rawAddress
+        );
 
         const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
         const encoder = new SubscriptionEncoder(selectedWallet);
