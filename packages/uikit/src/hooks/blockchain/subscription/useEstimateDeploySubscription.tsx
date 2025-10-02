@@ -50,9 +50,17 @@ export const useEstimateDeploySubscription = () => {
         const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
         const encoder = new SubscriptionEncoder(selectedWallet);
 
-        const { extensionAddress, outgoingMsg } = await encoder.encodeCreateSubscriptionV2({
-            beneficiary: Address.parse(admin),
-            subscriptionId: subscription_id,
+        const beneficiary = Address.parse(admin);
+        const subscriptionId = subscription_id;
+
+        const extensionAddress = encoder.getExtensionAddress({
+            beneficiary,
+            subscriptionId
+        });
+
+        const outgoingMsg = await encoder.encodeCreateSubscriptionV2({
+            beneficiary,
+            subscriptionId,
             firstChargingDate: first_charging_date,
             paymentPerPeriod: BigInt(payment_per_period),
             deployValue: BigInt(deploy_value),

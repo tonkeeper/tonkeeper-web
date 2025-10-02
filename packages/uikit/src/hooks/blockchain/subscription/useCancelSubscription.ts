@@ -38,10 +38,7 @@ export const useCancelSubscription = () => {
         const sender = new WalletMessageSender(api, selectedWallet, signer);
         const encoder = new SubscriptionEncoder(selectedWallet);
 
-        const { outgoingMsg } = encoder.encodeDestructAction(
-            extensionAddress,
-            BigInt(destroyValue)
-        );
+        const outgoingMsg = encoder.encodeDestructAction(extensionAddress, BigInt(destroyValue));
 
         await sender.send(outgoingMsg);
 

@@ -31,7 +31,7 @@ export const useEstimateRemoveExtension = () => {
             const encoder = new SubscriptionEncoder(selectedWallet);
             const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
 
-            const { outgoingMsg } = encoder.encodeDestructAction(
+            const outgoingMsg = encoder.encodeDestructAction(
                 extensionAddress,
                 BigInt(destroyValue)
             );

@@ -1,13 +1,9 @@
 import { Address, beginCell, Builder, Cell, contractAddress, internal, SendMode } from '@ton/core';
 import { StateInit as TonStateInit } from '@ton/core/dist/types/StateInit';
-import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
-import {
-    EncodedSubscriptionResult,
-    IPayloadEncoder,
-    OP,
-    SUBSCRIPTION_PROTOCOL_TAG
-} from './subscription-encoder';
+
 import { getTonkeeperQueryId } from '../../utils';
+import { OP, SUBSCRIPTION_PROTOCOL_TAG } from './constants';
+import { EncodedSubscriptionResult, IPayloadEncoder } from './types';
 
 export class PayloadEncoderV5 implements IPayloadEncoder {
     public readonly storeTag = (builder: Builder) => {
@@ -29,7 +25,7 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
             body
         });
 
-        const actions: OutActionWalletV5[] = [
+        return [
             { type: 'addExtension', address: extensionAddress },
             {
                 type: 'sendMsg',
@@ -37,8 +33,6 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
                 outMsg: initMsg
             }
         ];
-
-        return { outgoingMsg: actions, extensionAddress };
     }
 
     encodeDestructAction(extension: Address, destroyValue: bigint): EncodedSubscriptionResult {
@@ -49,7 +43,7 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
             body: this.buildDestructBody()
         });
 
-        const actions: OutActionWalletV5[] = [
+        return [
             {
                 type: 'sendMsg',
                 mode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
@@ -57,8 +51,6 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
             },
             { type: 'removeExtension', address: extension }
         ];
-
-        return { outgoingMsg: actions, extensionAddress: extension };
     }
 
     private buildDestructBody(): Cell {
