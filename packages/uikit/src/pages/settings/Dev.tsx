@@ -37,6 +37,7 @@ import { useDevMenuVisibility } from '../../state/dev';
 import { useMutateProApiUrl, useProApiUrl } from '../../state/pro';
 import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
 import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
+import { Button } from '../../components/fields/Button';
 
 const CookieSettings = () => {
     const sdk = useAppSdk();
@@ -176,6 +177,31 @@ const EnvironmentToggle = () => {
     );
 };
 
+const EncryptionKeysCleaner = () => {
+    const sdk = useAppSdk();
+
+    const handleClear = async () => {
+        await sdk.storage.delete(AppKey.META_ENCRYPTION_MAP);
+
+        console.log('Current encryption map: ', await sdk.storage.get(AppKey.META_ENCRYPTION_MAP));
+    };
+
+    return (
+        <HideOnReview>
+            <ListBlockDesktopAdaptive>
+                <ListItem hover={false}>
+                    <ListItemPayload>
+                        <Label1>Meta encryption keys</Label1>
+                        <Button size="small" onClick={handleClear}>
+                            Clear
+                        </Button>
+                    </ListItemPayload>
+                </ListItem>
+            </ListBlockDesktopAdaptive>
+        </HideOnReview>
+    );
+};
+
 const DesktopWrapper = styled(DesktopViewPageLayout)`
     ${ListBlock} {
         margin-bottom: 0;
@@ -302,6 +328,7 @@ export const DevSettings = React.memo(() => {
                 <ReviewerSettings />
                 <LogsSettings />
                 <EnvironmentToggle />
+                <EncryptionKeysCleaner />
             </DesktopWrapper>
         );
     }
