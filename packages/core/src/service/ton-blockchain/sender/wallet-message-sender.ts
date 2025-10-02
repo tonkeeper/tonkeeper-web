@@ -12,6 +12,7 @@ import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
 import { WalletV4ExtendedAction } from '@ton/ton/dist/wallets/v4/WalletContractV4Actions';
 import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
+import { WalletContractV5Beta } from '@ton/ton/dist/wallets/WalletContractV5Beta';
 
 type Outgoing = WalletOutgoingMessage | OutActionWalletV5[] | WalletV4ExtendedAction;
 
@@ -96,22 +97,38 @@ export class WalletMessageSender implements ISender {
 
         if (Array.isArray(msg)) {
             if (
-                !(contract instanceof WalletContractV5R1) ||
-                ![WalletVersion.V5_BETA, WalletVersion.V5R1].includes(this.wallet.version)
+                !(
+                    contract instanceof WalletContractV5R1 ||
+                    contract instanceof WalletContractV5Beta
+                ) ||
+                !isW5Version(this.wallet.version)
             ) {
                 throw new Error('V5 actions are supported only for V5R1');
             }
 
-            const transfer = await contract.createRequest({
-                seqno,
-                signer: this.signer,
-                timeout: getTTL(timestamp),
-                actions: msg
-            });
+            let transfer;
+            if (contract instanceof WalletContractV5R1) {
+                transfer = await contract.createRequest({
+                    seqno,
+                    signer: this.signer,
+                    timeout: getTTL(timestamp),
+                    actions: msg
+                });
+            } else {
+                transfer = await contract.createRequest({
+                    seqno,
+                    signer: this.signer,
+                    timeout: getTTL(timestamp),
+                    actions: msg
+                });
+            }
 
             return externalMessage(contract, seqno, transfer);
         }
 
+        /**
+         * Handles v3r1/v3r2 wallets and generic messages for all wallet versions.
+         */
         if (isWalletOutgoing(msg)) {
             const transfer = await (contract as WalletContractV5R1).createTransfer({
                 seqno,
