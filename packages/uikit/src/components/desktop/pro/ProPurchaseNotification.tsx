@@ -24,11 +24,6 @@ import { ProChoosePaymentMethod } from '../../pro/ProChoosePaymentMethod';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { useAppSdk } from '../../../hooks/appSdk';
 import { useProductSelection } from '../../../hooks/pro/useProductSelection';
-import { useAtomValue } from '../../../libs/useAtom';
-import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
-import { useMetaEncryptionNotification } from '../../modals/MetaEncryptionNotificationControlled';
-import { useToast } from '../../../hooks/useNotification';
-import { useMetaEncryptionData } from '../../../state/wallet';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
@@ -54,20 +49,14 @@ export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = props 
 type ContentProps = Pick<IProPurchaseNotificationProps, 'onClose'>;
 
 export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCurrentClose }) => {
-    const toast = useToast();
     const formId = useId();
     const { t } = useTranslation();
     const sdk = useAppSdk();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
-    const { onOpen: onMetaEncryptionOpen, onClose: onMetaEncryptionClose } =
-        useMetaEncryptionNotification();
-    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
 
     const { states, methods } = useProPurchaseController();
     const { onLogout, onManage, onPurchase } = methods;
-    const { isPurchasing, isManageLoading, isLoggingOut } = states;
-
-    const { data: metaEncryptionMap } = useMetaEncryptionData();
+    const { isPurchasing, isManageLoading, isLoggingOut, isIosInfoLoading } = states;
 
     const {
         plans,
@@ -79,7 +68,12 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         isSelectionLoading
     } = useProductSelection();
 
-    const isGlobalLoading = isSelectionLoading || isPurchasing || isLoggingOut || isManageLoading;
+    const isGlobalLoading =
+        isPurchasing ||
+        isLoggingOut ||
+        isManageLoading ||
+        isSelectionLoading ||
+        (selectedSource === SubscriptionSource.IOS && isIosInfoLoading);
 
     const handleDisconnect = async () => {
         await onLogout();
@@ -93,49 +87,12 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         onSourceSelect(source);
     };
 
-    const onSubmit = async () => {
-        const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
-
-        if (!targetAuth) return;
-        if (!selectedPlan) return;
-
-        const hasMetaEncryption =
-            metaEncryptionMap && metaEncryptionMap[targetAuth.wallet.rawAddress];
-
-        if (selectedSource === SubscriptionSource.EXTENSION && !hasMetaEncryption) {
-            const createMetaEncryption = () =>
-                new Promise(resolve => {
-                    onMetaEncryptionOpen({
-                        onConfirm: (isConfirmed?: boolean) => {
-                            if (isConfirmed) {
-                                resolve(true);
-
-                                onMetaEncryptionClose();
-                            } else {
-                                resolve(false);
-                            }
-                        }
-                    });
-                });
-
-            const isCreated = await createMetaEncryption();
-
-            if (!isCreated) {
-                toast(t('meta_encrypt_key_creation_failed'));
-
-                return;
-            }
-        }
-
-        await onPurchase({
-            source: selectedSource,
-            formData: {
-                selectedPlan,
-                wallet: targetAuth.wallet,
-                tempToken: targetAuth.tempToken
-            }
+    const onSubmit = () =>
+        onPurchase({
+            plans,
+            selectedPlanId,
+            selectedSource
         });
-    };
 
     const availableSources = useMemo(
         () => sdk.subscriptionService.getAvailableSources(),
