@@ -100,6 +100,7 @@
   "confirm_unlink": "Подтвердите отвязку",
   "connected_apps_short": "Подключения",
   "connect_telegram": "Подключить Telegram",
+  "contact_support": "Связаться с поддержкой",
   "continue": "Продолжить",
   "continue_for": "Продолжить за",
   "continue_from": "Продолжить с",
@@ -584,6 +585,7 @@
   "switch": "Сменить",
   "tab_action_toast_pinned": "Закреплено",
   "tab_action_toast_unpinned": "Откреплено",
+  "taking_too_long": "Слишком долго?",
   "tme_linked_with_another_address_warn": "Имя не связано с вашим текущим адресом. Будьте осторожными с транзакциями на это имя.",
   "toggle_developer_tools": "Переключить инструменты разработчика",
   "toggle_full_screen": "Развернуть на полный экран",
@@ -729,6 +731,7 @@
     "yearly_pro_package": "1 год"
   },
   "update": "Обновить",
+  "update_click_to_install": "Нажмите, чтобы установить последнюю версию",
   "update_ledger_error": "Убедитесь, что программное обеспечение Ledger обновлено",
   "update_subscription": "Обновить Подписку",
   "upload_file": "Загрузить файл",

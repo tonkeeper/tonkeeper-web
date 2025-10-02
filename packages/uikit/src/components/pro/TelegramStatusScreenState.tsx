@@ -1,16 +1,17 @@
 import styled from 'styled-components';
+import { getExpirationDate } from '@tonkeeper/core/dist/utils/pro';
 import { isValidSubscription, ProSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { handleSubmit } from '../../libs/form';
+import { ProStatusListItem } from './ProStatusListItem';
 import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
-import { getExpirationDate, getStatusColor } from '@tonkeeper/core/dist/utils/pro';
 
 interface IProps {
     subscription: ProSubscription | undefined;
@@ -36,14 +37,11 @@ export const TelegramStatusScreenState = ({ subscription }: IProps) => {
             />
 
             <ListBlock margin={false} fullWidth>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor(subscription)}>{`${t(
-                            subscription.status
-                        )} (${t('trial')})`}</Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
+                <ProStatusListItem
+                    subscription={subscription}
+                    statusText={`${t(subscription.status)} (${t('trial')})`}
+                />
+
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>

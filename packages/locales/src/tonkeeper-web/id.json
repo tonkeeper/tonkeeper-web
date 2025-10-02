@@ -100,6 +100,7 @@
   "confirm_unlink": "Konfirmasi putuskan sambungan",
   "connected_apps_short": "Aplikasi Terhubung",
   "connect_telegram": "Hubungkan Telegram",
+  "contact_support": "Hubungi dukungan",
   "continue": "Lanjutkan",
   "continue_for": "Lanjutkan untuk",
   "continue_from": "Lanjutkan dari",
@@ -584,6 +585,7 @@
   "switch": "Ganti",
   "tab_action_toast_pinned": "Disematkan",
   "tab_action_toast_unpinned": "Tidak Dipin",
+  "taking_too_long": "Terlalu lama?",
   "tme_linked_with_another_address_warn": "Nama tersebut tidak terkait dengan alamat Dompet Anda saat ini. Hati-hati dalam melakukan transaksi menggunakan nama yang tidak dapat di konfirmasi dengan alamat Dompet Anda.",
   "toggle_developer_tools": "Beralih Alat Pengembang",
   "toggle_full_screen": "Alihkan Layar Penuh",
@@ -670,6 +672,7 @@
     "wallet_aside_purchases": "Pembelian"
   },
   "update": "Perbarui",
+  "update_click_to_install": "Klik untuk menginstal versi terbaru",
   "update_ledger_error": "Pastikan perangkat lunak Ledger Anda diperbarui",
   "update_subscription": "Perbarui Langganan",
   "upload_file": "Unggah File",

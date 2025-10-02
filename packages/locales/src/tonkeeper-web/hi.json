@@ -100,6 +100,7 @@
   "confirm_unlink": "अनलिंक की पुष्टि करें",
   "connected_apps_short": "कनेक्टेड ऐप्स",
   "connect_telegram": "टेलीग्राम से कनेक्ट करें",
+  "contact_support": "सपोर्ट से संपर्क करें",
   "continue": "जारी रखें",
   "continue_for": "जारी रखें",
   "continue_from": "से जारी रखें",
@@ -584,6 +585,7 @@
   "switch": "बदलें",
   "tab_action_toast_pinned": "पिन किया गया",
   "tab_action_toast_unpinned": "अनपिन किया गया",
+  "taking_too_long": "बहुत लंबा समय लग रहा है?",
   "tme_linked_with_another_address_warn": "यह नाम आपके वर्तमान पते से जुड़ा नहीं है। इस नाम के लिए लेनदेन में सावधानी बरतें।",
   "toggle_developer_tools": "डेवलपर टूल्स टॉगल करें",
   "toggle_full_screen": "पूर्ण स्क्रीन टॉगल करें",
@@ -670,6 +672,7 @@
     "wallet_aside_purchases": "खरीदारी"
   },
   "update": "अपडेट करें",
+  "update_click_to_install": "नवीनतम संस्करण स्थापित करने के लिए क्लिक करें",
   "update_ledger_error": "सुनिश्चित करें कि आपका लेजर सॉफ़्टवेयर अपडेटेड है",
   "update_subscription": "सब्सक्रिप्शन अपडेट करें",
   "upload_file": "फ़ाइल अपलोड करें",

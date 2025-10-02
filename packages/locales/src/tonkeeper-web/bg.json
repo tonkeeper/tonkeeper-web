@@ -100,6 +100,7 @@
   "confirm_unlink": "Потвърдете разсвързването",
   "connected_apps_short": "Свързани приложения",
   "connect_telegram": "Свържете Telegram",
+  "contact_support": "Свържете се с поддръжката",
   "continue": "Продължи",
   "continue_for": "Продължи за",
   "continue_from": "Продължете от",
@@ -584,6 +585,7 @@
   "switch": "Превключи",
   "tab_action_toast_pinned": "Закачено",
   "tab_action_toast_unpinned": "Откачено",
+  "taking_too_long": "Отнема твърде дълго?",
   "tme_linked_with_another_address_warn": "Името не е свързано с текущия ви адрес. Бъдете внимателни с транзакциите към това име.",
   "toggle_developer_tools": "Превключване на инструменти за разработчици",
   "toggle_full_screen": "Превключване на цял екран",
@@ -672,6 +674,7 @@
     "wallet_aside_purchases": "Покупки"
   },
   "update": "Актуализация",
+  "update_click_to_install": "Щракнете за инсталиране на последната версия",
   "update_ledger_error": "Уверете се, че софтуерът на Ledger е актуализиран",
   "update_subscription": "Актуализиране на абонамент",
   "upload_file": "Качване на файл",

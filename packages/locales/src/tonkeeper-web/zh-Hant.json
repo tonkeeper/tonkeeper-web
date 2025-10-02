@@ -100,6 +100,7 @@
   "confirm_unlink": "確認取消連結",
   "connected_apps_short": "已連接的應用程式",
   "connect_telegram": "連接 Telegram",
+  "contact_support": "聯繫支援",
   "continue": "繼續",
   "continue_for": "繼續用於",
   "continue_from": "繼續從",
@@ -584,6 +585,7 @@
   "switch": "切換",
   "tab_action_toast_pinned": "已置頂",
   "tab_action_toast_unpinned": "已取消釘選",
+  "taking_too_long": "執行時間過久？",
   "tme_linked_with_another_address_warn": "此名稱未連結到您目前的地址。請小心與此名稱的交易。",
   "toggle_developer_tools": "切換開發者工具",
   "toggle_full_screen": "切換全螢幕",
@@ -683,6 +685,7 @@
     "wallet_aside_purchases": "購買"
   },
   "update": "更新",
+  "update_click_to_install": "點擊 安裝 最新 版本",
   "update_ledger_error": "請確保您的 Ledger 軟體已更新",
   "update_subscription": "更新訂閱",
   "upload_file": "上傳檔案",

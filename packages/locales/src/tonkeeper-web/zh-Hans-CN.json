@@ -100,6 +100,7 @@
   "confirm_unlink": "确认取消链接",
   "connected_apps_short": "连接的应用程序",
   "connect_telegram": "连接电报",
+  "contact_support": "联系 支持",
   "continue": "继续",
   "continue_for": "继续用于",
   "continue_from": "继续 自",
@@ -584,6 +585,7 @@
   "switch": "切换",
   "tab_action_toast_pinned": "已置顶",
   "tab_action_toast_unpinned": "已取消固定",
+  "taking_too_long": "耗费 太长 时间？",
   "tme_linked_with_another_address_warn": "名称未链接到你当前的地址。对此名字的交易要小心。",
   "toggle_developer_tools": "切换开发者工具",
   "toggle_full_screen": "切换全屏",
@@ -683,6 +685,7 @@
     "wallet_aside_purchases": "购买"
   },
   "update": "更新",
+  "update_click_to_install": "点击 安装 最新版本",
   "update_ledger_error": "确保您的Ledger软件已更新",
   "update_subscription": "更新订阅",
   "upload_file": "上传文件",

@@ -100,6 +100,7 @@
   "confirm_unlink": "Confirmar desvincular",
   "connected_apps_short": "Aplicaciones conectadas",
   "connect_telegram": "Conectar Telegram",
+  "contact_support": "Contactar con soporte",
   "continue": "Continuar",
   "continue_for": "Continuar por",
   "continue_from": "Continuar desde",
@@ -584,6 +585,7 @@
   "switch": "Cambiar",
   "tab_action_toast_pinned": "Fijado",
   "tab_action_toast_unpinned": "Desanclado",
+  "taking_too_long": "¿Tarda demasiado?",
   "tme_linked_with_another_address_warn": "El nombre no está enlazado a su dirección actual. Tenga cuidado con las transacciones con este nombre.",
   "toggle_developer_tools": "Alternar herramientas de desarrollador",
   "toggle_full_screen": "Alternar pantalla completa",
@@ -670,6 +672,7 @@
     "wallet_aside_purchases": "Compras"
   },
   "update": "Actualizar",
+  "update_click_to_install": "Haz clic para instalar la última versión",
   "update_ledger_error": "Asegure que su software de Ledger esté actualizado",
   "update_subscription": "Actualizar suscripción",
   "upload_file": "Subir archivo",

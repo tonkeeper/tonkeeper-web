@@ -5,23 +5,19 @@ import {
     isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
+import { getCryptoSubscriptionPrice, getExpirationDate } from '@tonkeeper/core/dist/utils/pro';
 
 import { Body2, Label2 } from '../Text';
 import { Button } from '../fields/Button';
 import { useProLogout } from '../../state/pro';
 import { handleSubmit } from '../../libs/form';
 import { ProActiveWallet } from './ProActiveWallet';
+import { ProStatusListItem } from './ProStatusListItem';
 import { useTranslation } from '../../hooks/translation';
 import { useNotifyError } from '../../hooks/useNotification';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
-import {
-    getCryptoSubscriptionPrice,
-    getExpirationDate,
-    getStatusColor,
-    getStatusText
-} from '@tonkeeper/core/dist/utils/pro';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
@@ -70,14 +66,8 @@ export const CryptoStatusScreenState = ({ subscription }: IProps) => {
             />
 
             <ListBlock margin={false} fullWidth>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor(subscription)}>
-                            {getStatusText(subscription, t)}
-                        </Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
+                <ProStatusListItem subscription={subscription} />
+
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>{t('expiration_date')}</Body2RegularStyled>

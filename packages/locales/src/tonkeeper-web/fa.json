@@ -100,6 +100,7 @@
   "confirm_unlink": "تأیید قطع اتصال",
   "connected_apps_short": "اپلیکیشن‌های متصل شده",
   "connect_telegram": "اتصال تلگرام",
+  "contact_support": "تماس با پشتیبانی",
   "continue": "ادامه",
   "continue_for": "ادامه برای",
   "continue_from": "ادامه از",
@@ -584,6 +585,7 @@
   "switch": "تغییر دادن",
   "tab_action_toast_pinned": "سنجاق‌شده",
   "tab_action_toast_unpinned": "لغو سنجاق",
+  "taking_too_long": "خیلی طول می‌کشد؟",
   "tme_linked_with_another_address_warn": "این نام به آدرس فعلی شما متصل نشده است. مراقب تراکنش‌های مرتبط با این نام باشید.",
   "toggle_developer_tools": "تغییر وضعیت ابزارهای توسعه‌دهنده",
   "toggle_full_screen": "تغییر به حالت تمام‌صفحه",
@@ -670,6 +672,7 @@
     "wallet_aside_purchases": "خریدها"
   },
   "update": "به‌روز‌رسانی",
+  "update_click_to_install": "برای نصب آخرین نسخه کلیک کنید",
   "update_ledger_error": "از به‌روز بودن نرم‌افزار لجر خود اطمینان حاصل کنید.",
   "update_subscription": "به‌روزرسانی اشتراک",
   "upload_file": "بارگذاری فایل",

@@ -100,6 +100,7 @@
   "confirm_unlink": "আনলিঙ্ক নিশ্চিত করুন",
   "connected_apps_short": "সংযুক্ত অ্যাপস",
   "connect_telegram": "টেলিগ্রাম সংযুক্ত করুন",
+  "contact_support": "সমর্থনে যোগাযোগ করুন",
   "continue": "চালিয়ে যান",
   "continue_for": "জন্য চালিয়ে যান",
   "continue_from": "থেকে চালিয়ে যান",
@@ -584,6 +585,7 @@
   "switch": "পরিবর্তন করুন",
   "tab_action_toast_pinned": "পিন করা",
   "tab_action_toast_unpinned": "আনপিন করা হয়েছে",
+  "taking_too_long": "অতিরিক্ত সময় লাগছে?",
   "tme_linked_with_another_address_warn": "নামটি আপনার বর্তমান ঠিকানার সাথে লিঙ্ক করা নেই। এই নামটিতে লেনদেন করার সময় সতর্ক থাকুন।",
   "toggle_developer_tools": "ডেভেলপার টুলস টগল করুন",
   "toggle_full_screen": "ফুলস্ক্রিন টগল করুন",
@@ -670,6 +672,7 @@
     "wallet_aside_purchases": "কেনাকাটা"
   },
   "update": "আপডেট করুন",
+  "update_click_to_install": "ক্লিক করে সর্বশেষ সংস্করণটি ইন্সটল করুন",
   "update_ledger_error": "আপনার লেজার সফটওয়্যারটি আপডেট করা হয়েছে তা নিশ্চিত করুন",
   "update_subscription": "সাবস্ক্রিপশন আপডেট করুন",
   "upload_file": "ফাইল আপলোড করুন",

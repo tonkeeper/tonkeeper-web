@@ -8,6 +8,8 @@ import {
     isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+import { getCryptoSubscriptionPrice, getExpirationDate } from '@tonkeeper/core/dist/utils/pro';
 
 import { Button } from '../fields/Button';
 import { useAppSdk } from '../../hooks/appSdk';
@@ -15,17 +17,11 @@ import { useProLogout } from '../../state/pro';
 import { handleSubmit } from '../../libs/form';
 import { Body2, Body3, Label2 } from '../Text';
 import { ProActiveWallet } from './ProActiveWallet';
+import { ProStatusListItem } from './ProStatusListItem';
 import { useTranslation } from '../../hooks/translation';
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { ProSubscriptionHeader } from './ProSubscriptionHeader';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
-import {
-    getCryptoSubscriptionPrice,
-    getExpirationDate,
-    getStatusColor,
-    getStatusText
-} from '@tonkeeper/core/dist/utils/pro';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
@@ -92,14 +88,8 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
             />
 
             <ListBlock margin={false} fullWidth>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor(subscription)}>
-                            {getStatusText(subscription, t)}
-                        </Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
+                <ProStatusListItem subscription={subscription} />
+
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>

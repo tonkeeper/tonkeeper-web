@@ -7,12 +7,8 @@ import {
     isValidSubscription,
     ProSubscription
 } from '@tonkeeper/core/dist/entries/pro';
-import {
-    getExpirationDate,
-    getIosSubscriptionPrice,
-    getStatusColor
-} from '@tonkeeper/core/dist/utils/pro';
 import { IAppSdk } from '@tonkeeper/core/dist/AppSdk';
+import { getExpirationDate, getIosSubscriptionPrice } from '@tonkeeper/core/dist/utils/pro';
 
 import { SlidersIcon } from '../Icon';
 import { Body2, Body3, Label2 } from '../Text';
@@ -20,6 +16,7 @@ import { Button } from '../fields/Button';
 import { useAppSdk } from '../../hooks/appSdk';
 import { handleSubmit } from '../../libs/form';
 import { ProActiveWallet } from './ProActiveWallet';
+import { ProStatusListItem } from './ProStatusListItem';
 import { useTranslation } from '../../hooks/translation';
 import { useNotifyError } from '../../hooks/useNotification';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
@@ -92,14 +89,11 @@ export const IosStatusScreenState = ({ subscription }: IProps) => {
             />
 
             <ListBlock margin={false} fullWidth>
-                <ListItemStyled hover={false}>
-                    <ListItemPayloadStyled>
-                        <Body2RegularStyled>{t('status')}</Body2RegularStyled>
-                        <Body2Styled color={getStatusColor(subscription)}>
-                            {t(subscription.status)}
-                        </Body2Styled>
-                    </ListItemPayloadStyled>
-                </ListItemStyled>
+                <ProStatusListItem
+                    subscription={subscription}
+                    statusText={t(subscription.status)}
+                />
+
                 <ListItemStyled hover={false}>
                     <ListItemPayloadStyled>
                         <Body2RegularStyled>
