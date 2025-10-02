@@ -1,4 +1,5 @@
 import { autoUpdater, BrowserWindow } from 'electron';
+import log from 'electron-log/main';
 import packageJson from '../../package.json';
 
 export class AutoUpdateManager {
@@ -51,10 +52,11 @@ export class AutoUpdateManager {
             const version = process.platform === 'win32' ? releaseNotes : releaseName;
             this.newAvailableVersion = version;
             this.win.webContents.send('app-update::ready', { version });
+            log.log('[AutoUpdate] updater new version fetched:', version);
         });
 
         autoUpdater.on('error', err => {
-            console.error('[AutoUpdate] updater error:', err);
+            log.error('[AutoUpdate] updater error:', err);
         });
     }
 }
