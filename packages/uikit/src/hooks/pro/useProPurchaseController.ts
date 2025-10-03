@@ -114,35 +114,25 @@ export const useProPurchaseController = () => {
         if (!selectedPlan) return;
 
         if (selectedSource === SubscriptionSource.IOS) {
-            if (!currentSubInfo || currentSubInfo.length < 1) {
-                toast(t(PurchaseErrors.PURCHASE_FAILED));
-
-                return;
-            }
-
             const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
 
-            if (!originalTransactionId) {
-                toast(t(PurchaseErrors.PURCHASE_FAILED));
+            if (originalTransactionId) {
+                const result = await sdk.confirm({
+                    message: t('already_have_subscription', {
+                        transactionId: String(originalTransactionId)
+                    }),
+                    okButtonTitle: t('choose_another_wallet'),
+                    cancelButtonTitle: t('cancel')
+                });
 
-                return;
-            }
+                if (result) {
+                    onCurrentClose();
+                    onProAuthOpen();
+                } else {
+                    toast(t(PurchaseErrors.PURCHASE_FAILED));
 
-            const result = await sdk.confirm({
-                message: t('already_have_subscription', {
-                    transactionId: String(originalTransactionId)
-                }),
-                okButtonTitle: t('choose_another_wallet'),
-                cancelButtonTitle: t('cancel')
-            });
-
-            if (result) {
-                onCurrentClose();
-                onProAuthOpen();
-            } else {
-                toast(t(PurchaseErrors.PURCHASE_FAILED));
-
-                return;
+                    return;
+                }
             }
         }
 
