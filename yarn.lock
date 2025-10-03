@@ -3996,9 +3996,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@https://github.com/p0lunin/ton-ton#build1":
-  version: 15.3.1
-  resolution: "@ton/ton@https://github.com/p0lunin/ton-ton.git#commit=129b866ab92d7425a2ef24f627225ee59391a7e9"
+"@ton/ton@npm:^15.4.0":
+  version: 15.4.0
+  resolution: "@ton/ton@npm:15.4.0"
   dependencies:
     axios: "npm:^1.6.7"
     dataloader: "npm:^2.0.0"
@@ -4006,9 +4006,9 @@ __metadata:
     teslabot: "npm:^1.3.0"
     zod: "npm:^3.21.4"
   peerDependencies:
-    "@ton/core": ">=0.60.0"
+    "@ton/core": ">=0.62.0 <1.0.0"
     "@ton/crypto": ">=3.2.0"
-  checksum: 10/b7a40f1bf7ef2dfcac0563991361533a7b2d95926a37668d725292736a18bf9348b7792e3d39976dfb699d40f68ecfc4e6934b1aec030ce7dd69cf860a51766a
+  checksum: 10/9ed3c3e26ea1b0d5991534980afc3b46a2a9eaf851e23b2d1ec6109f569f531eb74c0f8a3e8829f592e221f2fe0d9c34323057603ba40168b1893123acef9ad1
   languageName: node
   linkType: hard
 
@@ -4027,7 +4027,7 @@ __metadata:
     "@ton-keychain/trx": "npm:^0.0.7"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "https://github.com/p0lunin/ton-ton#build1"
+    "@ton/ton": "npm:^15.4.0"
     "@types/aes-js": "npm:^3.1.4"
     "@types/punycode": "npm:^2"
     aes-js: "npm:^3.1.2"
