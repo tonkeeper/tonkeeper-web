@@ -1,14 +1,14 @@
-import { Address, Cell, beginCell, contractAddress } from '@ton/core';
 import nacl from 'tweetnacl';
+import { Address, Cell, beginCell, contractAddress, storeMessageRelaxed } from '@ton/core';
 
+import { OP } from './constants';
+import { encryptMeta } from '../../../meta';
+import { getTonkeeperQueryId } from '../../utils';
 import { PayloadEncoderV4 } from './PayloadEncoderV4';
 import { PayloadEncoderV5 } from './PayloadEncoderV5';
 import { SubscriptionExtensionMetadata } from '../../../../pro';
+import { EncodedSubscriptionResult, IPayloadEncoder } from './types';
 import { TonWalletStandard, WalletVersion } from '../../../../entries/wallet';
-import { getTonkeeperQueryId } from '../../utils';
-import { encryptMeta } from '../../../meta';
-import { IPayloadEncoder } from './types';
-import { OP } from './constants';
 
 /**
  * https://github.com/tonkeeper/w5-subscriptions/commit/d33b44a9957bd3cb864dfad233e2754156f94303
@@ -113,6 +113,17 @@ export class SubscriptionEncoder {
         const stateInit = { code: this.code, data: stateData };
 
         return contractAddress(0, stateInit);
+    }
+
+    getOutMsgBocHex(outgoingMsg: EncodedSubscriptionResult, to: Address): string {
+        const internalMsg = this.currentPayloadEncoder.getInternalFromAction(outgoingMsg, to);
+        const outMsgCell = beginCell().store(storeMessageRelaxed(internalMsg)).endCell();
+
+        return this.convertCellToBocHex(outMsgCell);
+    }
+
+    convertCellToBocHex(msgCell: Cell): string {
+        return msgCell.toBoc().toString('hex');
     }
 
     private buildStateData(params: IBuildStateDataParams): Cell {

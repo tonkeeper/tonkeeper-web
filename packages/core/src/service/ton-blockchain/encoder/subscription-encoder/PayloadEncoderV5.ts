@@ -1,9 +1,19 @@
-import { Address, beginCell, Builder, Cell, contractAddress, internal, SendMode } from '@ton/core';
+import {
+    Address,
+    beginCell,
+    Builder,
+    Cell,
+    contractAddress,
+    internal,
+    MessageRelaxed,
+    SendMode
+} from '@ton/core';
 import { StateInit as TonStateInit } from '@ton/core/dist/types/StateInit';
+import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
 
+import { IPayloadEncoder } from './types';
 import { getTonkeeperQueryId } from '../../utils';
 import { OP, SUBSCRIPTION_PROTOCOL_TAG } from './constants';
-import { EncodedSubscriptionResult, IPayloadEncoder } from './types';
 
 export class PayloadEncoderV5 implements IPayloadEncoder {
     public readonly storeTag = (builder: Builder) => {
@@ -14,7 +24,7 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
         body: Cell,
         stateInit: TonStateInit,
         deployValue: bigint
-    ): EncodedSubscriptionResult {
+    ): OutActionWalletV5[] {
         const extensionAddress = contractAddress(0, stateInit);
 
         const initMsg = internal({
@@ -35,7 +45,7 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
         ];
     }
 
-    encodeDestructAction(extension: Address, destroyValue: bigint): EncodedSubscriptionResult {
+    encodeDestructAction(extension: Address, destroyValue: bigint): OutActionWalletV5[] {
         const outMsg = internal({
             to: extension,
             bounce: true,
@@ -51,6 +61,16 @@ export class PayloadEncoderV5 implements IPayloadEncoder {
             },
             { type: 'removeExtension', address: extension }
         ];
+    }
+
+    getInternalFromAction(outgoingMsg: OutActionWalletV5[]): MessageRelaxed {
+        const sendMsgAction = outgoingMsg.find(a => a.type === 'sendMsg');
+
+        if (sendMsgAction?.type !== 'sendMsg' || !sendMsgAction?.outMsg) {
+            throw new Error('No sendMsg action with outMsg found');
+        }
+
+        return sendMsgAction.outMsg;
     }
 
     private buildDestructBody(): Cell {

@@ -11,6 +11,8 @@ import { SubscriptionEncodingParams } from './commonTypes';
 import { useActiveApi, useMetaEncryptionData } from '../../../state/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
+import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
+import { estimateWalletContractExecutionGasFee } from '@tonkeeper/core/dist/service/wallet/contractService';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
@@ -40,13 +42,6 @@ export const useEstimateDeploySubscription = () => {
             throw new Error('walletMetaKeyPair is missed!');
         }
 
-        await assertBalanceEnough(
-            api,
-            BigInt(payment_per_period) + BigInt(deploy_value),
-            TON_ASSET,
-            selectedWallet.rawAddress
-        );
-
         const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
         const encoder = new SubscriptionEncoder(selectedWallet);
 
@@ -57,6 +52,8 @@ export const useEstimateDeploySubscription = () => {
             beneficiary,
             subscriptionId
         });
+
+        const config = await new BlockchainApi(api.tonApiV2).getBlockchainConfig();
 
         const outgoingMsg = await encoder.encodeCreateSubscriptionV2({
             beneficiary,
@@ -72,6 +69,24 @@ export const useEstimateDeploySubscription = () => {
             metadata,
             walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
         });
+
+        const inMsg = await sender.toExternal(outgoingMsg);
+        const inMsgBocHex = inMsg.toBoc().toString('hex');
+
+        const outMsgBocHex = encoder.getOutMsgBocHex(outgoingMsg, extensionAddress);
+
+        const executionGasFee = estimateWalletContractExecutionGasFee(config, {
+            walletVersion: selectedWallet.version,
+            inMsgBocHex,
+            outMsgBocHex
+        });
+
+        await assertBalanceEnough(
+            api,
+            executionGasFee + BigInt(deploy_value),
+            TON_ASSET,
+            selectedWallet.rawAddress
+        );
 
         const estimation = await sender.estimate(outgoingMsg);
 
