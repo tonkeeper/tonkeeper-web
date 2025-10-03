@@ -1,6 +1,6 @@
 import { StateInit as TonStateInit } from '@ton/core/dist/types/StateInit';
+import { OutActionWalletV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { Address, Builder, Cell, internal, MessageRelaxed } from '@ton/core';
-import { WalletV4ExtendedAction } from '@ton/ton/dist/wallets/v4/WalletContractV4Actions';
 
 import { IPayloadEncoder } from './types';
 import { SUBSCRIPTION_PROTOCOL_TAG } from './constants';
@@ -14,7 +14,7 @@ export class PayloadEncoderV4 implements IPayloadEncoder {
         body: Cell,
         stateInit: TonStateInit,
         deployValue: bigint
-    ): WalletV4ExtendedAction {
+    ): OutActionWalletV4 {
         return {
             type: 'addAndDeployPlugin',
             workchain: 0,
@@ -24,7 +24,7 @@ export class PayloadEncoderV4 implements IPayloadEncoder {
         };
     }
 
-    encodeDestructAction(extension: Address, destroyValue: bigint): WalletV4ExtendedAction {
+    encodeDestructAction(extension: Address, destroyValue: bigint): OutActionWalletV4 {
         return {
             type: 'removePlugin',
             address: extension,
@@ -32,7 +32,7 @@ export class PayloadEncoderV4 implements IPayloadEncoder {
         };
     }
 
-    getInternalFromAction(outgoingMsg: WalletV4ExtendedAction, to: Address): MessageRelaxed {
+    getInternalFromAction(outgoingMsg: OutActionWalletV4, to: Address): MessageRelaxed {
         switch (outgoingMsg.type) {
             case 'addAndDeployPlugin':
                 return internal({

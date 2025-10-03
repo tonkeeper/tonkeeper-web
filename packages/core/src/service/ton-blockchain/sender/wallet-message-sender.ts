@@ -10,17 +10,16 @@ import { ISender } from './ISender';
 import { AssetAmount } from '../../../entries/crypto/asset/asset-amount';
 import { TON_ASSET } from '../../../entries/crypto/asset/constants';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
-import { WalletV4ExtendedAction } from '@ton/ton/dist/wallets/v4/WalletContractV4Actions';
-import { WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { WalletContractV5Beta } from '@ton/ton/dist/wallets/WalletContractV5Beta';
+import { OutActionWalletV4, WalletContractV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 
-type Outgoing = WalletOutgoingMessage | OutActionWalletV5[] | WalletV4ExtendedAction;
+type Outgoing = WalletOutgoingMessage | OutActionWalletV5[] | OutActionWalletV4;
 
 function isWalletOutgoing(msg: Outgoing): msg is WalletOutgoingMessage {
     return typeof msg === 'object' && msg !== null && 'messages' in msg;
 }
 
-function isV4Action(msg: Outgoing): msg is WalletV4ExtendedAction {
+function isV4Action(msg: Outgoing): msg is OutActionWalletV4 {
     return (
         typeof msg === 'object' &&
         'type' in msg &&

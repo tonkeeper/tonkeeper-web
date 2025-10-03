@@ -1,9 +1,9 @@
 import { Address, Builder, Cell, MessageRelaxed } from '@ton/core';
 import { StateInit as TonStateInit } from '@ton/core/dist/types/StateInit';
+import { OutActionWalletV4 } from '@ton/ton/dist/wallets/WalletContractV4';
 import { OutActionWalletV5 } from '@ton/ton/dist/wallets/v5beta/WalletV5OutActions';
-import { WalletV4ExtendedAction } from '@ton/ton/dist/wallets/v4/WalletContractV4Actions';
 
-export type EncodedSubscriptionResult = OutActionWalletV5[] | WalletV4ExtendedAction;
+export type EncodedSubscriptionResult = OutActionWalletV5[] | OutActionWalletV4;
 
 export interface IPayloadEncoder {
     storeTag: (builder: Builder) => void;
