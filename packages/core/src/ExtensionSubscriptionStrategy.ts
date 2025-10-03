@@ -80,8 +80,7 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
 
             onProConfirmOpen({
                 extensionData: extension.data,
-                onConfirm,
-                onCancel: () => resolve(PurchaseStatuses.CANCELED)
+                onConfirm
             });
         });
     }

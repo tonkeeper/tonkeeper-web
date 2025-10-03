@@ -38,17 +38,16 @@ interface IProInstallExtensionProps {
     onClose: () => void;
     extensionData?: SubscriptionExtension;
     onConfirm?: (success?: boolean) => void;
-    onCancel?: () => void;
 }
 
 export const ProInstallExtensionNotification: FC<IProInstallExtensionProps> = props => {
-    const { isOpen, onConfirm, onClose, onCancel, extensionData } = props;
+    const { isOpen, onConfirm, onClose, extensionData } = props;
 
     return (
         <NotificationStyled
             isOpen={isOpen}
             handleClose={() => {
-                onCancel?.();
+                onConfirm?.();
                 onClose();
             }}
             hideButton
