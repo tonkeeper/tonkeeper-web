@@ -35,20 +35,18 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 interface IProInstallExtensionProps {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: (success?: boolean) => void;
     extensionData?: SubscriptionExtension;
-    onConfirm?: (success?: boolean) => void;
 }
 
 export const ProInstallExtensionNotification: FC<IProInstallExtensionProps> = props => {
-    const { isOpen, onConfirm, onClose, extensionData } = props;
+    const { isOpen, onClose, extensionData } = props;
 
     return (
         <NotificationStyled
             isOpen={isOpen}
             handleClose={() => {
-                onConfirm?.();
-                onClose();
+                onClose(false);
             }}
             hideButton
             backShadow
@@ -60,10 +58,7 @@ export const ProInstallExtensionNotification: FC<IProInstallExtensionProps> = pr
                     {extensionData && (
                         <ProInstallExtensionNotificationContent
                             extensionData={extensionData}
-                            onClose={confirmed => {
-                                onConfirm?.(confirmed);
-                                onClose();
-                            }}
+                            onClose={onClose}
                         />
                     )}
                 </ErrorBoundary>
@@ -72,17 +67,9 @@ export const ProInstallExtensionNotification: FC<IProInstallExtensionProps> = pr
     );
 };
 
-interface IProInstallExtensionContentProps {
-    onBack?: () => void;
-    onClose: (confirmed?: boolean) => void;
-    extensionData: SubscriptionExtension;
-    fitContent?: boolean;
-}
-
-const ProInstallExtensionNotificationContent: FC<IProInstallExtensionContentProps> = ({
-    onClose,
-    extensionData
-}) => {
+const ProInstallExtensionNotificationContent: FC<
+    Required<Omit<IProInstallExtensionProps, 'isOpen'>>
+> = ({ onClose, extensionData }) => {
     const { t } = useTranslation();
     const deployMutation = useCreateSubscription();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);

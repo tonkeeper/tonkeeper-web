@@ -16,11 +16,17 @@ export const ProInstallExtensionNotificationControlled = () => {
     const [params] = useAtom(paramsControl);
     const { onConfirm, extensionData } = params ?? {};
 
+    const handleClose = (confirm?: boolean) => {
+        if (!isOpen) return;
+
+        onConfirm?.(confirm);
+        onClose();
+    };
+
     return (
         <ProInstallExtensionNotification
             isOpen={isOpen}
-            onConfirm={onConfirm}
-            onClose={onClose}
+            onClose={handleClose}
             extensionData={extensionData}
         />
     );

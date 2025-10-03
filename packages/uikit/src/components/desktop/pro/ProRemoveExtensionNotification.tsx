@@ -33,21 +33,18 @@ import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 
 interface IProRecurrentNotificationProps {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: (success?: boolean) => void;
     subscription?: IExtensionActiveSubscription;
-    onConfirm?: (success?: boolean) => void;
-    onCancel?: () => void;
 }
 
 export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> = props => {
-    const { isOpen, onConfirm, onClose, onCancel, subscription } = props;
+    const { isOpen, onClose, subscription } = props;
 
     return (
         <NotificationStyled
             isOpen={isOpen}
             handleClose={() => {
-                onCancel?.();
-                onClose();
+                onClose(false);
             }}
             hideButton
             backShadow
@@ -59,10 +56,7 @@ export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> 
                     {subscription && (
                         <ProRemoveExtensionNotificationContent
                             subscription={subscription}
-                            onClose={confirmed => {
-                                onConfirm?.(confirmed);
-                                onClose();
-                            }}
+                            onClose={onClose}
                         />
                     )}
                 </ErrorBoundary>
@@ -71,17 +65,9 @@ export const ProRemoveExtensionNotification: FC<IProRecurrentNotificationProps> 
     );
 };
 
-interface IProRemoveExtensionContent {
-    onBack?: () => void;
-    onClose: (confirmed?: boolean) => void;
-    subscription: IExtensionActiveSubscription;
-    fitContent?: boolean;
-}
-
-const ProRemoveExtensionNotificationContent: FC<IProRemoveExtensionContent> = ({
-    onClose,
-    subscription
-}) => {
+const ProRemoveExtensionNotificationContent: FC<
+    Required<Omit<IProRecurrentNotificationProps, 'isOpen'>>
+> = ({ onClose, subscription }) => {
     const {
         contract: extensionContract,
         auth,

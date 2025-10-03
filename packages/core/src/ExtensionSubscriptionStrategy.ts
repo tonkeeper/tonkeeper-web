@@ -109,8 +109,7 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
                     );
 
                     resolve(PurchaseStatuses.PENDING);
-                },
-                onCancel: () => resolve(PurchaseStatuses.CANCELED)
+                }
             });
         });
     }

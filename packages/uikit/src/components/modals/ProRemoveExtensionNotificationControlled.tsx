@@ -7,7 +7,6 @@ import { ProRemoveExtensionNotification } from '../desktop/pro/ProRemoveExtensio
 interface IConfirmAtomParams {
     subscription: IExtensionActiveSubscription;
     onConfirm?: (success?: boolean) => void;
-    onCancel?: () => void;
 }
 const { hook, paramsControl } = createModalControl<IConfirmAtomParams>();
 
@@ -16,14 +15,19 @@ export const useProRemoveExtensionNotification = hook;
 export const ProRemoveExtensionNotificationControlled = () => {
     const { isOpen, onClose } = useProRemoveExtensionNotification();
     const [params] = useAtom(paramsControl);
-    const { onConfirm, onCancel, subscription } = params ?? {};
+    const { onConfirm, subscription } = params ?? {};
+
+    const handleClose = (confirm?: boolean) => {
+        if (!isOpen) return;
+
+        onConfirm?.(confirm);
+        onClose();
+    };
 
     return (
         <ProRemoveExtensionNotification
             isOpen={isOpen}
-            onConfirm={onConfirm}
-            onCancel={onCancel}
-            onClose={onClose}
+            onClose={handleClose}
             subscription={subscription}
         />
     );
