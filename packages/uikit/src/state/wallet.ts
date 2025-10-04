@@ -648,6 +648,12 @@ export const useCreateAccountMnemonic = () => {
                 wallet: account.activeTonWallet
             });
 
+            mutateMetaEncryptionKey({
+                wallet: account.activeTonWallet,
+                account,
+                mnemonic
+            });
+
             return account;
         }
 
@@ -829,6 +835,12 @@ export const useCreateAccountMAM = () => {
             }
 
             authBatteryForAllChildren(account);
+
+            mutateMetaEncryptionKey({
+                wallet: account.activeTonWallet,
+                account,
+                mnemonic
+            });
 
             return { account, childrenMnemonics };
         }
