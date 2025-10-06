@@ -9,7 +9,7 @@ import { Network } from '../../entries/network';
 import { BlockchainConfig } from '../../tonApiV2';
 import { TonWalletStandard, WalletVersion } from '../../entries/wallet';
 
-const GAS_SAFETY_MULTIPLIER = 104n;
+const GAS_SAFETY_MULTIPLIER = 105n;
 const GAS_SAFETY_MULTIPLIER_DENOMINATOR = 100n;
 
 export const walletContractFromState = (wallet: TonWalletStandard) => {
@@ -79,8 +79,7 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
     const {
         bitPrice = 26214400,
         cellPrice = 2621440000,
-        lumpPrice = 400000,
-        firstFrac = 21845
+        lumpPrice = 400000
     } = config?._25?.msgForwardPrices ?? {};
 
     const timeChunk = 65536; // 2^16
@@ -88,49 +87,11 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
     const msgFwdCellPrice = cellPrice;
     const gasPrice = (config._21?.gasLimitsPrices.gasPrice ?? 26214400) / timeChunk;
 
-    // const { bitPricePs: storageBitPrice = 1, cellPricePs: storageCellPrice = 500 } =
-    //     config._18?.storagePrices?.[0];
-
-    // function computeStorageFee(v: WalletVersion, timeDelta: number, isInited: boolean): number {
-    //     let usedStorageBits = 0;
-    //     let usedStorageCells = 0;
-    //
-    //     if (!isInited) {
-    //         usedStorageCells = 1;
-    //         usedStorageBits = 103;
-    //     } else {
-    //         switch (v) {
-    //             case WalletVersion.V4R2:
-    //                 usedStorageBits = 1315;
-    //                 usedStorageCells = 3;
-    //                 break;
-    //             case WalletVersion.V5_BETA:
-    //                 usedStorageBits = 749;
-    //                 usedStorageCells = 3;
-    //                 break;
-    //             case WalletVersion.V5R1:
-    //                 usedStorageBits = 5020;
-    //                 usedStorageCells = 22;
-    //                 break;
-    //             default:
-    //                 throw Error(`Unknown version: ${v}`);
-    //         }
-    //     }
-    //
-    //     const used = usedStorageBits * storageBitPrice + usedStorageCells * storageCellPrice;
-    //
-    //     return Math.ceil((used * timeDelta) / timeChunk);
-    // }
-
     function computeMsgFwdFee(msgBits: number, msgCells: number): number {
         const bitsPrice = msgFwdBitPrice * msgBits;
         const cellsPrice = msgFwdCellPrice * msgCells;
 
         return lumpPrice + Math.ceil((bitsPrice + cellsPrice) / timeChunk);
-    }
-
-    function computeActionFee(msgFee: number): number {
-        return Math.floor((msgFee * firstFrac) / timeChunk);
     }
 
     function computeGasFee(v: WalletVersion): number {
@@ -206,13 +167,11 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
         fwdMsgCells += innerFwdMsgCells;
     }
 
-    // const storageFee = computeStorageFee(v, timeDelta, isInited);
     const msgFwdFee = computeMsgFwdFee(fwdMsgBits, fwdMsgCells);
-    const actionFee = computeActionFee(msgFwdFee);
     const gasFee = computeGasFee(walletVersion);
     const importFee = computeImportFee(msgBits, msgCells);
 
-    const base = BigInt(actionFee + gasFee + importFee);
+    const base = BigInt(msgFwdFee + gasFee + importFee);
 
     return (base * GAS_SAFETY_MULTIPLIER) / GAS_SAFETY_MULTIPLIER_DENOMINATOR;
 };
