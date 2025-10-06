@@ -88,33 +88,33 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
     const msgFwdCellPrice = cellPrice;
     const gasPrice = (config._21?.gasLimitsPrices.gasPrice ?? 26214400) / timeChunk;
 
-    // function computeStorageFee(v: WalletVersion, timeDelta: number): number {
+    // const { bitPricePs: storageBitPrice = 1, cellPricePs: storageCellPrice = 500 } =
+    //     config._18?.storagePrices?.[0];
+
+    // function computeStorageFee(v: WalletVersion, timeDelta: number, isInited: boolean): number {
     //     let usedStorageBits = 0;
     //     let usedStorageCells = 0;
     //
-    //     switch (v) {
-    //         case WalletVersion.V3R1:
-    //             usedStorageBits = 1163;
-    //             usedStorageCells = 3;
-    //             break;
-    //         case WalletVersion.V3R2:
-    //             usedStorageBits = 1283;
-    //             usedStorageCells = 3;
-    //             break;
-    //         case WalletVersion.V4R2:
-    //             usedStorageBits = 5657;
-    //             usedStorageCells = 22;
-    //             break;
-    //         case WalletVersion.V5_BETA:
-    //             usedStorageBits = 709;
-    //             usedStorageCells = 3;
-    //             break;
-    //         case WalletVersion.V5R1:
-    //             usedStorageBits = 4980;
-    //             usedStorageCells = 22;
-    //             break;
-    //         default:
-    //             throw Error(`Unknown version: ${v}`);
+    //     if (!isInited) {
+    //         usedStorageCells = 1;
+    //         usedStorageBits = 103;
+    //     } else {
+    //         switch (v) {
+    //             case WalletVersion.V4R2:
+    //                 usedStorageBits = 1315;
+    //                 usedStorageCells = 3;
+    //                 break;
+    //             case WalletVersion.V5_BETA:
+    //                 usedStorageBits = 749;
+    //                 usedStorageCells = 3;
+    //                 break;
+    //             case WalletVersion.V5R1:
+    //                 usedStorageBits = 5020;
+    //                 usedStorageCells = 22;
+    //                 break;
+    //             default:
+    //                 throw Error(`Unknown version: ${v}`);
+    //         }
     //     }
     //
     //     const used = usedStorageBits * storageBitPrice + usedStorageCells * storageCellPrice;
@@ -136,20 +136,14 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
     function computeGasFee(v: WalletVersion): number {
         let gasUsed = 0;
         switch (v) {
-            case WalletVersion.V3R1:
-                gasUsed = 2275 + 642; // 2275 - газ за исполнение смарта, 624 - газ за отправку 1 сообщения
-                break;
-            case WalletVersion.V3R2:
-                gasUsed = 2352 + 642; // 2352 - газ за исполнение смарта, 624 - газ за отправку 1 сообщения
-                break;
             case WalletVersion.V4R2:
-                gasUsed = 2666 + 642; // 2666 - газ за исполнение смарта, 624 - газ за отправку 1 сообщения
+                gasUsed = 6615;
                 break;
             case WalletVersion.V5_BETA:
-                gasUsed = 3079 + 328; // 3079 - газ за исполнение смарта, 328 - газ за отправку 1 сообщения
+                gasUsed = 8444;
                 break;
             case WalletVersion.V5R1:
-                gasUsed = 4222 + 717; // 4222 - газ за исполнение смарта, 717 - газ за отправку 1 сообщения
+                gasUsed = 8444;
                 break;
             default:
                 throw Error(`Unknown version: ${v}`);
@@ -165,12 +159,19 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
         );
     }
 
-    function countBitsAndCellsInMsg(msg: Cell): [number, number] {
+    function countBitsAndCellsInMsg(msg: Cell, hashes: Set<Buffer>): [number, number] {
+        let temp = hashes.size;
+        hashes.add(msg.hash());
+        if (hashes.size == temp) {
+            return [0, 0];
+        }
+
         let cells = 1;
         let bits = msg.bits.length;
 
-        for (const ref of msg.refs) {
-            const [innerBits, innerCells] = countBitsAndCellsInMsg(ref);
+        for (let i = 0; i < msg.refs.length; i++) {
+            const ref = msg.refs[i];
+            let [innerBits, innerCells] = countBitsAndCellsInMsg(ref, hashes);
             bits += innerBits;
             cells += innerCells;
         }
@@ -183,17 +184,29 @@ export const estimateWalletContractExecutionGasFee = (config: BlockchainConfig, 
         throw Error('inbound external msg must be single');
     }
 
+    const inMsgHashes = new Set<Buffer>();
+    let [msgBits, msgCells] = [0, 0];
+    const inMsg = inMsgs[0];
+    for (const ref of inMsg.refs) {
+        let [innerMsgBits, innerMsgCells] = countBitsAndCellsInMsg(ref, inMsgHashes);
+        msgBits += innerMsgBits;
+        msgCells += innerMsgCells;
+    }
+
+    let [fwdMsgBits, fwdMsgCells] = [0, 0];
     const outMsgs = Cell.fromBoc(Buffer.from(outMsgBocHex, 'hex'));
     if (outMsgs.length > 1) {
         throw Error('outbound internal msg must be single');
     }
-
-    const inMsg = inMsgs[0];
     const outMsg = outMsgs[0];
-    const [msgBits, msgCells] = countBitsAndCellsInMsg(inMsg);
-    const [fwdMsgBits, fwdMsgCells] = countBitsAndCellsInMsg(outMsg);
+    const fwdMsgHashes = new Set<Buffer>();
+    for (const ref of outMsg.refs) {
+        const [innerFwdMsgBits, innerFwdMsgCells] = countBitsAndCellsInMsg(ref, fwdMsgHashes);
+        fwdMsgBits += innerFwdMsgBits;
+        fwdMsgCells += innerFwdMsgCells;
+    }
 
-    // const storageFee = computeStorageFee(v, timeDelta);
+    // const storageFee = computeStorageFee(v, timeDelta, isInited);
     const msgFwdFee = computeMsgFwdFee(fwdMsgBits, fwdMsgCells);
     const actionFee = computeActionFee(msgFwdFee);
     const gasFee = computeGasFee(walletVersion);
