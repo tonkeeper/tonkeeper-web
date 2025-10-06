@@ -1447,15 +1447,18 @@ export const useMutateMetaKeyAndCertificates = () => {
                 limitedDerivations.map(async derivation => {
                     const tonAccount = await root.getTonAccount(derivation.index);
 
-                    return createAndStoreMetaEncryptionKeys(
-                        sdk,
-                        tonAccount.mnemonics,
-                        derivation.activeTonWalletId
-                    );
+                    return createAndStoreMetaEncryptionKeys(sdk, {
+                        seedPrase: tonAccount.mnemonics,
+                        rawAddress: derivation.activeTonWalletId,
+                        mnemonicType: 'ton'
+                    });
                 })
             );
         } else {
-            await createAndStoreMetaEncryptionKeys(sdk, seedPrase, wallet.rawAddress);
+            await createAndStoreMetaEncryptionKeys(sdk, {
+                seedPrase,
+                rawAddress: wallet.rawAddress
+            });
         }
 
         await client.invalidateQueries({ queryKey: [QueryKey.metaEncryptionData] });
