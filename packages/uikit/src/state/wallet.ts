@@ -130,7 +130,7 @@ export const useActiveWallet = () => {
     return account.activeTonWallet;
 };
 
-export const useAccountWallets = (transform?: WalletsTransform): AccountWallet[] => {
+export const useProCompatibleAccountsWallets = (transform?: WalletsTransform): AccountWallet[] => {
     const accounts = useAccountsState().filter(
         (acc): acc is AccountTonMnemonic | AccountMAM =>
             seeIfMainnnetAccount(acc) && (acc.type === 'mnemonic' || acc.type === 'mam')
