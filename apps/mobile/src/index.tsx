@@ -1,8 +1,16 @@
-import { createRoot } from 'react-dom/client';
-import { App } from './app/App';
-import './app/i18n';
+import { migrateCapacitorStorage } from './libs/storage';
+import { setupLogger } from './libs/logger';
 
-import './telegram-widget';
+async function main() {
+    try {
+        setupLogger();
+        console.log('TEST Starting storage migration from Preferences to Keychain...');
+        await migrateCapacitorStorage();
+    } catch (e) {
+        console.error(e);
+    }
 
-const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+    import('./main');
+}
+
+main();
