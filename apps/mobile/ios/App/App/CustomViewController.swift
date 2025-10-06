@@ -21,12 +21,12 @@ class CustomViewController: CAPBridgeViewController {
         // Register plugins
         bridge?.registerPluginInstance(BiometricPlugin())
         bridge?.registerPluginInstance(SecureStoragePlugin())
+        bridge?.registerPluginInstance(DeviceStoragePlugin())
         bridge?.registerPluginInstance(DeepLinkPlugin())
         bridge?.registerPluginInstance(BluetoothPlugin())
         bridge?.registerPluginInstance(DappBrowserPlugin())
         bridge?.registerPluginInstance(SubscriptionPlugin())
         bridge?.registerPluginInstance(CountryInfoPlugin())
-        bridge?.registerPluginInstance(DeviceStoragePlugin())
 
         if let webView = self.bridge?.webView {
             makeWebViewTransparent(webView)

@@ -16,6 +16,7 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
+		B3275CA92E93D1B70000CC67 /* DeviceStoragePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3275CA82E93D1B70000CC67 /* DeviceStoragePlugin.swift */; };
 		B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */; };
 		B3313CCF2CEB459400E31C31 /* BiometricPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */; };
 		B3313CD12CEB4C7E00E31C31 /* SecureStoragePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */; };
@@ -40,6 +41,7 @@
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
+		B3275CA82E93D1B70000CC67 /* DeviceStoragePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStoragePlugin.swift; sourceTree = "<group>"; };
 		B3313CCC2CEB43AB00E31C31 /* CustomViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewController.swift; sourceTree = "<group>"; };
 		B3313CCE2CEB459400E31C31 /* BiometricPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricPlugin.swift; sourceTree = "<group>"; };
 		B3313CD02CEB4C7E00E31C31 /* SecureStoragePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureStoragePlugin.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				B38DE39A2DEA1BC200215137 /* injected.js */,
 				24879CC32E00A58900492642 /* SubscriptionPlugin.swift */,
 				B35BF13B2E5375DA00D0FD8A /* CountryInfoPlugin.swift */,
+				B3275CA82E93D1B70000CC67 /* DeviceStoragePlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			files = (
 				249AF7CC2E010F8E002AB84D /* SubscriptionPlugin.swift in Sources */,
 				B3F1263B2DE46D9700B2D403 /* DappBrowser.swift in Sources */,
+				B3275CA92E93D1B70000CC67 /* DeviceStoragePlugin.swift in Sources */,
 				B3BD508B2DB7A7500009E6E7 /* DeepLinkPlugin.swift in Sources */,
 				B3313CCD2CEB43AB00E31C31 /* CustomViewController.swift in Sources */,
 				B35BF13C2E5375DA00D0FD8A /* CountryInfoPlugin.swift in Sources */,

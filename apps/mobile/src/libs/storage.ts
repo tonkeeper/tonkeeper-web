@@ -5,30 +5,79 @@ import { pTimeout } from '@tonkeeper/core/dist/utils/common';
 
 export class DeviceStorage implements IStorage {
     get = async <R>(key: string): Promise<R | null> => {
-        const { value } = await DeviceStoragePlugin.get({ key });
-        return value ? (value as R) : null;
-    };
+        try {
+            const { value } = await DeviceStoragePlugin.get({ key });
+            if (value === null) {
+                return null;
+            }
 
-    set = async <R>(key: string, value: R) => {
-        await DeviceStoragePlugin.set<R>({ key, value });
-        return value;
-    };
-
-    setBatch = async <V extends Record<string, unknown>>(values: V) => {
-        await DeviceStoragePlugin.setBatch({ values });
-        return values;
-    };
-
-    delete = async <R>(key: string) => {
-        const payload = await this.get<R>(key);
-        if (payload !== null) {
-            await DeviceStoragePlugin.delete({ key });
+            try {
+                return JSON.parse(value) as R;
+            } catch {
+                return null;
+            }
+        } catch (error) {
+            console.error('DeviceStorage get error:', error);
+            return null;
         }
-        return payload;
+    };
+
+    set = async <R>(key: string, value: R): Promise<R> => {
+        try {
+            let stringValue: string;
+            if (typeof value === 'string') {
+                stringValue = value;
+            } else {
+                stringValue = JSON.stringify(value);
+            }
+
+            await DeviceStoragePlugin.set({ key, value: stringValue });
+            return value;
+        } catch (error) {
+            console.error('DeviceStorage set error:', error);
+            throw error;
+        }
+    };
+
+    setBatch = async <V extends Record<string, unknown>>(values: V): Promise<V> => {
+        try {
+            const stringValues: Record<string, string> = {};
+            for (const [key, value] of Object.entries(values)) {
+                if (typeof value === 'string') {
+                    stringValues[key] = value;
+                } else {
+                    stringValues[key] = JSON.stringify(value);
+                }
+            }
+
+            await DeviceStoragePlugin.setBatch({ values: stringValues });
+            return values;
+        } catch (error) {
+            console.error('DeviceStorage setBatch error:', error);
+            throw error;
+        }
+    };
+
+    delete = async <R>(key: string): Promise<R | null> => {
+        try {
+            const payload = await this.get<R>(key);
+            if (payload !== null) {
+                await DeviceStoragePlugin.delete({ key });
+            }
+            return payload;
+        } catch (error) {
+            console.error('DeviceStorage delete error:', error);
+            return null;
+        }
     };
 
     clear = async (): Promise<void> => {
-        await DeviceStoragePlugin.clear();
+        try {
+            await DeviceStoragePlugin.clear();
+        } catch (error) {
+            console.error('DeviceStorage clear error:', error);
+            throw error;
+        }
     };
 }
 

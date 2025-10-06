@@ -13,7 +13,59 @@ import Security
         CAPPluginMethod(name: "clear", returnType: CAPPluginReturnPromise)
     ]
 
-    private let servicePrefix = "com.tonkeeper.keychain."
+    private let servicePrefix = "com.tonapps.tonkeeperpro.device."
+
+    private func _get(key: String) -> (value: String?, error: String?) {
+        let keychainQuery: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: servicePrefix,
+            kSecAttrAccount: key,
+            kSecReturnData: true,
+            kSecMatchLimit: kSecMatchLimitOne
+        ]
+
+        var result: AnyObject?
+        let status = SecItemCopyMatching(keychainQuery as CFDictionary, &result)
+
+        if status == errSecSuccess, let data = result as? Data, let stringData = String(data: data, encoding: .utf8) {
+            return (stringData, nil)
+        } else if status == errSecItemNotFound {
+            return (nil, nil)
+        } else {
+            return (nil, "Error retrieving data: \(status)")
+        }
+    }
+
+    private func _set(key: String, value: String) -> (success: Bool, error: String?) {
+        guard let data = value.data(using: .utf8) else {
+            return (false, "Failed to encode value as UTF-8")
+        }
+
+        let keychainQuery: [CFString: Any] = [
+            kSecClass: kSecClassGenericPassword,
+            kSecAttrService: servicePrefix,
+            kSecAttrAccount: key
+        ]
+
+        let attributesToUpdate: [CFString: Any] = [
+            kSecValueData: data
+        ]
+
+        var status = SecItemUpdate(keychainQuery as CFDictionary, attributesToUpdate as CFDictionary)
+
+        if status == errSecItemNotFound {
+            var addQuery = keychainQuery
+            addQuery[kSecValueData] = data
+            addQuery[kSecAttrAccessible] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            status = SecItemAdd(addQuery as CFDictionary, nil)
+        }
+
+        if status == errSecSuccess {
+            return (true, nil)
+        } else {
+            return (false, "Error storing data: \(status)")
+        }
+    }
 
     @objc func get(_ call: CAPPluginCall) {
         guard let key = call.getString("key") else {
@@ -21,118 +73,55 @@ import Security
             return
         }
 
-        let keychainQuery: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: servicePrefix + key,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
+        let result = _get(key: key)
 
-        var result: AnyObject?
-        let status = SecItemCopyMatching(keychainQuery as CFDictionary, &result)
-
-        if status == errSecSuccess, let data = result as? Data {
-            do {
-                let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
-                call.resolve([
-                    "value": jsonObject
-                ])
-            } catch {
-                call.reject("Failed to deserialize JSON: \(error.localizedDescription)")
-            }
-        } else if status == errSecItemNotFound {
-            call.resolve([
-                "value": NSNull()
-            ])
-        } else {
-            call.reject("Error retrieving data: \(status)")
-        }
-    }
-
-    @objc func set(_ call: CAPPluginCall) {
-        guard let key = call.getString("key") else {
-            call.reject("Missing required parameters: key and value")
-            return
-        }
-
-        let value = call.getValue("value")
-        let jsonData: Data
-
-        do {
-            jsonData = try JSONSerialization.data(withJSONObject: value as Any, options: [])
-        } catch {
-            call.reject("Failed to serialize value to JSON: \(error.localizedDescription)")
-            return
-        }
-
-        let keychainQuery: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: servicePrefix + key,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
-
-        let attributesToUpdate: [CFString: Any] = [
-            kSecValueData: jsonData
-        ]
-
-        var status = SecItemUpdate(keychainQuery as CFDictionary, attributesToUpdate as CFDictionary)
-
-        if status == errSecItemNotFound {
-            var addQuery = keychainQuery
-            addQuery[kSecValueData] = jsonData
-            status = SecItemAdd(addQuery as CFDictionary, nil)
-        }
-
-        if status == errSecSuccess {
+        if let error = result.error {
+            call.reject(error)
+        } else if let value = result.value {
             call.resolve([
                 "value": value
             ])
         } else {
-            call.reject("Error storing data: \(status)")
+            call.resolve([
+                "value": NSNull()
+            ])
+        }
+    }
+
+    @objc func set(_ call: CAPPluginCall) {
+        guard let key = call.getString("key"),
+              let value = call.getString("value") else {
+            call.reject("Missing required parameters: key and value")
+            return
+        }
+
+        let result = _set(key: key, value: value)
+
+        if result.success {
+            call.resolve([
+                "value": value
+            ])
+        } else {
+            call.reject(result.error ?? "Unknown error")
         }
     }
 
     @objc func setBatch(_ call: CAPPluginCall) {
-        guard let values = call.getObject("values") as? [String: Any] else {
+        guard let values = call.getObject("values") as? [String: String] else {
             call.reject("Missing required parameter: values")
             return
         }
 
         var errors: [String] = []
-        var results: [String: Any] = [:]
+        var results: [String: String] = [:]
 
         for (key, value) in values {
-            let jsonData: Data
-            do {
-                jsonData = try JSONSerialization.data(withJSONObject: value, options: [])
-            } catch {
-                errors.append("Failed to serialize value for key '\(key)' to JSON: \(error.localizedDescription)")
-                continue
-            }
+            let result = _set(key: key, value: value)
 
-            let keychainQuery: [CFString: Any] = [
-                kSecClass: kSecClassGenericPassword,
-                kSecAttrService: servicePrefix + key,
-                kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-            ]
-
-            let attributesToUpdate: [CFString: Any] = [
-                kSecValueData: jsonData
-            ]
-
-            var status = SecItemUpdate(keychainQuery as CFDictionary, attributesToUpdate as CFDictionary)
-
-            if status == errSecItemNotFound {
-                var addQuery = keychainQuery
-                addQuery[kSecValueData] = jsonData
-                status = SecItemAdd(addQuery as CFDictionary, nil)
-            }
-
-            if status == errSecSuccess {
+            if result.success {
                 results[key] = value
             } else {
-                errors.append("Error storing data for key '\(key)': \(status)")
+                errors.append("Error storing data for key '\(key)': \(result.error ?? "Unknown error")")
             }
         }
 
@@ -151,39 +140,18 @@ import Security
             return
         }
 
-        // First get the current value
-        let getQuery: [CFString: Any] = [
-            kSecClass: kSecClassGenericPassword,
-            kSecAttrService: servicePrefix + key,
-            kSecReturnData: true,
-            kSecMatchLimit: kSecMatchLimitOne,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        ]
+        let getResult = _get(key: key)
 
-        var result: AnyObject?
-        let getStatus = SecItemCopyMatching(getQuery as CFDictionary, &result)
-
-        var previousValue: Any? = nil
-        if getStatus == errSecSuccess, let data = result as? Data {
-            do {
-                previousValue = try JSONSerialization.jsonObject(with: data, options: [])
-            } catch {
-                // If JSON deserialization fails, return null
-                previousValue = nil
-            }
-        }
-
-        // Delete the item
         let deleteQuery: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrService: servicePrefix + key,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            kSecAttrService: servicePrefix,
+            kSecAttrAccount: key
         ]
 
         let deleteStatus = SecItemDelete(deleteQuery as CFDictionary)
 
         if deleteStatus == errSecSuccess || deleteStatus == errSecItemNotFound {
-            if let value = previousValue {
+            if let value = getResult.value {
                 call.resolve([
                     "value": value
                 ])
@@ -200,30 +168,15 @@ import Security
     @objc func clear(_ call: CAPPluginCall) {
         let keychainQuery: [CFString: Any] = [
             kSecClass: kSecClassGenericPassword,
-            kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+            kSecAttrService: servicePrefix
         ]
 
-        var getAllQuery = keychainQuery
-        getAllQuery[kSecReturnAttributes] = true
-        getAllQuery[kSecMatchLimit] = kSecMatchLimitAll
+        let status = SecItemDelete(keychainQuery as CFDictionary)
 
-        var result: AnyObject?
-        let getStatus = SecItemCopyMatching(getAllQuery as CFDictionary, &result)
-
-        if getStatus == errSecSuccess, let items = result as? [[CFString: Any]] {
-            for item in items {
-                if let service = item[kSecAttrService] as? String,
-                   service.hasPrefix(servicePrefix) {
-                    let deleteQuery: [CFString: Any] = [
-                        kSecClass: kSecClassGenericPassword,
-                        kSecAttrService: service,
-                        kSecAttrAccessible: kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-                    ]
-                    SecItemDelete(deleteQuery as CFDictionary)
-                }
-            }
+        if status == errSecSuccess || status == errSecItemNotFound {
+            call.resolve()
+        } else {
+            call.reject("Error clearing storage: \(status)")
         }
-
-        call.resolve()
     }
 }
