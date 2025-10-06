@@ -208,6 +208,4 @@ export class CapacitorFileLogger {
     }
 }
 
-export function setupLogger() {
-    new CapacitorFileLogger();
-}
+export const capacitorFileLogger = new CapacitorFileLogger();

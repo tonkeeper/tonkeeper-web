@@ -13,7 +13,8 @@ export class DeviceStorage implements IStorage {
 
             try {
                 return JSON.parse(value) as R;
-            } catch {
+            } catch (e: unknown) {
+                console.error(e);
                 return null;
             }
         } catch (error) {
@@ -104,8 +105,6 @@ export class StorageMigrationService {
 
     private newStorage: DeviceStorage;
 
-    private migrationKey = 'STORAGE_MIGRATION_COMPLETED';
-
     constructor() {
         this.oldStorage = new PreferencesStorage();
         this.newStorage = new DeviceStorage();
@@ -113,8 +112,25 @@ export class StorageMigrationService {
 
     public async isMigrationCompleted(): Promise<boolean> {
         try {
-            const migrationFlag = await this.newStorage.get<boolean>(this.migrationKey);
-            return migrationFlag === true;
+            const remainingKeys = await this.oldStorage.keys();
+
+            if (remainingKeys.length === 0) {
+                return true;
+            }
+
+            let realKeysCount = 0;
+            for (const key of remainingKeys) {
+                try {
+                    const value = await this.oldStorage.get(key);
+                    if (value !== null) {
+                        realKeysCount++;
+                    }
+                } catch (error) {
+                    console.log(`Error checking key ${key}:`, error);
+                }
+            }
+
+            return realKeysCount === 0;
         } catch (error) {
             console.error('Error checking migration status:', error);
             return false;
@@ -125,14 +141,9 @@ export class StorageMigrationService {
         try {
             const value = await this.oldStorage.get(key);
 
-            if (value !== null) {
-                await this.newStorage.set(key, value);
-                console.log(`Migrated key: ${key}`);
-                return true;
-            } else {
-                console.log(`Key ${key} has null value, skipping migration`);
-                return false;
-            }
+            await this.newStorage.set(key, value);
+            console.log(`Migrated key: ${key}`);
+            return true;
         } catch (error) {
             console.error(`Error migrating key ${key}:`, error);
             return false;
@@ -157,10 +168,6 @@ export class StorageMigrationService {
         }
     }
 
-    private async markMigrationCompleted(): Promise<void> {
-        await this.newStorage.set(this.migrationKey, true);
-    }
-
     async migrate(): Promise<void> {
         if (await this.isMigrationCompleted()) {
             return;
@@ -172,17 +179,14 @@ export class StorageMigrationService {
         let migratedCount = 0;
 
         try {
-            const allKeys = await this.oldStorage.keys();
+            const keysToMigrate = await this.oldStorage.keys();
 
-            if (allKeys.length === 0) {
-                console.log('No keys found in old storage, marking migration as completed');
-                await this.markMigrationCompleted();
+            if (keysToMigrate.length === 0) {
+                console.log('No keys found in old storage, migration completed');
                 return;
             }
 
-            console.log(`Found ${allKeys.length} keys in old storage`);
-
-            const keysToMigrate = allKeys.filter(key => key !== this.migrationKey);
+            console.log(`Found ${keysToMigrate.length} keys in old storage`);
             const migratedKeys: string[] = [];
 
             for (const key of keysToMigrate) {
@@ -201,7 +205,7 @@ export class StorageMigrationService {
 
             if (errors.length === 0) {
                 await this.cleanupOldStorage(migratedKeys);
-                await this.markMigrationCompleted();
+                console.log('Migration completed successfully');
             } else {
                 console.log('Migration completed with errors, skipping cleanup');
             }

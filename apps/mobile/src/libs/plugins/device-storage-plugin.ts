@@ -5,7 +5,9 @@ export interface DeviceStoragePlugin {
 
     set(params: { key: string; value: string }): Promise<{ value: string }>;
 
-    setBatch(params: { values: Record<string, string> }): Promise<{ values: Record<string, string> }>;
+    setBatch(params: {
+        values: Record<string, string>;
+    }): Promise<{ values: Record<string, string> }>;
 
     delete(params: { key: string }): Promise<{ value: string | null }>;
 
@@ -27,7 +29,9 @@ export const DeviceStorage = registerPlugin<DeviceStoragePlugin>('DeviceStorage'
                 return { value: params.value };
             },
 
-            async setBatch(params: { values: Record<string, string> }): Promise<{ values: Record<string, string> }> {
+            async setBatch(params: {
+                values: Record<string, string>;
+            }): Promise<{ values: Record<string, string> }> {
                 Object.entries(params.values).forEach(([key, value]) => {
                     localStorage.setItem(WEB_DEVICE_STORAGE_PREFIX + key, value);
                 });

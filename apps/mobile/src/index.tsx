@@ -1,9 +1,9 @@
 import { migrateCapacitorStorage } from './libs/storage';
-import { setupLogger } from './libs/logger';
+import { capacitorFileLogger } from './libs/logger';
 
 async function main() {
     try {
-        setupLogger();
+        capacitorFileLogger.overrideConsole();
         await migrateCapacitorStorage();
     } catch (e) {
         console.error(e);

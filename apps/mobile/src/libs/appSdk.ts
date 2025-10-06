@@ -25,7 +25,7 @@ import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
 import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
-import { CapacitorFileLogger } from './logger';
+import { capacitorFileLogger } from './logger';
 import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
@@ -194,7 +194,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     keyboard = new CapacitorKeyboardService();
 
-    logger = new CapacitorFileLogger();
+    logger = capacitorFileLogger;
 
     dappBrowser = CapacitorDappBrowser;
 
