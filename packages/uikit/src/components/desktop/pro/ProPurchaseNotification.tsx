@@ -56,7 +56,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
     const { states, methods } = useProPurchaseController();
     const { onLogout, onManage, onPurchase } = methods;
-    const { isPurchasing, isManageLoading, isLoggingOut, isIosInfoLoading } = states;
+    const { isPurchasing, isManageLoading, isLoggingOut } = states;
 
     const {
         plans,
@@ -68,12 +68,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         isSelectionLoading
     } = useProductSelection();
 
-    const isGlobalLoading =
-        isPurchasing ||
-        isLoggingOut ||
-        isManageLoading ||
-        isSelectionLoading ||
-        (selectedSource === SubscriptionSource.IOS && isIosInfoLoading);
+    const isGlobalLoading = isPurchasing || isLoggingOut || isManageLoading || isSelectionLoading;
 
     const handleDisconnect = async () => {
         await onLogout();

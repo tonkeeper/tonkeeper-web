@@ -11,20 +11,11 @@ import { useNavigate } from '../router/useNavigate';
 import { useTargetAuthUpdate } from './useTargetAuthUpdate';
 import { AppRoute, SettingsRoute } from '../../libs/routes';
 import { useNotifyError, useToast } from '../useNotification';
-import {
-    useCurrentSubscriptionInfo,
-    useManageSubscription,
-    useProLogout,
-    useProPurchaseMutation
-} from '../../state/pro';
+import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
 import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
-import { useMetaEncryptionNotification } from '../../components/modals/MetaEncryptionNotificationControlled';
 import { useAtomValue } from '../../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
-import { useMetaEncryptionData } from '../../state/wallet';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useProAuthNotification } from '../../components/modals/ProAuthNotificationControlled';
-import { useAppSdk } from '../appSdk';
 
 interface IOnPurchaseProps {
     plans: IDisplayPlan[];
@@ -34,16 +25,10 @@ interface IOnPurchaseProps {
 
 export const useProPurchaseController = () => {
     const { t } = useTranslation();
-    const sdk = useAppSdk();
     const toast = useToast();
     const navigate = useNavigate();
-    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onClose: onCurrentClose } = useProPurchaseNotification();
-    const { onOpen: onMetaEncryptionOpen, onClose: onMetaEncryptionClose } =
-        useMetaEncryptionNotification();
-    const { data: metaEncryptionMap } = useMetaEncryptionData();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
-    const { data: currentSubInfo, isLoading: isIosInfoLoading } = useCurrentSubscriptionInfo();
 
     useTargetAuthUpdate();
 
@@ -114,57 +99,6 @@ export const useProPurchaseController = () => {
         if (!targetAuth) return;
         if (!selectedPlan) return;
 
-        if (selectedSource === SubscriptionSource.IOS) {
-            const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
-
-            if (originalTransactionId) {
-                const result = await sdk.confirm({
-                    message: t('already_have_subscription', {
-                        transactionId: String(originalTransactionId)
-                    }),
-                    okButtonTitle: t('choose_another_wallet'),
-                    cancelButtonTitle: t('cancel')
-                });
-
-                if (result) {
-                    onCurrentClose();
-                    onProAuthOpen();
-                } else {
-                    toast(t(PurchaseErrors.PURCHASE_FAILED));
-
-                    return;
-                }
-            }
-        }
-
-        const hasMetaEncryption =
-            metaEncryptionMap && metaEncryptionMap[targetAuth.wallet.rawAddress];
-
-        if (selectedSource === SubscriptionSource.EXTENSION && !hasMetaEncryption) {
-            const createMetaEncryption = () =>
-                new Promise(resolve => {
-                    onMetaEncryptionOpen({
-                        onConfirm: (isConfirmed?: boolean) => {
-                            if (isConfirmed) {
-                                resolve(true);
-
-                                onMetaEncryptionClose();
-                            } else {
-                                resolve(false);
-                            }
-                        }
-                    });
-                });
-
-            const isCreated = await createMetaEncryption();
-
-            if (!isCreated) {
-                toast(t('meta_encrypt_key_creation_failed'));
-
-                return;
-            }
-        }
-
         await startPurchasing({
             source: selectedSource,
             formData: {
@@ -179,8 +113,7 @@ export const useProPurchaseController = () => {
         states: {
             isPurchasing,
             isLoggingOut,
-            isManageLoading,
-            isIosInfoLoading
+            isManageLoading
         },
         methods: {
             onLogout: handleLogOut,

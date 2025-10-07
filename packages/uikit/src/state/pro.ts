@@ -36,7 +36,7 @@ import {
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useActiveApi, useActiveConfig } from './wallet';
+import { useActiveApi, useActiveConfig, useMetaEncryptionData } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
@@ -44,7 +44,10 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
 import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
 import { ServerConfig } from './tonendpoint';
-import { useTwoFAWalletConfig } from './two-fa';
+import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
+import { useProAuthNotification } from '../components/modals/ProAuthNotificationControlled';
+import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
+import { useMetaEncryptionNotification } from '../components/modals/MetaEncryptionNotificationControlled';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -291,17 +294,75 @@ export const useOriginalTransactionInfo = () => {
 };
 
 export const useProPurchaseMutation = () => {
+    const { t } = useTranslation();
     const sdk = useAppSdk();
+    const api = useActiveApi();
     const client = useQueryClient();
-    const { data: config } = useTwoFAWalletConfig();
+
+    const { data: metaEncryptionMap } = useMetaEncryptionData();
+    const { data: currentSubInfo } = useCurrentSubscriptionInfo();
+
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+    const { onClose: onCurrentClose } = useProPurchaseNotification();
+    const { onOpen: onMetaEncryptionOpen, onClose: onMetaEncryptionClose } =
+        useMetaEncryptionNotification();
 
     return useMutation<
         PurchaseStatuses,
         Error,
         { source: SubscriptionSource; formData: ISubscriptionFormData }
     >(async ({ source, formData }) => {
-        if (source === SubscriptionSource.EXTENSION && config?.status === 'active') {
+        if (source === SubscriptionSource.IOS) {
+            const originalTransactionId = currentSubInfo?.at(-1)?.originalTransactionId;
+
+            if (originalTransactionId) {
+                const result = await sdk.confirm({
+                    message: t('already_have_subscription', {
+                        transactionId: String(originalTransactionId)
+                    }),
+                    okButtonTitle: t('choose_another_wallet'),
+                    cancelButtonTitle: t('cancel')
+                });
+
+                if (result) {
+                    onCurrentClose();
+                    onProAuthOpen();
+                } else {
+                    throw new Error(PurchaseErrors.PURCHASE_FAILED);
+                }
+            }
+        }
+
+        const twoFAState = await new TwoFAEncoder(api, formData.wallet.rawAddress).getPluginState();
+
+        if (source === SubscriptionSource.EXTENSION && twoFAState.type === 'active') {
             throw new Error(PurchaseErrors.UNSUPPORTED_TWO_FA);
+        }
+
+        const hasMetaEncryption =
+            metaEncryptionMap && metaEncryptionMap[formData.wallet.rawAddress];
+
+        if (source === SubscriptionSource.EXTENSION && !hasMetaEncryption) {
+            const createMetaEncryption = () =>
+                new Promise(resolve => {
+                    onMetaEncryptionOpen({
+                        onConfirm: (isConfirmed?: boolean) => {
+                            if (isConfirmed) {
+                                resolve(true);
+
+                                onMetaEncryptionClose();
+                            } else {
+                                resolve(false);
+                            }
+                        }
+                    });
+                });
+
+            const isCreated = await createMetaEncryption();
+
+            if (!isCreated) {
+                throw new Error(PurchaseErrors.META_ENCRYPT_KEY_CREATION_FAILED);
+            }
         }
 
         const status = await sdk.subscriptionService.subscribe(source, formData);
