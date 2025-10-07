@@ -116,36 +116,31 @@ async function bip39ToPrivateKey(mnemonic: string[]) {
     return keyPairFromSeed(seedContainer.key);
 }
 
-export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: MnemonicType) => {
-    if (mnemonicType) {
-        if (mnemonicType === 'ton') {
-            if (!(await validateStandardTonMnemonic(mnemonic))) {
-                throw new Error('Invalid mnemonic type: ton');
-            }
+async function resolveMnemonicType(mnemonic: string[], type?: MnemonicType): Promise<MnemonicType> {
+    if (type) {
+        const isValid =
+            type === 'ton'
+                ? await validateStandardTonMnemonic(mnemonic)
+                : await validateBip39Mnemonic(mnemonic);
 
-            return mnemonicToPrivateKey(mnemonic);
-        }
+        if (!isValid) throw new Error('Invalid mnemonic');
 
-        if (mnemonicType === 'bip39') {
-            if (!(await validateBip39Mnemonic(mnemonic))) {
-                throw new Error('Invalid mnemonic type: bip39');
-            }
-
-            return bip39ToPrivateKey(mnemonic);
-        }
-
-        assertUnreachable(mnemonicType);
+        return type;
     }
 
-    if (await validateStandardTonMnemonic(mnemonic)) {
-        return mnemonicToPrivateKey(mnemonic);
-    }
-
-    if (await validateBip39Mnemonic(mnemonic)) {
-        return bip39ToPrivateKey(mnemonic);
-    }
+    if (await validateStandardTonMnemonic(mnemonic)) return 'ton';
+    if (await validateBip39Mnemonic(mnemonic)) return 'bip39';
 
     throw new Error('Invalid mnemonic');
+}
+
+export const mnemonicToKeypair = async (mnemonic: string[], mnemonicType?: MnemonicType) => {
+    switch (await resolveMnemonicType(mnemonic, mnemonicType)) {
+        case 'ton':
+            return mnemonicToPrivateKey(mnemonic);
+        case 'bip39':
+            return bip39ToPrivateKey(mnemonic);
+    }
 };
 
 const tonMnemonicToEd25519Seed = async (mnemonic: string[]) => {
@@ -162,32 +157,10 @@ const bip39MnemonicToEd25519Seed = async (mnemonic: string[]) => {
 };
 
 export async function mnemonicToEd25519Seed(mnemonic: string[], mnemonicType?: MnemonicType) {
-    if (mnemonicType) {
-        if (mnemonicType === 'ton') {
-            if (!(await validateStandardTonMnemonic(mnemonic))) {
-                throw new Error('Invalid mnemonic type: ton');
-            }
-
+    switch (await resolveMnemonicType(mnemonic, mnemonicType)) {
+        case 'ton':
             return tonMnemonicToEd25519Seed(mnemonic);
-        }
-
-        if (mnemonicType === 'bip39') {
-            if (!(await validateBip39Mnemonic(mnemonic))) {
-                throw new Error('Invalid mnemonic type: bip39');
-            }
-
+        case 'bip39':
             return bip39MnemonicToEd25519Seed(mnemonic);
-        }
-
-        assertUnreachable(mnemonicType);
     }
-
-    if (await validateStandardTonMnemonic(mnemonic)) {
-        return tonMnemonicToEd25519Seed(mnemonic);
-    }
-    if (await validateBip39Mnemonic(mnemonic)) {
-        return bip39MnemonicToEd25519Seed(mnemonic);
-    }
-
-    throw new Error('Invalid mnemonic');
 }
