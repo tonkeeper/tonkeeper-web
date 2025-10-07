@@ -1455,9 +1455,14 @@ export const useMutateMetaKeyAndCertificates = () => {
                 })
             );
         } else {
+            if (account.type !== 'mnemonic') {
+                throw new Error('Incorrect mnemonic type!');
+            }
+
             await createAndStoreMetaEncryptionKeys(sdk, {
                 seedPrase,
-                rawAddress: wallet.rawAddress
+                rawAddress: wallet.rawAddress,
+                mnemonicType: account.mnemonicType
             });
         }
 
