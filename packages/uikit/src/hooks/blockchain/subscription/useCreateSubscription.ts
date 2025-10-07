@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { Address } from '@ton/core';
-import { useActiveApi, useAccountWallets, useMetaEncryptionData } from '../../../state/wallet';
+import { useActiveApi, useProCompatibleAccountsWallets, useMetaEncryptionData } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
@@ -12,7 +12,7 @@ export const useCreateSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
     const { data: metaEncryptionMap } = useMetaEncryptionData();
-    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
+    const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 
     return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');

@@ -16,7 +16,7 @@ import {
 import { useProState, useSelectWalletForProMutation } from '../../../state/pro';
 import { useTranslation } from '../../../hooks/translation';
 import { useNavigate } from '../../../hooks/router/useNavigate';
-import { useAccountWallets, useActiveWallet } from '../../../state/wallet';
+import { useProCompatibleAccountsWallets, useActiveWallet } from '../../../state/wallet';
 import { useNotifyError, useToast } from '../../../hooks/useNotification';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { handleSubmit } from '../../../libs/form';
@@ -60,7 +60,7 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
     const navigate = useNavigate();
     const { onOpen: onPurchaseOpen } = useProPurchaseNotification();
     const activeWallet = useActiveWallet();
-    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
+    const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
     const [selectedAccountId, setSelectedAccountId] = useState(activeWallet?.rawAddress ?? '');
 
     const toast = useToast();

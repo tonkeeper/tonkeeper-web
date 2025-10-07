@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAccountWallets, useActiveApi } from '../../../state/wallet';
+import { useProCompatibleAccountsWallets, useActiveApi } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
 import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
@@ -13,7 +13,7 @@ export const useCancelSubscription = () => {
     const sdk = useAppSdk();
     const api = useActiveApi();
     const client = useQueryClient();
-    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
+    const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 
     return useMutation<boolean, Error, CancelParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');

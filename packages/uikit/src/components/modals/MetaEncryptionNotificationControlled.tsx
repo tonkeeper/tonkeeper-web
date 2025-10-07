@@ -15,7 +15,7 @@ import { Button } from '../fields/Button';
 import { Body2, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import { handleSubmit } from '../../libs/form';
-import { useAccountWallets, useMutateMetaKeyAndCertificates } from '../../state/wallet';
+import { useProCompatibleAccountsWallets, useMutateMetaKeyAndCertificates } from '../../state/wallet';
 import { useAtomValue } from '../../libs/useAtom';
 import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
@@ -58,7 +58,7 @@ interface IMetaEncryptionProps {
 const MetaEncryptionNotificationContent = ({ onClose, onConfirm }: IMetaEncryptionProps) => {
     const formId = useId();
     const { t } = useTranslation();
-    const accountsWallets = useAccountWallets(backwardCompatibilityFilter);
+    const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
 
     const toast = useToast();
     const targetAuth = useAtomValue(subscriptionFormTempAuth$);
