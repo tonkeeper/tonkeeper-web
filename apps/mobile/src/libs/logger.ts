@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { AppendFileOptions, Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { App } from '@capacitor/app';
-import { hideSensitiveData } from "@tonkeeper/core/dist/utils/common";
+import { hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 
 const originalConsoleError = console.error.bind(console);
 
@@ -156,7 +156,7 @@ class LogBuffer {
 export class CapacitorFileLogger {
     private buffer: LogBuffer;
 
-    constructor(logsPath: string) {
+    constructor(logsPath = 'logs.txt') {
         this.buffer = new LogBuffer(logsPath);
         this.overrideConsole();
     }
@@ -207,3 +207,5 @@ export class CapacitorFileLogger {
         return this.buffer.clear();
     }
 }
+
+export const capacitorFileLogger = new CapacitorFileLogger();

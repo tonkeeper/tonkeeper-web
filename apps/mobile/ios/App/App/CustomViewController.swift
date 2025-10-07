@@ -21,6 +21,7 @@ class CustomViewController: CAPBridgeViewController {
         // Register plugins
         bridge?.registerPluginInstance(BiometricPlugin())
         bridge?.registerPluginInstance(SecureStoragePlugin())
+        bridge?.registerPluginInstance(DeviceStoragePlugin())
         bridge?.registerPluginInstance(DeepLinkPlugin())
         bridge?.registerPluginInstance(BluetoothPlugin())
         bridge?.registerPluginInstance(DappBrowserPlugin())

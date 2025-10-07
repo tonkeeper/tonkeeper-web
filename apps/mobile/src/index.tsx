@@ -1,8 +1,15 @@
-import { createRoot } from 'react-dom/client';
-import { App } from './app/App';
-import './app/i18n';
+import { migrateCapacitorStorage } from './libs/storage';
+import { capacitorFileLogger } from './libs/logger';
 
-import './telegram-widget';
+async function main() {
+    try {
+        capacitorFileLogger.overrideConsole();
+        await migrateCapacitorStorage();
+    } catch (e) {
+        console.error(e);
+    }
 
-const root = createRoot(document.getElementById('root')!);
-root.render(<App />);
+    import('./main');
+}
+
+main();
