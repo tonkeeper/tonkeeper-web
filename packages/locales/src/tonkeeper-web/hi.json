@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "अप्रत्याशित क्यूआर कोड",
   "unknown_operation": "अज्ञात ऑपरेशन",
   "Unlock": "अनलॉक करें",
+  "unsupported_two_fa": "2FA वॉलेट्स अस्थायी रूप से समर्थित नहीं हैं। बिना 2FA के वॉलेट का उपयोग करें या इसे अक्षम करें।\n",
   "unused": {
     "Edit_jettons": "संपादित करें",
     "Enable_storing_config": "कॉन्फ़िग स्टोरिंग को सक्षम करें",

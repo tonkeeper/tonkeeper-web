@@ -11,6 +11,7 @@ import {
     ISubscriptionFormData,
     ISupportData,
     ProSubscription,
+    PurchaseErrors,
     PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
 import { isStandardTonWallet } from '@tonkeeper/core/dist/entries/wallet';
@@ -43,6 +44,7 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { isFirstSemverStringGreater } from '@tonkeeper/core/dist/utils/common';
 import { isWalletInOrigin } from '@tonkeeper/core/dist/utils/pro';
 import { ServerConfig } from './tonendpoint';
+import { useTwoFAWalletConfig } from './two-fa';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -291,12 +293,17 @@ export const useOriginalTransactionInfo = () => {
 export const useProPurchaseMutation = () => {
     const sdk = useAppSdk();
     const client = useQueryClient();
+    const { data: config } = useTwoFAWalletConfig();
 
     return useMutation<
         PurchaseStatuses,
         Error,
         { source: SubscriptionSource; formData: ISubscriptionFormData }
     >(async ({ source, formData }) => {
+        if (source === SubscriptionSource.EXTENSION && config?.status === 'active') {
+            throw new Error(PurchaseErrors.UNSUPPORTED_TWO_FA);
+        }
+
         const status = await sdk.subscriptionService.subscribe(source, formData);
 
         if (status === PurchaseStatuses.PENDING || status === PurchaseStatuses.SUCCESS) {

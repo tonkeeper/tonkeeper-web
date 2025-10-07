@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "کد QR نامعتبر",
   "unknown_operation": "عملیات ناشناخته",
   "Unlock": "باز کردن",
+  "unsupported_two_fa": "کیف پول‌های دارای 2FA به‌طور موقت پشتیبانی نمی‌شوند. از کیف پولی بدون 2FA استفاده کنید یا آن را غیرفعال نمایید.\n",
   "unused": {
     "Edit_jettons": "ویرایش",
     "Enable_storing_config": "فعال‌سازی ذخیره‌سازی پیکربندی",

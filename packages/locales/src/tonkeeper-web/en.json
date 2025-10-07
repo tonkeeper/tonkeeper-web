@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Unexpected QR Code",
   "unknown_operation": "Unknown Operation",
   "Unlock": "Unlock",
+  "unsupported_two_fa": "2FA wallets temporarily aren’t supported. Use a wallet without 2FA or disable it.\n",
   "unused": {
     "1_month": "1 month",
     "1_year": "1 year",

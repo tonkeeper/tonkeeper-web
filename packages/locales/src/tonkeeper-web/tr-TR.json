@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Beklenmeyen QR Kodu",
   "unknown_operation": "Bilinmeyen işlem",
   "Unlock": "Kilidi Aç",
+  "unsupported_two_fa": "2FA cüzdanlar geçici olarak desteklenmiyor. 2FA olmayan bir cüzdan kullanın veya devre dışı bırakın.",
   "unused": {
     "Edit_jettons": "Düzenle",
     "Enable_storing_config": "Yapılandırmayı kaydetmeyi etkinleştir",

@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "非預期的二维码",
   "unknown_operation": "未知操作",
   "Unlock": "解锁",
+  "unsupported_two_fa": "暂不支持 2FA 钱包。请使用不带 2FA 的钱包或禁用 2FA。\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} 个钱包由您的钱包列表管理",
     "add_wallet_existing_multisig_title": "现有多签钱包",

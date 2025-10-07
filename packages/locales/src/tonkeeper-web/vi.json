@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Mã QR không mong đợi",
   "unknown_operation": "Hoạt động không xác định",
   "Unlock": "Mở khóa",
+  "unsupported_two_fa": "Ví 2FA tạm thời không được hỗ trợ. Sử dụng ví không có 2FA hoặc vô hiệu hóa nó.\n",
   "update": "Cập nhật",
   "update_click_to_install": "Nhấp để cài đặt phiên bản mới nhất",
   "update_ledger_error": "Hãy đảm bảo phần mềm Ledger của bạn đã được cập nhật",

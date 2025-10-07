@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Kode QR tidak sesuai",
   "unknown_operation": "Operasi tidak dikenal",
   "Unlock": "Membuka Kunci",
+  "unsupported_two_fa": "Dompet 2FA sementara tidak didukung. Gunakan dompet tanpa 2FA atau nonaktifkan.\n",
   "unused": {
     "Edit_jettons": "Edit",
     "Enable_storing_config": "Aktifkan penyimpanan konfigurasi",

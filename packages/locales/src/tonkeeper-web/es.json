@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Código QR inesperado",
   "unknown_operation": "Operación desconocida",
   "Unlock": "Desbloquear",
+  "unsupported_two_fa": "Las carteras con 2FA no son soportadas temporalmente. Utiliza una cartera sin 2FA o desactívala.\n",
   "unused": {
     "Edit_jettons": "Editar",
     "Enable_storing_config": "Habilitar almacenar la configuración",

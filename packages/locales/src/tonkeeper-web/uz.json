@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Kutilmagan QR kodi",
   "unknown_operation": "Nomaʼlum operatsiya",
   "Unlock": "Qulfni ochish",
+  "unsupported_two_fa": "Ikki faktorli autentifikatsiya hamyonlari vaqtincha qo'llab-quvvatlanmaydi. Ikkita autentifikatsiyasiz hamyon ishlating yoki uni o'chiring.\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} hamyonlar sizning hamyon ro'yxatingiz tomonidan boshqariladi",
     "add_wallet_existing_multisig_title": "Mavjud Multisig hamyon",

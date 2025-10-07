@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Unerwarteter QR-Code",
   "unknown_operation": "Unbekannte Operation",
   "Unlock": "Entsperren",
+  "unsupported_two_fa": "2FA-Wallets werden vorübergehend nicht unterstützt. Verwenden Sie ein Wallet ohne 2FA oder deaktivieren Sie es.\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} Wallets werden von Ihrer Wallet-Liste verwaltet",
     "add_wallet_existing_multisig_title": "Bestehendes Multisig-Wallet",

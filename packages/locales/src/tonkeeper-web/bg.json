@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Неочакван QR код",
   "unknown_operation": "Неизвестна операция",
   "Unlock": "Отключи",
+  "unsupported_two_fa": "Портфейли с 2FA временно не се поддържат. Използвайте портфейл без 2FA или го деактивирайте.\n",
   "unused": {
     "add_wallet_existing_multisig_description": "%{number} портфейла, управлявани от вашия списък с портфейли",
     "add_wallet_existing_multisig_title": "Съществуващ Multisig портфейл",

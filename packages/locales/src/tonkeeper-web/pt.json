@@ -663,6 +663,7 @@
   "Unexpected_QR_Code": "Código QR inesperado",
   "unknown_operation": "Operação desconhecida",
   "Unlock": "Desbloquear",
+  "unsupported_two_fa": "Carteiras 2FA temporariamente não são suportadas. Utilize uma carteira sem 2FA ou desative-o.\n",
   "update": "Atualizar",
   "update_click_to_install": "Clique para instalar a versão mais recente",
   "update_ledger_error": "Certifique-se de que seu software Ledger está atualizado",

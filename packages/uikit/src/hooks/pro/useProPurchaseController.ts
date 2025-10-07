@@ -53,7 +53,8 @@ export const useProPurchaseController = () => {
         isLoading: isPurchasing,
         isSuccess: isPurchasingSuccess,
         isError: isPurchasingError,
-        error: purchaseError
+        error: purchaseError,
+        reset
     } = useProPurchaseMutation();
 
     const {
@@ -77,11 +78,11 @@ export const useProPurchaseController = () => {
 
         if (isPurchaseError(errorMessage)) {
             toast(t(errorMessage));
-
-            return;
+        } else {
+            toast(t(PurchaseErrors.PURCHASE_FAILED));
         }
 
-        toast(t(PurchaseErrors.PURCHASE_FAILED));
+        reset();
     }, [isPurchasingError]);
 
     useEffect(() => {
