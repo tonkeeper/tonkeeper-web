@@ -806,12 +806,16 @@ export const useGetActiveAccountSecret = () => {
     }, [sdk, accountId]);
 };
 
-export const createAndStoreMetaEncryptionKeys = async (
-    sdk: IAppSdk,
-    seedPrase: string[],
-    rawAddress: string
-) => {
-    const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase);
+interface ICreateMetaKeysData {
+    seedPrase: string[];
+    rawAddress: string;
+    mnemonicType?: MnemonicType;
+}
+
+export const createAndStoreMetaEncryptionKeys = async (sdk: IAppSdk, data: ICreateMetaKeysData) => {
+    const { seedPrase, rawAddress, mnemonicType } = data;
+
+    const walletMainEd22519Seed = await mnemonicToEd25519Seed(seedPrase, mnemonicType);
 
     const keyPair = keyPairFromSeed(walletMainEd22519Seed);
 
