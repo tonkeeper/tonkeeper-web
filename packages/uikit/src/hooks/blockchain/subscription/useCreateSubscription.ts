@@ -3,9 +3,12 @@ import { Address } from '@ton/core';
 import { useActiveApi, useAccountWallets, useMetaEncryptionData } from '../../../state/wallet';
 import { getSigner } from '../../../state/mnemonic';
 import { useAppSdk } from '../../appSdk';
-import { SubscriptionEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
+import {
+    prepareSubscriptionParamsForEncoder,
+    SubscriptionEncoder,
+    SubscriptionEncodingParams
+} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
 import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
-import { SubscriptionEncodingParams } from './commonTypes';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 
 export const useCreateSubscription = () => {
@@ -17,21 +20,7 @@ export const useCreateSubscription = () => {
     return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
         if (!subscriptionParams) throw new Error('No params');
 
-        const {
-            admin,
-            subscription_id,
-            first_charging_date,
-            payment_per_period,
-            period,
-            grace_period,
-            caller_fee,
-            recipient,
-            contract,
-            withdraw_msg_body,
-            selectedWallet,
-            deploy_value,
-            metadata
-        } = subscriptionParams;
+        const { admin, subscription_id, contract, selectedWallet } = subscriptionParams;
 
         const accountWallet = accountsWallets.find(
             accWallet => accWallet.wallet.id === selectedWallet.id
@@ -61,20 +50,9 @@ export const useCreateSubscription = () => {
             subscriptionId
         });
 
-        const outgoingMsg = await encoder.encodeCreateSubscriptionV2({
-            beneficiary,
-            subscriptionId,
-            firstChargingDate: first_charging_date,
-            paymentPerPeriod: BigInt(payment_per_period),
-            deployValue: BigInt(deploy_value),
-            period,
-            gracePeriod: grace_period,
-            callerFee: BigInt(caller_fee),
-            withdrawAddress: Address.parse(recipient),
-            withdrawMsgBody: withdraw_msg_body,
-            metadata,
-            walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
-        });
+        const outgoingMsg = await encoder.encodeCreateSubscriptionV2(
+            prepareSubscriptionParamsForEncoder(subscriptionParams, metaEncryptionMap)
+        );
 
         if (!extensionAddress.equals(Address.parse(contract))) {
             throw new Error('Contract extension addresses do not match!');
