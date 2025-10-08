@@ -8,6 +8,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { useUserLanguage } from '../../state/language';
 import { useProInstallExtensionNotification } from '../modals/ProInstallExtensionNotificationControlled';
 import { useProRemoveExtensionNotification } from '../modals/ProRemoveExtensionNotificationControlled';
+import { useIsOnIosReview } from '../../hooks/ios';
 
 interface Props {
     children: ReactNode;
@@ -16,6 +17,7 @@ interface Props {
 export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
     const sdk = useAppSdk();
     const { data: lang } = useUserLanguage();
+    const isOnReview = useIsOnIosReview();
     const { onOpen: onProConfirmOpen } = useProInstallExtensionNotification();
     const { onOpen: onRemoveExtensionConfirmOpen } = useProRemoveExtensionNotification();
 
@@ -23,6 +25,12 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
 
     useEffect(() => {
         if (!sdk || lang === undefined) return;
+
+        if (isOnReview) {
+            setIsReady(true);
+
+            return;
+        }
 
         if (!sdk.subscriptionService) {
             sdk.subscriptionService = new SubscriptionService(sdk.storage, {
@@ -52,7 +60,7 @@ export const CryptoStrategyInstaller: FC<Props> = ({ children }) => {
         }
 
         setIsReady(true);
-    }, [sdk, lang]);
+    }, [sdk, lang, isOnReview]);
 
     return isReady ? <>{children}</> : null;
 };
