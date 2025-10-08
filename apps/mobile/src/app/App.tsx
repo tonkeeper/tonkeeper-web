@@ -33,7 +33,7 @@ import {
     useActiveTonNetwork
 } from '@tonkeeper/uikit/dist/state/wallet';
 import { GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
-import { FC, Suspense, useEffect, useMemo } from 'react';
+import { FC, Fragment, ReactNode, Suspense, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createGlobalStyle, css } from 'styled-components';
 import { CapacitorAppSdk } from '../libs/appSdk';
@@ -50,6 +50,7 @@ import SignerPublishNotification from '@tonkeeper/uikit/dist/pages/signer/Publis
 import { queryClient } from '../libs/query-client';
 import { localesList } from '@tonkeeper/locales/localesList';
 import { useAppCountryInfo } from '@tonkeeper/uikit/dist/state/country';
+import { useIsOnIosReview } from '@tonkeeper/uikit/dist/hooks/ios';
 import { CryptoStrategyInstaller } from '@tonkeeper/uikit/dist/components/pro/CryptoStrategyInstaller';
 
 setupIonicReact({
@@ -260,13 +261,13 @@ export const Loader: FC = () => {
 
     return (
         <AppContext.Provider value={context}>
-            <CryptoStrategyInstaller>
+            <StrategyWrapper>
                 <Content activeAccount={activeAccount} lock={lock} />
                 <CopyNotification />
                 <QrScanner />
                 <ModalsRoot />
                 <SignerPublishNotification />
-            </CryptoStrategyInstaller>
+            </StrategyWrapper>
         </AppContext.Provider>
     );
 };
@@ -280,4 +281,16 @@ const Content: FC<{
     }
 
     return <WideContent {...props} />;
+};
+
+interface StrategyWrapperProps {
+    children: ReactNode;
+}
+
+const StrategyWrapper: FC<StrategyWrapperProps> = ({ children }) => {
+    const isOnReview = useIsOnIosReview();
+
+    const Wrapper = isOnReview ? Fragment : CryptoStrategyInstaller;
+
+    return <Wrapper>{children}</Wrapper>;
 };
