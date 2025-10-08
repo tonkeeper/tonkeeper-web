@@ -1,7 +1,6 @@
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { DeviceStorage as DeviceStoragePlugin } from './plugins/device-storage-plugin';
 import { PreferencesStorage } from './preferences-storage';
-import { pTimeout } from '@tonkeeper/core/dist/utils/common';
 
 export class DeviceStorage implements IStorage {
     get = async <R>(key: string): Promise<R | null> => {
@@ -11,28 +10,16 @@ export class DeviceStorage implements IStorage {
                 return null;
             }
 
-            try {
-                return JSON.parse(value) as R;
-            } catch (e: unknown) {
-                console.error(e);
-                return null;
-            }
+            return JSON.parse(value) as R;
         } catch (error) {
             console.error('DeviceStorage get error:', error);
-            return null;
+            throw error;
         }
     };
 
     set = async <R>(key: string, value: R): Promise<R> => {
         try {
-            let stringValue: string;
-            if (typeof value === 'string') {
-                stringValue = value;
-            } else {
-                stringValue = JSON.stringify(value);
-            }
-
-            await DeviceStoragePlugin.set({ key, value: stringValue });
+            await DeviceStoragePlugin.set({ key, value: JSON.stringify(value) });
             return value;
         } catch (error) {
             console.error('DeviceStorage set error:', error);
@@ -44,11 +31,7 @@ export class DeviceStorage implements IStorage {
         try {
             const stringValues: Record<string, string> = {};
             for (const [key, value] of Object.entries(values)) {
-                if (typeof value === 'string') {
-                    stringValues[key] = value;
-                } else {
-                    stringValues[key] = JSON.stringify(value);
-                }
+                stringValues[key] = JSON.stringify(value);
             }
 
             await DeviceStoragePlugin.setBatch({ values: stringValues });
@@ -68,7 +51,7 @@ export class DeviceStorage implements IStorage {
             return payload;
         } catch (error) {
             console.error('DeviceStorage delete error:', error);
-            return null;
+            throw error;
         }
     };
 
@@ -92,7 +75,7 @@ export function getCapacitorStorage() {
 
 export async function migrateCapacitorStorage() {
     const storageMigrationService = new StorageMigrationService();
-    await pTimeout(storageMigrationService.migrate(), 10000);
+    await storageMigrationService.migrate();
     const isMigrationCompleted = await storageMigrationService.isMigrationCompleted();
 
     if (isMigrationCompleted) {
@@ -169,6 +152,9 @@ export class StorageMigrationService {
     }
 
     async migrate(): Promise<void> {
+        await this.oldStorage.clear();
+        await this.newStorage.clear();
+        return;
         if (await this.isMigrationCompleted()) {
             return;
         }

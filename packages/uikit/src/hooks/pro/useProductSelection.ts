@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
+import { useAppSdk } from '../appSdk';
 import { useProPlans } from '../../state/pro';
 import { useTranslation } from '../translation';
 import { useNotifyError } from '../useNotification';
 import { getSkeletonProducts } from '../../libs/pro';
-import { usePrimarySubscriptionSource } from '../usePrimarySubscriptionSource';
 
 const SKELETON_PRODUCTS_QTY = 1;
 
@@ -15,9 +15,16 @@ export const getProductsForRender = (displayPlans: IDisplayPlan[]) => {
 };
 
 export const useProductSelection = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    const { availableSources, primarySource } = usePrimarySubscriptionSource();
+    const availableSources = useMemo(() => {
+        return sdk.subscriptionService.getAvailableSources();
+    }, [sdk.subscriptionService]);
+
+    const primarySource =
+        availableSources.find(source => source === SubscriptionSource.EXTENSION) ??
+        availableSources[0];
 
     const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(primarySource);
     const [selectedPlanId, setSelectedPlanId] = useState('');
@@ -34,7 +41,6 @@ export const useProductSelection = () => {
     return {
         plans,
         productsForRender,
-        availableSources,
         selectedSource,
         selectedPlanId,
         onSourceSelect: setSelectedSource,
