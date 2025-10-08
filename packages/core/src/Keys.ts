@@ -18,6 +18,7 @@ export enum AppKey {
     ACCOUNT_CONFIG = 'account_config',
     GLOBAL_PREFERENCES_CONFIG = 'global_preferences_config',
     MULTISIG_VIEWED_ORDERS = 'viewed_multisig_orders',
+    META_ENCRYPTION_MAP = 'meta_encryption_map',
 
     THEME = 'theme',
     UI_PREFERENCES = 'ui_preferences',
@@ -44,9 +45,12 @@ export enum AppKey {
     PRO_USED_TRIAL = 'pro_used_trial',
     PRO_AUTH_TOKEN = 'pro_auth_token',
     PRO_PENDING_SUBSCRIPTION = 'pro_pending_subscription',
+    PRO_CANCELLING_SUBSCRIPTION = 'pro_cancelling_subscription',
     PRO_ENDING_NOTIFICATION_STATE = 'pro_ending_notification_state',
+    PRO_BALANCE_NOTIFICATION_STATE = 'pro_balance_notification_state',
 
     IS_DEV_MENU_VISIBLE = 'is_dev_menu_visible',
+    IS_DEV_ENVIRONMENT_ALLOWED = 'is_dev_environment_allowed',
 
     SIGNER_MESSAGE = 'signer_message',
     SWAP_CUSTOM_ASSETS = 'swap_custom_assets',

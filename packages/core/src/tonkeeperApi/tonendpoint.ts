@@ -42,6 +42,7 @@ export interface TonendpointConfig {
     tron_api_url: string;
     tonkeeper_api_url: string;
     pro_api_url: string;
+    pro_dev_api_url: string;
 
     aptabaseEndpoint: string;
     aptabaseKey?: string;
@@ -94,6 +95,10 @@ export interface TonendpointConfig {
     '2fa_tg_linked_ttl_seconds': number;
     '2fa_bot_url'?: string;
 
+    /**
+     * It keeps the last release version, e.g. "v1.0.0"
+     */
+    pro_apk_name?: string;
     pro_mobile_app_appstore_link?: string;
     pro_media_base_url?: string;
     pro_landing_url?: string;
@@ -125,6 +130,7 @@ export const defaultTonendpointConfig: TonendpointConfig = {
     batteryHost: 'https://battery.tonkeeper.com',
     tonkeeper_api_url: 'https://api.tonkeeper.com',
     pro_api_url: 'https://pro.tonconsole.com',
+    pro_dev_api_url: 'https://dev-pro.tonconsole.com',
     batteryMeanFees: '0.0026',
     batteryReservedAmount: '0.065',
     disable_battery: false,

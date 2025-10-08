@@ -1,9 +1,10 @@
-import { Language } from './language';
 import { Network } from './network';
-import { DeprecatedAuthState } from './password';
+import { Language } from './language';
 import { WalletProxy } from './proxy';
 import { TronWallet } from './tron/tron-wallet';
+import { DeprecatedAuthState } from './password';
 import { Account, AccountMAM, AccountTonMnemonic } from './account';
+import { KeyPair } from '@ton/crypto';
 
 export enum WalletVersion {
     V3R1 = 0,
@@ -222,3 +223,18 @@ export const addWalletMethod = [
     'sk_fireblocks'
 ] as const;
 export type AddWalletMethod = (typeof addWalletMethod)[number];
+
+export interface IMetaEncryptionData {
+    keyPair: KeyPair;
+    certificate: Buffer;
+}
+
+export interface ISerializedMetaEncryptionData {
+    keyPair: {
+        publicKey: string;
+        secretKey: string;
+    };
+    certificate: string;
+}
+
+export type MetaEncryptionSerializedMap = Record<string, ISerializedMetaEncryptionData>;

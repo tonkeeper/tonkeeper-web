@@ -7,8 +7,8 @@ import { Subscribe } from './Subscribe';
 import {
     useAccountsState,
     useCreateAccountMAM,
-    useCreateAccountMnemonic,
     useMutateRenameAccount,
+    useCreateAccountMnemonic,
     useMutateRenameAccountDerivations
 } from '../../state/wallet';
 import { ChoseWalletVersionsByMnemonic } from '../../components/create/ChoseWalletVersions';
@@ -420,10 +420,10 @@ export const ImportExistingWallet: FC<{ afterCompleted: () => void }> = ({ after
 
     useEffect(() => {
         if (
-            createdAccount &&
             mnemonic &&
-            (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39') &&
-            selectNetworksPassed
+            createdAccount &&
+            selectNetworksPassed &&
+            (selectedMnemonicType === 'tonMnemonic' || selectedMnemonicType === 'bip39')
         ) {
             void tryAutoAuth({
                 wallet: createdAccount.activeTonWallet,

@@ -1,17 +1,24 @@
 import { IStorage } from '../Storage';
 import { Network } from '../entries/network';
-import { isStandardTonWallet } from '../entries/wallet';
+import { isStandardTonWallet, TonWalletStandard } from '../entries/wallet';
 import { getNetworkByAccount } from '../entries/account';
 import { accountsStorage } from '../service/accountsStorage';
 import { TON_ASSET } from '../entries/crypto/asset/constants';
 import { AssetAmount } from '../entries/crypto/asset/asset-amount';
-import { SubscriptionSource, SubscriptionVerification } from '../pro';
+import { SubscriptionExtensionStatus, SubscriptionSource, SubscriptionVerification } from '../pro';
 import { walletVersionFromProServiceDTO } from '../service/proService';
 import {
     AuthTypes,
     CryptoSubscriptionStatuses,
+    ExtensionSubscriptionStatuses,
+    hasExpiresDate,
+    hasIosPrice,
     IosSubscriptionStatuses,
-    IProStateWallet,
+    isCryptoSubscription,
+    isExpiredSubscription,
+    isExtensionCancellingSubscription,
+    isExtensionSubscription,
+    isPendingSubscription,
     isProductId,
     isProSubscription,
     isValidSubscription,
@@ -20,13 +27,15 @@ import {
     ProSubscription,
     TelegramSubscriptionStatuses
 } from '../entries/pro';
+import { toStructTimeLeft } from './date';
+
+const toDate = (ts: number) => new Date(ts * 1000);
 
 export const normalizeSubscription = (
     subscriptionDto: SubscriptionVerification | null | undefined,
-    authorizedWallet: IProStateWallet | null
+    authorizedWallet: TonWalletStandard | null
 ): ProSubscription => {
     const source = subscriptionDto?.source;
-    const toDate = (ts: number) => new Date(ts * 1000);
 
     if (!source) {
         return null;
@@ -34,7 +43,7 @@ export const normalizeSubscription = (
 
     const valid = subscriptionDto.valid;
     const nextChargeDate = subscriptionDto.next_charge
-        ? new Date(subscriptionDto.next_charge * 1000)
+        ? toDate(subscriptionDto.next_charge)
         : undefined;
 
     if (source === SubscriptionSource.TELEGRAM) {
@@ -66,6 +75,62 @@ export const normalizeSubscription = (
                 type: AuthTypes.TELEGRAM
             },
             expiresDate: toDate(dBStoredInfo.expires_date)
+        };
+    }
+
+    if (source === SubscriptionSource.EXTENSION && authorizedWallet) {
+        const dBStoredInfo = subscriptionDto?.extension;
+        const extensionExpiresDate = dBStoredInfo?.expiration_date
+            ? toDate(dBStoredInfo.expiration_date)
+            : undefined;
+        const extensionNextChargeDate = nextChargeDate ?? extensionExpiresDate;
+
+        if (dBStoredInfo === undefined) {
+            throw new Error('Missing crypto dBStoredInfo');
+        }
+
+        if (valid) {
+            return {
+                source,
+                status: ExtensionSubscriptionStatuses.ACTIVE,
+                valid: true,
+                nextChargeDate: extensionNextChargeDate,
+                auth: {
+                    type: AuthTypes.WALLET,
+                    wallet: authorizedWallet
+                },
+                contract: dBStoredInfo.contract,
+                currency: dBStoredInfo.currency,
+                expiresDate: extensionExpiresDate,
+                amount: dBStoredInfo.payment_per_period,
+                period: dBStoredInfo.period,
+                purchaseDate: toDate(dBStoredInfo.created_at),
+                deployValue: dBStoredInfo.deploy_value,
+                destroyValue: dBStoredInfo.destroy_value,
+                isAutoRenewable:
+                    dBStoredInfo.status === SubscriptionExtensionStatus.ACTIVE ||
+                    dBStoredInfo.status === SubscriptionExtensionStatus.FROZEN
+            };
+        }
+
+        return {
+            source,
+            status: ExtensionSubscriptionStatuses.EXPIRED,
+            valid: false,
+            nextChargeDate: extensionNextChargeDate,
+            auth: {
+                type: AuthTypes.WALLET,
+                wallet: authorizedWallet
+            },
+            contract: dBStoredInfo.contract,
+            currency: dBStoredInfo.currency,
+            expiresDate: extensionNextChargeDate,
+            amount: dBStoredInfo.payment_per_period,
+            period: dBStoredInfo.period,
+            purchaseDate: toDate(dBStoredInfo.created_at),
+            deployValue: dBStoredInfo.deploy_value,
+            destroyValue: dBStoredInfo.destroy_value,
+            isAutoRenewable: false
         };
     }
 
@@ -192,10 +257,7 @@ export const findAuthorizedWallet = async (user: IUserInfo, storage: IStorage) =
 
     if (!actualWallet) return null;
 
-    return {
-        publicKey: actualWallet.publicKey,
-        rawAddress: actualWallet.rawAddress
-    };
+    return actualWallet;
 };
 
 export const isValidNanoString = (value: string): boolean => {
@@ -241,3 +303,183 @@ export const pickBestSubscription = (
 
     return null;
 };
+
+type Translator = (text: string, replaces?: Record<string, string | number>) => string;
+
+export const getStatusText = (subscription: ProSubscription, translator: Translator) => {
+    if (!subscription) return '-';
+
+    if (isPendingSubscription(subscription)) {
+        return `${translator('processing')}...`;
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
+        return `${translator('cancelling')}...`;
+    }
+
+    return `${translator(subscription.status)}`;
+};
+
+export const getStatusColor = (subscription: ProSubscription) => {
+    if (!subscription) return undefined;
+
+    if (isPendingSubscription(subscription)) {
+        return 'textSecondary';
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
+        return 'textSecondary';
+    }
+
+    if (isExpiredSubscription(subscription)) {
+        return 'accentOrange';
+    }
+
+    return undefined;
+};
+
+export const getExpirationDate = (
+    subscription: ProSubscription,
+    dateFormatter: (
+        date: string | number | Date,
+        options?:
+            | (Intl.DateTimeFormatOptions & {
+                  inputUnit?: 'seconds' | 'ms' | undefined;
+              })
+            | undefined
+    ) => string
+) => {
+    try {
+        if (isValidSubscription(subscription) && subscription.nextChargeDate) {
+            return dateFormatter(subscription.nextChargeDate, { dateStyle: 'long' });
+        }
+
+        if (hasExpiresDate(subscription)) {
+            return dateFormatter(subscription.expiresDate, { dateStyle: 'long' });
+        }
+
+        return '-';
+    } catch (e) {
+        console.error('During formatDate error: ', e);
+
+        return '-';
+    }
+};
+
+export const getCryptoSubscriptionPrice = (subscription: ProSubscription) => {
+    if (
+        !subscription ||
+        !(isCryptoSubscription(subscription) || isExtensionSubscription(subscription))
+    )
+        return '-';
+
+    if (isPendingSubscription(subscription)) {
+        return subscription.displayPrice;
+    }
+
+    if (isExtensionCancellingSubscription(subscription)) {
+        return subscription.displayPrice;
+    }
+
+    return getFormattedProPrice(subscription.amount, true);
+};
+
+export const getIosSubscriptionPrice = (subscription: ProSubscription, translator: Translator) => {
+    if (!subscription) return '-';
+
+    if (!hasIosPrice(subscription)) return '-';
+
+    const { price, priceMultiplier, currency, productId } = subscription;
+
+    if (!price || !currency) return '-';
+
+    const proPeriod = SUBSCRIPTION_PERIODS_MAP.get(productId);
+    let proPeriodTranslated = '';
+
+    if (proPeriod) {
+        proPeriodTranslated = ` / ${translator(proPeriod)}`;
+    }
+
+    return `${currency} ${(price / priceMultiplier).toFixed(2)}` + proPeriodTranslated;
+};
+
+export enum Units {
+    YEAR = 'year',
+    MONTH = 'month',
+    WEEK = 'week',
+    DAY = 'day',
+    HOUR = 'hour',
+    MINUTE = 'minute',
+    SECOND = 'second'
+}
+
+type RuPluralForms = 'one' | 'few' | 'many' | 'other';
+
+function pluralRu(count: number): RuPluralForms {
+    const mod10 = count % 10;
+    const mod100 = count % 100;
+
+    if (mod10 === 1 && mod100 !== 11) return 'one';
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return 'few';
+    if (mod10 === 0 || (mod10 >= 5 && mod10 <= 9) || (mod100 >= 11 && mod100 <= 14)) return 'many';
+
+    return 'other';
+}
+
+export interface FormatEveryPeriodOptions {
+    // (30 days in seconds) => allowApproxMonthsYears ? 1 month : 30 days
+    allowApproxMonthsYears?: boolean;
+
+    // minUnit: 'minute' (5) => "Every minute" // not "Every 5 seconds"
+    minUnit?: Units;
+}
+
+interface ISecondsToUnitCountReturnType {
+    unit: Units;
+    count: number;
+    form: RuPluralForms;
+}
+
+export function secondsToUnitCount(
+    seconds: number,
+    opts?: FormatEveryPeriodOptions
+): ISecondsToUnitCountReturnType {
+    const safeSeconds = Math.max(1, Math.trunc(seconds));
+
+    const { days, hours, minutes, seconds: sec } = toStructTimeLeft(safeSeconds * 1000);
+
+    if (opts?.allowApproxMonthsYears === false) {
+        if (days > 0) return { unit: Units.DAY, count: days, form: pluralRu(days) };
+        if (hours > 0) return { unit: Units.HOUR, count: hours, form: pluralRu(hours) };
+        if (minutes > 0) return { unit: Units.MINUTE, count: minutes, form: pluralRu(minutes) };
+
+        return { unit: Units.SECOND, count: sec, form: pluralRu(sec) };
+    }
+
+    if (days >= 365) {
+        const years = Math.floor(days / 365);
+
+        return { unit: Units.YEAR, count: years, form: pluralRu(years) };
+    }
+
+    if (days >= 30) {
+        const months = Math.floor(days / 30);
+
+        return { unit: Units.MONTH, count: months, form: pluralRu(months) };
+    }
+
+    if (days >= 7) {
+        const weeks = Math.floor(days / 7);
+
+        return { unit: Units.WEEK, count: weeks, form: pluralRu(weeks) };
+    }
+
+    if (days > 0) return { unit: Units.DAY, count: days, form: pluralRu(days) };
+    if (hours > 0) return { unit: Units.HOUR, count: hours, form: pluralRu(hours) };
+    if (minutes > 0) return { unit: Units.MINUTE, count: minutes, form: pluralRu(minutes) };
+
+    return { unit: Units.SECOND, count: sec, form: pluralRu(sec) };
+}
+
+// Should be used only for Pro Dev tools
+export const isWalletInOrigin = () => window?.location?.origin.includes('wallet');

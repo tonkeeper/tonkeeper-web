@@ -1,0 +1,65 @@
+import { useMutation } from '@tanstack/react-query';
+import { Address } from '@ton/core';
+import { useActiveApi, useProCompatibleAccountsWallets, useMetaEncryptionData } from '../../../state/wallet';
+import { getSigner } from '../../../state/mnemonic';
+import { useAppSdk } from '../../appSdk';
+import {
+    prepareSubscriptionParamsForEncoder,
+    SubscriptionEncoder,
+    SubscriptionEncodingParams
+} from '@tonkeeper/core/dist/service/ton-blockchain/encoder/subscription-encoder';
+import { backwardCompatibilityFilter } from '@tonkeeper/core/dist/service/proService';
+import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
+
+export const useCreateSubscription = () => {
+    const sdk = useAppSdk();
+    const api = useActiveApi();
+    const { data: metaEncryptionMap } = useMetaEncryptionData();
+    const accountsWallets = useProCompatibleAccountsWallets(backwardCompatibilityFilter);
+
+    return useMutation<boolean, Error, SubscriptionEncodingParams>(async subscriptionParams => {
+        if (!subscriptionParams) throw new Error('No params');
+
+        const { admin, subscription_id, contract, selectedWallet } = subscriptionParams;
+
+        const accountWallet = accountsWallets.find(
+            accWallet => accWallet.wallet.id === selectedWallet.id
+        );
+        const accountId = accountWallet?.account?.id;
+
+        if (!accountId) throw new Error('Account id is required!');
+
+        const signer = await getSigner(sdk, accountId, {
+            walletId: selectedWallet.id
+        }).catch(() => null);
+
+        if (!signer || signer.type !== 'cell') throw new Error('Signer is incorrect!');
+
+        if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
+            throw new Error('walletMetaKeyPair is missed!');
+        }
+
+        const sender = new WalletMessageSender(api, selectedWallet, signer);
+        const encoder = new SubscriptionEncoder(selectedWallet);
+
+        const beneficiary = Address.parse(admin);
+        const subscriptionId = subscription_id;
+
+        const extensionAddress = encoder.getExtensionAddress({
+            beneficiary,
+            subscriptionId
+        });
+
+        const outgoingMsg = await encoder.encodeCreateSubscriptionV2(
+            prepareSubscriptionParamsForEncoder(subscriptionParams, metaEncryptionMap)
+        );
+
+        if (!extensionAddress.equals(Address.parse(contract))) {
+            throw new Error('Contract extension addresses do not match!');
+        }
+
+        await sender.send(outgoingMsg);
+
+        return true;
+    });
+};

@@ -1,44 +1,36 @@
+import { useEffect } from 'react';
 import {
-    isCryptoStrategy,
+    IDisplayPlan,
     isPurchaseError,
     PurchaseErrors,
     PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
-import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
 
-import { useAppSdk } from '../appSdk';
 import { useTranslation } from '../translation';
-import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
-import { useNotifyError, useToast } from '../useNotification';
-import { useProductSelection } from './useProductSelection';
-import { useEffect } from 'react';
-import { AppRoute, SettingsRoute } from '../../libs/routes';
-import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useNavigate } from '../router/useNavigate';
-import { useExistingIosSubscription } from './useExistingIosSubscription';
+import { useTargetAuthUpdate } from './useTargetAuthUpdate';
+import { AppRoute, SettingsRoute } from '../../libs/routes';
+import { useNotifyError, useToast } from '../useNotification';
+import { useManageSubscription, useProLogout, useProPurchaseMutation } from '../../state/pro';
+import { useProPurchaseNotification } from '../../components/modals/ProPurchaseNotificationControlled';
 import { useAtomValue } from '../../libs/useAtom';
+import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
+
+interface IOnPurchaseProps {
+    plans: IDisplayPlan[];
+    selectedSource: SubscriptionSource;
+    selectedPlanId: string;
+}
 
 export const useProPurchaseController = () => {
-    const sdk = useAppSdk();
     const { t } = useTranslation();
     const toast = useToast();
     const navigate = useNavigate();
-    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
     const { onClose: onCurrentClose } = useProPurchaseNotification();
-    const isCrypto = isCryptoStrategy(sdk.subscriptionStrategy);
+    const targetAuth = useAtomValue(subscriptionFormTempAuth$);
 
-    useExistingIosSubscription();
-
-    const {
-        plans,
-        productsForRender,
-        selectedPlanId,
-        setSelectedPlanId,
-        isLoading: isPlansLoading,
-        promoCode,
-        setPromoCode,
-        verifiedPromoCode
-    } = useProductSelection();
+    useTargetAuthUpdate();
 
     const {
         data: status,
@@ -46,7 +38,8 @@ export const useProPurchaseController = () => {
         isLoading: isPurchasing,
         isSuccess: isPurchasingSuccess,
         isError: isPurchasingError,
-        error: purchaseError
+        error: purchaseError,
+        reset
     } = useProPurchaseMutation();
 
     const {
@@ -61,7 +54,6 @@ export const useProPurchaseController = () => {
         isLoading: isManageLoading,
         isError: isManageError
     } = useManageSubscription();
-    useManageSubscription();
     useNotifyError(isManageError && new Error(t('manage_unavailable')));
 
     useEffect(() => {
@@ -71,11 +63,11 @@ export const useProPurchaseController = () => {
 
         if (isPurchaseError(errorMessage)) {
             toast(t(errorMessage));
-
-            return;
+        } else {
+            toast(t(PurchaseErrors.PURCHASE_FAILED));
         }
 
-        toast(t(PurchaseErrors.PURCHASE_FAILED));
+        reset();
     }, [isPurchasingError]);
 
     useEffect(() => {
@@ -99,37 +91,33 @@ export const useProPurchaseController = () => {
         navigate(AppRoute.settings + SettingsRoute.pro, { replace: true });
     }, [isPurchasingSuccess]);
 
-    const isLoading = isPlansLoading || isPurchasing || isLoggingOut || isManageLoading;
+    const handlePurchase = async (props: IOnPurchaseProps) => {
+        const { plans, selectedSource, selectedPlanId } = props;
 
-    const onSubmit = async () => {
         const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
 
         if (!targetAuth) return;
         if (!selectedPlan) return;
 
         await startPurchasing({
-            selectedPlan,
-            wallet: targetAuth.wallet,
-            tempToken: targetAuth.tempToken,
-            promoCode: verifiedPromoCode
+            source: selectedSource,
+            formData: {
+                selectedPlan,
+                wallet: targetAuth.wallet,
+                tempToken: targetAuth.tempToken
+            }
         });
     };
 
     return {
         states: {
-            isCrypto,
-            isLoading,
+            isPurchasing,
             isLoggingOut,
-            promoCode,
-            productsForRender,
-            verifiedPromoCode
+            isManageLoading
         },
         methods: {
-            onSubmit,
-            setPromoCode,
-            selectedPlanId,
-            setSelectedPlanId,
             onLogout: handleLogOut,
+            onPurchase: handlePurchase,
             onManage: handleManageSubscription
         }
     };

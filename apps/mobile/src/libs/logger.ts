@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { AppendFileOptions, Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { App } from '@capacitor/app';
-import { hideSensitiveData } from "@tonkeeper/core/dist/utils/common";
+import { hideSensitiveData } from '@tonkeeper/core/dist/utils/common';
 
 const originalConsoleError = console.error.bind(console);
 
@@ -156,20 +156,25 @@ class LogBuffer {
 export class CapacitorFileLogger {
     private buffer: LogBuffer;
 
-    constructor(logsPath: string) {
+    private isConsoleOverridden = false;
+
+    constructor(logsPath = 'logs.txt') {
         this.buffer = new LogBuffer(logsPath);
         this.overrideConsole();
     }
 
     public overrideConsole(): void {
-        const methods = ['log', 'error', 'warn', 'info', 'debug'] as const;
-        methods.forEach(method => {
-            const original = console[method]?.bind(console);
-            console[method] = (...args: unknown[]) => {
-                this.write(method.toUpperCase(), args);
-                original(...args);
-            };
-        });
+        if (!this.isConsoleOverridden) {
+            const methods = ['log', 'error', 'warn', 'info', 'debug'] as const;
+            methods.forEach(method => {
+                const original = console[method]?.bind(console);
+                console[method] = (...args: unknown[]) => {
+                    this.write(method.toUpperCase(), args);
+                    original(...args);
+                };
+            });
+            this.isConsoleOverridden = true;
+        }
     }
 
     private write(level: string, args: unknown[]): void {
@@ -207,3 +212,5 @@ export class CapacitorFileLogger {
         return this.buffer.clear();
     }
 }
+
+export const capacitorFileLogger = new CapacitorFileLogger();

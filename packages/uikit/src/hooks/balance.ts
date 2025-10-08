@@ -1,9 +1,10 @@
+import { useCallback, useMemo } from 'react';
+import BigNumber from 'bignumber.js';
+
 import { FiatCurrencies } from '@tonkeeper/core/dist/entries/fiat';
 import { AmountFormatter } from '@tonkeeper/core/dist/utils/AmountFormatter';
-import { formatDecimals, shiftedDecimals } from "@tonkeeper/core/dist/utils/balance";
+import { formatDecimals, shiftedDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { getDecimalSeparator, getGroupSeparator } from '@tonkeeper/core/dist/utils/formatting';
-import BigNumber from 'bignumber.js';
-import { useCallback, useMemo } from 'react';
 
 export const formatter = new AmountFormatter({
     getLocaleFormat: () => ({

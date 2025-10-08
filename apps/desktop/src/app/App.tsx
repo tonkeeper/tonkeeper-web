@@ -64,7 +64,7 @@ import { useDevSettings } from '@tonkeeper/uikit/dist/state/dev';
 import { useUserFiatQuery } from '@tonkeeper/uikit/dist/state/fiat';
 import { useUserLanguage } from '@tonkeeper/uikit/dist/state/language';
 import { useCanPromptTouchId } from '@tonkeeper/uikit/dist/state/password';
-import { useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
+import { useProApiUrl, useProBackupState } from '@tonkeeper/uikit/dist/state/pro';
 import { useTonendpoint, useTonenpointConfig } from '@tonkeeper/uikit/dist/state/tonendpoint';
 import { useAccountsStateQuery, useActiveAccountQuery } from '@tonkeeper/uikit/dist/state/wallet';
 import { Container, GlobalStyleCss } from '@tonkeeper/uikit/dist/styles/globalStyle';
@@ -276,6 +276,7 @@ export const Loader: FC = () => {
         storeCountryCode: countryInfo?.storeCountryCode
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(serverConfig?.mainnetConfig);
 
     useAppHeight();
 
@@ -305,6 +306,7 @@ export const Loader: FC = () => {
         serverConfig === undefined ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
@@ -313,7 +315,7 @@ export const Loader: FC = () => {
     }
 
     // set api url synchronously
-    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

@@ -6,4 +6,5 @@ export enum SubscriptionSource {
     IOS = 'ios',
     CRYPTO = 'crypto',
     TELEGRAM = 'telegram',
+    EXTENSION = 'extension',
 }

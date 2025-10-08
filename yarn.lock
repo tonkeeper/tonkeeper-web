@@ -3996,9 +3996,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@npm:^15.1.0":
-  version: 15.1.0
-  resolution: "@ton/ton@npm:15.1.0"
+"@ton/ton@npm:^15.4.0":
+  version: 15.4.0
+  resolution: "@ton/ton@npm:15.4.0"
   dependencies:
     axios: "npm:^1.6.7"
     dataloader: "npm:^2.0.0"
@@ -4006,9 +4006,9 @@ __metadata:
     teslabot: "npm:^1.3.0"
     zod: "npm:^3.21.4"
   peerDependencies:
-    "@ton/core": ">=0.59.0"
+    "@ton/core": ">=0.62.0 <1.0.0"
     "@ton/crypto": ">=3.2.0"
-  checksum: 10/8adde2c60858af8fd33835dbb0b1ca77fdc039de1a9ee5f8216d4b3366590301f56bd160a47a5d2cd9ef18674416e13dd3e0d91e63e90b2f55bdeefbd9b9badf
+  checksum: 10/9ed3c3e26ea1b0d5991534980afc3b46a2a9eaf851e23b2d1ec6109f569f531eb74c0f8a3e8829f592e221f2fe0d9c34323057603ba40168b1893123acef9ad1
   languageName: node
   linkType: hard
 
@@ -4027,8 +4027,10 @@ __metadata:
     "@ton-keychain/trx": "npm:^0.0.7"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "npm:^15.1.0"
+    "@ton/ton": "npm:^15.4.0"
+    "@types/aes-js": "npm:^3.1.4"
     "@types/punycode": "npm:^2"
+    aes-js: "npm:^3.1.2"
     bignumber.js: "npm:^9.1.1"
     bip39: "npm:^3.1.0"
     crc-32: "npm:^1.2.2"
@@ -4424,6 +4426,13 @@ __metadata:
   version: 1.0.4
   resolution: "@tsconfig/node16@npm:1.0.4"
   checksum: 10/202319785901f942a6e1e476b872d421baec20cf09f4b266a1854060efbf78cde16a4d256e8bc949d31e6cd9a90f1e8ef8fb06af96a65e98338a2b6b0de0a0ff
+  languageName: node
+  linkType: hard
+
+"@types/aes-js@npm:^3.1.4":
+  version: 3.1.4
+  resolution: "@types/aes-js@npm:3.1.4"
+  checksum: 10/49a322dd8ae49fed4175b345e2198b6b72636d1dce06c13ac846aff6959a7bc109fc6bee5b7f2fb22d9faac7c15c534bb4ac12d9383401020ababa55e0fc47f5
   languageName: node
   linkType: hard
 
@@ -6652,6 +6661,13 @@ __metadata:
   version: 4.0.0-beta.5
   resolution: "aes-js@npm:4.0.0-beta.5"
   checksum: 10/8f745da2e8fb38e91297a8ec13c2febe3219f8383303cd4ed4660ca67190242ccfd5fdc2f0d1642fd1ea934818fb871cd4cc28d3f28e812e3dc6c3d0f1f97c24
+  languageName: node
+  linkType: hard
+
+"aes-js@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "aes-js@npm:3.1.2"
+  checksum: 10/b65916767034a51375a3ac5aad62af452d89a386c1ae7b607bb9145d0bb8b8823bf2f3eba85bdfa52d61c65d5aed90ba90f677b8c826bfa1a8b7ae2fa3b54d91
   languageName: node
   linkType: hard
 

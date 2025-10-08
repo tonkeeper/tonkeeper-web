@@ -59,6 +59,7 @@ import { useNavigate } from '@tonkeeper/uikit/dist/hooks/router/useNavigate';
 import { useRealtimeUpdatesInvalidation } from '@tonkeeper/uikit/dist/hooks/realtime';
 import { RedirectFromDesktopSettings } from '@tonkeeper/uikit/dist/pages/settings/RedirectFromDesktopSettings';
 import { Notifications } from './components/Notifications';
+import { useProApiUrl } from '@tonkeeper/uikit/dist/state/pro';
 import { CustomConfirmNotificationControlled } from '@tonkeeper/uikit/dist/components/modals/CustomConfirmControlled';
 
 const Settings = React.lazy(() => import('@tonkeeper/uikit/dist/pages/settings'));
@@ -222,6 +223,7 @@ export const Loader: FC = React.memo(() => {
         platform: 'extension'
     });
     const { data: serverConfig } = useTonenpointConfig(tonendpoint);
+    const { data: proApiUrl } = useProApiUrl(serverConfig?.mainnetConfig);
 
     const { data: tracker } = useAnalytics(
         serverConfig?.mainnetConfig,
@@ -235,6 +237,7 @@ export const Loader: FC = React.memo(() => {
         !serverConfig ||
         lock === undefined ||
         fiat === undefined ||
+        proApiUrl === undefined ||
         !devSettings ||
         globalPreferencesLoading ||
         globalSetupLoading
@@ -247,7 +250,7 @@ export const Loader: FC = React.memo(() => {
     }
 
     // set api url synchronously
-    setProApiUrl(serverConfig.mainnetConfig.pro_api_url);
+    setProApiUrl(proApiUrl);
 
     const context: IAppContext = {
         mainnetApi: getApiConfig(serverConfig.mainnetConfig),

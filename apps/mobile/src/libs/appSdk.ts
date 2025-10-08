@@ -11,7 +11,6 @@ import {
     AppCountryInfo
 } from '@tonkeeper/core/dist/AppSdk';
 import packageJson from '../../package.json';
-import { CapacitorStorage } from './storage';
 import { Clipboard } from '@capacitor/clipboard';
 import { Biometric } from './plugins';
 import { CapacitorCookies } from '@capacitor/core';
@@ -26,11 +25,14 @@ import { Dialog } from '@capacitor/dialog';
 import { Keyboard } from '@capacitor/keyboard';
 import { isValidUrlProtocol, safeWindowOpen } from '@tonkeeper/core/dist/utils/common';
 import { CAPACITOR_APPLICATION_ID } from './aplication-id';
-import { CapacitorFileLogger } from './logger';
+import { capacitorFileLogger } from './logger';
 import { CapacitorDappBrowser } from './plugins/dapp-browser-plugin';
 import { UserIdentityService } from '@tonkeeper/core/dist/user-identity';
 import { IosSubscriptionStrategy } from './plugins/subscription-plugin';
 import { CountryInfo } from './plugins/country-info-plugin';
+import { getCapacitorStorage } from './storage';
+import { SubscriptionService } from '@tonkeeper/core/dist/SubscriptionService';
+import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 
 async function waitAppIsActive(): Promise<void> {
     return new Promise(async r => {
@@ -78,7 +80,8 @@ export class BiometryServiceCapacitor implements BiometryService {
         }
     };
 }
-export const capacitorStorage = new CapacitorStorage();
+
+export const capacitorStorage = getCapacitorStorage();
 
 export class CapacitorAppSdk extends BaseApp implements IAppSdk {
     cookie = new CookieCapacitor();
@@ -92,7 +95,9 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     keychain = new KeychainCapacitor(this.biometry, this.storage);
 
-    subscriptionStrategy = new IosSubscriptionStrategy(this.storage);
+    subscriptionService = new SubscriptionService(this.storage, {
+        initialStrategyMap: new Map([[SubscriptionSource.IOS, new IosSubscriptionStrategy()]])
+    });
 
     constructor() {
         super(capacitorStorage);
@@ -189,7 +194,7 @@ export class CapacitorAppSdk extends BaseApp implements IAppSdk {
 
     keyboard = new CapacitorKeyboardService();
 
-    logger = new CapacitorFileLogger('logs.txt');
+    logger = capacitorFileLogger;
 
     dappBrowser = CapacitorDappBrowser;
 

@@ -6,7 +6,9 @@ export enum PurchaseStatuses {
 
 export enum PurchaseErrors {
     INCORRECT_WALLET_TYPE = 'incorrect_wallet_type',
+    UNSUPPORTED_TWO_FA = 'unsupported_two_fa',
     PROMOCODE_ALREADY_USED = 'promocode_already_used',
+    META_ENCRYPT_KEY_CREATION_FAILED = 'meta_encrypt_key_creation_failed',
     PURCHASE_FAILED = 'purchase_failed'
 }
 
@@ -32,6 +34,16 @@ export enum CryptoSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired',
     PENDING = 'pending'
+}
+
+export enum ExtensionSubscriptionStatuses {
+    NOT_INITIALIZED = 'not_initialized',
+    ACTIVE = 'active',
+    EXPIRED = 'expired',
+    CANCELLED = 'cancelled',
+    INVALID = 'invalid',
+    PENDING = 'pending',
+    CANCELLING = 'cancelling'
 }
 
 export enum TelegramSubscriptionStatuses {

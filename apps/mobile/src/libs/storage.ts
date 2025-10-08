@@ -1,34 +1,204 @@
 import { IStorage } from '@tonkeeper/core/dist/Storage';
-import { Preferences } from '@capacitor/preferences';
+import { DeviceStorage as DeviceStoragePlugin } from './plugins/device-storage-plugin';
+import { PreferencesStorage } from './preferences-storage';
 
-export class CapacitorStorage implements IStorage {
+export class DeviceStorage implements IStorage {
     get = async <R>(key: string): Promise<R | null> => {
-        const { value } = await Preferences.get({ key });
-        return value ? (JSON.parse(value) as R) : null;
-    };
+        try {
+            const { value } = await DeviceStoragePlugin.get({ key });
+            if (value === null) {
+                return null;
+            }
 
-    set = async <R>(key: string, value: R) => {
-        await Preferences.set({ key, value: JSON.stringify(value) });
-        return value;
-    };
-
-    setBatch = async <V extends Record<string, unknown>>(values: V) => {
-        const operations = Object.entries(values).map(([key, value]) =>
-            Preferences.set({ key, value: JSON.stringify(value) })
-        );
-        await Promise.all(operations);
-        return values;
-    };
-
-    delete = async <R>(key: string) => {
-        const payload = await this.get<R>(key);
-        if (payload !== null) {
-            await Preferences.remove({ key });
+            return JSON.parse(value) as R;
+        } catch (error) {
+            console.error('DeviceStorage get error:', error);
+            throw error;
         }
-        return payload;
+    };
+
+    set = async <R>(key: string, value: R): Promise<R> => {
+        try {
+            await DeviceStoragePlugin.set({ key, value: JSON.stringify(value) });
+            return value;
+        } catch (error) {
+            console.error('DeviceStorage set error:', error);
+            throw error;
+        }
+    };
+
+    setBatch = async <V extends Record<string, unknown>>(values: V): Promise<V> => {
+        try {
+            const stringValues: Record<string, string> = {};
+            for (const [key, value] of Object.entries(values)) {
+                stringValues[key] = JSON.stringify(value);
+            }
+
+            await DeviceStoragePlugin.setBatch({ values: stringValues });
+            return values;
+        } catch (error) {
+            console.error('DeviceStorage setBatch error:', error);
+            throw error;
+        }
+    };
+
+    delete = async <R>(key: string): Promise<R | null> => {
+        try {
+            const payload = await this.get<R>(key);
+            if (payload !== null) {
+                await DeviceStoragePlugin.delete({ key });
+            }
+            return payload;
+        } catch (error) {
+            console.error('DeviceStorage delete error:', error);
+            throw error;
+        }
     };
 
     clear = async (): Promise<void> => {
-        await Preferences.clear();
+        try {
+            await DeviceStoragePlugin.clear();
+        } catch (error) {
+            console.error('DeviceStorage clear error:', error);
+            throw error;
+        }
     };
+}
+
+const deviceStorage = new DeviceStorage();
+const preferencesStorage = new PreferencesStorage();
+let capacitorStorage: IStorage = preferencesStorage;
+
+export function getCapacitorStorage() {
+    return capacitorStorage;
+}
+
+export async function migrateCapacitorStorage() {
+    const storageMigrationService = new StorageMigrationService();
+    await storageMigrationService.migrate();
+    const isMigrationCompleted = await storageMigrationService.isMigrationCompleted();
+
+    if (isMigrationCompleted) {
+        capacitorStorage = deviceStorage;
+    }
+}
+
+export class StorageMigrationService {
+    private oldStorage: PreferencesStorage;
+
+    private newStorage: DeviceStorage;
+
+    constructor() {
+        this.oldStorage = new PreferencesStorage();
+        this.newStorage = new DeviceStorage();
+    }
+
+    public async isMigrationCompleted(): Promise<boolean> {
+        try {
+            const remainingKeys = await this.oldStorage.keys();
+
+            if (remainingKeys.length === 0) {
+                return true;
+            }
+
+            let realKeysCount = 0;
+            for (const key of remainingKeys) {
+                try {
+                    const value = await this.oldStorage.get(key);
+                    if (value !== null) {
+                        realKeysCount++;
+                    }
+                } catch (error) {
+                    console.log(`Error checking key ${key}:`, error);
+                }
+            }
+
+            return realKeysCount === 0;
+        } catch (error) {
+            console.error('Error checking migration status:', error);
+            return false;
+        }
+    }
+
+    private async migrateKey(key: string): Promise<boolean> {
+        try {
+            const value = await this.oldStorage.get(key);
+
+            await this.newStorage.set(key, value);
+            console.log(`Migrated key: ${key}`);
+            return true;
+        } catch (error) {
+            console.error(`Error migrating key ${key}:`, error);
+            return false;
+        }
+    }
+
+    private async cleanupOldStorage(migratedKeys: string[]): Promise<void> {
+        try {
+            console.log(`Cleaning up ${migratedKeys.length} keys from old storage`);
+
+            for (const key of migratedKeys) {
+                try {
+                    await this.oldStorage.delete(key);
+                } catch (error) {
+                    console.error(`Error removing key ${key} from old storage:`, error);
+                }
+            }
+
+            console.log('Old storage cleanup completed');
+        } catch (error) {
+            console.error('Error during old storage cleanup:', error);
+        }
+    }
+
+    async migrate(): Promise<void> {
+        if (await this.isMigrationCompleted()) {
+            return;
+        }
+
+        console.log('Starting storage migration from Preferences to Keychain...');
+
+        const errors: string[] = [];
+        let migratedCount = 0;
+
+        try {
+            const keysToMigrate = await this.oldStorage.keys();
+
+            if (keysToMigrate.length === 0) {
+                console.log('No keys found in old storage, migration completed');
+                return;
+            }
+
+            console.log(`Found ${keysToMigrate.length} keys in old storage`);
+            const migratedKeys: string[] = [];
+
+            for (const key of keysToMigrate) {
+                try {
+                    const success = await this.migrateKey(key);
+                    if (success) {
+                        migratedCount++;
+                        migratedKeys.push(key);
+                    }
+                } catch (error) {
+                    const errorMsg = `Failed to migrate key ${key}: ${error}`;
+                    console.error(errorMsg);
+                    errors.push(errorMsg);
+                }
+            }
+
+            if (errors.length === 0) {
+                await this.cleanupOldStorage(migratedKeys);
+                console.log('Migration completed successfully');
+            } else {
+                console.log('Migration completed with errors, skipping cleanup');
+            }
+
+            console.log(
+                `Migration completed: ${migratedCount}/${keysToMigrate.length} keys migrated`
+            );
+        } catch (error) {
+            const errorMsg = `Migration failed: ${error}`;
+            console.error(errorMsg);
+        }
+    }
 }
