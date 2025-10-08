@@ -1,4 +1,4 @@
-import { FC, useId, useMemo } from 'react';
+import { FC, useId } from 'react';
 import { styled } from 'styled-components';
 
 import {
@@ -28,7 +28,7 @@ import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { useFormatFiat, useRate } from '../../../state/rates';
 import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { useAppSdk } from '../../../hooks/appSdk';
+import { usePrimarySubscriptionSource } from '../../../hooks/usePrimarySubscriptionSource';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -58,7 +58,6 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
     onClose,
     onOpenProps
 }) => {
-    const sdk = useAppSdk();
     const formId = useId();
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -71,14 +70,7 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
         onOpen: onTrialModalOpen
     } = useDisclosure();
 
-    const availableSources = useMemo(
-        () => sdk.subscriptionService.getAvailableSources(),
-        [sdk.subscriptionService]
-    );
-
-    const primarySource =
-        availableSources.find(source => source === SubscriptionSource.EXTENSION) ??
-        availableSources[0];
+    const { primarySource } = usePrimarySubscriptionSource();
 
     const {
         data: displayPlans,
@@ -153,12 +145,14 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
     const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
     const { t } = useTranslation();
 
+    const isIos = primarySource === SubscriptionSource.IOS;
     const { displayPrice, subscriptionPeriod } = displayPlans[0] || {};
 
     const { fiatAmount: fiatEquivalent } = useFormatFiat(rate, formatDecimals(displayPrice));
 
-    const finalFiatAmount =
-        primarySource === SubscriptionSource.IOS ? displayPrice : fiatEquivalent;
+    const isPrimaryLoading =
+        !isError &&
+        (isLoading || (isIos ? !displayPrice : !fiatEquivalent) || (!isIos && isRateLoading));
 
     return (
         <div className={className}>
@@ -168,11 +162,12 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
                 size="large"
                 type="submit"
                 form={formId}
-                loading={!isError && (!finalFiatAmount || isLoading || isRateLoading)}
+                loading={isPrimaryLoading}
             >
                 <Label2>
                     {t(isError ? 'try_again' : 'continue_from')}
-                    {!isError && ` ${finalFiatAmount} / ${t(subscriptionPeriod)}`}
+                    {!isError &&
+                        ` ${isIos ? displayPrice : fiatEquivalent} / ${t(subscriptionPeriod)}`}
                 </Label2>
             </Button>
 
