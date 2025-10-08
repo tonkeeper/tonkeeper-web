@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
+import { useAppSdk } from '../appSdk';
 import { useProPlans } from '../../state/pro';
 import { useTranslation } from '../translation';
 import { useNotifyError } from '../useNotification';
@@ -14,11 +15,18 @@ export const getProductsForRender = (displayPlans: IDisplayPlan[]) => {
 };
 
 export const useProductSelection = () => {
+    const sdk = useAppSdk();
     const { t } = useTranslation();
 
-    const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(
-        SubscriptionSource.EXTENSION
-    );
+    const availableSources = useMemo(() => {
+        return sdk.subscriptionService.getAvailableSources();
+    }, [sdk.subscriptionService]);
+
+    const primarySource =
+        availableSources.find(source => source === SubscriptionSource.EXTENSION) ??
+        availableSources[0];
+
+    const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(primarySource);
     const [selectedPlanId, setSelectedPlanId] = useState('');
 
     const { data: plans, isLoading, isError } = useProPlans(selectedSource);
@@ -33,6 +41,7 @@ export const useProductSelection = () => {
     return {
         plans,
         productsForRender,
+        availableSources,
         selectedSource,
         selectedPlanId,
         onSourceSelect: setSelectedSource,
