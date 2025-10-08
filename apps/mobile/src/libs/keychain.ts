@@ -20,9 +20,9 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
                 id: `Wallet-${key}`,
                 data: value
             });
-            console.info(`[KEYCHAIN] (success) SET key "Wallet-${key}"`);
+            console.log(`[KEYCHAIN] (success) SET key "Wallet-${key}"`);
         } catch (e) {
-            console.info(`[KEYCHAIN] (ERROR) SET key "Wallet-${key}"`, e);
+            console.log(`[KEYCHAIN] (ERROR) SET key "Wallet-${key}"`, e);
             throw e;
         }
     };
@@ -33,10 +33,10 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
             const { data } = await SecureStorage.getData({
                 id: `Wallet-${key}`
             });
-            console.info(`[KEYCHAIN] (success) GET key "Wallet-${key}"`);
+            console.log(`[KEYCHAIN] (success) GET key "Wallet-${key}"`);
             return data;
         } catch (e) {
-            console.info(`[KEYCHAIN] (ERROR) GET key "Wallet-${key}"`, e);
+            console.log(`[KEYCHAIN] (ERROR) GET key "Wallet-${key}"`, e);
             throw new KeychainGetError();
         }
     };
@@ -46,9 +46,9 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
             await SecureStorage.removeData({
                 id: `Wallet-${key}`
             });
-            console.info(`[KEYCHAIN] (success) DELETE key "Wallet-${key}"`);
+            console.log(`[KEYCHAIN] (success) DELETE key "Wallet-${key}"`);
         } catch (e) {
-            console.info(`[KEYCHAIN] (ERROR) DELETE key "Wallet-${key}"`, e);
+            console.log(`[KEYCHAIN] (ERROR) DELETE key "Wallet-${key}"`, e);
             throw e;
         }
     };
@@ -56,9 +56,9 @@ export class KeychainCapacitor extends BaseKeychainService implements IKeychainS
     clearStorage = async () => {
         try {
             await SecureStorage.clearStorage();
-            console.info('[KEYCHAIN] (success) CLEAR all data');
+            console.log('[KEYCHAIN] (success) CLEAR all data');
         } catch (e) {
-            console.info('[KEYCHAIN] (ERROR) CLEAR all data');
+            console.log('[KEYCHAIN] (ERROR) CLEAR all data');
             throw e;
         }
         await this.resetSecuritySettings();

@@ -14,9 +14,9 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
     setData = async (key: string, data: string) => {
         try {
             await sendBackground<void>({ king: 'set-keychain', publicKey: key, mnemonic: data });
-            console.info(`[KEYCHAIN] (success) SET key "Wallet-${key}"`);
+            console.log(`[KEYCHAIN] (success) SET key "Wallet-${key}"`);
         } catch (e) {
-            console.info(`[KEYCHAIN] (ERROR) SET key "Wallet-${key}"`, e);
+            console.log(`[KEYCHAIN] (ERROR) SET key "Wallet-${key}"`, e);
             throw e;
         }
     };
@@ -27,23 +27,23 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
         try {
             value = await sendBackground<string | null>({ king: 'get-keychain', publicKey: key });
         } catch (e) {
-            console.info(`[KEYCHAIN] (ERROR) GET key "Wallet-${key}"`, e);
+            console.log(`[KEYCHAIN] (ERROR) GET key "Wallet-${key}"`, e);
             throw new KeychainGetError();
         }
 
         if (value == null) {
             throw new KeychainGetError();
         }
-        console.info(`[KEYCHAIN] (success) GET key "Wallet-${key}"`);
+        console.log(`[KEYCHAIN] (success) GET key "Wallet-${key}"`);
         return value;
     };
 
     removeData = async (key: string) => {
         try {
             await sendBackground<void>({ king: 'remove-keychain', publicKey: key });
-            console.info(`[KEYCHAIN] (success) DELETE key "Wallet-${key}"`);
+            console.log(`[KEYCHAIN] (success) DELETE key "Wallet-${key}"`);
         } catch (e) {
-            console.info(`[KEYCHAIN] (ERROR) DELETE key "Wallet-${key}"`, e);
+            console.log(`[KEYCHAIN] (ERROR) DELETE key "Wallet-${key}"`, e);
             throw e;
         }
     };
@@ -51,9 +51,9 @@ export class KeychainDesktop extends BaseKeychainService implements IKeychainSer
     clearStorage = async () => {
         try {
             await sendBackground<void>({ king: 'clear-keychain' });
-            console.info('[KEYCHAIN] (success) CLEAR all data');
+            console.log('[KEYCHAIN] (success) CLEAR all data');
         } catch (e) {
-            console.info('[KEYCHAIN] (ERROR) CLEAR all data');
+            console.log('[KEYCHAIN] (ERROR) CLEAR all data');
             throw e;
         }
         await this.resetSecuritySettings();
