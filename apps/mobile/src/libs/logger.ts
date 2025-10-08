@@ -156,20 +156,25 @@ class LogBuffer {
 export class CapacitorFileLogger {
     private buffer: LogBuffer;
 
+    private isConsoleOverridden = false;
+
     constructor(logsPath = 'logs.txt') {
         this.buffer = new LogBuffer(logsPath);
         this.overrideConsole();
     }
 
     public overrideConsole(): void {
-        const methods = ['log', 'error', 'warn', 'info', 'debug'] as const;
-        methods.forEach(method => {
-            const original = console[method]?.bind(console);
-            console[method] = (...args: unknown[]) => {
-                this.write(method.toUpperCase(), args);
-                original(...args);
-            };
-        });
+        if (!this.isConsoleOverridden) {
+            const methods = ['log', 'error', 'warn', 'info', 'debug'] as const;
+            methods.forEach(method => {
+                const original = console[method]?.bind(console);
+                console[method] = (...args: unknown[]) => {
+                    this.write(method.toUpperCase(), args);
+                    original(...args);
+                };
+            });
+            this.isConsoleOverridden = true;
+        }
     }
 
     private write(level: string, args: unknown[]): void {
