@@ -1,7 +1,6 @@
 import { IStorage } from '@tonkeeper/core/dist/Storage';
 import { DeviceStorage as DeviceStoragePlugin } from './plugins/device-storage-plugin';
 import { PreferencesStorage } from './preferences-storage';
-import { pTimeout } from '@tonkeeper/core/dist/utils/common';
 
 export class DeviceStorage implements IStorage {
     get = async <R>(key: string): Promise<R | null> => {
@@ -76,7 +75,7 @@ export function getCapacitorStorage() {
 
 export async function migrateCapacitorStorage() {
     const storageMigrationService = new StorageMigrationService();
-    await pTimeout(storageMigrationService.migrate(), 10000);
+    await storageMigrationService.migrate();
     const isMigrationCompleted = await storageMigrationService.isMigrationCompleted();
 
     if (isMigrationCompleted) {
