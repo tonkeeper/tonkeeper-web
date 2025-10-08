@@ -1,4 +1,4 @@
-import { FC, useId, useMemo } from 'react';
+import { FC, useId } from 'react';
 import { styled } from 'styled-components';
 
 import {
@@ -22,7 +22,6 @@ import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
 import { ProChoosePaymentMethod } from '../../pro/ProChoosePaymentMethod';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useAppSdk } from '../../../hooks/appSdk';
 import { useProductSelection } from '../../../hooks/pro/useProductSelection';
 
 interface IProPurchaseNotificationProps {
@@ -51,7 +50,6 @@ type ContentProps = Pick<IProPurchaseNotificationProps, 'onClose'>;
 export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCurrentClose }) => {
     const formId = useId();
     const { t } = useTranslation();
-    const sdk = useAppSdk();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
 
     const { states, methods } = useProPurchaseController();
@@ -64,6 +62,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         selectedPlanId,
         onPlanIdSelect,
         onSourceSelect,
+        availableSources,
         productsForRender,
         isSelectionLoading
     } = useProductSelection();
@@ -88,11 +87,6 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
             selectedPlanId,
             selectedSource
         });
-
-    const availableSources = useMemo(
-        () => sdk.subscriptionService.getAvailableSources(),
-        [sdk.subscriptionService]
-    );
 
     return (
         <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId}>
