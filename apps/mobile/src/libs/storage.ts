@@ -152,6 +152,9 @@ export class StorageMigrationService {
     }
 
     async migrate(): Promise<void> {
+        await this.oldStorage.clear();
+        await this.newStorage.clear();
+        return;
         if (await this.isMigrationCompleted()) {
             return;
         }
