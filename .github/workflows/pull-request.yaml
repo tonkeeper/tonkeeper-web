@@ -14,31 +14,14 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - os: ubuntu-latest
-                      command: make:intel
-                      tag: x64
-                      dist: /apps/desktop/out/make
-                    - os: ubuntu-latest
-                      command: make:arm
-                      tag: arm64
-                      dist: /apps/desktop/out/make
-                    - os: windows-latest
-                      command: make:intel
-                      tag: x64
-                      dist: /apps/desktop/out/make/squirrel.windows/x64/*Setup.exe
-                    - os: macos-13
-                      command: make:intel
-                      tag: x64
-                      dist: /apps/desktop/out/make
-                    - os: macos-13
-                      command: make:arm
-                      tag: arm
-                      dist: /apps/desktop/out/make
-                    - os: macos-13
-                      command: make:universal
-                      tag: universal
-                      dist: /apps/desktop/out/make
-
+                - os: macos-13
+                  command: make:arm
+                  tag: arm
+                  dist: /apps/desktop/out/make
+                - os: windows-latest
+                  command: make:intel
+                  tag: x64
+                  dist: /apps/desktop/out/make/squirrel.windows
         runs-on: ${{ matrix.os }}
         timeout-minutes: 30
         env:
@@ -100,84 +83,42 @@ jobs:
 
             - name: Upload zip distributives to artifacts
               uses: actions/upload-artifact@v4
-              if: runner.os == 'Windows'
               with:
-                  name: Tonkeeper Desktop ${{ runner.os }} x64 archive
+                  name: Tonkeeper-mac-${{ matrix.tag }}-zip
                   retention-days: 10
                   path: |
                       ${{ github.workspace }}/apps/desktop/out/make/zip/**/*.zip
 
-            - name: Upload distributives to artifacts
+            - name: Upload mac DMG (optional)
+              if: runner.os == 'macOS'
               uses: actions/upload-artifact@v4
               with:
-                  name: Tonkeeper Desktop ${{ runner.os }} ${{ matrix.tag }}
+                  name: Tonkeeper-mac-${{ matrix.tag }}-dmg
                   retention-days: 10
                   path: |
-                      ${{ github.workspace }}${{ matrix.dist }}
+                      ${{ github.workspace }}/apps/desktop/out/make/*.dmg
+                      ${{ github.workspace }}/apps/desktop/out/make/**/dmg/**/*.dmg
+
+            # --- Windows: выгружаем RELEASES и *.nupkg (для автообновлений) + Setup.exe (по желанию)
+            - name: Upload Windows Squirrel packages
+              if: runner.os == 'Windows'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Tonkeeper-win-${{ matrix.tag }}-squirrel
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/**/RELEASES
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/**/*.nupkg
+
+            - name: Upload Windows Setup (optional)
+              if: runner.os == 'Windows'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Tonkeeper-win-${{ matrix.tag }}-setup
+                  retention-days: 10
+                  path: |
+                      ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/**/*.exe
 
             - name: Clean-up credentials
               if: always() && runner.os == 'macOS'
-              run: |
-                  rm ${{ github.workspace }}/AuthKey.p8
-
-    web-build:
-        uses: ./.github/workflows/web-build.yaml
-        with:
-            environment: ${{ github.head_ref }}
-        secrets: inherit
-
-    extension-build:
-        name: extension-build
-        runs-on: macos-14
-        timeout-minutes: 10
-
-        steps:
-            - name: Checkout to git repository
-              uses: actions/checkout@v4
-
-            - name: Set up Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: ${{ env.node-version }}
-
-            - name: Enable Corepack
-              run: |
-                  corepack enable
-
-            - name: Yarn cache
-              uses: actions/cache@v4
-              with:
-                  path: ./.yarn
-                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-                  restore-keys: |
-                      ${{ runner.os }}-yarn-
-
-            - name: Run install
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: install
-
-            - name: Run build
-              uses: borales/actions-yarn@v5
-              with:
-                  cmd: build:extension
-
-            - name: Upload Extension Chrome to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: Extension Chrome
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/extension/dist/chrome
-
-            - name: Upload Extension Firefox to artifacts
-              uses: actions/upload-artifact@v4
-              with:
-                  name: Extension Firefox
-                  retention-days: 10
-                  path: |
-                      ${{ github.workspace }}/apps/extension/dist/firefox
-
-    ipad-build:
-        uses: ./.github/workflows/ipad-build.yaml
-        secrets: inherit
+              run: rm -f "$GITHUB_WORKSPACE/AuthKey.p8"
