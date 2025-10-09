@@ -36,6 +36,7 @@ export const useProductSelection = () => {
         productsForRender,
         selectedSource,
         selectedPlanId,
+        availableSources,
         onSourceSelect: setSelectedSource,
         onPlanIdSelect: setSelectedPlanId,
         isSelectionLoading: isLoading
