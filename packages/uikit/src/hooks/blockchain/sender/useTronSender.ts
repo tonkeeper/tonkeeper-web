@@ -1,4 +1,8 @@
-import { useTronApi } from '../../../state/tron/tron';
+import {
+    Trc20FreeTransfersConfig,
+    useTrc20FreeTransfersConfig,
+    useTronApi
+} from '../../../state/tron/tron';
 import { useActiveAccount, useActiveApi } from '../../../state/wallet';
 import {
     useBatteryApi,
@@ -22,16 +26,20 @@ import { isTronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/asset';
 import { TronAsset } from '@tonkeeper/core/dist/entries/crypto/asset/tron-asset';
 import {
     TransactionFeeBattery,
+    TransactionFeeFreeTransfer,
     TransactionFeeTonAssetRelayed,
     TransactionFeeTronAsset
 } from '@tonkeeper/core/dist/entries/crypto/transaction-fee';
 import { TronNotEnoughBalanceEstimationError } from '@tonkeeper/core/dist/errors/TronNotEnoughBalanceEstimationError';
 import { pTimeout } from '@tonkeeper/core/dist/utils/common';
+import { useProAuthToken } from '../../../state/pro';
+import { TronFreeProSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-free-pro-sender';
 
 export enum TRON_SENDER_TYPE {
     TRX = 'tron-trx',
     BATTERY = 'tron-battery',
-    TON_ASSET = 'tron-ton-asset'
+    TON_ASSET = 'tron-ton-asset',
+    FREE_PRO = 'free-pro'
 }
 
 export type TronSenderType = (typeof TRON_SENDER_TYPE)[keyof typeof TRON_SENDER_TYPE];
@@ -47,6 +55,12 @@ export type TronSenderOption =
           type: TRON_SENDER_TYPE.TON_ASSET;
           isEnoughBalance: boolean;
           fee: TransactionFeeTonAssetRelayed;
+      }
+    | {
+          type: TRON_SENDER_TYPE.FREE_PRO;
+          isEnoughBalance: boolean;
+          config: Trc20FreeTransfersConfig;
+          fee: TransactionFeeFreeTransfer;
       };
 
 const preEstimationTimeoutMS = 8000;
@@ -55,6 +69,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
     const batteryTronSender = useTronEstimationBatterySender();
     const tronTrxSender = useTronEstimationTrxSender();
     const tronTonSender = useTronEstimationTonSender();
+    const { data: freeTrc20Config } = useTrc20FreeTransfersConfig();
 
     const queryKeyBattery = useToQueryKeyPart(batteryTronSender);
     const queryKeyTrx = useToQueryKeyPart(tronTrxSender);
@@ -66,6 +81,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             queryKeyBattery,
             queryKeyTrx,
             queryKeyTon,
+            freeTrc20Config,
             receiver,
             assetAmount
         ],
@@ -149,6 +165,17 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
                 });
             }
 
+            if (freeTrc20Config) {
+                optionsGetters.push(async () => ({
+                    type: TRON_SENDER_TYPE.FREE_PRO,
+                    isEnoughBalance:
+                        freeTrc20Config.type === 'active' &&
+                        freeTrc20Config.availableTransfersNumber > 0,
+                    config: freeTrc20Config,
+                    fee: { type: 'free-transfer' }
+                }));
+            }
+
             const options = (await Promise.all(optionsGetters.map(o => o()))).filter(notNullish);
 
             return options
@@ -165,6 +192,7 @@ export const useGetTronSender = () => {
     const tronTonSender = useGetTronTonSender();
     const batteryTronSender = useGetBatteryTronSender();
     const tronTrxSender = useGetTronTrxSender();
+    const tronFreeProSender = useGetTronFreeProSender();
 
     return useCallback(
         (type: TronSenderType) => {
@@ -175,11 +203,13 @@ export const useGetTronSender = () => {
                     return batteryTronSender();
                 case TRON_SENDER_TYPE.TON_ASSET:
                     return tronTonSender();
+                case TRON_SENDER_TYPE.FREE_PRO:
+                    return tronFreeProSender();
                 default:
                     assertUnreachable(type);
             }
         },
-        [tronTonSender, batteryTronSender, tronTrxSender]
+        [tronTonSender, batteryTronSender, tronTrxSender, tronFreeProSender]
     );
 };
 
@@ -276,10 +306,32 @@ const useGetTronTrxSender = () => {
     }, [activeAccount, activeTronWallet, tronApi]);
 };
 
+const useGetTronFreeProSender = () => {
+    const batteryApi = useBatteryApi();
+    const tronApi = useTronApi();
+    const activeAccount = useActiveAccount();
+    const sdk = useAppSdk();
+
+    const activeTronWallet = isAccountTronCompatible(activeAccount)
+        ? activeAccount.activeTronWallet
+        : undefined;
+
+    return useCallback(async () => {
+        const proToken = await sdk.subscriptionService.getToken();
+        if (!activeTronWallet || !proToken) {
+            throw new Error('Tron is not enabled for the active wallet');
+        }
+
+        const signer = getTronSigner(sdk, tronApi, activeAccount);
+        return new TronFreeProSender(tronApi, batteryApi, activeTronWallet, signer, proToken);
+    }, [activeAccount, activeTronWallet, tronApi, batteryApi]);
+};
+
 export const useTronEstimationSender = (senderType: TronSenderType | undefined) => {
     const batteryTronSender = useTronEstimationBatterySender();
     const tronTrxSender = useTronEstimationTrxSender();
     const tronTonSender = useTronEstimationTonSender();
+    const tronFreeProSender = useTronEstimationFreeProSender();
     switch (senderType) {
         case undefined:
             return undefined;
@@ -289,6 +341,9 @@ export const useTronEstimationSender = (senderType: TronSenderType | undefined) 
             return batteryTronSender;
         case TRON_SENDER_TYPE.TON_ASSET:
             return tronTonSender;
+        case TRON_SENDER_TYPE.FREE_PRO:
+            return tronFreeProSender;
+
         default:
             assertUnreachable(senderType);
     }
@@ -367,4 +422,30 @@ const useTronEstimationTonSender = () => {
             emptySigner
         );
     }, [activeAccount, activeTronWallet, activeAccount.activeTonWallet, tronApi, batteryApi]);
+};
+
+const useTronEstimationFreeProSender = () => {
+    const tronApi = useTronApi();
+    const activeAccount = useActiveAccount();
+    const batteryApi = useBatteryApi();
+    const { data: proToken } = useProAuthToken();
+
+    const activeTronWallet = isAccountTronCompatible(activeAccount)
+        ? activeAccount.activeTronWallet
+        : undefined;
+
+    return useMemo(() => {
+        if (!activeTronWallet || !isStandardTonWallet(activeAccount.activeTonWallet) || !proToken) {
+            return undefined;
+        }
+
+        return new TronFreeProSender(tronApi, batteryApi, activeTronWallet, emptySigner, proToken);
+    }, [
+        activeAccount,
+        activeTronWallet,
+        activeAccount.activeTonWallet,
+        tronApi,
+        batteryApi,
+        proToken
+    ]);
 };

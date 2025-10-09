@@ -13,9 +13,10 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
-import { useTrc20TransferDefaultFees } from '../../state/tron/tron';
+import { useTrc20FreeTransfersConfig, useTrc20TransferDefaultFees } from '../../state/tron/tron';
 import { Skeleton } from '../shared/Skeleton';
-import { ChevronRightIcon } from '../Icon';
+import { ChevronRightIcon, TonkeeperProCardIcon } from '../Icon';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const NotificationStyled = styled(Notification)`
     max-width: 648px;
@@ -130,6 +131,23 @@ const MethodInfo = styled.div`
         align-items: flex-start;
     }
 `;
+
+const ProCard = styled.div`
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: ${p => p.theme.cornerSmall};
+    background: ${props => props.theme.backgroundContent};
+    align-items: center;
+    gap: 12px;
+
+    ${MethodInfo} {
+        align-items: flex-start;
+    }
+`;
+
 const ActionButton = styled(Button)`
     ${isMobile} {
         position: absolute;
@@ -181,6 +199,8 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     const sdk = useAppSdk();
     const navigate = useNavigate();
     const { tonSenderFee, trxSenderFee, batterySenderFee } = useTrc20TransferDefaultFees();
+    const { onOpen: onGetPro } = useProFeaturesNotification();
+    const { data: trc20FreeTransfersConfig } = useTrc20FreeTransfersConfig();
 
     const onTopupToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -274,6 +294,39 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                     <ChevronButton />
                 </MethodCard>
             </Cards>
+
+            <ProCard>
+                <TonkeeperProCardIcon />
+                <MethodInfo>
+                    <CardTitle>{t('topup_trc20_fee_pro_banner_title')}</CardTitle>
+                    {trc20FreeTransfersConfig?.type === 'active' ? (
+                        trc20FreeTransfersConfig.availableTransfersNumber > 0 ? (
+                            <CardSubtitle>
+                                {t('topup_trc20_fee_pro_banner_description')}
+                            </CardSubtitle>
+                        ) : (
+                            <CardSubtitle>
+                                {t('topup_trc20_fee_pro_banner_description')}
+                            </CardSubtitle>
+                        )
+                    ) : (
+                        <CardSubtitle>{t('topup_trc20_fee_pro_banner_description')}</CardSubtitle>
+                    )}
+                </MethodInfo>
+                {trc20FreeTransfersConfig?.type !== 'active' && (
+                    <Button
+                        primary
+                        size="small"
+                        onClick={() => {
+                            onClose();
+                            onGetPro();
+                        }}
+                        loading={!trc20FreeTransfersConfig}
+                    >
+                        {t('pro_subscription_get_pro')}
+                    </Button>
+                )}
+            </ProCard>
 
             <FooterNote>
                 {t('topup_tron_fee_disclaimer')}

@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Tonkeeper Pro 订阅",
   "ton_login_title_web": "连接至{name}？",
   "Ton_page_description": "TON 是 Telegram 为数十亿用户设计的完全去中心化的第一层区块链。它拥有超快的交易速度、极低的费用、易于使用的应用程序，并且非常环保。",
+  "topup_trc20_fee_pro_banner_description": "每月可用与 Tonkeeper Pro 。",
+  "topup_trc20_fee_pro_banner_title": "免费 USD₮ TRC20 转账",
   "topup_tron_fee_battery_description": "支持 TRC20 转账、兑换、NFT 和 TON 代币转账",
   "topup_tron_fee_charges_per_transfer": "~ 每次TRC20转账收取{charges}手续费",
   "topup_tron_fee_disclaimer": "费用会根据多种因素实时变化。",

@@ -9,8 +9,7 @@ import { TON_ASSET } from './crypto/asset/constants';
 import {
     TransactionFeeBattery,
     TransactionFeeTonAsset,
-    TransactionFeeTonAssetRelayed,
-    TransactionFeeTronAsset
+    TronTransactionFee
 } from './crypto/transaction-fee';
 import { TronResources } from '../tronApi';
 
@@ -88,7 +87,7 @@ export const isTonEstimationDetailed = (
 };
 
 export type TronEstimation = {
-    fee: TransactionFeeBattery | TransactionFeeTronAsset | TransactionFeeTonAssetRelayed;
+    fee: TronTransactionFee;
     resources: TronResources;
 };
 

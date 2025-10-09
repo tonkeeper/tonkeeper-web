@@ -43,6 +43,7 @@ import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
 import { useConfirmDiscardNotification } from '../modals/ConfirmDiscardNotificationControlled';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const gaslessApproximateFee = (asset: TonAsset, tokenToTonRate: number) => {
     const k = asset.id === TON_USDT_ASSET.id ? 0.9 : 0.5;
@@ -115,6 +116,7 @@ export const ConfirmTransferView: FC<
     const [selectedSenderType, setSelectedSenderType] = useState<AllChainsSenderType>();
     const sdk = useAppSdk();
     const navigate = useNavigate();
+    const { onOpen: getPro } = useProFeaturesNotification();
 
     const onSenderTypeChange = useCallback(
         (type: AllChainsSenderType) => {
@@ -157,6 +159,8 @@ export const ConfirmTransferView: FC<
                                 navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
                                     disableMobileAnimation: true
                                 });
+                            } else if (choice.type === TRON_SENDER_TYPE.FREE_PRO) {
+                                getPro();
                             } else {
                                 assertUnreachableSoft(choice);
                             }
@@ -165,7 +169,7 @@ export const ConfirmTransferView: FC<
                 });
             }
         },
-        [availableSenderChoices, navigate, rest.onClose, openConfirmDiscardNotification]
+        [availableSenderChoices, navigate, rest.onClose, openConfirmDiscardNotification, getPro]
     );
 
     const estimation = useEstimateTransfer({

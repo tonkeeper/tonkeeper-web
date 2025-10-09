@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Langganan Tonkeeper Pro",
   "ton_login_title_web": "Hubungkan ke '{'name'}'?",
   "Ton_page_description": "TON adalah blockchain layer-1 yang sepenuhnya terdesentralisasi yang dirancang oleh Telegram untuk mendukung miliaran pengguna. Menawarkan kecepatan dalam transaksi dengan biaya yang murah dan aplikasi yang mudah digunakan serta ramah lingkungan.",
+  "topup_trc20_fee_pro_banner_description": "Tersedia bulanan dengan Tonkeeper Pro.",
+  "topup_trc20_fee_pro_banner_title": "Gratis transfer USD₮ TRC20",
   "topup_tron_fee_battery_description": "Mendukung transfer TRC20, swap, NFT, dan transfer token TON",
   "topup_tron_fee_charges_per_transfer": "~ {charges} biaya per transfer TRC20",
   "topup_tron_fee_disclaimer": "Biaya berubah secara real time berdasarkan berbagai faktor.",

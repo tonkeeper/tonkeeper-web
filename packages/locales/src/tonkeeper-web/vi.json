@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Đăng ký Tonkeeper Pro",
   "ton_login_title_web": "Kết nối với {name}?",
   "Ton_page_description": "TON là một blockchain layer-1 hoàn toàn phi tập trung được Telegram thiết kế để phục vụ hàng tỷ người dùng. Nó nổi bật với giao dịch siêu nhanh, phí cực thấp, ứng dụng dễ sử dụng và thân thiện với môi trường.",
+  "topup_trc20_fee_pro_banner_description": "Có sẵn hàng tháng với Tonkeeper Pro.",
+  "topup_trc20_fee_pro_banner_title": "Chuyển khoản miễn phí USD₮ TRC20",
   "topup_tron_fee_battery_description": "Hỗ trợ chuyển TRC20, hoán đổi, NFT và chuyển token TON",
   "topup_tron_fee_charges_per_transfer": "~ {charges} phí cho mỗi giao dịch chuyển TRC20",
   "topup_tron_fee_disclaimer": "Phí thay đổi theo thời gian thực dựa trên nhiều yếu tố.",

@@ -13,7 +13,7 @@ import { formatFiatCurrency } from '../../hooks/balance';
 import { useTranslation } from '../../hooks/translation';
 import { useAssetAmountFiatEquivalent } from '../../state/asset';
 import { useFormatFiat, useRate } from '../../state/rates';
-import { ChevronRightIcon, SpinnerIcon } from '../Icon';
+import { ChevronRightIcon, SpinnerIcon, TonkeeperProCardIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
 import { Body1, Body2Class, Body3, H2, Label1, Label2 } from '../Text';
@@ -54,6 +54,8 @@ import { BLOCKCHAIN_NAME } from '@tonkeeper/core/dist/entries/crypto';
 import { TRON_SENDER_TYPE } from '../../hooks/blockchain/sender/useTronSender';
 import { Skeleton } from '../shared/Skeleton';
 import { Dot } from '../Dot';
+import { Trc20FreeTransfersConfig } from '../../state/tron/tron';
+import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -363,6 +365,10 @@ export const ActionFeeDetails: FC<{
         return <ActionFeeTonAssetDetails extra={fee.extra} />;
     }
 
+    if (fee.type === 'free-transfer') {
+        return <ActionFeeTronFreeProDetails />;
+    }
+
     assertUnreachableSoft(fee);
     return null;
 };
@@ -405,7 +411,7 @@ export const ActionFeeTronAssetDetails: FC<{
         <ListItem hover={false}>
             <ListItemPayload>
                 <Label>{t('transaction_fee')}</Label>
-                <ColumnText right text={fee.extra.stringAssetRelativeAmount} secondary={'TODO'} />
+                <LabelPrimary>{fee.extra.stringAssetRelativeAmount}</LabelPrimary>
             </ListItemPayload>
         </ListItem>
     );
@@ -423,6 +429,19 @@ export const ActionFeeBatteryDetails: FC<{
                 <LabelPrimary>
                     {t('battery_n_battery_charges', { charges: fee.charges })}
                 </LabelPrimary>
+            </ListItemPayload>
+        </ListItem>
+    );
+};
+
+export const ActionFeeTronFreeProDetails = () => {
+    const { t } = useTranslation();
+
+    return (
+        <ListItem hover={false}>
+            <ListItemPayload>
+                <Label>{t('transaction_fee')}</Label>
+                <LabelPrimary>{t('action_fee_details_free_pro_transfer')}</LabelPrimary>
             </ListItemPayload>
         </ListItem>
     );
@@ -621,6 +640,8 @@ const SenderDropdownItem: FC<{ sender: AllChainsSenderOptions }> = ({ sender }) 
         case TRON_SENDER_TYPE.TRX:
         case TRON_SENDER_TYPE.TON_ASSET:
             return <SenderDropdownItemTronTrxOrTonAsset {...sender} />;
+        case TRON_SENDER_TYPE.FREE_PRO:
+            return <SenderDropdownItemTronFreePro {...sender} />;
         default:
             assertUnreachableSoft(sender);
             return null;
@@ -640,6 +661,39 @@ const SenderDropdownItemTronBattery: FC<{
                 <Label2>{t('battery_title')}</Label2>
                 <Body3Secondary>{t('battery_charges', { charges: fee.charges })}</Body3Secondary>
                 {!isEnoughBalance && <RefillText />}
+            </SenderText>
+        </>
+    );
+};
+
+const SenderDropdownItemTronFreePro: FC<{
+    config: Trc20FreeTransfersConfig;
+}> = ({ config }) => {
+    const { t } = useTranslation();
+    const formatDate = useDateTimeFormat();
+
+    return (
+        <>
+            <TonkeeperProCardIcon size={28} />
+            <SenderText>
+                <Label2>{t('select_fee_payment_method_option_free_pro_title')}</Label2>
+                {config.type === 'inactive' ? (
+                    <Body3Accent>{t('get_tonkeeper_pro')}</Body3Accent>
+                ) : config.availableTransfersNumber > 0 ? (
+                    <Body3Secondary>
+                        {t('select_fee_payment_method_option_free_pro_subtitle_available')}
+                    </Body3Secondary>
+                ) : (
+                    <Body3Accent>
+                        {t('select_fee_payment_method_option_free_pro_subtitle_used', {
+                            date: formatDate(config.rechargeDate, {
+                                month: 'short',
+                                day: 'numeric',
+                                year: undefined
+                            })
+                        })}
+                    </Body3Accent>
+                )}
             </SenderText>
         </>
     );
@@ -681,6 +735,10 @@ const ActionFeeDetailsUniversalValue: FC<{
         return <ActionFeeDetailsUniversalTokenValue fee={fee} />;
     }
 
+    if (fee.type === 'free-transfer') {
+        return <ActionFeeDetailsFreeTransferValue />;
+    }
+
     assertUnreachableSoft(fee);
     return null;
 };
@@ -700,6 +758,17 @@ const ActionFeeDetailsUniversalTokenValue: FC<{
             right
             text={fee.extra.stringAssetAbsoluteRelativeAmount}
             secondary={fiatAmountBN ? `≈ ${fiatAmount}` : undefined}
+        />
+    );
+};
+
+const ActionFeeDetailsFreeTransferValue = () => {
+    const { t } = useTranslation();
+    return (
+        <ColumnText
+            right
+            text={t('free')}
+            secondary={t('confirm_view_fee_row_free_pro_subtitle')}
         />
     );
 };

@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Tonkeeper Pro सदस्यता",
   "ton_login_title_web": "'{'name'}' से कनेक्ट करें?",
   "Ton_page_description": "टन एक पूरी तरह से विकेंद्रीकृत लेयर-1 ब्लॉकचैन है जिसे टेलीग्राम द्वारा अरबों उपयोगकर्ताओं को ऑनबोर्ड करने के लिए डिज़ाइन किया गया है। इसमें अति-तेज़ लेनदेन, छोटे शुल्क, आसानी से उपयोग होने वाले ऐप्स और पर्यावरण अनुकूल हैं।",
+  "topup_trc20_fee_pro_banner_description": "टोनकीपर प्रो के साथ मासिक रूप से उपलब्ध।",
+  "topup_trc20_fee_pro_banner_title": "नि:शुल्क यूएसडी₮ TRC20 ट्रांसफर",
   "topup_tron_fee_battery_description": "TRC20 ट्रांसफर, स्वैप्स, NFT और TON टोकन ट्रांसफर को सपोर्ट करता है",
   "topup_tron_fee_charges_per_transfer": "~ प्रत्येक TRC20 ट्रांसफर पर {charges} शुल्क",
   "topup_tron_fee_disclaimer": "फीस कई कारकों के आधार पर रीयल टाइम में बदलती रहती है।",

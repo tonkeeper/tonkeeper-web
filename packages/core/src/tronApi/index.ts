@@ -485,6 +485,10 @@ export class TronApi {
                                   }),
                                   sendToAddress: ''
                               }
+                            : item.feeType === 'free_pro'
+                            ? {
+                                  type: 'free-transfer'
+                              }
                             : {
                                   type: 'battery' as const,
                                   charges: item.batteryCharges

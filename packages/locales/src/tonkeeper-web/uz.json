@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Tonkeeper Pro obunasi",
   "ton_login_title_web": " '{'name'}'-ga ulansinmi?",
   "Ton_page_description": "TON - bu Telegram tomonidan milliardlab foydalanuvchilarni birlashtirish uchun ishlab chiqilgan to'liq markazlashtirilmagan qatlam-1 blokcheynidir. U o'ta tezkor tranzaksiyalar, kichik to'lovlar, foydalanish uchun qulay ilovalar bilan faxrlanadi va ekologik jihatdan qulaydir.",
+  "topup_trc20_fee_pro_banner_description": "Tonkeeper Pro bilan oylik mavjud.",
+  "topup_trc20_fee_pro_banner_title": "Bepul USD₮ TRC20 o'tkazmasi",
   "topup_tron_fee_battery_description": "TRC20 o‘tkazmalari, almashuvlar, NFT va TON token o‘tkazmalarini qo‘llab-quvvatlaydi",
   "topup_tron_fee_charges_per_transfer": "~ Har bir TRC20 o'tkazmasi uchun {charges} to'lov",
   "topup_tron_fee_disclaimer": "To‘lovlar bir nechta omillarga asoslanib real vaqt rejimida o‘zgaradi.",

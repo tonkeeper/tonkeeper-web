@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "اشتراك Tonkeeper Pro",
   "ton_login_title_web": "الاتصال بـ '{'name'}'?",
   "Ton_page_description": "إن TON هو بلوكتشين طبقة أولى(L1) بالكامل ومصمم من قبل تيليجرام لاستيعاب مليارات المستخدمين. يتميز بمعاملات فائقة السرعة، ورسوم منخفضة، وتطبيقات سهلة الاستخدام، وهو صديق للبيئة.",
+  "topup_trc20_fee_pro_banner_description": "متاحة شهريًا مع Tonkeeper Pro.",
+  "topup_trc20_fee_pro_banner_title": "مجانًا تحويل USD₮ TRC20",
   "topup_tron_fee_battery_description": "يدعم تحويلات TRC20، والمبادلات، وNFTs، وتحويلات رموز TON",
   "topup_tron_fee_charges_per_transfer": "~ {charges} رسوم لكل تحويل TRC20",
   "topup_tron_fee_disclaimer": "تتغير الرسوم في الوقت الفعلي بناءً على عدة عوامل.",

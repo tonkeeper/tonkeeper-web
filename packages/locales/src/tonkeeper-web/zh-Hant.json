@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Tonkeeper Pro 訂閱",
   "ton_login_title_web": "連接至{name}？",
   "Ton_page_description": "TON 是由 Telegram 設計的完全去中心化的第一層區塊鏈，由於它擁有超快的交易速度、極低的費用、易於使用的應用程序，而且對環境友好，吸引了數十億用戶。",
+  "topup_trc20_fee_pro_banner_description": "每月可用於 Tonkeeper Pro 。",
+  "topup_trc20_fee_pro_banner_title": "免費 USD₮ TRC20 轉帳",
   "topup_tron_fee_battery_description": "支援 TRC20 轉帳、交換、NFT 和 TON 代幣轉帳",
   "topup_tron_fee_charges_per_transfer": "~ 每次TRC20轉帳收取{charges}手續費",
   "topup_tron_fee_disclaimer": "費用會根據多種因素即時變動。",

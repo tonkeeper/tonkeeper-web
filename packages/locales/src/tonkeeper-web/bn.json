@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Tonkeeper Pro সাবস্ক্রিপশন",
   "ton_login_title_web": "সংযুক্ত হতে চান '{'name'}'?",
   "Ton_page_description": "TON একটি সম্পূর্ণ বিকেন্দ্রীকৃত লেয়ার-1 ব্লকচেইন যা টেলিগ্রাম দ্বারা ডিজাইন করা হয়েছে বিলিয়ন ব্যবহারকারীদের যোগদান করার জন্য। এটি অত্যন্ত দ্রুত লেনদেন, ছোট ফি, ব্যবহার করা সহজ অ্যাপ্লিকেশন এবং পরিবেশবান্ধব হিসেবে পরিচিত।",
+  "topup_trc20_fee_pro_banner_description": "প্রতি মাসে টনকিপার প্রো এর সাথে উপলব্ধ।",
+  "topup_trc20_fee_pro_banner_title": "বিনামূল্যে USD₮ TRC20 স্থানান্তর",
   "topup_tron_fee_battery_description": "TRC20 স্থানান্তর, অদলবদল, NFT এবং TON টোকেন স্থানান্তর সমর্থন করে",
   "topup_tron_fee_charges_per_transfer": "~ প্রতি TRC20 ট্রান্সফারে {charges} চার্জ প্রযোজ্য",
   "topup_tron_fee_disclaimer": "বিভিন্ন কারণে ফি রিয়েল টাইমে পরিবর্তিত হয়।",

@@ -603,6 +603,8 @@
   "tonkeeper_pro_subscription": "Abonnement Tonkeeper Pro",
   "ton_login_title_web": "Se connecter à {name} ?",
   "Ton_page_description": "TON est une blockchain de couche 1 entièrement décentralisée conçue par Telegram pour accueillir des milliards d’utilisateurs. Elle se distingue par des transactions ultra-rapides, des frais minimes, des applications faciles à utiliser et un respect de l’environnement.",
+  "topup_trc20_fee_pro_banner_description": "Disponible mensuellement avec Tonkeeper Pro.",
+  "topup_trc20_fee_pro_banner_title": "Transfert USD₮ TRC20 gratuit",
   "topup_tron_fee_battery_description": "Prend en charge les transferts TRC20, les échanges, les NFT et les transferts de jetons TON",
   "topup_tron_fee_charges_per_transfer": "~ {charges} frais par transfert TRC20",
   "topup_tron_fee_disclaimer": "Les frais changent en temps réel en fonction de plusieurs facteurs.",
