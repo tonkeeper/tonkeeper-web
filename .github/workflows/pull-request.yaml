@@ -113,8 +113,9 @@ jobs:
                     retention-days: 10
                     if-no-files-found: error
                     path: |
-                        apps/desktop/out/make/squirrel.windows/**/RELEASES
-                        apps/desktop/out/make/squirrel.windows/**/*-full.nupkg
+                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/**/RELEASES
+                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/**/*-full.nupkg
+                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/**/*-delta.nupkg
 
             -   name: Upload Windows Setup (optional)
                 if: runner.os == 'Windows'
