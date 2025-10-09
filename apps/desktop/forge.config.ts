@@ -70,7 +70,7 @@ const config: ForgeConfig = {
                 iconUrl: 'https://tonkeeper.com/assets/icon.ico',
                 setupIcon: path.join(process.cwd(), 'public', 'icon.ico'),
                 loadingGif: path.join(process.cwd(), 'public', 'install.gif'),
-                remoteReleases: 'https://github.com/tonkeeper/tonkeeper-web'
+                noDelta: true
             },
             ['win32']
         ),
