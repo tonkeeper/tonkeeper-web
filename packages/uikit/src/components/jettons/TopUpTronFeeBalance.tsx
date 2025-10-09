@@ -17,6 +17,7 @@ import { useTrc20FreeTransfersConfig, useTrc20TransferDefaultFees } from '../../
 import { Skeleton } from '../shared/Skeleton';
 import { ChevronRightIcon, TonkeeperProCardIcon } from '../Icon';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 
 const NotificationStyled = styled(Notification)`
     max-width: 648px;
@@ -201,6 +202,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     const { tonSenderFee, trxSenderFee, batterySenderFee } = useTrc20TransferDefaultFees();
     const { onOpen: onGetPro } = useProFeaturesNotification();
     const { data: trc20FreeTransfersConfig } = useTrc20FreeTransfersConfig();
+    const formatDate = useDateTimeFormat();
 
     const onTopupToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -306,7 +308,13 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                             </CardSubtitle>
                         ) : (
                             <CardSubtitle>
-                                {t('topup_trc20_fee_pro_banner_description')}
+                                {t('topup_trc20_fee_pro_banner_description_used', {
+                                    date: formatDate(trc20FreeTransfersConfig.rechargeDate, {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: undefined
+                                    })
+                                })}
                             </CardSubtitle>
                         )
                     ) : (
