@@ -8,6 +8,7 @@ import {
     setProtocolHandlerWindowsLinux
 } from './electron/protocol';
 import { tonConnectSSE } from './electron/sseEvetns';
+import { AutoUpdateManager } from './electron/autoUpdate';
 
 app.setName('Tonkeeper Pro');
 
@@ -42,14 +43,27 @@ if (process.platform !== 'linux') {
 }
 
 app.on('before-quit', async e => {
-    e.preventDefault();
-    tonConnectSSE.destroy();
-    if (process.platform !== 'linux') {
-        powerMonitor.off('unlock-screen', onUnLock);
+    try {
+        e.preventDefault();
+        tonConnectSSE.destroy();
+        if (process.platform !== 'linux') {
+            powerMonitor.off('unlock-screen', onUnLock);
+        }
+    } catch (e) {
+        console.error(e);
     }
 
     await delay(100);
-    app.exit();
+
+    try {
+        const exited = AutoUpdateManager.quitAndInstallIfFlagged();
+        if (!exited) {
+            app.exit();
+        }
+    } catch (e) {
+        console.error(e);
+        app.exit();
+    }
 });
 
 setDefaultProtocolClient();
