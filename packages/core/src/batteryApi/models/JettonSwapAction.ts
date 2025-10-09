@@ -39,7 +39,7 @@ export interface JettonSwapAction {
      * @type {string}
      * @memberof JettonSwapAction
      */
-    dex: JettonSwapActionDexEnum;
+    dex: string;
     /**
      * 
      * @type {string}
@@ -89,18 +89,6 @@ export interface JettonSwapAction {
      */
     jettonMasterOut?: JettonPreview;
 }
-
-
-/**
- * @export
- */
-export const JettonSwapActionDexEnum = {
-    Stonfi: 'stonfi',
-    Dedust: 'dedust',
-    Megatonfi: 'megatonfi'
-} as const;
-export type JettonSwapActionDexEnum = typeof JettonSwapActionDexEnum[keyof typeof JettonSwapActionDexEnum];
-
 
 /**
  * Check if a given object implements the JettonSwapAction interface.

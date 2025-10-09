@@ -58,6 +58,12 @@ export interface Risk {
      * @memberof Risk
      */
     nfts: Array<NftItem>;
+    /**
+     * Estimated equivalent value of all assets at risk in selected currency (for example USD)
+     * @type {number}
+     * @memberof Risk
+     */
+    totalEquivalent?: number;
 }
 
 /**
@@ -85,6 +91,7 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
         'ton': json['ton'],
         'jettons': ((json['jettons'] as Array<any>).map(JettonQuantityFromJSON)),
         'nfts': ((json['nfts'] as Array<any>).map(NftItemFromJSON)),
+        'totalEquivalent': json['total_equivalent'] == null ? undefined : json['total_equivalent'],
     };
 }
 
@@ -103,6 +110,7 @@ export function RiskFromJSONTyped(json: any, ignoreDiscriminator: boolean): Risk
         'ton': value['ton'],
         'jettons': ((value['jettons'] as Array<any>).map(JettonQuantityToJSON)),
         'nfts': ((value['nfts'] as Array<any>).map(NftItemToJSON)),
+        'total_equivalent': value['totalEquivalent'],
     };
 }
 

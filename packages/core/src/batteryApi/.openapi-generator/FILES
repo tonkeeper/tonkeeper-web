@@ -76,6 +76,7 @@ models/JettonQuantity.ts
 models/JettonSwapAction.ts
 models/JettonTransferAction.ts
 models/JettonVerificationType.ts
+models/LiquidityDepositAction.ts
 models/Message.ts
 models/MessageConsequences.ts
 models/Metadata.ts
@@ -123,11 +124,13 @@ models/Transaction.ts
 models/TransactionType.ts
 models/Transactions.ts
 models/TransactionsTransactionsInner.ts
+models/TronAvailableTransfers.ts
 models/TronSendRequest.ts
 models/TronTransactionsList.ts
 models/TronTransactionsListTransactionsInner.ts
 models/TrustType.ts
 models/UnSubscriptionAction.ts
+models/VaultDepositInfo.ts
 models/VerifyPurchasePromo200Response.ts
 models/WithdrawStakeAction.ts
 models/WithdrawStakeRequestAction.ts
