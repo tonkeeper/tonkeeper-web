@@ -6,6 +6,7 @@ import { useProPlans } from '../../state/pro';
 import { useTranslation } from '../translation';
 import { useNotifyError } from '../useNotification';
 import { getSkeletonProducts } from '../../libs/pro';
+import { usePrimarySubscriptionSource } from '../usePrimarySubscriptionSource';
 
 const SKELETON_PRODUCTS_QTY = 1;
 
@@ -16,9 +17,9 @@ export const getProductsForRender = (displayPlans: IDisplayPlan[]) => {
 export const useProductSelection = () => {
     const { t } = useTranslation();
 
-    const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(
-        SubscriptionSource.EXTENSION
-    );
+    const { availableSources, primarySource } = usePrimarySubscriptionSource();
+
+    const [selectedSource, setSelectedSource] = useState<SubscriptionSource>(primarySource);
     const [selectedPlanId, setSelectedPlanId] = useState('');
 
     const { data: plans, isLoading, isError } = useProPlans(selectedSource);
@@ -35,6 +36,7 @@ export const useProductSelection = () => {
         productsForRender,
         selectedSource,
         selectedPlanId,
+        availableSources,
         onSourceSelect: setSelectedSource,
         onPlanIdSelect: setSelectedPlanId,
         isSelectionLoading: isLoading
