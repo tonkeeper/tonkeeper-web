@@ -453,7 +453,12 @@ const useTronEstimationFreeProSender = () => {
         : undefined;
 
     return useMemo(() => {
-        if (!activeTronWallet || !isStandardTonWallet(activeAccount.activeTonWallet) || !proToken) {
+        if (
+            !activeTronWallet ||
+            !isStandardTonWallet(activeAccount.activeTonWallet) ||
+            !proToken ||
+            !batteryAuthToken
+        ) {
             return undefined;
         }
 

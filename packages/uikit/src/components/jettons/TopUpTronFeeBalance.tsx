@@ -147,6 +147,10 @@ const ProCard = styled.div`
     ${MethodInfo} {
         align-items: flex-start;
     }
+
+    ${isMobile} {
+        margin-top: 12px;
+    }
 `;
 
 const ActionButton = styled(Button)`
