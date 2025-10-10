@@ -102,10 +102,12 @@ jobs:
 
             -   name: List Squirrel output
                 if: runner.os == 'Windows'
+                shell: pwsh
                 run: |
-                    dir /s /b ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows
+                    Get-ChildItem -Recurse -File apps\desktop\out\make\squirrel.windows | 
+                      Select-Object FullName, Length | Format-Table -AutoSize
 
-            -   name: Upload Windows Squirrel artifacts (RELEASES + full nupkg)
+            -   name: Upload Windows Squirrel artifacts (RELEASES + full nupkg + delta nupkg)
                 if: runner.os == 'Windows'
                 uses: actions/upload-artifact@v4
                 with:
@@ -113,9 +115,9 @@ jobs:
                     retention-days: 10
                     if-no-files-found: error
                     path: |
-                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/RELEASES
-                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/*-full.nupkg
-                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/*-delta.nupkg
+                        apps/desktop/out/make/squirrel.windows/**/RELEASES
+                        apps/desktop/out/make/squirrel.windows/**/*-full.nupkg
+                        apps/desktop/out/make/squirrel.windows/**/*-delta.nupkg
 
             -   name: Upload Windows Setup (optional)
                 if: runner.os == 'Windows'
@@ -125,7 +127,7 @@ jobs:
                     retention-days: 10
                     if-no-files-found: error
                     path: |
-                        ${{ github.workspace }}/apps/desktop/out/make/squirrel.windows/*.exe
+                        apps/desktop/out/make/squirrel.windows/**/*.exe
             - name: Clean-up credentials
               if: always() && runner.os == 'macOS'
               run: rm -f "$GITHUB_WORKSPACE/AuthKey.p8"
