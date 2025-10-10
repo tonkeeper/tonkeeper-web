@@ -311,6 +311,7 @@ const useGetTronFreeProSender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
     const sdk = useAppSdk();
+    const { data: batteryAuthToken } = useBatteryAuthToken();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
         ? activeAccount.activeTronWallet
@@ -318,13 +319,29 @@ const useGetTronFreeProSender = () => {
 
     return useCallback(async () => {
         const proToken = await sdk.subscriptionService.getToken();
-        if (!activeTronWallet || !proToken) {
+
+        if (!proToken) {
+            throw new Error('Pro subscription is missing');
+        }
+
+        if (!activeTronWallet) {
             throw new Error('Tron is not enabled for the active wallet');
         }
 
+        if (!batteryAuthToken) {
+            throw new Error('Battery service authorization is missing');
+        }
+
         const signer = getTronSigner(sdk, tronApi, activeAccount);
-        return new TronFreeProSender(tronApi, batteryApi, activeTronWallet, signer, proToken);
-    }, [activeAccount, activeTronWallet, tronApi, batteryApi]);
+        return new TronFreeProSender(
+            tronApi,
+            batteryApi,
+            activeTronWallet,
+            signer,
+            batteryAuthToken,
+            proToken
+        );
+    }, [activeAccount, activeTronWallet, tronApi, batteryApi, batteryAuthToken]);
 };
 
 export const useTronEstimationSender = (senderType: TronSenderType | undefined) => {
@@ -428,6 +445,7 @@ const useTronEstimationFreeProSender = () => {
     const tronApi = useTronApi();
     const activeAccount = useActiveAccount();
     const batteryApi = useBatteryApi();
+    const { data: batteryAuthToken } = useBatteryAuthToken();
     const { data: proToken } = useProAuthToken();
 
     const activeTronWallet = isAccountTronCompatible(activeAccount)
@@ -439,13 +457,21 @@ const useTronEstimationFreeProSender = () => {
             return undefined;
         }
 
-        return new TronFreeProSender(tronApi, batteryApi, activeTronWallet, emptySigner, proToken);
+        return new TronFreeProSender(
+            tronApi,
+            batteryApi,
+            activeTronWallet,
+            emptySigner,
+            batteryAuthToken,
+            proToken
+        );
     }, [
         activeAccount,
         activeTronWallet,
         activeAccount.activeTonWallet,
         tronApi,
         batteryApi,
-        proToken
+        proToken,
+        batteryAuthToken
     ]);
 };

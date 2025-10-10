@@ -25,6 +25,7 @@ export class TronFreeProSender extends BaseTronSender implements ITronSender {
         batteryConfig: BatteryConfiguration,
         protected tronWallet: TronWallet,
         private tronSigner: TronSigner,
+        private readonly xBatteryAuth: string,
         private readonly xProAuthToken: string
     ) {
         super();
@@ -45,6 +46,7 @@ export class TronFreeProSender extends BaseTronSender implements ITronSender {
         try {
             await this.batteryApi.tronSend({
                 xProAuth: this.xProAuthToken,
+                xTonConnectAuth: this.xBatteryAuth,
                 tronSendRequest: {
                     tx: Buffer.from(JSON.stringify(signedTx)).toString('base64'),
                     wallet: this.tronWallet.address,

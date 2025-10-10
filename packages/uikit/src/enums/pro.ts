@@ -3,6 +3,6 @@ export enum FeatureSlideNames {
     MULTI_SIG = 1,
     MULTI_WALLET = 2,
     MULTI_SEND = 3,
-    SUPPORT = 4,
-    FREE_TRC20_TRANSFER = 5
+    FREE_TRC20_TRANSFER = 4,
+    SUPPORT = 5
 }
