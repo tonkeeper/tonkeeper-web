@@ -539,6 +539,7 @@ export const ActionFeeDetailsUniversal: FC<
 
 const SelectDropDownStyled = styled(SelectDropDown)`
     & .dd-select-container {
+        max-height: unset;
         z-index: 1000;
     }
 `;
@@ -666,6 +667,10 @@ const SenderDropdownItemTronBattery: FC<{
     );
 };
 
+const TonkeeperProCardIconStyled = styled(TonkeeperProCardIcon)`
+    margin-right: 12px;
+`;
+
 const SenderDropdownItemTronFreePro: FC<{
     config: Trc20FreeTransfersConfig;
 }> = ({ config }) => {
@@ -674,7 +679,7 @@ const SenderDropdownItemTronFreePro: FC<{
 
     return (
         <>
-            <TonkeeperProCardIcon size={28} />
+            <TonkeeperProCardIconStyled size={28} />
             <SenderText>
                 <Label2>{t('select_fee_payment_method_option_free_pro_title')}</Label2>
                 {config.type === 'inactive' ? (

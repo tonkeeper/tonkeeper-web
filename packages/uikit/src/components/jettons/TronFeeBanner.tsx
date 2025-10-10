@@ -3,6 +3,7 @@ import styled, { css, useTheme } from 'styled-components';
 import { Body1Class, Body2, Body2Class, Body3, Body3Class, Label1Class, Label2 } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
+    useTrc20FreeTransfersConfig,
     useTrc20TransferDefaultFees,
     useTrc20TransfersNumberAvailable,
     useTronBalances
@@ -25,6 +26,8 @@ import { ExternalLink } from '../shared/ExternalLink';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
 import { Notification } from '../Notification';
 import { useDisclosure } from '../../hooks/useDisclosure';
+import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 const TronTopUpUSDTWrapper = styled.div`
     background-color: ${p => p.theme.backgroundContent};
@@ -151,6 +154,7 @@ const InfoWrapper = styled.div`
 
 const DropDownStyled = styled(DropDown)`
     .tron-fee-info-container {
+        max-height: unset;
         width: 280px;
         right: -120px;
         top: 24px;
@@ -247,7 +251,7 @@ const TableWrapper = styled.div`
 const TableRow = styled.div`
     padding: 10px 16px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-rows: 1fr 1fr;
     align-items: center;
     flex-direction: column;
@@ -318,6 +322,9 @@ const FeeTable = () => {
     const { data: tonBalance } = useTonBalance();
     const { data: tronBalances } = useTronBalances();
     const { faq_tron_fee_url } = useActiveConfig();
+    const { data: trc20FreeTransfers } = useTrc20FreeTransfersConfig();
+    const formatDate = useDateTimeFormat();
+    const { onOpen: onGetPro } = useProFeaturesNotification();
 
     const onRefillToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -331,6 +338,54 @@ const FeeTable = () => {
 
     return (
         <TableWrapper>
+            <TableRow>
+                <TableFirsLineText>{t('tron_fee_table_free_transfer_title')}</TableFirsLineText>
+                {trc20FreeTransfers === undefined ? (
+                    <span />
+                ) : trc20FreeTransfers.type === 'inactive' ? (
+                    <GetProButton primary size="small" onClick={() => onGetPro()}>
+                        {t('pro_subscription_get_pro')}
+                    </GetProButton>
+                ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
+                    <TableFirsLineText>
+                        {t('tron_fee_table_free_transfer_transfers_left', {
+                            number: trc20FreeTransfers.availableTransfersNumber
+                        })}
+                    </TableFirsLineText>
+                ) : (
+                    <TableFirsLineText>
+                        {t('tron_fee_table_free_transfer_no_transfers_left')}
+                    </TableFirsLineText>
+                )}
+
+                {trc20FreeTransfers === undefined ? (
+                    <TextSkeleton />
+                ) : trc20FreeTransfers.type === 'inactive' ? (
+                    <TableSecondLineText>
+                        {t('tron_fee_table_free_transfer_subtitle_inactive')}
+                    </TableSecondLineText>
+                ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
+                    <TableSecondLineText>
+                        {t('tron_fee_table_free_transfer_subtitle_active')}
+                    </TableSecondLineText>
+                ) : (
+                    <span>
+                        <TableSecondLineText>
+                            {t('tron_fee_table_free_transfer_subtitle_active')}
+                        </TableSecondLineText>
+                        <Dot />
+                        <TableSecondLineText>
+                            {t('tron_fee_table_free_transfer_subtitle_used_next_on_date', {
+                                date: formatDate(trc20FreeTransfers.availableTransfersNumber, {
+                                    day: 'numeric',
+                                    month: 'short'
+                                })
+                            })}
+                        </TableSecondLineText>
+                    </span>
+                )}
+                <span />
+            </TableRow>
             <TableRowTemplate
                 heading="Tonkeeper Battery"
                 formattedBalance={
@@ -420,3 +475,8 @@ const TableRowTemplate: FC<{
         </TableRow>
     );
 };
+
+const GetProButton = styled(Button)`
+    grid-row: span 2;
+    height: 32px;
+`;

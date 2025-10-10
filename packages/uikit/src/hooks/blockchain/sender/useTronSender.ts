@@ -91,6 +91,17 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             }
             const optionsGetters: (() => Promise<TronSenderOption | undefined>)[] = [];
 
+            if (freeTrc20Config) {
+                optionsGetters.push(async () => ({
+                    type: TRON_SENDER_TYPE.FREE_PRO,
+                    isEnoughBalance:
+                        freeTrc20Config.type === 'active' &&
+                        freeTrc20Config.availableTransfersNumber > 0,
+                    config: freeTrc20Config,
+                    fee: { type: 'free-transfer' }
+                }));
+            }
+
             if (batteryTronSender) {
                 optionsGetters.push(async () => {
                     try {
@@ -163,17 +174,6 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
                         console.debug(e);
                     }
                 });
-            }
-
-            if (freeTrc20Config) {
-                optionsGetters.push(async () => ({
-                    type: TRON_SENDER_TYPE.FREE_PRO,
-                    isEnoughBalance:
-                        freeTrc20Config.type === 'active' &&
-                        freeTrc20Config.availableTransfersNumber > 0,
-                    config: freeTrc20Config,
-                    fee: { type: 'free-transfer' }
-                }));
             }
 
             const options = (await Promise.all(optionsGetters.map(o => o()))).filter(notNullish);
