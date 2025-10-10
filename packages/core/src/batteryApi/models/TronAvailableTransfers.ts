@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * 
+ *
  * @export
  * @interface TronAvailableTransfers
  */
@@ -25,6 +25,12 @@ export interface TronAvailableTransfers {
      * @memberof TronAvailableTransfers
      */
     availableTransfers: number;
+    /**
+     * Unix timestamp of next free transfers reset date (either next month after last reset or next charge date, whichever is closer)
+     * @type {number}
+     * @memberof TronAvailableTransfers
+     */
+    nextResetDate?: number;
 }
 
 /**
@@ -44,8 +50,9 @@ export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminat
         return json;
     }
     return {
-        
+
         'availableTransfers': json['available_transfers'],
+        'nextResetDate': json['next_reset_date'] == null ? undefined : json['next_reset_date'],
     };
 }
 
@@ -59,8 +66,9 @@ export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminat
     }
 
     return {
-        
+
         'available_transfers': value['availableTransfers'],
+        'next_reset_date': value['nextResetDate'],
     };
 }
 
