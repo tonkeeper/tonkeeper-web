@@ -475,24 +475,23 @@ export class TronApi {
                     isScam: false,
                     isFailed: item.isFailed,
                     inProgress: item.isPending,
-                    fee:
-                        item.feeType === 'ton' && item.feeTonNano
-                            ? {
-                                  type: 'ton-asset-relayed' as const,
-                                  extra: new AssetAmount({
-                                      asset: TON_ASSET,
-                                      weiAmount: item.feeTonNano! * -1
-                                  }),
-                                  sendToAddress: ''
-                              }
-                            : item.feeType === 'free_pro'
-                            ? {
-                                  type: 'free-transfer'
-                              }
-                            : {
-                                  type: 'battery' as const,
-                                  charges: item.batteryCharges
-                              }
+                    fee: item.isFreePro
+                        ? {
+                              type: 'free-transfer'
+                          }
+                        : item.feeType === 'ton' && item.feeTonNano
+                        ? {
+                              type: 'ton-asset-relayed' as const,
+                              extra: new AssetAmount({
+                                  asset: TON_ASSET,
+                                  weiAmount: item.feeTonNano! * -1
+                              }),
+                              sendToAddress: ''
+                          }
+                        : {
+                              type: 'battery' as const,
+                              charges: item.batteryCharges
+                          }
                 } satisfies TronHistoryItemTransferAsset;
             })
             .filter(notNullish);
