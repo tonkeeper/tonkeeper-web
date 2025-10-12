@@ -16,7 +16,7 @@ import {
 import { SubscriptionSource } from './pro';
 import { getProExtensionData, getProServiceTiers } from './service/proService';
 import { Language } from './entries/language';
-import { getFormattedProPrice } from './utils/pro';
+import { getFormattedProPrice, secondsToUnitCount } from './utils/pro';
 import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStrategy';
 import { AppKey } from './Keys';
 import { AssetAmount } from './entries/crypto/asset/asset-amount';
@@ -119,12 +119,16 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
 
         const filteredPlans = plans.filter(plan => plan.id === 1);
 
-        return filteredPlans.map(plan => ({
-            id: String(plan.id),
-            displayName: plan.name,
-            displayPrice: plan.amount,
-            subscriptionPeriod: 'month',
-            formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
-        }));
+        return filteredPlans.map(plan => {
+            const { unit: periodUnit } = secondsToUnitCount(plan.period);
+
+            return {
+                id: String(plan.id),
+                displayName: plan.name,
+                displayPrice: plan.amount,
+                subscriptionPeriod: periodUnit,
+                formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
+            };
+        });
     }
 }
