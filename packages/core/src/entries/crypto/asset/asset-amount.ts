@@ -1,14 +1,22 @@
 import BigNumber from 'bignumber.js';
+import { AmountFormatter } from '../../../utils/AmountFormatter';
+import { getDecimalSeparator, getGroupSeparator } from '../../../utils/formatting';
 import { Asset } from './asset';
 import { BasicAsset } from './basic-asset';
 import { IAssetAmount } from './i-asset-amount';
-import { coreFormatter } from '../../../utils/pro';
 
 type AssetAmountStruct<T extends BasicAsset> = {
     asset: T;
     weiAmount: BigNumber.Value;
     image?: string;
 };
+
+const formatter = new AmountFormatter({
+    getLocaleFormat: () => ({
+        decimalSeparator: getDecimalSeparator(),
+        groupingSeparator: getGroupSeparator()
+    })
+});
 
 export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T> {
     static fromRelativeAmount<T extends Asset = Asset>({
@@ -89,7 +97,7 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
         if (decimalPlaces === undefined) {
             decimalPlaces = this.asset.decimals;
         }
-        return coreFormatter.format(this.relativeAmount, { decimals: decimalPlaces });
+        return formatter.format(this.relativeAmount, { decimals: decimalPlaces });
     }
 
     toStringAssetRelativeAmount(decimalPlaces?: number): string {
@@ -100,7 +108,7 @@ export class AssetAmount<T extends BasicAsset = Asset> implements IAssetAmount<T
         if (decimalPlaces === undefined) {
             decimalPlaces = this.asset.decimals;
         }
-        return coreFormatter.format(this.relativeAmount.abs(), { decimals: decimalPlaces });
+        return formatter.format(this.relativeAmount.abs(), { decimals: decimalPlaces });
     }
 
     toStringAssetAbsoluteRelativeAmount(decimalPlaces?: number): string {
