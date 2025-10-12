@@ -14,6 +14,7 @@ import {
     hasExpiresDate,
     hasIosPrice,
     IosSubscriptionStatuses,
+    IProductsInfoPayload,
     isCryptoSubscription,
     isExpiredSubscription,
     isExtensionCancellingSubscription,
@@ -28,6 +29,10 @@ import {
     TelegramSubscriptionStatuses
 } from '../entries/pro';
 import { toStructTimeLeft } from './date';
+import { formatDecimals } from './balance';
+import BigNumber from 'bignumber.js';
+import { AmountFormatter } from './AmountFormatter';
+import { getDecimalSeparator, getGroupSeparator } from './formatting';
 
 const toDate = (ts: number) => new Date(ts * 1000);
 
@@ -284,6 +289,34 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
     } catch (e) {
         console.error('getFormattedDisplayPrice error: ', e);
         return '-';
+    }
+};
+
+export const coreFormatter = new AmountFormatter({
+    getLocaleFormat: () => ({
+        decimalSeparator: getDecimalSeparator(),
+        groupingSeparator: getGroupSeparator()
+    })
+});
+
+export const getFiatEquivalentProPrice = (
+    amount: string,
+    { fiat, ratePrices }: IProductsInfoPayload
+): string | null => {
+    if (!fiat || !ratePrices || !isValidNanoString(amount)) return null;
+
+    try {
+        const tokenAmount = formatDecimals(amount);
+        const value = new BigNumber(ratePrices).multipliedBy(tokenAmount);
+
+        return coreFormatter.format(value.toString(), {
+            currency: fiat,
+            ignoreZeroTruncate: false,
+            decimals: 4
+        });
+    } catch (error) {
+        console.error('getFiatEquivalentProPrice:', error);
+        return null;
     }
 };
 

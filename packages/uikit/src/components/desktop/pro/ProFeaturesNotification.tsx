@@ -24,10 +24,6 @@ import { useNavigate } from '../../../hooks/router/useNavigate';
 import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
-import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useFormatFiat, useRate } from '../../../state/rates';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { usePrimarySubscriptionSource } from '../../../hooks/usePrimarySubscriptionSource';
 
 interface IProFeaturesNotificationProps {
@@ -114,7 +110,6 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
                     <NotificationFooter>
                         <ButtonsBlockStyled
                             formId={formId}
-                            primarySource={primarySource}
                             isError={isError}
                             isLoading={isProPlanLoading}
                             displayPlans={displayPlans}
@@ -131,7 +126,6 @@ export const ProFeaturesNotificationContent: FC<Omit<IProFeaturesNotificationPro
 
 interface IButtonBlock {
     formId: string;
-    primarySource: SubscriptionSource;
     onTrial?: () => void;
     className?: string;
     isError: boolean;
@@ -140,19 +134,11 @@ interface IButtonBlock {
 }
 
 const ButtonsBlock: FC<IButtonBlock> = props => {
-    const { formId, onTrial, className, isError, isLoading, displayPlans, primarySource } = props;
+    const { formId, onTrial, className, isError, isLoading, displayPlans } = props;
 
-    const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
     const { t } = useTranslation();
 
-    const isIos = primarySource === SubscriptionSource.IOS;
-    const { displayPrice, subscriptionPeriod } = displayPlans[0] || {};
-
-    const { fiatAmount: fiatEquivalent } = useFormatFiat(rate, formatDecimals(displayPrice));
-
-    const isPrimaryLoading =
-        !isError &&
-        (isLoading || (isIos ? !displayPrice : !fiatEquivalent) || (!isIos && isRateLoading));
+    const { fiatEquivalent, subscriptionPeriod } = displayPlans[0] || {};
 
     return (
         <div className={className}>
@@ -162,12 +148,11 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
                 size="large"
                 type="submit"
                 form={formId}
-                loading={isPrimaryLoading}
+                loading={!isError && (isLoading || !fiatEquivalent)}
             >
                 <Label2>
                     {t(isError ? 'try_again' : 'continue_from')}
-                    {!isError &&
-                        ` ${isIos ? displayPrice : fiatEquivalent} / ${t(subscriptionPeriod)}`}
+                    {!isError && ` ${fiatEquivalent} / ${t(subscriptionPeriod)}`}
                 </Label2>
             </Button>
 

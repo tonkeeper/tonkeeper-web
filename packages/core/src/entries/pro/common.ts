@@ -11,6 +11,7 @@ export interface IDisplayPlan {
     id: string;
     displayName: string;
     displayPrice: string;
+    fiatEquivalent: string;
     subscriptionPeriod: string;
     formattedDisplayPrice: string;
 }

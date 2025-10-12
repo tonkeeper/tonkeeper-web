@@ -18,6 +18,7 @@ import {
 import { CryptoCurrency, SubscriptionSource } from '../../pro';
 import { Language } from '../language';
 import { DateSerialized } from '../../utils/date';
+import { FiatCurrencies } from '../fiat';
 
 export type ProSubscription =
     | IosSubscription
@@ -63,7 +64,7 @@ export interface IBaseSubscription {
 export interface IBaseSubscriptionStrategy {
     source: SubscriptionSource;
     subscribe(formData: ISubscriptionFormData): Promise<PurchaseStatuses>;
-    getAllProductsInfoCore(lang?: Language): Promise<IDisplayPlan[]>;
+    getAllProductsInfoCore(payload?: IProductsInfoPayload): Promise<IDisplayPlan[]>;
 }
 
 // IOS Subscription Types
@@ -217,6 +218,12 @@ export interface ITelegramExpiredSubscription extends IBaseTelegramSubscription 
     valid: false;
 }
 
+export interface IProductsInfoPayload {
+    lang?: Language;
+    fiat?: FiatCurrencies;
+    ratePrices?: number;
+}
+
 export interface ISubscriptionService {
     getAvailableSources(): ReadonlyArray<SubscriptionSource>;
     getStrategy(source: SubscriptionSource): SubscriptionStrategy | undefined;
@@ -229,5 +236,8 @@ export interface ISubscriptionService {
         formData: ISubscriptionFormData
     ): Promise<PurchaseStatuses>;
     activateTrial(token: string): Promise<void>;
-    getAllProductsInfo(source: SubscriptionSource, lang?: Language): Promise<IDisplayPlan[]>;
+    getAllProductsInfo(
+        source: SubscriptionSource,
+        payload: IProductsInfoPayload
+    ): Promise<IDisplayPlan[]>;
 }
