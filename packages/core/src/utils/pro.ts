@@ -292,7 +292,7 @@ export const getFormattedProPrice = (displayPrice: string | null, isCrypto: bool
     }
 };
 
-export const coreFormatter = new AmountFormatter({
+const formatter = new AmountFormatter({
     getLocaleFormat: () => ({
         decimalSeparator: getDecimalSeparator(),
         groupingSeparator: getGroupSeparator()
@@ -309,7 +309,7 @@ export const getFiatEquivalentProPrice = (
         const tokenAmount = formatDecimals(amount);
         const value = new BigNumber(ratePrices).multipliedBy(tokenAmount);
 
-        return coreFormatter.format(value.toString(), {
+        return formatter.format(value.toString(), {
             currency: fiat,
             ignoreZeroTruncate: false,
             decimals: 4
