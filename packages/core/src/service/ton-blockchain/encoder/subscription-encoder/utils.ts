@@ -1,11 +1,14 @@
 import { Address } from '@ton/core';
 
+import { createFakeMetaEncryptionData } from '../../../meta';
 import { IMetaEncryptionData } from '../../../../entries/wallet';
 import { DeployParams, SubscriptionEncodingParams } from './types';
 
+const FAKE_META_ENCRYPTION: Readonly<IMetaEncryptionData> = createFakeMetaEncryptionData();
+
 export const prepareSubscriptionParamsForEncoder = (
     subscriptionParams: SubscriptionEncodingParams,
-    metaEncryptionMap: Record<string, IMetaEncryptionData>
+    metaEncryptionMap?: Record<string, IMetaEncryptionData>
 ): DeployParams => {
     const {
         admin,
@@ -22,6 +25,9 @@ export const prepareSubscriptionParamsForEncoder = (
         metadata
     } = subscriptionParams;
 
+    const walletMetaKeyPair =
+        metaEncryptionMap?.[selectedWallet.rawAddress]?.keyPair ?? FAKE_META_ENCRYPTION.keyPair;
+
     return {
         beneficiary: Address.parse(admin),
         subscriptionId: subscription_id,
@@ -34,6 +40,6 @@ export const prepareSubscriptionParamsForEncoder = (
         withdrawAddress: Address.parse(recipient),
         withdrawMsgBody: withdraw_msg_body,
         metadata,
-        walletMetaKeyPair: metaEncryptionMap[selectedWallet.rawAddress].keyPair
+        walletMetaKeyPair
     };
 };

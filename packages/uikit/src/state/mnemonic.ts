@@ -361,6 +361,15 @@ export const getSigner = async (
             }
             case 'mam': {
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, wallet!.id);
+
+                if (wallet?.rawAddress) {
+                    await createAndStoreMetaEncryptionKeys(sdk, {
+                        seedPrase: mnemonic,
+                        rawAddress: wallet.rawAddress,
+                        mnemonicType: 'ton'
+                    });
+                }
+
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToKeypair(mnemonic, 'ton');
                     return sign(message.hash(), keyPair.secretKey);
@@ -374,6 +383,15 @@ export const getSigner = async (
                 if (secret.type !== 'mnemonic') {
                     throw new Error('Unexpected secret type');
                 }
+
+                if (wallet?.rawAddress) {
+                    await createAndStoreMetaEncryptionKeys(sdk, {
+                        seedPrase: secret.mnemonic,
+                        rawAddress: wallet.rawAddress,
+                        mnemonicType: account.mnemonicType
+                    });
+                }
+
                 const callback = async (message: Cell) => {
                     const keyPair = await mnemonicToKeypair(secret.mnemonic, account.mnemonicType);
                     return sign(message.hash(), keyPair.secretKey);
