@@ -4,5 +4,6 @@
 /* eslint-disable */
 export type Ok = {
     ok: boolean;
+    auth_token?: string;
 };
 
