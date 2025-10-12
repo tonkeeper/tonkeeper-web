@@ -8,6 +8,7 @@ import {
     IExtensionPendingSubscription,
     IExtensionStrategyConfig,
     IExtensionSubscriptionStrategy as IExtensionStrategy,
+    IProductsInfoPayload,
     isTonWalletStandard,
     ISubscriptionFormData,
     PurchaseErrors,
@@ -15,8 +16,7 @@ import {
 } from './entries/pro';
 import { SubscriptionSource } from './pro';
 import { getProExtensionData, getProServiceTiers } from './service/proService';
-import { Language } from './entries/language';
-import { getFormattedProPrice, secondsToUnitCount } from './utils/pro';
+import { getFiatEquivalentProPrice, getFormattedProPrice, secondsToUnitCount } from './utils/pro';
 import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStrategy';
 import { AppKey } from './Keys';
 import { AssetAmount } from './entries/crypto/asset/asset-amount';
@@ -114,20 +114,24 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
         });
     }
 
-    async getAllProductsInfoCore(lang?: Language): Promise<IDisplayPlan[]> {
-        const plans = await getProServiceTiers(lang);
+    async getAllProductsInfoCore(payload: IProductsInfoPayload): Promise<IDisplayPlan[]> {
+        const plans = await getProServiceTiers(payload.lang);
 
         const filteredPlans = plans.filter(plan => plan.id === 1);
 
         return filteredPlans.map(plan => {
-            const { unit: periodUnit } = secondsToUnitCount(plan.period);
+            const { id, period, amount, name } = plan;
+            const { unit: periodUnit } = secondsToUnitCount(period);
+
+            const formattedDisplayPrice = getFormattedProPrice(amount, true);
 
             return {
-                id: String(plan.id),
-                displayName: plan.name,
-                displayPrice: plan.amount,
+                id: String(id),
+                displayName: name,
+                displayPrice: amount,
+                formattedDisplayPrice,
                 subscriptionPeriod: periodUnit,
-                formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
+                fiatEquivalent: getFiatEquivalentProPrice(amount, payload) ?? formattedDisplayPrice
             };
         });
     }

@@ -48,6 +48,8 @@ import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encode
 import { useProAuthNotification } from '../components/modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
 import { useMetaEncryptionNotification } from '../components/modals/MetaEncryptionNotificationControlled';
+import { useRate } from './rates';
+import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -262,14 +264,23 @@ export const useProLogout = () => {
 
 export const useProPlans = (source: SubscriptionSource) => {
     const sdk = useAppSdk();
+    const { fiat } = useAppContext();
     const { data: lang } = useUserLanguage();
+    const { data: rate } = useRate(CryptoCurrency.TON);
 
     return useQuery<IDisplayPlan[], Error>(
         [QueryKey.pro, QueryKey.plans, lang, source],
-        async () => sdk.subscriptionService.getAllProductsInfo(source, lang),
+        async () => {
+            return sdk.subscriptionService.getAllProductsInfo(source, {
+                fiat,
+                lang,
+                ratePrices: rate?.prices
+            });
+        },
         {
             initialData: [],
-            staleTime: 0
+            staleTime: 0,
+            enabled: !!rate
         }
     );
 };

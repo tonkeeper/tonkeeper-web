@@ -154,6 +154,7 @@ export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrateg
             id: plan.id,
             displayName: plan.displayName,
             displayPrice: plan.displayPrice,
+            fiatEquivalent: plan.displayPrice,
             subscriptionPeriod: plan?.subscriptionPeriod || 'month',
             formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
         }));

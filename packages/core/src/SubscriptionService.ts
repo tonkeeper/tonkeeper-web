@@ -2,6 +2,7 @@ import {
     DateSerializedPendingSubscription,
     IDisplayPlan,
     IExtensionCancellingSubscription,
+    IProductsInfoPayload,
     isExtensionAutoRenewableSubscription,
     isExtensionCancellingSubscription,
     isPendingSubscription,
@@ -20,7 +21,6 @@ import { IStorage } from './Storage';
 import { ProAuthTokenService } from './ProAuthTokenService';
 import { AppKey } from './Keys';
 import { pickBestSubscription } from './utils/pro';
-import { Language } from './entries/language';
 import { DateSerialized, deserializeDates } from './utils/date';
 
 export class SubscriptionService implements ISubscriptionService {
@@ -112,7 +112,10 @@ export class SubscriptionService implements ISubscriptionService {
         };
     }
 
-    async getAllProductsInfo(source: SubscriptionSource, lang?: Language): Promise<IDisplayPlan[]> {
+    async getAllProductsInfo(
+        source: SubscriptionSource,
+        payload: IProductsInfoPayload
+    ): Promise<IDisplayPlan[]> {
         try {
             const strategy = this._strategiesMap.get(source);
 
@@ -120,7 +123,7 @@ export class SubscriptionService implements ISubscriptionService {
                 return [];
             }
 
-            return await strategy.getAllProductsInfoCore(lang);
+            return await strategy.getAllProductsInfoCore(payload);
         } catch (e) {
             console.error('Failed to fetch products info:', e);
 
