@@ -761,6 +761,7 @@
   "upload_file": "Загрузить файл",
   "View": "Вид",
   "view_on_tonviewer": "Открыть в Tonviewer",
+  "view_transaction": "Открыть Транзакцию",
   "wallet": "Кошелёк",
   "wallet_2fa_recovery_started": "Процесс сброса запущен",
   "wallet_address": "Адрес кошелька",
