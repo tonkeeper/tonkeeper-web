@@ -21,6 +21,7 @@ import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { ProSettingsPartnersSection } from './ProPartnersSecrion';
 
 interface IProps {
     subscription: ProSubscription | undefined;
@@ -99,6 +100,8 @@ export const CryptoStatusScreenState = ({ subscription }: IProps) => {
                     </ListItemStyled>
                 )}
             </ListBlock>
+
+            <ProSettingsPartnersSection />
 
             <ButtonsBlockStyled>
                 <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>

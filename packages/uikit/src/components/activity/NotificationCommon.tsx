@@ -693,8 +693,7 @@ const SenderDropdownItemTronFreePro: FC<{
                         {t('select_fee_payment_method_option_free_pro_subtitle_used', {
                             date: formatDate(config.rechargeDate, {
                                 month: 'short',
-                                day: 'numeric',
-                                year: undefined
+                                day: 'numeric'
                             })
                         })}
                     </Body3Accent>

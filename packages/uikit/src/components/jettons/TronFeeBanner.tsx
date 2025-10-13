@@ -376,7 +376,7 @@ const FeeTable = () => {
                         <Dot />
                         <TableSecondLineText>
                             {t('tron_fee_table_free_transfer_subtitle_used_next_on_date', {
-                                date: formatDate(trc20FreeTransfers.availableTransfersNumber, {
+                                date: formatDate(trc20FreeTransfers.rechargeDate, {
                                     day: 'numeric',
                                     month: 'short'
                                 })

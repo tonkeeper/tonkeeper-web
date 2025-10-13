@@ -199,11 +199,10 @@ export const useTrc20FreeTransfersConfig = () => {
                 return {
                     type: 'active' as const,
                     availableTransfersNumber: availableTransfers,
-                    rechargeDate: new Date(nextResetDate)
+                    rechargeDate: new Date(nextResetDate * 1000)
                 };
             } catch (e) {
                 console.error(e);
-                // TODO filter error
                 return { type: 'inactive' as const };
             }
         }
@@ -284,6 +283,7 @@ export const useTrc20TransfersNumberAvailable = () => {
     const { data: tronBalances } = useTronBalances();
     const { data: batteryBalance } = useBatteryBalance();
     const { data: tonBalance } = useTonBalance();
+    const { data: freeTrc20Config } = useTrc20FreeTransfersConfig();
 
     const batteryTransfers = useMemo(() => {
         if (!batteryBalance || !batterySenderFee.charges) {
@@ -314,6 +314,9 @@ export const useTrc20TransfersNumberAvailable = () => {
         return Math.floor(tronBalances.trx.weiAmount.div(trxSenderFee.trx.weiAmount).toNumber());
     }, [tronBalances?.trx, trxSenderFee.trx]);
 
+    const freeTrc20Transfers =
+        freeTrc20Config?.type === 'active' ? freeTrc20Config.availableTransfersNumber : 0;
+
     return useMemo(() => {
         let total = undefined;
         if (
@@ -321,7 +324,11 @@ export const useTrc20TransfersNumberAvailable = () => {
             tonTransfers !== undefined ||
             trxTransfers !== undefined
         ) {
-            total = (batteryTransfers ?? 0) + (tonTransfers ?? 0) + (trxTransfers ?? 0);
+            total =
+                (batteryTransfers ?? 0) +
+                (tonTransfers ?? 0) +
+                (trxTransfers ?? 0) +
+                freeTrc20Transfers;
         }
 
         return {
@@ -330,5 +337,5 @@ export const useTrc20TransfersNumberAvailable = () => {
             trxTransfers,
             total
         };
-    }, [batteryTransfers, tonTransfers, trxTransfers]);
+    }, [batteryTransfers, tonTransfers, trxTransfers, freeTrc20Transfers]);
 };
