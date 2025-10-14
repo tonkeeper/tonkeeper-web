@@ -1,5 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import {
+    RpcMethod,
+    WalletResponse,
     TonConnectAppRequest,
     TonConnectAppRequestPayload
 } from '@tonkeeper/core/dist/entries/tonConnect';
@@ -19,6 +21,7 @@ import {
 import { useActiveWallet, useMutateActiveTonWallet } from '../../state/wallet';
 import { listenBroadcastMessages, sendBroadcastMessage } from '../../libs/web';
 import { TonConnectRequestNotification } from './TonConnectRequestNotification';
+import { useTonConnectHttpResponseMutation } from './connectHook';
 import { useAppContext } from '../../hooks/appContext';
 
 const useUnSupportMethodMutation = () => {
@@ -41,6 +44,7 @@ const WebTonConnectSubscription = () => {
     const { mutate: badRequestResponse } = useUnSupportMethodMutation();
 
     const { mutateAsync: setActiveWallet } = useMutateActiveTonWallet();
+    const { mutateAsync: sendResponse } = useTonConnectHttpResponseMutation();
 
     const { mainnetConfig } = useAppContext();
 
@@ -141,15 +145,24 @@ const WebTonConnectSubscription = () => {
         mainnetConfig.ton_connect_bridge
     ]);
 
-    const handleClose = useCallback(() => {
-        if (!request) return;
-        setRequest(undefined);
+    const handleClose = useCallback(
+        async (result: WalletResponse<RpcMethod>) => {
+            if (!request) return;
+            setRequest(undefined);
 
-        sendBroadcastMessage(
-            BROADCAST_TAG,
-            JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
-        );
-    }, [request, setRequest]);
+            if (request.connection.type === 'http') {
+                await sendResponse({
+                    connection: request.connection,
+                    response: result
+                });
+            }
+            sendBroadcastMessage(
+                BROADCAST_TAG,
+                JSON.stringify({ event: 'close-tx-confirmation', id: request.id })
+            );
+        },
+        [request, setRequest]
+    );
 
     useEffect(() => {
         if (!request) {
