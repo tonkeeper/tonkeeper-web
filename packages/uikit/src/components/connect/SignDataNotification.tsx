@@ -155,12 +155,14 @@ const SignPayload: FC<{ params: SignDataRequestPayload }> = ({ params }) => {
                 </>
             );
         case 'cell':
+            const parsedCell = Cell.fromBase64(params.cell).toString();
+
             return (
                 <>
                     <Disclaimer>{t('signDataCellDisclaimer')}</Disclaimer>
                     <Payload>
-                        <SignText>{params.schema}</SignText>
-                        <SignText>{params.cell}</SignText>
+                        <SignText>{parsedCell}</SignText>
+
                         <ButtonRow>
                             <Button
                                 size="small"
