@@ -239,16 +239,17 @@ const NarrowContentAppRouting = () => {
         console.log(new Date(), 'Narrow content mounted');
     }, []);
 
-    const { assets } = useAllChainsAssetsWithPrice();
+    useAllChainsAssetsWithPrice();
+
     const isSplashHidden = useRef(false);
-    const isReady = assets !== undefined;
+
     useEffect(() => {
         if (isReady && !isSplashHidden.current) {
             console.log(new Date(), 'remove splash');
             isSplashHidden.current = true;
             SplashScreen.hide();
         }
-    }, [isReady]);
+    }, []);
 
     const [animated] = useAtom(ionRouterAnimation$);
 
