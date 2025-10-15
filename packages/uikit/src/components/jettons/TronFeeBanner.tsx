@@ -1,6 +1,5 @@
-import { BorderSmallResponsive } from '../shared/Styles';
 import styled, { css, useTheme } from 'styled-components';
-import { Body1Class, Body2, Body2Class, Body3, Body3Class, Label1Class, Label2 } from '../Text';
+import { Body1Class, Body2Class, Body3, Body3Class, Label1Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
     useTrc20FreeTransfersConfig,
@@ -28,49 +27,6 @@ import { Notification } from '../Notification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
-
-const TronTopUpUSDTWrapper = styled.div`
-    background-color: ${p => p.theme.backgroundContent};
-    ${BorderSmallResponsive};
-    padding: 16px 14px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: space-between;
-    margin: 16px;
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-
-    ${p =>
-        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
-        css`
-            gap: 16px;
-            flex-direction: column;
-
-            button {
-                width: 100%;
-                box-sizing: border-box;
-            }
-        `}
-
-    ${p =>
-        p.theme.displayType === 'compact' &&
-        css`
-            margin: 16px 0;
-        `}
-`;
-
-const TextContainer = styled.div`
-    > * {
-        display: block;
-    }
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
 
 const SmallDivider = styled.div`
     width: 100%;
@@ -174,24 +130,6 @@ export const TronFeeBanner = () => {
 
     if (total === undefined) {
         return null;
-    }
-
-    if (total === 0) {
-        return (
-            <>
-                <TronTopUpUSDTWrapper>
-                    <TextContainer>
-                        <Label2>{t('tron_fee_start_banner_title')}</Label2>
-                        <Body2>{t('tron_fee_start_banner_description')}</Body2>
-                    </TextContainer>
-
-                    <Button size="small" onClick={openTopUpNotification}>
-                        {t('tron_fee_start_banner_button')}
-                    </Button>
-                </TronTopUpUSDTWrapper>
-                <SmallDivider />
-            </>
-        );
     }
 
     const showDropDown = theme.displayType === 'full-width' && theme.proDisplayType === 'desktop';

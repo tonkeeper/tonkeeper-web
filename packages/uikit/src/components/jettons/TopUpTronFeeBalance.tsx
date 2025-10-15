@@ -23,15 +23,34 @@ const NotificationStyled = styled(Notification)`
     max-width: 648px;
 `;
 
+const isMobile = '@media (max-width: 768px)';
+
+const CardTitle = styled(Label2)`
+    ${isMobile} {
+        ${Label1Class};
+    }
+`;
+
+const CardSubtitle = styled(Body3)`
+    color: ${props => props.theme.textSecondary};
+    ${isMobile} {
+        ${Body2Class};
+    }
+`;
+
 const Content = styled.div`
     display: flex;
     flex-direction: column;
     padding-bottom: 4px;
     align-items: center;
 
-    > ${Label2} {
+    > ${CardTitle} {
+        margin-bottom: 4px;
         text-align: center;
-        margin-bottom: 24px;
+    }
+
+    > ${CardSubtitle} {
+        text-align: center;
     }
 `;
 
@@ -57,9 +76,8 @@ const BatteryIcon = () => {
     );
 };
 
-const isMobile = '@media (max-width: 768px)';
-
 const Cards = styled.div`
+    margin-top: 24px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
@@ -67,19 +85,6 @@ const Cards = styled.div`
     ${isMobile} {
         grid-template: repeat(3, 1fr) / 1fr;
         width: 100%;
-    }
-`;
-
-const CardTitle = styled(Label2)`
-    ${isMobile} {
-        ${Label1Class};
-    }
-`;
-
-const CardSubtitle = styled(Body3)`
-    color: ${props => props.theme.textSecondary};
-    ${isMobile} {
-        ${Body2Class};
     }
 `;
 
@@ -221,6 +226,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     return (
         <Content>
             <CardTitle>{t('topup_tron_fee_title')}</CardTitle>
+            <CardSubtitle>{t('topup_tron_fee_subtitle')}</CardSubtitle>
 
             <Cards>
                 <MethodCard>
