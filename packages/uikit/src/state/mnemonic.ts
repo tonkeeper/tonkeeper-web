@@ -257,14 +257,15 @@ export const useGetAccountSigner = () => {
     );
 };
 
+interface IGetSignerOptions {
+    walletId?: WalletId;
+    shouldCreateMetaKeys?: boolean;
+}
+
 export const getSigner = async (
     sdk: IAppSdk,
     accountId: AccountId,
-    {
-        walletId
-    }: {
-        walletId?: WalletId;
-    } = {}
+    { walletId, shouldCreateMetaKeys }: IGetSignerOptions = {}
 ): Promise<Signer> => {
     try {
         const account = await accountsStorage(sdk.storage).getAccount(accountId);
@@ -362,7 +363,7 @@ export const getSigner = async (
             case 'mam': {
                 const mnemonic = await getMAMWalletMnemonic(sdk, account.id, wallet!.id);
 
-                if (wallet?.rawAddress) {
+                if (wallet?.rawAddress && shouldCreateMetaKeys) {
                     await createAndStoreMetaEncryptionKeys(sdk, {
                         seedPrase: mnemonic,
                         rawAddress: wallet.rawAddress,
@@ -384,7 +385,7 @@ export const getSigner = async (
                     throw new Error('Unexpected secret type');
                 }
 
-                if (wallet?.rawAddress) {
+                if (wallet?.rawAddress && shouldCreateMetaKeys) {
                     await createAndStoreMetaEncryptionKeys(sdk, {
                         seedPrase: secret.mnemonic,
                         rawAddress: wallet.rawAddress,
