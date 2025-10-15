@@ -134,6 +134,15 @@ export const ConfirmTransferView: FC<
                 return setSelectedSenderType(type);
             }
 
+            if (
+                choice.type === TRON_SENDER_TYPE.FREE_PRO &&
+                choice.config.type === 'active' &&
+                choice.config.availableTransfersNumber < 1
+            ) {
+                sdk.topMessage(t('top_message_error_free_trc20_transfers_used'));
+                return;
+            }
+
             if (!choice.isEnoughBalance) {
                 openConfirmDiscardNotification({
                     onClose(isDiscarded: boolean) {
