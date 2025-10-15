@@ -36,16 +36,24 @@ export const useCreateSubscription = () => {
 
         if (!accountId) throw new Error('Account id is required!');
 
-        const metaEncryptionMap = await sdk.storage
+        let metaEncryptionMap = await sdk.storage
             .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
             .then(metaEncryptionMapSerializer);
 
+        const shouldCreateMetaKeys = !metaEncryptionMap?.[selectedWallet.rawAddress];
+
         const signer = await getSigner(sdk, accountId, {
             walletId: selectedWallet.id,
-            shouldCreateMetaKeys: !metaEncryptionMap?.[selectedWallet.rawAddress]
+            shouldCreateMetaKeys
         }).catch(() => null);
 
         if (!signer || signer.type !== 'cell') throw new Error('Signer is incorrect!');
+
+        if (shouldCreateMetaKeys) {
+            metaEncryptionMap = await sdk.storage
+                .get<MetaEncryptionSerializedMap>(AppKey.META_ENCRYPTION_MAP)
+                .then(metaEncryptionMapSerializer);
+        }
 
         const sender = new WalletMessageSender(api, selectedWallet, signer);
         const encoder = new SubscriptionEncoder(selectedWallet);
