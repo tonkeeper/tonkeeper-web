@@ -235,17 +235,13 @@ const NarrowContentInitialPages: FC<{
 
 const NarrowContentAppRouting = () => {
     const location = useLocation();
-    useEffect(() => {
-        console.log(new Date(), 'Narrow content mounted');
-    }, []);
 
     useAllChainsAssetsWithPrice();
 
     const isSplashHidden = useRef(false);
 
     useEffect(() => {
-        if (isReady && !isSplashHidden.current) {
-            console.log(new Date(), 'remove splash');
+        if (!isSplashHidden.current) {
             isSplashHidden.current = true;
             SplashScreen.hide();
         }

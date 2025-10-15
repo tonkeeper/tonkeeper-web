@@ -114,8 +114,6 @@ export const useProState = () => {
     return useQuery<ProSubscription, Error>(
         [QueryKey.pro],
         async () => {
-            console.log(new Date(), 'Start loading subscription');
-
             try {
                 const subscription = await sdk.subscriptionService.getSubscription(
                     subscriptionFormTempAuth$?.value?.tempToken ?? null
@@ -123,8 +121,6 @@ export const useProState = () => {
 
                 await setBackupState(sdk.storage, subscription);
                 await client.invalidateQueries([QueryKey.proBackup]);
-
-                console.log(new Date(), 'End loading subscription');
 
                 return subscription;
             } catch (e) {
