@@ -38,9 +38,7 @@ export interface IAppContext {
 
 export const AppContext = React.createContext<IAppContext>({
     mainnetApi: {
-        tonApiV2: new ConfigurationV2({
-            basePath: defaultTonendpointConfig.tonapiV2Endpoint
-        })
+        tonApiV2: new ConfigurationV2()
     },
     testnetApi: {
         tonApiV2: new ConfigurationV2()
