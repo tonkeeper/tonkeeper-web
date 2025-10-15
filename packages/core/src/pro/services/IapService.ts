@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Ok } from '../models/Ok';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -10,7 +11,7 @@ export class IapService {
      * Activate Pro subscription via IAP purchase
      * @param authorization
      * @param requestBody Data that is expected
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
     public static activateIapPurchase(
@@ -18,10 +19,7 @@ export class IapService {
         requestBody: {
             original_transaction_id: string;
         },
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token?: string;
-    }> {
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/iap',
