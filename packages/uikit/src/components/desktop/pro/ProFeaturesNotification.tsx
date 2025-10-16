@@ -12,7 +12,12 @@ import { Button } from '../../fields/Button';
 import { handleSubmit } from '../../../libs/form';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import { useProPlans, useProState, useTrialAvailability } from '../../../state/pro';
+import {
+    useFormattedProPrice,
+    useProPlans,
+    useProState,
+    useTrialAvailability
+} from '../../../state/pro';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
@@ -25,9 +30,6 @@ import { AppRoute, SettingsRoute } from '../../../libs/routes';
 import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { useFormatFiat, useRate } from '../../../state/rates';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
 import { usePrimarySubscriptionSource } from '../../../hooks/usePrimarySubscriptionSource';
 
 interface IProFeaturesNotificationProps {
@@ -142,17 +144,16 @@ interface IButtonBlock {
 const ButtonsBlock: FC<IButtonBlock> = props => {
     const { formId, onTrial, className, isError, isLoading, displayPlans, primarySource } = props;
 
-    const { data: rate, isLoading: isRateLoading } = useRate(CryptoCurrency.TON);
     const { t } = useTranslation();
 
     const isIos = primarySource === SubscriptionSource.IOS;
-    const { displayPrice, subscriptionPeriod } = displayPlans[0] || {};
+    const { price, subscriptionPeriod } = displayPlans[0] || {};
 
-    const { fiatAmount: fiatEquivalent } = useFormatFiat(rate, formatDecimals(displayPrice));
+    const { data: formattedPrices } = useFormattedProPrice(price);
 
-    const isPrimaryLoading =
-        !isError &&
-        (isLoading || (isIos ? !displayPrice : !fiatEquivalent) || (!isIos && isRateLoading));
+    const { displayPrice, fiatEquivalent } = formattedPrices ?? {};
+
+    const isPrimaryLoading = !isError && (isLoading || (isIos ? !displayPrice : !fiatEquivalent));
 
     return (
         <div className={className}>

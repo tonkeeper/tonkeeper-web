@@ -3,18 +3,16 @@ import {
     IDisplayPlan,
     IIosPurchaseResult,
     IIosSubscriptionStrategy as IIosStrategy,
-    ISubscriptionFormData,
     IOriginalTransactionInfo,
-    IProductInfo,
-    isProductId
-} from '@tonkeeper/core/dist/entries/pro';
-import {
     IosEnvironmentTypes,
-    PurchaseStatuses,
-    ProductIds
+    IProductInfo,
+    isProductId,
+    ISubscriptionFormData,
+    ProductIds,
+    ProPriceTypes,
+    PurchaseStatuses
 } from '@tonkeeper/core/dist/entries/pro';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
-import { getFormattedProPrice } from '@tonkeeper/core/dist/utils/pro';
 import { saveIapPurchase } from '@tonkeeper/core/dist/service/proService';
 import { BaseSubscriptionStrategy as BaseStrategy } from '@tonkeeper/core/dist/BaseSubscriptionStrategy';
 
@@ -153,9 +151,11 @@ export class IosSubscriptionStrategy extends BaseStrategy implements IIosStrateg
         return products.map(plan => ({
             id: plan.id,
             displayName: plan.displayName,
-            displayPrice: plan.displayPrice,
-            subscriptionPeriod: plan?.subscriptionPeriod || 'month',
-            formattedDisplayPrice: getFormattedProPrice(plan.displayPrice, false)
+            price: {
+                type: ProPriceTypes.FORMATTED,
+                value: plan.displayPrice
+            },
+            subscriptionPeriod: plan?.subscriptionPeriod || 'month'
         }));
     }
 }

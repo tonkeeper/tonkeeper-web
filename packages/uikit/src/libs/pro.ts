@@ -1,4 +1,4 @@
-import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
+import { IDisplayPlan, ProPriceTypes } from '@tonkeeper/core/dist/entries/pro';
 import { useProCarouselMetaData } from '../components/pro/PromoNotificationCarousel';
 import { useMemo } from 'react';
 
@@ -6,9 +6,11 @@ export const getSkeletonProducts = (skeletonSize = 2): IDisplayPlan[] =>
     Array.from({ length: skeletonSize }, (_, index) => ({
         id: String(index),
         displayName: '',
-        displayPrice: '',
-        subscriptionPeriod: '',
-        formattedDisplayPrice: ''
+        price: {
+            type: ProPriceTypes.FORMATTED,
+            value: ''
+        },
+        subscriptionPeriod: ''
     }));
 
 export const useAllCarouselImages = (baseSlideUrl: string | undefined): string[] => {

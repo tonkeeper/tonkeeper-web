@@ -10,13 +10,14 @@ import {
     IExtensionSubscriptionStrategy as IExtensionStrategy,
     isTonWalletStandard,
     ISubscriptionFormData,
+    ProPriceTypes,
     PurchaseErrors,
     PurchaseStatuses
 } from './entries/pro';
 import { SubscriptionSource } from './pro';
 import { getProExtensionData, getProServiceTiers } from './service/proService';
 import { Language } from './entries/language';
-import { getFormattedProPrice, secondsToUnitCount } from './utils/pro';
+import { secondsToUnitCount } from './utils/pro';
 import { BaseSubscriptionStrategy as BaseStrategy } from './BaseSubscriptionStrategy';
 import { AppKey } from './Keys';
 import { AssetAmount } from './entries/crypto/asset/asset-amount';
@@ -125,9 +126,11 @@ export class ExtensionSubscriptionStrategy extends BaseStrategy implements IExte
             return {
                 id: String(plan.id),
                 displayName: plan.name,
-                displayPrice: plan.amount,
-                subscriptionPeriod: periodUnit,
-                formattedDisplayPrice: getFormattedProPrice(plan.amount, true)
+                price: {
+                    type: ProPriceTypes.RAW,
+                    value: new AssetAmount({ weiAmount: plan.amount, asset: TON_ASSET })
+                },
+                subscriptionPeriod: periodUnit
             };
         });
     }
