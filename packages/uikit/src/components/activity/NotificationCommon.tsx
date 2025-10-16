@@ -841,7 +841,7 @@ export const CommonActionDetailsBlock: FC<PropsWithChildren<{ eventId: string; u
                         fullWidth
                         onClick={() => sdk.openPage(url.replace('%s', eventId))}
                     >
-                        {t('nft_view_in_explorer')}
+                        {t('view_transaction')}
                     </Button>
                 </NotificationFooter>
             </NotificationFooterPortal>

@@ -130,7 +130,6 @@ export const useProState = () => {
             }
         },
         {
-            suspense: true,
             keepPreviousData: true,
             refetchInterval: s => {
                 if (

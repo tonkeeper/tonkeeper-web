@@ -135,7 +135,7 @@ export class Aptabase implements Analytics {
             return 'iOS';
         }
         if (navigator.userAgent.includes('Mac')) {
-            return 'macOS';
+            return navigator.maxTouchPoints > 1 ? 'iOS' : 'macOS';
         }
         if (navigator.userAgent.includes('Linux')) {
             return 'Linux';
