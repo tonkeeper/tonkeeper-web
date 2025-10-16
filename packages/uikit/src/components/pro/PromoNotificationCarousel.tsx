@@ -179,6 +179,15 @@ const META_DATA_MAP = [
         }
     },
     {
+        id: FeatureSlideNames.FREE_TRC20_TRANSFER,
+        titleKey: 'pro_feature_free_trc20_transfer_title',
+        subtitleKey: 'pro_feature_free_trc20_transfer_subtitle',
+        src: {
+            ru: 'ru/6.png',
+            eng: 'eng/6.png'
+        }
+    },
+    {
         id: FeatureSlideNames.SUPPORT,
         titleKey: 'pro_feature_priority_support_title',
         subtitleKey: 'promo_subtitle_support',

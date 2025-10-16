@@ -41,6 +41,13 @@ import {
     WithdrawStakeActionToJSON,
     WithdrawStakeActionToJSONTyped,
 } from './WithdrawStakeAction';
+import type { LiquidityDepositAction } from './LiquidityDepositAction';
+import {
+    LiquidityDepositActionFromJSON,
+    LiquidityDepositActionFromJSONTyped,
+    LiquidityDepositActionToJSON,
+    LiquidityDepositActionToJSONTyped,
+} from './LiquidityDepositAction';
 import type { NftItemTransferAction } from './NftItemTransferAction';
 import {
     NftItemTransferActionFromJSON,
@@ -379,6 +386,12 @@ export interface Action {
     withdrawTokenStakeRequest?: WithdrawTokenStakeRequestAction;
     /**
      * 
+     * @type {LiquidityDepositAction}
+     * @memberof Action
+     */
+    liquidityDeposit?: LiquidityDepositAction;
+    /**
+     * 
      * @type {ActionSimplePreview}
      * @memberof Action
      */
@@ -416,8 +429,13 @@ export const ActionTypeEnum = {
     SmartContractExec: 'SmartContractExec',
     DomainRenew: 'DomainRenew',
     Purchase: 'Purchase',
+    AddExtension: 'AddExtension',
+    RemoveExtension: 'RemoveExtension',
+    SetSignatureAllowedAction: 'SetSignatureAllowedAction',
+    GasRelay: 'GasRelay',
     DepositTokenStake: 'DepositTokenStake',
     WithdrawTokenStakeRequest: 'WithdrawTokenStakeRequest',
+    LiquidityDeposit: 'LiquidityDeposit',
     Unknown: 'Unknown'
 } as const;
 export type ActionTypeEnum = typeof ActionTypeEnum[keyof typeof ActionTypeEnum];
@@ -481,6 +499,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'gasRelay': json['GasRelay'] == null ? undefined : GasRelayActionFromJSON(json['GasRelay']),
         'depositTokenStake': json['DepositTokenStake'] == null ? undefined : DepositTokenStakeActionFromJSON(json['DepositTokenStake']),
         'withdrawTokenStakeRequest': json['WithdrawTokenStakeRequest'] == null ? undefined : WithdrawTokenStakeRequestActionFromJSON(json['WithdrawTokenStakeRequest']),
+        'liquidityDeposit': json['LiquidityDeposit'] == null ? undefined : LiquidityDepositActionFromJSON(json['LiquidityDeposit']),
         'simplePreview': ActionSimplePreviewFromJSON(json['simple_preview']),
         'baseTransactions': json['base_transactions'],
     };
@@ -525,6 +544,7 @@ export function ActionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ac
         'GasRelay': GasRelayActionToJSON(value['gasRelay']),
         'DepositTokenStake': DepositTokenStakeActionToJSON(value['depositTokenStake']),
         'WithdrawTokenStakeRequest': WithdrawTokenStakeRequestActionToJSON(value['withdrawTokenStakeRequest']),
+        'LiquidityDeposit': LiquidityDepositActionToJSON(value['liquidityDeposit']),
         'simple_preview': ActionSimplePreviewToJSON(value['simplePreview']),
         'base_transactions': value['baseTransactions'],
     };

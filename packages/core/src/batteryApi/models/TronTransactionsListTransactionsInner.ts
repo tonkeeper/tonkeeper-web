@@ -85,6 +85,12 @@ export interface TronTransactionsListTransactionsInner {
      * @memberof TronTransactionsListTransactionsInner
      */
     feeTonNano?: number;
+    /**
+     * Whether this transaction was made using free pro transfers
+     * @type {boolean}
+     * @memberof TronTransactionsListTransactionsInner
+     */
+    isFreePro?: boolean;
 }
 
 /**
@@ -123,6 +129,7 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
         'trongridResult': json['trongrid_result'] == null ? undefined : json['trongrid_result'],
         'feeType': json['fee_type'] == null ? undefined : json['fee_type'],
         'feeTonNano': json['fee_ton_nano'] == null ? undefined : json['fee_ton_nano'],
+        'isFreePro': json['is_free_pro'] == null ? undefined : json['is_free_pro'],
     };
 }
 
@@ -148,6 +155,7 @@ export function TronTransactionsListTransactionsInnerFromJSONTyped(json: any, ig
         'trongrid_result': value['trongridResult'],
         'fee_type': value['feeType'],
         'fee_ton_nano': value['feeTonNano'],
+        'is_free_pro': value['isFreePro'],
     };
 }
 

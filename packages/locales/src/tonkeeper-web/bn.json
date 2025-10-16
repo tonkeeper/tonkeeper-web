@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "প্রতি মাসে উপলব্ধ",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "পরবর্তী {date} এ",
   "tron_fee_table_free_transfer_title": "ফ্রি ট্রান্সফার",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {# স্থানান্তর} other {# স্থানান্তরগুলি}}",
+  "tron_fee_table_free_transfer_transfers_left": "{number} স্থানান্তর",
   "tron_fee_table_transfers": "{transfers} ট্রান্সফার",
   "try_again": "আবার চেষ্টা করুন",
   "two_fa_confirm_tg_cannot_access_tg": "আপনি কি আপনার টেলিগ্রাম অ্যাকাউন্টে প্রবেশ করতে পারছেন না?",

@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "हर महीने उपलब्ध",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "अगला {date} को",
   "tron_fee_table_free_transfer_title": "नि:शुल्क स्थानांतरण",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, other {# स्थानांतरण} }",
+  "tron_fee_table_free_transfer_transfers_left": "{number} स्थानांतरण",
   "tron_fee_table_transfers": "{transfers} स्थानांतरण",
   "try_again": "फिर से प्रयास करें",
   "two_fa_confirm_tg_cannot_access_tg": "क्या आप अपने टेलीग्राम अकाउंट तक पहुंच नहीं पा रहे हैं?",

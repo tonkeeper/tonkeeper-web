@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "Her ay mevcut",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "Sonraki {date}",
   "tron_fee_table_free_transfer_title": "Ücretsiz Transfer",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {# transfers} other {# transfer}}",
+  "tron_fee_table_free_transfer_transfers_left": "{number} transfer",
   "tron_fee_table_transfers": "{transfers} transfer",
   "try_again": "Tekrar Dene",
   "two_fa_confirm_tg_cannot_access_tg": "Telegram hesabınıza erişemiyor musunuz?",

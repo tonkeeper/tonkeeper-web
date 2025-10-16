@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "每月 可用",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "下次在 {date}",
   "tron_fee_table_free_transfer_title": "免费 转移",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, other {# 次转账} }",
+  "tron_fee_table_free_transfer_transfers_left": "{number} 次转移",
   "tron_fee_table_transfers": "{transfers} 次转账",
   "try_again": "再试一次",
   "two_fa_confirm_tg_cannot_access_tg": "无法访问您的Telegram帐户？",

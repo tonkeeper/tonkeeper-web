@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "در هر ماه موجود است",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "بعدی در {date}",
   "tron_fee_table_free_transfer_title": "انتقال رایگان",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {{count} انتقال} other {{count} انتقالات}}",
+  "tron_fee_table_free_transfer_transfers_left": "{number} انتقال",
   "tron_fee_table_transfers": "{transfers} انتقال",
   "try_again": "تلاش دوباره",
   "two_fa_confirm_tg_cannot_access_tg": "نمی‌توانید به حساب تلگرام خود دسترسی پیدا کنید؟",

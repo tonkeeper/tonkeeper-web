@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "متاح كل شهر",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "التالي في {date}",
   "tron_fee_table_free_transfer_title": "تحويل مجاني",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {# تحويل} two {# تحويلان} other {# تحويلات} }",
+  "tron_fee_table_free_transfer_transfers_left": "{number} تحويل",
   "tron_fee_table_transfers": "{transfers} تحويلات",
   "try_again": "حاول مرة أخرى",
   "two_fa_confirm_tg_cannot_access_tg": "هل لا يمكنك الوصول إلى حسابك على تيليجرام؟",

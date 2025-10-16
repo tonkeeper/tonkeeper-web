@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "ਹਰ ਮਹੀਨੇ ਉਪਲਬਧ",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "ਅਗਲਾ {date} 'ਤੇ",
   "tron_fee_table_free_transfer_title": "ਮੁਫਤ ਟ੍ਰਾਂਸਫਰ",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {{count} ਟ੍ਰਾਂਸਫਰ} other {{count} ਟ੍ਰਾਂਸਫਰਸ}}",
+  "tron_fee_table_free_transfer_transfers_left": "{number} ਟ੍ਰਾਂਸਫਰ",
   "tron_fee_table_transfers": "{transfers} ਟ੍ਰਾਂਸਫਰ",
   "try_again": "ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
   "two_fa_confirm_tg_cannot_access_tg": "ਕੀ ਤੁਸੀਂ ਆਪਣੇ ਟੈਲੀਗ੍ਰਾਮ ਖਾਤੇ ਤੱਕ ਪਹੁੰਚ ਨਹੀਂ ਕਰ ਸਕਦੇ?",

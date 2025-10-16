@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "Verfügbar jeden Monat",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "Nächster am {date}",
   "tron_fee_table_free_transfer_title": "Kostenlose Überweisung",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {{count} Überweisung} other {{count} Überweisungen}}",
+  "tron_fee_table_free_transfer_transfers_left": "{number} Überweisung",
   "tron_fee_table_transfers": "{transfers} Überweisungen",
   "try_again": "Versuchen Sie es erneut",
   "two_fa_confirm_tg_cannot_access_tg": "Können Sie nicht auf Ihr Telegram-Konto zugreifen?",

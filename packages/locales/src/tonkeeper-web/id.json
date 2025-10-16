@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "Tersedia setiap bulan",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "Berikutnya pada {date}",
   "tron_fee_table_free_transfer_title": "Transfer Gratis",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, other {# transfer} }",
+  "tron_fee_table_free_transfer_transfers_left": "{number} transfer",
   "tron_fee_table_transfers": "{transfers} transfer",
   "try_again": "Coba Lagi",
   "two_fa_confirm_tg_cannot_access_tg": "Tidak dapat mengakses akun Telegram Anda?",

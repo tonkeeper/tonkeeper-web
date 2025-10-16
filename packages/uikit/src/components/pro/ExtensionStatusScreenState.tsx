@@ -26,6 +26,7 @@ import { useNotifyError, useToast } from '../../hooks/useNotification';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { ProSettingsPartnersSection } from './ProPartnersSecrion';
 
 interface IProps {
     subscription: ProSubscription | undefined;
@@ -127,6 +128,8 @@ export const ExtensionStatusScreenState = ({ subscription }: IProps) => {
             </ListBlock>
 
             {isAutoRenewable && <Body3Styled>{t('subscription_renews_crypto')}</Body3Styled>}
+
+            <ProSettingsPartnersSection />
 
             <ButtonsBlockStyled>
                 <Button secondary fullWidth type="button" onClick={() => onProFeaturesOpen()}>

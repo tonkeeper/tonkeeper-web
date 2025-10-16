@@ -32,7 +32,11 @@ import { tonAssetAddressToString } from '@tonkeeper/core/dist/entries/crypto/ass
 import { TronTrxSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-trx-sender';
 import { TronTrc20Encoder } from '@tonkeeper/core/dist/service/tron-blockchain/encoder/tron-trc20-encoder';
 import { cachedSync } from '@tonkeeper/core/dist/utils/common';
-import { Configuration as BatteryConfiguration } from '@tonkeeper/core/dist/batteryApi';
+import {
+    Configuration as BatteryConfiguration,
+    DefaultApi as BatteryApiClient
+} from '@tonkeeper/core/dist/batteryApi';
+import { useProAuthToken } from '../pro';
 
 export const useIsTronEnabledForActiveWallet = () => {
     const tronWallet = useActiveTronWallet();
@@ -157,6 +161,54 @@ export const useTronBalances = () => {
     );
 };
 
+type Trc20FreeTransfersActiveConfig = {
+    type: 'active';
+    availableTransfersNumber: number;
+    rechargeDate: Date;
+};
+
+type Trc20FreeTransfersInactiveConfig = {
+    type: 'inactive';
+};
+
+export type Trc20FreeTransfersConfig =
+    | Trc20FreeTransfersActiveConfig
+    | Trc20FreeTransfersInactiveConfig;
+
+export const useTrc20FreeTransfersConfig = () => {
+    const batteryApi = useBatteryApi();
+    const { data: proToken } = useProAuthToken();
+
+    return useQuery<Trc20FreeTransfersConfig>(
+        [QueryKey.trc20FreeTransfersConfig, proToken],
+        async () => {
+            if (!proToken) {
+                return { type: 'inactive' as const };
+            }
+
+            try {
+                const { availableTransfers, nextResetDate } = await new BatteryApiClient(
+                    batteryApi
+                ).getTronAvailableTransfers({
+                    xProAuth: proToken
+                });
+                if (!nextResetDate) {
+                    throw new Error('nextResetDate is undefined');
+                }
+
+                return {
+                    type: 'active' as const,
+                    availableTransfersNumber: availableTransfers,
+                    rechargeDate: new Date(nextResetDate * 1000)
+                };
+            } catch (e) {
+                console.error(e);
+                return { type: 'inactive' as const };
+            }
+        }
+    );
+};
+
 const useTrc20TrxDefaultFee = () => {
     const tronApi = useTronApi();
 
@@ -231,6 +283,7 @@ export const useTrc20TransfersNumberAvailable = () => {
     const { data: tronBalances } = useTronBalances();
     const { data: batteryBalance } = useBatteryBalance();
     const { data: tonBalance } = useTonBalance();
+    const { data: freeTrc20Config } = useTrc20FreeTransfersConfig();
 
     const batteryTransfers = useMemo(() => {
         if (!batteryBalance || !batterySenderFee.charges) {
@@ -261,6 +314,9 @@ export const useTrc20TransfersNumberAvailable = () => {
         return Math.floor(tronBalances.trx.weiAmount.div(trxSenderFee.trx.weiAmount).toNumber());
     }, [tronBalances?.trx, trxSenderFee.trx]);
 
+    const freeTrc20Transfers =
+        freeTrc20Config?.type === 'active' ? freeTrc20Config.availableTransfersNumber : 0;
+
     return useMemo(() => {
         let total = undefined;
         if (
@@ -268,7 +324,11 @@ export const useTrc20TransfersNumberAvailable = () => {
             tonTransfers !== undefined ||
             trxTransfers !== undefined
         ) {
-            total = (batteryTransfers ?? 0) + (tonTransfers ?? 0) + (trxTransfers ?? 0);
+            total =
+                (batteryTransfers ?? 0) +
+                (tonTransfers ?? 0) +
+                (trxTransfers ?? 0) +
+                freeTrc20Transfers;
         }
 
         return {
@@ -277,5 +337,5 @@ export const useTrc20TransfersNumberAvailable = () => {
             trxTransfers,
             total
         };
-    }, [batteryTransfers, tonTransfers, trxTransfers]);
+    }, [batteryTransfers, tonTransfers, trxTransfers, freeTrc20Transfers]);
 };

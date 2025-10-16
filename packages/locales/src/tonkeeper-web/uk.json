@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "Доступно щомісяця",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "Наступний {date}",
   "tron_fee_table_free_transfer_title": "Безкоштовний переказ",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, one {# переказ} few {# перекази} other {# переказів} }",
+  "tron_fee_table_free_transfer_transfers_left": "{number} трансфер",
   "tron_fee_table_transfers": "{transfers} переказів",
   "try_again": "Повторити",
   "two_fa_confirm_tg_cannot_access_tg": "Не можете отримати доступ до свого акаунта Telegram?",

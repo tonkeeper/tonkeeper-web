@@ -16,7 +16,7 @@ import { useAppSdk } from '../../hooks/appSdk';
 import { openIosKeyboard } from '../../hooks/ios';
 import { useTranslation } from '../../hooks/translation';
 import { useJettonList } from '../../state/jetton';
-import { useActiveTronWallet } from '../../state/tron/tron';
+import { useActiveTronWallet, useTrc20TransfersNumberAvailable } from '../../state/tron/tron';
 import {
     Notification,
     NotificationFooter,
@@ -60,6 +60,7 @@ import { useActiveWallet } from '../../state/wallet';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
 import { JettonsBalances } from '@tonkeeper/core/dist/tonApiV2';
+import { useTopUpTronFeeBalanceNotification } from '../modals/TopUpTronFeeBalanceNotificationControlled';
 
 const SendContent: FC<{
     onClose: () => void;
@@ -106,6 +107,9 @@ const SendContent: FC<{
         }
     }, []);
 
+    const availableTrc20Transfers = useTrc20TransfersNumberAvailable();
+    const { onOpen: openTopUpNotification } = useTopUpTronFeeBalanceNotification();
+
     const activeTronWallet = useActiveTronWallet();
 
     const { mutateAsync: getAccountAsync, isLoading: isAccountLoading } = useGetToAccount();
@@ -125,6 +129,13 @@ const SendContent: FC<{
     };
 
     const onRecipient = (data: RecipientData) => {
+        if (
+            data.address.blockchain === BLOCKCHAIN_NAME.TRON &&
+            availableTrc20Transfers.total === 0
+        ) {
+            return openTopUpNotification();
+        }
+
         setRight(true);
         setRecipient(data);
         setView('amount');

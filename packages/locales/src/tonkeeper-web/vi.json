@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "Có sẵn mỗi tháng",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "Tiếp theo vào {date}",
   "tron_fee_table_free_transfer_title": "Chuyển khoản miễn phí",
-  "tron_fee_table_free_transfer_transfers_left": "{value, plural, other {{count} chuyển khoản}}",
+  "tron_fee_table_free_transfer_transfers_left": "{number} chuyển khoản",
   "tron_fee_table_transfers": "{transfers} chuyển khoản",
   "try_again": "Thử lại",
   "two_fa_confirm_tg_cannot_access_tg": "Bạn không thể truy cập vào tài khoản Telegram của mình?",

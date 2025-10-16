@@ -147,6 +147,14 @@ export const useProState = () => {
     );
 };
 
+export const useProAuthToken = () => {
+    const { data } = useProState();
+    const sdk = useAppSdk();
+    return useQuery([QueryKey.proAuthToken, data?.valid], () => {
+        return sdk.subscriptionService.getToken();
+    });
+};
+
 export const useCurrentSubscriptionInfo = () => {
     const sdk = useAppSdk();
 
