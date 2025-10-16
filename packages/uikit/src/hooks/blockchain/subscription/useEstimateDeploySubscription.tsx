@@ -11,15 +11,15 @@ import {
     estimationSigner
 } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
-import { useActiveApi, useMetaEncryptionData } from '../../../state/wallet';
+import { useActiveApi } from '../../../state/wallet';
 import { WalletMessageSender } from '@tonkeeper/core/dist/service/ton-blockchain/sender';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { BlockchainApi } from '@tonkeeper/core/dist/tonApiV2';
 import { estimateWalletContractExecutionGasFee } from '@tonkeeper/core/dist/service/wallet/contractService';
+import { createFakeMetaEncryptionData } from '@tonkeeper/core/dist/service/meta';
 
 export const useEstimateDeploySubscription = () => {
     const api = useActiveApi();
-    const { data: metaEncryptionMap } = useMetaEncryptionData();
 
     return useMutation<
         { fee: TransactionFeeTonAsset; address: Address },
@@ -27,10 +27,6 @@ export const useEstimateDeploySubscription = () => {
         SubscriptionEncodingParams
     >(async subscriptionParams => {
         const { admin, subscription_id, selectedWallet, deploy_value } = subscriptionParams;
-
-        if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
-            throw new Error('walletMetaKeyPair is missed!');
-        }
 
         const sender = new WalletMessageSender(api, selectedWallet, estimationSigner);
         const encoder = new SubscriptionEncoder(selectedWallet);
@@ -46,7 +42,9 @@ export const useEstimateDeploySubscription = () => {
         const config = await new BlockchainApi(api.tonApiV2).getBlockchainConfig();
 
         const outgoingMsg = await encoder.encodeCreateSubscriptionV2(
-            prepareSubscriptionParamsForEncoder(subscriptionParams, metaEncryptionMap)
+            prepareSubscriptionParamsForEncoder(subscriptionParams, {
+                [selectedWallet.rawAddress]: createFakeMetaEncryptionData()
+            })
         );
 
         const inMsg = await sender.toExternal(outgoingMsg);
