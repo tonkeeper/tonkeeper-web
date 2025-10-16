@@ -652,7 +652,7 @@
   "tron_fee_table_free_transfer_subtitle_inactive": "Har oy mavjud",
   "tron_fee_table_free_transfer_subtitle_used_next_on_date": "Keyingi {date} da",
   "tron_fee_table_free_transfer_title": "Bepul O‘tkazish",
-  "tron_fee_table_free_transfer_transfers_left": "{number} o‘tkazma",
+  "tron_fee_table_free_transfer_transfers_left": "{number} o‘tqazish",
   "tron_fee_table_transfers": "{transfers} o‘tkazma",
   "try_again": "Qayta urinib ko'ring",
   "two_fa_confirm_tg_cannot_access_tg": "Telegram hisobingizga kira olmadingizmi?",
