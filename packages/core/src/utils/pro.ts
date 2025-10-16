@@ -268,21 +268,17 @@ export function trimEmptyDecimals(text: string): string {
     return text.replace(/(-?\d+)\.00(?!\d)/g, '$1');
 }
 
-export const getFormattedProPrice = (displayPrice: string | null, isCrypto: boolean): string => {
+export const getFormattedProCryptoPrice = (amount: string | null): string => {
     try {
-        if (!displayPrice) return '-';
+        if (!amount) return '-';
 
-        if (isCrypto) {
-            const assetAmount = new AssetAmount({ weiAmount: displayPrice, asset: TON_ASSET });
+        const assetAmount = new AssetAmount({ weiAmount: amount, asset: TON_ASSET });
 
-            return isValidNanoString(displayPrice)
-                ? trimEmptyDecimals(assetAmount.toStringAssetRelativeAmount(2))
-                : '-';
-        }
-
-        return displayPrice;
+        return isValidNanoString(amount)
+            ? trimEmptyDecimals(assetAmount.toStringAssetRelativeAmount(2))
+            : '-';
     } catch (e) {
-        console.error('getFormattedDisplayPrice error: ', e);
+        console.error('getFormattedProCryptoPrice error: ', e);
         return '-';
     }
 };
@@ -381,7 +377,7 @@ export const getCryptoSubscriptionPrice = (subscription: ProSubscription) => {
         return subscription.displayPrice;
     }
 
-    return getFormattedProPrice(subscription.amount, true);
+    return getFormattedProCryptoPrice(subscription.amount);
 };
 
 export const getIosSubscriptionPrice = (subscription: ProSubscription, translator: Translator) => {

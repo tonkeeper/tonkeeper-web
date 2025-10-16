@@ -2,17 +2,35 @@ import { RecipientData } from '../send';
 import { TonWalletStandard } from '../wallet';
 import { InvoicesInvoice } from '../../tonConsoleApi';
 import { AssetAmount } from '../crypto/asset/asset-amount';
-import { AuthTypes, IosEnvironmentTypes, ProductIds, PurchaseStatuses } from './enums';
+import {
+    AuthTypes,
+    IosEnvironmentTypes,
+    ProductIds,
+    ProPriceTypes,
+    PurchaseStatuses
+} from './enums';
 import { SubscriptionExtension, SubscriptionSource } from '../../pro';
 import { IExtensionActiveSubscription, SubscriptionStrategy } from './subscription';
 import { Language } from '../language';
+import { TonAsset } from '../crypto/asset/ton-asset';
+
+interface IProRawPrice {
+    type: ProPriceTypes.RAW;
+    value: AssetAmount<TonAsset>;
+}
+
+interface IProFormattedPrice {
+    type: ProPriceTypes.FORMATTED;
+    value: string;
+}
+
+export type ProPrice = IProRawPrice | IProFormattedPrice;
 
 export interface IDisplayPlan {
     id: string;
+    price: ProPrice;
     displayName: string;
-    displayPrice: string;
     subscriptionPeriod: string;
-    formattedDisplayPrice: string;
 }
 
 export interface IProductInfo {

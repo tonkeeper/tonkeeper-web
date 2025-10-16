@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Lang } from '../models/Lang';
+import type { Ok } from '../models/Ok';
 import type { Tier } from '../models/Tier';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -38,7 +39,7 @@ export class TiersService {
     /**
      * Activate Pro trial subscription
      * @param requestBody Data that is expected
-     * @returns any Ok
+     * @returns Ok Ok
      * @throws ApiError
      */
     public static activateTrial(
@@ -51,10 +52,7 @@ export class TiersService {
             hash: string;
             auth_date: number;
         },
-    ): CancelablePromise<{
-        ok: boolean;
-        auth_token?: string;
-    }> {
+    ): CancelablePromise<Ok> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/services/pro/trial',

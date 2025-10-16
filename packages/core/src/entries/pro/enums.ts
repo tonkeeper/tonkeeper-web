@@ -50,3 +50,8 @@ export enum TelegramSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired'
 }
+
+export enum ProPriceTypes {
+    RAW = 'raw',
+    FORMATTED = 'formatted'
+}

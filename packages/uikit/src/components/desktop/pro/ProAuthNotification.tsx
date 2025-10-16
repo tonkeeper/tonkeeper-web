@@ -138,7 +138,7 @@ export const ProAuthNotificationContent: FC<ProAuthNotificationContentProps> = (
                             form={formId}
                             loading={isLoading}
                         >
-                            <Label2>{t('continue')}</Label2>
+                            <Label2>{t('connect_wallet')}</Label2>
                         </Button>
                     </ButtonWrapper>
                 </NotificationFooter>

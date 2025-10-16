@@ -1,13 +1,11 @@
 import { type ChangeEvent, type FC, useId } from 'react';
 import styled from 'styled-components';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 
 import { Body3, Label2 } from '../Text';
-import { useFormatFiat, useRate } from '../../state/rates';
 import { Skeleton } from '../shared/Skeleton';
 import { useTranslation } from '../../hooks/translation';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
+import { useFormattedProPrice } from '../../hooks/pro/useFormattedProPrice';
 
 interface IProps extends IDisplayPlan {
     isLoading: boolean;
@@ -19,18 +17,12 @@ export const ProPlanLabel: FC<IProps> = props => {
     const skeletonId = useId();
     const { t } = useTranslation();
 
-    const {
-        displayName,
-        selectedPlanId,
-        displayPrice,
-        subscriptionPeriod,
-        formattedDisplayPrice,
-        onChange,
-        isLoading,
-        id
-    } = props;
+    const { price, displayName, selectedPlanId, subscriptionPeriod, onChange, isLoading, id } =
+        props;
 
-    const isDataReady = displayName && displayPrice && formattedDisplayPrice;
+    const { displayPrice, fiatEquivalent } = useFormattedProPrice(price);
+
+    const isDataReady = displayName && price;
 
     return isDataReady ? (
         <LabelStyled selected={selectedPlanId === id}>
@@ -45,8 +37,8 @@ export const ProPlanLabel: FC<IProps> = props => {
             <Label2>{t('price')}</Label2>
 
             <PriceWrapper>
-                <Label2>{` ${formattedDisplayPrice} / ${t(subscriptionPeriod)}`}</Label2>
-                <FiatEquivalent amount={displayPrice} />
+                <Label2>{` ${displayPrice} / ${t(subscriptionPeriod)}`}</Label2>
+                {!!fiatEquivalent && <Text>≈ {fiatEquivalent}</Text>}
             </PriceWrapper>
         </LabelStyled>
     ) : (
@@ -60,17 +52,6 @@ export const ProPlanLabel: FC<IProps> = props => {
             <StyledSkeleton id={skeletonId} />
         </LabelStyled>
     );
-};
-
-interface IFiatEquivalentProps {
-    amount: string | null;
-}
-
-const FiatEquivalent: FC<IFiatEquivalentProps> = ({ amount }) => {
-    const { data } = useRate(CryptoCurrency.TON);
-    const { fiatAmount } = useFormatFiat(data, formatDecimals(amount ?? 0));
-
-    return fiatAmount ? <Text>≈ {fiatAmount}</Text> : null;
 };
 
 const Text = styled(Body3)`
