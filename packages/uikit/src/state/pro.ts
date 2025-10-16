@@ -10,8 +10,6 @@ import {
     isPaidActiveSubscription,
     ISubscriptionFormData,
     ISupportData,
-    ProPrice,
-    ProPriceTypes,
     ProSubscription,
     PurchaseErrors,
     PurchaseStatuses
@@ -50,9 +48,6 @@ import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encode
 import { useProAuthNotification } from '../components/modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
 import { useMetaEncryptionNotification } from '../components/modals/MetaEncryptionNotificationControlled';
-import { useFormatFiat, useRate } from './rates';
-import { formatDecimals } from '@tonkeeper/core/dist/utils/balance';
-import { CryptoCurrency } from '@tonkeeper/core/dist/entries/crypto';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -437,28 +432,4 @@ export const useMutateProApiUrl = () => {
 
         await client.invalidateQueries([AppKey.IS_DEV_ENVIRONMENT_ALLOWED]);
     });
-};
-
-export const useFormattedProPrice = (price: ProPrice | undefined) => {
-    const isRaw = price?.type === ProPriceTypes.RAW;
-    const tokenAmount = isRaw ? formatDecimals(price.value.stringWeiAmount) : undefined;
-
-    const { data: rate } = useRate(CryptoCurrency.TON);
-    const { fiatAmount: fiatEquivalent } = useFormatFiat(rate, tokenAmount);
-
-    return useQuery(
-        [QueryKey.pro, QueryKey.formattedProPrice, price, rate],
-        async () => {
-            if (!price) {
-                throw new Error('Price is missing!');
-            }
-
-            const displayPrice = isRaw
-                ? price.value.toStringAssetAbsoluteRelativeAmount()
-                : price.value;
-
-            return { displayPrice, fiatEquivalent };
-        },
-        { enabled: !!price && !!rate }
-    );
 };

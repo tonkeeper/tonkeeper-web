@@ -5,7 +5,7 @@ import { IDisplayPlan } from '@tonkeeper/core/dist/entries/pro';
 import { Body3, Label2 } from '../Text';
 import { Skeleton } from '../shared/Skeleton';
 import { useTranslation } from '../../hooks/translation';
-import { useFormattedProPrice } from '../../state/pro';
+import { useFormattedProPrice } from '../../hooks/pro/useFormattedProPrice';
 
 interface IProps extends IDisplayPlan {
     isLoading: boolean;
@@ -20,9 +20,7 @@ export const ProPlanLabel: FC<IProps> = props => {
     const { price, displayName, selectedPlanId, subscriptionPeriod, onChange, isLoading, id } =
         props;
 
-    const { data: formattedPrices } = useFormattedProPrice(price);
-
-    const { displayPrice, fiatEquivalent } = formattedPrices ?? {};
+    const { displayPrice, fiatEquivalent } = useFormattedProPrice(price);
 
     const isDataReady = displayName && price;
 

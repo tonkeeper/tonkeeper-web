@@ -12,12 +12,7 @@ import { Button } from '../../fields/Button';
 import { handleSubmit } from '../../../libs/form';
 import { useTranslation } from '../../../hooks/translation';
 import { useDisclosure } from '../../../hooks/useDisclosure';
-import {
-    useFormattedProPrice,
-    useProPlans,
-    useProState,
-    useTrialAvailability
-} from '../../../state/pro';
+import { useProPlans, useProState, useTrialAvailability } from '../../../state/pro';
 import { useNotifyError } from '../../../hooks/useNotification';
 import { ProTrialStartNotification } from '../../pro/ProTrialStartNotification';
 import { IDisplayPlan, isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
@@ -31,6 +26,7 @@ import { ErrorBoundary } from '../../shared/ErrorBoundary';
 import { fallbackRenderOver } from '../../Error';
 import { SubscriptionSource } from '@tonkeeper/core/dist/pro';
 import { usePrimarySubscriptionSource } from '../../../hooks/usePrimarySubscriptionSource';
+import { useFormattedProPrice } from '../../../hooks/pro/useFormattedProPrice';
 
 interface IProFeaturesNotificationProps {
     isOpen: boolean;
@@ -149,9 +145,7 @@ const ButtonsBlock: FC<IButtonBlock> = props => {
     const isIos = primarySource === SubscriptionSource.IOS;
     const { price, subscriptionPeriod } = displayPlans[0] || {};
 
-    const { data: formattedPrices } = useFormattedProPrice(price);
-
-    const { displayPrice, fiatEquivalent } = formattedPrices ?? {};
+    const { displayPrice, fiatEquivalent } = useFormattedProPrice(price);
 
     const isPrimaryLoading = !isError && (isLoading || (isIos ? !displayPrice : !fiatEquivalent));
 
