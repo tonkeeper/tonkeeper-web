@@ -10,6 +10,7 @@ import {
     isPaidActiveSubscription,
     ISubscriptionFormData,
     ISupportData,
+    ProPriceTypes,
     ProSubscription,
     PurchaseErrors,
     PurchaseStatuses
@@ -47,6 +48,7 @@ import { ServerConfig } from './tonendpoint';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { useProAuthNotification } from '../components/modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
+import { getWalletBalance } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -330,16 +332,32 @@ export const useProPurchaseMutation = () => {
                 if (result) {
                     onCurrentClose();
                     onProAuthOpen();
+
+                    return PurchaseStatuses.CANCELED;
                 } else {
                     throw new Error(PurchaseErrors.PURCHASE_FAILED);
                 }
             }
         }
 
-        const twoFAState = await new TwoFAEncoder(api, formData.wallet.rawAddress).getPluginState();
+        const walletAddress = formData.wallet.rawAddress;
+
+        const twoFAState = await new TwoFAEncoder(api, walletAddress).getPluginState();
 
         if (source === SubscriptionSource.EXTENSION && twoFAState.type === 'active') {
             throw new Error(PurchaseErrors.UNSUPPORTED_TWO_FA);
+        }
+
+        const proPrice = formData.selectedPlan.price;
+
+        if (proPrice.type === ProPriceTypes.RAW) {
+            const balance = await getWalletBalance(api, walletAddress, proPrice.value.asset);
+
+            const totalWei = proPrice.value.weiAmount;
+
+            if (totalWei.isGreaterThan(balance.weiAmount)) {
+                throw new Error(PurchaseErrors.NOT_ENOUGH_FUNDS);
+            }
         }
 
         const status = await sdk.subscriptionService.subscribe(source, formData);
