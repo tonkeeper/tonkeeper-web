@@ -16,8 +16,8 @@ import { useFormatFiat, useRate } from '../../state/rates';
 import { ChevronRightIcon, SpinnerIcon, TonkeeperProCardIcon } from '../Icon';
 import { ColumnText } from '../Layout';
 import { ListItem, ListItemPayload } from '../List';
-import { Body1, Body2Class, Body3, H2, Label1, Label2 } from '../Text';
-import { Button } from '../fields/Button';
+import { Body1, Body2Class, Body3, Body3Class, H2, Label1, Label2 } from '../Text';
+import { Button, ButtonFlat } from '../fields/Button';
 import { hexToRGBA } from '../../libs/css';
 import { useActiveConfig, useActiveTonNetwork } from '../../state/wallet';
 
@@ -56,6 +56,9 @@ import { Skeleton } from '../shared/Skeleton';
 import { Dot } from '../Dot';
 import { Trc20FreeTransfersConfig } from '../../state/tron/tron';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
+import { useNavigate } from '../../hooks/router/useNavigate';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -544,6 +547,10 @@ const SelectDropDownStyled = styled(SelectDropDown)`
     }
 `;
 
+const DropDownItemStyled = styled(DropDownItem)<{ $isDisabled: boolean }>`
+    cursor: ${p => (p.$isDisabled ? 'not-allowed' : 'pointer')};
+`;
+
 export const SelectSenderDropdown: FC<
     {
         className?: string;
@@ -563,16 +570,20 @@ export const SelectSenderDropdown: FC<
                 <DropDownContent>
                     {availableSendersOptions.map(s => (
                         <>
-                            <DropDownItem
+                            <DropDownItemStyled
                                 onClick={() => {
+                                    if ('isEnoughBalance' in s && !s.isEnoughBalance) {
+                                        return;
+                                    }
                                     onClose();
                                     onSenderTypeChange?.(s.type as TonSenderTypeUserAvailable);
                                 }}
                                 key={s.type}
                                 isSelected={selectedSenderType === s.type}
+                                $isDisabled={'isEnoughBalance' in s && !s.isEnoughBalance}
                             >
                                 <SenderDropdownItem sender={s} />
-                            </DropDownItem>
+                            </DropDownItemStyled>
                             <DropDownItemsDivider />
                         </>
                     ))}
@@ -596,17 +607,26 @@ const Body3Secondary = styled(Body3)`
     color: ${p => p.theme.textSecondary};
 `;
 
-const Body3Accent = styled(Body3)`
-    color: ${p => p.theme.textAccent};
+const ButtonFlatStyled = styled(ButtonFlat)`
+    ${Body3Class};
+    cursor: pointer;
 `;
 
-const RefillText = () => {
+const RefillText: FC<{ onClickRefill: () => void }> = ({ onClickRefill }) => {
     const { t } = useTranslation();
     return (
         <Body3>
             <Body3Secondary>{t('select_fee_payment_method_not_enough_funds')}</Body3Secondary>
             <Dot />
-            <Body3Accent>{t('select_fee_payment_method_refill')}</Body3Accent>
+            <ButtonFlatStyled
+                onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onClickRefill();
+                }}
+            >
+                {t('select_fee_payment_method_refill')}
+            </ButtonFlatStyled>
         </Body3>
     );
 };
@@ -654,6 +674,13 @@ const SenderDropdownItemTronBattery: FC<{
     fee: TransactionFeeBattery;
 }> = ({ fee, isEnoughBalance }) => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
+
+    const onClickRefill = () => {
+        navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+            disableMobileAnimation: true
+        });
+    };
 
     return (
         <>
@@ -661,7 +688,7 @@ const SenderDropdownItemTronBattery: FC<{
             <SenderText>
                 <Label2>{t('battery_title')}</Label2>
                 <Body3Secondary>{t('battery_charges', { charges: fee.charges })}</Body3Secondary>
-                {!isEnoughBalance && <RefillText />}
+                {!isEnoughBalance && <RefillText onClickRefill={onClickRefill} />}
             </SenderText>
         </>
     );
@@ -676,6 +703,7 @@ const SenderDropdownItemTronFreePro: FC<{
 }> = ({ config }) => {
     const { t } = useTranslation();
     const formatDate = useDateTimeFormat();
+    const { onOpen: getPro } = useProFeaturesNotification();
 
     return (
         <>
@@ -683,7 +711,9 @@ const SenderDropdownItemTronFreePro: FC<{
             <SenderText>
                 <Label2>{t('select_fee_payment_method_option_free_pro_title')}</Label2>
                 {config.type === 'inactive' ? (
-                    <Body3Accent>{t('get_tonkeeper_pro')}</Body3Accent>
+                    <ButtonFlatStyled onClick={() => getPro()}>
+                        {t('get_tonkeeper_pro')}
+                    </ButtonFlatStyled>
                 ) : config.availableTransfersNumber > 0 ? (
                     <Body3Secondary>
                         {t('select_fee_payment_method_option_free_pro_subtitle_available')}
@@ -692,7 +722,7 @@ const SenderDropdownItemTronFreePro: FC<{
                     <Body3Secondary>
                         {t('select_fee_payment_method_option_free_pro_subtitle_used', {
                             date: formatDate(config.rechargeDate, {
-                                month: 'short',
+                                month: 'long',
                                 day: 'numeric'
                             })
                         })}
@@ -709,6 +739,17 @@ const SenderDropdownItemTronTrxOrTonAsset: FC<{
 }> = ({ fee, isEnoughBalance }) => {
     const { data: assetRate } = useRate(tonAssetAddressToString(fee.extra.asset.address));
     const { fiatAmount } = useFormatFiat(assetRate, fee.extra.relativeAmount);
+    const sdk = useAppSdk();
+
+    const onClickRefill = () => {
+        sdk.uiEvents.emit('receive', {
+            method: 'receive',
+            params: {
+                chain: fee.extra.asset.blockchain,
+                jetton: fee.extra.asset.id
+            }
+        });
+    };
 
     return (
         <>
@@ -722,7 +763,7 @@ const SenderDropdownItemTronTrxOrTonAsset: FC<{
                 ) : (
                     <Skeleton height="14px" marginTop="2px" width="100px" />
                 )}
-                {!isEnoughBalance && <RefillText />}
+                {!isEnoughBalance && <RefillText onClickRefill={onClickRefill} />}
             </SenderText>
         </>
     );
