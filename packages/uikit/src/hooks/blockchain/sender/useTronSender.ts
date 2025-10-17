@@ -176,11 +176,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
                 });
             }
 
-            const options = (await Promise.all(optionsGetters.map(o => o()))).filter(notNullish);
-
-            return options
-                .filter(o => o.isEnoughBalance)
-                .concat(options.filter(o => !o.isEnoughBalance));
+            return (await Promise.all(optionsGetters.map(o => o()))).filter(notNullish);
         },
         {
             enabled: !!tronTrxSender || !!tronTonSender

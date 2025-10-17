@@ -321,7 +321,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                                 {t('topup_trc20_fee_pro_banner_description_used', {
                                     date: formatDate(trc20FreeTransfersConfig.rechargeDate, {
                                         day: 'numeric',
-                                        month: 'short'
+                                        month: 'long'
                                     })
                                 })}
                             </CardSubtitle>
