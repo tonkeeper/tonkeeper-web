@@ -111,7 +111,7 @@ const InfoWrapper = styled.div`
 const DropDownStyled = styled(DropDown)`
     .tron-fee-info-container {
         max-height: unset;
-        width: 280px;
+        width: 340px;
         right: -120px;
         top: 24px;
     }
