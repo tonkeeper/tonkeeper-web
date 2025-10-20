@@ -39,7 +39,11 @@ import {
 } from '@tonkeeper/core/dist/entries/crypto/asset/ton-asset';
 import { AssetAmount } from '@tonkeeper/core/dist/entries/crypto/asset/asset-amount';
 import { assertUnreachableSoft } from '@tonkeeper/core/dist/utils/types';
-import { NotificationFooter, NotificationFooterPortal } from '../Notification';
+import {
+    closeAllNotifications,
+    NotificationFooter,
+    NotificationFooterPortal
+} from '../Notification';
 import { Image } from '../shared/Image';
 import {
     AllChainsSenderOptions,
@@ -677,9 +681,16 @@ const SenderDropdownItemTronBattery: FC<{
     const navigate = useNavigate();
 
     const onClickRefill = () => {
-        navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
-            disableMobileAnimation: true
-        });
+        try {
+            closeAllNotifications();
+        } catch (e) {
+            console.error(e);
+        }
+        setTimeout(() => {
+            navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+                disableMobileAnimation: true
+            });
+        }, 150);
     };
 
     return (
