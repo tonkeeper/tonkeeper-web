@@ -13,6 +13,7 @@ import { useAtomValue } from '../../libs/useAtom';
 
 interface IProps {
     title?: ReactNode;
+    belowCaption?: ReactNode;
     isCurrentSubscription?: ReactNode;
     onDisconnect?: () => Promise<void>;
     isLoading: boolean;
@@ -24,6 +25,7 @@ export const ProActiveWallet: FC<IProps> = props => {
         onDisconnect,
         isLoading,
         title,
+        belowCaption,
         isCurrentSubscription,
         disableRightElement = false
     } = props;
@@ -72,6 +74,7 @@ export const ProActiveWallet: FC<IProps> = props => {
                     }
                 />
             </ListBlock>
+            {belowCaption}
         </Block>
     );
 };
