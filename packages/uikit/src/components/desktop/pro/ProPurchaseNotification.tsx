@@ -78,7 +78,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
     const isGlobalLoading = isPurchasing || isLoggingOut || isManageLoading || isSelectionLoading;
 
-    const isCryptoEnabled = isCryptoSubscriptionEnabled || sdk.isIOs();
+    const isCryptoSubscribingAvailable = isCryptoSubscriptionEnabled || sdk.isIOs();
 
     const handleDisconnect = async () => {
         await onLogout();
@@ -105,11 +105,19 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         });
 
     return (
-        <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId} spaced={isCryptoEnabled}>
+        <ContentWrapper
+            onSubmit={handleSubmit(onSubmit)}
+            id={formId}
+            spaced={isCryptoSubscribingAvailable}
+        >
             <ProSubscriptionLightHeader
-                titleKey={isCryptoEnabled ? 'get_tonkeeper_pro' : 'tonkeeper_pro_subscription'}
+                titleKey={
+                    isCryptoSubscribingAvailable
+                        ? 'get_tonkeeper_pro'
+                        : 'tonkeeper_pro_subscription'
+                }
                 subtitleKey={
-                    isCryptoEnabled
+                    isCryptoSubscribingAvailable
                         ? 'choose_billing_description'
                         : 'unavailable_on_desktop_in_region'
                 }
@@ -118,7 +126,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
             <ProActiveWallet
                 title={<Body3Styled>{t('selected_wallet')}</Body3Styled>}
                 belowCaption={
-                    isCryptoEnabled ? undefined : (
+                    isCryptoSubscribingAvailable ? undefined : (
                         <Body3Styled>{t('no_active_pro_on_wallet')}</Body3Styled>
                     )
                 }
@@ -126,9 +134,11 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
                 onDisconnect={handleDisconnect}
             />
 
-            {!isCryptoEnabled && <QrCodeSection qrValue={pro_mobile_app_appstore_link} />}
+            {!isCryptoSubscribingAvailable && (
+                <QrCodeSection qrValue={pro_mobile_app_appstore_link} />
+            )}
 
-            {isCryptoEnabled && (
+            {isCryptoSubscribingAvailable && (
                 <>
                     {availableSources.length > 1 && (
                         <ProChoosePaymentMethod
@@ -152,7 +162,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    {isCryptoEnabled ? (
+                    {isCryptoSubscribingAvailable ? (
                         <PurchaseButtonWrapper>
                             <Button
                                 primary
