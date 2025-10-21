@@ -7,7 +7,7 @@ import { useTranslation } from '../../hooks/translation';
 import { ListBlock, ListItem, ListItemPayload } from '../List';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { FeatureSlideNames } from '../../enums/pro';
-import { useActiveConfig } from '../../state/wallet';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 interface IHeaderOptions {
     removeHeader?: boolean;
@@ -22,15 +22,14 @@ interface IProps {
 }
 
 const ProFeaturesListContent: FC<IProps> = props => {
-    const { flags } = useActiveConfig();
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
     const { className, headerOptions, features = PRO_FEATURES } = props;
     const { removeHeader, ...restHeaderProps } = headerOptions ?? {};
 
     const { t } = useTranslation();
 
-    const filteredFeatures = features.filter(
-        ({ id }) =>
-            !(flags.disable_crypto_subscription && id === FeatureSlideNames.FREE_TRC20_TRANSFER)
+    const filteredFeatures = features.filter(({ id }) =>
+        id === FeatureSlideNames.FREE_TRC20_TRANSFER ? isTronEnabled : true
     );
 
     return (

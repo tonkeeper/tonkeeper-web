@@ -27,6 +27,7 @@ import { QRCode } from 'react-qrcode-logo';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useActiveConfig } from '../../../state/wallet';
 import { useAppSdk } from '../../../hooks/appSdk';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../../state/tonendpoint';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
@@ -55,9 +56,10 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
     const sdk = useAppSdk();
     const formId = useId();
     const { t } = useTranslation();
-    const { flags, pro_mobile_app_appstore_link } = useActiveConfig();
+    const { pro_mobile_app_appstore_link } = useActiveConfig();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
+    const isCryptoSubscriptionEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.CRYPTO_SUBSCRIPTION);
 
     const { states, methods } = useProPurchaseController();
     const { onLogout, onManage, onPurchase } = methods;
@@ -76,7 +78,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
     const isGlobalLoading = isPurchasing || isLoggingOut || isManageLoading || isSelectionLoading;
 
-    const isCryptoDisabled = flags.disable_crypto_subscription && !sdk.isIOs();
+    const isCryptoEnabled = isCryptoSubscriptionEnabled || sdk.isIOs();
 
     const handleDisconnect = async () => {
         await onLogout();
@@ -103,30 +105,30 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         });
 
     return (
-        <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId} spaced={!isCryptoDisabled}>
+        <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId} spaced={isCryptoEnabled}>
             <ProSubscriptionLightHeader
-                titleKey={isCryptoDisabled ? 'tonkeeper_pro_subscription' : 'get_tonkeeper_pro'}
+                titleKey={isCryptoEnabled ? 'get_tonkeeper_pro' : 'tonkeeper_pro_subscription'}
                 subtitleKey={
-                    isCryptoDisabled
-                        ? 'unavailable_on_desktop_in_region'
-                        : 'choose_billing_description'
+                    isCryptoEnabled
+                        ? 'choose_billing_description'
+                        : 'unavailable_on_desktop_in_region'
                 }
             />
 
             <ProActiveWallet
                 title={<Body3Styled>{t('selected_wallet')}</Body3Styled>}
                 belowCaption={
-                    isCryptoDisabled ? (
+                    isCryptoEnabled ? undefined : (
                         <Body3Styled>{t('no_active_pro_on_wallet')}</Body3Styled>
-                    ) : undefined
+                    )
                 }
                 isLoading={isLoggingOut}
                 onDisconnect={handleDisconnect}
             />
 
-            {isCryptoDisabled && <QrCodeSection qrValue={pro_mobile_app_appstore_link} />}
+            {!isCryptoEnabled && <QrCodeSection qrValue={pro_mobile_app_appstore_link} />}
 
-            {!isCryptoDisabled && (
+            {isCryptoEnabled && (
                 <>
                     {availableSources.length > 1 && (
                         <ProChoosePaymentMethod
@@ -150,11 +152,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    {isCryptoDisabled ? (
-                        <Button secondary fullWidth type="button" onClick={handleOpenFeatures}>
-                            <Label2>{t('tonkeeper_pro_features')}</Label2>
-                        </Button>
-                    ) : (
+                    {isCryptoEnabled ? (
                         <PurchaseButtonWrapper>
                             <Button
                                 primary
@@ -169,6 +167,10 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
                             <ProLegalNote selectedSource={selectedSource} onManage={onManage} />
                         </PurchaseButtonWrapper>
+                    ) : (
+                        <Button secondary fullWidth type="button" onClick={handleOpenFeatures}>
+                            <Label2>{t('tonkeeper_pro_features')}</Label2>
+                        </Button>
                     )}
                 </NotificationFooter>
             </NotificationFooterPortal>

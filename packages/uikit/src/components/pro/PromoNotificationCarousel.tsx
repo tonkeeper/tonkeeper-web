@@ -203,7 +203,13 @@ export const useProCarouselMetaData = () => {
 
     // FeatureSlideNames.SUPPORT contains information about Tron transfers that are not available for some users due to region restrictions
     return useMemo(
-        () => META_DATA_MAP.filter(item => item.id !== FeatureSlideNames.SUPPORT || isTronEnabled),
+        () =>
+            META_DATA_MAP.filter(
+                item =>
+                    (item.id !== FeatureSlideNames.SUPPORT &&
+                        item.id !== FeatureSlideNames.FREE_TRC20_TRANSFER) ||
+                    isTronEnabled
+            ),
         [isTronEnabled]
     );
 };
