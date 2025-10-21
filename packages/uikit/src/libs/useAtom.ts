@@ -24,6 +24,19 @@ export function useAtom<T>(a: Atom<T>): [T, (value: T | ((prev: T) => T)) => voi
     return [value, next];
 }
 
+export function useMayBeAtomValue<T>(a: ReadonlyAtom<T> | undefined): T | undefined {
+    const [value, setValue] = useState<T | undefined>(a?.value);
+
+    useEffect(() => {
+        setValue(a?.value);
+        return a?.subscribe(v => {
+            setValue(v);
+        });
+    }, [a]);
+
+    return value;
+}
+
 export function useAtomValue<T>(a: ReadonlyAtom<T>): T {
     const [value, setValue] = useState(a.value);
 
