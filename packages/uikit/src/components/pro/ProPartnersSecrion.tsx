@@ -6,6 +6,8 @@ import { TRON_TRX_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/consta
 import { useTrc20FreeTransfersConfig } from '../../state/tron/tron';
 import { Dot } from '../Dot';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { useProState } from '../../state/pro';
+import { isValidSubscription } from '@tonkeeper/core/dist/entries/pro';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -18,8 +20,13 @@ const Heading = styled(Label2)`
 
 export const ProSettingsPartnersSection = () => {
     const { t } = useTranslation();
+    const { data: subscription } = useProState();
     const { data: config } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
+
+    if (!isValidSubscription(subscription)) {
+        return null;
+    }
 
     return (
         <Wrapper>
