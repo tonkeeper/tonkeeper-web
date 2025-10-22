@@ -26,7 +26,7 @@ export const ProSettingsPartnersSection = () => {
     const formatDate = useDateTimeFormat();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 
-    if (isTronEnabled || !isValidSubscription(subscription)) {
+    if (!isTronEnabled || !isValidSubscription(subscription)) {
         return null;
     }
 
