@@ -27,6 +27,7 @@ import { Notification } from '../Notification';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const SmallDivider = styled.div`
     width: 100%;
@@ -263,6 +264,7 @@ const FeeTable = () => {
     const { data: trc20FreeTransfers } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
     const { onOpen: onGetPro } = useProFeaturesNotification();
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 
     const onRefillToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -276,54 +278,56 @@ const FeeTable = () => {
 
     return (
         <TableWrapper>
-            <TableRow>
-                <TableFirsLineText>{t('tron_fee_table_free_transfer_title')}</TableFirsLineText>
-                {trc20FreeTransfers === undefined ? (
-                    <span />
-                ) : trc20FreeTransfers.type === 'inactive' ? (
-                    <GetProButton primary size="small" onClick={() => onGetPro()}>
-                        {t('pro_subscription_get_pro')}
-                    </GetProButton>
-                ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
-                    <TableFirsLineText>
-                        {t('tron_fee_table_free_transfer_transfers_left', {
-                            number: trc20FreeTransfers.availableTransfersNumber
-                        })}
-                    </TableFirsLineText>
-                ) : (
-                    <TableFirsLineText>
-                        {t('tron_fee_table_free_transfer_no_transfers_left')}
-                    </TableFirsLineText>
-                )}
+            {isTronEnabled && (
+                <TableRow>
+                    <TableFirsLineText>{t('tron_fee_table_free_transfer_title')}</TableFirsLineText>
+                    {trc20FreeTransfers === undefined ? (
+                        <span />
+                    ) : trc20FreeTransfers.type === 'inactive' ? (
+                        <GetProButton primary size="small" onClick={() => onGetPro()}>
+                            {t('pro_subscription_get_pro')}
+                        </GetProButton>
+                    ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
+                        <TableFirsLineText>
+                            {t('tron_fee_table_free_transfer_transfers_left', {
+                                number: trc20FreeTransfers.availableTransfersNumber
+                            })}
+                        </TableFirsLineText>
+                    ) : (
+                        <TableFirsLineText>
+                            {t('tron_fee_table_free_transfer_no_transfers_left')}
+                        </TableFirsLineText>
+                    )}
 
-                {trc20FreeTransfers === undefined ? (
-                    <TextSkeleton />
-                ) : trc20FreeTransfers.type === 'inactive' ? (
-                    <TableSecondLineText>
-                        {t('tron_fee_table_free_transfer_subtitle_inactive')}
-                    </TableSecondLineText>
-                ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
-                    <TableSecondLineText>
-                        {t('tron_fee_table_free_transfer_subtitle_active')}
-                    </TableSecondLineText>
-                ) : (
-                    <span>
+                    {trc20FreeTransfers === undefined ? (
+                        <TextSkeleton />
+                    ) : trc20FreeTransfers.type === 'inactive' ? (
+                        <TableSecondLineText>
+                            {t('tron_fee_table_free_transfer_subtitle_inactive')}
+                        </TableSecondLineText>
+                    ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
                         <TableSecondLineText>
                             {t('tron_fee_table_free_transfer_subtitle_active')}
                         </TableSecondLineText>
-                        <Dot />
-                        <TableSecondLineText>
-                            {t('tron_fee_table_free_transfer_subtitle_used_next_on_date', {
-                                date: formatDate(trc20FreeTransfers.rechargeDate, {
-                                    day: 'numeric',
-                                    month: 'long'
-                                })
-                            })}
-                        </TableSecondLineText>
-                    </span>
-                )}
-                <span />
-            </TableRow>
+                    ) : (
+                        <span>
+                            <TableSecondLineText>
+                                {t('tron_fee_table_free_transfer_subtitle_active')}
+                            </TableSecondLineText>
+                            <Dot />
+                            <TableSecondLineText>
+                                {t('tron_fee_table_free_transfer_subtitle_used_next_on_date', {
+                                    date: formatDate(trc20FreeTransfers.rechargeDate, {
+                                        day: 'numeric',
+                                        month: 'long'
+                                    })
+                                })}
+                            </TableSecondLineText>
+                        </span>
+                    )}
+                    <span />
+                </TableRow>
+            )}
             <TableRowTemplate
                 heading="Tonkeeper Battery"
                 formattedBalance={
