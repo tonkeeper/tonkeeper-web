@@ -266,6 +266,8 @@ const FeeTable = () => {
     const { onOpen: onGetPro } = useProFeaturesNotification();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 
+    const hasBatteryTransfers = typeof batteryTransfers === 'number' && batteryTransfers > 0;
+
     const onRefillToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
             method: 'receive',
@@ -328,36 +330,43 @@ const FeeTable = () => {
                     <span />
                 </TableRow>
             )}
-            <TableRowTemplate
-                heading="Tonkeeper Battery"
-                formattedBalance={
-                    batteryBalance
-                        ? t('battery_charges', {
-                              charges: batteryBalance?.batteryUnitsBalance.toString() ?? 0
-                          })
-                        : undefined
-                }
-                transfersNumber={batteryTransfers}
-                fiatPerTransfer={
-                    batterySenderFee.charges !== undefined
-                        ? t('battery_charges', {
-                              charges: batterySenderFee.charges
-                          })
-                        : undefined
-                }
-                onRefill={() =>
-                    navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
-                        disableMobileAnimation: true
-                    })
-                }
-            />
-            <TableRowTemplate
-                heading="Toncoin"
-                formattedBalance={tonBalance?.stringAssetRelativeAmount}
-                transfersNumber={tonTransfers}
-                fiatPerTransfer={tonSenderFee.fiatAmount}
-                onRefill={() => onRefillToken('ton')}
-            />
+            {(isTronEnabled || hasBatteryTransfers) && (
+                <TableRowTemplate
+                    heading="Tonkeeper Battery"
+                    formattedBalance={
+                        batteryBalance
+                            ? t('battery_charges', {
+                                  charges: batteryBalance?.batteryUnitsBalance.toString() ?? 0
+                              })
+                            : undefined
+                    }
+                    transfersNumber={batteryTransfers}
+                    fiatPerTransfer={
+                        batterySenderFee.charges !== undefined
+                            ? t('battery_charges', {
+                                  charges: batterySenderFee.charges
+                              })
+                            : undefined
+                    }
+                    onRefill={
+                        isTronEnabled
+                            ? () =>
+                                  navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+                                      disableMobileAnimation: true
+                                  })
+                            : null
+                    }
+                />
+            )}
+            {isTronEnabled && (
+                <TableRowTemplate
+                    heading="Toncoin"
+                    formattedBalance={tonBalance?.stringAssetRelativeAmount}
+                    transfersNumber={tonTransfers}
+                    fiatPerTransfer={tonSenderFee.fiatAmount}
+                    onRefill={() => onRefillToken('ton')}
+                />
+            )}
             <TableRowTemplate
                 heading="TRX"
                 formattedBalance={tronBalances?.trx.stringAssetRelativeAmount}
@@ -383,7 +392,7 @@ const TableRowTemplate: FC<{
     transfersNumber: number | undefined;
     formattedBalance: string | undefined;
     fiatPerTransfer: string | undefined;
-    onRefill: () => void;
+    onRefill: (() => void) | null;
 }> = ({ heading, transfersNumber, formattedBalance, fiatPerTransfer, onRefill }) => {
     const { t } = useTranslation();
     return (
@@ -401,10 +410,14 @@ const TableRowTemplate: FC<{
             ) : (
                 <span>
                     <TableSecondLineText>{formattedBalance}</TableSecondLineText>
-                    <Dot />
-                    <RefillButton onClick={onRefill}>
-                        {t('tron_fee_start_banner_button')}
-                    </RefillButton>
+                    {!!onRefill && (
+                        <>
+                            <Dot />
+                            <RefillButton onClick={onRefill}>
+                                {t('tron_fee_start_banner_button')}
+                            </RefillButton>
+                        </>
+                    )}
                 </span>
             )}
             {fiatPerTransfer === undefined ? (
