@@ -26,8 +26,6 @@ import { useProductSelection } from '../../../hooks/pro/useProductSelection';
 import { QRCode } from 'react-qrcode-logo';
 import { useProFeaturesNotification } from '../../modals/ProFeaturesNotificationControlled';
 import { useActiveConfig } from '../../../state/wallet';
-import { useAppSdk } from '../../../hooks/appSdk';
-import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../../state/tonendpoint';
 
 interface IProPurchaseNotificationProps {
     isOpen: boolean;
@@ -53,13 +51,11 @@ export const ProPurchaseNotification: FC<IProPurchaseNotificationProps> = props 
 type ContentProps = Pick<IProPurchaseNotificationProps, 'onClose'>;
 
 export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCurrentClose }) => {
-    const sdk = useAppSdk();
     const formId = useId();
     const { t } = useTranslation();
     const { pro_mobile_app_appstore_link } = useActiveConfig();
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onOpen: onProFeaturesOpen } = useProFeaturesNotification();
-    const isCryptoSubscriptionEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.CRYPTO_SUBSCRIPTION);
 
     const { states, methods } = useProPurchaseController();
     const { onLogout, onManage, onPurchase } = methods;
@@ -78,7 +74,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
     const isGlobalLoading = isPurchasing || isLoggingOut || isManageLoading || isSelectionLoading;
 
-    const isCryptoSubscribingAvailable = isCryptoSubscriptionEnabled || sdk.isIOs();
+    const hasAnySource = availableSources.length > 0;
 
     const handleDisconnect = async () => {
         await onLogout();
@@ -105,28 +101,18 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
         });
 
     return (
-        <ContentWrapper
-            onSubmit={handleSubmit(onSubmit)}
-            id={formId}
-            spaced={isCryptoSubscribingAvailable}
-        >
+        <ContentWrapper onSubmit={handleSubmit(onSubmit)} id={formId} spaced={hasAnySource}>
             <ProSubscriptionLightHeader
-                titleKey={
-                    isCryptoSubscribingAvailable
-                        ? 'get_tonkeeper_pro'
-                        : 'tonkeeper_pro_subscription'
-                }
+                titleKey={hasAnySource ? 'get_tonkeeper_pro' : 'tonkeeper_pro_subscription'}
                 subtitleKey={
-                    isCryptoSubscribingAvailable
-                        ? 'choose_billing_description'
-                        : 'unavailable_on_desktop_in_region'
+                    hasAnySource ? 'choose_billing_description' : 'unavailable_on_desktop_in_region'
                 }
             />
 
             <ProActiveWallet
                 title={<Body3Styled>{t('selected_wallet')}</Body3Styled>}
                 belowCaption={
-                    isCryptoSubscribingAvailable ? undefined : (
+                    hasAnySource ? undefined : (
                         <Body3Styled>{t('no_active_pro_on_wallet')}</Body3Styled>
                     )
                 }
@@ -134,11 +120,9 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
                 onDisconnect={handleDisconnect}
             />
 
-            {!isCryptoSubscribingAvailable && (
-                <QrCodeSection qrValue={pro_mobile_app_appstore_link} />
-            )}
+            {!hasAnySource && <QrCodeSection qrValue={pro_mobile_app_appstore_link} />}
 
-            {isCryptoSubscribingAvailable && (
+            {hasAnySource && (
                 <>
                     {availableSources.length > 1 && (
                         <ProChoosePaymentMethod
@@ -162,7 +146,7 @@ export const ProPurchaseNotificationContent: FC<ContentProps> = ({ onClose: onCu
 
             <NotificationFooterPortal>
                 <NotificationFooter>
-                    {isCryptoSubscribingAvailable ? (
+                    {hasAnySource ? (
                         <PurchaseButtonWrapper>
                             <Button
                                 primary
