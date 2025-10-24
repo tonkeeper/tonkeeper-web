@@ -34,6 +34,7 @@ import { TronNotEnoughBalanceEstimationError } from '@tonkeeper/core/dist/errors
 import { pTimeout } from '@tonkeeper/core/dist/utils/common';
 import { useProAuthToken } from '../../../state/pro';
 import { TronFreeProSender } from '@tonkeeper/core/dist/service/tron-blockchain/sender/tron-free-pro-sender';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../../state/tonendpoint';
 
 export enum TRON_SENDER_TYPE {
     TRX = 'tron-trx',
@@ -74,6 +75,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
     const queryKeyBattery = useToQueryKeyPart(batteryTronSender);
     const queryKeyTrx = useToQueryKeyPart(tronTrxSender);
     const queryKeyTon = useToQueryKeyPart(tronTonSender);
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 
     return useQuery<TronSenderOption[]>(
         [
@@ -83,7 +85,8 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             queryKeyTon,
             freeTrc20Config,
             receiver,
-            assetAmount
+            assetAmount,
+            isTronEnabled
         ],
         async () => {
             if (!isTronAsset(assetAmount.asset)) {
@@ -91,7 +94,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             }
             const optionsGetters: (() => Promise<TronSenderOption | undefined>)[] = [];
 
-            if (freeTrc20Config) {
+            if (freeTrc20Config && isTronEnabled) {
                 optionsGetters.push(async () => ({
                     type: TRON_SENDER_TYPE.FREE_PRO,
                     isEnoughBalance:
@@ -118,7 +121,11 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
                             fee
                         };
                     } catch (e: unknown) {
-                        if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
+                        if (
+                            e instanceof TronNotEnoughBalanceEstimationError &&
+                            e.fee &&
+                            isTronEnabled
+                        ) {
                             return {
                                 type: TRON_SENDER_TYPE.BATTERY,
                                 isEnoughBalance: false,
@@ -130,7 +137,7 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
                 });
             }
 
-            if (tronTonSender) {
+            if (tronTonSender && isTronEnabled) {
                 optionsGetters.push(async () => {
                     try {
                         const { fee } = await pTimeout(

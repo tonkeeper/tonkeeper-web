@@ -52,7 +52,10 @@ export function TronAvailableTransfersFromJSON(json: any): TronAvailableTransfer
     return TronAvailableTransfersFromJSONTyped(json, false);
 }
 
-export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminator: boolean): TronAvailableTransfers {
+export function TronAvailableTransfersFromJSONTyped(
+    json: any,
+    ignoreDiscriminator: boolean
+): TronAvailableTransfers {
     if (json == null) {
         return json;
     }
@@ -64,11 +67,14 @@ export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-  export function TronAvailableTransfersToJSON(json: any): TronAvailableTransfers {
-      return TronAvailableTransfersToJSONTyped(json, false);
-  }
+export function TronAvailableTransfersToJSON(json: any): TronAvailableTransfers {
+    return TronAvailableTransfersToJSONTyped(json, false);
+}
 
-  export function TronAvailableTransfersToJSONTyped(value?: TronAvailableTransfers | null, ignoreDiscriminator: boolean = false): any {
+export function TronAvailableTransfersToJSONTyped(
+    value?: TronAvailableTransfers | null,
+    ignoreDiscriminator: boolean = false
+): any {
     if (value == null) {
         return value;
     }
@@ -80,4 +86,3 @@ export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminat
         'next_reset_date': value['nextResetDate'],
     };
 }
-

@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Notification } from '../Notification';
 import { Body2Class, Body3, Label1Class, Label2 } from '../Text';
 import { Button } from '../fields/Button';
@@ -18,6 +18,7 @@ import { Skeleton } from '../shared/Skeleton';
 import { ChevronRightIcon, TonkeeperProCardIcon } from '../Icon';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
 
 const NotificationStyled = styled(Notification)`
     max-width: 648px;
@@ -76,14 +77,25 @@ const BatteryIcon = () => {
     );
 };
 
-const Cards = styled.div`
+const Cards = styled.div<{ isSingleChild: boolean }>`
     margin-top: 24px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+
+    ${({ isSingleChild }) =>
+        isSingleChild
+            ? css`
+                  grid-template-columns: 1fr;
+                  grid-template-rows: repeat(3, auto);
+                  width: 100%;
+              `
+            : css`
+                  grid-template-columns: repeat(3, 1fr);
+                  gap: 12px;
+              `}
 
     ${isMobile} {
-        grid-template: repeat(3, 1fr) / 1fr;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, auto);
         width: 100%;
     }
 `;
@@ -212,6 +224,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     const { onOpen: onGetPro } = useProFeaturesNotification();
     const { data: trc20FreeTransfersConfig } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 
     const onTopupToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -226,63 +239,76 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     return (
         <Content>
             <CardTitle>{t('topup_tron_fee_title')}</CardTitle>
-            <CardSubtitle>{t('topup_tron_fee_subtitle')}</CardSubtitle>
+            {isTronEnabled && <CardSubtitle>{t('topup_tron_fee_subtitle')}</CardSubtitle>}
 
-            <Cards>
-                <MethodCard>
-                    <BatteryIcon />
-                    <MobileBlockWrapper>
-                        <MethodInfo>
-                            <CardTitle>{t('battery_title')}</CardTitle>
-                            <CardSubtitle>{t('topup_tron_fee_battery_description')}</CardSubtitle>
-                        </MethodInfo>
-                        {batterySenderFee.charges !== undefined ? (
-                            <CardSubtitle>
-                                {t('topup_tron_fee_charges_per_transfer', {
-                                    charges: batterySenderFee.charges
-                                })}
-                            </CardSubtitle>
-                        ) : (
-                            <Skeleton height="14px" marginTop="2px" width="100px" />
-                        )}
-                        <ActionButton
-                            primary
-                            size="small"
-                            onClick={() => {
-                                onClose();
-                                navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
-                                    disableMobileAnimation: true
-                                });
-                            }}
-                            fullWidth
-                        >
-                            {t('topup_tron_fee_top_up')}
-                        </ActionButton>
-                    </MobileBlockWrapper>
-                    <ChevronButton />
-                </MethodCard>
-                <MethodCard>
-                    <MethodImage src={TON_ASSET.image} />
-                    <MobileBlockWrapper>
-                        <MethodInfo>
-                            <CardTitle>{TON_ASSET.symbol}</CardTitle>
-                            <CardSubtitle>{t('topup_tron_fee_ton_description')}</CardSubtitle>
-                        </MethodInfo>
-                        {tonSenderFee.fiatAmount ? (
-                            <CardSubtitle>
-                                {t('topup_tron_fee_price_per_transfer', {
-                                    fiat: tonSenderFee.fiatAmount
-                                })}
-                            </CardSubtitle>
-                        ) : (
-                            <Skeleton height="14px" marginTop="2px" width="100px" />
-                        )}
-                        <ActionButton size="small" onClick={() => onTopupToken('ton')} fullWidth>
-                            {t('topup_tron_fee_top_up')}
-                        </ActionButton>
-                    </MobileBlockWrapper>
-                    <ChevronButton />
-                </MethodCard>
+            <Cards isSingleChild={!isTronEnabled}>
+                {isTronEnabled && (
+                    <MethodCard>
+                        <BatteryIcon />
+                        <MobileBlockWrapper>
+                            <MethodInfo>
+                                <CardTitle>{t('battery_title')}</CardTitle>
+                                <CardSubtitle>
+                                    {t('topup_tron_fee_battery_description')}
+                                </CardSubtitle>
+                            </MethodInfo>
+                            {batterySenderFee.charges !== undefined ? (
+                                <CardSubtitle>
+                                    {t('topup_tron_fee_charges_per_transfer', {
+                                        charges: batterySenderFee.charges
+                                    })}
+                                </CardSubtitle>
+                            ) : (
+                                <Skeleton height="14px" marginTop="2px" width="100px" />
+                            )}
+                            <ActionButton
+                                primary
+                                size="small"
+                                onClick={() => {
+                                    onClose();
+                                    navigate(
+                                        AppRoute.walletSettings + WalletSettingsRoute.battery,
+                                        {
+                                            disableMobileAnimation: true
+                                        }
+                                    );
+                                }}
+                                fullWidth
+                            >
+                                {t('topup_tron_fee_top_up')}
+                            </ActionButton>
+                        </MobileBlockWrapper>
+                        <ChevronButton />
+                    </MethodCard>
+                )}
+                {isTronEnabled && (
+                    <MethodCard>
+                        <MethodImage src={TON_ASSET.image} />
+                        <MobileBlockWrapper>
+                            <MethodInfo>
+                                <CardTitle>{TON_ASSET.symbol}</CardTitle>
+                                <CardSubtitle>{t('topup_tron_fee_ton_description')}</CardSubtitle>
+                            </MethodInfo>
+                            {tonSenderFee.fiatAmount ? (
+                                <CardSubtitle>
+                                    {t('topup_tron_fee_price_per_transfer', {
+                                        fiat: tonSenderFee.fiatAmount
+                                    })}
+                                </CardSubtitle>
+                            ) : (
+                                <Skeleton height="14px" marginTop="2px" width="100px" />
+                            )}
+                            <ActionButton
+                                size="small"
+                                onClick={() => onTopupToken('ton')}
+                                fullWidth
+                            >
+                                {t('topup_tron_fee_top_up')}
+                            </ActionButton>
+                        </MobileBlockWrapper>
+                        <ChevronButton />
+                    </MethodCard>
+                )}
                 <MethodCard>
                     <MethodImage src={TRON_TRX_ASSET.image} />
                     <MobileBlockWrapper>
@@ -307,43 +333,47 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                 </MethodCard>
             </Cards>
 
-            <ProCard>
-                <TonkeeperProCardIcon />
-                <MethodInfo>
-                    <CardTitle>{t('topup_trc20_fee_pro_banner_title')}</CardTitle>
-                    {trc20FreeTransfersConfig?.type === 'active' ? (
-                        trc20FreeTransfersConfig.availableTransfersNumber > 0 ? (
+            {isTronEnabled && (
+                <ProCard>
+                    <TonkeeperProCardIcon />
+                    <MethodInfo>
+                        <CardTitle>{t('topup_trc20_fee_pro_banner_title')}</CardTitle>
+                        {trc20FreeTransfersConfig?.type === 'active' ? (
+                            trc20FreeTransfersConfig.availableTransfersNumber > 0 ? (
+                                <CardSubtitle>
+                                    {t('topup_trc20_fee_pro_banner_description')}
+                                </CardSubtitle>
+                            ) : (
+                                <CardSubtitle>
+                                    {t('topup_trc20_fee_pro_banner_description_used', {
+                                        date: formatDate(trc20FreeTransfersConfig.rechargeDate, {
+                                            day: 'numeric',
+                                            month: 'long'
+                                        })
+                                    })}
+                                </CardSubtitle>
+                            )
+                        ) : (
                             <CardSubtitle>
                                 {t('topup_trc20_fee_pro_banner_description')}
                             </CardSubtitle>
-                        ) : (
-                            <CardSubtitle>
-                                {t('topup_trc20_fee_pro_banner_description_used', {
-                                    date: formatDate(trc20FreeTransfersConfig.rechargeDate, {
-                                        day: 'numeric',
-                                        month: 'long'
-                                    })
-                                })}
-                            </CardSubtitle>
-                        )
-                    ) : (
-                        <CardSubtitle>{t('topup_trc20_fee_pro_banner_description')}</CardSubtitle>
+                        )}
+                    </MethodInfo>
+                    {trc20FreeTransfersConfig?.type !== 'active' && (
+                        <Button
+                            primary
+                            size="small"
+                            onClick={() => {
+                                onClose();
+                                onGetPro();
+                            }}
+                            loading={!trc20FreeTransfersConfig}
+                        >
+                            {t('pro_subscription_get_pro')}
+                        </Button>
                     )}
-                </MethodInfo>
-                {trc20FreeTransfersConfig?.type !== 'active' && (
-                    <Button
-                        primary
-                        size="small"
-                        onClick={() => {
-                            onClose();
-                            onGetPro();
-                        }}
-                        loading={!trc20FreeTransfersConfig}
-                    >
-                        {t('pro_subscription_get_pro')}
-                    </Button>
-                )}
-            </ProCard>
+                </ProCard>
+            )}
 
             <FooterNote>
                 {t('topup_tron_fee_disclaimer')}
