@@ -106,29 +106,35 @@ export const useAvailableTronSendersChoices = (receiver: string, assetAmount: As
             }
 
             if (batteryTronSender) {
-                let battery: TronSenderOption | undefined;
-
-                try {
-                    const { fee } = await pTimeout(
-                        batteryTronSender.estimate(receiver, assetAmount as AssetAmount<TronAsset>),
-                        preEstimationTimeoutMS
-                    );
-
-                    battery = { type: TRON_SENDER_TYPE.BATTERY, isEnoughBalance: true, fee };
-                } catch (e: unknown) {
-                    if (e instanceof TronNotEnoughBalanceEstimationError && e.fee) {
-                        battery = {
+                optionsGetters.push(async () => {
+                    try {
+                        const { fee } = await pTimeout(
+                            batteryTronSender.estimate(
+                                receiver,
+                                assetAmount as AssetAmount<TronAsset>
+                            ),
+                            preEstimationTimeoutMS
+                        );
+                        return {
                             type: TRON_SENDER_TYPE.BATTERY,
-                            isEnoughBalance: false,
-                            fee: e.fee as TransactionFeeBattery
+                            isEnoughBalance: true,
+                            fee
                         };
+                    } catch (e: unknown) {
+                        if (
+                            e instanceof TronNotEnoughBalanceEstimationError &&
+                            e.fee &&
+                            isTronEnabled
+                        ) {
+                            return {
+                                type: TRON_SENDER_TYPE.BATTERY,
+                                isEnoughBalance: false,
+                                fee: e.fee as TransactionFeeBattery
+                            };
+                        }
+                        console.debug(e);
                     }
-                    console.debug(e);
-                }
-
-                if (battery && battery.isEnoughBalance) {
-                    optionsGetters.push(async () => battery);
-                }
+                });
             }
 
             if (tronTonSender && isTronEnabled) {
