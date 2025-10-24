@@ -26,6 +26,12 @@ export interface TronAvailableTransfers {
      */
     availableTransfers: number;
     /**
+     * Availability type. 'inactive' if source is telegram.
+     * @type {string}
+     * @memberof TronAvailableTransfers
+     */
+    type: string;
+    /**
      * Unix timestamp of next free transfers reset date (either next month after last reset or next charge date, whichever is closer)
      * @type {number}
      * @memberof TronAvailableTransfers
@@ -38,6 +44,7 @@ export interface TronAvailableTransfers {
  */
 export function instanceOfTronAvailableTransfers(value: object): value is TronAvailableTransfers {
     if (!('availableTransfers' in value) || value['availableTransfers'] === undefined) return false;
+    if (!('type' in value) || value['type'] === undefined) return false;
     return true;
 }
 
@@ -45,30 +52,35 @@ export function TronAvailableTransfersFromJSON(json: any): TronAvailableTransfer
     return TronAvailableTransfersFromJSONTyped(json, false);
 }
 
-export function TronAvailableTransfersFromJSONTyped(json: any, ignoreDiscriminator: boolean): TronAvailableTransfers {
+export function TronAvailableTransfersFromJSONTyped(
+    json: any,
+    ignoreDiscriminator: boolean
+): TronAvailableTransfers {
     if (json == null) {
         return json;
     }
     return {
-
-        'availableTransfers': json['available_transfers'],
-        'nextResetDate': json['next_reset_date'] == null ? undefined : json['next_reset_date'],
+        availableTransfers: json['available_transfers'],
+        type: json['type'],
+        nextResetDate: json['next_reset_date'] == null ? undefined : json['next_reset_date']
     };
 }
 
-  export function TronAvailableTransfersToJSON(json: any): TronAvailableTransfers {
-      return TronAvailableTransfersToJSONTyped(json, false);
-  }
+export function TronAvailableTransfersToJSON(json: any): TronAvailableTransfers {
+    return TronAvailableTransfersToJSONTyped(json, false);
+}
 
-  export function TronAvailableTransfersToJSONTyped(value?: TronAvailableTransfers | null, ignoreDiscriminator: boolean = false): any {
+export function TronAvailableTransfersToJSONTyped(
+    value?: TronAvailableTransfers | null,
+    ignoreDiscriminator: boolean = false
+): any {
     if (value == null) {
         return value;
     }
 
     return {
-
-        'available_transfers': value['availableTransfers'],
-        'next_reset_date': value['nextResetDate'],
+        available_transfers: value['availableTransfers'],
+        type: value['type'],
+        next_reset_date: value['nextResetDate']
     };
 }
-

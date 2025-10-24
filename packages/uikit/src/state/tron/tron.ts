@@ -187,7 +187,7 @@ export const useTrc20FreeTransfersConfig = () => {
             }
 
             try {
-                const { availableTransfers, nextResetDate } = await new BatteryApiClient(
+                const { availableTransfers, type, nextResetDate } = await new BatteryApiClient(
                     batteryApi
                 ).getTronAvailableTransfers({
                     xProAuth: proToken
@@ -195,9 +195,12 @@ export const useTrc20FreeTransfersConfig = () => {
                 if (!nextResetDate) {
                     throw new Error('nextResetDate is undefined');
                 }
+                if (type !== 'active') {
+                    throw new Error('type is inactive');
+                }
 
                 return {
-                    type: 'active' as const,
+                    type: type as 'active',
                     availableTransfersNumber: availableTransfers,
                     rechargeDate: new Date(nextResetDate * 1000)
                 };
