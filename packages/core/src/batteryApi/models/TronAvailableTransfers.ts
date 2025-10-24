@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- *
+ * 
  * @export
  * @interface TronAvailableTransfers
  */
@@ -60,9 +60,10 @@ export function TronAvailableTransfersFromJSONTyped(
         return json;
     }
     return {
-        availableTransfers: json['available_transfers'],
-        type: json['type'],
-        nextResetDate: json['next_reset_date'] == null ? undefined : json['next_reset_date']
+        
+        'availableTransfers': json['available_transfers'],
+        'type': json['type'],
+        'nextResetDate': json['next_reset_date'] == null ? undefined : json['next_reset_date'],
     };
 }
 
@@ -79,8 +80,9 @@ export function TronAvailableTransfersToJSONTyped(
     }
 
     return {
-        available_transfers: value['availableTransfers'],
-        type: value['type'],
-        next_reset_date: value['nextResetDate']
+        
+        'available_transfers': value['availableTransfers'],
+        'type': value['type'],
+        'next_reset_date': value['nextResetDate'],
     };
 }
