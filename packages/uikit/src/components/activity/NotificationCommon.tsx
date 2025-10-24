@@ -63,6 +63,9 @@ import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { AppRoute, WalletSettingsRoute } from '../../libs/routes';
 import { useNavigate } from '../../hooks/router/useNavigate';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProState } from '../../state/pro';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 
 export const Title = styled(H2)<{ secondary?: boolean; tertiary?: boolean }>`
     display: flex;
@@ -713,8 +716,19 @@ const SenderDropdownItemTronFreePro: FC<{
     config: Trc20FreeTransfersConfig;
 }> = ({ config }) => {
     const { t } = useTranslation();
+
+    const { data: subscription } = useProState();
     const formatDate = useDateTimeFormat();
-    const { onOpen: getPro } = useProFeaturesNotification();
+    const { onOpen: onGetPro } = useProFeaturesNotification();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+
+    const handleProButtonClick = () => {
+        if (isTelegramActiveSubscription(subscription)) {
+            onProAuthOpen();
+        } else {
+            onGetPro();
+        }
+    };
 
     return (
         <>
@@ -722,7 +736,7 @@ const SenderDropdownItemTronFreePro: FC<{
             <SenderText>
                 <Label2>{t('select_fee_payment_method_option_free_pro_title')}</Label2>
                 {config.type === 'inactive' ? (
-                    <ButtonFlatStyled onClick={() => getPro()}>
+                    <ButtonFlatStyled onClick={handleProButtonClick}>
                         {t('get_tonkeeper_pro')}
                     </ButtonFlatStyled>
                 ) : config.availableTransfersNumber > 0 ? (

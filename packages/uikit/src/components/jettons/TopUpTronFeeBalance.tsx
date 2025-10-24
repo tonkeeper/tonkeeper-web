@@ -19,6 +19,9 @@ import { ChevronRightIcon, TonkeeperProCardIcon } from '../Icon';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
+import { useProState } from '../../state/pro';
 
 const NotificationStyled = styled(Notification)`
     max-width: 648px;
@@ -219,9 +222,12 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
     const { t } = useTranslation();
     const { mainnetConfig } = useAppContext();
     const sdk = useAppSdk();
+
     const navigate = useNavigate();
+    const { data: subscription } = useProState();
     const { tonSenderFee, trxSenderFee, batterySenderFee } = useTrc20TransferDefaultFees();
     const { onOpen: onGetPro } = useProFeaturesNotification();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { data: trc20FreeTransfersConfig } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
@@ -234,6 +240,16 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                 jetton: asset === 'ton' ? TON_ASSET.id : TRON_TRX_ASSET.id
             }
         });
+    };
+
+    const handleProButtonClick = () => {
+        onClose();
+
+        if (isTelegramActiveSubscription(subscription)) {
+            onProAuthOpen();
+        } else {
+            onGetPro();
+        }
     };
 
     return (
@@ -363,10 +379,7 @@ const TopUpTronFeeBalanceContent: FC<{ onClose: () => void }> = ({ onClose }) =>
                         <Button
                             primary
                             size="small"
-                            onClick={() => {
-                                onClose();
-                                onGetPro();
-                            }}
+                            onClick={handleProButtonClick}
                             loading={!trc20FreeTransfersConfig}
                         >
                             {t('pro_subscription_get_pro')}
