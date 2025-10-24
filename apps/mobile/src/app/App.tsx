@@ -144,15 +144,13 @@ export const Providers = () => {
     );
 };
 
-export const App = () => {
-    return (
-        <IonApp>
-            <IonReactRouter>
-                <Providers />
-            </IonReactRouter>
-        </IonApp>
-    );
-};
+export const App = () => (
+    <IonApp>
+        <IonReactRouter>
+            <Providers />
+        </IonReactRouter>
+    </IonApp>
+);
 
 const ThemeAndContent = () => {
     const { data } = useProBackupState();

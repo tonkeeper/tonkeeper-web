@@ -1,8 +1,8 @@
-import { BorderSmallResponsive } from '../shared/Styles';
 import styled, { css, useTheme } from 'styled-components';
-import { Body1Class, Body2, Body2Class, Body3, Body3Class, Label1Class, Label2 } from '../Text';
+import { Body1Class, Body2Class, Body3, Body3Class, Label1Class } from '../Text';
 import { useTranslation } from '../../hooks/translation';
 import {
+    useTrc20FreeTransfersConfig,
     useTrc20TransferDefaultFees,
     useTrc20TransfersNumberAvailable,
     useTronBalances
@@ -25,49 +25,12 @@ import { ExternalLink } from '../shared/ExternalLink';
 import { IconButtonTransparentBackground } from '../fields/IconButton';
 import { Notification } from '../Notification';
 import { useDisclosure } from '../../hooks/useDisclosure';
-
-const TronTopUpUSDTWrapper = styled.div`
-    background-color: ${p => p.theme.backgroundContent};
-    ${BorderSmallResponsive};
-    padding: 16px 14px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    justify-content: space-between;
-    margin: 16px;
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-
-    ${p =>
-        (p.theme.proDisplayType === 'mobile' || p.theme.displayType === 'compact') &&
-        css`
-            gap: 16px;
-            flex-direction: column;
-
-            button {
-                width: 100%;
-                box-sizing: border-box;
-            }
-        `}
-
-    ${p =>
-        p.theme.displayType === 'compact' &&
-        css`
-            margin: 16px 0;
-        `}
-`;
-
-const TextContainer = styled.div`
-    > * {
-        display: block;
-    }
-
-    > ${Body2} {
-        color: ${p => p.theme.textSecondary};
-    }
-`;
+import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
+import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
+import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { useProState } from '../../state/pro';
+import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 
 const SmallDivider = styled.div`
     width: 100%;
@@ -151,6 +114,7 @@ const InfoWrapper = styled.div`
 
 const DropDownStyled = styled(DropDown)`
     .tron-fee-info-container {
+        max-height: unset;
         width: 280px;
         right: -120px;
         top: 24px;
@@ -170,24 +134,6 @@ export const TronFeeBanner = () => {
 
     if (total === undefined) {
         return null;
-    }
-
-    if (total === 0) {
-        return (
-            <>
-                <TronTopUpUSDTWrapper>
-                    <TextContainer>
-                        <Label2>{t('tron_fee_start_banner_title')}</Label2>
-                        <Body2>{t('tron_fee_start_banner_description')}</Body2>
-                    </TextContainer>
-
-                    <Button size="small" onClick={openTopUpNotification}>
-                        {t('tron_fee_start_banner_button')}
-                    </Button>
-                </TronTopUpUSDTWrapper>
-                <SmallDivider />
-            </>
-        );
     }
 
     const showDropDown = theme.displayType === 'full-width' && theme.proDisplayType === 'desktop';
@@ -247,7 +193,7 @@ const TableWrapper = styled.div`
 const TableRow = styled.div`
     padding: 10px 16px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto;
     grid-template-rows: 1fr 1fr;
     align-items: center;
     flex-direction: column;
@@ -312,12 +258,20 @@ const FeeTable = () => {
     const sdk = useAppSdk();
     const navigate = useNavigate();
 
+    const { data: subscription } = useProState();
     const { batterySenderFee, tonSenderFee, trxSenderFee } = useTrc20TransferDefaultFees();
     const { batteryTransfers, tonTransfers, trxTransfers } = useTrc20TransfersNumberAvailable();
     const { data: batteryBalance } = useBatteryBalance();
     const { data: tonBalance } = useTonBalance();
     const { data: tronBalances } = useTronBalances();
     const { faq_tron_fee_url } = useActiveConfig();
+    const { data: trc20FreeTransfers } = useTrc20FreeTransfersConfig();
+    const formatDate = useDateTimeFormat();
+    const { onOpen: onGetPro } = useProFeaturesNotification();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
+    const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
+
+    const hasBatteryTransfers = typeof batteryTransfers === 'number' && batteryTransfers > 0;
 
     const onRefillToken = (asset: 'ton' | 'trx') => {
         sdk.uiEvents.emit('receive', {
@@ -329,38 +283,103 @@ const FeeTable = () => {
         });
     };
 
+    const handleProButtonClick = () => {
+        if (isTelegramActiveSubscription(subscription)) {
+            onProAuthOpen();
+        } else {
+            onGetPro();
+        }
+    };
+
     return (
         <TableWrapper>
-            <TableRowTemplate
-                heading="Tonkeeper Battery"
-                formattedBalance={
-                    batteryBalance
-                        ? t('battery_charges', {
-                              charges: batteryBalance?.batteryUnitsBalance.toString() ?? 0
-                          })
-                        : undefined
-                }
-                transfersNumber={batteryTransfers}
-                fiatPerTransfer={
-                    batterySenderFee.charges !== undefined
-                        ? t('battery_charges', {
-                              charges: batterySenderFee.charges
-                          })
-                        : undefined
-                }
-                onRefill={() =>
-                    navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
-                        disableMobileAnimation: true
-                    })
-                }
-            />
-            <TableRowTemplate
-                heading="Toncoin"
-                formattedBalance={tonBalance?.stringAssetRelativeAmount}
-                transfersNumber={tonTransfers}
-                fiatPerTransfer={tonSenderFee.fiatAmount}
-                onRefill={() => onRefillToken('ton')}
-            />
+            {isTronEnabled && (
+                <TableRow>
+                    <TableFirsLineText>{t('tron_fee_table_free_transfer_title')}</TableFirsLineText>
+                    {trc20FreeTransfers === undefined ? (
+                        <span />
+                    ) : trc20FreeTransfers.type === 'inactive' ? (
+                        <GetProButton primary size="small" onClick={handleProButtonClick}>
+                            {t('pro_subscription_get_pro')}
+                        </GetProButton>
+                    ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
+                        <TableFirsLineText>
+                            {t('tron_fee_table_free_transfer_transfers_left', {
+                                number: trc20FreeTransfers.availableTransfersNumber
+                            })}
+                        </TableFirsLineText>
+                    ) : (
+                        <TableFirsLineText>
+                            {t('tron_fee_table_free_transfer_no_transfers_left')}
+                        </TableFirsLineText>
+                    )}
+
+                    {trc20FreeTransfers === undefined ? (
+                        <TextSkeleton />
+                    ) : trc20FreeTransfers.type === 'inactive' ? (
+                        <TableSecondLineText>
+                            {t('tron_fee_table_free_transfer_subtitle_inactive')}
+                        </TableSecondLineText>
+                    ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
+                        <TableSecondLineText>
+                            {t('tron_fee_table_free_transfer_subtitle_active')}
+                        </TableSecondLineText>
+                    ) : (
+                        <span>
+                            <TableSecondLineText>
+                                {t('tron_fee_table_free_transfer_subtitle_active')}
+                            </TableSecondLineText>
+                            <Dot />
+                            <TableSecondLineText>
+                                {t('tron_fee_table_free_transfer_subtitle_used_next_on_date', {
+                                    date: formatDate(trc20FreeTransfers.rechargeDate, {
+                                        day: 'numeric',
+                                        month: 'long'
+                                    })
+                                })}
+                            </TableSecondLineText>
+                        </span>
+                    )}
+                    <span />
+                </TableRow>
+            )}
+            {(isTronEnabled || hasBatteryTransfers) && (
+                <TableRowTemplate
+                    heading="Tonkeeper Battery"
+                    formattedBalance={
+                        batteryBalance
+                            ? t('battery_charges', {
+                                  charges: batteryBalance?.batteryUnitsBalance.toString() ?? 0
+                              })
+                            : undefined
+                    }
+                    transfersNumber={batteryTransfers}
+                    fiatPerTransfer={
+                        batterySenderFee.charges !== undefined
+                            ? t('battery_charges', {
+                                  charges: batterySenderFee.charges
+                              })
+                            : undefined
+                    }
+                    onRefill={
+                        isTronEnabled
+                            ? () =>
+                                  navigate(AppRoute.walletSettings + WalletSettingsRoute.battery, {
+                                      disableMobileAnimation: true
+                                  })
+                            : null
+                    }
+                />
+            )}
+            {isTronEnabled && (
+                <TableRowTemplate
+                    heading="Toncoin"
+                    formattedBalance={tonBalance?.stringAssetRelativeAmount}
+                    transfersNumber={tonTransfers}
+                    fiatPerTransfer={tonSenderFee.fiatAmount}
+                    onRefill={() => onRefillToken('ton')}
+                />
+            )}
             <TableRowTemplate
                 heading="TRX"
                 formattedBalance={tronBalances?.trx.stringAssetRelativeAmount}
@@ -386,7 +405,7 @@ const TableRowTemplate: FC<{
     transfersNumber: number | undefined;
     formattedBalance: string | undefined;
     fiatPerTransfer: string | undefined;
-    onRefill: () => void;
+    onRefill: (() => void) | null;
 }> = ({ heading, transfersNumber, formattedBalance, fiatPerTransfer, onRefill }) => {
     const { t } = useTranslation();
     return (
@@ -404,10 +423,14 @@ const TableRowTemplate: FC<{
             ) : (
                 <span>
                     <TableSecondLineText>{formattedBalance}</TableSecondLineText>
-                    <Dot />
-                    <RefillButton onClick={onRefill}>
-                        {t('tron_fee_start_banner_button')}
-                    </RefillButton>
+                    {!!onRefill && (
+                        <>
+                            <Dot />
+                            <RefillButton onClick={onRefill}>
+                                {t('tron_fee_start_banner_button')}
+                            </RefillButton>
+                        </>
+                    )}
                 </span>
             )}
             {fiatPerTransfer === undefined ? (
@@ -420,3 +443,8 @@ const TableRowTemplate: FC<{
         </TableRow>
     );
 };
+
+const GetProButton = styled(Button)`
+    grid-row: span 2;
+    height: 32px;
+`;

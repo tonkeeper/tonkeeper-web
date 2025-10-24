@@ -9,6 +9,7 @@ export enum PurchaseErrors {
     UNSUPPORTED_TWO_FA = 'unsupported_two_fa',
     PROMOCODE_ALREADY_USED = 'promocode_already_used',
     META_ENCRYPT_KEY_CREATION_FAILED = 'meta_encrypt_key_creation_failed',
+    NOT_ENOUGH_FUNDS = 'not_enough_funds',
     PURCHASE_FAILED = 'purchase_failed'
 }
 
@@ -49,4 +50,9 @@ export enum ExtensionSubscriptionStatuses {
 export enum TelegramSubscriptionStatuses {
     ACTIVE = 'active',
     EXPIRED = 'expired'
+}
+
+export enum ProPriceTypes {
+    RAW = 'raw',
+    FORMATTED = 'formatted'
 }

@@ -10,6 +10,7 @@ import {
     isPaidActiveSubscription,
     ISubscriptionFormData,
     ISupportData,
+    ProPriceTypes,
     ProSubscription,
     PurchaseErrors,
     PurchaseStatuses
@@ -36,7 +37,7 @@ import {
     getWalletById,
     isAccountTonWalletStandard
 } from '@tonkeeper/core/dist/entries/account';
-import { useActiveApi, useActiveConfig, useMetaEncryptionData } from './wallet';
+import { useActiveApi, useActiveConfig } from './wallet';
 import { AppKey } from '@tonkeeper/core/dist/Keys';
 import { useAtom } from '../libs/useAtom';
 import { subscriptionFormTempAuth$ } from '@tonkeeper/core/dist/ProAuthTokenService';
@@ -47,7 +48,7 @@ import { ServerConfig } from './tonendpoint';
 import { TwoFAEncoder } from '@tonkeeper/core/dist/service/ton-blockchain/encoder/two-fa-encoder';
 import { useProAuthNotification } from '../components/modals/ProAuthNotificationControlled';
 import { useProPurchaseNotification } from '../components/modals/ProPurchaseNotificationControlled';
-import { useMetaEncryptionNotification } from '../components/modals/MetaEncryptionNotificationControlled';
+import { getWalletBalance } from '@tonkeeper/core/dist/service/ton-blockchain/utils';
 
 export const useTrialAvailability = () => {
     const sdk = useAppSdk();
@@ -130,7 +131,6 @@ export const useProState = () => {
             }
         },
         {
-            suspense: true,
             keepPreviousData: true,
             refetchInterval: s => {
                 if (
@@ -146,6 +146,14 @@ export const useProState = () => {
             refetchIntervalInBackground: true
         }
     );
+};
+
+export const useProAuthToken = () => {
+    const { data } = useProState();
+    const sdk = useAppSdk();
+    return useQuery([QueryKey.proAuthToken, data?.valid], () => {
+        return sdk.subscriptionService.getToken();
+    });
 };
 
 export const useCurrentSubscriptionInfo = () => {
@@ -299,13 +307,10 @@ export const useProPurchaseMutation = () => {
     const api = useActiveApi();
     const client = useQueryClient();
 
-    const { data: metaEncryptionMap } = useMetaEncryptionData();
     const { data: currentSubInfo } = useCurrentSubscriptionInfo();
 
     const { onOpen: onProAuthOpen } = useProAuthNotification();
     const { onClose: onCurrentClose } = useProPurchaseNotification();
-    const { onOpen: onMetaEncryptionOpen, onClose: onMetaEncryptionClose } =
-        useMetaEncryptionNotification();
 
     return useMutation<
         PurchaseStatuses,
@@ -327,41 +332,31 @@ export const useProPurchaseMutation = () => {
                 if (result) {
                     onCurrentClose();
                     onProAuthOpen();
+
+                    return PurchaseStatuses.CANCELED;
                 } else {
                     throw new Error(PurchaseErrors.PURCHASE_FAILED);
                 }
             }
         }
 
-        const twoFAState = await new TwoFAEncoder(api, formData.wallet.rawAddress).getPluginState();
+        const walletAddress = formData.wallet.rawAddress;
+
+        const twoFAState = await new TwoFAEncoder(api, walletAddress).getPluginState();
 
         if (source === SubscriptionSource.EXTENSION && twoFAState.type === 'active') {
             throw new Error(PurchaseErrors.UNSUPPORTED_TWO_FA);
         }
 
-        const hasMetaEncryption =
-            metaEncryptionMap && metaEncryptionMap[formData.wallet.rawAddress];
+        const proPrice = formData.selectedPlan.price;
 
-        if (source === SubscriptionSource.EXTENSION && !hasMetaEncryption) {
-            const createMetaEncryption = () =>
-                new Promise(resolve => {
-                    onMetaEncryptionOpen({
-                        onConfirm: (isConfirmed?: boolean) => {
-                            if (isConfirmed) {
-                                resolve(true);
+        if (proPrice.type === ProPriceTypes.RAW) {
+            const balance = await getWalletBalance(api, walletAddress, proPrice.value.asset);
 
-                                onMetaEncryptionClose();
-                            } else {
-                                resolve(false);
-                            }
-                        }
-                    });
-                });
+            const totalWei = proPrice.value.weiAmount;
 
-            const isCreated = await createMetaEncryption();
-
-            if (!isCreated) {
-                throw new Error(PurchaseErrors.META_ENCRYPT_KEY_CREATION_FAILED);
+            if (totalWei.isGreaterThan(balance.weiAmount)) {
+                throw new Error(PurchaseErrors.NOT_ENOUGH_FUNDS);
             }
         }
 

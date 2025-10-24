@@ -14,7 +14,11 @@ export enum Language {
     FR = 12,
     PA = 13,
     PT = 14,
-    VI = 15
+    VI = 15,
+    HI = 16,
+    AR = 17,
+    DE = 18,
+    FA = 19
 }
 
 export const defaultLanguage: Language = Language.EN;
@@ -35,7 +39,11 @@ export const languages = [
     Language.FR,
     Language.PA,
     Language.PT,
-    Language.VI
+    Language.VI,
+    Language.HI,
+    Language.AR,
+    Language.DE,
+    Language.FA
 ];
 
 export const localizationText = (lang?: Language) => {
@@ -72,6 +80,14 @@ export const localizationText = (lang?: Language) => {
             return 'pt';
         case Language.VI:
             return 'vi';
+        case Language.HI:
+            return 'hi';
+        case Language.AR:
+            return 'ar';
+        case Language.DE:
+            return 'de';
+        case Language.FA:
+            return 'fa';
         default:
             return 'en';
     }
@@ -111,6 +127,14 @@ export const localizationFrom = (lang: string) => {
             return Language.PT;
         case 'vi':
             return Language.VI;
+        case 'hi':
+            return Language.HI;
+        case 'ar':
+            return Language.AR;
+        case 'de':
+            return Language.DE;
+        case 'fa':
+            return Language.FA;
         default:
             return Language.EN;
     }

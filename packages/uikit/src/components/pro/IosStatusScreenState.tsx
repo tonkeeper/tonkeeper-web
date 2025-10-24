@@ -26,6 +26,7 @@ import { useManageSubscription, useProLogout } from '../../state/pro';
 import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { useProPurchaseNotification } from '../modals/ProPurchaseNotificationControlled';
+import { ProSettingsPartnersSection } from './ProPartnersSecrion';
 
 interface IProps {
     subscription: ProSubscription | undefined;
@@ -133,6 +134,8 @@ export const IosStatusScreenState = ({ subscription }: IProps) => {
             {isIosAutoRenewable && (
                 <Body3Styled>{t('subscription_renews_automatically')}</Body3Styled>
             )}
+
+            <ProSettingsPartnersSection />
 
             <ButtonsBlockStyled>
                 {isIosActive && (

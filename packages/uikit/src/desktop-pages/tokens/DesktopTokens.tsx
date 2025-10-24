@@ -21,7 +21,7 @@ import { useAppTargetEnv } from '../../hooks/appSdk';
 import { InvisibleIcon, VisibleIcon } from '../../components/Icon';
 import { ForTargetEnv } from '../../components/shared/TargetEnv';
 import { PullToRefresh } from '../../components/mobile-pro/PullToRefresh';
-import { ErrorBoundary } from "../../components/shared/ErrorBoundary";
+import { ErrorBoundary } from '../../components/shared/ErrorBoundary';
 
 export const DesktopAssetStylesOverride = css`
     background-color: transparent;

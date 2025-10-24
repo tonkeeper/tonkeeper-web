@@ -70,6 +70,12 @@ export interface Config {
      * @memberof Config
      */
     meanPrices: ConfigMeanPrices;
+    /**
+     * reserved amount in TON that is kept for gas fees
+     * @type {string}
+     * @memberof Config
+     */
+    batteryReservedAmount: string;
 }
 
 /**
@@ -82,6 +88,7 @@ export function instanceOfConfig(value: object): value is Config {
     if (!('messageTtl' in value) || value['messageTtl'] === undefined) return false;
     if (!('gasProxy' in value) || value['gasProxy'] === undefined) return false;
     if (!('meanPrices' in value) || value['meanPrices'] === undefined) return false;
+    if (!('batteryReservedAmount' in value) || value['batteryReservedAmount'] === undefined) return false;
     return true;
 }
 
@@ -101,6 +108,7 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'messageTtl': json['message_ttl'],
         'gasProxy': ((json['gas_proxy'] as Array<any>).map(ConfigGasProxyInnerFromJSON)),
         'meanPrices': ConfigMeanPricesFromJSON(json['mean_prices']),
+        'batteryReservedAmount': json['battery_reserved_amount'],
     };
 }
 
@@ -121,6 +129,7 @@ export function ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean): Co
         'message_ttl': value['messageTtl'],
         'gas_proxy': ((value['gasProxy'] as Array<any>).map(ConfigGasProxyInnerToJSON)),
         'mean_prices': ConfigMeanPricesToJSON(value['meanPrices']),
+        'battery_reserved_amount': value['batteryReservedAmount'],
     };
 }
 

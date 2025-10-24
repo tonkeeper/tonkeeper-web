@@ -45,9 +45,11 @@ export enum QueryKey {
     total = 'total',
     distribution = 'distribution',
     pro = 'pro',
+    proAuthToken = 'proAuthToken',
     plans = 'plans',
     proBackup = 'proBackup',
     supportToken = 'supportToken',
+    formattedProPrice = 'formattedProPrice',
     trialAvailability = 'trialAvailability',
     allWalletsTotalBalance = 'allWalletsTotalBalance',
     originalTransactionId = 'originalTransactionId',
@@ -86,7 +88,8 @@ export enum QueryKey {
     searchEngineRecommendations = 'searchEngineRecommendations',
     appCountryInfo = 'appCountryInfo',
 
-    trc20TrxDefaultFee = 'trc20TrxDefaultFee'
+    trc20TrxDefaultFee = 'trc20TrxDefaultFee',
+    trc20FreeTransfersConfig = 'trc20FreeTransfersConfig'
 }
 
 export enum JettonKey {

@@ -20,6 +20,7 @@ import { useJettonList } from '../../state/jetton';
 import { eqAddresses } from '@tonkeeper/core/dist/utils/address';
 import { TON_ASSET } from '@tonkeeper/core/dist/entries/crypto/asset/constants';
 import { useNavigate } from '../../hooks/router/useNavigate';
+import { useIsFullWidthMode } from '../../hooks/useIsFullWidthMode';
 
 export interface TonAssetData {
     info: Account;
@@ -43,12 +44,14 @@ export const TonAsset = forwardRef<
 
     const { data } = useRate(CryptoCurrency.TON);
     const { fiatPrice, fiatAmount } = useFormatFiat(data, balance.relativeAmount);
+    const isFullWidth = useIsFullWidthMode();
 
     return (
         <ListItem
             onClick={() => navigate(AppRoute.coins + '/ton', { replace: false })}
             className={className}
             ref={ref}
+            backgroundHighlighted={isFullWidth}
         >
             <ListItemPayload>
                 <TokenLogo src={TON_ASSET.image} noRadius={TON_ASSET.noImageCorners} />
@@ -113,6 +116,7 @@ export const JettonAsset = forwardRef<
                 ?.jetton.verification,
         [jettonBalances, fiat]
     );
+    const isFullWidth = useIsFullWidthMode();
 
     return (
         <ListItem
@@ -129,6 +133,7 @@ export const JettonAsset = forwardRef<
             }
             className={className}
             ref={ref}
+            backgroundHighlighted={isFullWidth}
         >
             <ListItemPayload>
                 <TokenLogo src={balance.asset.image} noRadius={balance.asset.noImageCorners} />

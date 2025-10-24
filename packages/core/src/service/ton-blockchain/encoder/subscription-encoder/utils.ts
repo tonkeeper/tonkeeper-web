@@ -5,7 +5,7 @@ import { DeployParams, SubscriptionEncodingParams } from './types';
 
 export const prepareSubscriptionParamsForEncoder = (
     subscriptionParams: SubscriptionEncodingParams,
-    metaEncryptionMap: Record<string, IMetaEncryptionData>
+    metaEncryptionMap: Record<string, IMetaEncryptionData> | null
 ): DeployParams => {
     const {
         admin,
@@ -21,6 +21,10 @@ export const prepareSubscriptionParamsForEncoder = (
         deploy_value,
         metadata
     } = subscriptionParams;
+
+    if (!metaEncryptionMap || !metaEncryptionMap[selectedWallet.rawAddress]) {
+        throw new Error('No walletMetaKeyPair found!');
+    }
 
     return {
         beneficiary: Address.parse(admin),

@@ -3996,9 +3996,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ton/ton@npm:^15.4.0":
-  version: 15.4.0
-  resolution: "@ton/ton@npm:15.4.0"
+"@ton/ton@npm:^16.0.0":
+  version: 16.0.0
+  resolution: "@ton/ton@npm:16.0.0"
   dependencies:
     axios: "npm:^1.6.7"
     dataloader: "npm:^2.0.0"
@@ -4008,7 +4008,7 @@ __metadata:
   peerDependencies:
     "@ton/core": ">=0.62.0 <1.0.0"
     "@ton/crypto": ">=3.2.0"
-  checksum: 10/9ed3c3e26ea1b0d5991534980afc3b46a2a9eaf851e23b2d1ec6109f569f531eb74c0f8a3e8829f592e221f2fe0d9c34323057603ba40168b1893123acef9ad1
+  checksum: 10/90e2e3a77f8f24fddc43d6b82df70775ac006231800b563f7b8fbb6654ab21cb1c653f4cf2605a1759462d368e5813456f9ddc74f36747b8d2573aadbcce854c
   languageName: node
   linkType: hard
 
@@ -4027,7 +4027,7 @@ __metadata:
     "@ton-keychain/trx": "npm:^0.0.7"
     "@ton/core": "npm:0.56.0"
     "@ton/crypto": "npm:3.2.0"
-    "@ton/ton": "npm:^15.4.0"
+    "@ton/ton": "npm:^16.0.0"
     "@types/aes-js": "npm:^3.1.4"
     "@types/punycode": "npm:^2"
     aes-js: "npm:^3.1.2"
