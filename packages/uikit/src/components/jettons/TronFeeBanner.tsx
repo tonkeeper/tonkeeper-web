@@ -28,6 +28,9 @@ import { useDisclosure } from '../../hooks/useDisclosure';
 import { useDateTimeFormat } from '../../hooks/useDateTimeFormat';
 import { useProFeaturesNotification } from '../modals/ProFeaturesNotificationControlled';
 import { FLAGGED_FEATURE, useIsFeatureEnabled } from '../../state/tonendpoint';
+import { useProState } from '../../state/pro';
+import { isTelegramActiveSubscription } from '@tonkeeper/core/dist/entries/pro';
+import { useProAuthNotification } from '../modals/ProAuthNotificationControlled';
 
 const SmallDivider = styled.div`
     width: 100%;
@@ -255,6 +258,7 @@ const FeeTable = () => {
     const sdk = useAppSdk();
     const navigate = useNavigate();
 
+    const { data: subscription } = useProState();
     const { batterySenderFee, tonSenderFee, trxSenderFee } = useTrc20TransferDefaultFees();
     const { batteryTransfers, tonTransfers, trxTransfers } = useTrc20TransfersNumberAvailable();
     const { data: batteryBalance } = useBatteryBalance();
@@ -264,6 +268,7 @@ const FeeTable = () => {
     const { data: trc20FreeTransfers } = useTrc20FreeTransfersConfig();
     const formatDate = useDateTimeFormat();
     const { onOpen: onGetPro } = useProFeaturesNotification();
+    const { onOpen: onProAuthOpen } = useProAuthNotification();
     const isTronEnabled = useIsFeatureEnabled(FLAGGED_FEATURE.TRON);
 
     const hasBatteryTransfers = typeof batteryTransfers === 'number' && batteryTransfers > 0;
@@ -278,6 +283,14 @@ const FeeTable = () => {
         });
     };
 
+    const handleProButtonClick = () => {
+        if (isTelegramActiveSubscription(subscription)) {
+            onProAuthOpen();
+        } else {
+            onGetPro();
+        }
+    };
+
     return (
         <TableWrapper>
             {isTronEnabled && (
@@ -286,7 +299,7 @@ const FeeTable = () => {
                     {trc20FreeTransfers === undefined ? (
                         <span />
                     ) : trc20FreeTransfers.type === 'inactive' ? (
-                        <GetProButton primary size="small" onClick={() => onGetPro()}>
+                        <GetProButton primary size="small" onClick={handleProButtonClick}>
                             {t('pro_subscription_get_pro')}
                         </GetProButton>
                     ) : trc20FreeTransfers.availableTransfersNumber > 0 ? (
